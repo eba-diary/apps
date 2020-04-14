@@ -59,6 +59,7 @@ namespace Sentry.data.Web
             this.HasHeader = dto.HasHeader;
             this.SchemaId = dto.Schema.SchemaId;
             this.OldSchemaId = (dto.Schemas != null) ? dto.Schemas.FirstOrDefault().DataElementID : 0;
+            this.CLA1396_NewEtlColumns = (dto.Schema != null) ? dto.Schema.CLA1396_NewEtlColumns : false;
         }
 
         public DatasetFileConfigsModel(DatasetFileConfig dsfc, Boolean renderingForTable, Boolean renderingForPopup, IDatasetContext datasetContext)
@@ -151,6 +152,7 @@ namespace Sentry.data.Web
         public string RawStorageId { get; set; }
         public int SchemaId { get; set; }
         public int OldSchemaId { get; set; }
+        public bool CLA1396_NewEtlColumns { get; set; }
         public IList<RetrieverJob> RetrieverJobs { get; set; }
 
         public IList<DataElement> Schemas { get; set; }  
