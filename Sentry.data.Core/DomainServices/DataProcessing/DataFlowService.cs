@@ -247,7 +247,7 @@ namespace Sentry.data.Core
                         AddDataFlowStep(dto, df, DataActionType.UncompressZip);
                         break;
                     case CompressionTypes.GZIP:
-                        AddDataFlowStep(dto, df, DataActionType.UncompressGZip);
+                        AddDataFlowStep(dto, df, DataActionType.UncompressGzip);
                         break;
                     default:
                         break;
@@ -294,7 +294,7 @@ namespace Sentry.data.Core
                         AddDataFlowStep(dto, df, DataActionType.UncompressZip);
                         break;
                     case CompressionTypes.GZIP:
-                        AddDataFlowStep(dto, df, DataActionType.UncompressGZip);
+                        AddDataFlowStep(dto, df, DataActionType.UncompressGzip);
                         break;
                     default:
                         break;
@@ -483,7 +483,7 @@ namespace Sentry.data.Core
                         }
                     }
                     return schemaMapStep;
-                case DataActionType.UncompressGZip:
+                case DataActionType.UncompressGzip:
                 case DataActionType.None:
                 default:
                     return null;
@@ -545,7 +545,7 @@ namespace Sentry.data.Core
                 //These only send output to down stream dependent steps
                 case DataActionType.SchemaLoad:
                 case DataActionType.UncompressZip:
-                case DataActionType.UncompressGZip:
+                case DataActionType.UncompressGzip:
                 case DataActionType.SchemaMap:
                 case DataActionType.S3Drop:
                     step.TargetPrefix = null;
