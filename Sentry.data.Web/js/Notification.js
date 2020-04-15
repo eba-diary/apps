@@ -54,19 +54,11 @@ data.Notification = {
                 { data: "StartTime", className: "startTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
                 { data: "ExpirationTime", className: "expirationTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
                 { data: "MessageSeverityDescription", className: "messageSeverityTag" },
-                //{ data: null, className: "recycler", orderable: false, defaultContent: "<button style='background-color: #f44336; border: none; color: white;'>Expire</button> ", width: "20px" }
-
                 { data: null, className: "recycler", width: "20px", render: function (data) { return data.CanEdit ? '<a href=/Notification/ExpireNotification?notificationId=' + data.NotificationId + '\>Expire</a>' : ''; } },
                 
             ],
             order: [[3, 'desc'], [6, 'desc']]
         });
-
-        //$('#notificationTable tbody').on('click', 'td.recycler', function ()
-        //{
-        //    alert('jive');
-        //});
-
 
         // DataTable
         var table = $('#notificationTable').DataTable();
