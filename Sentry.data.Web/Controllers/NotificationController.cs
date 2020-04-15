@@ -43,7 +43,6 @@ namespace Sentry.data.Web.Controllers
             return View("NotFound");
         }
 
-
         [HttpGet]
         public ActionResult ExpireNotification(int notificationId = 0)
         {
@@ -51,19 +50,12 @@ namespace Sentry.data.Web.Controllers
             {
                 return View("NotFound");
             }
-            else
-            {
-                NotificationModel model = _notificationService.GetNotificationModelForModify(notificationId).ToWeb();
-                model.NotificationId = _notificationService.SubmitNotification(model.ToCore(),true);
-            }
+            
+            NotificationModel model = _notificationService.GetNotificationModelForModify(notificationId).ToWeb();
+            model.NotificationId = _notificationService.SubmitNotification(model.ToCore(),true);    //leverage this existing method and pass second param as true to flag for autoExpire
 
-            return Redirect(Request.UrlReferrer.PathAndQuery);
+            return Redirect("/Notification/ManageNotification");                                    //go back to ManageNotifications page to see refreshed notifications
         }
-
-
-
-
-
 
         [HttpPost]
         public ActionResult SubmitNotification(NotificationModel model)

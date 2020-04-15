@@ -70,6 +70,7 @@ namespace Sentry.data.Core
             return model;
         }
 
+        //NOTE: autoExpire is a default param, but when used it will auto expire the notification
         public int SubmitNotification(NotificationDto dto, bool autoExpire=false)
         {
             Notification notification = null;
@@ -85,10 +86,25 @@ namespace Sentry.data.Core
             }
             else
             {
-                //TODO: hardcode a min datetime here for start and end time is 1 second more
                 notification = _domainContext.Notification.FirstOrDefault(x => x.NotificationId == dto.NotificationId);
-                notification.ExpirationTime = (autoExpire)? DateTime.MinValue.AddSeconds(1) : dto.ExpirationTime;
-                notification.StartTime      = (autoExpire)? DateTime.MinValue : dto.StartTime;
+
+                //set these times to be static so logic below always is dealing the same date
+                DateTime startTime = dto.StartTime;
+                DateTime expirationTime = dto.ExpirationTime;
+                DateTime nowTime = DateTime.Now;
+
+                //if this is coming from auto expire, need to auto expire these dateTimes within the validation rules of the system, 
+                if (autoExpire)
+                {
+                    if(startTime > nowTime)
+                    {
+                        startTime = nowTime.Subtract(new TimeSpan(0, 1, 0));        //set to now minus a minute
+                    }
+                    expirationTime = nowTime;                                       //set to now time becuse its greater then startTime from abover
+                }
+
+                notification.ExpirationTime = expirationTime;
+                notification.StartTime = startTime;
                 notification.MessageSeverity = dto.MessageSeverity;
                 notification.Message = dto.Message;
                 notification.NotificationType = dto.NotificationType;
