@@ -463,6 +463,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<UncompressGzipAction> UncompressGzipAction
+        {
+            get
+            {
+                return Query<UncompressGzipAction>();
+            }
+        }
+
         public IQueryable<GoogleApiAction> GoogleApiAction
         {
             get
