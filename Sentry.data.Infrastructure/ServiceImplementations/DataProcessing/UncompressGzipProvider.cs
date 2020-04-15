@@ -21,15 +21,16 @@ namespace Sentry.data.Infrastructure
         private DataFlowStep _step;
 
         public UncompressGzipProvider(IMessagePublisher messagePublisher, IDataFeatures dataFeatures,
-            IDataFlowService dataFlowService) : base(dataFlowService)
+            IDataFlowService dataFlowService, IS3ServiceProvider s3ServiceProvider) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _featureFlags = dataFeatures;
+            _s3ServiceProvider = s3ServiceProvider;
         }
 
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
-            if (!_featureFlags.Remove_Mock_Uncompress_Logic_CLA_759.GetValue())
+            if (!_featureFlags.Remove_Mock_UncompressGzip_Logic_CLA_757.GetValue())
             {
                 Stopwatch stopWatch = new Stopwatch();
                 _step = step;

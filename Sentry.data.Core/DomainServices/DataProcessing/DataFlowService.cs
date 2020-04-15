@@ -457,6 +457,9 @@ namespace Sentry.data.Core
                 case DataActionType.ClaimIq:
                     action = _datasetContext.ClaimIQAction.FirstOrDefault();
                     break;
+                case DataActionType.UncompressGzip:
+                    action = _datasetContext.UncompressGzipAction.FirstOrDefault();
+                    break;
                 case DataActionType.SchemaLoad:
                     action = _datasetContext.SchemaLoadAction.FirstOrDefault();
                     DataFlowStep schemaLoadStep = MapToDataFlowStep(df, action, actionType);
@@ -483,7 +486,6 @@ namespace Sentry.data.Core
                         }
                     }
                     return schemaMapStep;
-                case DataActionType.UncompressGzip:
                 case DataActionType.None:
                 default:
                     return null;
