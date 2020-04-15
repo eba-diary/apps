@@ -32,7 +32,6 @@ data.Notification = {
                 tr.addClass('shown');
             }
         });
-
         
         $("#notificationTable").DataTable({
             autoWidth: true,
@@ -54,8 +53,7 @@ data.Notification = {
                 { data: "StartTime", className: "startTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
                 { data: "ExpirationTime", className: "expirationTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
                 { data: "MessageSeverityDescription", className: "messageSeverityTag" },
-                { data: null, className: "recycler", width: "20px", render: function (data) { return data.CanEdit ? '<a href=/Notification/ExpireNotification?notificationId=' + data.NotificationId + '\>Expire</a>' : ''; } },
-                
+                { data: null, className: "recycler", width: "20px", render: function (data) { return data.CanEdit ? '<a href=/Notification/ExpireNotification?notificationId=' + data.NotificationId + '\>Expire</a>' : ''; } }
             ],
             order: [[3, 'desc'], [6, 'desc']]
         });
