@@ -94,9 +94,10 @@ namespace Sentry.data.Infrastructure
             ConfigureClient();
             ConfigureRequest();
 
-            do
-            {
-                ConfigurePaging();                
+            //TODO: Revisit when GOOGLEAPI data source needs paging implemented
+            //do
+            //{
+            ConfigurePaging();                
 
                 IRestResponse resp = SendRequest();
                 string targetFullPath;
@@ -196,8 +197,9 @@ namespace Sentry.data.Infrastructure
 
                     }
                 }
-
-            } while (_hasNext);
+                
+            //TODO: Revisit when GOOGLEAPI data source needs paging implemented
+            //} while (_hasNext);
         }
 
         public override void Execute(RetrieverJob job, string filePath)
@@ -225,13 +227,15 @@ namespace Sentry.data.Infrastructure
 
             JObject x = JObject.Parse(resp.Content);
             
-            JArray report = (JArray)x["reports"];                
-            next = report[0]["nextPageToken"];
-            if (next != null)
-            {
-                _hasNext = true;
-                _nextVal = next.ToString();
-            }
+            JArray report = (JArray)x["reports"];
+            
+            //TODO: Revisit when GOOGLEAPI data source needs paging implemented
+            //next = report[0]["nextPageToken"];
+            //if (next != null)
+            //{
+            //    _hasNext = true;
+            //    _nextVal = next.ToString();
+            //}
 
             return resp;
         }
@@ -248,7 +252,7 @@ namespace Sentry.data.Infrastructure
 
         protected override string GetOAuthAccessToken(HTTPSSource source)
         {
-            if (source.CurrentTokenExp == null || source.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
+            if (source.CurrentToken == null || source.CurrentTokenExp == null || source.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
             {
                var httpHandler = new System.Net.Http.HttpClientHandler()
                 {
@@ -355,23 +359,24 @@ namespace Sentry.data.Infrastructure
             return x.ToString();
         }
 
+        //TODO: Revisit when GOOGLEAPI data source needs paging implemented
         private void ConfigurePaging()
         {
-            if (_job.JobOptions.HttpOptions.Body != null)
-            {
-                string requestBody = _job.JobOptions.HttpOptions.Body;
+            //if (_job.JobOptions.HttpOptions.Body != null)
+            //{
+            //    string requestBody = _job.JobOptions.HttpOptions.Body;
 
-                if (((GoogleApiSource)_job.DataSource).PagingEnabled)
-                {
-                    ConfigurePaging();
-                    requestBody = AddPageSize(requestBody);
-                    if (_nextVal != "0")
-                    {
-                        requestBody = AddPageToken(requestBody);
-                    };
-                }
-                _request.AddJsonBody(requestBody);
-            }
+            //    if (((GoogleApiSource)_job.DataSource).PagingEnabled)
+            //    {
+            //        ConfigurePaging();
+            //        requestBody = AddPageSize(requestBody);
+            //        if (_nextVal != "0")
+            //        {
+            //            requestBody = AddPageToken(requestBody);
+            //        };
+            //    }
+            //    _request.AddJsonBody(requestBody);
+            //}
         }
     }
 }
