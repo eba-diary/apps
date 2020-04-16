@@ -1,39 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.DataProcessing.Actions;
 using Sentry.data.Core.Entities.S3;
 using Sentry.data.Core.Interfaces.DataProcessing;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 
 namespace Sentry.data.Infrastructure
 {
-    [ActionType(DataActionType.GoogleApi)]
-    public class ClaimIQActionProvider : BaseActionProvider, IClaimIQActionProvider
+    [ActionType(DataActionType.UncompressGzip)]
+    public class UncompressGzipProvider : BaseActionProvider, IUncompressGzipProvider
     {
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IDataFeatures _featureFlags;
         private DataFlowStep _step;
 
-        public ClaimIQActionProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, 
-            IDataFlowService dataFlowService, IDataFeatures dataFeatures) : base(dataFlowService)
+        public UncompressGzipProvider(IMessagePublisher messagePublisher, IDataFeatures dataFeatures,
+            IDataFlowService dataFlowService, IS3ServiceProvider s3ServiceProvider) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
-            _s3ServiceProvider = s3ServiceProvider;
             _featureFlags = dataFeatures;
+            _s3ServiceProvider = s3ServiceProvider;
         }
 
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
-            if (!_featureFlags.Remove_ClaimIQ_mock_logic_CLA_758.GetValue())
+            if (!_featureFlags.Remove_Mock_UncompressGzip_Logic_CLA_757.GetValue())
             {
                 Stopwatch stopWatch = new Stopwatch();
                 _step = step;
@@ -46,14 +43,14 @@ namespace Sentry.data.Infrastructure
                     string fileName = Path.GetFileName(stepEvent.SourceKey);
 
                     /***************************************
-                     *  Perform provider specific processing
-                     ***************************************/
+                        *  Perform provider specific processing
+                        ***************************************/
                     // This step is performed by an external process
 
 
                     /***************************************
-                     *  Trigger dependent data flow steps
-                     ***************************************/
+                        *  Trigger dependent data flow steps
+                        ***************************************/
                     foreach (DataFlowStepEventTarget target in stepEvent.DownstreamTargets)
                     {
                         _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, target.BucketName, $"{target.ObjectKey}{fileName}");
@@ -100,16 +97,15 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
-                Logger.Debug("claimiq-executeaction disabled-by-featureflag");
+                Logger.Debug("uncompresszipprovider-executeaction disabled-by-featureflag");
             }
         }
 
         public override void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
-            _step = step;
             try
             {
-                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <{_step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
                 string objectKey = s3Event.s3.Object.key;
                 string keyBucket = s3Event.s3.bucket.name;
 
@@ -124,9 +120,9 @@ namespace Sentry.data.Infrastructure
                     ActionGuid = step.Action.ActionGuid.ToString(),
                     SourceBucket = keyBucket,
                     SourceKey = objectKey,
-                    StepTargetBucket = null,
-                    StepTargetPrefix = null, //This step does push data to long term storage, only pushes result to next steps
-                    EventType = GlobalConstants.DataFlowStepEvent.CLAIMIQ_PREPROCESSING_START,
+                    StepTargetBucket = step.Action.TargetStorageBucket,
+                    StepTargetPrefix = (step.TargetPrefix == null) ? null : step.TargetPrefix + $"{flowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
+                    EventType = GlobalConstants.DataFlowStepEvent.UNCOMPRESS_GZIP_START,
                     FileSize = s3Event.s3.Object.size.ToString(),
                     S3EventTime = s3Event.eventTime.ToString("s"),
                     OriginalS3Event = JsonConvert.SerializeObject(s3Event)
@@ -134,16 +130,16 @@ namespace Sentry.data.Infrastructure
 
                 base.GenerateDependencyTargets(stepEvent);
 
-                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
 
                 _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JsonConvert.SerializeObject(stepEvent));
 
-                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <{_step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
             }
             catch (Exception ex)
             {
-                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{_step.DataAction_Type_Id.ToString()} - publishstartevent failed", Log_Level.Error, ex);
-                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <{_step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent failed", Log_Level.Error, ex);
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
             }
         }
     }
