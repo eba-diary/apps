@@ -87,6 +87,7 @@
   <ItemGroup>
     <Compile Include="DomainServices\BusinessAreaService.cs" />
     <Compile Include="DomainServices\ConfigService.cs" />
+    <Compile Include="DomainServices\DaleService.cs" />
     <Compile Include="DomainServices\DataProcessing\DataFlowService.cs" />
     <Compile Include="DomainServices\DataProcessing\DataStepService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
@@ -200,6 +201,7 @@
     <Compile Include="Interfaces\DataProcessing\ISchemaMapProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
+    <Compile Include="Interfaces\IDaleService.cs" />
     <Compile Include="Interfaces\IDataFeatures.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
@@ -416,7 +418,9 @@
       <Name>Sentry.Messaging.Common</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="DTO\Dale\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
