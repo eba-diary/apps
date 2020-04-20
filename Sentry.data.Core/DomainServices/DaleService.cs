@@ -8,7 +8,7 @@ using Sentry.Common.Logging;
 
 namespace Sentry.data.Core
 {
-    class DaleService : IDaleService
+    public class DaleService : IDaleService
     {
         private readonly UserService _userService;
         private readonly IEventService _eventService;
@@ -20,6 +20,7 @@ namespace Sentry.data.Core
             _eventService = eventService;
         }
 
+       
         public void GetSearchResults(string search)
         {
 

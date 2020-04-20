@@ -390,6 +390,7 @@
     <Compile Include="Models\Config\ValidDatatypesModel.cs" />
     <Compile Include="Models\Config\ManageConfigsModel.cs" />
     <Compile Include="Models\ContactInfoModel.cs" />
+    <Compile Include="Models\Dale\DaleResultsModel.cs" />
     <Compile Include="Models\Dale\DaleSearchModel.cs" />
     <Compile Include="Models\DataAsset\AssetUIModel.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetInfoModel.cs" />
@@ -465,6 +466,7 @@
     <Content Include="Content\toastr.css" />
     <Content Include="Content\toastr.min.css" />
     <Content Include="Images\BusinessAreaTiles\Meeting3.jpg" />
+    <Content Include="Images\Dale\Dale.jpg" />
     <Content Include="Images\DataFlow\ConceptTeamwork1.jpg" />
     <Content Include="Images\DataFlow\Conversation12.jpg" />
     <Content Include="js\BusinessArea.js" />

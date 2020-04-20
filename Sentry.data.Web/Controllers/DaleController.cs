@@ -1,26 +1,26 @@
-﻿using Sentry.data.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using System.Web.SessionState;
+using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Web.Controllers
 {
-    [SessionState(SessionStateBehavior.ReadOnly)]
     public class DaleController : BaseController
     {
         private readonly IEventService _eventService;
         private readonly IDataFeatures _featureFlags;
+        private readonly IDaleService _daleService;
 
-        public DaleController(IEventService eventService,IDataFeatures featureFlags)
+        public DaleController(IEventService eventService,IDataFeatures featureFlags, IDaleService daleService)
         {
             _eventService = eventService;
             _featureFlags = featureFlags;
+            _daleService = daleService;
+
         }
 
-        //TODO create this to return model view
         public ActionResult DaleSearch()
         {
             if ( _featureFlags.Expose_DaleSearch_CLA_1450.GetValue() || SharedContext.CurrentUser.IsAdmin)
@@ -33,5 +33,15 @@ namespace Sentry.data.Web.Controllers
                 return View("Forbidden");
             }
         }
+
+        [HttpPost]
+        public ActionResult GetSearchResults(DaleSearchModel dale)
+        {
+
+            return View("Forbidden");
+
+        }
+
+
     }
 }
