@@ -8,7 +8,7 @@ namespace Sentry.data.Core
         bool CanUserModifyNotifications();
         NotificationDto GetNotificationModelForModify(int notificationId);
         NotificationDto GetNotificationModelForDisplay(int notificationId);
-        int SubmitNotification(NotificationDto dto, bool autoExpire=false);
+        int SubmitNotification(NotificationDto dto);
         List<NotificationDto> GetNotificationsForDataAsset();
         List<NotificationDto> GetNotificationForBusinessArea(BusinessAreaType type);
         List<NotificationDto> GetAllNotifications();
@@ -26,5 +26,7 @@ namespace Sentry.data.Core
         void CreateUpdateSubscription(SubscriptionDto dto);
 
         EventType FindEventTypeParent(EventType child);
+
+        void AutoExpire(int notificationId);
     }
 }

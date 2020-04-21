@@ -51,10 +51,10 @@ namespace Sentry.data.Web.Controllers
                 return View("NotFound");
             }
             
-            NotificationModel model = _notificationService.GetNotificationModelForModify(notificationId).ToWeb();
-            model.NotificationId = _notificationService.SubmitNotification(model.ToCore(),true);    //leverage this existing method and pass second param as true to flag for autoExpire
+            _notificationService.AutoExpire(notificationId);
 
-            return Redirect("/Notification/ManageNotification");                                    //go back to ManageNotifications page to see refreshed notifications
+            //go back to ManageNotifications page to see refreshed notifications
+            return Redirect("/Notification/ManageNotification");                                    
         }
 
         [HttpPost]
