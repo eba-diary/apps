@@ -112,6 +112,7 @@
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleApiAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\SchemaMapAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\UncompressGzipAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressZip.cs" />
     <Compile Include="Entities\DataProcessing\DataFlow_Log.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ActionTypeAttribute.cs" />
@@ -199,6 +200,7 @@
     <Compile Include="Interfaces\DataProcessing\IS3DropProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\ISchemaLoadProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\ISchemaMapProvider.cs" />
+    <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
     <Compile Include="Interfaces\IDaleService.cs" />
