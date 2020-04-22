@@ -117,8 +117,8 @@ namespace Sentry.data.Infrastructure
                 stopWatch.Start();
                 _step.LogExecution(_flowGuid, _runInstGuid, $"start-method <{_step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug);
 
-                //Convert FlowExecutionGuid to DateTime
-                DateTime flowGuidDTM = DataFlowHelpers.ConvertFlowGuidToDateTime(flowExecutionGuid);
+                //Convert FlowExecutionGuid to DateTime, then to local time
+                DateTime flowGuidDTM = DataFlowHelpers.ConvertFlowGuidToDateTime(flowExecutionGuid).ToLocalTime();
 
                 DataFlowStepEvent stepEvent = new DataFlowStepEvent()
                 {
@@ -132,7 +132,7 @@ namespace Sentry.data.Infrastructure
                     SourceBucket = keyBucket,
                     SourceKey = objectKey,
                     StepTargetBucket = _step.Action.TargetStorageBucket,
-                    StepTargetPrefix = _step.TargetPrefix + $"{flowGuidDTM.Year.ToString()}/{flowGuidDTM.Month.ToString()}/{flowGuidDTM.Day.ToString()}/",
+                    StepTargetPrefix = _step.TargetPrefix + $"{flowGuidDTM.Year.ToString()}/{flowGuidDTM.Month.ToString()}/{flowGuidDTM.Day.ToString()}/{DataFlowHelpers.GenerateGuid(flowExecutionGuid, runInstanceGuid)}/",
                     EventType = GlobalConstants.DataFlowStepEvent.RAW_STORAGE_START,
                     FileSize = s3Event.s3.Object.size.ToString(),
                     S3EventTime = s3Event.eventTime.ToString("s"),

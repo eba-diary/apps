@@ -18,5 +18,17 @@ namespace Sentry.data.Infrastructure.Helpers
             DateTime flowGuidDTM = DateTime.ParseExact(flowGuid, GlobalConstants.DataFlowGuidConfiguration.GUID_FORMAT, provider);
             return flowGuidDTM;
         }
+
+        public static string GenerateGuid(string executionGuid, string instanceGuid)
+        {
+            if (instanceGuid == null)
+            {
+                return executionGuid;
+            }
+            else
+            {
+                return executionGuid + "-" + instanceGuid;
+            }
+        }
     }
 }
