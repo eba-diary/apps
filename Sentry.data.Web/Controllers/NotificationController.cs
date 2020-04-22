@@ -43,6 +43,20 @@ namespace Sentry.data.Web.Controllers
             return View("NotFound");
         }
 
+        [HttpGet]
+        public ActionResult ExpireNotification(int notificationId = 0)
+        {
+            if (!_notificationService.CanUserModifyNotifications())
+            {
+                return View("NotFound");
+            }
+            
+            _notificationService.AutoExpire(notificationId);
+
+            //go back to ManageNotifications page to see refreshed notifications
+            return Redirect("/Notification/ManageNotification");                                    
+        }
+
         [HttpPost]
         public ActionResult SubmitNotification(NotificationModel model)
         {
@@ -112,11 +126,6 @@ namespace Sentry.data.Web.Controllers
             {
                 return PartialView("_Success", new SuccessModel("Notification access was successfully requested.", "HPSM Change Id: " + ticketId, true));
             }
-        }
-
-        public ActionResult GetNotificationPartialView(int notificationId)
-        {
-            return View("_Notification",_notificationService.GetNotificationModelForDisplay(notificationId).ToWeb());
         }
 
         public JsonResult GetApproversByBusinessArea(int businessAreaId)
