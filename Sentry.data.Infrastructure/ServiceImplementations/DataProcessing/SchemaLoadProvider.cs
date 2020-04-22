@@ -194,6 +194,6 @@ namespace Sentry.data.Infrastructure
             }
 
             return storageCode;
-        }S
+        }
     }
 }
