@@ -21,9 +21,9 @@ namespace Sentry.data.Core
         }
 
        
-        public void GetSearchResults(string search)
+        public DaleResultsDto GetSearchResults(DaleSearchDto dto)
         {
-
+            return new DaleResultsDto();
         }
 
 

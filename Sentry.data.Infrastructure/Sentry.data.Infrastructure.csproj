@@ -271,6 +271,7 @@
     </Compile>
     <Compile Include="ServiceImplementations\AWSLambdaProvider.cs" />
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
+    <Compile Include="ServiceImplementations\DaleSearchProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\BaseActionProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\ClaimIQActionProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\ConvertToParquetProvider.cs" />

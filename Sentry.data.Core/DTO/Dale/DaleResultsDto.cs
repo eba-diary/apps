@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Sentry.data.Web
+namespace Sentry.data.Core
 {
-    public class DaleResultsModel
+    public class DaleResultsDto
     {
 
         public string Server { get; set; }
@@ -18,7 +19,6 @@ namespace Sentry.data.Web
         public DateTime EffectiveDate { get; set; }
         public DateTime ExpirationDate { get; set; }
         public DateTime LastScanDate { get; set; }
-
 
 
     }

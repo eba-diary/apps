@@ -96,6 +96,8 @@
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
+    <Compile Include="DTO\Dale\DaleSearchDto.cs" />
+    <Compile Include="DTO\Dale\DaleResultsDto.cs" />
     <Compile Include="DTO\DataProcessing\CompressionJobDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDto.cs" />
@@ -420,9 +422,7 @@
       <Name>Sentry.Messaging.Common</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DTO\Dale\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
