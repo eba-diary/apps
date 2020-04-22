@@ -138,13 +138,13 @@ namespace Sentry.data.Infrastructure
                         SourceKey = objectKey,
                         StepTargetBucket = step.Action.TargetStorageBucket,
                         //<targetstorageprefix>/<dataflowid>/<storagecode>/<flow execution guid>[-<run instance guid>]/
-                        StepTargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.FlowStorageCode}/{item.MappedSchema.StorageCode}/{GenerateGuid(flowExecutionGuid, runInstanceGuid)}/",
+                        StepTargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.FlowStorageCode}/{item.MappedSchema.StorageCode}/{DataFlowHelpers.GenerateGuid(flowExecutionGuid, runInstanceGuid)}/",
                         EventType = GlobalConstants.DataFlowStepEvent.SCHEMA_LOAD_START,
                         FileSize = s3Event.s3.Object.size.ToString(),
                         S3EventTime = s3Event.eventTime.ToString("s"),
                         OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                     };
-
+                    
                     base.GenerateDependencyTargets(stepEvent);
 
                     step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
@@ -194,18 +194,6 @@ namespace Sentry.data.Infrastructure
             }
 
             return storageCode;
-        }
-
-        private string GenerateGuid(string executionGuid, string instanceGuid)
-        {
-            if (instanceGuid == null)
-            {
-                return executionGuid;
-            }
-            else
-            {
-                return executionGuid + "-" + instanceGuid;
-            }            
-        }
+        }S
     }
 }
