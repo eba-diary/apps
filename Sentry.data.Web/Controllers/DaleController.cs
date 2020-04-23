@@ -26,6 +26,9 @@ namespace Sentry.data.Web.Controllers
             if ( _featureFlags.Expose_DaleSearch_CLA_1450.GetValue() || SharedContext.CurrentUser.IsAdmin)
             {
                 DaleSearchModel model = new DaleSearchModel();
+
+                List<DaleResultDto> daleResults = _daleService.GetSearchResults(model.ToDto());
+
                 return View(model);
             }
             else
@@ -37,7 +40,7 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public ActionResult GetSearchResults(DaleSearchModel dale)
         {
-
+            List<DaleResultDto> daleResults = _daleService.GetSearchResults(dale.ToDto());
             return View("Forbidden");
 
         }

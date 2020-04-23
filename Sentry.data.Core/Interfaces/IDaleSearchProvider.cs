@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class DaleSearchDto
+    public interface IDaleSearchProvider
     {
-        public bool Column { get; set; }
-        public string Criteria { get; set; }
+        List<DaleResultDto> GetSearchResults(DaleSearchDto dto);
+
     }
 }

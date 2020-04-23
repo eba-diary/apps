@@ -17,7 +17,6 @@ namespace Sentry.data.Web
 
             return new DaleSearchDto()
             {
-                Table = model.Table,
                 Column = model.Column,
                 Criteria = model.Criteria
             };

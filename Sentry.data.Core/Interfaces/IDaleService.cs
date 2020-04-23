@@ -4,6 +4,6 @@ namespace Sentry.data.Core
 {
     public interface IDaleService
     {
-        DaleResultsDto GetSearchResults(DaleSearchDto dto);
+        List<DaleResultDto> GetSearchResults(DaleSearchDto dto);
     }
 }
