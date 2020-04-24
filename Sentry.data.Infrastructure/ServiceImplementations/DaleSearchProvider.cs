@@ -15,6 +15,11 @@ namespace Sentry.data.Infrastructure
         {
             List<DaleResultDto> daleResults = new List<DaleResultDto>();
 
+            dto.Table = true;
+            dto.Column = true;
+            dto.View = true;
+            dto.Criteria = "spam";
+
             //make sure incoming criteria is valid, or return empty results
             if (!IsCriteriaValid(dto))
             {
@@ -24,8 +29,7 @@ namespace Sentry.data.Infrastructure
             string connectionString = Configuration.Config.GetHostSetting("DaleConnectionString");
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                SqlCommand command = new SqlCommand(GetQuery(dto), connection);
-                //command.Parameters.AddWithValue("@pricePoint", paramValue);
+                SqlCommand command = new SqlCommand(BuildAQuery(dto), connection);
 
                 try
                 {
@@ -48,11 +52,25 @@ namespace Sentry.data.Infrastructure
             return daleResults;
         }
 
-        private string GetQuery(DaleSearchDto dto)
+        private string BuildAQuery(DaleSearchDto dto)
         {
             string qSelect = "SELECT  Server_NME,Database_NME,Table_NME,Column_NME,Column_TYP,Precision_LEN,Scale_LEN,Effective_DTM,Expiration_DTM,LastScan_DTM ";
             string qFrom = "FROM Column_v ";
-            string qWhereColumn = (dto.Column) ? "Column_NME " : "Table_NME";
+            
+            string qWhereColumn = String.Empty;
+            if(dto.Table)
+            {
+                qWhereColumn = "Table_NME";
+            }
+            else if(dto.Column)
+            {
+                qWhereColumn = "Column_NME";
+            }
+            else if(dto.View)
+            {
+                qWhereColumn = "View_NME";
+            }
+
             string qWhereStatement = "WHERE " + qWhereColumn + " LIKE '%" + dto.Criteria + "%'";
 
             string q = qSelect + qFrom + qWhereStatement;
@@ -62,14 +80,21 @@ namespace Sentry.data.Infrastructure
 
         private bool IsCriteriaValid(DaleSearchDto dto)
         {
+            bool isValid = true;
+
+            //validate for white space in criteria
             if (String.IsNullOrWhiteSpace(dto.Criteria) || String.IsNullOrEmpty(dto.Criteria))
             {
-                return false;
+                isValid = false;
             }
-            else
+
+            //validate to ensure something is selected to query
+            if ( (!dto.Table) && (!dto.Column) && (!dto.View))
             {
-                return true;
+                isValid = false;
             }
+
+            return isValid;
         }
 
         private DaleResultDto CreateDaleResultDto(SqlDataReader reader)

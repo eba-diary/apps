@@ -27,9 +27,12 @@ namespace Sentry.data.Web.Controllers
             {
                 DaleSearchModel model = new DaleSearchModel();
 
-                List<DaleResultDto> daleResults = _daleService.GetSearchResults(model.ToDto());
+                List<DaleResultModel> daleResultModels = _daleService.GetSearchResults(model.ToDto()).ToWeb();
 
-                return View(model);
+                if(daleResultModels.Count == 0)
+                    return View("Forbidden");
+                else 
+                    return View(model);
             }
             else
             {

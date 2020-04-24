@@ -13,8 +13,8 @@ namespace Sentry.data.Web
         public string Table { get; set; }
         public string Column { get; set; }
         public string ColumnType { get; set; }
-        public string PrecisionLength { get; set; }
-        public string ScaleLength { get; set; }
+        public int PrecisionLength { get; set; }
+        public int ScaleLength { get; set; }
         public DateTime EffectiveDate { get; set; }
         public DateTime ExpirationDate { get; set; }
         public DateTime LastScanDate { get; set; }
