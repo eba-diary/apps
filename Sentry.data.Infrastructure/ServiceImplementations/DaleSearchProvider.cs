@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Data.SqlClient;
 using Sentry.data.Core;
 using Sentry.Common.Logging;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Infrastructure
 {
@@ -14,11 +15,6 @@ namespace Sentry.data.Infrastructure
         public List<DaleResultDto> GetSearchResults(DaleSearchDto dto)
         {
             List<DaleResultDto> daleResults = new List<DaleResultDto>();
-
-            dto.Table = true;
-            dto.Column = true;
-            dto.View = true;
-            dto.Criteria = "spam";
 
             //make sure incoming criteria is valid, or return empty results
             if (!IsCriteriaValid(dto))
@@ -58,15 +54,15 @@ namespace Sentry.data.Infrastructure
             string qFrom = "FROM Column_v ";
             
             string qWhereColumn = String.Empty;
-            if(dto.Table)
+            if(dto.Destination == DaleDestination.Table)
             {
                 qWhereColumn = "Table_NME";
             }
-            else if(dto.Column)
+            else if(dto.Destination == DaleDestination.Column)
             {
                 qWhereColumn = "Column_NME";
             }
-            else if(dto.View)
+            else if(dto.Destination == DaleDestination.View)
             {
                 qWhereColumn = "View_NME";
             }
@@ -88,8 +84,8 @@ namespace Sentry.data.Infrastructure
                 isValid = false;
             }
 
-            //validate to ensure something is selected to query
-            if ( (!dto.Table) && (!dto.Column) && (!dto.View))
+            //validate to ensure valid destination
+            if ( (dto.Destination != DaleDestination.Table) && (dto.Destination != DaleDestination.Column) && (dto.Destination != DaleDestination.View))
             {
                 isValid = false;
             }

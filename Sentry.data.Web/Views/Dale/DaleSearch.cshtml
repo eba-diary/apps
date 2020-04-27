@@ -1,12 +1,44 @@
 ﻿@using Sentry.data.Web;
-@Model DaleSearchModel
-@{
-    ViewBag.Title = "Dale Search";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+@model DaleSearchModel
+
+
+
+
+@using (Html.BeginForm("GetSearchResults", "Dale", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="jive">
+        <div class="jive" style="background-image: url('/Images/Dale/AskDaleLogo.jpg'); background-position: 50% 50%; height: 180px; background-repeat: no-repeat;"></div>
+
+        <div class="form-group" style="text-align: center;">
+            @Html.RadioButtonFor((model) => model.Destination, Sentry.data.Core.GlobalEnums.DaleDestination.Table)
+            Table
+            @Html.RadioButtonFor((model) => model.Destination, Sentry.data.Core.GlobalEnums.DaleDestination.Column, new { Checked = "checked" })
+            Column
+            @Html.RadioButtonFor((model) => model.Destination, Sentry.data.Core.GlobalEnums.DaleDestination.View)
+            View
+        </div>
+
+        <div style="text-align: center;">
+            <div>
+                @Html.TextBoxFor((model) => model.Criteria, new { @class = "ask-dale" })
+                <input type="submit" value="Answer!" class="btn btn-primary" />
+            </div>
+        </div>
+
+    </div>
+
+
 }
 
-<div class="col-sm-12 col-md-12 col-lg-12">
-    <p class="landing-pg-tile-title blue">Ask Dale</p>
-    <div class="landing-pg-image" style="background-image: url('/Images/Dale/Dale.jpg');"></div>
-    <p class="landing-pg-hyperlink"><a target="_blank" href="todo" class="blue">Ask Dale! &gt;</a></p>
-</div>
+
+
+@section Scripts {
+    <script type="text/javascript">
+
+        $(function () {
+            data.Dale.init();
+        });
+
+    </script>
+}

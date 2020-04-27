@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Web
 {
@@ -10,11 +11,10 @@ namespace Sentry.data.Web
 
         public DaleSearchModel() { }
 
-        public bool Table { get; set; }
-        public bool Column { get; set; }
-        public bool View { get; set; }
         public string Criteria { get; set; }
 
-
+        public DaleDestination Destination { get; set; }
     }
+
+
 }

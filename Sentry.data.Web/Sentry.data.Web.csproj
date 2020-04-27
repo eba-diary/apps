@@ -456,6 +456,7 @@
     <Content Include="Content\bootstrap-datetimepicker.css" />
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.min.css" />
+    <Content Include="Content\dale.css" />
     <Content Include="Content\dataflow.css" />
     <Content Include="Content\dataset-detail.css" />
     <Content Include="Content\datasets.css" />
@@ -467,10 +468,11 @@
     <Content Include="Content\toastr.css" />
     <Content Include="Content\toastr.min.css" />
     <Content Include="Images\BusinessAreaTiles\Meeting3.jpg" />
-    <Content Include="Images\Dale\Dale.jpg" />
+    <Content Include="Images\Dale\AskDaleLogo.jpg" />
     <Content Include="Images\DataFlow\ConceptTeamwork1.jpg" />
     <Content Include="Images\DataFlow\Conversation12.jpg" />
     <Content Include="js\BusinessArea.js" />
+    <Content Include="js\Dale.js" />
     <Content Include="js\DataFlow.js" />
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />

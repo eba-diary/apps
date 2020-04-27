@@ -17,10 +17,11 @@ namespace Sentry.data.Web
 
             return new DaleSearchDto()
             {
-                Column = model.Column,
-                Table = model.Table,
-                View = model.View,
-                Criteria = model.Criteria
+
+                Criteria = model.Criteria,
+                Destination = model.Destination
+                
+                
             };
             
         }
