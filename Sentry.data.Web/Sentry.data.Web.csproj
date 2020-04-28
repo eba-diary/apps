@@ -1374,6 +1374,7 @@
     <Content Include="Views\BusinessArea\_LibertyBellPopover.cshtml" />
     <Content Include="Views\BusinessArea\_LibertyBellPopoverItem.cshtml" />
     <Content Include="Views\Dale\DaleSearch.cshtml" />
+    <Content Include="Views\Dale\DaleResult.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

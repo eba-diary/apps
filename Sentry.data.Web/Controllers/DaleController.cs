@@ -18,7 +18,6 @@ namespace Sentry.data.Web.Controllers
             _eventService = eventService;
             _featureFlags = featureFlags;
             _daleService = daleService;
-
         }
 
         public ActionResult DaleSearch()
@@ -37,13 +36,16 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public ActionResult GetSearchResults(DaleSearchModel searchModel)
         {
-            List<DaleResultModel> resultModels = _daleService.GetSearchResults(searchModel.ToDto()).ToWeb();
 
-
-            return View("Forbidden");
-
+            if (_featureFlags.Expose_DaleSearch_CLA_1450.GetValue() || SharedContext.CurrentUser.IsAdmin)
+            {
+                searchModel.DaleResults = _daleService.GetSearchResults(searchModel.ToDto()).ToWeb();
+                return View("DaleResult", searchModel);
+            }
+            else
+            {
+                return View("Forbidden");
+            }
         }
-
-
     }
 }

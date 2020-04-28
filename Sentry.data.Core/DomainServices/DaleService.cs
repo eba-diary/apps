@@ -15,7 +15,6 @@ namespace Sentry.data.Core
         private readonly IEventService _eventService;
         private readonly IDaleSearchProvider _daleSearchProvider;
 
-
         public DaleService(UserService userService, IEventService eventService, IDaleSearchProvider daleSearchProvider)
         {
             _userService = userService;
@@ -29,9 +28,5 @@ namespace Sentry.data.Core
             List<DaleResultDto> daleResults = _daleSearchProvider.GetSearchResults(dto);
             return daleResults;
         }
-
-
-
-
     }
 }
