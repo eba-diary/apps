@@ -76,21 +76,18 @@ namespace Sentry.data.Infrastructure
 
         private bool IsCriteriaValid(DaleSearchDto dto)
         {
-            bool isValid = true;
-
-            //validate for white space in criteria
-            if (String.IsNullOrWhiteSpace(dto.Criteria) || String.IsNullOrEmpty(dto.Criteria))
+            //validate for white space only, null, empty string in criteria
+            if (String.IsNullOrWhiteSpace(dto.Criteria))
             {
-                isValid = false;
+                return false;
             }
 
             //validate to ensure valid destination
             if ( (dto.Destination != DaleDestination.Table) && (dto.Destination != DaleDestination.Column) && (dto.Destination != DaleDestination.View))
             {
-                isValid = false;
+                return false;
             }
-
-            return isValid;
+            return true;
         }
 
         private DaleResultDto CreateDaleResultDto(SqlDataReader reader)

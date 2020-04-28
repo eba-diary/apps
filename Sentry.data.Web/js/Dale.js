@@ -1,7 +1,6 @@
 ﻿data.Dale =
 {
-    init: function ()
-    {
+    init: function () {
         //$("[id^='RequestAccessButton']").off('click').on('click', function (e)
         //{
         //    $.ajax({
@@ -22,4 +21,4 @@
         //    });
         //});
     }
-}
+};
