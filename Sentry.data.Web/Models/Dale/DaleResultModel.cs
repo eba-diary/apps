@@ -7,7 +7,6 @@ namespace Sentry.data.Web
 {
     public class DaleResultModel
     {
-
         public string Server { get; set; }
         public string Database { get; set; }
         public string Table { get; set; }
@@ -18,8 +17,5 @@ namespace Sentry.data.Web
         public DateTime EffectiveDate { get; set; }
         public DateTime ExpirationDate { get; set; }
         public DateTime LastScanDate { get; set; }
-
-
-
     }
 }

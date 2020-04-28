@@ -8,9 +8,6 @@ namespace Sentry.data.Web
 {
     public class DaleSearchModel
     {
-
-        public DaleSearchModel() { }
-
         public string Criteria { get; set; }
 
         public DaleDestination Destination { get; set; }
