@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[Notifications]
 (
 	[Notification_ID] INT NOT NULL PRIMARY KEY IDENTITY, 
-    [Message_DSC] VARCHAR(250) NOT NULL, 
+    [Message_DSC] VARCHAR(1001) NOT NULL, 
     [CreateUser] VARCHAR(10) NOT NULL, 
     [Start_DTM] DATETIME NOT NULL, 
     [Expire_DTM] DATETIME NOT NULL, 

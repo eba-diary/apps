@@ -14,7 +14,8 @@ data.Notification = {
 
     },
 
-    NotificationTableInit: function () {
+    NotificationTableInit: function ()
+    {
         $('#notificationTable tbody').on('click', 'td.details-control', function () {
             var tr = $(this).closest('tr');
             var row = table.row(tr);
@@ -31,7 +32,7 @@ data.Notification = {
                 tr.addClass('shown');
             }
         });
-
+        
         $("#notificationTable").DataTable({
             autoWidth: true,
             serverSide: true,
@@ -51,11 +52,11 @@ data.Notification = {
                 { data: "CreateUser", className: "displayCreateUser" },
                 { data: "StartTime", className: "startTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
                 { data: "ExpirationTime", className: "expirationTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
-                { data: "MessageSeverityDescription", className: "messageSeverityTag" }
+                { data: "MessageSeverityDescription", className: "messageSeverityTag" },
+                { data: null, className: "recycler", width: "20px", render: function (data) { return data.CanEdit ? '<a href=/Notification/ExpireNotification?notificationId=' + data.NotificationId + '\>Expire</a>' : ''; } }
             ],
             order: [[3, 'desc'], [6, 'desc']]
         });
-
 
         // DataTable
         var table = $('#notificationTable').DataTable();

@@ -19,6 +19,18 @@ namespace Sentry.data.Infrastructure.Helpers
             return flowGuidDTM;
         }
 
+        public static string GenerateGuid(string executionGuid, string instanceGuid)
+        {
+            if (instanceGuid == null)
+            {
+                return executionGuid;
+            }
+            else
+            {
+                return executionGuid + "-" + instanceGuid;
+            }
+        }
+
         /// <summary>
         /// Return file name suffixed with flowexecutionguid.  Retruns null when filename does not 
         /// match file format.
