@@ -18,5 +18,27 @@ namespace Sentry.data.Infrastructure.Helpers
             DateTime flowGuidDTM = DateTime.ParseExact(flowGuid, GlobalConstants.DataFlowGuidConfiguration.GUID_FORMAT, provider);
             return flowGuidDTM;
         }
+
+        /// <summary>
+        /// Return file name suffixed with flowexecutionguid.  Retruns null when filename does not 
+        /// match file format.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="flowExecutionGuid"></param>
+        /// <returns></returns>
+        public static string AddFlowExecutionGuidToFilename(string filename, string flowExecutionGuid)
+        {
+            string newFilename = null;
+
+            //testfile.txt.json will result in ['testfile', 'txt.json']
+            string[] split = filename.Split(new Char[] { '.' }, 2);
+
+            if (split.Any() && split.Count() == 2)
+            {
+                newFilename = $"{split[0]}_{flowExecutionGuid}.{split[1]}";
+            }
+            
+            return newFilename;
+        }
     }
 }
