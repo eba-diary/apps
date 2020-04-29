@@ -197,6 +197,8 @@
         {
             public const string DATAASSET_TYPE = "DA";
             public const string BUSINESSAREA_TYPE = "BA";
+            public const int TITLE_MAX_SIZE = 250;
+            public const int MESSAGE_MAX_SIZE = 1000;
         }
 
         public static class JobStates
@@ -280,6 +282,7 @@
             public const string CONVERT_TO_PARQUET_PREFIX = TEMP_FILE_PREFIX + "parquet/";
             public const string SCHEMA_MAP_PREFIX = TEMP_FILE_PREFIX + "schemamap/";
             public const string UNCOMPRESS_ZIP_PREFIX = TEMP_FILE_PREFIX + "uncompresszip/";
+            public const string UNCOMPRESS_GZIP_PREFIX = TEMP_FILE_PREFIX + "uncompressgzip/";
             public const string GOOGLEAPI_PREPROCESSING_PREFIX = TEMP_FILE_PREFIX + "googleapipreprocessing/";
             public const string CLAIMIQ_PREPROCESSING_PREFIX = TEMP_FILE_PREFIX + "claimiqpreprocessing/";
         }
@@ -293,6 +296,7 @@
             public const string SCHEMA_MAP_START = "DATAFLOWSTEP_SCHEMA_MAP_START";
             public const string CONVERT_TO_PARQUET_START = "DATAFLOWSTEP_CONVERTTOPARQUET_START";
             public const string UNCOMPRESS_ZIP_START = "DATAFLOWSTEP_UNCOMPRESSZIP_START";
+            public const string UNCOMPRESS_GZIP_START = "DATAFLOWSTEP_UNCOMPRESSGZIP_START";
             public const string GOOGLEAPI_PREPROCESSING_START = "DATAFLOWSTEP_GOOGLEAPIPREPROCESSING_START";
             public const string CLAIMIQ_PREPROCESSING_START = "DATAFLOWSTEP_CLAIMIQPREPROCESSING_START";
         }

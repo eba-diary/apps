@@ -197,6 +197,7 @@
     <Compile Include="Mappings\Primary\DataProcessing\Actions\ClaimIQActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleApiActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\SchemaMapActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\UncompressGzipActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\UncompressZipActionMapping.cs" />
     <Compile Include="Mappings\Primary\NotificationMapping.cs" />
     <Compile Include="Mappings\Primary\AssetSourceMapping.cs" />
@@ -270,6 +271,7 @@
     </Compile>
     <Compile Include="ServiceImplementations\AWSLambdaProvider.cs" />
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
+    <Compile Include="ServiceImplementations\DaleSearchProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\BaseActionProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\ClaimIQActionProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\ConvertToParquetProvider.cs" />
@@ -281,6 +283,7 @@
     <Compile Include="ServiceImplementations\DataProcessing\S3DropProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\SchemaLoadProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\SchemaMapProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\UncompressGzipProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\UncompressZipProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\DfsDataFlowBasicProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\FtpDataFlowProvider.cs" />

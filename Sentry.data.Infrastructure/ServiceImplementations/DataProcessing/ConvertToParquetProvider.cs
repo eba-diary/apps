@@ -126,8 +126,8 @@ namespace Sentry.data.Infrastructure
                     _dataset = datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).FirstOrDefault().ParentDataset;
                 }
 
-                //Convert FlowExecutionGuid to DateTime
-                DateTime flowGuidDTM = DataFlowHelpers.ConvertFlowGuidToDateTime(flowExecutionGuid);
+                //Convert FlowExecutionGuid to DateTime, then to local time
+                DateTime flowGuidDTM = DataFlowHelpers.ConvertFlowGuidToDateTime(flowExecutionGuid).ToLocalTime();
 
                 DataFlowStepEvent stepEvent = new DataFlowStepEvent()
                 {

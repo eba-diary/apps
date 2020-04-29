@@ -20,77 +20,87 @@ namespace Sentry.data.Infrastructure
     {
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
+        private readonly IDataFeatures _featureFlags;
         private DataFlowStep _step;
 
-        public ClaimIQActionProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, IDataFlowService dataFlowService) : base(dataFlowService)
+        public ClaimIQActionProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, 
+            IDataFlowService dataFlowService, IDataFeatures dataFeatures) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
+            _featureFlags = dataFeatures;
         }
 
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
-            Stopwatch stopWatch = new Stopwatch();
-            _step = step;
-
-            _step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"start-method <{_step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug);
-
-            try
+            if (!_featureFlags.Remove_ClaimIQ_mock_logic_CLA_758.GetValue())
             {
-                stopWatch.Start();
-                string fileName = Path.GetFileName(stepEvent.SourceKey);
+                Stopwatch stopWatch = new Stopwatch();
+                _step = step;
 
-                /***************************************
-                 *  Perform provider specific processing
-                 ***************************************/
-                // This step is performed by an external process
+                _step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"start-method <{_step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug);
 
-
-                /***************************************
-                 *  Trigger dependent data flow steps
-                 ***************************************/
-                foreach (DataFlowStepEventTarget target in stepEvent.DownstreamTargets)
+                try
                 {
-                    _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, target.BucketName, $"{target.ObjectKey}{fileName}");
+                    stopWatch.Start();
+                    string fileName = Path.GetFileName(stepEvent.SourceKey);
+
+                    /***************************************
+                     *  Perform provider specific processing
+                     ***************************************/
+                    // This step is performed by an external process
+
+
+                    /***************************************
+                     *  Trigger dependent data flow steps
+                     ***************************************/
+                    foreach (DataFlowStepEventTarget target in stepEvent.DownstreamTargets)
+                    {
+                        _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, target.BucketName, $"{target.ObjectKey}{fileName}");
 
 #if (DEBUG)
-                    //Mock for testing... sent mock s3object created 
-                    S3Event s3e = null;
-                    s3e = new S3Event
-                    {
-                        EventType = "S3EVENT",
-                        PayLoad = new S3ObjectEvent()
+                        //Mock for testing... sent mock s3object created 
+                        S3Event s3e = null;
+                        s3e = new S3Event
                         {
-                            eventName = "ObjectCreated:Put",
-                            s3 = new S3()
+                            EventType = "S3EVENT",
+                            PayLoad = new S3ObjectEvent()
                             {
-                                bucket = new Bucket()
+                                eventName = "ObjectCreated:Put",
+                                s3 = new S3()
                                 {
-                                    name = target.BucketName
-                                },
-                                Object = new Sentry.data.Core.Entities.S3.Object()
-                                {
-                                    key = $"{target.ObjectKey}{fileName}"
+                                    bucket = new Bucket()
+                                    {
+                                        name = target.BucketName
+                                    },
+                                    Object = new Sentry.data.Core.Entities.S3.Object()
+                                    {
+                                        key = $"{target.ObjectKey}{fileName}"
+                                    }
                                 }
                             }
-                        }
-                    };
-                    _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+                        };
+                        _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
 #endif
-                }
+                    }
 
-                stopWatch.Stop();
-
-                _step.Executions.Add(_step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-executeaction-success", Log_Level.Debug, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }));
-            }
-            catch (Exception ex)
-            {
-                if (stopWatch.IsRunning)
-                {
                     stopWatch.Stop();
+
+                    _step.Executions.Add(_step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-executeaction-success", Log_Level.Debug, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }));
                 }
-                _step.Executions.Add(_step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-executeaction-failed", Log_Level.Error, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, ex));
-                _step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"end-method <{_step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug);
+                catch (Exception ex)
+                {
+                    if (stopWatch.IsRunning)
+                    {
+                        stopWatch.Stop();
+                    }
+                    _step.Executions.Add(_step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-executeaction-failed", Log_Level.Error, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, ex));
+                    _step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"end-method <{_step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug);
+                }
+            }
+            else
+            {
+                Logger.Debug("claimiq-executeaction disabled-by-featureflag");
             }
         }
 
