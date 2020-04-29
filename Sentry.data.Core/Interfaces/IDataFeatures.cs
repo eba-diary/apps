@@ -9,5 +9,8 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> Remove_ConvertToParquet_Logic_CLA_747 { get; }
         IFeatureFlag<bool> Expose_TrainingMaterials_CLA_911 { get; }
         IFeatureFlag<bool> Remove_ClaimIQ_mock_logic_CLA_758 { get; }
+        IFeatureFlag<bool> Expose_DaleSearch_CLA_1450 { get; }
+
+
     }
 }
