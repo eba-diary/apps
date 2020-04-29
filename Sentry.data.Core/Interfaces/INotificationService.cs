@@ -26,5 +26,7 @@ namespace Sentry.data.Core
         void CreateUpdateSubscription(SubscriptionDto dto);
 
         EventType FindEventTypeParent(EventType child);
+
+        void AutoExpire(int notificationId);
     }
 }

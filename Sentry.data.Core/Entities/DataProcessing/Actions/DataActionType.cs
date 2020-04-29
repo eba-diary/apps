@@ -18,7 +18,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
         [Description("Uncompress Zip")]
         UncompressZip = 6,
         [Description("Uncompress GZip")]
-        UncompressGZip = 7,
+        UncompressGzip = 7,
         [Description("Schema Map")]
         SchemaMap = 8,
         [Description("Google Api")]

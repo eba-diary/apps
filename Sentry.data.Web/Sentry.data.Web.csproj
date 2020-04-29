@@ -16,7 +16,7 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44321</IISExpressSSLPort>
+    <IISExpressSSLPort>44371</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -292,6 +292,7 @@
     <Compile Include="Controllers\DataFlowController.cs" />
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\FavoritesController.cs" />
+    <Compile Include="Controllers\DaleController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\WebApi\AssetController.cs" />
     <Compile Include="Controllers\DataAssetController.cs" />
@@ -313,6 +314,7 @@
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Extensions\BusinessIntelligenceExtensions.cs" />
     <Compile Include="Extensions\ConfigExtension.cs" />
+    <Compile Include="Extensions\DaleExtensions.cs" />
     <Compile Include="Extensions\DataFlowExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
     <Compile Include="Extensions\FavoriteExtensions.cs" />
@@ -389,6 +391,8 @@
     <Compile Include="Models\Config\ValidDatatypesModel.cs" />
     <Compile Include="Models\Config\ManageConfigsModel.cs" />
     <Compile Include="Models\ContactInfoModel.cs" />
+    <Compile Include="Models\Dale\DaleResultModel.cs" />
+    <Compile Include="Models\Dale\DaleSearchModel.cs" />
     <Compile Include="Models\DataAsset\AssetUIModel.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetInfoModel.cs" />
     <Compile Include="Models\DataProcessing\CompressionModel.cs" />
@@ -452,6 +456,7 @@
     <Content Include="Content\bootstrap-datetimepicker.css" />
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.min.css" />
+    <Content Include="Content\dale.css" />
     <Content Include="Content\dataflow.css" />
     <Content Include="Content\dataset-detail.css" />
     <Content Include="Content\datasets.css" />
@@ -463,9 +468,11 @@
     <Content Include="Content\toastr.css" />
     <Content Include="Content\toastr.min.css" />
     <Content Include="Images\BusinessAreaTiles\Meeting3.jpg" />
+    <Content Include="Images\Dale\AskDaleLogo.jpg" />
     <Content Include="Images\DataFlow\ConceptTeamwork1.jpg" />
     <Content Include="Images\DataFlow\Conversation12.jpg" />
     <Content Include="js\BusinessArea.js" />
+    <Content Include="js\Dale.js" />
     <Content Include="js\DataFlow.js" />
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
@@ -1366,6 +1373,8 @@
     <Content Include="Views\BusinessArea\_LibertyBell.cshtml" />
     <Content Include="Views\BusinessArea\_LibertyBellPopover.cshtml" />
     <Content Include="Views\BusinessArea\_LibertyBellPopoverItem.cshtml" />
+    <Content Include="Views\Dale\DaleSearch.cshtml" />
+    <Content Include="Views\Dale\DaleResult.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
