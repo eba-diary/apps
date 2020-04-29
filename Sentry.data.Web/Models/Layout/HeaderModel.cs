@@ -23,5 +23,6 @@ namespace Sentry.data.Web
         public Boolean CanViewReports { get; set; }
         public Boolean CanManageReports { get; set; }
         public Boolean CanViewBusinessArea { get; set; }
+        public Boolean CanViewDale { get; set; }
     }
 }

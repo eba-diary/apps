@@ -87,6 +87,7 @@
   <ItemGroup>
     <Compile Include="DomainServices\BusinessAreaService.cs" />
     <Compile Include="DomainServices\ConfigService.cs" />
+    <Compile Include="DomainServices\DaleService.cs" />
     <Compile Include="DomainServices\DataProcessing\DataFlowService.cs" />
     <Compile Include="DomainServices\DataProcessing\DataStepService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
@@ -95,6 +96,8 @@
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
+    <Compile Include="DTO\Dale\DaleSearchDto.cs" />
+    <Compile Include="DTO\Dale\DaleResultDto.cs" />
     <Compile Include="DTO\DataProcessing\CompressionJobDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDto.cs" />
@@ -176,6 +179,7 @@
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DataSourceQueryExtensions.cs" />
     <Compile Include="Extensions\SchemaExtensions.cs" />
+    <Compile Include="GlobalEnums\DaleDestination.cs" />
     <Compile Include="GlobalEnums\DataFlowPreProcessingTypes.cs" />
     <Compile Include="GlobalEnums\HttpDataFormat.cs" />
     <Compile Include="GlobalEnums\HTTPMethods.cs" />
@@ -202,6 +206,8 @@
     <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
+    <Compile Include="Interfaces\IDaleSearchProvider.cs" />
+    <Compile Include="Interfaces\IDaleService.cs" />
     <Compile Include="Interfaces\IDataFeatures.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
