@@ -49,7 +49,8 @@ namespace Sentry.data.Infrastructure
                  ***************************************/
                 bool IsRegisterSuccessful = false;
 
-                string targetFileName = Path.GetFileNameWithoutExtension(stepEvent.SourceKey) + "_" + _flowGuid + Path.GetExtension(stepEvent.SourceKey);
+
+                string targetFileName = DataFlowHelpers.AddFlowExecutionGuidToFilename(Path.GetFileName(stepEvent.SourceKey), _flowGuid);
                 string targetKey = stepEvent.StepTargetPrefix + targetFileName;
 
                 //Copy file to RawQuery Storage
