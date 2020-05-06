@@ -4,6 +4,9 @@ using System.Linq;
 using System.Web.Mvc;
 using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.DataTables.Mvc;
+using Sentry.DataTables.QueryableAdapter;
+using Sentry.DataTables.Shared;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -33,19 +36,42 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        [HttpPost]
-        public ActionResult GetSearchResults(DaleSearchModel searchModel)
+        public JsonResult GetSearchResults([ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest,string searchCriteria, string destination)
         {
+            DaleSearchModel searchModel = new DaleSearchModel();
+            searchModel.Criteria = searchCriteria;
+            searchModel.Destiny = destination.ToDaleDestiny();
 
-            if (_featureFlags.Expose_DaleSearch_CLA_1450.GetValue() || SharedContext.CurrentUser.IsAdmin)
+            if(IsCriteriaValid(searchModel))
             {
                 searchModel.DaleResults = _daleService.GetSearchResults(searchModel.ToDto()).ToWeb();
-                return View("DaleResult", searchModel);
             }
             else
             {
-                return View("Forbidden");
+                searchModel.DaleResults = new List<DaleResultModel>();
             }
+
+            DataTablesQueryableAdapter<DaleResultModel> dtqa = new DataTablesQueryableAdapter<DaleResultModel>(searchModel.DaleResults.AsQueryable(), dtRequest);
+            DataTablesResponse response = dtqa.GetDataTablesResponse();
+
+            return Json(response);
+        }
+
+
+        private bool IsCriteriaValid(DaleSearchModel model)
+        {
+            //validate for white space only, null, empty string in criteria
+            if (String.IsNullOrWhiteSpace(model.Criteria))
+            {
+                return false;
+            }
+
+            //validate to ensure valid destination
+            if ((model.Destiny != DaleDestiny.Table) && (model.Destiny != DaleDestiny.Column) && (model.Destiny != DaleDestiny.View))
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

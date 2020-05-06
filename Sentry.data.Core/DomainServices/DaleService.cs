@@ -22,7 +22,6 @@ namespace Sentry.data.Core
             _daleSearchProvider = daleSearchProvider;
         }
 
-       
         public List<DaleResultDto> GetSearchResults(DaleSearchDto dto)
         {
             List<DaleResultDto> daleResults = _daleSearchProvider.GetSearchResults(dto);

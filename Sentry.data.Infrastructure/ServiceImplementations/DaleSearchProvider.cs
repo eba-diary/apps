@@ -54,15 +54,15 @@ namespace Sentry.data.Infrastructure
             string qFrom = "FROM Column_v ";
             
             string qWhereColumn = String.Empty;
-            if(dto.Destination == DaleDestination.Table)
+            if(dto.Destiny == DaleDestiny.Table)
             {
                 qWhereColumn = "Table_NME";
             }
-            else if(dto.Destination == DaleDestination.Column)
+            else if(dto.Destiny == DaleDestiny.Column)
             {
                 qWhereColumn = "Column_NME";
             }
-            else if(dto.Destination == DaleDestination.View)
+            else if(dto.Destiny == DaleDestiny.View)
             {
                 qWhereColumn = "View_NME";
             }
@@ -83,7 +83,7 @@ namespace Sentry.data.Infrastructure
             }
 
             //validate to ensure valid destination
-            if ( (dto.Destination != DaleDestination.Table) && (dto.Destination != DaleDestination.Column) && (dto.Destination != DaleDestination.View))
+            if ( (dto.Destiny != DaleDestiny.Table) && (dto.Destiny != DaleDestiny.Column) && (dto.Destiny != DaleDestiny.View))
             {
                 return false;
             }

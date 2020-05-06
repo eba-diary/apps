@@ -4,36 +4,42 @@
 
 
 
-@using (Html.BeginForm("GetSearchResults", "Dale", FormMethod.Post))
-{
-    @Html.AntiForgeryToken()
-    <div class="jive">
-        <div class="jive" style="background-image: url('/Images/Dale/AskDaleLogo.jpg'); background-position: 50% 50%; height: 180px; background-repeat: no-repeat;"></div>
 
-        <div class="form-group" style="text-align: center;">
-            @Html.RadioButtonFor((model) => model.Destination, Sentry.data.Core.GlobalEnums.DaleDestination.Table )
-            Table
-            @Html.RadioButtonFor((model) => model.Destination, Sentry.data.Core.GlobalEnums.DaleDestination.Column, new { Checked = "checked" })
-            Column
-            @Html.RadioButtonFor((model) => model.Destination, Sentry.data.Core.GlobalEnums.DaleDestination.View)
-            View
+
+    
+<div class="jive">
+    <div class="jive" style="background-image: url('/Images/Dale/DataInventoryLogo.jpg'); background-position: 50% 50%; height: 100px; background-repeat: no-repeat;"></div>
+
+    <div class="form-group" style="text-align: center;">
+        @Html.RadioButtonFor((model) => model.Destiny, Sentry.data.Core.GlobalEnums.DaleDestiny.Table )
+        Table
+        @Html.RadioButtonFor((model) => model.Destiny, Sentry.data.Core.GlobalEnums.DaleDestiny.Column, new { Checked = "checked" })
+        Column
+        @Html.RadioButtonFor((model) => model.Destiny, Sentry.data.Core.GlobalEnums.DaleDestiny.View)
+        View
+    </div>
+
+    <div style="text-align: center;">
+        <div>
+            @Html.TextBoxFor((model) => model.Criteria, new { id = "daleSearchCriteria" })
+
+            <input type="button" value="Search!" id="askDaleBtn" class="btn btn-primary" />
         </div>
+    </div>
 
-        <div style="text-align: center;">
-            <div>
-                @Html.TextBoxFor((model) => model.Criteria, new { @class = "ask-dale" })
-                <input type="submit" value="Answer!" class="btn btn-primary" />
-            </div>
-        </div>
+    @Html.Partial("~/Views/Dale/DaleResult.cshtml")
 
-       @* @Html.Partial("~/Views/Dale/_DaleResults.cshtml", new Sentry.data.Web.DaleResultModel())*@
+    <div id="searchResults">
 
     </div>
-}
+
+</div>
+
 
 
 
 @section Scripts {
+    @Scripts.Render("~/bundles/dataTables")
     <script type="text/javascript">
 
         $(function () {
