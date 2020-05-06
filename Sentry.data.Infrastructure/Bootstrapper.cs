@@ -84,6 +84,7 @@ namespace Sentry.data.Infrastructure
                 x.Type<GoogleApiProvider>().Named(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE);
                 x.Type<DfsDataFlowBasicProvider>().Named(GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION);
                 x.Type<FtpDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.FTP_DATAFLOW_SOURCE);
+                x.Type<GoogleAPIDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
             });
             //Register other services
             Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();

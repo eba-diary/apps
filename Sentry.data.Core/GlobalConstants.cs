@@ -115,6 +115,7 @@
 
             public const string DEFAULT_DATAFLOW_DFS_DROP_LOCATION = "DFSDataFlowBasic";
             public const string FTP_DATAFLOW_SOURCE = "FTPDATAFLOW";
+            public const string GOOGLE_API_DATAFLOW_SOURCE = "GOOGLEAPIDATAFLOW";
         }
 
         public static class DataFeedType

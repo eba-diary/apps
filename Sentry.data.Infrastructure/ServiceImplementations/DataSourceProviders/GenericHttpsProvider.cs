@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using RestSharp;
 using Sentry.data.Core;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
 
 namespace Sentry.data.Infrastructure
 {
@@ -245,5 +242,9 @@ namespace Sentry.data.Infrastructure
         {
             throw new NotImplementedException();
         }
+
+        protected override void FindTargetJob() { }
+
+        protected override void SetTargetPath(string extension) { }
     }
 }
