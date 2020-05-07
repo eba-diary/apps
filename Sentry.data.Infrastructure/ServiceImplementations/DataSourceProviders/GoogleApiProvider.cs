@@ -1,19 +1,16 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Security;
+using RestSharp;
+using Sentry.Common.Logging;
+using Sentry.data.Core;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using RestSharp;
-using Sentry.data.Core;
-using Sentry.Common.Logging;
-using Newtonsoft.Json;
-using Org.BouncyCastle.Security;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Crypto;
-using Hangfire;
 using System.Net;
-using Newtonsoft.Json.Linq;
-using RestSharp.Authenticators;
+using System.Text;
 
 namespace Sentry.data.Infrastructure
 {
@@ -22,6 +19,8 @@ namespace Sentry.data.Infrastructure
         private IJobService _jobService;
         private bool _hasNext = false;
         private string _nextVal = "0";
+        protected bool _IsTargetS3;
+        protected string _targetPath;
 
         public GoogleApiProvider(IDatasetContext datasetContext,
             IConfigService configService, IEncryptionService encryptionService, IJobService jobService) : base(datasetContext, configService, encryptionService)
@@ -56,9 +55,6 @@ namespace Sentry.data.Infrastructure
             _request = new RestRequest();
 
             ConfigureOAuth(_request, _job);
-
-            
-
 
             switch (_job.JobOptions.HttpOptions.RequestMethod)
             {
@@ -99,62 +95,35 @@ namespace Sentry.data.Infrastructure
             //{
             ConfigurePaging();                
 
-                IRestResponse resp = SendRequest();
-                string targetFullPath;
+            IRestResponse resp = SendRequest();
 
-                //Find appropriate drop location (S3Basic or DfsBasic)
-                RetrieverJob targetJob = _jobService.FindBasicJob(this._job);
+            FindTargetJob();
 
-                //Get target path based on basic job found
-                string extension = resp.ParseContentType();
+            SetTargetPath(resp.ParseContentType());
+                
+            /*
+                * Google API will not return compressed files, therefore, no need to check whether job
+                * has compression set.
+            */
+
+            //Setup temporary work space for job
+            var tempFile = _job.SetupTempWorkSpace();
+
+            if (_IsTargetS3)
+            {
+                _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
 
                 try
                 {
-                    targetFullPath = $"{targetJob.GetTargetPath(_job)}.{extension}";
+                    using (Stream filestream = new FileStream(tempFile, FileMode.Create, FileAccess.ReadWrite))
+                    {
+                        resp.CopyToStream(filestream);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    _job.JobLoggerMessage("Error", "targetjob_gettargetpath_failure", ex);
-                    throw;
-                }
-
-                
-                /*
-                    * Google API will not return compressed files, therefore, no need to check whether job
-                    * has compression set.
-                */
-
-                //Setup temporary work space for job
-                var tempFile = _job.SetupTempWorkSpace();
-
-                if (targetJob.DataSource.Is<S3Basic>())
-                {
-                    _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
-
-                    try
-                    {
-                        using (Stream filestream = new FileStream(tempFile, FileMode.Create, FileAccess.ReadWrite))
-                        {
-                            resp.CopyToStream(filestream);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _job.JobLoggerMessage("Error", "Retriever job failed streaming temp location.", ex);
-                        _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
-
-                        //Cleanup temp file if exists
-                        if (File.Exists(tempFile))
-                        {
-                            File.Delete(tempFile);
-                        }
-                    }
-
-                    S3ServiceProvider s3Service = new S3ServiceProvider();
-                    string targetkey = targetFullPath;
-                    var versionId = s3Service.UploadDataFile(tempFile, targetkey);
-
-                    _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
+                    _job.JobLoggerMessage("Error", "Retriever job failed streaming temp location.", ex);
+                    _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
 
                     //Cleanup temp file if exists
                     if (File.Exists(tempFile))
@@ -162,41 +131,53 @@ namespace Sentry.data.Infrastructure
                         File.Delete(tempFile);
                     }
                 }
-                else if (targetJob.DataSource.Is<DfsBasic>())
+
+                S3ServiceProvider s3Service = new S3ServiceProvider();
+                string targetkey = _targetPath;
+                var versionId = s3Service.UploadDataFile(tempFile, targetkey);
+
+                _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
+
+                //Cleanup temp file if exists
+                if (File.Exists(tempFile))
                 {
-                    _job.JobLoggerMessage("Info", "Sending file to DFS drop location");
+                    File.Delete(tempFile);
+                }
+            }
+            else
+            {
+                _job.JobLoggerMessage("Info", "Sending file to DFS drop location");
 
-                    try
-                    {
-                        using (Stream filestream = new FileStream(targetFullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
-                        {                            
-                            resp.CopyToStream(filestream);
-                        }
-                    }
-                    catch (WebException ex)
-                    {
-                        _job.JobLoggerMessage("Error", "Web request return error", ex);
-                        _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
-
-                        //Cleanup target file if exists
-                        if (File.Exists(targetFullPath))
-                        {
-                            File.Delete(targetFullPath);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
-                        _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
-
-                        //Cleanup target file if exists
-                        if (File.Exists(targetFullPath))
-                        {
-                            File.Delete(targetFullPath);
-                        }
-
+                try
+                {
+                    using (Stream filestream = new FileStream(_targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
+                    {                            
+                        resp.CopyToStream(filestream);
                     }
                 }
+                catch (WebException ex)
+                {
+                    _job.JobLoggerMessage("Error", "Web request return error", ex);
+                    _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
+
+                    //Cleanup target file if exists
+                    if (File.Exists(_targetPath))
+                    {
+                        File.Delete(_targetPath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
+                    _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
+
+                    //Cleanup target file if exists
+                    if (File.Exists(_targetPath))
+                    {
+                        File.Delete(_targetPath);
+                    }
+                }
+            }
                 
             //TODO: Revisit when GOOGLEAPI data source needs paging implemented
             //} while (_hasNext);
@@ -376,6 +357,27 @@ namespace Sentry.data.Infrastructure
             //        };
             //    }
                 _request.AddJsonBody(requestBody);
+            }
+        }
+
+        protected override void FindTargetJob()
+        {
+            //Find appropriate drop location (S3Basic or DfsBasic)
+            _targetJob = _jobService.FindBasicJob(_job);
+
+            _IsTargetS3 = _targetJob.DataSource.Is<S3Basic>();
+        }
+
+        protected override void SetTargetPath(string extension)
+        {
+            try
+            {
+                _targetPath = $"{_targetJob.GetTargetPath(_job)}.{extension}";
+            }
+            catch (Exception ex)
+            {
+                _job.JobLoggerMessage("Error", "targetjob_gettargetpath_failure", ex);
+                throw;
             }
         }
     }

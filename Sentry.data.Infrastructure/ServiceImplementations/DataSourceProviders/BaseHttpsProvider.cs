@@ -1,17 +1,12 @@
 ﻿using Newtonsoft.Json;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Security;
 using RestSharp;
 using Sentry.data.Core;
-using StructureMap;
+using Sentry.data.Core.Entities.DataProcessing;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
-using Sentry.Common.Logging;
 
 namespace Sentry.data.Infrastructure
 {
@@ -24,6 +19,8 @@ namespace Sentry.data.Infrastructure
         protected IDatasetContext _dsContext;
         protected IConfigService _configService;
         protected IEncryptionService _encryptionService;
+        protected RetrieverJob _targetJob;
+        protected DataFlowStep _targetStep;
         #endregion
 
         protected BaseHttpsProvider(IDatasetContext datasetContext, 
@@ -111,6 +108,11 @@ namespace Sentry.data.Infrastructure
         }
 
         public abstract List<IRestResponse> SendPagingRequest();
+
+        #region TargetSpecificMethods
+        protected abstract void FindTargetJob();
+        protected abstract void SetTargetPath(string extension);
+        #endregion
 
         #region TokenAuthSpecific
         protected void ConfigureTokenAuth(IRestRequest req, RetrieverJob job)
