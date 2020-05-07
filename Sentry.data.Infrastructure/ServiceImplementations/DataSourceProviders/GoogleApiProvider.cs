@@ -343,9 +343,9 @@ namespace Sentry.data.Infrastructure
         //TODO: Revisit when GOOGLEAPI data source needs paging implemented
         private void ConfigurePaging()
         {
-            //if (_job.JobOptions.HttpOptions.Body != null)
-            //{
-            //    string requestBody = _job.JobOptions.HttpOptions.Body;
+            if (_job.JobOptions.HttpOptions.Body != null)
+            {
+                string requestBody = _job.JobOptions.HttpOptions.Body;
 
             //    if (((GoogleApiSource)_job.DataSource).PagingEnabled)
             //    {
@@ -356,8 +356,8 @@ namespace Sentry.data.Infrastructure
             //            requestBody = AddPageToken(requestBody);
             //        };
             //    }
-            //    _request.AddJsonBody(requestBody);
-            //}
+                _request.AddJsonBody(requestBody);
+            }
         }
 
         protected override void FindTargetJob()
