@@ -26,6 +26,7 @@ namespace Sentry.data.Infrastructure
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 SqlCommand command = new SqlCommand(BuildAQuery(dto), connection);
+                command.CommandTimeout = 0;
 
                 try
                 {
@@ -50,7 +51,7 @@ namespace Sentry.data.Infrastructure
 
         private string BuildAQuery(DaleSearchDto dto)
         {
-            string qSelect = "SELECT TOP 300 Server_NME,Database_NME,Table_NME,Column_NME,Column_TYP,Precision_LEN,Scale_LEN,Effective_DTM,Expiration_DTM,LastScan_DTM ";
+            string qSelect = "SELECT top 750 Server_NME,Database_NME,Table_NME,Column_NME,Column_TYP,Precision_LEN,Scale_LEN,Effective_DTM,Expiration_DTM,LastScan_DTM ";
             string qFrom = "FROM Column_v ";
             
             string qWhereColumn = String.Empty;

@@ -54,7 +54,25 @@ namespace Sentry.data.Web.Controllers
             DataTablesQueryableAdapter<DaleResultModel> dtqa = new DataTablesQueryableAdapter<DaleResultModel>(searchModel.DaleResults.AsQueryable(), dtRequest);
             DataTablesResponse response = dtqa.GetDataTablesResponse();
 
-            return Json(response);
+             return Json(response);
+        }
+
+        public JsonResult GetSearchResultsClient(string searchCriteria, string destination)
+        {
+            DaleSearchModel searchModel = new DaleSearchModel();
+            searchModel.Criteria = searchCriteria;
+            searchModel.Destiny = destination.ToDaleDestiny();
+
+            if (IsCriteriaValid(searchModel))
+            {
+                searchModel.DaleResults = _daleService.GetSearchResults(searchModel.ToDto()).ToWeb();
+            }
+            else
+            {
+                searchModel.DaleResults = new List<DaleResultModel>();
+            }
+
+            return Json(new { data = searchModel.DaleResults }, JsonRequestBehavior.AllowGet);
         }
 
 

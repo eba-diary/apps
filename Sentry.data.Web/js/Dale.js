@@ -3,20 +3,43 @@
     init: function ()
     {
         var daleResultsTable = $("#daleResultsTable").DataTable({
+
+            //server side setup
+            //autoWidth: true,
+            //serverSide: true,
+            //processing: true,
+            //searching: true,
+            //paging: true,
+            //scroller: true,
+            //deferRender: true,
+            //ajax: {
+            //    url: "/Dale/GetSearchResults/",
+            //    type: "POST",
+            //    data: function (d)
+            //    {
+            //        d.searchCriteria = $('#daleSearchCriteria').val();
+            //        d.destination = data.Dale.getDaleDestiny(); 
+            //    }
+            //},
+
+
+            //client side setup
             autoWidth: true,
-            serverSide: true,
-            processing: true,
+            serverSide: false,
             searching: true,
             paging: true,
+            async: false,
             ajax: {
-                url: "/Dale/GetSearchResults/",
-                type: "POST",
+                url: "/Dale/GetSearchResultsClient/",
+                type: "GET",
                 data: function (d)
                 {
                     d.searchCriteria = $('#daleSearchCriteria').val();
                     d.destination = data.Dale.getDaleDestiny(); 
                 }
             },
+
+
             columns: [
                 { data: "Server", className: "Server" },
                 { data: "Database", className: "Database" },
@@ -44,8 +67,14 @@
         //this reloads DataTable and does a refresh pulling criteria everytime
         $('#askDaleBtn').click(function ()
         {
-            daleResultsTable.ajax.reload();     //blah is function pointer to DataTable init from above
-            $('#daleContainer').show();
+            //hide intitially since they could be doing a search after a previous search
+            $('#daleContainer').hide();
+
+            //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
+            daleResultsTable.ajax.reload(function (json)
+            {
+                $('#daleContainer').show();
+            });
         })
     },
 

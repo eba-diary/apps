@@ -1,12 +1,6 @@
 ﻿@using Sentry.data.Web;
 @model DaleSearchModel
 
-
-
-
-
-
-    
 <div class="jive">
     <div class="jive" style="background-image: url('/Images/Dale/DataInventoryLogo.jpg'); background-position: 50% 50%; height: 100px; background-repeat: no-repeat;"></div>
 
@@ -23,7 +17,12 @@
         <div>
             @Html.TextBoxFor((model) => model.Criteria, new { id = "daleSearchCriteria" })
 
-            <input type="button" value="Search!" id="askDaleBtn" class="btn btn-primary" />
+            @*<input type="button" value="Search!" id="askDaleBtn" class="btn btn-primary" />*@
+
+            <button class="buttonload" id="askDaleBtn">
+                <i class="fa fa-spinner fa-spin"></i>Loading
+            </button>
+
         </div>
     </div>
 
@@ -34,8 +33,6 @@
     </div>
 
 </div>
-
-
 
 
 @section Scripts {
