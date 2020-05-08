@@ -100,7 +100,7 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
-                Logger.Debug("converttoparquetprovider-executeaction disabled-by-featureflag");
+                Logger.Debug("converttoparquetprovider-executeaction-dotnet disabled-by-featureflag");
             }
         }
 
