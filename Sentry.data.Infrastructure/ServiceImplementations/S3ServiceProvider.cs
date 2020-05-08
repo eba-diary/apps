@@ -11,6 +11,9 @@ using System.IO;
 using Sentry.Common.Logging;
 using Amazon.S3.IO;
 using System.Diagnostics;
+using Sentry.Configuration;
+using Amazon.Runtime;
+using Amazon.Runtime.CredentialManagement;
 
 namespace Sentry.data.Infrastructure
 {
@@ -48,18 +51,48 @@ namespace Sentry.data.Infrastructure
                     // instantiate a new shared client
                     AWSConfigsS3.UseSignatureVersion4 = true;
                     AmazonS3Config s3config = new AmazonS3Config();
-                    s3config.RegionEndpoint = RegionEndpoint.GetBySystemName(Configuration.Config.GetSetting("AWSRegion"));
+                    s3config.RegionEndpoint = RegionEndpoint.GetBySystemName(Config.GetHostSetting("AWSRegion"));
                     //proxy only needed when not running on AWS.  Calling code expected to pass empty value if proxy host not needed.
-                    if (!String.IsNullOrWhiteSpace(Configuration.Config.GetHostSetting("SentryS3ProxyHost")))
+                    if (bool.Parse(Config.GetHostSetting("UseProxy")))
                     {
-                        s3config.ProxyHost = Configuration.Config.GetHostSetting("SentryS3ProxyHost");
-                        s3config.ProxyPort = int.Parse(Configuration.Config.GetSetting("SentryS3ProxyPort"));
+                        s3config.ProxyHost = Config.GetHostSetting("SentryS3ProxyHost");
+                        s3config.ProxyPort = int.Parse(Config.GetHostSetting("SentryS3ProxyPort"));
+                        s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
                     }
-                    s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
-                    string awsAccessKey = Configuration.Config.GetHostSetting("AWSAccessKey");
-                    string awsSecretKey = Configuration.Config.GetHostSetting("AWSSecretKey");
-                    _s3client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);
 
+                    AmazonS3Client client;
+                    if (bool.Parse(Config.GetHostSetting("UseAWSProfileName")))
+                    {
+                        //attempt to load the profile info from the .NET SDK credential store
+                        AWSCredentials awsCredentials;
+                        var profileName = Config.GetHostSetting("AWSProfileName");
+                        if (new CredentialProfileStoreChain().TryGetAWSCredentials(profileName, out awsCredentials))
+                        {
+                            client = new AmazonS3Client(awsCredentials, s3config);
+                        }
+                        else
+                        {
+                            throw new Exception($"Couldn't retrieve AWS credentials for the profile name {profileName}");
+                        }
+                    }
+                    else
+                    {
+                        string awsAccessKey = Config.GetHostSetting("AWSAccessKey");
+                        string awsSecretKey = Config.GetHostSetting("AWSSecretKey");
+                        client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);
+                    }
+
+                    _s3client = client;
+
+                    Logger.Debug("Getting list of buckets available to client...");
+                    var response = client.ListBuckets();
+
+                    StringBuilder sb = new StringBuilder();
+                    foreach (S3Bucket b in response.Buckets)
+                    {
+                        sb.Append($"{b.BucketName}; ");
+                    }
+                    Logger.Debug($"Buckets available to client - {sb.ToString()}");
                     Logger.Info($"s3serviceprovider-clientinit regionendpoint:{s3config.RegionEndpoint},proxyhost:{s3config.ProxyHost},proxyport:{s3config.ProxyPort.ToString()}");
                 }
                 return _s3client;

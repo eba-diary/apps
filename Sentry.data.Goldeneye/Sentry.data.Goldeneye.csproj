@@ -167,6 +167,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\AWSSettings.config">
+      <Link>AWSSettings.config</Link>
+    </None>
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>
