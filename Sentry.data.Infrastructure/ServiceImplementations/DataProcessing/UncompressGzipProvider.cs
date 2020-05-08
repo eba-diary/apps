@@ -97,7 +97,7 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
-                Logger.Debug("uncompresszipprovider-executeaction disabled-by-featureflag");
+                Logger.Debug("uncompresszipprovider-executeaction-dotnet disabled-by-featureflag");
             }
         }
 
