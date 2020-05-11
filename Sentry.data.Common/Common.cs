@@ -1,26 +1,21 @@
-﻿using System;
+﻿using Amazon.S3;
+using Newtonsoft.Json;
+using Sentry.Common.Logging;
+using Sentry.Core;
+using Sentry.data.Core;
+using Sentry.data.Infrastructure;
+using Sentry.Configuration;
+using StructureMap;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using Sentry.data.Core;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Security.Principal;
-using Amazon.S3;
 using System.Web;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Web.Script.Serialization;
-using Sentry.data.Infrastructure;
-using System.Security.Cryptography;
-using Sentry.Common.Logging;
-using Newtonsoft.Json;
-using System.Linq.Expressions;
-using StructureMap;
-using System.Runtime.InteropServices;
-using Newtonsoft.Json.Linq;
-using Sentry.Core;
 
 namespace Sentry.data.Common
 {
@@ -29,7 +24,28 @@ namespace Sentry.data.Common
     /// </summary>
     /// 
     public static class Utilities
-    {        
+    {
+        private static string _bucket = null;
+        private static string RootBucket
+        {
+            get
+            {
+                if (_bucket == null)
+                {
+                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+                    {
+                        IDataFeatures dataFeatures = container.GetInstance<IDataFeatures>();
+
+                        _bucket = dataFeatures.Use_AWS_v2_Configuration_CLA_1488.GetValue()
+                            ? Config.GetHostSetting("AWS2_0RootBucket")
+                            : Config.GetHostSetting("AWSRootBucket");
+                    }
+                }
+                return _bucket;
+            }
+        }
+
+
         /// <summary>
         /// Generates full drop location path for a dataset
         /// </summary>
@@ -531,7 +547,7 @@ namespace Sentry.data.Common
                             {
                                 rawFileEvent = new RawFileAddModel()
                                 {
-                                    SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                                    SourceBucket = RootBucket,
                                     SourceKey = df_newParent.FileLocation,
                                     SourceVersionId = df_newParent.VersionId,
                                     SchemaID = df_newParent.DatasetFileConfig.Schema.SchemaId,
@@ -634,7 +650,7 @@ namespace Sentry.data.Common
                             {
                                 rawFileEvent = new RawFileAddModel()
                                 {
-                                    SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                                    SourceBucket = RootBucket,
                                     SourceKey = df_newParent.FileLocation,
                                     SourceVersionId = df_newParent.VersionId,
                                     SchemaID = df_newParent.DatasetFileConfig.Schema.SchemaId,

@@ -15,5 +15,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> Expose_TrainingMaterials_CLA_911 { get; } = new BooleanFeatureFlag("Expose_TrainingMaterials_CLA_911", configRepo);
         public IFeatureFlag<bool> Remove_ClaimIQ_mock_logic_CLA_758 { get; } = new BooleanFeatureFlag("Remove_ClaimIQ_mock_logic_CLA_758", configRepo);
         public IFeatureFlag<bool> Expose_DaleSearch_CLA_1450 { get; } = new BooleanFeatureFlag("Expose_DaleSearch_CLA_1450", configRepo);
+        public IFeatureFlag<bool> Use_AWS_v2_Configuration_CLA_1488 { get; } = new BooleanFeatureFlag("Use_AWS_v2_Configuration_CLA_1488", configRepo);
     }
 }

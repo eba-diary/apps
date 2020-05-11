@@ -11,9 +11,9 @@ namespace Sentry.data.Core
     {
         public S3Basic()
         {
-            Bucket = Configuration.Config.GetHostSetting("AWSRootBucket");
-            string url = Path.Combine($"http://s3-sa-east-1.amazonaws.com/", Bucket, Configuration.Config.GetHostSetting("S3DataPrefix"), "droplocation");
-            BaseUri = new Uri(url);
+            //Bucket = Configuration.Config.GetHostSetting("AWSRootBucket");
+            //string url = Path.Combine($"http://s3-sa-east-1.amazonaws.com/", Bucket, Configuration.Config.GetHostSetting("S3DataPrefix"), "droplocation");
+            //BaseUri = new Uri(url);
             IsUriEditable = false;
         }
 

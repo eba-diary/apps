@@ -1,8 +1,6 @@
-﻿
-using System;
+﻿using Sentry.Configuration;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace Sentry.data.Web
 {
@@ -10,11 +8,9 @@ namespace Sentry.data.Web
     {
         public static void GenerateStorageInfo(this Core.ImageDto dto)
         {
-            var bucket = Configuration.Config.GetHostSetting("AWSRootBucket");
-            var prefix = Sentry.data.Core.GlobalConstants.StoragePrefixes.DATASET_IMAGE_STORAGE_PREFIX;
-            prefix += "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + System.Guid.NewGuid().ToString();
+            var prefix = Core.GlobalConstants.StoragePrefixes.DATASET_IMAGE_STORAGE_PREFIX;
+            prefix += "/" + Config.GetHostSetting("S3DataPrefix") + System.Guid.NewGuid().ToString();
 
-            dto.StorageBucketName = bucket;
             dto.StoragePrefix = prefix;
             dto.StorageKey = prefix;
         }
