@@ -51,13 +51,17 @@ namespace Sentry.data.Infrastructure
 
         private string BuildAQuery(DaleSearchDto dto)
         {
-            string qSelect = "SELECT top 750 Server_NME,Database_NME,Table_NME,Column_NME,Column_TYP,Precision_LEN,Scale_LEN,Effective_DTM,Expiration_DTM,LastScan_DTM ";
+            string qSelect = "SELECT Server_NME,Database_NME,Object_NME AS Table_NME,Column_NME,Column_TYP,Precision_LEN,Scale_LEN,Effective_DTM,Expiration_DTM,LastScan_DTM ";
             string qFrom = "FROM Column_v ";
-            
             string qWhereColumn = String.Empty;
-            if(dto.Destiny == DaleDestiny.Table)
+            string qWhereObjectType = String.Empty;
+            string qWhereStatement = String.Empty;
+            string q = String.Empty;
+
+            if (dto.Destiny == DaleDestiny.Table)
             {
-                qWhereColumn = "Table_NME";
+                qWhereColumn = "Object_NME";
+                qWhereObjectType = " AND Object_TYP = 'ST' ";
             }
             else if(dto.Destiny == DaleDestiny.Column)
             {
@@ -65,12 +69,14 @@ namespace Sentry.data.Infrastructure
             }
             else if(dto.Destiny == DaleDestiny.View)
             {
-                qWhereColumn = "View_NME";
+                qWhereColumn = "Object_NME";
+                qWhereObjectType = " AND Object_TYP = 'SV' ";
             }
 
-            string qWhereStatement = "WHERE " + qWhereColumn + " LIKE '%" + dto.Criteria + "%'";
-
-            string q = qSelect + qFrom + qWhereStatement;
+            qWhereStatement += "WHERE " + qWhereColumn + " LIKE '%" + dto.Criteria + "%'";
+            qWhereStatement += qWhereObjectType;
+            qWhereStatement += " AND Expiration_DTM IS NULL";
+            q = qSelect + qFrom + qWhereStatement;
 
             return q;
         }

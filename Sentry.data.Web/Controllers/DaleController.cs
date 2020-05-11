@@ -36,7 +36,8 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        public JsonResult GetSearchResults([ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest,string searchCriteria, string destination)
+        //use for ServerSide DataTable processing
+        public JsonResult GetSearchResultsServer([ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest,string searchCriteria, string destination)
         {
             DaleSearchModel searchModel = new DaleSearchModel();
             searchModel.Criteria = searchCriteria;
@@ -57,6 +58,7 @@ namespace Sentry.data.Web.Controllers
              return Json(response);
         }
 
+        //use for ClientSide DataTable processing
         public JsonResult GetSearchResultsClient(string searchCriteria, string destination)
         {
             DaleSearchModel searchModel = new DaleSearchModel();
@@ -72,7 +74,10 @@ namespace Sentry.data.Web.Controllers
                 searchModel.DaleResults = new List<DaleResultModel>();
             }
 
-            return Json(new { data = searchModel.DaleResults }, JsonRequestBehavior.AllowGet);
+            JsonResult result = Json(new { data = searchModel.DaleResults}, JsonRequestBehavior.AllowGet);
+            result.MaxJsonLength = Int32.MaxValue;  //need to set MaxJsonLength to avoid 500 exceptions because of large json coming back since we are doing client side for max performance
+
+            return result;
         }
 
 
