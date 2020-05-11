@@ -59,9 +59,19 @@ namespace Sentry.data.Infrastructure
                     //proxy only needed when not running on AWS.  Calling code expected to pass empty value if proxy host not needed.
                     if (bool.Parse(Config.GetHostSetting("AWSUseProxy")))
                     {
+                        if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyHost")))
+                        {
+                            throw new Exception("SentryS3ProxyHost cannot be found");
+                        }
+                        if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyPort")))
+                        {
+                            throw new Exception("SentryS3ProxyPort cannot be found");
+                        }
                         s3config.ProxyHost = Config.GetHostSetting("SentryS3ProxyHost");
                         s3config.ProxyPort = int.Parse(Config.GetHostSetting("SentryS3ProxyPort"));
                         s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
+
+                        
                     }
 
                     AmazonS3Client client;
@@ -76,6 +86,14 @@ namespace Sentry.data.Infrastructure
                     {
                         string awsAccessKey = Config.GetHostSetting("AWSAccessKey");
                         string awsSecretKey = Config.GetHostSetting("AWSSecretKey");
+                        if (string.IsNullOrWhiteSpace(awsAccessKey))
+                        {
+                            throw new Exception("AWSAccessKey cannot be found");
+                        }
+                        if (string.IsNullOrWhiteSpace(awsSecretKey))
+                        {
+                            throw new Exception("AWSSecretKey cannot be found");
+                        }
                         client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);
                     }
                     else if (UseAWS2_0 && bool.Parse(Config.GetHostSetting("UseAWSProfileName")))
@@ -83,6 +101,10 @@ namespace Sentry.data.Infrastructure
                         //attempt to load the profile info from the .NET SDK credential store
                         AWSCredentials awsCredentials;
                         var profileName = Config.GetHostSetting("AWSProfileName");
+                        if (string.IsNullOrWhiteSpace("AWSProfileName"))
+                        {
+                            throw new Exception("AWSProfileName cannot be found");
+                        }
                         if (new CredentialProfileStoreChain().TryGetAWSCredentials(profileName, out awsCredentials))
                         {
                             client = new AmazonS3Client(awsCredentials, s3config);
