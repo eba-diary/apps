@@ -52,26 +52,31 @@ namespace Sentry.data.Infrastructure
             {
                 if (null == _s3client)
                 {
+                    Logger.Debug("<s3serviceprovider> clientitnit...");
+
                     // instantiate a new shared client
                     AWSConfigsS3.UseSignatureVersion4 = true;
                     AmazonS3Config s3config = new AmazonS3Config();
                     s3config.RegionEndpoint = RegionEndpoint.GetBySystemName(AWSRegion);
                     //proxy only needed when not running on AWS.  Calling code expected to pass empty value if proxy host not needed.
+                    Logger.Debug($"<s3serviceprovider> AWSUseProxy : {Config.GetHostSetting("AWSUseProxy")}");
                     if (bool.Parse(Config.GetHostSetting("AWSUseProxy")))
                     {
+                        Logger.Debug($"<s3serviceprovider> SentryS3ProxyHost : {Config.GetHostSetting("SentryS3ProxyHost")}");
                         if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyHost")))
                         {
                             throw new Exception("SentryS3ProxyHost cannot be found");
                         }
+
+                        Logger.Debug($"<s3serviceprovider> SentryS3ProxyPort : {Config.GetHostSetting("SentryS3ProxyPort")}");
                         if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyPort")))
                         {
                             throw new Exception("SentryS3ProxyPort cannot be found");
                         }
+
                         s3config.ProxyHost = Config.GetHostSetting("SentryS3ProxyHost");
                         s3config.ProxyPort = int.Parse(Config.GetHostSetting("SentryS3ProxyPort"));
                         s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
-
-                        
                     }
 
                     AmazonS3Client client;
@@ -82,29 +87,31 @@ namespace Sentry.data.Infrastructure
                      *  For AWS 2.0 Running on Server in AWS 1.0, always use Proxy and Key\Secret key
                      *  For AWs 2.0 Running on Server in AWS 2.0, no proxy usage and do not specify credentials (will be set on EC2 Instance)
                      */
+                    Logger.Debug($"<s3serviceprovider> UseAWS2_0 : {UseAWS2_0.ToString()}");
+                    Logger.Debug($"<s3serviceprovider> UseAWSProfileName : {Config.GetHostSetting("UseAWSProfileName")}");
                     if (!UseAWS2_0)
                     {
+                        Logger.Debug("<s3serviceprovider> Use key and secret key for authentication / access");
                         string awsAccessKey = Config.GetHostSetting("AWSAccessKey");
                         string awsSecretKey = Config.GetHostSetting("AWSSecretKey");
-                        if (string.IsNullOrWhiteSpace(awsAccessKey))
-                        {
-                            throw new Exception("AWSAccessKey cannot be found");
-                        }
-                        if (string.IsNullOrWhiteSpace(awsSecretKey))
-                        {
-                            throw new Exception("AWSSecretKey cannot be found");
-                        }
+                        if (string.IsNullOrWhiteSpace(awsAccessKey)) { throw new Exception("AWSAccessKey cannot be found"); }
+                        else { Logger.Debug("<s3serviceprovider> AWSAccessKey found"); };
+
+                        if (string.IsNullOrWhiteSpace(awsSecretKey)) { throw new Exception("AWSSecretKey cannot be found"); }
+                        else { Logger.Debug("<s3serviceprovider> AWSSecretKey found"); }
+
                         client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);
                     }
                     else if (UseAWS2_0 && bool.Parse(Config.GetHostSetting("UseAWSProfileName")))
                     {
+                        Logger.Debug("<s3serviceprovider> Use AWS Profile for authentication / access");
                         //attempt to load the profile info from the .NET SDK credential store
                         AWSCredentials awsCredentials;
                         var profileName = Config.GetHostSetting("AWSProfileName");
-                        if (string.IsNullOrWhiteSpace("AWSProfileName"))
-                        {
-                            throw new Exception("AWSProfileName cannot be found");
-                        }
+
+                        if (string.IsNullOrWhiteSpace(profileName)) { throw new Exception("AWSProfileName cannot be found"); }
+                        else Logger.Debug($"<s3serviceprovider> AWSProfileName : {profileName}");
+
                         if (new CredentialProfileStoreChain().TryGetAWSCredentials(profileName, out awsCredentials))
                         {
                             client = new AmazonS3Client(awsCredentials, s3config);
@@ -116,12 +123,13 @@ namespace Sentry.data.Infrastructure
                     }                    
                     else
                     {
+
                         client = new AmazonS3Client(s3config);
                     }
 
                     _s3client = client;
 
-                    Logger.Debug("Getting list of buckets available to client...");
+                    Logger.Debug("<s3serviceprovider> Getting list of buckets available to client...");
                     var response = client.ListBuckets();
 
                     StringBuilder sb = new StringBuilder();
@@ -129,8 +137,10 @@ namespace Sentry.data.Infrastructure
                     {
                         sb.Append($"{b.BucketName}; ");
                     }
-                    Logger.Debug($"Buckets available to client - {sb.ToString()}");
-                    Logger.Info($"s3serviceprovider-clientinit regionendpoint:{s3config.RegionEndpoint},proxyhost:{s3config.ProxyHost},proxyport:{s3config.ProxyPort.ToString()}");
+                    Logger.Debug($"<s3serviceprovider> Buckets available to client - {sb.ToString()}");
+                    Logger.Info($"<s3serviceprovider>-clientinit regionendpoint:{s3config.RegionEndpoint},proxyhost:{s3config.ProxyHost},proxyport:{s3config.ProxyPort.ToString()}");
+
+                    Logger.Debug("<s3serviceprovider> clientitnit-end");
                 }
                 return _s3client;
             }
@@ -190,6 +200,8 @@ namespace Sentry.data.Infrastructure
                 return bool.Parse(_useAws2_0);
             }
         }
+
+
         /// <summary>
         /// Retrieves a presigned URL for the S3 Object. versionId is optional, if not supplied
         /// default is null and will return latest version of S3 key.
