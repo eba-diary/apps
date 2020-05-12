@@ -66,7 +66,7 @@
         //this reloads DataTable and does a refresh pulling criteria everytime
         $('#askDaleBtn').click(function ()
         {
-            data.Dale.disableDale();        
+            data.Dale.disableDale();
 
             //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
             daleResultsTable.ajax.reload(function (json)
@@ -87,9 +87,10 @@
     {
         //hide intitially since they could be doing a search after a previous search
         $('#daleContainer').hide();
-        document.querySelector('#askDaleBtn').value = '...Searching!';
         $('#askDaleBtn').attr('disabled', 'disabled');
         $('#daleSearchCriteria').attr('disabled', 'disabled');
+        $('#askDaleBtn').hide();
+        $('#askDaleBtnFake').show();
     },
 
     //enable all controls user can hit during search
@@ -97,8 +98,9 @@
 
         //hide intitially since they could be doing a search after a previous search
         $('#daleContainer').show();
-        document.querySelector('#askDaleBtn').value = 'Search!';
         $('#askDaleBtn').removeAttr('disabled');
         $('#daleSearchCriteria').removeAttr('disabled');
+        $('#askDaleBtn').show();
+        $('#askDaleBtnFake').hide();
     }
 };

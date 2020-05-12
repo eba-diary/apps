@@ -74,7 +74,7 @@ namespace Sentry.data.Web
             bundles.Add(new StyleBundle("~/bundles/css/main").
                         Include("~/Content/bootstrap.min.css", new CssRewriteUrlTransform()).
 
-                        Include("~/Content/font-awesome.min.css", new CssRewriteUrlTransform()).
+                        Include("~/Content/font-awesome.css", new CssRewriteUrlTransform()).
                         Include("~/Content/css/select2.css", new CssRewriteUrlTransform()).
                         Include("~/Content/ladda-themeless.css"));
 
