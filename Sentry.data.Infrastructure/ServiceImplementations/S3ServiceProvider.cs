@@ -89,7 +89,8 @@ namespace Sentry.data.Infrastructure
                      */
                     Logger.Debug($"<s3serviceprovider> UseAWS2_0 : {UseAWS2_0.ToString()}");
                     Logger.Debug($"<s3serviceprovider> UseAWSProfileName : {Config.GetHostSetting("UseAWSProfileName")}");
-                    if (!UseAWS2_0)
+                    //Use AWS keys when connecting to 1.0 or 2.0 and profile is not used.
+                    if (!UseAWS2_0 || (UseAWS2_0 && !bool.Parse(Config.GetHostSetting("UseAWSProfileName"))))
                     {
                         Logger.Debug("<s3serviceprovider> Use key and secret key for authentication / access");
                         string awsAccessKey = Config.GetHostSetting("AWSAccessKey");
