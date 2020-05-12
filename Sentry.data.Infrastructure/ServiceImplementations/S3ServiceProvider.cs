@@ -129,17 +129,16 @@ namespace Sentry.data.Infrastructure
 
                     _s3client = client;
 
-                    Logger.Debug("<s3serviceprovider> Getting list of buckets available to client...");
-                    var response = client.ListBuckets();
+                    //Logger.Debug("<s3serviceprovider> Getting list of buckets available to client...");
+                    //var response = client.ListBuckets();
 
-                    StringBuilder sb = new StringBuilder();
-                    foreach (S3Bucket b in response.Buckets)
-                    {
-                        sb.Append($"{b.BucketName}; ");
-                    }
-                    Logger.Debug($"<s3serviceprovider> Buckets available to client - {sb.ToString()}");
+                    //StringBuilder sb = new StringBuilder();
+                    //foreach (S3Bucket b in response.Buckets)
+                    //{
+                    //    sb.Append($"{b.BucketName}; ");
+                    //}
+                    //Logger.Debug($"<s3serviceprovider> Buckets available to client - {sb.ToString()}");
                     Logger.Info($"<s3serviceprovider>-clientinit regionendpoint:{s3config.RegionEndpoint},proxyhost:{s3config.ProxyHost},proxyport:{s3config.ProxyPort.ToString()}");
-
                     Logger.Debug("<s3serviceprovider> clientitnit-end");
                 }
                 return _s3client;
