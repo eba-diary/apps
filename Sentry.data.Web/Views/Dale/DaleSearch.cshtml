@@ -4,25 +4,37 @@
 
 <div style="background-image: url('/Images/Dale/DataInventoryLogo.jpg'); background-position: 50% 50%; height: 100px; background-repeat: no-repeat;"></div>
 
-<div class="form-group" style="text-align: center;">
-    @Html.RadioButtonFor((model) => model.Destiny, Sentry.data.Core.GlobalEnums.DaleDestiny.Table)
-    Table
-    @Html.RadioButtonFor((model) => model.Destiny, Sentry.data.Core.GlobalEnums.DaleDestiny.Column, new { Checked = "checked" })
-    Column
-    @Html.RadioButtonFor((model) => model.Destiny, Sentry.data.Core.GlobalEnums.DaleDestiny.View)
-    View
+
+<div  style="text-align: center;">
+    <label class="containerDale" style="text-align:left; width:90px;">
+        @Sentry.data.Core.GlobalEnums.DaleDestiny.Table
+        <input type="radio" name="Destiny" id="DestinyTableRadio" value= @Sentry.data.Core.GlobalEnums.DaleDestiny.Table >
+        <span class="checkmark"></span>
+    </label>
+
+    <label class="containerDale" style="text-align:left; width:100px;">
+        @Sentry.data.Core.GlobalEnums.DaleDestiny.Column
+        <input type="radio" name="Destiny" id="DestinyColumnRadio" value= @Sentry.data.Core.GlobalEnums.DaleDestiny.Column checked="checked">
+        <span class="checkmark"></span>
+    </label>
+    <label class="containerDale" style="text-align:left;width:90px;">
+        @Sentry.data.Core.GlobalEnums.DaleDestiny.View
+        <input type="radio" name="Destiny" id="DestinyViewRadio" value= @Sentry.data.Core.GlobalEnums.DaleDestiny.View>
+        <span class="checkmark"></span>
+    </label>
+
 </div>
+
 
 <div style="text-align: center;">
     <div>
+        <input type="text" id="daleSearchCriteria" style="width: 200px;border: 3px solid #555;font-size: 18px;font-weight: 600;">
 
-        @Html.TextBoxFor((model) => model.Criteria, new { id = "daleSearchCriteria" })
-
-        <button id="askDaleBtn" class="btn btn-primary">
+        <button id="askDaleBtn" class="btn btn-primary" style="font-size:18px;">
             Search!
         </button>
 
-        <button id="askDaleBtnFake" class="btn btn-primary" style="display:none" disabled>
+        <button id="askDaleBtnFake" class="btn btn-primary" style="display:none; font-size:18px;" disabled>
             <i class="fa fa-circle-o-notch fa-spin"></i>  Searching archives...
         </button>
 

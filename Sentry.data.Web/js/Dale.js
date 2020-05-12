@@ -85,8 +85,11 @@
     {
         //hide intitially since they could be doing a search after a previous search
         $('#daleContainer').hide();
-        $('#askDaleBtn').attr('disabled', 'disabled');
         $('#daleSearchCriteria').attr('disabled', 'disabled');
+        $('#DestinyTableRadio').attr('disabled', 'disabled');
+        $('#DestinyColumnRadio').attr('disabled', 'disabled');
+        $('#DestinyViewRadio').attr('disabled', 'disabled');
+        $('#askDaleBtn').attr('disabled', 'disabled');
         $('#askDaleBtn').hide();
         $('#askDaleBtnFake').show();
     },
@@ -96,8 +99,11 @@
 
         //hide intitially since they could be doing a search after a previous search
         $('#daleContainer').show();
-        $('#askDaleBtn').removeAttr('disabled');
         $('#daleSearchCriteria').removeAttr('disabled');
+        $('#DestinyTableRadio').removeAttr('disabled');
+        $('#DestinyColumnRadio').removeAttr('disabled');
+        $('#DestinyViewRadio').removeAttr('disabled');
+        $('#askDaleBtn').removeAttr('disabled');
         $('#askDaleBtn').show();
         $('#askDaleBtnFake').hide();
     }
