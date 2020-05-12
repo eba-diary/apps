@@ -43,7 +43,7 @@
                 { data: "Server", className: "Server" },
                 { data: "Database", className: "Database" },
                 { data: "Table", className: "Table" },
-                { data: "Column", className: "ColumnMan" },
+                { data: "Column", className: "ColumnMan" }
             ],
             order: [[1, 'desc'], [2, 'desc']]
         });
@@ -64,16 +64,14 @@
         $('#daleResultsTable_filter').hide();
 
         //this reloads DataTable and does a refresh pulling criteria everytime
-        $('#askDaleBtn').click(function ()
-        {
+        $('#askDaleBtn').click(function () {
             data.Dale.disableDale();
 
             //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
-            daleResultsTable.ajax.reload(function (json)
-            {
+            daleResultsTable.ajax.reload(function() {
                 data.Dale.enableDale();
             });
-        })
+        });
     },
 
     getDaleDestiny: function ()
