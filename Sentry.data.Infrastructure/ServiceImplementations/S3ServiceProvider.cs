@@ -26,8 +26,123 @@ namespace Sentry.data.Infrastructure
         private static string _bucket = null;
         private static string _awsRegion = null;
         private static string _useAws2_0 = null;
+        private static string _proxyHost = null;
+        private static string _proxyPort = null;
 
         public S3ServiceProvider() { }
+
+        private static string RootBucket
+        {
+            get
+            {
+                if (_bucket == null)
+                {
+                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+                    {
+                        IDataFeatures dataFeatures = container.GetInstance<IDataFeatures>();
+
+                        _bucket = dataFeatures.Use_AWS_v2_Configuration_CLA_1488.GetValue()
+                            ? Config.GetHostSetting("AWS2_0RootBucket")
+                            : Config.GetHostSetting("AWSRootBucket");
+                    }
+                }
+                return _bucket;
+            }
+        }
+        private static string AWSRegion
+        {
+            get
+            {
+                if (_awsRegion == null)
+                {
+                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+                    {
+                        IDataFeatures dataFeatures = container.GetInstance<IDataFeatures>();
+
+                        _awsRegion = dataFeatures.Use_AWS_v2_Configuration_CLA_1488.GetValue()
+                            ? Config.GetHostSetting("AWS2_0Region")
+                            : Config.GetHostSetting("AWSRegion");
+                    }
+                }
+                return _awsRegion;
+            }
+        }
+        private static bool UseAWS2_0
+        {
+            get
+            {
+                if (_useAws2_0 == null)
+                {
+                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+                    {
+                        IDataFeatures dataFeatures = container.GetInstance<IDataFeatures>();
+
+                        _useAws2_0 = dataFeatures.Use_AWS_v2_Configuration_CLA_1488.GetValue().ToString();
+                    }
+                }
+                return bool.Parse(_useAws2_0);
+            }
+        }
+        private static string ProxyHost
+        {
+            get
+            {
+                if (!UseAWS2_0)
+                {
+                    if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyHost")))
+                    {
+                        throw new Exception("SentryS3ProxyHost cannot be found");
+                    }
+                    else
+                    {
+                        _proxyHost = Config.GetHostSetting("SentryS3ProxyHost");
+                    }
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryServerProxyHost")))
+                    {
+                        throw new Exception("SentryServerProxyHost cannot be found");
+                    }
+                    else
+                    {
+                        _proxyHost = Config.GetHostSetting("SentryServerProxyHost");
+                    }
+                }
+
+                return _proxyHost;
+            }
+        }
+        private static string ProxyPort
+        {
+            get
+            {
+                if (!UseAWS2_0)
+                {
+                    if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyPort")))
+                    {
+                        throw new Exception("SentryS3ProxyPort cannot be found");
+                    }
+                    else
+                    {
+                        _proxyPort = Config.GetHostSetting("SentryS3ProxyPort");
+                    }
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryServerProxyPort")))
+                    {
+                        throw new Exception("SentryServerProxyPort cannot be found");
+                    }
+                    else
+                    {
+                        _proxyPort = Config.GetHostSetting("SentryServerProxyPort");
+                    }
+                }
+
+                return _proxyPort;
+            }
+        }
 
         public static S3ServiceProvider Instance
         {
@@ -62,20 +177,12 @@ namespace Sentry.data.Infrastructure
                     Logger.Debug($"<s3serviceprovider> AWSUseProxy : {Config.GetHostSetting("AWSUseProxy")}");
                     if (bool.Parse(Config.GetHostSetting("AWSUseProxy")))
                     {
-                        Logger.Debug($"<s3serviceprovider> SentryS3ProxyHost : {Config.GetHostSetting("SentryS3ProxyHost")}");
-                        if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyHost")))
-                        {
-                            throw new Exception("SentryS3ProxyHost cannot be found");
-                        }
+                        Logger.Debug($"<s3serviceprovider> SentryS3ProxyHost : {ProxyHost}");
+                        s3config.ProxyHost = ProxyHost;
 
-                        Logger.Debug($"<s3serviceprovider> SentryS3ProxyPort : {Config.GetHostSetting("SentryS3ProxyPort")}");
-                        if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyPort")))
-                        {
-                            throw new Exception("SentryS3ProxyPort cannot be found");
-                        }
+                        Logger.Debug($"<s3serviceprovider> SentryS3ProxyPort : {ProxyPort}");                        
+                        s3config.ProxyPort = int.Parse(ProxyPort);
 
-                        s3config.ProxyHost = Config.GetHostSetting("SentryS3ProxyHost");
-                        s3config.ProxyPort = int.Parse(Config.GetHostSetting("SentryS3ProxyPort"));
                         s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
                     }
 
@@ -145,63 +252,6 @@ namespace Sentry.data.Infrastructure
                 return _s3client;
             }
         }
-
-        private static string RootBucket
-        {
-            get
-            {
-                if (_bucket == null)
-                {
-                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                    {
-                        IDataFeatures dataFeatures = container.GetInstance<IDataFeatures>();
-
-                        _bucket = dataFeatures.Use_AWS_v2_Configuration_CLA_1488.GetValue()
-                            ? Config.GetHostSetting("AWS2_0RootBucket")
-                            : Config.GetHostSetting("AWSRootBucket");
-                    }
-                }
-                return _bucket;
-            }
-        }
-
-        private static string AWSRegion
-        {
-            get
-            {
-                if (_awsRegion == null)
-                {
-                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                    {
-                        IDataFeatures dataFeatures = container.GetInstance<IDataFeatures>();
-
-                        _awsRegion = dataFeatures.Use_AWS_v2_Configuration_CLA_1488.GetValue()
-                            ? Config.GetHostSetting("AWS2_0Region")
-                            : Config.GetHostSetting("AWSRegion");
-                    }
-                }
-                return _awsRegion;
-            }
-        }
-
-        private static bool UseAWS2_0
-        {
-            get
-            {
-                if (_useAws2_0 == null)
-                {
-                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                    {
-                        IDataFeatures dataFeatures = container.GetInstance<IDataFeatures>();
-
-                        _useAws2_0 = dataFeatures.Use_AWS_v2_Configuration_CLA_1488.GetValue().ToString();
-                    }
-                }
-                return bool.Parse(_useAws2_0);
-            }
-        }
-
-
         /// <summary>
         /// Retrieves a presigned URL for the S3 Object. versionId is optional, if not supplied
         /// default is null and will return latest version of S3 key.
