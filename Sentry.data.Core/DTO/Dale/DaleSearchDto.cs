@@ -10,6 +10,6 @@ namespace Sentry.data.Core
     public class DaleSearchDto
     {
         public string Criteria { get; set; }
-        public DaleDestination Destination { get; set; }
+        public DaleDestiny Destiny { get; set; }
     }
 }

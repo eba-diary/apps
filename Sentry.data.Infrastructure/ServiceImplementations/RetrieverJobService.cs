@@ -1,26 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hangfire;
+using Newtonsoft.Json;
+using Sentry.Common.Logging;
+using Sentry.Core;
 using Sentry.data.Core;
 using StructureMap;
+using System;
+using System.Collections.Generic;
 using System.IO;
-using Sentry.Common.Logging;
+using System.Linq;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Principal;
-using Newtonsoft.Json;
-using Hangfire;
-using System.Threading;
-using System.Net;
-using System.Net.Mime;
-using WinSCP;
-using System.Net.Http;
+using System.Text;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
-using Sentry.Core;
-using RestSharp;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
@@ -81,28 +76,35 @@ namespace Sentry.data.Infrastructure
                     }
                     else
                     {
+                        bool includeFilename = false;
                         switch (_job.DataSource.SourceType)
                         {
                             //Map exising source type to new Dataflow Provider
                             case GlobalConstants.DataSoureDiscriminator.FTP_SOURCE:
                                 _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSoureDiscriminator.FTP_DATAFLOW_SOURCE);
-                                // Execute job
-                                if (_jobProvider != null)
-                                {
-                                    _jobProvider.Execute(_job);
-                                }
+                                break;
+                            case GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE:
+                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
                                 break;
                             case GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION:
+                                includeFilename = true;
                                 _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
-                                // Execute job
-                                if (_jobProvider != null)
-                                {
-                                    _jobProvider.Execute(_job, filePath);
-                                }
                                 break;
                             default:
                                 _job.JobLoggerMessage("Debug", $"RetrieverJobService not configured for source type  - jobid:{_job.Id} sourcetype:{_job.DataSource.SourceType}");
                                 throw new NotImplementedException($"RetrieverJobService not configured for source type - jobid:{_job.Id} sourcetype:{_job.DataSource.SourceType}");
+                        }
+
+                        if (_jobProvider != null)
+                        {
+                            if (includeFilename)
+                            {
+                                _jobProvider.Execute(_job, filePath);
+                            }
+                            else
+                            {
+                                _jobProvider.Execute(_job);
+                            }
                         }
                     }
                     #region OldLegacyCode
