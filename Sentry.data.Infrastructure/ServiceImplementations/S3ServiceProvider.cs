@@ -7,6 +7,7 @@ using Amazon.S3.Model;
 using Sentry.Common.Logging;
 using Sentry.Configuration;
 using Sentry.data.Core;
+using Sentry.data.Infrastructure.Exceptions;
 using StructureMap;
 using System;
 using System.Collections.Generic;
@@ -23,11 +24,10 @@ namespace Sentry.data.Infrastructure
         private static S3ServiceProvider instance = null;
         private static readonly object padlock = new object();
         private static string versionId;
-        private static string _bucket = null;
-        private static string _awsRegion = null;
-        private static string _useAws2_0 = null;
-        private static string _proxyHost = null;
-        private static string _proxyPort = null;
+        private static string _bucket;
+        private static string _awsRegion;
+        private static string _useAws2_0;
+        private static string _proxyHost;
 
         public S3ServiceProvider() { }
 
@@ -49,7 +49,7 @@ namespace Sentry.data.Infrastructure
                 return _bucket;
             }
         }
-        private static string AWSRegion
+        private static string AwsRegion
         {
             get
             {
@@ -83,64 +83,87 @@ namespace Sentry.data.Infrastructure
                 return bool.Parse(_useAws2_0);
             }
         }
-        private static string ProxyHost
+        private static string GetProxyHost()
         {
-            get
+            if (!UseAWS2_0)
             {
-                if (!UseAWS2_0)
+                if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyHost")))
                 {
-                    if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyHost")))
-                    {
-                        throw new Exception("SentryS3ProxyHost cannot be found");
-                    }
-                    else
-                    {
-                        _proxyHost = Config.GetHostSetting("SentryS3ProxyHost");
-                    }
+                    throw new S3ServiceProviderException("SentryS3ProxyHost cannot be found");
                 }
                 else
                 {
-                    if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryServerProxyHost")))
-                    {
-                        throw new Exception("SentryServerProxyHost cannot be found");
-                    }
-                    else
-                    {
-                        _proxyHost = Config.GetHostSetting("SentryServerProxyHost");
-                    }
+                    return Config.GetHostSetting("SentryS3ProxyHost");
                 }
-
-                return _proxyHost;
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryServerProxyHost")))
+                {
+                    throw new S3ServiceProviderException("SentryServerProxyHost cannot be found");
+                }
+                else
+                {
+                    return Config.GetHostSetting("SentryServerProxyHost");
+                }
             }
         }
-        private static string ProxyPort
+        private static string GetProxyPort() 
         {
-            get
+            if (!UseAWS2_0)
             {
-                if (!UseAWS2_0)
+                if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyPort")))
                 {
-                    if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyPort")))
-                    {
-                        throw new Exception("SentryS3ProxyPort cannot be found");
-                    }
-                    else
-                    {
-                        _proxyPort = Config.GetHostSetting("SentryS3ProxyPort");
-                    }
+                    throw new S3ServiceProviderException("SentryS3ProxyPort cannot be found");
                 }
                 else
                 {
-                    if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryServerProxyPort")))
-                    {
-                        throw new Exception("SentryServerProxyPort cannot be found");
-                    }
-                    else
-                    {
-                        _proxyPort = Config.GetHostSetting("SentryServerProxyPort");
-                    }
+                    return Config.GetHostSetting("SentryS3ProxyPort");
                 }
-
-                return _proxyPort;
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryServerProxyPort")))
+                {
+                    throw new S3ServiceProviderException("SentryServerProxyPort cannot be found");
+                }
+                else
+                {
+                    return Config.GetHostSetting("SentryServerProxyPort");
+                }
+            }
+        }
+        private static string GetAwsAccessKey()
+        {
+            if (string.IsNullOrWhiteSpace(Config.GetHostSetting("AWSAccessKey")))
+            {
+                throw new S3ServiceProviderException("AWSAccessKey cannot be found");
+            }
+            else
+            {
+                return Config.GetHostSetting("AWSAccessKey");
+            }
+        }
+        private static string GetAwsSecretKey()
+        {
+            if (string.IsNullOrWhiteSpace(Config.GetHostSetting("AWSSecretKey")))
+            {
+                throw new S3ServiceProviderException("AWSSecretKey cannot be found");
+            }
+            else
+            {
+                return Config.GetHostSetting("AWSSecretKey");
+            }
+        }
+        private static string GetAwsProfileName()
+        {
+            if (string.IsNullOrWhiteSpace(Config.GetHostSetting("AWSProfileName")))
+            {
+                throw new S3ServiceProviderException("AWSProfileName cannot be found");
+            }
+            else
+            {
+                return Config.GetHostSetting("AWSProfileName");
             }
         }
 
@@ -172,19 +195,9 @@ namespace Sentry.data.Infrastructure
                     // instantiate a new shared client
                     AWSConfigsS3.UseSignatureVersion4 = true;
                     AmazonS3Config s3config = new AmazonS3Config();
-                    s3config.RegionEndpoint = RegionEndpoint.GetBySystemName(AWSRegion);
+                    s3config.RegionEndpoint = RegionEndpoint.GetBySystemName(AwsRegion);
                     //proxy only needed when not running on AWS.  Calling code expected to pass empty value if proxy host not needed.
-                    Logger.Debug($"<s3serviceprovider> AWSUseProxy : {Config.GetHostSetting("AWSUseProxy")}");
-                    if (bool.Parse(Config.GetHostSetting("AWSUseProxy")))
-                    {
-                        Logger.Debug($"<s3serviceprovider> SentryS3ProxyHost : {ProxyHost}");
-                        s3config.ProxyHost = ProxyHost;
-
-                        Logger.Debug($"<s3serviceprovider> SentryS3ProxyPort : {ProxyPort}");                        
-                        s3config.ProxyPort = int.Parse(ProxyPort);
-
-                        s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
-                    }
+                    SetAwsClientProxy(s3config);
 
                     AmazonS3Client client;
                     /*
@@ -199,59 +212,72 @@ namespace Sentry.data.Infrastructure
                     //Use AWS keys when connecting to 1.0 or 2.0 and profile is not used.
                     if (!UseAWS2_0 || (UseAWS2_0 && !bool.Parse(Config.GetHostSetting("UseAWSProfileName"))))
                     {
-                        Logger.Debug("<s3serviceprovider> Use key and secret key for authentication / access");
-                        string awsAccessKey = Config.GetHostSetting("AWSAccessKey");
-                        string awsSecretKey = Config.GetHostSetting("AWSSecretKey");
-                        if (string.IsNullOrWhiteSpace(awsAccessKey)) { throw new Exception("AWSAccessKey cannot be found"); }
-                        else { Logger.Debug("<s3serviceprovider> AWSAccessKey found"); };
-
-                        if (string.IsNullOrWhiteSpace(awsSecretKey)) { throw new Exception("AWSSecretKey cannot be found"); }
-                        else { Logger.Debug("<s3serviceprovider> AWSSecretKey found"); }
-
-                        client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);
+                        client = GetKeyBasedClient(s3config);
                     }
                     else if (UseAWS2_0 && bool.Parse(Config.GetHostSetting("UseAWSProfileName")))
                     {
-                        Logger.Debug("<s3serviceprovider> Use AWS Profile for authentication / access");
-                        //attempt to load the profile info from the .NET SDK credential store
-                        AWSCredentials awsCredentials;
-                        var profileName = Config.GetHostSetting("AWSProfileName");
-
-                        if (string.IsNullOrWhiteSpace(profileName)) { throw new Exception("AWSProfileName cannot be found"); }
-                        else Logger.Debug($"<s3serviceprovider> AWSProfileName : {profileName}");
-
-                        if (new CredentialProfileStoreChain().TryGetAWSCredentials(profileName, out awsCredentials))
-                        {
-                            client = new AmazonS3Client(awsCredentials, s3config);
-                        }
-                        else
-                        {
-                            throw new Exception($"Couldn't retrieve AWS credentials for the profile name {profileName}");
-                        }
-                    }                    
+                        client = GetProfileBasedClient(s3config);
+                    }
                     else
                     {
-
                         client = new AmazonS3Client(s3config);
                     }
 
                     _s3client = client;
 
-                    //Logger.Debug("<s3serviceprovider> Getting list of buckets available to client...");
-                    //var response = client.ListBuckets();
-
-                    //StringBuilder sb = new StringBuilder();
-                    //foreach (S3Bucket b in response.Buckets)
-                    //{
-                    //    sb.Append($"{b.BucketName}; ");
-                    //}
-                    //Logger.Debug($"<s3serviceprovider> Buckets available to client - {sb.ToString()}");
                     Logger.Info($"<s3serviceprovider>-clientinit regionendpoint:{s3config.RegionEndpoint},proxyhost:{s3config.ProxyHost},proxyport:{s3config.ProxyPort.ToString()}");
                     Logger.Debug("<s3serviceprovider> clientitnit-end");
                 }
                 return _s3client;
             }
         }
+
+        private static AmazonS3Client GetProfileBasedClient(AmazonS3Config s3config)
+        {
+            AmazonS3Client client;
+            Logger.Debug("<s3serviceprovider> Use AWS Profile for authentication / access");
+            //attempt to load the profile info from the .NET SDK credential store
+            AWSCredentials awsCredentials;
+            var profileName = GetAwsProfileName();
+            Logger.Debug($"<s3serviceprovider> AWSProfileName : {profileName}");
+
+            if (new CredentialProfileStoreChain().TryGetAWSCredentials(profileName, out awsCredentials))
+            {
+                client = new AmazonS3Client(awsCredentials, s3config);
+            }
+            else
+            {
+                throw new S3ServiceProviderException($"Couldn't retrieve AWS credentials for the profile name {profileName}");
+            }
+
+            return client;
+        }
+
+        private static AmazonS3Client GetKeyBasedClient(AmazonS3Config s3config)
+        {
+            AmazonS3Client client;
+            Logger.Debug("<s3serviceprovider> Use key and secret key for authentication / access");
+            string awsAccessKey = GetAwsAccessKey();
+            string awsSecretKey = GetAwsSecretKey();
+            client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);
+            return client;
+        }
+
+        private static void SetAwsClientProxy(AmazonS3Config s3config)
+        {
+            Logger.Debug($"<s3serviceprovider> AWSUseProxy : {Config.GetHostSetting("AWSUseProxy")}");
+            if (bool.Parse(Config.GetHostSetting("AWSUseProxy")))
+            {
+                s3config.ProxyHost = GetProxyHost();
+                Logger.Debug($"<s3serviceprovider> SentryS3ProxyHost : {GetProxyHost()}");
+
+                s3config.ProxyPort = int.Parse(GetProxyPort());
+                Logger.Debug($"<s3serviceprovider> SentryS3ProxyPort : {GetProxyPort()}");
+
+                s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
+            }
+        }
+
         /// <summary>
         /// Retrieves a presigned URL for the S3 Object. versionId is optional, if not supplied
         /// default is null and will return latest version of S3 key.
@@ -894,13 +920,10 @@ namespace Sentry.data.Infrastructure
         public IDictionary<string, string> GetDatasetList(string parentDir = "sentry-dataset-management", bool includeSubDirectories = true)
         {
             // this will include folders in addition to data sets...
-            if (parentDir == null)
-            {
-                parentDir = RootBucket;
-            }
+
             Dictionary<string, string> dsList = new Dictionary<string, string>();
             ListObjectsRequest lbReq = new ListObjectsRequest();
-            lbReq.BucketName = parentDir;
+            lbReq.BucketName = parentDir ?? RootBucket;
             ListObjectsResponse lbRsp = null;
             do
             {   // get list of ojbects

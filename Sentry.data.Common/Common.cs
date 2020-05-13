@@ -25,7 +25,7 @@ namespace Sentry.data.Common
     /// 
     public static class Utilities
     {
-        private static string _bucket = null;
+        private static string _bucket;
         private static string RootBucket
         {
             get

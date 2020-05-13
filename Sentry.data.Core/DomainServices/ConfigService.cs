@@ -22,7 +22,7 @@ namespace Sentry.data.Core
         private readonly ISchemaService _schemaService;
         private readonly IDataFeatures _featureFlags;
         private Guid _guid;
-        private static string _bucket = null;
+        private string _bucket;
 
         public ConfigService(IDatasetContext dsCtxt, IUserService userService, IEventService eventService, 
             IMessagePublisher messagePublisher, IEncryptionService encryptService, ISecurityService securityService,

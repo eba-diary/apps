@@ -33,7 +33,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         private IConfigService _configService;
         private ISchemaService _schemaService;
         private ISecurityService _securityService;
-        private IDataFeatures _featureFlags;
+        private readonly IDataFeatures _featureFlags;
         private string _bucket;
 
         public QueryToolController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, 
