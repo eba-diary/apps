@@ -2,7 +2,7 @@
 
 namespace Sentry.data.Core.GlobalEnums
 {
-    public enum DaleDestination
+    public enum DaleDestiny
     {
         [Description("Table")]
         Table = 0,

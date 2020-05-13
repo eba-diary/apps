@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Web
 {
@@ -17,13 +18,9 @@ namespace Sentry.data.Web
 
             return new DaleSearchDto()
             {
-
                 Criteria = model.Criteria,
-                Destination = model.Destination
-                
-                
+                Destiny = model.Destiny
             };
-            
         }
 
         public static DaleResultModel ToWeb(this DaleResultDto dto)
@@ -50,6 +47,22 @@ namespace Sentry.data.Web
             dtos.ForEach(x => models.Add(x.ToWeb()));
 
             return models;
+        }
+
+        public static DaleDestiny ToDaleDestiny(this string destiny)
+        {
+            if(destiny == DaleDestiny.Column.GetDescription())
+            {
+                return DaleDestiny.Column;
+            }
+            else if (destiny == DaleDestiny.Table.GetDescription())
+            {
+                return DaleDestiny.Table;
+            }
+            else
+            {
+                return DaleDestiny.View;
+            }
         }
     }
 }
