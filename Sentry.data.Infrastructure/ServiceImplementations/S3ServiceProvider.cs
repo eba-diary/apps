@@ -27,7 +27,6 @@ namespace Sentry.data.Infrastructure
         private static string _bucket;
         private static string _awsRegion;
         private static string _useAws2_0;
-        private static string _proxyHost;
 
         public S3ServiceProvider() { }
 

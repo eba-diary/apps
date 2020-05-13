@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Sentry.data.Infrastructure.Exceptions
 {
     [Serializable]
-    class S3ServiceProviderException : Exception, ISerializable
+    public class S3ServiceProviderException : Exception
     {
         public S3ServiceProviderException() { }
         public S3ServiceProviderException(string message) : base(message) { }
