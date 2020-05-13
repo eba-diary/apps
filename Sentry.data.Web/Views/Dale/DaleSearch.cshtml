@@ -26,19 +26,18 @@
 </div>
 
 
-<div style="text-align: center;">
-    <div>
-        <input type="text" id="daleSearchCriteria" style="width: 200px;border: 3px solid #555;font-size: 18px;font-weight: 600;">
+<div id="corySearchInput" style="display: table; width: 300px; margin: auto;">
+        
+    <span id="joker" class="input-group-addon clickable ds-search-icon" onclick="$(function() {$('#daleSearchCriteria').focus();});">
+        <i class="glyphicon glyphicon-search"></i>
+    </span>
 
-        <button id="askDaleBtn" class="btn btn-primary" style="font-size:18px;">
-            Search!
-        </button>
+    <span id="joker2" class="input-group-addon ds-search-icon" style="display:none;" disabled onclick="$(function() {$('#daleSearchCriteria').focus();}); ">
+        <em class="fa fa-circle-o-notch fa-spin"></em>
+    </span>
 
-        <button id="askDaleBtnFake" class="btn btn-primary" style="display:none; font-size:18px;" disabled>
-            <em class="fa fa-circle-o-notch fa-spin"></em>  Searching ...
-        </button>
-
-    </div>
+    <input type="text" id="daleSearchCriteria" name="searchPhrase" class="form-control ds-search-textbox" placeholder="Find your destiny ..." style="font-size: 18px;font-weight: 600;" />
+        
 </div>
 
 
