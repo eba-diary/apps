@@ -74,7 +74,7 @@ namespace Sentry.data.Web
             bundles.Add(new StyleBundle("~/bundles/css/main").
                         Include("~/Content/bootstrap.min.css", new CssRewriteUrlTransform()).
 
-                        Include("~/Content/font-awesome.min.css", new CssRewriteUrlTransform()).
+                        Include("~/Content/font-awesome.css", new CssRewriteUrlTransform()).
                         Include("~/Content/css/select2.css", new CssRewriteUrlTransform()).
                         Include("~/Content/ladda-themeless.css"));
 
@@ -106,6 +106,7 @@ namespace Sentry.data.Web
                         Include("~/Content/business-intelligence.css").
                         Include("~/Content/dataflow.css").
                         Include("~/Content/site.css").
+                        Include("~/Content/dale.css").
                         Include("~/Content/jquery.json-viewer.css"));
 
             /* If you want to see content bundled/minimized when running locally, uncomment the EnableOptimizations 
