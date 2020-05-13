@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core.Exceptions;
+using Sentry.Configuration;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Sentry.Common.Logging;
-using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Core
 {
@@ -17,10 +17,12 @@ namespace Sentry.data.Core
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
         private readonly ISecurityService _securityService;
+        private readonly IDataFeatures _featureFlags;
+        private string _bucket;
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
-            IDataFlowService dataFlowService,
-            IJobService jobService, ISecurityService securityService)
+            IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
+            IDataFeatures dataFeatures)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -28,6 +30,21 @@ namespace Sentry.data.Core
             _dataFlowService = dataFlowService;
             _jobService = jobService;
             _securityService = securityService;
+            _featureFlags = dataFeatures;
+        }
+
+        private string RootBucket
+        {
+            get
+            {
+                if (_bucket == null)
+                {
+                    _bucket = _featureFlags.Use_AWS_v2_Configuration_CLA_1488.GetValue()
+                        ? Config.GetHostSetting("AWS2_0RootBucket")
+                        : Config.GetHostSetting("AWSRootBucket");
+                }
+                return _bucket;
+            }
         }
 
         public int CreateAndSaveSchema(FileSchemaDto schemaDto)
@@ -379,7 +396,7 @@ namespace Sentry.data.Core
                 HiveDatabase = GenerateHiveDatabaseName(parentDataset.DatasetCategories.First()),
                 HiveTable = FormatHiveTableNamePart(parentDataset.DatasetName) + "_" + FormatHiveTableNamePart(dto.Name),
                 HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
-                HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
+                HiveLocation = RootBucket + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
                 CreatedDTM = DateTime.Now,
                 LastUpdatedDTM = DateTime.Now,
                 DeleteIssueDTM = DateTime.MaxValue,

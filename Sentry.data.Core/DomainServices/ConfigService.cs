@@ -1,13 +1,11 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Sentry.Common.Logging;
+using Sentry.data.Core.Exceptions;
+using Sentry.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Sentry.Common.Logging;
-using StructureMap;
-using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Core
 {
@@ -22,12 +20,14 @@ namespace Sentry.data.Core
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly ISecurityService _securityService;
         private readonly ISchemaService _schemaService;
+        private readonly IDataFeatures _featureFlags;
         private Guid _guid;
+        private string _bucket;
 
         public ConfigService(IDatasetContext dsCtxt, IUserService userService, IEventService eventService, 
             IMessagePublisher messagePublisher, IEncryptionService encryptService, ISecurityService securityService,
             IJobService jobService, IS3ServiceProvider s3ServiceProvider,
-            ISchemaService schemaService)
+            ISchemaService schemaService, IDataFeatures dataFeatures)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
@@ -38,6 +38,7 @@ namespace Sentry.data.Core
             JobService = jobService;
             _s3ServiceProvider = s3ServiceProvider;
             _schemaService = schemaService;
+            _featureFlags = dataFeatures;
         }
 
         private IJobService JobService
@@ -49,6 +50,20 @@ namespace Sentry.data.Core
             set
             {
                 _jobService = value;
+            }
+        }
+
+        private string RootBucket
+        {
+            get
+            {
+                if (_bucket == null)
+                {
+                    _bucket = _featureFlags.Use_AWS_v2_Configuration_CLA_1488.GetValue()
+                            ? Config.GetHostSetting("AWS2_0RootBucket")
+                            : Config.GetHostSetting("AWSRootBucket");
+                }
+                return _bucket;
             }
         }
 
@@ -416,7 +431,7 @@ namespace Sentry.data.Core
                 HiveDatabase = "Default",
                 HiveTable = ds.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.SchemaName.Replace(" ", "").ToUpper(),
                 HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
-                HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
+                HiveLocation = RootBucket + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
                 CreateCurrentView = dto.CreateCurrentView,
                 IsInSAS = dto.IsInSAS,
                 SasLibrary = (dto.IsInSAS) ? dto.GenerateSASLibary(_datasetContext) : null

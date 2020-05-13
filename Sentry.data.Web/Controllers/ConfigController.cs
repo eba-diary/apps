@@ -1,4 +1,6 @@
 ﻿using LazyCache;
+using Sentry.Common.Logging;
+using Sentry.Configuration;
 using Sentry.Core;
 using Sentry.data.Common;
 using Sentry.data.Core;
@@ -8,11 +10,8 @@ using Sentry.data.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
-using Sentry.Common.Logging;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Web.Controllers
@@ -31,11 +30,13 @@ namespace Sentry.data.Web.Controllers
         public IObsidianService _obsidianService;
         public ISecurityService _securityService;
         public ISchemaService _schemaService;
+        private readonly IDataFeatures _featureFlags;
+        private string _bucket;
 
         public ConfigController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService,
             ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService,
             IEventService eventService, IDatasetService datasetService, IObsidianService obsidianService,
-            ISecurityService securityService, ISchemaService schemaService)
+            ISecurityService securityService, ISchemaService schemaService, IDataFeatures dataFeatures)
         {
             _cache = new CachingService();
             _datasetContext = dsCtxt;
@@ -49,6 +50,21 @@ namespace Sentry.data.Web.Controllers
             _obsidianService = obsidianService;
             _securityService = securityService;
             _schemaService = schemaService;
+            _featureFlags = dataFeatures;
+        }
+
+        private string RootBucket
+        {
+            get
+            {
+                if (_bucket == null)
+                {
+                    _bucket = _featureFlags.Use_AWS_v2_Configuration_CLA_1488.GetValue()
+                        ? Config.GetHostSetting("AWS2_0RootBucket")
+                        : Config.GetHostSetting("AWSRootBucket");
+                }
+                return _bucket;
+            }
         }
 
         [HttpGet]
@@ -1381,7 +1397,7 @@ namespace Sentry.data.Web.Controllers
                         HiveDatabase = "Default",
                         HiveTable = dfc.ParentDataset.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfc.Name.Replace(" ", "").ToUpper(),
                         HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
-                        HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
+                        HiveLocation = RootBucket + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
                     };
 
                     dfc.Schemas.Add(de);
