@@ -5,7 +5,7 @@
     [ContentType] VARCHAR(50) NOT NULL, 
     [FileExtension] VARCHAR(10) NOT NULL, 
     [FileName] VARCHAR(250) NOT NULL, 
-    [StorageBucketName] VARCHAR(100) NOT NULL, 
+    [StorageBucketName] VARCHAR(100) NULL, 
     [StoragePrefix] VARCHAR(250) NOT NULL, 
     [StorageKey] VARCHAR(500) NOT NULL, 
     [UploadDate] DATETIME NOT NULL, 
