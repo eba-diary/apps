@@ -31,6 +31,5 @@ from (
 		and scm.SASLibrary is null
 		and scm.Schema_Id is not null
 		and cat.Name is not null
-	order by DS.Dataset_NME, SCM.Schema_NME
 ) x
 where Schema_Id = x.xID
