@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.DataTables.Mvc;
 using Sentry.DataTables.QueryableAdapter;
 using Sentry.DataTables.Shared;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
 {
