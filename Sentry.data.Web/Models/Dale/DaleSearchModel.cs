@@ -10,7 +10,7 @@ namespace Sentry.data.Web
     {
         public string Criteria { get; set; }
 
-        public DaleDestination Destination { get; set; }
+        public DaleDestiny Destiny { get; set; }
 
         public List<DaleResultModel> DaleResults { get; set; }
     }

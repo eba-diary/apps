@@ -5,6 +5,7 @@ using Sentry.Core;
 using Sentry.Common.Logging;
 using System;
 using System.IO;
+using Sentry.data.Core.Entities.DataProcessing;
 
 namespace Sentry.data.Infrastructure
 {
@@ -34,6 +35,27 @@ namespace Sentry.data.Infrastructure
             else
             {
                 targetPath = Path.Combine(basepath, executingJob.GetTargetFileName(Path.GetFileName(executingJob.GetUri().ToString())));
+            }
+
+            return targetPath;
+        }
+
+        public static string GetTargetPath(this DataFlowStep s3DropStep, RetrieverJob executingJob)
+        {
+            string targetPath;
+
+            if (s3DropStep.DataAction_Type_Id != DataActionType.S3Drop)
+            {
+                throw new NotImplementedException("Only Configured to determine target path for S3DropSteps");
+            }
+
+            if (executingJob.DataSource.Is<HTTPSSource>())
+            {
+                targetPath = $"{s3DropStep.TriggerKey}{executingJob.GetTargetFileName(Path.GetFileName(executingJob.GetUri().ToString()))}";
+            }
+            else
+            {
+                throw new NotImplementedException("retrieverjobextensions-gettargetpath - Only configured to get file name from https sources");
             }
 
             return targetPath;

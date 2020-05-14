@@ -2,38 +2,50 @@
 @model DaleSearchModel
 
 
+<div style="background-image: url('/Images/Dale/DataInventoryLogo.jpg'); background-position: 50% 50%; height: 100px; background-repeat: no-repeat;"></div>
 
 
-@using (Html.BeginForm("GetSearchResults", "Dale", FormMethod.Post))
-{
-    @Html.AntiForgeryToken()
-    <div class="jive">
-        <div class="jive" style="background-image: url('/Images/Dale/AskDaleLogo.jpg'); background-position: 50% 50%; height: 180px; background-repeat: no-repeat;"></div>
+<div  style="text-align: center;">
+    <label class="containerDale" style="text-align:left; width:90px;">
+        @Sentry.data.Core.GlobalEnums.DaleDestiny.Table
+        <input type="radio" name="Destiny" id="DestinyTableRadio" value= @Sentry.data.Core.GlobalEnums.DaleDestiny.Table >
+        <span class="checkmark"></span>
+    </label>
 
-        <div class="form-group" style="text-align: center;">
-            @Html.RadioButtonFor((model) => model.Destination, Sentry.data.Core.GlobalEnums.DaleDestination.Table )
-            Table
-            @Html.RadioButtonFor((model) => model.Destination, Sentry.data.Core.GlobalEnums.DaleDestination.Column, new { Checked = "checked" })
-            Column
-            @Html.RadioButtonFor((model) => model.Destination, Sentry.data.Core.GlobalEnums.DaleDestination.View)
-            View
-        </div>
+    <label class="containerDale" style="text-align:left; width:100px;">
+        @Sentry.data.Core.GlobalEnums.DaleDestiny.Column
+        <input type="radio" name="Destiny" id="DestinyColumnRadio" value= @Sentry.data.Core.GlobalEnums.DaleDestiny.Column checked="checked">
+        <span class="checkmark"></span>
+    </label>
+    <label class="containerDale" style="text-align:left;width:90px;">
+        @Sentry.data.Core.GlobalEnums.DaleDestiny.View
+        <input type="radio" name="Destiny" id="DestinyViewRadio" value= @Sentry.data.Core.GlobalEnums.DaleDestiny.View>
+        <span class="checkmark"></span>
+    </label>
 
-        <div style="text-align: center;">
-            <div>
-                @Html.TextBoxFor((model) => model.Criteria, new { @class = "ask-dale" })
-                <input type="submit" value="Answer!" class="btn btn-primary" />
-            </div>
-        </div>
+</div>
 
-       @* @Html.Partial("~/Views/Dale/_DaleResults.cshtml", new Sentry.data.Web.DaleResultModel())*@
 
-    </div>
-}
+<div id="corySearchInput" style="display: table; width: 300px; margin: auto;">
+        
+    <span id="joker" class="input-group-addon clickable ds-search-icon" onclick="$(function() {$('#daleSearchCriteria').focus();});">
+        <em class="glyphicon glyphicon-search"></em>
+    </span>
 
+    <span id="joker2" class="input-group-addon ds-search-icon" style="display:none;" disabled onclick="$(function() {$('#daleSearchCriteria').focus();}); ">
+        <em class="fa fa-circle-o-notch fa-spin"></em>
+    </span>
+
+    <input type="text" id="daleSearchCriteria" name="searchPhrase" class="form-control ds-search-textbox" placeholder="Find your destiny ..." style="font-size: 18px;font-weight: 600;" />
+        
+</div>
+
+
+@Html.Partial("~/Views/Dale/DaleResult.cshtml")
 
 
 @section Scripts {
+    @Scripts.Render("~/bundles/dataTables")
     <script type="text/javascript">
 
         $(function () {
