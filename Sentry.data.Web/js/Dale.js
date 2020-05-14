@@ -72,6 +72,16 @@
                 data.Dale.enableDale();
             });
         });
+
+        $('.input-group-addon').click(function (e) {
+
+            data.Dale.disableDale();
+
+            //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
+            daleResultsTable.ajax.reload(function () {
+                data.Dale.enableDale();
+            });
+        });
     },
 
     getDaleDestiny: function ()
@@ -89,9 +99,10 @@
         $('#DestinyTableRadio').attr('disabled', 'disabled');
         $('#DestinyColumnRadio').attr('disabled', 'disabled');
         $('#DestinyViewRadio').attr('disabled', 'disabled');
-        $('#askDaleBtn').attr('disabled', 'disabled');
-        $('#askDaleBtn').hide();
-        $('#askDaleBtnFake').show();
+
+        $('#joker').hide();
+        $('#joker2').show();
+
     },
 
     //enable all controls user can hit during search
@@ -103,8 +114,8 @@
         $('#DestinyTableRadio').removeAttr('disabled');
         $('#DestinyColumnRadio').removeAttr('disabled');
         $('#DestinyViewRadio').removeAttr('disabled');
-        $('#askDaleBtn').removeAttr('disabled');
-        $('#askDaleBtn').show();
-        $('#askDaleBtnFake').hide();
+
+        $('#joker').show();
+        $('#joker2').hide();
     }
 };
