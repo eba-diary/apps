@@ -100,8 +100,8 @@
         $('#DestinyColumnRadio').attr('disabled', 'disabled');
         $('#DestinyViewRadio').attr('disabled', 'disabled');
 
-        $('#joker').hide();
-        $('#joker2').show();
+        $('#daleSearchClick').hide();
+        $('#daleSearchClickSpinner').show();
 
     },
 
@@ -115,7 +115,7 @@
         $('#DestinyColumnRadio').removeAttr('disabled');
         $('#DestinyViewRadio').removeAttr('disabled');
 
-        $('#joker').show();
-        $('#joker2').hide();
+        $('#daleSearchClick').show();
+        $('#daleSearchClickSpinner').hide();
     }
 };
