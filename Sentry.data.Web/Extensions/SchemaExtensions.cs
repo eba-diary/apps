@@ -123,7 +123,8 @@ namespace Sentry.data.Web
                 Precision = dto.Precision.ToString(),
                 Scale = dto.Scale.ToString(),
                 LastUpdated = dto.LastUpdatedDTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds,
-                DataObjectField_ID = dto.FieldId
+                DataObjectField_ID = dto.FieldId,
+                Length = dto.Length.ToString()
             };
 
             if (dto.ChildFields.Any())

@@ -247,6 +247,9 @@
                             <span>1234.56 = Precision:6  Scale:2</span>
                         </div>
                     </div>
+                    <div class="showVarcharLength col-lg-2" data-bind="visible: ShowVarcharLength">
+                        <input class="varcharlength col-lg-12" data-bind="value: Length" data-toggle="tooltip" data-placement="top" title="Length" />
+                    </div>
 
                     <div class="showDateFormat col-lg-4" data-bind="visible: ShowDateFormat">
                         <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Not Specified (default is @dateDefault)" data-toggle="tooltip" data-placement="top" title="Format" />
@@ -373,6 +376,7 @@
             self.DeleteInd = ko.observable(false);
             self.IsArray = ko.observable(indata.IsArray);
             self.Level = ko.observable(thisLevel);
+            self.Length = ko.observable(indata.Length);
             self.ChildRows = ko.observableArray(ko.utils.arrayMap(indata.ChildRows, function (rowInfo) {
                 currentMax++;
                 return new Row(currentMax, rowInfo, parentvm, thisLevel);
@@ -500,6 +504,15 @@
                     return false;
                 }
             });
+
+            self.ShowVarcharLength = ko.computed(function () {
+                if (self.DataType() === 'VARCHAR') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            })
 
             self.ShowAddChild = ko.computed(function () {
                 if ((self.DataType() === 'STRUCT' || (self.DataType() === 'ARRAY' && self.ArrayType() === 'STRUCT')) && self.Toggled) {
@@ -681,7 +694,7 @@
 
             self.save = function () {
                 console.log(ko.toJS(vm.Rows));
-                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd', 'IsArray', 'FieldGuid']);
+                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd', 'IsArray', 'FieldGuid', 'Length']);
                 console.log(a);
 
                 var url_parts = window.location.href.replace(/\/\s*$/, '').split('/');
