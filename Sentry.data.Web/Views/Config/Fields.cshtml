@@ -248,7 +248,7 @@
                         </div>
                     </div>
                     <div class="showVarcharLength col-lg-2" data-bind="visible: ShowVarcharLength">
-                        <input class="varcharlength col-lg-12" data-bind="value: Length" data-toggle="tooltip" data-placement="top" title="Length" />
+                        <input class="varcharlength col-lg-12" data-bind="value: Length" data-toggle="tooltip" data-placement="top" title="Length (min=1 max=65535" />
                     </div>
 
                     <div class="showDateFormat col-lg-4" data-bind="visible: ShowDateFormat">
@@ -376,7 +376,7 @@
             self.DeleteInd = ko.observable(false);
             self.IsArray = ko.observable(indata.IsArray);
             self.Level = ko.observable(thisLevel);
-            self.Length = ko.observable(indata.Length);
+            self.Length = ko.observable(indata.Length).extend({ numeric: { precision: 0, min: 1, max: 65535 }});
             self.ChildRows = ko.observableArray(ko.utils.arrayMap(indata.ChildRows, function (rowInfo) {
                 currentMax++;
                 return new Row(currentMax, rowInfo, parentvm, thisLevel);
