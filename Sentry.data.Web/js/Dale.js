@@ -71,7 +71,7 @@
         $('#daleResultsTable_filter').hide();
 
         //wire up column Picker for grid
-        data.Dale.initDaleColumnPicker();
+        //data.Dale.initDaleColumnPicker();
 
         //this reloads DataTable and does a refresh pulling criteria everytime
         $('#askDaleBtn').click(function () {
@@ -133,6 +133,9 @@
         $('#daleSearchClickSpinner').hide();
     },
 
+
+
+
     initDaleColumnPicker: function ()
     {
         var mySelect = document.getElementById('daleColumnPicker');
@@ -152,8 +155,8 @@
                 table.column(x).visible(true);
             }
 
-            //
-            document.getElementById("daleColumnPicker").value = "Column Selector";
+            //$('#daleColumnPicker').val('Column Selector');
+            //document.getElementById("daleColumnPicker").value = "Column Selector";
         }
     }
 
