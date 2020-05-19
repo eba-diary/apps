@@ -1,15 +1,12 @@
 ﻿using Confluent.Kafka;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using StructureMap;
-using Sentry.Common.Logging;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using Sentry.data.Infrastructure.Helpers;
 
 namespace Sentry.data.Infrastructure
 {
@@ -57,24 +54,24 @@ namespace Sentry.data.Infrastructure
         {
             lock (_initLocker)
             {
-                Sentry.Common.Logging.Logger.Info("Initializing goldeneye-producer");
-
-                ApplicationConfiguration config = null;
+                Logger.Info("Initializing goldeneye-producer");
                 
                 try
                 {
+                    LogSettings();
+
                     IList<KeyValuePair<String, Object>> configuration = new List<KeyValuePair<String, Object>>()
                     {
                         { new KeyValuePair<String, Object>("statistics.interval.ms", "60000") },
-                        { new KeyValuePair<String, Object>("bootstrap.servers", Configuration.Config.GetHostSetting("KafkaBootstrapServers")) }                        
+                        { new KeyValuePair<String, Object>("bootstrap.servers", KafkaHelper.GetKafkaBrokers()) }                        
                     };
 
-                    if ((Configuration.Config.GetHostSetting("KafkaSSL").ToLower() == "true") ? true : false)
+                    if (KafkaHelper.UseSASL())
                     {
                         configuration.Add(new KeyValuePair<String, Object>("security.protocol", "sasl_ssl"));
                         configuration.Add(new KeyValuePair<String, Object>("sasl.mechanism", "GSSAPI"));
-                        configuration.Add(new KeyValuePair<String, Object>("sasl.kerberos.service.name", Configuration.Config.GetHostSetting("sasl_kerberos_service_name")));
-                        configuration.Add(new KeyValuePair<String, Object>("ssl.ca.location", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Configuration.Config.GetHostSetting("CertPath"))));
+                        configuration.Add(new KeyValuePair<String, Object>("sasl.kerberos.service.name", KafkaHelper.GetKerberosServiceName()));
+                        configuration.Add(new KeyValuePair<String, Object>("ssl.ca.location", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, KafkaHelper.GetCertPath())));
                     }
 
                     //Add kafka debug logging 
@@ -85,7 +82,7 @@ namespace Sentry.data.Infrastructure
 
                     //Print configuration on start
                     string cfgstr = "Producer Configuration:\r\n";
-                    cfgstr += $"KafkaSSL: {Configuration.Config.GetHostSetting("KafkaSSL")}\r\n";
+                    cfgstr += $"KafkaSSL: {KafkaHelper.UseSASL().ToString()}\r\n";
                     cfgstr += $"KafkaDebugLogging: {Configuration.Config.GetHostSetting("KafkaDebugLogging")}";
                     foreach (KeyValuePair<String, Object> itm in configuration)
                     {
@@ -106,7 +103,7 @@ namespace Sentry.data.Infrastructure
                 }
                 catch (Exception ex)
                 {
-                    Sentry.Common.Logging.Logger.Fatal("Failed to initialize goldeneye-producer", ex);
+                    Logger.Fatal("Failed to initialize goldeneye-producer", ex);
                 }
             }
         }
@@ -115,7 +112,7 @@ namespace Sentry.data.Infrastructure
         {
             Sentry.Common.Logging.Logger.Info("DEBUG LOG FROM KAFKA: " + e.Message);
         }
-
+        
         public void Publish(string topic, string key, string value)
         {
             try
@@ -125,7 +122,7 @@ namespace Sentry.data.Infrastructure
                     Producer p = Producer;
                 }
 
-                Logger.Info($"Publishing message - Topic:{Sentry.data.Infrastructure.TopicHelper.GetDSCEventTopic()} Key:{key} Message:{value}");
+                Logger.Info($"Publishing message - Topic:{KafkaHelper.GetDSCEventTopic()} Key:{key} Message:{value}");
 
                 _producer_str_str.ProduceAsync(topic, key, value, new ProducerDeliveryHandler());
 
@@ -138,9 +135,21 @@ namespace Sentry.data.Infrastructure
 
         public void PublishDSCEvent(string key, string value)
         {
-            Publish(Sentry.data.Infrastructure.TopicHelper.GetDSCEventTopic(), key, value);
+            Publish(KafkaHelper.GetDSCEventTopic(), key, value);
         }
         #endregion
+        
+        private static void LogSettings()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"UseConfluent: {KafkaHelper.UseConfluent()}");
+            sb.AppendLine($"Brokers: {KafkaHelper.GetKafkaBrokers()}");
+            sb.AppendLine($"UseSASL: {KafkaHelper.UseSASL()}");
+            sb.AppendLine($"KerberosServiceName: {KafkaHelper.GetKerberosServiceName()}");
+            sb.AppendLine($"KafkaDebugLogging: {Configuration.Config.GetHostSetting("KafkaDebugLogging")}");
+
+            Logger.Debug(sb.ToString());
+        }
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
