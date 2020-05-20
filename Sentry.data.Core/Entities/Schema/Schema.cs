@@ -35,12 +35,14 @@ namespace Sentry.data.Core
         #region SchemaLevelFeatureFlags
         //These feature flags are at a schema level instead of
         //  an application level
-
-
         /// <summary>
         /// These feature
         /// </summary>
         public virtual bool CLA1396_NewEtlColumns { get; set; }
+        /// <summary>
+        /// This feature triggers the creation of JSON structures within Parquet
+        /// </summary>
+        public virtual bool CLA1580_StructureHive { get; set; }
         #endregion
 
         protected internal virtual void AddRevision(SchemaRevision revision)

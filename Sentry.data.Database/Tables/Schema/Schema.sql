@@ -22,5 +22,6 @@
     [DeleteIssueDTM] DATETIME NULL, 
     [HiveStatus] VARCHAR(50) NULL, 
     [CLA1396_NewEtlColumns] BIT NOT NULL, 
+    [CLA1580_StructureHive ] BIT NOT NULL, 
     CONSTRAINT [FK_Schema_FileExtension] FOREIGN KEY ([FileExtension_Id]) REFERENCES [FileExtension]([Extension_Id]) 
 )
