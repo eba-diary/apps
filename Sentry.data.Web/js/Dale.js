@@ -49,7 +49,14 @@
                 { data: "ScaleLength", className: "ScaleLength", visible: false }
             ],
 
-            order: [[1, 'desc'], [2, 'desc']]
+            order: [[1, 'desc'], [2, 'desc']],
+
+            //styles for columnVisibility to show
+            dom: 'Blrtip',
+            buttons: [
+                'colvis' 
+            ]
+
         });
 
         //add a filter in each column
@@ -70,9 +77,6 @@
         //to get column filtering requires the Searching=true to be set to true, if i set it to false then column filtering goes away so by default you can't have one without the other, so cheat the system here
         $('#daleResultsTable_filter').hide();
 
-        //wire up column Picker for grid
-        //data.Dale.initDaleColumnPicker();
-
         //this reloads DataTable and does a refresh pulling criteria everytime
         $('#askDaleBtn').click(function () {
             data.Dale.disableDale();
@@ -92,10 +96,6 @@
                 data.Dale.enableDale();
             });
         });
-
-        
-
-        
     },
 
     getDaleDestiny: function ()
@@ -131,33 +131,5 @@
 
         $('#daleSearchClick').show();
         $('#daleSearchClickSpinner').hide();
-    },
-
-
-
-
-    initDaleColumnPicker: function ()
-    {
-        var mySelect = document.getElementById('daleColumnPicker');
-
-        mySelect.onchange = function () {
-       
-            var x = document.getElementById("daleColumnPicker").value;
-            
-            var table = $("#daleResultsTable").DataTable();
-            
-            if (table.column(x).visible() === true)
-            {
-                table.column(x).visible(false);
-            }
-            else
-            {
-                table.column(x).visible(true);
-            }
-
-            //$('#daleColumnPicker').val('Column Selector');
-            //document.getElementById("daleColumnPicker").value = "Column Selector";
-        }
     }
-
 };
