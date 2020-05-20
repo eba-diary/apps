@@ -50,11 +50,13 @@ namespace Sentry.data.Core
                 case SchemaDatatypes.TIMESTAMP:
                     dto.SourceFormat = ((TimestampField)field).SourceFormat;
                     break;
+                case SchemaDatatypes.VARCHAR:
+                    dto.Length = ((VarcharField)field).FieldLength;
+                    break;
                 case SchemaDatatypes.STRUCT:
                 case SchemaDatatypes.NONE:
                 case SchemaDatatypes.INTEGER:
                 case SchemaDatatypes.BIGINT:
-                case SchemaDatatypes.VARCHAR:
                 default:
                     break;
             }

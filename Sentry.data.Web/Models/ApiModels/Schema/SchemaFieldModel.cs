@@ -20,5 +20,6 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public bool Nullable { get; set; }
         public int OrdinalPosition { get; set; }
         public string Description { get; set; }
+        public int Length { get; set; }
     }
 }
