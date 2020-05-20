@@ -29,14 +29,20 @@ namespace Sentry.data.Web
             {
                 Server = dto.Server,
                 Database = dto.Database,
-                Table = dto.Table,
+                Object = dto.Object,
+                ObjectType = dto.ObjectType,
                 Column = dto.Column,
+
+                
                 ColumnType = dto.ColumnType,
-                PrecisionLength = dto.PrecisionLength,
-                ScaleLength = dto.ScaleLength,
+                MaxLength = dto.MaxLength,
+                Precision = dto.Precision,
+                Scale = dto.Scale,
+                IsNullable = dto.IsNullable,
                 EffectiveDate = dto.EffectiveDate,
-                ExpirationDate = dto.ExpirationDate,
-                LastScanDate = dto.LastScanDate
+
+                //ExpirationDate = dto.ExpirationDate,
+                //LastScanDate = dto.LastScanDate,
             };
         }
 

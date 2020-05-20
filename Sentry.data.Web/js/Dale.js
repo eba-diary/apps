@@ -28,6 +28,7 @@
             autoWidth: true,
             searching: true,
             pageLength: 50,
+            //scrollX:true,
 
             ajax: {
                 url: "/Dale/GetSearchResultsClient/",
@@ -42,14 +43,19 @@
             columns: [
                 { data: "Server", className: "Server" },
                 { data: "Database", className: "Database" },
-                { data: "Table", className: "Table" },
-                { data: "Column", className: "ColumnMan"},
-                { data: "ColumnType", className: "ColumnType", visible: false  },
-                { data: "PrecisionLength", className: "PrecisionLength", visible: false  },
-                { data: "ScaleLength", className: "ScaleLength", visible: false }
+                { data: "Object", className: "Object" },
+                { data: "ObjectType", className: "ObjectType" },
+                { data: "Column", className: "ColumnMan" },
+
+                { data: "ColumnType", className: "ColumnType", visible: false },
+                { data: "MaxLength", className: "MaxLength", visible: false },
+                { data: "Precision", className: "Precision", visible: false },
+                { data: "Scale", className: "Scale", visible: false },
+                { data: "IsNullable", className: "IsNullable", visible: false },
+                { data: "EffectiveDate", className: "EffectiveDate", visible: false }
             ],
 
-            order: [[1, 'desc'], [2, 'desc']],
+            order: [4, 'desc'],
 
             //styles for columnVisibility to show
             dom: 'Blrtip',
@@ -68,8 +74,14 @@
                 { type: "text" },
                 { type: "text" },
                 { type: "text" },
+
+                { type: "text" },
+                { type: "text" },
+                { type: "text" },
+                { type: "text" },
                 { type: "text" },
                 { type: "text" }
+                
             ]
         });
 
