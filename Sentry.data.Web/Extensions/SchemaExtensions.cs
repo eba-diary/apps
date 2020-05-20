@@ -66,7 +66,8 @@ namespace Sentry.data.Web
                 OrdinalPosition = dto.OrdinalPosition,
                 Precision = dto.Precision,
                 Scale = dto.Scale,
-                SourceFormat = (dto.FieldType.ToUpper() == Core.SchemaDatatypes.TIMESTAMP.ToString() || dto.FieldType.ToUpper() == Core.SchemaDatatypes.DATE.ToString()) ? SetFieldDefaults(dto.FieldType, dto.SourceFormat) : dto.SourceFormat
+                SourceFormat = (dto.FieldType.ToUpper() == Core.SchemaDatatypes.TIMESTAMP.ToString() || dto.FieldType.ToUpper() == Core.SchemaDatatypes.DATE.ToString()) ? SetFieldDefaults(dto.FieldType, dto.SourceFormat) : dto.SourceFormat,
+                Length = dto.Length
             };
 
             if (dto.ChildFields.Any())
@@ -123,7 +124,8 @@ namespace Sentry.data.Web
                 Precision = dto.Precision.ToString(),
                 Scale = dto.Scale.ToString(),
                 LastUpdated = dto.LastUpdatedDTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds,
-                DataObjectField_ID = dto.FieldId
+                DataObjectField_ID = dto.FieldId,
+                Length = dto.Length.ToString()
             };
 
             if (dto.ChildFields.Any())
