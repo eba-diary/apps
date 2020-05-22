@@ -25,10 +25,8 @@
 
 
             //client side setup
-            //autoWidth: true,
             searching: true,
             pageLength: 50,
-            //scrollX:true,
 
             ajax: {
                 url: "/Dale/GetSearchResultsClient/",
@@ -86,6 +84,7 @@
                 
             ]
         });
+
 
         //Hide DataTable SearchBox (NOTE: jquery calls the search box what you named table and appends _filter)
         //to get column filtering requires the Searching=true to be set to true, if i set it to false then column filtering goes away so by default you can't have one without the other, so cheat the system here

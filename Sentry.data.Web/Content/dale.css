@@ -63,8 +63,12 @@
     background: white;
 }
 
+.dale-search-row {
+    margin-left: 40px;
+    margin-right: 40px; 
+}
 
-.dale-row {
-    margin-left: -353px;
-    /* margin-right: -13px; */
+.dale-result-row {
+    margin-left: 100px;
+    margin-right: 100px; 
 }

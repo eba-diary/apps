@@ -1,22 +1,30 @@
 ﻿@using Sentry.data.Web;
 @model DaleSearchModel
 
+@{
+    ViewBag.Title = "Dale Search Page";
+    ViewBag.Fluid = true;   /*this is needed so results grid grows because of column additions*/
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-<div class="row"  style="margin-top:10px;">
-    
-    <div style="float:left;width: auto;">
-        <img style="height:50px;"src='~/Images/Dale/DataInventoryIcon.png' alt="DataInventory Image"/>
+@*Need a seperate bootstrap class container here because parent layout is set to fluid from above so the result row can grow*@
+<div class="container">
+
+    <div class="row" style="margin-top:10px; margin-left: 40px;">
+
+        <div style="float:left;">
+            <img style="height:50px;" src='~/Images/Dale/DataInventoryIcon.png' alt="DataInventory Image" />
+        </div>
+
+        <div style="float:left;">
+            <label style="color: #003da5;    font-family: KievitSlabWeb W03,Lucida Sans,serif;font-size:24px;">Data Inventory</label>
+        </div>
+
     </div>
 
-    <div style="float:left;width: auto;">
-        <label style="color: #003da5;    font-family: KievitSlabWeb W03,Lucida Sans,serif;font-size:24px;">Data Inventory</label>
-    </div>
-    
-</div>
+    <div class="dale-search-row" style="margin-top:12px;">
 
-<div class="row" style="margin-top:12px;">
-
-    <div style="float:left;">
+        <div style="float:left;">
 
             <div id="daleCriteriaContainer" style="display: table; width: 300px;">
 
@@ -28,39 +36,40 @@
                     <em class="fa fa-circle-o-notch fa-spin"></em>
                 </span>
 
-                <input type="text" id="daleSearchCriteria" name="searchPhrase" class="form-control" placeholder="Find your destiny ..." style="width:500px"/>
+                <input type="text" id="daleSearchCriteria" name="searchPhrase" class="form-control" placeholder="Find your destiny ..." style="width:500px" />
 
             </div>
-     </div>
 
-    <div style="float:left;margin-left:25px;">
-
-        <div style="text-align: left; font-family: KievitSlabWeb W03,Lucida Sans,serif;">
-            <label class="containerDale" style="text-align:left; width:150px;">
-                Column/View
-                <input type="radio" name="Destiny" id="DestinyTableRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Object>
-                <span class="checkmark"></span>
-            </label>
-
-            <label class="containerDale" style="text-align:left; width:100px;">
-                @Sentry.data.Core.GlobalEnums.DaleDestiny.Column
-                <input type="radio" name="Destiny" id="DestinyColumnRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Column checked="checked">
-                <span class="checkmark"></span>
-            </label>
         </div>
+
+        <div style="float:left;margin-left:25px;">
+
+            <div style="text-align: left; font-family: KievitSlabWeb W03,Lucida Sans,serif;">
+                <label class="containerDale" style="text-align:left; width:150px;">
+                    Column/View
+                    <input type="radio" name="Destiny" id="DestinyTableRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Object>
+                    <span class="checkmark"></span>
+                </label>
+
+                <label class="containerDale" style="text-align:left; width:100px;">
+                    @Sentry.data.Core.GlobalEnums.DaleDestiny.Column
+                    <input type="radio" name="Destiny" id="DestinyColumnRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Column checked="checked">
+                    <span class="checkmark"></span>
+                </label>
+            </div>
+
+        </div>
+
     </div>
 
 </div>
 
-<div class="row">
-    
-</div>
-
-<div class="row">
+@*result row here obeys container-fluid from layout so it can grow to max width*@
+<div class="dale-result-row">
     <div>
         @Html.Partial("~/Views/Dale/DaleResult.cshtml")
     </div>
-    
+
 </div>
 
 
