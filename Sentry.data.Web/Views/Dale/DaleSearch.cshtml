@@ -36,9 +36,9 @@
     <div style="float:left;margin-left:25px;">
 
         <div style="text-align: left; font-family: KievitSlabWeb W03,Lucida Sans,serif;">
-            <label class="containerDale" style="text-align:left; width:90px;">
-                @Sentry.data.Core.GlobalEnums.DaleDestiny.Table
-                <input type="radio" name="Destiny" id="DestinyTableRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Table>
+            <label class="containerDale" style="text-align:left; width:150px;">
+                Column/View
+                <input type="radio" name="Destiny" id="DestinyTableRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Object>
                 <span class="checkmark"></span>
             </label>
 
@@ -47,12 +47,6 @@
                 <input type="radio" name="Destiny" id="DestinyColumnRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Column checked="checked">
                 <span class="checkmark"></span>
             </label>
-            <label class="containerDale" style="text-align:left;width:90px;">
-                @Sentry.data.Core.GlobalEnums.DaleDestiny.View
-                <input type="radio" name="Destiny" id="DestinyViewRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.View>
-                <span class="checkmark"></span>
-            </label>
-
         </div>
     </div>
 
@@ -63,7 +57,10 @@
 </div>
 
 <div class="row">
-    @Html.Partial("~/Views/Dale/DaleResult.cshtml")
+    <div>
+        @Html.Partial("~/Views/Dale/DaleResult.cshtml")
+    </div>
+    
 </div>
 
 

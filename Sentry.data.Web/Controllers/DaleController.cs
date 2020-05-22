@@ -90,7 +90,7 @@ namespace Sentry.data.Web.Controllers
             }
 
             //validate to ensure valid destination
-            if ((model.Destiny != DaleDestiny.Table) && (model.Destiny != DaleDestiny.Column) && (model.Destiny != DaleDestiny.View))
+            if ((model.Destiny != DaleDestiny.Object) && (model.Destiny != DaleDestiny.Column))
             {
                 return false;
             }

@@ -25,7 +25,7 @@
 
 
             //client side setup
-            autoWidth: true,
+            //autoWidth: true,
             searching: true,
             pageLength: 50,
             //scrollX:true,
@@ -41,21 +41,23 @@
             },
 
             columns: [
-                { data: "Server", className: "Server" },
-                { data: "Database", className: "Database" },
-                { data: "Object", className: "Object" },
-                { data: "ObjectType", className: "ObjectType" },
-                { data: "Column", className: "ColumnMan" },
+                { data: "Server", className: "Server", searchable: "false" },
+                { data: "Database", className: "Database", searchable: "false" },
+                { data: "Object", className: "Object", searchable: "false" },
+                { data: "ObjectType", className: "ObjectType",searchable: "true" },
+                { data: "Column", className: "ColumnMan", searchable: "false" },
 
-                { data: "ColumnType", className: "ColumnType", visible: false },
-                { data: "MaxLength", className: "MaxLength", visible: false },
-                { data: "Precision", className: "Precision", visible: false },
-                { data: "Scale", className: "Scale", visible: false },
-                { data: "IsNullable", className: "IsNullable", visible: false },
-                { data: "EffectiveDate", className: "EffectiveDate", visible: false }
+                { data: "ColumnType", className: "ColumnType", visible: false, searchable: "false" },
+                { data: "MaxLength", className: "MaxLength", visible: false, searchable: "false" },
+                { data: "Precision", className: "Precision", visible: false, searchable: "false" },
+                { data: "Scale", className: "Scale", visible: false, searchable: "false" },
+                { data: "IsNullable", className: "IsNullable", visible: false, searchable: "false" },
+                { data: "EffectiveDate", className: "EffectiveDate", visible: false, searchable: "false" }
             ],
 
             order: [4, 'desc'],
+
+            margin: "0 auto",
 
             //styles for columnVisibility to show
             dom: 'Blrtip',
@@ -104,10 +106,29 @@
             data.Dale.disableDale();
 
             //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
-            daleResultsTable.ajax.reload(function () {
+            daleResultsTable.ajax.reload(function ()
+            {
+                //daleResultsTable.fnFilter('View',3);
+                //var jive = $('#daleResultsTable').dataTable();
+                //var table = $('#daleResultsTable').DataTable();
+                //table.search('Table').draw();
+                //daleResultsTable.clear();
+                //daleResultsTable.draw();
+                //var table = $('#daleResultsTable').DataTable();
+                //$('#column3_search').on('keyup', function () {
+                //    table
+                //        .columns(3)
+                //        .search('Table')
+                //        .draw();
+                //});
+
+
                 data.Dale.enableDale();
             });
         });
+
+        
+
     },
 
     getDaleDestiny: function ()

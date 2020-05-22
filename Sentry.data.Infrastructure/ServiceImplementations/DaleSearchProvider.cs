@@ -51,30 +51,22 @@ namespace Sentry.data.Infrastructure
 
         private string BuildAQuery(DaleSearchDto dto)
         {
-            string qSelect = "SELECT Server_NME,Database_NME,Object_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM ";
+            string qSelect = "SELECT Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM ";
             string qFrom = "FROM Column_v ";
             string qWhereColumn = String.Empty;
             string qWhereObjectType = String.Empty;
             string qWhereStatement = String.Empty;
             string q = String.Empty;
 
-            if (dto.Destiny == DaleDestiny.Table)
+            if (dto.Destiny == DaleDestiny.Object)
             {
-                qWhereColumn = "Object_NME";
-                qWhereObjectType = " AND Object_TYP = 'ST' ";
+                qWhereColumn = "Base_NME";
             }
             else if(dto.Destiny == DaleDestiny.Column)
             {
                 qWhereColumn = "Column_NME";
             }
-            else if(dto.Destiny == DaleDestiny.View)
-            {
-                qWhereColumn = "Object_NME";
-                qWhereObjectType = " AND Object_TYP = 'SV' ";
-            }
-
             qWhereStatement += "WHERE " + qWhereColumn + " LIKE '%" + dto.Criteria + "%'";
-            qWhereStatement += qWhereObjectType;
             qWhereStatement += " AND Expiration_DTM IS NULL";
             q = qSelect + qFrom + qWhereStatement;
 
@@ -90,7 +82,7 @@ namespace Sentry.data.Infrastructure
             }
 
             //validate to ensure valid destination
-            if ( (dto.Destiny != DaleDestiny.Table) && (dto.Destiny != DaleDestiny.Column) && (dto.Destiny != DaleDestiny.View))
+            if ( (dto.Destiny != DaleDestiny.Object) && (dto.Destiny != DaleDestiny.Column) )
             {
                 return false;
             }

@@ -39,7 +39,7 @@ namespace Sentry.data.Web
                 Precision = dto.Precision,
                 Scale = dto.Scale,
                 IsNullable = dto.IsNullable,
-                EffectiveDate = dto.EffectiveDate,
+                EffectiveDate = dto.EffectiveDate.ToString("MM/dd/yyyy HH:mm:ss"),
 
                 //ExpirationDate = dto.ExpirationDate,
                 //LastScanDate = dto.LastScanDate,
@@ -61,13 +61,9 @@ namespace Sentry.data.Web
             {
                 return DaleDestiny.Column;
             }
-            else if (destiny == DaleDestiny.Table.GetDescription())
+            else 
             {
-                return DaleDestiny.Table;
-            }
-            else
-            {
-                return DaleDestiny.View;
+                return DaleDestiny.Object;
             }
         }
     }

@@ -18,7 +18,7 @@ namespace Sentry.data.Web
         public int Precision { get; set; }
         public int Scale { get; set; }
         public bool IsNullable { get; set; }
-        public DateTime EffectiveDate { get; set; }
+        public string EffectiveDate { get; set; }
 
         //public DateTime ExpirationDate { get; set; }
         //public DateTime LastScanDate { get; set; }
