@@ -64,11 +64,31 @@
 }
 
 .dale-search-row {
-    margin-left: 40px;
-    margin-right: 40px; 
+    margin-left: 80px;
+    margin-right: 70px; 
 }
 
 .dale-result-row {
     margin-left: 100px;
     margin-right: 100px; 
+}
+
+table.dataTable thead .sorting {
+    background: url('/Content/DataTables/images/sort_both.png') no-repeat center right;
+}
+
+table.dataTable thead .sorting_asc {
+    background: url('/Content/DataTables/images/sort_asc.png') no-repeat center right;
+}
+
+table.dataTable thead .sorting_desc {
+    background: url('/Content/DataTables/images/sort_desc.png') no-repeat center right;
+}
+
+table.dataTable thead .sorting_asc_disabled {
+    background: url('/Content/DataTables/images/sort_asc_disabled.png') no-repeat center right;
+}
+
+table.dataTable thead .sorting_desc_disabled {
+    background: url('/Content/DataTables/images/sort_desc_disabled.png') no-repeat center right;
 }

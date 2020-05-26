@@ -93,7 +93,6 @@ namespace Sentry.data.Web
 
                         Include(dataTablesStylesDirectory + "/jquery.dataTables.min.css").      //required for DataTable Buttons
                         Include(dataTablesStylesDirectory + "/buttons.dataTables.min.css").     //required for DataTable Buttons
-
                         Include(dataTablesStylesDirectory + "/dataTables.bootstrap3.css").
                         Include(dataTablesStylesDirectory + "/dataTables.fontAwesome.css").
                         Include(dataTablesStylesDirectory + "/dataTables.responsive.css")

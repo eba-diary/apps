@@ -2,7 +2,7 @@
 @model DaleSearchModel
 
 @{
-    ViewBag.Title = "Dale Search Page";
+    ViewBag.Title = "Data Inventory";
     ViewBag.Fluid = true;   /*this is needed so results grid grows because of column additions*/
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -10,7 +10,7 @@
 @*Need a seperate bootstrap class container here because parent layout is set to fluid from above so the result row can grow*@
 <div class="container">
 
-    <div class="row" style="margin-top:10px; margin-left: 40px;">
+    <div class="row" style="margin-top:10px; margin-left: 80px;">
 
         <div style="float:left;">
             <img style="height:50px;" src='~/Images/Dale/DataInventoryIcon.png' alt="DataInventory Image" />
@@ -46,7 +46,7 @@
 
             <div style="text-align: left; font-family: KievitSlabWeb W03,Lucida Sans,serif;">
                 <label class="containerDale" style="text-align:left; width:150px;">
-                    Column/View
+                    Table/View
                     <input type="radio" name="Destiny" id="DestinyTableRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Object>
                     <span class="checkmark"></span>
                 </label>
