@@ -33,16 +33,12 @@ namespace Sentry.data.Web
                 ObjectType = dto.ObjectType,
                 Column = dto.Column,
 
-                
                 ColumnType = dto.ColumnType,
                 MaxLength = dto.MaxLength,
                 Precision = dto.Precision,
                 Scale = dto.Scale,
                 IsNullable = dto.IsNullable,
                 EffectiveDate = dto.EffectiveDate.ToString("MM/dd/yyyy HH:mm:ss"),
-
-                //ExpirationDate = dto.ExpirationDate,
-                //LastScanDate = dto.LastScanDate,
             };
         }
 

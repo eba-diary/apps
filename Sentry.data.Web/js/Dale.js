@@ -59,10 +59,7 @@
 
             //styles for columnVisibility to show
             dom: 'Blrtip',
-            buttons: [
-                'colvis' 
-            ]
-
+            buttons: [ 'colvis'  ]
         });
 
         //add a filter in each column
@@ -81,7 +78,6 @@
                 { type: "text" },
                 { type: "text" },
                 { type: "text" }
-                
             ]
         });
 
@@ -120,14 +116,9 @@
                 //        .search('Table')
                 //        .draw();
                 //});
-
-
                 data.Dale.enableDale();
             });
         });
-
-        
-
     },
 
     getDaleDestiny: function ()

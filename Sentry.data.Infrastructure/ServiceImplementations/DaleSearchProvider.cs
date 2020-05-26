@@ -54,7 +54,6 @@ namespace Sentry.data.Infrastructure
             string qSelect = "SELECT Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM ";
             string qFrom = "FROM Column_v ";
             string qWhereColumn = String.Empty;
-            string qWhereObjectType = String.Empty;
             string qWhereStatement = String.Empty;
             string q = String.Empty;
 
@@ -97,9 +96,6 @@ namespace Sentry.data.Infrastructure
             result.Object = (!reader.IsDBNull(2)) ? reader.GetString(2) : String.Empty;
             result.ObjectType = (!reader.IsDBNull(3)) ? reader.GetString(3) : String.Empty;
             result.Column = (!reader.IsDBNull(4)) ? reader.GetString(4) : String.Empty;
-
-           
-
             result.ColumnType = (!reader.IsDBNull(5)) ? reader.GetString(5) : String.Empty;
 
             if (!reader.IsDBNull(6))
