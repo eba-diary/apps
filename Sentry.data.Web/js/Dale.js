@@ -55,18 +55,17 @@
 
             order: [4, 'desc'],
 
-            margin: "0 auto",
-
             //styles for columnVisibility to show
             dom: 'Blrtip',
-            buttons: [ 'colvis'  ]
+            buttons: ['colvis'],
+            
         });
 
         //add a filter in each column
         $("#daleResultsTable").dataTable().columnFilter({
             sPlaceHolder: "head:after",
             aoColumns: [
-                { type: "text" },
+                { type: "text"},
                 { type: "text" },
                 { type: "text" },
                 { type: "text" },
@@ -96,6 +95,7 @@
             });
         });
 
+        //when they click search  span for a new search
         $('.input-group-addon').click(function (e) {
 
             data.Dale.disableDale();
