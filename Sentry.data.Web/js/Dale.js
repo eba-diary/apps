@@ -25,11 +25,11 @@
                 { data: "ObjectType", className: "ObjectType",searchable: "true" },
                 { data: "Column", className: "ColumnMan", searchable: "false" },
 
-                { data: "ColumnType", className: "ColumnType", visible: false, searchable: "false" },
-                { data: "MaxLength", className: "MaxLength", visible: false, searchable: "false" },
-                { data: "Precision", className: "Precision", visible: false, searchable: "false" },
-                { data: "Scale", className: "Scale", visible: false, searchable: "false" },
-                { data: "IsNullable", className: "IsNullable", visible: false, searchable: "false" },
+                { data: "ColumnType", className: "ColumnType", visible: false, searchable: "false", width: "100px" },
+                { data: "MaxLength", className: "MaxLength", visible: false, searchable: "false", width: "75px" },
+                { data: "Precision", className: "Precision", visible: false, searchable: "false", width: "100px" },
+                { data: "Scale", className: "Scale", visible: false, searchable: "false", width: "75px"  },
+                { data: "IsNullable", className: "IsNullable", visible: false, searchable: "false", width: "100px" },
                 { data: "EffectiveDate", className: "EffectiveDate", visible: false, searchable: "false" }
             ],
 
