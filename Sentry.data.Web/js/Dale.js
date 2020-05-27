@@ -4,26 +4,6 @@
     {
         var daleResultsTable = $("#daleResultsTable").DataTable({
 
-            //server side setup - leave here for potential future processing
-            //autoWidth: true,
-            //serverSide: true,
-            //processing: true,
-            //searching: true,
-            //paging: true,
-            //scroller: true,
-            //deferRender: true,
-            //pageLength: 50,
-            //ajax: {
-            //    url: "/Dale/GetSearchResultsServer/",
-            //    type: "POST",
-            //    data: function (d)
-            //    {
-            //        d.searchCriteria = $('#daleSearchCriteria').val();
-            //        d.destination = data.Dale.getDaleDestiny(); 
-            //    }
-            //},
-
-
             //client side setup
             searching: true,
             pageLength: 50,
@@ -57,8 +37,7 @@
 
             //styles for columnVisibility to show
             dom: 'Blrtip',
-            buttons: ['colvis'],
-            
+            buttons: ['colvis']
         });
 
         //add a filter in each column
@@ -103,19 +82,6 @@
             //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
             daleResultsTable.ajax.reload(function ()
             {
-                //daleResultsTable.fnFilter('View',3);
-                //var jive = $('#daleResultsTable').dataTable();
-                //var table = $('#daleResultsTable').DataTable();
-                //table.search('Table').draw();
-                //daleResultsTable.clear();
-                //daleResultsTable.draw();
-                //var table = $('#daleResultsTable').DataTable();
-                //$('#column3_search').on('keyup', function () {
-                //    table
-                //        .columns(3)
-                //        .search('Table')
-                //        .draw();
-                //});
                 data.Dale.enableDale();
             });
         });
