@@ -51,7 +51,7 @@ namespace Sentry.data.Infrastructure
 
         private string BuildAQuery(DaleSearchDto dto)
         {
-            string qSelect = "SELECT Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM ";
+            string qSelect = "SELECT Asset_CDE, Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM ";
             string qFrom = "FROM Column_v ";
             string qWhereColumn = String.Empty;
             string qWhereStatement = String.Empty;
@@ -91,36 +91,37 @@ namespace Sentry.data.Infrastructure
         private DaleResultDto CreateDaleResultDto(SqlDataReader reader)
         {
             DaleResultDto result = new DaleResultDto();
-            result.Server = (!reader.IsDBNull(0)) ? reader.GetString(0) : String.Empty;
-            result.Database = (!reader.IsDBNull(1)) ? reader.GetString(1) : String.Empty;
-            result.Object = (!reader.IsDBNull(2)) ? reader.GetString(2) : String.Empty;
-            result.ObjectType = (!reader.IsDBNull(3)) ? reader.GetString(3) : String.Empty;
-            result.Column = (!reader.IsDBNull(4)) ? reader.GetString(4) : String.Empty;
-            result.ColumnType = (!reader.IsDBNull(5)) ? reader.GetString(5) : String.Empty;
-
-            if (!reader.IsDBNull(6))
-            {
-                result.MaxLength = reader.GetInt32(6);
-            }
+            result.Asset = (!reader.IsDBNull(0)) ? reader.GetString(0) : String.Empty;
+            result.Server = (!reader.IsDBNull(1)) ? reader.GetString(1) : String.Empty;
+            result.Database = (!reader.IsDBNull(2)) ? reader.GetString(2) : String.Empty;
+            result.Object = (!reader.IsDBNull(3)) ? reader.GetString(3) : String.Empty;
+            result.ObjectType = (!reader.IsDBNull(4)) ? reader.GetString(4) : String.Empty;
+            result.Column = (!reader.IsDBNull(5)) ? reader.GetString(5) : String.Empty;
+            result.ColumnType = (!reader.IsDBNull(6)) ? reader.GetString(6) : String.Empty;
 
             if (!reader.IsDBNull(7))
             {
-                result.Precision = reader.GetInt32(7);
+                result.MaxLength = reader.GetInt32(7);
             }
 
             if (!reader.IsDBNull(8))
             {
-                result.Scale = reader.GetInt32(8);
+                result.Precision = reader.GetInt32(8);
             }
 
             if (!reader.IsDBNull(9))
             {
-                result.IsNullable = reader.GetBoolean(9);
+                result.Scale = reader.GetInt32(9);
             }
 
             if (!reader.IsDBNull(10))
             {
-                result.EffectiveDate = reader.GetDateTime(10);
+                result.IsNullable = reader.GetBoolean(10);
+            }
+
+            if (!reader.IsDBNull(11))
+            {
+                result.EffectiveDate = reader.GetDateTime(11);
             }
 
             return result;
