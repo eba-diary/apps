@@ -9,13 +9,19 @@ namespace Sentry.data.Web
     {
         public string Server { get; set; }
         public string Database { get; set; }
-        public string Table { get; set; }
+        public string Object { get; set; }
+        public string ObjectType { get; set; }
         public string Column { get; set; }
+
         public string ColumnType { get; set; }
-        public int PrecisionLength { get; set; }
-        public int ScaleLength { get; set; }
-        public DateTime EffectiveDate { get; set; }
-        public DateTime ExpirationDate { get; set; }
-        public DateTime LastScanDate { get; set; }
+        public int MaxLength { get; set; }
+        public int Precision { get; set; }
+        public int Scale { get; set; }
+        public bool IsNullable { get; set; }
+        public string EffectiveDate { get; set; }
+
+        //public DateTime ExpirationDate { get; set; }
+        //public DateTime LastScanDate { get; set; }
+
     }
 }

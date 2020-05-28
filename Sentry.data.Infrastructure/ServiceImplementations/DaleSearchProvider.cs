@@ -51,30 +51,21 @@ namespace Sentry.data.Infrastructure
 
         private string BuildAQuery(DaleSearchDto dto)
         {
-            string qSelect = "SELECT Server_NME,Database_NME,Object_NME AS Table_NME,Column_NME,Column_TYP,Precision_LEN,Scale_LEN,Effective_DTM,Expiration_DTM,LastScan_DTM ";
+            string qSelect = "SELECT Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM ";
             string qFrom = "FROM Column_v ";
             string qWhereColumn = String.Empty;
-            string qWhereObjectType = String.Empty;
             string qWhereStatement = String.Empty;
             string q = String.Empty;
 
-            if (dto.Destiny == DaleDestiny.Table)
+            if (dto.Destiny == DaleDestiny.Object)
             {
-                qWhereColumn = "Object_NME";
-                qWhereObjectType = " AND Object_TYP = 'ST' ";
+                qWhereColumn = "Base_NME";
             }
             else if(dto.Destiny == DaleDestiny.Column)
             {
                 qWhereColumn = "Column_NME";
             }
-            else if(dto.Destiny == DaleDestiny.View)
-            {
-                qWhereColumn = "Object_NME";
-                qWhereObjectType = " AND Object_TYP = 'SV' ";
-            }
-
             qWhereStatement += "WHERE " + qWhereColumn + " LIKE '%" + dto.Criteria + "%'";
-            qWhereStatement += qWhereObjectType;
             qWhereStatement += " AND Expiration_DTM IS NULL";
             q = qSelect + qFrom + qWhereStatement;
 
@@ -90,7 +81,7 @@ namespace Sentry.data.Infrastructure
             }
 
             //validate to ensure valid destination
-            if ( (dto.Destiny != DaleDestiny.Table) && (dto.Destiny != DaleDestiny.Column) && (dto.Destiny != DaleDestiny.View))
+            if ( (dto.Destiny != DaleDestiny.Object) && (dto.Destiny != DaleDestiny.Column) )
             {
                 return false;
             }
@@ -102,37 +93,37 @@ namespace Sentry.data.Infrastructure
             DaleResultDto result = new DaleResultDto();
             result.Server = (!reader.IsDBNull(0)) ? reader.GetString(0) : String.Empty;
             result.Database = (!reader.IsDBNull(1)) ? reader.GetString(1) : String.Empty;
-            result.Table = (!reader.IsDBNull(2)) ? reader.GetString(2) : String.Empty;
-            result.Column = (!reader.IsDBNull(3)) ? reader.GetString(3) : String.Empty;
-            result.ColumnType = (!reader.IsDBNull(4)) ? reader.GetString(4) : String.Empty;
-
-            if (!reader.IsDBNull(5))
-            {
-                result.PrecisionLength = reader.GetInt32(5);
-            }
+            result.Object = (!reader.IsDBNull(2)) ? reader.GetString(2) : String.Empty;
+            result.ObjectType = (!reader.IsDBNull(3)) ? reader.GetString(3) : String.Empty;
+            result.Column = (!reader.IsDBNull(4)) ? reader.GetString(4) : String.Empty;
+            result.ColumnType = (!reader.IsDBNull(5)) ? reader.GetString(5) : String.Empty;
 
             if (!reader.IsDBNull(6))
             {
-                result.ScaleLength = reader.GetInt32(6);
+                result.MaxLength = reader.GetInt32(6);
             }
 
             if (!reader.IsDBNull(7))
             {
-                result.EffectiveDate = reader.GetDateTime(7);
+                result.Precision = reader.GetInt32(7);
             }
 
             if (!reader.IsDBNull(8))
             {
-                result.ExpirationDate = reader.GetDateTime(8);
+                result.Scale = reader.GetInt32(8);
             }
 
             if (!reader.IsDBNull(9))
             {
-                result.LastScanDate = reader.GetDateTime(9);
+                result.IsNullable = reader.GetBoolean(9);
+            }
+
+            if (!reader.IsDBNull(10))
+            {
+                result.EffectiveDate = reader.GetDateTime(10);
             }
 
             return result;
-
         }
     }
 }
