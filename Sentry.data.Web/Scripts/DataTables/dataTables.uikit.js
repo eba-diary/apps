@@ -1,4 +1,4 @@
-﻿/*! DataTables UIkit 3 integration
+/*! DataTables UIkit 3 integration
  */
 
 /**

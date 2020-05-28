@@ -29,14 +29,16 @@ namespace Sentry.data.Web
             {
                 Server = dto.Server,
                 Database = dto.Database,
-                Table = dto.Table,
+                Object = dto.Object,
+                ObjectType = dto.ObjectType,
                 Column = dto.Column,
+
                 ColumnType = dto.ColumnType,
-                PrecisionLength = dto.PrecisionLength,
-                ScaleLength = dto.ScaleLength,
-                EffectiveDate = dto.EffectiveDate,
-                ExpirationDate = dto.ExpirationDate,
-                LastScanDate = dto.LastScanDate
+                MaxLength = dto.MaxLength,
+                Precision = dto.Precision,
+                Scale = dto.Scale,
+                IsNullable = dto.IsNullable,
+                EffectiveDate = dto.EffectiveDate.ToString("MM/dd/yyyy HH:mm:ss"),
             };
         }
 
@@ -55,13 +57,9 @@ namespace Sentry.data.Web
             {
                 return DaleDestiny.Column;
             }
-            else if (destiny == DaleDestiny.Table.GetDescription())
+            else 
             {
-                return DaleDestiny.Table;
-            }
-            else
-            {
-                return DaleDestiny.View;
+                return DaleDestiny.Object;
             }
         }
     }
