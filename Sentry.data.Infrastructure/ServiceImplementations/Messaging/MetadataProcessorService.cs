@@ -1,10 +1,6 @@
-﻿using System;
+﻿using Sentry.Messaging.Common;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sentry.Messaging.Common;
-using Sentry.data.Core;
 using System.IO;
 
 namespace Sentry.data.Infrastructure
@@ -45,14 +41,14 @@ namespace Sentry.data.Infrastructure
         {
             //domain context needed to retrieve config
             KafkaSettings settings = new KafkaSettings(groupId,
-                                            Configuration.Config.GetHostSetting("KafkaBootstrapServers"),
-                                            Sentry.data.Infrastructure.TopicHelper.GetDSCEventTopic(),
+                                            KafkaHelper.GetKafkaBrokers(),
+                                            KafkaHelper.GetDSCEventTopic(),
                                             Configuration.Config.GetHostSetting("EnvironmentName").ToUpper(),
                                             (Configuration.Config.GetHostSetting("KafkaDebugLogging").ToLower() == "true") ? true : false,
-                                            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Configuration.Config.GetHostSetting("CertPath")), 
+                                            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, KafkaHelper.GetCertPath()), 
                                             0, /*This is not used for consumers*/
-                                            (Configuration.Config.GetHostSetting("KafkaSSL").ToLower() == "true") ? true : false,
-                                            Configuration.Config.GetHostSetting("sasl_kerberos_service_name")
+                                            KafkaHelper.UseSASL(),
+                                            KafkaHelper.GetKerberosServiceName()
                                             );
 
             return new MetadataProcessorKafkaConsumer(settings);
