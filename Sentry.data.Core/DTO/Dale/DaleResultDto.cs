@@ -4,6 +4,7 @@ namespace Sentry.data.Core
 {
     public class DaleResultDto
     {
+        public string Asset { get; set; }
         public string Server { get; set; }
         public string Database { get; set; }
         public string Object { get; set; }

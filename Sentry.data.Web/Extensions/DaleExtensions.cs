@@ -27,6 +27,7 @@ namespace Sentry.data.Web
         {
             return new DaleResultModel()
             {
+                Asset = dto.Asset,
                 Server = dto.Server,
                 Database = dto.Database,
                 Object = dto.Object,

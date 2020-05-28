@@ -19,6 +19,7 @@
             },
 
             columns: [
+                { data: "Asset", className: "Asset", searchable: "false" },
                 { data: "Server", className: "Server", searchable: "false" },
                 { data: "Database", className: "Database", searchable: "false" },
                 { data: "Object", className: "Object", searchable: "false" },
@@ -44,7 +45,8 @@
         $("#daleResultsTable").dataTable().columnFilter({
             sPlaceHolder: "head:after",
             aoColumns: [
-                { type: "text"},
+                { type: "text" },
+                { type: "text" },
                 { type: "text" },
                 { type: "text" },
                 { type: "text" },
