@@ -1,4 +1,4 @@
-﻿/*! DataTables Bootstrap 3 integration
+/*! DataTables Bootstrap 3 integration
  * ©2011-2015 SpryMedia Ltd - datatables.net/license
  */
 
@@ -181,7 +181,7 @@ DataTable.ext.renderer.pageButton.material = function ( settings, host, idx, but
 		buttons
 	);
 
-	if ( activeEl ) {
+	if ( activeEl !== undefined ) {
 		$(host).find( '[data-dt-idx='+activeEl+']' ).focus();
 	}
 };
