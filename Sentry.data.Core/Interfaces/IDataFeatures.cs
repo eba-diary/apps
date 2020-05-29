@@ -12,5 +12,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> Remove_ClaimIQ_mock_logic_CLA_758 { get; }
         IFeatureFlag<bool> Expose_DaleSearch_CLA_1450 { get; }
         IFeatureFlag<bool> Use_AWS_v2_Configuration_CLA_1488 { get; }
+        IFeatureFlag<bool> Confluent_Kafka_CLA_1793 { get; }
     }
 }
