@@ -37,8 +37,8 @@
             order: [4, 'desc'],
 
             //styles for columnVisibility to show
-            dom: 'Blrtip',
-            buttons: ['colvis']
+            dom: 'Bfrtip',
+            buttons: ['colvis', 'csv', 'copy']
         });
 
         //add a filter in each column
@@ -76,16 +76,21 @@
             });
         });
 
-        //when they click search  span for a new search
+        //setup click event for search  span for a new search
         $('.input-group-addon').click(function (e) {
-
             data.Dale.disableDale();
+            daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
+        });
 
-            //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
-            daleResultsTable.ajax.reload(function ()
-            {
-                data.Dale.enableDale();
-            });
+        //setup search box enter event
+        //add something around here to know if search is in progress
+        var input = document.getElementById("daleSearchCriteria");
+        input.addEventListener("keyup", function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                data.Dale.disableDale();
+                daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
+            }
         });
     },
 
@@ -107,12 +112,11 @@
 
         $('#daleSearchClick').hide();
         $('#daleSearchClickSpinner').show();
-
     },
 
     //enable all controls user can hit during search
-    enableDale: function () {
-
+    enableDale: function ()
+    {
         //hide intitially since they could be doing a search after a previous search
         $('#daleContainer').show();
         $('#daleSearchCriteria').removeAttr('disabled');
