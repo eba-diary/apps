@@ -38,7 +38,7 @@
 
             //styles for columnVisibility to show
             dom: 'Bfrtip',
-            buttons: ['colvis', 'csv', 'copy']
+            buttons: ['colvis', 'csv']
         });
 
         //add a filter in each column
