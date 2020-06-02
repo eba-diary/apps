@@ -34,7 +34,7 @@
                 { data: "EffectiveDate", className: "EffectiveDate", visible: false, searchable: "false" }
             ],
 
-            order: [4, 'desc'],
+            order: [2, 'desc'],
 
             //styles for columnVisibility to show
             dom: 'Bfrtip',
