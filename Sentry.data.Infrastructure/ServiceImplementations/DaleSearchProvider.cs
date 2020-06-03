@@ -51,29 +51,48 @@ namespace Sentry.data.Infrastructure
 
         private string BuildAQuery(DaleSearchDto dto)
         {
-            string qSelect = "SELECT Asset_CDE, Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM ";
-            string qFrom = "FROM Column_v ";
-            string qWhereColumn = String.Empty;
-            string qWhereStatement = String.Empty;
             string q = String.Empty;
+            string qSelect = "SELECT Asset_CDE, Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM,Alias_NME,Prod_Typ,BaseColumn_ID ";
+            string qFrom = "FROM Column_v ";
+            string qWhereStatement = BuildAWhere(dto);
 
-            if (dto.Destiny == DaleDestiny.Object)
-            {
-                qWhereColumn = "Base_NME";
-            }
-            else if(dto.Destiny == DaleDestiny.Column)
-            {
-                qWhereColumn = "Column_NME";
-            }
-            qWhereStatement += "WHERE " + qWhereColumn + " LIKE '%" + dto.Criteria + "%'";
-            qWhereStatement += " AND Expiration_DTM IS NULL";
             q = qSelect + qFrom + qWhereStatement;
 
             return q;
         }
 
+        private string BuildAWhere(DaleSearchDto dto)
+        {
+            string qWhereColumn = String.Empty;
+            string qWhereStatement = String.Empty;
+
+            if(dto.Sensitive)
+            {
+                qWhereStatement = "WHERE IsSensitive_FLG = 1 ";
+            }
+            else
+            {
+                if (dto.Destiny == DaleDestiny.Object)
+                {
+                    qWhereColumn = "Base_NME";
+                }
+                else if (dto.Destiny == DaleDestiny.Column)
+                {
+                    qWhereColumn = "Column_NME";
+                }
+                qWhereStatement += "WHERE " + qWhereColumn + " LIKE '%" + dto.Criteria + "%'";
+            }
+
+            qWhereStatement += " AND Expiration_DTM IS NULL";
+
+            return qWhereStatement;
+        }
+
         private bool IsCriteriaValid(DaleSearchDto dto)
         {
+            if (dto.Sensitive)
+                return true;
+
             //validate for white space only, null, empty string in criteria
             if (String.IsNullOrWhiteSpace(dto.Criteria))
             {
@@ -122,6 +141,14 @@ namespace Sentry.data.Infrastructure
             if (!reader.IsDBNull(11))
             {
                 result.EffectiveDate = reader.GetDateTime(11);
+            }
+
+            result.Alias = (!reader.IsDBNull(12)) ? reader.GetString(12) : String.Empty;
+            result.ProdType = (!reader.IsDBNull(13)) ? reader.GetString(13) : String.Empty;
+            
+            if (!reader.IsDBNull(14))
+            {
+                result.Scale = reader.GetInt32(14);
             }
 
             return result;

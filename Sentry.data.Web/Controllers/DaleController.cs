@@ -59,11 +59,12 @@ namespace Sentry.data.Web.Controllers
         }
 
         //use for ClientSide DataTable processing
-        public JsonResult GetSearchResultsClient(string searchCriteria, string destination)
+        public JsonResult GetSearchResultsClient(string searchCriteria, string destination, bool sensitive=false)
         {
             DaleSearchModel searchModel = new DaleSearchModel();
             searchModel.Criteria = searchCriteria;
             searchModel.Destiny = destination.ToDaleDestiny();
+            searchModel.Sensitive = sensitive;
 
             if (IsCriteriaValid(searchModel))
             {
@@ -83,6 +84,9 @@ namespace Sentry.data.Web.Controllers
 
         private bool IsCriteriaValid(DaleSearchModel model)
         {
+            if (model.Sensitive)
+                return true;
+
             //validate for white space only, null, empty string in criteria
             if (String.IsNullOrWhiteSpace(model.Criteria))
             {
@@ -94,6 +98,7 @@ namespace Sentry.data.Web.Controllers
             {
                 return false;
             }
+
             return true;
         }
     }

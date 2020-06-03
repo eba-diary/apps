@@ -19,7 +19,8 @@ namespace Sentry.data.Web
             return new DaleSearchDto()
             {
                 Criteria = model.Criteria,
-                Destiny = model.Destiny
+                Destiny = model.Destiny,
+                Sensitive = model.Sensitive
             };
         }
 
@@ -34,12 +35,17 @@ namespace Sentry.data.Web
                 ObjectType = dto.ObjectType,
                 Column = dto.Column,
 
+                Alias = dto.Alias,
+                ProdType = dto.ProdType,
+
                 ColumnType = dto.ColumnType,
                 MaxLength = dto.MaxLength,
                 Precision = dto.Precision,
                 Scale = dto.Scale,
                 IsNullable = dto.IsNullable,
                 EffectiveDate = dto.EffectiveDate.ToString("MM/dd/yyyy HH:mm:ss"),
+                
+                BaseColumnId = dto.BaseColumnId
             };
         }
 

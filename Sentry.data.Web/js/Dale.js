@@ -1,5 +1,8 @@
 ﻿data.Dale =
 {
+    //declare a property within the data.Dale that essentially represents a global var that all functions can use within data.Dale to set whether sensitive or not
+    sensitive:false,
+
     init: function ()
     {
         var daleResultsTable = $("#daleResultsTable").DataTable({
@@ -15,6 +18,7 @@
                 {
                     d.searchCriteria = $('#daleSearchCriteria').val();
                     d.destination = data.Dale.getDaleDestiny(); 
+                    d.sensitive = data.Dale.sensitive;
                 }
             },
 
@@ -25,6 +29,9 @@
                 { data: "Object", className: "Object", searchable: "false" },
                 { data: "ObjectType", className: "ObjectType",searchable: "true" },
                 { data: "Column", className: "ColumnMan", searchable: "false" },
+
+                { data: "Alias", className: "Alias", visible: false,searchable: "false" },
+                { data: "ProdType", className: "ProdType", visible: false, searchable: "false" },
 
                 { data: "ColumnType", className: "ColumnType", visible: false, searchable: "false", width: "100px" },
                 { data: "MaxLength", className: "MaxLength", visible: false, searchable: "false", width: "75px" },
@@ -54,6 +61,9 @@
 
                 { type: "text" },
                 { type: "text" },
+
+                { type: "text" },
+                { type: "text" },
                 { type: "text" },
                 { type: "text" },
                 { type: "text" },
@@ -66,18 +76,10 @@
         //to get column filtering requires the Searching=true to be set to true, if i set it to false then column filtering goes away so by default you can't have one without the other, so cheat the system here
         $('#daleResultsTable_filter').hide();
 
-        //this reloads DataTable and does a refresh pulling criteria everytime
-        $('#askDaleBtn').click(function () {
-            data.Dale.disableDale();
-
-            //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
-            daleResultsTable.ajax.reload(function() {
-                data.Dale.enableDale();
-            });
-        });
-
         //setup click event for search  span for a new search
-        $('.input-group-addon').click(function (e) {
+        $('.input-group-addon').click(function (e)
+        {
+            data.Dale.sensitive = false;
             data.Dale.disableDale();
             daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
         });
@@ -92,6 +94,17 @@
                 daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
             }
         });
+
+        //setup click event for sensitive search
+        $("#sensitiveSearch").on('click', function ()
+        {
+            data.Dale.sensitive = true;
+            data.Dale.disableDale();
+            daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
+            
+
+        });
+
     },
 
     getDaleDestiny: function ()
@@ -126,5 +139,6 @@
 
         $('#daleSearchClick').show();
         $('#daleSearchClickSpinner').hide();
+
     }
 };
