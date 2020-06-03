@@ -25,8 +25,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    height: 25px;
-    width: 25px;
+    height: 26px;
+    width: 26px;
     background-color: #eee;
     border-radius: 50%;
 }
@@ -57,8 +57,45 @@
 .containerDale .checkmark:after {
     top: 9px;
     left: 9px;
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: white;
 }
+
+.dale-search-row {
+    margin-left: 80px;
+    margin-right: 70px; 
+}
+
+.dale-result-row {
+    margin-left: 100px;
+    margin-right: 100px; 
+}
+
+
+
+/*these are added so dale datatable can find sorting images, future move these where all datatables can find*/
+table.dataTable thead .sorting {
+    background: url('/Content/DataTables/images/sort_both.png') no-repeat center right;
+}
+
+table.dataTable thead .sorting_asc {
+    background: url('/Content/DataTables/images/sort_asc.png') no-repeat center right;
+}
+
+table.dataTable thead .sorting_desc {
+    background: url('/Content/DataTables/images/sort_desc.png') no-repeat center right;
+}
+
+table.dataTable thead .sorting_asc_disabled {
+    background: url('/Content/DataTables/images/sort_asc_disabled.png') no-repeat center right;
+}
+
+table.dataTable thead .sorting_desc_disabled {
+    background: url('/Content/DataTables/images/sort_desc_disabled.png') no-repeat center right;
+}
+
+/*#daleResultsTable jiveme {
+    width: 50px !important;
+}*/

@@ -121,7 +121,8 @@ namespace Sentry.data.Web
                 ParentDatasetId = model.DatasetId,
                 SchemaId = model.SchemaId,
                 Description = model.ConfigFileDesc,
-                CLA1396_NewEtlColumns = model.CLA1396_NewEtlColumns
+                CLA1396_NewEtlColumns = model.CLA1396_NewEtlColumns,
+                CLA1580_StructureHive = model.CLA1580_StructureHive
             };
         }
 
@@ -195,7 +196,8 @@ namespace Sentry.data.Web
                 HiveLocation = schemaDto.HiveLocation,
                 Options = new List<string>()
                 {
-                    "CLA1396_NewEtlColumns|" + schemaDto.CLA1396_NewEtlColumns.ToString()
+                    "CLA1396_NewEtlColumns|" + schemaDto.CLA1396_NewEtlColumns.ToString(),
+                    "CLA1580_StructureHive|" + schemaDto.CLA1580_StructureHive.ToString()
                 },
                 DeleteInd = schemaDto.DeleteInd
             };
@@ -231,6 +233,7 @@ namespace Sentry.data.Web
             model.HasHeader = (config.Schema != null) ? config.Schema.HasHeader : false;
             model.OldSchemaId = (model.Schemas.Any()) ? model.Schemas.FirstOrDefault().DataElement_ID : 0;
             model.CLA1396_NewEtlColumns = (config.Schema != null) ? config.Schema.CLA1396_NewEtlColumns : false;
+            model.CLA1580_StructureHive = (config.Schema != null) ? config.Schema.CLA1580_StructureHive : false;
             model.DeleteInd = config.Schema.DeleteInd;
         }
     }

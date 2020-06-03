@@ -657,7 +657,10 @@ namespace Sentry.data.Core
 
                     break;
                 case "VARCHAR":
-                    newField = new VarcharField() { };
+                    newField = new VarcharField()
+                    {
+                        FieldLength = int.Parse(row.Length)
+                    };
                     changed = compare && TryConvertTo<VarcharField>(previousFieldVersion) == null;
                     break;
                 case "DATE":
@@ -1130,7 +1133,7 @@ namespace Sentry.data.Core
                     if (b.Precision != null) { r.Precision = b.Precision ?? null; }
                     if (b.Scale != null) { r.Scale = b.Scale ?? null; }
                     if (b.Nullable != null) { r.Nullable = b.Nullable ?? null; }
-                    if (b.Length != null) { r.Length = b.Length ?? null; }
+                    if (b.Length != null) { r.Length = b.Length; }
                     r.Position = (b.OrdinalPosition != null) ? Int32.Parse(b.OrdinalPosition) : -1;
                     if (b.FieldFormat != null) { r.Format = b.FieldFormat ?? null; }
                     rows.Add(r);

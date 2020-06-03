@@ -183,7 +183,7 @@
     <Compile Include="HangfireFilters\DisableMultipleQueuedItemsFilter.cs" />
     <Compile Include="Helpers\DataFlowHelpers.cs" />
     <Compile Include="Helpers\ParsingHelpers.cs" />
-    <Compile Include="Helpers\TopicHelper.cs" />
+    <Compile Include="Helpers\KafkaHelper.cs" />
     <Compile Include="Interfaces\IDataFlowStepProvider.cs" />
     <Compile Include="Mappings\Metadata\DataElementDetailMapping.cs" />
     <Compile Include="Mappings\Metadata\DataElementMapping.cs" />

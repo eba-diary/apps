@@ -1,4 +1,4 @@
-﻿/*! Foundation integration for DataTables' Responsive
+/*! Foundation integration for DataTables' Responsive
  * ©2015 SpryMedia Ltd - datatables.net/license
  */
 
