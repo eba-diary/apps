@@ -44,7 +44,7 @@
             order: [2, 'desc'],
 
             //styles for columnVisibility to show
-            dom: 'Bfrtip',
+            dom: 'Blrtip',
             buttons: ['colvis', 'csv']
         });
 
@@ -79,7 +79,7 @@
         //setup click event for search  span for a new search
         $('.input-group-addon').click(function (e)
         {
-            data.Dale.sensitive = false;
+            data.Dale.sensitive = false;                                            //set sensitive property to true so grid does sensitive search back to controller
             data.Dale.disableDale();
             daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
         });
@@ -98,7 +98,7 @@
         //setup click event for sensitive search
         $("#sensitiveSearch").on('click', function ()
         {
-            data.Dale.sensitive = true;
+            data.Dale.sensitive = true;                                             //set sensitive property to true so grid does sensitive search back to controller
             data.Dale.disableDale();
             daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
             
