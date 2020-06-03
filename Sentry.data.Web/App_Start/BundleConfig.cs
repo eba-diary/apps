@@ -53,12 +53,14 @@ namespace Sentry.data.Web
             //This bundle contains scripts needed for DataTables and related plugins
             bundles.Add(new ScriptBundle("~/bundles/dataTables").
 
-                        //WORKS
-                        Include(dataTablesScriptsDirectory + "/jquery.dataTables.js").          //required for DataTable Buttons
-                        Include(dataTablesScriptsDirectory + "/dataTables.buttons.min.js").     //required for DataTable Buttons
-                        Include(dataTablesScriptsDirectory + "/buttons.bootstrap.min.js").      //required for DataTable Buttons
-                        Include(dataTablesScriptsDirectory + "/buttons.colVis.min.js").         //required for DataTable Buttons
+                        //DataTable Buttons required
+                        Include(dataTablesScriptsDirectory + "/jquery.dataTables.js").          //required for DataTable COLVIS
+                        Include(dataTablesScriptsDirectory + "/dataTables.buttons.min.js").     //required for DataTable COLVIS
+                        Include(dataTablesScriptsDirectory + "/buttons.bootstrap.min.js").      //required for DataTable COLVIS
+                        Include(dataTablesScriptsDirectory + "/buttons.colVis.min.js").         //required for DataTable COLVIS
                         Include(dataTablesScriptsDirectory + "/dataTables.columnFilter.js").    //required for DataTable Filter
+                        Include(dataTablesScriptsDirectory + "/buttons.flash.min.js").          //required for Datatable CSV
+                        Include(dataTablesScriptsDirectory + "/buttons.html5.min.js").          //required for Datatable CSV
 
 
                         Include(dataTablesScriptsDirectory + "/dataTables.bootstrap3.js").
