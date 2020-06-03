@@ -4,6 +4,7 @@ using Sentry.Configuration;
 using Sentry.Core;
 using Sentry.data.Common;
 using Sentry.data.Core;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
 using Sentry.data.Web.Models;
@@ -82,7 +83,7 @@ namespace Sentry.data.Web.Controllers
                 DatasetDto dsDto = _DatasetService.GetDatasetDto(id);
 
                 List<DatasetFileConfigsModel> configModelList = new List<DatasetFileConfigsModel>();
-                foreach (DatasetFileConfig config in ds.DatasetFileConfigs.Where(w => !w.DeleteInd))
+                foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
                 {
                     configModelList.Add(new DatasetFileConfigsModel(config, true, false));
                 }
@@ -231,11 +232,19 @@ namespace Sentry.data.Web.Controllers
 
                 if (us != null && us.CanEditDataset)
                 {
-                    _configService.Delete(id, true, false);
+                    bool IsDeleted = _configService.Delete(id, true, false);
+                    if (!IsDeleted)
+                    {
+                        return Json(new { Success = false, Message = "Schema was not deleted" });
+                    }
                     _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.DELETE_DATASET_SCHEMA, SharedContext.CurrentUser.AssociateId, "Deleted Dataset Schema", id);
                     return Json(new { Success = true, Message = "Schema was successfully deleted" });
                 }
                 return Json(new { Success = false, Message = "You do not have permissions to delete schema" });
+            }
+            catch (DatasetFileConfigDeletedException ex)
+            {
+                return Json(new { Success = false, ex.Message });
             }
             catch (Exception ex)
             {
@@ -270,6 +279,13 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Edit(int configId)
         {
             DatasetFileConfigDto dto = _configService.GetDatasetFileConfigDto(configId);
+
+            //Users are unable to edit 
+            if (dto.DeleteInd)
+            {
+                return View("Forbidden");
+            }
+
             DatasetFileConfigsModel dfcm = new DatasetFileConfigsModel(dto);
 
             dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, dfcm.DatasetScopeTypeID);
@@ -335,6 +351,12 @@ namespace Sentry.data.Web.Controllers
         public ActionResult CreateRetrievalJob(int configId)
         {
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
+
+            //Users are unable to delete config already marked as deleted
+            if (dfc.DeleteInd)
+            {
+                return View("Forbidden");
+            }
 
             ViewBag.DatasetId = dfc.ParentDataset.DatasetId;
             CreateJobModel cjm = new CreateJobModel(dfc.ConfigId, dfc.ParentDataset.DatasetId);
@@ -513,6 +535,13 @@ namespace Sentry.data.Web.Controllers
         {
             RetrieverJob retrieverJob = _datasetContext.GetById<RetrieverJob>(jobId);
 
+            //do not allow editing of retriever jobs which associated schema is logically deleted
+            if ((retrieverJob.DatasetConfig != null && retrieverJob.DatasetConfig.DeleteInd) ||
+                (retrieverJob.FileSchema != null && retrieverJob.FileSchema.DeleteInd))
+            {
+                return View("Forbidden");
+            }
+
             EditJobModel ejm = new EditJobModel(retrieverJob);
             ejm.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
 
@@ -544,6 +573,11 @@ namespace Sentry.data.Web.Controllers
 
             try
             {
+                if (rj.FileSchema.DeleteInd)
+                {
+                    throw new DatasetFileConfigDeletedException("Parent Schema ");
+                }
+
                 AddCoreValidationExceptionsToModel(ejm.Validate());
 
                 if (ModelState.IsValid)
@@ -1269,6 +1303,11 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetFileConfigDto configDto = _configService.GetDatasetFileConfigDto(configId);
 
+            if (configDto.DeleteInd)
+            {
+                return View("Forbidden");
+            }
+
             if (configDto.Schema.SchemaId == schemaId)
             {
                 UserSecurity us = _DatasetService.GetUserSecurityForConfig(configId);
@@ -1435,6 +1474,12 @@ namespace Sentry.data.Web.Controllers
         public ActionResult EditSchema(int configId, int schemaId)
         {
             DatasetFileConfigDto config = _configService.GetDatasetFileConfigDto(configId);
+
+            if (config.DeleteInd)
+            {
+                return View("Forbidden");
+            }
+
             FileSchemaDto schema = (config.Schema.SchemaId == schemaId) ? config.Schema : null;
             //DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
             if (schema != null)

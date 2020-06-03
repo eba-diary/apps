@@ -175,7 +175,7 @@ namespace Sentry.data.Web.Controllers
 
             if (model.SelectedDataset > 0)
             {
-                var datasetSchemaList = _configService.GetDatasetFileConfigDtoByDataset(model.SelectedDataset).OrderBy(o => o.Name);
+                var datasetSchemaList = _configService.GetDatasetFileConfigDtoByDataset(model.SelectedDataset).Where(w => !w.DeleteInd).OrderBy(o => o.Name);
 
                 foreach (var scm in datasetSchemaList)
                 {

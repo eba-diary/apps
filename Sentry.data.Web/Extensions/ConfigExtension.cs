@@ -196,7 +196,8 @@ namespace Sentry.data.Web
                 Options = new List<string>()
                 {
                     "CLA1396_NewEtlColumns|" + schemaDto.CLA1396_NewEtlColumns.ToString()
-                }
+                },
+                DeleteInd = schemaDto.DeleteInd
             };
         }
 
@@ -230,6 +231,7 @@ namespace Sentry.data.Web
             model.HasHeader = (config.Schema != null) ? config.Schema.HasHeader : false;
             model.OldSchemaId = (model.Schemas.Any()) ? model.Schemas.FirstOrDefault().DataElement_ID : 0;
             model.CLA1396_NewEtlColumns = (config.Schema != null) ? config.Schema.CLA1396_NewEtlColumns : false;
+            model.DeleteInd = config.Schema.DeleteInd;
         }
     }
 }
