@@ -8,7 +8,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
     {
         private static IReadableFeatureRepository configRepo = new Sentry.FeatureFlags.SentryConfig.FeatureRepository();
 
-        public IFeatureFlag<bool> Remove_Mock_UncompressGzip_Logic_CLA_757 { get; } = new BooleanFeatureFlag("Remove_Mock_UncompressGzip_Logic_CLA_757", configRepo);
         public IFeatureFlag<bool> Remove_Mock_Uncompress_Logic_CLA_759 { get; } = new BooleanFeatureFlag("Remove_Mock_Uncompress_Logic_CLA_759", configRepo);
         public IFeatureFlag<bool> Remove_ConvertToParquet_Logic_CLA_747 { get; } = new BooleanFeatureFlag("Remove_ConvertToParquet_Logic_CLA_747", configRepo);
         public IFeatureFlag<bool> Remove_Mock_GoogleAPI_Logic_CLA_1679 { get; } = new BooleanFeatureFlag("Remove_Mock_GoogleAPI_Logic_CLA_1679", configRepo);
