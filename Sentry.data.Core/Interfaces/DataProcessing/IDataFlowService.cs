@@ -63,5 +63,6 @@ namespace Sentry.data.Core
         /// <exception cref="ArgumentNullException"
         /// <returns></returns>
         List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId);
+        void DeleteByFileSchema(FileSchema scm);
     }
 }

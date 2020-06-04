@@ -190,6 +190,83 @@ namespace Sentry.data.Core
 
         }
 
+        public void DeleteByFileSchema(FileSchema scm)
+        {
+            //Find schema specific dataflow
+            DataFlow schemaSpecificFlow = _datasetContext.DataFlow.Where(w => w.Name == GenerateDataFlowNameForFileSchema(scm)).FirstOrDefault();
+
+            //Find all SchemaMappings associated with FileSchema
+            List<SchemaMap> schemaMappings = _datasetContext.SchemaMap.Where(w => w.MappedSchema == scm).ToList();
+
+            foreach (SchemaMap map in schemaMappings)
+            {
+                //ScheamMap step associated with SchemaMapping
+                DataFlowStep mapStep = map.DataFlowStepId;
+
+                //Find non-SchemaSpecific DataFlow associated with SchemaMap step, then return all SchemaMap steps associated with DataFlow
+                List<DataFlowStep> associatedMapSteps =  _datasetContext.GetById<DataFlow>(mapStep.DataFlow.Id).Steps.Where(w => w.DataAction_Type_Id == DataActionType.SchemaMap).ToList();
+
+                //if non-SchemaSpecific flow only contains 1 SchemaMap step, issue delete of DataFlow
+                // if count greater than 1 and all other SchemaMaps reference same FileSchema, issue delete of DataFlow
+                // if count greater than 1 and any other SchemaMaps reference differnt FileSchema, only delete SchemaMap step
+
+                //There are no non-SchemaSpecific dataflows mapped to this schema,
+                //  Therefore, delete schema specific dataflow
+                if (associatedMapSteps.Count == 0)
+                {                    
+                    Delete(mapStep.DataFlow.Id);
+                }
+                else if (associatedMapSteps.Count >= 1)
+                {
+                    int nonMatchingFileSchemas = 0;
+                    foreach (DataFlowStep step in associatedMapSteps)
+                    {
+                        if (scm != _datasetContext.SchemaMap.Where(w => w.DataFlowStepId == step).Select(s => s.MappedSchema))
+                        {
+                            nonMatchingFileSchemas++;
+                        }
+                    }
+
+                    if (nonMatchingFileSchemas == 0)
+                    {
+                        Delete(mapStep.DataFlow.Id);
+                    }
+                    else
+                    {
+                        _datasetContext.Remove(map);
+                    }
+                }
+            }
+
+            // Issue Delete of Schema-Specific data flow
+            Delete(schemaSpecificFlow.Id);
+
+        }
+
+        public void Delete(int dataFlowId)
+        {
+            //Find DataFlow
+            DataFlow flow = _datasetContext.GetById<DataFlow>(dataFlowId);
+
+            if (flow == null)
+            {
+                Logger.Debug($"dataflowservice-delete DataFlow not found - dataflowid:{dataFlowId.ToString()}");
+            }
+            else
+            {
+                //Find associated RetrieverJobs
+                List<RetrieverJob> jobs = _datasetContext.RetrieverJob.Where(w => w.DataFlow == flow).ToList();
+
+                foreach (RetrieverJob job in jobs)
+                {
+                    _jobService.DeleteJob(job.Id);
+                }
+
+                _datasetContext.Remove(flow);
+                _datasetContext.SaveChanges();
+            }
+        }
+
         #region Private Methods
         private void CreateDataFlow(DataFlowDto dto)
         {           

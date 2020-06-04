@@ -22,7 +22,7 @@ namespace Sentry.data.Infrastructure
             tasks.Add(Task.Factory.StartNew(() => { DeleteSchemas(); }));
             tasks.Add(Task.Factory.StartNew(() => { DeleteDatasets(); }));
 
-            await Task.WhenAll(tasks);
+                await Task.WhenAll(tasks);
 
             Logger.Info($"walleservice-run-completed - guid:{_runGuid}");
         }
@@ -72,7 +72,7 @@ namespace Sentry.data.Infrastructure
                     {
                         Logger.Info($"walleservice-datasetdelete-start - DatasetId:{ds.DatasetId} DatasetName:{ds.DatasetName} guid:{_runGuid}");
                         bool IsSuccessful = datasetService.Delete(ds.DatasetId, false);
-                        if (!IsSuccessful)
+                        if (IsSuccessful)
                         {
                             Logger.Info($"walleservice-datasetdelete-end - DatasetId:{ds.DatasetId} DatasetName:{ds.DatasetName} guid:{_runGuid}");
                         }
