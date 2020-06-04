@@ -176,6 +176,10 @@
 
             public const string USER_SWITCH = "UserSwitch";
             public const string ADMIN_USER = "AdminUser";
+
+            public const string DALE_SENSITIVE_VIEW = "DaleSensView";
+
+
         }
 
         public static class ConvertedFileStoragePrefix

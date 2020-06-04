@@ -60,11 +60,14 @@
 
         </div>
 
+        @if (Model.CanDaleSensitiveView)
+        {
+            <div style="float:left;margin-left:10px;">
+                <em class="glyphicon glyphicon-warning-sign" style="color:#00a3e0" ;></em>
+                <a href="#" id="sensitiveSearch" style="color:#00a3e0;font-weight: 500;">Show Sensitive Columns</a>
+            </div>
+        }
 
-        <div style="float:left;margin-left:10px;">
-            <em class="glyphicon glyphicon-warning-sign" style="color:#00a3e0";></em>
-            <a href="#" id="sensitiveSearch" style="color:#00a3e0;font-weight: 500;">Show Sensitive Columns</a>
-        </div>
 
     </div>
 

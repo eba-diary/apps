@@ -28,6 +28,8 @@ namespace Sentry.data.Web.Controllers
             if ( _featureFlags.Expose_DaleSearch_CLA_1450.GetValue() || SharedContext.CurrentUser.IsAdmin)
             {
                 DaleSearchModel searchModel = new DaleSearchModel();
+                searchModel.CanDaleSensitiveView = SharedContext.CurrentUser.CanDaleSensitiveView;
+
                 return View(searchModel);
             }
             else
@@ -37,26 +39,26 @@ namespace Sentry.data.Web.Controllers
         }
 
         //use for ServerSide DataTable processing
-        public JsonResult GetSearchResultsServer([ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest,string searchCriteria, string destination)
-        {
-            DaleSearchModel searchModel = new DaleSearchModel();
-            searchModel.Criteria = searchCriteria;
-            searchModel.Destiny = destination.ToDaleDestiny();
+        //public JsonResult GetSearchResultsServer([ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest,string searchCriteria, string destination)
+        //{
+        //    DaleSearchModel searchModel = new DaleSearchModel();
+        //    searchModel.Criteria = searchCriteria;
+        //    searchModel.Destiny = destination.ToDaleDestiny();
 
-            if(IsCriteriaValid(searchModel))
-            {
-                searchModel.DaleResults = _daleService.GetSearchResults(searchModel.ToDto()).ToWeb();
-            }
-            else
-            {
-                searchModel.DaleResults = new List<DaleResultModel>();
-            }
+        //    if (IsCriteriaValid(searchModel))
+        //    {
+        //        searchModel.DaleResults = _daleService.GetSearchResults(searchModel.ToDto()).ToWeb();
+        //    }
+        //    else
+        //    {
+        //        searchModel.DaleResults = new List<DaleResultModel>();
+        //    }
 
-            DataTablesQueryableAdapter<DaleResultModel> dtqa = new DataTablesQueryableAdapter<DaleResultModel>(searchModel.DaleResults.AsQueryable(), dtRequest);
-            DataTablesResponse response = dtqa.GetDataTablesResponse();
+        //    DataTablesQueryableAdapter<DaleResultModel> dtqa = new DataTablesQueryableAdapter<DaleResultModel>(searchModel.DaleResults.AsQueryable(), dtRequest);
+        //    DataTablesResponse response = dtqa.GetDataTablesResponse();
 
-             return Json(response);
-        }
+        //     return Json(response);
+        //}
 
         //use for ClientSide DataTable processing
         public JsonResult GetSearchResultsClient(string searchCriteria, string destination, bool sensitive=false)
@@ -65,14 +67,16 @@ namespace Sentry.data.Web.Controllers
             searchModel.Criteria = searchCriteria;
             searchModel.Destiny = destination.ToDaleDestiny();
             searchModel.Sensitive = sensitive;
+            searchModel.CanDaleSensitiveView = SharedContext.CurrentUser.CanDaleSensitiveView;
 
-            if (IsCriteriaValid(searchModel))
+            //DO NOT perform search if invalid criteria OR sensitive and they lack permissions. NOTE: if they lack permissions, VIEW hides ability to even click sensitive link
+            if (!IsCriteriaValid(searchModel) || (!CanDaleSensitiveView(searchModel)) )            
             {
-                searchModel.DaleResults = _daleService.GetSearchResults(searchModel.ToDto()).ToWeb();
+                searchModel.DaleResults = new List<DaleResultModel>();
             }
             else
             {
-                searchModel.DaleResults = new List<DaleResultModel>();
+                searchModel.DaleResults = _daleService.GetSearchResults(searchModel.ToDto()).ToWeb();
             }
 
             JsonResult result = Json(new { data = searchModel.DaleResults}, JsonRequestBehavior.AllowGet);
@@ -80,7 +84,6 @@ namespace Sentry.data.Web.Controllers
 
             return result;
         }
-
 
         private bool IsCriteriaValid(DaleSearchModel model)
         {
@@ -98,6 +101,20 @@ namespace Sentry.data.Web.Controllers
             {
                 return false;
             }
+
+            return true;
+        }
+
+        private bool CanDaleSensitiveView(DaleSearchModel model)
+        {
+            //check feature flag, REMOVE once officially released
+            if( !_featureFlags.Expose_DaleSensitiveView_CLA_1709.GetValue() && !SharedContext.CurrentUser.IsAdmin)
+            {
+                return false;
+            }
+
+            if (model.Sensitive && !model.CanDaleSensitiveView)
+                return false;
 
             return true;
         }

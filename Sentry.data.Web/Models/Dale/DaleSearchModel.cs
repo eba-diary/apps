@@ -14,6 +14,9 @@ namespace Sentry.data.Web
 
         public bool Sensitive { get; set; }
 
+        public bool CanDaleSensitiveView { get; set; }
+
         public List<DaleResultModel> DaleResults { get; set; }
+        
     }
 }
