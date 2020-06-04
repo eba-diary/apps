@@ -373,7 +373,7 @@ namespace Sentry.data.Core
             }
 
             List<DatasetFileConfigDto> dtoList = new List<DatasetFileConfigDto>();
-            foreach(DatasetFileConfig config in ds.DatasetFileConfigs.Where(w => !w.DeleteInd))
+            foreach(DatasetFileConfig config in ds.DatasetFileConfigs)
             {
                 dtoList.Add(GetDatasetFileConfigDto(config.ConfigId));
             }
@@ -850,6 +850,12 @@ namespace Sentry.data.Core
             try
             {
                 DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
+
+                if (dfc.DeleteInd)
+                {
+                    throw new DatasetFileConfigDeletedException("Already marked for deletion");
+                }
+
                 FileSchema scm = _datasetContext.GetById<FileSchema>(dfc.Schema.SchemaId);
                 FileSchema de = dfc.Schema;
 
@@ -1006,7 +1012,7 @@ namespace Sentry.data.Core
 
                 if (configList != null)
                 {
-                    foreach (DatasetFileConfig config in configList.Where(w => w.Schema.Revisions.Any()))
+                    foreach (DatasetFileConfig config in configList.Where(w => w.Schema.Revisions.Any() && !w.DeleteInd))
                     {
                         HiveTableCreateModel hiveModel = new HiveTableCreateModel()
                         {
@@ -1413,6 +1419,9 @@ namespace Sentry.data.Core
             dto.HiveLocation = dfc.Schema?.HiveLocation;
             dto.HiveTableStatus = dfc.Schema?.HiveTableStatus;
             dto.Schema = (dfc.Schema != null) ? _schemaService.GetFileSchemaDto(dfc.Schema.SchemaId) : null;
+            dto.DeleteInd = dfc.DeleteInd;
+            dto.DeleteIssuer = dfc.DeleteIssuer;
+            dto.DeleteIssueDTM = dfc.DeleteIssueDTM;
         }
 
         public static Object TryConvertTo<T>(Object input)

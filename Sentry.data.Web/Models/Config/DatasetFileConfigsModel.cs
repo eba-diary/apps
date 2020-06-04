@@ -166,5 +166,6 @@ namespace Sentry.data.Web
 
         public UserSecurity Security { get; set; }
         public string SasLibrary { get; set; }
+        public bool DeleteInd { get; set; }
     }
 }

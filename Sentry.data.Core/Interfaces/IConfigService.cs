@@ -40,6 +40,7 @@ namespace Sentry.data.Core
         /// <param name="logicalDelete">Perform soft or hard delete</param>
         /// <param name="parentDriven">Is this driven by parent object</param>
         /// <returns></returns>
+        /// <exception cref="DatasetFileConfigDeletedException">When DatasetFileConfig is already marked for deletion</exception>
         bool Delete(int id, bool logicalDelete = true, bool parentDriven = false);
         UserSecurity GetUserSecurityForConfig(int id);
         /// <summary>

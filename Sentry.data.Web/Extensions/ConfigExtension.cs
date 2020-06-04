@@ -198,7 +198,8 @@ namespace Sentry.data.Web
                 {
                     "CLA1396_NewEtlColumns|" + schemaDto.CLA1396_NewEtlColumns.ToString(),
                     "CLA1580_StructureHive|" + schemaDto.CLA1580_StructureHive.ToString()
-                }
+                },
+                DeleteInd = schemaDto.DeleteInd
             };
         }
 
@@ -233,6 +234,7 @@ namespace Sentry.data.Web
             model.OldSchemaId = (model.Schemas.Any()) ? model.Schemas.FirstOrDefault().DataElement_ID : 0;
             model.CLA1396_NewEtlColumns = (config.Schema != null) ? config.Schema.CLA1396_NewEtlColumns : false;
             model.CLA1580_StructureHive = (config.Schema != null) ? config.Schema.CLA1580_StructureHive : false;
+            model.DeleteInd = config.Schema.DeleteInd;
         }
     }
 }
