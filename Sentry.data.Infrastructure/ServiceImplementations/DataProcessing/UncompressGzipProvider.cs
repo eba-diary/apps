@@ -30,8 +30,8 @@ namespace Sentry.data.Infrastructure
 
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
-            if (!_featureFlags.Remove_Mock_UncompressGzip_Logic_CLA_757.GetValue())
-            {
+
+#if (DEBUG)
                 Stopwatch stopWatch = new Stopwatch();
                 _step = step;
 
@@ -55,7 +55,7 @@ namespace Sentry.data.Infrastructure
                     {
                         _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, target.BucketName, $"{target.ObjectKey}{fileName}");
 
-#if (DEBUG)
+
                         //Mock for testing... sent mock s3object created 
                         S3Event s3e = null;
                         s3e = new S3Event
@@ -78,7 +78,7 @@ namespace Sentry.data.Infrastructure
                             }
                         };
                         _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
-#endif
+
                     }
 
                     stopWatch.Stop();
@@ -94,11 +94,8 @@ namespace Sentry.data.Infrastructure
                     _step.Executions.Add(_step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-executeaction-failed", Log_Level.Error, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, ex));
                     _step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"end-method <{_step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug);
                 }
-            }
-            else
-            {
-                Logger.Debug("uncompresszipprovider-executeaction-dotnet disabled-by-featureflag");
-            }
+#endif
+
         }
 
         public override void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
