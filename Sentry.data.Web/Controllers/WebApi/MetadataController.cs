@@ -254,12 +254,14 @@ namespace Sentry.data.Web.WebApi.Controllers
         {
             try
             {
-                //ValidateModifyPermissionsForDataset(datasetId);
+                ValidateModifyPermissionsForDataset(datasetId);
 
-                //if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
-                //{
-                //    throw new SchemaNotFoundException();
-                //}
+                if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
+                {
+                    throw new SchemaNotFoundException();
+                }
+
+                int configId = _configService.GetDatasetFileConfigDtoByDataset(datasetId).Where(w => w.Schema.SchemaId == schemaId).First().ConfigId;
 
 
                 //string jobj = schemaStructure.ToString();
@@ -274,7 +276,9 @@ namespace Sentry.data.Web.WebApi.Controllers
                 //string schema = JsonSchemaDriller_v3(schema_v3);
                 List<SchemaRow> schemarows_v2 = new List<SchemaRow>();
                 ToSchemaRows(schema_v3, schemarows_v2);
-                
+
+                _configService.UpdateFields(configId, schemaId, schemarows_v2);
+
                 return Ok(schemarows_v2);
             }
             catch (DatasetUnauthorizedAccessException)

@@ -474,6 +474,8 @@ namespace Sentry.data.Core
                         revision.Fields.Add(AddRevisionField(row, revision, null, latestRevision));
                     }
 
+                    //Add Checksum validation here
+
                     _datasetContext.SaveChanges();
                 }
             }
