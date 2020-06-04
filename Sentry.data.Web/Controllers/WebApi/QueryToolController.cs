@@ -1,22 +1,22 @@
-﻿using Sentry.data.Core;
+﻿using Newtonsoft.Json;
+using Sentry.Configuration;
+using Sentry.data.Common;
+using Sentry.data.Core;
+using Sentry.data.Core.Entities;
+using Sentry.data.Core.Entities.Livy;
+using Sentry.data.Infrastructure;
+using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Web.Http;
-using System.Threading.Tasks;
 using System.Net.Http.Headers;
-using Sentry.data.Infrastructure;
-using Sentry.Configuration;
-using System.Web.Http.Results;
-using Sentry.data.Common;
-using Newtonsoft.Json;
+using System.Text;
 using System.Threading;
-using Sentry.data.Core.Entities.Livy;
-using Sentry.data.Web.Helpers;
-using Sentry.data.Core.Entities;
+using System.Threading.Tasks;
+using System.Web.Http;
+using System.Web.Http.Results;
 
 namespace Sentry.data.Web.WebApi.Controllers
 {
@@ -33,22 +33,38 @@ namespace Sentry.data.Web.WebApi.Controllers
         private IConfigService _configService;
         private ISchemaService _schemaService;
         private ISecurityService _securityService;
+        private readonly IDataFeatures _featureFlags;
+        private string _bucket;
 
         public QueryToolController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, 
             ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService,
-            ISchemaService schemaService, ISecurityService securityService)
+            ISchemaService schemaService, ISecurityService securityService, IDataFeatures dataFeatures)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
             _s3Service = dsSvc;
             _livy = new LivyHelper(dsCtxt);
             _associateInfoProvider = associateInfoService;
-            _livyUrl = Sentry.Configuration.Config.GetHostSetting("ApacheLivy");
+            _livyUrl = Config.GetHostSetting("ApacheLivy");
             _configService = configService;
             _schemaService = schemaService;
             _securityService = securityService;
+            _featureFlags = dataFeatures;
         }
 
+        private string RootBucket
+        {
+            get
+            {
+                if (_bucket == null)
+                {
+                    _bucket = _featureFlags.Use_AWS_v2_Configuration_CLA_1488.GetValue()
+                        ? Config.GetHostSetting("AWS2_0RootBucket")
+                        : Config.GetHostSetting("AWSRootBucket");
+                }
+                return _bucket;
+            }
+        }
 
         /// <summary>
         /// gets all primary livey sessions
@@ -551,7 +567,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             var obj = new
             {
-                s3Key = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + Utilities.GenerateCustomStorageLocation(new string[] { "QueryTool/Bundle", user.AssociateId })
+                s3Key = RootBucket + "/" + Utilities.GenerateCustomStorageLocation(new string[] { "QueryTool/Bundle", user.AssociateId })
             };
 
             return Ok(obj);
@@ -632,7 +648,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 {
                     QueryableConfig qd = new QueryableConfig();
                     qd.configName = schemaDto.Name;
-                    qd.bucket = Config.GetHostSetting("AWSRootBucket");
+                    qd.bucket = RootBucket;
 
                     qd.s3Key = schemaDto.RawQueryStorage;
 
@@ -703,7 +719,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             //        QueryableConfig qd = new QueryableConfig();
 
             //        qd.configName = item.Name;
-            //        qd.bucket = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket");
+            //        qd.bucket = RootBucket;
             //        qd.s3Key = Utilities.GenerateLocationKey(item);
 
 
@@ -1064,8 +1080,8 @@ namespace Sentry.data.Web.WebApi.Controllers
 
                 //python += ".partitionBy('own_code')";
 
-                String bucket = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket");
-                String s3Prefix = Sentry.Configuration.Config.GetHostSetting("S3DataPrefix");
+                String bucket = RootBucket;
+                String s3Prefix = Config.GetHostSetting("S3DataPrefix");
 
                 dropLocation = "s3a://"
                     + bucket + "/"
@@ -1115,7 +1131,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             return StatusCode(HttpStatusCode.NoContent);
             //DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
 
-            //String bucket = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket");
+            //String bucket = RootBucket;
             //String s3Prefix = Sentry.Configuration.Config.GetHostSetting("S3DataPrefix");
 
             //String dropLocation = "s3a://"

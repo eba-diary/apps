@@ -573,7 +573,7 @@ namespace Sentry.data.Web.Controllers
                 _s3Service.GetObjectMetadata(df.FileLocation);
 
                 JsonResult jr = new JsonResult();
-                jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation, df.VersionId);
+                jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation);
                 jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
 
                 e.Reason = "Successfully Downloaded Data File";

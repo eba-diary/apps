@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 using Sentry.data.Web.Models.ApiModels.Config;
 using Sentry.data.Web.Models.ApiModels.Schema;
@@ -119,7 +120,9 @@ namespace Sentry.data.Web
                 SasLibrary = model.SasLibrary,
                 ParentDatasetId = model.DatasetId,
                 SchemaId = model.SchemaId,
-                Description = model.ConfigFileDesc
+                Description = model.ConfigFileDesc,
+                CLA1396_NewEtlColumns = model.CLA1396_NewEtlColumns,
+                CLA1580_StructureHive = model.CLA1580_StructureHive
             };
         }
 
@@ -193,7 +196,8 @@ namespace Sentry.data.Web
                 HiveLocation = schemaDto.HiveLocation,
                 Options = new List<string>()
                 {
-                    "CLA1396_NewEtlColumns|" + schemaDto.CLA1396_NewEtlColumns.ToString()
+                    "CLA1396_NewEtlColumns|" + schemaDto.CLA1396_NewEtlColumns.ToString(),
+                    "CLA1580_StructureHive|" + schemaDto.CLA1580_StructureHive.ToString()
                 }
             };
         }
@@ -206,6 +210,29 @@ namespace Sentry.data.Web
                 modelList.Add(dto.ToSchemaModel());
             }
             return modelList;
+        }
+
+        public static void ToModel(this DatasetFileConfigsModel model, Core.DatasetFileConfig config)
+        {
+            model.ConfigId = config.ConfigId;
+            model.FileTypeId = config.FileTypeId;
+            model.ConfigFileName = config.Schema.Name;
+            model.ConfigFileDesc = config.Schema.Description;
+            model.ParentDatasetName = config.ParentDataset.DatasetName;
+            model.DatasetScopeTypeID = config.DatasetScopeType.ScopeTypeId;
+            model.ScopeType = config.DatasetScopeType;
+            model.FileExtensionID = config.Schema.Extension.Id;
+            model.FileExtension = config.Schema.Extension;
+            model.Schemas = config.Schemas;
+            model.Schema = config.Schema ?? null;
+            model.RawStorageId = config.Schema.StorageCode;
+            model.Delimiter = config.Schema?.Delimiter;
+            model.SchemaId = (config.Schema != null) ? config.Schema.SchemaId : 0;
+            model.CreateCurrentView = (config.Schema != null) ? config.Schema.CreateCurrentView : false;
+            model.HasHeader = (config.Schema != null) ? config.Schema.HasHeader : false;
+            model.OldSchemaId = (model.Schemas.Any()) ? model.Schemas.FirstOrDefault().DataElement_ID : 0;
+            model.CLA1396_NewEtlColumns = (config.Schema != null) ? config.Schema.CLA1396_NewEtlColumns : false;
+            model.CLA1580_StructureHive = (config.Schema != null) ? config.Schema.CLA1580_StructureHive : false;
         }
     }
 }

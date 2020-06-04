@@ -17,8 +17,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.DatabaseGenerat
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9E622421-1970-4955-8B4D-D06A01A6457F}"
 	ProjectSection(SolutionItems) = preProject
+		AWSSettings.config = AWSSettings.config
 		DefaultSettings\defaultSettings.config = DefaultSettings\defaultSettings.config
+		FeatureFlagSettings.config = FeatureFlagSettings.config
 		Jenkinsfile.gvy = Jenkinsfile.gvy
+		KafkaSettings.config = KafkaSettings.config
 		Local.testsettings = Local.testsettings
 		ReferenceAppRemoval.xml = ReferenceAppRemoval.xml
 	EndProjectSection

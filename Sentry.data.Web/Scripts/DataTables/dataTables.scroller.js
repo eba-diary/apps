@@ -1,4 +1,4 @@
-﻿/*! Scroller 1.4.2
+/*! Scroller 1.4.2
  * ©2011-2016 SpryMedia Ltd - datatables.net/license
  */
 

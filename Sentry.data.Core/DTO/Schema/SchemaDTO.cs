@@ -17,5 +17,6 @@ namespace Sentry.data.Core
         public virtual string DeleteIssuer { get; set; }
         public virtual DateTime DeleteIssueDTM { get; set; }
         public virtual bool CLA1396_NewEtlColumns { get; set; }
+        public virtual bool CLA1580_StructureHive { get; set; }
     }
 }

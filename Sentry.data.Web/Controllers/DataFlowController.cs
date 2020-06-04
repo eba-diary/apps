@@ -203,7 +203,8 @@ namespace Sentry.data.Web.Controllers
         private void CreateDropDownSetup(JobModel model)
         {
             var temp = _dataFlowService.GetDataSourceTypes()
-                .Where(w => w.DiscrimatorValue == GlobalConstants.DataSoureDiscriminator.FTP_SOURCE)
+                .Where(w => w.DiscrimatorValue == GlobalConstants.DataSoureDiscriminator.FTP_SOURCE ||
+                    w.DiscrimatorValue == GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE)
                 .Select(v => new SelectListItem { Text = v.Name, Value = v.DiscrimatorValue })
                 .ToList();
 

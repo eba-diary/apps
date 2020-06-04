@@ -52,16 +52,25 @@ namespace Sentry.data.Web
 
             //This bundle contains scripts needed for DataTables and related plugins
             bundles.Add(new ScriptBundle("~/bundles/dataTables").
-                        Include(dataTablesScriptsDirectory + "/jquery.dataTables.js").
+
+                        //DataTable Buttons required
+                        Include(dataTablesScriptsDirectory + "/jquery.dataTables.js").          //required for DataTable COLVIS
+                        Include(dataTablesScriptsDirectory + "/dataTables.buttons.min.js").     //required for DataTable COLVIS
+                        Include(dataTablesScriptsDirectory + "/buttons.bootstrap.min.js").      //required for DataTable COLVIS
+                        Include(dataTablesScriptsDirectory + "/buttons.colVis.min.js").         //required for DataTable COLVIS
+                        Include(dataTablesScriptsDirectory + "/dataTables.columnFilter.js").    //required for DataTable Filter
+                        Include(dataTablesScriptsDirectory + "/buttons.flash.min.js").          //required for Datatable CSV
+                        Include(dataTablesScriptsDirectory + "/buttons.html5.min.js").          //required for Datatable CSV
+
+
                         Include(dataTablesScriptsDirectory + "/dataTables.bootstrap3.js").
-                        Include(dataTablesScriptsDirectory + "/dataTables.colVis.js").
-                        Include(dataTablesScriptsDirectory + "/dataTables.columnFilter.js").
                         Include(dataTablesScriptsDirectory + "/dataTables.responsive.js").
                         Include(dataTablesScriptsDirectory + "/jquery.dataTables.odata.js").
                         Include(dataTablesScriptsDirectory + "/moment-with-locales.js").
                         Include(dataTablesScriptsDirectory + "/moment-with-locales.min.js").
                         Include(dataTablesScriptsDirectory + "/moment.js").
-                        Include(dataTablesScriptsDirectory + "/moment.min.js"));
+                        Include(dataTablesScriptsDirectory + "/moment.min.js")
+                        );
 
             bundles.Add(new ScriptBundle("~/bundles/prettyCron").
                         Include(dataTablesScriptsDirectory + "/moment.js").
@@ -74,18 +83,24 @@ namespace Sentry.data.Web
             bundles.Add(new StyleBundle("~/bundles/css/main").
                         Include("~/Content/bootstrap.min.css", new CssRewriteUrlTransform()).
 
-                        Include("~/Content/font-awesome.min.css", new CssRewriteUrlTransform()).
+                        Include("~/Content/font-awesome.css", new CssRewriteUrlTransform()).
                         Include("~/Content/css/select2.css", new CssRewriteUrlTransform()).
                         Include("~/Content/ladda-themeless.css"));
 
-            string dataTablesStylesDirectory = "~/Content/DataTables/css";
+
 
             //This bundle contains styles specific to DataTables and related plugins
+            string dataTablesStylesDirectory = "~/Content/DataTables/css";
             bundles.Add(new StyleBundle("~/bundles/css/dataTables").
+
+                        Include(dataTablesStylesDirectory + "/jquery.dataTables.min.css").      //required for DataTable Buttons
+                        Include(dataTablesStylesDirectory + "/buttons.dataTables.min.css").     //required for DataTable Buttons
                         Include(dataTablesStylesDirectory + "/dataTables.bootstrap3.css").
                         Include(dataTablesStylesDirectory + "/dataTables.fontAwesome.css").
-                        Include(dataTablesStylesDirectory + "/dataTables.colVis.css").
-                        Include(dataTablesStylesDirectory + "/dataTables.responsive.css"));
+                        Include(dataTablesStylesDirectory + "/dataTables.responsive.css")
+                        );
+
+
 
             //This bundle contains styles that override everything else, and must come after all other css includes
             bundles.Add(new StyleBundle("~/bundles/css/site").
@@ -106,6 +121,7 @@ namespace Sentry.data.Web
                         Include("~/Content/business-intelligence.css").
                         Include("~/Content/dataflow.css").
                         Include("~/Content/site.css").
+                        Include("~/Content/dale.css").
                         Include("~/Content/jquery.json-viewer.css"));
 
             /* If you want to see content bundled/minimized when running locally, uncomment the EnableOptimizations 

@@ -27,15 +27,8 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult PersonalLines()
         {
-            if (_featureFlags.Expose_BusinessArea_Pages_CLA_1424.GetValue() || SharedContext.CurrentUser.IsAdmin)
-            {
-                BusinessAreaLandingPageModel model = GetBusinessAreaLandingPageModel();
-                return View(model);
-            }
-            else
-            {
-                return View("Forbidden");
-            }
+            BusinessAreaLandingPageModel model = GetBusinessAreaLandingPageModel();
+            return View(model);
         }
 
 

@@ -51,7 +51,7 @@ namespace Sentry.data.Core
                 {
                     CreateUser = user.AssociateId,
                     StartTime = DateTime.Now,
-                    ExpirationTime = DateTime.Now.AddHours(1)
+                    ExpirationTime = DateTime.MaxValue
                 };
             }
             else
@@ -75,7 +75,7 @@ namespace Sentry.data.Core
             Notification notification = null;
 
             bool addNotification = true;
-            
+
             if (dto.NotificationId == 0)
             {
                 notification = dto.ToCore();
@@ -98,14 +98,35 @@ namespace Sentry.data.Core
             }
 
             _domainContext.SaveChanges();
+            CreateEvent(addNotification, notification);
+            return dto.NotificationId;
+        }
 
+        public void AutoExpire(int notificationId)
+        {
+            Notification notification = _domainContext.Notification.FirstOrDefault(x => x.NotificationId == notificationId);
+
+            //set now time to be static so logic below always is dealing the same date
+            DateTime nowTime = DateTime.Now;
+            if (notification.StartTime >= nowTime)
+            {
+                notification.StartTime = nowTime.Subtract(new TimeSpan(0, 1, 0));        //set to now minus a minute
+            }
+            
+            notification.ExpirationTime = nowTime;
+            _domainContext.SaveChanges();
+            CreateEvent(false, notification);
+        }
+
+        private void CreateEvent(bool addNotification, Notification notification)
+        {
             //the way that other components work when publishing events is to pass a constant which is essentially 
             //equal to the EventType.Description, this is sort of strange because the actual event service then grabs
             //the appropriate EventType based on the description here, because i need to move on I will use this design
             //pattern because it works, so don't judge me.
             string eventTypeDescription = null;
 
-            switch (dto.MessageSeverity)
+            switch (notification.MessageSeverity)
             {
                 case NotificationSeverity.Critical:
                     eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_CRITICAL_ADD : GlobalConstants.EventType.NOTIFICATION_CRITICAL_UPDATE;
@@ -117,14 +138,12 @@ namespace Sentry.data.Core
                     eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_INFO_ADD : GlobalConstants.EventType.NOTIFICATION_INFO_UPDATE;
                     break;
                 default:
-                    Logger.Error("Notification Severity Not Found to log EventType of " + dto.MessageSeverity.ToString() + " for NotificationId = " + dto.NotificationId.ToString());
+                    Logger.Error("Notification Severity Not Found to log EventType of " + notification.MessageSeverity.ToString() + " for NotificationId = " + notification.NotificationId.ToString());
                     break;
             }
 
-            if(eventTypeDescription != null)
+            if (eventTypeDescription != null)
                 _eventService.PublishSuccessEventByNotificationId(eventTypeDescription, _userService.GetCurrentUser().AssociateId, eventTypeDescription, notification);
-
-            return dto.NotificationId;
         }
 
         public List<NotificationDto> GetNotificationsForDataAsset()

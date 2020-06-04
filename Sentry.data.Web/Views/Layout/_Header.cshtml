@@ -145,7 +145,7 @@ else
                         </ul>
                     </li>
                 }
-                
+
                 @if (Model.CanViewBusinessArea)
                 {
                     <li class="dropdown">
@@ -237,6 +237,15 @@ else
                         </ul>
                     </li>
                 }
+
+
+                @if (Model.CanViewDale)
+                {
+                    <li>
+                        <a href="~/Dale/DaleSearch" class="">Data Inventory</a>
+                    </li>
+                }
+
                 @if (Model.CanViewDataset || Model.CanEditDataset)
                 {
                     <li>

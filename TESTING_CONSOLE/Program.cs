@@ -34,7 +34,7 @@ namespace TESTING_CONSOLE
                 //    var result = service.DoWork();
                 //    container.GetInstance<ITESTING_CONSOLEContext>.SaveChanges();
                 AmazonLambdaConfig ldConfig = new AmazonLambdaConfig();
-                ldConfig.RegionEndpoint = RegionEndpoint.GetBySystemName(Config.GetSetting("AWSRegion"));
+                ldConfig.RegionEndpoint = RegionEndpoint.GetBySystemName(Config.GetHostSetting("AWSRegion"));
                 //if (!String.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyHost")))
                 //{
                 //    ldConfig.ProxyHost = Config.GetHostSetting("SentryS3ProxyHost");

@@ -134,6 +134,8 @@
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_20_02_02" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_02_04" />
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_20_02_05" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_03_01" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_03_02" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -245,6 +247,7 @@
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_20_02_02\InitializeDataFlowProcessingMetadata.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_02_04\INSERT_BusinessArea_Subscription.sql" />
     <Build Include="Tables\DatasetFile_Conversion_Archive.sql" />
+    <Build Include="Tables\EventHandlerMetrics.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
@@ -279,6 +282,8 @@
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_01_04\Create_HangFire_1_7_6_Schema.sql" />
     <None Include="Scripts\Post-Deploy\StaticData\DataAction.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_02_04\Insert_ZipCodesDotCom_DataSource.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_03_01\UpdateSASLibrary.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_03_02\Varchar_length_history_fix.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Sentry.data.Database.refactorlog" />

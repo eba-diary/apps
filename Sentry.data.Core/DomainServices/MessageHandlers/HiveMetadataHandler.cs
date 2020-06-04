@@ -98,6 +98,7 @@ namespace Sentry.data.Core
                         switch (deleteCompletedEvent.HiveStatus.ToUpper())
                         {
                             case "DELETED":
+                            case "SKIPPED":
                                 de.HiveTableStatus = HiveTableStatusEnum.Deleted.ToString();
                                 break;
                             case "FAILED":

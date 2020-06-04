@@ -1,16 +1,21 @@
-﻿using System;
+﻿using Amazon;
+using Amazon.Runtime;
+using Amazon.Runtime.CredentialManagement;
+using Amazon.S3;
+using Amazon.S3.IO;
+using Amazon.S3.Model;
+using Sentry.Common.Logging;
+using Sentry.Configuration;
+using Sentry.data.Core;
+using Sentry.data.Infrastructure.Exceptions;
+using StructureMap;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Amazon;
-using Amazon.S3;
-using Amazon.S3.Model;
-using Sentry.data.Core;
-using System.IO;
-using Sentry.Common.Logging;
-using Amazon.S3.IO;
-using System.Diagnostics;
 
 namespace Sentry.data.Infrastructure
 {
@@ -19,8 +24,147 @@ namespace Sentry.data.Infrastructure
         private static S3ServiceProvider instance = null;
         private static readonly object padlock = new object();
         private static string versionId;
+        private static string _bucket;
+        private static string _awsRegion;
+        private static string _useAws2_0;
 
         public S3ServiceProvider() { }
+
+        private static string RootBucket
+        {
+            get
+            {
+                if (_bucket == null)
+                {
+                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+                    {
+                        IDataFeatures dataFeatures = container.GetInstance<IDataFeatures>();
+
+                        _bucket = dataFeatures.Use_AWS_v2_Configuration_CLA_1488.GetValue()
+                            ? Config.GetHostSetting("AWS2_0RootBucket")
+                            : Config.GetHostSetting("AWSRootBucket");
+                    }
+                }
+                return _bucket;
+            }
+        }
+        private static string AwsRegion
+        {
+            get
+            {
+                if (_awsRegion == null)
+                {
+                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+                    {
+                        IDataFeatures dataFeatures = container.GetInstance<IDataFeatures>();
+
+                        _awsRegion = dataFeatures.Use_AWS_v2_Configuration_CLA_1488.GetValue()
+                            ? Config.GetHostSetting("AWS2_0Region")
+                            : Config.GetHostSetting("AWSRegion");
+                    }
+                }
+                return _awsRegion;
+            }
+        }
+        private static bool UseAWS2_0
+        {
+            get
+            {
+                if (_useAws2_0 == null)
+                {
+                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+                    {
+                        IDataFeatures dataFeatures = container.GetInstance<IDataFeatures>();
+
+                        _useAws2_0 = dataFeatures.Use_AWS_v2_Configuration_CLA_1488.GetValue().ToString();
+                    }
+                }
+                return bool.Parse(_useAws2_0);
+            }
+        }
+        private static string GetProxyHost()
+        {
+            if (!UseAWS2_0)
+            {
+                if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyHost")))
+                {
+                    throw new S3ServiceProviderException("SentryS3ProxyHost cannot be found");
+                }
+                else
+                {
+                    return Config.GetHostSetting("SentryS3ProxyHost");
+                }
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryServerProxyHost")))
+                {
+                    throw new S3ServiceProviderException("SentryServerProxyHost cannot be found");
+                }
+                else
+                {
+                    return Config.GetHostSetting("SentryServerProxyHost");
+                }
+            }
+        }
+        private static string GetProxyPort() 
+        {
+            if (!UseAWS2_0)
+            {
+                if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyPort")))
+                {
+                    throw new S3ServiceProviderException("SentryS3ProxyPort cannot be found");
+                }
+                else
+                {
+                    return Config.GetHostSetting("SentryS3ProxyPort");
+                }
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryServerProxyPort")))
+                {
+                    throw new S3ServiceProviderException("SentryServerProxyPort cannot be found");
+                }
+                else
+                {
+                    return Config.GetHostSetting("SentryServerProxyPort");
+                }
+            }
+        }
+        private static string GetAwsAccessKey()
+        {
+            if (string.IsNullOrWhiteSpace(Config.GetHostSetting("AWSAccessKey")))
+            {
+                throw new S3ServiceProviderException("AWSAccessKey cannot be found");
+            }
+            else
+            {
+                return Config.GetHostSetting("AWSAccessKey");
+            }
+        }
+        private static string GetAwsSecretKey()
+        {
+            if (string.IsNullOrWhiteSpace(Config.GetHostSetting("AWSSecretKey")))
+            {
+                throw new S3ServiceProviderException("AWSSecretKey cannot be found");
+            }
+            else
+            {
+                return Config.GetHostSetting("AWSSecretKey");
+            }
+        }
+        private static string GetAwsProfileName()
+        {
+            if (string.IsNullOrWhiteSpace(Config.GetHostSetting("AWSProfileName")))
+            {
+                throw new S3ServiceProviderException("AWSProfileName cannot be found");
+            }
+            else
+            {
+                return Config.GetHostSetting("AWSProfileName");
+            }
+        }
 
         public static S3ServiceProvider Instance
         {
@@ -45,24 +189,91 @@ namespace Sentry.data.Infrastructure
             {
                 if (null == _s3client)
                 {
+                    Logger.Debug("<s3serviceprovider> clientitnit...");
+
                     // instantiate a new shared client
                     AWSConfigsS3.UseSignatureVersion4 = true;
                     AmazonS3Config s3config = new AmazonS3Config();
-                    s3config.RegionEndpoint = RegionEndpoint.GetBySystemName(Configuration.Config.GetSetting("AWSRegion"));
+                    s3config.RegionEndpoint = RegionEndpoint.GetBySystemName(AwsRegion);
                     //proxy only needed when not running on AWS.  Calling code expected to pass empty value if proxy host not needed.
-                    if (!String.IsNullOrWhiteSpace(Configuration.Config.GetHostSetting("SentryS3ProxyHost")))
-                    {
-                        s3config.ProxyHost = Configuration.Config.GetHostSetting("SentryS3ProxyHost");
-                        s3config.ProxyPort = int.Parse(Configuration.Config.GetSetting("SentryS3ProxyPort"));
-                    }
-                    s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
-                    string awsAccessKey = Configuration.Config.GetHostSetting("AWSAccessKey");
-                    string awsSecretKey = Configuration.Config.GetHostSetting("AWSSecretKey");
-                    _s3client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);
+                    SetAwsClientProxy(s3config);
 
-                    Logger.Info($"s3serviceprovider-clientinit regionendpoint:{s3config.RegionEndpoint},proxyhost:{s3config.ProxyHost},proxyport:{s3config.ProxyPort.ToString()}");
+                    AmazonS3Client client;
+                    /*
+                     *  For AWS 2.0 Local development, always use Proxy and Profile
+                     *  For AWS 1.0 Local Development, always use Proxy and Key\Secret Key
+                     *  
+                     *  For AWS 2.0 Running on Server in AWS 1.0, always use Proxy and Key\Secret key
+                     *  For AWs 2.0 Running on Server in AWS 2.0, no proxy usage and do not specify credentials (will be set on EC2 Instance)
+                     */
+                    Logger.Debug($"<s3serviceprovider> UseAWS2_0 : {UseAWS2_0.ToString()}");
+                    Logger.Debug($"<s3serviceprovider> UseAWSProfileName : {Config.GetHostSetting("UseAWSProfileName")}");
+                    //Use AWS keys when connecting to 1.0 or 2.0 and profile is not used.
+                    if (!UseAWS2_0 || (UseAWS2_0 && !bool.Parse(Config.GetHostSetting("UseAWSProfileName"))))
+                    {
+                        client = GetKeyBasedClient(s3config);
+                    }
+                    else if (UseAWS2_0 && bool.Parse(Config.GetHostSetting("UseAWSProfileName")))
+                    {
+                        client = GetProfileBasedClient(s3config);
+                    }
+                    else
+                    {
+                        client = new AmazonS3Client(s3config);
+                    }
+
+                    _s3client = client;
+
+                    Logger.Info($"<s3serviceprovider>-clientinit regionendpoint:{s3config.RegionEndpoint},proxyhost:{s3config.ProxyHost},proxyport:{s3config.ProxyPort.ToString()}");
+                    Logger.Debug("<s3serviceprovider> clientitnit-end");
                 }
                 return _s3client;
+            }
+        }
+
+        private static AmazonS3Client GetProfileBasedClient(AmazonS3Config s3config)
+        {
+            AmazonS3Client client;
+            Logger.Debug("<s3serviceprovider> Use AWS Profile for authentication / access");
+            //attempt to load the profile info from the .NET SDK credential store
+            AWSCredentials awsCredentials;
+            var profileName = GetAwsProfileName();
+            Logger.Debug($"<s3serviceprovider> AWSProfileName : {profileName}");
+
+            if (new CredentialProfileStoreChain().TryGetAWSCredentials(profileName, out awsCredentials))
+            {
+                client = new AmazonS3Client(awsCredentials, s3config);
+            }
+            else
+            {
+                throw new S3ServiceProviderException($"Couldn't retrieve AWS credentials for the profile name {profileName}");
+            }
+
+            return client;
+        }
+
+        private static AmazonS3Client GetKeyBasedClient(AmazonS3Config s3config)
+        {
+            AmazonS3Client client;
+            Logger.Debug("<s3serviceprovider> Use key and secret key for authentication / access");
+            string awsAccessKey = GetAwsAccessKey();
+            string awsSecretKey = GetAwsSecretKey();
+            client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);
+            return client;
+        }
+
+        private static void SetAwsClientProxy(AmazonS3Config s3config)
+        {
+            Logger.Debug($"<s3serviceprovider> AWSUseProxy : {Config.GetHostSetting("AWSUseProxy")}");
+            if (bool.Parse(Config.GetHostSetting("AWSUseProxy")))
+            {
+                s3config.ProxyHost = GetProxyHost();
+                Logger.Debug($"<s3serviceprovider> SentryS3ProxyHost : {GetProxyHost()}");
+
+                s3config.ProxyPort = int.Parse(GetProxyPort());
+                Logger.Debug($"<s3serviceprovider> SentryS3ProxyPort : {GetProxyPort()}");
+
+                s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
             }
         }
 
@@ -77,7 +288,7 @@ namespace Sentry.data.Infrastructure
         {
             GetPreSignedUrlRequest req = new GetPreSignedUrlRequest()
             {
-                BucketName = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                BucketName = RootBucket,
                 Key = key,
                 VersionId = versionId,
                 Expires = DateTime.Now.AddMinutes(2)
@@ -100,7 +311,7 @@ namespace Sentry.data.Infrastructure
         {
             GetPreSignedUrlRequest req = new GetPreSignedUrlRequest()
             {
-                BucketName = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                BucketName = RootBucket,
                 Key = key,
                 VersionId = null,
                 Expires = DateTime.Now.AddMinutes(2)
@@ -155,7 +366,7 @@ namespace Sentry.data.Infrastructure
             {
                 Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
                 Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
-                s3tuReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+                s3tuReq.BucketName = RootBucket;
                 s3tuReq.InputStream = stream;
                 s3tuReq.Key = folder + fileName;
                 s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
@@ -178,7 +389,7 @@ namespace Sentry.data.Infrastructure
                 Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
                 Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
 
-                s3tuReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+                s3tuReq.BucketName = RootBucket;
 
                 s3tuReq.InputStream = stream;
 
@@ -202,8 +413,8 @@ namespace Sentry.data.Infrastructure
                 Sentry.Common.Logging.Logger.Debug("Started S3 TransferUtility Setup for Download");
                 Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
                 Amazon.S3.Transfer.TransferUtilityDownloadRequest s3tuDwnldReq = new Amazon.S3.Transfer.TransferUtilityDownloadRequest();
-                Sentry.Common.Logging.Logger.Debug("TransferUtility - Set AWS BucketName: " + Configuration.Config.GetHostSetting("AWSRootBucket"));
-                s3tuDwnldReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+                Sentry.Common.Logging.Logger.Debug("TransferUtility - Set AWS BucketName: " + RootBucket);
+                s3tuDwnldReq.BucketName = RootBucket;
                 Sentry.Common.Logging.Logger.Debug("TransferUtility - Set FilePath: " + baseTargetPath + folder + @"\" + filename);
                 s3tuDwnldReq.FilePath = baseTargetPath + folder + @"\" + filename;
 
@@ -287,7 +498,7 @@ namespace Sentry.data.Infrastructure
                 Sentry.Common.Logging.Logger.Error("Error Processing MultiPartUpload", ex);
                 AbortMultipartUploadRequest abortMPURequest = new AbortMultipartUploadRequest
                 {
-                    BucketName = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                    BucketName = RootBucket,
                     Key = targetKey,
                     UploadId = uploadId
                 };
@@ -309,7 +520,7 @@ namespace Sentry.data.Infrastructure
         public string StartUpload(string uniqueKey)
         {
             InitiateMultipartUploadRequest mReq = new InitiateMultipartUploadRequest();
-            mReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+            mReq.BucketName = RootBucket;
             mReq.Key = uniqueKey;
             mReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
             InitiateMultipartUploadResponse mRsp = S3Client.InitiateMultipartUpload(mReq);
@@ -322,7 +533,7 @@ namespace Sentry.data.Infrastructure
         private UploadPartResponse UploadPart(string uniqueKey, string sourceFilePath, long filePosition, long partSize, int partNumber, string uploadId)
         {
             UploadPartRequest uReq = new UploadPartRequest();
-            uReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+            uReq.BucketName = RootBucket;
             uReq.Key = uniqueKey;
             uReq.FilePath = sourceFilePath;
             uReq.FilePosition = filePosition;
@@ -347,7 +558,7 @@ namespace Sentry.data.Infrastructure
         private string StopUpload(string uniqueKey, string uploadId, List<UploadPartResponse> responses)
         {
             CompleteMultipartUploadRequest cReq = new CompleteMultipartUploadRequest();
-            cReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+            cReq.BucketName = RootBucket;
             cReq.Key = uniqueKey;
             cReq.UploadId = uploadId;
             cReq.AddPartETags(responses);
@@ -415,9 +626,9 @@ namespace Sentry.data.Infrastructure
                 {
                     CopyPartRequest copyRequest = new CopyPartRequest
                     {
-                        DestinationBucket = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                        DestinationBucket = RootBucket,
                         DestinationKey = targetKey,
-                        SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                        SourceBucket = RootBucket,
                         SourceKey = sourceKey,
                         UploadId = uploadId,
                         FirstByte = bytePosition,
@@ -440,10 +651,10 @@ namespace Sentry.data.Infrastructure
             catch (AmazonS3Exception e)
             {
                 Logger.Error($"Error encountered on server. Message:'{e.Message}' when writing an object", e);
-                Logger.Info($"Issuing an Abort request - bucket:{Configuration.Config.GetHostSetting("AWSRootBucket")} | key:{targetKey} | uploadid:{uploadId}");
+                Logger.Info($"Issuing an Abort request - bucket:{RootBucket} | key:{targetKey} | uploadid:{uploadId}");
                 AbortMultipartUploadRequest abortreq = new AbortMultipartUploadRequest
                 {
-                    BucketName = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                    BucketName = RootBucket,
                     Key = targetKey,
                     UploadId = uploadId
                 };
@@ -456,10 +667,10 @@ namespace Sentry.data.Infrastructure
             catch (Exception e)
             {
                 Logger.Error($"Unknown encountered on server. Message:'{e.Message}' when writing an object", e);
-                Logger.Info($"Issuing an Abort request - bucket:{Configuration.Config.GetHostSetting("AWSRootBucket")} | key:{targetKey} | uploadid:{uploadId}");
+                Logger.Info($"Issuing an Abort request - bucket:{RootBucket} | key:{targetKey} | uploadid:{uploadId}");
                 AbortMultipartUploadRequest abortreq = new AbortMultipartUploadRequest
                 {
-                    BucketName = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                    BucketName = RootBucket,
                     Key = targetKey,
                     UploadId = uploadId
                 };
@@ -474,7 +685,7 @@ namespace Sentry.data.Infrastructure
         {
             CompleteMultipartUploadRequest cReq = new CompleteMultipartUploadRequest
             { 
-                BucketName = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                BucketName = RootBucket,
                 Key = uniqueKey,
                 UploadId = uploadId
             };
@@ -498,7 +709,7 @@ namespace Sentry.data.Infrastructure
             {
                 PutObjectRequest poReq = new PutObjectRequest();
                 poReq.InputStream = filestream;
-                poReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+                poReq.BucketName = RootBucket;
                 poReq.Key = targetKey;
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 poReq.AutoCloseStream = true;                
@@ -535,7 +746,7 @@ namespace Sentry.data.Infrastructure
             {
                 PutObjectRequest poReq = new PutObjectRequest();
                 poReq.FilePath = sourceFilePath;
-                poReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+                poReq.BucketName = RootBucket;
                 poReq.Key = targetKey;
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
 
@@ -578,7 +789,7 @@ namespace Sentry.data.Infrastructure
         public ObjectKeyVersion MarkDeleted(string key)
         {
             DeleteObjectRequest doReq = new DeleteObjectRequest();
-            doReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+            doReq.BucketName = RootBucket;
             doReq.Key = key;
             DeleteObjectResponse doRsp = S3Client.DeleteObject(doReq);
 
@@ -600,7 +811,7 @@ namespace Sentry.data.Infrastructure
             try
             {
                 DeleteObjectRequest doReq = new DeleteObjectRequest();
-                doReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+                doReq.BucketName = RootBucket;
                 doReq.Key = keyVersion.key;
                 DeleteObjectResponse doRsp = S3Client.DeleteObject(doReq);
 
@@ -641,7 +852,7 @@ namespace Sentry.data.Infrastructure
             try
             {
                 DeleteObjectsRequest dosReq = new DeleteObjectsRequest();
-                dosReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+                dosReq.BucketName = RootBucket;
                 dosReq.Objects = objects;
                 DeleteObjectsResponse dosRsp = S3Client.DeleteObjects(dosReq);
                 Logger.Info($"No. of objects successfully deleted = {dosRsp.DeletedObjects.Count}");
@@ -708,13 +919,10 @@ namespace Sentry.data.Infrastructure
         public IDictionary<string, string> GetDatasetList(string parentDir = "sentry-dataset-management", bool includeSubDirectories = true)
         {
             // this will include folders in addition to data sets...
-            if (parentDir == null)
-            {
-                parentDir = Configuration.Config.GetHostSetting("AWSRootBucket");
-            }
+
             Dictionary<string, string> dsList = new Dictionary<string, string>();
             ListObjectsRequest lbReq = new ListObjectsRequest();
-            lbReq.BucketName = parentDir;
+            lbReq.BucketName = parentDir ?? RootBucket;
             ListObjectsResponse lbRsp = null;
             do
             {   // get list of ojbects
@@ -745,7 +953,7 @@ namespace Sentry.data.Infrastructure
             GetObjectMetadataRequest req = new GetObjectMetadataRequest();
             GetObjectMetadataResponse resp = null;
 
-            req.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+            req.BucketName = RootBucket;
             req.Key = key;
             req.VersionId = versionId;
 
@@ -776,7 +984,7 @@ namespace Sentry.data.Infrastructure
 
             return ConvertObjectMetadataResponse(resp);
         }
-        
+
         //public string GetObject(string key, string versionId)
         //{
         //    throw new NotImplementedException();
@@ -784,7 +992,7 @@ namespace Sentry.data.Infrastructure
         //    //GetObjectRequest req = new GetObjectRequest();
         //    //string contents = null;
 
-        //    //req.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+        //    //req.BucketName = RootBucket;
         //    //req.Key = key;
         //    //req.VersionId = versionId;
 
@@ -812,7 +1020,7 @@ namespace Sentry.data.Infrastructure
             GetObjectRequest req = new GetObjectRequest();
             GetObjectResponse response = new GetObjectResponse();
 
-            req.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+            req.BucketName = RootBucket;
             req.Key = key;
             req.VersionId = versionId;
 
@@ -840,7 +1048,7 @@ namespace Sentry.data.Infrastructure
 
         public S3FileInfo GetFileInfo(string key)
         {
-            S3DirectoryInfo s3Root = new S3DirectoryInfo(S3Client, Configuration.Config.GetHostSetting("AWSRootBucket"));
+            S3DirectoryInfo s3Root = new S3DirectoryInfo(S3Client, RootBucket);
             S3FileInfo outfile = s3Root.GetFile(key);
 
             return outfile;
@@ -850,7 +1058,7 @@ namespace Sentry.data.Infrastructure
         {
             var request = new ListObjectsRequest();
 
-            request.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+            request.BucketName = RootBucket;
             request.Prefix = keyPrefix;
 
             ListObjectsResponse response = S3Client.ListObjects(request);
@@ -1080,13 +1288,13 @@ namespace Sentry.data.Infrastructure
 
         public void DeleteParquetFilesByStorageCode(string storageCode)
         {
-            S3DirectoryInfo S3DirectoryToDelete = new S3DirectoryInfo(S3Client, Configuration.Config.GetHostSetting("AWSRootBucket"), $"parquet/{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
+            S3DirectoryInfo S3DirectoryToDelete = new S3DirectoryInfo(S3Client, RootBucket, $"parquet/{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
             S3DirectoryToDelete.Delete(true);
         }
 
         public void DeleteS3Prefix(string prefix)
         {
-            List<ObjectKeyVersion> s3Keys = ConvertToObjectKeyVersion(ListObjects(Configuration.Config.GetHostSetting("AWSRootBucket"), prefix).ToList());
+            List<ObjectKeyVersion> s3Keys = ConvertToObjectKeyVersion(ListObjects(RootBucket, prefix).ToList());
             if (s3Keys.Count == 0)
             {
                 Logger.Info($"deleteS3Prefix-nofilesdetected - prefix:{prefix}");

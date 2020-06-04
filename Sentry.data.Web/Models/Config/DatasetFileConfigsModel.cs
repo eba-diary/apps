@@ -1,12 +1,10 @@
-﻿using System;
+﻿using Sentry.data.Core;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Sentry.data.Core;
-using System.ComponentModel.DataAnnotations;
-using System.Web.Mvc;
 using System.ComponentModel;
-using Sentry.Core;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace Sentry.data.Web
 {
@@ -17,23 +15,7 @@ namespace Sentry.data.Web
 
         public DatasetFileConfigsModel(DatasetFileConfig dsfc, Boolean renderingForTable, Boolean renderingForPopup)
         {
-            this.ConfigId = dsfc.ConfigId;
-            this.FileTypeId = dsfc.FileTypeId;
-            this.ConfigFileName = dsfc.Schema.Name;
-            this.ConfigFileDesc = dsfc.Schema.Description;
-            this.ParentDatasetName = dsfc.ParentDataset.DatasetName;
-            this.DatasetScopeTypeID = dsfc.DatasetScopeType.ScopeTypeId;
-            this.ScopeType = dsfc.DatasetScopeType;
-            this.FileExtensionID = dsfc.Schema.Extension.Id;
-            this.FileExtension = dsfc.Schema.Extension;
-            this.Schemas = dsfc.Schemas;
-            this.Schema = dsfc.Schema ?? null;
-            this.RawStorageId = dsfc.Schema.StorageCode;
-            this.SchemaId = (dsfc.Schema != null) ? dsfc.Schema.SchemaId : 0;
-            this.Delimiter = dsfc.Schema?.Delimiter;
-            this.CreateCurrentView = (dsfc.Schema != null) ? dsfc.Schema.CreateCurrentView : false;
-            this.HasHeader = (dsfc.Schema != null) ? dsfc.Schema.HasHeader : false;
-            this.OldSchemaId = (Schemas.Any()) ? Schemas.FirstOrDefault().DataElement_ID : 0;
+            this.ToModel(dsfc);
 
             try
             {
@@ -77,27 +59,13 @@ namespace Sentry.data.Web
             this.HasHeader = dto.HasHeader;
             this.SchemaId = dto.Schema.SchemaId;
             this.OldSchemaId = (dto.Schemas != null) ? dto.Schemas.FirstOrDefault().DataElementID : 0;
+            this.CLA1396_NewEtlColumns = (dto.Schema != null) ? dto.Schema.CLA1396_NewEtlColumns : false;
+            this.CLA1580_StructureHive = (dto.Schema != null) ? dto.Schema.CLA1580_StructureHive : false;
         }
 
         public DatasetFileConfigsModel(DatasetFileConfig dsfc, Boolean renderingForTable, Boolean renderingForPopup, IDatasetContext datasetContext)
         {
-            this.ConfigId = dsfc.ConfigId;
-            this.FileTypeId = dsfc.FileTypeId;
-            this.ConfigFileName = dsfc.Name;
-            this.ConfigFileDesc = dsfc.Description;
-            this.ParentDatasetName = dsfc.ParentDataset.DatasetName;
-            this.DatasetScopeTypeID = dsfc.DatasetScopeType.ScopeTypeId;
-            this.ScopeType = dsfc.DatasetScopeType;
-            this.FileExtensionID = dsfc.FileExtension.Id;
-            this.FileExtension = dsfc.FileExtension;
-            this.Schemas = dsfc.Schemas;
-            this.SchemaId = (dsfc.Schema != null) ? dsfc.Schema.SchemaId : 0;
-            this.Schema = dsfc.Schema ?? null;
-            this.Delimiter = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().Delimiter;
-            this.RawStorageId = dsfc.GetStorageCode();
-            this.CreateCurrentView = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().CreateCurrentView;
-            this.HasHeader = dsfc.Schemas.OrderByDescending(o => o.DataElementChange_DTM).FirstOrDefault().HasHeader;
-            this.OldSchemaId = (Schemas != null) ? Schemas.FirstOrDefault().DataElement_ID : 0;
+            this.ToModel(dsfc);
 
             try
             {
@@ -185,6 +153,8 @@ namespace Sentry.data.Web
         public string RawStorageId { get; set; }
         public int SchemaId { get; set; }
         public int OldSchemaId { get; set; }
+        public bool CLA1396_NewEtlColumns { get; set; }
+        public bool CLA1580_StructureHive { get; set; }
         public IList<RetrieverJob> RetrieverJobs { get; set; }
 
         public IList<DataElement> Schemas { get; set; }  

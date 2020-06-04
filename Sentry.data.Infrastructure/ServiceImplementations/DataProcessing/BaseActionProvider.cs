@@ -2,6 +2,7 @@
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.S3;
 using Sentry.data.Core.Interfaces.DataProcessing;
+using Sentry.data.Infrastructure.Helpers;
 using System;
 using System.Collections.Generic;
 
@@ -43,7 +44,7 @@ namespace Sentry.data.Infrastructure
                 DataFlowStepEventTarget target = new DataFlowStepEventTarget
                 {
                     BucketName = dStep.Action.TargetStorageBucket,
-                    ObjectKey = dStep.TriggerKey + $"{((storageCode == null) ? string.Empty : storageCode + "/")}{stepEvent.FlowExecutionGuid}{((stepEvent.RunInstanceGuid == null) ? String.Empty : "-" + stepEvent.RunInstanceGuid)}/"
+                    ObjectKey = dStep.TriggerKey + $"{((storageCode == null) ? string.Empty : storageCode + "/")}{DataFlowHelpers.GenerateGuid(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid)}/"                    
                 };
 
                 targets.Add(target);

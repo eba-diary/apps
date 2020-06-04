@@ -26,6 +26,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property(x => x.DeleteIssuer, m => m.Column("DeleteIssuer"));
             Property(x => x.DeleteIssueDTM, m => m.Column("DeleteIssueDTM"));
             Property(x => x.CLA1396_NewEtlColumns, m => m.Column("CLA1396_NewEtlColumns"));
+            Property(x => x.CLA1580_StructureHive, m => m.Column("CLA1580_StructureHive"));
             this.Bag((x) => x.Revisions, (m) =>
             {
                 m.Inverse(true);
