@@ -108,214 +108,226 @@
 
             @foreach (var item in Model.DatasetFileConfigs)
             {
-                <div>
-                    <div class="configHeader categoryBanner-@color">
-                        <h1 class="@color">@item.ConfigFileName</h1>
-                        <i class="glyphicon glyphicon-menu-up tracker-menu-icon"></i>
-                    </div>
-
-                    <div class="configContainer" style="display: none;">
-
-                        <h4 class="@color">Schema and Configuration Information</h4>
-                        <hr />
-
-                        <div class="col-md-12">
-                            @if (item.ConfigFileDesc != null && item.ConfigFileDesc.Length >= 300)
-                            {
-
-                                int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
-                                <p>
-                                    <span style="margin-top: 15px;">@item.ConfigFileDesc.Substring(0, lastInfo)</span>
-                                    <span id="usageSeeMoreEllipsis">...&nbsp;</span>
-                                    <span id="usageSeeMorePanel" style="display: none;">@item.ConfigFileDesc.Substring(lastInfo)</span>
-                                    <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
-                                    <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
-                                </p>
-                            }
-                            else
-                            {
-                                <p style="margin-top: 15px;">@item.ConfigFileDesc</p>
-                            }
+                <div>                    
+                    @if (!item.DeleteInd)
+                    {
+                        <div class="configHeader categoryBanner-@color">
+                            <h1 class="@color">@item.ConfigFileName</h1>
+                            <i class="glyphicon glyphicon-menu-up tracker-menu-icon"></i>
                         </div>
-                        <div class="col-md-12 configDetailRow">
-
-                            @if (Model.Security.ShowAdminControls)
-                            {
-                                <div class="col-md-3">Storage id: <b>@item.RawStorageId</b></div>
-                                <div class="col-md-3">Schema id: <b>@item.SchemaId</b> <i>(@item.OldSchemaId)</i></div>
-                            }
-                            else
-                            {
-                                <div class="col-md-3">Schema id: <b>@item.SchemaId</b></div>
-                            }
-                            <div class="col-md-3">Configuration classification: <b>@item.FileType</b></div>
-                            <div class="col-md-3">File type: <b>@item.FileExtension.Name</b></div>
+                    }
+                    else
+                    {
+                        <div class="configHeader categoryBanner-gray">
+                            <h1 class="@color">@item.ConfigFileName <strong><i>(Delete Pending)</i></strong></h1>
                         </div>
-                        @if (item.FileExtension.Name.Trim() == "ANY" || item.FileExtension.Name.Trim() == "DELIMITED" || item.FileExtension.Name.Trim() == "CSV")
-                        {
-                            <div class="col-md-12 configDetailRow">
-                                <div class="col-md-3">This schema's current Delimiter is ( <b>@item.Delimiter</b> )</div>
-                                @if (Model.Security.ShowAdminControls)
+                    }
+
+                    @if (!item.DeleteInd || Model.Security.ShowAdminControls)
+                    {
+                        <div class="configContainer" style="display: none;">
+
+                            <h4 class="@color">Schema and Configuration Information</h4>
+                            <hr />
+
+                            <div class="col-md-12">
+                                @if (item.ConfigFileDesc != null && item.ConfigFileDesc.Length >= 300)
                                 {
-                                    <div class="col-md-3">Files contain headers: <b>@item.HasHeader</b></div>
-                                    <div class="col-md-6">CLA1396_NewEtlColumns: <b>@item.CLA1396_NewEtlColumns</b></div>
+
+                                    int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
+                                    <p>
+                                        <span style="margin-top: 15px;">@item.ConfigFileDesc.Substring(0, lastInfo)</span>
+                                        <span id="usageSeeMoreEllipsis">...&nbsp;</span>
+                                        <span id="usageSeeMorePanel" style="display: none;">@item.ConfigFileDesc.Substring(lastInfo)</span>
+                                        <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
+                                        <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
+                                    </p>
                                 }
                                 else
                                 {
-                                    <div class="col-md-9">Files contain headers: <b>@item.HasHeader</b></div>
+                                    <p style="margin-top: 15px;">@item.ConfigFileDesc</p>
                                 }
                             </div>
-                        }
-                        <div class="col-md-12 configDetailRow">
-                            @if (item.FileExtension.Name.Trim() == "ANY" || item.FileExtension.Name.Trim() == "DELIMITED")
-                            {<div class="col-md-12">This configuration will allow <b>all</b> file extensions.</div>}
-                            else
-                            {<div class="col-md-12">This configuration will only allow files with <b>.@item.FileExtension.Name.ToLower()</b> extension</div>}
-                        </div>
-                        <div class="col-md-12 configDetailRow">
-                            <div class="col-md-12">This configuration Data Scope is <b>@item.ScopeType.Name</b> which means :</div>
-                            <div class="col-md-11 col-md-offset-1">@item.ScopeType.Description</div>
-                        </div>
-                        <div class="col-md-12 configDetailRow">
-                            @if (item.CreateCurrentView)
+                            <div class="col-md-12 configDetailRow">
+
+                                @if (Model.Security.ShowAdminControls)
+                                {
+                                    <div class="col-md-3">Storage id: <b>@item.RawStorageId</b></div>
+                                    <div class="col-md-3">Schema id: <b>@item.SchemaId</b> <i>(@item.OldSchemaId)</i></div>
+                                }
+                                else
+                                {
+                                    <div class="col-md-3">Schema id: <b>@item.SchemaId</b></div>
+                                }
+                                <div class="col-md-3">Configuration classification: <b>@item.FileType</b></div>
+                                <div class="col-md-3">File type: <b>@item.FileExtension.Name</b></div>
+                            </div>
+                            @if (item.FileExtension.Name.Trim() == "ANY" || item.FileExtension.Name.Trim() == "DELIMITED" || item.FileExtension.Name.Trim() == "CSV")
                             {
-                                <div class="col-md-12">A current view exists for this schema which filters to data from latest file processed.</div>
-                            }
-                            else
-                            {
-                                <div class="col-md-12">This schema does not contain a current view</div>
-                            }
-                        </div>
-
-
-                        <a class="btn btn-primary" href="/Config/Edit/@item.ConfigId">Edit</a>
-                        <button class="btn btn-danger" id="btnDeleteConfig" data-id="@item.ConfigId">Delete</button>
-
-                        <hr />
-                        <h4 class="@color">Dataset Retrieval Jobs</h4>
-                        <hr />
-
-                        @foreach (var job in item.RetrieverJobs)
-                        {
-                            <div class="retJob @job.DataSource.SourceType">
-                                <div class="jobHeader categoryBanner-@color">
-                                    <h6>@job.DataSource.Name</h6>
-                                    <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
-                                    @if (job.DataSource.SourceType != "S3Basic" && job.DataSource.SourceType != "DFSBasic")
+                                <div class="col-md-12 configDetailRow">
+                                    <div class="col-md-3">This schema's current Delimiter is ( <b>@item.Delimiter</b> )</div>
+                                    @if (Model.Security.ShowAdminControls)
                                     {
-                                        <button style="float:right; margin-top:3px;" class="btn btn-default on-demand-run" id="@job.Id">On-Demand Run</button>
-
-                                        if (job.IsEnabled)
-                                        {
-                                            <button style="float:right; margin-top:3px;" class="btn btn-default jobstatus jobstatus_enabled" id="@job.Id">Disable</button>
-                                        }
-                                        else
-                                        {
-                                            <button style="float:right; margin-top:3px;" class="btn btn-default jobstatus jobstatus_disabled" id="@job.Id"> Enable</button>
-                                        }
+                                        <div class="col-md-3">Files contain headers: <b>@item.HasHeader</b></div>
+                                        <div class="col-md-6">CLA1396_NewEtlColumns: <b>@item.CLA1396_NewEtlColumns</b></div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-md-9">Files contain headers: <b>@item.HasHeader</b></div>
                                     }
                                 </div>
-                                <div class="jobContainer" style="display:none;">
-                                    <p>@job.DataSource.Description</p>
+                            }
+                            <div class="col-md-12 configDetailRow">
+                                @if (item.FileExtension.Name.Trim() == "ANY" || item.FileExtension.Name.Trim() == "DELIMITED")
+                                {<div class="col-md-12">This configuration will allow <b>all</b> file extensions.</div>}
+                                else
+                                {<div class="col-md-12">This configuration will only allow files with <b>.@item.FileExtension.Name.ToLower()</b> extension</div>}
+                            </div>
+                            <div class="col-md-12 configDetailRow">
+                                <div class="col-md-12">This configuration Data Scope is <b>@item.ScopeType.Name</b> which means :</div>
+                                <div class="col-md-11 col-md-offset-1">@item.ScopeType.Description</div>
+                            </div>
+                            <div class="col-md-12 configDetailRow">
+                                @if (item.CreateCurrentView)
+                                {
+                                    <div class="col-md-12">A current view exists for this schema which filters to data from latest file processed.</div>
+                                }
+                                else
+                                {
+                                    <div class="col-md-12">This schema does not contain a current view</div>
+                                }
+                            </div>
 
-                                    @if (job.IsGeneric)
-                                    {
-                                        <p>This is the Generic Data File Configuration that was created when the Dataset was created. Certain fields cannot be modified.</p>
-                                    }
-                                    <p><span class="schedule">@job.Schedule</span></p>
-                                    <p>This retriever job is grabbing files from the following URL </p>
-                                    <p class="filePath" style="margin-left: 30px;">@job.GetUri() </p>
 
-                                    @if (job.JobOptions != null)
-                                    {
-                                        if (job.JobOptions.IsRegexSearch)
+                            <a class="btn btn-primary" href="/Config/Edit/@item.ConfigId">Edit</a>
+                            <button class="btn btn-danger" id="btnDeleteConfig" data-id="@item.ConfigId">Delete</button>
+
+                            <hr />
+                            <h4 class="@color">Dataset Retrieval Jobs</h4>
+                            <hr />
+
+                            @foreach (var job in item.RetrieverJobs)
+                            {
+                                <div class="retJob @job.DataSource.SourceType">
+                                    <div class="jobHeader categoryBanner-@color">
+                                        <h6>@job.DataSource.Name</h6>
+                                        <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                                        @if (job.DataSource.SourceType != "S3Basic" && job.DataSource.SourceType != "DFSBasic")
                                         {
-                                            <p>This job is searching for Regex</p>
-                                        }
-                                        else
-                                        {
-                                            <p>This job is searching for Exact Strings</p>
-                                        }
+                                            <button style="float:right; margin-top:3px;" class="btn btn-default on-demand-run" id="@job.Id">On-Demand Run</button>
 
-                                        <p>It is searching for : @job.JobOptions.SearchCriteria</p>
-
-                                        if (job.JobOptions.OverwriteDataFile)
-                                        {
-                                            <p>This job will overwrite exact file names with the same name and save them as versions.</p>
-                                        }
-
-                                        if (!String.IsNullOrWhiteSpace(job.JobOptions.TargetFileName))
-                                        {
-                                            <p>This the target file name :  @job.JobOptions.TargetFileName</p>
-                                        }
-                                    }
-
-
-                                    @if (job.JobOptions.CompressionOptions != null)
-                                    {
-                                        if (job.JobOptions.CompressionOptions.IsCompressed)
-                                        {
-                                            <p>This job is uncompressing @job.JobOptions.CompressionOptions.CompressionType files.</p>
-
-                                            foreach (var fileName in job.JobOptions.CompressionOptions.FileNameExclusionList)
+                                            if (job.IsEnabled)
                                             {
-                                                <p>@fileName is being excluded.</p>
+                                                <button style="float:right; margin-top:3px;" class="btn btn-default jobstatus jobstatus_enabled" id="@job.Id">Disable</button>
+                                            }
+                                            else
+                                            {
+                                                <button style="float:right; margin-top:3px;" class="btn btn-default jobstatus jobstatus_disabled" id="@job.Id"> Enable</button>
                                             }
                                         }
-                                    }
+                                    </div>
+                                    <div class="jobContainer" style="display:none;">
+                                        <p>@job.DataSource.Description</p>
 
-                                    <hr />
-                                    <p>Created on : @job.Created</p>
-                                    <p>Modified on : @job.Modified</p>
-
-                                    <a class="btn btn-primary" href="/Config/@item.ConfigId/Job/Edit/@job.Id">Edit</a>
-
-                                </div>
-                            </div>
-                        }
-
-                        <a class="btn btn-success" href="/Config/@item.ConfigId/Job/Create">Add Job</a>
-
-                        @if (item.Schema != null)
-                        {
-                            <hr />
-                            <h4 class="@color">Schema (columns, datatypes, delimiter, etc.)</h4>
-                            <hr />
-                            <div class="retJob">
-                                <div class="jobHeader categoryBanner-@color">
-                                    <h6>@item.Schema.Name</h6>
-                                    <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
-                                </div>
-                                <div class="jobContainer" style="display:none;">
-
-                                    <p>@item.Schema.Description</p>
-
-                                    @if (item.Schema.Revisions.Count() == 0)
-                                    {
-                                        <p>This schema is not currently does not yet have any columns associated to it.</p>
-                                    }
-                                    <p>Created on: @item.Schema.CreatedDTM</p>
-                                    <p>Last Modified on: @item.Schema.LastUpdatedDTM</p>
-
-                                    <p>
-                                        <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Edit">Edit Schema Metadata</a>
-                                        <br>
-                                        <br>
-
-                                        @if (item.Schema.Revisions.Count() > 0)
+                                        @if (job.IsGeneric)
                                         {
-                                            <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">Edit Columns and Fields</a>
-                                            <a class="btn btn-primary" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId">Sync Consumption Layer</a>
+                                            <p>This is the Generic Data File Configuration that was created when the Dataset was created. Certain fields cannot be modified.</p>
                                         }
+                                        <p><span class="schedule">@job.Schedule</span></p>
+                                        <p>This retriever job is grabbing files from the following URL </p>
+                                        <p class="filePath" style="margin-left: 30px;">@job.GetUri() </p>
+
+                                        @if (job.JobOptions != null)
+                                        {
+                                            if (job.JobOptions.IsRegexSearch)
+                                            {
+                                                <p>This job is searching for Regex</p>
+                                            }
+                                            else
+                                            {
+                                                <p>This job is searching for Exact Strings</p>
+                                            }
+
+                                            <p>It is searching for : @job.JobOptions.SearchCriteria</p>
+
+                                            if (job.JobOptions.OverwriteDataFile)
+                                            {
+                                                <p>This job will overwrite exact file names with the same name and save them as versions.</p>
+                                            }
+
+                                            if (!String.IsNullOrWhiteSpace(job.JobOptions.TargetFileName))
+                                            {
+                                                <p>This the target file name :  @job.JobOptions.TargetFileName</p>
+                                            }
+                                        }
+
+
+                                        @if (job.JobOptions.CompressionOptions != null)
+                                        {
+                                            if (job.JobOptions.CompressionOptions.IsCompressed)
+                                            {
+                                                <p>This job is uncompressing @job.JobOptions.CompressionOptions.CompressionType files.</p>
+
+                                                foreach (var fileName in job.JobOptions.CompressionOptions.FileNameExclusionList)
+                                                {
+                                                    <p>@fileName is being excluded.</p>
+                                                }
+                                            }
+                                        }
+
+                                        <hr />
+                                        <p>Created on : @job.Created</p>
+                                        <p>Modified on : @job.Modified</p>
+
+                                        <a class="btn btn-primary" href="/Config/@item.ConfigId/Job/Edit/@job.Id">Edit</a>
+
+                                    </div>
+                                </div>
+                            }
+
+                            <a class="btn btn-success" href="/Config/@item.ConfigId/Job/Create">Add Job</a>
+
+                            @if (item.Schema != null)
+                            {
+                                <hr />
+                                <h4 class="@color">Schema (columns, datatypes, delimiter, etc.)</h4>
+                                <hr />
+                                <div class="retJob">
+                                    <div class="jobHeader categoryBanner-@color">
+                                        <h6>@item.Schema.Name</h6>
+                                        <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                                    </div>
+                                    <div class="jobContainer" style="display:none;">
+
+                                        <p>@item.Schema.Description</p>
+
                                         @if (item.Schema.Revisions.Count() == 0)
                                         {
-                                            <a class="btn btn-success" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">Add Columns and Fields</a>
+                                            <p>This schema is not currently does not yet have any columns associated to it.</p>
                                         }
-                                    </p>
+                                        <p>Created on: @item.Schema.CreatedDTM</p>
+                                        <p>Last Modified on: @item.Schema.LastUpdatedDTM</p>
+
+                                        <p>
+                                            <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Edit">Edit Schema Metadata</a>
+                                            <br>
+                                            <br>
+
+                                            @if (item.Schema.Revisions.Count() > 0)
+                                            {
+                                                <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">Edit Columns and Fields</a>
+                                                <a class="btn btn-primary" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId">Sync Consumption Layer</a>
+                                            }
+                                            @if (item.Schema.Revisions.Count() == 0)
+                                            {
+                                                <a class="btn btn-success" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">Add Columns and Fields</a>
+                                            }
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        }
-                    </div>
+                            }
+                        </div>
+                    }
 
                 </div>
                 <hr />
