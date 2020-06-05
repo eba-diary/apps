@@ -6,7 +6,7 @@
     init: function ()
     {
         //init DataTable
-        var daleResultsTable = $("#daleResultsTable").DataTable({
+        $("#daleResultsTable").DataTable({
 
             //client side setup
             searching: true,
