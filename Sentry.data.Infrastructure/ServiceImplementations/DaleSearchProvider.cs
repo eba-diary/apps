@@ -91,7 +91,9 @@ namespace Sentry.data.Infrastructure
         private bool IsCriteriaValid(DaleSearchDto dto)
         {
             if (dto.Sensitive)
+            {
                 return true;
+            }
 
             //validate for white space only, null, empty string in criteria
             if (String.IsNullOrWhiteSpace(dto.Criteria))

@@ -5,6 +5,7 @@
 
     init: function ()
     {
+        //init DataTable
         var daleResultsTable = $("#daleResultsTable").DataTable({
 
             //client side setup
@@ -71,40 +72,12 @@
             ]
         });
 
-
         //Hide DataTable SearchBox (NOTE: jquery calls the search box what you named table and appends _filter)
         //to get column filtering requires the Searching=true to be set to true, if i set it to false then column filtering goes away so by default you can't have one without the other, so cheat the system here
         $('#daleResultsTable_filter').hide();
 
-        //setup click event for search  span for a new search
-        $('.input-group-addon').click(function (e)
-        {
-            data.Dale.sensitive = false;                                            //set sensitive property to true so grid does sensitive search back to controller
-            data.Dale.disableDale();
-            daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
-        });
-
-        //setup search box enter event
-        //add something around here to know if search is in progress
-        var input = document.getElementById("daleSearchCriteria");
-        input.addEventListener("keyup", function (event) {
-            if (event.keyCode === 13) {
-                event.preventDefault();
-                data.Dale.disableDale();
-                daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
-            }
-        });
-
-        //setup click event for sensitive search
-        $("#sensitiveSearchReal").on('click', function ()
-        {
-            data.Dale.sensitive = true;                                             //set sensitive property to true so grid does sensitive search back to controller
-            $("#daleSearchCriteria").val("");
-            data.Dale.disableDale();
-            daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
-            
-
-        });
+        //setup all click events
+        data.Dale.setupClickAttack();
     },
 
     getDaleDestiny: function ()
@@ -135,5 +108,37 @@
         $('#sensitiveSearchLink').removeClass("hidestuff");
         $('#daleCriteriaContainer').removeClass("hidestuff");
         $('#radioMadness').removeClass("hidestuff");
+    },
+
+    setupClickAttack: function ()
+    {
+        var daleResultsTable = $("#daleResultsTable").DataTable();
+
+        //setup click event for search  span for a new search
+        $('.input-group-addon').click(function (e) {
+            data.Dale.sensitive = false;                                            //set sensitive property to true so grid does sensitive search back to controller
+            data.Dale.disableDale();
+            daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
+        });
+
+        //setup search box enter event
+        //add something around here to know if search is in progress
+        var input = document.getElementById("daleSearchCriteria");
+        input.addEventListener("keyup", function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                data.Dale.disableDale();
+                daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
+            }
+        });
+
+        //setup click event for sensitive search
+        $("#sensitiveSearchLink").on('click', function () {
+
+            data.Dale.sensitive = true;                                             //set sensitive property to true so grid does sensitive search back to controller
+            $("#daleSearchCriteria").val("");
+            data.Dale.disableDale();
+            daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
+        });
     }
 };

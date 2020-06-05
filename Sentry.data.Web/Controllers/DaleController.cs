@@ -87,10 +87,12 @@ namespace Sentry.data.Web.Controllers
 
         private bool IsCriteriaValid(DaleSearchModel model)
         {
-            
+
             //if sensitive query, don't bother to validate criteria and immediately return true
             if (model.Sensitive)
+            {
                 return true;
+            }
 
             //validate for white space only, null, empty string in criteria
             if (String.IsNullOrWhiteSpace(model.Criteria))
@@ -111,7 +113,9 @@ namespace Sentry.data.Web.Controllers
         {
             //if admin, ALWAYS let them see sensitive
             if (SharedContext.CurrentUser.IsAdmin)
+            {
                 return true;
+            }
 
             //check feature flag, REMOVE this whole IF once officially released
             if( !_featureFlags.Expose_DaleSensitiveView_CLA_1709.GetValue())
