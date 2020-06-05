@@ -96,15 +96,15 @@
         });
 
         //setup click event for sensitive search
-        $("#sensitiveSearch").on('click', function ()
+        $("#sensitiveSearchReal").on('click', function ()
         {
             data.Dale.sensitive = true;                                             //set sensitive property to true so grid does sensitive search back to controller
+            $("#daleSearchCriteria").val("");
             data.Dale.disableDale();
             daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
             
 
         });
-
     },
 
     getDaleDestiny: function ()
@@ -116,29 +116,24 @@
     //disable all controls user can hit during search
     disableDale: function ()
     {
-        //hide intitially since they could be doing a search after a previous search
-        $('#daleContainer').hide();
-        $('#daleSearchCriteria').attr('disabled', 'disabled');
-        $('#DestinyTableRadio').attr('disabled', 'disabled');
-        $('#DestinyColumnRadio').attr('disabled', 'disabled');
-        $('#DestinyViewRadio').attr('disabled', 'disabled');
-
         $('#daleSearchClick').hide();
         $('#daleSearchClickSpinner').show();
+        $('#daleContainer').hide();
+
+        $('#sensitiveSearchLink').addClass("hidestuff");
+        $('#daleCriteriaContainer').addClass("hidestuff");
+        $('#radioMadness').addClass("hidestuff");
     },
 
     //enable all controls user can hit during search
     enableDale: function ()
     {
-        //hide intitially since they could be doing a search after a previous search
-        $('#daleContainer').show();
-        $('#daleSearchCriteria').removeAttr('disabled');
-        $('#DestinyTableRadio').removeAttr('disabled');
-        $('#DestinyColumnRadio').removeAttr('disabled');
-        $('#DestinyViewRadio').removeAttr('disabled');
-
         $('#daleSearchClick').show();
         $('#daleSearchClickSpinner').hide();
+        $('#daleContainer').show();
 
+        $('#sensitiveSearchLink').removeClass("hidestuff");
+        $('#daleCriteriaContainer').removeClass("hidestuff");
+        $('#radioMadness').removeClass("hidestuff");
     }
 };

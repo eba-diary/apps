@@ -28,7 +28,7 @@ namespace Sentry.data.Web.Controllers
             if ( _featureFlags.Expose_DaleSearch_CLA_1450.GetValue() || SharedContext.CurrentUser.IsAdmin)
             {
                 DaleSearchModel searchModel = new DaleSearchModel();
-                searchModel.CanDaleSensitiveView = SharedContext.CurrentUser.CanDaleSensitiveView;
+                searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
 
                 return View(searchModel);
             }
@@ -70,7 +70,7 @@ namespace Sentry.data.Web.Controllers
             searchModel.CanDaleSensitiveView = SharedContext.CurrentUser.CanDaleSensitiveView;
 
             //DO NOT perform search if invalid criteria OR sensitive and they lack permissions. NOTE: if they lack permissions, VIEW hides ability to even click sensitive link
-            if (!IsCriteriaValid(searchModel) || (!CanDaleSensitiveView(searchModel)) )            
+            if (!IsCriteriaValid(searchModel) || ( sensitive && !CanDaleSensitiveView() ) )            
             {
                 searchModel.DaleResults = new List<DaleResultModel>();
             }
@@ -87,6 +87,8 @@ namespace Sentry.data.Web.Controllers
 
         private bool IsCriteriaValid(DaleSearchModel model)
         {
+            
+            //if sensitive query, don't bother to validate criteria and immediately return true
             if (model.Sensitive)
                 return true;
 
@@ -105,16 +107,22 @@ namespace Sentry.data.Web.Controllers
             return true;
         }
 
-        private bool CanDaleSensitiveView(DaleSearchModel model)
+        private bool CanDaleSensitiveView()
         {
-            //check feature flag, REMOVE once officially released
-            if( !_featureFlags.Expose_DaleSensitiveView_CLA_1709.GetValue() && !SharedContext.CurrentUser.IsAdmin)
+            //if admin, ALWAYS let them see sensitive
+            if (SharedContext.CurrentUser.IsAdmin)
+                return true;
+
+            //check feature flag, REMOVE this whole IF once officially released
+            if( !_featureFlags.Expose_DaleSensitiveView_CLA_1709.GetValue())
             {
                 return false;
             }
 
-            if (model.Sensitive && !model.CanDaleSensitiveView)
+            if (!SharedContext.CurrentUser.CanDaleSensitiveView)
+            {
                 return false;
+            }
 
             return true;
         }
