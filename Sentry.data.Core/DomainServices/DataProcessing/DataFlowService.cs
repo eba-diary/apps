@@ -17,15 +17,17 @@ namespace Sentry.data.Core
         private readonly IMessagePublisher _messagePublisher;
         private readonly UserService _userService;
         private readonly IJobService _jobService;
+        private readonly IS3ServiceProvider _s3ServiceProvider;
 
 
         public DataFlowService(IDatasetContext datasetContext, IMessagePublisher messagePublisher, 
-            UserService userService, IJobService jobService)
+            UserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider)
         {
             _datasetContext = datasetContext;
             _messagePublisher = messagePublisher;
             _userService = userService;
             _jobService = jobService;
+            _s3ServiceProvider = s3ServiceProvider;
         }
 
         public List<DataFlowDto> ListDataFlows()
@@ -245,6 +247,8 @@ namespace Sentry.data.Core
 
         public void Delete(int dataFlowId)
         {
+            Logger.Info($"dataflowservice-delete-start - dataflowid:{dataFlowId}");
+
             //Find DataFlow
             DataFlow flow = _datasetContext.GetById<DataFlow>(dataFlowId);
 
@@ -257,17 +261,42 @@ namespace Sentry.data.Core
                 //Find associated RetrieverJobs
                 List<RetrieverJob> jobs = _datasetContext.RetrieverJob.Where(w => w.DataFlow == flow).ToList();
 
+                Logger.Info($"dataflowservice-delete-deleteretrieverjobs - dataflowid:{flow.Id}");
                 foreach (RetrieverJob job in jobs)
                 {
                     _jobService.DeleteJob(job.Id);
                 }
 
+                //Remove long-term storage files                
+                DeleteLongTermFiles(flow);
+
+                Logger.Info($"dataflowservice-delete-deletedataflow - dataflowid:{flow.Id}");
                 _datasetContext.Remove(flow);
                 _datasetContext.SaveChanges();
             }
+
+            Logger.Info($"dataflowservice-delete-end - dataflowid:{dataFlowId}");
         }
 
         #region Private Methods
+        private void DeleteLongTermFiles(DataFlow flow)
+        {
+            Logger.Info($"dataflowservice-deleteLongtermfiles - dataflowid:{flow.Id}");
+            foreach (DataFlowStep step in flow.Steps)
+            {
+                if (step.DataAction_Type_Id == DataActionType.S3Drop)
+                {
+                    Logger.Info($"dataflowservice-deleteLongtermfiles-delete - dataflowid:{flow.Id} stepid:{step.Id} prefix:{step.TriggerKey}");
+                    _s3ServiceProvider.DeleteS3Prefix(step.TriggerKey);
+                }
+                else if (step.DataAction_Type_Id == DataActionType.RawStorage)
+                {
+                    Logger.Info($"dataflowservice-deleteLongtermfiles-delete - dataflowid:{flow.Id} stepid:{step.Id} prefix:{step.TargetPrefix}");
+                    _s3ServiceProvider.DeleteS3Prefix(step.TargetPrefix);                    
+                }
+            }
+        }
+
         private void CreateDataFlow(DataFlowDto dto)
         {           
             DataFlow df = MapToDataFlow(dto);
