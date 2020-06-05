@@ -221,7 +221,7 @@ namespace Sentry.data.Core
                     int nonMatchingFileSchemas = 0;
                     foreach (DataFlowStep step in associatedMapSteps)
                     {
-                        if (scm != _datasetContext.SchemaMap.Where(w => w.DataFlowStepId == step).Select(s => s.MappedSchema))
+                        if (scm.SchemaId != _datasetContext.SchemaMap.Where(w => w.DataFlowStepId == step).Select(s => s.MappedSchema).FirstOrDefault().SchemaId)
                         {
                             nonMatchingFileSchemas++;
                         }
