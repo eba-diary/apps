@@ -324,10 +324,12 @@ namespace Sentry.data.Web.WebApi.Controllers
             switch (currentProperty.Type)
             {
                 case JsonObjectType.Object:
-                    SchemaRow row = new SchemaRow();
-                    row.DataType = GlobalConstants.Datatypes.STRUCT;
-                    row.Name = prop.Key;
-
+                    SchemaRow row = new SchemaRow
+                    {
+                        DataType = GlobalConstants.Datatypes.STRUCT,
+                        Name = prop.Key,
+                        Description = currentProperty.Description
+                    };
                     
                     if (parentRow == null)
                     {
@@ -347,7 +349,8 @@ namespace Sentry.data.Web.WebApi.Controllers
                     SchemaRow arrayRow = new SchemaRow()
                     {
                         Name = prop.Key,
-                        IsArray = true
+                        IsArray = true,
+                        Description = currentProperty.Description
                     };
 
                     //While JSON Schema alows an arrays of multiple types, DSC only allows single type.
@@ -387,12 +390,35 @@ namespace Sentry.data.Web.WebApi.Controllers
                                         break;
                                 }
                                 break;
+                            case JsonObjectType.Number:
+
+                                arrayRow.Name = prop.Key;
+                                arrayRow.DataType = GlobalConstants.Datatypes.DECIMAL;
+                                arrayRow.Description = currentProperty.Description;
+
+                                if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-precision"))
+                                {
+                                    arrayRow.Precision = currentProperty.ExtensionData.Where(w => w.Key == "dsc-precision").Select(s => s.Value).ToString();
+                                }
+                                else
+                                {
+                                    arrayRow.Precision = "1";
+                                }
+
+                                if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-scale"))
+                                {
+                                    arrayRow.Scale = currentProperty.ExtensionData.Where(w => w.Key == "dsc-scale").Select(s => s.Value).ToString();
+                                }
+                                else
+                                {
+                                    arrayRow.Scale = "1";
+                                }
+                                break;
                             default:
                             case JsonObjectType.None:
                             case JsonObjectType.File:
                             case JsonObjectType.Null:
                             case JsonObjectType.Boolean:
-                            case JsonObjectType.Number:
                                 break;
                         }
                     }
@@ -416,7 +442,8 @@ namespace Sentry.data.Web.WebApi.Controllers
                     StringBuilder extraProperties = new StringBuilder();
                     SchemaRow stringrow = new SchemaRow()
                     {
-                        Name = prop.Key
+                        Name = prop.Key,
+                        Description = currentProperty.Description
                     };
 
                     if (!String.IsNullOrWhiteSpace(currentProperty.Format))
@@ -463,14 +490,73 @@ namespace Sentry.data.Web.WebApi.Controllers
                     }
 
                     //    currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {prop.Key} (json-type:{prop.Value.Type.ToString()}{extraProperties.ToString()})" : $"{prop.Key} ({prop.Value.Type.ToString()})";
+                    break;
+                case JsonObjectType.Integer:
+                    SchemaRow intRow = new SchemaRow()
+                    {
+                        Name = prop.Key,
+                        DataType = GlobalConstants.Datatypes.INTEGER,
+                        Description = currentProperty.Description
+                    };
+
+                    if (parentRow == null)
+                    {
+                        schemaRowList.Add(intRow);
+                    }
+                    else
+                    {
+                        if (parentRow.ChildRows == null)
+                        {
+                            parentRow.ChildRows = new List<SchemaRow>();
+                        }
+
+                        parentRow.ChildRows.Add(intRow);
+                    }
+                    break;
+                case JsonObjectType.Number:
+                    SchemaRow decimalRow = new SchemaRow()
+                    {
+                        Name = prop.Key,
+                        DataType = GlobalConstants.Datatypes.DECIMAL,
+                        Description = currentProperty.Description
+                    };
+
+                    if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-precision"))
+                    {
+                        decimalRow.Precision = currentProperty.ExtensionData.Where(w => w.Key == "dsc-precision").Select(s => s.Value).ToString();
+                    }
+                    else
+                    {
+                        decimalRow.Precision = "1";
+                    }
+
+                    if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-scale"))
+                    {
+                        decimalRow.Scale = currentProperty.ExtensionData.Where(w => w.Key == "dsc-scale").Select(s => s.Value).ToString();
+                    }
+                    else
+                    {
+                        decimalRow.Scale = "1";
+                    }
 
 
+                    if (parentRow == null)
+                    {
+                        schemaRowList.Add(decimalRow);
+                    }
+                    else
+                    {
+                        if (parentRow.ChildRows == null)
+                        {
+                            parentRow.ChildRows = new List<SchemaRow>();
+                        }
+
+                        parentRow.ChildRows.Add(decimalRow);
+                    }
                     break;
                 default:
-                case JsonObjectType.Number:
                 case JsonObjectType.File:
                 case JsonObjectType.Null:
-                case JsonObjectType.Integer:
                 case JsonObjectType.Boolean:
                 case JsonObjectType.None:
                     //currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {prop.Key} ({prop.Value.Type.ToString()})" : $"{prop.Key} ({prop.Value.Type.ToString()})";
