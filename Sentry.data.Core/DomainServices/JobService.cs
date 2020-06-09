@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core.Entities.DataProcessing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Sentry.Common.Logging;
-using Sentry.data.Core.Entities.DataProcessing;
 using static Sentry.data.Core.RetrieverJobOptions;
-using Sentry.data.Core.Exceptions;
+using Hangfire;
 
 namespace Sentry.data.Core
 {
@@ -239,9 +238,17 @@ namespace Sentry.data.Core
         {
             try
             {
+                //Find associated retrieverjobs
                 RetrieverJob job = _datasetContext.GetById<RetrieverJob>(id);
 
-                
+                DeleteJobFromScheduler(job);
+
+                DeleteDFSDropLocation(job);
+
+                _datasetContext.Remove(job);
+
+                //_datasetContext.SaveChanges();
+
             }
             catch (Exception ex)
             {
@@ -289,6 +296,42 @@ namespace Sentry.data.Core
             job.RelativeUri = dto.RelativeUri;
             job.Schedule = dto.Schedule;
             job.TimeZone = "Central Standard Time";
+        }
+
+        private void DeleteJobFromScheduler(RetrieverJob job)
+        {
+            //Remove jobs from Hangfire if they exist
+            RecurringJob.RemoveIfExists(job.JobName());
+        }
+
+        private void DeleteDFSDropLocation(RetrieverJob job)
+        {
+            //For DFS type jobs, remove drop folder from network location
+            if (job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsBasicHsz>() || job.DataSource.Is<DfsDataFlowBasic>())
+            {
+                string dfsPath = job.GetUri().LocalPath;
+
+                if (System.IO.Directory.Exists(dfsPath))
+                {
+                    Logger.Debug($"jobservice-deletedfsdropLocation - dfs-directory-detected - JobId:{job.Id}");
+                    List<string> files = System.IO.Directory.EnumerateFiles(dfsPath).ToList();
+                    if (files.Any())
+                    {
+                        Logger.Debug($"jobservice-deletedfsdropLocation dfs-directory-file-detected - deleteing {files.Count} file(s) from {dfsPath} - JobId:{job.Id}");
+                        foreach (string file in files)
+                        {
+                            System.IO.File.Delete(file);
+                        }
+                    }
+
+                    Logger.Debug($"jobservice-deletedfsdropLocation dfs-directory-delete path:{dfsPath} - JobId:{job.Id}");
+                    System.IO.Directory.Delete(dfsPath);
+                }
+                else
+                {
+                    Logger.Debug($"jobservice-deletedfsdropLocation - dfs-directory-not-detected - JobId:{job.Id}");
+                }
+            }
         }
         #endregion
     }

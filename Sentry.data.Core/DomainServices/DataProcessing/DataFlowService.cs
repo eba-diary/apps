@@ -17,15 +17,17 @@ namespace Sentry.data.Core
         private readonly IMessagePublisher _messagePublisher;
         private readonly UserService _userService;
         private readonly IJobService _jobService;
+        private readonly IS3ServiceProvider _s3ServiceProvider;
 
 
         public DataFlowService(IDatasetContext datasetContext, IMessagePublisher messagePublisher, 
-            UserService userService, IJobService jobService)
+            UserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider)
         {
             _datasetContext = datasetContext;
             _messagePublisher = messagePublisher;
             _userService = userService;
             _jobService = jobService;
+            _s3ServiceProvider = s3ServiceProvider;
         }
 
         public List<DataFlowDto> ListDataFlows()
@@ -190,7 +192,111 @@ namespace Sentry.data.Core
 
         }
 
+        public void DeleteByFileSchema(FileSchema scm)
+        {
+            //Find schema specific dataflow
+            DataFlow schemaSpecificFlow = _datasetContext.DataFlow.Where(w => w.Name == GenerateDataFlowNameForFileSchema(scm)).FirstOrDefault();
+
+            //Find all SchemaMappings associated with FileSchema
+            List<SchemaMap> schemaMappings = _datasetContext.SchemaMap.Where(w => w.MappedSchema == scm).ToList();
+
+            foreach (SchemaMap map in schemaMappings)
+            {
+                //ScheamMap step associated with SchemaMapping
+                DataFlowStep mapStep = map.DataFlowStepId;
+
+                //Find non-SchemaSpecific DataFlow associated with SchemaMap step, then return all SchemaMap steps associated with DataFlow
+                List<DataFlowStep> associatedMapSteps =  _datasetContext.GetById<DataFlow>(mapStep.DataFlow.Id).Steps.Where(w => w.DataAction_Type_Id == DataActionType.SchemaMap).ToList();
+
+                //if non-SchemaSpecific flow only contains 1 SchemaMap step, issue delete of DataFlow
+                // if count greater than 1 and all other SchemaMaps reference same FileSchema, issue delete of DataFlow
+                // if count greater than 1 and any other SchemaMaps reference differnt FileSchema, only delete SchemaMap step
+
+                //There are no non-SchemaSpecific dataflows mapped to this schema,
+                //  Therefore, delete schema specific dataflow
+                if (associatedMapSteps.Count == 0)
+                {                    
+                    Delete(mapStep.DataFlow.Id);
+                }
+                else if (associatedMapSteps.Count >= 1)
+                {
+                    int nonMatchingFileSchemas = 0;
+                    foreach (DataFlowStep step in associatedMapSteps)
+                    {
+                        if (scm.SchemaId != _datasetContext.SchemaMap.Where(w => w.DataFlowStepId == step).Select(s => s.MappedSchema).FirstOrDefault().SchemaId)
+                        {
+                            nonMatchingFileSchemas++;
+                        }
+                    }
+
+                    if (nonMatchingFileSchemas == 0)
+                    {
+                        Delete(mapStep.DataFlow.Id);
+                    }
+                    else
+                    {
+                        _datasetContext.Remove(map);
+                    }
+                }
+            }
+
+            // Issue Delete of Schema-Specific data flow
+            Delete(schemaSpecificFlow.Id);
+
+        }
+
+        public void Delete(int dataFlowId)
+        {
+            Logger.Info($"dataflowservice-delete-start - dataflowid:{dataFlowId}");
+
+            //Find DataFlow
+            DataFlow flow = _datasetContext.GetById<DataFlow>(dataFlowId);
+
+            if (flow == null)
+            {
+                Logger.Debug($"dataflowservice-delete DataFlow not found - dataflowid:{dataFlowId.ToString()}");
+            }
+            else
+            {
+                //Find associated RetrieverJobs
+                List<RetrieverJob> jobs = _datasetContext.RetrieverJob.Where(w => w.DataFlow == flow).ToList();
+
+                Logger.Info($"dataflowservice-delete-deleteretrieverjobs - dataflowid:{flow.Id}");
+                foreach (RetrieverJob job in jobs)
+                {
+                    _jobService.DeleteJob(job.Id);
+                }
+
+                //Remove long-term storage files                
+                DeleteLongTermFiles(flow);
+
+                Logger.Info($"dataflowservice-delete-deletedataflow - dataflowid:{flow.Id}");
+                _datasetContext.Remove(flow);
+                _datasetContext.SaveChanges();
+            }
+
+            Logger.Info($"dataflowservice-delete-end - dataflowid:{dataFlowId}");
+        }
+
         #region Private Methods
+        private void DeleteLongTermFiles(DataFlow flow)
+        {
+            Logger.Info($"dataflowservice-deleteLongtermfiles - dataflowid:{flow.Id}");
+            foreach (DataFlowStep step in flow.Steps)
+            {
+                if (step.DataAction_Type_Id == DataActionType.S3Drop)
+                {
+                    Logger.Info($"dataflowservice-deleteLongtermfiles-delete - dataflowid:{flow.Id} stepid:{step.Id} prefix:{step.TriggerKey}");
+                    _s3ServiceProvider.DeleteS3Prefix(step.TriggerKey);
+                }
+                else if (step.DataAction_Type_Id == DataActionType.RawStorage)
+                {
+                    Logger.Info($"dataflowservice-deleteLongtermfiles-delete - dataflowid:{flow.Id} stepid:{step.Id} prefix:{step.TargetPrefix}");
+                    _s3ServiceProvider.DeleteS3Prefix(step.TargetPrefix);                    
+                }
+            }
+        }
+
         private void CreateDataFlow(DataFlowDto dto)
         {           
             DataFlow df = MapToDataFlow(dto);
