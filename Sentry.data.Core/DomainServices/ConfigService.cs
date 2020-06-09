@@ -17,6 +17,7 @@ namespace Sentry.data.Core
         public IMessagePublisher _messagePublisher;
         public IEncryptionService _encryptService;
         public IJobService _jobService;
+        public readonly IDataFlowService _dataFlowService;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly ISecurityService _securityService;
         private readonly ISchemaService _schemaService;
@@ -27,7 +28,7 @@ namespace Sentry.data.Core
         public ConfigService(IDatasetContext dsCtxt, IUserService userService, IEventService eventService, 
             IMessagePublisher messagePublisher, IEncryptionService encryptService, ISecurityService securityService,
             IJobService jobService, IS3ServiceProvider s3ServiceProvider,
-            ISchemaService schemaService, IDataFeatures dataFeatures)
+            ISchemaService schemaService, IDataFeatures dataFeatures, IDataFlowService dataFlowService)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
@@ -39,6 +40,7 @@ namespace Sentry.data.Core
             _s3ServiceProvider = s3ServiceProvider;
             _schemaService = schemaService;
             _featureFlags = dataFeatures;
+            _dataFlowService = dataFlowService;
         }
 
         private IJobService JobService
@@ -887,26 +889,29 @@ namespace Sentry.data.Core
                     Logger.Info($"configservice-delete-physical - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                     try
                     {
-                        Logger.Info($"configservice-delete-disabledjobs - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         //Ensure all associated RetrieverJobs are disabled
-                        foreach (var job in dfc.RetrieverJobs)
+                        Logger.Info($"configservice-delete-disabledjobs - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
+                        List<RetrieverJob> jobs = dfc.RetrieverJobs.ToList();
+                        foreach (var job in jobs)
                         {
+                            dfc.RetrieverJobs.Remove(job);
                             _jobService.DeleteJob(job.Id);
                         }
 
-                        Logger.Info($"configservice-delete-deleteparquetstorage - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         //Delete all parquet files under schema storage code
+                        Logger.Info($"configservice-delete-deleteparquetstorage - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         DeleteParquetFilesByStorageCode(scm.StorageCode);
 
-                        Logger.Info($"configservice-delete-deleterawstorage - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         //Delete all raw data files under schema storage code
+                        Logger.Info($"configservice-delete-deleterawstorage - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         DeleteRawFilesByStorageCode(scm.StorageCode);
 
+                        //Delete all prefiew files under schema storage code
                         Logger.Info($"configservice-delete-deletepreviewstorage - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         DeletePreviewFilesByStorageCode(scm.StorageCode);
 
-                        Logger.Info($"configservice-delete-datasetfileparquetmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         //Delete all DatasetFileParquet metadata  (inserts are managed outside of DSC code)
+                        Logger.Info($"configservice-delete-datasetfileparquetmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         List<DatasetFileParquet> parquetFileList = _datasetContext.DatasetFileParquet.Where(w => w.SchemaId == scm.SchemaId).ToList();
                         Logger.Info($"configservice-delete-datasetfileparquetmetadata - recordsfound:{parquetFileList.Count} datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         foreach (DatasetFileParquet record in parquetFileList)
@@ -914,8 +919,8 @@ namespace Sentry.data.Core
                             _datasetContext.Remove(record);
                         }
 
-                        Logger.Info($"configservice-delete-datasetfilereplymetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         //Delete all DatasetFileReply metadata  (inserts are managed outside of DSC code)
+                        Logger.Info($"configservice-delete-datasetfilereplymetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         List<DatasetFileReply> replyList = _datasetContext.DatasetFileReply.Where(w => w.SchemaID == scm.SchemaId).ToList();
                         Logger.Info($"configservice-delete-datasetfilereplymetadata - recordsfound:{parquetFileList.Count} datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         foreach (DatasetFileReply record in replyList)
@@ -923,9 +928,13 @@ namespace Sentry.data.Core
                             _datasetContext.Remove(record);
                         }
 
-                        Logger.Info($"configservice-delete-configmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                        //Delete all Schema metadata (will cascade delete to datafiles, dataelement, dataobject, dataobjectfield tables (including detail tables))
+                        //Delete associated dataflows\steps
+                        Logger.Info($"configservice-delete-dataflowmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
+                        _dataFlowService.DeleteByFileSchema(scm);
 
+
+                        //Delete all Schema metadata (will cascade delete to datafiles, dataelement, dataobject, dataobjectfield tables (including detail tables))
+                        Logger.Info($"configservice-delete-configmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         if (!parentDriven)
                         {
                             _datasetContext.Remove(dfc);
