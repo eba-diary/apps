@@ -853,7 +853,7 @@ namespace Sentry.data.Core
             {
                 DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
 
-                if (dfc.DeleteInd)
+                if (logicalDelete & dfc.DeleteInd)
                 {
                     throw new DatasetFileConfigDeletedException("Already marked for deletion");
                 }
