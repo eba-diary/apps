@@ -13,7 +13,7 @@ namespace Sentry.data.Core
     {
         private readonly Lazy<DomainUser> _domainUser;
         private readonly IExtendedUserInfo _extendedUserInfo;
-        
+
         internal ApplicationUser(Lazy<DomainUser> domainUser, IExtendedUserInfo extendedUserInfo)
         {
             _domainUser = domainUser;
@@ -134,6 +134,14 @@ namespace Sentry.data.Core
             get
             {
                 return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.ADMIN_USER);
+            }
+        }
+
+        public virtual bool CanDaleSensitiveView
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.DALE_SENSITIVE_VIEW);
             }
         }
 

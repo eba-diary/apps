@@ -637,7 +637,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             Dataset ds = _datasetContext.GetById<Dataset>(datasetID);
             UserSecurity us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
 
-            List<DatasetFileConfigDto> configDtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetID);
+            List<DatasetFileConfigDto> configDtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetID).Where(w => !w.DeleteInd).ToList();
 
             List<QueryableConfig> reply = new List<QueryableConfig>();
 

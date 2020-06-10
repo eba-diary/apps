@@ -31,5 +31,8 @@ namespace Sentry.data.Core
         public string HiveDatabase { get; set; }
         public string HiveLocation { get; set; }
         public string HiveTableStatus { get; set; }
+        public bool DeleteInd { get; set; }
+        public string DeleteIssuer { get; set; }
+        public DateTime? DeleteIssueDTM { get; set; }
     }
 }
