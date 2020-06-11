@@ -20,7 +20,8 @@ namespace Sentry.data.Web
             {
                 Criteria = model.Criteria,
                 Destiny = model.Destiny,
-                Sensitive = model.Sensitive
+                Sensitive = model.Sensitive,
+                DaleHelpUrl = model.DaleHelpUrl
             };
         }
 
@@ -34,7 +35,8 @@ namespace Sentry.data.Web
                 Object = dto.Object,
                 ObjectType = dto.ObjectType,
                 Column = dto.Column,
-
+                
+                IsSensitive = dto.IsSensitive,
                 Alias = dto.Alias,
                 ProdType = dto.ProdType,
 
@@ -44,8 +46,9 @@ namespace Sentry.data.Web
                 Scale = dto.Scale,
                 IsNullable = dto.IsNullable,
                 EffectiveDate = dto.EffectiveDate.ToString("MM/dd/yyyy HH:mm:ss"),
-                
                 BaseColumnId = dto.BaseColumnId
+
+                
             };
         }
 

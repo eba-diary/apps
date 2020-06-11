@@ -31,7 +31,8 @@
                 { data: "ObjectType", className: "ObjectType",searchable: "true" },
                 { data: "Column", className: "ColumnMan", searchable: "false" },
 
-                { data: "Alias", className: "Alias", visible: false,searchable: "false" },
+                { data: "IsSensitive", className: "IsSensitive", visible: false, searchable: "false" },
+                { data: "Alias", className: "Alias", visible: false, searchable: "false" },
                 { data: "ProdType", className: "ProdType", visible: false, searchable: "false" },
 
                 { data: "ColumnType", className: "ColumnType", visible: false, searchable: "false", width: "100px" },
@@ -60,6 +61,7 @@
                 { type: "text" },
                 { type: "text" },
 
+                { type: "text" },
                 { type: "text" },
                 { type: "text" },
 

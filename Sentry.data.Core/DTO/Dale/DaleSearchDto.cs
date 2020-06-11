@@ -11,6 +11,7 @@ namespace Sentry.data.Core
     {
         public string Criteria { get; set; }
         public DaleDestiny Destiny { get; set; }
-        public bool Sensitive { get; set; }
+        public DaleSensitive Sensitive { get; set; }
+        public string DaleHelpUrl { get; set; }
     }
 }
