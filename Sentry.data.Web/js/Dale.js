@@ -43,6 +43,11 @@
                 { data: "EffectiveDate", className: "EffectiveDate", visible: false, searchable: "false" }
             ],
 
+            aLengthMenu: [
+                [25, 50, 100, 500],
+                [25, 50, 100, 500]
+            ],
+
             order: [2, 'desc'],
 
             //styles for columnVisibility to show
