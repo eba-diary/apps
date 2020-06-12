@@ -20,8 +20,7 @@ namespace Sentry.data.Web
             {
                 Criteria = model.Criteria,
                 Destiny = model.Destiny,
-                Sensitive = model.Sensitive,
-                DaleHelpUrl = model.DaleHelpUrl
+                Sensitive = model.Sensitive
             };
         }
 

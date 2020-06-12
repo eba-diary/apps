@@ -67,7 +67,6 @@ namespace Sentry.data.Web.Controllers
             searchModel.Criteria = searchCriteria;
             searchModel.Destiny = destination.ToDaleDestiny();
             searchModel.CanDaleSensitiveView = SharedContext.CurrentUser.CanDaleSensitiveView;
-            searchModel.DaleHelpUrl = "https://confluence.sentry.com/display/CLA/Data+Inventory";
 
             if (sensitive && searchModel.CanDaleSensitiveView)
             {
