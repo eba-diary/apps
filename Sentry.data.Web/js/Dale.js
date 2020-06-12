@@ -10,7 +10,7 @@
 
             //client side setup
             searching: true,
-            pageLength: 50,
+            pageLength: 100,
 
             ajax: {
                 url: "/Dale/GetSearchResultsClient/",
@@ -44,8 +44,8 @@
             ],
 
             aLengthMenu: [
-                [25, 50, 100, 500],
-                [25, 50, 100, 500]
+                [20, 100, 500],
+                [20, 100, 500]
             ],
 
             order: [2, 'desc'],
