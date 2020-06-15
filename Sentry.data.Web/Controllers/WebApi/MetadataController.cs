@@ -217,7 +217,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                         
             try
             {
-                if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
+                if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Where(w => !w.DeleteInd).Any(w => w.Schema.SchemaId == schemaId))
                 {
                     throw new SchemaNotFoundException();
                 }
@@ -802,7 +802,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             try
             {
-                if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
+                if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Where(w => !w.DeleteInd).Any(w => w.Schema.SchemaId == schemaId))
                 {
                     throw new SchemaNotFoundException();
                 }

@@ -12,8 +12,11 @@ namespace Sentry.data.Web
 
         public DaleDestiny Destiny { get; set; }
 
+        public bool Sensitive { get; set; }
+
+        public bool CanDaleSensitiveView { get; set; }
+
         public List<DaleResultModel> DaleResults { get; set; }
+        
     }
-
-
 }

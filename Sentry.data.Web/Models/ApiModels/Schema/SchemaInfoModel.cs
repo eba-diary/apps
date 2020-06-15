@@ -25,5 +25,6 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public string HiveTableStatus { get; set; }
         public string HiveLocation { get; set; }
         public List<string> Options { get; set; }
+        public bool DeleteInd { get; set; }
     }
 }

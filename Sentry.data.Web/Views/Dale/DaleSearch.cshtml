@@ -42,7 +42,7 @@
 
         </div>
 
-        <div style="float:left;margin-left:25px;">
+        <div id ="radioMadness" style="float:left;margin-left:25px;">
 
             <div style="text-align: left; font-family: KievitSlabWeb W03,Lucida Sans,serif;">
                 <label class="containerDale" style="text-align:left; width:150px;">
@@ -59,6 +59,18 @@
             </div>
 
         </div>
+
+        @if (Model.CanDaleSensitiveView)
+        {
+            <div style="float:left;margin-left:10px;">
+
+                <em class="glyphicon glyphicon-warning-sign" style="color:#00a3e0" ;></em>
+                <a href="#" id="sensitiveSearchLink" style="color:#00a3e0;font-weight: 500;">Show Sensitive Columns</a>
+
+            </div>
+            
+        }
+
 
     </div>
 
