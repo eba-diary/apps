@@ -1,6 +1,13 @@
 ﻿data.Job = {
 
-    FormInit: function () {        
+    FormInit: function () {
+        var selectedSourceType = $("[id$='SelectedSourceType']").val();
+        if (selectedSourceType !== undefined && selectedSourceType !== null) {
+            selectedSourceType == selectedSourceType.toLowerCase();
+        }
+
+        data.Job.SetDataSourceSpecificPanels(selectedSourceType);
+        
         $("[id$='SelectedSourceType']").change(function () {
             var selectBox = this;
             data.Job.SetDataSourceSpecificPanels();

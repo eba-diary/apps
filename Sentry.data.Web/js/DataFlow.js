@@ -60,10 +60,12 @@
 
         if (selection === "2") {
             $('.retrieverPanel').show();
+            $('.questionairePanel').show();
             $('.compressionPanel').show();
             $('.schemaMapPanel').show();
             $('.preProcessingPanel').show();
             $('.formSubmitButtons').show();
+            data.Job.FormInit();
         }
         else if (selection === "1") {
             $('.retrieverPanel').hide();

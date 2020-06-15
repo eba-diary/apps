@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Helpers;
 
 namespace Sentry.data.Web.Controllers
@@ -99,6 +100,7 @@ namespace Sentry.data.Web.Controllers
 
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
+            model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreprocessingOptions);
             if (model.RetrieverJob != null)
             {
                 CreateDropDownSetup(model.RetrieverJob.First());
@@ -253,6 +255,8 @@ namespace Sentry.data.Web.Controllers
             model.RequestDataFormatDropdown = Utility.BuildRequestDataFormatDropdown(model.SelectedRequestDataFormat);
 
             model.FtpPatternDropDown = Utility.BuildFtpPatternSelectList(model.FtpPattern);
+
+            model.SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(((RetrieverJobScheduleTypes)model.SchedulePicker).GetDescription());
         }
 
         private void CreateDropDownList(CompressionModel model)
