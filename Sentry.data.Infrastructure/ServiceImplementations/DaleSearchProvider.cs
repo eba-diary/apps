@@ -28,6 +28,9 @@ namespace Sentry.data.Infrastructure
                 SqlCommand command = new SqlCommand(BuildAQuery(dto), connection);
                 command.CommandTimeout = 0;
 
+                command.Parameters.AddWithValue("@Criteria", System.Data.SqlDbType.VarChar);
+                command.Parameters["@Criteria"].Value = "%" + dto.Criteria + "%";
+                
                 try
                 {
                     connection.Open();
@@ -82,7 +85,7 @@ namespace Sentry.data.Infrastructure
                     qWhereColumn = "Column_NME";
                 }
                
-                qWhereStatement += "WHERE " + qWhereColumn + " LIKE '%" + dto.Criteria + "%'";
+                qWhereStatement += "WHERE " + qWhereColumn + " LIKE @Criteria ";
 
                 //ONLY apply logic here if they dont want to see any sensitive information
                 if (dto.Sensitive == DaleSensitive.SensitiveNone)

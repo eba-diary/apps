@@ -52,7 +52,12 @@
 
             //styles for columnVisibility to show
             dom: 'Blrtip',
-            buttons: ['colvis', 'csv']
+
+            buttons:
+            [
+                    { extend: 'colvis', text: 'Columns' },
+                    { extend: 'csv', text: 'Download' }
+            ]
         });
 
         //add a filter in each column
