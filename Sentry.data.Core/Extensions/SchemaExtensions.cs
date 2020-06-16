@@ -18,7 +18,8 @@ namespace Sentry.data.Core
                 SchemaRevisionName = revision.SchemaRevision_Name,
                 CreatedBy = revision.CreatedBy,
                 CreatedDTM = revision.CreatedDTM,
-                LastUpdatedDTM = revision.LastUpdatedDTM
+                LastUpdatedDTM = revision.LastUpdatedDTM,
+                JsonSchemaObject = revision.JsonSchemaObject
             };
         }
 

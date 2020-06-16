@@ -29,6 +29,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property((x) => x.CreatedBy, (m) => m.Column("CreatedBy"));
             Property((x) => x.CreatedDTM, (m) => m.Column("CreatedDTM"));
             Property((x) => x.LastUpdatedDTM, (m) => m.Column("LastUpdatedDTM"));
+            Property((x) => x.JsonSchemaObject, (m) => m.Column("JsonSchemaObject"));
 
             this.Bag((x) => x.Fields, (m) =>
             {

@@ -146,7 +146,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 return NotFound();
             }
-            catch(DatasetUnauthorizedAccessException duax)
+            catch (DatasetUnauthorizedAccessException duax)
             {
                 throw new UnauthorizedAccessException("Unauthroized Access to Dataset", duax);
             }
@@ -195,7 +195,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 Logger.Error($"metdataapi_getschema_internalserverserror - datasetId:{datasetId} schemaId{schemaId}", ex);
                 return InternalServerError();
-            }            
+            }
         }
 
         /// <summary>
@@ -214,7 +214,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         public async Task<IHttpActionResult> GetSchemaRevisionBySchema(int datasetId, int schemaId)
         {
             ValidateViewPermissionsForDataset(datasetId);
-                        
+
             try
             {
                 if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Where(w => !w.DeleteInd).Any(w => w.Schema.SchemaId == schemaId))
@@ -277,7 +277,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 List<SchemaRow> schemarows_v2 = new List<SchemaRow>();
                 ToSchemaRows(schema_v3, schemarows_v2);
 
-                _configService.UpdateFields(configId, schemaId, schemarows_v2);
+                _configService.UpdateFields(configId, schemaId, schemarows_v2, schema_v3.ToJson());
 
                 return Ok(schemarows_v2);
             }
@@ -288,280 +288,395 @@ namespace Sentry.data.Web.WebApi.Controllers
             }
             catch (Exception ex)
             {
-                return InternalServerError();
+                return InternalServerError(ex);
             }
+        }
+
+        [HttpPost]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("dataset/{datasetId}/schema/{schemaId}/revision/GenerateSchemaFromSampleData")]
+        public async Task<IHttpActionResult> GenerateSchema(int datasetId, int schemaId, [FromBody] JObject data)
+        {
+            JsonSchema schema = JsonSchema.FromSampleJson(JsonConvert.SerializeObject(data));
+            //string schema1 = JsonSchemaReferenceUtilities.ConvertJsonReferences(schema.ToJson());
+            //string schema2 = JsonSchemaReferenceUtilities.ConvertPropertyReferences(schema.ToJson());
+            //JsonSchema schemav2 = await JsonSchema.FromJsonAsync(schema2);
+            return Ok(schema);
         }
 
         public static void ToSchemaRows(JsonSchema schema, List<SchemaRow> schemaRowList, SchemaRow parentSchemaRow = null)
         {
-            
-            switch (schema.Type)
+            try
             {
-                case JsonObjectType.Object:
-                    //sb.AppendLine(JsonSchema_PropertiesDriller_v3(schema.Properties.ToList(), parentBreadCrumb));
-                    foreach (KeyValuePair<string, JsonSchemaProperty> prop in schema.Properties.ToList())
-                    {
-                        ToSchemaRow(prop, schemaRowList, parentSchemaRow);
-                    }
-                    break;
-                //case JsonObjectType.Array:
+                switch (schema.Type)
+                {
+                    case JsonObjectType.Object:
+                        //sb.AppendLine(JsonSchema_PropertiesDriller_v3(schema.Properties.ToList(), parentBreadCrumb));
+                        foreach (KeyValuePair<string, JsonSchemaProperty> prop in schema.Properties.ToList())
+                        {
+                            ToSchemaRow(prop, schemaRowList, parentSchemaRow);
+                        }
+                        break;
+                    case JsonObjectType.None:
+                        if (schema.HasReference)
+                        {
+                            ToSchemaRows(schema.Reference, schemaRowList, parentSchemaRow);
+                        }
+                        else
+                        {
+                            if (parentSchemaRow == null)
+                            {
+                                Logger.Warn("Unhandled Scenario");
+                            }
+                            else
+                            {
+                                parentSchemaRow.DataType = GlobalConstants.Datatypes.VARCHAR;
+                                parentSchemaRow.Description = "MOCKED OUT";
+                            }
+                        }
+                        break;
+                    //case JsonObjectType.Array:
 
-                //    foreach (JsonSchema prop in schema.Items)
-                //    {
-                //        //sb.AppendLine(prop.ToString());
-                //        schemaRows.Add(ToSchemaRow(prop));
-                //    }
-                //    break;
-                default:
-                    break;
+                    //    foreach (JsonSchema prop in schema.Items)
+                    //    {
+                    //        //sb.AppendLine(prop.ToString());
+                    //        schemaRows.Add(ToSchemaRow(prop));
+                    //    }
+                    //    break;
+                    default:
+                        break;
+                }
             }
+            catch(Exception ex)
+            {
+                Logger.Error("ToSchemaRows Error", ex);
+                throw;
+            }            
         }
 
         public static void ToSchemaRow(KeyValuePair<string, JsonSchemaProperty> prop, List<SchemaRow> schemaRowList, SchemaRow parentRow = null)
         {
-            JsonSchemaProperty currentProperty = prop.Value;
-            
-            switch (currentProperty.Type)
+            try
             {
-                case JsonObjectType.Object:
-                    SchemaRow row = new SchemaRow
-                    {
-                        DataType = GlobalConstants.Datatypes.STRUCT,
-                        Name = prop.Key,
-                        Description = currentProperty.Description
-                    };
-                    
-                    if (parentRow == null)
-                    {
-                        schemaRowList.Add(row);
-                    }
-                    else
-                    {
-                        if (parentRow.ChildRows == null)
+                JsonSchemaProperty currentProperty = prop.Value;
+
+                switch (currentProperty.Type)
+                {
+                    case JsonObjectType.None:
+                        if (currentProperty.HasReference)
                         {
-                            parentRow.ChildRows = new List<SchemaRow>();
-                        }
-                        parentRow.ChildRows.Add(row);
-                    }
-                    break;
-                case JsonObjectType.Array:
-                    //Create the schema row
-                    SchemaRow arrayRow = new SchemaRow()
-                    {
-                        Name = prop.Key,
-                        IsArray = true,
-                        Description = currentProperty.Description
-                    };
+                            SchemaRow referenceRow = new SchemaRow
+                            {
+                                DataType = GlobalConstants.Datatypes.STRUCT,
+                                Name = prop.Key,
+                                Description = currentProperty.Description
+                            };
 
-                    //While JSON Schema alows an arrays of multiple types, DSC only allows single type.
-                    if (currentProperty.Items.Count > 1)
-                    {
-                        Logger.Warn($"Schema contains multiple items within array ({prop.Key}) - taking first Item");
-                    }
-
-                    JsonSchema nestedSchema = currentProperty.Items.First();
-
-                    //Determine what this is an array of
-                    if (nestedSchema.IsObject)
-                    {
-                        arrayRow.DataType = GlobalConstants.Datatypes.STRUCT;
-                    }
-                    else
-                    {
-                        switch (nestedSchema.Type)
-                        {
-                            case JsonObjectType.Object:
-                                arrayRow.DataType = GlobalConstants.Datatypes.STRUCT;
-                                break;
-                            case JsonObjectType.Integer:
-                                arrayRow.DataType = GlobalConstants.Datatypes.INTEGER;
-                                break;
-                            case JsonObjectType.String:
-                                switch (currentProperty.Format)
+                            if (parentRow == null)
+                            {
+                                schemaRowList.Add(referenceRow);
+                            }
+                            else
+                            {
+                                if (parentRow.ChildRows == null)
                                 {
-                                    case "date-time":
-                                        arrayRow.DataType = GlobalConstants.Datatypes.TIMESTAMP;
-                                        break;
-                                    case "date":
-                                        arrayRow.DataType = GlobalConstants.Datatypes.DATE;
-                                        break;
-                                    default:
-                                        arrayRow.DataType = GlobalConstants.Datatypes.VARCHAR;
-                                        break;
+                                    parentRow.ChildRows = new List<SchemaRow>();
                                 }
-                                break;
-                            case JsonObjectType.Number:
+                                parentRow.ChildRows.Add(referenceRow);
+                            }
 
-                                arrayRow.Name = prop.Key;
-                                arrayRow.DataType = GlobalConstants.Datatypes.DECIMAL;
-                                arrayRow.Description = currentProperty.Description;
+                            ToSchemaRows(currentProperty.Reference, schemaRowList, referenceRow);
+                        }
+                        else
+                        {
+                            Logger.Warn("Does not handle object type of None without reference");
+                            SchemaRow nullRow = new SchemaRow
+                            {
+                                DataType = GlobalConstants.Datatypes.VARCHAR,
+                                Name = prop.Key,
+                                Description = "MOCKED OUT: Field did not have definition, therefore defaulted to VARCHAR"
+                            };
 
-                                if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-precision"))
+                            if (parentRow == null)
+                            {
+                                schemaRowList.Add(nullRow);
+                            }
+                            else
+                            {
+                                if (parentRow.ChildRows == null)
                                 {
-                                    arrayRow.Precision = currentProperty.ExtensionData.Where(w => w.Key == "dsc-precision").Select(s => s.Value).ToString();
+                                    parentRow.ChildRows = new List<SchemaRow>();
                                 }
-                                else
-                                {
-                                    arrayRow.Precision = "1";
-                                }
-
-                                if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-scale"))
-                                {
-                                    arrayRow.Scale = currentProperty.ExtensionData.Where(w => w.Key == "dsc-scale").Select(s => s.Value).ToString();
-                                }
-                                else
-                                {
-                                    arrayRow.Scale = "1";
-                                }
-                                break;
-                            default:
-                            case JsonObjectType.None:
-                            case JsonObjectType.File:
-                            case JsonObjectType.Null:
-                            case JsonObjectType.Boolean:
-                                break;
+                                parentRow.ChildRows.Add(nullRow);
+                            }
                         }
-                    }
-
-                    ToSchemaRows(nestedSchema, schemaRowList, arrayRow);                    
-
-                    if (parentRow == null)
-                    {
-                        schemaRowList.Add(arrayRow);
-                    }
-                    else
-                    {
-                        if (parentRow.ChildRows == null)
+                        break;
+                    case JsonObjectType.Object:
+                        SchemaRow row = new SchemaRow
                         {
-                            parentRow.ChildRows = new List<SchemaRow>();
-                        }
-                        parentRow.ChildRows.Add(arrayRow);
-                    }
-                    break;
-                case JsonObjectType.String:
-                    StringBuilder extraProperties = new StringBuilder();
-                    SchemaRow stringrow = new SchemaRow()
-                    {
-                        Name = prop.Key,
-                        Description = currentProperty.Description
-                    };
+                            DataType = GlobalConstants.Datatypes.STRUCT,
+                            Name = prop.Key,
+                            Description = currentProperty.Description
+                        };
 
-                    if (!String.IsNullOrWhiteSpace(currentProperty.Format))
-                    {
-                        switch (currentProperty.Format)
+                        if (parentRow == null)
                         {
-                            case "date-time":
-                                stringrow.DataType = GlobalConstants.Datatypes.TIMESTAMP;
-                                extraProperties.Append($", DSC-DataType:TIMESTAMP");
-                                break;
-                            case "date":
-                                stringrow.DataType = GlobalConstants.Datatypes.DATE;
-                                extraProperties.Append($", DSC-DataType:DATE");
-                                break;
-                            default:
-                                break;
+                            schemaRowList.Add(row);
                         }
-                    }
-                    else
-                    {
-                        stringrow.DataType = GlobalConstants.Datatypes.VARCHAR;
-                        extraProperties.Append($", DSC-DataType:STRING");
-                        if (currentProperty.MaxLength != null)
+                        else
                         {
-                            //default to 8000 if maxlenght is not specified
-                            int stringLength = (currentProperty.MaxLength) ?? 8000;
-                            extraProperties.Append($", Length:{stringLength.ToString()}");
-                            stringrow.Length = stringLength.ToString();
+                            if (parentRow.ChildRows == null)
+                            {
+                                parentRow.ChildRows = new List<SchemaRow>();
+                            }
+                            parentRow.ChildRows.Add(row);
                         }
-                    }
-
-                    if (parentRow == null)
-                    {
-                        schemaRowList.Add(stringrow);
-                    }
-                    else
-                    {
-                        if (parentRow.ChildRows == null)
+                        break;
+                    case JsonObjectType.Array:
+                        //Create the schema row
+                        SchemaRow arrayRow = new SchemaRow()
                         {
-                            parentRow.ChildRows = new List<SchemaRow>();
-                        }
+                            Name = prop.Key,
+                            IsArray = true,
+                            Description = currentProperty.Description
+                        };
 
-                        parentRow.ChildRows.Add(stringrow);
-                    }
+                        JsonSchema nestedSchema = null;
+                        //While JSON Schema alows an arrays of multiple types, DSC only allows single type.
 
-                    //    currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {prop.Key} (json-type:{prop.Value.Type.ToString()}{extraProperties.ToString()})" : $"{prop.Key} ({prop.Value.Type.ToString()})";
-                    break;
-                case JsonObjectType.Integer:
-                    SchemaRow intRow = new SchemaRow()
-                    {
-                        Name = prop.Key,
-                        DataType = GlobalConstants.Datatypes.INTEGER,
-                        Description = currentProperty.Description
-                    };
-
-                    if (parentRow == null)
-                    {
-                        schemaRowList.Add(intRow);
-                    }
-                    else
-                    {
-                        if (parentRow.ChildRows == null)
+                        if (currentProperty.Items.Count == 0 && currentProperty.Item == null)
                         {
-                            parentRow.ChildRows = new List<SchemaRow>();
+                            throw new Exception("Not valid schema");
                         }
-
-                        parentRow.ChildRows.Add(intRow);
-                    }
-                    break;
-                case JsonObjectType.Number:
-                    SchemaRow decimalRow = new SchemaRow()
-                    {
-                        Name = prop.Key,
-                        DataType = GlobalConstants.Datatypes.DECIMAL,
-                        Description = currentProperty.Description
-                    };
-
-                    if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-precision"))
-                    {
-                        decimalRow.Precision = currentProperty.ExtensionData.Where(w => w.Key == "dsc-precision").Select(s => s.Value).ToString();
-                    }
-                    else
-                    {
-                        decimalRow.Precision = "1";
-                    }
-
-                    if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-scale"))
-                    {
-                        decimalRow.Scale = currentProperty.ExtensionData.Where(w => w.Key == "dsc-scale").Select(s => s.Value).ToString();
-                    }
-                    else
-                    {
-                        decimalRow.Scale = "1";
-                    }
-
-
-                    if (parentRow == null)
-                    {
-                        schemaRowList.Add(decimalRow);
-                    }
-                    else
-                    {
-                        if (parentRow.ChildRows == null)
+                        else if (currentProperty.Items.Count == 0 && currentProperty.Item != null)
                         {
-                            parentRow.ChildRows = new List<SchemaRow>();
+                            nestedSchema = currentProperty.Item;
+                        }
+                        //else if (currentProperty.Items.Count < 1)
+                        //{
+                        //    if (currentProperty.ParentSchema.Definitions.Any(w => w.Key.ToLower() == prop.Key.ToLower()))
+                        //    {
+                        //        nestedSchema = currentProperty.ParentSchema.Definitions.Where(w => w.Key.ToLower() == prop.Key.ToLower()).Select(s => s.Value).FirstOrDefault();
+                        //    }
+                        //}
+                        else
+                        {
+                            if (currentProperty.Items.Count > 1)
+                            {
+                                Logger.Warn($"Schema contains multiple items within array ({prop.Key}) - taking first Item");
+                            }
+                            nestedSchema = currentProperty.Items.First();
                         }
 
-                        parentRow.ChildRows.Add(decimalRow);
-                    }
-                    break;
-                default:
-                case JsonObjectType.File:
-                case JsonObjectType.Null:
-                case JsonObjectType.Boolean:
-                case JsonObjectType.None:
-                    //currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {prop.Key} ({prop.Value.Type.ToString()})" : $"{prop.Key} ({prop.Value.Type.ToString()})";
-                    break;
+
+
+                        //Determine what this is an array of
+                        if (nestedSchema.IsObject)
+                        {
+                            arrayRow.DataType = GlobalConstants.Datatypes.STRUCT;
+                        }
+                        else
+                        {
+                            switch (nestedSchema.Type)
+                            {
+                                case JsonObjectType.Object:
+                                    arrayRow.DataType = GlobalConstants.Datatypes.STRUCT;
+                                    break;
+                                case JsonObjectType.Integer:
+                                    arrayRow.DataType = GlobalConstants.Datatypes.INTEGER;
+                                    break;
+                                case JsonObjectType.String:
+                                    switch (currentProperty.Format)
+                                    {
+                                        case "date-time":
+                                            arrayRow.DataType = GlobalConstants.Datatypes.TIMESTAMP;
+                                            break;
+                                        case "date":
+                                            arrayRow.DataType = GlobalConstants.Datatypes.DATE;
+                                            break;
+                                        default:
+                                            arrayRow.DataType = GlobalConstants.Datatypes.VARCHAR;
+                                            break;
+                                    }
+                                    break;
+                                case JsonObjectType.Number:
+
+                                    arrayRow.Name = prop.Key;
+                                    arrayRow.DataType = GlobalConstants.Datatypes.DECIMAL;
+                                    arrayRow.Description = currentProperty.Description;
+
+                                    if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-precision"))
+                                    {
+                                        arrayRow.Precision = currentProperty.ExtensionData.Where(w => w.Key == "dsc-precision").Select(s => s.Value).ToString();
+                                    }
+                                    else
+                                    {
+                                        arrayRow.Precision = "1";
+                                    }
+
+                                    if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-scale"))
+                                    {
+                                        arrayRow.Scale = currentProperty.ExtensionData.Where(w => w.Key == "dsc-scale").Select(s => s.Value).ToString();
+                                    }
+                                    else
+                                    {
+                                        arrayRow.Scale = "1";
+                                    }
+                                    break;
+                                default:
+                                case JsonObjectType.None:
+                                case JsonObjectType.File:
+                                case JsonObjectType.Null:
+                                case JsonObjectType.Boolean:
+                                    break;
+                            }
+                        }
+
+                        ToSchemaRows(nestedSchema, schemaRowList, arrayRow);
+
+                        if (parentRow == null)
+                        {
+                            schemaRowList.Add(arrayRow);
+                        }
+                        else
+                        {
+                            if (parentRow.ChildRows == null)
+                            {
+                                parentRow.ChildRows = new List<SchemaRow>();
+                            }
+                            parentRow.ChildRows.Add(arrayRow);
+                        }
+                        break;
+                    case JsonObjectType.String:
+                        StringBuilder extraProperties = new StringBuilder();
+                        SchemaRow stringrow = new SchemaRow()
+                        {
+                            Name = prop.Key,
+                            Description = currentProperty.Description
+                        };
+
+                        if (!String.IsNullOrWhiteSpace(currentProperty.Format))
+                        {
+                            switch (currentProperty.Format)
+                            {
+                                case "date-time":
+                                    stringrow.DataType = GlobalConstants.Datatypes.TIMESTAMP;
+                                    extraProperties.Append($", DSC-DataType:TIMESTAMP");
+                                    break;
+                                case "date":
+                                    stringrow.DataType = GlobalConstants.Datatypes.DATE;
+                                    extraProperties.Append($", DSC-DataType:DATE");
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            stringrow.DataType = GlobalConstants.Datatypes.VARCHAR;
+                            extraProperties.Append($", DSC-DataType:STRING");
+                            if (currentProperty.MaxLength != null)
+                            {
+                                //default to 8000 if maxlenght is not specified
+                                int stringLength = (currentProperty.MaxLength) ?? 8000;
+                                extraProperties.Append($", Length:{stringLength.ToString()}");
+                                stringrow.Length = stringLength.ToString();
+                            }
+                        }
+
+                        if (parentRow == null)
+                        {
+                            schemaRowList.Add(stringrow);
+                        }
+                        else
+                        {
+                            if (parentRow.ChildRows == null)
+                            {
+                                parentRow.ChildRows = new List<SchemaRow>();
+                            }
+
+                            parentRow.ChildRows.Add(stringrow);
+                        }
+
+                        //    currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {prop.Key} (json-type:{prop.Value.Type.ToString()}{extraProperties.ToString()})" : $"{prop.Key} ({prop.Value.Type.ToString()})";
+                        break;
+                    case JsonObjectType.Integer:
+                        SchemaRow intRow = new SchemaRow()
+                        {
+                            Name = prop.Key,
+                            DataType = GlobalConstants.Datatypes.INTEGER,
+                            Description = currentProperty.Description
+                        };
+
+                        if (parentRow == null)
+                        {
+                            schemaRowList.Add(intRow);
+                        }
+                        else
+                        {
+                            if (parentRow.ChildRows == null)
+                            {
+                                parentRow.ChildRows = new List<SchemaRow>();
+                            }
+
+                            parentRow.ChildRows.Add(intRow);
+                        }
+                        break;
+                    case JsonObjectType.Number:
+                        SchemaRow decimalRow = new SchemaRow()
+                        {
+                            Name = prop.Key,
+                            DataType = GlobalConstants.Datatypes.DECIMAL,
+                            Description = currentProperty.Description
+                        };
+
+                        if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-precision"))
+                        {
+                            decimalRow.Precision = currentProperty.ExtensionData.Where(w => w.Key == "dsc-precision").Select(s => s.Value).ToString();
+                        }
+                        else
+                        {
+                            decimalRow.Precision = "1";
+                        }
+
+                        if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-scale"))
+                        {
+                            decimalRow.Scale = currentProperty.ExtensionData.Where(w => w.Key == "dsc-scale").Select(s => s.Value).ToString();
+                        }
+                        else
+                        {
+                            decimalRow.Scale = "1";
+                        }
+
+
+                        if (parentRow == null)
+                        {
+                            schemaRowList.Add(decimalRow);
+                        }
+                        else
+                        {
+                            if (parentRow.ChildRows == null)
+                            {
+                                parentRow.ChildRows = new List<SchemaRow>();
+                            }
+
+                            parentRow.ChildRows.Add(decimalRow);
+                        }
+                        break;
+                    default:
+                    case JsonObjectType.File:
+                    case JsonObjectType.Null:
+                    case JsonObjectType.Boolean:
+                        //currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {prop.Key} ({prop.Value.Type.ToString()})" : $"{prop.Key} ({prop.Value.Type.ToString()})";
+                        break;
+                }
             }
+            catch (Exception ex)
+            {
+                Logger.Error("ToSchemaRow Error", ex);
+                throw;
+            }
+            
         }
 
         //private static string JsonSchemaDriller_v3(JsonSchema schema, string parentBreadCrumb = null)
@@ -682,113 +797,113 @@ namespace Sentry.data.Web.WebApi.Controllers
         //{
         //    string currentBreadCrumb = null;
 
-            //    switch (schema.Type)
-            //    {
-            //        case JSchemaType.Object:
-            //            currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {entry.Key} ({entry.Value.Type.ToString()})" : $"{entry.Key} ({entry.Value.Type.ToString()})";
-            //            if (schema.Properties.Any())
-            //            {
-            //                JsonSchemaProperitiesDriller_v2(schema.Properties);
-            //            }
-            //            //else if (schema.ExtensionData.Any())
-            //            //{
-            //            //    Debug.WriteLine("Yay");
-            //            //    JsonSchemaDriller_v2(JSchema.Parse(schema.ExtensionData.ToString()));
-            //            //}
+        //    switch (schema.Type)
+        //    {
+        //        case JSchemaType.Object:
+        //            currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {entry.Key} ({entry.Value.Type.ToString()})" : $"{entry.Key} ({entry.Value.Type.ToString()})";
+        //            if (schema.Properties.Any())
+        //            {
+        //                JsonSchemaProperitiesDriller_v2(schema.Properties);
+        //            }
+        //            //else if (schema.ExtensionData.Any())
+        //            //{
+        //            //    Debug.WriteLine("Yay");
+        //            //    JsonSchemaDriller_v2(JSchema.Parse(schema.ExtensionData.ToString()));
+        //            //}
 
-            //            break;
-            //        case JSchemaType.Array:
-            //            foreach (JSchema arraySchema in schema.Items)
-            //            {
-            //                JsonSchemaDriller_v2(arraySchema);
-            //            }
-            //            break;
-            //        default:
-            //            break;
-            //    }
-            //}
+        //            break;
+        //        case JSchemaType.Array:
+        //            foreach (JSchema arraySchema in schema.Items)
+        //            {
+        //                JsonSchemaDriller_v2(arraySchema);
+        //            }
+        //            break;
+        //        default:
+        //            break;
+        //    }
+        //}
 
-            //private static void JsonSchemaProperitiesDriller_v2(IDictionary<string, JSchema> propertyList, string parentBreadCrumb = null)
-            //{
-            //    foreach (KeyValuePair<string, JSchema> prop in propertyList)
-            //    {
-            //        Debug.WriteLine($"{prop.Key} ({prop.Value.Type.ToString()})");
-            //        if (prop.Value.Type == JSchemaType.Object)
-            //        {                    
-            //            JsonSchemaDriller_v2(prop.Value);
-            //        }
-            //        else if (prop.Value.Type == JSchemaType.Array)
-            //        {
-            //            foreach(JSchema arraySchema in prop.Value.Items)
-            //            {
-            //                JsonSchemaDriller_v2(arraySchema);
-            //            }
-            //        }
-            //    }
-            //}
+        //private static void JsonSchemaProperitiesDriller_v2(IDictionary<string, JSchema> propertyList, string parentBreadCrumb = null)
+        //{
+        //    foreach (KeyValuePair<string, JSchema> prop in propertyList)
+        //    {
+        //        Debug.WriteLine($"{prop.Key} ({prop.Value.Type.ToString()})");
+        //        if (prop.Value.Type == JSchemaType.Object)
+        //        {                    
+        //            JsonSchemaDriller_v2(prop.Value);
+        //        }
+        //        else if (prop.Value.Type == JSchemaType.Array)
+        //        {
+        //            foreach(JSchema arraySchema in prop.Value.Items)
+        //            {
+        //                JsonSchemaDriller_v2(arraySchema);
+        //            }
+        //        }
+        //    }
+        //}
 
-            //private static string JsonSchemaDriller(JSchema schema, string parentBreadCrumb = null)
-            //{
-            //    StringBuilder sb = new StringBuilder();
-            //    string currentBreadCrumb = null;
+        //private static string JsonSchemaDriller(JSchema schema, string parentBreadCrumb = null)
+        //{
+        //    StringBuilder sb = new StringBuilder();
+        //    string currentBreadCrumb = null;
 
-            //    switch (schema.Type)
-            //    {
-            //        case JSchemaType.Object:
-            //            foreach (KeyValuePair<string, JSchema> entry in schema.Properties)
-            //            {
-            //                if (entry.Value.Type == JSchemaType.Object || entry.Value.Type == JSchemaType.Array)
-            //                {
-            //                    currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {entry.Key} ({entry.Value.Type.ToString()})" : $"{entry.Key} ({entry.Value.Type.ToString()})";
-            //                    Debug.WriteLine(currentBreadCrumb);
-            //                    sb.AppendLine(JsonSchemaDriller(entry.Value, currentBreadCrumb));
-            //                }
-            //                else
-            //                {
-            //                    currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {entry.Key} ({entry.Value.Type.ToString()})" : $"{entry.Key} ({entry.Value.Type.ToString()})";
-            //                    Debug.WriteLine(currentBreadCrumb);
-            //                    sb.AppendLine($"{currentBreadCrumb}");
-            //                }
-            //            }
-            //            break;
-            //        case JSchemaType.Array:
-            //            currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb : $"Array ({JSchemaType.Array.ToString()})";
-            //            Debug.WriteLine(currentBreadCrumb);
-            //            foreach (JSchema item in schema.Items)
-            //            {
-            //                sb.AppendLine(JsonSchemaDriller(item, currentBreadCrumb));
-            //            }                    
-            //            break;
-            //        default:
-            //            break;
-            //    }
+        //    switch (schema.Type)
+        //    {
+        //        case JSchemaType.Object:
+        //            foreach (KeyValuePair<string, JSchema> entry in schema.Properties)
+        //            {
+        //                if (entry.Value.Type == JSchemaType.Object || entry.Value.Type == JSchemaType.Array)
+        //                {
+        //                    currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {entry.Key} ({entry.Value.Type.ToString()})" : $"{entry.Key} ({entry.Value.Type.ToString()})";
+        //                    Debug.WriteLine(currentBreadCrumb);
+        //                    sb.AppendLine(JsonSchemaDriller(entry.Value, currentBreadCrumb));
+        //                }
+        //                else
+        //                {
+        //                    currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {entry.Key} ({entry.Value.Type.ToString()})" : $"{entry.Key} ({entry.Value.Type.ToString()})";
+        //                    Debug.WriteLine(currentBreadCrumb);
+        //                    sb.AppendLine($"{currentBreadCrumb}");
+        //                }
+        //            }
+        //            break;
+        //        case JSchemaType.Array:
+        //            currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb : $"Array ({JSchemaType.Array.ToString()})";
+        //            Debug.WriteLine(currentBreadCrumb);
+        //            foreach (JSchema item in schema.Items)
+        //            {
+        //                sb.AppendLine(JsonSchemaDriller(item, currentBreadCrumb));
+        //            }                    
+        //            break;
+        //        default:
+        //            break;
+        //    }
 
-            //    return sb.ToString();
+        //    return sb.ToString();
 
-            //    //foreach(KeyValuePair<string, JSchema> entry in schema.Properties)
-            //    //{
-            //    //    string currentBreadCrumb = null;
+        //    //foreach(KeyValuePair<string, JSchema> entry in schema.Properties)
+        //    //{
+        //    //    string currentBreadCrumb = null;
 
-            //    //    if (entry.Value.Type == JSchemaType.Object)
-            //    //    {
-            //    //        currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {entry.Key} ({JSchemaType.Object.ToString()})" : $"{entry.Key} ({JSchemaType.Object.ToString()})";
-            //    //        sb.AppendLine(JsonSchemaDriller(entry.Value, currentBreadCrumb));
-            //    //    }
-            //    //    else
-            //    //    {
-            //    //        currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {entry.Key} ({entry.Value.Type.ToString()})" : $"{entry.Key} ({entry.Value.Type.ToString()})";
-            //    //        sb.AppendLine($"{currentBreadCrumb}");
-            //    //    }
-            //    //}
-            //}
+        //    //    if (entry.Value.Type == JSchemaType.Object)
+        //    //    {
+        //    //        currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {entry.Key} ({JSchemaType.Object.ToString()})" : $"{entry.Key} ({JSchemaType.Object.ToString()})";
+        //    //        sb.AppendLine(JsonSchemaDriller(entry.Value, currentBreadCrumb));
+        //    //    }
+        //    //    else
+        //    //    {
+        //    //        currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {entry.Key} ({entry.Value.Type.ToString()})" : $"{entry.Key} ({entry.Value.Type.ToString()})";
+        //    //        sb.AppendLine($"{currentBreadCrumb}");
+        //    //    }
+        //    //}
+        //}
 
-            /// <summary>
-            /// Get the latest schema revision detail
-            /// </summary>
-            /// <param name="datasetid"></param>
-            /// <param name="schemaId"></param>
-            /// <response code="401">Unauthroized Access</response>
-            /// <returns>Latest field metadata for schema.</returns>
+        /// <summary>
+        /// Get the latest schema revision detail
+        /// </summary>
+        /// <param name="datasetid"></param>
+        /// <param name="schemaId"></param>
+        /// <response code="401">Unauthroized Access</response>
+        /// <returns>Latest field metadata for schema.</returns>
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}/revision/latest/fields")]
@@ -836,6 +951,19 @@ namespace Sentry.data.Web.WebApi.Controllers
                 Logger.Error($"metadataapi_getlatestschemarevisiondetail_badrequest - datasetid:{datasetId} schemaid:{schemaId}", ex);
                 return InternalServerError();
             }
+        }
+
+        [HttpGet]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("dataset/{datasetId}/schema/{schemaId}/revision/latest/jsonschema")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(JObject))]
+        public async Task<IHttpActionResult> GetLatestSchemaRevisionJsonFormat(int datasetId, int schemaId)
+        {
+            SchemaRevisionDto revisiondto = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
+
+            JsonSchema schema = await JsonSchema.FromJsonAsync(revisiondto.JsonSchemaObject);
+
+            return Ok(schema);
         }
 
         /// <summary>

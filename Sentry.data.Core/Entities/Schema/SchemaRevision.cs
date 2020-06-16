@@ -20,5 +20,6 @@ namespace Sentry.data.Core
         public virtual DateTime LastUpdatedDTM { get; set; }
         public virtual int SchemaStruct_Id { get; set; }
         public virtual IList<BaseField> Fields { get; set; }
+        public virtual string JsonSchemaObject { get; set; }
     }
 }

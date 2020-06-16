@@ -31,7 +31,8 @@ namespace Sentry.data.Web
                 CreatedBy = dto.CreatedBy,
                 CreatedByName = dto.CreatedByName,
                 CreatedDTM = dto.CreatedDTM.ToString("s"),
-                LastUpdatedDTM = dto.LastUpdatedDTM.ToString("s")
+                LastUpdatedDTM = dto.LastUpdatedDTM.ToString("s"),
+                JsonSchemaObject = dto.JsonSchemaObject
             };
         }
 

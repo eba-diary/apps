@@ -442,7 +442,7 @@ namespace Sentry.data.Core
             return de;
         }
 
-        public void UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows)
+        public void UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows, string jsonSchema = null)
         {
             DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
             FileSchema schema = config.Schema;
@@ -462,7 +462,9 @@ namespace Sentry.data.Core
                     revision = new SchemaRevision()
                     {
                         SchemaRevision_Name = "Another Revision " + (revisionCnt + 1).ToString(),
-                        CreatedBy = _userService.GetCurrentUser().AssociateId
+                        CreatedBy = _userService.GetCurrentUser().AssociateId,
+                        //JsonSchemaObject = jsonSchema
+                        JsonSchemaObject = ""
                     };
 
                     schema.AddRevision(revision);
@@ -645,8 +647,8 @@ namespace Sentry.data.Core
                 case "DECIMAL":
                     newField = new DecimalField()
                     {                        
-                        Precision = int.Parse(row.Precision),
-                        Scale = int.Parse(row.Scale)
+                        Precision = (row.Precision == null) ? 8 : int.Parse(row.Precision),
+                        Scale = (row.Scale == null) ? 2 : int.Parse(row.Scale)
                     };
 
                     if (compare && TryConvertTo<DecimalField>(previousFieldVersion) != null)
@@ -663,7 +665,7 @@ namespace Sentry.data.Core
                 case "VARCHAR":
                     newField = new VarcharField()
                     {
-                        FieldLength = int.Parse(row.Length)
+                        FieldLength = (row.Length == null)? 10 : int.Parse(row.Length)
                     };
                     changed = compare && TryConvertTo<VarcharField>(previousFieldVersion) == null;
                     break;
