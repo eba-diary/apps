@@ -24,7 +24,7 @@
             },
 
             columns: [
-                { data: "Asset", className: "Asset", searchable: "false" },
+                { data: null, className: "Asset", render: function (data) { return '<a href=https://said.sentry.com/ViewAsset.aspx?ID=' + data.Asset + '\>' + data.Asset + '</a>'; } },
                 { data: "Server", className: "Server", searchable: "false" },
                 { data: "Database", className: "Database", searchable: "false" },
                 { data: "Object", className: "Object", searchable: "false" },
@@ -105,9 +105,9 @@
         $('#daleSearchClickSpinner').show();
         $('#daleContainer').hide();
 
-        $('#sensitiveSearchLink').addClass("hidestuff");
-        $('#daleCriteriaContainer').addClass("hidestuff");
-        $('#radioMadness').addClass("hidestuff");
+        $('#sensitiveSearchLink').addClass("dale-hide-stuff");
+        $('#daleCriteriaContainer').addClass("dale-hide-stuff");
+        $('#radioMadness').addClass("dale-hide-stuff");
     },
 
     //enable all controls user can hit during search
@@ -117,9 +117,9 @@
         $('#daleSearchClickSpinner').hide();
         $('#daleContainer').show();
 
-        $('#sensitiveSearchLink').removeClass("hidestuff");
-        $('#daleCriteriaContainer').removeClass("hidestuff");
-        $('#radioMadness').removeClass("hidestuff");
+        $('#sensitiveSearchLink').removeClass("dale-hide-stuff");
+        $('#daleCriteriaContainer').removeClass("dale-hide-stuff");
+        $('#radioMadness').removeClass("dale-hide-stuff");
     },
 
     setupClickAttack: function ()
