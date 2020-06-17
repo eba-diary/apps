@@ -57,7 +57,7 @@
             [
                     { extend: 'colvis', text: 'Columns' },
                     { extend: 'csv', text: 'Download' }
-            ],
+            ]
         });
 
         //add a filter in each column
