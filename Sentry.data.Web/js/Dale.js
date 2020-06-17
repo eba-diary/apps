@@ -9,7 +9,6 @@
         $("#daleResultsTable").DataTable({
 
             //client side setup
-            searching: true,
             pageLength: 100,
 
             ajax: {
@@ -24,23 +23,23 @@
             },
 
             columns: [
-                { data: null, className: "Asset", render: function (data) { return '<a href=https://said.sentry.com/ViewAsset.aspx?ID=' + data.Asset + '\>' + data.Asset + '</a>'; } },
-                { data: "Server", className: "Server", searchable: "false" },
-                { data: "Database", className: "Database", searchable: "false" },
-                { data: "Object", className: "Object", searchable: "false" },
-                { data: "ObjectType", className: "ObjectType",searchable: "true" },
-                { data: "Column", className: "ColumnMan", searchable: "false" },
+                { data: null, className: "Asset", render: function (data) { return '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + data.Asset + '\>' + data.Asset + '</a>'; } },
+                { data: "Server", className: "Server"},
+                { data: "Database", className: "Database" },
+                { data: "Object", className: "Object" },
+                { data: "ObjectType", className: "ObjectType" },
+                { data: "Column", className: "ColumnMan"},
 
-                { data: "IsSensitive", className: "IsSensitive", visible: false, searchable: "false" },
-                { data: "Alias", className: "Alias", visible: false, searchable: "false" },
-                { data: "ProdType", className: "ProdType", visible: false, searchable: "false" },
+                { data: "IsSensitive", className: "IsSensitive", visible: false},
+                { data: "Alias", className: "Alias", visible: false },
+                { data: "ProdType", className: "ProdType", visible: false },
 
-                { data: "ColumnType", className: "ColumnType", visible: false, searchable: "false", width: "100px" },
-                { data: "MaxLength", className: "MaxLength", visible: false, searchable: "false", width: "75px" },
-                { data: "Precision", className: "Precision", visible: false, searchable: "false", width: "100px" },
-                { data: "Scale", className: "Scale", visible: false, searchable: "false", width: "75px"  },
-                { data: "IsNullable", className: "IsNullable", visible: false, searchable: "false", width: "100px" },
-                { data: "EffectiveDate", className: "EffectiveDate", visible: false, searchable: "false" }
+                { data: "ColumnType", className: "ColumnType", visible: false},
+                { data: "MaxLength", className: "MaxLength", visible: false},
+                { data: "Precision", className: "Precision", visible: false},
+                { data: "Scale", className: "Scale", visible: false},
+                { data: "IsNullable", className: "IsNullable", visible: false},
+                { data: "EffectiveDate", className: "EffectiveDate", visible: false}
             ],
 
             aLengthMenu: [
@@ -50,14 +49,15 @@
 
             order: [2, 'desc'],
 
-            //styles for columnVisibility to show
+            //style for columnVisibility and paging to show
             dom: 'Blrtip',
 
+            //buttons to show and customize text for them
             buttons:
             [
                     { extend: 'colvis', text: 'Columns' },
                     { extend: 'csv', text: 'Download' }
-            ]
+            ],
         });
 
         //add a filter in each column
@@ -84,10 +84,6 @@
             ]
         });
 
-        //Hide DataTable SearchBox (NOTE: jquery calls the search box what you named table and appends _filter)
-        //to get column filtering requires the Searching=true to be set to true, if i set it to false then column filtering goes away so by default you can't have one without the other, so cheat the system here
-        $('#daleResultsTable_filter').hide();
-
         //setup all click events
         data.Dale.setupClickAttack();
     },
@@ -113,6 +109,9 @@
     //enable all controls user can hit during search
     enableDale: function ()
     {
+        //everytime a new search happens, we want to redraw the grid so column contents is redrawn to fit properly
+        $("#daleResultsTable").DataTable().columns.adjust().draw();
+
         $('#daleSearchClick').show();
         $('#daleSearchClickSpinner').hide();
         $('#daleContainer').show();
