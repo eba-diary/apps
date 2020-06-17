@@ -361,6 +361,11 @@ namespace Sentry.data.Core
                 errors.Add("Category is required");
             }
 
+            if (dto.DatasetId == 0 && dto.DatasetScopeTypeId == 0)
+            {
+                errors.Add("Dataset Scope is required");
+            }
+
             return errors;
         }
 
