@@ -27,8 +27,6 @@ namespace Sentry.data.Web
         [DisplayName("Origination Code")]
         public int OriginationID { get; set; }
 
-        [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Please select a Dataset Scope")]
         [DisplayName("Dataset Scope")]
         public int DatasetScopeTypeId { get; set; }
 
