@@ -90,7 +90,7 @@ namespace Sentry.data.Infrastructure
                 //ONLY apply logic here if they dont want to see any sensitive information
                 if (dto.Sensitive == DaleSensitive.SensitiveNone)
                 {
-                    qWhereStatement += " AND ( IsSensitive_FLG <> 1 OR IsSensitive_FLG IS NULL) ";
+                    qWhereStatement += " AND IsSensitive_FLG = 0 ";
                 }
             }
 
