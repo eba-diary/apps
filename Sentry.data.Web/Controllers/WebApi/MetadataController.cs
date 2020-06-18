@@ -297,10 +297,10 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("dataset/{datasetId}/schema/{schemaId}/revision/GenerateSchemaFromSampleData")]
         public async Task<IHttpActionResult> GenerateSchema(int datasetId, int schemaId, [FromBody] JObject data)
         {
-            JsonSchema schema = JsonSchema.FromSampleJson(JsonConvert.SerializeObject(data));
-            //string schema1 = JsonSchemaReferenceUtilities.ConvertJsonReferences(schema.ToJson());
+            var schema = JsonSchema.FromSampleJson(JsonConvert.SerializeObject(data));
+            //string schema1 = JsonSchemaReferenceUtilities.ConvertJsonReferences(schema.ToString());
             //string schema2 = JsonSchemaReferenceUtilities.ConvertPropertyReferences(schema.ToJson());
-            //JsonSchema schemav2 = await JsonSchema.FromJsonAsync(schema2);
+            //JsonSchema schemav2 = await JsonSchema.FromJsonAsync(schema1);
             return Ok(schema);
         }
 
