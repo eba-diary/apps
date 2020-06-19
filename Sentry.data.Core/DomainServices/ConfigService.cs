@@ -448,6 +448,7 @@ namespace Sentry.data.Core
             FileSchema schema = config.Schema;
             SchemaRevision revision = new SchemaRevision();
             SchemaRevision latestRevision = null;
+
             #region Populate New Schema Structure
             //Insert schema metadata into new structure
             try
@@ -478,7 +479,7 @@ namespace Sentry.data.Core
                         revision.Fields.Add(AddRevisionField(row, revision, null, latestRevision));
                     }
 
-                    //Add Checksum validation here
+                    //Add posible checksum validation here
 
                     _datasetContext.SaveChanges();
                 }
@@ -487,122 +488,6 @@ namespace Sentry.data.Core
             {
                 Logger.Error("configservice_updatefields - add new revision failed", ex);
             }
-            #endregion
-
-            #region Populate Old Schema Structure
-            ////Maintain metadata in old schema structure
-            //DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
-            //DataElement newRevision = null;
-            //DataObject DOBJ = null;
-            //Boolean newRev = false;
-            //if (schema.DataObjects.Count == 0)
-            //{
-            //    //This is a new configuration with no schema defined.
-            //    DOBJ = new DataObject()
-            //    {
-            //        DataObjectCreate_DTM = DateTime.Now,
-            //        DataObjectChange_DTM = DateTime.Now,
-            //        LastUpdt_DTM = DateTime.Now,
-            //        DataObject_NME = schema.SchemaName,
-            //        DataObject_DSC = schema.SchemaDescription,
-            //        DataObject_CDE = config.FileExtension.Id.ToString(),
-            //        DataObjectCode_DSC = config.FileExtension.Name
-            //    };
-
-            //    schema.DataObjects.Add(DOBJ);
-            //}
-            //else
-            //{
-            //    DOBJ = schema.DataObjects.Single();
-            //}
-
-            //List<DataObjectField> dofList = new List<DataObjectField>();
-
-            //foreach (SchemaRow sr in schemaRows)
-            //{
-            //    if (sr.DeleteInd)
-            //    {
-            //        //Delete Row
-            //        _datasetContext.Remove(DOBJ.DataObjectFields.FirstOrDefault(w => w.DataObjectField_ID == sr.DataObjectField_ID));
-            //    }
-            //    else
-            //    {
-            //        DataObjectField dof = null;
-
-            //        //Update Row
-            //        if (sr.DataObjectField_ID != 0 && newRev == false)
-            //        {
-            //            dof = DOBJ.DataObjectFields.FirstOrDefault(w => w.DataObjectField_ID == sr.DataObjectField_ID);
-            //            dof.DataObjectField_NME = sr.Name;
-            //            dof.DataObjectField_DSC = sr.Description;
-            //            dof.OrdinalPosition = sr.Position.ToString();
-            //            dof.FieldFormat = sr.Format;
-            //            dof.LastUpdt_DTM = DateTime.Now;
-            //            dof.DataObjectFieldChange_DTM = DateTime.Now;
-            //        }
-            //        //Add New Row
-            //        else
-            //        {
-            //            dof = new DataObjectField
-            //            {
-            //                DataObject = DOBJ,
-            //                DataObjectFieldCreate_DTM = DateTime.Now,
-            //                DataObjectField_NME = sr.Name,
-            //                DataObjectField_DSC = sr.Description,
-            //                OrdinalPosition = sr.Position.ToString(),
-            //                FieldFormat = sr.Format,
-            //                LastUpdt_DTM = DateTime.Now,
-            //                DataObjectFieldChange_DTM = DateTime.Now
-            //            };
-            //        }
-
-
-            //        if (sr.DataType != "ARRAY")
-            //        {
-            //            dof.DataType = sr.DataType;
-            //        }
-            //        else
-            //        {
-            //            dof.DataType = sr.DataType + "<" + sr.ArrayType + ">";
-            //        }
-
-            //        if (sr.Nullable != null) { dof.Nullable = sr.Nullable ?? null; }
-            //        if (sr.Precision != null)
-            //        {
-            //            if (sr.DataType == "DECIMAL")
-            //            {
-            //                dof.Precision = sr.Precision;
-            //            }
-            //            else
-            //            {
-            //                dof.Precision = null;
-            //            }
-            //        }
-            //        if (sr.Scale != null)
-            //        {
-            //            if (sr.DataType == "DECIMAL")
-            //            {
-            //                dof.Scale = sr.Scale;
-            //            }
-            //            else
-            //            {
-            //                dof.Scale = null;
-            //            }
-            //        }
-            //        dofList.Add(dof);
-            //    }
-            //}
-
-            //DOBJ.DataObjectFields = dofList;
-
-            //_datasetContext.Merge(schema);
-            //_datasetContext.SaveChanges();
-
-            //if (newRev == true)
-            //{
-            //    _datasetContext.Merge(newRevision);
-            //    _datasetContext.SaveChanges();
-            //}
             #endregion
 
             //Send message to create hive table
@@ -616,15 +501,6 @@ namespace Sentry.data.Core
             };
             _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
 
-            //Send Email to have hive table added to SAS if option is checked
-            //if (latestRevision == null)
-            //{
-            //    revision.SendIncludeInSasEmail(true, _userService.GetCurrentUser(), _emailService);
-            //}
-            //else
-            //{
-            //    revision.SendIncludeInSasEmail(false, _userService.GetCurrentUser(), _emailService);
-            //}
         }
 
         private BaseField AddRevisionField(SchemaRow row, SchemaRevision CurrentRevision, BaseField parentRow = null, SchemaRevision previousRevision = null)

@@ -6,6 +6,7 @@ using Sentry.data.Web.Models.ApiModels.Schema;
 using NJsonSchema;
 using Sentry.data.Core;
 using System.Text;
+using Sentry.data.Core.Factories.Fields;
 
 namespace Sentry.data.Web
 {
@@ -160,6 +161,58 @@ namespace Sentry.data.Web
                 CreateCurrentView = model.CurrentView,
                 Description = model.Description
             };
+        }
+
+        public static List<BaseFieldDto> ToDto(this List<SchemaRow> schemaRows)
+        {
+            List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            foreach(SchemaRow row in schemaRows)
+            {
+                dtoList.Add(row.ToDto());
+            }
+
+            return dtoList;
+        }
+
+        public static BaseFieldDto ToDto(this SchemaRow row)
+        {
+            FieldDtoFactory fieldFactory;
+            switch (row.DataType.ToUpper())
+            {
+                case GlobalConstants.Datatypes.DECIMAL:
+                    fieldFactory = new DecimalFieldDtoFactory(row); 
+                    break;
+                case GlobalConstants.Datatypes.DATE:
+                    fieldFactory = new DateFieldDtoFactory(row);
+                    break;
+                case GlobalConstants.Datatypes.INTEGER:
+                    fieldFactory = new IntegerFieldDtoFactory(row);
+                    break;
+                case GlobalConstants.Datatypes.STRUCT:
+                    fieldFactory = new StructFieldDtoFactory(row);
+                    break;
+                case GlobalConstants.Datatypes.TIMESTAMP:
+                    fieldFactory = new TimestampFieldDtoFactory(row);
+                    break;
+                case GlobalConstants.Datatypes.VARCHAR:
+                    fieldFactory = new VarcharFieldDtoFactory(row);
+                    break;
+                default:
+                    fieldFactory = new VarcharFieldDtoFactory(row);
+                    break;
+            }
+
+            BaseFieldDto dto = fieldFactory.GetField();
+
+            if (row.ChildRows != null && row.ChildRows.Any())
+            {
+                foreach (SchemaRow childrow in row.ChildRows)
+                {
+                    dto.ChildFields.Add(childrow.ToDto());
+                }
+            }
+
+            return dto;
         }
     }
 }

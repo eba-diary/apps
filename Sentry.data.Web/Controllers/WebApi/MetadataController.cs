@@ -5,13 +5,13 @@ using Sentry.Common.Logging;
 using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.Factories.Fields;
 using Sentry.data.Web.Models.ApiModels.Dataset;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -247,9 +247,10 @@ namespace Sentry.data.Web.WebApi.Controllers
         [HttpPost]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}/revision")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaRow>))]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(int))]
         [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
         [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, null)]
         public async Task<IHttpActionResult> AddSchemaRevision(int datasetId, int schemaId, string revisionName, [FromBody] JObject schemaStructure)
         {
             try
@@ -274,17 +275,32 @@ namespace Sentry.data.Web.WebApi.Controllers
 
                 JsonSchema schema_v3 = await JsonSchema.FromJsonAsync(schemaStructure.ToString());
                 //string schema = JsonSchemaDriller_v3(schema_v3);
-                List<SchemaRow> schemarows_v2 = new List<SchemaRow>();
+
+                List<BaseFieldDto> schemarows_v2 = new List<BaseFieldDto>();
                 ToSchemaRows(schema_v3, schemarows_v2);
 
-                _configService.UpdateFields(configId, schemaId, schemarows_v2, schema_v3.ToJson());
+                //_configService.UpdateFields(configId, schemaId, schemarows_v2, schema_v3.ToJson());
+                int savedRevisionId = _schemaService.CreateAndSaveSchemaRevision(schemaId, schemarows_v2, revisionName, schema_v3.ToJson());
 
-                return Ok(schemarows_v2);
+                //SchemaRevisionDto revisiondto = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
+                //SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
+                //List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisiondto.RevisionId);
+                //revisionDetailModel.Fields = fieldDtoList.ToSchemaFieldModel();
+                if (savedRevisionId == 0)
+                {
+                    return Content(System.Net.HttpStatusCode.BadRequest, "Unable to Save Revision");
+                }
+                return Ok(savedRevisionId);
             }
             catch (DatasetUnauthorizedAccessException)
             {
-                Logger.Debug($"metadataapi_addschemarevision_unauthorizedexception dataset - datasetId:{datasetId} schemaId:{schemaId}");
+                Logger.Debug($"{nameof(SchemaService).ToLower()}_{nameof(AddSchemaRevision).ToLower()}_unauthorizedexception dataset - datasetId:{datasetId} schemaId:{schemaId}");
                 return Content(System.Net.HttpStatusCode.Unauthorized, "Unauthroized Access to Dataset");
+            }
+            catch (SchemaUnauthorizedAccessException)
+            {
+                Logger.Debug($"{nameof(SchemaService).ToLower()}_{nameof(AddSchemaRevision).ToLower()}_unauthorizedexception schema - datasetId:{datasetId} schemaId:{schemaId}");
+                return Content(System.Net.HttpStatusCode.Unauthorized, "Unauthroized Access to Schema");
             }
             catch (Exception ex)
             {
@@ -304,14 +320,13 @@ namespace Sentry.data.Web.WebApi.Controllers
             return Ok(schema);
         }
 
-        public static void ToSchemaRows(JsonSchema schema, List<SchemaRow> schemaRowList, SchemaRow parentSchemaRow = null)
+        public static void ToSchemaRows(JsonSchema schema, List<BaseFieldDto> schemaRowList, BaseFieldDto parentSchemaRow = null)
         {
             try
             {
                 switch (schema.Type)
                 {
                     case JsonObjectType.Object:
-                        //sb.AppendLine(JsonSchema_PropertiesDriller_v3(schema.Properties.ToList(), parentBreadCrumb));
                         foreach (KeyValuePair<string, JsonSchemaProperty> prop in schema.Properties.ToList())
                         {
                             ToSchemaRow(prop, schemaRowList, parentSchemaRow);
@@ -330,20 +345,12 @@ namespace Sentry.data.Web.WebApi.Controllers
                             }
                             else
                             {
-                                parentSchemaRow.DataType = GlobalConstants.Datatypes.VARCHAR;
                                 parentSchemaRow.Description = "MOCKED OUT";
                             }
                         }
                         break;
-                    //case JsonObjectType.Array:
-
-                    //    foreach (JsonSchema prop in schema.Items)
-                    //    {
-                    //        //sb.AppendLine(prop.ToString());
-                    //        schemaRows.Add(ToSchemaRow(prop));
-                    //    }
-                    //    break;
                     default:
+                        Logger.Warn($"Unhandled Scenario for schema object type of {schema.Type}");
                         break;
                 }
             }
@@ -354,111 +361,85 @@ namespace Sentry.data.Web.WebApi.Controllers
             }            
         }
 
-        public static void ToSchemaRow(KeyValuePair<string, JsonSchemaProperty> prop, List<SchemaRow> schemaRowList, SchemaRow parentRow = null)
+        public static void ToSchemaRow(KeyValuePair<string, JsonSchemaProperty> prop, List<BaseFieldDto> schemaRowList, BaseFieldDto parentRow = null)
         {
             try
             {
-                JsonSchemaProperty currentProperty = prop.Value;
+                FieldDtoFactory fieldFactory = null;
 
+                JsonSchemaProperty currentProperty = prop.Value;
+                Logger.Debug($"Found property:{prop.Key}");
                 switch (currentProperty.Type)
                 {
                     case JsonObjectType.None:
+                        Logger.Debug($"Detected type of {currentProperty.Type}");
                         if (currentProperty.HasReference)
                         {
-                            SchemaRow referenceRow = new SchemaRow
-                            {
-                                DataType = GlobalConstants.Datatypes.STRUCT,
-                                Name = prop.Key,
-                                Description = currentProperty.Description
-                            };
+                            Logger.Debug($"Detected ref object: property will be defined as STRUCT");
+                            fieldFactory = new StructFieldDtoFactory(prop, false);
+                            BaseFieldDto noneStructField = fieldFactory.GetField();
 
                             if (parentRow == null)
                             {
-                                schemaRowList.Add(referenceRow);
+                                schemaRowList.Add(noneStructField);
                             }
                             else
                             {
-                                if (parentRow.ChildRows == null)
-                                {
-                                    parentRow.ChildRows = new List<SchemaRow>();
-                                }
-                                parentRow.ChildRows.Add(referenceRow);
+                                parentRow.ChildFields.Add(noneStructField);
                             }
 
-                            ToSchemaRows(currentProperty.Reference, schemaRowList, referenceRow);
+                            ToSchemaRows(currentProperty.Reference, schemaRowList, noneStructField);
                         }
                         else
                         {
-                            Logger.Warn("Does not handle object type of None without reference");
-                            SchemaRow nullRow = new SchemaRow
-                            {
-                                DataType = GlobalConstants.Datatypes.VARCHAR,
-                                Name = prop.Key,
-                                Description = "MOCKED OUT: Field did not have definition, therefore defaulted to VARCHAR"
-                            };
+                            Logger.Debug($"No ref object detected: property will be defined as VARCHAR");
+                            fieldFactory = new VarcharFieldDtoFactory(prop, false);
 
                             if (parentRow == null)
                             {
-                                schemaRowList.Add(nullRow);
+                                schemaRowList.Add(fieldFactory.GetField());
                             }
                             else
                             {
-                                if (parentRow.ChildRows == null)
-                                {
-                                    parentRow.ChildRows = new List<SchemaRow>();
-                                }
-                                parentRow.ChildRows.Add(nullRow);
+                                parentRow.ChildFields.Add(fieldFactory.GetField());
                             }
                         }
                         break;
                     case JsonObjectType.Object:
-                        SchemaRow row = new SchemaRow
-                        {
-                            DataType = GlobalConstants.Datatypes.STRUCT,
-                            Name = prop.Key,
-                            Description = currentProperty.Description
-                        };
+                        Logger.Debug($"Detected type of {currentProperty.Type}");
+                        Logger.Debug($"Detected ref object: property will be defined as STRUCT");
+                        fieldFactory = new StructFieldDtoFactory(prop, false);
+                        BaseFieldDto objectStructfield = fieldFactory.GetField();
 
                         if (parentRow == null)
-                        {
-                            schemaRowList.Add(row);
+                        {                            
+                            schemaRowList.Add(objectStructfield);                           
                         }
                         else
                         {
-                            if (parentRow.ChildRows == null)
-                            {
-                                parentRow.ChildRows = new List<SchemaRow>();
-                            }
-                            parentRow.ChildRows.Add(row);
+                            parentRow.ChildFields.Add(objectStructfield);
                         }
+
+                        foreach (KeyValuePair<string, JsonSchemaProperty> nestedProp in currentProperty.Properties)
+                        {
+                            ToSchemaRow(nestedProp, schemaRowList, objectStructfield);
+                        }
+
                         break;
                     case JsonObjectType.Array:
-                        //Create the schema row
-                        SchemaRow arrayRow = new SchemaRow()
-                        {
-                            Name = prop.Key,
-                            IsArray = true,
-                            Description = currentProperty.Description
-                        };
+                        Logger.Debug($"Detected type of {currentProperty.Type}");
 
                         JsonSchema nestedSchema = null;
                         //While JSON Schema alows an arrays of multiple types, DSC only allows single type.
 
                         if (currentProperty.Items.Count == 0 && currentProperty.Item == null)
                         {
-                            throw new Exception("Not valid schema");
+                            throw new Exception("Not valid schema: Array does not contain items");
                         }
                         else if (currentProperty.Items.Count == 0 && currentProperty.Item != null)
                         {
                             nestedSchema = currentProperty.Item;
                         }
-                        //else if (currentProperty.Items.Count < 1)
-                        //{
-                        //    if (currentProperty.ParentSchema.Definitions.Any(w => w.Key.ToLower() == prop.Key.ToLower()))
-                        //    {
-                        //        nestedSchema = currentProperty.ParentSchema.Definitions.Where(w => w.Key.ToLower() == prop.Key.ToLower()).Select(s => s.Value).FirstOrDefault();
-                        //    }
-                        //}
                         else
                         {
                             if (currentProperty.Items.Count > 1)
@@ -468,63 +449,68 @@ namespace Sentry.data.Web.WebApi.Controllers
                             nestedSchema = currentProperty.Items.First();
                         }
 
-
-
                         //Determine what this is an array of
                         if (nestedSchema.IsObject)
                         {
-                            arrayRow.DataType = GlobalConstants.Datatypes.STRUCT;
+                            Logger.Debug($"Detected nested schema as Object");
+                            Logger.Debug($"Defined as array of STRUCT");
+                            fieldFactory = new StructFieldDtoFactory(prop, true);
                         }
                         else
                         {
                             switch (nestedSchema.Type)
                             {
                                 case JsonObjectType.Object:
-                                    arrayRow.DataType = GlobalConstants.Datatypes.STRUCT;
+                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
+                                    Logger.Debug($"Defined as array of STRUCT");
+                                    fieldFactory = new StructFieldDtoFactory(prop, true);
                                     break;
                                 case JsonObjectType.Integer:
-                                    arrayRow.DataType = GlobalConstants.Datatypes.INTEGER;
+                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
+                                    Logger.Debug($"Defined as array of INTEGER");
+                                    fieldFactory = new IntegerFieldDtoFactory(prop, true);
                                     break;
                                 case JsonObjectType.String:
+                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
                                     switch (currentProperty.Format)
                                     {
                                         case "date-time":
-                                            arrayRow.DataType = GlobalConstants.Datatypes.TIMESTAMP;
+                                            Logger.Debug($"Detected string format of {currentProperty.Format}");
+                                            Logger.Debug($"Defined as array of TIMESTAMP");
+                                            fieldFactory = new TimestampFieldDtoFactory(prop, true);
                                             break;
                                         case "date":
-                                            arrayRow.DataType = GlobalConstants.Datatypes.DATE;
+                                            Logger.Debug($"Detected string format of {currentProperty.Format}");
+                                            Logger.Debug($"Defined as array of DATE");
+                                            fieldFactory = new DateFieldDtoFactory(prop, true);
                                             break;
                                         default:
-                                            arrayRow.DataType = GlobalConstants.Datatypes.VARCHAR;
+                                            Logger.Debug($"No string format detected");
+                                            Logger.Debug($"Defined as array of VARCHAR");
+                                            fieldFactory = new VarcharFieldDtoFactory(prop, true);
                                             break;
                                     }
                                     break;
                                 case JsonObjectType.Number:
-
-                                    arrayRow.Name = prop.Key;
-                                    arrayRow.DataType = GlobalConstants.Datatypes.DECIMAL;
-                                    arrayRow.Description = currentProperty.Description;
-
-                                    if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-precision"))
+                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
+                                    Logger.Debug($"Defined as array of DECIMAL");
+                                    fieldFactory = new DecimalFieldDtoFactory(prop, true);
+                                    break;
+                                case JsonObjectType.None:
+                                    if (nestedSchema.IsAnyType)
                                     {
-                                        arrayRow.Precision = currentProperty.ExtensionData.Where(w => w.Key == "dsc-precision").Select(s => s.Value).ToString();
+                                        Logger.Debug($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} and marked as IsAnyType");
+                                        Logger.Debug($"Defined as array of VARCHAR");
+                                        fieldFactory = new VarcharFieldDtoFactory(prop, true);
                                     }
                                     else
                                     {
-                                        arrayRow.Precision = "1";
-                                    }
-
-                                    if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-scale"))
-                                    {
-                                        arrayRow.Scale = currentProperty.ExtensionData.Where(w => w.Key == "dsc-scale").Select(s => s.Value).ToString();
-                                    }
-                                    else
-                                    {
-                                        arrayRow.Scale = "1";
+                                        Logger.Debug($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()}");
+                                        Logger.Debug($"Defined as array of VARCHAR");
+                                        fieldFactory = new VarcharFieldDtoFactory(prop, true);
                                     }
                                     break;
                                 default:
-                                case JsonObjectType.None:
                                 case JsonObjectType.File:
                                 case JsonObjectType.Null:
                                 case JsonObjectType.Boolean:
@@ -532,40 +518,35 @@ namespace Sentry.data.Web.WebApi.Controllers
                             }
                         }
 
-                        ToSchemaRows(nestedSchema, schemaRowList, arrayRow);
+                        BaseFieldDto field = fieldFactory.GetField();
+
+                        ToSchemaRows(nestedSchema, schemaRowList, field);
 
                         if (parentRow == null)
                         {
-                            schemaRowList.Add(arrayRow);
+                            schemaRowList.Add(field);
                         }
                         else
                         {
-                            if (parentRow.ChildRows == null)
-                            {
-                                parentRow.ChildRows = new List<SchemaRow>();
-                            }
-                            parentRow.ChildRows.Add(arrayRow);
+                            parentRow.ChildFields.Add(field);
                         }
                         break;
                     case JsonObjectType.String:
-                        StringBuilder extraProperties = new StringBuilder();
-                        SchemaRow stringrow = new SchemaRow()
-                        {
-                            Name = prop.Key,
-                            Description = currentProperty.Description
-                        };
+                        Logger.Debug($"Detected type of {currentProperty.Type}");
 
                         if (!String.IsNullOrWhiteSpace(currentProperty.Format))
                         {
                             switch (currentProperty.Format)
                             {
                                 case "date-time":
-                                    stringrow.DataType = GlobalConstants.Datatypes.TIMESTAMP;
-                                    extraProperties.Append($", DSC-DataType:TIMESTAMP");
+                                    Logger.Debug($"Detected string format of {currentProperty.Format}");
+                                    Logger.Debug($"Defined as TIMESTAMP");
+                                    fieldFactory = new TimestampFieldDtoFactory(prop, false);
                                     break;
                                 case "date":
-                                    stringrow.DataType = GlobalConstants.Datatypes.DATE;
-                                    extraProperties.Append($", DSC-DataType:DATE");
+                                    Logger.Debug($"Detected string format of {currentProperty.Format}");
+                                    Logger.Debug($"Defined as DATE");
+                                    fieldFactory = new DateFieldDtoFactory(prop, false);
                                     break;
                                 default:
                                     break;
@@ -573,101 +554,55 @@ namespace Sentry.data.Web.WebApi.Controllers
                         }
                         else
                         {
-                            stringrow.DataType = GlobalConstants.Datatypes.VARCHAR;
-                            extraProperties.Append($", DSC-DataType:STRING");
-                            if (currentProperty.MaxLength != null)
-                            {
-                                //default to 8000 if maxlenght is not specified
-                                int stringLength = (currentProperty.MaxLength) ?? 8000;
-                                extraProperties.Append($", Length:{stringLength.ToString()}");
-                                stringrow.Length = stringLength.ToString();
-                            }
+                            Logger.Debug($"No string format detected");
+                            Logger.Debug($"Defined as VARCHAR");
+                            fieldFactory = new VarcharFieldDtoFactory(prop, false);
                         }
 
                         if (parentRow == null)
                         {
-                            schemaRowList.Add(stringrow);
+                            schemaRowList.Add(fieldFactory.GetField());
                         }
                         else
                         {
-                            if (parentRow.ChildRows == null)
-                            {
-                                parentRow.ChildRows = new List<SchemaRow>();
-                            }
-
-                            parentRow.ChildRows.Add(stringrow);
+                            parentRow.ChildFields.Add(fieldFactory.GetField());
                         }
 
-                        //    currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {prop.Key} (json-type:{prop.Value.Type.ToString()}{extraProperties.ToString()})" : $"{prop.Key} ({prop.Value.Type.ToString()})";
                         break;
                     case JsonObjectType.Integer:
-                        SchemaRow intRow = new SchemaRow()
-                        {
-                            Name = prop.Key,
-                            DataType = GlobalConstants.Datatypes.INTEGER,
-                            Description = currentProperty.Description
-                        };
+                        Logger.Debug($"Detected type of {currentProperty.Type}");
+                        Logger.Debug($"Defined as INTEGER");
+
+                        fieldFactory = new IntegerFieldDtoFactory(prop, false);
 
                         if (parentRow == null)
                         {
-                            schemaRowList.Add(intRow);
+                            schemaRowList.Add(fieldFactory.GetField());
                         }
                         else
                         {
-                            if (parentRow.ChildRows == null)
-                            {
-                                parentRow.ChildRows = new List<SchemaRow>();
-                            }
-
-                            parentRow.ChildRows.Add(intRow);
+                            parentRow.ChildFields.Add(fieldFactory.GetField());
                         }
                         break;
                     case JsonObjectType.Number:
-                        SchemaRow decimalRow = new SchemaRow()
-                        {
-                            Name = prop.Key,
-                            DataType = GlobalConstants.Datatypes.DECIMAL,
-                            Description = currentProperty.Description
-                        };
-
-                        if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-precision"))
-                        {
-                            decimalRow.Precision = currentProperty.ExtensionData.Where(w => w.Key == "dsc-precision").Select(s => s.Value).ToString();
-                        }
-                        else
-                        {
-                            decimalRow.Precision = "1";
-                        }
-
-                        if (currentProperty.ExtensionData.Any(w => w.Key == "dsc-scale"))
-                        {
-                            decimalRow.Scale = currentProperty.ExtensionData.Where(w => w.Key == "dsc-scale").Select(s => s.Value).ToString();
-                        }
-                        else
-                        {
-                            decimalRow.Scale = "1";
-                        }
-
+                        Logger.Debug($"Detected type of {currentProperty.Type}");
+                        Logger.Debug($"Defined as DECIMAL");
+                        fieldFactory = new DecimalFieldDtoFactory(prop, false);
 
                         if (parentRow == null)
                         {
-                            schemaRowList.Add(decimalRow);
+                            schemaRowList.Add(fieldFactory.GetField());
                         }
                         else
                         {
-                            if (parentRow.ChildRows == null)
-                            {
-                                parentRow.ChildRows = new List<SchemaRow>();
-                            }
-
-                            parentRow.ChildRows.Add(decimalRow);
+                            parentRow.ChildFields.Add(fieldFactory.GetField());
                         }
                         break;
                     default:
                     case JsonObjectType.File:
                     case JsonObjectType.Null:
                     case JsonObjectType.Boolean:
-                        //currentBreadCrumb = (parentBreadCrumb != null) ? parentBreadCrumb + $" -> {prop.Key} ({prop.Value.Type.ToString()})" : $"{prop.Key} ({prop.Value.Type.ToString()})";
+                        Logger.Debug($"Detected type of {currentProperty.Type} which is not supported");
                         break;
                 }
             }

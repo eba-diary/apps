@@ -1342,9 +1342,6 @@ namespace Sentry.data.Web.Controllers
             {
                 return RedirectToAction("Index", new { id = configDto.ParentDatasetId });
             }
-
-
-
         }
 
         [HttpPost]
@@ -1354,16 +1351,17 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                _configService.UpdateFields(configId, schemaId, schemaRows);
+                List<BaseFieldDto> schemaRowsDto = schemaRows.ToDto();
 
-                //Task.Factory.StartNew(() => _eventService.PublishSuccessEventByConfigId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Edit Fields", configId), TaskCreationOptions.LongRunning);
+                _schemaService.CreateAndSaveSchemaRevision(schemaId, schemaRowsDto, "blah", null);
             }
             catch (Exception ex)
             {
                 Logger.Error($"Failed to update schema - ConfigId:{configId} DataElementId:{schemaId}", ex);
+                return Json(new { Success = false, Message = "Failed to update schema" });
             }
 
-            return Json("Success", JsonRequestBehavior.AllowGet);
+            return Json(new { Success = true }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]

@@ -55,9 +55,15 @@
     <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.0.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
     </Reference>
+    <Reference Include="Namotion.Reflection, Version=1.0.11.0, Culture=neutral, PublicKeyToken=c2f9c3bdfae56102, processorArchitecture=MSIL">
+      <HintPath>..\packages\Namotion.Reflection.1.0.11\lib\net45\Namotion.Reflection.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="NJsonSchema, Version=10.1.18.0, Culture=neutral, PublicKeyToken=c2f9c3bdfae56102, processorArchitecture=MSIL">
+      <HintPath>..\packages\NJsonSchema.10.1.18\lib\net45\NJsonSchema.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
@@ -89,7 +95,9 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
     <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -120,8 +128,14 @@
     <Compile Include="DTO\DataProcessing\SchemaMapDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
-    <Compile Include="DTO\Schema\BaseFieldDto.cs" />
+    <Compile Include="DTO\Schema\Fields\BaseFieldDto.cs" />
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
+    <Compile Include="DTO\Schema\Fields\DateFieldDto.cs" />
+    <Compile Include="DTO\Schema\Fields\DecimalFieldDto.cs" />
+    <Compile Include="DTO\Schema\Fields\IntegerFieldDto.cs" />
+    <Compile Include="DTO\Schema\Fields\StructFieldDto.cs" />
+    <Compile Include="DTO\Schema\Fields\TimestampFieldDto.cs" />
+    <Compile Include="DTO\Schema\Fields\VarcharFieldDto.cs" />
     <Compile Include="DTO\Schema\FileSchemaDto.cs" />
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
@@ -195,6 +209,13 @@
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DataSourceQueryExtensions.cs" />
     <Compile Include="Extensions\SchemaExtensions.cs" />
+    <Compile Include="Factories\Fields\DateFieldDtoFactory.cs" />
+    <Compile Include="Factories\Fields\DecimalFieldDtoFactory.cs" />
+    <Compile Include="Factories\Fields\FieldDtoFactory.cs" />
+    <Compile Include="Factories\Fields\IntegerFieldDtoFactory.cs" />
+    <Compile Include="Factories\Fields\StructFieldDtoFactory.cs" />
+    <Compile Include="Factories\Fields\TimestampFieldDtoFactory.cs" />
+    <Compile Include="Factories\Fields\VarcharFieldDtoFactory.cs" />
     <Compile Include="GlobalEnums\DaleDestiny.cs" />
     <Compile Include="GlobalEnums\DataFlowPreProcessingTypes.cs" />
     <Compile Include="GlobalEnums\HttpDataFormat.cs" />
