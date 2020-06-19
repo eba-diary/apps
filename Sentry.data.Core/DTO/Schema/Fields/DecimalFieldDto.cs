@@ -51,23 +51,9 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
         public DecimalFieldDto(SchemaRow row) : base(row)
         {
-            if (String.IsNullOrWhiteSpace(row.Precision))
-            {
-                Precision = (Int32.TryParse(row.Precision, out int x)) ? x : 0;
-            }
-            else
-            {
-                Precision = 0;
-            }
+            Precision = string.IsNullOrWhiteSpace(row.Precision) ? 0 : (Int32.TryParse(row.Precision, out int p)) ? p : 0;
 
-            if (String.IsNullOrWhiteSpace(row.Scale))
-            {
-                Scale = (Int32.TryParse(row.Scale, out int x)) ? x : 0;
-            }
-            else
-            {
-                Scale = 0;
-            }
+            Scale = string.IsNullOrWhiteSpace(row.Scale) ? 0 : (Int32.TryParse(row.Scale, out int s)) ? s : 0;
         }
 
         public override string FieldType => GlobalConstants.Datatypes.DECIMAL;
@@ -77,9 +63,9 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
 
         //Properties that are not utilized by this type and are defaulted
-        public override string SourceFormat { get { return _sourceFormat; } set { _sourceFormat = null; } }
-        public override int OrdinalPosition { get { return _ordinalPosition; } set { _ordinalPosition = 0; } }
-        public override int Length { get { return _length; } set { _length = 0; } }
+        public override string SourceFormat { get => _sourceFormat; set => _sourceFormat = value; }
+        public override int OrdinalPosition { get => _ordinalPosition; set => _ordinalPosition = value; }
+        public override int Length { get => _length; set => _length = value; }
 
         public override BaseField ToEntity(BaseField parentField, SchemaRevision parentRevision)
         {
@@ -96,9 +82,18 @@ namespace Sentry.data.Core.DTO.Schema.Fields
         public override bool CompareToEntity(BaseField field)
         {
             bool changed = false;
-            if (SchemaExtensions.TryConvertTo<DecimalField>(field) == null) { changed = true; }
-            if (changed != true && Precision != ((DecimalField)field).Precision) { changed = true; }
-            if (changed != true && Scale != ((DecimalField)field).Scale) { changed = true; }
+            if (SchemaExtensions.TryConvertTo<DecimalField>(field) == null)
+            {
+                changed = true;
+            }
+            if (!changed && Precision != ((DecimalField)field).Precision)
+            {
+                changed = true;
+            }
+            if (!changed && Scale != ((DecimalField)field).Scale)
+            {
+                changed = true;
+            }
             return changed;
         }
     }

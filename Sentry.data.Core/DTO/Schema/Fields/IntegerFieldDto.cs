@@ -22,16 +22,19 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
 
         //Properties that are not utilized by this type and are defaulted
-        public override int Precision { get { return _precision; } set { _precision = 0; } }
-        public override int Scale { get { return _scale; } set { _scale = 0; } }
-        public override string SourceFormat { get { return _sourceFormat; } set { _sourceFormat = null; } }
-        public override int OrdinalPosition { get { return _ordinalPosition; } set { _ordinalPosition = 0; } }
-        public override int Length { get { return _length; } set { _length = 0; } }
+        public override int Precision { get => _precision; set => _precision = value; }
+        public override int Scale { get => _scale; set => _scale = value; }
+        public override string SourceFormat { get => _sourceFormat; set => _sourceFormat = value; }
+        public override int OrdinalPosition { get => _ordinalPosition; set => _ordinalPosition = value; }
+        public override int Length { get => _length; set => _length = value; }
 
         public override bool CompareToEntity(BaseField field)
         {
             bool changed = false;
-            if (SchemaExtensions.TryConvertTo<IntegerField>(field) == null) { changed = true; }
+            if (SchemaExtensions.TryConvertTo<IntegerField>(field) == null)
+            {
+                changed = true;
+            }
             return changed;
         }
 

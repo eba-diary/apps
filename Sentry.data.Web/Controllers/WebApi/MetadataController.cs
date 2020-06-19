@@ -314,10 +314,8 @@ namespace Sentry.data.Web.WebApi.Controllers
         public async Task<IHttpActionResult> GenerateSchema(int datasetId, int schemaId, [FromBody] JObject data)
         {
             var schema = JsonSchema.FromSampleJson(JsonConvert.SerializeObject(data));
-            //string schema1 = JsonSchemaReferenceUtilities.ConvertJsonReferences(schema.ToString());
-            //string schema2 = JsonSchemaReferenceUtilities.ConvertPropertyReferences(schema.ToJson());
-            //JsonSchema schemav2 = await JsonSchema.FromJsonAsync(schema1);
-            return Ok(schema);
+            string schema2 = JsonSchemaReferenceUtilities.ConvertPropertyReferences(schema.ToJson());
+            return Ok(JsonConvert.DeserializeObject<JsonSchema>(schema2));
         }
 
         public static void ToSchemaRows(JsonSchema schema, List<BaseFieldDto> schemaRowList, BaseFieldDto parentSchemaRow = null)
@@ -392,7 +390,8 @@ namespace Sentry.data.Web.WebApi.Controllers
                         }
                         else
                         {
-                            Logger.Debug($"No ref object detected: property will be defined as VARCHAR");
+                            Logger.Warn($"No ref object detected");
+                            Logger.Warn($"{prop.Key} will be defined as STRUCT");
                             fieldFactory = new VarcharFieldDtoFactory(prop, false);
 
                             if (parentRow == null)
@@ -434,7 +433,15 @@ namespace Sentry.data.Web.WebApi.Controllers
 
                         if (currentProperty.Items.Count == 0 && currentProperty.Item == null)
                         {
-                            throw new Exception("Not valid schema: Array does not contain items");
+                            JsonSchema refSchema = currentProperty.ParentSchema.Definitions.Where(w => w.Key.ToUpper() == prop.Key.ToUpper()).FirstOrDefault().Value;
+                            if (refSchema == null)
+                            {
+                                throw new Exception("Not valid schema: Array does not contain items");
+                            }
+                            else
+                            {
+                                nestedSchema = refSchema;
+                            }
                         }
                         else if (currentProperty.Items.Count == 0 && currentProperty.Item != null)
                         {
@@ -453,7 +460,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                         if (nestedSchema.IsObject)
                         {
                             Logger.Debug($"Detected nested schema as Object");
-                            Logger.Debug($"Defined as array of STRUCT");
+                            Logger.Debug($"{prop.Key} will be defined as array of STRUCT");
                             fieldFactory = new StructFieldDtoFactory(prop, true);
                         }
                         else
@@ -462,12 +469,12 @@ namespace Sentry.data.Web.WebApi.Controllers
                             {
                                 case JsonObjectType.Object:
                                     Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
-                                    Logger.Debug($"Defined as array of STRUCT");
+                                    Logger.Debug($"{prop.Key} will be defined as array of STRUCT");
                                     fieldFactory = new StructFieldDtoFactory(prop, true);
                                     break;
                                 case JsonObjectType.Integer:
                                     Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
-                                    Logger.Debug($"Defined as array of INTEGER");
+                                    Logger.Debug($"{prop.Key} will be defined as array of INTEGER");
                                     fieldFactory = new IntegerFieldDtoFactory(prop, true);
                                     break;
                                 case JsonObjectType.String:
@@ -476,37 +483,37 @@ namespace Sentry.data.Web.WebApi.Controllers
                                     {
                                         case "date-time":
                                             Logger.Debug($"Detected string format of {currentProperty.Format}");
-                                            Logger.Debug($"Defined as array of TIMESTAMP");
+                                            Logger.Debug($"{prop.Key} will be defined as array of TIMESTAMP");
                                             fieldFactory = new TimestampFieldDtoFactory(prop, true);
                                             break;
                                         case "date":
                                             Logger.Debug($"Detected string format of {currentProperty.Format}");
-                                            Logger.Debug($"Defined as array of DATE");
+                                            Logger.Debug($"{prop.Key} will be defined as array of DATE");
                                             fieldFactory = new DateFieldDtoFactory(prop, true);
                                             break;
                                         default:
                                             Logger.Debug($"No string format detected");
-                                            Logger.Debug($"Defined as array of VARCHAR");
+                                            Logger.Debug($"{prop.Key} will be defined as array of VARCHAR");
                                             fieldFactory = new VarcharFieldDtoFactory(prop, true);
                                             break;
                                     }
                                     break;
                                 case JsonObjectType.Number:
                                     Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
-                                    Logger.Debug($"Defined as array of DECIMAL");
+                                    Logger.Debug($"{prop.Key} will be defined as array of DECIMAL");
                                     fieldFactory = new DecimalFieldDtoFactory(prop, true);
                                     break;
                                 case JsonObjectType.None:
                                     if (nestedSchema.IsAnyType)
                                     {
                                         Logger.Debug($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} and marked as IsAnyType");
-                                        Logger.Debug($"Defined as array of VARCHAR");
+                                        Logger.Debug($"{prop.Key} will be defined as array of VARCHAR");
                                         fieldFactory = new VarcharFieldDtoFactory(prop, true);
                                     }
                                     else
                                     {
                                         Logger.Debug($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()}");
-                                        Logger.Debug($"Defined as array of VARCHAR");
+                                        Logger.Debug($"{prop.Key} will be defined as array of VARCHAR");
                                         fieldFactory = new VarcharFieldDtoFactory(prop, true);
                                     }
                                     break;
@@ -514,6 +521,9 @@ namespace Sentry.data.Web.WebApi.Controllers
                                 case JsonObjectType.File:
                                 case JsonObjectType.Null:
                                 case JsonObjectType.Boolean:
+                                    Logger.Warn($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} which is not handled by DSC");
+                                    Logger.Warn($"{prop.Key} will be defined as array of VARCHAR");
+                                    fieldFactory = new VarcharFieldDtoFactory(prop, true);
                                     break;
                             }
                         }
@@ -540,22 +550,25 @@ namespace Sentry.data.Web.WebApi.Controllers
                             {
                                 case "date-time":
                                     Logger.Debug($"Detected string format of {currentProperty.Format}");
-                                    Logger.Debug($"Defined as TIMESTAMP");
+                                    Logger.Debug($"{prop.Key} will be defined as TIMESTAMP");
                                     fieldFactory = new TimestampFieldDtoFactory(prop, false);
                                     break;
                                 case "date":
                                     Logger.Debug($"Detected string format of {currentProperty.Format}");
-                                    Logger.Debug($"Defined as DATE");
+                                    Logger.Debug($"{prop.Key} will be defined as DATE");
                                     fieldFactory = new DateFieldDtoFactory(prop, false);
                                     break;
                                 default:
+                                    Logger.Warn($"Detected string format of {currentProperty.Format} which is not handled by DSC");
+                                    Logger.Warn($"{prop.Key} will be defined as DATE");
+                                    fieldFactory = new VarcharFieldDtoFactory(prop, false);
                                     break;
                             }
                         }
                         else
                         {
                             Logger.Debug($"No string format detected");
-                            Logger.Debug($"Defined as VARCHAR");
+                            Logger.Debug($"{prop.Key} will be defined as VARCHAR");
                             fieldFactory = new VarcharFieldDtoFactory(prop, false);
                         }
 
@@ -567,11 +580,10 @@ namespace Sentry.data.Web.WebApi.Controllers
                         {
                             parentRow.ChildFields.Add(fieldFactory.GetField());
                         }
-
                         break;
                     case JsonObjectType.Integer:
                         Logger.Debug($"Detected type of {currentProperty.Type}");
-                        Logger.Debug($"Defined as INTEGER");
+                        Logger.Debug($"{prop.Key} will be defined as INTEGER");
 
                         fieldFactory = new IntegerFieldDtoFactory(prop, false);
 
@@ -586,7 +598,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                         break;
                     case JsonObjectType.Number:
                         Logger.Debug($"Detected type of {currentProperty.Type}");
-                        Logger.Debug($"Defined as DECIMAL");
+                        Logger.Debug($"{prop.Key} will be defined as DECIMAL");
                         fieldFactory = new DecimalFieldDtoFactory(prop, false);
 
                         if (parentRow == null)
@@ -602,7 +614,9 @@ namespace Sentry.data.Web.WebApi.Controllers
                     case JsonObjectType.File:
                     case JsonObjectType.Null:
                     case JsonObjectType.Boolean:
-                        Logger.Debug($"Detected type of {currentProperty.Type} which is not supported");
+                        Logger.Warn($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} which is not handled by DSC");
+                        Logger.Warn($"{prop.Key} will be defined as array of VARCHAR");
+                        fieldFactory = new VarcharFieldDtoFactory(prop, true);
                         break;
                 }
             }

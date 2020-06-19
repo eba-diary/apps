@@ -681,8 +681,7 @@ namespace Sentry.data.Core
 
             //if comparing, pull field from previous version
             BaseFieldDto previousFieldDtoVersion = (compare) ? previousRevision.Fields.FirstOrDefault(w => w.FieldGuid == row.FieldGuid).ToDto() : null;
-
-
+            
             bool changed = false;
             newField = row.ToEntity(parentRow, CurrentRevision);
 
@@ -693,118 +692,9 @@ namespace Sentry.data.Core
             }
             else
             {
-                changed = (compare) ? previousFieldDtoVersion.CompareToEntity(newField) : false;
+                changed = previousFieldDtoVersion.CompareToEntity(newField);
                 newField.LastUpdateDTM = (changed) ? CurrentRevision.LastUpdatedDTM : previousFieldDtoVersion.LastUpdatedDTM;
             }
-
-            //switch (row.FieldType.ToUpper())
-            //{
-            //    case "INTEGER":
-            //        //newField = new IntegerField() { };
-            //        //changed = compare && TryConvertTo<IntegerField>(previousFieldVersion) == null;
-            //        break;
-            //    case "DECIMAL":
-            //        //newField = new DecimalField()
-            //        //{
-            //        //    Precision = (row.Precision == 0) ? 8 : row.Precision,
-            //        //    Scale = (row.Scale == 0) ? 2 : row.Scale
-            //        //};
-
-            //        //if (compare && TryConvertTo<DecimalField>(previousFieldVersion) != null)
-            //        //{
-            //        //    if (changed != true && ((DecimalField)newField).Precision != ((DecimalField)previousFieldVersion).Precision) { changed = true; }
-            //        //    if (changed != true && ((DecimalField)newField).Scale != ((DecimalField)previousFieldVersion).Scale) { changed = true; }
-            //        //}
-            //        //else
-            //        //{
-            //        //    changed = true;
-            //        //}
-
-            //        break;
-            //    case "VARCHAR":
-            //        //newField = new VarcharField()
-            //        //{
-            //        //    FieldLength = (row.Length == 0) ? 8000 : row.Length
-            //        //};
-            //        //changed = compare && TryConvertTo<VarcharField>(previousFieldVersion) == null;
-            //        break;
-            //    case "DATE":
-            //        //newField = new DateField()
-            //        //{
-            //        //    SourceFormat = row.SourceFormat
-            //        //};
-
-            //        //if (compare && TryConvertTo<DateField>(previousFieldVersion) != null)
-            //        //{
-            //        //    if (changed != true && ((DateField)newField).SourceFormat != ((DateField)previousFieldVersion).SourceFormat) { changed = true; }
-            //        //}
-            //        //else
-            //        //{
-            //        //    changed = true;
-            //        //}
-
-            //        break;
-            //    case "TIMESTAMP":
-            //        //newField = new TimestampField()
-            //        //{
-            //        //    SourceFormat = row.SourceFormat
-            //        //};
-
-            //        //if (compare && TryConvertTo<TimestampField>(previousFieldVersion) != null)
-            //        //{
-            //        //    if (changed != true && ((TimestampField)newField).SourceFormat != ((TimestampField)previousFieldVersion).SourceFormat) { changed = true; }
-            //        //}
-            //        //else
-            //        //{
-            //        //    changed = true;
-            //        //}
-
-            //        break;
-            //    case "STRUCT":
-            //        //newField = new StructField() { };
-            //        //changed = compare && TryConvertTo<StructField>(previousFieldVersion) == null;
-            //        break;
-            //    case "BIGINT":
-            //        newField = new BigintField() { };
-            //        changed = compare && TryConvertTo<BigintField>(previousFieldVersion) == null;
-            //        break;
-            //    default:
-            //        Logger.Error($"updatefields - datatype not supported ({row.FieldType.ToUpper()})");
-            //        break;
-            //}
-
-            //if (newField != null)
-            //{
-            //    newField.Name = row.Name;
-            //    newField.ParentSchemaRevision = CurrentRevision;
-            //    newField.ParentField = parentRow;
-            //    newField.OrdinalPosition = row.OrdinalPosition;
-            //    newField.NullableIndicator = row.Nullable;
-            //    newField.IsArray = row.IsArray;
-            //    newField.Description = row.Description;
-            //    newField.FieldGuid = (row.FieldGuid == Guid.Empty) ? g : row.FieldGuid;
-
-            //    //if incoming field data is new, then comparison will be set to false.  So set these fields appropriately
-            //    if (!compare)
-            //    {
-            //        newField.CreateDTM = CurrentRevision.CreatedDTM;
-            //        newField.LastUpdateDTM = CurrentRevision.CreatedDTM;
-            //    }
-            //    //incoming field is existing so we are perofmring comparison.  Deteremine if changes occurred on this field to correctly update lastupdateddtm.
-            //    else
-            //    {
-            //        newField.CreateDTM = previousRevision.CreatedDTM;
-            //        if (changed != true && newField.Name != previousFieldVersion.Name) { changed = true; }
-            //        if (changed != true && newField.OrdinalPosition != previousFieldVersion.OrdinalPosition) { changed = true; }
-            //        if (changed != true && (parentRow != null) != (previousFieldVersion.ParentField != null) && (parentRow != null && previousFieldVersion.ParentField != null && parentRow.FieldGuid != previousFieldVersion.ParentField.FieldGuid)) { changed = true; }
-            //        if (changed != true && newField.NullableIndicator != previousFieldVersion.NullableIndicator) { changed = true; }
-            //        if (changed != true && newField.IsArray != previousFieldVersion.IsArray) { changed = true; }
-
-            //        newField.LastUpdateDTM = (changed) ? CurrentRevision.LastUpdatedDTM : previousFieldVersion.LastUpdateDTM;
-            //    }
-
-            //    _datasetContext.Add(newField);
-            //}
 
             _datasetContext.Add(newField);
 
