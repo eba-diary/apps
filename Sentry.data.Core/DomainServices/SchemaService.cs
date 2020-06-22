@@ -114,8 +114,7 @@ namespace Sentry.data.Core
                     {
                         SchemaRevision_Name = revisionname,
                         CreatedBy = _userService.GetCurrentUser().AssociateId,
-                        //JsonSchemaObject = jsonSchema
-                        JsonSchemaObject = ""
+                        JsonSchemaObject = jsonSchema
                     };
 
                     schema.AddRevision(revision);

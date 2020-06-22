@@ -264,28 +264,13 @@ namespace Sentry.data.Web.WebApi.Controllers
 
                 int configId = _configService.GetDatasetFileConfigDtoByDataset(datasetId).Where(w => w.Schema.SchemaId == schemaId).First().ConfigId;
 
-
-                //string jobj = schemaStructure.ToString();
-
-                //JSchema schema_v1 = JSchema.Parse(schemaStructure.ToString());
-                //JsonSchemaDriller(schema_v1);
-
-                //JsonSchemaDriller_v2(schema);
-                //bool valid = schemaStructure.IsValid(schema);
-
                 JsonSchema schema_v3 = await JsonSchema.FromJsonAsync(schemaStructure.ToString());
-                //string schema = JsonSchemaDriller_v3(schema_v3);
 
                 List<BaseFieldDto> schemarows_v2 = new List<BaseFieldDto>();
                 ToSchemaRows(schema_v3, schemarows_v2);
 
-                //_configService.UpdateFields(configId, schemaId, schemarows_v2, schema_v3.ToJson());
                 int savedRevisionId = _schemaService.CreateAndSaveSchemaRevision(schemaId, schemarows_v2, revisionName, schema_v3.ToJson());
 
-                //SchemaRevisionDto revisiondto = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
-                //SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
-                //List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisiondto.RevisionId);
-                //revisionDetailModel.Fields = fieldDtoList.ToSchemaFieldModel();
                 if (savedRevisionId == 0)
                 {
                     return Content(System.Net.HttpStatusCode.BadRequest, "Unable to Save Revision");
@@ -310,7 +295,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
         [HttpPost]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        [Route("dataset/{datasetId}/schema/{schemaId}/revision/GenerateSchemaFromSampleData")]
+        [Route("GenerateSchemaFromSampleData")]
         public async Task<IHttpActionResult> GenerateSchema(int datasetId, int schemaId, [FromBody] JObject data)
         {
             var schema = JsonSchema.FromSampleJson(JsonConvert.SerializeObject(data));
@@ -911,8 +896,8 @@ namespace Sentry.data.Web.WebApi.Controllers
             SchemaRevisionDto revisiondto = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
 
             JsonSchema schema = await JsonSchema.FromJsonAsync(revisiondto.JsonSchemaObject);
-
-            return Ok(schema);
+            string schema2 = JsonSchemaReferenceUtilities.ConvertPropertyReferences(schema.ToJson());
+            return Ok(JsonConvert.DeserializeObject<JsonSchema>(schema2));
         }
 
         /// <summary>
