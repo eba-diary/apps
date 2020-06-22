@@ -66,8 +66,20 @@ namespace Sentry.data.Web.Controllers
             DaleSearchModel searchModel = new DaleSearchModel();
             searchModel.Criteria = searchCriteria;
             searchModel.Destiny = destination.ToDaleDestiny();
-            searchModel.Sensitive = sensitive;
             searchModel.CanDaleSensitiveView = SharedContext.CurrentUser.CanDaleSensitiveView;
+
+            if (sensitive && searchModel.CanDaleSensitiveView)
+            {
+                searchModel.Sensitive = DaleSensitive.SensitiveOnly;
+            }
+            else if (searchModel.CanDaleSensitiveView)
+            {
+                searchModel.Sensitive = DaleSensitive.SensitiveAll;
+            }
+            else
+            {
+                searchModel.Sensitive = DaleSensitive.SensitiveNone;
+            }
 
             //DO NOT perform search if invalid criteria OR sensitive and they lack permissions. NOTE: if they lack permissions, VIEW hides ability to even click sensitive link
             if (!IsCriteriaValid(searchModel) || ( sensitive && !CanDaleSensitiveView() ) )            
@@ -89,7 +101,7 @@ namespace Sentry.data.Web.Controllers
         {
 
             //if sensitive query, don't bother to validate criteria and immediately return true
-            if (model.Sensitive)
+            if (model.Sensitive == DaleSensitive.SensitiveOnly)
             {
                 return true;
             }

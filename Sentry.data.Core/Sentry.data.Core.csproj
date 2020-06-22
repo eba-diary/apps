@@ -196,6 +196,7 @@
     <Compile Include="Extensions\DataSourceQueryExtensions.cs" />
     <Compile Include="Extensions\SchemaExtensions.cs" />
     <Compile Include="GlobalEnums\DaleDestiny.cs" />
+    <Compile Include="GlobalEnums\DaleSensitive.cs" />
     <Compile Include="GlobalEnums\DataFlowPreProcessingTypes.cs" />
     <Compile Include="GlobalEnums\HttpDataFormat.cs" />
     <Compile Include="GlobalEnums\HTTPMethods.cs" />
