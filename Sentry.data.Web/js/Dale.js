@@ -10,7 +10,7 @@
 
             //client side setup
             searching: true,
-            pageLength: 50,
+            pageLength: 100,
 
             ajax: {
                 url: "/Dale/GetSearchResultsClient/",
@@ -31,7 +31,8 @@
                 { data: "ObjectType", className: "ObjectType",searchable: "true" },
                 { data: "Column", className: "ColumnMan", searchable: "false" },
 
-                { data: "Alias", className: "Alias", visible: false,searchable: "false" },
+                { data: "IsSensitive", className: "IsSensitive", visible: false, searchable: "false" },
+                { data: "Alias", className: "Alias", visible: false, searchable: "false" },
                 { data: "ProdType", className: "ProdType", visible: false, searchable: "false" },
 
                 { data: "ColumnType", className: "ColumnType", visible: false, searchable: "false", width: "100px" },
@@ -42,11 +43,21 @@
                 { data: "EffectiveDate", className: "EffectiveDate", visible: false, searchable: "false" }
             ],
 
+            aLengthMenu: [
+                [20, 100, 500],
+                [20, 100, 500]
+            ],
+
             order: [2, 'desc'],
 
             //styles for columnVisibility to show
             dom: 'Blrtip',
-            buttons: ['colvis', 'csv']
+
+            buttons:
+            [
+                    { extend: 'colvis', text: 'Columns' },
+                    { extend: 'csv', text: 'Download' }
+            ]
         });
 
         //add a filter in each column
@@ -60,6 +71,7 @@
                 { type: "text" },
                 { type: "text" },
 
+                { type: "text" },
                 { type: "text" },
                 { type: "text" },
 
