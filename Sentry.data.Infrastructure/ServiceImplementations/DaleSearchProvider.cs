@@ -28,6 +28,9 @@ namespace Sentry.data.Infrastructure
                 SqlCommand command = new SqlCommand(BuildAQuery(dto), connection);
                 command.CommandTimeout = 0;
 
+                command.Parameters.AddWithValue("@Criteria", System.Data.SqlDbType.VarChar);
+                command.Parameters["@Criteria"].Value = "%" + dto.Criteria + "%";
+                
                 try
                 {
                     connection.Open();
@@ -52,7 +55,7 @@ namespace Sentry.data.Infrastructure
         private string BuildAQuery(DaleSearchDto dto)
         {
             string q = String.Empty;
-            string qSelect = "SELECT Asset_CDE, Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM,Alias_NME,Prod_Typ,BaseColumn_ID ";
+            string qSelect = "SELECT Asset_CDE, Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM,Alias_NME,Prod_Typ,BaseColumn_ID,IsSensitive_FLG ";
             string qFrom = "FROM Column_v ";
             string qWhereStatement = BuildAWhere(dto);
 
@@ -66,11 +69,12 @@ namespace Sentry.data.Infrastructure
             string qWhereColumn = String.Empty;
             string qWhereStatement = String.Empty;
 
-            if(dto.Sensitive)
+            //set variable portion of WHERE STATEMENT
+            if(dto.Sensitive == DaleSensitive.SensitiveOnly)
             {
                 qWhereStatement = "WHERE IsSensitive_FLG = 1 ";
             }
-            else
+            else 
             {
                 if (dto.Destiny == DaleDestiny.Object)
                 {
@@ -80,7 +84,14 @@ namespace Sentry.data.Infrastructure
                 {
                     qWhereColumn = "Column_NME";
                 }
-                qWhereStatement += "WHERE " + qWhereColumn + " LIKE '%" + dto.Criteria + "%'";
+               
+                qWhereStatement += "WHERE " + qWhereColumn + " LIKE @Criteria ";
+
+                //ONLY apply logic here if they dont want to see any sensitive information
+                if (dto.Sensitive == DaleSensitive.SensitiveNone)
+                {
+                    qWhereStatement += " AND ( IsSensitive_FLG <> 1 OR IsSensitive_FLG IS NULL) ";
+                }
             }
 
             qWhereStatement += " AND Expiration_DTM IS NULL";
@@ -90,7 +101,7 @@ namespace Sentry.data.Infrastructure
 
         private bool IsCriteriaValid(DaleSearchDto dto)
         {
-            if (dto.Sensitive)
+            if (dto.Sensitive == DaleSensitive.SensitiveOnly)
             {
                 return true;
             }
@@ -150,7 +161,12 @@ namespace Sentry.data.Infrastructure
             
             if (!reader.IsDBNull(14))
             {
-                result.Scale = reader.GetInt32(14);
+                result.BaseColumnId = reader.GetInt32(14);
+            }
+
+            if (!reader.IsDBNull(15))
+            {
+                result.IsSensitive = reader.GetBoolean(15);
             }
 
             return result;

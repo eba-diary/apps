@@ -14,6 +14,7 @@ namespace Sentry.data.Web
         public string ObjectType { get; set; }
         public string Column { get; set; }
 
+        public bool IsSensitive { get; set; }
         public string Alias { get; set; }
         public string ProdType { get; set; }
 
@@ -24,8 +25,8 @@ namespace Sentry.data.Web
         public int Scale { get; set; }
         public bool IsNullable { get; set; }
         public string EffectiveDate { get; set; }
+        public int BaseColumnId { get; set; }
 
         
-        public int BaseColumnId { get; set; }
     }
 }

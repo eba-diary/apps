@@ -17,7 +17,13 @@
         </div>
 
         <div style="float:left;">
-            <label style="color: #003da5;    font-family: KievitSlabWeb W03,Lucida Sans,serif;font-size:24px;">Data Inventory</label>
+            <h1 class="htCenter datasetHeader">Data Inventory</h1>
+        </div>
+
+        <div style="float:left; margin-left: 2px;">
+            <a href="https://confluence.sentry.com/display/CLA/Data+Inventory">
+                <em class="glyphicon glyphicon-info-sign" style="color:#003da5;"></em>
+            </a>
         </div>
 
     </div>
@@ -42,35 +48,33 @@
 
         </div>
 
-        <div id ="radioMadness" style="float:left;margin-left:25px;">
+        <div id ="radioMadness" style="float:left;margin-left:25px;" >
 
             <div style="text-align: left; font-family: KievitSlabWeb W03,Lucida Sans,serif;">
-                <label class="containerDale" style="text-align:left; width:150px;">
-                    Table/View
+             
+                <label style="text-align:left; width:100px;">
                     <input type="radio" name="Destiny" id="DestinyTableRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Object>
-                    <span class="checkmark"></span>
+                    Table/View
                 </label>
 
-                <label class="containerDale" style="text-align:left; width:100px;">
-                    @Sentry.data.Core.GlobalEnums.DaleDestiny.Column
+                <label style="text-align:left; width:75px;">
                     <input type="radio" name="Destiny" id="DestinyColumnRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Column checked="checked">
-                    <span class="checkmark"></span>
+                    @Sentry.data.Core.GlobalEnums.DaleDestiny.Column
                 </label>
+
             </div>
 
         </div>
 
         @if (Model.CanDaleSensitiveView)
         {
-            <div style="float:left;margin-left:10px;">
+            <div style="float:left;margin-left:10px;margin-top: 2px;">
 
-                <em class="glyphicon glyphicon-warning-sign" style="color:#00a3e0" ;></em>
-                <a href="#" id="sensitiveSearchLink" style="color:#00a3e0;font-weight: 500;">Show Sensitive Columns</a>
+                <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;"></em>
+                <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500;">Show Sensitive Columns</a>
 
             </div>
-            
         }
-
 
     </div>
 
