@@ -64,36 +64,7 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> RequestMethodDropdown { get; set; }
         public IEnumerable<SelectListItem> RequestDataFormatDropdown { get; set; }
         public IEnumerable<SelectListItem> FtpPatternDropDown { get; internal set; }
-
-        public IEnumerable<SelectListItem> SchedulePickerDropdown
-        {
-            get
-            {
-                List<SelectListItem> list = new List<SelectListItem>();
-                String[] picker = new String[5] { "Hourly", "Daily", "Weekly", "Monthly", "Yearly" };
-
-                int i = 0;
-                SelectListItem sli = new SelectListItem()
-                {
-                    Text = "Pick a Schedule",
-                    Selected = true,
-                    Disabled = true
-                };
-                list.Add(sli);
-                foreach (String s in picker)
-                {
-                    sli = new SelectListItem()
-                    {
-                        Text = s,
-                        Value = i.ToString()
-                    };
-                    list.Add(sli);
-                    i++;
-                }
-
-                return list;
-            }
-        }
+        public IEnumerable<SelectListItem> SchedulePickerDropdown { get; set; }
 
         public List<string> SourceIds { get; set; }
 

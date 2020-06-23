@@ -1,6 +1,6 @@
 ﻿data.Job = {
 
-    FormInit: function () {        
+    FormInit: function () {
         $("[id$='SelectedSourceType']").change(function () {
             var selectBox = this;
             data.Job.SetDataSourceSpecificPanels();
@@ -153,6 +153,16 @@
         };
 
         $("#compressionPanel").toggle($("#IsSourceCompressed").is(':checked'));
+
+        // If this is an init of page with existing data
+        var dataSourceElement = $("[id$='SelectedDataSource']")[0];
+        var dataSourceVal = $("[id$='SelectedDataSource']").val();
+        if (dataSourceVal !== undefined && dataSourceVal !== null) {
+            var element = dataSourceElement;
+            var event = new Event('change');
+            element.dispatchEvent(event);
+        }
+
     },
 
     SetFtpPatternDefaults: function (patternSelection) {
