@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace Sentry.data.Core
 {
@@ -18,11 +19,12 @@ namespace Sentry.data.Core
         private readonly IEmailService _emailService;
         private readonly ISecurityService _securityService;
         private readonly IDataFeatures _featureFlags;
+        private readonly IMessagePublisher _messagePublisher;
         private string _bucket;
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -31,6 +33,7 @@ namespace Sentry.data.Core
             _jobService = jobService;
             _securityService = securityService;
             _featureFlags = dataFeatures;
+            _messagePublisher = messagePublisher;
         }
 
         private string RootBucket
@@ -69,6 +72,91 @@ namespace Sentry.data.Core
             return newSchema.SchemaId;
         }
 
+        public int CreateAndSaveSchemaRevision(int schemaId, List<BaseFieldDto> schemaRows, string revisionname, string jsonSchema = null)
+        {
+            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).Select(s => s.ParentDataset).FirstOrDefault();
+
+            try
+            {
+                UserSecurity us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+                if (!(us.CanEditDataset))
+                {
+                    try
+                    {
+                        IApplicationUser user = _userService.GetCurrentUser();
+                        Logger.Info($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access: Id:{user.AssociateId}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access", ex);
+                    }
+                    throw new SchemaUnauthorizedAccessException();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} failed to retrieve UserSecurity object", ex);
+                throw new SchemaUnauthorizedAccessException();
+            }
+
+
+            FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
+            SchemaRevision revision;
+            SchemaRevision latestRevision = null;
+
+            try
+            {
+                if (schema != null)
+                {
+                    latestRevision = _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schema.SchemaId).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();
+                    
+                    revision = new SchemaRevision()
+                    {
+                        SchemaRevision_Name = revisionname,
+                        CreatedBy = _userService.GetCurrentUser().AssociateId,
+                        JsonSchemaObject = jsonSchema
+                    };
+
+                    schema.AddRevision(revision);
+
+                    _datasetContext.Add(revision);
+
+
+                    //filter out fields marked for deletion
+                    foreach (var row in schemaRows.Where(w => !w.DeleteInd))
+                    {
+                        revision.Fields.Add(AddRevisionField(row, revision, previousRevision: latestRevision));
+                    }
+
+                    //Add posible checksum validation here
+
+                    _datasetContext.SaveChanges();
+
+                    //Send message to create hive table
+                    HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
+                    {
+                        SchemaID = revision.ParentSchema.SchemaId,
+                        RevisionID = revision.SchemaRevision_Id,
+                        DatasetID = ds.DatasetId,
+                        HiveStatus = null,
+                        InitiatorID = _userService.GetCurrentUser().AssociateId
+                    };
+                    _messagePublisher.PublishDSCEvent(schemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
+
+                    return revision.SchemaRevision_Id;
+                }
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failed to add revision", ex);
+
+                return 0;
+            }
+        }
+
+
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
         {
             
@@ -91,10 +179,10 @@ namespace Sentry.data.Core
                  *      set notification trigger to true
                  *      set type of notification
                  */
-                if (SchemaRevisionExists && schema.IsInSAS != schemaDto.IsInSAS)
+                if (SchemaRevisionExists && schema.IsInSAS != schemaDto.IsInSas)
                 {
                     SendSASNotification = true;
-                    SASNotificationType = (schemaDto.IsInSAS) ? "ADD" : "REMOVE";
+                    SASNotificationType = (schemaDto.IsInSas) ? "ADD" : "REMOVE";
                 }
 
                 /*
@@ -105,7 +193,7 @@ namespace Sentry.data.Core
                  *      set notification trigger to true
                  *      set type of notification
                  */
-                if (SchemaRevisionExists && (schemaDto.IsInSAS || (SASNotificationType != null && SASNotificationType.ToUpper() == "REMOVE")) && schema.CreateCurrentView != schemaDto.CreateCurrentView)
+                if (SchemaRevisionExists && (schemaDto.IsInSas || (SASNotificationType != null && SASNotificationType.ToUpper() == "REMOVE")) && schema.CreateCurrentView != schemaDto.CreateCurrentView)
                 {
                     SendSASNotification = true;
                     CurrentViewNotificationType = (schemaDto.CreateCurrentView) ? "ADD" : "REMOVE";
@@ -137,7 +225,7 @@ namespace Sentry.data.Core
             {
                 schema.Name = dto.Name;
                 chgDetected = true;
-            };
+            }
             if (schema.Delimiter != dto.Delimiter)
             {
                 schema.Description = dto.Description;
@@ -163,9 +251,9 @@ namespace Sentry.data.Core
                 schema.HasHeader = dto.HasHeader;
                 chgDetected = true;
             }
-            if (schema.IsInSAS != dto.IsInSAS)
+            if (schema.IsInSAS != dto.IsInSas)
             {
-                schema.IsInSAS = dto.IsInSAS;
+                schema.IsInSAS = dto.IsInSas;
                 chgDetected = true;
             }
             if (schema.CLA1396_NewEtlColumns != dto.CLA1396_NewEtlColumns)
@@ -394,7 +482,7 @@ namespace Sentry.data.Core
                 Extension = (dto.FileExtensionId != 0) ? _datasetContext.GetById<FileExtension>(dto.FileExtensionId) : (dto.FileExtenstionName != null) ? _datasetContext.FileExtensions.Where(w => w.Name == dto.FileExtenstionName).FirstOrDefault() : null,
                 Delimiter = dto.Delimiter,
                 HasHeader = dto.HasHeader,
-                IsInSAS = dto.IsInSAS,
+                IsInSAS = dto.IsInSas,
                 SasLibrary = CommonExtensions.GenerateSASLibaryName(_datasetContext.GetById<Dataset>(dto.ParentDatasetId)),
                 Description = dto.Description,
                 StorageCode = storageCode,
@@ -422,7 +510,7 @@ namespace Sentry.data.Core
                 Delimiter = scm.Delimiter,
                 FileExtensionId = scm.Extension.Id,
                 HasHeader = scm.HasHeader,
-                IsInSAS = scm.IsInSAS,
+                IsInSas = scm.IsInSAS,
                 SasLibrary = scm.SasLibrary,
                 SchemaEntity_NME = scm.SchemaEntity_NME,
                 SchemaId = scm.SchemaId,
@@ -592,6 +680,57 @@ namespace Sentry.data.Core
         private string GenerateHiveDatabaseName(Category cat)
         {            
             return "dsc_" + cat.Name.ToLower();
+        }
+
+        private BaseField AddRevisionField(BaseFieldDto row, SchemaRevision CurrentRevision, BaseField parentRow = null, SchemaRevision previousRevision = null)
+        {
+            BaseField newField = null;
+            //Should we perform comparison to previous based on is incoming field new
+            bool compare = (row.FieldGuid.ToString() != Guid.Empty.ToString() && previousRevision != null);
+
+            //if comparing, pull field from previous version
+            BaseFieldDto previousFieldDtoVersion = (compare) ? previousRevision.Fields.FirstOrDefault(w => w.FieldGuid == row.FieldGuid).ToDto() : null;
+            
+            bool changed = false;
+            newField = row.ToEntity(parentRow, CurrentRevision);
+
+            if (!compare)
+            {
+                newField.CreateDTM = CurrentRevision.CreatedDTM;
+                newField.LastUpdateDTM = CurrentRevision.CreatedDTM;
+            }
+            else
+            {
+                changed = previousFieldDtoVersion.CompareToEntity(newField);
+                newField.LastUpdateDTM = (changed) ? CurrentRevision.LastUpdatedDTM : previousFieldDtoVersion.LastUpdatedDtm;
+            }
+
+            _datasetContext.Add(newField);
+
+            //if there are child rows, perform a recursive call to this function
+            if (newField != null && row.ChildFields != null)
+            {
+                foreach (BaseFieldDto cRow in row.ChildFields)
+                {
+                    newField.ChildFields.Add(AddRevisionField(cRow, CurrentRevision, newField, previousRevision));
+                }
+            }
+
+            return newField;
+        }
+
+        public static Object TryConvertTo<T>(Object input)
+        {
+            Object result = null;
+            try
+            {
+                result = Convert.ChangeType(input, typeof(T));
+                return result;
+            }
+            catch (Exception)
+            {
+                return result;
+            }
         }
     }
 }

@@ -15,5 +15,6 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public string CreatedByName { get; set; }
         public string CreatedDTM { get; set; }
         public string LastUpdatedDTM { get; set; }
+        public string JsonSchemaObject { get; set; }
     }
 }

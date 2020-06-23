@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Sentry.data.Web.Models.ApiModels.Schema;
-
+using NJsonSchema;
+using Sentry.data.Core;
+using System.Text;
+using Sentry.data.Core.Factories.Fields;
 
 namespace Sentry.data.Web
 {
@@ -29,7 +32,8 @@ namespace Sentry.data.Web
                 CreatedBy = dto.CreatedBy,
                 CreatedByName = dto.CreatedByName,
                 CreatedDTM = dto.CreatedDTM.ToString("s"),
-                LastUpdatedDTM = dto.LastUpdatedDTM.ToString("s")
+                LastUpdatedDTM = dto.LastUpdatedDTM.ToString("s"),
+                JsonSchemaObject = dto.JsonSchemaObject
             };
         }
 
@@ -60,8 +64,8 @@ namespace Sentry.data.Web
                 FieldGuid = dto.FieldGuid,
                 FieldType = dto.FieldType,
                 IsArray = dto.IsArray,
-                CreateDTM = dto.CreateDTM.ToString("s"),
-                LastUpdatedDTM = dto.LastUpdatedDTM.ToString("s"),
+                CreateDTM = dto.CreateDtm.ToString("s"),
+                LastUpdatedDTM = dto.LastUpdatedDtm.ToString("s"),
                 Nullable = dto.Nullable,
                 OrdinalPosition = dto.OrdinalPosition,
                 Precision = dto.Precision,
@@ -123,7 +127,7 @@ namespace Sentry.data.Web
                 Position = dto.OrdinalPosition,
                 Precision = dto.Precision.ToString(),
                 Scale = dto.Scale.ToString(),
-                LastUpdated = dto.LastUpdatedDTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds,
+                LastUpdated = dto.LastUpdatedDtm.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds,
                 DataObjectField_ID = dto.FieldId,
                 Length = dto.Length.ToString()
             };
@@ -153,10 +157,62 @@ namespace Sentry.data.Web
                 Delimiter = model.Delimiter,
                 FileExtenstionName = model.FileFormat,
                 HasHeader = model.HasHeader,
-                IsInSAS = model.AddToSAS,
+                IsInSas = model.AddToSAS,
                 CreateCurrentView = model.CurrentView,
                 Description = model.Description
             };
+        }
+
+        public static List<BaseFieldDto> ToDto(this List<SchemaRow> schemaRows)
+        {
+            List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            foreach(SchemaRow row in schemaRows)
+            {
+                dtoList.Add(row.ToDto());
+            }
+
+            return dtoList;
+        }
+
+        public static BaseFieldDto ToDto(this SchemaRow row)
+        {
+            FieldDtoFactory fieldFactory;
+            switch (row.DataType.ToUpper())
+            {
+                case GlobalConstants.Datatypes.DECIMAL:
+                    fieldFactory = new DecimalFieldDtoFactory(row); 
+                    break;
+                case GlobalConstants.Datatypes.DATE:
+                    fieldFactory = new DateFieldDtoFactory(row);
+                    break;
+                case GlobalConstants.Datatypes.INTEGER:
+                    fieldFactory = new IntegerFieldDtoFactory(row);
+                    break;
+                case GlobalConstants.Datatypes.STRUCT:
+                    fieldFactory = new StructFieldDtoFactory(row);
+                    break;
+                case GlobalConstants.Datatypes.TIMESTAMP:
+                    fieldFactory = new TimestampFieldDtoFactory(row);
+                    break;
+                case GlobalConstants.Datatypes.VARCHAR:
+                    fieldFactory = new VarcharFieldDtoFactory(row);
+                    break;
+                default:
+                    fieldFactory = new VarcharFieldDtoFactory(row);
+                    break;
+            }
+
+            BaseFieldDto dto = fieldFactory.GetField();
+
+            if (row.ChildRows != null && row.ChildRows.Any())
+            {
+                foreach (SchemaRow childrow in row.ChildRows)
+                {
+                    dto.ChildFields.Add(childrow.ToDto());
+                }
+            }
+
+            return dto;
         }
     }
 }

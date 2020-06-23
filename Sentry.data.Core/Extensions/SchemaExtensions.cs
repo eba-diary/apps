@@ -1,8 +1,6 @@
-﻿using System;
+﻿using Sentry.data.Core.Factories.Fields;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -18,56 +16,52 @@ namespace Sentry.data.Core
                 SchemaRevisionName = revision.SchemaRevision_Name,
                 CreatedBy = revision.CreatedBy,
                 CreatedDTM = revision.CreatedDTM,
-                LastUpdatedDTM = revision.LastUpdatedDTM
+                LastUpdatedDTM = revision.LastUpdatedDTM,
+                JsonSchemaObject = revision.JsonSchemaObject
             };
         }
 
         public static BaseFieldDto ToDto(this BaseField field)
         {
-            BaseFieldDto dto = new BaseFieldDto()
-            {
-                FieldId = field.FieldId,
-                FieldGuid = field.FieldGuid,
-                Name = field.Name,
-                CreateDTM = field.CreateDTM,
-                LastUpdatedDTM = field.LastUpdateDTM,
-                FieldType = field.FieldType.ToString(),
-                Nullable = field.NullableIndicator,
-                OrdinalPosition = field.OrdinalPosition,
-                Description = field.Description,
-                IsArray = field.IsArray
-            };
+            FieldDtoFactory factory;
+            BaseFieldDto dto = null;
 
-            switch (field.FieldType)
+            switch (field)
             {                 
-                case SchemaDatatypes.DECIMAL:
-                    dto.Precision = ((DecimalField)field).Precision;
-                    dto.Scale = ((DecimalField)field).Scale;
+                case DecimalField dm:
+                    factory = new DecimalFieldDtoFactory(dm);
                     break;
-                case SchemaDatatypes.DATE:
-                    dto.SourceFormat = ((DateField)field).SourceFormat;
+                case DateField dt:
+                    factory = new DateFieldDtoFactory(dt);
                     break;
-                case SchemaDatatypes.TIMESTAMP:
-                    dto.SourceFormat = ((TimestampField)field).SourceFormat;
+                case TimestampField tm:
+                    factory = new TimestampFieldDtoFactory(tm);
                     break;
-                case SchemaDatatypes.VARCHAR:
-                    dto.Length = ((VarcharField)field).FieldLength;
+                case VarcharField v:
+                    factory = new VarcharFieldDtoFactory(v);
                     break;
-                case SchemaDatatypes.STRUCT:
-                case SchemaDatatypes.NONE:
-                case SchemaDatatypes.INTEGER:
-                case SchemaDatatypes.BIGINT:
+                case IntegerField i:
+                    factory = new IntegerFieldDtoFactory(i);
+                    break;
+                case StructField s:
+                    factory = new StructFieldDtoFactory(s);
+                    break;
                 default:
+                    factory = null;
                     break;
             }
 
-
-            List<BaseFieldDto> childList = new List<BaseFieldDto>();
-            foreach (BaseField childField in field.ChildFields)
+            if (factory != null)
             {
-                childList.Add(childField.ToDto());
+                dto = factory.GetField();
+
+                List<BaseFieldDto> childList = new List<BaseFieldDto>();
+                foreach (BaseField childField in field.ChildFields)
+                {
+                    childList.Add(childField.ToDto());
+                }
+                dto.ChildFields = childList;
             }
-            dto.ChildFields = childList;
 
             return dto;
         }
@@ -96,6 +90,19 @@ namespace Sentry.data.Core
                 FileExtensionId = dsDto.FileExtensionId,
                 ParentDatasetId = dsDto.DatasetId
             };
+        }
+        public static Object TryConvertTo<T>(Object input)
+        {
+            Object result = null;
+            try
+            {
+                result = Convert.ChangeType(input, typeof(T));
+                return result;
+            }
+            catch (Exception)
+            {
+                return result;
+            }
         }
     }
 }

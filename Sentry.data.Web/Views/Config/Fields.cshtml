@@ -710,8 +710,14 @@
                     dataType: "json",
                     contentType: "application/json",
                     success: function (returnedData) {
-                        $('#buttonSpinner').hide();
-                        window.location.href = "/Config/Dataset/@Model.DatasetId";
+                        if (Sentry.WasAjaxSuccessful(returnedData)) {                            
+                            $('#buttonSpinner').hide();
+                            window.location.href = "/Config/Dataset/@Model.DatasetId";
+                        }
+                        else {
+                            $('#buttonSpinner').hide();
+                            var modal = Sentry.ShowModalAlert(returnedData.Message, function () { })
+                        }
                     },
                     error: function (error) {
                         console.log(error);
