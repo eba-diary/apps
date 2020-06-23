@@ -52,6 +52,10 @@
                             <div class="textReadOnly">
                                 @Html.Raw(Sentry.data.Web.Helpers.Utility.FormatCategoryList(Model.CategoryNames))
                             </div>
+                            for (int i = 0; i < Model.DatasetCategoryIds.Count; i++)
+                            {
+                                @Html.HiddenFor(model => model.DatasetCategoryIds[i])
+                            }
                         }
                     </div>
                 </div>
