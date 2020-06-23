@@ -1,21 +1,20 @@
-﻿using Sentry.data.Common;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NJsonSchema;
+using Sentry.Common.Logging;
+using Sentry.data.Common;
 using Sentry.data.Core;
-using Sentry.data.Infrastructure;
+using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.Factories.Fields;
+using Sentry.data.Web.Models.ApiModels.Dataset;
+using Sentry.data.Web.Models.ApiModels.Schema;
+using Sentry.WebAPI.Versioning;
+using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Description;
-using Swashbuckle.Swagger.Annotations;
-using Sentry.data.Web.Models.ApiModels.Dataset;
-using Sentry.data.Web.Models.ApiModels.Config;
-using Sentry.data.Web.Models.ApiModels.Schema;
-using Sentry.WebAPI.Versioning;
-using Sentry.Common.Logging;
-using Newtonsoft.Json;
-using Sentry.data.Web.WebApi;
-using Sentry.data.Core.Exceptions;
 using System.Web.Http.Results;
 
 namespace Sentry.data.Web.WebApi.Controllers
@@ -25,25 +24,20 @@ namespace Sentry.data.Web.WebApi.Controllers
     [WebApiAuthorizeUseApp]
     public class MetadataController : BaseWebApiController
     {
-        private MetadataRepositoryService _metadataRepositoryService;
-        private IDatasetContext _dsContext;
-        private IAssociateInfoProvider _associateInfoService;
-        private UserService _userService;
-        private IConfigService _configService;
-        private IDatasetService _datasetService;
-        private ISchemaService _schemaService;
-        private ISecurityService _securityService;
-        private IDataFlowService _dataFlowService;
+        private readonly IDatasetContext _dsContext;
+        private readonly UserService _userService;
+        private readonly IConfigService _configService;
+        private readonly IDatasetService _datasetService;
+        private readonly ISchemaService _schemaService;
+        private readonly ISecurityService _securityService;
+        private readonly IDataFlowService _dataFlowService;
 
-        public MetadataController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext,
-                                IAssociateInfoProvider associateInfoService, UserService userService,
+        public MetadataController(IDatasetContext dsContext, UserService userService,
                                 IConfigService configService, IDatasetService datasetService,
                                 ISchemaService schemaService, ISecurityService securityService,
                                 IDataFlowService dataFlowService)
         {
-            _metadataRepositoryService = metadataRepositoryService;
             _dsContext = dsContext;
-            _associateInfoService = associateInfoService;
             _userService = userService;
             _configService = configService;
             _datasetService = datasetService;
@@ -146,7 +140,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 return NotFound();
             }
-            catch(DatasetUnauthorizedAccessException duax)
+            catch (DatasetUnauthorizedAccessException duax)
             {
                 throw new UnauthorizedAccessException("Unauthroized Access to Dataset", duax);
             }
@@ -195,7 +189,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 Logger.Error($"metdataapi_getschema_internalserverserror - datasetId:{datasetId} schemaId{schemaId}", ex);
                 return InternalServerError();
-            }            
+            }
         }
 
         /// <summary>
@@ -214,7 +208,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         public async Task<IHttpActionResult> GetSchemaRevisionBySchema(int datasetId, int schemaId)
         {
             ValidateViewPermissionsForDataset(datasetId);
-                        
+
             try
             {
                 if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Where(w => !w.DeleteInd).Any(w => w.Schema.SchemaId == schemaId))
@@ -242,6 +236,63 @@ namespace Sentry.data.Web.WebApi.Controllers
                 Logger.Error($"metadataapi_getschemarevisionbyschema_internalservererror - datasetId:{datasetId} schemaId{schemaId}", ex);
                 return InternalServerError();
             }
+        }
+
+        [HttpPost]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("dataset/{datasetId}/schema/{schemaId}/revision")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(int))]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, null)]
+        public async Task<IHttpActionResult> AddSchemaRevision(int datasetId, int schemaId, string revisionName, [FromBody] JObject schemaStructure)
+        {
+            try
+            {
+                ValidateModifyPermissionsForDataset(datasetId);
+
+                if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
+                {
+                    throw new SchemaNotFoundException();
+                }
+
+                JsonSchema schema_v3 = await JsonSchema.FromJsonAsync(schemaStructure.ToString());
+
+                List<BaseFieldDto> schemarows_v2 = new List<BaseFieldDto>();
+                ToSchemaRows(schema_v3, schemarows_v2);
+
+                int savedRevisionId = _schemaService.CreateAndSaveSchemaRevision(schemaId, schemarows_v2, revisionName, schema_v3.ToJson());
+
+                if (savedRevisionId == 0)
+                {
+                    return Content(System.Net.HttpStatusCode.BadRequest, "Unable to Save Revision");
+                }
+                return Ok(savedRevisionId);
+            }
+            catch (DatasetUnauthorizedAccessException)
+            {
+                Logger.Debug($"{nameof(SchemaService).ToLower()}_{nameof(AddSchemaRevision).ToLower()}_unauthorizedexception dataset - datasetId:{datasetId} schemaId:{schemaId}");
+                return Content(System.Net.HttpStatusCode.Unauthorized, "Unauthroized Access to Dataset");
+            }
+            catch (SchemaUnauthorizedAccessException)
+            {
+                Logger.Debug($"{nameof(SchemaService).ToLower()}_{nameof(AddSchemaRevision).ToLower()}_unauthorizedexception schema - datasetId:{datasetId} schemaId:{schemaId}");
+                return Content(System.Net.HttpStatusCode.Unauthorized, "Unauthroized Access to Schema");
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+        [HttpPost]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("GenerateSchemaFromSampleData")]
+        public async Task<IHttpActionResult> GenerateSchema([FromBody] JObject data)
+        {
+            var schema = JsonSchema.FromSampleJson(JsonConvert.SerializeObject(data));
+            string schema2 = JsonSchemaReferenceUtilities.ConvertPropertyReferences(schema.ToJson());
+            return Ok(JsonConvert.DeserializeObject<JsonSchema>(schema2));
         }
 
         /// <summary>
@@ -297,6 +348,33 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 Logger.Error($"metadataapi_getlatestschemarevisiondetail_badrequest - datasetid:{datasetId} schemaid:{schemaId}", ex);
                 return InternalServerError();
+            }
+        }
+
+        /// <summary>
+        ///  Will return jsonschema associated with DSC schema, only if latest revision was updated via API.
+        /// </summary>
+        /// <param name="datasetId"></param>
+        /// <param name="schemaId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("dataset/{datasetId}/schema/{schemaId}/revision/latest/jsonschema")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(JObject))]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
+        public async Task<IHttpActionResult> GetLatestSchemaRevisionJsonFormat(int datasetId, int schemaId)
+        {
+            SchemaRevisionDto revisiondto = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
+
+            if (revisiondto.JsonSchemaObject != null)
+            {
+                JsonSchema schema = await JsonSchema.FromJsonAsync(revisiondto.JsonSchemaObject);
+                string schema2 = JsonSchemaReferenceUtilities.ConvertPropertyReferences(schema.ToJson());
+                return Ok(JsonConvert.DeserializeObject<JsonSchema>(schema2));
+            }
+            else
+            {
+                return Content(System.Net.HttpStatusCode.NotFound, "Latest revision was not updated via API");
             }
         }
 
@@ -748,6 +826,321 @@ namespace Sentry.data.Web.WebApi.Controllers
                 throw new DatasetUnauthorizedAccessException();
             }
         }
+
+
+        private static void ToSchemaRows(JsonSchema schema, List<BaseFieldDto> schemaRowList, BaseFieldDto parentSchemaRow = null)
+        {
+            try
+            {
+                switch (schema.Type)
+                {
+                    case JsonObjectType.Object:
+                        foreach (KeyValuePair<string, JsonSchemaProperty> prop in schema.Properties.ToList())
+                        {
+                            ToSchemaRow(prop, schemaRowList, parentSchemaRow);
+                        }
+                        break;
+                    case JsonObjectType.None:
+                        if (schema.HasReference)
+                        {
+                            ToSchemaRows(schema.Reference, schemaRowList, parentSchemaRow);
+                        }
+                        else
+                        {
+                            if (parentSchemaRow == null)
+                            {
+                                Logger.Warn("Unhandled Scenario");
+                            }
+                            else
+                            {
+                                parentSchemaRow.Description = "MOCKED OUT";
+                            }
+                        }
+                        break;
+                    default:
+                        Logger.Warn($"Unhandled Scenario for schema object type of {schema.Type}");
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("ToSchemaRows Error", ex);
+                throw;
+            }
+        }
+
+        private static void ToSchemaRow(KeyValuePair<string, JsonSchemaProperty> prop, List<BaseFieldDto> schemaRowList, BaseFieldDto parentRow = null)
+        {
+            try
+            {
+                FieldDtoFactory fieldFactory = null;
+
+                JsonSchemaProperty currentProperty = prop.Value;
+                Logger.Debug($"Found property:{prop.Key}");
+                switch (currentProperty.Type)
+                {
+                    case JsonObjectType.None:
+                        Logger.Debug($"Detected type of {currentProperty.Type}");
+                        if (currentProperty.HasReference)
+                        {
+                            Logger.Debug($"Detected ref object: property will be defined as STRUCT");
+                            fieldFactory = new StructFieldDtoFactory(prop, false);
+                            BaseFieldDto noneStructField = fieldFactory.GetField();
+
+                            if (parentRow == null)
+                            {
+                                schemaRowList.Add(noneStructField);
+                            }
+                            else
+                            {
+                                parentRow.ChildFields.Add(noneStructField);
+                            }
+
+                            ToSchemaRows(currentProperty.Reference, schemaRowList, noneStructField);
+                        }
+                        else
+                        {
+                            Logger.Warn($"No ref object detected");
+                            Logger.Warn($"{prop.Key} will be defined as STRUCT");
+                            fieldFactory = new VarcharFieldDtoFactory(prop, false);
+
+                            if (parentRow == null)
+                            {
+                                schemaRowList.Add(fieldFactory.GetField());
+                            }
+                            else
+                            {
+                                parentRow.ChildFields.Add(fieldFactory.GetField());
+                            }
+                        }
+                        break;
+                    case JsonObjectType.Object:
+                        Logger.Debug($"Detected type of {currentProperty.Type}");
+                        Logger.Debug($"Detected ref object: property will be defined as STRUCT");
+                        fieldFactory = new StructFieldDtoFactory(prop, false);
+                        BaseFieldDto objectStructfield = fieldFactory.GetField();
+
+                        if (parentRow == null)
+                        {
+                            schemaRowList.Add(objectStructfield);
+                        }
+                        else
+                        {
+                            parentRow.ChildFields.Add(objectStructfield);
+                        }
+
+                        foreach (KeyValuePair<string, JsonSchemaProperty> nestedProp in currentProperty.Properties)
+                        {
+                            ToSchemaRow(nestedProp, schemaRowList, objectStructfield);
+                        }
+
+                        break;
+                    case JsonObjectType.Array:
+                        Logger.Debug($"Detected type of {currentProperty.Type}");
+
+                        JsonSchema nestedSchema = null;
+                        //While JSON Schema alows an arrays of multiple types, DSC only allows single type.
+
+                        if (currentProperty.Items.Count == 0 && currentProperty.Item == null)
+                        {
+                            JsonSchema refSchema = currentProperty.ParentSchema.Definitions.FirstOrDefault(w => w.Key.ToUpper() == prop.Key.ToUpper()).Value;
+                            if (refSchema == null)
+                            {
+                                throw new ArgumentException("Not valid schema: Array does not contain items");
+                            }
+                            else
+                            {
+                                nestedSchema = refSchema;
+                            }
+                        }
+                        else if (currentProperty.Items.Count == 0 && currentProperty.Item != null)
+                        {
+                            nestedSchema = currentProperty.Item;
+                        }
+                        else
+                        {
+                            if (currentProperty.Items.Count > 1)
+                            {
+                                Logger.Warn($"Schema contains multiple items within array ({prop.Key}) - taking first Item");
+                            }
+                            nestedSchema = currentProperty.Items.First();
+                        }
+
+                        //Determine what this is an array of
+                        if (nestedSchema.IsObject)
+                        {
+                            Logger.Debug($"Detected nested schema as Object");
+                            Logger.Debug($"{prop.Key} will be defined as array of STRUCT");
+                            fieldFactory = new StructFieldDtoFactory(prop, true);
+                        }
+                        else
+                        {
+                            switch (nestedSchema.Type)
+                            {
+                                case JsonObjectType.Object:
+                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
+                                    Logger.Debug($"{prop.Key} will be defined as array of STRUCT");
+                                    fieldFactory = new StructFieldDtoFactory(prop, true);
+                                    break;
+                                case JsonObjectType.Integer:
+                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
+                                    Logger.Debug($"{prop.Key} will be defined as array of INTEGER");
+                                    fieldFactory = new IntegerFieldDtoFactory(prop, true);
+                                    break;
+                                case JsonObjectType.String:
+                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
+                                    switch (currentProperty.Format)
+                                    {
+                                        case "date-time":
+                                            Logger.Debug($"Detected string format of {currentProperty.Format}");
+                                            Logger.Debug($"{prop.Key} will be defined as array of TIMESTAMP");
+                                            fieldFactory = new TimestampFieldDtoFactory(prop, true);
+                                            break;
+                                        case "date":
+                                            Logger.Debug($"Detected string format of {currentProperty.Format}");
+                                            Logger.Debug($"{prop.Key} will be defined as array of DATE");
+                                            fieldFactory = new DateFieldDtoFactory(prop, true);
+                                            break;
+                                        default:
+                                            Logger.Debug($"No string format detected");
+                                            Logger.Debug($"{prop.Key} will be defined as array of VARCHAR");
+                                            fieldFactory = new VarcharFieldDtoFactory(prop, true);
+                                            break;
+                                    }
+                                    break;
+                                case JsonObjectType.Number:
+                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
+                                    Logger.Debug($"{prop.Key} will be defined as array of DECIMAL");
+                                    fieldFactory = new DecimalFieldDtoFactory(prop, true);
+                                    break;
+                                case JsonObjectType.None:
+                                    if (nestedSchema.IsAnyType)
+                                    {
+                                        Logger.Debug($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} and marked as IsAnyType");
+                                        Logger.Debug($"{prop.Key} will be defined as array of VARCHAR");
+                                        fieldFactory = new VarcharFieldDtoFactory(prop, true);
+                                    }
+                                    else
+                                    {
+                                        Logger.Debug($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()}");
+                                        Logger.Debug($"{prop.Key} will be defined as array of VARCHAR");
+                                        fieldFactory = new VarcharFieldDtoFactory(prop, true);
+                                    }
+                                    break;
+                                default:
+                                    Logger.Warn($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} which is not handled by DSC");
+                                    Logger.Warn($"{prop.Key} will be defined as array of VARCHAR");
+                                    fieldFactory = new VarcharFieldDtoFactory(prop, true);
+                                    break;
+                            }
+                        }
+
+                        BaseFieldDto field = fieldFactory.GetField();
+
+                        ToSchemaRows(nestedSchema, schemaRowList, field);
+
+                        if (parentRow == null)
+                        {
+                            schemaRowList.Add(field);
+                        }
+                        else
+                        {
+                            parentRow.ChildFields.Add(field);
+                        }
+                        break;
+                    case JsonObjectType.String:
+                        Logger.Debug($"Detected type of {currentProperty.Type}");
+
+                        if (!String.IsNullOrWhiteSpace(currentProperty.Format))
+                        {
+                            switch (currentProperty.Format)
+                            {
+                                case "date-time":
+                                    Logger.Debug($"Detected string format of {currentProperty.Format}");
+                                    Logger.Debug($"{prop.Key} will be defined as TIMESTAMP");
+                                    fieldFactory = new TimestampFieldDtoFactory(prop, false);
+                                    break;
+                                case "date":
+                                    Logger.Debug($"Detected string format of {currentProperty.Format}");
+                                    Logger.Debug($"{prop.Key} will be defined as DATE");
+                                    fieldFactory = new DateFieldDtoFactory(prop, false);
+                                    break;
+                                default:
+                                    Logger.Warn($"Detected string format of {currentProperty.Format} which is not handled by DSC");
+                                    Logger.Warn($"{prop.Key} will be defined as DATE");
+                                    fieldFactory = new VarcharFieldDtoFactory(prop, false);
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            Logger.Debug($"No string format detected");
+                            Logger.Debug($"{prop.Key} will be defined as VARCHAR");
+                            fieldFactory = new VarcharFieldDtoFactory(prop, false);
+                        }
+
+                        if (parentRow == null)
+                        {
+                            schemaRowList.Add(fieldFactory.GetField());
+                        }
+                        else
+                        {
+                            parentRow.ChildFields.Add(fieldFactory.GetField());
+                        }
+                        break;
+                    case JsonObjectType.Integer:
+                        Logger.Debug($"Detected type of {currentProperty.Type}");
+                        Logger.Debug($"{prop.Key} will be defined as INTEGER");
+
+                        fieldFactory = new IntegerFieldDtoFactory(prop, false);
+
+                        if (parentRow == null)
+                        {
+                            schemaRowList.Add(fieldFactory.GetField());
+                        }
+                        else
+                        {
+                            parentRow.ChildFields.Add(fieldFactory.GetField());
+                        }
+                        break;
+                    case JsonObjectType.Number:
+                        Logger.Debug($"Detected type of {currentProperty.Type}");
+                        Logger.Debug($"{prop.Key} will be defined as DECIMAL");
+                        fieldFactory = new DecimalFieldDtoFactory(prop, false);
+
+                        if (parentRow == null)
+                        {
+                            schemaRowList.Add(fieldFactory.GetField());
+                        }
+                        else
+                        {
+                            parentRow.ChildFields.Add(fieldFactory.GetField());
+                        }
+                        break;
+                    default:
+                        Logger.Warn($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} which is not handled by DSC");
+                        Logger.Warn($"{prop.Key} will be defined as array of VARCHAR");
+                        fieldFactory = new VarcharFieldDtoFactory(prop, true);
+
+                        if (parentRow == null)
+                        {
+                            schemaRowList.Add(fieldFactory.GetField());
+                        }
+                        else
+                        {
+                            parentRow.ChildFields.Add(fieldFactory.GetField());
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("ToSchemaRow Error", ex);
+                throw;
+            }
+
+        }
+
         #endregion
 
 
