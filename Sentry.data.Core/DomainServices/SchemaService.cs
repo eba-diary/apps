@@ -125,7 +125,7 @@ namespace Sentry.data.Core
                     //filter out fields marked for deletion
                     foreach (var row in schemaRows.Where(w => !w.DeleteInd))
                     {
-                        revision.Fields.Add(AddRevisionField(row, revision, null, latestRevision));
+                        revision.Fields.Add(AddRevisionField(row, revision, previousRevision: latestRevision));
                     }
 
                     //Add posible checksum validation here
@@ -168,10 +168,10 @@ namespace Sentry.data.Core
                  *      set notification trigger to true
                  *      set type of notification
                  */
-                if (SchemaRevisionExists && schema.IsInSAS != schemaDto.IsInSAS)
+                if (SchemaRevisionExists && schema.IsInSAS != schemaDto.IsInSas)
                 {
                     SendSASNotification = true;
-                    SASNotificationType = (schemaDto.IsInSAS) ? "ADD" : "REMOVE";
+                    SASNotificationType = (schemaDto.IsInSas) ? "ADD" : "REMOVE";
                 }
 
                 /*
@@ -182,7 +182,7 @@ namespace Sentry.data.Core
                  *      set notification trigger to true
                  *      set type of notification
                  */
-                if (SchemaRevisionExists && (schemaDto.IsInSAS || (SASNotificationType != null && SASNotificationType.ToUpper() == "REMOVE")) && schema.CreateCurrentView != schemaDto.CreateCurrentView)
+                if (SchemaRevisionExists && (schemaDto.IsInSas || (SASNotificationType != null && SASNotificationType.ToUpper() == "REMOVE")) && schema.CreateCurrentView != schemaDto.CreateCurrentView)
                 {
                     SendSASNotification = true;
                     CurrentViewNotificationType = (schemaDto.CreateCurrentView) ? "ADD" : "REMOVE";
@@ -214,7 +214,7 @@ namespace Sentry.data.Core
             {
                 schema.Name = dto.Name;
                 chgDetected = true;
-            };
+            }
             if (schema.Delimiter != dto.Delimiter)
             {
                 schema.Description = dto.Description;
@@ -240,9 +240,9 @@ namespace Sentry.data.Core
                 schema.HasHeader = dto.HasHeader;
                 chgDetected = true;
             }
-            if (schema.IsInSAS != dto.IsInSAS)
+            if (schema.IsInSAS != dto.IsInSas)
             {
-                schema.IsInSAS = dto.IsInSAS;
+                schema.IsInSAS = dto.IsInSas;
                 chgDetected = true;
             }
             if (schema.CLA1396_NewEtlColumns != dto.CLA1396_NewEtlColumns)
@@ -471,7 +471,7 @@ namespace Sentry.data.Core
                 Extension = (dto.FileExtensionId != 0) ? _datasetContext.GetById<FileExtension>(dto.FileExtensionId) : (dto.FileExtenstionName != null) ? _datasetContext.FileExtensions.Where(w => w.Name == dto.FileExtenstionName).FirstOrDefault() : null,
                 Delimiter = dto.Delimiter,
                 HasHeader = dto.HasHeader,
-                IsInSAS = dto.IsInSAS,
+                IsInSAS = dto.IsInSas,
                 SasLibrary = CommonExtensions.GenerateSASLibaryName(_datasetContext.GetById<Dataset>(dto.ParentDatasetId)),
                 Description = dto.Description,
                 StorageCode = storageCode,
@@ -499,7 +499,7 @@ namespace Sentry.data.Core
                 Delimiter = scm.Delimiter,
                 FileExtensionId = scm.Extension.Id,
                 HasHeader = scm.HasHeader,
-                IsInSAS = scm.IsInSAS,
+                IsInSas = scm.IsInSAS,
                 SasLibrary = scm.SasLibrary,
                 SchemaEntity_NME = scm.SchemaEntity_NME,
                 SchemaId = scm.SchemaId,
@@ -692,7 +692,7 @@ namespace Sentry.data.Core
             else
             {
                 changed = previousFieldDtoVersion.CompareToEntity(newField);
-                newField.LastUpdateDTM = (changed) ? CurrentRevision.LastUpdatedDTM : previousFieldDtoVersion.LastUpdatedDTM;
+                newField.LastUpdateDTM = (changed) ? CurrentRevision.LastUpdatedDTM : previousFieldDtoVersion.LastUpdatedDtm;
             }
 
             _datasetContext.Add(newField);

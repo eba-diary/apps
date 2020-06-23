@@ -1,9 +1,6 @@
 ﻿using Sentry.data.Core.Factories.Fields;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -49,7 +46,6 @@ namespace Sentry.data.Core
                 case StructField s:
                     factory = new StructFieldDtoFactory(s);
                     break;
-                case BigintField _:
                 default:
                     factory = null;
                     break;
@@ -101,12 +97,12 @@ namespace Sentry.data.Core
             try
             {
                 result = Convert.ChangeType(input, typeof(T));
+                return result;
             }
-            catch
+            catch (Exception)
             {
+                return result;
             }
-
-            return result;
         }
     }
 }

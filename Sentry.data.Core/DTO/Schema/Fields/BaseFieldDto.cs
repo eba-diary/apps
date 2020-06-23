@@ -1,9 +1,6 @@
-﻿using System;
+﻿using NJsonSchema;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NJsonSchema;
 
 namespace Sentry.data.Core
 {
@@ -14,8 +11,8 @@ namespace Sentry.data.Core
             FieldId = field.FieldId;
             FieldGuid = field.FieldGuid;
             Name = field.Name;
-            CreateDTM = field.CreateDTM;
-            LastUpdatedDTM = field.LastUpdateDTM;
+            CreateDtm = field.CreateDTM;
+            LastUpdatedDtm = field.LastUpdateDTM;
             IsArray = field.IsArray;
             Description = field.Description;
             ChildFields = new List<BaseFieldDto>();
@@ -26,8 +23,8 @@ namespace Sentry.data.Core
             FieldId = 0;
             FieldGuid = Guid.Empty;
             Name = prop.Key;
-            CreateDTM = DateTime.Now;
-            LastUpdatedDTM = DateTime.Now;
+            CreateDtm = DateTime.Now;
+            LastUpdatedDtm = DateTime.Now;
             IsArray = array;
             Description = prop.Value.Description;
             ChildFields = new List<BaseFieldDto>();
@@ -38,8 +35,8 @@ namespace Sentry.data.Core
             FieldId = row.DataObjectField_ID;
             FieldGuid = row.FieldGuid;
             Name = row.Name;
-            CreateDTM = DateTime.Now;
-            LastUpdatedDTM = DateTime.Now;
+            CreateDtm = DateTime.Now;
+            LastUpdatedDtm = DateTime.Now;
             IsArray = row.IsArray;
             Description = row.Description;
             ChildFields = new List<BaseFieldDto>();
@@ -48,8 +45,8 @@ namespace Sentry.data.Core
         public int FieldId { get; set; }
         public Guid FieldGuid { get; set; }
         public string Name { get; set; }
-        public DateTime CreateDTM { get; set; }
-        public DateTime LastUpdatedDTM { get; set; }
+        public DateTime CreateDtm { get; set; }
+        public DateTime LastUpdatedDtm { get; set; }
         public string Description { get; set; }
         public bool DeleteInd { get; set; }
         public List<BaseFieldDto> ChildFields { get; set; }
@@ -70,8 +67,8 @@ namespace Sentry.data.Core
         {
             field.FieldId = FieldId;
             field.Name = Name;
-            field.CreateDTM = CreateDTM;
-            field.LastUpdateDTM = LastUpdatedDTM;
+            field.CreateDTM = CreateDtm;
+            field.LastUpdateDTM = LastUpdatedDtm;
             field.Description = Description;
             field.IsArray = IsArray;
             field.ParentField = parentField;

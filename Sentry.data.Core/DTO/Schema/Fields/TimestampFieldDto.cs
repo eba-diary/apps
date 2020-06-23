@@ -1,20 +1,11 @@
 ﻿using NJsonSchema;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core.DTO.Schema.Fields
 {
     public class TimestampFieldDto : BaseFieldDto
     {
-        private int _scale;
-        private int _precision;
-        private string _sourceFormat;
-        private int _ordinalPosition;
-        private int _length;
-
         public TimestampFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, bool array) : base(prop, array)
         {
             SourceFormat = prop.Value.ExtensionData.Any(w => w.Key == "dsc-format")
@@ -37,17 +28,23 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
 
         //Properties that are not utilized by this type and are defaulted
-        public override int Precision { get => _precision; set => _precision = value; }
-        public override int Scale { get => _scale; set => _scale = value; }
-        public override string SourceFormat { get => _sourceFormat; set => _sourceFormat = value; }
-        public override int OrdinalPosition { get => _ordinalPosition; set => _ordinalPosition = value; }
-        public override int Length { get => _length; set => _length = value; }
+        public override int Precision { get; set; }
+        public override int Scale { get; set; }
+        public override string SourceFormat { get; set; }
+        public override int OrdinalPosition { get; set; }
+        public override int Length { get; set; }
 
         public override bool CompareToEntity(BaseField field)
         {
             bool changed = false;
-            if (SchemaExtensions.TryConvertTo<TimestampField>(field) == null) { changed = true; }
-            if (changed != true && SourceFormat != ((TimestampField)field).SourceFormat) { changed = true; }
+            if (SchemaExtensions.TryConvertTo<TimestampField>(field) == null)
+            {
+                changed = true;
+            }
+            if (!changed && SourceFormat != ((TimestampField)field).SourceFormat)
+            {
+                changed = true;
+            }
             return changed;
         }
 

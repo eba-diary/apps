@@ -7,11 +7,6 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 {
     public class DateFieldDto : BaseFieldDto
     {
-        private int _scale;
-        private int _precision;
-        private int _ordinalPosition;
-        private int _length;
-
         public DateFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, bool array) : base(prop, array)
         {
             SourceFormat = prop.Value.ExtensionData.Any(w => w.Key == "dsc-format")
@@ -36,10 +31,10 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
 
         //Properties that are not utilized by this type and are defaulted
-        public override int Precision { get => _precision; set => _precision = value; }
-        public override int Scale { get => _scale; set => _scale = value; }
-        public override int OrdinalPosition { get => _ordinalPosition; set => _ordinalPosition = value; }
-        public override int Length { get => _length; set => _length = value; }
+        public override int Precision { get; set; }
+        public override int Scale { get; set; }
+        public override int OrdinalPosition { get; set; }
+        public override int Length { get; set; }
 
         public override bool CompareToEntity(BaseField field)
         {

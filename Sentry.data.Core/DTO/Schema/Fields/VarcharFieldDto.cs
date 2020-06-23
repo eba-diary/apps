@@ -1,16 +1,11 @@
 ﻿using NJsonSchema;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
 namespace Sentry.data.Core.DTO.Schema.Fields
 {
     public class VarcharFieldDto : BaseFieldDto
     {
-        private int _scale;
-        private int _precision;
-        private string _sourceFormat;
-        private int _ordinalPosition;
-
         public VarcharFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, bool array) : base(prop, array)
         {
             Length = (prop.Value.MaxLength) ?? 0;
@@ -23,7 +18,9 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
         public VarcharFieldDto(SchemaRow row) : base(row)
         {
+#pragma warning disable S3240 // The simplest possible condition syntax should be used
             if (!String.IsNullOrWhiteSpace(row.Length))
+#pragma warning restore S3240 // The simplest possible condition syntax should be used
             {
                 Length = (Int32.TryParse(row.Length, out int x)) ? x : 0;
             }
@@ -39,15 +36,18 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
         
         //Properties that are not utilized by this type and are defaulted
-        public override int Precision { get { return _precision; } set { _precision = 0; } }
-        public override int Scale { get { return _scale; } set { _scale = 0; } }
-        public override string SourceFormat { get { return _sourceFormat; } set { _sourceFormat = null; } }
-        public override int OrdinalPosition { get { return _ordinalPosition; } set { _ordinalPosition = 0; } }
+        public override int Precision { get; set; }
+        public override int Scale { get; set; }
+        public override string SourceFormat { get; set; }
+        public override int OrdinalPosition { get; set; }
 
         public override bool CompareToEntity(BaseField field)
         {
             bool changed = false;
-            if (SchemaExtensions.TryConvertTo<VarcharField>(field) == null) { changed = true; }
+            if (SchemaExtensions.TryConvertTo<VarcharField>(field) == null)
+            {
+                changed = true;
+            }
             return changed;
         }
 

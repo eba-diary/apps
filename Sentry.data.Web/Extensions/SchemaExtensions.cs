@@ -64,8 +64,8 @@ namespace Sentry.data.Web
                 FieldGuid = dto.FieldGuid,
                 FieldType = dto.FieldType,
                 IsArray = dto.IsArray,
-                CreateDTM = dto.CreateDTM.ToString("s"),
-                LastUpdatedDTM = dto.LastUpdatedDTM.ToString("s"),
+                CreateDTM = dto.CreateDtm.ToString("s"),
+                LastUpdatedDTM = dto.LastUpdatedDtm.ToString("s"),
                 Nullable = dto.Nullable,
                 OrdinalPosition = dto.OrdinalPosition,
                 Precision = dto.Precision,
@@ -127,7 +127,7 @@ namespace Sentry.data.Web
                 Position = dto.OrdinalPosition,
                 Precision = dto.Precision.ToString(),
                 Scale = dto.Scale.ToString(),
-                LastUpdated = dto.LastUpdatedDTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds,
+                LastUpdated = dto.LastUpdatedDtm.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds,
                 DataObjectField_ID = dto.FieldId,
                 Length = dto.Length.ToString()
             };
@@ -157,7 +157,7 @@ namespace Sentry.data.Web
                 Delimiter = model.Delimiter,
                 FileExtenstionName = model.FileFormat,
                 HasHeader = model.HasHeader,
-                IsInSAS = model.AddToSAS,
+                IsInSas = model.AddToSAS,
                 CreateCurrentView = model.CurrentView,
                 Description = model.Description
             };

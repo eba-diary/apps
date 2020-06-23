@@ -5,7 +5,6 @@ using Sentry.Core;
 using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
-using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
 using Sentry.data.Web.Models;
 using System;
@@ -19,31 +18,27 @@ namespace Sentry.data.Web.Controllers
 {
     public class ConfigController : BaseController
     {
-        public IAssociateInfoProvider _associateInfoProvider;
-        public IDatasetContext _datasetContext;
-        public IConfigService _configService;
-        private UserService _userService;
-        private S3ServiceProvider _s3Service;
-        private ISASService _sasService;
+        private readonly IAssociateInfoProvider _associateInfoProvider;
+        private readonly IDatasetContext _datasetContext;
+        private readonly IConfigService _configService;
+        private readonly UserService _userService;
         private IAppCache _cache;
-        public IEventService _eventService;
-        public IDatasetService _DatasetService;
-        public IObsidianService _obsidianService;
-        public ISecurityService _securityService;
-        public ISchemaService _schemaService;
+        private readonly IEventService _eventService;
+        private readonly IDatasetService _DatasetService;
+        private readonly IObsidianService _obsidianService;
+        private readonly ISecurityService _securityService;
+        private readonly ISchemaService _schemaService;
         private readonly IDataFeatures _featureFlags;
         private string _bucket;
 
-        public ConfigController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService,
-            ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService,
-            IEventService eventService, IDatasetService datasetService, IObsidianService obsidianService,
-            ISecurityService securityService, ISchemaService schemaService, IDataFeatures dataFeatures)
+        public ConfigController(IDatasetContext dsCtxt, UserService userService, IAssociateInfoProvider associateInfoService,
+            IConfigService configService, IEventService eventService, IDatasetService datasetService, 
+            IObsidianService obsidianService, ISecurityService securityService, ISchemaService schemaService, 
+            IDataFeatures dataFeatures)
         {
             _cache = new CachingService();
             _datasetContext = dsCtxt;
-            _s3Service = dsSvc;
             _userService = userService;
-            _sasService = sasService;
             _associateInfoProvider = associateInfoService;
             _configService = configService;
             _eventService = eventService;
@@ -58,7 +53,9 @@ namespace Sentry.data.Web.Controllers
         {
             get
             {
+#pragma warning disable S3240 // The simplest possible condition syntax should be used
                 if (_bucket == null)
+#pragma warning restore S3240 // The simplest possible condition syntax should be used
                 {
                     _bucket = _featureFlags.Use_AWS_v2_Configuration_CLA_1488.GetValue()
                         ? Config.GetHostSetting("AWS2_0RootBucket")
@@ -98,15 +95,17 @@ namespace Sentry.data.Web.Controllers
 
                 mcm.Security = _DatasetService.GetUserSecurityForDataset(id);
 
-                Event e = new Event();
-                e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-                e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                e.TimeCreated = DateTime.Now;
-                e.TimeNotified = DateTime.Now;
-                e.IsProcessed = false;
-                e.Dataset = ds.DatasetId;
-                e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-                e.Reason = "Viewed Dataset Configuration Page";
+                Event e = new Event
+                {
+                    EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                    Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                    TimeCreated = DateTime.Now,
+                    TimeNotified = DateTime.Now,
+                    IsProcessed = false,
+                    Dataset = ds.DatasetId,
+                    UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
+                    Reason = "Viewed Dataset Configuration Page"
+                };
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
                 return View("Index", mcm);
@@ -232,7 +231,7 @@ namespace Sentry.data.Web.Controllers
 
                 if (us != null && us.CanEditDataset)
                 {
-                    bool IsDeleted = _configService.Delete(id, true, false);
+                    bool IsDeleted = _configService.Delete(id);
                     if (!IsDeleted)
                     {
                         return Json(new { Success = false, Message = "Schema was not deleted" });
@@ -260,14 +259,16 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetFileConfigsModel edfc = new DatasetFileConfigsModel();
 
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Configuration Management Page";
+            Event e = new Event
+            {
+                EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                TimeCreated = DateTime.Now,
+                TimeNotified = DateTime.Now,
+                IsProcessed = false,
+                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
+                Reason = "Viewed Configuration Management Page"
+            };
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View(edfc);
@@ -304,8 +305,10 @@ namespace Sentry.data.Web.Controllers
         public ActionResult GetEditConfigPartialView(int configId)
         {
             DatasetFileConfig dfc = _datasetContext.getDatasetFileConfigs(configId);
-            EditDatasetFileConfigModel edfc = new EditDatasetFileConfigModel(dfc);
-            edfc.DatasetId = dfc.ParentDataset.DatasetId;
+            EditDatasetFileConfigModel edfc = new EditDatasetFileConfigModel(dfc)
+            {
+                DatasetId = dfc.ParentDataset.DatasetId
+            };
             edfc.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, edfc.DatasetScopeTypeID);
             edfc.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
@@ -359,21 +362,25 @@ namespace Sentry.data.Web.Controllers
             }
 
             ViewBag.DatasetId = dfc.ParentDataset.DatasetId;
-            CreateJobModel cjm = new CreateJobModel(dfc.ConfigId, dfc.ParentDataset.DatasetId);
-            cjm.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
+            CreateJobModel cjm = new CreateJobModel(dfc.ConfigId, dfc.ParentDataset.DatasetId)
+            {
+                Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser())
+            };
 
             cjm = CreateDropDownSetup(cjm);
 
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.DataConfig = dfc.ConfigId;
-            e.Dataset = dfc.ParentDataset.DatasetId;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Retrieval Creation Page";
+            Event e = new Event
+            {
+                EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                TimeCreated = DateTime.Now,
+                TimeNotified = DateTime.Now,
+                IsProcessed = false,
+                DataConfig = dfc.ConfigId,
+                Dataset = dfc.ParentDataset.DatasetId,
+                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
+                Reason = "Viewed Retrieval Creation Page"
+            };
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
 
@@ -542,22 +549,25 @@ namespace Sentry.data.Web.Controllers
                 return View("Forbidden");
             }
 
-            EditJobModel ejm = new EditJobModel(retrieverJob);
-            ejm.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
-
-            ejm.SelectedDataSource = retrieverJob.DataSource.Id;
-            ejm.SelectedSourceType = retrieverJob.DataSource.SourceType;
+            EditJobModel ejm = new EditJobModel(retrieverJob)
+            {
+                Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser()),
+                SelectedDataSource = retrieverJob.DataSource.Id,
+                SelectedSourceType = retrieverJob.DataSource.SourceType
+            };
 
             ejm = EditDropDownSetup(ejm, retrieverJob);
 
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Retrieval Edit Page";
+            Event e = new Event
+            {
+                EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                TimeCreated = DateTime.Now,
+                TimeNotified = DateTime.Now,
+                IsProcessed = false,
+                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
+                Reason = "Viewed Retrieval Edit Page"
+            };
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
 
@@ -596,7 +606,7 @@ namespace Sentry.data.Web.Controllers
                     {
                         Body = ejm.HttpRequestBody,
                         RequestMethod = ejm.SelectedRequestMethod,
-                        RequestDataFormat = (HttpDataFormat)ejm.SelectedRequestDataFormat
+                        RequestDataFormat = ejm.SelectedRequestDataFormat
                     };
 
                     rj.JobOptions = new RetrieverJobOptions()
@@ -754,14 +764,16 @@ namespace Sentry.data.Web.Controllers
 
             dsm = CreateSourceDropDown(dsm);
 
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Data Source Creation Page";
+            Event e = new Event
+            {
+                EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                TimeCreated = DateTime.Now,
+                TimeNotified = DateTime.Now,
+                IsProcessed = false,
+                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
+                Reason = "Viewed Data Source Creation Page"
+            };
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View("CreateDataSource", dsm);
@@ -818,8 +830,7 @@ namespace Sentry.data.Web.Controllers
             }
             else
             {
-                int intvalue;
-                var temp2 = AuthenticationTypesByType(csm.SourceType, Int32.TryParse(csm.AuthID, out intvalue) ? (int?)intvalue : null);
+                var temp2 = AuthenticationTypesByType(csm.SourceType, Int32.TryParse(csm.AuthID, out int intvalue) ? (int?)intvalue : null);
                 temp2.Add(new SelectListItem()
                 {
                     Text = "Pick a Authentication Type",
@@ -851,14 +862,9 @@ namespace Sentry.data.Web.Controllers
                     {
                         _eventService.PublishSuccessEvent(GlobalConstants.EventType.CREATED_DATASOURCE, SharedContext.CurrentUser.AssociateId, dto.Name + " was created.");
 
-                        if (!String.IsNullOrWhiteSpace(model.ReturnUrl))
-                        {
-                            return Redirect(model.ReturnUrl);
-                        }
-                        else
-                        {
-                            return Redirect("/");
-                        }
+                        return !String.IsNullOrWhiteSpace(model.ReturnUrl) 
+                            ? Redirect(model.ReturnUrl) 
+                            : Redirect("/");
                     }
                 }
                 else
@@ -867,14 +873,9 @@ namespace Sentry.data.Web.Controllers
                     if (IsSuccessful)
                     {
                         _eventService.PublishSuccessEvent(GlobalConstants.EventType.UPDATED_DATASOURCE, SharedContext.CurrentUser.AssociateId, dto.Name + " was updated.");
-                        if (!String.IsNullOrWhiteSpace(model.ReturnUrl))
-                        {
-                            return Redirect(model.ReturnUrl);
-                        }
-                        else
-                        {
-                            return Redirect("/");
-                        }
+                        return !String.IsNullOrWhiteSpace(model.ReturnUrl) 
+                            ? Redirect(model.ReturnUrl) 
+                            : Redirect("/");
                     }
                 }
             }
@@ -988,8 +989,7 @@ namespace Sentry.data.Web.Controllers
 
             model.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic" && x.Value != "S3Basic" && x.Value != "JavaApp").OrderBy(x => x.Value);
 
-            int intvalue;
-            var temp2 = AuthenticationTypesByType(model.SourceType, Int32.TryParse(model.AuthID, out intvalue) ? (int?)intvalue : null);
+            var temp2 = AuthenticationTypesByType(model.SourceType, Int32.TryParse(model.AuthID, out int intvalue) ? (int?)intvalue : null);
 
             model.AuthTypesDropdown = temp2.OrderBy(x => x.Value);
         }
@@ -1353,7 +1353,7 @@ namespace Sentry.data.Web.Controllers
             {
                 List<BaseFieldDto> schemaRowsDto = schemaRows.ToDto();
 
-                _schemaService.CreateAndSaveSchemaRevision(schemaId, schemaRowsDto, "blah", null);
+                _schemaService.CreateAndSaveSchemaRevision(schemaId, schemaRowsDto, "blah");
             }
             catch (Exception ex)
             {
@@ -1382,14 +1382,16 @@ namespace Sentry.data.Web.Controllers
                 DatasetId = dfc.ParentDataset.DatasetId
             };
 
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Retrieval Edit Page";
+            Event e = new Event
+            {
+                EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                TimeCreated = DateTime.Now,
+                TimeNotified = DateTime.Now,
+                IsProcessed = false,
+                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
+                Reason = "Viewed Retrieval Edit Page"
+            };
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View(createSchemaModel);
@@ -1495,14 +1497,16 @@ namespace Sentry.data.Web.Controllers
                     FileTypeId = schema.FileExtensionId
                 };
 
-                Event e = new Event();
-                e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-                e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                e.TimeCreated = DateTime.Now;
-                e.TimeNotified = DateTime.Now;
-                e.IsProcessed = false;
-                e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-                e.Reason = "Viewed Retrieval Edit Page";
+                Event e = new Event
+                {
+                    EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                    Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                    TimeCreated = DateTime.Now,
+                    TimeNotified = DateTime.Now,
+                    IsProcessed = false,
+                    UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
+                    Reason = "Viewed Retrieval Edit Page"
+                };
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
                 return View(editSchemaModel);
@@ -1553,7 +1557,10 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public JsonResult IsHttpSource(int dataSourceId)
         {
-            if (dataSourceId == 0) { return Json(false, JsonRequestBehavior.AllowGet); }
+            if (dataSourceId == 0)
+            {
+                return Json(false, JsonRequestBehavior.AllowGet);
+            }
 
             DataSourceDto dto = _configService.GetDataSourceDto(dataSourceId);
             bool result;
@@ -1594,14 +1601,9 @@ namespace Sentry.data.Web.Controllers
             AccessRequest ar = model.ToCore();
             string ticketId = _configService.RequestAccessToDataSource(ar);
 
-            if (string.IsNullOrEmpty(ticketId))
-            {
-                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
-            }
-            else
-            {
-                return PartialView("_Success", new SuccessModel("Data Source access was successfully requested.", "HPSM Change Id: " + ticketId, true));
-            }
+            return string.IsNullOrEmpty(ticketId) 
+                ? PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false)) 
+                : PartialView("_Success", new SuccessModel("Data Source access was successfully requested.", "HPSM Change Id: " + ticketId, true));
         }
 
         [HttpGet]
