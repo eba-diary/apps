@@ -1635,10 +1635,7 @@ namespace Sentry.data.Web.Controllers
                 case "JSON":
                     model.IsPositional = false;
                     model.IsFixedWidth = false;
-                    if (Configuration.Config.GetHostSetting("ShowJSONComplexDataTypes").ToLower() == "true")
-                    {
-                        model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A struct", "Complex Data Types"));
-                    }
+                    model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A struct", "Complex Data Types"));
                     break;
                 default:
                     break;
