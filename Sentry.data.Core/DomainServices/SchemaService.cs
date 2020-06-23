@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace Sentry.data.Core
 {
@@ -18,11 +19,12 @@ namespace Sentry.data.Core
         private readonly IEmailService _emailService;
         private readonly ISecurityService _securityService;
         private readonly IDataFeatures _featureFlags;
+        private readonly IMessagePublisher _messagePublisher;
         private string _bucket;
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -31,6 +33,7 @@ namespace Sentry.data.Core
             _jobService = jobService;
             _securityService = securityService;
             _featureFlags = dataFeatures;
+            _messagePublisher = messagePublisher;
         }
 
         private string RootBucket
@@ -128,6 +131,17 @@ namespace Sentry.data.Core
                     //Add posible checksum validation here
 
                     _datasetContext.SaveChanges();
+
+                    //Send message to create hive table
+                    HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
+                    {
+                        SchemaID = revision.ParentSchema.SchemaId,
+                        RevisionID = revision.SchemaRevision_Id,
+                        DatasetID = ds.DatasetId,
+                        HiveStatus = null,
+                        InitiatorID = _userService.GetCurrentUser().AssociateId
+                    };
+                    _messagePublisher.PublishDSCEvent(schemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
 
                     return revision.SchemaRevision_Id;
                 }

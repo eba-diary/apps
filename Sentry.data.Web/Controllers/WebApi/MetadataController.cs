@@ -351,17 +351,31 @@ namespace Sentry.data.Web.WebApi.Controllers
             }
         }
 
+        /// <summary>
+        ///  Will return jsonschema associated with DSC schema, only if latest revision was updated via API.
+        /// </summary>
+        /// <param name="datasetId"></param>
+        /// <param name="schemaId"></param>
+        /// <returns></returns>
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}/revision/latest/jsonschema")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(JObject))]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
         public async Task<IHttpActionResult> GetLatestSchemaRevisionJsonFormat(int datasetId, int schemaId)
         {
             SchemaRevisionDto revisiondto = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
 
-            JsonSchema schema = await JsonSchema.FromJsonAsync(revisiondto.JsonSchemaObject);
-            string schema2 = JsonSchemaReferenceUtilities.ConvertPropertyReferences(schema.ToJson());
-            return Ok(JsonConvert.DeserializeObject<JsonSchema>(schema2));
+            if (revisiondto.JsonSchemaObject != null)
+            {
+                JsonSchema schema = await JsonSchema.FromJsonAsync(revisiondto.JsonSchemaObject);
+                string schema2 = JsonSchemaReferenceUtilities.ConvertPropertyReferences(schema.ToJson());
+                return Ok(JsonConvert.DeserializeObject<JsonSchema>(schema2));
+            }
+            else
+            {
+                return Content(System.Net.HttpStatusCode.NotFound, "Latest revision was not updated via API");
+            }
         }
 
         /// <summary>
