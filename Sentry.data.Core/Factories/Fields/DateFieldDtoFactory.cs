@@ -7,9 +7,9 @@ namespace Sentry.data.Core.Factories.Fields
     public class DateFieldDtoFactory : FieldDtoFactory
     {
         private KeyValuePair<string, JsonSchemaProperty> _property;
-        private bool _array;
-        private DateField _baseField;
-        private SchemaRow _row;
+        private readonly bool _array;
+        private readonly DateField _baseField;
+        private readonly SchemaRow _row;
         private readonly bool IsProperty;
         private readonly bool IsField;
         private readonly bool IsRow;

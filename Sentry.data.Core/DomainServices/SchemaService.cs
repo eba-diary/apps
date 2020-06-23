@@ -98,18 +98,15 @@ namespace Sentry.data.Core
 
 
             FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
-            SchemaRevision revision = new SchemaRevision();
+            SchemaRevision revision;
             SchemaRevision latestRevision = null;
 
             try
             {
                 if (schema != null)
                 {
-                    var revisionCnt = (schema.Revisions.Any()) ? schema.Revisions.Count() : 0;
-
                     latestRevision = _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schema.SchemaId).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();
-
-
+                    
                     revision = new SchemaRevision()
                     {
                         SchemaRevision_Name = revisionname,
@@ -673,7 +670,6 @@ namespace Sentry.data.Core
 
         private BaseField AddRevisionField(BaseFieldDto row, SchemaRevision CurrentRevision, BaseField parentRow = null, SchemaRevision previousRevision = null)
         {
-            Guid g = Guid.NewGuid();
             BaseField newField = null;
             //Should we perform comparison to previous based on is incoming field new
             bool compare = (row.FieldGuid.ToString() != Guid.Empty.ToString() && previousRevision != null);
@@ -715,12 +711,12 @@ namespace Sentry.data.Core
             try
             {
                 result = Convert.ChangeType(input, typeof(T));
+                return result;
             }
-            catch
+            catch (Exception)
             {
+                return result;
             }
-
-            return result;
         }
     }
 }

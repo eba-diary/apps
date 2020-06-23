@@ -442,7 +442,7 @@ namespace Sentry.data.Core
             return de;
         }
 
-        public void UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows, string jsonSchema = null)
+        public void UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows, string jsonSchemaObject = null)
         {
             DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
             FileSchema schema = config.Schema;

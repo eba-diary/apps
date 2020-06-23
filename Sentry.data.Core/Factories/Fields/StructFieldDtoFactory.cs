@@ -11,9 +11,9 @@ namespace Sentry.data.Core.Factories.Fields
     public class StructFieldDtoFactory : FieldDtoFactory
     {
         private KeyValuePair<string, JsonSchemaProperty> _property;
-        private bool _array;
-        private StructField _baseField;
-        private SchemaRow _row;
+        private readonly bool _array;
+        private readonly StructField _baseField;
+        private readonly SchemaRow _row;
         private readonly bool IsProperty;
         private readonly bool IsField;
         private readonly bool IsRow;
