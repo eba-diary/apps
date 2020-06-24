@@ -1,0 +1,12 @@
+{
+  "ServerUri": "https://sonarqube.sentry.com/",
+  "Organization": null,
+  "ProjectKey": "DATA:Data.Sentry.Com",
+  "ProjectName": "Data.Sentry.Com",
+  "Profiles": {
+    "CSharp": {
+      "ProfileKey": "AWfHVo6VBE0WvjRoNJAM",
+      "ProfileTimestamp": "2019-02-21T15:06:53Z"
+    }
+  }
+}

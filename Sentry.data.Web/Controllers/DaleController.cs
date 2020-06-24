@@ -10,6 +10,9 @@ using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
 {
+
+    [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATA_ASSET_VIEW)]
+
     public class DaleController : BaseController
     {
         private readonly IEventService _eventService;
@@ -25,7 +28,7 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult DaleSearch()
         {
-            if ( _featureFlags.Expose_DaleSearch_CLA_1450.GetValue() || SharedContext.CurrentUser.IsAdmin)
+            if (  _featureFlags.Expose_DaleSearch_CLA_1450.GetValue() || SharedContext.CurrentUser.IsAdmin )
             {
                 DaleSearchModel searchModel = new DaleSearchModel();
                 searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
@@ -66,8 +69,20 @@ namespace Sentry.data.Web.Controllers
             DaleSearchModel searchModel = new DaleSearchModel();
             searchModel.Criteria = searchCriteria;
             searchModel.Destiny = destination.ToDaleDestiny();
-            searchModel.Sensitive = sensitive;
             searchModel.CanDaleSensitiveView = SharedContext.CurrentUser.CanDaleSensitiveView;
+
+            if (sensitive && searchModel.CanDaleSensitiveView)
+            {
+                searchModel.Sensitive = DaleSensitive.SensitiveOnly;
+            }
+            else if (searchModel.CanDaleSensitiveView)
+            {
+                searchModel.Sensitive = DaleSensitive.SensitiveAll;
+            }
+            else
+            {
+                searchModel.Sensitive = DaleSensitive.SensitiveNone;
+            }
 
             //DO NOT perform search if invalid criteria OR sensitive and they lack permissions. NOTE: if they lack permissions, VIEW hides ability to even click sensitive link
             if (!IsCriteriaValid(searchModel) || ( sensitive && !CanDaleSensitiveView() ) )            
@@ -89,7 +104,7 @@ namespace Sentry.data.Web.Controllers
         {
 
             //if sensitive query, don't bother to validate criteria and immediately return true
-            if (model.Sensitive)
+            if (model.Sensitive == DaleSensitive.SensitiveOnly)
             {
                 return true;
             }
