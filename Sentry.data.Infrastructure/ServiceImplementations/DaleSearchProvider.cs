@@ -35,7 +35,8 @@ namespace Sentry.data.Infrastructure
                 {
                     connection.Open();
                     SqlDataReader reader = command.ExecuteReader();
-                    
+
+                    int i = 0;
                     while (reader.Read())
                     {
                         daleResults.Add(CreateDaleResultDto(reader));
