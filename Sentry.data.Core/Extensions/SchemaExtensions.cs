@@ -1,6 +1,9 @@
-﻿using Sentry.data.Core.Factories.Fields;
+﻿using NJsonSchema;
+using Sentry.Common.Logging;
+using Sentry.data.Core.Factories.Fields;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sentry.data.Core
 {
@@ -103,6 +106,43 @@ namespace Sentry.data.Core
             {
                 return result;
             }
+        }
+
+        /// <summary>
+        /// Will return JsonSchema associated with array JsonSchemaProperty
+        /// </summary>
+        /// <param name="prop"></param>
+        /// <exception cref="ArgumentException">If array does not contain Items or Definition reference</exception>
+        /// <returns></returns>
+        public static JsonSchema FindArraySchema(this KeyValuePair<string, JsonSchemaProperty> prop)
+        {
+            JsonSchemaProperty currentProp = prop.Value;
+            JsonSchema outSchema = null;
+
+            if (currentProp.Items.Count == 0 && currentProp.Item == null)
+            {
+                outSchema = currentProp.ParentSchema.Definitions.FirstOrDefault(w => w.Key.ToUpper() == prop.Key.ToUpper()).Value;                
+            }
+            else if (currentProp.Items.Count == 0 && currentProp.Item != null)
+            {
+                outSchema = currentProp.Item;
+            }
+            else
+            {
+                if (currentProp.Items.Count > 1)
+                {
+                    Logger.Warn($"Schema contains multiple items within array ({prop.Key}) - taking first Item");
+                }
+                outSchema = currentProp.Items.First();
+            }
+
+            if (outSchema == null)
+            {
+                throw new ArgumentException("Not valid array schema: Needs to contain Items or Definition reference");
+            }
+
+            return outSchema;
+
         }
     }
 }

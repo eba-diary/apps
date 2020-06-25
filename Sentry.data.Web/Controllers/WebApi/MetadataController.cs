@@ -281,6 +281,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             }
             catch (Exception ex)
             {
+                Logger.Error($"{nameof(SchemaService).ToLower()}_{nameof(AddSchemaRevision).ToLower()}_unhandledException", ex);
                 return InternalServerError(ex);
             }
         }
@@ -941,30 +942,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                         JsonSchema nestedSchema = null;
                         //While JSON Schema alows an arrays of multiple types, DSC only allows single type.
 
-                        if (currentProperty.Items.Count == 0 && currentProperty.Item == null)
-                        {
-                            JsonSchema refSchema = currentProperty.ParentSchema.Definitions.FirstOrDefault(w => w.Key.ToUpper() == prop.Key.ToUpper()).Value;
-                            if (refSchema == null)
-                            {
-                                throw new ArgumentException("Not valid schema: Array does not contain items");
-                            }
-                            else
-                            {
-                                nestedSchema = refSchema;
-                            }
-                        }
-                        else if (currentProperty.Items.Count == 0 && currentProperty.Item != null)
-                        {
-                            nestedSchema = currentProperty.Item;
-                        }
-                        else
-                        {
-                            if (currentProperty.Items.Count > 1)
-                            {
-                                Logger.Warn($"Schema contains multiple items within array ({prop.Key}) - taking first Item");
-                            }
-                            nestedSchema = currentProperty.Items.First();
-                        }
+                        nestedSchema = prop.FindArraySchema();
 
                         //Determine what this is an array of
                         if (nestedSchema.IsObject)
@@ -989,17 +967,17 @@ namespace Sentry.data.Web.WebApi.Controllers
                                     break;
                                 case JsonObjectType.String:
                                     Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
-                                    switch (currentProperty.Format)
+                                    switch (nestedSchema.Format)
                                     {
                                         case "date-time":
-                                            Logger.Debug($"Detected string format of {currentProperty.Format}");
+                                            Logger.Debug($"Detected string format of {nestedSchema.Format}");
                                             Logger.Debug($"{prop.Key} will be defined as array of TIMESTAMP");
                                             fieldFactory = new TimestampFieldDtoFactory(prop, true);
                                             break;
                                         case "date":
-                                            Logger.Debug($"Detected string format of {currentProperty.Format}");
+                                            Logger.Debug($"Detected string format of {nestedSchema.Format}");
                                             Logger.Debug($"{prop.Key} will be defined as array of DATE");
-                                            fieldFactory = new DateFieldDtoFactory(prop, true);
+                                             fieldFactory = new DateFieldDtoFactory(prop, true);
                                             break;
                                         default:
                                             Logger.Debug($"No string format detected");
