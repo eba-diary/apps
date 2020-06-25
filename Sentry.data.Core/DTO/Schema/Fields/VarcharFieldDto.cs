@@ -8,7 +8,14 @@ namespace Sentry.data.Core.DTO.Schema.Fields
     {
         public VarcharFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, bool array) : base(prop, array)
         {
-            Length = (prop.Value.MaxLength) ?? 0;
+            if (prop.Value.IsArray)
+            {
+                Length = prop.FindArraySchema().MaxLength ?? 0;
+            }
+            else
+            {
+                Length = prop.Value.MaxLength?? 0;
+            }
         }
 
         public VarcharFieldDto(VarcharField field) : base(field)
