@@ -48,10 +48,10 @@
 
         </div>
 
-        <div id ="radioMadness" style="float:left;margin-left:25px;" >
+        <div id="radioMadness" style="float:left;margin-left:25px;">
 
             <div style="text-align: left; font-family: KievitSlabWeb W03,Lucida Sans,serif;">
-             
+
                 <label style="text-align:left; width:100px;">
                     <input type="radio" name="Destiny" id="DestinyTableRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Object>
                     Table/View
@@ -66,15 +66,21 @@
 
         </div>
 
-        @if (Model.CanDaleSensitiveView)
-        {
-            <div style="float:left;margin-left:10px;margin-top: 2px;">
 
-                <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;"></em>
+        <div title="Please request the App_DATA_DINV_Sens_View entitlement via MyAccess to gain access to sensitive column information on the Data Inventory site" style="float:left;margin-left:10px; margin-top: 2px;">
+
+            <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;"></em>
+
+            @if (Model.CanDaleSensitiveView)
+            {
                 <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500;">Show Sensitive Columns</a>
+            }
+            else
+            {
+                <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500; pointer-events:none;">Show Sensitive Columns</a>
+            }
 
-            </div>
-        }
+        </div>
 
     </div>
 
