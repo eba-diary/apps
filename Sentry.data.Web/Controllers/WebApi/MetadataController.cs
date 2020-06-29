@@ -259,7 +259,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 JsonSchema schema_v3 = await JsonSchema.FromJsonAsync(schemaStructure.ToString());
 
                 List<BaseFieldDto> schemarows_v2 = new List<BaseFieldDto>();
-                ToSchemaRows(schema_v3, schemarows_v2);
+                schema_v3.ToDto(schemarows_v2);
 
                 int savedRevisionId = _schemaService.CreateAndSaveSchemaRevision(schemaId, schemarows_v2, revisionName, schema_v3.ToJson());
 
@@ -838,13 +838,13 @@ namespace Sentry.data.Web.WebApi.Controllers
                     case JsonObjectType.Object:
                         foreach (KeyValuePair<string, JsonSchemaProperty> prop in schema.Properties.ToList())
                         {
-                            ToSchemaRow(prop, schemaRowList, parentSchemaRow);
+                            prop.ToDto(schemaRowList, parentSchemaRow);
                         }
                         break;
                     case JsonObjectType.None:
                         if (schema.HasReference)
                         {
-                            ToSchemaRows(schema.Reference, schemaRowList, parentSchemaRow);
+                            schema.Reference.ToDto(schemaRowList, parentSchemaRow);
                         }
                         else
                         {

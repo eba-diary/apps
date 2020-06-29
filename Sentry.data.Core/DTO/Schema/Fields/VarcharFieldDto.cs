@@ -10,7 +10,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
         {
             if (prop.Value.IsArray)
             {
-                Length = prop.FindArraySchema().MaxLength ?? 0;
+                Length = prop.FindArraySchema()?.MaxLength ?? 0;
             }
             else
             {

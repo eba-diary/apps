@@ -27,7 +27,6 @@ namespace Sentry.data.Core
             LastUpdatedDtm = DateTime.Now;
             IsArray = array;
             ChildFields = new List<BaseFieldDto>();
-            //Description = prop.Value.IsArray ? prop.FindArraySchema().Description : prop.Value.Description;
             Description = prop.Value.Description;
         }
 
