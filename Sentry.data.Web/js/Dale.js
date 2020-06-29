@@ -5,6 +5,9 @@
 
     init: function ()
     {
+        // Clear all items
+        localStorage.clear();
+
         //init DataTable
         $("#daleResultsTable").DataTable({
 
@@ -30,7 +33,7 @@
                 { data: "ObjectType", className: "ObjectType" },
                 { data: "Column", className: "ColumnMan"},
 
-                { data: "IsSensitive", className: "IsSensitive", visible: false},
+                { data: "IsSensitive", className: "IsSensitive" },
                 { data: "Alias", className: "Alias", visible: false },
                 { data: "ProdType", className: "ProdType", visible: false },
 
@@ -86,6 +89,162 @@
 
         //setup all click events
         data.Dale.setupClickAttack();
+
+
+        var table = $('#daleResultsTable').DataTable();
+
+        //row click event
+        $('#daleResultsTable tbody').on('click', 'tr', function ()
+        {
+            ////console.log(table.row(this).data());
+            //var d = table.row(this).data();
+
+
+            //alert(d.Column);
+            //d.Column = 'reject';
+            
+            //table
+            //    .row(this)
+            //    .data(d)
+            //    .draw();
+
+
+            //alert('Clicked on cell in visible column: ' + table.cell(this).index().columnVisible);
+
+        });
+
+
+
+        //cell click event
+        $('#daleResultsTable tbody').on('click', 'td', function () {
+            //console.log(table.row(this).data());
+
+            //alert(table.cell(this).index().columnVisible);
+            var columnIndex = table.cell(this).index().columnVisible;
+
+
+            var d = table.row(this).data();
+            //var BaseColumnId = d.BaseColumnId;
+            //var IsSensitive = d.IsSensitive;
+
+
+
+            if (d.IsSensitive) {
+                d.IsSensitive = false;
+            }
+            else {
+                d.IsSensitive = true;
+            }
+
+
+            //get rowIndex being updated
+            var rowIdx = table
+                .cell(this)
+                .index().row;
+
+            table
+                .row(this)
+                .data(d)            //supply updated data for grid row
+                .draw()             //redraw table because of changes
+                .rows(rowIdx)       //identifies a given row to modify
+                .nodes()
+                .to$()
+                .addClass('dale-clicked');
+
+            
+            var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));
+            var o = { "BaseColumnId": "IsSensitive" };
+            o.BaseColumnId = d.BaseColumnId;
+            o.IsSensitive = d.IsSensitive;
+
+            if (sensitiveList == null)
+            {
+                sensitiveList = [];
+                sensitiveList[0] = o;
+            }
+            else
+            {
+                //todo firgure out why its not adding!
+                var index = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === d.BaseColumnId);       //first make sure we remove if already exists in list
+                sensitiveList.splice(index, 1, o);                                                      //then remove that index from array and replace
+            }
+            localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));
+
+            console.log(sensitiveList);
+                
+        });
+
+
+        //$('#daleResultsTable tbody').on('click', 'td', function () {
+        //    var tr = $(this).parent();
+        //    var listOfFilesToBundle;
+
+        //    if (!$(this).hasClass('details-control')) {
+
+        //        if (!tr.hasClass('unUsable') && (tr.hasClass('even') || tr.hasClass('odd'))) {
+
+        //            if (tr.hasClass('active'))
+        //            {
+        //                tr.removeClass('active');
+        //                listOfFilesToBundle = JSON.parse(localStorage.getItem("SensitiveRows"));
+
+        //                if ($(tr).prop('id')) {
+
+        //                    if (listOfFilesToBundle !== null) {
+        //                        listOfFilesToBundle.splice(listOfFilesToBundle.indexOf($(tr).prop('id')), 1);
+        //                    }
+        //                    localStorage.setItem("listOfFilesToBundle", JSON.stringify(listOfFilesToBundle));
+        //                    $('#bundleCountSelected').html(parseInt($('#bundleCountSelected').html(), 10) - 1);
+        //                }
+        //            }
+        //            else
+        //            {
+        //                tr.addClass('active');
+
+        //                listOfFilesToBundle = JSON.parse(localStorage.getItem("listOfFilesToBundle"));
+        //                if ($(tr).prop('id')) {
+
+        //                    if (listOfFilesToBundle !== null) {
+        //                        listOfFilesToBundle[listOfFilesToBundle.length] = $(tr).prop('id');
+        //                    }
+        //                    else {
+        //                        listOfFilesToBundle = [];
+        //                        listOfFilesToBundle[0] = $(tr).prop('id');
+        //                    }
+
+        //                    localStorage.setItem("listOfFilesToBundle", JSON.stringify(listOfFilesToBundle));
+        //                    $('#bundleCountSelected').html(parseInt($('#bundleCountSelected').html(), 10) + 1);
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    if (parseInt($('#bundleCountSelected').html(), 10) < 2) {
+        //        $('#bundle_selected').attr("disabled", true);
+        //    }
+        //    else {
+        //        $('#bundle_selected').attr("disabled", false);
+        //    }
+        //    if (parseInt($('#bundleCountFiltered').html(), 10) < 2) {
+        //        $('#bundle_allFiltered').attr("disabled", true);
+        //    }
+        //    else {
+        //        $('#bundle_allFiltered').attr("disabled", false);
+        //    }
+        //});
+
+
+
+
+
+
+
+
+
+
+
+
+
     },
 
     getDaleDestiny: function ()

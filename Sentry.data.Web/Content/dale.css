@@ -32,3 +32,7 @@ table.dataTable thead .sorting_desc_disabled {
 .dale-disable-stuff{
     pointer-events:none;
 }
+
+.dale-clicked {
+    color: red;
+}
