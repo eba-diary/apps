@@ -101,9 +101,9 @@
         $('#daleSearchClickSpinner').show();
         $('#daleContainer').hide();
 
-        $('#sensitiveSearchLink').addClass("dale-hide-stuff");
-        $('#daleCriteriaContainer').addClass("dale-hide-stuff");
-        $('#radioMadness').addClass("dale-hide-stuff");
+        $('#sensitiveSearchLink').addClass("dale-disable-stuff");
+        $('#daleCriteriaContainer').addClass("dale-disable-stuff");
+        $('#radioMadness').addClass("dale-disable-stuff");
     },
 
     //enable all controls user can hit during search
@@ -116,9 +116,9 @@
         $('#daleSearchClickSpinner').hide();
         $('#daleContainer').show();
 
-        $('#sensitiveSearchLink').removeClass("dale-hide-stuff");
-        $('#daleCriteriaContainer').removeClass("dale-hide-stuff");
-        $('#radioMadness').removeClass("dale-hide-stuff");
+        $('#sensitiveSearchLink').removeClass("dale-disable-stuff");
+        $('#daleCriteriaContainer').removeClass("dale-disable-stuff");
+        $('#radioMadness').removeClass("dale-disable-stuff");
     },
 
     setupClickAttack: function ()

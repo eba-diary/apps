@@ -29,6 +29,6 @@ table.dataTable thead .sorting_desc_disabled {
     background: url('/Content/DataTables/images/sort_desc_disabled.png') no-repeat center right;
 }
 
-.dale-hide-stuff{
+.dale-disable-stuff{
     pointer-events:none;
 }
