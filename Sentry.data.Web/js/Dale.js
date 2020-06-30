@@ -5,8 +5,8 @@
 
     init: function ()
     {
-        // Clear all items
-        localStorage.clear();
+        
+        localStorage.clear();                                                           // Clear all items
 
         //init DataTable
         $("#daleResultsTable").DataTable({
@@ -59,7 +59,29 @@
             buttons:
             [
                     { extend: 'colvis', text: 'Columns' },
-                    { extend: 'csv', text: 'Download' }
+                    { extend: 'csv', text: 'Download' },
+
+                    {
+                        text: 'Select Page',
+                        action: function (e, dt, node, config)
+                        {
+                            var rowsIndexes = table.rows({ page: 'current' }).indexes();
+                            var rowsData = table.rows(rowsIndexes).data();
+                            var rowData1 = rowsData[0];
+                            rowData1.IsSensitive = !rowData1.IsSensitive;
+                            var rowIndex1 = rowsIndexes[0];
+
+
+                            table                                                                                               //remove dale-clicked class
+                                .row(rowIndex1)
+                                .data(rowData1)         //supply updated data for grid row
+                                .draw()                 //redraw table because of changes
+                                .rows(rowIndex1)        //identifies a given row to modify
+                                .nodes()
+                                .to$()
+                                .addClass('dale-clicked');
+                        }
+                    }
             ]
         });
 
@@ -93,152 +115,62 @@
 
         var table = $('#daleResultsTable').DataTable();
 
-        //row click event
-        $('#daleResultsTable tbody').on('click', 'tr', function ()
-        {
-            ////console.log(table.row(this).data());
-            //var d = table.row(this).data();
-
-
-            //alert(d.Column);
-            //d.Column = 'reject';
-            
-            //table
-            //    .row(this)
-            //    .data(d)
-            //    .draw();
-
-
-            //alert('Clicked on cell in visible column: ' + table.cell(this).index().columnVisible);
-
-        });
-
-
-
         //cell click event
         $('#daleResultsTable tbody').on('click', 'td', function () {
-            //console.log(table.row(this).data());
-
-            //alert(table.cell(this).index().columnVisible);
-            var columnIndex = table.cell(this).index().columnVisible;
-
-
-            var d = table.row(this).data();
-            //var BaseColumnId = d.BaseColumnId;
-            //var IsSensitive = d.IsSensitive;
-
-
-
-            if (d.IsSensitive) {
-                d.IsSensitive = false;
-            }
-            else {
-                d.IsSensitive = true;
-            }
-
-
-            //get rowIndex being updated
-            var rowIdx = table
-                .cell(this)
-                .index().row;
-
-            table
-                .row(this)
-                .data(d)            //supply updated data for grid row
-                .draw()             //redraw table because of changes
-                .rows(rowIdx)       //identifies a given row to modify
-                .nodes()
-                .to$()
-                .addClass('dale-clicked');
-
             
-            var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));
-            var o = { "BaseColumnId": "IsSensitive" };
-            o.BaseColumnId = d.BaseColumnId;
-            o.IsSensitive = d.IsSensitive;
+            var row = table.row(this).data();                                                                           //get whole row of data to use later
+            var rowIndex = table.cell(this).index().row;                                                                //get rowIndex being updated
+            var columnIndex = table.cell(this).index().columnVisible;                                                   //get columnIndex clicked
+            var pageNumber = table.page();                                                                              //figure out page number
 
-            if (sensitiveList == null)
-            {
-                sensitiveList = [];
-                sensitiveList[0] = o;
-            }
-            else
-            {
-                //todo firgure out why its not adding!
-                var index = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === d.BaseColumnId);       //first make sure we remove if already exists in list
-                sensitiveList.splice(index, 1, o);                                                      //then remove that index from array and replace
-            }
-            localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));
 
-            console.log(sensitiveList);
-                
+            if (columnIndex == 6)                                                                                       
+            {
+               
+                row.IsSensitive = !row.IsSensitive;                                                                         //flip IsSensitive
+
+                var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                      //get stored object array
+                var o = { "BaseColumnId": "IsSensitive" };                                                                  //create new obj based off current selection
+                o.BaseColumnId = row.BaseColumnId;
+                o.IsSensitive = row.IsSensitive;
+
+                if (sensitiveList == null)
+                {
+                    sensitiveList = [];
+                    sensitiveList[0] = o;
+                }
+                else
+                {
+                    var index = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);            //first make sure we remove if already exists in list
+                    if (index >= 0)                                                                                         //check if already exists
+                    {
+                        sensitiveList.splice(index, 1);                                                                     //remove that index from array  
+                        table                                                                                               //remove dale-clicked class
+                            .row(rowIndex)
+                            .data(row)              //supply updated data for grid row
+                            .draw()                 //redraw table because of changes
+                            .rows(rowIndex)         //identifies a given row to modify
+                            .nodes()
+                            .to$()
+                            .removeClass('dale-clicked');
+                    }
+                    else
+                    {
+                        sensitiveList.push(o);                                                                              //add new item
+                        table                                                                                               //add dale-clicked class 
+                            .row(rowIndex)
+                            .data(row)              //supply updated data for grid row
+                            .draw()                 //redraw table because of changes
+                            .rows(rowIndex)         //identifies a given row to modify
+                            .nodes()
+                            .to$()
+                            .addClass('dale-clicked');
+                    }
+                    
+                }
+                localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));                                       //save array to storage
+            }
         });
-
-
-        //$('#daleResultsTable tbody').on('click', 'td', function () {
-        //    var tr = $(this).parent();
-        //    var listOfFilesToBundle;
-
-        //    if (!$(this).hasClass('details-control')) {
-
-        //        if (!tr.hasClass('unUsable') && (tr.hasClass('even') || tr.hasClass('odd'))) {
-
-        //            if (tr.hasClass('active'))
-        //            {
-        //                tr.removeClass('active');
-        //                listOfFilesToBundle = JSON.parse(localStorage.getItem("SensitiveRows"));
-
-        //                if ($(tr).prop('id')) {
-
-        //                    if (listOfFilesToBundle !== null) {
-        //                        listOfFilesToBundle.splice(listOfFilesToBundle.indexOf($(tr).prop('id')), 1);
-        //                    }
-        //                    localStorage.setItem("listOfFilesToBundle", JSON.stringify(listOfFilesToBundle));
-        //                    $('#bundleCountSelected').html(parseInt($('#bundleCountSelected').html(), 10) - 1);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                tr.addClass('active');
-
-        //                listOfFilesToBundle = JSON.parse(localStorage.getItem("listOfFilesToBundle"));
-        //                if ($(tr).prop('id')) {
-
-        //                    if (listOfFilesToBundle !== null) {
-        //                        listOfFilesToBundle[listOfFilesToBundle.length] = $(tr).prop('id');
-        //                    }
-        //                    else {
-        //                        listOfFilesToBundle = [];
-        //                        listOfFilesToBundle[0] = $(tr).prop('id');
-        //                    }
-
-        //                    localStorage.setItem("listOfFilesToBundle", JSON.stringify(listOfFilesToBundle));
-        //                    $('#bundleCountSelected').html(parseInt($('#bundleCountSelected').html(), 10) + 1);
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    if (parseInt($('#bundleCountSelected').html(), 10) < 2) {
-        //        $('#bundle_selected').attr("disabled", true);
-        //    }
-        //    else {
-        //        $('#bundle_selected').attr("disabled", false);
-        //    }
-        //    if (parseInt($('#bundleCountFiltered').html(), 10) < 2) {
-        //        $('#bundle_allFiltered').attr("disabled", true);
-        //    }
-        //    else {
-        //        $('#bundle_allFiltered').attr("disabled", false);
-        //    }
-        //});
-
-
-
-
-
-
-
 
 
 
@@ -289,6 +221,14 @@
             data.Dale.sensitive = false;                                            //set sensitive property to true so grid does sensitive search back to controller
             data.Dale.disableDale();
             daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
+
+
+            
+
+
+
+
+
         });
 
         //setup search box enter event
