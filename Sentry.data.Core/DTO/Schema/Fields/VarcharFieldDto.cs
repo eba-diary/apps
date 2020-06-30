@@ -14,6 +14,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
         public VarcharFieldDto(VarcharField field) : base(field)
         {
             Length = field.FieldLength;
+            OrdinalPosition = field.OrdinalPosition;
         }
 
         public VarcharFieldDto(SchemaRow row) : base(row)
@@ -28,6 +29,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             {
                 Length = 0;
             }
+            OrdinalPosition = row.Position;
         }
 
         public override string FieldType => GlobalConstants.Datatypes.VARCHAR;

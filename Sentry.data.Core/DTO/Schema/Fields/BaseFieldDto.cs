@@ -40,6 +40,7 @@ namespace Sentry.data.Core
             IsArray = row.IsArray;
             Description = row.Description;
             ChildFields = new List<BaseFieldDto>();
+            OrdinalPosition = row.Position;
         }
 
         public int FieldId { get; set; }

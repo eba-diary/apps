@@ -1353,15 +1353,45 @@ namespace Sentry.data.Web.Controllers
             {
                 List<BaseFieldDto> schemaRowsDto = schemaRows.ToDto();
 
+                _schemaService.Validate(schemaRowsDto);
                 _schemaService.CreateAndSaveSchemaRevision(schemaId, schemaRowsDto, "blah");
+
+            }
+            catch (ValidationException vEx)
+            {
+                return Json(new { Success = false, Message = "Failed schema validation", Errors = vEx.ValidationResults.GetAll() }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
                 Logger.Error($"Failed to update schema - ConfigId:{configId} DataElementId:{schemaId}", ex);
-                return Json(new { Success = false, Message = "Failed to update schema" });
+                return Json(new { Success = false, Message = "Failed to update schema"});
             }
 
             return Json(new { Success = true }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        [Route("Config/Schema/ValidateField")]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        public JsonResult ValidateField(SchemaRow schemaRow)
+        {
+            try
+            {
+                List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+                dtoList.Add(schemaRow.ToDto());
+
+                _schemaService.Validate(dtoList);
+
+                return Json(new { Success = true }, JsonRequestBehavior.AllowGet);
+            }
+            catch (ValidationException vEx)
+            {
+                return Json(new { Success = false, Message = "Failed schema validation", Errors = vEx.ValidationResults.GetAll() }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Success = false, Message = "Failed to validate schema rows" }, JsonRequestBehavior.AllowGet);
+            }
         }
 
         [HttpGet]

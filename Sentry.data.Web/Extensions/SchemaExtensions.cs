@@ -7,6 +7,7 @@ using NJsonSchema;
 using Sentry.data.Core;
 using System.Text;
 using Sentry.data.Core.Factories.Fields;
+using Sentry.Core;
 
 namespace Sentry.data.Web
 {
@@ -163,6 +164,12 @@ namespace Sentry.data.Web
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="schemaRows"></param>
+        /// <exception cref="ValidationException"></exception>
+        /// <returns></returns>
         public static List<BaseFieldDto> ToDto(this List<SchemaRow> schemaRows)
         {
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
@@ -176,43 +183,54 @@ namespace Sentry.data.Web
 
         public static BaseFieldDto ToDto(this SchemaRow row)
         {
-            FieldDtoFactory fieldFactory;
-            switch (row.DataType.ToUpper())
+            ValidationResults errors = new ValidationResults();
+
+            if (string.IsNullOrEmpty(row.DataType))
             {
-                case GlobalConstants.Datatypes.DECIMAL:
-                    fieldFactory = new DecimalFieldDtoFactory(row); 
-                    break;
-                case GlobalConstants.Datatypes.DATE:
-                    fieldFactory = new DateFieldDtoFactory(row);
-                    break;
-                case GlobalConstants.Datatypes.INTEGER:
-                    fieldFactory = new IntegerFieldDtoFactory(row);
-                    break;
-                case GlobalConstants.Datatypes.STRUCT:
-                    fieldFactory = new StructFieldDtoFactory(row);
-                    break;
-                case GlobalConstants.Datatypes.TIMESTAMP:
-                    fieldFactory = new TimestampFieldDtoFactory(row);
-                    break;
-                case GlobalConstants.Datatypes.VARCHAR:
-                    fieldFactory = new VarcharFieldDtoFactory(row);
-                    break;
-                default:
-                    fieldFactory = new VarcharFieldDtoFactory(row);
-                    break;
+                errors.Add(row.Position.ToString(), "Must select datatype");
+
+                throw new ValidationException(errors);
             }
-
-            BaseFieldDto dto = fieldFactory.GetField();
-
-            if (row.ChildRows != null && row.ChildRows.Any())
+            else
             {
-                foreach (SchemaRow childrow in row.ChildRows)
+                FieldDtoFactory fieldFactory;
+                switch (row.DataType.ToUpper())
                 {
-                    dto.ChildFields.Add(childrow.ToDto());
+                    case GlobalConstants.Datatypes.DECIMAL:
+                        fieldFactory = new DecimalFieldDtoFactory(row);
+                        break;
+                    case GlobalConstants.Datatypes.DATE:
+                        fieldFactory = new DateFieldDtoFactory(row);
+                        break;
+                    case GlobalConstants.Datatypes.INTEGER:
+                        fieldFactory = new IntegerFieldDtoFactory(row);
+                        break;
+                    case GlobalConstants.Datatypes.STRUCT:
+                        fieldFactory = new StructFieldDtoFactory(row);
+                        break;
+                    case GlobalConstants.Datatypes.TIMESTAMP:
+                        fieldFactory = new TimestampFieldDtoFactory(row);
+                        break;
+                    case GlobalConstants.Datatypes.VARCHAR:
+                        fieldFactory = new VarcharFieldDtoFactory(row);
+                        break;
+                    default:
+                        fieldFactory = new VarcharFieldDtoFactory(row);
+                        break;
                 }
-            }
 
-            return dto;
+                BaseFieldDto dto = fieldFactory.GetField();
+
+                if (row.ChildRows != null && row.ChildRows.Any())
+                {
+                    foreach (SchemaRow childrow in row.ChildRows)
+                    {
+                        dto.ChildFields.Add(childrow.ToDto());
+                    }
+                }
+
+                return dto;
+            }            
         }
     }
 }
