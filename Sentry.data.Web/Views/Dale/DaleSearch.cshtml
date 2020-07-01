@@ -66,21 +66,20 @@
 
         </div>
 
-
-        <div title="Please request the App_DATA_DINV_Sens_View entitlement via MyAccess to view sensitive column information on the Data Inventory site." style="float:left;margin-left:10px; margin-top: 2px;">
-
-            <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;"></em>
-
-            @if (Model.CanDaleSensitiveView)
-            {
+        @if (Model.CanDaleSensitiveView)
+        {
+            <div style="float:left;margin-left:10px; margin-top: 2px;">
+                <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;"></em>
                 <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500;">Show Sensitive Columns</a>
-            }
-            else
-            {
+            </div>
+        }
+        else
+        {
+            <div data-toggle="tooltip" data-placement="top" title="Please request the App_DATA_DINV_Sens_View entitlement via MyAccess to view sensitive column information on the Data Inventory site." style="float:left;margin-left:10px; margin-top: 2px;">
+                <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;"></em>
                 <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500; pointer-events:none;">Show Sensitive Columns</a>
-            }
-
-        </div>
+            </div>
+        }
 
     </div>
 
