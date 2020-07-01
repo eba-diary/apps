@@ -26,7 +26,7 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult DaleSearch()
         {
-            if ( (_featureFlags.Expose_DaleSearch_CLA_1450.GetValue() && SharedContext.CurrentUser.CanDaleView ) || SharedContext.CurrentUser.IsAdmin ) 
+            if( (_featureFlags.Expose_DaleSearch_CLA_1450.GetValue() && SharedContext.CurrentUser.CanDaleView ) || SharedContext.CurrentUser.IsAdmin ) 
             {
                 DaleSearchModel searchModel = new DaleSearchModel();
                 searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
