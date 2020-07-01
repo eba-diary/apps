@@ -65,21 +65,22 @@
                         text: 'Select Page',
                         action: function (e, dt, node, config)
                         {
-                            var rowsIndexes = table.rows({ page: 'current' }).indexes();
-                            var rowsData = table.rows(rowsIndexes).data();
-                            var rowData1 = rowsData[0];
-                            rowData1.IsSensitive = !rowData1.IsSensitive;
-                            var rowIndex1 = rowsIndexes[0];
+                            data.Dale.editPage();
+                            //var rowsIndexes = table.rows({ page: 'current' }).indexes();
+                            //var rowsData = table.rows(rowsIndexes).data();
+                            //var rowData1 = rowsData[0];
+                            //rowData1.IsSensitive = !rowData1.IsSensitive;
+                            //var rowIndex1 = rowsIndexes[0];
 
 
-                            table                                                                                               //remove dale-clicked class
-                                .row(rowIndex1)
-                                .data(rowData1)         //supply updated data for grid row
-                                .draw()                 //redraw table because of changes
-                                .rows(rowIndex1)        //identifies a given row to modify
-                                .nodes()
-                                .to$()
-                                .addClass('dale-clicked');
+                            //table                                                                                               //remove dale-clicked class
+                            //    .row(rowIndex1)
+                            //    .data(rowData1)         //supply updated data for grid row
+                            //    .draw()                 //redraw table because of changes
+                            //    .rows(rowIndex1)        //identifies a given row to modify
+                            //    .nodes()
+                            //    .to$()
+                            //    .addClass('dale-clicked');
                         }
                     }
             ]
@@ -113,68 +114,144 @@
         data.Dale.setupClickAttack();
 
 
-        var table = $('#daleResultsTable').DataTable();
+        
 
         //cell click event
-        $('#daleResultsTable tbody').on('click', 'td', function () {
-            
-            var row = table.row(this).data();                                                                           //get whole row of data to use later
-            var rowIndex = table.cell(this).index().row;                                                                //get rowIndex being updated
-            var columnIndex = table.cell(this).index().columnVisible;                                                   //get columnIndex clicked
-            var pageNumber = table.page();                                                                              //figure out page number
+        $('#daleResultsTable tbody').on('click', 'td', function ()
+        {
+            var table = $('#daleResultsTable').DataTable();
+            var rowIndex = table.cell(this).index().row;                                                                    //get rowIndex being updated
+            var rowData = table.row(this).data();                                                                           //get whole row of data to use later
+            var columnIndex = table.cell(this).index().columnVisible;                                                       //get columnIndex clicked
 
+            data.Dale.editRow(rowIndex, rowData, columnIndex);
 
-            if (columnIndex == 6)                                                                                       
-            {
-               
-                row.IsSensitive = !row.IsSensitive;                                                                         //flip IsSensitive
+            ////IsSensitive Cell Check
+            //if (columnIndex == 6)                                                                                       
+            //{
+            //    var edit = true;
 
-                var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                      //get stored object array
-                var o = { "BaseColumnId": "IsSensitive" };                                                                  //create new obj based off current selection
-                o.BaseColumnId = row.BaseColumnId;
-                o.IsSensitive = row.IsSensitive;
+            //    rowData.IsSensitive = !rowData.IsSensitive;                                                                 //flip IsSensitive
 
-                if (sensitiveList == null)
-                {
-                    sensitiveList = [];
-                    sensitiveList[0] = o;
-                }
-                else
-                {
-                    var index = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);            //first make sure we remove if already exists in list
-                    if (index >= 0)                                                                                         //check if already exists
-                    {
-                        sensitiveList.splice(index, 1);                                                                     //remove that index from array  
-                        table                                                                                               //remove dale-clicked class
-                            .row(rowIndex)
-                            .data(row)              //supply updated data for grid row
-                            .draw()                 //redraw table because of changes
-                            .rows(rowIndex)         //identifies a given row to modify
-                            .nodes()
-                            .to$()
-                            .removeClass('dale-clicked');
-                    }
-                    else
-                    {
-                        sensitiveList.push(o);                                                                              //add new item
-                        table                                                                                               //add dale-clicked class 
-                            .row(rowIndex)
-                            .data(row)              //supply updated data for grid row
-                            .draw()                 //redraw table because of changes
-                            .rows(rowIndex)         //identifies a given row to modify
-                            .nodes()
-                            .to$()
-                            .addClass('dale-clicked');
-                    }
+            //    var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                      //get stored object array
+            //    var o = { "BaseColumnId": "IsSensitive" };                                                                  //create new obj based off current selection
+            //    o.BaseColumnId = rowData.BaseColumnId;
+            //    o.IsSensitive = rowData.IsSensitive;
+                
+            //    //first time create new array
+            //    if (sensitiveList == null)
+            //    {
+            //        sensitiveList = [];
+            //        sensitiveList[0] = o;
+            //    }
+            //    else
+            //    {
+            //        //check if item exists and remove or add new item to list
+            //        var index = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);            
+            //        if (index >= 0)                                                                                         //check if already exists
+            //        {
+            //            edit = false;
+            //            sensitiveList.splice(index, 1);                                                                     //remove that index from array  
+            //        }
+            //        else
+            //        {
+            //            sensitiveList.push(o);                                                                              //add new item
+            //        }
                     
-                }
-                localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));                                       //save array to storage
-            }
+            //    }
+            //    localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));                                       //save array to storage
+
+            //    data.Dale.styleRow(edit,rowIndex, rowData);
+               
+            //}
         });
+    },
+
+    //style row either edited or not edited
+    styleRow: function (edit, rowIndex, rowData) {
+        var table = $('#daleResultsTable').DataTable();
+
+        if (edit) {                                                                                                         //if editing then add dale-clicked class
+            table                                                                                               
+                .row(rowIndex)
+                .data(rowData)              //supply updated data for grid row
+                .draw()                 //redraw table because of changes
+                .rows(rowIndex)         //identifies a given row to modify
+                .nodes()
+                .to$()
+                .addClass('dale-clicked');
+        }
+        else {                                                                                                              //if not editing then remove dale-clicked class
+            table                                                                                              
+                .row(rowIndex)
+                .data(rowData)          //supply updated data for grid row
+                .draw()                 //redraw table because of changes
+                .rows(rowIndex)         //identifies a given row to modify
+                .nodes()
+                .to$()
+                .removeClass('dale-clicked');
+        }
+    },
+
+    editRow: function (rowIndex, rowData, columnIndex) {
+
+        //IsSensitive Cell Check
+        if (columnIndex == 6) {
+
+            var edit = true;
+
+            rowData.IsSensitive = !rowData.IsSensitive;                                                                 //flip IsSensitive
+
+            var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                      //get stored object array
+            var o = { "BaseColumnId": "IsSensitive" };                                                                  //create new obj based off current selection
+            o.BaseColumnId = rowData.BaseColumnId;
+            o.IsSensitive = rowData.IsSensitive;
+
+            //first time create new array
+            if (sensitiveList == null) {
+                sensitiveList = [];
+                sensitiveList[0] = o;
+            }
+            else {
+                //check if item exists and remove or add new item to list
+                var index = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);
+                if (index >= 0)                                                                                         //check if already exists
+                {
+                    edit = false;
+                    sensitiveList.splice(index, 1);                                                                     //remove that index from array  
+                }
+                else {
+                    sensitiveList.push(o);                                                                              //add new item
+                }
+
+            }
+            localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));                                       //save array to storage
+
+            data.Dale.styleRow(edit, rowIndex, rowData);
+
+        }
+
+    },
+
+    //mark 
+    editPage: function ()
+    {
+
+        var table = $('#daleResultsTable').DataTable();
+        var rowsIndexes = table.rows({ page: 'current' }).indexes();
+        var rowsData = table.rows(rowsIndexes).data();
 
 
 
 
+
+
+
+        var rowData1 = rowsData[0];
+        rowData1.IsSensitive = !rowData1.IsSensitive;
+        var rowIndex1 = rowsIndexes[0];
+
+        data.Dale.styleRow(true, rowIndex1, rowData1);
 
 
     },
