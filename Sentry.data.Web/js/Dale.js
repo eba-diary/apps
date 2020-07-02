@@ -126,44 +126,6 @@
 
             data.Dale.editRow(rowIndex, rowData, columnIndex);
 
-            ////IsSensitive Cell Check
-            //if (columnIndex == 6)                                                                                       
-            //{
-            //    var edit = true;
-
-            //    rowData.IsSensitive = !rowData.IsSensitive;                                                                 //flip IsSensitive
-
-            //    var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                      //get stored object array
-            //    var o = { "BaseColumnId": "IsSensitive" };                                                                  //create new obj based off current selection
-            //    o.BaseColumnId = rowData.BaseColumnId;
-            //    o.IsSensitive = rowData.IsSensitive;
-                
-            //    //first time create new array
-            //    if (sensitiveList == null)
-            //    {
-            //        sensitiveList = [];
-            //        sensitiveList[0] = o;
-            //    }
-            //    else
-            //    {
-            //        //check if item exists and remove or add new item to list
-            //        var index = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);            
-            //        if (index >= 0)                                                                                         //check if already exists
-            //        {
-            //            edit = false;
-            //            sensitiveList.splice(index, 1);                                                                     //remove that index from array  
-            //        }
-            //        else
-            //        {
-            //            sensitiveList.push(o);                                                                              //add new item
-            //        }
-                    
-            //    }
-            //    localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));                                       //save array to storage
-
-            //    data.Dale.styleRow(edit,rowIndex, rowData);
-               
-            //}
         });
     },
 
@@ -228,12 +190,11 @@
             localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));                                       //save array to storage
 
             data.Dale.styleRow(edit, rowIndex, rowData);
-
         }
 
     },
 
-    //mark 
+    //mark all on a single page
     editPage: function ()
     {
 
@@ -241,19 +202,17 @@
         var rowsIndexes = table.rows({ page: 'current' }).indexes();
         var rowsData = table.rows(rowsIndexes).data();
 
+        var len = rowsIndexes.length;
+        for (i = 0; i < len; i++) {
 
+            var ri = rowsIndexes[i];
+            var rd = rowsData[i];
 
+            data.Dale.editRow(ri, rd, 6);
+        }
 
-
-
-
-        var rowData1 = rowsData[0];
-        rowData1.IsSensitive = !rowData1.IsSensitive;
-        var rowIndex1 = rowsIndexes[0];
-
-        data.Dale.styleRow(true, rowIndex1, rowData1);
-
-
+        var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));
+        var len2 = sensitiveList.length;
     },
 
     getDaleDestiny: function ()
@@ -298,14 +257,6 @@
             data.Dale.sensitive = false;                                            //set sensitive property to true so grid does sensitive search back to controller
             data.Dale.disableDale();
             daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
-
-
-            
-
-
-
-
-
         });
 
         //setup search box enter event
