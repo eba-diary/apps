@@ -67,7 +67,7 @@ namespace Sentry.data.Web.Controllers
             DaleSearchModel searchModel = new DaleSearchModel();
             searchModel.Criteria = searchCriteria;
             searchModel.Destiny = destination.ToDaleDestiny();
-            searchModel.CanDaleSensitiveView = SharedContext.CurrentUser.CanDaleSensitiveView;
+            searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
 
             if (sensitive && searchModel.CanDaleSensitiveView)
             {
