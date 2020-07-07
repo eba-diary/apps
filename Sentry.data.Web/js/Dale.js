@@ -33,7 +33,24 @@
                 { data: "ObjectType", className: "ObjectType" },
                 { data: "Column", className: "ColumnMan"},
 
-                { data: "IsSensitive", className: "IsSensitive" },
+                //{ data: "IsSensitive", className: "IsSensitive" },
+
+                {
+                    data: null, className: "IsSensitive", render: function (data)
+                    {
+                        if (1 == 2) {
+                            return '<select name="DropMe" >        <option value="true">true</option>     <option selected= "selected" value="false">false</option>       </select>';
+                        }
+                        else {
+                            return '<select name="DropMe" >        <option value="true">true</option>     <option value="false">false</option>       </select>';
+
+                        } 
+                    }
+                },
+
+
+
+
                 { data: "Alias", className: "Alias", visible: false },
                 { data: "ProdType", className: "ProdType", visible: false },
 
@@ -66,21 +83,6 @@
                         action: function (e, dt, node, config)
                         {
                             data.Dale.editPage();
-                            //var rowsIndexes = table.rows({ page: 'current' }).indexes();
-                            //var rowsData = table.rows(rowsIndexes).data();
-                            //var rowData1 = rowsData[0];
-                            //rowData1.IsSensitive = !rowData1.IsSensitive;
-                            //var rowIndex1 = rowsIndexes[0];
-
-
-                            //table                                                                                               //remove dale-clicked class
-                            //    .row(rowIndex1)
-                            //    .data(rowData1)         //supply updated data for grid row
-                            //    .draw()                 //redraw table because of changes
-                            //    .rows(rowIndex1)        //identifies a given row to modify
-                            //    .nodes()
-                            //    .to$()
-                            //    .addClass('dale-clicked');
                         }
                     }
             ]
@@ -117,16 +119,39 @@
         
 
         //cell click event
-        $('#daleResultsTable tbody').on('click', 'td', function ()
+        //this looks for any event on #daleResultsTable tbody, then we filter on ONLY change events that happen within the IsSensitive/select element
+        //then to get the row data later we have to traverse the hierarchy up by using the closest, that we we can get the rowData
+        //in the future when we add more columns we have to listen for, we would call them IsSensitive2 class for example and listen for that one in a different event handler
+        //this code allows me to get rid of the column==6 check too.
+        $('#daleResultsTable tbody').on('change', '.IsSensitive select', function (event)
         {
-            var table = $('#daleResultsTable').DataTable();
-            var rowIndex = table.cell(this).index().row;                                                                    //get rowIndex being updated
-            var rowData = table.row(this).data();                                                                           //get whole row of data to use later
-            var columnIndex = table.cell(this).index().columnVisible;                                                       //get columnIndex clicked
+            var cellClicked = $(this).closest('td');
+            var value = this.value;
 
-            data.Dale.editRow(rowIndex, rowData, columnIndex);
+
+            var table = $('#daleResultsTable').DataTable();
+            var rowIndex = table.cell(cellClicked).index().row;                                                                    //get rowIndex being updated
+            var rowData = table.row(cellClicked).data();                                                                           //get whole row of data to use later
+            var columnIndex = table.cell(cellClicked).index().columnVisible;                                                       //get columnIndex clicked
+
+            //data.Dale.editRow(rowIndex, rowData, columnIndex);
 
         });
+
+
+        ////cell click event
+        //$('#daleResultsTable tbody').on('click', 'td', function () {
+        //    var table = $('#daleResultsTable').DataTable();
+        //    var rowIndex = table.cell(this).index().row;                                                                    //get rowIndex being updated
+        //    var rowData = table.row(this).data();                                                                           //get whole row of data to use later
+        //    var columnIndex = table.cell(this).index().columnVisible;                                                       //get columnIndex clicked
+
+        //    //data.Dale.editRow(rowIndex, rowData, columnIndex);
+
+        //});
+
+
+
     },
 
     //style row either edited or not edited
