@@ -145,5 +145,13 @@ namespace Sentry.data.Core
             }
         }
 
+        public virtual bool CanDaleView
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.DALE_VIEW);
+            }
+        }
+
     }
 }
