@@ -33,23 +33,18 @@
                 { data: "ObjectType", className: "ObjectType" },
                 { data: "Column", className: "ColumnMan"},
 
-                //{ data: "IsSensitive", className: "IsSensitive" },
-
                 {
                     data: null, className: "IsSensitive", render: function (data)
                     {
-                        if (1 == 2) {
-                            return '<select name="DropMe" >        <option value="true">true</option>     <option selected= "selected" value="false">false</option>       </select>';
+                        if (data.IsSensitive) {
+                            return '<select name="DropMe" >     <option selected= "selected" value="true">true</option>     <option value="false">false</option>                        </select>';
                         }
                         else {
-                            return '<select name="DropMe" >        <option value="true">true</option>     <option value="false">false</option>       </select>';
+                            return '<select name="DropMe" >     <option value="true">true</option>                          <option selected= "selected" value="false">false</option>   </select>';
 
                         } 
                     }
                 },
-
-
-
 
                 { data: "Alias", className: "Alias", visible: false },
                 { data: "ProdType", className: "ProdType", visible: false },
@@ -79,10 +74,13 @@
                     { extend: 'csv', text: 'Download' },
 
                     {
-                        text: 'Select Page',
+                       text: 'SaveMe',
+                        attr: {
+                            id: 'SaveMeButton'
+                        },
                         action: function (e, dt, node, config)
                         {
-                            data.Dale.editPage();
+                            //data.Dale.editPage();
                         }
                     }
             ]
@@ -134,7 +132,7 @@
             var rowData = table.row(cellClicked).data();                                                                           //get whole row of data to use later
             var columnIndex = table.cell(cellClicked).index().columnVisible;                                                       //get columnIndex clicked
 
-            //data.Dale.editRow(rowIndex, rowData, columnIndex);
+            data.Dale.editRow(rowIndex, rowData, columnIndex);
 
         });
 
