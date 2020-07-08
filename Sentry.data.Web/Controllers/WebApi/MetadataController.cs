@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Sentry.Common.Logging;
+using Sentry.Core;
 using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
@@ -245,6 +246,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
         [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
         [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, "Failed schema validation", typeof(List<string>))]
         public async Task<IHttpActionResult> AddSchemaRevision(int datasetId, int schemaId, string revisionName, [FromBody] JObject schemaStructure)
         {
             try
@@ -261,6 +263,8 @@ namespace Sentry.data.Web.WebApi.Controllers
                 List<BaseFieldDto> schemarows_v2 = new List<BaseFieldDto>();
                 ToSchemaRows(schema_v3, schemarows_v2);
 
+                _schemaService.Validate(schemarows_v2);
+
                 int savedRevisionId = _schemaService.CreateAndSaveSchemaRevision(schemaId, schemarows_v2, revisionName, schema_v3.ToJson());
 
                 if (savedRevisionId == 0)
@@ -268,6 +272,10 @@ namespace Sentry.data.Web.WebApi.Controllers
                     return Content(System.Net.HttpStatusCode.BadRequest, "Unable to Save Revision");
                 }
                 return Ok(savedRevisionId);
+            }
+            catch (ValidationException vEx)
+            {
+                return Content( System.Net.HttpStatusCode.BadRequest, vEx.ValidationResults.GetAll().Select(s => s.Description).ToList());
             }
             catch (DatasetUnauthorizedAccessException)
             {
