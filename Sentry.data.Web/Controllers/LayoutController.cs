@@ -39,7 +39,7 @@ namespace Sentry.data.Web.Controllers
             headerModel.CanViewReports = SharedContext.CurrentUser.CanViewReports;
             headerModel.CanManageReports = SharedContext.CurrentUser.CanManageReports;
             headerModel.CanViewBusinessArea = true; 
-            headerModel.CanViewDale = (_featureFlags.Expose_DaleSearch_CLA_1450.GetValue() || SharedContext.CurrentUser.IsAdmin);
+            headerModel.CanViewDale = SharedContext.CurrentUser.CanDaleView || SharedContext.CurrentUser.IsAdmin;
 
             if (SharedContext.CurrentUser.GetType() == typeof(ImpersonatedApplicationUser))
             {

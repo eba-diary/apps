@@ -178,6 +178,7 @@
             public const string ADMIN_USER = "AdminUser";
 
             public const string DALE_SENSITIVE_VIEW = "DaleSensView";
+            public const string DALE_VIEW = "DaleView";
 
 
         }
