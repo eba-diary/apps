@@ -26,8 +26,8 @@ namespace Sentry.data.Core
             CreateDtm = DateTime.Now;
             LastUpdatedDtm = DateTime.Now;
             IsArray = array;
-            Description = prop.Value.Description;
             ChildFields = new List<BaseFieldDto>();
+            Description = prop.Value.Description;
         }
 
         public BaseFieldDto(SchemaRow row)

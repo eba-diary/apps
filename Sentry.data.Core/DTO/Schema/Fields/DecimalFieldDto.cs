@@ -9,30 +9,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
     {
         public DecimalFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, bool array) : base(prop, array)
         {
-
-            if (prop.Value.ExtensionData != null && prop.Value.ExtensionData.Any(w => w.Key == "dsc-precision"))
-            {
-                var valObject = prop.Value.ExtensionData.FirstOrDefault(w => w.Key == "dsc-precision").Value;
-                //handle if null was passed for dsc-scale
-                string valString = (valObject != null) ? valObject.ToString() : "";
-                Precision = (Int32.TryParse(valString, out int x)) ? x : 0;
-            }
-            else
-            {
-                Precision = 0;
-            }
-
-            if (prop.Value.ExtensionData != null && prop.Value.ExtensionData.Any(w => w.Key == "dsc-scale"))
-            {
-                var valObject = prop.Value.ExtensionData.FirstOrDefault(w => w.Key == "dsc-scale").Value;
-                //handle if null was passed for dsc-scale
-                string valString = (valObject != null) ? valObject.ToString() : "";
-                Scale = (Int32.TryParse(valString, out int x)) ? x : 0;
-            }
-            else
-            {
-                Scale = 0;
-            }
+            SetPrecisionScale(prop.Value.IsArray ? prop.FindArraySchema().ExtensionData : prop.Value.ExtensionData);
         }
 
         public DecimalFieldDto(DecimalField field) : base(field)
@@ -106,6 +83,33 @@ namespace Sentry.data.Core.DTO.Schema.Fields
                 changed = true;
             }
             return changed;
+        }
+
+        private void SetPrecisionScale(IDictionary<string, object> extensionData)
+        {
+            if (extensionData != null && extensionData.Any(w => w.Key == "dsc-precision"))
+            {
+                var valObject = extensionData.FirstOrDefault(w => w.Key == "dsc-precision").Value;
+                //handle if null was passed for dsc-scale
+                string valString = (valObject != null) ? valObject.ToString() : "";
+                Precision = (Int32.TryParse(valString, out int x)) ? x : 0;
+            }
+            else
+            {
+                Precision = 0;
+            }
+
+            if (extensionData != null && extensionData.Any(w => w.Key == "dsc-scale"))
+            {
+                var valObject = extensionData.FirstOrDefault(w => w.Key == "dsc-scale").Value;
+                //handle if null was passed for dsc-scale
+                string valString = (valObject != null) ? valObject.ToString() : "";
+                Scale = (Int32.TryParse(valString, out int x)) ? x : 0;
+            }
+            else
+            {
+                Scale = 0;
+            }
         }
     }
 }
