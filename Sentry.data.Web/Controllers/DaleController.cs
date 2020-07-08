@@ -11,8 +11,6 @@ using System.Web.Mvc;
 namespace Sentry.data.Web.Controllers
 {
 
-    [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATA_ASSET_VIEW)]
-
     public class DaleController : BaseController
     {
         private readonly IEventService _eventService;
@@ -28,7 +26,7 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult DaleSearch()
         {
-            if (  _featureFlags.Expose_DaleSearch_CLA_1450.GetValue() || SharedContext.CurrentUser.IsAdmin )
+            if( CanDaleView() ) 
             {
                 DaleSearchModel searchModel = new DaleSearchModel();
                 searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
@@ -69,7 +67,7 @@ namespace Sentry.data.Web.Controllers
             DaleSearchModel searchModel = new DaleSearchModel();
             searchModel.Criteria = searchCriteria;
             searchModel.Destiny = destination.ToDaleDestiny();
-            searchModel.CanDaleSensitiveView = SharedContext.CurrentUser.CanDaleSensitiveView;
+            searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
 
             if (sensitive && searchModel.CanDaleSensitiveView)
             {
@@ -102,7 +100,6 @@ namespace Sentry.data.Web.Controllers
 
         private bool IsCriteriaValid(DaleSearchModel model)
         {
-
             //if sensitive query, don't bother to validate criteria and immediately return true
             if (model.Sensitive == DaleSensitive.SensitiveOnly)
             {
@@ -132,13 +129,23 @@ namespace Sentry.data.Web.Controllers
                 return true;
             }
 
-            //check feature flag, REMOVE this whole IF once officially released
-            if( !_featureFlags.Expose_DaleSensitiveView_CLA_1709.GetValue())
+            if (!SharedContext.CurrentUser.CanDaleSensitiveView)
             {
                 return false;
             }
 
-            if (!SharedContext.CurrentUser.CanDaleSensitiveView)
+            return true;
+        }
+
+        private bool CanDaleView()
+        {
+            //if admin, ALWAYS let them see sensitive
+            if (SharedContext.CurrentUser.IsAdmin)
+            {
+                return true;
+            }
+
+            if (!SharedContext.CurrentUser.CanDaleView)
             {
                 return false;
             }
