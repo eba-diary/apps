@@ -382,92 +382,163 @@
                 return new Row(currentMax, rowInfo, parentvm, thisLevel);
             }));
 
+            //Call UpdateRow() when any property changes
+            self.Name.subscribe(        function () { self.UpdateRow() });
+            self.FieldGuid.subscribe(   function () { self.UpdateRow() });
+            self.Description.subscribe( function () { self.UpdateRow() });
+            self.DataType.subscribe(    function () { self.UpdateRow() });
+            self.ArrayType.subscribe(   function () { self.UpdateRow() });
+            self.Precision.subscribe(   function () { self.UpdateRow() });
+            self.Scale.subscribe(       function () { self.UpdateRow() });
+            self.Format.subscribe(      function () { self.UpdateRow() });
+            self.IsArray.subscribe(     function () { self.UpdateRow() });
+            self.Length.subscribe(      function () { self.UpdateRow() });
 
-            self.RowColor = ko.computed(function () {
-                var hasError = false;
+            self.UpdateRow = function () {
+                //alert("Row #" + self.Position() + " has updated its Name field.")
 
-                if (parentvm.Errors === undefined) {
-                    parentvm.Errors = ko.observableArray();
-                }
-                else {
-                    parentvm.Errors.remove(function (item) {
-                    return item.Id === self.Position();
-                    });
-                }
+                
+                //call parent self.UpdateRow  -- parentvw.UpdateRow
 
-                //Has no children.  Error
-                if ((self.DataType() === 'STRUCT' || (self.DataType() === 'ARRAY' && self.ArrayType() === 'STRUCT')) && self.ChildRows !== undefined && self.ChildRows().length === 0) {
-                    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has no children.  Please add a child or change data types.' });
-                    hasError = true;
-                }
-                //Has children when it shouldn't
-                else if (self.DataType() === 'ARRAY' && self.ArrayType() !== "STRUCT" && self.ChildRows !== undefined && self.ChildRows().length > 0) {
-                    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to ARRAY<STRUCT>.' });
-                    hasError = true;
-                }
-                //Has children when it shouldn't
-                else if (self.DataType() !== 'STRUCT' && (self.DataType() !== 'ARRAY' && self.ArrayType() !== "STRUCT") && self.ChildRows !== undefined && self.ChildRows().length > 0) {
-                    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to STRUCT.' });
-                    hasError = true;
-                }
-                //Name is blank
-                if (self.Name() === '' || self.Name() === undefined || self.Name() === null) {
-                    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' has no name.' });
-                    hasError = true;
-                }
+                var a = JSON.stringify(ko.toJS(self), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd', 'IsArray', 'FieldGuid', 'Length']);
 
-                if (self.Name() !== undefined && self.Name() !== '' && self.Name() !== null) {
-                    //Name contains spaces
-                    if (self.Name().indexOf(' ') >= 0) {
-                        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot contain Spaces.' });
-                        hasError = true;
-                    }
+                //ajax
+                $.ajax({
+                    type: "POST",
+                    url: "/Config/Schema/ValidateField",
+                    data: a,
+                    dataType: "json",
+                    contentType: "application/json",
+                    success: function (returnedData) {
+                        if (Sentry.WasAjaxSuccessful(returnedData)) {                            
+                           //No errors for field so remove any existing errors displayed
+                            parentvm.Errors.remove(function (item) {
+                                return item.Id === self.Position().toString();
+                            });
 
-                    //Name contains special characters
-                    var pattchar = new RegExp("[-:,;{}()]");
-                    if (pattchar.test(self.Name())) {
-                        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot special characters (-:,;{}()).' });
-                        hasError = true;
-                    }
+                            //Remove error color from row
+                            self.RowColor('');
 
-                    //Name contains uppercase
-                    var pattupper = new RegExp("[A-Z]");
-                    //var nme = self.Name();
-                    if (pattupper.test(self.Name())) {
-                        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot contain uppercase letters.' });
-                        hasError = true;
-                    }
-                }
+                            //If there are no errors on page, show save button
+                            if (parentvm.Errors !== undefined && parentvm.Errors().length === 0) {
+                                $('#saveBtn').show();
+                            }
+                        }
+                        else {
+                            var previousId = 0;
+                            for (var i = 0; i < returnedData.Errors.length; i++) {
+                                if (previousId !== returnedData.Errors[i].Id) {
+                                        //Remove all associated errors with this Id
+                                        parentvm.Errors.remove(function (item) {
+                                            return item.Id === returnedData.Errors[i].Id;
+                                        });
+                                    previousId = returnedData.Errors[i].Id;
+                                }
+                                parentvm.Errors.push({ 'Id': returnedData.Errors[i].Id, 'ErrorType': 'Type', 'Description': returnedData.Errors[i].Description });
+                            }
 
-                if (self.DataType() === undefined) {
-                    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': ' Datatype selection required.' });
-                    hasError = true;
-                }
+                            //Adjust color of row
+                            self.RowColor('rgba(255, 0, 0, 0.8)');
 
-                if (self.DataType() === 'DECIMAL') {
-                    if (self.Scale() > self.Precision()) {
-                        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': 'Scale need to be less than or equal to Precision.' });
-                        hasError = true;
-                    }
+                            //Hide save button
+                            $('#saveBtn').hide();
+                        }
+                    },
+                    error: function (error) {
+                        console.log(error);
+                        //$('#buttonSpinner').hide();
+                    },
+                    async: false
+                });
+            }
 
-                    if (self.Precision() <= 0) {
-                        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': 'Precision need to be greater than 0.' });
-                        hasError = true;
-                    }
-                }
+            self.RowColor = ko.observable()
+                //ko.computed(function () {
+                //return '';
+                //var hasError = false;
 
-                if (hasError) {
-                    $('#saveBtn').hide();
-                    return 'rgba(255, 0, 0, 0.8)';
-                }
-                else {
-                    if (parentvm.Errors !== undefined && parentvm.Errors().length === 0) {
-                        $('#saveBtn').show();
-                    }
-                    return '';
-                }
+                //if (parentvm.Errors === undefined) {
+                //    parentvm.Errors = ko.observableArray();
+                //}
+                //else {
+                //    parentvm.Errors.remove(function (item) {
+                //    return item.Id === self.Position();
+                //    });
+                //}
 
-            });
+                ////Has no children.  Error
+                //if ((self.DataType() === 'STRUCT' || (self.DataType() === 'ARRAY' && self.ArrayType() === 'STRUCT')) && self.ChildRows !== undefined && self.ChildRows().length === 0) {
+                //    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has no children.  Please add a child or change data types.' });
+                //    hasError = true;
+                //}
+                ////Has children when it shouldn't
+                //else if (self.DataType() === 'ARRAY' && self.ArrayType() !== "STRUCT" && self.ChildRows !== undefined && self.ChildRows().length > 0) {
+                //    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to ARRAY<STRUCT>.' });
+                //    hasError = true;
+                //}
+                ////Has children when it shouldn't
+                //else if (self.DataType() !== 'STRUCT' && (self.DataType() !== 'ARRAY' && self.ArrayType() !== "STRUCT") && self.ChildRows !== undefined && self.ChildRows().length > 0) {
+                //    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to STRUCT.' });
+                //    hasError = true;
+                //}
+                ////Name is blank
+                //if (self.Name() === '' || self.Name() === undefined || self.Name() === null) {
+                //    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' has no name.' });
+                //    hasError = true;
+                //}
+
+                //if (self.Name() !== undefined && self.Name() !== '' && self.Name() !== null) {
+                //    //Name contains spaces
+                //    if (self.Name().indexOf(' ') >= 0) {
+                //        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot contain Spaces.' });
+                //        hasError = true;
+                //    }
+
+                //    //Name contains special characters
+                //    var pattchar = new RegExp("[-:,;{}()]");
+                //    if (pattchar.test(self.Name())) {
+                //        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot special characters (-:,;{}()).' });
+                //        hasError = true;
+                //    }
+
+                //    //Name contains uppercase
+                //    var pattupper = new RegExp("[A-Z]");
+                //    //var nme = self.Name();
+                //    if (pattupper.test(self.Name())) {
+                //        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot contain uppercase letters.' });
+                //        hasError = true;
+                //    }
+                //}
+
+                //if (self.DataType() === undefined) {
+                //    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': ' Datatype selection required.' });
+                //    hasError = true;
+                //}
+
+                //if (self.DataType() === 'DECIMAL') {
+                //    if (self.Scale() > self.Precision()) {
+                //        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': 'Scale need to be less than or equal to Precision.' });
+                //        hasError = true;
+                //    }
+
+                //    if (self.Precision() <= 0) {
+                //        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': 'Precision need to be greater than 0.' });
+                //        hasError = true;
+                //    }
+                //}
+
+                //if (hasError) {
+                //    $('#saveBtn').hide();
+                //    return 'rgba(255, 0, 0, 0.8)';
+                //}
+                //else {
+                //    if (parentvm.Errors !== undefined && parentvm.Errors().length === 0) {
+                //        $('#saveBtn').show();
+                //    }
+                //    return '';
+                //}
+
+            //});
 
             self.ShowPandS = ko.computed(function () {
                 if (self.DataType() === 'DECIMAL') {
@@ -599,6 +670,8 @@
                 if (!self.Toggled()) {
                     self.ToggleChildren();
                 }
+
+                self.UpdateRow();
             };
 
             self.removeChild = function (row) {
@@ -633,7 +706,7 @@
 
             //Observables
             //self.ErrorsCopy = ko.observableArray();
-            self.Errors = ko.observableArray();
+            self.Errors = ko.observableArray().extend({ notify: 'always' });
             self.DataTypes = ko.observableArray();
             self.IsPositional = ko.observable();
             self.IsFixedWidth = ko.observable();

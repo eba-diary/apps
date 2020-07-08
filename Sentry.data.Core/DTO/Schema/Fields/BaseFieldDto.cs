@@ -26,8 +26,8 @@ namespace Sentry.data.Core
             CreateDtm = DateTime.Now;
             LastUpdatedDtm = DateTime.Now;
             IsArray = array;
-            Description = prop.Value.Description;
             ChildFields = new List<BaseFieldDto>();
+            Description = prop.Value.Description;
         }
 
         public BaseFieldDto(SchemaRow row)
@@ -40,6 +40,7 @@ namespace Sentry.data.Core
             IsArray = row.IsArray;
             Description = row.Description;
             ChildFields = new List<BaseFieldDto>();
+            OrdinalPosition = row.Position;
         }
 
         public int FieldId { get; set; }

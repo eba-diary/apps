@@ -8,12 +8,20 @@ namespace Sentry.data.Core.DTO.Schema.Fields
     {
         public VarcharFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, bool array) : base(prop, array)
         {
-            Length = (prop.Value.MaxLength) ?? 0;
+            if (prop.Value.IsArray)
+            {
+                Length = prop.FindArraySchema()?.MaxLength ?? 0;
+            }
+            else
+            {
+                Length = prop.Value.MaxLength?? 0;
+            }
         }
 
         public VarcharFieldDto(VarcharField field) : base(field)
         {
             Length = field.FieldLength;
+            OrdinalPosition = field.OrdinalPosition;
         }
 
         public VarcharFieldDto(SchemaRow row) : base(row)
@@ -28,6 +36,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             {
                 Length = 0;
             }
+            OrdinalPosition = row.Position;
         }
 
         public override string FieldType => GlobalConstants.Datatypes.VARCHAR;

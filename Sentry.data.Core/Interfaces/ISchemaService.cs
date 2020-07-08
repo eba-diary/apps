@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sentry.Core;
 using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Core
@@ -47,5 +48,12 @@ namespace Sentry.data.Core
         FileSchema GetFileSchemaByStorageCode(string storageCode);
         bool RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent);
         bool SasUpdateNotification(int schemaId, int revisionId, string initiatorId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fieldDtoList"></param>
+        /// <exception cref="ValidationException">Thrown when metadata does not adhere to validations</exception>
+        void Validate(List<BaseFieldDto> fieldDtoList);
     }
 }

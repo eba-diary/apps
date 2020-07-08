@@ -12,31 +12,7 @@ namespace Sentry.data.Core.Tests
     public class SchemaServiceTests
     {
         #region DecimalFieldDto_JsonConstructor Tests
-
-        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        public void Get_False_IsArray_From_BaseFieldDto_Json_Constructor()
-        {
-
-            JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
-
-            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-            Assert.IsNotNull(dto);
-            Assert.AreEqual(false, dto.IsArray);
-        }
-        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        public void Get_True_IsArray_From_BaseFieldDto_Json_Constructor()
-        {
-
-            JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
-
-            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
-
-            Assert.IsNotNull(dto);
-            Assert.AreEqual(true, dto.IsArray);
-        }
+        #region DecimalFieldDto Precision Tests
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Get_Precision_From_DecimalFieldDto_Json_Constructor()
         {
@@ -50,174 +26,18 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(6, dto.Precision);
         }
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        public void Get_Scale_From_DecimalFieldDto_Json_Constructor()
+        public void Get_Precision_From_DecimalFieldDto_Json_Constructor__Array()
         {
-
-            JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+            JsonSchema schema = BuildMockJsonSchemaWithDecimalFieldArray();
 
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
             DecimalFieldDto dto = new DecimalFieldDto(prop, false);
 
             Assert.IsNotNull(dto);
-            Assert.AreEqual(2, dto.Scale);
+            Assert.AreEqual(6, dto.Precision);
         }
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        public void Get_Null_SourceFormat_From_DecimalFieldDto_Json_Constructor()
-        {
-
-            JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
-
-            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-            Assert.IsNotNull(dto);
-            Assert.AreEqual(null, dto.SourceFormat);
-        }
-        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        public void Get_0_Length_From_DecimalFieldDto_Json_Constructor()
-        {
-
-            JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
-
-            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-            Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Length);
-        }
-        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        public void Get_0_OrdinalPosition_From_DecimalFieldDto_Json_Constructor()
-        {
-
-            JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
-
-            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-            Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.OrdinalPosition);
-        }
-        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        public void Get_Default_Percision_From_DecimalFieldDto_Json_Constructor()
-        {
-            //Setup
-            string jsonSchema = @"{
-                ""type"": ""object"",
-                ""properties"": { 
-                    ""salary"":{
-                        ""type"": ""number"",
-                        ""dsc-scale"": 2,
-                        ""description"": ""Decimal field""
-                    }
-                }
-            }";
-            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
-            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-
-            //Action
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-            //Assertion
-            Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Precision);
-        }
-        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        public void Get_Default_Scale_From_DecimalFieldDto_Json_Constructor()
-        {
-            //Setup
-            string jsonSchema = @"{
-                ""type"": ""object"",
-                ""properties"": { 
-                    ""salary"":{
-                        ""type"": ""number"",
-                        ""dsc-scale"": null,
-                        ""description"": ""Decimal field""
-                    }
-                }
-            }";
-            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
-            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-
-            //Action
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-            //Assertion
-            Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Scale);
-        }
-        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        public void Get_dscscale_Value_IsNull_To_DecimalFieldDto_Json_Constructor()
-        {
-            //Setup
-            string jsonSchema = @"{
-                ""type"": ""object"",
-                ""properties"": { 
-                    ""salary"":{
-                        ""type"": ""number"",
-                        ""dsc-scale"": null,
-                        ""description"": ""Decimal field""
-                    }
-                }
-            }";
-            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
-            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-
-            //Action
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-            //Assertion
-            Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Scale);
-        }
-        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        public void Get_dscscale_DoesNotExist_To_DecimalFieldDto_Json_Constructor()
-        {
-            //Setup
-            string jsonSchema = @"{
-                ""type"": ""object"",
-                ""properties"": { 
-                    ""salary"":{
-                        ""type"": ""number"",
-                        ""description"": ""Decimal field""
-                    }
-                }
-            }";
-            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
-            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-
-            //Action
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-            //Assertion
-            Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Scale);
-        }
-        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        public void Get_dscprecision_DoesNotExist_To_DecimalFieldDto_Json_Constructor()
-        {
-            //Setup
-            string jsonSchema = @"{
-                ""type"": ""object"",
-                ""properties"": { 
-                    ""salary"":{
-                        ""type"": ""number"",
-                        ""dsc-scale"": 2,
-                        ""description"": ""Decimal field""
-                    }
-                }
-            }";
-            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
-            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-
-            //Action
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-            //Assertion
-            Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Precision);
-        }
-        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        public void Get_dscprecision_Value_IsNull_To_DecimalFieldDto_Json_Constructor()
+        public void Can_Default_Null_dscprecision_From_DecimalFieldDto_Json_Constructor()
         {
             //Setup
             string jsonSchema = @"{
@@ -240,6 +60,314 @@ namespace Sentry.data.Core.Tests
             //Assertion
             Assert.IsNotNull(dto);
             Assert.AreEqual(0, dto.Precision);
+        }
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Can_Default_Null_dscprecision_From_DecimalFieldDto_Json_Constructor__Array()
+        {
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""decimalarray"":{
+                        ""type"": ""array"",
+                        ""items"": {
+                            ""type"": ""number"",
+                            ""dsc-precision"": null,
+                            ""dsc-scale"": 2
+                            },
+                        ""description"": ""Decimal field""
+                    }
+                }
+            }";
+
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(0, dto.Precision);
+        }
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Can_Default_NonExistent_dscprecision_From_DecimalFieldDto_Json_Constructor()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""salary"":{
+                        ""type"": ""number"",
+                        ""dsc-scale"": 2,
+                        ""description"": ""Decimal field""
+                    }
+                }
+            }";
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(0, dto.Precision);
+        }
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Can_Default_NonExistent_dscprecision_From_DecimalFieldDto_Json_Constructor__Array()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""decimalarray"":{
+                        ""type"": ""array"",
+                        ""items"": {
+                            ""type"": ""number"",
+                            ""dsc-scale"": 2
+                            },
+                        ""description"": ""Decimal field""
+                    }
+                }
+            }";
+
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(0, dto.Precision);
+        }
+        #endregion
+        #region DecimalFieldDto Scale Tests
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Get_Scale_From_DecimalFieldDto_Json_Constructor()
+        {
+
+            JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(2, dto.Scale);
+        }
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Get_Scale_From_DecimalFieldDto_Json_Constructor__Array()
+        {
+
+            JsonSchema schema = BuildMockJsonSchemaWithDecimalFieldArray();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(2, dto.Scale);
+        }
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Can_Default_Null_dscscale_From_DecimalFieldDto_Json_Constructor()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""salary"":{
+                        ""type"": ""number"",
+                        ""dsc-scale"": null,
+                        ""description"": ""Decimal field""
+                    }
+                }
+            }";
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(0, dto.Scale);
+        }
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Can_Default_Null_dscscale_From_DecimalFieldDto_Json_Constructor__Array() 
+        {
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""decimalarray"":{
+                        ""type"": ""array"",
+                        ""items"": {
+                            ""type"": ""number"",
+                            ""dsc-precision"": 6,
+                            ""dsc-scale"": null
+                            },
+                        ""description"": ""Decimal field""
+                    }
+                }
+            }";
+
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(0, dto.Scale);
+        }
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Can_Default_NonExistent_dscscale_From_DecimalFieldDto_Json_Constructor()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""salary"":{
+                        ""type"": ""number"",
+                        ""description"": ""Decimal field""
+                    }
+                }
+            }";
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(0, dto.Scale);
+        }
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Can_Default_NonExistent_dscscale_From_DecimalFieldDto_Json_Constructor__Array()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""decimalarray"":{
+                        ""type"": ""array"",
+                        ""items"": {
+                            ""type"": ""number"",
+                            ""dsc-precision"": 6
+                            },
+                        ""description"": ""Decimal field""
+                    }
+                }
+            }";
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(0, dto.Scale);
+        }
+        #endregion
+        #region DecimalFieldDto SourceFormat Tests
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Get_Null_SourceFormat_From_DecimalFieldDto_Json_Constructor()
+        {
+
+            JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(null, dto.SourceFormat);
+        }
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Get_Null_SourceFormat_From_DecimalFieldDto_Json_Constructor__Array()
+        {
+
+            JsonSchema schema = BuildMockJsonSchemaWithDecimalFieldArray();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(null, dto.SourceFormat);
+        }
+        #endregion
+        #region DecimalFieldDto Length Tests
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Get_0_Length_From_DecimalFieldDto_Json_Constructor()
+        {
+
+            JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(0, dto.Length);
+        }
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Get_0_Length_From_DecimalFieldDto_Json_Constructor__Array()
+        {
+
+            JsonSchema schema = BuildMockJsonSchemaWithDecimalFieldArray();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(0, dto.Length);
+        }
+        #endregion
+        #region DecimalFieldDto OridinalPosition Tests
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Get_0_OrdinalPosition_From_DecimalFieldDto_Json_Constructor()
+        {
+
+            JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(0, dto.OrdinalPosition);
+        }
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Get_0_OrdinalPosition_From_DecimalFieldDto_Json_Constructor__Array()
+        {
+
+            JsonSchema schema = BuildMockJsonSchemaWithDecimalFieldArray();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(0, dto.OrdinalPosition);
+        }
+        #endregion
+
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Get_False_IsArray_From_BaseFieldDto_Json_Constructor()
+        {
+
+            JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(false, dto.IsArray);
+        }
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Get_True_IsArray_From_BaseFieldDto_Json_Constructor()
+        {
+
+            JsonSchema schema = BuildMockJsonSchemaWithDecimalFieldArray();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(true, dto.IsArray);
         }
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Get_FieldType_From_DecimalFieldDto_Constructor()
@@ -291,6 +419,32 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(false, dto.DeleteInd);
             Assert.AreEqual(false, dto.IsArray);
         }
+
+        [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
+        public void Get_BaseFieldDto_Properties_From_DecimalFieldDto_Constructor__Array()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithDecimalFieldArray();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual("decimalarray", dto.Name);
+            Assert.AreEqual("Decimal field", dto.Description);
+            Assert.IsNotNull(dto.ChildFields);
+            Assert.AreEqual(0, dto.ChildFields.Count);
+            Assert.AreNotEqual(DateTime.MinValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MinValue, dto.LastUpdatedDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.LastUpdatedDtm);
+            Assert.AreEqual(0, dto.FieldId);
+            Assert.AreEqual(Guid.Empty, dto.FieldGuid);
+            Assert.AreEqual(false, dto.DeleteInd);
+            Assert.AreEqual(true, dto.IsArray);
+        }
         #endregion
 
         #region DecimalFieldDto SchemaRow Constructor Tests
@@ -309,223 +463,6 @@ namespace Sentry.data.Core.Tests
             Assert.IsNotNull(dto);
             Assert.AreEqual(false, dto.IsArray);
         }
-        //[TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        //public void Get_True_IsArray_From_BaseFieldDto_Json_Constructor()
-        //{
-
-        //    JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
-
-        //    KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-        //    DecimalFieldDto dto = new DecimalFieldDto(prop, true);
-
-        //    Assert.IsNotNull(dto);
-        //    Assert.AreEqual(true, dto.IsArray);
-        //}
-        //[TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        //public void Get_Precision_From_DecimalFieldDto_Json_Constructor()
-        //{
-
-        //    JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
-
-        //    KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-        //    DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-        //    Assert.IsNotNull(dto);
-        //    Assert.AreEqual(6, dto.Precision);
-        //}
-        //[TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        //public void Get_Scale_From_DecimalFieldDto_Json_Constructor()
-        //{
-
-        //    JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
-
-        //    KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-        //    DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-        //    Assert.IsNotNull(dto);
-        //    Assert.AreEqual(2, dto.Scale);
-        //}
-        //[TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        //public void Get_Null_SourceFormat_From_DecimalFieldDto_Json_Constructor()
-        //{
-
-        //    JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
-
-        //    KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-        //    DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-        //    Assert.IsNotNull(dto);
-        //    Assert.AreEqual(null, dto.SourceFormat);
-        //}
-        //[TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        //public void Get_0_Length_From_DecimalFieldDto_Json_Constructor()
-        //{
-
-        //    JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
-
-        //    KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-        //    DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-        //    Assert.IsNotNull(dto);
-        //    Assert.AreEqual(0, dto.Length);
-        //}
-        //[TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        //public void Get_0_OrdinalPosition_From_DecimalFieldDto_Json_Constructor()
-        //{
-
-        //    JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
-
-        //    KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-        //    DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-        //    Assert.IsNotNull(dto);
-        //    Assert.AreEqual(0, dto.OrdinalPosition);
-        //}
-        //[TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        //public void Get_Default_Percision_From_DecimalFieldDto_Json_Constructor()
-        //{
-        //    //Setup
-        //    string jsonSchema = @"{
-        //        ""type"": ""object"",
-        //        ""properties"": { 
-        //            ""salary"":{
-        //                ""type"": ""number"",
-        //                ""dsc-scale"": 2,
-        //                ""description"": ""Decimal field""
-        //            }
-        //        }
-        //    }";
-        //    JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
-        //    KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-
-        //    //Action
-        //    DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-        //    //Assertion
-        //    Assert.IsNotNull(dto);
-        //    Assert.AreEqual(1, dto.Precision);
-        //}
-        //[TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        //public void Get_Default_Scale_From_DecimalFieldDto_Json_Constructor()
-        //{
-        //    //Setup
-        //    string jsonSchema = @"{
-        //        ""type"": ""object"",
-        //        ""properties"": { 
-        //            ""salary"":{
-        //                ""type"": ""number"",
-        //                ""dsc-scale"": null,
-        //                ""description"": ""Decimal field""
-        //            }
-        //        }
-        //    }";
-        //    JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
-        //    KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-
-        //    //Action
-        //    DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-        //    //Assertion
-        //    Assert.IsNotNull(dto);
-        //    Assert.AreEqual(1, dto.Scale);
-        //}
-        //[TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        //public void Get_dscscale_Value_IsNull_To_DecimalFieldDto_Json_Constructor()
-        //{
-        //    //Setup
-        //    string jsonSchema = @"{
-        //        ""type"": ""object"",
-        //        ""properties"": { 
-        //            ""salary"":{
-        //                ""type"": ""number"",
-        //                ""dsc-scale"": null,
-        //                ""description"": ""Decimal field""
-        //            }
-        //        }
-        //    }";
-        //    JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
-        //    KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-
-        //    //Action
-        //    DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-        //    //Assertion
-        //    Assert.IsNotNull(dto);
-        //    Assert.AreEqual(1, dto.Scale);
-        //}
-        //[TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        //public void Get_dscscale_DoesNotExist_To_DecimalFieldDto_Json_Constructor()
-        //{
-        //    //Setup
-        //    string jsonSchema = @"{
-        //        ""type"": ""object"",
-        //        ""properties"": { 
-        //            ""salary"":{
-        //                ""type"": ""number"",
-        //                ""description"": ""Decimal field""
-        //            }
-        //        }
-        //    }";
-        //    JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
-        //    KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-
-        //    //Action
-        //    DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-        //    //Assertion
-        //    Assert.IsNotNull(dto);
-        //    Assert.AreEqual(1, dto.Scale);
-        //}
-        //[TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        //public void Get_dscprecision_DoesNotExist_To_DecimalFieldDto_Json_Constructor()
-        //{
-        //    //Setup
-        //    string jsonSchema = @"{
-        //        ""type"": ""object"",
-        //        ""properties"": { 
-        //            ""salary"":{
-        //                ""type"": ""number"",
-        //                ""dsc-scale"": 2,
-        //                ""description"": ""Decimal field""
-        //            }
-        //        }
-        //    }";
-        //    JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
-        //    KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-
-        //    //Action
-        //    DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-        //    //Assertion
-        //    Assert.IsNotNull(dto);
-        //    Assert.AreEqual(1, dto.Precision);
-        //}
-        //[TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
-        //public void Get_dscprecision_Value_IsNull_To_DecimalFieldDto_Json_Constructor()
-        //{
-        //    //Setup
-        //    string jsonSchema = @"{
-        //        ""type"": ""object"",
-        //        ""properties"": { 
-        //            ""salary"":{
-        //                ""type"": ""number"",
-        //                ""dsc-precision"": null,
-        //                ""dsc-scale"": 2,
-        //                ""description"": ""Decimal field""
-        //            }
-        //        }
-        //    }";
-        //    JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
-        //    KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-
-        //    //Action
-        //    DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
-        //    //Assertion
-        //    Assert.IsNotNull(dto);
-        //    Assert.AreEqual(1, dto.Precision);
-        //}
-
         #endregion
 
         #region DecimalFieldDto Field Constructor Tests
@@ -786,7 +723,753 @@ namespace Sentry.data.Core.Tests
         }
         #endregion
 
+        #region VarcharFieldDto JsonConstructor Tests
+        #region __VarcharFieldDto Length Tests
+        /*********Start __VarcharFieldDto Length Tests************/
+        [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
+        public void Get_Length_From_VarcharFieldDto_Json_Constructor()
+        {
 
+            JsonSchema schema = BuildMockJsonSchemaWithVarcharField();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            VarcharFieldDto dto = new VarcharFieldDto(prop, false);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(99, dto.Length);
+        }
+        [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
+        public void Get_Length_From_VarcharFieldDto_Json_Constructor__Array()
+        {
+            JsonSchema schema = BuildMockJsonSchemaWithVarcharFieldArray();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            VarcharFieldDto dto = new VarcharFieldDto(prop, true);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(15, dto.Length);
+        }
+        [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
+        public void Can_Default_Null_maxlength_From_VarcharFieldDto_Json_Constructor()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""firstname"":{
+                        ""type"": ""string"",
+                        ""maxlength"": null,
+                        ""description"": ""Varchar field""
+                    }
+                }
+            }";
+
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            VarcharFieldDto dto = new VarcharFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(0, dto.Length);
+        }
+        [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
+        public void Can_Default_Null_maxlength_From_VarcharFieldDto_Json_Constructor_Array()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""varchararray"":{
+                        ""type"": ""array"",
+                        ""items"": {
+                            ""type"": ""string"",
+                            ""maxlength"": null
+                            },
+                        ""description"": ""Varchar field array""
+                    }
+                }
+            }";
+
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            VarcharFieldDto dto = new VarcharFieldDto(prop, true);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(0, dto.Length);
+        }
+        [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
+        public void Can_Default_NonExistent_maxlength_From_VarcharFieldDto_Json_Constructor()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""firstname"":{
+                        ""type"": ""string"",
+                        ""description"": ""Varchar field""
+                    }
+                }
+            }";
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            VarcharFieldDto dto = new VarcharFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(0, dto.Precision);
+        }
+        [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
+        public void Can_Default_NonExistent_maxlength_From_VarcharFieldDto_Json_Constructor_Array()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""varchararray"":{
+                        ""type"": ""array"",
+                        ""items"": {
+                            ""type"": ""string""
+                            },
+                        ""description"": ""Varchar field array""
+                    }
+                }
+            }";
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            VarcharFieldDto dto = new VarcharFieldDto(prop, true);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(0, dto.Precision);
+        }
+
+        /*********End __VarcharFieldDto Length Tests************/
+        #endregion
+
+        [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
+        public void Get_IsArray_False_From_VarcharFieldDto_Json_Constructor()
+        {
+
+            JsonSchema schema = BuildMockJsonSchemaWithVarcharField();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            VarcharFieldDto dto = new VarcharFieldDto(prop, false);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(false, dto.IsArray);
+        }
+        [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
+        public void Get_IsArray_True_From_VarcharFieldDto_Json_Constructor()
+        {
+
+            JsonSchema schema = BuildMockJsonSchemaWithVarcharFieldArray();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            VarcharFieldDto dto = new VarcharFieldDto(prop, true);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(true, dto.IsArray);
+        }
+        [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
+        public void Get_BaseFieldDto_Properties_From_VarcharFieldDto_Constructor()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithVarcharField();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            VarcharFieldDto dto = new VarcharFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual("firstname", dto.Name);
+            Assert.AreEqual("Varchar field", dto.Description);
+            Assert.IsNotNull(dto.ChildFields);
+            Assert.AreEqual(0, dto.ChildFields.Count);
+            Assert.AreNotEqual(DateTime.MinValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MinValue, dto.LastUpdatedDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.LastUpdatedDtm);
+            Assert.AreEqual(0, dto.FieldId);
+            Assert.AreEqual(Guid.Empty, dto.FieldGuid);
+            Assert.AreEqual(false, dto.DeleteInd);
+            Assert.AreEqual(false, dto.IsArray);
+        }
+        [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
+        public void Get_BaseFieldDto_Properties_From_VarcharFieldDto_Constructor__Array()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithVarcharFieldArray();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual("varchararray", dto.Name);
+            Assert.AreEqual("Varchar field array", dto.Description);
+            Assert.IsNotNull(dto.ChildFields);
+            Assert.AreEqual(0, dto.ChildFields.Count);
+            Assert.AreNotEqual(DateTime.MinValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MinValue, dto.LastUpdatedDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.LastUpdatedDtm);
+            Assert.AreEqual(0, dto.FieldId);
+            Assert.AreEqual(Guid.Empty, dto.FieldGuid);
+            Assert.AreEqual(false, dto.DeleteInd);
+            Assert.AreEqual(true, dto.IsArray);
+        }
+        [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
+        public void Get_FieldType_From_VarcharFieldDto_Constructor()
+        {
+            //Setup
+
+            JsonSchema schema = BuildMockJsonSchemaWithVarcharField();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            VarcharFieldDto dto = new VarcharFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, dto.FieldType);
+        }
+        [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
+        public void Get_FieldType_From_VarcharFieldDto_Constructor__Array()
+        {
+            //Setup
+
+            JsonSchema schema = BuildMockJsonSchemaWithVarcharFieldArray();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            VarcharFieldDto dto = new VarcharFieldDto(prop, true);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, dto.FieldType);
+        }
+        #endregion
+
+        #region DateFieldDto JsonConstructor Tests
+        [TestMethod, TestCategory("DateFieldDto JsonContructor")]
+        public void Get_IsArray_False_From_DateFieldDto_Json_Constructor()
+        {
+
+            JsonSchema schema = BuildMockJsonSchemaWithDateField();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            DateFieldDto dto = new DateFieldDto(prop, false);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(false, dto.IsArray);
+        }
+        [TestMethod, TestCategory("DateFieldDto JsonContructor")]
+        public void Get_IsArray_True_From_DateFieldDto_Json_Constructor()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithDateFieldArray();
+
+            //Action
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            DateFieldDto dto = new DateFieldDto(prop, true);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(true, dto.IsArray);
+        }
+        [TestMethod, TestCategory("DateFieldDto JsonContructor")]
+        public void Get_BaseFieldDto_Properties_From_DateFieldDto_Constructor()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithDateField();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            DateFieldDto dto = new DateFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual("DOB", dto.Name);
+            Assert.AreEqual("Date field", dto.Description);
+            Assert.IsNotNull(dto.ChildFields);
+            Assert.AreEqual(0, dto.ChildFields.Count);
+            Assert.AreNotEqual(DateTime.MinValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MinValue, dto.LastUpdatedDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.LastUpdatedDtm);
+            Assert.AreEqual(0, dto.FieldId);
+            Assert.AreEqual(Guid.Empty, dto.FieldGuid);
+            Assert.AreEqual(false, dto.DeleteInd);
+            Assert.AreEqual(false, dto.IsArray);
+        }
+        [TestMethod, TestCategory("DateFieldDto JsonContructor")]
+        public void Get_BaseFieldDto_Properties_From_DateFieldDto_Constructor__Array()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithDateFieldArray();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            DateFieldDto dto = new DateFieldDto(prop, true);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual("datearray", dto.Name);
+            Assert.AreEqual("Date field array", dto.Description);
+            Assert.IsNotNull(dto.ChildFields);
+            Assert.AreEqual(0, dto.ChildFields.Count);
+            Assert.AreNotEqual(DateTime.MinValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MinValue, dto.LastUpdatedDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.LastUpdatedDtm);
+            Assert.AreEqual(0, dto.FieldId);
+            Assert.AreEqual(Guid.Empty, dto.FieldGuid);
+            Assert.AreEqual(false, dto.DeleteInd);
+            Assert.AreEqual(true, dto.IsArray);
+        }
+        [TestMethod, TestCategory("DateFieldDto JsonContructor")]
+        public void Get_FieldType_From_DateFieldDto_Constructor()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithDateField();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            DateFieldDto dto = new DateFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(GlobalConstants.Datatypes.DATE, dto.FieldType);
+        }
+        [TestMethod, TestCategory("DateFieldDto JsonContructor")]
+        public void Get_FieldType_From_DateFieldDto_Constructor__Array()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithDateFieldArray();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            DateFieldDto dto = new DateFieldDto(prop, true);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(GlobalConstants.Datatypes.DATE, dto.FieldType);
+        }
+
+        [TestMethod, TestCategory("DateFieldDto JsonContructor")]
+        public void Can_Default_Null_dscformat_From_DateFieldDto_Constructor()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""DOB"":{
+                        ""type"": ""string"",
+                        ""format"": ""date"",
+                        ""dsc-format"": null,
+                        ""description"": ""Date field""
+                    }
+                }
+            }";
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            DateFieldDto dto = new DateFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.IsNull(dto.SourceFormat);
+        }
+        [TestMethod, TestCategory("DateFieldDto JsonContructor")]
+        public void Can_Default_Null_dscformat_From_DateFieldDto_Constructor__Array()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""datearray"":{
+                        ""type"": ""array"",
+                        ""items"": {
+                            ""type"": ""string"",
+                            ""format"": ""date"",
+                            ""dsc-format"": null,
+                            ""description"": ""Date field""
+                            },
+                        ""description"": ""Date field array""
+                    }
+                }
+            }";
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            DateFieldDto dto = new DateFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.IsNull(dto.SourceFormat);
+        }
+        [TestMethod, TestCategory("DateFieldDto JsonContructor")]
+        public void Can_Default_NonExistent_dscformat_From_DateFieldDto_Constructor()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""DOB"":{
+                        ""type"": ""string"",
+                        ""format"": ""date"",
+                        ""description"": ""Date field""
+                    }
+                }
+            }";
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            DateFieldDto dto = new DateFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.IsNull(dto.SourceFormat);
+        }
+        [TestMethod, TestCategory("DateFieldDto JsonContructor")]
+        public void Can_Default_NonExistent_dscformat_From_DateFieldDto_Constructor__Array()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""datearray"":{
+                        ""type"": ""array"",
+                        ""items"": {
+                            ""type"": ""string"",
+                            ""format"": ""date"",
+                            ""description"": ""Date field""
+                            },
+                        ""description"": ""Date field array""
+                    }
+                }
+            }";
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            DateFieldDto dto = new DateFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.IsNull(dto.SourceFormat);
+        }
+        #endregion
+
+        #region TimestampFieldDto JsonConstructor Tests
+        [TestMethod, TestCategory("TimestampFieldDto JsonContructor")]
+        public void Get_IsArray_False_From_TimestampFieldDto_Json_Constructor()
+        {
+
+            JsonSchema schema = BuildMockJsonSchemaWithTimestampField();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            TimestampFieldDto dto = new TimestampFieldDto(prop, false);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(false, dto.IsArray);
+        }
+        [TestMethod, TestCategory("TimestampFieldDto JsonContructor")]
+        public void Get_IsArray_True_From_TimestampFieldDto_Json_Constructor()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithTimestampFieldArray();
+
+            //Action
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            TimestampFieldDto dto = new TimestampFieldDto(prop, true);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(true, dto.IsArray);
+        }
+        [TestMethod, TestCategory("TimestampFieldDto JsonContructor")]
+        public void Get_BaseFieldDto_Properties_From_TimestampFieldDto_Constructor()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithTimestampField();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            TimestampFieldDto dto = new TimestampFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual("createdtm", dto.Name);
+            Assert.AreEqual("Timestamp field", dto.Description);
+            Assert.IsNotNull(dto.ChildFields);
+            Assert.AreEqual(0, dto.ChildFields.Count);
+            Assert.AreNotEqual(DateTime.MinValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MinValue, dto.LastUpdatedDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.LastUpdatedDtm);
+            Assert.AreEqual(0, dto.FieldId);
+            Assert.AreEqual(Guid.Empty, dto.FieldGuid);
+            Assert.AreEqual(false, dto.DeleteInd);
+            Assert.AreEqual(false, dto.IsArray);
+        }
+        [TestMethod, TestCategory("TimestampFieldDto JsonContructor")]
+        public void Get_BaseFieldDto_Properties_From_TimestampFieldDto_Constructor__Array()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithTimestampFieldArray();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            TimestampFieldDto dto = new TimestampFieldDto(prop, true);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual("timestamparray", dto.Name);
+            Assert.AreEqual("Timestamp field array", dto.Description);
+            Assert.IsNotNull(dto.ChildFields);
+            Assert.AreEqual(0, dto.ChildFields.Count);
+            Assert.AreNotEqual(DateTime.MinValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MinValue, dto.LastUpdatedDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.LastUpdatedDtm);
+            Assert.AreEqual(0, dto.FieldId);
+            Assert.AreEqual(Guid.Empty, dto.FieldGuid);
+            Assert.AreEqual(false, dto.DeleteInd);
+            Assert.AreEqual(true, dto.IsArray);
+        }
+        [TestMethod, TestCategory("TimestampFieldDto JsonContructor")]
+        public void Get_FieldType_From_TimestampFieldDto_Constructor()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithDateField();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            TimestampFieldDto dto = new TimestampFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(GlobalConstants.Datatypes.TIMESTAMP, dto.FieldType);
+        }
+        [TestMethod, TestCategory("TimestampFieldDto JsonContructor")]
+        public void Get_FieldType_From_TimestampFieldDto_Constructor__Array()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithDateFieldArray();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            TimestampFieldDto dto = new TimestampFieldDto(prop, true);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(GlobalConstants.Datatypes.TIMESTAMP, dto.FieldType);
+        }
+
+        [TestMethod, TestCategory("TimestampFieldDto JsonContructor")]
+        public void Can_Default_Null_dscformat_From_TimestampFieldDto_Constructor()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""createdtm"":{
+                        ""type"": ""string"",
+                        ""format"": ""date-time"",
+                        ""dsc-format"": null,
+                        ""description"": ""Timestamp field""
+                    }
+                }
+            }";
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            TimestampFieldDto dto = new TimestampFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.IsNull(dto.SourceFormat);
+        }
+        [TestMethod, TestCategory("TimestampFieldDto JsonContructor")]
+        public void Can_Default_Null_dscformat_From_TimestampFieldDto_Constructor__Array()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""timestamparray"":{
+                        ""type"": ""array"",
+                        ""items"": {
+                            ""type"": ""string"",
+                            ""format"": ""date-time"",
+                            ""dsc-format"": null,
+                            ""description"": ""Date field""
+                            },
+                        ""description"": ""Timestamp field array""
+                    }
+                }
+            }";
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            TimestampFieldDto dto = new TimestampFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.IsNull(dto.SourceFormat);
+        }
+        [TestMethod, TestCategory("TimestampFieldDto JsonContructor")]
+        public void Can_Default_NonExistent_dscformat_From_TimestampFieldDto_Constructor()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""createdtm"":{
+                        ""type"": ""string"",
+                        ""format"": ""date-time"",
+                        ""description"": ""Timestamp field""
+                    }
+                }
+            }";
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            TimestampFieldDto dto = new TimestampFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.IsNull(dto.SourceFormat);
+        }
+        [TestMethod, TestCategory("TimestampFieldDto JsonContructor")]
+        public void Can_Default_NonExistent_dscformat_From_TimestampFieldDto_Constructor__Array()
+        {
+            //Setup
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""timestamparray"":{
+                        ""type"": ""array"",
+                        ""items"": {
+                            ""type"": ""string"",
+                            ""format"": ""date-time"",
+                            ""description"": ""Date field""
+                            },
+                        ""description"": ""Timestamp field array""
+                    }
+                }
+            }";
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            TimestampFieldDto dto = new TimestampFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.IsNull(dto.SourceFormat);
+        }
+        #endregion
+
+        #region IntegerFieldDto JsonConstrcutor Tests
+
+        [TestMethod, TestCategory("IntegerFieldDto JsonContructor")]
+        public void Get_IsArray_False_From_IntegerFieldDto_Json_Constructor()
+        {
+
+            JsonSchema schema = BuildMockJsonSchemaWithIntegerField();
+
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            IntegerFieldDto dto = new IntegerFieldDto(prop, false);
+
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(false, dto.IsArray);
+        }
+        [TestMethod, TestCategory("IntegerFieldDto JsonContructor")]
+        public void Get_IsArray_True_From_IntegerFieldDto_Json_Constructor()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithIntegerFieldArray();
+
+            //Action
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            IntegerFieldDto dto = new IntegerFieldDto(prop, true);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual(true, dto.IsArray);
+        }
+        [TestMethod, TestCategory("IntegerFieldDto JsonContructor")]
+        public void Get_BaseFieldDto_Properties_From_IntegerFieldDto_Constructor()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithIntegerField();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            IntegerFieldDto dto = new IntegerFieldDto(prop, false);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual("age", dto.Name);
+            Assert.AreEqual("Integer field", dto.Description);
+            Assert.IsNotNull(dto.ChildFields);
+            Assert.AreEqual(0, dto.ChildFields.Count);
+            Assert.AreNotEqual(DateTime.MinValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MinValue, dto.LastUpdatedDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.LastUpdatedDtm);
+            Assert.AreEqual(0, dto.FieldId);
+            Assert.AreEqual(Guid.Empty, dto.FieldGuid);
+            Assert.AreEqual(false, dto.DeleteInd);
+            Assert.AreEqual(false, dto.IsArray);
+        }
+        [TestMethod, TestCategory("IntegerFieldDto JsonContructor")]
+        public void Get_BaseFieldDto_Properties_From_IntegerFieldDto_Constructor__Array()
+        {
+            //Setup
+            JsonSchema schema = BuildMockJsonSchemaWithIntegerFieldArray();
+            KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+
+            //Action
+            IntegerFieldDto dto = new IntegerFieldDto(prop, true);
+
+            //Assertion
+            Assert.IsNotNull(dto);
+            Assert.AreEqual("timestamparray", dto.Name);
+            Assert.AreEqual("Timestamp field array", dto.Description);
+            Assert.IsNotNull(dto.ChildFields);
+            Assert.AreEqual(0, dto.ChildFields.Count);
+            Assert.AreNotEqual(DateTime.MinValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.CreateDtm);
+            Assert.AreNotEqual(DateTime.MinValue, dto.LastUpdatedDtm);
+            Assert.AreNotEqual(DateTime.MaxValue, dto.LastUpdatedDtm);
+            Assert.AreEqual(0, dto.FieldId);
+            Assert.AreEqual(Guid.Empty, dto.FieldGuid);
+            Assert.AreEqual(false, dto.DeleteInd);
+            Assert.AreEqual(true, dto.IsArray);
+        }
+        #endregion
+
+        #region Private Methods
         private JsonSchema BuildMockJsonSchemaWithDecimalField()
         {
             string jsonSchema = @"{
@@ -804,13 +1487,185 @@ namespace Sentry.data.Core.Tests
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             return schema;
         }
+        private JsonSchema BuildMockJsonSchemaWithDecimalFieldArray()
+        {
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""decimalarray"":{
+                        ""type"": ""array"",
+                        ""items"": {
+                            ""type"": ""number"",
+                            ""dsc-precision"": 6,
+                            ""dsc-scale"": 2
+                            },
+                        ""description"": ""Decimal field""
+                    }
+                }
+            }";
+
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            return schema;
+        }
+
+        private JsonSchema BuildMockJsonSchemaWithVarcharField()
+        {
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""firstname"":{
+                        ""type"": ""string"",
+                        ""maxlength"": 99,
+                        ""description"": ""Varchar field""
+                    }
+                }
+            }";
+
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            return schema;
+        }
+        private JsonSchema BuildMockJsonSchemaWithVarcharFieldArray()
+        {
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""varchararray"":{
+                        ""type"": ""array"",
+                        ""items"": {
+                            ""type"": ""string"",
+                            ""maxlength"": 15
+                            },
+                        ""description"": ""Varchar field array""
+                    }
+                }
+            }";
+
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            return schema;
+        }
+
+        private JsonSchema BuildMockJsonSchemaWithDateField()
+        {
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""DOB"":{
+                        ""type"": ""string"",
+                        ""format"": ""date"",
+                        ""dsc-format"": ""yy-mm-dd"",
+                        ""description"": ""Date field""
+                    }
+                }
+            }";
+
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            return schema;
+        }
+        private JsonSchema BuildMockJsonSchemaWithDateFieldArray()
+        {
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""datearray"":{
+                        ""type"": ""array"",
+                        ""items"": {
+                            ""type"": ""string"",
+                            ""format"": ""date"",
+                            ""dsc-format"": ""yy-mm-dd"",
+                            ""description"": ""Date field""
+                            },
+                        ""description"": ""Date field array""
+                    }
+                }
+            }";
+
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            return schema;
+        }
+
+        private JsonSchema BuildMockJsonSchemaWithTimestampField()
+        {
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""createdtm"":{
+                        ""type"": ""string"",
+                        ""format"": ""date-time"",
+                        ""dsc-format"": ""yy-mm-dd hh:mm:ss"",
+                        ""description"": ""Timestamp field""
+                    }
+                }
+            }";
+
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            return schema;
+        }
+        private JsonSchema BuildMockJsonSchemaWithTimestampFieldArray()
+        {
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""timestamparray"":{
+                        ""type"": ""array"",
+                        ""items"": {
+                            ""type"": ""string"",
+                            ""format"": ""date-time"",
+                            ""dsc-format"": ""yy-mm-dd hh:mm:ss"",
+                            ""description"": ""Date field""
+                            },
+                        ""description"": ""Timestamp field array""
+                    }
+                }
+            }";
+
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            return schema;
+        }
+
+
+        private JsonSchema BuildMockJsonSchemaWithIntegerField()
+        {
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""age"":{
+                        ""type"": ""integer"",
+                        ""description"": ""Integer field""
+                    }
+                }
+            }";
+
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            return schema;
+        }
+        private JsonSchema BuildMockJsonSchemaWithIntegerFieldArray()
+        {
+            string jsonSchema = @"{
+                ""type"": ""object"",
+                ""properties"": { 
+                    ""timestamparray"":{
+                        ""type"": ""array"",
+                        ""items"": {
+                            ""type"": ""string"",
+                            ""format"": ""date-time"",
+                            ""dsc-format"": ""yy-mm-dd hh:mm:ss"",
+                            ""description"": ""Date field""
+                            },
+                        ""description"": ""Timestamp field array""
+                    }
+                }
+            }";
+
+            JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            return schema;
+        }
         private FileSchema BuildMockFileSchema(string extensionType, bool addRevision, bool deleted, int deletedDaysAgo, string[] fieldTypes)
         {
             FileSchema s = new FileSchema()
             {
                 CreateCurrentView = true,
                 CreatedBy = "072984",
-                CreatedDTM = DateTime.Parse("2020-06-17 13:08:00"),                
+                CreatedDTM = DateTime.Parse("2020-06-17 13:08:00"),
                 Delimiter = ",",
                 Description = "Mock Schema Description",
                 Extension = BuildMockFileExtension(extensionType),
@@ -862,7 +1717,7 @@ namespace Sentry.data.Core.Tests
 
             switch (extension.ToLower())
             {
-                
+
                 case "json":
                     ext.Name = "JSON";
                     ext.Id = 2;
@@ -962,6 +1817,9 @@ namespace Sentry.data.Core.Tests
 
             return field;
         }
+        #endregion
+
+
 
     }
 }

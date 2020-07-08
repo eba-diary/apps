@@ -8,9 +8,18 @@ namespace Sentry.data.Core.DTO.Schema.Fields
     {
         public TimestampFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, bool array) : base(prop, array)
         {
-            SourceFormat = prop.Value.ExtensionData.Any(w => w.Key == "dsc-format")
-                ? prop.Value.ExtensionData.Where(w => w.Key == "dsc-format").Select(s => s.Value).ToString()
-                : null;
+            IDictionary<string, object> extData = null;
+            extData = prop.Value.IsArray ? prop.FindArraySchema().ExtensionData : prop.Value.ExtensionData;
+
+            if (extData != null && extData.Any(w => w.Key == "dsc-format"))
+            {
+                object val = extData.Where(w => w.Key == "dsc-format").Select(s => s.Value).FirstOrDefault();
+                SourceFormat = val?.ToString();
+            }
+            else
+            {
+                SourceFormat = null;
+            }
         }
 
         public TimestampFieldDto(TimestampField field) : base(field)
