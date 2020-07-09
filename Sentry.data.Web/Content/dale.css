@@ -62,3 +62,7 @@ table.dataTable thead .sorting_desc_disabled {
     filter: alpha(opacity=90);
     opacity: .4;
 }
+
+.dale-clicked {
+    color: red;
+}
