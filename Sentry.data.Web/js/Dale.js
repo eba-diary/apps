@@ -31,17 +31,19 @@
                 { data: "Database", className: "Database" },
                 { data: "Object", className: "Object" },
                 { data: "ObjectType", className: "ObjectType" },
-                { data: "Column", className: "ColumnMan"},
+                { data: "Column", className: "ColumnMan" },
 
+                //the key piece here is including a label with text to indicate whether the row is true or false so the filtering works
+                //Since I did not want user to see label text and still have a filter.  My cheat to this was to style it with display:none while still keeping the filtering ability
+                //later on when they check/uncheck the box my editRow() function will refresh the data associated with the grid which changes the label hidden text to the opposite so filtering can refresh
                 {
                     data: null, className: "IsSensitive", render: function (data)
                     {
                         if (data.IsSensitive) {
-                            return '<select name="DropMe" >     <option selected= "selected" value="true">true</option>     <option value="false">false</option>                        </select>';
+                            return ' <input type="checkbox" name="vehicle3" value="true" checked> <label class="trains" style="display:none;" for="vehicle3">true</label><br><br>';
                         }
                         else {
-                            return '<select name="DropMe" >     <option value="true">true</option>                          <option selected= "selected" value="false">false</option>   </select>';
-
+                            return ' <input type="checkbox" name="vehicle3" value="false" > <label class="trains" style="display:none;" for="vehicle3">false</label><br><br>';
                         } 
                     }
                 },
@@ -115,71 +117,49 @@
         data.Dale.setupClickAttack();
 
 
-        
-
-        //cell click event
-        //this looks for any event on #daleResultsTable tbody, then we filter on ONLY change events that happen within the IsSensitive/select element
-        //then to get the row data later we have to traverse the hierarchy up by using the closest, that we we can get the rowData
-        //in the future when we add more columns we have to listen for, we would call them IsSensitive2 class for example and listen for that one in a different event handler
-        //this code allows me to get rid of the column==6 check too.
-        $('#daleResultsTable tbody').on('change', '.IsSensitive select', function (event)
+        $('#daleResultsTable tbody').on('change', '.IsSensitive input', function (event)
         {
             var cellClicked = $(this).closest('td');
-            var value = this.value;
-
+            var value = this.checked;                                                                                               //determine what the user checked
 
             var table = $('#daleResultsTable').DataTable();
-            var rowIndex = table.cell(cellClicked).index().row;                                                                    //get rowIndex being updated
-            var rowData = table.row(cellClicked).data();                                                                           //get whole row of data to use later
-            var columnIndex = table.cell(cellClicked).index().columnVisible;                                                       //get columnIndex clicked
+            var rowIndex = table.cell(cellClicked).index().row;                                                                     //get rowIndex being updated
+            var rowData = table.row(cellClicked).data();                                                                            //get whole row of data to use later
+            var columnIndex = table.cell(cellClicked).index().columnVisible;                                                        //get columnIndex clicked
 
-            data.Dale.editRow(rowIndex, rowData, columnIndex);
+            data.Dale.editArray(rowIndex, rowData, columnIndex);
 
         });
-
-
-        ////cell click event
-        //$('#daleResultsTable tbody').on('click', 'td', function () {
-        //    var table = $('#daleResultsTable').DataTable();
-        //    var rowIndex = table.cell(this).index().row;                                                                    //get rowIndex being updated
-        //    var rowData = table.row(this).data();                                                                           //get whole row of data to use later
-        //    var columnIndex = table.cell(this).index().columnVisible;                                                       //get columnIndex clicked
-
-        //    //data.Dale.editRow(rowIndex, rowData, columnIndex);
-
-        //});
-
-
-
     },
 
-    //style row either edited or not edited
-    styleRow: function (edit, rowIndex, rowData) {
+    //edit row (data and style) since user changed something
+    editRow: function (edit, rowIndex, rowData) {
         var table = $('#daleResultsTable').DataTable();
 
-        if (edit) {                                                                                                         //if editing then add dale-clicked class
+        if (edit) {                                                                                                         
             table                                                                                               
                 .row(rowIndex)
-                .data(rowData)              //supply updated data for grid row
-                .draw()                 //redraw table because of changes
-                .rows(rowIndex)         //identifies a given row to modify
+                .data(rowData)                  //supply updated data for grid row, NEED THIS FOR FILTERING!!!!!!! if we dont refresh rowData, then filtering will think its old values, even in the case of the checkboxes
+                .draw()                         //redraw table because of changes
+                .rows(rowIndex)                 //identifies a given row to modify
                 .nodes()
                 .to$()
-                .addClass('dale-clicked');
+                .addClass('dale-clicked');      //if editing then add dale-clicked class
         }
-        else {                                                                                                              //if not editing then remove dale-clicked class
+        else {                                                                                                             
             table                                                                                              
                 .row(rowIndex)
-                .data(rowData)          //supply updated data for grid row
-                .draw()                 //redraw table because of changes
-                .rows(rowIndex)         //identifies a given row to modify
+                .data(rowData)                  //supply updated data for grid row, NEED THIS FOR FILTERING!!!!!!! if we dont refresh rowData, then filtering will think its old values, even in the case of the checkboxes
+                .draw()                         //redraw table because of changes
+                .rows(rowIndex)                 //identifies a given row to modify
                 .nodes()
                 .to$()
-                .removeClass('dale-clicked');
+                .removeClass('dale-clicked');   //if not editing then remove dale-clicked class                                                        
         }
     },
 
-    editRow: function (rowIndex, rowData, columnIndex) {
+    //edit array since user is changing data
+    editArray: function (rowIndex, rowData, columnIndex) {
 
         //IsSensitive Cell Check
         if (columnIndex == 6) {
@@ -213,30 +193,9 @@
             }
             localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));                                       //save array to storage
 
-            data.Dale.styleRow(edit, rowIndex, rowData);
+            data.Dale.editRow(edit, rowIndex, rowData);
         }
 
-    },
-
-    //mark all on a single page
-    editPage: function ()
-    {
-
-        var table = $('#daleResultsTable').DataTable();
-        var rowsIndexes = table.rows({ page: 'current' }).indexes();
-        var rowsData = table.rows(rowsIndexes).data();
-
-        var len = rowsIndexes.length;
-        for (i = 0; i < len; i++) {
-
-            var ri = rowsIndexes[i];
-            var rd = rowsData[i];
-
-            data.Dale.editRow(ri, rd, 6);
-        }
-
-        var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));
-        var len2 = sensitiveList.length;
     },
 
     getDaleDestiny: function ()
