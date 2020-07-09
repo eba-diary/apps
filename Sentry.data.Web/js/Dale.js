@@ -73,16 +73,17 @@
                     { extend: 'colvis', text: 'Columns' },
                     { extend: 'csv', text: 'Download' },
 
-                    {
-                       text: 'SaveMe',
-                        attr: {
-                            id: 'SaveMeButton'
-                        },
-                        action: function (e, dt, node, config)
-                        {
-                            //data.Dale.editPage();
-                        }
-                    }
+                    //create my own custom button, problem here is attr doesn't work with out version of buttons
+                    //{
+                    //   text: 'Save',
+                    //    attr: {
+                    //        id: 'SaveMeButton'
+                    //    },
+                    //    action: function (e, dt, node, config)
+                    //    {
+                    //        //data.Dale.editPage();
+                    //    }
+                    //}
             ]
         });
 
