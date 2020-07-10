@@ -52,6 +52,7 @@ namespace Sentry.data.Core
         public bool DeleteInd { get; set; }
         public List<BaseFieldDto> ChildFields { get; set; }
         public bool IsArray { get; set; }
+        public bool HasChildren { get; set; }
 
 
         public abstract string FieldType { get; }

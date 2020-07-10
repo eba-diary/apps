@@ -1,4 +1,5 @@
 ﻿using NJsonSchema;
+using Sentry.Core;
 using System;
 using System.Collections.Generic;
 
@@ -10,11 +11,11 @@ namespace Sentry.data.Core.DTO.Schema.Fields
         {
             if (prop.Value.IsArray)
             {
-                Length = prop.FindArraySchema()?.MaxLength ?? 0;
+                Length = prop.FindArraySchema()?.MaxLength ?? GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT;
             }
             else
             {
-                Length = prop.Value.MaxLength?? 0;
+                Length = prop.Value.MaxLength?? GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT;
             }
         }
 
@@ -26,17 +27,24 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
         public VarcharFieldDto(SchemaRow row) : base(row)
         {
-#pragma warning disable S3240 // The simplest possible condition syntax should be used
-            if (!String.IsNullOrWhiteSpace(row.Length))
-#pragma warning restore S3240 // The simplest possible condition syntax should be used
+            ValidationResults results = new ValidationResults();
+            if (String.IsNullOrWhiteSpace(row.Length))
             {
-                Length = (Int32.TryParse(row.Length, out int x)) ? x : 0;
+                Length = GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT;
+            }
+            else if (!Int32.TryParse(row.Length, out int x))
+            {
+                results.Add(OrdinalPosition.ToString(), $"({Name}) VARCHAR Length must be non-negative integer value");
             }
             else
             {
-                Length = 0;
+                Length = Int32.Parse(row.Length);
             }
-            OrdinalPosition = row.Position;
+
+            if (!results.IsValid())
+            {
+                throw new ValidationException(results);
+            }
         }
 
         public override string FieldType => GlobalConstants.Datatypes.VARCHAR;

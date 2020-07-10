@@ -262,6 +262,9 @@
             {                
                 public const string DATE_DEFAULT = "yyyy-MM-dd";
                 public const string TIMESTAMP_DEFAULT = DATE_DEFAULT +" HH:mm:ss";
+                public const int VARCHAR_LENGTH_DEFAULT = 1000;
+                public const int DECIMAL_PRECISION_DEFAULT = 9;
+                public const int DECIMAL_SCALE_DEFAULT = 2;
             }
         }
 

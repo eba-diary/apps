@@ -1,4 +1,5 @@
 ﻿using NJsonSchema;
+using Sentry.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,27 +22,41 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
         public DecimalFieldDto(SchemaRow row) : base(row)
         {
+            ValidationResults results = new ValidationResults();
 #pragma warning disable S3240 // The simplest possible condition syntax should be used
             if (string.IsNullOrWhiteSpace(row.Precision))
 #pragma warning restore S3240 // The simplest possible condition syntax should be used
             {
-                Precision = 0;
+                Precision = GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT;
+            }
+            else if(Int32.TryParse(row.Precision, out int p))
+            {
+                results.Add(OrdinalPosition.ToString(), $"({Name}) DECIMAL Precision must be integer between 1 and 38");
             }
             else
             {
-                Precision = (Int32.TryParse(row.Precision, out int p)) ? p : 0;
+                Precision = Int32.Parse(row.Precision);
             }
 
 #pragma warning disable S3240 // The simplest possible condition syntax should be used
             if (string.IsNullOrWhiteSpace(row.Scale))
 #pragma warning restore S3240 // The simplest possible condition syntax should be used
             {
-                Scale = 0;
+                Scale = GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT;
+            }
+            else if (Int32.TryParse(row.Precision, out int p))
+            {
+                results.Add(OrdinalPosition.ToString(), $"({Name}) DECIMAL Scale must be integer between 1 and 38");
             }
             else
             {
-                Scale =  (Int32.TryParse(row.Scale, out int s)) ? s : 0;
-            }            
+                Scale =  (Int32.TryParse(row.Scale, out int s)) ? s : GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT;
+            }
+            
+            if (!results.IsValid())
+            {
+                throw new ValidationException(results);
+            }
         }
 
         public override string FieldType => GlobalConstants.Datatypes.DECIMAL;
@@ -60,8 +75,8 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             BaseField newEntityField = new DecimalField()
             {
                 //Apply defaults if neccessary
-                Precision = (this.Precision == 0) ? 8 : this.Precision,
-                Scale = (this.Scale == 0) ? 2 : this.Scale
+                Precision = (this.Precision == 0) ? GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT : this.Precision,
+                Scale = (this.Scale == 0) ? GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT : this.Scale
             };
             base.ToEntity(newEntityField, parentField, parentRevision);
             return newEntityField;
@@ -92,11 +107,11 @@ namespace Sentry.data.Core.DTO.Schema.Fields
                 var valObject = extensionData.FirstOrDefault(w => w.Key == "dsc-precision").Value;
                 //handle if null was passed for dsc-scale
                 string valString = (valObject != null) ? valObject.ToString() : "";
-                Precision = (Int32.TryParse(valString, out int x)) ? x : 0;
+                Precision = (Int32.TryParse(valString, out int x)) ? x : GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT;
             }
             else
             {
-                Precision = 0;
+                Precision = GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT;
             }
 
             if (extensionData != null && extensionData.Any(w => w.Key == "dsc-scale"))
@@ -104,11 +119,11 @@ namespace Sentry.data.Core.DTO.Schema.Fields
                 var valObject = extensionData.FirstOrDefault(w => w.Key == "dsc-scale").Value;
                 //handle if null was passed for dsc-scale
                 string valString = (valObject != null) ? valObject.ToString() : "";
-                Scale = (Int32.TryParse(valString, out int x)) ? x : 0;
+                Scale = (Int32.TryParse(valString, out int x)) ? x : GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT;
             }
             else
             {
-                Scale = 0;
+                Scale = GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT;
             }
         }
     }
