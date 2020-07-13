@@ -1,12 +1,31 @@
 ﻿data.Dale =
 {
     //declare a property within the data.Dale that essentially represents a global var that all functions can use within data.Dale to set whether sensitive or not
-    sensitive:false,
+    sensitive: false,
 
     init: function ()
     {
         
         localStorage.clear();                                                           // Clear all items in our array
+
+        //first thing is to figure out if they have the access to edit sensitive which changes grid values
+        $.ajax({
+            url: "/Dale/GetCanDaleSensitiveEdit/",
+            method: "GET",
+            dataType: 'json',
+            success: function (obj) {
+                data.Dale.dataTableExplosion(obj);
+            },
+            failure: function () {
+                alert('Error getting Edit Permissions');
+            },
+            error: function () {
+                alert('Error getting Edit Permissions');
+            }
+        });
+    },
+
+    dataTableExplosion: function (canDaleSensitiveEdit) {
 
         //init DataTable
         $("#daleResultsTable").DataTable({
@@ -17,34 +36,42 @@
             ajax: {
                 url: "/Dale/GetSearchResultsClient/",
                 type: "GET",
-                data: function (d)
-                {
+                data: function (d) {
                     d.searchCriteria = $('#daleSearchCriteria').val();
-                    d.destination = data.Dale.getDaleDestiny(); 
+                    d.destination = data.Dale.getDaleDestiny();
                     d.sensitive = data.Dale.sensitive;
                 }
             },
 
             columns: [
-                { data: null        ,className: "Asset", render: function (data) { return '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + data.Asset + '\>' + data.Asset + '</a>'; } },
-                { data: "Server"    ,className: "Server"        },
-                { data: "Database"  ,className: "Database"      },
-                { data: "Object"    ,className: "Object"        },
-                { data: "ObjectType",className: "ObjectType"    },
-                { data: "Column"    ,className: "ColumnMan"     },
+                { data: null, className: "Asset", render: function (data) { return '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + data.Asset + '\>' + data.Asset + '</a>'; } },
+                { data: "Server", className: "Server" },
+                { data: "Database", className: "Database" },
+                { data: "Object", className: "Object" },
+                { data: "ObjectType", className: "ObjectType" },
+                { data: "Column", className: "ColumnMan" },
 
                 //the key piece here is including a label with text to indicate whether the row is true or false so the filtering works
                 //Since I did not want user to see label text and still have a filter.  My cheat to this was to style it with display:none while still keeping the filtering ability
                 //later on when they check/uncheck the box my editRow() function will refresh the data associated with the grid which changes the label hidden text to the opposite so filtering can refresh
                 {
-                    data: null, className: "IsSensitive", render: function (data)
-                    {
-                        if (data.IsSensitive) {
-                            return ' <input type="checkbox" value="true"    style="margin:auto; width:100%; zoom:1.25;"  checked   >   <label style="display:none;">true</label>';  //styles center and make checkbox bigger
+                    data: null, className: "IsSensitive", render: function (d) {
+
+                        //the below code is a way to not have to repeat the html checkbox below and only set the vars here once
+                        var disabled = '';
+                        var checked = '';
+                        var cellValue = 'false'
+
+                        if (!canDaleSensitiveEdit) {
+                            disabled = ' disabled="disabled" ';
                         }
-                        else {
-                            return ' <input type="checkbox" value="false"   style="margin:auto; width:100%; zoom:1.25;"            >   <label style="display:none;">false</label>'; //styles center and make checkbox bigger
-                        } 
+
+                        if (d.IsSensitive){
+                            checked = ' checked="checked" ';
+                            cellValue = 'true';
+                        }
+
+                        return ' <input type="checkbox" value="true"    style="margin:auto; width:100%; zoom:1.25;"  ' + checked + disabled + '  >   <label style="display:none;">' + cellValue + '</label>';  //styles center and make checkbox bigger
                     }
                 },
 
@@ -52,12 +79,12 @@
                 { data: "Alias", className: "Alias", visible: false },
                 { data: "ProdType", className: "ProdType", visible: false },
 
-                { data: "ColumnType", className: "ColumnType", visible: false},
-                { data: "MaxLength", className: "MaxLength", visible: false},
-                { data: "Precision", className: "Precision", visible: false},
-                { data: "Scale", className: "Scale", visible: false},
-                { data: "IsNullable", className: "IsNullable", visible: false},
-                { data: "EffectiveDate", className: "EffectiveDate", visible: false}
+                { data: "ColumnType", className: "ColumnType", visible: false },
+                { data: "MaxLength", className: "MaxLength", visible: false },
+                { data: "Precision", className: "Precision", visible: false },
+                { data: "Scale", className: "Scale", visible: false },
+                { data: "IsNullable", className: "IsNullable", visible: false },
+                { data: "EffectiveDate", className: "EffectiveDate", visible: false }
             ],
 
             aLengthMenu: [
@@ -72,7 +99,7 @@
 
             //buttons to show and customize text for them
             buttons:
-            [
+                [
                     { extend: 'colvis', text: 'Columns' },
                     { extend: 'csv', text: 'Download' },
 
@@ -87,7 +114,7 @@
                     //        //data.Dale.editPage();
                     //    }
                     //}
-            ]
+                ]
         });
 
         //add a filter in each column
@@ -118,8 +145,7 @@
         data.Dale.setupClickAttack();
 
         //setup onChange event to fire when a checkbox is changed.  This will update internal array for user to save later
-        $('#daleResultsTable tbody').on('change', '.IsSensitive input', function (event)
-        {
+        $('#daleResultsTable tbody').on('change', '.IsSensitive input', function (event) {
             var cellClicked = $(this).closest('td');                                                                                //get which cell is clicked too use later to figure out rowIndex,rowData,columnIndex
             var columnValue = this.checked;                                                                                               //determine if checkbox is checked or not
 
@@ -130,6 +156,7 @@
 
             data.Dale.editArray(rowIndex, rowData, columnIndex, columnValue);
         });
+
     },
 
     //edit row (data and style) since user changed something
@@ -261,5 +288,14 @@
             data.Dale.disableDale();
             daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
         });
+    },
+
+     getPermissions: function () {
+        var errorMessage = 'Error';
+
+       
     }
+
+
+
 };
