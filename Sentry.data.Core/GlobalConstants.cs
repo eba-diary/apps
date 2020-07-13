@@ -179,6 +179,8 @@
 
             public const string DALE_SENSITIVE_VIEW = "DaleSensView";
             public const string DALE_VIEW = "DaleView";
+            public const string DALE_SENSITIVE_EDIT = "DaleSensEdit";
+
 
 
         }

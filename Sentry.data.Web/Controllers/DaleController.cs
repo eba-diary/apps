@@ -30,6 +30,7 @@ namespace Sentry.data.Web.Controllers
             {
                 DaleSearchModel searchModel = new DaleSearchModel();
                 searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
+                searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
 
                 return View(searchModel);
             }
@@ -68,6 +69,7 @@ namespace Sentry.data.Web.Controllers
             searchModel.Criteria = searchCriteria;
             searchModel.Destiny = destination.ToDaleDestiny();
             searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
+            searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
 
             if (sensitive && searchModel.CanDaleSensitiveView)
             {
@@ -123,12 +125,6 @@ namespace Sentry.data.Web.Controllers
 
         private bool CanDaleSensitiveView()
         {
-            //if admin, ALWAYS let them see sensitive
-            if (SharedContext.CurrentUser.IsAdmin)
-            {
-                return true;
-            }
-
             if (!SharedContext.CurrentUser.CanDaleSensitiveView)
             {
                 return false;
@@ -139,13 +135,17 @@ namespace Sentry.data.Web.Controllers
 
         private bool CanDaleView()
         {
-            //if admin, ALWAYS let them see sensitive
-            if (SharedContext.CurrentUser.IsAdmin)
+            if (!SharedContext.CurrentUser.CanDaleView)
             {
-                return true;
+                return false;
             }
 
-            if (!SharedContext.CurrentUser.CanDaleView)
+            return true;
+        }
+
+        private bool CanDaleSensitiveEdit()
+        {
+            if (!SharedContext.CurrentUser.CanDaleSensitiveEdit)
             {
                 return false;
             }

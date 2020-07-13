@@ -6,13 +6,13 @@
     init: function ()
     {
         
-        localStorage.clear();                                                           // Clear all items
+        localStorage.clear();                                                           // Clear all items in our array
 
         //init DataTable
         $("#daleResultsTable").DataTable({
 
             //client side setup
-            pageLength: 100,
+            pageLength: 10,
 
             ajax: {
                 url: "/Dale/GetSearchResultsClient/",
@@ -26,12 +26,12 @@
             },
 
             columns: [
-                { data: null, className: "Asset", render: function (data) { return '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + data.Asset + '\>' + data.Asset + '</a>'; } },
-                { data: "Server", className: "Server"},
-                { data: "Database", className: "Database" },
-                { data: "Object", className: "Object" },
-                { data: "ObjectType", className: "ObjectType" },
-                { data: "Column", className: "ColumnMan" },
+                { data: null        ,className: "Asset", render: function (data) { return '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + data.Asset + '\>' + data.Asset + '</a>'; } },
+                { data: "Server"    ,className: "Server"        },
+                { data: "Database"  ,className: "Database"      },
+                { data: "Object"    ,className: "Object"        },
+                { data: "ObjectType",className: "ObjectType"    },
+                { data: "Column"    ,className: "ColumnMan"     },
 
                 //the key piece here is including a label with text to indicate whether the row is true or false so the filtering works
                 //Since I did not want user to see label text and still have a filter.  My cheat to this was to style it with display:none while still keeping the filtering ability
@@ -40,13 +40,14 @@
                     data: null, className: "IsSensitive", render: function (data)
                     {
                         if (data.IsSensitive) {
-                            return ' <input type="checkbox" name="vehicle3" value="true" checked> <label class="trains" style="display:none;" for="vehicle3">true</label><br><br>';
+                            return ' <input type="checkbox" value="true"    style="margin:auto; width:100%; zoom:1.25;"  checked   >   <label style="display:none;">true</label>';  //styles center and make checkbox bigger
                         }
                         else {
-                            return ' <input type="checkbox" name="vehicle3" value="false" > <label class="trains" style="display:none;" for="vehicle3">false</label><br><br>';
+                            return ' <input type="checkbox" value="false"   style="margin:auto; width:100%; zoom:1.25;"            >   <label style="display:none;">false</label>'; //styles center and make checkbox bigger
                         } 
                     }
                 },
+
 
                 { data: "Alias", className: "Alias", visible: false },
                 { data: "ProdType", className: "ProdType", visible: false },
@@ -116,57 +117,56 @@
         //setup all click events
         data.Dale.setupClickAttack();
 
-
+        //setup onChange event to fire when a checkbox is changed.  This will update internal array for user to save later
         $('#daleResultsTable tbody').on('change', '.IsSensitive input', function (event)
         {
-            var cellClicked = $(this).closest('td');
-            var value = this.checked;                                                                                               //determine what the user checked
+            var cellClicked = $(this).closest('td');                                                                                //get which cell is clicked too use later to figure out rowIndex,rowData,columnIndex
+            var columnValue = this.checked;                                                                                               //determine if checkbox is checked or not
 
             var table = $('#daleResultsTable').DataTable();
             var rowIndex = table.cell(cellClicked).index().row;                                                                     //get rowIndex being updated
             var rowData = table.row(cellClicked).data();                                                                            //get whole row of data to use later
             var columnIndex = table.cell(cellClicked).index().columnVisible;                                                        //get columnIndex clicked
 
-            data.Dale.editArray(rowIndex, rowData, columnIndex);
-
+            data.Dale.editArray(rowIndex, rowData, columnIndex, columnValue);
         });
     },
 
     //edit row (data and style) since user changed something
     editRow: function (edit, rowIndex, rowData) {
+
         var table = $('#daleResultsTable').DataTable();
 
-        if (edit) {                                                                                                         
-            table                                                                                               
-                .row(rowIndex)
-                .data(rowData)                  //supply updated data for grid row, NEED THIS FOR FILTERING!!!!!!! if we dont refresh rowData, then filtering will think its old values, even in the case of the checkboxes
-                .draw()                         //redraw table because of changes
+        //UPDATE INTERNAL DATATABLE DATA WHICH IS USED FOR FILTERING
+        table
+            .row(rowIndex)                  //pick which row to adjust
+            .data(rowData)                  //supply updated data for grid row, NEED THIS FOR FILTERING!!!!!!! if we dont refresh rowData, then filtering will think its old values, even in the case of the checkboxes, what this update does is update the label associated with it
+
+        //STYLE ROW BASED ON BEING EDITED OR NOT (add/remove class that makes it RED if they are changing)
+        if (edit) {
+            table
                 .rows(rowIndex)                 //identifies a given row to modify
-                .nodes()
-                .to$()
-                .addClass('dale-clicked');      //if editing then add dale-clicked class
+                .nodes()                        //grab all TR nodes (rows) under the .rows selector above
+                .to$()                          //Convert to a jQuery object
+                .addClass('dale-clicked');      //add dale-clicked class
         }
-        else {                                                                                                             
-            table                                                                                              
-                .row(rowIndex)
-                .data(rowData)                  //supply updated data for grid row, NEED THIS FOR FILTERING!!!!!!! if we dont refresh rowData, then filtering will think its old values, even in the case of the checkboxes
-                .draw()                         //redraw table because of changes
+        else {
+            table
                 .rows(rowIndex)                 //identifies a given row to modify
-                .nodes()
-                .to$()
-                .removeClass('dale-clicked');   //if not editing then remove dale-clicked class                                                        
+                .nodes()                        //grab all TR nodes (rows) under the .rows selector above
+                .to$()                          //Convert to a jQuery object
+                .removeClass('dale-clicked');   //remove dale-clicked class                                                        
         }
     },
 
     //edit array since user is changing data
-    editArray: function (rowIndex, rowData, columnIndex) {
+    editArray: function (rowIndex, rowData, columnIndex, columnValue) {
 
         //IsSensitive Cell Check
         if (columnIndex == 6) {
 
             var edit = true;
-
-            rowData.IsSensitive = !rowData.IsSensitive;                                                                 //flip IsSensitive
+            rowData.IsSensitive = columnValue;                                                                          //flip IsSensitive
 
             var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                      //get stored object array
             var o = { "BaseColumnId": "IsSensitive" };                                                                  //create new obj based off current selection
@@ -198,6 +198,7 @@
 
     },
 
+    //figure out which radio button was selected
     getDaleDestiny: function ()
     {
         var daleDestinyTableRadio = $('input[name="Destiny"]:checked').val();
@@ -235,15 +236,14 @@
     {
         var daleResultsTable = $("#daleResultsTable").DataTable();
 
-        //setup click event for search  span for a new search
+        //MOUSE CLICK EVENT NEW SEARCH
         $('.input-group-addon').click(function (e) {
             data.Dale.sensitive = false;                                            //set sensitive property to true so grid does sensitive search back to controller
             data.Dale.disableDale();
             daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
         });
 
-        //setup search box enter event
-        //add something around here to know if search is in progress
+        //ENTER BUTTON EVENT
         var input = document.getElementById("daleSearchCriteria");
         input.addEventListener("keyup", function (event) {
             if (event.keyCode === 13) {
@@ -253,7 +253,7 @@
             }
         });
 
-        //setup click event for sensitive search
+        //SENSITIVE SEARCH CLICK EVENT
         $("#sensitiveSearchLink").on('click', function () {
 
             data.Dale.sensitive = true;                                             //set sensitive property to true so grid does sensitive search back to controller

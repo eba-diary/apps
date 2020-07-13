@@ -34,5 +34,6 @@ namespace Sentry.data.Core
         DomainUser DomainUser { get; }
         Boolean CanDaleSensitiveView { get; }
         Boolean CanDaleView { get; }
+        Boolean CanDaleSensitiveEdit { get; }
     }
 }
