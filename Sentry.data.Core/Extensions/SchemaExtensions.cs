@@ -2,6 +2,7 @@
 using Sentry.Common.Logging;
 using Sentry.data.Core.Factories.Fields;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -163,6 +164,7 @@ namespace Sentry.data.Core
 
                 JsonSchemaProperty currentProperty = prop.Value;
                 Logger.Debug($"Found property:{prop.Key}");
+
                 switch (currentProperty.Type)
                 {
                     case JsonObjectType.None:
@@ -170,17 +172,10 @@ namespace Sentry.data.Core
                         if (currentProperty.HasReference)
                         {
                             Logger.Debug($"Detected ref object: property will be defined as STRUCT");
-                            fieldFactory = new StructFieldDtoFactory(prop, false);
+                            fieldFactory = BuildStructFactory(prop, JsonObjectType.Object);
                             BaseFieldDto noneStructField = fieldFactory.GetField();
 
-                            if (parentRow == null)
-                            {
-                                dtoList.Add(noneStructField);
-                            }
-                            else
-                            {
-                                parentRow.ChildFields.Add(noneStructField);
-                            }
+                            AddToFieldList(dtoList, parentRow, noneStructField);
 
                             currentProperty.Reference.ToDto(dtoList.ToList(), noneStructField);
                             
@@ -202,27 +197,20 @@ namespace Sentry.data.Core
                         }
                         break;
                     case JsonObjectType.Object:
-                        Logger.Debug($"Detected type of {currentProperty.Type}");
-                        Logger.Debug($"Detected ref object: property will be defined as STRUCT");
-                        fieldFactory = new StructFieldDtoFactory(prop, false);
+                    case JsonObjectType.Null | JsonObjectType.Object:
+                        fieldFactory = BuildStructFactory(prop, currentProperty.Type);
+
                         BaseFieldDto objectStructfield = fieldFactory.GetField();
 
-                        if (parentRow == null)
-                        {
-                            dtoList.Add(objectStructfield);
-                        }
-                        else
-                        {
-                            parentRow.ChildFields.Add(objectStructfield);
-                        }
+                        AddToFieldList(dtoList, parentRow, objectStructfield);
 
                         foreach (KeyValuePair<string, JsonSchemaProperty> nestedProp in currentProperty.Properties)
                         {
                             nestedProp.ToDto(dtoList, objectStructfield);
                         }
-
                         break;
                     case JsonObjectType.Array:
+                    case JsonObjectType.Null | JsonObjectType.Array:
                         Logger.Debug($"Detected type of {currentProperty.Type}");
 
                         JsonSchema nestedSchema = null;
@@ -234,73 +222,50 @@ namespace Sentry.data.Core
                         if (nestedSchema == null)
                         {
                             Logger.Warn($"Schema could not be detected for {prop.Key} property");
-                            Logger.Warn($"{prop.Key} will be defined as array of VARCHAR");
-                            fieldFactory = new VarcharFieldDtoFactory(prop, true);
+
+                            fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, true);
                         }
                         else if (nestedSchema.IsObject)
                         {
                             Logger.Debug($"Detected nested schema as Object");
-                            Logger.Debug($"{prop.Key} will be defined as array of STRUCT");
-                            fieldFactory = new StructFieldDtoFactory(prop, true);
+
+                            fieldFactory = BuildStructFactory(prop, JsonObjectType.Object, true);
                         }
                         else
                         {
                             switch (nestedSchema.Type)
                             {
                                 case JsonObjectType.Object:
-                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
-                                    Logger.Debug($"{prop.Key} will be defined as array of STRUCT");
-                                    fieldFactory = new StructFieldDtoFactory(prop, true);
+                                case JsonObjectType.Null | JsonObjectType.Object:
+                                    fieldFactory = BuildStructFactory(prop, nestedSchema.Type, true);
                                     break;
                                 case JsonObjectType.Integer:
-                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
-                                    Logger.Debug($"{prop.Key} will be defined as array of INTEGER");
-                                    fieldFactory = new IntegerFieldDtoFactory(prop, true);
+                                case JsonObjectType.Null | JsonObjectType.Integer:
+                                    fieldFactory = BuildIntegerFactory(prop, nestedSchema.Type, true);
                                     break;
                                 case JsonObjectType.String:
-                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
-                                    switch (nestedSchema.Format)
-                                    {
-                                        case "date-time":
-                                            Logger.Debug($"Detected string format of {nestedSchema.Format}");
-                                            Logger.Debug($"{prop.Key} will be defined as array of TIMESTAMP");
-                                            fieldFactory = new TimestampFieldDtoFactory(prop, true);
-                                            break;
-                                        case "date":
-                                            Logger.Debug($"Detected string format of {nestedSchema.Format}");
-                                            Logger.Debug($"{prop.Key} will be defined as array of DATE");
-                                            fieldFactory = new DateFieldDtoFactory(prop, true);
-                                            break;
-                                        default:
-                                            Logger.Debug($"No string format detected");
-                                            Logger.Debug($"{prop.Key} will be defined as array of VARCHAR");
-                                            fieldFactory = new VarcharFieldDtoFactory(prop, true);
-                                            break;
-                                    }
+                                case JsonObjectType.Null | JsonObjectType.String:                                    
+                                    fieldFactory = BuildStringFactory(prop, nestedSchema.Type, nestedSchema.Format, true);
                                     break;
                                 case JsonObjectType.Number:
-                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
-                                    Logger.Debug($"{prop.Key} will be defined as array of DECIMAL");
-                                    fieldFactory = new DecimalFieldDtoFactory(prop, true);
+                                case JsonObjectType.Null | JsonObjectType.Number:
+                                    fieldFactory = BuildDecimalFactory(prop, nestedSchema.Type, true);
                                     break;
                                 case JsonObjectType.None:
                                     if (nestedSchema.IsAnyType)
                                     {
                                         Logger.Debug($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} and marked as IsAnyType");
-                                        Logger.Debug($"{prop.Key} will be defined as array of VARCHAR");
-                                        fieldFactory = new VarcharFieldDtoFactory(prop, true);
+                                        fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, true);
                                     }
                                     else
                                     {
                                         Logger.Debug($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()}");
-                                        Logger.Debug($"{prop.Key} will be defined as array of VARCHAR");
-                                        fieldFactory = new VarcharFieldDtoFactory(prop, true);
+                                        fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, true);
                                     }
                                     break;
                                 default:
                                     Logger.Warn($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} which is not handled by DSC");
-                                    Logger.Warn($"{prop.Key} will be defined as array of VARCHAR");
-                                    fieldFactory = new VarcharFieldDtoFactory(prop, true);
+                                    fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, true);
                                     break;
                             }
                         }
@@ -312,97 +277,37 @@ namespace Sentry.data.Core
                             nestedSchema.ToDto(dtoList.ToList(), field);
                         }
 
-                        if (parentRow == null)
-                        {
-                            dtoList.Add(field);
-                        }
-                        else
-                        {
-                            parentRow.ChildFields.Add(field);
-                        }
+                        AddToFieldList(dtoList, parentRow, field);
+                        
                         break;
                     case JsonObjectType.String:
-                        Logger.Debug($"Detected type of {currentProperty.Type}");
+                    case JsonObjectType.Null | JsonObjectType.String:
+                        fieldFactory = BuildStringFactory(prop, currentProperty.Type, currentProperty.Format);
 
-                        if (!String.IsNullOrWhiteSpace(currentProperty.Format))
-                        {
-                            switch (currentProperty.Format)
-                            {
-                                case "date-time":
-                                    Logger.Debug($"Detected string format of {currentProperty.Format}");
-                                    Logger.Debug($"{prop.Key} will be defined as TIMESTAMP");
-                                    fieldFactory = new TimestampFieldDtoFactory(prop, false);
-                                    break;
-                                case "date":
-                                    Logger.Debug($"Detected string format of {currentProperty.Format}");
-                                    Logger.Debug($"{prop.Key} will be defined as DATE");
-                                    fieldFactory = new DateFieldDtoFactory(prop, false);
-                                    break;
-                                default:
-                                    Logger.Warn($"Detected string format of {currentProperty.Format} which is not handled by DSC");
-                                    Logger.Warn($"{prop.Key} will be defined as DATE");
-                                    fieldFactory = new VarcharFieldDtoFactory(prop, false);
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            Logger.Debug($"No string format detected");
-                            Logger.Debug($"{prop.Key} will be defined as VARCHAR");
-                            fieldFactory = new VarcharFieldDtoFactory(prop, false);
-                        }
+                        AddToFieldList(dtoList, parentRow, fieldFactory.GetField());
 
-                        if (parentRow == null)
-                        {
-                            dtoList.Add(fieldFactory.GetField());
-                        }
-                        else
-                        {
-                            parentRow.ChildFields.Add(fieldFactory.GetField());
-                        }
                         break;
                     case JsonObjectType.Integer:
-                        Logger.Debug($"Detected type of {currentProperty.Type}");
-                        Logger.Debug($"{prop.Key} will be defined as INTEGER");
+                    case JsonObjectType.Null | JsonObjectType.Integer:
+                        fieldFactory = BuildIntegerFactory(prop, currentProperty.Type);
 
-                        fieldFactory = new IntegerFieldDtoFactory(prop, false);
+                        AddToFieldList(dtoList, parentRow, fieldFactory.GetField());
 
-                        if (parentRow == null)
-                        {
-                            dtoList.Add(fieldFactory.GetField());
-                        }
-                        else
-                        {
-                            parentRow.ChildFields.Add(fieldFactory.GetField());
-                        }
                         break;
                     case JsonObjectType.Number:
-                        Logger.Debug($"Detected type of {currentProperty.Type}");
-                        Logger.Debug($"{prop.Key} will be defined as DECIMAL");
-                        fieldFactory = new DecimalFieldDtoFactory(prop, false);
+                    case JsonObjectType.Null | JsonObjectType.Number:
+                        fieldFactory = BuildDecimalFactory(prop, currentProperty.Type);
 
-                        if (parentRow == null)
-                        {
-                            dtoList.Add(fieldFactory.GetField());
-                        }
-                        else
-                        {
-                            parentRow.ChildFields.Add(fieldFactory.GetField());
-                        }
+                        AddToFieldList(dtoList, parentRow, fieldFactory.GetField());
+
                         break;
                     default:
                         Logger.Warn($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} which is not handled by DSC");
-                        Logger.Warn($"{prop.Key} will be defined as array of VARCHAR");
-                        fieldFactory = new VarcharFieldDtoFactory(prop, true);
 
-                        if (parentRow == null)
-                        {
-                            dtoList.Add(fieldFactory.GetField());
-                        }
-                        else
-                        {
-                            parentRow.ChildFields.Add(fieldFactory.GetField());
-                        }
+                        fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, true);
+
+                        AddToFieldList(dtoList, parentRow, fieldFactory.GetField());
+
                         break;
                 }
             }
@@ -410,6 +315,84 @@ namespace Sentry.data.Core
             {
                 Logger.Error("ToSchemaRow Error", ex);
                 throw;
+            }
+        }
+
+        private static FieldDtoFactory BuildDecimalFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objectType, bool isArray = false)
+        {
+            FieldDtoFactory fieldFactory;
+            Logger.Debug($"Detected type of {objectType}");
+            Logger.Debug($"{prop.Key} will be defined as DECIMAL");
+            fieldFactory = new DecimalFieldDtoFactory(prop, isArray);
+            return fieldFactory;
+        }
+
+        private static FieldDtoFactory BuildIntegerFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objectType, bool isArray = false)
+        {
+            FieldDtoFactory fieldFactory;
+            Logger.Debug($"Detected type of {objectType}");
+            Logger.Debug($"{prop.Key} will be defined as INTEGER");
+
+            fieldFactory = new IntegerFieldDtoFactory(prop, isArray);
+            return fieldFactory;
+        }
+
+        private static FieldDtoFactory BuildStringFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objectType, string format, bool isArray = false)
+        {
+            FieldDtoFactory fieldFactory;
+            Logger.Debug($"Detected type of {objectType}");
+
+            if (!String.IsNullOrWhiteSpace(format))
+            {
+                switch (format)
+                {
+                    case "date-time":
+                        Logger.Debug($"Detected string format of {format}");
+                        Logger.Debug($"{prop.Key} will be defined as TIMESTAMP");
+                        fieldFactory = new TimestampFieldDtoFactory(prop, isArray);
+                        break;
+                    case "date":
+                        Logger.Debug($"Detected string format of {format}");
+                        Logger.Debug($"{prop.Key} will be defined as DATE");
+                        fieldFactory = new DateFieldDtoFactory(prop, isArray);
+                        break;
+                    default:
+                        Logger.Warn($"Detected string format of {format} which is not handled by DSC");
+                        Logger.Warn($"{prop.Key} will be defined as DATE");
+                        fieldFactory = new VarcharFieldDtoFactory(prop, isArray);
+                        break;
+                }
+            }
+            else
+            {
+                Logger.Debug($"No string format detected");
+                Logger.Debug($"{prop.Key} will be defined as VARCHAR");
+                fieldFactory = new VarcharFieldDtoFactory(prop, isArray);
+            }
+
+            return fieldFactory;
+        }
+
+        private static FieldDtoFactory BuildStructFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objecType, bool isArray = false)
+        {
+            FieldDtoFactory fieldFactory;
+            Logger.Debug($"Detected type of {objecType}");
+            Logger.Debug($"Detected ref object: property will be defined as STRUCT");
+            fieldFactory = new StructFieldDtoFactory(prop, isArray);
+
+            return fieldFactory;
+        }
+
+        private static void AddToFieldList(IList<BaseFieldDto> dtoList, BaseFieldDto parentRow, BaseFieldDto objectStructfield)
+        {
+            if (parentRow == null)
+            {
+                dtoList.Add(objectStructfield);
+            }
+            else
+            {
+                parentRow.ChildFields.Add(objectStructfield);
+                parentRow.HasChildren = true;
             }
         }
 
