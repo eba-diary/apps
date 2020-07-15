@@ -780,7 +780,7 @@ namespace Sentry.data.Core
             }
 
             //Struct has children
-            if (fieldDto.FieldType == GlobalConstants.Datatypes.STRUCT && !fieldDto.ChildFields.Any())
+            if (fieldDto.FieldType == GlobalConstants.Datatypes.STRUCT && !fieldDto.HasChildren)
             {
                 results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) STRUCTs are required to have children");
             }

@@ -1378,7 +1378,7 @@ namespace Sentry.data.Web.Controllers
             try
             {
                 List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
-                dtoList.Add(schemaRow.ToDto());
+                dtoList.Add(schemaRow.ToDto(false));
 
                 _schemaService.Validate(dtoList);
 

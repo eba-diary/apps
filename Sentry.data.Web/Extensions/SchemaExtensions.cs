@@ -181,7 +181,7 @@ namespace Sentry.data.Web
             return dtoList;
         }
 
-        public static BaseFieldDto ToDto(this SchemaRow row)
+        public static BaseFieldDto ToDto(this SchemaRow row, bool convertChildren = true)
         {
             ValidationResults errors = new ValidationResults();
 
@@ -191,46 +191,49 @@ namespace Sentry.data.Web
 
                 throw new ValidationException(errors);
             }
-            else
+
+            FieldDtoFactory fieldFactory;
+            switch (row.DataType.ToUpper())
             {
-                FieldDtoFactory fieldFactory;
-                switch (row.DataType.ToUpper())
-                {
-                    case GlobalConstants.Datatypes.DECIMAL:
-                        fieldFactory = new DecimalFieldDtoFactory(row);
-                        break;
-                    case GlobalConstants.Datatypes.DATE:
-                        fieldFactory = new DateFieldDtoFactory(row);
-                        break;
-                    case GlobalConstants.Datatypes.INTEGER:
-                        fieldFactory = new IntegerFieldDtoFactory(row);
-                        break;
-                    case GlobalConstants.Datatypes.STRUCT:
-                        fieldFactory = new StructFieldDtoFactory(row);
-                        break;
-                    case GlobalConstants.Datatypes.TIMESTAMP:
-                        fieldFactory = new TimestampFieldDtoFactory(row);
-                        break;
-                    case GlobalConstants.Datatypes.VARCHAR:
-                        fieldFactory = new VarcharFieldDtoFactory(row);
-                        break;
-                    default:
-                        fieldFactory = new VarcharFieldDtoFactory(row);
-                        break;
-                }
+                case GlobalConstants.Datatypes.DECIMAL:
+                    fieldFactory = new DecimalFieldDtoFactory(row);
+                    break;
+                case GlobalConstants.Datatypes.DATE:
+                    fieldFactory = new DateFieldDtoFactory(row);
+                    break;
+                case GlobalConstants.Datatypes.INTEGER:
+                    fieldFactory = new IntegerFieldDtoFactory(row);
+                    break;
+                case GlobalConstants.Datatypes.STRUCT:
+                    fieldFactory = new StructFieldDtoFactory(row);
+                    break;
+                case GlobalConstants.Datatypes.TIMESTAMP:
+                    fieldFactory = new TimestampFieldDtoFactory(row);
+                    break;
+                case GlobalConstants.Datatypes.VARCHAR:
+                    fieldFactory = new VarcharFieldDtoFactory(row);
+                    break;
+                default:
+                    fieldFactory = new VarcharFieldDtoFactory(row);
+                    break;
+            }
 
-                BaseFieldDto dto = fieldFactory.GetField();
+            BaseFieldDto dto = fieldFactory.GetField();
 
-                if (row.ChildRows != null && row.ChildRows.Any())
+            if (row.ChildRows != null && row.ChildRows.Any())
+            {
+                dto.HasChildren = true;
+
+                if (convertChildren)
                 {
                     foreach (SchemaRow childrow in row.ChildRows)
                     {
                         dto.ChildFields.Add(childrow.ToDto());
                     }
                 }
+            }
 
-                return dto;
-            }            
+            return dto;            
         }
     }
 }

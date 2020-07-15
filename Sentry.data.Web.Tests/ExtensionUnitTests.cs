@@ -404,7 +404,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(1, childFields.Count);
             Assert.AreEqual("name", childFields.First().Name);
             Assert.IsInstanceOfType(childFields.First(), typeof(VarcharFieldDto));
-            Assert.AreEqual(0, childFields.First().Length);
+            Assert.AreEqual(1000, childFields.First().Length);
             Assert.IsNull(childFields.First().Description);
         }
 
