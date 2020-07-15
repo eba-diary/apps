@@ -9,7 +9,10 @@
         localStorage.clear();                                                           // Clear all items in our array
 
         
-        $.ajax({                                                                        //first thing is to figure out if they have the access to edit sensitive which changes grid values
+
+        
+        //first thing is to figure out if they have the access to edit sensitive which changes grid values
+        $.ajax({                                                                        
             url: "/Dale/GetCanDaleSensitiveEdit/",
             method: "GET",
             dataType: 'json',
@@ -217,6 +220,13 @@
                     sensitiveList.push(o);                                                                              //add new item
                 }
 
+            }
+
+            if (sensitiveList.length > 0) {
+                $('#btnSaveMe').show();
+            }
+            else {
+                $('#btnSaveMe').hide();
             }
             localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));                                       //save array to storage
 
