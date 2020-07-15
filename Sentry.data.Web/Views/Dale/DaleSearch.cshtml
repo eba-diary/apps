@@ -7,131 +7,133 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@*Need a seperate bootstrap class container here because parent layout is set to fluid from above so the result row can grow*@
-   
  <div>
-             <div class="row" style="margin-top:12px; ">
+     <div class="row" style="margin-top:12px; ">
 
+         @*MAIN LEFT PORTION OF SCREEN*@
+         <div class="col-xs-2">
 
-                 <div class="col-xs-2">
-                     
-                 </div>
+         </div>
 
+         @*MAIN MIDDLE PORTION OF SCREEN*@
+         <div class="col-xs-8">
 
-                 <div class="col-xs-8">
+             @*nested row within column so we can have another nested set of columns to make up search cluster and save button*@
+             <div class="row" style="display:flex;">
 
-                     <div class="row" style="display:flex;">
-                         <div class="col-lg-6">
+                 @*NESTED SEARCH CLUSTER A:  Search Bar and Title *@
+                 <div class="col-lg-6">
 
+                     <div class="pull-right" style="display:inline-block;">
 
-                             <div class="pull-right" style="display:inline-block;">
-
-                                 <div id="icon-container" style="display:inline-block;">
-                                     <div style="float:left;">
-                                         <img style="height:50px;" src='~/Images/Dale/DataInventoryIcon.png' alt="DataInventory Image" />
-                                     </div>
-
-                                     <div style="float:left;">
-                                         <h1 class="htCenter datasetHeader">Data Inventory</h1>
-                                     </div>
-
-                                     <div style="float:left; margin-left: 2px;">
-                                         <a target="_blank" rel="noopener noreferrer" href="https://confluence.sentry.com/display/CLA/Data+Inventory">
-                                             <em class="glyphicon glyphicon-info-sign" style="color:#003da5;"></em>
-                                         </a>
-                                     </div>
-                                 </div>
-
-
-
-                                 <div id="daleCriteriaContainer" class="xpull-right" style="display: table; width: 300px;">
-
-                                     <span id="daleSearchClick" class="input-group-addon clickable" style="width: 50px;height:30px;" onclick="$(function() {$('#daleSearchCriteria').focus();});">
-                                         <em class="glyphicon glyphicon-search"></em>
-                                     </span>
-
-                                     <span id="daleSearchClickSpinner" class="input-group-addon" style="width: 50px;height:30px; display:none;" disabled onclick="$(function() {$('#daleSearchCriteria').focus();}); ">
-                                         <em class="fa fa-circle-o-notch fa-spin"></em>
-                                     </span>
-
-                                     <input type="text" id="daleSearchCriteria" name="searchPhrase" class="form-control" style="width:500px" />
-
-                                 </div>
-
+                         @*DATA INVENTORY TITLE STUFF*@
+                         <div id="icon-container" style="display:inline-block;">
+                             <div style="float:left;">
+                                 <img style="height:50px;" src='~/Images/Dale/DataInventoryIcon.png' alt="DataInventory Image" />
                              </div>
 
+                             <div style="float:left;">
+                                 <h1 class="htCenter datasetHeader">Data Inventory</h1>
+                             </div>
 
-
-                            
+                             <div style="float:left; margin-left: 2px;">
+                                 <a target="_blank" rel="noopener noreferrer" href="https://confluence.sentry.com/display/CLA/Data+Inventory">
+                                     <em class="glyphicon glyphicon-info-sign" style="color:#003da5;"></em>
+                                 </a>
+                             </div>
                          </div>
 
-                         <div class="col-lg-4" style="display:flex;">
-                             <span id="radioMadness" style="display:flex; align-items:flex-end;">
+                         @*SEARCH BUTTON AND CRITERIA STUFF*@
+                         <div id="daleCriteriaContainer" class="xpull-right" style="display: table; width: 300px;">
 
-                                 <span style="text-align: left; font-family: KievitSlabWeb W03,Lucida Sans,serif;width:200px;">
-
-                                     <label style="text-align:left; width:100px;">
-                                         <input type="radio" name="Destiny" id="DestinyTableRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Object>
-                                         Table/View
-                                     </label>
-
-                                     <label style="text-align:left; width:75px;">
-                                         <input type="radio" name="Destiny" id="DestinyColumnRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Column checked="checked">
-                                         @Sentry.data.Core.GlobalEnums.DaleDestiny.Column
-                                     </label>
-
-                                 </span>
-
+                             <span id="daleSearchClick" class="input-group-addon clickable" style="width: 50px;height:30px;" onclick="$(function() {$('#daleSearchCriteria').focus();});">
+                                 <em class="glyphicon glyphicon-search"></em>
                              </span>
 
-                             @if (Model.CanDaleSensitiveView)
-                             {
-                                 <span class=" " style="align-items: flex-end;display: flex;">
-                                     <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;margin-bottom: 4px;"></em>
-                                     <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500;">Show Sensitive Columns</a>
-                                 </span>
-                             }
-                             else
-                             {
-                                 <span class=""  style="align-items: flex-end;display: flex;" data-toggle="tooltip" data-placement="top" title="Please request the App_DATA_DINV_Sens_View entitlement via MyAccess to view sensitive column information on the Data Inventory site.">
-                                     <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;margin-bottom: 4px;"></em>
-                                     <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500; pointer-events:none;">Show Sensitive Columns</a>
-                                 </span>
-                             }
+                             <span id="daleSearchClickSpinner" class="input-group-addon" style="width: 50px;height:30px; display:none;" disabled onclick="$(function() {$('#daleSearchCriteria').focus();}); ">
+                                 <em class="fa fa-circle-o-notch fa-spin"></em>
+                             </span>
+
+                             <input type="text" id="daleSearchCriteria" name="searchPhrase" class="form-control" style="width:500px" />
 
                          </div>
 
                      </div>
+
                  </div>
-                    
-                                 
 
-                <div class="col-xs-2" style="margin-top: -5px;" data-toggle="tooltip" data-placement="top" title="Save IsSensitive changes.">
-                    <button type="button" class="pull-right" id="btnSaveMe" style="width:200px; height:70px; background-color:#00a3e0; border-color:#00a3e0;color:ghostwhite;font-size: xx-large;margin-right: 100px;margin-top: 40px;">Save</button>
-                </div>
+                 @*NESTED SEARCH CLUSTER B:  Radio Buttons and Sensitive*@
+                 <div class="col-lg-4" style="display:flex;">
 
+                     @*NOTE! the flex style basically pushes the radio button and sensitive controls to the button of the screen levereging the flex-end tag that sits on the actual control*@
+                     <span id="radioMadness" style="display:flex; align-items:flex-end;">
+
+                         <span style="text-align: left; font-family: KievitSlabWeb W03,Lucida Sans,serif;width:200px;">
+
+                             <label style="text-align:left; width:100px;">
+                                 <input type="radio" name="Destiny" id="DestinyTableRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Object>
+                                 Table/View
+                             </label>
+
+                             <label style="text-align:left; width:75px;">
+                                 <input type="radio" name="Destiny" id="DestinyColumnRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Column checked="checked">
+                                 @Sentry.data.Core.GlobalEnums.DaleDestiny.Column
+                             </label>
+
+                         </span>
+
+                     </span>
+
+                     @if (Model.CanDaleSensitiveView)
+                     {
+                         <span style="align-items: flex-end;display: flex;">
+                             <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;margin-bottom: 4px;"></em>
+                             <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500;">Show Sensitive Columns</a>
+                         </span>
+                     }
+                     else
+                     {
+                         <span style="align-items: flex-end;display: flex;" data-toggle="tooltip" data-placement="top" title="Please request the App_DATA_DINV_Sens_View entitlement via MyAccess to view sensitive column information on the Data Inventory site.">
+                             <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;margin-bottom: 4px;"></em>
+                             <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500; pointer-events:none;">Show Sensitive Columns</a>
+                         </span>
+                     }
+
+                 </div>
 
              </div>
+
+         </div>
+
+
+         @*MAIN RIGHT PORTION OF SCREEN*@
+         <div class="col-xs-2" style="margin-top: -5px;" data-toggle="tooltip" data-placement="top" title="Save IsSensitive changes.">
+             <button type="button" class="pull-right" id="btnSaveMe" style="width:200px; height:70px; background-color:#00a3e0; border-color:#00a3e0;color:ghostwhite;font-size: xx-large;margin-right: 100px;margin-top: 40px;">Save</button>
+         </div>
+
+
+     </div>
   </div>
 
-        @*result row here obeys container-fluid from layout so it can grow to max width*@
-        <div class="dale-result-row">
-            <div>
-                @Html.Partial("~/Views/Dale/DaleResult.cshtml")
-            </div>
+@*result row here obeys container-fluid from layout so it can grow to max width*@
+<div class="dale-result-row">
+    <div>
+        @Html.Partial("~/Views/Dale/DaleResult.cshtml")
+    </div>
 
-        </div>
-
-
+</div>
 
 
-        @section Scripts {
-            @Scripts.Render("~/bundles/dataTables")
-            <script type="text/javascript">
 
-                $(function () {
-                    data.Dale.init();
-                });
 
-            </script>
-        }
+@section Scripts 
+{
+    @Scripts.Render("~/bundles/dataTables")
+    <script type="text/javascript">
+
+        $(function () {
+            data.Dale.init();
+        });
+
+    </script>
+}
