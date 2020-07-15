@@ -24,6 +24,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
         [Description("Google Api")]
         GoogleApi = 9,
         [Description("ClaimIQ")]
-        ClaimIq = 10
+        ClaimIq = 10,
+        [Description("Fixed Width")]
+        FixedWidth = 11
     }
 }

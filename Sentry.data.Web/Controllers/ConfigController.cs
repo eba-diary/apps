@@ -1660,6 +1660,7 @@ namespace Sentry.data.Web.Controllers
                     model.IsFixedWidth = false;
                     break;
                 case "FIXEDWIDTH":
+                    model.IsPositional = true;
                     model.IsFixedWidth = true;
                     break;
                 case "JSON":
