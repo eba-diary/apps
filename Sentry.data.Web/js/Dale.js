@@ -14,12 +14,6 @@
             dataType: 'json',
             success: function (obj) {
                 data.Dale.dataTablCreate(obj);
-            },
-            failure: function () {
-                alert('Error getting Edit Permissions');
-            },
-            error: function () {
-                alert('Error getting Edit Permissions');
             }
         });
     },
