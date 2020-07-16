@@ -5,7 +5,6 @@
 
     init: function ()
     {
-        
         localStorage.clear();                                                           // Clear all items in our array
 
         //init GRID based on User Security
@@ -60,7 +59,7 @@
                         //the below code is a way to not have to repeat the html checkbox creation below because it can be disabled or checked based on whether they can edit or if its IsSensitive
                         var disabled = '';
                         var checked = '';
-                        var cellValue = 'false'
+                        var cellValue = 'false';
 
                         if (!canDaleSensitiveEdit) {
                             disabled = ' disabled="disabled" ';
@@ -101,7 +100,7 @@
             buttons:
                 [
                     { extend: 'colvis', text: 'Columns' },
-                    { extend: 'csv', text: 'Download' },
+                    { extend: 'csv', text: 'Download' }
                 ]
         });
 
@@ -133,7 +132,7 @@
         data.Dale.setupClickAttack();
 
         //setup onChange event to fire when a checkbox is changed.  This will update internal array for user to save later
-        $('#daleResultsTable tbody').on('change', '.IsSensitive input', function (event) {                                          //filter down to '.IsSensitive' class and child of that which is 'input' which gets you too checkbox
+        $('#daleResultsTable tbody').on('change', '.IsSensitive input', function () {                                                //filter down to '.IsSensitive' class and child of that which is 'input' which gets you too checkbox
             var cellClicked = $(this).closest('td');                                                                                //get which cell is clicked too use later to figure out rowIndex,rowData,columnIndex
             var columnValue = this.checked;                                                                                         //determine if checkbox is checked or not
 
@@ -155,7 +154,7 @@
         //UPDATE INTERNAL DATATABLE DATA WHICH IS USED FOR FILTERING
         table
             .row(rowIndex)                  //pick which row to adjust
-            .data(rowData)                  //supply updated data for grid row, NEED THIS FOR FILTERING!!!!!!! if we dont refresh rowData, then filtering will think its old values, even in the case of the checkboxes, what this update does is update the label associated with it
+            .data(rowData);                 //supply updated data for grid row, NEED THIS FOR FILTERING!!!!!!! if we dont refresh rowData, then filtering will think its old values, even in the case of the checkboxes, what this update does is update the label associated with it
 
         //STYLE ROW BASED ON BEING EDITED OR NOT (add/remove class that makes it RED if they are changing)
         if (edit) {
@@ -178,7 +177,7 @@
     editArray: function (rowIndex, rowData, columnIndex, columnValue) {
 
         //IsSensitive Cell Check
-        if (columnIndex == 6) {
+        if (columnIndex === 6) {
 
             var edit = true;
             rowData.IsSensitive = columnValue;                                                                          //flip IsSensitive
