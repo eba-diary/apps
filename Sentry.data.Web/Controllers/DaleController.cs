@@ -10,7 +10,7 @@ using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
 {
-
+    
     public class DaleController : BaseController
     {
         private readonly IEventService _eventService;
@@ -160,5 +160,18 @@ namespace Sentry.data.Web.Controllers
         {
             return Json(CanDaleSensitiveEdit(), JsonRequestBehavior.AllowGet);
         }
+
+        [HttpPost]
+        public void UpdateIsSensitive(List<DaleSensitiveModel> listMe)
+        {
+
+            int i = 1;
+
+            //go through listMe and add each row of data by passing a single row to the provider which just does an update statement
+        }
+
+
+
+
     }
 }

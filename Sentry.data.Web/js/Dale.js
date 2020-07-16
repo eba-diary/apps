@@ -16,6 +16,26 @@
                 data.Dale.dataTablCreate(obj);
             }
         });
+
+        //SAVE BUTTON onCLICK
+        $("#btnSaveMe").on('click', function () {
+
+            var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                      //get stored object array
+
+            //Send the JSON array to Controller using AJAX.
+            $.ajax({
+                type: "POST",
+                url: "/Dale/UpdateIsSensitive",
+                data: JSON.stringify(sensitiveList),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (r) {
+                    
+                }
+            });
+
+        });
+
     },
 
     dataTablCreate: function (canDaleSensitiveEdit) {
@@ -48,7 +68,7 @@
                 //Since I did not want user to see label text and still have a filter.  My cheat to this was to style label with display:none while still keeping the filtering ability
                 //later on when they check/uncheck the box my editRow() function will refresh the data associated with the grid which changes the label hidden text to the opposite so filtering can refresh
                 {
-                    data: null, className: "IsSensitive", visible: false, render: function (d) {
+                    data: null, className: "IsSensitive", render: function (d) {
 
                         //the below code is a way to not have to repeat the html checkbox creation below because it can be disabled or checked based on whether they can edit or if its IsSensitive
                         var disabled = '';
