@@ -87,14 +87,14 @@
                      @if (Model.CanDaleSensitiveView)
                      {
                          <span style="align-items: flex-end;display: flex;">
-                             <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;margin-bottom: 4px;"></em>
+                             <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;margin-bottom: 4px; margin-right:1px;"></em>
                              <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500;">Show Sensitive Columns</a>
                          </span>
                      }
                      else
                      {
-                         <span style="align-items: flex-end;display: flex;" data-toggle="tooltip" data-placement="top" title="Please request the App_DATA_DINV_Sens_View entitlement via MyAccess to view sensitive column information on the Data Inventory site.">
-                             <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;margin-bottom: 4px;"></em>
+                         <span style="align-items: flex-end;display: flex;" data-toggle="tooltip" data-placement="right" title="Please request the App_DATA_DINV_Sens_View entitlement via MyAccess to view sensitive column information on the Data Inventory site.">
+                             <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;margin-bottom: 4px; margin-right:1px;"></em>
                              <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500; pointer-events:none;">Show Sensitive Columns</a>
                          </span>
                      }

@@ -8,10 +8,7 @@
         
         localStorage.clear();                                                           // Clear all items in our array
 
-        
-
-        
-        //first thing is to figure out if they have the access to edit sensitive which changes grid values
+        //init GRID based on User Security
         $.ajax({                                                                        
             url: "/Dale/GetCanDaleSensitiveEdit/",
             method: "GET",
@@ -34,7 +31,7 @@
         $("#daleResultsTable").DataTable({
 
             //client side setup
-            pageLength: 10,
+            pageLength: 100,
 
             ajax: {
                 url: "/Dale/GetSearchResultsClient/",
@@ -58,7 +55,7 @@
                 //Since I did not want user to see label text and still have a filter.  My cheat to this was to style label with display:none while still keeping the filtering ability
                 //later on when they check/uncheck the box my editRow() function will refresh the data associated with the grid which changes the label hidden text to the opposite so filtering can refresh
                 {
-                    data: null, className: "IsSensitive", render: function (d) {
+                    data: null, className: "IsSensitive", visible: false, render: function (d) {
 
                         //the below code is a way to not have to repeat the html checkbox creation below because it can be disabled or checked based on whether they can edit or if its IsSensitive
                         var disabled = '';
@@ -105,18 +102,6 @@
                 [
                     { extend: 'colvis', text: 'Columns' },
                     { extend: 'csv', text: 'Download' },
-
-                    //create my own custom button, problem here is attr doesn't work with out version of buttons
-                    //{
-                    //   text: 'Save',
-                    //    attr: {
-                    //        id: 'SaveMeButton'
-                    //    },
-                    //    action: function (e, dt, node, config)
-                    //    {
-                    //        //data.Dale.editPage();
-                    //    }
-                    //}
                 ]
         });
 
@@ -219,7 +204,6 @@
                 else {
                     sensitiveList.push(o);                                                                              //add new item
                 }
-
             }
 
             if (sensitiveList.length > 0) {
