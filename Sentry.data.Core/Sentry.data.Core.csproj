@@ -120,6 +120,7 @@
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
     <Compile Include="DTO\Dale\DaleSearchDto.cs" />
     <Compile Include="DTO\Dale\DaleResultDto.cs" />
+    <Compile Include="DTO\Dale\DaleSensitiveDto.cs" />
     <Compile Include="DTO\DataProcessing\CompressionJobDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDto.cs" />
