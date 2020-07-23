@@ -1,12 +1,18 @@
 ﻿BEGIN TRAN 
 	BEGIN TRY 
 		DECLARE	@Bucket VARCHAR(255)		
-		if @@SERVERNAME like '%' + 'FIT-N' + '%'  AND DB_NAME() like '%_NR'
-			SET @Bucket = 'sentry-dataset-management-np-nr'
-		else if (@@SERVERNAME like 'FIT-N' + '%' AND DB_NAME() not like '%_NR')
-			SET @Bucket = 'sentry-dataset-management-np'
+		if @@SERVERNAME like '%' + 'FIT-N' + '%' + '11'  AND DB_NAME() like '%_NR'
+			SET @Bucket = 'sentry-data-nrtest-dataset-ae2'
+		else if (@@SERVERNAME like 'FIT-N' + '%' + '12' AND DB_NAME() like '%_NR')
+			SET @Bucket = 'sentry-data-nrdev-dataset-ae2'
+		else if (@@SERVERNAME like 'FIT-N' + '%' + '12' AND DB_NAME() not like '%_NR')
+			SET @Bucket = 'sentry-data-dev-dataset-ae2'
+		else if (@@SERVERNAME like 'FIT-N' + '%' + '11' AND DB_NAME() not like '%_NR')
+			SET @Bucket = 'sentry-data-test-dataset-ae2'
+		else if ((@@SERVERNAME like 'FIT-N' + '%' + '10' OR @@SERVERNAME like 'FIT-N' + '%' + '20') AND DB_NAME() not like '%_NR')
+			SET @Bucket = 'sentry-data-qual-dataset-ae2'
 		else
-			SET @Bucket = 'sentry-dataset-management'
+			SET @Bucket = 'sentry-data-prod-dataset-ae2'
 		
 		
 
