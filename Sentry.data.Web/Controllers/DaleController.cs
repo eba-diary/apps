@@ -145,12 +145,14 @@ namespace Sentry.data.Web.Controllers
 
         private bool CanDaleSensitiveEdit()
         {
-            if (!SharedContext.CurrentUser.CanDaleSensitiveEdit)
+            if( (_featureFlags.Dale_Expose_EditSensitive_CLA_2025.GetValue() && SharedContext.CurrentUser.CanDaleSensitiveEdit)
+                || SharedContext.CurrentUser.IsAdmin
+              )
             {
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         
