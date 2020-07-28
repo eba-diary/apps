@@ -59,7 +59,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Precision);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT, dto.Precision);
         }
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Can_Default_Null_dscprecision_From_DecimalFieldDto_Json_Constructor__Array()
@@ -85,7 +85,7 @@ namespace Sentry.data.Core.Tests
             DecimalFieldDto dto = new DecimalFieldDto(prop, false);
 
             Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Precision);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT, dto.Precision);
         }
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Can_Default_NonExistent_dscprecision_From_DecimalFieldDto_Json_Constructor()
@@ -109,7 +109,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Precision);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT, dto.Precision);
         }
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Can_Default_NonExistent_dscprecision_From_DecimalFieldDto_Json_Constructor__Array()
@@ -137,7 +137,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Precision);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT, dto.Precision);
         }
         #endregion
         #region DecimalFieldDto Scale Tests
@@ -187,7 +187,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Scale);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT, dto.Scale);
         }
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Can_Default_Null_dscscale_From_DecimalFieldDto_Json_Constructor__Array() 
@@ -213,7 +213,7 @@ namespace Sentry.data.Core.Tests
             DecimalFieldDto dto = new DecimalFieldDto(prop, false);
 
             Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Scale);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT, dto.Scale);
         }
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Can_Default_NonExistent_dscscale_From_DecimalFieldDto_Json_Constructor()
@@ -236,7 +236,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Scale);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT, dto.Scale);
         }
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Can_Default_NonExistent_dscscale_From_DecimalFieldDto_Json_Constructor__Array()
@@ -263,7 +263,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Scale);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT, dto.Scale);
         }
         #endregion
         #region DecimalFieldDto SourceFormat Tests
@@ -772,7 +772,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Length);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, dto.Length);
         }
         [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
         public void Can_Default_Null_maxlength_From_VarcharFieldDto_Json_Constructor_Array()
@@ -800,7 +800,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Length);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, dto.Length);
         }
         [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
         public void Can_Default_NonExistent_maxlength_From_VarcharFieldDto_Json_Constructor()
@@ -823,7 +823,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Precision);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, dto.Length);
         }
         [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
         public void Can_Default_NonExistent_maxlength_From_VarcharFieldDto_Json_Constructor_Array()
@@ -849,7 +849,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.Precision);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, dto.Length);
         }
 
         /*********End __VarcharFieldDto Length Tests************/
@@ -1090,7 +1090,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.IsNull(dto.SourceFormat);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.DATE_DEFAULT, dto.SourceFormat);
         }
         [TestMethod, TestCategory("DateFieldDto JsonContructor")]
         public void Can_Default_Null_dscformat_From_DateFieldDto_Constructor__Array()
@@ -1119,7 +1119,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.IsNull(dto.SourceFormat);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.DATE_DEFAULT, dto.SourceFormat);
         }
         [TestMethod, TestCategory("DateFieldDto JsonContructor")]
         public void Can_Default_NonExistent_dscformat_From_DateFieldDto_Constructor()
@@ -1143,7 +1143,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.IsNull(dto.SourceFormat);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.DATE_DEFAULT, dto.SourceFormat);
         }
         [TestMethod, TestCategory("DateFieldDto JsonContructor")]
         public void Can_Default_NonExistent_dscformat_From_DateFieldDto_Constructor__Array()
@@ -1171,7 +1171,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.IsNull(dto.SourceFormat);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.DATE_DEFAULT, dto.SourceFormat);
         }
         #endregion
 
@@ -1304,7 +1304,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.IsNull(dto.SourceFormat);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT, dto.SourceFormat);
         }
         [TestMethod, TestCategory("TimestampFieldDto JsonContructor")]
         public void Can_Default_Null_dscformat_From_TimestampFieldDto_Constructor__Array()
@@ -1333,7 +1333,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.IsNull(dto.SourceFormat);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT, dto.SourceFormat);
         }
         [TestMethod, TestCategory("TimestampFieldDto JsonContructor")]
         public void Can_Default_NonExistent_dscformat_From_TimestampFieldDto_Constructor()
@@ -1357,7 +1357,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.IsNull(dto.SourceFormat);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT, dto.SourceFormat);
         }
         [TestMethod, TestCategory("TimestampFieldDto JsonContructor")]
         public void Can_Default_NonExistent_dscformat_From_TimestampFieldDto_Constructor__Array()
@@ -1385,7 +1385,7 @@ namespace Sentry.data.Core.Tests
 
             //Assertion
             Assert.IsNotNull(dto);
-            Assert.IsNull(dto.SourceFormat);
+            Assert.AreEqual(GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT, dto.SourceFormat);
         }
         #endregion
 
