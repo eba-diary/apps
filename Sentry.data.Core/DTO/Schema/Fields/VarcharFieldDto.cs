@@ -73,7 +73,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             BaseField newEntityField = new VarcharField()
             {
                 //Apply defaults if neccessary
-                FieldLength = (this.Length == 0) ? 8000 : this.Length
+                FieldLength = (this.Length == 0) ? GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT : this.Length
             };
             base.ToEntity(newEntityField, parentField, parentRevision);
             return newEntityField;

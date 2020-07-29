@@ -1,17 +1,10 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Entities.S3;
 using Sentry.data.Core.Interfaces.DataProcessing;
+using StructureMap;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StructureMap;
-using Sentry.data.Core.Entities.DataProcessing;
-using Sentry.data.Core.Entities.DataProcessing.Actions;
-using System.Reflection;
-using Newtonsoft.Json;
-using Sentry.Common.Logging;
-using Sentry.data.Core.Entities.S3;
 
 namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
 {
@@ -119,6 +112,9 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
                     break;
                 case DataActionType.ClaimIq:
                     _provider = container.GetInstance<IClaimIQActionProvider>();
+                    break;
+                case DataActionType.FixedWidth:
+                    _provider = container.GetInstance<IFixedWidthProvider>();
                     break;
                 case DataActionType.None:
                 default:

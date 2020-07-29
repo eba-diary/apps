@@ -1,17 +1,16 @@
-﻿using StructureMap;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.S3;
-using Sentry.Common.Logging;
 using Sentry.data.Core.Interfaces.DataProcessing;
+using StructureMap;
+using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Diagnostics;
-using Newtonsoft.Json;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
@@ -173,12 +172,13 @@ namespace Sentry.data.Infrastructure
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_ZIP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_GZIP_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) || 
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CONVERT_TO_PARQUET_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_MAP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.GOOGLEAPI_PREPROCESSING_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CLAIMIQ_PREPROCESSING_PREFIX))
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CLAIMIQ_PREPROCESSING_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.FIXEDWIDTH_PREPROCESSING_PREFIX))
             {
                 int idx = GetNthIndex(key, '/', 4);
                 filePrefix = key.Substring(0, (idx + 1));
@@ -210,7 +210,8 @@ namespace Sentry.data.Infrastructure
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_MAP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.GOOGLEAPI_PREPROCESSING_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CLAIMIQ_PREPROCESSING_PREFIX))
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CLAIMIQ_PREPROCESSING_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.FIXEDWIDTH_PREPROCESSING_PREFIX))
             {
                 int strtIdx = GetNthIndex(key, '/', 4);
                 int endIdx = GetNthIndex(key, '/', 5);

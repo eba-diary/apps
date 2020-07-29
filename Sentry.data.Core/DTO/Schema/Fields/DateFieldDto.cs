@@ -64,9 +64,12 @@ namespace Sentry.data.Core.DTO.Schema.Fields
         {
             BaseField newEntityField = new DateField()
             {
-                //Apply defaults if neccessaryS
+                //Apply defaults if neccessary
                 SourceFormat = (string.IsNullOrWhiteSpace(this.SourceFormat)) ? GlobalConstants.Datatypes.Defaults.DATE_DEFAULT : this.SourceFormat
             };
+
+            newEntityField.FieldLength = ((DateField)newEntityField).SourceFormat.Length;
+
             base.ToEntity(newEntityField, parentField, parentRevision);
             return newEntityField;
         }
