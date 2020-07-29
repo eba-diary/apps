@@ -736,11 +736,12 @@ namespace Sentry.data.Core
             }
         }
 
-        public void Validate(List<BaseFieldDto> fieldDtoList)
+        public void Validate(int schemaId, List<BaseFieldDto> fieldDtoList)
         {
+            FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
             ValidationResults errors = new ValidationResults();
-            
-            errors.MergeInResults(Validate(null, fieldDtoList));
+
+            errors.MergeInResults(Validate(schema, fieldDtoList));
 
             if (!errors.IsValid())
             {
@@ -751,7 +752,7 @@ namespace Sentry.data.Core
         private ValidationResults Validate(FileSchema scm, List<BaseFieldDto> fieldDtoList)
         {
             ValidationResults results = new ValidationResults();
-            foreach (BaseFieldDto fieldDto in fieldDtoList)
+            foreach(BaseFieldDto fieldDto in fieldDtoList)
             {
                 //Field name cannot be blank
                 if (string.IsNullOrWhiteSpace(fieldDto.Name))
@@ -809,11 +810,49 @@ namespace Sentry.data.Core
                     results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Scale ({fieldDto.Scale}) needs to be less than or equal to Precision ({fieldDto.Precision})");
                 }
 
+                results.MergeInResults(ValidateFieldtoFileSchema(scm, fieldDto));
+
                 if (fieldDto.ChildFields.Any())
                 {
-                    results.MergeInResults(Validate(null, fieldDto.ChildFields));
+                    results.MergeInResults(Validate(scm, fieldDto.ChildFields));
                 }
-            }           
+            }
+            return results;
+        }
+
+        private ValidationResults ValidateFieldtoFileSchema(FileSchema scm, BaseFieldDto fieldDto)
+        {
+            ValidationResults results = new ValidationResults();
+            string extension = scm.Extension.Name;
+            if (extension == "FIXEDWIDTH" && fieldDto.Length == 0)
+            {
+                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be greater than zero for FIXEDWIDTH schema");
+            }
+
+            if (extension == "FIXEDWIDTH" && fieldDto.FieldType == GlobalConstants.Datatypes.DECIMAL && fieldDto.Length != 0 && fieldDto.Length < fieldDto.Precision)
+            {
+                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be equal or greater than specified precision for FIXEDWIDTH schema");
+            }
+
+            if (extension == "FIXEDWIDTH" && (fieldDto.FieldType == GlobalConstants.Datatypes.TIMESTAMP || fieldDto.FieldType == GlobalConstants.Datatypes.DATE) && fieldDto.SourceFormat != null && fieldDto.Length < fieldDto.SourceFormat.Length)
+            {
+                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be equal or greater than specified format for FIXEDWIDTH schema");
+            }
+
+            if (extension == "FIXEDWIDTH" && (fieldDto.FieldType == GlobalConstants.Datatypes.TIMESTAMP) && fieldDto.SourceFormat == null && fieldDto.Length < GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT.Length)
+            {
+                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be equal or greater than default format length ({GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT.Length}) for FIXEDWIDTH schema");
+            }
+
+            if (extension == "FIXEDWIDTH" && (fieldDto.FieldType == GlobalConstants.Datatypes.DATE) && fieldDto.SourceFormat == null && fieldDto.Length < GlobalConstants.Datatypes.Defaults.DATE_DEFAULT.Length)
+            {
+                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be equal or greater than default format length ({GlobalConstants.Datatypes.Defaults.DATE_DEFAULT.Length}) for FIXEDWIDTH schema");
+            }
+
+            if (extension == "FIXEDWIDTH" && fieldDto.FieldType == GlobalConstants.Datatypes.VARCHAR && fieldDto.Length == 0)
+            {
+                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be equal or greater than specified precision for FIXEDWIDTH schema");
+            }
 
             return results;
         }

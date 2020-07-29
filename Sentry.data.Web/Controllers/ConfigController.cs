@@ -1353,7 +1353,7 @@ namespace Sentry.data.Web.Controllers
             {
                 List<BaseFieldDto> schemaRowsDto = schemaRows.ToDto();
 
-                _schemaService.Validate(schemaRowsDto);
+                _schemaService.Validate(schemaId, schemaRowsDto);
                 _schemaService.CreateAndSaveSchemaRevision(schemaId, schemaRowsDto, "blah");
 
             }
@@ -1371,16 +1371,16 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        [Route("Config/Schema/ValidateField")]
+        [Route("Config/Schema/{schemaId}/ValidateField")]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
-        public JsonResult ValidateField(SchemaRow schemaRow)
+        public JsonResult ValidateField(int schemaId, SchemaRow schemaRow)
         {
             try
             {
                 List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
                 dtoList.Add(schemaRow.ToDto(false));
 
-                _schemaService.Validate(dtoList);
+                _schemaService.Validate(schemaId, dtoList);
 
                 return Json(new { Success = true }, JsonRequestBehavior.AllowGet);
             }
@@ -1660,6 +1660,7 @@ namespace Sentry.data.Web.Controllers
                     model.IsFixedWidth = false;
                     break;
                 case "FIXEDWIDTH":
+                    model.IsPositional = true;
                     model.IsFixedWidth = true;
                     break;
                 case "JSON":

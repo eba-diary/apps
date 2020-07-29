@@ -247,9 +247,6 @@
                             <span>1234.56 = Precision:6  Scale:2</span>
                         </div>
                     </div>
-                    <div class="showVarcharLength col-lg-2" data-bind="visible: ShowVarcharLength">
-                        <input class="varcharlength col-lg-12" data-bind="value: Length" placeholder="default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
-                    </div>
 
                     <div class="showDateFormat col-lg-4" data-bind="visible: ShowDateFormat">
                         <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Not Specified (default is @dateDefault)" data-toggle="tooltip" data-placement="top" title="Format - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DATE_DEFAULT" />
@@ -262,6 +259,11 @@
                     <div class="showArray col-lg-2" data-bind="visible: $root.AllowArrays">
                         <label class="arrayLabel">IsArray?</label>
                         <input class="array col-lg-2" data-bind="checked: IsArray" type="checkbox" />
+                    </div>
+
+                    <div class="showLength col-lg-2" data-bind="visible: ShowFieldLength">
+                        <input class="fieldlength col-lg-12" data-bind="visible: ShowFieldLength && DataType() === 'VARCHAR', value: Length" placeholder="default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
+                        <input class="fieldlength col-lg-12" data-bind="visible: ShowFieldLength && DataType() !== 'VARCHAR', value: Length" placeholder="Specify length" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
                     </div>
 
                     <div class="options col-lg-4">
@@ -408,10 +410,14 @@
 
                 var a = JSON.stringify(ko.toJS(self), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd', 'IsArray', 'FieldGuid', 'Length']);
 
+                var url_parts = window.location.href.replace(/\/\s*$/, '').split('/');
+                //since we do not need example.com
+                url_parts.shift();
+
                 //ajax
                 $.ajax({
                     type: "POST",
-                    url: "/Config/Schema/ValidateField",
+                    url: "/Config/Schema/" + url_parts[5] + "/ValidateField",
                     data: a,
                     dataType: "json",
                     contentType: "application/json",
@@ -458,6 +464,10 @@
                 });
             }
 
+            self.ShowFixed = ko.computed(function () {
+                return parent.IsFixedWidth();
+            });
+
             self.ShowPandS = ko.computed(function () {
                 if (self.DataType() === 'DECIMAL') {
                     return true;
@@ -494,7 +504,16 @@
                 }
             });
 
-            self.ShowVarcharLength = ko.computed(function () {
+            self.ShowFieldLength = ko.computed(function () {
+                if (self.ShowFixed() || self.DataType() === 'VARCHAR') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            })
+
+            self.ShowVarcharLengthDescription = ko.computed(function () {
                 if (self.DataType() === 'VARCHAR') {
                     return true;
                 }
@@ -510,10 +529,6 @@
                 else {
                     return false;
                 }
-            });
-
-            self.ShowFixed = ko.computed(function () {
-                return parent.IsFixedWidth;
             });
 
             self.ShowPositional = ko.computed(function () {
@@ -619,6 +634,8 @@
                     }
                 });
             }
+
+            self.UpdateRow();
         };
 
         function ValidDataType(item) {
@@ -631,6 +648,7 @@
         var viewModel = function (incomingJson) {
             var self = this;
 
+            
             //Observables
             //self.ErrorsCopy = ko.observableArray();
             self.Errors = ko.observableArray().extend({ notify: 'always' });
@@ -642,13 +660,14 @@
             self.HiveDatabaseName = ko.observable(incomingJson.HiveDatabaseName);
             self.HiveTableName = ko.observable(incomingJson.HiveTableName);
             self.FileExtensionId = incomingJson.FileExtension;
+            self.AllowArrays = ko.observable();
+
             self.Rows = ko.observableArray(ko.utils.arrayMap(incomingJson.rows, function (rowInfo) {
                 currentMax++;
                 return new Row(currentMax, rowInfo, self, 0);
             }));
             self.RowCount = ko.observable(incomingJson.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
             self.FileExtensionName = ko.observable(incomingJson.FileExtensionName);
-            self.AllowArrays = ko.observable();
 
             self.Errors.subscribe(function () { self.ShowHideSaveButton() });
             self.ShowHideSaveButton = function () {
@@ -753,7 +772,7 @@
 
             self.SortRows = function () {
                 newVal = 0;
-                $('.parentContainer').each(function (index) {
+                $('.schemaRowContainer').each(function (index) {
                     var httpItem = $(this).children().children().children().children('input[name="dataObjectField_Id"]').val();
                     var match = ko.utils.arrayFirst(self.SortedRows(), function (item) {
                         if (item.DataObjectField_ID() == httpItem && item.Position() != index + 1) {
@@ -761,9 +780,7 @@
                         }
                     })
                 })
-            }
-
-
+            }            
 
             $.ajax({
                 type: "GET",
@@ -779,6 +796,7 @@
                 },
                 async: false
             });
+            
         };
 
         var initialData = [

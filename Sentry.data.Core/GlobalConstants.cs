@@ -296,6 +296,7 @@
             public const string UNCOMPRESS_GZIP_PREFIX = TEMP_FILE_PREFIX + "uncompressgzip/";
             public const string GOOGLEAPI_PREPROCESSING_PREFIX = TEMP_FILE_PREFIX + "googleapipreprocessing/";
             public const string CLAIMIQ_PREPROCESSING_PREFIX = TEMP_FILE_PREFIX + "claimiqpreprocessing/";
+            public const string FIXEDWIDTH_PREPROCESSING_PREFIX = TEMP_FILE_PREFIX + "fixedwidthpreprocessing/";
         }
 
         public static class DataFlowStepEvent
@@ -310,6 +311,7 @@
             public const string UNCOMPRESS_GZIP_START = "DATAFLOWSTEP_UNCOMPRESSGZIP_START";
             public const string GOOGLEAPI_PREPROCESSING_START = "DATAFLOWSTEP_GOOGLEAPIPREPROCESSING_START";
             public const string CLAIMIQ_PREPROCESSING_START = "DATAFLOWSTEP_CLAIMIQPREPROCESSING_START";
+            public const string FIXEDWIDTH_PREPROCESSING_START = "DATAFLOWSTEP_FIXEDWIDTH_START";
         }
 
         public static class AWSEventNotifications

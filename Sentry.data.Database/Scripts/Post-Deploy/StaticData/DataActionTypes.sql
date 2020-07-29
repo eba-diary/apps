@@ -11,7 +11,8 @@
 		  (7,	'Uncompress Gzip'),
 		  (8,	'Schema Map'),
 		  (9,	'Google Api'),
-		  (10,	'ClaimIQ')
+		  (10,	'ClaimIQ'),
+		  (11,	'Fixed Width')
         )
         AS Source ([ID], [Name])
         ON Target.[ID] = Source.[ID]   

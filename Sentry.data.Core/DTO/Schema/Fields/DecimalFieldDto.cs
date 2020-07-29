@@ -29,7 +29,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             {
                 Precision = GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT;
             }
-            else if(Int32.TryParse(row.Precision, out int p))
+            else if(!Int32.TryParse(row.Precision, out int p))
             {
                 results.Add(OrdinalPosition.ToString(), $"({Name}) DECIMAL Precision must be integer between 1 and 38");
             }
@@ -44,7 +44,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             {
                 Scale = GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT;
             }
-            else if (Int32.TryParse(row.Precision, out int p))
+            else if (!Int32.TryParse(row.Scale, out int p))
             {
                 results.Add(OrdinalPosition.ToString(), $"({Name}) DECIMAL Scale must be integer between 1 and 38");
             }
