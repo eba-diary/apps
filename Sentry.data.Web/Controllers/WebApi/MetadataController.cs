@@ -263,7 +263,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 List<BaseFieldDto> schemarows_v2 = new List<BaseFieldDto>();
                 schema_v3.ToDto(schemarows_v2);
 
-                _schemaService.Validate(schemarows_v2);
+                _schemaService.Validate(schemaId, schemarows_v2);
 
                 int savedRevisionId = _schemaService.CreateAndSaveSchemaRevision(schemaId, schemarows_v2, revisionName, schema_v3.ToJson());
 
