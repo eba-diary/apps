@@ -12,7 +12,7 @@
 		else if ((@@SERVERNAME like 'FIT-N' + '%' + '10' OR @@SERVERNAME like 'FIT-N' + '%' + '20') AND DB_NAME() not like '%_NR')
 			SET @Bucket = 'sentry-data-qual-dataset-ae2'
 		else
-			SET @Bucket = 'sentry-data-prod-dataset-ae2'
+			SET @Bucket = 'sentry-dataset-management'
 		
 		
 
