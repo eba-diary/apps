@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data.SqlClient;
 using Sentry.data.Core;
 using Sentry.Common.Logging;
 using Sentry.data.Core.GlobalEnums;
+using System.Diagnostics;
 
 namespace Sentry.data.Infrastructure
 {
@@ -25,7 +23,11 @@ namespace Sentry.data.Infrastructure
             string connectionString = Configuration.Config.GetHostSetting("DaleConnectionString");
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                SqlCommand command = new SqlCommand(BuildAQuery(dto), connection);
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
+               
+                string q = BuildAQuery(dto);
+                SqlCommand command = new SqlCommand(q, connection);
                 command.CommandTimeout = 0;
 
                 command.Parameters.AddWithValue("@Criteria", System.Data.SqlDbType.VarChar);
@@ -36,7 +38,6 @@ namespace Sentry.data.Infrastructure
                     connection.Open();
                     SqlDataReader reader = command.ExecuteReader();
 
-                    int i = 0;
                     while (reader.Read())
                     {
                         daleResults.Add(CreateDaleResultDto(reader));
@@ -46,9 +47,15 @@ namespace Sentry.data.Infrastructure
                 }
                 catch (Exception ex)
                 {
-                    Logger.Fatal("Failed to Ask Dale a question", ex);
+                    Logger.Fatal("Dale Failed!!  Query: " + q, ex);
                 }
+
+                stopWatch.Stop();
+                TimeSpan ts = stopWatch.Elapsed;
+                Logger.Info("Dale Provider Query: Row Count:" + daleResults.Count + " Elapsed Time:" + ts.Seconds + " seconds.");
             }
+
+
 
             return daleResults;
         }
@@ -57,7 +64,7 @@ namespace Sentry.data.Infrastructure
         {
             string q = String.Empty;
             string qSelect = "SELECT Asset_CDE, Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM,Alias_NME,Prod_Typ,BaseColumn_ID,IsSensitive_FLG ";
-            string qFrom = "FROM Column_v ";
+            string qFrom = (dto.Sensitive == DaleSensitive.SensitiveOnly)? "FROM ColumnSensitivityCurrent_v " : "FROM Column_v ";
             string qWhereStatement = BuildAWhere(dto);
 
             q = qSelect + qFrom + qWhereStatement;
@@ -93,9 +100,9 @@ namespace Sentry.data.Infrastructure
                 {
                     qWhereStatement += " AND IsSensitive_FLG = 0 ";
                 }
-            }
 
-            qWhereStatement += " AND Expiration_DTM IS NULL";
+                qWhereStatement += " AND Expiration_DTM IS NULL";
+            }
 
             return qWhereStatement;
         }

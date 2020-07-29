@@ -743,16 +743,6 @@ namespace Sentry.data.Core
 
             errors.MergeInResults(Validate(schema, fieldDtoList));
 
-            //foreach(BaseFieldDto dto in fieldDtoList)
-            //{
-            //    errors.MergeInResults(Validate(schema, dto));
-
-            //    if (dto.ChildFields.Any())
-            //    {
-            //        foreach(BaseFieldDto)
-            //    }
-            //}
-
             if (!errors.IsValid())
             {
                 throw new ValidationException(errors);
