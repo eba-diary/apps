@@ -402,12 +402,6 @@
             self.Length.subscribe(      function () { self.UpdateRow() });
 
             self.UpdateRow = function () {
-                //alert("Row #" + self.Position() + " has updated its Name field.")
-
-                if (parentRecord != undefined) {
-                    parentRecord.UpdateRow();
-                }
-
                 var a = JSON.stringify(ko.toJS(self), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd', 'IsArray', 'FieldGuid', 'Length']);
 
                 var url_parts = window.location.href.replace(/\/\s*$/, '').split('/');
@@ -614,6 +608,8 @@
                 if (parentvm.Errors !== undefined && parentvm.Errors().length === 0) {
                     $('#saveBtn').show();
                 }
+
+                self.UpdateRow();
             };
 
             self.removeChildren = function () {
