@@ -1,9 +1,4 @@
-﻿.dale-search-row {
-    margin-left: 80px;
-    margin-right: 70px; 
-}
-
-.dale-result-row {
+﻿.dale-result-row {
     margin-left: 100px;
     margin-right: 100px; 
 }
@@ -61,4 +56,8 @@ table.dataTable thead .sorting_desc_disabled {
 .tooltip.in {
     filter: alpha(opacity=90);
     opacity: .4;
+}
+
+.dale-clicked {
+    color: red;
 }

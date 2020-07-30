@@ -10,7 +10,5 @@
             }
             set => FieldType = SchemaDatatypes.VARCHAR;
         }
-
-        public virtual int FieldLength { get; set; }
     }
 }

@@ -26,6 +26,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property((x) => x.NullableIndicator, (m) => m.Column("NullableIndicator"));
             Property((x) => x.FieldGuid, (m) => m.Column("FieldGuid"));
             Property((x) => x.Description, (m) => m.Column("Description"));
+            Property(x => x.FieldLength, m => m.Column("FieldLength"));
             Discriminator(x => x.Column("Type"));
 
             ManyToOne((x) => x.ParentField, (m) =>
@@ -111,8 +112,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             public VarcharFieldMapping()
             {
                 DiscriminatorValue("VARCHAR");
-
-                Property(x => x.FieldLength, m => m.Column("FieldLength"));
             }
         }
     }

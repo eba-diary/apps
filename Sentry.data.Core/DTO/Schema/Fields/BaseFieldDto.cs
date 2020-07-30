@@ -16,6 +16,8 @@ namespace Sentry.data.Core
             IsArray = field.IsArray;
             Description = field.Description;
             ChildFields = new List<BaseFieldDto>();
+            Length = field.FieldLength;
+            OrdinalPosition = field.OrdinalPosition;
         }
 
         public BaseFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, bool array)
@@ -41,6 +43,7 @@ namespace Sentry.data.Core
             Description = row.Description;
             ChildFields = new List<BaseFieldDto>();
             OrdinalPosition = row.Position;
+            Length = (Int32.TryParse(row.Length, out int x) ? x : 0);
         }
 
         public int FieldId { get; set; }
@@ -52,6 +55,7 @@ namespace Sentry.data.Core
         public bool DeleteInd { get; set; }
         public List<BaseFieldDto> ChildFields { get; set; }
         public bool IsArray { get; set; }
+        public bool HasChildren { get; set; }
 
 
         public abstract string FieldType { get; }
@@ -74,6 +78,8 @@ namespace Sentry.data.Core
             field.IsArray = IsArray;
             field.ParentField = parentField;
             field.ParentSchemaRevision = parentRevision;
+            field.FieldLength = Length;
+            field.OrdinalPosition = OrdinalPosition;
             if (FieldGuid == Guid.Empty)
             {
                 Guid g = Guid.NewGuid();
