@@ -294,5 +294,5 @@
             data.Dale.disableDale();
             daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
         });
-    }
+    }  
 };

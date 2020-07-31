@@ -1,16 +1,12 @@
 ﻿using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
-using Sentry.DataTables.Mvc;
-using Sentry.DataTables.QueryableAdapter;
-using Sentry.DataTables.Shared;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
 {
-    
+
     public class DaleController : BaseController
     {
         private readonly IEventService _eventService;
@@ -164,12 +160,12 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public void UpdateIsSensitive(List<DaleSensitiveModel> listMe)
+        public void UpdateIsSensitive(List<DaleSensitiveModel> models)
         {
 
-            int i = 1;
+            bool success = false;
 
-            //go through listMe and add each row of data by passing a single row to the provider which just does an update statement
+            success = _daleService.UpdateIsSensitive(models.ToDto());
         }
 
 

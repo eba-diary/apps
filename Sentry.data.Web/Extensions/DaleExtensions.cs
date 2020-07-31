@@ -85,5 +85,16 @@ namespace Sentry.data.Web
                 SensitiveInd = model.SensitiveInd
             };
         }
+
+        public static List<DaleSensitiveDto> ToDto(this List<DaleSensitiveModel> models)
+        {
+            List<DaleSensitiveDto> dtos = new List<DaleSensitiveDto>();
+
+            models.ForEach(x => dtos.Add(x.ToDto()));
+
+            return dtos;
+        }
+
+
     }
 }

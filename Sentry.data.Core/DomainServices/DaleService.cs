@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Sentry.Core;
-using Sentry.data.Core.GlobalEnums;
-using Sentry.Common.Logging;
+﻿using System.Collections.Generic;
+
 
 
 
@@ -26,6 +22,16 @@ namespace Sentry.data.Core
         {
             List<DaleResultDto> daleResults = _daleSearchProvider.GetSearchResults(dto);
             return daleResults;
+        }
+
+        public bool UpdateIsSensitive(List<DaleSensitiveDto> dtos)
+        {
+
+            bool b = false;
+            string sensitiveBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtos);
+            b = _daleSearchProvider.SaveSensitive(sensitiveBlob);
+            return b;
+            
         }
     }
 }
