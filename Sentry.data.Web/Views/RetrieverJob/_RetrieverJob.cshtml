@@ -29,7 +29,7 @@
                 <p>This is the Generic Data File Configuration that was created when the Dataset was created. Certain fields cannot be modified.</p>
             }
             <p><span class="schedule">@Model.Schedule</span></p>
-            <p>This retriever job is grabbing files from the following URL </p>
+            <p>We are watching for files within the following URL: </p>
             <p class="filePath" style="margin-left: 30px;">@Model.GetUri() </p>
 
             @if (Model.JobOptions != null)
@@ -57,11 +57,11 @@
             }
 
 
-            @if (Model.JobOptions.CompressionOptions != null)
+            @if (Model.JobOptions != null && Model.JobOptions.CompressionOptions != null)
             {
                 if (Model.JobOptions.CompressionOptions.IsCompressed)
                 {
-                    <p>This job is uncompressing @Model.JobOptions.CompressionOptions.CompressionType files.</p>
+                    <p>This job is uncompressing Model.JobOptions.CompressionOptions.CompressionType files.</p>
 
                     foreach (var fileName in Model.JobOptions.CompressionOptions.FileNameExclusionList)
                     {
@@ -74,7 +74,10 @@
             <p>Created on : @Model.Created</p>
             <p>Modified on : @Model.Modified</p>
 
-            <a class="btn btn-primary" href="/Config/@Model.DatasetConfig.ConfigId/Job/Edit/@Model.Id">Edit</a>
+            @if(@Model.DatasetConfig != null)
+            {
+                <a class="btn btn-primary" href="/Config/@Model.DatasetConfig.ConfigId/Job/Edit/@Model.Id">Edit</a>
+            }            
 
+            </div>
         </div>
-    </div>

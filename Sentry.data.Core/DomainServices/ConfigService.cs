@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Sentry.data.Core.Entities.DataProcessing;
 
 namespace Sentry.data.Core
 {
@@ -1118,6 +1119,25 @@ namespace Sentry.data.Core
             dto.DeleteInd = dfc.DeleteInd;
             dto.DeleteIssuer = dfc.DeleteIssuer;
             dto.DeleteIssueDTM = dfc.DeleteIssueDTM;
+        }
+
+        public Tuple<List<RetrieverJob>, List<DataFlowStepDto>> GetDataFlowDropLocationJobs(DatasetFileConfig config)
+        {
+            Tuple<List<RetrieverJob>, List<DataFlowStepDto>> jobTuple;
+            List<RetrieverJob> retrieverList = new List<RetrieverJob>();
+            List<DataFlowStepDto> stepList = new List<DataFlowStepDto>();
+            try
+            {
+                stepList = new List<DataFlowStepDto>() { _dataFlowService.GetS3DropStepForFileSchema(config.Schema) };                
+                retrieverList.Add(_datasetContext.RetrieverJob.FirstOrDefault(w => w.DataFlow.Id == stepList.First().DataFlowId));
+                jobTuple = new Tuple<List<RetrieverJob>, List<DataFlowStepDto>>(retrieverList, stepList);
+            }
+            catch (DataFlowStepNotFound)
+            {
+                jobTuple = new Tuple<List<RetrieverJob>, List<DataFlowStepDto>>(retrieverList, stepList);
+            }
+
+            return jobTuple;
         }
 
         public static Object TryConvertTo<T>(Object input)

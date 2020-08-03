@@ -96,7 +96,7 @@ namespace Sentry.data.Core
             return dataFlowName;
         }
 
-        public DataFlowStep GetS3DropStepForFileSchema(FileSchema scm)
+        public DataFlowStepDto GetS3DropStepForFileSchema(FileSchema scm)
         {
             if(scm == null)
             {
@@ -106,13 +106,16 @@ namespace Sentry.data.Core
             string schemaFlowName = GenerateDataFlowNameForFileSchema(scm);
             DataFlow flow = _datasetContext.DataFlow.Where(w => w.Name == schemaFlowName).FirstOrDefault();
             DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow == flow && w.DataAction_Type_Id == DataActionType.S3Drop).FirstOrDefault();
-
             if (step == null)
             {
                 throw new DataFlowStepNotFound();
             }
+            DataFlowStepDto stepDto = new DataFlowStepDto();
+            MapToDto(step, stepDto);
 
-            return step;
+            
+
+            return stepDto;
         }
 
         public DataFlow GetDataFlowByName(string schemaFlowName)
@@ -502,6 +505,7 @@ namespace Sentry.data.Core
             dto.ActionName = step.Action.Name;
             dto.TriggerKey = step.TriggerKey;
             dto.TargetPrefix = step.TargetPrefix;
+            dto.DataFlowId = step.DataFlow.Id;
         }
 
         private void MapToDtoList(List<DataFlowStep> steps, List<DataFlowStepDto> dtoList)

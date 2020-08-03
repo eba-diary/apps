@@ -142,5 +142,19 @@ namespace Sentry.data.Web
             }
             return model;
         }
+
+        public static DataFlowStepModel ToModel(this Core.DataFlowStepDto dto)
+        {
+            DataFlowStepModel model = new DataFlowStepModel()
+            {
+                Id = dto.Id,
+                ActionId = dto.ActionId,
+                ActionName = dto.ActionName,
+                ExecutionOrder = dto.ExeuctionOrder,
+                TriggetKey = dto.TriggerKey,
+                TargetPrefix = dto.TargetPrefix
+            };
+            return model;
+        }
     }
 }
