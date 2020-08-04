@@ -82,7 +82,7 @@ namespace Sentry.data.Web
             return new DaleSensitiveDto()
             {
                 BaseColumnId = model.BaseColumnId,
-                SensitiveInd = model.SensitiveInd
+                IsSensitive = model.IsSensitive
             };
         }
 

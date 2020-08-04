@@ -167,9 +167,5 @@ namespace Sentry.data.Web.Controllers
 
             success = _daleService.UpdateIsSensitive(models.ToDto());
         }
-
-
-
-
     }
 }

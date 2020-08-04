@@ -26,6 +26,7 @@
             $.ajax({
                 type: "POST",
                 url: "/Dale/UpdateIsSensitive",
+                traditional: true,
                 data: JSON.stringify(sensitiveList),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -33,7 +34,7 @@
                     
                 }
             });
-
+           
         });
 
     },
@@ -148,6 +149,12 @@
         //setup onChange event to fire when a checkbox is changed.  This will update internal array for user to save later
         $('#daleResultsTable tbody').on('change', '.IsSensitive input', function () {                                                //filter down to '.IsSensitive' class and child of that which is 'input' which gets you too checkbox
             var cellClicked = $(this).closest('td');                                                                                //get which cell is clicked too use later to figure out rowIndex,rowData,columnIndex
+            //var columnValue;
+            //if (this.checked === true)
+            //    columnValue = 'true';
+            //else
+            //    columnValue = 'false';
+
             var columnValue = this.checked;                                                                                         //determine if checkbox is checked or not
 
             var table = $('#daleResultsTable').DataTable();
