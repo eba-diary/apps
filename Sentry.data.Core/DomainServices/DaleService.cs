@@ -27,11 +27,12 @@ namespace Sentry.data.Core
         public bool UpdateIsSensitive(List<DaleSensitiveDto> dtos)
         {
 
-            bool b = false;
+            bool success = false;
+
             string sensitiveBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtos);
-            b = _daleSearchProvider.SaveSensitive(sensitiveBlob);
-            return b;
+            success = _daleSearchProvider.SaveSensitive(sensitiveBlob);
             
+            return success;
         }
     }
 }

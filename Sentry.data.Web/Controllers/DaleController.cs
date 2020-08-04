@@ -160,12 +160,20 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public void UpdateIsSensitive(List<DaleSensitiveModel> models)
+        public ActionResult UpdateIsSensitive(List<DaleSensitiveModel> models)
         {
-
             bool success = false;
 
             success = _daleService.UpdateIsSensitive(models.ToDto());
+
+            if(success)
+            {
+                return Json(new { success = true });
+            }
+            else
+            {
+                return Json(new { success = true });
+            }
         }
     }
 }

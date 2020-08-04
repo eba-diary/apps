@@ -31,7 +31,13 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (r) {
-                    
+                    data.Dale.resetAfterSave();
+                },
+                 failure: function () {
+                    alert('TODO: save failure');
+                },
+                error: function () {
+                    alert('TODO: save failure');
                 }
             });
            
@@ -149,12 +155,6 @@
         //setup onChange event to fire when a checkbox is changed.  This will update internal array for user to save later
         $('#daleResultsTable tbody').on('change', '.IsSensitive input', function () {                                                //filter down to '.IsSensitive' class and child of that which is 'input' which gets you too checkbox
             var cellClicked = $(this).closest('td');                                                                                //get which cell is clicked too use later to figure out rowIndex,rowData,columnIndex
-            //var columnValue;
-            //if (this.checked === true)
-            //    columnValue = 'true';
-            //else
-            //    columnValue = 'false';
-
             var columnValue = this.checked;                                                                                         //determine if checkbox is checked or not
 
             var table = $('#daleResultsTable').DataTable();
@@ -162,7 +162,10 @@
             var rowData = table.row(cellClicked).data();                                                                            //get whole row of data to use later
             var columnIndex = table.cell(cellClicked).index().columnVisible;                                                        //get columnIndex clicked
 
+
             data.Dale.editArray(rowIndex, rowData, columnIndex, columnValue);
+
+            
         });
 
     },
@@ -301,5 +304,30 @@
             data.Dale.disableDale();
             daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
         });
-    }  
+    },
+
+    
+    resetAfterSave: function () {
+
+        var table = $('#daleResultsTable').DataTable();
+        var rowsIndexes = table.rows('.dale-clicked').indexes();
+
+        var len = rowsIndexes.length;
+        for (i = 0; i < len; i++) {
+
+            var ri = rowsIndexes[i];
+
+            table
+                .rows(ri)                        //pick which row(s) to bring back
+                .nodes()                        //grab all TR nodes (rows) under the .rows selector above
+                .to$()                          //Convert to a jQuery object
+                .removeClass('dale-clicked');   //remove dale-clicked class                   
+        }
+
+        localStorage.clear();                                                           // Clear all items in our array
+        $('#btnSaveMe').hide();
+    }
+
+
+
 };

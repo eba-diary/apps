@@ -61,6 +61,8 @@ namespace Sentry.data.Infrastructure
 
         public bool SaveSensitive(string sensitiveBlob)
         {
+            bool success = true;
+
             string connectionString = Configuration.Config.GetHostSetting("DaleConnectionString");
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -83,7 +85,9 @@ namespace Sentry.data.Infrastructure
                 }
                 catch (Exception ex)
                 {
-                    Logger.Fatal("Dale Failed!!  Query: " + q, ex);
+                    success = false;
+                    Logger.Fatal("DaleSearchProvider.SaveSensitive() Failed!!  Query: " + q, ex);
+
                 }
 
                 stopWatch.Stop();
@@ -91,7 +95,7 @@ namespace Sentry.data.Infrastructure
                 Logger.Info("DaleSearchProvider.SaveSensitive()  Row Count:" + rowsAffected + " Elapsed Seconds:" + ts.Seconds + " Query:" + q);
             }
 
-            return true;
+            return success;
         }
 
         private string BuildAQuery(DaleSearchDto dto)
