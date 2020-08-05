@@ -1,15 +1,68 @@
 ﻿using Newtonsoft.Json;
+using Sentry.Configuration;
 using Sentry.data.Core;
+using Sentry.data.Infrastructure;
+using StructureMap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-
 
 namespace Sentry.data.Web
 {
+
     public static class DataFlowExtensions
     {
+        private static string _bucket;
+        private static string _awsRegion;
+        private static string _isAwsConfigSet;
+        private static bool _aws_v2;
+
+        public static bool AWSv2Configuration
+        {
+            get
+            {
+                if (_isAwsConfigSet == null)
+                {
+                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+                    {
+                        IDataFeatures featureFlags = container.GetInstance<IDataFeatures>();
+                        _aws_v2 = featureFlags.Use_AWS_v2_Configuration_CLA_1488.GetValue();
+                    }
+                    _isAwsConfigSet = "true";
+                }
+                return _aws_v2;
+            }
+        }
+        private static string RootBucket
+        {
+            get
+            {
+#pragma warning disable S3240 // The simplest possible condition syntax should be used
+                if (_bucket == null)
+#pragma warning restore S3240 // The simplest possible condition syntax should be used
+                {
+                    _bucket = AWSv2Configuration
+                        ? Config.GetHostSetting("AWS2_0RootBucket")
+                        : Config.GetHostSetting("AWSRootBucket");
+                }
+                return _bucket;
+            }
+        }
+        private static string AWSRegion
+        {
+            get
+            {
+                if (_awsRegion == null)
+                {
+                    _awsRegion = AWSv2Configuration
+                            ? Config.GetHostSetting("AWS2_0Region")
+                            : Config.GetHostSetting("AWSRegion");
+                }
+                return _awsRegion;
+            }
+        }
+
+
         public static List<DFModel> ToModelList(this List<Core.DataFlowDto> dtoList)
         {
             List<DFModel> modelList = new List<DFModel>();
@@ -152,9 +205,20 @@ namespace Sentry.data.Web
                 ActionName = dto.ActionName,
                 ExecutionOrder = dto.ExeuctionOrder,
                 TriggetKey = dto.TriggerKey,
-                TargetPrefix = dto.TargetPrefix
+                TargetPrefix = dto.TargetPrefix,
+                RootAWSUrl = $"https://{AWSRegion.ToLower()}.amazonaws.com/{RootBucket.ToLower()}/"
             };
             return model;
+        }
+
+        public static List<AssociatedDataFlowModel> ToModel(this List<Tuple<DataFlowDetailDto, List<RetrieverJob>>> jobList)
+        {
+            List<AssociatedDataFlowModel> resultList = new List<AssociatedDataFlowModel>();
+            foreach (Tuple<DataFlowDetailDto, List<RetrieverJob>> item in jobList)
+            {
+                resultList.Add(new AssociatedDataFlowModel(item));
+            }
+            return resultList;
         }
     }
 }

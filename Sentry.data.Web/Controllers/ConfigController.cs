@@ -109,8 +109,8 @@ namespace Sentry.data.Web.Controllers
                     }
 
                     model.RetrieverJobs = config.RetrieverJobs;
-                    model.DataFlowJobs = new Tuple<List<RetrieverJob>, List<DataFlowStepModel>>( jobs.Item1, stepModels );                    
-
+                    model.DataFlowJobs = new Tuple<List<RetrieverJob>, List<DataFlowStepModel>>( jobs.Item1, stepModels );
+                    model.ExternalDataFlowJobs = _configService.GetExternalDataFlowsBySchema(config).ToModel();
                     configModelList.Add(model);
                 }
 
