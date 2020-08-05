@@ -31,13 +31,23 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (r) {
-                    data.Dale.resetAfterSave();
+
+                    if (r.success) {
+                        data.Dale.resetAfterSave();
+                        data.Dale.makeToast("success", "Success!  Changes Saved.");
+                    }
+                    else {
+                        data.Dale.makeToast("error", "Failure!  Please try again.");
+                    } 
+
                 },
-                 failure: function () {
-                    alert('TODO: save failure');
+                failure: function () {
+
+                     data.Dale.makeToast("error", "Failure!  Please try again.");
                 },
                 error: function () {
-                    alert('TODO: save failure');
+
+                    data.Dale.makeToast("error", "Failure!  Please try again.");
                 }
             });
            
@@ -162,10 +172,7 @@
             var rowData = table.row(cellClicked).data();                                                                            //get whole row of data to use later
             var columnIndex = table.cell(cellClicked).index().columnVisible;                                                        //get columnIndex clicked
 
-
             data.Dale.editArray(rowIndex, rowData, columnIndex, columnValue);
-
-            
         });
 
     },
@@ -326,6 +333,52 @@
 
         localStorage.clear();                                                           // Clear all items in our array
         $('#btnSaveMe').hide();
+    },
+
+
+
+    makeToast: function (severity, message) {
+
+        if (severity === 'success') {
+            toastr.options = {
+                "closeButton": false,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+        }
+        else {
+            toastr.options = {
+                "closeButton": false,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "1000",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+        }
+        
+        toastr[severity](message);
     }
 
 

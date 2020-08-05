@@ -172,7 +172,7 @@ namespace Sentry.data.Web.Controllers
             }
             else
             {
-                return Json(new { success = true });
+                return Json(new { success = false });
             }
         }
     }
