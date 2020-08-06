@@ -69,19 +69,17 @@ namespace Sentry.data.Infrastructure
                 Stopwatch stopWatch = new Stopwatch();
                 stopWatch.Start();
 
-                string q = "exec usp_DALE_BaseScanAction @sensitiveBlob";
+                string q = "exec usp_DALE_BaseScanAction_UPDATE @sensitiveBlob";
                 SqlCommand command = new SqlCommand(q, connection);
                 command.CommandTimeout = 0;
 
                 command.Parameters.AddWithValue("@sensitiveBlob", System.Data.SqlDbType.NVarChar);
                 command.Parameters["@sensitiveBlob"].Value = sensitiveBlob;
 
-                int rowsAffected = 0;
                 try
                 {
                     connection.Open();
-                    rowsAffected = command.ExecuteNonQuery();
-                    
+                    command.ExecuteNonQuery();
                 }
                 catch (Exception ex)
                 {
@@ -92,7 +90,7 @@ namespace Sentry.data.Infrastructure
 
                 stopWatch.Stop();
                 TimeSpan ts = stopWatch.Elapsed;
-                Logger.Info("DaleSearchProvider.SaveSensitive()  Row Count:" + rowsAffected + " Elapsed Seconds:" + ts.Seconds + " Query:" + q);
+                Logger.Info("DaleSearchProvider.SaveSensitive()  Elapsed Seconds:" + ts.Seconds + " Query:" + q);
             }
 
             return success;

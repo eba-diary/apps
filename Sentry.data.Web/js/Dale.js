@@ -31,7 +31,6 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (r) {
-
                     if (r.success) {
                         data.Dale.resetAfterSave();
                         data.Dale.makeToast("success", "Success!  Changes Saved.");
@@ -39,20 +38,16 @@
                     else {
                         data.Dale.makeToast("error", "Failure!  Please try again.");
                     } 
-
                 },
                 failure: function () {
-
                      data.Dale.makeToast("error", "Failure!  Please try again.");
                 },
                 error: function () {
-
                     data.Dale.makeToast("error", "Failure!  Please try again.");
                 }
             });
            
         });
-
     },
 
     dataTablCreate: function (canDaleSensitiveEdit) {
@@ -313,29 +308,26 @@
         });
     },
 
-    
     resetAfterSave: function () {
 
         var table = $('#daleResultsTable').DataTable();
         var rowsIndexes = table.rows('.dale-clicked').indexes();
 
         var len = rowsIndexes.length;
-        for (i = 0; i < len; i++) {
+        for (let i = 0; i < len; i++) {
 
             var ri = rowsIndexes[i];
 
             table
-                .rows(ri)                        //pick which row(s) to bring back
+                .rows(ri)                       //pick which row(s) to bring back
                 .nodes()                        //grab all TR nodes (rows) under the .rows selector above
                 .to$()                          //Convert to a jQuery object
                 .removeClass('dale-clicked');   //remove dale-clicked class                   
         }
 
-        localStorage.clear();                                                           // Clear all items in our array
-        $('#btnSaveMe').hide();
+        localStorage.clear();                   // Clear all items in our array
+        $('#btnSaveMe').hide();                 //hide the save button again
     },
-
-
 
     makeToast: function (severity, message) {
 
@@ -356,7 +348,7 @@
                 "hideEasing": "linear",
                 "showMethod": "fadeIn",
                 "hideMethod": "fadeOut"
-            }
+            };
         }
         else {
             toastr.options = {
@@ -375,12 +367,9 @@
                 "hideEasing": "linear",
                 "showMethod": "fadeIn",
                 "hideMethod": "fadeOut"
-            }
+            };
         }
         
         toastr[severity](message);
     }
-
-
-
 };
