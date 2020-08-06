@@ -54,7 +54,7 @@ namespace Sentry.data.Core
         /// <returns></returns>
         /// <exception cref="Exceptions.DataFlowStepNotFound"></exception>
         /// <exception cref="ArgumentNullException"
-        DataFlowStep GetS3DropStepForFileSchema(FileSchema scm);
+        DataFlowStepDto GetS3DropStepForFileSchema(FileSchema scm);
 
         /// <summary>
         /// 

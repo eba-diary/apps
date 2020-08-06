@@ -409,6 +409,7 @@
     <Compile Include="Models\Dale\DaleSearchModel.cs" />
     <Compile Include="Models\DataAsset\AssetUIModel.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetInfoModel.cs" />
+    <Compile Include="Models\DataProcessing\AssociatedDataFlowModel.cs" />
     <Compile Include="Models\DataProcessing\CompressionModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowDetailModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowModel.cs" />
@@ -1467,6 +1468,7 @@
     <Content Include="Views\BusinessArea\_LibertyBellPopoverItem.cshtml" />
     <Content Include="Views\Dale\DaleSearch.cshtml" />
     <Content Include="Views\Dale\DaleResult.cshtml" />
+    <Content Include="Views\RetrieverJob\_RetrieverJob.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1478,7 +1480,6 @@
     <Folder Include="Views\Alert\" />
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />
-    <Folder Include="Views\Retriever\" />
     <Folder Include="Views\Security\" />
     <Folder Include="Views\Subscription\" />
     <Folder Include="Views\Tag\" />

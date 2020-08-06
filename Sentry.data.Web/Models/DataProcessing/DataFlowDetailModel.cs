@@ -13,7 +13,7 @@ namespace Sentry.data.Web
             Step = new List<DataFlowStepModel>();
             foreach (DataFlowStepDto stepDto in dto.steps)
             {
-                Step.Add(new DataFlowStepModel(stepDto));
+                Step.Add(stepDto.ToModel());
             };            
         }
         public List<DataFlowStepModel> Step { get; set; }
