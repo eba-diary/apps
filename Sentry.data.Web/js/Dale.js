@@ -16,6 +16,38 @@
                 data.Dale.dataTablCreate(obj);
             }
         });
+
+        //SAVE BUTTON onCLICK
+        $("#btnSaveMe").on('click', function () {
+
+            var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                      //get stored object array
+
+            //Send the JSON array to Controller using AJAX.
+            $.ajax({
+                type: "POST",
+                url: "/Dale/UpdateIsSensitive",
+                traditional: true,
+                data: JSON.stringify(sensitiveList),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (r) {
+                    if (r.success) {
+                        data.Dale.resetAfterSave();
+                        data.Dale.makeToast("success", "Success!  Changes Saved.");
+                    }
+                    else {
+                        data.Dale.makeToast("error", "Failure!  Please try again.");
+                    } 
+                },
+                failure: function () {
+                     data.Dale.makeToast("error", "Failure!  Please try again.");
+                },
+                error: function () {
+                    data.Dale.makeToast("error", "Failure!  Please try again.");
+                }
+            });
+           
+        });
     },
 
     dataTablCreate: function (canDaleSensitiveEdit) {
@@ -48,7 +80,7 @@
                 //Since I did not want user to see label text and still have a filter.  My cheat to this was to style label with display:none while still keeping the filtering ability
                 //later on when they check/uncheck the box my editRow() function will refresh the data associated with the grid which changes the label hidden text to the opposite so filtering can refresh
                 {
-                    data: null, className: "IsSensitive", visible: false, render: function (d) {
+                    data: null, className: "IsSensitive", render: function (d) {
 
                         //the below code is a way to not have to repeat the html checkbox creation below because it can be disabled or checked based on whether they can edit or if its IsSensitive
                         var disabled = '';
@@ -274,5 +306,70 @@
             data.Dale.disableDale();
             daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
         });
+    },
+
+    resetAfterSave: function () {
+
+        var table = $('#daleResultsTable').DataTable();
+        var rowsIndexes = table.rows('.dale-clicked').indexes();
+
+        var len = rowsIndexes.length;
+        for (let i = 0; i < len; i++) {
+
+            var ri = rowsIndexes[i];
+
+            table
+                .rows(ri)                       //pick which row(s) to bring back
+                .nodes()                        //grab all TR nodes (rows) under the .rows selector above
+                .to$()                          //Convert to a jQuery object
+                .removeClass('dale-clicked');   //remove dale-clicked class                   
+        }
+
+        localStorage.clear();                   // Clear all items in our array
+        $('#btnSaveMe').hide();                 //hide the save button again
+    },
+
+    makeToast: function (severity, message) {
+
+        if (severity === 'success') {
+            toastr.options = {
+                "closeButton": false,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+        }
+        else {
+            toastr.options = {
+                "closeButton": false,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "1000",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+        }
+        
+        toastr[severity](message);
     }
 };

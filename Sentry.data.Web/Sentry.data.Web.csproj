@@ -16,7 +16,7 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44321</IISExpressSSLPort>
+    <IISExpressSSLPort>44371</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -407,6 +407,7 @@
     <Compile Include="Models\ContactInfoModel.cs" />
     <Compile Include="Models\Dale\DaleResultModel.cs" />
     <Compile Include="Models\Dale\DaleSearchModel.cs" />
+    <Compile Include="Models\Dale\DaleSensitiveModel.cs" />
     <Compile Include="Models\DataAsset\AssetUIModel.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetInfoModel.cs" />
     <Compile Include="Models\DataProcessing\CompressionModel.cs" />

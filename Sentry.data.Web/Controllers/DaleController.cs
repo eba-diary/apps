@@ -1,11 +1,7 @@
 ﻿using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
-using Sentry.DataTables.Mvc;
-using Sentry.DataTables.QueryableAdapter;
-using Sentry.DataTables.Shared;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
@@ -161,6 +157,23 @@ namespace Sentry.data.Web.Controllers
         public JsonResult GetCanDaleSensitiveEdit()
         {
             return Json(CanDaleSensitiveEdit(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult UpdateIsSensitive(List<DaleSensitiveModel> models)
+        {
+            bool success = false;
+
+            success = _daleService.UpdateIsSensitive(models.ToDto());
+
+            if(success)
+            {
+                return Json(new { success = true });
+            }
+            else
+            {
+                return Json(new { success = false });
+            }
         }
     }
 }
