@@ -59,6 +59,10 @@ namespace Sentry.data.Web.WebApi.Controllers
 
         public class Metadata
         {
+            public Metadata()
+            {
+                DataFlows = new List<DataFlow>();
+            }
             public double DataLastUpdated { get; set; }
             public string Description { get; set; }
             public DropLocation DFSDropLocation { get; set; }
@@ -69,6 +73,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             public List<DropLocation> OtherJobs { get; set; }
             public List<string> CronJobs { get; set; }
+            public List<DataFlow> DataFlows { get; set; }
 
             //   public int Views { get; set; }
             //   public int Downloads { get; set; }
@@ -86,6 +91,14 @@ namespace Sentry.data.Web.WebApi.Controllers
         {
             public string Key { get; set; }
             public string Message { get; set; }
+        }
+
+        public class DataFlow
+        {
+            public string Name { get; set; }
+            public int Id { get; set; }
+            public string DetailUrl { get; set; }
+            public List<DropLocation> RetrieverJobs { get; set; }
         }
         #endregion
 
@@ -766,6 +779,33 @@ namespace Sentry.data.Web.WebApi.Controllers
                         .Select(x => new DropLocation() { Location = x.IsEnabled ? x.Schedule : "Disabled", Name = x.DataSource.SourceType, JobId = x.Id, IsEnabled = x.IsEnabled }).ToList();
                 }
 
+                //m.DataFlows = _configService.GetExternalDataFlowsBySchema(config).Select(s => new DataFlow() { Name = s.Item1.Name, Id = s.Item1.Id, DetailUrl = $"DataFlow/{s.Item1.Id.ToString()}/Detail" }).ToList();
+
+                foreach (var item in _configService.GetExternalDataFlowsBySchema(config).ToList())
+                {
+                    DataFlow df = new DataFlow()
+                    {
+                        Name = item.Item1.Name,
+                        Id = item.Item1.Id,
+                        DetailUrl = $"DataFlow/{item.Item1.Id.ToString()}/Detail"
+                    };
+                    List<DropLocation> rjList = new List<DropLocation>();
+                    foreach (var job in item.Item2)
+                    {
+                        rjList.Add(new DropLocation()
+                        {
+                            Name = (job.IsGeneric) ? job.DataSource.Name : $"{job.DataSource.SourceType} - {job.DataSource.Name}",
+                            JobId = job.Id,
+                            IsEnabled = job.IsEnabled,
+                            Location = job.GetUri().AbsolutePath
+                        });                        
+                    }
+
+                    rjList.Add(item.Item1.steps.Where(w => w.DataActionType == Core.Entities.DataProcessing.DataActionType.S3Drop).Select(s => new DropLocation() { Name = s.ActionName, JobId = s.Id, IsEnabled = true, Location = s.TriggerKey }).FirstOrDefault());
+
+                    df.RetrieverJobs = rjList;
+                    m.DataFlows.Add(df);
+                }
 
                 return Ok(m);
 
