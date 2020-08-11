@@ -71,5 +71,30 @@ namespace Sentry.data.Web
                 return DaleDestiny.Object;
             }
         }
+
+        public static DaleSensitiveDto ToDto(this DaleSensitiveModel model)
+        {
+            if (model == null)
+            {
+                return new DaleSensitiveDto();
+            }
+
+            return new DaleSensitiveDto()
+            {
+                BaseColumnId = model.BaseColumnId,
+                IsSensitive = model.IsSensitive
+            };
+        }
+
+        public static List<DaleSensitiveDto> ToDto(this List<DaleSensitiveModel> models)
+        {
+            List<DaleSensitiveDto> dtos = new List<DaleSensitiveDto>();
+
+            models.ForEach(x => dtos.Add(x.ToDto()));
+
+            return dtos;
+        }
+
+
     }
 }

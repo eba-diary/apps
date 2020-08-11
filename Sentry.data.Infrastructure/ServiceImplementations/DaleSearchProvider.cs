@@ -52,12 +52,48 @@ namespace Sentry.data.Infrastructure
 
                 stopWatch.Stop();
                 TimeSpan ts = stopWatch.Elapsed;
-                Logger.Info("Dale Provider Query: Row Count:" + daleResults.Count + " Elapsed Time:" + ts.Seconds + " seconds.");
+                Logger.Info("DaleSearchProvider.GetSearchResults()  Row Count:" + daleResults.Count + " Elapsed Seconds:" + ts.Seconds + " Query:" + q);
+
             }
 
-
-
             return daleResults;
+        }
+
+        public bool SaveSensitive(string sensitiveBlob)
+        {
+            bool success = true;
+
+            string connectionString = Configuration.Config.GetHostSetting("DaleConnectionString");
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
+
+                string q = "exec usp_DALE_BaseScanAction_UPDATE @sensitiveBlob";
+                SqlCommand command = new SqlCommand(q, connection);
+                command.CommandTimeout = 0;
+
+                command.Parameters.AddWithValue("@sensitiveBlob", System.Data.SqlDbType.NVarChar);
+                command.Parameters["@sensitiveBlob"].Value = sensitiveBlob;
+
+                try
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    success = false;
+                    Logger.Fatal("DaleSearchProvider.SaveSensitive() Failed!!  Query: " + q, ex);
+
+                }
+
+                stopWatch.Stop();
+                TimeSpan ts = stopWatch.Elapsed;
+                Logger.Info("DaleSearchProvider.SaveSensitive()  Elapsed Seconds:" + ts.Seconds + " Query:" + q);
+            }
+
+            return success;
         }
 
         private string BuildAQuery(DaleSearchDto dto)
