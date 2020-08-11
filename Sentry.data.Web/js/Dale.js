@@ -193,6 +193,20 @@
             data.Dale.editArray(rowIndex, rowData, columnIndex, columnValue);
         });
 
+
+        //setup onChange event to fire when a checkbox is changed.  This will update internal array for user to save later
+        $('#daleResultsTable tbody').on('change', '.IsUserVerified input', function () {                                            //filter down to '.IsUserVerified' class and child of that which is 'input' which gets you too checkbox
+            var cellClicked = $(this).closest('td');                                                                                //get which cell is clicked too use later to figure out rowIndex,rowData,columnIndex
+            var columnValue = this.checked;                                                                                         //determine if checkbox is checked or not
+
+            var table = $('#daleResultsTable').DataTable();
+            var rowIndex = table.cell(cellClicked).index().row;                                                                     //get rowIndex being updated
+            var rowData = table.row(cellClicked).data();                                                                            //get whole row of data to use later
+            var columnIndex = table.cell(cellClicked).index().columnVisible;                                                        //get columnIndex clicked
+
+            data.Dale.editArray(rowIndex, rowData, columnIndex, columnValue);
+        });
+
     },
 
     //edit row (data and style) since user changed something
@@ -225,16 +239,21 @@
     //edit storage array since user is changing data
     editArray: function (rowIndex, rowData, columnIndex, columnValue) {
 
+        
+        var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                      //get stored object array
+        var verifiedList = JSON.parse(localStorage.getItem("verifiedList"));                                        //get stored object array
+
+        var o = new Object();
+        o.BaseColumnId = rowData.BaseColumnId;
+        o.IsSensitive = rowData.IsSensitive;
+        o.IsUserVerified = rowData.IsUserVerified;
+
+
         //IsSensitive Cell Check
         if (columnIndex === 6) {
 
-            var edit = true;
-            rowData.IsSensitive = columnValue;                                                                          //flip IsSensitive
-
-            var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                      //get stored object array
-            var o = { "BaseColumnId": "IsSensitive" };                                                                  //create new obj based off current selection
-            o.BaseColumnId = rowData.BaseColumnId;
-            o.IsSensitive = rowData.IsSensitive;
+            rowData.IsSensitive = columnValue;                                                                          //flip IsSensitive for rowData
+            o.IsSensitive = columnValue;                                                                                //flip IsSensitive for array storage
 
             //first time create new array
             if (sensitiveList == null) {
@@ -246,24 +265,75 @@
                 var index = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);
                 if (index >= 0)                                                                                         //check if already exists
                 {
-                    edit = false;
                     sensitiveList.splice(index, 1);                                                                     //remove that index from array  
                 }
                 else {
                     sensitiveList.push(o);                                                                              //add new item
                 }
             }
+        }
+        else if (columnIndex === 7) {
 
-            if (sensitiveList.length > 0) {
-                $('#btnSaveMe').show();
+            rowData.IsUserVerified = columnValue;                                                                          //flip IsSensitive for rowData
+            o.IsUserVerified = columnValue;                                                                                //flip IsSensitive for array storage
+
+            //first time create new array
+            if (verifiedList == null) {
+                verifiedList = [];
+                verifiedList[0] = o;
             }
             else {
-                $('#btnSaveMe').hide();
+                //check if item exists and remove or add new item to list
+                var index = verifiedList.findIndex(verified => verified.BaseColumnId === o.BaseColumnId);
+                if (index >= 0)                                                                                         //check if already exists
+                {
+                    verifiedList.splice(index, 1);                                                                     //remove that index from array  
+                }
+                else {
+                    verifiedList.push(o);                                                                              //add new item
+                }
             }
-            localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));                                       //save array to storage
-
-            data.Dale.editRow(edit, rowIndex, rowData);
         }
+
+        var edit = false;
+        var sensitiveEDITED = -1;
+        var verifiedEDITED = -1;
+        var sensitiveListLength = 0;
+        var verifiedListLength = 0;
+
+        //init 
+        if (sensitiveList != null) {
+            sensitiveEDITED = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);
+            sensitiveListLength = sensitiveList.length;
+        }
+
+        if (verifiedList != null) {
+            verifiedEDITED = verifiedList.findIndex(verified => verified.BaseColumnId === o.BaseColumnId);
+            verifiedListLength = verifiedList.length;
+        }
+
+
+        //DETERMINE IF ROW SHOULD BE RED
+        if (sensitiveEDITED >= 0 || verifiedEDITED >= 0) {
+            edit = true;
+        }
+        else {
+            edit = false;
+        }
+
+        //DETERMINE WHETHER TO SHOW SAVE BUTTON
+        if (sensitiveListLength > 0 || verifiedListLength > 0) {
+            $('#btnSaveMe').show();
+        }
+        else {
+       
+            $('#btnSaveMe').hide();
+        }
+
+        localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));                                           //save array to storage
+        localStorage.setItem("verifiedList", JSON.stringify(verifiedList));                                           //save array to storage
+
+        data.Dale.editRow(edit, rowIndex, rowData);
     },
 
     //figure out which radio button was selected

@@ -163,19 +163,12 @@ namespace Sentry.data.Web.Controllers
             return false;
         }
 
-
         [HttpGet]
         //method called by dale.js to return whether user can edit IsSensitive IND
         public JsonResult GetCanDaleSensitiveEdit()
         {
-            return Json(CanDaleSensitiveEdit(), JsonRequestBehavior.AllowGet);
-        }
-
-        [HttpGet]
-        //method called by dale.js to return whether user can edit IsSensitive IND
-        public JsonResult GetCanDaleUserVerifiedEdit()
-        {
-            return Json(CanDaleUserVerifiedEdit(), JsonRequestBehavior.AllowGet);
+            //return Json(CanDaleSensitiveEdit(),JsonRequestBehavior.AllowGet);
+            return Json(new {canDaleSensitiveEdit = CanDaleSensitiveEdit(), canDaleUserVerifiedEdit = CanDaleUserVerifiedEdit() },JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
