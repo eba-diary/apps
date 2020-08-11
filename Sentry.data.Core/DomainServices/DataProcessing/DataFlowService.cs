@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using Sentry.Common.Logging;
+﻿using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
-using Sentry.data.Core.Interfaces.DataProcessing;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 
 namespace Sentry.data.Core
@@ -566,6 +563,9 @@ namespace Sentry.data.Core
                 case DataActionType.UncompressGzip:
                     action = _datasetContext.UncompressGzipAction.FirstOrDefault();
                     break;
+                case DataActionType.FixedWidth:
+                    action = _datasetContext.FixedWidthAction.FirstOrDefault();
+                    break;
                 case DataActionType.SchemaLoad:
                     action = _datasetContext.SchemaLoadAction.FirstOrDefault();
                     DataFlowStep schemaLoadStep = MapToDataFlowStep(df, action, actionType);
@@ -656,6 +656,7 @@ namespace Sentry.data.Core
                 case DataActionType.UncompressGzip:
                 case DataActionType.SchemaMap:
                 case DataActionType.S3Drop:
+                case DataActionType.FixedWidth:
                     step.TargetPrefix = null;
                     break;
                 default:
@@ -704,8 +705,8 @@ namespace Sentry.data.Core
             AddDataFlowStep(dto, df, DataActionType.S3Drop);
             AddDataFlowStep(dto, df, DataActionType.RawStorage);
 
-            //Generate preprocessing for file types (i.e. csv, json, etc...)
-            //MapPreProcessingSteps(dto, df);
+            //Generate preprocessing for file types (i.e. fixedwidth, csv, json, etc...)
+            MapPreProcessingSteps(scm, dto, df);
 
             //Generate DSC registering step
             AddDataFlowStep(dto, df, DataActionType.SchemaLoad);
@@ -714,6 +715,14 @@ namespace Sentry.data.Core
             ////Generate consumption layer steps
             AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
 
+        }
+
+        private void MapPreProcessingSteps(FileSchema scm, DataFlowDto dto, DataFlow df)
+        {
+            if (scm.Extension.Name.ToUpper() == "FIXEDWIDTH")
+            {
+                AddDataFlowStep(dto, df, DataActionType.FixedWidth);
+            }
         }
 
         private DataFlowDto MapToDto(FileSchema scm)

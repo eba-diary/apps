@@ -736,13 +736,12 @@ namespace Sentry.data.Core
             }
         }
 
-        public void Validate(List<BaseFieldDto> fieldDtoList)
+        public void Validate(int schemaId, List<BaseFieldDto> fieldDtoList)
         {
+            FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
             ValidationResults errors = new ValidationResults();
-            foreach(BaseFieldDto dto in fieldDtoList)
-            {
-                errors.MergeInResults(Validate(dto));
-            }
+
+            errors.MergeInResults(Validate(schema, fieldDtoList));
 
             if (!errors.IsValid())
             {
@@ -750,63 +749,109 @@ namespace Sentry.data.Core
             }
         }
 
-        private ValidationResults Validate(BaseFieldDto fieldDto)
+        private ValidationResults Validate(FileSchema scm, List<BaseFieldDto> fieldDtoList)
         {
             ValidationResults results = new ValidationResults();
-            //Field name cannot be blank
-            if (string.IsNullOrWhiteSpace(fieldDto.Name))
+            foreach(BaseFieldDto fieldDto in fieldDtoList)
             {
-                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Name cannot be empty string");
+                //Field name cannot be blank
+                if (string.IsNullOrWhiteSpace(fieldDto.Name))
+                {
+                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Name cannot be empty string");
+                }
+
+                //Field name cannot contain spaces
+                if (fieldDto.Name != null && fieldDto.Name.Any(char.IsWhiteSpace))
+                {
+                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Name cannot contain spaces");
+                }
+
+                //Field name cannot contain special characters
+                string specialCharacters = @"-:,;{}()";
+                string specialCharPattern = $"[{specialCharacters}]";
+                if (fieldDto.Name != null && Regex.IsMatch(fieldDto.Name, specialCharPattern))
+                {
+                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Name cannot contain special characters ({specialCharacters})");
+                }
+
+                //Field name cannot contain uppercase letters
+                if (fieldDto.Name != null && fieldDto.Name.Any(char.IsUpper))
+                {
+                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Name cannot contain uppercase letters");
+                }
+
+                //Struct has children
+                if (fieldDto.FieldType == GlobalConstants.Datatypes.STRUCT && !fieldDto.HasChildren)
+                {
+                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) STRUCTs are required to have children");
+                }
+
+                //Varchar Length
+                if (fieldDto.FieldType == GlobalConstants.Datatypes.VARCHAR && (fieldDto.Length < 1 || fieldDto.Length > 65535))
+                {
+                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) VARCHAR length ({fieldDto.Length}) is required to be between 1 and 65535");
+                }
+
+                //Decimal Precision
+                if (fieldDto.FieldType == GlobalConstants.Datatypes.DECIMAL && (fieldDto.Precision < 1 || fieldDto.Precision > 38))
+                {
+                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Precision ({fieldDto.Precision}) is required to be between 1 and 38");
+                }
+
+                //Decimal Scale
+                if (fieldDto.FieldType == GlobalConstants.Datatypes.DECIMAL && (fieldDto.Scale < 1 || fieldDto.Scale > 38))
+                {
+                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Scale ({fieldDto.Scale}) is required to be between 1 and 38");
+                }
+
+                //Decimal Scale and Precision dependency
+                if (fieldDto.FieldType == GlobalConstants.Datatypes.DECIMAL && fieldDto.Scale > fieldDto.Precision)
+                {
+                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Scale ({fieldDto.Scale}) needs to be less than or equal to Precision ({fieldDto.Precision})");
+                }
+
+                results.MergeInResults(ValidateFieldtoFileSchema(scm, fieldDto));
+
+                if (fieldDto.ChildFields.Any())
+                {
+                    results.MergeInResults(Validate(scm, fieldDto.ChildFields));
+                }
+            }
+            return results;
+        }
+
+        private ValidationResults ValidateFieldtoFileSchema(FileSchema scm, BaseFieldDto fieldDto)
+        {
+            ValidationResults results = new ValidationResults();
+            string extension = scm.Extension.Name;
+            if (extension == "FIXEDWIDTH" && fieldDto.Length == 0)
+            {
+                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be greater than zero for FIXEDWIDTH schema");
             }
 
-            //Field name cannot contain spaces
-            if (fieldDto.Name != null && fieldDto.Name.Any(char.IsWhiteSpace))
+            if (extension == "FIXEDWIDTH" && fieldDto.FieldType == GlobalConstants.Datatypes.DECIMAL && fieldDto.Length != 0 && fieldDto.Length < fieldDto.Precision)
             {
-                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Name cannot contain spaces");
+                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be equal or greater than specified precision for FIXEDWIDTH schema");
             }
 
-            //Field name cannot contain special characters
-            string specialCharacters = @"-:,;{}()";
-            string specialCharPattern = $"[{specialCharacters}]";
-            if (fieldDto.Name != null && Regex.IsMatch(fieldDto.Name, specialCharPattern))
+            if (extension == "FIXEDWIDTH" && (fieldDto.FieldType == GlobalConstants.Datatypes.TIMESTAMP || fieldDto.FieldType == GlobalConstants.Datatypes.DATE) && fieldDto.SourceFormat != null && fieldDto.Length < fieldDto.SourceFormat.Length)
             {
-                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Name cannot contain special characters ({specialCharacters})");
+                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be equal or greater than specified format for FIXEDWIDTH schema");
             }
 
-            //Field name cannot contain uppercase letters
-            if (fieldDto.Name != null && fieldDto.Name.Any(char.IsUpper))
+            if (extension == "FIXEDWIDTH" && (fieldDto.FieldType == GlobalConstants.Datatypes.TIMESTAMP) && fieldDto.SourceFormat == null && fieldDto.Length < GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT.Length)
             {
-                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Name cannot contain uppercase letters");
+                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be equal or greater than default format length ({GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT.Length}) for FIXEDWIDTH schema");
             }
 
-            //Struct has children
-            if (fieldDto.FieldType == GlobalConstants.Datatypes.STRUCT && !fieldDto.ChildFields.Any())
+            if (extension == "FIXEDWIDTH" && (fieldDto.FieldType == GlobalConstants.Datatypes.DATE) && fieldDto.SourceFormat == null && fieldDto.Length < GlobalConstants.Datatypes.Defaults.DATE_DEFAULT.Length)
             {
-                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) STRUCTs are required to have children");
+                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be equal or greater than default format length ({GlobalConstants.Datatypes.Defaults.DATE_DEFAULT.Length}) for FIXEDWIDTH schema");
             }
 
-            //Varchar Length
-            if (fieldDto.FieldType == GlobalConstants.Datatypes.VARCHAR && (fieldDto.Length < 1 || fieldDto.Length > 65535))
+            if (extension == "FIXEDWIDTH" && fieldDto.FieldType == GlobalConstants.Datatypes.VARCHAR && fieldDto.Length == 0)
             {
-                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) VARCHAR length ({fieldDto.Length}) is required to be between 1 and 65535");
-            }
-
-            //Decimal Precision
-            if (fieldDto.FieldType == GlobalConstants.Datatypes.DECIMAL && (fieldDto.Precision < 1 || fieldDto.Precision > 38))
-            {
-                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Precision ({fieldDto.Precision}) is required to be between 1 and 38");
-            }
-            
-            //Decimal Scale
-            if (fieldDto.FieldType == GlobalConstants.Datatypes.DECIMAL && (fieldDto.Scale < 1 || fieldDto.Scale > 38))
-            {
-                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Scale ({fieldDto.Scale}) is required to be between 1 and 38");
-            }
-
-            //Decimal Scale and Precision dependency
-            if (fieldDto.FieldType == GlobalConstants.Datatypes.DECIMAL && fieldDto.Scale > fieldDto.Precision)
-            {
-                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Scale ({fieldDto.Scale}) needs to be less than or equal to Precision ({fieldDto.Precision})");
+                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be equal or greater than specified precision for FIXEDWIDTH schema");
             }
 
             return results;

@@ -219,8 +219,8 @@
     </script>
 
     <script type="text/html" id="RowTemplate">
-        <li class="ui-sortable-handle schemaRowContainer" data-bind="css: $root.ClickableRows(), style : { 'background-color' : RowColor }">
-            <div class="col-lg-12 schemaRow" data-bind="css: Color">
+        <li class="ui-sortable-handle schemaRowContainer" data-bind="css: $root.ClickableRows()">
+            <div class="col-lg-12 schemaRow" data-bind="css: Color, style : { 'background-color' : RowColor }">
                 <div class="rowDetails">
                     <div class="rowNumberIdentifier">
                         <b><span data-bind="text: Position"></span></b>
@@ -238,30 +238,32 @@
                     </div>
                     <div class="showPandS col-lg-4" data-bind="visible: ShowPandS">
                         <div class="precisionContainer col-lg-2">
-                            <input class="precision col-lg-12" data-bind="textInput: Precision" placeholder="Prec" data-toggle="tooltip" data-placement="top" title="Precision" />
+                            <input class="precision col-lg-12" data-bind="textInput: Precision" placeholder="Prec" data-toggle="tooltip" data-placement="top" title="Precision - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT.ToString()" />
                         </div>
                         <div class="scaleContainer col-lg-2">
-                            <input class="scale col-lg-12" data-bind="textInput: Scale" placeholder="Scale" data-toggle="tooltip" data-placement="top" title="Scale" />
+                            <input class="scale col-lg-12" data-bind="textInput: Scale" placeholder="Scale" data-toggle="tooltip" data-placement="top" title="Scale - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT.ToString()" />
                         </div>
                         <div class="col-lg-8">
                             <span>1234.56 = Precision:6  Scale:2</span>
                         </div>
                     </div>
-                    <div class="showVarcharLength col-lg-2" data-bind="visible: ShowVarcharLength">
-                        <input class="varcharlength col-lg-12" data-bind="value: Length" data-toggle="tooltip" data-placement="top" title="Length (min=1 max=65535" />
-                    </div>
 
                     <div class="showDateFormat col-lg-4" data-bind="visible: ShowDateFormat">
-                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Not Specified (default is @dateDefault)" data-toggle="tooltip" data-placement="top" title="Format" />
+                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Not Specified (default is @dateDefault)" data-toggle="tooltip" data-placement="top" title="Format - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DATE_DEFAULT" />
                     </div>
 
                     <div class="showTimestampFormat col-lg-4" data-bind="visible: ShowTimestampFormat">
-                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Not Specified (default is @timestampDefault)" data-toggle="tooltip" data-placement="top" title="Format" />
+                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Not Specified (default is @timestampDefault)" data-toggle="tooltip" data-placement="top" title="Format - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT" />
                     </div>
 
                     <div class="showArray col-lg-2" data-bind="visible: $root.AllowArrays">
                         <label class="arrayLabel">IsArray?</label>
                         <input class="array col-lg-2" data-bind="checked: IsArray" type="checkbox" />
+                    </div>
+
+                    <div class="showLength col-lg-2" data-bind="visible: ShowFieldLength">
+                        <input class="fieldlength col-lg-12" data-bind="visible: ShowFieldLength && DataType() === 'VARCHAR', value: Length" placeholder="default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
+                        <input class="fieldlength col-lg-12" data-bind="visible: ShowFieldLength && DataType() !== 'VARCHAR', value: Length" placeholder="Specify length" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
                     </div>
 
                     <div class="options col-lg-4">
@@ -351,10 +353,11 @@
             return result;
             };
 
-        function Row(id, indata, parent, level) {
+        function Row(id, indata, parent, level, parentRow) {
             var self = this;
             var parentvm = parent;
             var thisLevel = ++level;
+            var parentRecord = parentRow;
 
             if (indata.Position != undefined && indata.Position !== 0) {
                 self.Position = ko.observable(indata.Position);
@@ -370,17 +373,21 @@
             self.Description = ko.observable(indata.Description);
             self.DataType = ko.observable(indata.DataType).extend({ notify: 'always'});
             self.ArrayType = ko.observable(indata.ArrayType);
-            self.Precision = ko.observable(indata.Precision).extend({ numeric: { precision: 0, min: 1, max: 38 }});
-            self.Scale = ko.observable(indata.Scale).extend({ numeric: { precision: 0, min: 1, max: 38 }});
+            //self.Precision = ko.observable(indata.Precision).extend({ numeric: { precision: 9, min: 1, max: 38 }});
+            self.Precision = ko.observable(indata.Precision);
+            //self.Scale = ko.observable(indata.Scale).extend({ numeric: { precision: 2, min: 1, max: 38 } });
+            self.Scale = ko.observable(indata.Scale);
             self.Format = ko.observable(indata.Format);
             self.DeleteInd = ko.observable(false);
             self.IsArray = ko.observable(indata.IsArray);
             self.Level = ko.observable(thisLevel);
-            self.Length = ko.observable(indata.Length).extend({ numeric: { precision: 0, min: 1, max: 65535 }});
+            //self.Length = ko.observable(indata.Length).extend({ numeric: { precision: 0, min: 1, max: 65535 } });
+            self.Length = ko.observable(indata.Length);
             self.ChildRows = ko.observableArray(ko.utils.arrayMap(indata.ChildRows, function (rowInfo) {
                 currentMax++;
-                return new Row(currentMax, rowInfo, parentvm, thisLevel);
+                return new Row(currentMax, rowInfo, parentvm, thisLevel, self);
             }));
+            self.RowColor = ko.observable()
 
             //Call UpdateRow() when any property changes
             self.Name.subscribe(        function () { self.UpdateRow() });
@@ -395,17 +402,16 @@
             self.Length.subscribe(      function () { self.UpdateRow() });
 
             self.UpdateRow = function () {
-                //alert("Row #" + self.Position() + " has updated its Name field.")
-
-                
-                //call parent self.UpdateRow  -- parentvw.UpdateRow
-
                 var a = JSON.stringify(ko.toJS(self), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd', 'IsArray', 'FieldGuid', 'Length']);
+
+                var url_parts = window.location.href.replace(/\/\s*$/, '').split('/');
+                //since we do not need example.com
+                url_parts.shift();
 
                 //ajax
                 $.ajax({
                     type: "POST",
-                    url: "/Config/Schema/ValidateField",
+                    url: "/Config/Schema/" + url_parts[5] + "/ValidateField",
                     data: a,
                     dataType: "json",
                     contentType: "application/json",
@@ -452,93 +458,9 @@
                 });
             }
 
-            self.RowColor = ko.observable()
-                //ko.computed(function () {
-                //return '';
-                //var hasError = false;
-
-                //if (parentvm.Errors === undefined) {
-                //    parentvm.Errors = ko.observableArray();
-                //}
-                //else {
-                //    parentvm.Errors.remove(function (item) {
-                //    return item.Id === self.Position();
-                //    });
-                //}
-
-                ////Has no children.  Error
-                //if ((self.DataType() === 'STRUCT' || (self.DataType() === 'ARRAY' && self.ArrayType() === 'STRUCT')) && self.ChildRows !== undefined && self.ChildRows().length === 0) {
-                //    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has no children.  Please add a child or change data types.' });
-                //    hasError = true;
-                //}
-                ////Has children when it shouldn't
-                //else if (self.DataType() === 'ARRAY' && self.ArrayType() !== "STRUCT" && self.ChildRows !== undefined && self.ChildRows().length > 0) {
-                //    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to ARRAY<STRUCT>.' });
-                //    hasError = true;
-                //}
-                ////Has children when it shouldn't
-                //else if (self.DataType() !== 'STRUCT' && (self.DataType() !== 'ARRAY' && self.ArrayType() !== "STRUCT") && self.ChildRows !== undefined && self.ChildRows().length > 0) {
-                //    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to STRUCT.' });
-                //    hasError = true;
-                //}
-                ////Name is blank
-                //if (self.Name() === '' || self.Name() === undefined || self.Name() === null) {
-                //    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' has no name.' });
-                //    hasError = true;
-                //}
-
-                //if (self.Name() !== undefined && self.Name() !== '' && self.Name() !== null) {
-                //    //Name contains spaces
-                //    if (self.Name().indexOf(' ') >= 0) {
-                //        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot contain Spaces.' });
-                //        hasError = true;
-                //    }
-
-                //    //Name contains special characters
-                //    var pattchar = new RegExp("[-:,;{}()]");
-                //    if (pattchar.test(self.Name())) {
-                //        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot special characters (-:,;{}()).' });
-                //        hasError = true;
-                //    }
-
-                //    //Name contains uppercase
-                //    var pattupper = new RegExp("[A-Z]");
-                //    //var nme = self.Name();
-                //    if (pattupper.test(self.Name())) {
-                //        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot contain uppercase letters.' });
-                //        hasError = true;
-                //    }
-                //}
-
-                //if (self.DataType() === undefined) {
-                //    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': ' Datatype selection required.' });
-                //    hasError = true;
-                //}
-
-                //if (self.DataType() === 'DECIMAL') {
-                //    if (self.Scale() > self.Precision()) {
-                //        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': 'Scale need to be less than or equal to Precision.' });
-                //        hasError = true;
-                //    }
-
-                //    if (self.Precision() <= 0) {
-                //        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': 'Precision need to be greater than 0.' });
-                //        hasError = true;
-                //    }
-                //}
-
-                //if (hasError) {
-                //    $('#saveBtn').hide();
-                //    return 'rgba(255, 0, 0, 0.8)';
-                //}
-                //else {
-                //    if (parentvm.Errors !== undefined && parentvm.Errors().length === 0) {
-                //        $('#saveBtn').show();
-                //    }
-                //    return '';
-                //}
-
-            //});
+            self.ShowFixed = ko.computed(function () {
+                return parent.IsFixedWidth();
+            });
 
             self.ShowPandS = ko.computed(function () {
                 if (self.DataType() === 'DECIMAL') {
@@ -576,7 +498,16 @@
                 }
             });
 
-            self.ShowVarcharLength = ko.computed(function () {
+            self.ShowFieldLength = ko.computed(function () {
+                if (self.ShowFixed() || self.DataType() === 'VARCHAR') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            })
+
+            self.ShowVarcharLengthDescription = ko.computed(function () {
                 if (self.DataType() === 'VARCHAR') {
                     return true;
                 }
@@ -592,10 +523,6 @@
                 else {
                     return false;
                 }
-            });
-
-            self.ShowFixed = ko.computed(function () {
-                return parent.IsFixedWidth;
             });
 
             self.ShowPositional = ko.computed(function () {
@@ -665,7 +592,7 @@
                 //self.ChildRows.push(new Row(currentMax, [{ DataObjectField_ID: "", Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }], parent));
 
                 currentMax++;
-                var cr = new Row(currentMax, { DataObjectField_ID: "new" + currentMax, Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, parent, thisLevel);
+                var cr = new Row(currentMax, { DataObjectField_ID: "new" + currentMax, Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, parent, thisLevel, self);
                 self.ChildRows.push(cr);
                 if (!self.Toggled()) {
                     self.ToggleChildren();
@@ -675,8 +602,14 @@
             };
 
             self.removeChild = function (row) {
-                parentvm.Errors.remove(function (item) { return item.Id === row.Position(); });
+                parentvm.Errors.remove(function (item) { return item.Id === row.Position().toString(); });
                 self.ChildRows.remove(row);
+                //If there are no errors on page, show save button
+                if (parentvm.Errors !== undefined && parentvm.Errors().length === 0) {
+                    $('#saveBtn').show();
+                }
+
+                self.UpdateRow();
             };
 
             self.removeChildren = function () {
@@ -690,8 +623,15 @@
                     });
 
                     cRow.DeleteInd(true);
+
+                    //If there are no errors on page, show save button
+                    if (parentvm.Errors !== undefined && parentvm.Errors().length === 0) {
+                        $('#saveBtn').show();
+                    }
                 });
             }
+
+            self.UpdateRow();
         };
 
         function ValidDataType(item) {
@@ -704,6 +644,7 @@
         var viewModel = function (incomingJson) {
             var self = this;
 
+            
             //Observables
             //self.ErrorsCopy = ko.observableArray();
             self.Errors = ko.observableArray().extend({ notify: 'always' });
@@ -715,14 +656,25 @@
             self.HiveDatabaseName = ko.observable(incomingJson.HiveDatabaseName);
             self.HiveTableName = ko.observable(incomingJson.HiveTableName);
             self.FileExtensionId = incomingJson.FileExtension;
+            self.AllowArrays = ko.observable();
+
             self.Rows = ko.observableArray(ko.utils.arrayMap(incomingJson.rows, function (rowInfo) {
                 currentMax++;
                 return new Row(currentMax, rowInfo, self, 0);
             }));
             self.RowCount = ko.observable(incomingJson.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
             self.FileExtensionName = ko.observable(incomingJson.FileExtensionName);
-            self.AllowArrays = ko.observable();
 
+            self.Errors.subscribe(function () { self.ShowHideSaveButton() });
+            self.ShowHideSaveButton = function () {
+                //If there are no errors on page, show save button
+                if (self.Errors !== undefined && self.Errors().length === 0) {
+                    $('#saveBtn').show();
+                }
+                else if (self.Errors === undefined && self.Errors().length > 0) {
+                    $('#saveBtn').hide();
+                }
+            };
 
             //Computed properties
             self.RowSorter = ko.computed(function () {
@@ -816,7 +768,7 @@
 
             self.SortRows = function () {
                 newVal = 0;
-                $('.parentContainer').each(function (index) {
+                $('.schemaRowContainer').each(function (index) {
                     var httpItem = $(this).children().children().children().children('input[name="dataObjectField_Id"]').val();
                     var match = ko.utils.arrayFirst(self.SortedRows(), function (item) {
                         if (item.DataObjectField_ID() == httpItem && item.Position() != index + 1) {
@@ -824,9 +776,7 @@
                         }
                     })
                 })
-            }
-
-
+            }            
 
             $.ajax({
                 type: "GET",
@@ -842,6 +792,7 @@
                 },
                 async: false
             });
+            
         };
 
         var initialData = [

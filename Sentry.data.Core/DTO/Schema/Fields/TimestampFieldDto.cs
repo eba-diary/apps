@@ -14,11 +14,11 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             if (extData != null && extData.Any(w => w.Key == "dsc-format"))
             {
                 object val = extData.Where(w => w.Key == "dsc-format").Select(s => s.Value).FirstOrDefault();
-                SourceFormat = val?.ToString();
+                SourceFormat = (val != null) ? val.ToString() : GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT;
             }
             else
             {
-                SourceFormat = null;
+                SourceFormat = GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT;
             }
         }
 
@@ -64,6 +64,9 @@ namespace Sentry.data.Core.DTO.Schema.Fields
                 //Apply defaults if neccessary
                 SourceFormat = (string.IsNullOrWhiteSpace(this.SourceFormat)) ? GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT : this.SourceFormat
             };
+
+            newEntityField.FieldLength = ((TimestampField)newEntityField).SourceFormat.Length;
+
             base.ToEntity(newEntityField, parentField, parentRevision);
             return newEntityField;
         }

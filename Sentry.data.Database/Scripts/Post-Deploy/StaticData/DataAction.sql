@@ -1,10 +1,16 @@
 ﻿BEGIN TRAN 
 	BEGIN TRY 
 		DECLARE	@Bucket VARCHAR(255)		
-		if @@SERVERNAME like '%' + 'FIT-N' + '%'  AND DB_NAME() like '%_NR'
-			SET @Bucket = 'sentry-dataset-management-np-nr'
-		else if (@@SERVERNAME like 'FIT-N' + '%' AND DB_NAME() not like '%_NR')
-			SET @Bucket = 'sentry-dataset-management-np'
+		if @@SERVERNAME like '%' + 'FIT-N' + '%' + '11'  AND DB_NAME() like '%_NR'
+			SET @Bucket = 'sentry-data-nrtest-dataset-ae2'
+		else if (@@SERVERNAME like 'FIT-N' + '%' + '12' AND DB_NAME() like '%_NR')
+			SET @Bucket = 'sentry-data-nrdev-dataset-ae2'
+		else if (@@SERVERNAME like 'FIT-N' + '%' + '12' AND DB_NAME() not like '%_NR')
+			SET @Bucket = 'sentry-data-dev-dataset-ae2'
+		else if (@@SERVERNAME like 'FIT-N' + '%' + '11' AND DB_NAME() not like '%_NR')
+			SET @Bucket = 'sentry-data-test-dataset-ae2'
+		else if ((@@SERVERNAME like 'FIT-N' + '%' + '10' OR @@SERVERNAME like 'FIT-N' + '%' + '20') AND DB_NAME() not like '%_NR')
+			SET @Bucket = 'sentry-data-qual-dataset-ae2'
 		else
 			SET @Bucket = 'sentry-dataset-management'
 		
@@ -21,7 +27,8 @@
 									(7, '4F40C384-A838-42B9-A9E4-8EC3CFE436DA', 'Schema Map', 'schemamap/', @Bucket, 'SchemaMap', 0),
 									(8, '0ED73692-AB69-42D9-8935-6B040164DDA7', 'Google Api', 'googleapipreprocessing/', @Bucket, 'GoogleApi', 0),
 									(9, '23A7A07F-0B54-4990-AEFE-90C4611E5C69', 'ClaimIQ', 'claimiqpreprocessing/', @Bucket, 'ClaimIq', 0),
-									(10, 'C9B8BED8-A3C5-48F8-8A46-873240D66952', 'Uncompress Gzip', 'uncompressgzip/', @Bucket, 'UncompressGzip', 0)
+									(10, 'C9B8BED8-A3C5-48F8-8A46-873240D66952', 'Uncompress Gzip', 'uncompressgzip/', @Bucket, 'UncompressGzip', 0),
+									(11, 'C3B3CC25-2F94-48C4-90E8-084BAF117BFA', 'Fixed Width', 'fixedwidthpreprocessing/', @Bucket, 'FixedWidth', 0)
 								)
 								AS Source ([Id], [ActionGuid], [Name], [TargetStoragePrefix], [TargetStorageBucket], [ActionType], [TargetStorageSchemaAware]) 
 
