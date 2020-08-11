@@ -101,7 +101,30 @@
                 },
 
 
-                { data: "Alias", className: "Alias", visible: false },
+                {
+                    data: null, className: "IsUserVerified", render: function (d) {
+
+                        //the below code is a way to not have to repeat the html checkbox creation below because it can be disabled or checked based on whether they can edit or if its IsSensitive
+                        var disabled = '';
+                        var checked = '';
+                        var cellValue = 'false';
+
+                        if (!canDaleSensitiveEdit) {
+                            disabled = ' disabled="disabled" ';
+                        }
+
+                        if (d.IsUserVerified) {
+                            checked = ' checked="checked" ';
+                            cellValue = 'true';
+                        }
+
+                        return ' <input type="checkbox" value="true"    style="margin:auto; width:100%; zoom:1.25;"  ' + checked + disabled + '  >   <label style="display:none;">' + cellValue + '</label>';  //styles center and make checkbox bigger
+                    }
+                },
+
+
+
+
                 { data: "ProdType", className: "ProdType", visible: false },
 
                 { data: "ColumnType", className: "ColumnType", visible: false },

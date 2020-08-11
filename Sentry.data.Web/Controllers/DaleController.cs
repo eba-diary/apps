@@ -151,12 +151,31 @@ namespace Sentry.data.Web.Controllers
             return false;
         }
 
-        
+        private bool CanDaleUserVerifiedEdit()
+        {
+            if ((_featureFlags.Dale_Expose_EditUserVerified_CLA_1911.GetValue() && SharedContext.CurrentUser.CanDaleUserVerifiedEdit)
+                || SharedContext.CurrentUser.IsAdmin
+              )
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+
         [HttpGet]
         //method called by dale.js to return whether user can edit IsSensitive IND
         public JsonResult GetCanDaleSensitiveEdit()
         {
             return Json(CanDaleSensitiveEdit(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        //method called by dale.js to return whether user can edit IsSensitive IND
+        public JsonResult GetCanDaleUserVerifiedEdit()
+        {
+            return Json(CanDaleUserVerifiedEdit(), JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]

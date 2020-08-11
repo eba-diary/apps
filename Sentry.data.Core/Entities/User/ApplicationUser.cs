@@ -161,5 +161,14 @@ namespace Sentry.data.Core
             }
         }
 
+        public virtual bool CanDaleUserVerifiedEdit
+        {
+            get
+            {
+                return true;
+                //return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.DALE_SENSITIVE_EDIT);
+            }
+        }
+
     }
 }

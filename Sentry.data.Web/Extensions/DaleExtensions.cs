@@ -45,7 +45,9 @@ namespace Sentry.data.Web
                 Scale = dto.Scale,
                 IsNullable = dto.IsNullable,
                 EffectiveDate = dto.EffectiveDate.ToString("MM/dd/yyyy HH:mm:ss"),
-                BaseColumnId = dto.BaseColumnId
+                BaseColumnId = dto.BaseColumnId,
+
+                IsUserVerified = dto.IsUserVerified
 
                 
             };

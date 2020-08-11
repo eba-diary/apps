@@ -12,5 +12,7 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> Use_AWS_v2_Configuration_CLA_1488 { get; }
         IFeatureFlag<bool> Confluent_Kafka_CLA_1793 { get; }
         IFeatureFlag<bool> Dale_Expose_EditSensitive_CLA_2025 { get; }
+        IFeatureFlag<bool> Dale_Expose_EditUserVerified_CLA_1911 { get; }
+
     }
 }
