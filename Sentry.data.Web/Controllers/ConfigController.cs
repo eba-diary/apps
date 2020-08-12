@@ -1711,5 +1711,14 @@ namespace Sentry.data.Web.Controllers
 
             return Json(model, JsonRequestBehavior.AllowGet);
         }
+
+        public PartialViewResult _RetrieverJob(int jobId)
+        {
+            RetrieverJob job = _datasetContext.GetById<RetrieverJob>(jobId);
+
+            ViewData["EnableJobControls"] = "false";
+            ViewData["Color"] = "blue";
+            return PartialView("~/Views/RetrieverJob/_RetrieverJob.cshtml", job);
+        }
     }
 }

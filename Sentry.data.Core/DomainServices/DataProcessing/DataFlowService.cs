@@ -463,26 +463,21 @@ namespace Sentry.data.Core
             dto.CreateDTM = df.CreatedDTM;
             dto.CreatedBy = df.CreatedBy;
             dto.FlowStorageCode = df.FlowStorageCode;
+            dto.MappedSchema = GetMappedFileSchema(df.Id);
+            dto.AssociatedJobs = GetExternalRetrieverJobs(df.Id);
         }
 
-        private void MaptToDto(DataFlowDto dto, RetrieverJobDto jobDto)
+        private List<int> GetMappedFileSchema(int dataflowId)
         {
-            jobDto.DataSourceId = dto.RetrieverJob.DataSourceId;
-            jobDto.DataSourceType = dto.RetrieverJob.DataSourceType;
-            jobDto.IsCompressed = false; //for the data flow compression is handled outside of retriever job logic
-            jobDto.CreateCurrentFile = dto.RetrieverJob.CreateCurrentFile;
-            jobDto.DatasetFileConfig = 0; //jobs for the data flow are linked via data flow id not datasetfileconfig
-            jobDto.FileNameExclusionList = dto.RetrieverJob.FileNameExclusionList;
-            jobDto.FileSchema = dto.RetrieverJob.FileSchema;
-            jobDto.FtpPatrn = dto.RetrieverJob.FtpPatrn;
-            jobDto.HttpRequestBody = dto.RetrieverJob.HttpRequestBody;
-            jobDto.JobId = dto.RetrieverJob.JobId;
-            jobDto.RelativeUri = dto.RetrieverJob.RelativeUri;
-            jobDto.RequestDataFormat = dto.RetrieverJob.RequestDataFormat;
-            jobDto.RequestMethod = dto.RetrieverJob.RequestMethod;
-            jobDto.Schedule = dto.RetrieverJob.Schedule;
-            jobDto.SearchCriteria = dto.RetrieverJob.SearchCriteria;
-            jobDto.TargetFileName = dto.RetrieverJob.TargetFileName;
+            List<int> scmIdList = new List<int>();
+            scmIdList = _datasetContext.SchemaMap.Where(w => w.DataFlowStepId.DataFlow.Id == dataflowId).Select(s => s.MappedSchema.SchemaId).ToList();
+            return scmIdList;
+        }
+
+        private List<int> GetExternalRetrieverJobs(int dataflowId)
+        {
+            List<int> rjList = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == dataflowId && !w.IsGeneric).Select(s => s.Id).ToList();
+            return rjList;
         }
 
         private void MapToDetailDto(DataFlow flow, DataFlowDetailDto dto)

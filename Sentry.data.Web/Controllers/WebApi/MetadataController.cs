@@ -99,6 +99,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             public int Id { get; set; }
             public string DetailUrl { get; set; }
             public List<DropLocation> RetrieverJobs { get; set; }
+            public bool PopulatesMultipleSchema { get; set; }
         }
         #endregion
 
@@ -787,7 +788,8 @@ namespace Sentry.data.Web.WebApi.Controllers
                     {
                         Name = item.Item1.Name,
                         Id = item.Item1.Id,
-                        DetailUrl = $"DataFlow/{item.Item1.Id.ToString()}/Detail"
+                        DetailUrl = $"DataFlow/{item.Item1.Id.ToString()}/Detail",
+                        PopulatesMultipleSchema = (item.Item1.MappedSchema.Count > 1)
                     };
                     List<DropLocation> rjList = new List<DropLocation>();
                     foreach (var job in item.Item2)

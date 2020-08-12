@@ -2,12 +2,13 @@
 
 @{ 
     string color = this.ViewData.ContainsKey("Color") ? this.ViewData["Color"].ToString() : string.Empty;
+    bool enableJobControls = this.ViewData.ContainsKey("EnableJobControls") ? Convert.ToBoolean(this.ViewData["EnableJobControls"]) : true;
 }
     <div class="retJob @Model.DataSource.SourceType">
         <div class="jobHeader categoryBanner-@color">
             <h6>@Model.DataSource.Name</h6>
             <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
-            @if (Model.DataSource.SourceType != "S3Basic" && Model.DataSource.SourceType != "DFSBasic")
+            @if (enableJobControls && Model.DataSource.SourceType != "S3Basic" && Model.DataSource.SourceType != "DFSBasic")
             {
                 <button style="float:right; margin-top:3px;" class="btn btn-default on-demand-run" id="@Model.Id">On-Demand Run</button>
 

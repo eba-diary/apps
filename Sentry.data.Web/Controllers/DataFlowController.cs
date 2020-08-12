@@ -15,12 +15,15 @@ namespace Sentry.data.Web.Controllers
         private readonly IDataFlowService _dataFlowService;
         private readonly IDatasetService _datasetService;
         private readonly IConfigService _configService;
+        private readonly ISecurityService _securityService;
 
-        public DataFlowController(IDataFlowService dataFlowService, IDatasetService datasetService, IConfigService configService)
+        public DataFlowController(IDataFlowService dataFlowService, IDatasetService datasetService, IConfigService configService,
+            ISecurityService securityService)
         {
             _dataFlowService = dataFlowService;
             _datasetService = datasetService;
             _configService = configService;
+            _securityService = securityService;
         }
 
         // GET: DataFlow
@@ -39,6 +42,8 @@ namespace Sentry.data.Web.Controllers
         {
             DataFlowDetailDto dto = _dataFlowService.GetDataFlowDetailDto(id);
             DataFlowDetailModel model = new DataFlowDetailModel(dto);
+
+            model.UserSecurity = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
 
             return View(model);
         }

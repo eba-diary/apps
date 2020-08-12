@@ -17,5 +17,6 @@ namespace Sentry.data.Web
             };            
         }
         public List<DataFlowStepModel> Step { get; set; }
+        public UserSecurity UserSecurity { get; set; }
     }
 }
