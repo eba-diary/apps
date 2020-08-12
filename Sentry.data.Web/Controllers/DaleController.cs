@@ -167,7 +167,6 @@ namespace Sentry.data.Web.Controllers
         //method called by dale.js to return whether user can edit IsSensitive IND
         public JsonResult GetCanDaleSensitiveEdit()
         {
-            //return Json(CanDaleSensitiveEdit(),JsonRequestBehavior.AllowGet);
             return Json(new {canDaleSensitiveEdit = CanDaleSensitiveEdit(), canDaleUserVerifiedEdit = CanDaleUserVerifiedEdit() },JsonRequestBehavior.AllowGet);
         }
 

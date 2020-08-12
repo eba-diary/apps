@@ -50,7 +50,7 @@
         });
     },
 
-    dataTablCreate: function (canDaleSensitiveEdit) {
+    dataTablCreate: function (obj) {
 
         //init DataTable
         $("#daleResultsTable").DataTable({
@@ -80,14 +80,14 @@
                 //Since I did not want user to see label text and still have a filter.  My cheat to this was to style label with display:none while still keeping the filtering ability
                 //later on when they check/uncheck the box my editRow() function will refresh the data associated with the grid which changes the label hidden text to the opposite so filtering can refresh
                 {
-                    data: null, className: "IsSensitive", render: function (d) {
+                    data: null, className: "IsSensitive", visible: false,  render: function (d) {
 
                         //the below code is a way to not have to repeat the html checkbox creation below because it can be disabled or checked based on whether they can edit or if its IsSensitive
                         var disabled = '';
                         var checked = '';
                         var cellValue = 'false';
 
-                        if (!canDaleSensitiveEdit) {
+                        if (!obj.canDaleSensitiveEdit) {
                             disabled = ' disabled="disabled" ';
                         }
 
@@ -102,14 +102,14 @@
 
 
                 {
-                    data: null, className: "IsUserVerified", render: function (d) {
+                    data: null, className: "IsUserVerified", visible: false, render: function (d) {
 
                         //the below code is a way to not have to repeat the html checkbox creation below because it can be disabled or checked based on whether they can edit or if its IsSensitive
                         var disabled = '';
                         var checked = '';
                         var cellValue = 'false';
 
-                        if (!canDaleSensitiveEdit) {
+                        if (!obj.canDaleUserVerifiedEdit) {
                             disabled = ' disabled="disabled" ';
                         }
 
@@ -121,9 +121,6 @@
                         return ' <input type="checkbox" value="true"    style="margin:auto; width:100%; zoom:1.25;"  ' + checked + disabled + '  >   <label style="display:none;">' + cellValue + '</label>';  //styles center and make checkbox bigger
                     }
                 },
-
-
-
 
                 { data: "ProdType", className: "ProdType", visible: false },
 
@@ -209,6 +206,107 @@
 
     },
 
+    //edit storage array since user is changing data
+    editArray: function (rowIndex, rowData, columnIndex, columnValue) {
+
+        var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                      //get stored object array
+        var verifiedList = JSON.parse(localStorage.getItem("verifiedList"));                                        //get stored object array
+
+        var o = new Object();
+        o.BaseColumnId = rowData.BaseColumnId;
+        o.IsSensitive = rowData.IsSensitive;
+        o.IsUserVerified = rowData.IsUserVerified;
+
+        //IsSensitive Cell Check
+        if (columnIndex === 6) {
+
+            rowData.IsSensitive = columnValue;                                                                          //flip IsSensitive for rowData
+            o.IsSensitive = columnValue;                                                                                //flip IsSensitive for array storage
+
+            //first time create new array
+            if (sensitiveList == null) {
+                sensitiveList = [];
+                sensitiveList[0] = o;
+            }
+            else {
+                //check if item exists and remove or add new item to list
+                var index = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);
+                if (index >= 0)                                                                                         
+                {
+                    sensitiveList.splice(index, 1);                                                                     //remove that index from array  
+                }
+                else {
+                    sensitiveList.push(o);                                                                              //add new item
+                }
+            }
+        }
+        else if (columnIndex === 7) {
+
+            rowData.IsUserVerified = columnValue;                                                                          //flip IsSensitive for rowData
+            o.IsUserVerified = columnValue;                                                                                //flip IsSensitive for array storage
+
+            //first time create new array
+            if (verifiedList == null) {
+                verifiedList = [];
+                verifiedList[0] = o;
+            }
+            else {
+                //check if item exists and remove or add new item to list
+                var index = verifiedList.findIndex(verified => verified.BaseColumnId === o.BaseColumnId);
+                if (index >= 0)                                                                                         
+                {
+                    verifiedList.splice(index, 1);                                                                     //remove that index from array  
+                }
+                else {
+                    verifiedList.push(o);                                                                              //add new item
+                }
+            }
+        }
+
+        //init variables to use to know whether to mark row as edited and show save button
+        var edit = false;
+        var sensitiveIndexEDITED = -1;
+        var verifiedIndexEDITED = -1;
+        var sensitiveListLength = 0;
+        var verifiedListLength = 0;
+
+        //init 
+        if (sensitiveList != null) {
+            sensitiveIndexEDITED = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);
+            sensitiveListLength = sensitiveList.length;
+        }
+
+        if (verifiedList != null) {
+            verifiedIndexEDITED = verifiedList.findIndex(verified => verified.BaseColumnId === o.BaseColumnId);
+            verifiedListLength = verifiedList.length;
+        }
+
+
+        //DETERMINE IF ROW SHOULD BE RED based on if we found that index in the array with changes
+        if (sensitiveIndexEDITED >= 0 || verifiedIndexEDITED >= 0) {
+            edit = true;
+        }
+        else {
+            edit = false;
+        }
+
+        //DETERMINE WHETHER TO SHOW SAVE BUTTON based on if any of the arrays have items
+        if (sensitiveListLength > 0 || verifiedListLength > 0) {
+            $('#btnSaveMe').show();
+        }
+        else {
+       
+            $('#btnSaveMe').hide();
+        }
+
+        //save array to storage
+        localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));                                           
+        localStorage.setItem("verifiedList", JSON.stringify(verifiedList));                                           
+
+        //mark UI as edited
+        data.Dale.editRow(edit, rowIndex, rowData);
+    },
+
     //edit row (data and style) since user changed something
     editRow: function (edit, rowIndex, rowData) {
 
@@ -234,106 +332,6 @@
                 .to$()                          //Convert to a jQuery object
                 .removeClass('dale-clicked');   //remove dale-clicked class                                                        
         }
-    },
-
-    //edit storage array since user is changing data
-    editArray: function (rowIndex, rowData, columnIndex, columnValue) {
-
-        
-        var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                      //get stored object array
-        var verifiedList = JSON.parse(localStorage.getItem("verifiedList"));                                        //get stored object array
-
-        var o = new Object();
-        o.BaseColumnId = rowData.BaseColumnId;
-        o.IsSensitive = rowData.IsSensitive;
-        o.IsUserVerified = rowData.IsUserVerified;
-
-
-        //IsSensitive Cell Check
-        if (columnIndex === 6) {
-
-            rowData.IsSensitive = columnValue;                                                                          //flip IsSensitive for rowData
-            o.IsSensitive = columnValue;                                                                                //flip IsSensitive for array storage
-
-            //first time create new array
-            if (sensitiveList == null) {
-                sensitiveList = [];
-                sensitiveList[0] = o;
-            }
-            else {
-                //check if item exists and remove or add new item to list
-                var index = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);
-                if (index >= 0)                                                                                         //check if already exists
-                {
-                    sensitiveList.splice(index, 1);                                                                     //remove that index from array  
-                }
-                else {
-                    sensitiveList.push(o);                                                                              //add new item
-                }
-            }
-        }
-        else if (columnIndex === 7) {
-
-            rowData.IsUserVerified = columnValue;                                                                          //flip IsSensitive for rowData
-            o.IsUserVerified = columnValue;                                                                                //flip IsSensitive for array storage
-
-            //first time create new array
-            if (verifiedList == null) {
-                verifiedList = [];
-                verifiedList[0] = o;
-            }
-            else {
-                //check if item exists and remove or add new item to list
-                var index = verifiedList.findIndex(verified => verified.BaseColumnId === o.BaseColumnId);
-                if (index >= 0)                                                                                         //check if already exists
-                {
-                    verifiedList.splice(index, 1);                                                                     //remove that index from array  
-                }
-                else {
-                    verifiedList.push(o);                                                                              //add new item
-                }
-            }
-        }
-
-        var edit = false;
-        var sensitiveEDITED = -1;
-        var verifiedEDITED = -1;
-        var sensitiveListLength = 0;
-        var verifiedListLength = 0;
-
-        //init 
-        if (sensitiveList != null) {
-            sensitiveEDITED = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);
-            sensitiveListLength = sensitiveList.length;
-        }
-
-        if (verifiedList != null) {
-            verifiedEDITED = verifiedList.findIndex(verified => verified.BaseColumnId === o.BaseColumnId);
-            verifiedListLength = verifiedList.length;
-        }
-
-
-        //DETERMINE IF ROW SHOULD BE RED
-        if (sensitiveEDITED >= 0 || verifiedEDITED >= 0) {
-            edit = true;
-        }
-        else {
-            edit = false;
-        }
-
-        //DETERMINE WHETHER TO SHOW SAVE BUTTON
-        if (sensitiveListLength > 0 || verifiedListLength > 0) {
-            $('#btnSaveMe').show();
-        }
-        else {
-       
-            $('#btnSaveMe').hide();
-        }
-
-        localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));                                           //save array to storage
-        localStorage.setItem("verifiedList", JSON.stringify(verifiedList));                                           //save array to storage
-
-        data.Dale.editRow(edit, rowIndex, rowData);
     },
 
     //figure out which radio button was selected

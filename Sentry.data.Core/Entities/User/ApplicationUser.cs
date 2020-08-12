@@ -165,8 +165,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                return true;
-                //return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.DALE_SENSITIVE_EDIT);
+                return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.DALE_USER_VERIFIED_EDIT);
             }
         }
 
