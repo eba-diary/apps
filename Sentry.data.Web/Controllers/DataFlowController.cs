@@ -93,14 +93,18 @@ namespace Sentry.data.Web.Controllers
 
             if (ModelState.IsValid)
             {
+                int newFlowId = 0;
+
                 DataFlowDto dfDto = model.ToDto();
                 
                 if (dfDto.Id == 0)
                 {
-                    _dataFlowService.CreateandSaveDataFlow(dfDto);
-                }
-
-                return RedirectToAction("Index");
+                    newFlowId = _dataFlowService.CreateandSaveDataFlow(dfDto);
+                    if (newFlowId != 0)
+                    {
+                        return RedirectToAction("Detail", "DataFlow", new { id = newFlowId});
+                    }
+                }                                
             }
 
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);

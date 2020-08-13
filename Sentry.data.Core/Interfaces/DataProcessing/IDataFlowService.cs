@@ -12,7 +12,7 @@ namespace Sentry.data.Core
         List<DataFlowDto> ListDataFlows();
         DataFlowDetailDto GetDataFlowDetailDto(int id);
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
-        bool CreateandSaveDataFlow(DataFlowDto dto);
+        int CreateandSaveDataFlow(DataFlowDto dto);
         void PublishMessage(string key, string message);
         IQueryable<DataSourceType> GetDataSourceTypes();
         IQueryable<DataSource> GetDataSources();

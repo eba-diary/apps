@@ -51,21 +51,21 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
-        public bool CreateandSaveDataFlow(DataFlowDto dto)
+        public int CreateandSaveDataFlow(DataFlowDto dto)
         {
             try
             {
-                CreateDataFlow(dto);
+                DataFlow df = CreateDataFlow(dto);
 
                 _datasetContext.SaveChanges();
+
+                return df.Id;
             }
             catch (Exception ex)
             {
                 Logger.Error("dataflowservice-createandsavedataflow failed to save dataflow", ex);
-                return false;
+                return 0;
             }
-
-            return true;
         }
 
         public void CreateDataFlowForSchema(FileSchema scm)
@@ -297,7 +297,7 @@ namespace Sentry.data.Core
             }
         }
 
-        private void CreateDataFlow(DataFlowDto dto)
+        private DataFlow CreateDataFlow(DataFlowDto dto)
         {           
             DataFlow df = MapToDataFlow(dto);
 
@@ -312,6 +312,8 @@ namespace Sentry.data.Core
                 default:
                     break;
             }
+
+            return df;
         }
 
         private DataFlow MapToDataFlow(DataFlowDto dto)
@@ -335,9 +337,9 @@ namespace Sentry.data.Core
         {
             //This type of dataflow does not need to worry about retrieving data from external sources
             // Data will be pushed by user to S3 and\or DFS drop locations
-
             //Add default DFS drop location for data flow
-            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_DATAFLOW_DFS_DROP_LOCATION)));
+            List<DataSource> srcList = _datasetContext.DataSources.ToList();
+            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
             _datasetContext.Add(dfsDataFlowBasic);
 
             //Generate ingestion steps (get file to raw location)
@@ -697,7 +699,8 @@ namespace Sentry.data.Core
             DataFlowDto dto = MapToDto(scm);
 
             //Add default DFS drop location for data flow
-            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_DATAFLOW_DFS_DROP_LOCATION)));
+            List<DataSource> srcList = _datasetContext.DataSources.ToList();
+            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
             _datasetContext.Add(dfsDataFlowBasic);
 
             //Generate ingestion steps (get file to raw location)
