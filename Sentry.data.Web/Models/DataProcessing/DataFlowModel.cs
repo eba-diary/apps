@@ -17,6 +17,7 @@ namespace Sentry.data.Web
             IsPreProcessingRequired = false;
         }
 
+        public string Name { get; set; }
         /// <summary>
         /// How is data getting into DSC (Push or Pull)
         /// </summary>
@@ -87,6 +88,11 @@ namespace Sentry.data.Web
                 {
                     errors.Add("Must select schema for schema mapping");
                 }
+            }
+
+            if (Name.StartsWith("FileSchemaFlow"))
+            {
+                errors.Add("FileSchemaFlow is a reserved name, please choose new name");
             }
 
             return errors;

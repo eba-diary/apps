@@ -29,7 +29,7 @@ namespace Sentry.data.Web
             Core.DataFlowDto dto = new Core.DataFlowDto
             {
                 Id = model.DataFlowId,
-                Name = "Blah",
+                Name = model.Name,
                 CreatedBy = model.CreatedBy,
                 CreateDTM = model.CreatedDTM,
                 IngestionType = model.IngestionType,

@@ -59,6 +59,7 @@
         var selection = $("[id$=IngestionType]").val();
 
         if (selection === "2") {
+            $('.namePanel').show();
             $('.retrieverPanel').show();
             $('.questionairePanel').show();
             $('.compressionPanel').show();
@@ -68,6 +69,7 @@
             data.Job.FormInit();
         }
         else if (selection === "1") {
+            $('.namePanel').show();
             $('.retrieverPanel').hide();
             $('.compressionPanel').show();
             $('.schemaMapPanel').show();
@@ -76,12 +78,14 @@
         }
 
         if (selection === "0") {
+            $('.namePanel').hide();
             $('.compressionPanel').hide();
             $('.schemaMapPanel').hide();
             $('.preProcessingPanel').hide();
             $('.formSubmitButtons').hide();
         }
         else {
+            $('.namePanel').show();
             $('.compressionPanel').show();
             $('.schemaMapPanel').show();
             $('.preProcessingPanel').show();
@@ -100,6 +104,7 @@
             else {
                 $('.retrieverPanel').hide();
             }
+            $('.namePanel').show();
             $('.compressionPanel').show();
             $('.schemaMapPanel').show();
             $('.preProcessingPanel').show();

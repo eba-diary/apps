@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -86,10 +85,12 @@ namespace Sentry.data.Web.Controllers
         {
             AddCoreValidationExceptionsToModel(model.Validate());
 
+            DataFlowDto dfDto = model.ToDto();
+
+            AddCoreValidationExceptionsToModel(_dataFlowService.Validate(dfDto));
+
             if (ModelState.IsValid)
-            {
-                DataFlowDto dfDto = model.ToDto();
-                
+            {                
                 if (dfDto.Id == 0)
                 {
                     _dataFlowService.CreateandSaveDataFlow(dfDto);

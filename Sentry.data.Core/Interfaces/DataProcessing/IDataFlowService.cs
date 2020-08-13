@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core.Entities.DataProcessing;
+﻿using Sentry.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,5 +65,6 @@ namespace Sentry.data.Core
         /// <returns></returns>
         List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId);
         void DeleteByFileSchema(FileSchema scm);
+        List<string> Validate(DataFlowDto dfDto);
     }
 }

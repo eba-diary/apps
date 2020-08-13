@@ -275,6 +275,16 @@ namespace Sentry.data.Core
             Logger.Info($"dataflowservice-delete-end - dataflowid:{dataFlowId}");
         }
 
+        public List<string> Validate(DataFlowDto dfDto)
+        {
+            List<string> errors = new List<string>();
+            if (_datasetContext.DataFlow.Any(w => w.Name == dfDto.Name))
+            {
+                errors.Add("Dataflow name is already used");
+            }
+            return errors;
+        }
+
         #region Private Methods
         private void DeleteLongTermFiles(DataFlow flow)
         {

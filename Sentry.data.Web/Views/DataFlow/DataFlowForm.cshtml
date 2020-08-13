@@ -38,6 +38,14 @@
                     @*@Html.RadioButtonFor(model => model.IngestionType, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })*@
                 </div>
             </div>
+            <div class="namePanel" style="display:none;">
+                <div class="form-group col-md-12">
+                    <h4>What Would You Like to Name This Data Flow?</h4>
+                    <div class="col-md-4">
+                        @Html.TextBoxFor((m) => m.Name, Model.Name, new { @class = "form-control edit-dataset-row" })
+                    </div>
+                </div>
+            </div>
             <br />
             <div class="compressionPanel" style="display:none;">
                 @*@Html.HiddenFor(model => model.IsCompressed)*@
