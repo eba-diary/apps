@@ -22,3 +22,7 @@
     CONSTRAINT [FK_SchemaField_SchemaField] FOREIGN KEY ([ParentField]) REFERENCES [SchemaField]([Field_Id]), 
     CONSTRAINT [FK_SchemaField_SchemaRevision] FOREIGN KEY ([ParentSchemaRevision]) REFERENCES [SchemaRevision]([SchemaRevision_Id])
 )
+
+GO
+
+CREATE INDEX [idx_SchemaField_parent] ON [dbo].[SchemaField] ([ParentField])
