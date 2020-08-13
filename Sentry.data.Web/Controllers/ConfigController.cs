@@ -1633,7 +1633,7 @@ namespace Sentry.data.Web.Controllers
 
             return string.IsNullOrEmpty(ticketId) 
                 ? PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false)) 
-                : PartialView("_Success", new SuccessModel("Data Source access was successfully requested.", "HPSM Change Id: " + ticketId, true));
+                : PartialView("_Success", new SuccessModel("Data Source access was successfully requested.", "Change Id: " + ticketId, true));
         }
 
         [HttpGet]
