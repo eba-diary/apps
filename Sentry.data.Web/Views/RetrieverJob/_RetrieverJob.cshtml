@@ -1,0 +1,84 @@
+﻿@model Sentry.data.Core.RetrieverJob
+
+@{ 
+    string color = this.ViewData.ContainsKey("Color") ? this.ViewData["Color"].ToString() : string.Empty;
+    bool enableJobControls = this.ViewData.ContainsKey("EnableJobControls") ? Convert.ToBoolean(this.ViewData["EnableJobControls"]) : true;
+}
+    <div class="retJob @Model.DataSource.SourceType">
+        <div class="jobHeader categoryBanner-@color">
+            <h6>@Model.DataSource.Name</h6>
+            <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+            @if (enableJobControls && Model.DataSource.SourceType != "S3Basic" && Model.DataSource.SourceType != "DFSBasic")
+            {
+                <button style="float:right; margin-top:3px;" class="btn btn-default on-demand-run" id="@Model.Id">On-Demand Run</button>
+
+                if (Model.IsEnabled)
+                {
+                    <button style="float:right; margin-top:3px;" class="btn btn-default jobstatus jobstatus_enabled" id="@Model.Id">Disable</button>
+                }
+                else
+                {
+                    <button style="float:right; margin-top:3px;" class="btn btn-default jobstatus jobstatus_disabled" id="@Model.Id"> Enable</button>
+                }
+            }
+        </div>
+        <div class="jobContainer" style="display:none;">
+            <p>@Model.DataSource.Description</p>
+
+            @if (Model.IsGeneric)
+            {
+                <p>This is the Generic Data File Configuration that was created when the Dataset was created. Certain fields cannot be modified.</p>
+            }
+            <p><span class="schedule">@Model.Schedule</span></p>
+            <p>We are watching for files within the following URL: </p>
+            <p class="filePath"">@Model.GetUri() </p>
+
+            @if (Model.JobOptions != null)
+            {
+                if (Model.JobOptions.IsRegexSearch)
+                {
+                    <p>This job is searching for Regex</p>
+                }
+                else
+                {
+                    <p>This job is searching for Exact Strings</p>
+                }
+
+                <p>It is searching for : @Model.JobOptions.SearchCriteria</p>
+
+                if (Model.JobOptions.OverwriteDataFile)
+                {
+                    <p>This job will overwrite exact file names with the same name and save them as versions.</p>
+                }
+
+                if (!String.IsNullOrWhiteSpace(Model.JobOptions.TargetFileName))
+                {
+                    <p>This the target file name :  @Model.JobOptions.TargetFileName</p>
+                }
+            }
+
+
+            @if (Model.JobOptions != null && Model.JobOptions.CompressionOptions != null)
+            {
+                if (Model.JobOptions.CompressionOptions.IsCompressed)
+                {
+                    <p>This job is uncompressing Model.JobOptions.CompressionOptions.CompressionType files.</p>
+
+                    foreach (var fileName in Model.JobOptions.CompressionOptions.FileNameExclusionList)
+                    {
+                        <p>@fileName is being excluded.</p>
+                    }
+                }
+            }
+
+            <hr />
+            <p>Created on : @Model.Created</p>
+            <p>Modified on : @Model.Modified</p>
+
+            @if(@Model.DatasetConfig != null)
+            {
+                <a class="btn btn-primary" href="/Config/@Model.DatasetConfig.ConfigId/Job/Edit/@Model.Id">Edit</a>
+            }            
+
+            </div>
+        </div>

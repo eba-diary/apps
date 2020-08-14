@@ -55,6 +55,24 @@
         data.DataFlow.InitSchemaMaps();
     },
 
+    DataFlowDetailInit: function () {
+        $('body').on('click', '.jobHeader', function () {
+            if ($(this).children('.tracker-menu-icon').hasClass('glyphicon-menu-down')) {
+                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
+            } else {
+                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-up', 'glyphicon-menu-down');
+            }
+            $(this).next('.jobContainer').toggle();
+
+            if ($(this).next('.jobContainer:visible').length == 0) {
+                // action when all are hidden
+                $(this).css('border-radius', '5px 5px 5px 5px');
+            } else {
+                $(this).css('border-radius', '5px 5px 0px 0px');
+            }
+        });
+    },
+
     InitIngestionType() {
         var selection = $("[id$=IngestionType]").val();
 

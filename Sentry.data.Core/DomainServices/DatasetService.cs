@@ -563,6 +563,11 @@ namespace Sentry.data.Core
             {
                 dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
             }
+
+            //foreach (DatasetFileConfig item in ds.DatasetFileConfigs)
+            //{
+            //    dto.DataFlows.Add(new Tuple<string, List<Tuple<DataFlowDetailDto, List<RetrieverJob>>>>(item.Name, _configService.GetExternalDataFlowsBySchema(item)));
+            //}
         }
 
         private string GeneratePreviewLambdaTriggerEvent(string bucket, DatasetFile dsf)

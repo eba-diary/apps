@@ -30,6 +30,7 @@ namespace Sentry.data.Web.Controllers
         private readonly ISchemaService _schemaService;
         private readonly IDataFeatures _featureFlags;
         private string _bucket;
+        private string _awsRegion;
 
         public ConfigController(IDatasetContext dsCtxt, UserService userService, IAssociateInfoProvider associateInfoService,
             IConfigService configService, IEventService eventService, IDatasetService datasetService, 
@@ -65,6 +66,20 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
+        private string AWSRegion
+        {
+            get
+            {
+                if (_awsRegion == null)
+                {
+                    _awsRegion = _featureFlags.Use_AWS_v2_Configuration_CLA_1488.GetValue()
+                            ? Config.GetHostSetting("AWS2_0Region")
+                            : Config.GetHostSetting("AWSRegion");
+                }
+                return _awsRegion;
+            }
+        }
+
         [HttpGet]
         [Route("Config/Dataset/{id}")]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
@@ -82,7 +97,21 @@ namespace Sentry.data.Web.Controllers
                 List<DatasetFileConfigsModel> configModelList = new List<DatasetFileConfigsModel>();
                 foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
                 {
-                    configModelList.Add(new DatasetFileConfigsModel(config, true, false));
+                    DatasetFileConfigsModel model = new DatasetFileConfigsModel(config, true, false);
+
+                    Tuple<List<RetrieverJob>, List<DataFlowStepDto>> jobs =  _configService.GetDataFlowDropLocationJobs(config);
+                    List<DataFlowStepModel> stepModels = new List<DataFlowStepModel>();
+                    foreach (DataFlowStepDto stepDto in jobs.Item2)
+                    {
+                        DataFlowStepModel stepModel = stepDto.ToModel();
+                        stepModel.RootAWSUrl = $"https://{AWSRegion.ToLower()}.amazonaws.com/{RootBucket.ToLower()}/";
+                        stepModels.Add(stepModel);
+                    }
+
+                    model.RetrieverJobs = config.RetrieverJobs;
+                    model.DataFlowJobs = new Tuple<List<RetrieverJob>, List<DataFlowStepModel>>( jobs.Item1, stepModels );
+                    model.ExternalDataFlowJobs = _configService.GetExternalDataFlowsBySchema(config).ToModel();
+                    configModelList.Add(model);
                 }
 
                 ManageConfigsModel mcm = new ManageConfigsModel()
@@ -1681,6 +1710,15 @@ namespace Sentry.data.Web.Controllers
             model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.TIMESTAMP, "A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss", "Date Time Data Types"));
 
             return Json(model, JsonRequestBehavior.AllowGet);
+        }
+
+        public PartialViewResult _RetrieverJob(int jobId)
+        {
+            RetrieverJob job = _datasetContext.GetById<RetrieverJob>(jobId);
+
+            ViewData["EnableJobControls"] = "false";
+            ViewData["Color"] = "blue";
+            return PartialView("~/Views/RetrieverJob/_RetrieverJob.cshtml", job);
         }
     }
 }
