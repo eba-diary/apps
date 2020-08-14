@@ -76,7 +76,7 @@ namespace Sentry.data.Web
                     }
                     if (model.SelectedSchema == 0)
                     {
-                        dsSelectionErr = true;
+                        scmSelectionErr = true;
                     }
                 }
 
@@ -93,6 +93,11 @@ namespace Sentry.data.Web
             if (Name.StartsWith("FileSchemaFlow"))
             {
                 errors.Add("FileSchemaFlow is a reserved name, please choose new name");
+            }
+
+            if (IsPreProcessingRequired && PreprocessingOptions.Count == 1 && PreprocessingOptions.First() == 0)
+            {
+                errors.Add("Pre Processing selection is required");
             }
 
             return errors;

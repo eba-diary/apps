@@ -31,6 +31,14 @@
             }
         });
 
+        //init preprocessing panel
+        if ($("#IsPreProcessingRequired").val() == "true") {
+            $(".preProcessingJobPanel").show();
+        }
+        else {
+            $(".preProcessingJobPanel").hide();
+        }
+        //init preprocessing change eventS
         $("#IsPreProcessingRequired").change(function () {
             if ($(this).val() === "true") {
                 $('.preProcessingJobPanel').show();
@@ -41,7 +49,7 @@
                 //}
             }
             else {
-                $('.preProcessingPanel').hide();
+                $('.preProcessingJobPanel').hide();
             }
         });
 
@@ -224,11 +232,11 @@
                 if (curVal === null || curVal === "0") {
                     targetElement.val("0");
                 }
-                else if (schemaId !== null || curVal === "-1") {
+                else if ((schemaId != undefined && schemaId !== null) || curVal === "-1") {
                     targetElement.val(schemaId)
                 }
                 else {
-                    targetElement.val(curVal);
+                    $(targetElement).val(curVal);
                 }
             });
         }
