@@ -84,7 +84,8 @@ namespace Sentry.data.Web
             return new DaleSensitiveDto()
             {
                 BaseColumnId = model.BaseColumnId,
-                IsSensitive = model.IsSensitive
+                IsSensitive = model.IsSensitive,
+                IsUserVerified = model.IsUserVerified
             };
         }
 

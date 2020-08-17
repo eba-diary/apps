@@ -21,6 +21,9 @@
         $("#btnSaveMe").on('click', function () {
 
             var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                      //get stored object array
+            var verifiedList = JSON.parse(localStorage.getItem("verifiedList"));                                      //get stored object array
+
+            sensitiveList = data.Dale.createMasterList(sensitiveList, verifiedList);
 
             //Send the JSON array to Controller using AJAX.
             $.ajax({
@@ -49,6 +52,39 @@
            
         });
     },
+
+    createMasterList: function (sensitiveList, verifiedList) {
+
+        //update SENSITIVE LIST FROM VERIFIED LIST
+        var len = sensitiveList.length;
+        for (let i = 0; i < len; i++) {
+
+            var r = sensitiveList[i];
+            var index = verifiedList.findIndex(item => item.BaseColumnId === r.BaseColumnId);
+
+            if (index >= 0) {
+                var o = verifiedList[index];
+                r.IsUserVerified = o.IsUserVerified;
+
+                sensitiveList[i] = r;
+            }
+        }
+
+        //INSERT SENSITIVE LIST FROM VERIFIED LIST
+        var len2 = verifiedList.length;
+        for (let i = 0; i < len2; i++) {
+
+            var r = verifiedList[i];
+            var index = sensitiveList.findIndex(item => item.BaseColumnId === r.BaseColumnId);
+
+            if (index < 0) {
+                sensitiveList.push(r)
+            }
+        }
+
+        return sensitiveList;
+    },
+
 
     dataTablCreate: function (obj) {
 
@@ -80,7 +116,7 @@
                 //Since I did not want user to see label text and still have a filter.  My cheat to this was to style label with display:none while still keeping the filtering ability
                 //later on when they check/uncheck the box my editRow() function will refresh the data associated with the grid which changes the label hidden text to the opposite so filtering can refresh
                 {
-                    data: null, className: "IsSensitive", visible: false,  render: function (d) {
+                    data: null, className: "IsSensitive", /*visible: false,*/  render: function (d) {
 
                         //the below code is a way to not have to repeat the html checkbox creation below because it can be disabled or checked based on whether they can edit or if its IsSensitive
                         var disabled = '';
@@ -102,7 +138,7 @@
 
 
                 {
-                    data: null, className: "IsUserVerified", visible: false, render: function (d) {
+                    data: null, className: "IsUserVerified", /*visible: false,*/ render: function (d) {
 
                         //the below code is a way to not have to repeat the html checkbox creation below because it can be disabled or checked based on whether they can edit or if its IsSensitive
                         var disabled = '';
@@ -211,8 +247,9 @@
 
         var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                      //get stored object array
         var verifiedList = JSON.parse(localStorage.getItem("verifiedList"));                                        //get stored object array
-
-        var o = new Object();
+        
+        //create new obj to represent all editable columns
+        var o = new Object();                                                                                       
         o.BaseColumnId = rowData.BaseColumnId;
         o.IsSensitive = rowData.IsSensitive;
         o.IsUserVerified = rowData.IsUserVerified;
@@ -223,44 +260,17 @@
             rowData.IsSensitive = columnValue;                                                                          //flip IsSensitive for rowData
             o.IsSensitive = columnValue;                                                                                //flip IsSensitive for array storage
 
-            //first time create new array
-            if (sensitiveList == null) {
-                sensitiveList = [];
-                sensitiveList[0] = o;
-            }
-            else {
-                //check if item exists and remove or add new item to list
-                var index = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);
-                if (index >= 0)                                                                                         
-                {
-                    sensitiveList.splice(index, 1);                                                                     //remove that index from array  
-                }
-                else {
-                    sensitiveList.push(o);                                                                              //add new item
-                }
-            }
-        }
+            sensitiveList = data.Dale.editArrayItem(o, sensitiveList);
+            localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));                                       //save array to storage
+
+        } //IsUserVerified
         else if (columnIndex === 7) {
 
-            rowData.IsUserVerified = columnValue;                                                                          //flip IsSensitive for rowData
-            o.IsUserVerified = columnValue;                                                                                //flip IsSensitive for array storage
+            rowData.IsUserVerified = columnValue;                                                                       //flip IsSensitive for rowData
+            o.IsUserVerified = columnValue;                                                                             //flip IsSensitive for array storage
 
-            //first time create new array
-            if (verifiedList == null) {
-                verifiedList = [];
-                verifiedList[0] = o;
-            }
-            else {
-                //check if item exists and remove or add new item to list
-                var index = verifiedList.findIndex(verified => verified.BaseColumnId === o.BaseColumnId);
-                if (index >= 0)                                                                                         
-                {
-                    verifiedList.splice(index, 1);                                                                     //remove that index from array  
-                }
-                else {
-                    verifiedList.push(o);                                                                              //add new item
-                }
-            }
+            verifiedList = data.Dale.editArrayItem(o, verifiedList);
+            localStorage.setItem("verifiedList", JSON.stringify(verifiedList));                                         //save array to storage
         }
 
         //init variables to use to know whether to mark row as edited and show save button
@@ -281,7 +291,6 @@
             verifiedListLength = verifiedList.length;
         }
 
-
         //DETERMINE IF ROW SHOULD BE RED based on if we found that index in the array with changes
         if (sensitiveIndexEDITED >= 0 || verifiedIndexEDITED >= 0) {
             edit = true;
@@ -290,7 +299,7 @@
             edit = false;
         }
 
-        //DETERMINE WHETHER TO SHOW SAVE BUTTON based on if any of the arrays have items
+        //DETERMINE WHETHER TO SHOW SAVE BUTTON based on if any of arrays have items
         if (sensitiveListLength > 0 || verifiedListLength > 0) {
             $('#btnSaveMe').show();
         }
@@ -299,12 +308,30 @@
             $('#btnSaveMe').hide();
         }
 
-        //save array to storage
-        localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));                                           
-        localStorage.setItem("verifiedList", JSON.stringify(verifiedList));                                           
-
-        //mark UI as edited
+        //mark UI as edited or NOT
         data.Dale.editRow(edit, rowIndex, rowData);
+    },
+
+    //UPDATE ARRAY based on new data
+    editArrayItem: function (o, list) {
+
+        //first time create new array
+        if (list == null) {
+            list = [];
+            list[0] = o;
+        }
+        else {
+            //check if item exists and remove or add new item to list
+            var index = list.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);
+            if (index >= 0) {
+                list.splice(index, 1);                                                                     //remove that index from array  
+            }
+            else {
+                list.push(o);                                                                              //add new item
+            }
+        }
+
+        return list;
     },
 
     //edit row (data and style) since user changed something
