@@ -242,109 +242,128 @@
                             </div>
                         }
 
-                        <hr />
-                        <h4 class="@color">DataFlow (Schema Specific) Drop Locations</h4>
-                        <hr />
-
-                        @if (!item.DataFlowJobs.Item1.Any() && !item.DataFlowJobs.Item2.Any())
+                        @if (!Model.DisplayDataflowMetadata)
                         {
-                            <p>This schema does not have any associated dataflows yet.</p>
-                        }
-
-                        @foreach (DataFlowStepModel step in item.DataFlowJobs.Item2)
-                        {
-                            <div class="retJob @step.ActionName">
-                                <div class="jobHeader categoryBanner-@color">
-                                    <h6>@step.ActionName</h6>
-                                    <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
-                                </div>
-                                <div class="jobContainer" style="display:none;">
-                                    <div><span>We are watching for files dropped in this AWS S3 url:</span></div>
-                                    <div class="filePath"><span>@step.RootAWSUrl@step.TriggetKey</span></div>
-                                </div>
-                            </div>
-                        }
-
-                        @foreach (Sentry.data.Core.RetrieverJob dfRetreiverJobs in item.DataFlowJobs.Item1)
-                        {
-                            Html.RenderPartial("~/Views/RetrieverJob/_RetrieverJob.cshtml", dfRetreiverJobs, new ViewDataDictionary { { "Color", color } });
-                        }
-
-                        <hr />
-                        <h4 class="@color">Upstream DataFlow (Non-Schema Specific) Drop Locations</h4>
-                        <hr />
-
-                        @* Loop through each external dataflow *@
-                        @if (!item.ExternalDataFlowJobs.Any())
-                        {
-                            <p>This schema does not have any associated dataflows yet.</p>
-                        }
-                        @foreach (var ext in item.ExternalDataFlowJobs)
-                        {
-                            <div class="retJob">
-                                <div class="jobHeader categoryBanner-@color">
-                                    <h6>@ext.Name</h6>
-                                    <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
-                                </div>
-                                <div class="jobContainer" style="display:none;">
-                                    @if (ext.Step.Any(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map"))
-                                    {
-                                        <p>This dataflow contains the following steps:</p>
-                                        <ol>
-                                            @foreach (DataFlowStepModel step in ext.Step.Where(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map").OrderBy(o => o.ExecutionOrder))
-                                            {
-                                                <li>@step.ActionName</li>
-                                            }
-                                        </ol>
-                                    }
-                                    else
-                                    {
-                                        <p>This dataflow does not contain any special processing.</p>
-                                    }
-
-                                    @* DataflowStep metadata *@
-                                    @foreach (DataFlowStepModel stepModel in ext.Step.Where(w => w.ActionName == "S3 Drop"))
-                                    {
-                                        <div class="retJob @stepModel.ActionName">
-                                            <div class="jobHeader categoryBanner-@color">
-                                                <h6>@stepModel.ActionName</h6>
-                                                <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
-                                            </div>
-                                            <div class="jobContainer" style="display:none;">
-                                                <div><span>We are watching for files dropped in this AWS S3 url:</span></div>
-                                                <div class="filePath"><span>@stepModel.RootAWSUrl@stepModel.TriggetKey</span></div>
-                                            </div>
-                                        </div>
-                                    }
-                                    @* Loop through associated retriever job metadata *@
-                                    @foreach (Sentry.data.Core.RetrieverJob extJob in ext.RetrieverJobs)
-                                    {
-                                        Html.RenderPartial("~/Views/RetrieverJob/_RetrieverJob.cshtml", extJob, new ViewDataDictionary { { "Color", color } });
-                                    }
-                                </div>
-                            </div>
-                            
-                        }
-
-                        @* Legacy Data Processing Platform Metadata *@
-                        <hr />
-                        <div class="retJob">
-                            <div class="jobHeader categoryBanner-@color">
-                                <h6>Legacy Processing Platform Jobs</h6>
-                                <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
-                            </div>
-                            <div class="jobContainer" style="display:none;">
-                                <h4 class="@color">Dataset Retrieval Jobs</h4>
+                            <h4 class="@color">Dataset Retrieval Jobs</h4>
                                 <hr />
 
-                                @foreach (var job in item.RetrieverJobs)
+                                foreach (var job in item.RetrieverJobs)
                                 {
                                     Html.RenderPartial("~/Views/RetrieverJob/_RetrieverJob.cshtml", job, new ViewDataDictionary { { "Color", color } });
                                 }
 
                                 <a class="btn btn-success" href="/Config/@item.ConfigId/Job/Create">Add Job</a>
+                        }
+
+
+                        @if (Model.DisplayDataflowMetadata || Model.Security.ShowAdminControls)
+                        {
+                            <hr />
+                            <h4 class="@color">DataFlow (Schema Specific) Drop Locations</h4>
+                            <hr />
+
+                            if (!item.DataFlowJobs.Item1.Any() && !item.DataFlowJobs.Item2.Any())
+                            {
+                                <p>This schema does not have any associated dataflows yet.</p>
+                            }
+
+                            foreach (DataFlowStepModel step in item.DataFlowJobs.Item2)
+                            {
+                                <div class="retJob @step.ActionName">
+                                    <div class="jobHeader categoryBanner-@color">
+                                        <h6>@step.ActionName</h6>
+                                        <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                                    </div>
+                                    <div class="jobContainer" style="display:none;">
+                                        <div><span>We are watching for files dropped in this AWS S3 url:</span></div>
+                                        <div class="filePath"><span>@step.RootAWSUrl@step.TriggetKey</span></div>
+                                    </div>
+                                </div>
+                            }
+
+                            foreach (Sentry.data.Core.RetrieverJob dfRetreiverJobs in item.DataFlowJobs.Item1)
+                            {
+                                Html.RenderPartial("~/Views/RetrieverJob/_RetrieverJob.cshtml", dfRetreiverJobs, new ViewDataDictionary { { "Color", color } });
+                            }
+
+                            <hr />
+                            <h4 class="@color">Upstream DataFlow (Non-Schema Specific) Drop Locations</h4>
+                            <hr />
+                            @* Loop through each external dataflow *@
+                            if (!item.ExternalDataFlowJobs.Any())
+                            {
+                                <p>This schema does not have any associated dataflows yet.</p>
+                            }
+                            foreach (var ext in item.ExternalDataFlowJobs)
+                            {
+                                <div class="retJob">
+                                    <div class="jobHeader categoryBanner-@color">
+                                        <h6>@ext.Name</h6>
+                                        <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                                    </div>
+                                    <div class="jobContainer" style="display:none;">
+                                        @if (ext.Step.Any(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map"))
+                                        {
+                                            <p>This dataflow contains the following steps:</p>
+                                            <ol>
+                                                @foreach (DataFlowStepModel step in ext.Step.Where(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map").OrderBy(o => o.ExecutionOrder))
+                                                {
+                                                    <li>@step.ActionName</li>
+                                                }
+                                            </ol>
+                                        }
+                                        else
+                                        {
+                                            <p>This dataflow does not contain any special processing.</p>
+                                        }
+
+                                        @* DataflowStep metadata *@
+                                        @foreach (DataFlowStepModel stepModel in ext.Step.Where(w => w.ActionName == "S3 Drop"))
+                                        {
+                                            <div class="retJob @stepModel.ActionName">
+                                                <div class="jobHeader categoryBanner-@color">
+                                                    <h6>@stepModel.ActionName</h6>
+                                                    <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                                                </div>
+                                                <div class="jobContainer" style="display:none;">
+                                                    <div><span>We are watching for files dropped in this AWS S3 url:</span></div>
+                                                    <div class="filePath"><span>@stepModel.RootAWSUrl@stepModel.TriggetKey</span></div>
+                                                </div>
+                                            </div>
+                                        }
+                                        @* Loop through associated retriever job metadata *@
+                                        @foreach (Sentry.data.Core.RetrieverJob extJob in ext.RetrieverJobs)
+                                        {
+                                            Html.RenderPartial("~/Views/RetrieverJob/_RetrieverJob.cshtml", extJob, new ViewDataDictionary { { "Color", color } });
+                                        }
+                                    </div>
+                                </div>
+                            
+                            }
+                        }
+                        
+                        @if (Model.DisplayDataflowMetadata && Model.Security.ShowAdminControls)
+                        {
+                            @* Legacy Data Processing Platform Metadata *@
+                            <hr />
+                            <div class="retJob">
+                                <div class="jobHeader categoryBanner-gray">
+                                    <h6>Legacy Processing Platform Jobs</h6>
+                                    <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                                </div>
+                                <div class="jobContainer" style="display:none;">
+                                    <h4 class="@color">Dataset Retrieval Jobs</h4>
+                                    <hr />
+
+                                    @foreach (var job in item.RetrieverJobs)
+                                    {
+                                        Html.RenderPartial("~/Views/RetrieverJob/_RetrieverJob.cshtml", job, new ViewDataDictionary { { "Color", color } });
+                                    }
+
+                                    <a class="btn btn-success" href="/Config/@item.ConfigId/Job/Create">Add Job</a>
+                                </div>
                             </div>
-                        </div>
+                        }                        
                     </div>
                 }
             </div>

@@ -119,7 +119,9 @@ namespace Sentry.data.Web.Controllers
                     DatasetId = dsDto.DatasetId,
                     DatasetName = dsDto.DatasetName,
                     CategoryColor = dsDto.CategoryColor,
-                    DatasetFileConfigs = configModelList
+                    DatasetFileConfigs = configModelList,
+                    //DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue()
+                    DisplayDataflowMetadata = true
                 };
 
                 mcm.Security = _DatasetService.GetUserSecurityForDataset(id);
