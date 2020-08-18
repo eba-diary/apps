@@ -70,8 +70,9 @@
                 </div>
             </div>
             <br />
-            <div class="form-group col-md-12 retrieverPanel" style="display:none">
+            <div class="form-group col-md-12 retrieverPanel" style="display:none">                
                 <div id="retrieverJobPanel">
+                    <div id="retrieverPanelSpinner"></div>
                     @if (Model.RetrieverJob != null)
                     {
                         @Html.Partial("_RetrieverJob", Model.RetrieverJob.First())

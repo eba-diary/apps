@@ -101,16 +101,41 @@
         }            
 
         $("[id$=IngestionType]").on('change', function () {
-            if ($(this).val() === "2") {
+            var ingestionSelection = $(this).val();
+            //if changing to Pull
+            if (ingestionSelection === "2") {
+                $('#retrieverPanelSpinner').css('float', 'left');
+                Sentry.InjectSpinner($("#retrieverPanelSpinner"));
                 $('.retrieverPanel').show();
-                Sentry.InjectSpinner($("#retrieverJobPanel"));
                 $.get("/DataFlow/NewRetrieverJob", function (e) {
                     $("#retrieverJobPanel").replaceWith(e);
                     data.Job.FormInit();
                 });
             }
+            //if changing to Push
             else {
-                $('.retrieverPanel').hide();
+                //Need to warn user potential loss of values
+                //  for retriever job configuration if sourcetype has been selected.
+                //If sourcetype has not been selected, then reset the RetrieverPanel as
+                //  there are no values to loose.
+                if ($('[id$=__SelectedSourceType]').val() == null) {
+                    data.DataFlow.ResetRetrieverPanel(this);
+                }
+                else {
+                    //need to manually pass buttons in order to specify callback for OK and Cancel options
+                    Sentry.ShowModalCustom('Potential Loss of Configuration', 'You will loose configuration values within "Where Do You Want Us to Pull From" section if you continue', {
+                        OK: {
+                            label: "OK",
+                            className: "btn-primary",
+                            callback: function () { data.DataFlow.ResetRetrieverPanel(this) }
+                        },
+                        Cancel: {
+                            label: "Cancel",
+                            className: "btn-link",
+                            callback: function () { data.DataFlow.CancelIngestionSelection(ingestionSelection, $(this)) }
+                        }
+                    })
+                };
             }
             $('.namePanel').show();
             $('.compressionPanel').show();
@@ -119,7 +144,27 @@
             $('.formSubmitButtons').show();
         });
     },
-        
+
+    CancelIngestionSelection: function (e, item) {
+        //from https://stackoverflow.com/a/28324400
+        var ingestionSelectBox = document.querySelector("[id$=IngestionType]");
+        switch (e) {
+            case "1":
+                ingestionSelectBox.value = "2";
+                break;
+            case "2":
+                ingestionSelectBox.value = "1";
+                break;
+            default:
+        }
+        ingestionSelectBox.dispatchEvent(new Event('change'));
+    },
+
+    ResetRetrieverPanel: function (e) {
+        $(".retrieverPanel").replaceWith('<div class="form-group col-md-12 retrieverPanel" style="display: none;"><div id="retrieverJobPanel"><div id="retrieverPanelSpinner"></div></div></div>');
+        $('.retrieverPanel').hide();
+    },
+
     RenderDatasetCreatePage() {
         $.get("/Dataset/_DatasetCreateEdit", function (result) {
             $('#DatasetFormContent').html(result);

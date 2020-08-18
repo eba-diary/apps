@@ -90,7 +90,12 @@ namespace Sentry.data.Web
                 }
             }
 
-            if (Name.StartsWith("FileSchemaFlow"))
+            if(Name == null)
+            {
+                errors.Add("Data flow name is required");
+            }
+
+            if (Name != null && Name.StartsWith("FileSchemaFlow"))
             {
                 errors.Add("FileSchemaFlow is a reserved name, please choose new name");
             }
