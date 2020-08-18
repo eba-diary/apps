@@ -141,9 +141,7 @@ namespace Sentry.data.Web.Controllers
 
         private bool CanDaleSensitiveEdit()
         {
-            if( (_featureFlags.Dale_Expose_EditSensitive_CLA_2025.GetValue() && SharedContext.CurrentUser.CanDaleSensitiveEdit)
-                || SharedContext.CurrentUser.IsAdmin
-              )
+            if( SharedContext.CurrentUser.CanDaleSensitiveEdit || SharedContext.CurrentUser.IsAdmin )
             {
                 return true;
             }
@@ -151,9 +149,9 @@ namespace Sentry.data.Web.Controllers
             return false;
         }
 
-        private bool CanDaleUserVerifiedEdit()
+        private bool CanDaleOwnerVerifiedEdit()
         {
-            if ((_featureFlags.Dale_Expose_EditUserVerified_CLA_1911.GetValue() && SharedContext.CurrentUser.CanDaleUserVerifiedEdit)
+            if ((_featureFlags.Dale_Expose_EditOwnerVerified_CLA_1911.GetValue() && SharedContext.CurrentUser.CanDaleOwnerVerifiedEdit)
                 || SharedContext.CurrentUser.IsAdmin
               )
             {
@@ -167,7 +165,7 @@ namespace Sentry.data.Web.Controllers
         //method called by dale.js to return whether user can edit IsSensitive IND
         public JsonResult GetCanDaleSensitiveEdit()
         {
-            return Json(new {canDaleSensitiveEdit = CanDaleSensitiveEdit(), canDaleUserVerifiedEdit = CanDaleUserVerifiedEdit() },JsonRequestBehavior.AllowGet);
+            return Json(new {canDaleSensitiveEdit = CanDaleSensitiveEdit(), canDaleOwnerVerifiedEdit = CanDaleOwnerVerifiedEdit() },JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]

@@ -20,8 +20,8 @@
         //SAVE BUTTON onCLICK
         $("#btnSaveMe").on('click', function () {
 
-            var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                      //get stored object array
-            var verifiedList = JSON.parse(localStorage.getItem("verifiedList"));                                      //get stored object array
+            var sensitiveList = JSON.parse(localStorage.getItem("sensitiveList"));                                     
+            var verifiedList = JSON.parse(localStorage.getItem("verifiedList"));                                      
 
             sensitiveList = data.Dale.createMasterList(sensitiveList, verifiedList);
 
@@ -55,7 +55,14 @@
 
     createMasterList: function (sensitiveList, verifiedList) {
 
-        //update SENSITIVE LIST FROM VERIFIED LIST
+        //CHECK ARRAYS FIRST, IF ONLY ONE OF THEM HAS CHANGES, NO NEED TO UPDATE THE OTHER
+        if (verifiedList == null) {
+            return sensitiveList;                                                                                  //no OwnerVerified changes, return sensitive
+        } else if (sensitiveList == null) {
+            return verifiedList;                                                                                   //no sensitive changes, return verified
+        }
+
+        //UPDATE SENSITIVE LIST FROM VERIFIED LIST since both HAD CHANGES
         var len = sensitiveList.length;
         for (let i = 0; i < len; i++) {
 
@@ -64,13 +71,13 @@
 
             if (index >= 0) {
                 var o = verifiedList[index];
-                r.IsUserVerified = o.IsUserVerified;
+                r.IsOwnerVerified = o.IsOwnerVerified;
 
                 sensitiveList[i] = r;
             }
         }
 
-        //INSERT SENSITIVE LIST FROM VERIFIED LIST
+        //INSERT INTO SENSITIVE LIST FROM VERIFIED LIST
         var len2 = verifiedList.length;
         for (let i = 0; i < len2; i++) {
 
@@ -116,7 +123,7 @@
                 //Since I did not want user to see label text and still have a filter.  My cheat to this was to style label with display:none while still keeping the filtering ability
                 //later on when they check/uncheck the box my editRow() function will refresh the data associated with the grid which changes the label hidden text to the opposite so filtering can refresh
                 {
-                    data: null, className: "IsSensitive", /*visible: false,*/  render: function (d) {
+                    data: null, className: "IsSensitive", visible: false,  render: function (d) {
 
                         //the below code is a way to not have to repeat the html checkbox creation below because it can be disabled or checked based on whether they can edit or if its IsSensitive
                         var disabled = '';
@@ -138,18 +145,18 @@
 
 
                 {
-                    data: null, className: "IsUserVerified", /*visible: false,*/ render: function (d) {
+                    data: null, className: "IsOwnerVerified", visible: false, render: function (d) {
 
                         //the below code is a way to not have to repeat the html checkbox creation below because it can be disabled or checked based on whether they can edit or if its IsSensitive
                         var disabled = '';
                         var checked = '';
                         var cellValue = 'false';
 
-                        if (!obj.canDaleUserVerifiedEdit) {
+                        if (!obj.canDaleOwnerVerifiedEdit) {
                             disabled = ' disabled="disabled" ';
                         }
 
-                        if (d.IsUserVerified) {
+                        if (d.IsOwnerVerified) {
                             checked = ' checked="checked" ';
                             cellValue = 'true';
                         }
@@ -228,7 +235,7 @@
 
 
         //setup onChange event to fire when a checkbox is changed.  This will update internal array for user to save later
-        $('#daleResultsTable tbody').on('change', '.IsUserVerified input', function () {                                            //filter down to '.IsUserVerified' class and child of that which is 'input' which gets you too checkbox
+        $('#daleResultsTable tbody').on('change', '.IsOwnerVerified input', function () {                                            //filter down to '.IsOwnerVerified' class and child of that which is 'input' which gets you too checkbox
             var cellClicked = $(this).closest('td');                                                                                //get which cell is clicked too use later to figure out rowIndex,rowData,columnIndex
             var columnValue = this.checked;                                                                                         //determine if checkbox is checked or not
 
@@ -252,7 +259,7 @@
         var o = new Object();                                                                                       
         o.BaseColumnId = rowData.BaseColumnId;
         o.IsSensitive = rowData.IsSensitive;
-        o.IsUserVerified = rowData.IsUserVerified;
+        o.IsOwnerVerified = rowData.IsOwnerVerified;
 
         //IsSensitive Cell Check
         if (columnIndex === 6) {
@@ -263,53 +270,20 @@
             sensitiveList = data.Dale.editArrayItem(o, sensitiveList);
             localStorage.setItem("sensitiveList", JSON.stringify(sensitiveList));                                       //save array to storage
 
-        } //IsUserVerified
+        } //IsOwnerVerified
         else if (columnIndex === 7) {
 
-            rowData.IsUserVerified = columnValue;                                                                       //flip IsSensitive for rowData
-            o.IsUserVerified = columnValue;                                                                             //flip IsSensitive for array storage
+            rowData.IsOwnerVerified = columnValue;                                                                       //flip IsOwnerVerified for rowData
+            o.IsOwnerVerified = columnValue;                                                                             //flip IsOwnerVerified for array storage
 
             verifiedList = data.Dale.editArrayItem(o, verifiedList);
             localStorage.setItem("verifiedList", JSON.stringify(verifiedList));                                         //save array to storage
         }
 
-        //init variables to use to know whether to mark row as edited and show save button
-        var edit = false;
-        var sensitiveIndexEDITED = -1;
-        var verifiedIndexEDITED = -1;
-        var sensitiveListLength = 0;
-        var verifiedListLength = 0;
-
-        //init 
-        if (sensitiveList != null) {
-            sensitiveIndexEDITED = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);
-            sensitiveListLength = sensitiveList.length;
-        }
-
-        if (verifiedList != null) {
-            verifiedIndexEDITED = verifiedList.findIndex(verified => verified.BaseColumnId === o.BaseColumnId);
-            verifiedListLength = verifiedList.length;
-        }
-
-        //DETERMINE IF ROW SHOULD BE RED based on if we found that index in the array with changes
-        if (sensitiveIndexEDITED >= 0 || verifiedIndexEDITED >= 0) {
-            edit = true;
-        }
-        else {
-            edit = false;
-        }
-
-        //DETERMINE WHETHER TO SHOW SAVE BUTTON based on if any of arrays have items
-        if (sensitiveListLength > 0 || verifiedListLength > 0) {
-            $('#btnSaveMe').show();
-        }
-        else {
-       
-            $('#btnSaveMe').hide();
-        }
+        var edited = data.Dale.IsRowEdited(sensitiveList, verifiedList, o);
 
         //mark UI as edited or NOT
-        data.Dale.editRow(edit, rowIndex, rowData);
+        data.Dale.editGridRow(edited, rowIndex, rowData);
     },
 
     //UPDATE ARRAY based on new data
@@ -334,8 +308,49 @@
         return list;
     },
 
+    IsRowEdited: function (sensitiveList, verifiedList, o) {
+
+        //VARS TO BE USED to know whether to mark row as edited and show save button
+        var edit = false;
+        var sensitiveIndexEDITED = -1;
+        var verifiedIndexEDITED = -1;
+        var sensitiveListLength = 0;
+        var verifiedListLength = 0;
+
+        //SET VARS 
+        if (sensitiveList != null) {
+            sensitiveIndexEDITED = sensitiveList.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);     //search array list for current row index too see if its marked for edit
+            sensitiveListLength = sensitiveList.length;                                                                 //set length of array to know if save button should be shown
+        }
+
+        if (verifiedList != null) {
+            verifiedIndexEDITED = verifiedList.findIndex(verified => verified.BaseColumnId === o.BaseColumnId);         //search array list for current row index too see if its marked for edit
+            verifiedListLength = verifiedList.length;                                                                   //set length of array to know if save button should be shown
+        }
+
+        //DETERMINE IF ROW SHOULD BE RED based on if we found that index in the array with changes
+        if (sensitiveIndexEDITED >= 0 || verifiedIndexEDITED >= 0) {
+            edit = true;
+        }
+        else {
+            edit = false;
+        }
+
+        //SHOW SAVE BUTTON based on if any of arrays have items
+        if (sensitiveListLength > 0 || verifiedListLength > 0) {
+            $('#btnSaveMe').show();
+        }
+        else {
+
+            $('#btnSaveMe').hide();
+        }
+
+        return edit;
+    },
+
+
     //edit row (data and style) since user changed something
-    editRow: function (edit, rowIndex, rowData) {
+    editGridRow: function (edited, rowIndex, rowData) {
 
         var table = $('#daleResultsTable').DataTable();
 
@@ -345,7 +360,7 @@
             .data(rowData);                 //supply updated data for grid row, NEED THIS FOR FILTERING!!!!!!! if we dont refresh rowData, then filtering will think its old values, even in the case of the checkboxes, what this update does is update the label associated with it
 
         //STYLE ROW BASED ON BEING EDITED OR NOT (add/remove class that makes it RED if they are changing)
-        if (edit) {
+        if (edited) {
             table
                 .rows(rowIndex)                 //pick which row(s) to bring back
                 .nodes()                        //grab all TR nodes (rows) under the .rows selector above

@@ -47,9 +47,7 @@ namespace Sentry.data.Web
                 EffectiveDate = dto.EffectiveDate.ToString("MM/dd/yyyy HH:mm:ss"),
                 BaseColumnId = dto.BaseColumnId,
 
-                IsUserVerified = dto.IsUserVerified
-
-                
+                IsOwnerVerified = dto.IsOwnerVerified
             };
         }
 
@@ -85,7 +83,7 @@ namespace Sentry.data.Web
             {
                 BaseColumnId = model.BaseColumnId,
                 IsSensitive = model.IsSensitive,
-                IsUserVerified = model.IsUserVerified
+                IsOwnerVerified = model.IsOwnerVerified
             };
         }
 

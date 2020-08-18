@@ -4,7 +4,7 @@
     {
         public int BaseColumnId { get; set; }
         public bool IsSensitive { get; set; }
-        public bool IsUserVerified { get; set; }
+        public bool IsOwnerVerified { get; set; }
     }
 }
 

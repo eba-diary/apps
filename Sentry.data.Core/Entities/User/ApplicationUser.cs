@@ -161,11 +161,11 @@ namespace Sentry.data.Core
             }
         }
 
-        public virtual bool CanDaleUserVerifiedEdit
+        public virtual bool CanDaleOwnerVerifiedEdit
         {
             get
             {
-                return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.DALE_USER_VERIFIED_EDIT);
+                return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.DALE_OWNER_VERIFIED_EDIT);
             }
         }
 
