@@ -66,14 +66,14 @@
         var len = sensitiveList.length;
         for (let i = 0; i < len; i++) {
 
-            var r = sensitiveList[i];
-            var index = verifiedList.findIndex(item => item.BaseColumnId === r.BaseColumnId);
+            var s = sensitiveList[i];
+            var sIndex = verifiedList.findIndex(item => item.BaseColumnId === s.BaseColumnId);
 
-            if (index >= 0) {
-                var o = verifiedList[index];
-                r.IsOwnerVerified = o.IsOwnerVerified;
+            if (sIndex >= 0) {
+                var o = verifiedList[sIndex];
+                s.IsOwnerVerified = o.IsOwnerVerified;
 
-                sensitiveList[i] = r;
+                sensitiveList[i] = s;
             }
         }
 
@@ -81,11 +81,11 @@
         var len2 = verifiedList.length;
         for (let i = 0; i < len2; i++) {
 
-            var r = verifiedList[i];
-            var index = sensitiveList.findIndex(item => item.BaseColumnId === r.BaseColumnId);
+            var v = verifiedList[i];
+            var vIndex = sensitiveList.findIndex(item => item.BaseColumnId === v.BaseColumnId);
 
-            if (index < 0) {
-                sensitiveList.push(r)
+            if (vIndex < 0) {
+                sensitiveList.push(v);
             }
         }
 
