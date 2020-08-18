@@ -60,15 +60,15 @@ namespace Sentry.data.Web
         {
             List<string> errors = new List<string>();
 
-            if (SchemaMaps == null || SchemaMaps.Count == 0)
+            if (SchemaMaps == null || !SchemaMaps.Any(w => !w.IsDeleted))
             {
                 errors.Add("Must contain atleast one schema mapping");
             }
-            else if (SchemaMaps.Count > 0)
+            else if (SchemaMaps.Any(w => !w.IsDeleted))
             {
                 bool dsSelectionErr = false;
                 bool scmSelectionErr = false;
-                foreach (SchemaMapModel model in SchemaMaps)
+                foreach (SchemaMapModel model in SchemaMaps.Where(w => !w.IsDeleted))
                 {
                     if (model.SelectedDataset == 0)
                     {

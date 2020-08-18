@@ -3,7 +3,6 @@ using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 
 namespace Sentry.data.Web
@@ -86,7 +85,8 @@ namespace Sentry.data.Web
                 Id = model.Id,
                 SchemaId = model.SelectedSchema,
                 DatasetId = model.SelectedDataset,
-                SearchCriteria = model.SearchCriteria
+                SearchCriteria = model.SearchCriteria,
+                IsDeleted = model.IsDeleted
             };
 
             return dto;

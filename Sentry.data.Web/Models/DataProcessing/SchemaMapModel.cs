@@ -22,6 +22,7 @@ namespace Sentry.data.Web
         public int SelectedDataset { get; set; }
         //[Required]
         public int SelectedSchema { get; set; }
+        public bool IsDeleted { get; set; }
 
         public IEnumerable<SelectListItem> AllDatasets { get; set; }
         public IEnumerable<SelectListItem> AllSchemas { get; set; }

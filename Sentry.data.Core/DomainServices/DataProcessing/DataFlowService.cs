@@ -580,7 +580,7 @@ namespace Sentry.data.Core
                     action = _datasetContext.SchemaLoadAction.FirstOrDefault();
                     DataFlowStep schemaLoadStep = MapToDataFlowStep(df, action, actionType);
                     List<SchemaMap> schemaMapList = new List<SchemaMap>();
-                    foreach (SchemaMapDto mapDto in dto.SchemaMap)
+                    foreach (SchemaMapDto mapDto in dto.SchemaMap.Where(w => !w.IsDeleted))
                     {
                         schemaMapList.Add(MapToSchemaMap(mapDto, schemaLoadStep));
                     }
@@ -589,7 +589,7 @@ namespace Sentry.data.Core
                 case DataActionType.SchemaMap:
                     action = _datasetContext.SchemaMapAction.FirstOrDefault();
                     DataFlowStep schemaMapStep = MapToDataFlowStep(df, action, actionType);
-                    foreach (SchemaMapDto mapDto in dto.SchemaMap)
+                    foreach (SchemaMapDto mapDto in dto.SchemaMap.Where(w => !w.IsDeleted))
                     {
                         MapToSchemaMap(mapDto, schemaMapStep);
                         bool exists = DataFlowExistsForFileSchema(mapDto.SchemaId);

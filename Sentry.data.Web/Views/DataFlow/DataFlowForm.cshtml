@@ -111,8 +111,8 @@
                     @*<a id="btnAddSchemaMap" class="btn btn-primary">Add Schema Mapping</a>*@
                     <div id="schemaMapPanel" class="form-group col-md-12">
                         @foreach (SchemaMapModel mapModel in Model.SchemaMaps)
-                        {
-                            @Html.Partial("_SchemaMap", mapModel)
+                        {                            
+                            @Html.Partial("_SchemaMap", mapModel)                            
                         }
                         <button type="button" id="btnAddSchemaMap" class="btn btn-success"><span>Add Another Target</span></button>
                     </div>
@@ -173,6 +173,26 @@
     <script type="text/javascript">
         $(function () {
             data.DataFlow.DataFlowFormInit();
+
+            //Adding delete button logic here to ensure it is added to 
+            // any additional schemaMapLineItems that are added
+            $(document).on("click", "#btnSchemaMapRemove", function () {
+                if ($('.schemaMapLineItem.active').length === 1) {
+                    Sentry.ShowModalAlert("At least one schema mapping is required");
+                }
+                else {                    
+                    var self = $(this);
+                    var parentContainer = self.parent(".schemaMapLineItem");
+                    var isDeleteHidden = parentContainer.find("[id$=IsDeleted]");
+                    //Set hidden value for when object is model is passed back to controller
+                    $(isDeleteHidden).val("True");
+                    //remove active class from parentcontainer to ensure not counted 
+                    // when ensuring there is at least one active mapping
+                    $(parentContainer).removeClass("active");
+                    //Hide parentcontainer to ensure not displayed to user after deletion
+                    $(parentContainer).hide();
+                }
+            })
         });
     </script>
 }

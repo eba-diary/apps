@@ -56,10 +56,10 @@
         $("#btnAddSchemaMap").on('click', function () {
             $.get("/DataFlow/NewSchemaMap", function (e) {
                 $(e).insertBefore($("#btnAddSchemaMap"));
-                data.DataFlow.InitSchemaMaps();
+                data.DataFlow.InitSchemaMaps();               
             });
         });
-
+        
         data.DataFlow.InitSchemaMaps();
     },
 
