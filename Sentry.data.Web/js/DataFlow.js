@@ -256,6 +256,7 @@
     },
 
     PopulateSchemas(datasetId, schemaId, targetElement) {
+        var scmSpinner = $(targetElement).parent().parent().find('.schemaSpinner');
         if (datasetId !== null && datasetId !== "-1" && datasetId !== "0") {
             var curVal = targetElement.val();
             $.getJSON("/api/v2/metadata/dataset/" + datasetId + "/schema", function (result) {
@@ -272,6 +273,7 @@
                     subItems += "<option value='" + item.SchemaId + "'>" + item.Name + "</option>";
                 });
 
+                scmSpinner.html('');
                 targetElement.html(subItems);
 
                 if (curVal === null || curVal === "0") {
@@ -288,6 +290,7 @@
         else {
             var subItems;
             subItems += "<option value='0'>Select Dataset First</option>";
+            scmSpinner.html('');
             targetElement.html(subItems);
         }
 
@@ -306,6 +309,15 @@
     },
 
     InitSchemaMaps(datasetId, schemaId) {
+        $('.datasetSpinner').each(function (index) {
+            var cur = $(this);
+            Sentry.InjectSpinner(cur, 30);
+        });
+        $('.schemaSpinner').each(function (index) {
+            var cur = $(this);
+            Sentry.InjectSpinner(cur, 30);
+        });
+
         $.getJSON("/api/v2/metadata/dataset", function (result) {
             var newSubItems;
             var groupName;
@@ -343,7 +355,10 @@
 
             $('[id$=__SelectedDataset]').each(function (index) {
                 var cur = $(this);
+                var dsSpinner = cur.parent().find('.datasetSpinner');
                 var curVal = cur.val();
+
+                dsSpinner.html('');
                 cur.html(newSubItems);
 
                 if (curVal === null || curVal === undefined) {
@@ -368,6 +383,8 @@
                 var curRow = $(this).parent().parent();
                 var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
                 var datasetId = $(this).val();
+
+                Sentry.InjectSpinner(curRow.find('.schemaSpinner'), 30);
 
                 //if Create New Dataset Selected
                 if (datasetId === "-1") {
