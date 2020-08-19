@@ -130,9 +130,13 @@
                         var checked = '';
                         var cellValue = 'false';
 
-                        if (!obj.canDaleSensitiveEdit) {
+                        //NOTE: DISABLE for the following scenarios: (1)no permissions to sensitive (2)no permissions to sensitive and no permissions to owner and owner has been checked
+                        //basically if they don't have permissions to owner verify and owner verified is checked, then don't let them change IsSensitive
+                        if (!obj.canDaleSensitiveEdit || ( obj.canDaleSensitiveEdit && !obj.canDaleOwnerVerifiedEdit && d.IsOwnerVerified ) )
+                        {
                             disabled = ' disabled="disabled" ';
                         }
+
 
                         if (d.IsSensitive){
                             checked = ' checked="checked" ';
