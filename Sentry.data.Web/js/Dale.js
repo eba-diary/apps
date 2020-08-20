@@ -92,7 +92,6 @@
         return sensitiveList;
     },
 
-
     dataTablCreate: function (obj) {
 
         //init DataTable
@@ -119,6 +118,7 @@
                 { data: "ObjectType", className: "ObjectType" },
                 { data: "Column", className: "ColumnMan" },
 
+                //ISSENSITIVE CHECKBOX
                 //the key piece here is including a label with text to indicate whether IsSensitive column is true or false so the filtering works
                 //Since I did not want user to see label text and still have a filter.  My cheat to this was to style label with display:none while still keeping the filtering ability
                 //later on when they check/uncheck the box my editRow() function will refresh the data associated with the grid which changes the label hidden text to the opposite so filtering can refresh
@@ -130,13 +130,12 @@
                         var checked = '';
                         var cellValue = 'false';
 
-                        //NOTE: DISABLE for the following scenarios: (1)no permissions to sensitive (2)no permissions to sensitive and no permissions to owner and owner has been checked
+                        //NOTE: DISABLE for the following scenarios: (1)no permissions to sensitive (2)have permission to sensitive but no permissions to owner and owner has been checked
                         //basically if they don't have permissions to owner verify and owner verified is checked, then don't let them change IsSensitive
                         if (!obj.canDaleSensitiveEdit || ( obj.canDaleSensitiveEdit && !obj.canDaleOwnerVerifiedEdit && d.IsOwnerVerified ) )
                         {
                             disabled = ' disabled="disabled" ';
                         }
-
 
                         if (d.IsSensitive){
                             checked = ' checked="checked" ';
@@ -147,11 +146,11 @@
                     }
                 },
 
-
+                //OWNER VERIFIED CHECKBOX
                 {
                     data: null, className: "IsOwnerVerified", visible: false, render: function (d) {
 
-                        //the below code is a way to not have to repeat the html checkbox creation below because it can be disabled or checked based on whether they can edit or if its IsSensitive
+                        //the below code is a way to not have to repeat the html checkbox creation below because it can be disabled or checked based on whether they can edit or if its IsOwnerVerified
                         var disabled = '';
                         var checked = '';
                         var cellValue = 'false';
@@ -221,36 +220,9 @@
             ]
         });
 
-        //setup all click events
-        data.Dale.setupClickAttack();
-
-        //setup onChange event to fire when a checkbox is changed.  This will update internal array for user to save later
-        $('#daleResultsTable tbody').on('change', '.IsSensitive input', function () {                                                //filter down to '.IsSensitive' class and child of that which is 'input' which gets you too checkbox
-            var cellClicked = $(this).closest('td');                                                                                //get which cell is clicked too use later to figure out rowIndex,rowData,columnIndex
-            var columnValue = this.checked;                                                                                         //determine if checkbox is checked or not
-
-            var table = $('#daleResultsTable').DataTable();
-            var rowIndex = table.cell(cellClicked).index().row;                                                                     //get rowIndex being updated
-            var rowData = table.row(cellClicked).data();                                                                            //get whole row of data to use later
-            var columnIndex = table.cell(cellClicked).index().columnVisible;                                                        //get columnIndex clicked
-
-            data.Dale.editArray(rowIndex, rowData, columnIndex, columnValue);
-        });
-
-
-        //setup onChange event to fire when a checkbox is changed.  This will update internal array for user to save later
-        $('#daleResultsTable tbody').on('change', '.IsOwnerVerified input', function () {                                            //filter down to '.IsOwnerVerified' class and child of that which is 'input' which gets you too checkbox
-            var cellClicked = $(this).closest('td');                                                                                //get which cell is clicked too use later to figure out rowIndex,rowData,columnIndex
-            var columnValue = this.checked;                                                                                         //determine if checkbox is checked or not
-
-            var table = $('#daleResultsTable').DataTable();
-            var rowIndex = table.cell(cellClicked).index().row;                                                                     //get rowIndex being updated
-            var rowData = table.row(cellClicked).data();                                                                            //get whole row of data to use later
-            var columnIndex = table.cell(cellClicked).index().columnVisible;                                                        //get columnIndex clicked
-
-            data.Dale.editArray(rowIndex, rowData, columnIndex, columnValue);
-        });
-
+        //CLICK EVENT SETUP
+        data.Dale.setupClickAttackSearch();                                                                         //SETUP SEARCH CLICK EVENTS
+        data.Dale.setupClickAttackGrid();                                                                           //SETUP GRID CLICK EVENTS
     },
 
     //edit storage array since user is changing data
@@ -299,10 +271,10 @@
             list[0] = o;
         }
         else {
-            //check if item exists and remove or add new item to list
+            //check if item exists and remove or add new item to list.  Remember, if something already exists, then just remove it because they changed their mind
             var index = list.findIndex(sensitive => sensitive.BaseColumnId === o.BaseColumnId);
             if (index >= 0) {
-                list.splice(index, 1);                                                                     //remove that index from array  
+                list.splice(index, 1);                                                                     //remove that index from array
             }
             else {
                 list.push(o);                                                                              //add new item
@@ -351,7 +323,6 @@
 
         return edit;
     },
-
 
     //edit row (data and style) since user changed something
     editGridRow: function (edited, rowIndex, rowData) {
@@ -414,7 +385,8 @@
         $('#radioMadness').removeClass("dale-disable-stuff");
     },
 
-    setupClickAttack: function ()
+    //SEARCH CLICK EVENTS
+    setupClickAttackSearch: function ()
     {
         var daleResultsTable = $("#daleResultsTable").DataTable();
 
@@ -442,6 +414,37 @@
             $("#daleSearchCriteria").val("");
             data.Dale.disableDale();
             daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
+        });
+    },
+
+    //GRID CLICK EVENTS
+    setupClickAttackGrid: function () {
+
+        //setup onChange event to fire when a checkbox is changed.  This will update internal array for user to save later
+        $('#daleResultsTable tbody').on('change', '.IsSensitive input', function () {                                               //filter down to '.IsSensitive' class and child of that which is 'input' which gets you too checkbox
+            var cellClicked = $(this).closest('td');                                                                                //get which cell is clicked too use later to figure out rowIndex,rowData,columnIndex
+            var columnValue = this.checked;                                                                                         //determine if checkbox is checked or not
+
+            var table = $('#daleResultsTable').DataTable();
+            var rowIndex = table.cell(cellClicked).index().row;                                                                     //get rowIndex being updated
+            var rowData = table.row(cellClicked).data();                                                                            //get whole row of data to use later
+            var columnIndex = table.cell(cellClicked).index().columnVisible;                                                        //get columnIndex clicked
+
+            data.Dale.editArray(rowIndex, rowData, columnIndex, columnValue);
+        });
+
+
+        //setup onChange event to fire when a checkbox is changed.  This will update internal array for user to save later
+        $('#daleResultsTable tbody').on('change', '.IsOwnerVerified input', function () {                                            //filter down to '.IsOwnerVerified' class and child of that which is 'input' which gets you too checkbox
+            var cellClicked = $(this).closest('td');                                                                                //get which cell is clicked too use later to figure out rowIndex,rowData,columnIndex
+            var columnValue = this.checked;                                                                                         //determine if checkbox is checked or not
+
+            var table = $('#daleResultsTable').DataTable();
+            var rowIndex = table.cell(cellClicked).index().row;                                                                     //get rowIndex being updated
+            var rowData = table.row(cellClicked).data();                                                                            //get whole row of data to use later
+            var columnIndex = table.cell(cellClicked).index().columnVisible;                                                        //get columnIndex clicked
+
+            data.Dale.editArray(rowIndex, rowData, columnIndex, columnValue);
         });
     },
 
