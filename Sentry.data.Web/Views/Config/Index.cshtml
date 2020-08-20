@@ -276,7 +276,7 @@
                                     </div>
                                     <div class="jobContainer" style="display:none;">
                                         <div><span>We are watching for files dropped in this AWS S3 url:</span></div>
-                                        <div class="filePath"><span>@step.RootAWSUrl@step.TriggetKey</span></div>
+                                        <div class="filePath"><span>@step.RootAwsUrl@step.TriggetKey</span></div>
                                     </div>
                                 </div>
                             }
@@ -299,7 +299,7 @@
                                 <div class="retJob">
                                     <div class="jobHeader categoryBanner-@color">
                                         <h6>@ext.Name</h6>
-                                        <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                                        <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
                                     </div>
                                     <div class="jobContainer" style="display:none;">
                                         @if (ext.Step.Any(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map"))
@@ -323,11 +323,11 @@
                                             <div class="retJob @stepModel.ActionName">
                                                 <div class="jobHeader categoryBanner-@color">
                                                     <h6>@stepModel.ActionName</h6>
-                                                    <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                                                    <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
                                                 </div>
                                                 <div class="jobContainer" style="display:none;">
                                                     <div><span>We are watching for files dropped in this AWS S3 url:</span></div>
-                                                    <div class="filePath"><span>@stepModel.RootAWSUrl@stepModel.TriggetKey</span></div>
+                                                    <div class="filePath"><span>@stepModel.RootAwsUrl@stepModel.TriggetKey</span></div>
                                                 </div>
                                             </div>
                                         }
@@ -349,7 +349,7 @@
                             <div class="retJob">
                                 <div class="jobHeader categoryBanner-gray">
                                     <h6>Legacy Processing Platform Jobs</h6>
-                                    <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                                    <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
                                 </div>
                                 <div class="jobContainer" style="display:none;">
                                     <h4 class="@color">Dataset Retrieval Jobs</h4>

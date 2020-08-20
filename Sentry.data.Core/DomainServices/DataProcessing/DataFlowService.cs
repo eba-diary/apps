@@ -471,9 +471,7 @@ namespace Sentry.data.Core
 
         private List<int> GetMappedFileSchema(int dataflowId)
         {
-            List<int> scmIdList = new List<int>();
-            scmIdList = _datasetContext.SchemaMap.Where(w => w.DataFlowStepId.DataFlow.Id == dataflowId).Select(s => s.MappedSchema.SchemaId).ToList();
-            return scmIdList;
+            return _datasetContext.SchemaMap.Where(w => w.DataFlowStepId.DataFlow.Id == dataflowId).Select(s => s.MappedSchema.SchemaId).ToList();
         }
 
         private List<int> GetExternalRetrieverJobs(int dataflowId)

@@ -66,7 +66,7 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        private string AWSRegion
+        private string AwsRegion
         {
             get
             {
@@ -104,7 +104,7 @@ namespace Sentry.data.Web.Controllers
                     foreach (DataFlowStepDto stepDto in jobs.Item2)
                     {
                         DataFlowStepModel stepModel = stepDto.ToModel();
-                        stepModel.RootAWSUrl = $"https://{AWSRegion.ToLower()}.amazonaws.com/{RootBucket.ToLower()}/";
+                        stepModel.RootAwsUrl = $"https://{AwsRegion.ToLower()}.amazonaws.com/{RootBucket.ToLower()}/";
                         stepModels.Add(stepModel);
                     }
 

@@ -64,7 +64,7 @@
             }
             $(this).next('.jobContainer').toggle();
 
-            if ($(this).next('.jobContainer:visible').length == 0) {
+            if ($(this).next('.jobContainer:visible').length === 0) {
                 // action when all are hidden
                 $(this).css('border-radius', '5px 5px 5px 5px');
             } else {

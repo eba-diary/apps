@@ -4,14 +4,12 @@ namespace Sentry.data.Web
 {
     public class DataFlowStepModel
     {
-        public DataFlowStepModel() { }
-
         public int Id { get; set; }
         public int ActionId { get; set; }
         public string ActionName { get; set; }
         public int ExecutionOrder { get; set; }
         public string TriggetKey { get; set; }
         public string TargetPrefix { get; set; }
-        public string RootAWSUrl { get; set; }
+        public string RootAwsUrl { get; set; }
     }
 }

@@ -10,7 +10,7 @@
         <h4>Associated Retriever Jobs</h4>
         @if (Model.AssociatedJobs == null || Model.AssociatedJobs.Count > 0)
         {
-            <p><i>These jobs pull data from external sources and send it to this data flow.</i></p>
+            <p><em>These jobs pull data from external sources and send it to this data flow.</em></p>
             <ul class="stepList">
                 @foreach (int id in Model.AssociatedJobs)
                 {
@@ -34,15 +34,15 @@
                     <div class="jobHeader categoryBanner-blue">
                         <span><h6>@step.ExecutionOrder.ToString()</h6></span>
                         <h6>@step.ActionName</h6>
-                        <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                        <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
                     </div>
                     <div class="jobContainer" style="display:none;">
                         <div><span><strong>This step processes files dropped in this AWS S3 url:</strong></span></div>
-                        <div class="filePath"><span>@step.RootAWSUrl@step.TriggetKey</span></div>
+                        <div class="filePath"><span>@step.RootAwsUrl@step.TriggetKey</span></div>
                         @if (Model.UserSecurity.ShowAdminControls && step.TargetPrefix != null)
                         {
                             <div><span><strong>This step produces output to this long term storage url:</strong></span></div>
-                            <div class="filePath"><span>@step.RootAWSUrl@step.TargetPrefix</span></div>
+                            <div class="filePath"><span>@step.RootAwsUrl@step.TargetPrefix</span></div>
                         }
                     </div>
                 </li>

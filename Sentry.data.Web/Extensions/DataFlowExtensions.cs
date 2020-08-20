@@ -48,7 +48,7 @@ namespace Sentry.data.Web
                 return _bucket;
             }
         }
-        private static string AWSRegion
+        private static string AwsRegion
         {
             get
             {
@@ -206,7 +206,7 @@ namespace Sentry.data.Web
                 ExecutionOrder = dto.ExeuctionOrder,
                 TriggetKey = dto.TriggerKey,
                 TargetPrefix = dto.TargetPrefix,
-                RootAWSUrl = $"https://{AWSRegion.ToLower()}.amazonaws.com/{RootBucket.ToLower()}/"
+                RootAwsUrl = $"https://{AwsRegion.ToLower()}.amazonaws.com/{RootBucket.ToLower()}/"
             };
             return model;
         }

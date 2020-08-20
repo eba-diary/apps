@@ -440,18 +440,10 @@
                                                         @if (Model.Security.CanEditDataset)
                                                         {
                                                             <!-- ko if: IsEnabled-->
-                                                            <td class="borderMeta_@color" data-bind="text: Location()"></td>
-                                                            @*<td class="borderMeta_@color">
-                                                                <button style="float:right; margin-left: 30px;" class="btn btn-default on-demand-run" data-bind="attr: { id: JobId }">On-Demand Run</button>
-                                                                <button style="float:right; margin-left: 30px;" class="btn btn-default jobstatus jobstatus_enabled" data-bind="attr: { id: JobId }">Disable</button>
-                                                            </td>*@
+                                                            <td class="borderMeta_@color" data-bind="text: Location()"></td>                                                            
                                                             <!-- /ko -->
                                                             <!-- ko ifnot: IsEnabled-->
                                                             <td class="borderMeta_@color"> Disabled</td>
-                                                            @*<td class="borderMeta_@color">
-                                                                <button style="float:right; margin-left: 30px;" class="btn btn-default on-demand-run" disabled="disabled" data-toggle="tooltip" data-placement="top" title="Job is disabled" data-bind="attr: { id: JobId }">On-Demand Run</button>
-                                                                <button style="float:right; margin-left: 30px;" class="btn btn-default jobstatus jobstatus_disabled" data-bind="attr: { id: JobId }">Enable</button>
-                                                            </td>*@
                                                             <!-- /ko -->
                                                         }
                                                         else
