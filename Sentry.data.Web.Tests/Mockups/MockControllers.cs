@@ -5,8 +5,6 @@ using Sentry.data.Web.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Web.Tests
 {
@@ -70,6 +68,8 @@ namespace Sentry.data.Web.Tests
             
             var mockEventService = MockRepository.GenerateStub<IEventService>();
 
+            var mockFeatureFlag = MockRepository.GenerateStub<IDataFeatures>();
+
             mockSharedContextModel.CurrentUser = user;
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());
 
@@ -103,7 +103,11 @@ namespace Sentry.data.Web.Tests
 
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user);
 
-            var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, mockAssociateService, mockObsidianService, mockDatasetService, mockEventService, mockConfigService);
+            mockFeatureFlag.Stub(x => x.Expose_Dataflow_Metadata_CLA_2146.GetValue()).Return(false);
+
+            var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, 
+                mockAssociateService, mockObsidianService, mockDatasetService, mockEventService, mockConfigService,
+                mockFeatureFlag);
             dsc.SharedContext = mockSharedContextModel;
 
             return dsc;
