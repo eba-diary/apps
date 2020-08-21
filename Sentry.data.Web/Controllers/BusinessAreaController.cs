@@ -70,13 +70,6 @@ namespace Sentry.data.Web.Controllers
                 string linkText = tile.LinkText;
                 string hyperlink = tile.Hyperlink;
 
-                //only change the following for training tile, i used the following technique so worse case scenario ONLY training is effected by this feature flag
-                if(tile.Title == "Training")
-                {
-                    linkText =  ( (tile.Title == "Training" && _featureFlags.Expose_TrainingMaterials_CLA_911.GetValue() ) || SharedContext.CurrentUser.IsAdmin) ? linkText     : linkText + " Coming Soon";
-                    hyperlink = ( (tile.Title == "Training" && _featureFlags.Expose_TrainingMaterials_CLA_911.GetValue() ) || SharedContext.CurrentUser.IsAdmin) ? hyperlink    : null;
-                }
-                
                 tileModels.Add(new BusinessAreaTileModel
                 {
                     Title = tile.Title,
