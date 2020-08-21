@@ -45,9 +45,9 @@ namespace Sentry.data.Web
                 Scale = dto.Scale,
                 IsNullable = dto.IsNullable,
                 EffectiveDate = dto.EffectiveDate.ToString("MM/dd/yyyy HH:mm:ss"),
-                BaseColumnId = dto.BaseColumnId
+                BaseColumnId = dto.BaseColumnId,
 
-                
+                IsOwnerVerified = dto.IsOwnerVerified
             };
         }
 
@@ -82,7 +82,8 @@ namespace Sentry.data.Web
             return new DaleSensitiveDto()
             {
                 BaseColumnId = model.BaseColumnId,
-                IsSensitive = model.IsSensitive
+                IsSensitive = model.IsSensitive,
+                IsOwnerVerified = model.IsOwnerVerified
             };
         }
 
