@@ -1468,7 +1468,6 @@
     <Content Include="Views\BusinessArea\_LibertyBellPopoverItem.cshtml" />
     <Content Include="Views\Dale\DaleSearch.cshtml" />
     <Content Include="Views\Dale\DaleResult.cshtml" />
-    <Content Include="Views\Shared\EditorTemplates\BootstrapSelect.cshtml" />
     <Content Include="Views\DataFlow\_AjaxMakeSchemaMap.cshtml" />
   </ItemGroup>
   <ItemGroup>
