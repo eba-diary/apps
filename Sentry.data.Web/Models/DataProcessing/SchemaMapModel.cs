@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using Sentry.data.Core;
 
 namespace Sentry.data.Web
 {
@@ -18,11 +14,13 @@ namespace Sentry.data.Web
 
         public int Id { get; set; }
         public string SearchCriteria { get; set; }        
-        //[Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Please Select a Dataset")]
         public int SelectedDataset { get; set; }
-        //[Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Please Select a Schema")]
         public int SelectedSchema { get; set; }
         public bool IsDeleted { get; set; }
+
+        public string Index { get; set; }
 
         public IEnumerable<SelectListItem> AllDatasets { get; set; }
         public IEnumerable<SelectListItem> AllSchemas { get; set; }

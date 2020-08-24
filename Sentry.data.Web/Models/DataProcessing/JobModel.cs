@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
+using Sentry.Core;
 
 namespace Sentry.data.Web
 {
@@ -14,14 +14,11 @@ namespace Sentry.data.Web
             IsRegexSearch = true;
         }
 
-        [Required]
         public string Schedule { get; set; }
 
-        [Required]
         [DisplayName("Schedule")]
-        public int SchedulePicker { get; set; }
+        public string SchedulePicker { get; set; }
 
-        [Required]
         [DisplayName("Relative URI")]
         public string RelativeUri { get; set; }
 
@@ -47,16 +44,20 @@ namespace Sentry.data.Web
         public int DatasetConfigID { get; set; }
 
         [DisplayName("Data Source")]
-        public int SelectedDataSource { get; set; }
+        public string SelectedDataSource { get; set; }
 
         [DisplayName("Source Type")]
         public string SelectedSourceType { get; set; }
+
         [DisplayName("Request Method")]
         public HttpMethods SelectedRequestMethod { get; set; }
+
         [DisplayName("Request Body Format")]
         public HttpDataFormat SelectedRequestDataFormat { get; set; }
+
         [DisplayName("FTP Pattern")]
         public FtpPattern FtpPattern { get; set; }
+
         public List<DataSource> AvailableSources { get; set; }
 
         public IEnumerable<SelectListItem> SourceTypesDropdown { get; set; }
@@ -69,5 +70,24 @@ namespace Sentry.data.Web
         public List<string> SourceIds { get; set; }
 
         public UserSecurity Security { get; set; }
+
+        internal ValidationException Validate()
+        {
+            ValidationResults results = new ValidationResults();
+            if (SelectedSourceType == null)
+            {
+                results.Add("SelectedSourceType", "Source type is required");
+            }
+            if (string.IsNullOrWhiteSpace(SelectedDataSource) || SelectedDataSource == "0")
+            {
+                results.Add("SelectedDataSource", "Data source is required");
+            }
+            if (string.IsNullOrWhiteSpace(SchedulePicker) || SchedulePicker == "0" || string.IsNullOrWhiteSpace(Schedule))
+            {
+                results.Add("SchedulePicker", "Schedule is required");
+            }
+
+            return new ValidationException(results);
+        }
     }
 }

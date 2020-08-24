@@ -1,5 +1,6 @@
 ﻿using Sentry.Core;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Helpers;
 using System;
@@ -64,6 +65,7 @@ namespace Sentry.data.Web.Controllers
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreprocessingOptions);
+            CreateDropDownSetup(model.RetrieverJob);
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
             SchemaMapModel schemaModel = new SchemaMapModel
             {
@@ -90,14 +92,21 @@ namespace Sentry.data.Web.Controllers
 
             AddCoreValidationExceptionsToModel(_dataFlowService.Validate(dfDto));
 
-            if (ModelState.IsValid)
-            {                
-                if (dfDto.Id == 0)
+            try
+            {
+                if (ModelState.IsValid)
                 {
-                    _dataFlowService.CreateandSaveDataFlow(dfDto);
-                }
+                    if (dfDto.Id == 0)
+                    {
+                        _dataFlowService.CreateandSaveDataFlow(dfDto);
+                    }
 
-                return RedirectToAction("Index");
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (ValidationException ex)
+            {
+                AddCoreValidationExceptionsToModel(ex);
             }
 
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
@@ -105,7 +114,7 @@ namespace Sentry.data.Web.Controllers
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreprocessingOptions);
             if (model.RetrieverJob != null)
             {
-                CreateDropDownSetup(model.RetrieverJob.First());
+                CreateDropDownSetup(model.RetrieverJob);
             }  
             if (model.SchemaMaps != null && model.SchemaMaps.Count > 0)
             {
@@ -117,16 +126,25 @@ namespace Sentry.data.Web.Controllers
             return View("DataFlowForm", model);
         }
 
+        /// <summary>
+        /// THis method utilizes a wrapper partial view to ensure the new schemamap is
+        ///   added to the collection correctly using EditorForMany helper.  The EditorForMany
+        ///   adds Guid (Index field) to each model, therefore, validations can be traked across
+        ///   a collection of models.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("DataFlow/NewSchemaMap/")]
-        public PartialViewResult NewSchemaMap()
-        {
-            SchemaMapModel modela = new SchemaMapModel
+        public PartialViewResult _AjaxMakeSchemaMap()
+        {            
+            DataFlowModel dfModel = new DataFlowModel();
+            SchemaMapModel schemaModel = new SchemaMapModel
             {
                 SelectedDataset = 0
             };
+            dfModel.SchemaMaps.Add(schemaModel);
 
-            return PartialView("_SchemaMap", modela);
+            return PartialView(dfModel);
         }
 
         [HttpGet]
@@ -195,9 +213,9 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        public PartialViewResult NewRetrieverJob()
+        public PartialViewResult NewRetrieverJob(JobModel model)
         {
-            JobModel model = new JobModel();
+            //JobModel model = new JobModel();
 
             CreateDropDownSetup(model);
 
@@ -224,7 +242,7 @@ namespace Sentry.data.Web.Controllers
 
             List<SelectListItem> temp2 = new List<SelectListItem>();
 
-            if (model.SelectedSourceType != null && model.SelectedDataSource != 0)
+            if (!string.IsNullOrWhiteSpace(model.SelectedSourceType) && model.SelectedDataSource != "0")
             {
                 temp2 = DataSourcesByType(model.SelectedSourceType, model.SelectedDataSource);
             }
@@ -258,7 +276,16 @@ namespace Sentry.data.Web.Controllers
 
             model.FtpPatternDropDown = Utility.BuildFtpPatternSelectList(model.FtpPattern);
 
-            model.SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(((RetrieverJobScheduleTypes)model.SchedulePicker).GetDescription());
+            int s;
+            int pickerval;
+            if (int.TryParse(model.SchedulePicker, out s)){
+                pickerval = s;
+            }
+            else
+            {
+                pickerval = 0;
+            }
+            model.SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(((RetrieverJobScheduleTypes)pickerval).GetDescription());
         }
 
         private void CreateDropDownList(CompressionModel model)
@@ -267,11 +294,11 @@ namespace Sentry.data.Web.Controllers
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
         }
 
-        private List<SelectListItem> DataSourcesByType(string sourceType, int? selectedId)
+        private List<SelectListItem> DataSourcesByType(string sourceType, string selectedId)
         {
             List<SelectListItem> output = new List<SelectListItem>();
 
-            if (selectedId != null || selectedId != 0)
+            if (!string.IsNullOrWhiteSpace(selectedId) || selectedId != "0")
             {
                 output.Add(new SelectListItem() { Text = "Pick a Data Source", Value = "0" });
             }
@@ -281,43 +308,70 @@ namespace Sentry.data.Web.Controllers
                 case "FTP":
                     List<DataSource> fTpList = _dataFlowService.GetDataSources().Where(x => x is FtpSource).ToList();
                     output.AddRange(fTpList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
                 case "SFTP":
                     List<DataSource> sfTpList = _dataFlowService.GetDataSources().Where(x => x is SFtpSource).ToList();
                     output.AddRange(sfTpList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
                 case "DFSBasic":
                     List<DataSource> dfsBasicList = _dataFlowService.GetDataSources().Where(x => x is DfsBasic).ToList();
                     output.AddRange(dfsBasicList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
                 case "DFSCustom":
                     List<DataSource> dfsCustomList = _dataFlowService.GetDataSources().Where(x => x is DfsCustom).ToList();
                     output.AddRange(dfsCustomList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
                 case "S3Basic":
                     List<DataSource> s3BasicList = _dataFlowService.GetDataSources().Where(x => x is S3Basic).ToList();
                     output.AddRange(s3BasicList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
                 case "HTTPS":
                     List<DataSource> HttpsList = _dataFlowService.GetDataSources().Where(x => x is HTTPSSource).ToList();
                     output.AddRange(HttpsList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
                 case "GOOGLEAPI":
                     List<DataSource> GApiList = _dataFlowService.GetDataSources().Where(x => x is GoogleApiSource).ToList();
                     output.AddRange(GApiList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
                 default:
                     throw new NotImplementedException();
             }
 
             return output;
+        }
+
+        protected override void AddCoreValidationExceptionsToModel(ValidationException ex)
+        {
+            foreach (ValidationResult vr in ex.ValidationResults.GetAll())
+            {
+                switch (vr.Id)
+                {
+                    case DataFlow.ValidationErrors.nameIsBlank:
+                    case DataFlow.ValidationErrors.nameMustBeUnique:
+                    case DataFlow.ValidationErrors.nameContainsReservedWords:
+                        ModelState.AddModelError("Name", vr.Description);
+                        break;
+                    case "PreprocessingOptions":
+                        ModelState.AddModelError(vr.Id, vr.Description);
+                        break;
+                    case "SelectedDataSource":
+                    case "SelectedSourceType":
+                    case "SchedulePicker":
+                        ModelState.AddModelError($"RetrieverJob.{vr.Id}", vr.Description);
+                        break;
+                    case DataFlow.ValidationErrors.stepsContainsAtLeastOneSchemaMap:
+                    default:
+                        ModelState.AddModelError(string.Empty, vr.Description);
+                        break;
+                }
+            }
         }
 
         //[HttpGet]

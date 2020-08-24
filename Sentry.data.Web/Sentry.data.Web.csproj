@@ -1457,8 +1457,8 @@
     <Content Include="Views\DataFlow\Detail.cshtml" />
     <Content Include="Views\DataFlow\DataFlowForm.cshtml" />
     <Content Include="Views\DataFlow\EditorTemplates\Enum.cshtml" />
-    <Content Include="Views\DataFlow\_SchemaMap.cshtml" />
-    <Content Include="Views\DataFlow\_RetrieverJob.cshtml" />
+    <Content Include="Views\DataFlow\EditorTemplates\SchemaMapModel.cshtml" />
+    <Content Include="Views\DataFlow\EditorTemplates\JobModel.cshtml" />
     <Content Include="Views\Shared\_SubscribeHero.cshtml" />
     <Content Include="Views\DataFlow\_CompressionJob.cshtml" />
     <Content Include="Views\Dataset\_DatasetCreateEdit.cshtml" />
@@ -1468,6 +1468,8 @@
     <Content Include="Views\BusinessArea\_LibertyBellPopoverItem.cshtml" />
     <Content Include="Views\Dale\DaleSearch.cshtml" />
     <Content Include="Views\Dale\DaleResult.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\BootstrapSelect.cshtml" />
+    <Content Include="Views\DataFlow\_AjaxMakeSchemaMap.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

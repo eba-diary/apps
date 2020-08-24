@@ -1,4 +1,5 @@
 ﻿using Sentry.Common.Logging;
+using Sentry.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
 using System;
@@ -58,6 +59,12 @@ namespace Sentry.data.Core
                 CreateDataFlow(dto);
 
                 _datasetContext.SaveChanges();
+            }
+            catch (ValidationException vEx)
+            {
+                //throw validation errors for controller to handle
+                _datasetContext.Clear();
+                throw vEx;
             }
             catch (Exception ex)
             {
@@ -275,14 +282,17 @@ namespace Sentry.data.Core
             Logger.Info($"dataflowservice-delete-end - dataflowid:{dataFlowId}");
         }
 
-        public List<string> Validate(DataFlowDto dfDto)
+        public ValidationException Validate(DataFlowDto dfDto)
         {
+            ValidationResults results = new ValidationResults();
             List<string> errors = new List<string>();
             if (_datasetContext.DataFlow.Any(w => w.Name == dfDto.Name))
             {
-                errors.Add("Dataflow name is already used");
+                results.Add(DataFlow.ValidationErrors.nameMustBeUnique, "Dataflow name is already used");
+               // errors.Add("Dataflow name is already used");
             }
-            return errors;
+            return new ValidationException(results);
+            //return errors;
         }
 
         #region Private Methods

@@ -1,9 +1,10 @@
-﻿using Sentry.data.Core.GlobalEnums;
+﻿using Sentry.Core;
+using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace Sentry.data.Web
@@ -15,8 +16,10 @@ namespace Sentry.data.Web
             SchemaMaps = new List<SchemaMapModel>();
             IsCompressed = false;
             IsPreProcessingRequired = false;
+            RetrieverJob = new JobModel();
         }
 
+        [System.ComponentModel.DataAnnotations.Required]
         public string Name { get; set; }
         /// <summary>
         /// How is data getting into DSC (Push or Pull)
@@ -42,7 +45,7 @@ namespace Sentry.data.Web
 
         [DisplayName("Where should this data be loaded?")]
         public List<SchemaMapModel> SchemaMaps { get; set; }
-        public List<JobModel> RetrieverJob { get; set; }
+        public JobModel RetrieverJob { get; set; }
         public List<CompressionModel> CompressionJob { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedDTM { get; set; }
@@ -56,13 +59,33 @@ namespace Sentry.data.Web
         [DisplayName("Pre Processing Options")]
         public List<int> PreprocessingOptions { get; set; }
 
-        public List<string> Validate()
+        public ValidationException Validate()
         {
-            List<string> errors = new List<string>();
+            ValidationResults results = new ValidationResults();
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                results.Add(DataFlow.ValidationErrors.nameIsBlank, "Must specify data flow name");
+            }
+
+            #region RetrieverJob validations
+            if (IngestionType == IngestionType.DSC_Pull && (RetrieverJob == null))
+            {
+                results.Add(string.Empty, "Pull type data flows required retriever job configuration");
+            }
+            if(IngestionType == IngestionType.DSC_Pull && RetrieverJob != null)
+            {
+                foreach (ValidationResult result in RetrieverJob.Validate().ValidationResults.GetAll())
+                {
+                    results.Add(result.Id, result.Description, result.Severity);
+                }
+            }
+            
+            #endregion
+
 
             if (SchemaMaps == null || !SchemaMaps.Any(w => !w.IsDeleted))
             {
-                errors.Add("Must contain atleast one schema mapping");
+                results.Add(DataFlow.ValidationErrors.stepsContainsAtLeastOneSchemaMap, "Must contain at least one schema mapping");
             }
             else if (SchemaMaps.Any(w => !w.IsDeleted))
             {
@@ -82,30 +105,27 @@ namespace Sentry.data.Web
 
                 if (dsSelectionErr)
                 {
-                    errors.Add("Must select dataset for schema mapping");
+                    results.Add(SchemaMap.ValidationErrors.schemamapMustContainDataset, "Must select dataset for schema mapping");
                 }
                 if (scmSelectionErr)
                 {
-                    errors.Add("Must select schema for schema mapping");
+                    results.Add(SchemaMap.ValidationErrors.schemamapMustContainSchema, "Must select schema for schema mapping");
                 }
-            }
-
-            if(Name == null)
-            {
-                errors.Add("Data flow name is required");
-            }
-
-            if (Name != null && Name.StartsWith("FileSchemaFlow"))
-            {
-                errors.Add("FileSchemaFlow is a reserved name, please choose new name");
             }
 
             if (IsPreProcessingRequired && PreprocessingOptions.Count == 1 && PreprocessingOptions.First() == 0)
             {
-                errors.Add("Pre Processing selection is required");
+                results.Add("PreprocessingOptions", "Pre Processing selection is required");
             }
+            ValidationException ex = new ValidationException(results);            
+            return ex;
+        }
 
-            return errors;
+        private ValidationResults RetrieverJobValidations()
+        {
+            ValidationResults results = new ValidationResults();
+
+            return results;
         }
     }
 }

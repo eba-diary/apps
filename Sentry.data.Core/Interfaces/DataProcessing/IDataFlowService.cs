@@ -65,6 +65,6 @@ namespace Sentry.data.Core
         /// <returns></returns>
         List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId);
         void DeleteByFileSchema(FileSchema scm);
-        List<string> Validate(DataFlowDto dfDto);
+        ValidationException Validate(DataFlowDto dfDto);
     }
 }

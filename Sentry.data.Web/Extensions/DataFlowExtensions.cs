@@ -44,7 +44,7 @@ namespace Sentry.data.Web
 
             if (model.RetrieverJob != null)
             {
-                dto.RetrieverJob = model.RetrieverJob.First().ToDto();
+                dto.RetrieverJob = model.RetrieverJob.ToDto();
             }
 
             if (model.CompressionJob != null)
@@ -96,7 +96,7 @@ namespace Sentry.data.Web
         {
             Core.RetrieverJobDto dto = new Core.RetrieverJobDto()
             {
-                DataSourceId = model.SelectedDataSource,
+                DataSourceId = (string.IsNullOrEmpty(model.SelectedDataSource)) ? 0 : Int32.Parse(model.SelectedDataSource),
                 DataSourceType = model.SelectedSourceType,
                 IsCompressed = false, //for the data flow compression is handled outside of retriever job logic
                 CreateCurrentFile = model.CreateCurrentFile,

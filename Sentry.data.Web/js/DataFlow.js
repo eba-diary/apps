@@ -61,6 +61,8 @@
         });
         
         data.DataFlow.InitSchemaMaps();
+
+        data.Job.FormInit();
     },
 
     InitIngestionType() {
@@ -68,12 +70,13 @@
 
         if (selection === "2") {
             $('.namePanel').show();
-            $('.retrieverPanel').show();
-            $('.questionairePanel').show();
             $('.compressionPanel').show();
             $('.schemaMapPanel').show();
             $('.preProcessingPanel').show();
             $('.formSubmitButtons').show();
+
+            $('.retrieverPanel').show();
+            $('.questionairePanel').show();
             data.Job.FormInit();
         }
         else if (selection === "1") {
@@ -107,10 +110,10 @@
                 $('#retrieverPanelSpinner').css('float', 'left');
                 Sentry.InjectSpinner($("#retrieverPanelSpinner"));
                 $('.retrieverPanel').show();
-                $.get("/DataFlow/NewRetrieverJob", function (e) {
-                    $("#retrieverJobPanel").replaceWith(e);
-                    data.Job.FormInit();
-                });
+                //$.get("/DataFlow/NewRetrieverJob", function (e) {
+                //    $("#retrieverJobPanel").replaceWith(e);
+                //    data.Job.FormInit();
+                //});
             }
             //if changing to Push
             else {
@@ -161,7 +164,7 @@
     },
 
     ResetRetrieverPanel: function (e) {
-        $(".retrieverPanel").replaceWith('<div class="form-group col-md-12 retrieverPanel" style="display: none;"><div id="retrieverJobPanel"><div id="retrieverPanelSpinner"></div></div></div>');
+        //$(".retrieverPanel").replaceWith('<div class="form-group col-md-12 retrieverPanel" style="display: none;"><div id="retrieverJobPanel"><div id="retrieverPanelSpinner"></div></div></div>');
         $('.retrieverPanel').hide();
     },
 
