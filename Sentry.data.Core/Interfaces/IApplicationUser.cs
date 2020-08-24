@@ -35,5 +35,6 @@ namespace Sentry.data.Core
         Boolean CanDaleSensitiveView { get; }
         Boolean CanDaleView { get; }
         Boolean CanDaleSensitiveEdit { get; }
+        Boolean CanDaleOwnerVerifiedEdit { get; }
     }
 }

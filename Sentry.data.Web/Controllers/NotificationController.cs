@@ -124,7 +124,7 @@ namespace Sentry.data.Web.Controllers
             }
             else
             {
-                return PartialView("_Success", new SuccessModel("Notification access was successfully requested.", "HPSM Change Id: " + ticketId, true));
+                return PartialView("_Success", new SuccessModel("Notification access was successfully requested.", "Change Id: " + ticketId, true));
             }
         }
 
