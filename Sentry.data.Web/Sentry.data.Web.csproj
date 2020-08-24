@@ -16,7 +16,7 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44371</IISExpressSSLPort>
+    <IISExpressSSLPort>44321</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -410,6 +410,7 @@
     <Compile Include="Models\Dale\DaleSensitiveModel.cs" />
     <Compile Include="Models\DataAsset\AssetUIModel.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetInfoModel.cs" />
+    <Compile Include="Models\DataProcessing\AssociatedDataFlowModel.cs" />
     <Compile Include="Models\DataProcessing\CompressionModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowDetailModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowModel.cs" />
@@ -1468,6 +1469,7 @@
     <Content Include="Views\BusinessArea\_LibertyBellPopoverItem.cshtml" />
     <Content Include="Views\Dale\DaleSearch.cshtml" />
     <Content Include="Views\Dale\DaleResult.cshtml" />
+    <Content Include="Views\RetrieverJob\_RetrieverJob.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1479,7 +1481,6 @@
     <Folder Include="Views\Alert\" />
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />
-    <Folder Include="Views\Retriever\" />
     <Folder Include="Views\Security\" />
     <Folder Include="Views\Subscription\" />
     <Folder Include="Views\Tag\" />
@@ -1534,9 +1535,9 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2457</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:44371</IISUrl>
+          <IISUrl>https://localhost:44321</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>https://localhost.sentry.com:44371</IISAppRootUrl>
+          <IISAppRootUrl>https://localhost.sentry.com:44321</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

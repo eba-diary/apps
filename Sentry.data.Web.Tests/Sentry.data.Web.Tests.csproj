@@ -98,6 +98,7 @@
       <HintPath>..\packages\Sentry_DataTables_ServerSide_MVC.1.0.5\lib\net45\Sentry.DataTables.Shared.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Sentry.FeatureFlags, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="Sentry.Web, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Web.5.0.2\lib\net40\Sentry.Web.dll</HintPath>
       <Private>True</Private>
