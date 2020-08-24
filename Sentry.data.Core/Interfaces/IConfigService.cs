@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Core
@@ -49,5 +50,19 @@ namespace Sentry.data.Core
         /// <param name="schemaId"></param>
         /// <returns></returns>
         bool SyncConsumptionLayer(int datasetId, int schemaId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        Tuple<List<RetrieverJob>, List<DataFlowStepDto>> GetDataFlowDropLocationJobs(DatasetFileConfig config);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        List<Tuple<DataFlowDetailDto, List<RetrieverJob>>> GetExternalDataFlowsBySchema(DatasetFileConfig config);
     }
 }
