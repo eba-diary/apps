@@ -1,24 +1,17 @@
-﻿using Sentry.data.Core;
-using System.Linq;
-using System.Web.Mvc;
-using System.Web.SessionState;
-using System.Threading;
-using Microsoft.AspNet.SignalR;
-using System.Collections.Generic;
-using System;
-using System.Xml;
-using System.ServiceModel.Syndication;
-using LazyCache;
-using System.Threading.Tasks;
-using System.Net.Http;
-using System.Web.Script.Serialization;
-using System.Text;
-using System.Net.Http.Headers;
-using System.Net;
+﻿using LazyCache;
 using Newtonsoft.Json.Linq;
-using System.IO;
 using Sentry.Configuration;
 using Sentry.data.Common;
+using Sentry.data.Core;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web.Mvc;
+using System.Web.SessionState;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -28,11 +21,13 @@ namespace Sentry.data.Web.Controllers
         private readonly IDataFeedContext _feedContext;
         private readonly IDatasetContext _dsContext;
         private readonly IAppCache cache;
+        private readonly IDataFeatures _featureFlags;
 
-        public HomeController(IDataFeedContext feedContext, IDatasetContext datasetContext, IDataAssetContext dataAssetContext)
+        public HomeController(IDataFeedContext feedContext, IDatasetContext datasetContext, IDataAssetContext dataAssetContext, IDataFeatures featureFlags)
         {
             _feedContext = feedContext;
             _dsContext = datasetContext;
+            _featureFlags = featureFlags;
             cache = new CachingService();
         }
 
@@ -46,7 +41,8 @@ namespace Sentry.data.Web.Controllers
             {
                 DatasetCount = dsList.Count(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET),
                 Categories = _dsContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).ToList(),
-                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset
+                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
+                DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue()
             };
 
             Event e = new Event()
