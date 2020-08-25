@@ -353,12 +353,16 @@ namespace Sentry.data.Web.Controllers
             {
                 switch (vr.Id)
                 {
+                    //Base Model Errors
                     case DataFlow.ValidationErrors.nameIsBlank:
                     case DataFlow.ValidationErrors.nameMustBeUnique:
                     case DataFlow.ValidationErrors.nameContainsReservedWords:
                         ModelState.AddModelError("Name", vr.Description);
                         break;
                     case "PreprocessingOptions":
+                        ModelState.AddModelError("vr.Id", vr.Description);
+                        break;
+                    //Nested model errors
                     case "SelectedDataSource":
                     case "SelectedSourceType":
                     case "SchedulePicker":
