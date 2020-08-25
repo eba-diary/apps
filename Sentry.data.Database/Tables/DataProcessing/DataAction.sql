@@ -7,6 +7,7 @@
     [TargetStorageBucket] VARCHAR(250) NOT NULL, 
 	[ActionType] VARCHAR(250) NOT NULL, 
     [TargetStorageSchemaAware] BIT NOT NULL, 
+    [Description] VARCHAR(250) NOT NULL, 
     CONSTRAINT [PK_DataAction] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC

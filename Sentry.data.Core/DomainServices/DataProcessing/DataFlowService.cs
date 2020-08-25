@@ -498,6 +498,7 @@ namespace Sentry.data.Core
             dto.DataActionType = step.DataAction_Type_Id;
             dto.ExeuctionOrder = step.ExeuctionOrder;
             dto.ActionName = step.Action.Name;
+            dto.ActionDescription = step.Action.Description;
             dto.TriggerKey = step.TriggerKey;
             dto.TargetPrefix = step.TargetPrefix;
             dto.DataFlowId = step.DataFlow.Id;
