@@ -87,7 +87,55 @@ namespace Sentry.data.Web
                 results.Add("SchedulePicker", "Schedule is required");
             }
 
+            //Validate FTP Configuration
+            if (SelectedSourceType == GlobalConstants.DataSoureDiscriminator.FTP_SOURCE)
+            {
+                ValidateFtpJobValues(results);
+            }
+
+            //Validate GoogleApi Configuration
+            if (SelectedSourceType == GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE)
+            {
+                ValidateGoogleApiValues(results);
+            }
+
             return new ValidationException(results);
+        }
+
+        private void ValidateFtpJobValues(ValidationResults results)
+        {
+            if (FtpPattern == FtpPattern.NoPattern)
+            {
+                results.Add(RetrieverJob.ValidationErrors.ftpPatternNotSelected, "Ftp pattern selection is required");
+            } 
+        }
+        
+        private void ValidateGoogleApiValues(ValidationResults results)
+        {
+            if (string.IsNullOrWhiteSpace(RelativeUri))
+            {
+                
+                results.Add(RetrieverJob.ValidationErrors.googleApiRelativeUriIsBlank, "Please provide a url");
+            }
+            if (SelectedRequestMethod == HttpMethods.none)
+            {
+                results.Add(RetrieverJob.ValidationErrors.httpsRequestMethodNotSelected, "Request method is required");
+            }
+
+            if (SelectedRequestMethod == HttpMethods.post && SelectedRequestDataFormat == HttpDataFormat.none)
+            {
+                results.Add(RetrieverJob.ValidationErrors.httpsRequestDataFormatNotSelected, "Request Body Format is required");
+            }
+
+            if (SelectedRequestMethod == HttpMethods.post && string.IsNullOrWhiteSpace(HttpRequestBody))
+            {
+                results.Add(RetrieverJob.ValidationErrors.httpsRequestBodyIsBlank, "Request body is required");
+            }
+
+            if (string.IsNullOrWhiteSpace(TargetFileName))
+            {
+                results.Add(RetrieverJob.ValidationErrors.httpsTargetFileNameIsBlank, "Target file name is required");
+            }
         }
     }
 }

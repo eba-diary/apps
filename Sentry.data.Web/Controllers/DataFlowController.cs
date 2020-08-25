@@ -359,12 +359,28 @@ namespace Sentry.data.Web.Controllers
                         ModelState.AddModelError("Name", vr.Description);
                         break;
                     case "PreprocessingOptions":
-                        ModelState.AddModelError(vr.Id, vr.Description);
-                        break;
                     case "SelectedDataSource":
                     case "SelectedSourceType":
                     case "SchedulePicker":
                         ModelState.AddModelError($"RetrieverJob.{vr.Id}", vr.Description);
+                        break;
+                    case RetrieverJob.ValidationErrors.googleApiRelativeUriIsBlank:
+                        ModelState.AddModelError("RetrieverJob.RelativeUri", vr.Description);
+                        break;
+                    case RetrieverJob.ValidationErrors.httpsRequestBodyIsBlank:
+                        ModelState.AddModelError("RetrieverJob.HttpRequestBody", vr.Description);
+                        break;
+                    case RetrieverJob.ValidationErrors.httpsRequestDataFormatNotSelected:
+                        ModelState.AddModelError("RetrieverJob.SelectedRequestDataFormat", vr.Description);
+                        break;
+                    case RetrieverJob.ValidationErrors.httpsRequestMethodNotSelected:
+                        ModelState.AddModelError("RetrieverJob.SelectedRequestMethod", vr.Description);
+                        break;
+                    case RetrieverJob.ValidationErrors.httpsTargetFileNameIsBlank:
+                        ModelState.AddModelError("RetrieverJob.TargetFileName", vr.Description);
+                        break;
+                    case RetrieverJob.ValidationErrors.ftpPatternNotSelected:
+                        ModelState.AddModelError("RetrieverJob.FtpPattern", vr.Description);
                         break;
                     case DataFlow.ValidationErrors.stepsContainsAtLeastOneSchemaMap:
                     default:
@@ -373,22 +389,6 @@ namespace Sentry.data.Web.Controllers
                 }
             }
         }
-
-        //[HttpGet]
-        //[Route("DataFlow/{dataFlowId}/DataFlowExecution/{executionGuid}/DataFlowStep/{dataFlowStepId}/ProcessFile")]
-        //public bool RunDataFlowStep(int dataFlowId, int dataFlowStepId, string key, string bucket, string executionGuid)
-        //{
-        //    DataFlowDetailDto flowDto = _dataFlowService.GetDataFlowDetailDto(dataFlowId);
-        //    if (flowDto.steps.Any(w => w.Id == dataFlowStepId))
-        //    {
-        //        _dataFlowService.GenerateJobRequest(dataFlowStepId, bucket, key, executionGuid);
-        //    }
-        //    else
-        //    {
-        //        return false;
-        //    }
-        //    return true;
-        //}
     }
 
     public class DataFlowStepFile
