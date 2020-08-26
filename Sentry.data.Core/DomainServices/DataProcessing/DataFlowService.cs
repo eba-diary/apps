@@ -1,4 +1,5 @@
 ﻿using Sentry.Common.Logging;
+using Sentry.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
 using System;
@@ -60,6 +61,12 @@ namespace Sentry.data.Core
                 _datasetContext.SaveChanges();
 
                 return df.Id;
+            }
+            catch (ValidationException vEx)
+            {
+                //throw validation errors for controller to handle
+                _datasetContext.Clear();
+                throw;
             }
             catch (Exception ex)
             {
@@ -276,6 +283,16 @@ namespace Sentry.data.Core
             }
 
             Logger.Info($"dataflowservice-delete-end - dataflowid:{dataFlowId}");
+        }
+
+        public ValidationException Validate(DataFlowDto dfDto)
+        {
+            ValidationResults results = new ValidationResults();
+            if (_datasetContext.DataFlow.Any(w => w.Name == dfDto.Name))
+            {
+                results.Add(DataFlow.ValidationErrors.nameMustBeUnique, "Dataflow name is already used");
+            }
+            return new ValidationException(results);
         }
 
         #region Private Methods
@@ -569,7 +586,7 @@ namespace Sentry.data.Core
                     action = _datasetContext.SchemaLoadAction.FirstOrDefault();
                     DataFlowStep schemaLoadStep = MapToDataFlowStep(df, action, actionType);
                     List<SchemaMap> schemaMapList = new List<SchemaMap>();
-                    foreach (SchemaMapDto mapDto in dto.SchemaMap)
+                    foreach (SchemaMapDto mapDto in dto.SchemaMap.Where(w => !w.IsDeleted))
                     {
                         schemaMapList.Add(MapToSchemaMap(mapDto, schemaLoadStep));
                     }
@@ -578,7 +595,7 @@ namespace Sentry.data.Core
                 case DataActionType.SchemaMap:
                     action = _datasetContext.SchemaMapAction.FirstOrDefault();
                     DataFlowStep schemaMapStep = MapToDataFlowStep(df, action, actionType);
-                    foreach (SchemaMapDto mapDto in dto.SchemaMap)
+                    foreach (SchemaMapDto mapDto in dto.SchemaMap.Where(w => !w.IsDeleted))
                     {
                         MapToSchemaMap(mapDto, schemaMapStep);
                         bool exists = DataFlowExistsForFileSchema(mapDto.SchemaId);

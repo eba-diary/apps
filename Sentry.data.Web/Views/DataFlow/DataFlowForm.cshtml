@@ -25,10 +25,10 @@
                 @*Show the custom validation summary*@
                 @Html.DisplayFor((model) => ViewData.ModelState)
             </div>
-
             <div class="form-group col-md-12">
+                <br />
                 @*@Html.LabelFor(model => model.IngestionType, htmlAttributes: new { @class = "control-label col-md-2" })*@
-                <h4>How Will The Data be Sent to Us?</h4>
+                <div class="col-md-5"><h4>How Will The Data be Sent to Us?</h4></div>
                 <div class="col-md-4">
                     @*@Html.EditorFor(m => m.IngestionType)*@
                     @Html.EnumDropDownListFor(
@@ -38,11 +38,20 @@
                     @*@Html.RadioButtonFor(model => model.IngestionType, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })*@
                 </div>
             </div>
+            <div class="namePanel" style="display:none;">
+                <div class="form-group col-md-12">
+                    <div class="col-md-5"><h4>What Would You Like to Name This Data Flow?</h4></div>
+                    <div class="col-md-4">
+                        @Html.TextBoxFor((m) => m.Name, Model.Name, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor(model => Model.Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
             <br />
             <div class="compressionPanel" style="display:none;">
                 @*@Html.HiddenFor(model => model.IsCompressed)*@
                 <div class="form-group col-md-12">
-                    <h4>Is Your Incoming Data Compressed?</h4>
+                    <div class="col-md-5"><h4>Is Your Incoming Data Compressed?</h4></div>
                     <div class="col-md-1">
                         @Html.DropDownListFor((m) => m.IsCompressed, Model.CompressionDropdown, new { @class = "form-control edit-dataset-row" })
                     </div>
@@ -64,16 +73,14 @@
             <br />
             <div class="form-group col-md-12 retrieverPanel" style="display:none">
                 <div id="retrieverJobPanel">
-                    @if (Model.RetrieverJob != null)
-                    {
-                        @Html.Partial("_RetrieverJob", Model.RetrieverJob.First())
-                    }
+                    @*<div id="retrieverPanelSpinner"></div>*@
+                        @Html.EditorFor(model => Model.RetrieverJob)                    
                 </div>
             </div>
             <br />
             <div class="preProcessingPanel" style="display:none;">
                 <div class="form-group col-md-12">
-                    <h4>Does Your Data Require Preprocessing?</h4>
+                    <div class="col-md-5"><h4>Does Your Data Require Preprocessing?</h4></div>
                     <div class="col-md-1">
                         @Html.DropDownListFor((m) => m.IsPreProcessingRequired, Model.PreProcessingRequiredDropdown, new { @class = "form-control edit-dataset-row" })
                     </div>
@@ -81,9 +88,9 @@
                 <div class="form-group col-md-12 preProcessingJobPanel" style="display:none;">
                     @* PreProcessing Options *@
                     <div class="form-group">
-                        @Html.LabelFor((model) => model.PreprocessingOptions, new { @class = "control-label col-md-2" })
-                        <div class="col-md-10">
-                            <select id="PreprocessingOptions" name="PreprocessingOptions" class="form-control edit-dataset-row">
+                        @Html.LabelFor((model) => model.PreprocessingOptions, new { @class = "control-label col-md-5" })
+                        <div class="col-md-4">
+                            <select id="PreprocessingOptions" name="PreprocessingOptions" class="form-control edit-dataset-row" style="width:100%">
                                 @foreach (var item in Model.PreProcessingOptionsDropdown)
                                 {
                                     <option selected="@item.Selected" value="@item.Value">@item.Text</option>
@@ -97,14 +104,15 @@
             <br />
             <div class="schemaMapPanel" style="display:none;">
                 <div class="form-group col-md-12">
-                    <h4>Where Do You Want The Data to Go?</h4>
+                    <div class="col-md-5"><h4>Where Do You Want The Data to Go?</h4></div>
                     @*@Html.LabelFor(model => model.SchemaMaps, htmlAttributes: new { @class = "control-label col-md-2" })*@
                     @*<a id="btnAddSchemaMap" class="btn btn-primary">Add Schema Mapping</a>*@
                     <div id="schemaMapPanel" class="form-group col-md-12">
-                        @foreach (SchemaMapModel mapModel in Model.SchemaMaps)
+                        @Html.EditorForMany(m => m.SchemaMaps, x => x.Index)
+                        @*@foreach (SchemaMapModel mapModel in Model.SchemaMaps)
                         {
                             @Html.Partial("_SchemaMap", mapModel)
-                        }
+                        }*@
                         <button type="button" id="btnAddSchemaMap" class="btn btn-success"><span>Add Another Target</span></button>
                     </div>
                 </div>
@@ -164,6 +172,38 @@
     <script type="text/javascript">
         $(function () {
             data.DataFlow.DataFlowFormInit();
+
+            //Adding delete button logic here to ensure it is added to 
+            // any additional schemaMapLineItems that are added
+            $(document).on("click", "#btnSchemaMapRemove", function () {
+                if ($('.schemaMapLineItem.active').length === 1) {
+                    Sentry.ShowModalAlert("At least one schema mapping is required");
+                }
+                else {                    
+                    var self = $(this);
+                    var parentContainer = self.parent(".schemaMapLineItem");
+                    var isDeleteHidden = parentContainer.find("[id$=IsDeleted]");
+                    //Set hidden value for when object is model is passed back to controller
+                    $(isDeleteHidden).val("True");
+                    //remove active class from parentcontainer to ensure not counted 
+                    // when ensuring there is at least one active mapping
+                    $(parentContainer).removeClass("active");
+                    //Hide parentcontainer to ensure not displayed to user after deletion
+                    $(parentContainer).hide();
+                }
+            })
         });
     </script>
+
+    <style>
+        select.form-control{
+            border-radius: 4px;
+        }
+        select.edit-dataset-row{
+            border-radius: 4px;
+        }
+        span.glyphicon.glyphicon-warning-sign.form-control-feedback{
+            text-align:unset;
+        }
+    </style>
 }
