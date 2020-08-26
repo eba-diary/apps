@@ -32,7 +32,7 @@
         });
 
         //init preprocessing panel
-        if ($("#IsPreProcessingRequired").val() == "true") {
+        if ($("#IsPreProcessingRequired").val() === "true") {
             $(".preProcessingJobPanel").show();
         }
         else {
@@ -110,10 +110,6 @@
                 $('#retrieverPanelSpinner').css('float', 'left');
                 Sentry.InjectSpinner($("#retrieverPanelSpinner"));
                 $('.retrieverPanel').show();
-                //$.get("/DataFlow/NewRetrieverJob", function (e) {
-                //    $("#retrieverJobPanel").replaceWith(e);
-                //    data.Job.FormInit();
-                //});
             }
             //if changing to Push
             else {
@@ -122,7 +118,7 @@
                 //If sourcetype has not been selected, then reset the RetrieverPanel as
                 //  there are no values to loose.
                 if ($('[id$=__SelectedSourceType]').val() == null) {
-                    data.DataFlow.ResetRetrieverPanel(this);
+                    data.DataFlow.ResetRetrieverPanel();
                 }
                 else {
                     //need to manually pass buttons in order to specify callback for OK and Cancel options
@@ -130,14 +126,14 @@
                         OK: {
                             label: "OK",
                             className: "btn-primary",
-                            callback: function () { data.DataFlow.ResetRetrieverPanel(this) }
+                            callback: function () { data.DataFlow.ResetRetrieverPanel(); }
                         },
                         Cancel: {
                             label: "Cancel",
                             className: "btn-link",
-                            callback: function () { data.DataFlow.CancelIngestionSelection(ingestionSelection, $(this)) }
+                            callback: function () { data.DataFlow.CancelIngestionSelection(ingestionSelection, $(this)); }
                         }
-                    })
+                    });
                 };
             }
             $('.namePanel').show();
@@ -163,8 +159,7 @@
         ingestionSelectBox.dispatchEvent(new Event('change'));
     },
 
-    ResetRetrieverPanel: function (e) {
-        //$(".retrieverPanel").replaceWith('<div class="form-group col-md-12 retrieverPanel" style="display: none;"><div id="retrieverJobPanel"><div id="retrieverPanelSpinner"></div></div></div>');
+    ResetRetrieverPanel: function () {
         $('.retrieverPanel').hide();
     },
 
@@ -282,7 +277,7 @@
                 if (curVal === null || curVal === "0") {
                     targetElement.val("0");
                 }
-                else if ((schemaId != undefined && schemaId !== null) || curVal === "-1") {
+                else if ((schemaId !== undefined && schemaId !== null) || curVal === "-1") {
                     targetElement.val(schemaId)
                 }
                 else {

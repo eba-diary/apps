@@ -64,7 +64,7 @@ namespace Sentry.data.Core
             {
                 //throw validation errors for controller to handle
                 _datasetContext.Clear();
-                throw vEx;
+                throw;
             }
             catch (Exception ex)
             {
@@ -285,14 +285,11 @@ namespace Sentry.data.Core
         public ValidationException Validate(DataFlowDto dfDto)
         {
             ValidationResults results = new ValidationResults();
-            List<string> errors = new List<string>();
             if (_datasetContext.DataFlow.Any(w => w.Name == dfDto.Name))
             {
                 results.Add(DataFlow.ValidationErrors.nameMustBeUnique, "Dataflow name is already used");
-               // errors.Add("Dataflow name is already used");
             }
             return new ValidationException(results);
-            //return errors;
         }
 
         #region Private Methods

@@ -120,12 +120,5 @@ namespace Sentry.data.Web
             ValidationException ex = new ValidationException(results);            
             return ex;
         }
-
-        private ValidationResults RetrieverJobValidations()
-        {
-            ValidationResults results = new ValidationResults();
-
-            return results;
-        }
     }
 }
