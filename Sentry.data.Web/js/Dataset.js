@@ -16,6 +16,11 @@ data.Dataset = {
             window.location = "/Dataset/Create";
         });
 
+        $("[id^='CreateDataflow']").click(function (e) {
+            e.preventDefault();
+            window.location = "/Dataflow/Create";
+        });
+
         $("[id^='UploadDatafile']").click(function (e) {
             e.preventDefault();
             data.Dataset.UploadFileModal(0);

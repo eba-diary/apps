@@ -52,13 +52,15 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
-        public bool CreateandSaveDataFlow(DataFlowDto dto)
+        public int CreateandSaveDataFlow(DataFlowDto dto)
         {
             try
             {
-                CreateDataFlow(dto);
+                DataFlow df = CreateDataFlow(dto);
 
                 _datasetContext.SaveChanges();
+
+                return df.Id;
             }
             catch (ValidationException vEx)
             {
@@ -69,10 +71,8 @@ namespace Sentry.data.Core
             catch (Exception ex)
             {
                 Logger.Error("dataflowservice-createandsavedataflow failed to save dataflow", ex);
-                return false;
+                return 0;
             }
-
-            return true;
         }
 
         public void CreateDataFlowForSchema(FileSchema scm)
@@ -103,7 +103,7 @@ namespace Sentry.data.Core
             return dataFlowName;
         }
 
-        public DataFlowStep GetS3DropStepForFileSchema(FileSchema scm)
+        public DataFlowStepDto GetS3DropStepForFileSchema(FileSchema scm)
         {
             if(scm == null)
             {
@@ -113,13 +113,16 @@ namespace Sentry.data.Core
             string schemaFlowName = GenerateDataFlowNameForFileSchema(scm);
             DataFlow flow = _datasetContext.DataFlow.Where(w => w.Name == schemaFlowName).FirstOrDefault();
             DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow == flow && w.DataAction_Type_Id == DataActionType.S3Drop).FirstOrDefault();
-
             if (step == null)
             {
                 throw new DataFlowStepNotFound();
             }
+            DataFlowStepDto stepDto = new DataFlowStepDto();
+            MapToDto(step, stepDto);
 
-            return step;
+            
+
+            return stepDto;
         }
 
         public DataFlow GetDataFlowByName(string schemaFlowName)
@@ -311,7 +314,7 @@ namespace Sentry.data.Core
             }
         }
 
-        private void CreateDataFlow(DataFlowDto dto)
+        private DataFlow CreateDataFlow(DataFlowDto dto)
         {           
             DataFlow df = MapToDataFlow(dto);
 
@@ -326,6 +329,8 @@ namespace Sentry.data.Core
                 default:
                     break;
             }
+
+            return df;
         }
 
         private DataFlow MapToDataFlow(DataFlowDto dto)
@@ -349,9 +354,9 @@ namespace Sentry.data.Core
         {
             //This type of dataflow does not need to worry about retrieving data from external sources
             // Data will be pushed by user to S3 and\or DFS drop locations
-
             //Add default DFS drop location for data flow
-            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_DATAFLOW_DFS_DROP_LOCATION)));
+            List<DataSource> srcList = _datasetContext.DataSources.ToList();
+            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
             _datasetContext.Add(dfsDataFlowBasic);
 
             //Generate ingestion steps (get file to raw location)
@@ -477,26 +482,19 @@ namespace Sentry.data.Core
             dto.CreateDTM = df.CreatedDTM;
             dto.CreatedBy = df.CreatedBy;
             dto.FlowStorageCode = df.FlowStorageCode;
+            dto.MappedSchema = GetMappedFileSchema(df.Id);
+            dto.AssociatedJobs = GetExternalRetrieverJobs(df.Id);
         }
 
-        private void MaptToDto(DataFlowDto dto, RetrieverJobDto jobDto)
+        private List<int> GetMappedFileSchema(int dataflowId)
         {
-            jobDto.DataSourceId = dto.RetrieverJob.DataSourceId;
-            jobDto.DataSourceType = dto.RetrieverJob.DataSourceType;
-            jobDto.IsCompressed = false; //for the data flow compression is handled outside of retriever job logic
-            jobDto.CreateCurrentFile = dto.RetrieverJob.CreateCurrentFile;
-            jobDto.DatasetFileConfig = 0; //jobs for the data flow are linked via data flow id not datasetfileconfig
-            jobDto.FileNameExclusionList = dto.RetrieverJob.FileNameExclusionList;
-            jobDto.FileSchema = dto.RetrieverJob.FileSchema;
-            jobDto.FtpPatrn = dto.RetrieverJob.FtpPatrn;
-            jobDto.HttpRequestBody = dto.RetrieverJob.HttpRequestBody;
-            jobDto.JobId = dto.RetrieverJob.JobId;
-            jobDto.RelativeUri = dto.RetrieverJob.RelativeUri;
-            jobDto.RequestDataFormat = dto.RetrieverJob.RequestDataFormat;
-            jobDto.RequestMethod = dto.RetrieverJob.RequestMethod;
-            jobDto.Schedule = dto.RetrieverJob.Schedule;
-            jobDto.SearchCriteria = dto.RetrieverJob.SearchCriteria;
-            jobDto.TargetFileName = dto.RetrieverJob.TargetFileName;
+            return _datasetContext.SchemaMap.Where(w => w.DataFlowStepId.DataFlow.Id == dataflowId).Select(s => s.MappedSchema.SchemaId).ToList();
+        }
+
+        private List<int> GetExternalRetrieverJobs(int dataflowId)
+        {
+            List<int> rjList = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == dataflowId && !w.IsGeneric).Select(s => s.Id).ToList();
+            return rjList;
         }
 
         private void MapToDetailDto(DataFlow flow, DataFlowDetailDto dto)
@@ -519,6 +517,7 @@ namespace Sentry.data.Core
             dto.ActionName = step.Action.Name;
             dto.TriggerKey = step.TriggerKey;
             dto.TargetPrefix = step.TargetPrefix;
+            dto.DataFlowId = step.DataFlow.Id;
         }
 
         private void MapToDtoList(List<DataFlowStep> steps, List<DataFlowStepDto> dtoList)
@@ -715,7 +714,8 @@ namespace Sentry.data.Core
             DataFlowDto dto = MapToDto(scm);
 
             //Add default DFS drop location for data flow
-            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_DATAFLOW_DFS_DROP_LOCATION)));
+            List<DataSource> srcList = _datasetContext.DataSources.ToList();
+            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
             _datasetContext.Add(dfsDataFlowBasic);
 
             //Generate ingestion steps (get file to raw location)
