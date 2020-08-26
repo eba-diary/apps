@@ -204,6 +204,7 @@ namespace Sentry.data.Web
                 Id = dto.Id,
                 ActionId = dto.ActionId,
                 ActionName = dto.ActionName,
+                ActionDescription = dto.ActionDescription,
                 ExecutionOrder = dto.ExeuctionOrder,
                 TriggetKey = dto.TriggerKey,
                 TargetPrefix = dto.TargetPrefix,
