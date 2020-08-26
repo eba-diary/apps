@@ -1470,6 +1470,7 @@
     <Content Include="Views\Dale\DaleSearch.cshtml" />
     <Content Include="Views\Dale\DaleResult.cshtml" />
     <Content Include="Views\DataFlow\_AjaxMakeSchemaMap.cshtml" />
+    <Content Include="Views\RetrieverJob\_RetrieverJob.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
