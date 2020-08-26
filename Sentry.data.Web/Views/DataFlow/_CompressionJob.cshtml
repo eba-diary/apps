@@ -20,7 +20,7 @@
         <div id="compressionJobQuestion">
             <div class="form-group">
                 @Html.LabelFor(model => model.CompressionType, htmlAttributes: new { @class = "control-label col-md-5" })
-                <div class="col-md-3">S
+                <div class="col-md-3">
                     @Html.DropDownListFor(model => model.CompressionType, Model.CompressionTypesDropdown, new { @class = "form-control edit-dataset-row", })
                     @Html.ValidationMessageFor(model => model.CompressionType, "", new { @class = "text-danger" })
                 </div>
