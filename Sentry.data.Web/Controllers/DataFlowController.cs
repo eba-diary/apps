@@ -360,7 +360,7 @@ namespace Sentry.data.Web.Controllers
                         ModelState.AddModelError("Name", vr.Description);
                         break;
                     case "PreprocessingOptions":
-                        ModelState.AddModelError("vr.Id", vr.Description);
+                        ModelState.AddModelError(vr.Id, vr.Description);
                         break;
                     //Nested model errors
                     case "SelectedDataSource":
