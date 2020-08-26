@@ -37,6 +37,8 @@
                         <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
                     </div>
                     <div class="jobContainer" style="display:none;">
+                        <div><span>@step.ActionDescription</span></div>
+                        <br />
                         <div><span><strong>This step processes files dropped in this AWS S3 url:</strong></span></div>
                         <div class="filePath"><span>@step.RootAwsUrl@step.TriggetKey</span></div>
                         @if (Model.UserSecurity.ShowAdminControls && step.TargetPrefix != null)
