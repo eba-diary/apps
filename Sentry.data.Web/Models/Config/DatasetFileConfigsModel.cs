@@ -156,6 +156,8 @@ namespace Sentry.data.Web
         public bool CLA1396_NewEtlColumns { get; set; }
         public bool CLA1580_StructureHive { get; set; }
         public IList<RetrieverJob> RetrieverJobs { get; set; }
+        public Tuple<List<RetrieverJob>, List<DataFlowStepModel>> DataFlowJobs { get; set; }
+        public IList<AssociatedDataFlowModel> ExternalDataFlowJobs { get; set; }
 
         public IList<DataElement> Schemas { get; set; }  
         public FileSchema Schema { get; set; }

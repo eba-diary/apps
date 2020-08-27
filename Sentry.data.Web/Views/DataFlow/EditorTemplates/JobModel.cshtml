@@ -1,12 +1,14 @@
 ﻿@model Sentry.data.Web.JobModel
-@using (Html.BeginCollectionItem("RetrieverJob"))
-{
+@*@using (Html.BeginCollectionItem("RetrieverJob"))
+{*@
 
-    <h4>Where Do You Want Us to Pull From?</h4>
-    <hr />
+    <div class="col-md-12"><h4>Where Do You Want Us to Pull From?</h4></div>
+    
     <div class="form-group col-md-12">
+        <hr />
         @Html.LabelFor((model) => model.SelectedSourceType, new { @class = "control-label col-md-2" })
         <div class="col-md-2">
+            @*@Html.EditorFor(m => m.SelectedSourceType, "BootstrapSelec", Model.SourceTypesDropdown)*@
             @Html.DropDownListFor((model) => model.SelectedSourceType, Model.SourceTypesDropdown, new { @class = "form-control edit-dataset-row" })
             @Html.ValidationMessageFor((model) => model.SelectedSourceType, "", new { @class = "text-danger" })
         </div>
@@ -15,7 +17,7 @@
     <div class="form-group col-md-12">
         @Html.LabelFor((model) => model.SelectedDataSource, new { @class = "control-label col-md-2" })
         <div class="col-md-5">
-            @Html.DropDownListFor((model) => model.SelectedDataSource, Model.SourcesForDropdown, new { @class = "form-control edit-dataset-row" })
+            @Html.DropDownListFor((model) => model.SelectedDataSource, Model.SourcesForDropdown, new { @class = "form-control edit-dataset-row"})
             @Html.ValidationMessageFor((model) => model.SelectedDataSource, "", new { @class = "text-danger" })
         </div>
         <div class="securityPanel col-md-5" style="display:none;">
@@ -289,7 +291,7 @@
         @Html.HiddenFor(model => model.Schedule)
 
         <div class="jobquestion schedule">
-            <div id="schedulePanel">
+            <div id="schedulePanel" style="display:none">
                 <div class="form-group configQuestion">
                     <div class="col-md-12">
                         <h5>How often would you like us to pull the data?</h5>
@@ -298,7 +300,7 @@
                 <div class="form-group col-md-12">
                     @Html.LabelFor(model => model.SchedulePicker, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-2">
-                        @Html.DropDownListFor(model => model.SchedulePicker, Model.SchedulePickerDropdown, new { @class = "form-control edit-dataset-row", })
+                        @Html.DropDownListFor(model => model.SchedulePicker, Model.SchedulePickerDropdown, new { @class = "form-control edit-dataset-row" })
                         @Html.ValidationMessageFor(model => model.SchedulePicker, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -382,5 +384,5 @@
             </div>
         </div>
     </div>
-}
+@*}*@
     

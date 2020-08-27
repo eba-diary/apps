@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 
 namespace Sentry.data.Core
@@ -13,5 +14,6 @@ namespace Sentry.data.Core
         public string OriginationCode { get; set; }
         public string DataClassificationDescription { get; set; }
         public int GroupAccessCount { get; set; }
+        public List<Tuple<string, List<Tuple<DataFlowDetailDto, List<RetrieverJob>>>>> DataFlows { get; set; }
     }
 }

@@ -13,5 +13,6 @@ namespace Sentry.data.Web
         public string CategoryColor { get; set; }
         public List<DatasetFileConfigsModel> DatasetFileConfigs { get; set; }
         public UserSecurity Security { get; set; }
+        public bool DisplayDataflowMetadata { get; set; }
     }
 }

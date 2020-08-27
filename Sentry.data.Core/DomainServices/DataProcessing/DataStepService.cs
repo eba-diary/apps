@@ -31,6 +31,7 @@ namespace Sentry.data.Core
                 dto.DataActionName = step.DataAction_Type_Id.ToString();
                 dto.ActionId = step.Action.Id;
                 dto.ActionName = step.Action.Name;
+                dto.ActionDescription = step.Action.Description;
                 dto.ExeuctionOrder = step.ExeuctionOrder;
 
                 dtoList.Add(dto);

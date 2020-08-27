@@ -1,6 +1,7 @@
 ﻿data.Job = {
 
     FormInit: function () {
+        $("[id$='SelectedDataSource'] select").val("0");
         $("[id$='SelectedSourceType']").change(function () {
             var selectBox = this;
             data.Job.SetDataSourceSpecificPanels();
@@ -74,6 +75,7 @@
                             $(".editDataSourceLink").hide();
                             $('#btnCreateDataset').hide();
                             $('#btnCreateDataset').hide();
+                            $('#schedulePanel').hide();
                         }
 
                         $('#primaryOwner').text(datain.PrimaryOwnerName);
@@ -161,6 +163,21 @@
             var element = dataSourceElement;
             var event = new Event('change');
             element.dispatchEvent(event);
+
+            $('#schedulePanel').show();
+        }
+        else {
+            //If Source Type is selected, trigger changed event to ensure data source dropdown is populated
+            var dataSourceTypeVal = $("[id$='SelectedSourceType']").val();
+            if (dataSourceTypeVal !== undefined && dataSourceTypeVal !== null) {
+                var element = document.querySelector("[id$='SelectedSourceType']");
+                element.dispatchEvent(new Event('change'));
+            }
+            $('.securityPanel').hide();
+            $('.questionairePanel').hide();
+            $('.dataSourceInfoPanel').hide();
+            $('.fieldDescription').hide();
+            $('.editDataSourceLink').hide();
         }
 
     },
@@ -397,6 +414,10 @@
         var a = $("[id$='Schedule']").val().split(' ');
         var e = jQuery.Event("keydown");
         e.which = 13; // # Some key code value
+
+        if (a !== undefined || a !== null) {
+            $('#schedulePanel').show();
+        }
 
         $("[id$='SchedulePicker']").change(function () {
 

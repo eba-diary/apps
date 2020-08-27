@@ -31,6 +31,14 @@
             }
         });
 
+        //init preprocessing panel
+        if ($("#IsPreProcessingRequired").val() === "true") {
+            $(".preProcessingJobPanel").show();
+        }
+        else {
+            $(".preProcessingJobPanel").hide();
+        }
+        //init preprocessing change eventS
         $("#IsPreProcessingRequired").change(function () {
             if ($(this).val() === "true") {
                 $('.preProcessingJobPanel').show();
@@ -41,33 +49,56 @@
                 //}
             }
             else {
-                $('.preProcessingPanel').hide();
+                $('.preProcessingJobPanel').hide();
             }
         });
 
         $("#btnAddSchemaMap").on('click', function () {
             $.get("/DataFlow/NewSchemaMap", function (e) {
                 $(e).insertBefore($("#btnAddSchemaMap"));
-                data.DataFlow.InitSchemaMaps();
+                data.DataFlow.InitSchemaMaps();               
             });
         });
-
+        
         data.DataFlow.InitSchemaMaps();
+
+        data.Job.FormInit();
+    },
+
+    DataFlowDetailInit: function () {
+        $('body').on('click', '.jobHeader', function () {
+            if ($(this).children('.tracker-menu-icon').hasClass('glyphicon-menu-down')) {
+                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
+            } else {
+                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-up', 'glyphicon-menu-down');
+            }
+            $(this).next('.jobContainer').toggle();
+
+            if ($(this).next('.jobContainer:visible').length === 0) {
+                // action when all are hidden
+                $(this).css('border-radius', '5px 5px 5px 5px');
+            } else {
+                $(this).css('border-radius', '5px 5px 0px 0px');
+            }
+        });
     },
 
     InitIngestionType() {
         var selection = $("[id$=IngestionType]").val();
 
         if (selection === "2") {
-            $('.retrieverPanel').show();
-            $('.questionairePanel').show();
+            $('.namePanel').show();
             $('.compressionPanel').show();
             $('.schemaMapPanel').show();
             $('.preProcessingPanel').show();
             $('.formSubmitButtons').show();
+
+            $('.retrieverPanel').show();
+            $('.questionairePanel').show();
             data.Job.FormInit();
         }
         else if (selection === "1") {
+            $('.namePanel').show();
             $('.retrieverPanel').hide();
             $('.compressionPanel').show();
             $('.schemaMapPanel').show();
@@ -76,12 +107,14 @@
         }
 
         if (selection === "0") {
+            $('.namePanel').hide();
             $('.compressionPanel').hide();
             $('.schemaMapPanel').hide();
             $('.preProcessingPanel').hide();
             $('.formSubmitButtons').hide();
         }
         else {
+            $('.namePanel').show();
             $('.compressionPanel').show();
             $('.schemaMapPanel').show();
             $('.preProcessingPanel').show();
@@ -89,24 +122,65 @@
         }            
 
         $("[id$=IngestionType]").on('change', function () {
-            if ($(this).val() === "2") {
+            var ingestionSelection = $(this).val();
+            //if changing to Pull
+            if (ingestionSelection === "2") {
+                $('#retrieverPanelSpinner').css('float', 'left');
+                Sentry.InjectSpinner($("#retrieverPanelSpinner"));
                 $('.retrieverPanel').show();
-                Sentry.InjectSpinner($("#retrieverJobPanel"));
-                $.get("/DataFlow/NewRetrieverJob", function (e) {
-                    $("#retrieverJobPanel").replaceWith(e);
-                    data.Job.FormInit();
-                });
             }
+            //if changing to Push
             else {
-                $('.retrieverPanel').hide();
+                //Need to warn user potential loss of values
+                //  for retriever job configuration if sourcetype has been selected.
+                //If sourcetype has not been selected, then reset the RetrieverPanel as
+                //  there are no values to loose.
+                if ($('[id$=__SelectedSourceType]').val() == null) {
+                    data.DataFlow.ResetRetrieverPanel();
+                }
+                else {
+                    //need to manually pass buttons in order to specify callback for OK and Cancel options
+                    Sentry.ShowModalCustom('Potential Loss of Configuration', 'You will loose configuration values within "Where Do You Want Us to Pull From" section if you continue', {
+                        OK: {
+                            label: "OK",
+                            className: "btn-primary",
+                            callback: function () { data.DataFlow.ResetRetrieverPanel(); }
+                        },
+                        Cancel: {
+                            label: "Cancel",
+                            className: "btn-link",
+                            callback: function () { data.DataFlow.CancelIngestionSelection(ingestionSelection, $(this)); }
+                        }
+                    });
+                };
             }
+            $('.namePanel').show();
             $('.compressionPanel').show();
             $('.schemaMapPanel').show();
             $('.preProcessingPanel').show();
             $('.formSubmitButtons').show();
         });
     },
-        
+
+    CancelIngestionSelection: function (e, item) {
+        //from https://stackoverflow.com/a/28324400
+        var ingestionSelectBox = document.querySelector("[id$=IngestionType]");
+        switch (e) {
+            case "1":
+                ingestionSelectBox.value = "2";
+                break;
+            case "2":
+                ingestionSelectBox.value = "1";
+                break;
+            default:
+        }
+        ingestionSelectBox.dispatchEvent(new Event('change'));
+    },
+
+    ResetRetrieverPanel: function () {
+        $('.retrieverPanel').hide();
+    },
+
     RenderDatasetCreatePage() {
         $.get("/Dataset/_DatasetCreateEdit", function (result) {
             $('#DatasetFormContent').html(result);
@@ -198,6 +272,7 @@
     },
 
     PopulateSchemas(datasetId, schemaId, targetElement) {
+        var scmSpinner = $(targetElement).parent().parent().find('.schemaSpinner');
         if (datasetId !== null && datasetId !== "-1" && datasetId !== "0") {
             var curVal = targetElement.val();
             $.getJSON("/api/v2/metadata/dataset/" + datasetId + "/schema", function (result) {
@@ -214,22 +289,24 @@
                     subItems += "<option value='" + item.SchemaId + "'>" + item.Name + "</option>";
                 });
 
+                scmSpinner.html('');
                 targetElement.html(subItems);
 
                 if (curVal === null || curVal === "0") {
                     targetElement.val("0");
                 }
-                else if (schemaId !== null || curVal === "-1") {
+                else if ((schemaId !== undefined && schemaId !== null) || curVal === "-1") {
                     targetElement.val(schemaId)
                 }
                 else {
-                    targetElement.val(curVal);
+                    $(targetElement).val(curVal);
                 }
             });
         }
         else {
             var subItems;
             subItems += "<option value='0'>Select Dataset First</option>";
+            scmSpinner.html('');
             targetElement.html(subItems);
         }
 
@@ -248,6 +325,15 @@
     },
 
     InitSchemaMaps(datasetId, schemaId) {
+        $('.datasetSpinner').each(function (index) {
+            var cur = $(this);
+            Sentry.InjectSpinner(cur, 30);
+        });
+        $('.schemaSpinner').each(function (index) {
+            var cur = $(this);
+            Sentry.InjectSpinner(cur, 30);
+        });
+
         $.getJSON("/api/v2/metadata/dataset", function (result) {
             var newSubItems;
             var groupName;
@@ -285,7 +371,10 @@
 
             $('[id$=__SelectedDataset]').each(function (index) {
                 var cur = $(this);
+                var dsSpinner = cur.parent().find('.datasetSpinner');
                 var curVal = cur.val();
+
+                dsSpinner.html('');
                 cur.html(newSubItems);
 
                 if (curVal === null || curVal === undefined) {
@@ -310,6 +399,8 @@
                 var curRow = $(this).parent().parent();
                 var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
                 var datasetId = $(this).val();
+
+                Sentry.InjectSpinner(curRow.find('.schemaSpinner'), 30);
 
                 //if Create New Dataset Selected
                 if (datasetId === "-1") {

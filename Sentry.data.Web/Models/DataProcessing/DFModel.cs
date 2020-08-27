@@ -1,10 +1,6 @@
-﻿using System;
+﻿using Sentry.data.Core;
+using System;
 using System.Collections.Generic;
-using System.Web.Mvc;
-using Sentry.data.Core;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using Sentry.data.Core;
 
 namespace Sentry.data.Web
 {
@@ -18,6 +14,7 @@ namespace Sentry.data.Web
             CreatedBy = dto.CreatedBy;
             CreatedDTM = dto.CreateDTM;
             FlowStorageCode = dto.FlowStorageCode;
+            AssociatedJobs = dto.AssociatedJobs;
         }
 
         public int Id { get; set; }
@@ -26,5 +23,9 @@ namespace Sentry.data.Web
         public string CreatedBy { get; set; }
         public DateTime CreatedDTM { get; set; }
         public string FlowStorageCode { get; set; }
+        /// <summary>
+        /// Associated retriever job which pull data from external sources
+        /// </summary>
+        public List<int> AssociatedJobs { get; set; }
     }
 }
