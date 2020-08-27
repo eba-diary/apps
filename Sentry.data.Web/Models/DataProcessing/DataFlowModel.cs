@@ -67,6 +67,11 @@ namespace Sentry.data.Web
                 results.Add(DataFlow.ValidationErrors.nameIsBlank, "Must specify data flow name");
             }
 
+            if (Name != null && Name.StartsWith("FileSchemaFlow"))
+            {
+                results.Add(DataFlow.ValidationErrors.nameContainsReservedWords, "FileSchemaFlow is a reserved name, please choose new name");
+            }
+
             #region RetrieverJob validations
             if (IngestionType == IngestionType.DSC_Pull && (RetrieverJob == null))
             {
