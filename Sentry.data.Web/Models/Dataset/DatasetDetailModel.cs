@@ -33,5 +33,7 @@ namespace Sentry.data.Web
         public List<string> DistinctFileExtensions { get; set; }
         public string DataClassificationDescription { get; set; }
         public List<Tuple<string, List<AssociatedDataFlowModel>>> DataFlows { get; set; }
+
+        public bool DisplayDataflowMetadata { get; set; }
     }
 }

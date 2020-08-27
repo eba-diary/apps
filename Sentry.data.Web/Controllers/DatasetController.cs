@@ -222,6 +222,7 @@ namespace Sentry.data.Web.Controllers
             if (dto != null)
             {
                 DatasetDetailModel model = new DatasetDetailModel(dto);
+                model.DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue();
 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
 
