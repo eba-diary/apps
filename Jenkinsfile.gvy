@@ -67,14 +67,10 @@ pipeline {
                 // This takes everything in a particular subfolder of your build output, zips it up, and archives it into Jenkins. 
                 dotNetArchiveArtifact 'Sentry.data.Web.zip', dir: 'Sentry.data.Web\\_PublishedWebsites\\Sentry.data.Web'
 				dotNetArchiveArtifact 'Sentry.data.Goldeneye.zip', dir: 'Sentry.data.Goldeneye'
-				dotNetArchiveArtifact 'Sentry.data.Bundler.zip', dir: 'Sentry.data.Bundler'
-				dotNetArchiveArtifact 'HSZGOLDENEYE.zip', dir: 'HSZGOLDENEYE'
  
                 // Record this build into Quartermaster.  The artifact name should match the filename produced in the dotNetArchiveArtifact step above.
                 recordArtifactToQuartermaster requiresConfigTransformation: true, appType: 'Web', applicationName: 'DATA', saidAssetKey: 'DATA', artifactName: 'Sentry.data.Web.zip'
 				recordArtifactToQuartermaster requiresConfigTransformation: true, appType: 'Service', applicationName: 'GoldenEye', saidAssetKey: 'DATA', artifactName: 'Sentry.data.Goldeneye.zip'
-				recordArtifactToQuartermaster requiresConfigTransformation: true, appType: 'Service', applicationName: 'BundleService', saidAssetKey: 'DATA', artifactName: 'Sentry.data.Bundler.zip'
-				recordArtifactToQuartermaster requiresConfigTransformation: true, appType: 'Service', applicationName: 'HSZGOLDENEYE', saidAssetKey: 'DATA', artifactName: 'HSZGOLDENEYE.zip'
             }
         }
  
