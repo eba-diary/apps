@@ -66,10 +66,6 @@ namespace Sentry.data.Core.Entities.DataProcessing
             {
                 vr.Add(ValidationErrors.nameIsBlank, "The Name of the data flow is required");
             }
-            if (Name != null && Name.StartsWith("FileSchemaFlow"))
-            {
-                vr.Add(ValidationErrors.nameContainsReservedWords, "FileSchemaFlow is a reserved name, please choose new name");
-            }
             return vr;
         }
 
