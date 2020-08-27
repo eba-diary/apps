@@ -18,14 +18,14 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual ValidationResults ValidateForSave()
         {
             ValidationResults errors = new ValidationResults();
-            if (Dataset == null)
-            {
-                errors.Add(ValidationErrors.schemamapMustContainDataset, "Schema Map must map to dataset");
-            }
-            if (MappedSchema == null)
-            {
-                errors.Add(ValidationErrors.schemamapMustContainSchema, "Schema Map must map to schema");
-            }
+            //if (Dataset == null)
+            //{
+            //    errors.Add(ValidationErrors.schemamapMustContainDataset, "Schema Map must map to dataset");
+            //}
+            //if (MappedSchema == null)
+            //{
+            //    errors.Add(ValidationErrors.schemamapMustContainSchema, "Schema Map must map to schema");
+            //}
             return errors;
         }
 
