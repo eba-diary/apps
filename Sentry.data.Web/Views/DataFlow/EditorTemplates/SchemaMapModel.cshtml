@@ -1,7 +1,7 @@
 ﻿﻿@model Sentry.data.Web.SchemaMapModel
-@*@using (Html.BeginCollectionItem("SchemaMaps"))
-{*@
 
+@* When save failure occur, this logic will ensure schemamaps marked as
+    deleted will not show when page is reloaded *@
 @{var isActive = "active";
     var displayType = "block";
 
@@ -34,5 +34,4 @@
             <a class="btn btn-danger">Remove</a>
         </div>
     </div>
-@*}*@
 
