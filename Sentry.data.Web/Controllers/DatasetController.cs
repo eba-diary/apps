@@ -1,27 +1,27 @@
-﻿using Sentry.data.Core;
-using Amazon.S3;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Web.Mvc;
-using System.Web.SessionState;
-using System.Linq.Dynamic;
-using System.Web;
-using Sentry.data.Web.Helpers;
-using System.Threading.Tasks;
+﻿using Amazon.S3;
+using Hangfire;
 using Newtonsoft.Json;
-using System.Net;
-using System.Text;
+using Sentry.Common.Logging;
+using Sentry.Core;
+using Sentry.data.Common;
+using Sentry.data.Core;
 using Sentry.data.Infrastructure;
-using Sentry.DataTables.Shared;
+using Sentry.data.Web.Helpers;
 using Sentry.DataTables.Mvc;
 using Sentry.DataTables.QueryableAdapter;
-using Sentry.data.Common;
+using Sentry.DataTables.Shared;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using Sentry.Common.Logging;
-using Hangfire;
-using Sentry.Core;
+using System.IO;
+using System.Linq;
+using System.Linq.Dynamic;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.SessionState;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -38,6 +38,7 @@ namespace Sentry.data.Web.Controllers
         private readonly IDatasetService _datasetService;
         private readonly IEventService _eventService;
         private readonly IConfigService _configService;
+        private readonly IDataFeatures _featureFlags;
 
         public DatasetController(
             IDatasetContext dsCtxt,
@@ -48,7 +49,8 @@ namespace Sentry.data.Web.Controllers
             IObsidianService obsidianService,
             IDatasetService datasetService,
             IEventService eventService,
-            IConfigService configService)
+            IConfigService configService,
+            IDataFeatures featureFlags)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
@@ -59,6 +61,7 @@ namespace Sentry.data.Web.Controllers
             _datasetService = datasetService;
             _eventService = eventService;
             _configService = configService;
+            _featureFlags = featureFlags;
         }
 
         public ActionResult Index()
@@ -67,7 +70,8 @@ namespace Sentry.data.Web.Controllers
             {
                 DatasetCount = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET && w.CanDisplay).Count(),
                 Categories = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).ToList(),
-                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset
+                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
+                DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue()
             };
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Home Page", 0);
@@ -218,6 +222,7 @@ namespace Sentry.data.Web.Controllers
             if (dto != null)
             {
                 DatasetDetailModel model = new DatasetDetailModel(dto);
+                model.DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue();
 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
 

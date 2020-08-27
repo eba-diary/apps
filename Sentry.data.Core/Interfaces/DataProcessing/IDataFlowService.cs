@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core.Entities.DataProcessing;
+﻿using Sentry.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace Sentry.data.Core
         List<DataFlowDto> ListDataFlows();
         DataFlowDetailDto GetDataFlowDetailDto(int id);
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
-        bool CreateandSaveDataFlow(DataFlowDto dto);
+        int CreateandSaveDataFlow(DataFlowDto dto);
         void PublishMessage(string key, string message);
         IQueryable<DataSourceType> GetDataSourceTypes();
         IQueryable<DataSource> GetDataSources();
@@ -54,7 +55,7 @@ namespace Sentry.data.Core
         /// <returns></returns>
         /// <exception cref="Exceptions.DataFlowStepNotFound"></exception>
         /// <exception cref="ArgumentNullException"
-        DataFlowStep GetS3DropStepForFileSchema(FileSchema scm);
+        DataFlowStepDto GetS3DropStepForFileSchema(FileSchema scm);
 
         /// <summary>
         /// 
@@ -64,5 +65,6 @@ namespace Sentry.data.Core
         /// <returns></returns>
         List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId);
         void DeleteByFileSchema(FileSchema scm);
+        ValidationException Validate(DataFlowDto dfDto);
     }
 }

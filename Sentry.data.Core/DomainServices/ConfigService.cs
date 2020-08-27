@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Sentry.data.Core.Entities.DataProcessing;
 
 namespace Sentry.data.Core
 {
@@ -1119,6 +1120,47 @@ namespace Sentry.data.Core
             dto.DeleteIssuer = dfc.DeleteIssuer;
             dto.DeleteIssueDTM = dfc.DeleteIssueDTM;
         }
+
+        public Tuple<List<RetrieverJob>, List<DataFlowStepDto>> GetDataFlowDropLocationJobs(DatasetFileConfig config)
+        {
+            Tuple<List<RetrieverJob>, List<DataFlowStepDto>> jobTuple;
+            List<RetrieverJob> retrieverList = new List<RetrieverJob>();
+            List<DataFlowStepDto> stepList = new List<DataFlowStepDto>();
+            try
+            {
+                stepList = new List<DataFlowStepDto>() { _dataFlowService.GetS3DropStepForFileSchema(config.Schema) };                
+                retrieverList.Add(_datasetContext.RetrieverJob.FirstOrDefault(w => w.DataFlow.Id == stepList.First().DataFlowId));
+                jobTuple = new Tuple<List<RetrieverJob>, List<DataFlowStepDto>>(retrieverList, stepList);
+            }
+            catch (DataFlowStepNotFound)
+            {
+                jobTuple = new Tuple<List<RetrieverJob>, List<DataFlowStepDto>>(retrieverList, stepList);
+            }
+
+            return jobTuple;
+        }
+
+        public List<Tuple<DataFlowDetailDto, List<RetrieverJob>>> GetExternalDataFlowsBySchema(DatasetFileConfig config)
+        {
+            List<Tuple<DataFlowDetailDto, List<RetrieverJob>>> externalJobList = new List<Tuple<DataFlowDetailDto, List<RetrieverJob>>>();
+            
+            ///Determine all SchemaMap steps which reference this schema
+            List<SchemaMap> schemaMappings = _datasetContext.SchemaMap.Where(w => w.MappedSchema == config.Schema && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaMap).ToList();
+
+            //For each dataflow, get the detaildto object and associated retrieverjobs.  Create new tuple and add to return list.
+            foreach (SchemaMap item in schemaMappings)
+            {
+                DataFlowDetailDto dfDto = _dataFlowService.GetDataFlowDetailDto(item.DataFlowStepId.DataFlow.Id);
+                List<RetrieverJob> rjList = new List<RetrieverJob>();
+                if (dfDto != null)
+                {
+                    rjList.AddRange(_datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == dfDto.Id).ToList());
+                }
+                externalJobList.Add(new Tuple<DataFlowDetailDto, List<RetrieverJob>>(dfDto, rjList));
+            }
+            return externalJobList;
+        }
+
 
         public static Object TryConvertTo<T>(Object input)
         {

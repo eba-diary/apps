@@ -135,8 +135,14 @@ else
                             {
                                 <li class="divider"></li>
                                 <li class="dropdown-header">Dataset Actions</li>
-
-                                <li><a href="/Dataset/Create">Create Dataset</a></li>
+                                if (Model.DisplayDataflowMetadata)
+                                {
+                                    <li><a href="/DataFlow/Create">Send Data to DSC</a></li>
+                                }
+                                else
+                                {
+                                    <li><a href="/Dataset/Create">Create Dataset</a></li>
+                                }
                                 <li class="divider"></li>
                                 <li class="dropdown-header">Dataset Administration</li>
                                 <li><a href="/Config/Manage">Manage Configs</a></li>

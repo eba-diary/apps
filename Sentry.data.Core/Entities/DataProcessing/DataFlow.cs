@@ -1,13 +1,11 @@
-﻿using System;
+﻿using Sentry.Common.Logging;
+using Sentry.Core;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sentry.Common.Logging;
 
 namespace Sentry.data.Core.Entities.DataProcessing
 {
-    public class DataFlow
+    public class DataFlow : IValidatable
     {
         public DataFlow()
         {
@@ -54,6 +52,29 @@ namespace Sentry.data.Core.Entities.DataProcessing
                 CreatedDTM = DateTime.Now,
                 Step = null
             };
+        }
+
+        public virtual ValidationResults ValidateForDelete()
+        {
+            return new ValidationResults();
+        }
+
+        public virtual ValidationResults ValidateForSave()
+        {
+            ValidationResults vr = new ValidationResults();
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                vr.Add(ValidationErrors.nameIsBlank, "The Name of the data flow is required");
+            }
+            return vr;
+        }
+
+        public class ValidationErrors
+        {
+            public const string nameIsBlank = "nameIsBlank";
+            public const string nameContainsReservedWords = "nameContainsReservedWords";
+            public const string nameMustBeUnique = "nameMustBeUnique";
+            public const string stepsContainsAtLeastOneSchemaMap = "stepsContainsAtLeastOneSchemaMap";
         }
     }
 }

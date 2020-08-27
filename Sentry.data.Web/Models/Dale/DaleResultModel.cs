@@ -27,6 +27,6 @@ namespace Sentry.data.Web
         public string EffectiveDate { get; set; }
         public int BaseColumnId { get; set; }
 
-        
+        public bool IsOwnerVerified { get; set; }
     }
 }

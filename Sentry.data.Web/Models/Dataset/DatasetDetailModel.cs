@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using Sentry.data.Core;
 
@@ -17,6 +18,10 @@ namespace Sentry.data.Web
             DistinctFileExtensions = dto.DistinctFileExtensions;
             DataClassificationDescription = dto.DataClassificationDescription;
             GroupAccessCount = dto.GroupAccessCount;
+            //foreach (var item in dto.DataFlows)
+            //{
+            //    DataFlows.Add(new Tuple<string, List<AssociatedDataFlowModel>>(item.Item1, item.Item2.ToModel()));
+            //}
         }
 
         public int Downloads { get; set; }
@@ -27,5 +32,8 @@ namespace Sentry.data.Web
         public Dictionary<string, string> DatasetScopeTypeNames { get; set; }
         public List<string> DistinctFileExtensions { get; set; }
         public string DataClassificationDescription { get; set; }
+        public List<Tuple<string, List<AssociatedDataFlowModel>>> DataFlows { get; set; }
+
+        public bool DisplayDataflowMetadata { get; set; }
     }
 }
