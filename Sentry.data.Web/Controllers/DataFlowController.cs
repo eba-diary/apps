@@ -364,13 +364,17 @@ namespace Sentry.data.Web.Controllers
             {
                 switch (vr.Id)
                 {
-                    //Base Model Errors
+                    //Base Model Errors                    
                     case DataFlow.ValidationErrors.nameIsBlank:
                     case DataFlow.ValidationErrors.nameMustBeUnique:
                     case DataFlow.ValidationErrors.nameContainsReservedWords:
                         ModelState.AddModelError("Name", vr.Description);
                         break;
                     case "PreprocessingOptions":
+                    case SchemaMap.ValidationErrors.schemamapMustContainDataset:
+                    case SchemaMap.ValidationErrors.schemamapMustContainSchema:
+                    case var sd when (sd.EndsWith("SelectedDataset")):
+                    case var ss when (ss.EndsWith("SelectedSchema")):
                         ModelState.AddModelError(vr.Id, vr.Description);
                         break;
                     //Nested model errors
@@ -396,6 +400,8 @@ namespace Sentry.data.Web.Controllers
                         break;
                     case RetrieverJob.ValidationErrors.ftpPatternNotSelected:
                         ModelState.AddModelError("RetrieverJob.FtpPattern", vr.Description);
+                        break;
+                    
                         break;
                     case DataFlow.ValidationErrors.stepsContainsAtLeastOneSchemaMap:
                     default:

@@ -92,31 +92,42 @@ namespace Sentry.data.Web
             {
                 results.Add(DataFlow.ValidationErrors.stepsContainsAtLeastOneSchemaMap, "Must contain at least one schema mapping");
             }
-            else if (SchemaMaps.Any(w => !w.IsDeleted))
+            else
             {
-                bool dsSelectionErr = false;
-                bool scmSelectionErr = false;
-                foreach (SchemaMapModel model in SchemaMaps.Where(w => !w.IsDeleted))
+                foreach(SchemaMapModel model in SchemaMaps)
                 {
-                    if (model.SelectedDataset == 0)
+                    foreach(ValidationResult result in model.Validate().ValidationResults.GetAll())
                     {
-                        dsSelectionErr = true;
+                        results.Add($"SchemaMaps[{model.Index}].{result.Id}", result.Description, result.Severity);
                     }
-                    if (model.SelectedSchema == 0)
-                    {
-                        scmSelectionErr = true;
-                    }
-                }
-
-                if (dsSelectionErr)
-                {
-                    results.Add(SchemaMap.ValidationErrors.schemamapMustContainDataset, "Must select dataset for schema mapping");
-                }
-                if (scmSelectionErr)
-                {
-                    results.Add(SchemaMap.ValidationErrors.schemamapMustContainSchema, "Must select schema for schema mapping");
                 }
             }
+
+            //else if (SchemaMaps.Any(w => !w.IsDeleted))
+            //{
+            //    bool dsSelectionErr = false;
+            //    bool scmSelectionErr = false;
+            //    foreach (SchemaMapModel model in SchemaMaps.Where(w => !w.IsDeleted))
+            //    {
+            //        if (model.SelectedDataset == 0)
+            //        {
+            //            dsSelectionErr = true;
+            //        }
+            //        if (model.SelectedSchema == 0)
+            //        {
+            //            scmSelectionErr = true;
+            //        }
+            //    }
+
+            //    if (dsSelectionErr)
+            //    {
+            //        results.Add(SchemaMap.ValidationErrors.schemamapMustContainDataset, "Must select dataset for schema mapping");
+            //    }
+            //    if (scmSelectionErr)
+            //    {
+            //        results.Add(SchemaMap.ValidationErrors.schemamapMustContainSchema, "Must select schema for schema mapping");
+            //    }
+            //}
 
             if (IsPreProcessingRequired && PreprocessingOptions.Count == 1 && PreprocessingOptions.First() == 0)
             {
