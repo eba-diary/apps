@@ -166,6 +166,15 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        /// <summary>
+        /// This should be removed once application is running on ae2 EC2
+        /// </summary>
+        /// <returns></returns>
+        private static S3CannedACL GetCannedAcl()
+        {
+            return S3CannedACL.BucketOwnerFullControl;
+        }
+
         public static S3ServiceProvider Instance
         {
             get
@@ -371,6 +380,7 @@ namespace Sentry.data.Infrastructure
                 s3tuReq.Key = folder + fileName;
                 s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 s3tuReq.AutoCloseStream = true;
+                s3tuReq.CannedACL = GetCannedAcl();
                 s3tu.Upload(s3tuReq);
             }
             catch (AmazonS3Exception e)
@@ -396,6 +406,7 @@ namespace Sentry.data.Infrastructure
                 s3tuReq.Key = key;
                 s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 s3tuReq.AutoCloseStream = true;
+                s3tuReq.CannedACL = GetCannedAcl();
 
                 s3tu.Upload(s3tuReq);
             }
@@ -523,6 +534,7 @@ namespace Sentry.data.Infrastructure
             mReq.BucketName = RootBucket;
             mReq.Key = uniqueKey;
             mReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+            mReq.CannedACL = GetCannedAcl();
             InitiateMultipartUploadResponse mRsp = S3Client.InitiateMultipartUpload(mReq);
 
             Sentry.Common.Logging.Logger.Debug($"Initiated MultipartUpload UploadID: {mRsp.UploadId}");
@@ -712,7 +724,8 @@ namespace Sentry.data.Infrastructure
                 poReq.BucketName = RootBucket;
                 poReq.Key = targetKey;
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
-                poReq.AutoCloseStream = true;                
+                poReq.AutoCloseStream = true;
+                poReq.CannedACL = GetCannedAcl();
 
                 Sentry.Common.Logging.Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
 
@@ -749,6 +762,7 @@ namespace Sentry.data.Infrastructure
                 poReq.BucketName = RootBucket;
                 poReq.Key = targetKey;
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+                poReq.CannedACL = GetCannedAcl();
 
                 Sentry.Common.Logging.Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
 
