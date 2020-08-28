@@ -1177,7 +1177,8 @@ namespace Sentry.data.Infrastructure
                         SourceKey = srcKey,
                         DestinationBucket = destBucket,
                         DestinationKey = destKey,
-                        ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256
+                        ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256,
+                        CannedACL = S3CannedACL.BucketOwnerFullControl
                     };
 
                     CopyObjectResponse response = S3Client.CopyObject(request);
