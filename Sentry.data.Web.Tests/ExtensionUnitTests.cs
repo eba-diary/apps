@@ -50,6 +50,20 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("person", dtoList.First().Name);
             Assert.IsInstanceOfType(dtoList.First(), typeof(StructFieldDto));
         }
+
+        [TestMethod, TestCategory("ToDto JsonSchema")]
+        public void Can_Boolean_Within_Object_Reference()
+        {
+            JsonSchema schema = BuildMockJsonSchema_ObjectReference_Based();
+            List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+
+            //Action
+            schema.ToDto(dtoList);
+
+            //Assertion
+            Assert.AreEqual(true, dtoList.First().ChildFields.Any(w => w.Name == "haschildren"));
+            Assert.IsInstanceOfType(dtoList.First().ChildFields.First(w => w.Name == "haschildren"), typeof(VarcharFieldDto));
+        }
         [TestMethod, TestCategory("ToDto JsonSchema")]
         public void Can_Find_Object_Property()
         {
@@ -626,6 +640,10 @@ namespace Sentry.data.Web.Tests
                     ""top3favoritecolors"": {
                         ""type"": ""array"",
                         ""$ref"": ""#/definitions/top3favoritecolors""
+                    },
+                    ""haschildren"": {
+                        ""type"": ""boolean"",
+                        ""description"": ""Indicator whether person has children""
                     }
                   }
                 },
