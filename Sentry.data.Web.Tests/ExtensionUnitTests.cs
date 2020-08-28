@@ -125,7 +125,7 @@ namespace Sentry.data.Web.Tests
             List<BaseFieldDto> childrenList = dtoList.First().ChildFields;
 
             //Assertion
-            Assert.AreEqual(3, childrenList.Count);
+            Assert.AreEqual(4, childrenList.Count);
         }
         [TestMethod, TestCategory("ToDto JsonSchemaProperty")]
         public void Can_Detect_String()
