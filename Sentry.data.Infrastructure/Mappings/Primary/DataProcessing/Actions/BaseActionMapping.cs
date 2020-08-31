@@ -18,6 +18,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Discriminator(x => x.Column("ActionType"));
             this.Property(x => x.ActionGuid, m => m.Column("ActionGuid"));
             this.Property(x => x.Name, m => m.Column("Name"));
+            this.Property(x => x.Description, m => m.Column("Description"));
             this.Property(x => x.TargetStorageBucket, m => m.Column("TargetStorageBucket"));
             this.Property(x => x.TargetStoragePrefix, m => m.Column("TargetStoragePrefix"));
             this.Property(x => x.TargetStorageSchemaAware, m => m.Column("TargetStorageSchemaAware"));

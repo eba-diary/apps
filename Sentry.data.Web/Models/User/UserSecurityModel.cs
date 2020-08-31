@@ -23,5 +23,7 @@ namespace Sentry.data.Web
 
         public bool CanEditDataSource { get; set; }
         public bool CanCreateDataSource { get; set; }
+
+        public bool ShowAdminControls { get; set; }
     }
 }

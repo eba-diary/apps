@@ -265,6 +265,12 @@ namespace Sentry.data.Core
         public class ValidationErrors
         {
             public const string httpsTargetFileNameBlank = "keyIsBlank";
+            public const string googleApiRelativeUriIsBlank = "googleApiRelativeUriIsBlank";
+            public const string httpsRequestMethodNotSelected = "httpsRequestMethodNotSelected";
+            public const string httpsRequestDataFormatNotSelected = "httpsRequestDataFormateNotSelected";
+            public const string httpsRequestBodyIsBlank = "httpsRequestBodyIsBlank";
+            public const string httpsTargetFileNameIsBlank = "httpsTargetFileNameIsBlank";
+            public const string ftpPatternNotSelected = "ftpPatternNotSelected";
         }
 
         public virtual string JobName()

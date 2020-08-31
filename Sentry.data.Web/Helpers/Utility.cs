@@ -147,21 +147,22 @@ namespace Sentry.data.Web.Helpers
 
         internal static IEnumerable<SelectListItem> BuildPreProcessingOptionsDropdown(List<int> preProcessingOptionSelections)
         {
-            List<SelectListItem> items;
+            List<SelectListItem> items = new List<SelectListItem>();
 
-            if (preProcessingOptionSelections == null || !preProcessingOptionSelections.Any())
+            if (preProcessingOptionSelections == null || !preProcessingOptionSelections.Any() || preProcessingOptionSelections.Contains(0))
             {
-                items = Enum.GetValues(typeof(DataFlowPreProcessingTypes)).Cast<DataFlowPreProcessingTypes>().Select(v => new SelectListItem { Text = v.GetDescription(), Value = ((int)v).ToString() }).ToList();
+                items.Add(new SelectListItem { Text = "Select Option", Value = "0", Selected = true});
+                items.AddRange(Enum.GetValues(typeof(DataFlowPreProcessingTypes)).Cast<DataFlowPreProcessingTypes>().Select(v => new SelectListItem { Text = v.GetDescription(), Value = ((int)v).ToString() }).ToList());
             }
             else
             {
-                items = Enum.GetValues(typeof(DataFlowPreProcessingTypes)).Cast<DataFlowPreProcessingTypes>().Select(v =>
+                items.AddRange(Enum.GetValues(typeof(DataFlowPreProcessingTypes)).Cast<DataFlowPreProcessingTypes>().Select(v =>
                     new SelectListItem
                     {
                         Selected = (preProcessingOptionSelections.Contains((int)v)),
                         Text = v.GetDescription(),
                         Value = v.ToString()
-                    }).ToList();
+                    }).ToList());
             }
             return items;
         }
