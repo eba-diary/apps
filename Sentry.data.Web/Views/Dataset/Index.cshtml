@@ -49,9 +49,16 @@
                 <div class="ds-upload-row">
                     @if (Model.CanEditDataset)
                     {
-                        <button type="button" class="btn btn-default btn-lg ds-operation-button" id="CreateDataset">
-                            <span class="glyphicon glyphicon-plus text-primary"></span> Create Dataset
-                        </button>
+                        if (Model.DisplayDataflowMetadata)
+                        {
+                            <button type="button" class="btn btn-primary btn-lg ds-operation-button" id="CreateDataflow">Send Data to DSC</button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-default btn-lg ds-operation-button" id="CreateDataset">
+                                <span class="glyphicon glyphicon-plus text-primary"></span> Create Dataset
+                            </button>
+                        }
                     }
                 </div>
             </div>

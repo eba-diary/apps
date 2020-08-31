@@ -23,5 +23,10 @@ namespace Sentry.data.Core
         public bool IsPreProcessingRequired { get; set; }
         public List<DataFlowPreProcessingTypes> PreProcessingOptions { get; set; }
         public string FlowStorageCode { get; set; }
+        public List<int> MappedSchema { get; set; }
+        /// <summary>
+        /// Associated RetrieverJobs which pull data from external sources
+        /// </summary>
+        public List<int> AssociatedJobs { get; set; }
     }
 }

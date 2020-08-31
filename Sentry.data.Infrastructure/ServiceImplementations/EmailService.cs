@@ -82,7 +82,7 @@ namespace Sentry.data.Infrastructure
             if (baEvents.Any())
             {
                 body.Append(@"</p><table cellpadding='0' cellspacing='0' border='0' width='100 % '><tr bgcolor='003DA5'><td><b>Business Area Events</b></td></table></p>");
-                header = @"<tr bgcolor='00A3E0'><td><b>Creation Date</b></td><td><b>Description</b></td><td><b>Initiator</b></td><td><b>Event Type</b></td></tr>";
+                header = @"<tr bgcolor='00A3E0'><td><b>Creation Date</b></td><td><b>Description</b></td><td><b>Initiator</b></td><td><b>Event Type</b></td><td><b>Expiration Date</b></td></tr>";
                 body.Append(CreateEvents(header, EventTypeGroup.BusinessArea, baEvents));
             }
             myMail.Body = body.ToString();
@@ -161,6 +161,12 @@ namespace Sentry.data.Infrastructure
             var user = int.TryParse(e.UserWhoStartedEvent.Trim(), out n) ? _associateInfoProvider.GetAssociateInfo(e.UserWhoStartedEvent.Trim()).FullName : e.UserWhoStartedEvent.Trim();
             body.Append(@"<td>" + user + @"</td>");
             body.Append(@"<td>" + e.EventType.Description + @"</td>");
+
+            if(group == EventTypeGroup.BusinessArea)
+            {
+                body.Append(@"<td>" + e.Notification.ExpirationTime + @"</td>");
+            }
+
             body.Append(@" </tr>");
 
             return body.ToString();

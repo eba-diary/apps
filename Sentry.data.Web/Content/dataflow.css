@@ -54,3 +54,7 @@
 #PreprocessingOptions {
     width: 900px;
 }
+
+.error-over-color .text-danger {
+    color:#fff; 
+}

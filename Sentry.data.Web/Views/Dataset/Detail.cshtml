@@ -392,7 +392,7 @@
                                         @if (Model.Security.CanEditDataset)
                                         {
                                             <!-- ko if: IsEnabled-->
-                                            <td class="borderMeta_@color" data-bind="text: Location()"></td>
+                                            //<td class="borderMeta_@color" data-bind="text: prettyCron.getNext(Location())"></td>
                                             <td class="borderMeta_@color">
                                                 <button style="float:right; margin-left: 30px;" class="btn btn-default on-demand-run" data-bind="attr: { id: JobId }">On-Demand Run</button>
                                                 <button style="float:right; margin-left: 30px;" class="btn btn-default jobstatus jobstatus_enabled" data-bind="attr: { id: JobId }">Disable</button>
@@ -418,6 +418,57 @@
                                 </tbody>
                             </table>
                         </div>
+                        @if (Model.Security.ShowAdminControls || Model.DisplayDataflowMetadata)
+                        {
+                            <div>
+                                <br />
+                                <h5 class="@color">DataFlows:</h5>
+                                <!-- ko if: RenderDataFlows -->
+                                <!-- ko foreach: DataFlows -->
+                                <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
+                                    <tbody>
+                                        <tr>
+                                            <td class="borderMeta_@color colOneMeta"><a data-bind="attr: { href:DetailUrl, target: '_blank' }, click: DataFlowDetailRedirect, text: Name()"></a></td>
+                                            <!-- ko if: RenderJobs() == "noRenderJobs" -->
+                                            <td style="padding:0px; border-top-width:0px">There are no retriever jobs associated with this dataflow</td>
+                                            <!-- /ko -->
+                                            <!-- ko if: RenderJobs() == "RenderJobs" -->
+                                            <td style="padding:0px; border-top-width:0px">
+                                                <table class="table table-striped table-hover detailTable" style="margin: -1px; margin-top: 0px; margin-bottom:-1px; max-width: 100%">
+                                                    <tbody>
+                                                        <!-- ko foreach: Jobs -->
+                                                        <tr>
+                                                            <td class="borderMeta_@color colOneMeta" data-bind="text: Name()"></td>
+                                                            @if (Model.Security.CanEditDataset)
+                                                            {
+                                                                <!-- ko if: IsEnabled-->
+                                                                <td class="borderMeta_@color" data-bind="text: Location()"></td>                                                            
+                                                                <!-- /ko -->
+                                                                <!-- ko ifnot: IsEnabled-->
+                                                                <td class="borderMeta_@color"> Disabled</td>
+                                                                <!-- /ko -->
+                                                            }
+                                                            else
+                                                            {
+                                                                <td class="borderMeta_@color"></td>
+                                                            }
+
+                                                        </tr>
+                                                        <!-- /ko -->
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                            <!-- /ko -->
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <!-- /ko -->
+                                <!-- /ko -->
+                                <!-- ko ifnot: RenderDataFlows -->
+                                <p> There are no dataflows sending data to this schema</p>
+                                <!-- /ko -->
+                            </div>
+                        }                        
                     </div>
                 </div>
             </div>
@@ -688,9 +739,29 @@
 
         function DropLocation(data) {
             this.Name = ko.observable(data.Name);
-            this.Location = ko.observable('Next Processing Time is ' + prettyCron.getNext(data.Location));
+            this.Location = ko.observable(data.Location);
             this.JobId = ko.observable(data.JobId);
             this.IsEnabled = ko.observable(data.IsEnabled);
+        }
+
+        function DataFlow(data){
+            var self = this;
+            self.Name = ko.observable(data.Name);
+            self.Id = ko.observable(data.Id);
+            self.DetailUrl = ko.observable(data.DetailUrl);
+            self.Jobs = ko.observableArray();
+            self.DetailUrl = "/DataFlow/" + encodeURIComponent(self.Id()) + "/Detail";
+            $.each(data.RetrieverJobs, function (i, val) {
+                        var item = new DropLocation(val);
+
+                        self.Jobs().push(item);
+                    });
+            self.DataFlowDetailRedirect = function () {
+                window.open("/DataFlow/" + encodeURIComponent(this.Id()) + "/Detail");
+            }
+            self.RenderJobs = ko.pureComputed(function () {
+                return ko.unwrap(self.Jobs) ? "RenderJobs" : "noRenderJobs";
+            });
         }
 
         function ViewModel() {
@@ -731,11 +802,20 @@
             self.DFSDropLocation = ko.observable();
             self.S3DropLocation = ko.observable();
             self.OtherJobs = ko.observableArray();
+            self.DataFlows = ko.observableArray();            
             self.DFSCronJob = ko.observable();
             self.S3CronJob = ko.observable();
             self.CronJobs = ko.observableArray();
             self.Views = ko.observable();
             self.Downloads = ko.observable();
+            self.RenderDataFlows = ko.computed(function () {
+                if (self.DataFlows == undefined || self.DataFlows().length == 0) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            });
             self.ShowDataFileTable = ko.computed(function () {
                 if (self.DataLastUpdated() === 'No Data Files Exist') {
                     return false;
@@ -845,6 +925,7 @@
                     self.Views(result.Views);
                     self.Description(result.Description);
 
+                    //Populate legacy retriever jobs
                     self.OtherJobs.removeAll();
                     $.each(result.OtherJobs, function (i, val) {
                         var item = new DropLocation(val);
@@ -852,6 +933,15 @@
                         self.OtherJobs().push(item);
                     });
                     self.OtherJobs.notifySubscribers();
+
+                    //Populate associated DataFlows
+                    self.DataFlows.removeAll();
+                    $.each(result.DataFlows, function (i, val) {
+                        var item = new DataFlow(val);
+
+                        self.DataFlows().push(item);
+                    });
+                    self.DataFlows.notifySubscribers();
 
                     var d = new Date(result.DataLastUpdated);
                     if (d < new Date('1990-01-01')) {

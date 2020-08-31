@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Sentry.data.Core
+﻿namespace Sentry.data.Core
 {
     public class SchemaMapDto
     {
@@ -13,5 +7,6 @@ namespace Sentry.data.Core
         public int SchemaId { get; set; }
         public int DatasetId { get; set; }
         public string SearchCriteria { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }
