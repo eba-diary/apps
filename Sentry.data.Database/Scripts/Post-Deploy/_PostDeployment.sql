@@ -40,14 +40,14 @@ DECLARE @ErrorState INT;
 --Now only run these scritps if the versioning allows us.
 --ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
 --SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
-SET @ScriptVersion = '2020.08.26.01_PostDeploy'
+SET @ScriptVersion = '2020.09.02.01_PostDeploy'
 
 BEGIN TRAN 
 IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion) 
 BEGIN TRY 
 
   --insert one off script files here
-  :r ..\Post-Deploy\SupportingScripts\Sprint_20_04_02\DataSource_Updates.sql
+  :r ..\Post-Deploy\SupportingScripts\Sprint_20_03_06\aws2_0_metadata_updates.sql
 
   --insert into the verision table so these scripts do not run again.
   INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
