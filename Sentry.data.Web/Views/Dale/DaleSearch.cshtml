@@ -68,7 +68,7 @@
                      @*NOTE! the flex style basically pushes the radio button and sensitive controls to the button of the screen levereging the flex-end tag that sits on the actual control*@
                      <span id="radioMadness" style="display:flex; align-items:flex-end;">
 
-                         <span style="text-align: left; font-family: KievitSlabWeb W03,Lucida Sans,serif;width:200px;">
+                         <span style="text-align: left; font-family: KievitSlabWeb W03,Lucida Sans,serif;width:250px;">
 
                              <label style="text-align:left; width:100px;">
                                  <input type="radio" name="Destiny" id="DestinyTableRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Object>
@@ -78,6 +78,11 @@
                              <label style="text-align:left; width:75px;">
                                  <input type="radio" name="Destiny" id="DestinyColumnRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Column checked="checked">
                                  @Sentry.data.Core.GlobalEnums.DaleDestiny.Column
+                             </label>
+
+                             <label style="text-align:left; width:50px;">
+                                 <input type="radio" name="Destiny" id="DestinySaidRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.SAID >
+                                 @Sentry.data.Core.GlobalEnums.DaleDestiny.SAID
                              </label>
 
                          </span>

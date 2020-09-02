@@ -9,5 +9,8 @@ namespace Sentry.data.Core.GlobalEnums
 
         [Description("Column")]
         Column = 1,
+
+        [Description("SAID")]
+        SAID = 2
     }
 }
