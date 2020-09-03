@@ -20,13 +20,25 @@ namespace Sentry.data.Web.Controllers
             _daleService = daleService;
         }
 
-        public ActionResult DaleSearch()
+        [Route("DataInventory/{q?}")]
+        public ActionResult DaleSearch(string q, string destination)
         {
             if( CanDaleView() ) 
             {
                 DaleSearchModel searchModel = new DaleSearchModel();
                 searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
                 searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
+
+                //Determine if NORMAL DALE WEB or SAID URL HIT
+                if(q == null)
+                {
+                    searchModel.Destiny = DaleDestiny.Column;       //no query , normal Dale WEB 
+                }
+                else
+                {
+                    searchModel.Criteria = q;                       //query specified, URL SAID hit
+                    searchModel.Destiny = DaleDestiny.SAID;
+                }
 
                 return View(searchModel);
             }
