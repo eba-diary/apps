@@ -20,8 +20,13 @@ namespace Sentry.data.Web.Controllers
             _daleService = daleService;
         }
 
-        [Route("DataInventory/{q?}")]
-        public ActionResult DaleSearch(string q, string destination)
+        //[Route("DataInventory/{q?}")]
+        //ALLOWED TARGETS=entity,column,SAID
+        //e.g. https://localhost.sentry.com:44371/DataInventory/CODS/SAID/SSN
+        [Route("DataInventory")]
+        [Route("DataInventory/{search}/{target}")]
+        [Route("DataInventory/{search}/{target}/{filter}")]
+        public ActionResult DaleSearch(string search=null, string target=null, string filter=null)
         {
             if( CanDaleView() ) 
             {
@@ -29,15 +34,26 @@ namespace Sentry.data.Web.Controllers
                 searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
                 searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
 
-                //Determine if NORMAL DALE WEB or SAID URL HIT
-                if(q == null)
+                if(String.IsNullOrEmpty(search))                        //no search , normal Dale WEB default to column
                 {
-                    searchModel.Destiny = DaleDestiny.Column;       //no query , normal Dale WEB 
+                    searchModel.Destiny = DaleDestiny.Column;       
                 }
                 else
                 {
-                    searchModel.Criteria = q;                       //query specified, URL SAID hit
-                    searchModel.Destiny = DaleDestiny.SAID;
+                    searchModel.Criteria = search;                       //search specified, figure out what is target
+
+                    if (target.ToUpper() == "SAID")
+                    {
+                        searchModel.Destiny = DaleDestiny.SAID;
+                    }
+                    else if (target.ToUpper() == "ENTITY")
+                    {
+                        searchModel.Destiny = DaleDestiny.Object;
+                    }
+                    else
+                    {
+                        searchModel.Destiny = DaleDestiny.Column;       //if its not one of above, default too column, this guards against mispelled stuff
+                    }
                 }
 
                 return View(searchModel);
