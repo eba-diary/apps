@@ -128,7 +128,11 @@ namespace Sentry.data.Infrastructure
                 {
                     qWhereColumn = "Column_NME";
                 }
-               
+                else if (dto.Destiny == DaleDestiny.SAID)
+                {
+                    qWhereColumn = "Asset_CDE";
+                }
+
                 qWhereStatement += "WHERE " + qWhereColumn + " LIKE @Criteria ";
 
                 //ONLY apply logic here if they dont want to see any sensitive information
@@ -157,7 +161,7 @@ namespace Sentry.data.Infrastructure
             }
 
             //validate to ensure valid destination
-            if ( (dto.Destiny != DaleDestiny.Object) && (dto.Destiny != DaleDestiny.Column) )
+            if ( (dto.Destiny != DaleDestiny.Object) && (dto.Destiny != DaleDestiny.Column) && (dto.Destiny != DaleDestiny.SAID) )
             {
                 return false;
             }

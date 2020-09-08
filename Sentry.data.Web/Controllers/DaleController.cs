@@ -20,13 +20,41 @@ namespace Sentry.data.Web.Controllers
             _daleService = daleService;
         }
 
-        public ActionResult DaleSearch()
+        //[Route("DataInventory/{q?}")]
+        //ALLOWED TARGETS=entity,column,SAID
+        //e.g. https://localhost.sentry.com:44371/DataInventory/CODS/SAID/SSN
+        [Route("DataInventory")]
+        [Route("DataInventory/{search}/{target}")]
+        [Route("DataInventory/{search}/{target}/{filter}")]
+        public ActionResult DaleSearch(string search=null, string target=null, string filter=null)
         {
             if( CanDaleView() ) 
             {
                 DaleSearchModel searchModel = new DaleSearchModel();
                 searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
                 searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
+
+                if(String.IsNullOrEmpty(search))                        //no search , normal Dale WEB default to column
+                {
+                    searchModel.Destiny = DaleDestiny.Column;       
+                }
+                else
+                {
+                    searchModel.Criteria = search;                       //search specified, figure out what is target
+
+                    if (target.ToUpper() == "SAID")
+                    {
+                        searchModel.Destiny = DaleDestiny.SAID;
+                    }
+                    else if (target.ToUpper() == "ENTITY")
+                    {
+                        searchModel.Destiny = DaleDestiny.Object;
+                    }
+                    else
+                    {
+                        searchModel.Destiny = DaleDestiny.Column;       //if its not one of above, default too column, this guards against mispelled stuff
+                    }
+                }
 
                 return View(searchModel);
             }
@@ -111,7 +139,7 @@ namespace Sentry.data.Web.Controllers
             }
 
             //validate to ensure valid destination
-            if ((model.Destiny != DaleDestiny.Object) && (model.Destiny != DaleDestiny.Column))
+            if ((model.Destiny != DaleDestiny.Object) && (model.Destiny != DaleDestiny.Column) && (model.Destiny != DaleDestiny.SAID))
             {
                 return false;
             }
