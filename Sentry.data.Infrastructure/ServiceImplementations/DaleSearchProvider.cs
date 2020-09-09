@@ -10,14 +10,26 @@ namespace Sentry.data.Infrastructure
 {
     public class DaleSearchProvider : IDaleSearchProvider
     {
-        public List<DaleResultDto> GetSearchResults(DaleSearchDto dto)
+        public DaleResultDto GetSearchResults(DaleSearchDto dto)
         {
-            List<DaleResultDto> daleResults = new List<DaleResultDto>();
+            DaleResultDto daleResult = new DaleResultDto();
+            daleResult.DaleResults = new List<DaleResultRowDto>();
+
+
+            daleResult.DaleEvent = new DaleEventDto()
+            {
+                Criteria = dto.Criteria,
+                Destiny = dto.Destiny.GetDescription(),
+                QuerySuccess = true,
+                Sensitive = dto.Sensitive.GetDescription()
+            };
 
             //make sure incoming criteria is valid, or return empty results
             if (!IsCriteriaValid(dto))
             {
-                return daleResults;
+                daleResult.DaleEvent.QueryErrorMessage = "Invalid Criteria.  No Query executed.";
+                daleResult.DaleEvent.QuerySuccess = false;
+                return daleResult;
             }
 
             string connectionString = Configuration.Config.GetHostSetting("DaleConnectionString");
@@ -40,23 +52,29 @@ namespace Sentry.data.Infrastructure
 
                     while (reader.Read())
                     {
-                        daleResults.Add(CreateDaleResultDto(reader));
+                        daleResult.DaleResults.Add(CreateDaleResultRow(reader));
                     }
 
                     reader.Close();
                 }
                 catch (Exception ex)
                 {
-                    Logger.Fatal("Dale Failed!!  Query: " + q, ex);
+                    string daleMessage = "Dale Failed!!  Query: " + q;
+                    daleResult.DaleEvent.QuerySuccess = false;
+                    daleResult.DaleEvent.QueryErrorMessage = daleMessage + " " + ex.Message;
+                    Logger.Fatal(daleMessage, ex);
                 }
 
                 stopWatch.Stop();
                 TimeSpan ts = stopWatch.Elapsed;
-                Logger.Info("DaleSearchProvider.GetSearchResults()  Row Count:" + daleResults.Count + " Elapsed Seconds:" + ts.Seconds + " Query:" + q);
 
+                daleResult.DaleEvent.QueryRows = daleResult.DaleResults.Count;
+                daleResult.DaleEvent.QuerySeconds = ts.Seconds;
+
+                Logger.Info("DaleSearchProvider.GetSearchResults()  Row Count:" + daleResult.DaleResults.Count + " Elapsed Seconds:" + ts.Seconds + " Query:" + q);
             }
 
-            return daleResults;
+            return daleResult;
         }
 
         public bool SaveSensitive(string sensitiveBlob)
@@ -168,9 +186,9 @@ namespace Sentry.data.Infrastructure
             return true;
         }
 
-        private DaleResultDto CreateDaleResultDto(SqlDataReader reader)
+        private DaleResultRowDto CreateDaleResultRow(SqlDataReader reader)
         {
-            DaleResultDto result = new DaleResultDto();
+            DaleResultRowDto result = new DaleResultRowDto();
             result.Asset = (!reader.IsDBNull(0)) ? reader.GetString(0) : String.Empty;
             result.Server = (!reader.IsDBNull(1)) ? reader.GetString(1) : String.Empty;
             result.Database = (!reader.IsDBNull(2)) ? reader.GetString(2) : String.Empty;

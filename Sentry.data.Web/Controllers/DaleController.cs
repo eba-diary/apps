@@ -111,14 +111,15 @@ namespace Sentry.data.Web.Controllers
             //DO NOT perform search if invalid criteria OR sensitive and they lack permissions. NOTE: if they lack permissions, VIEW hides ability to even click sensitive link
             if (!IsCriteriaValid(searchModel) || ( sensitive && !CanDaleSensitiveView() ) )            
             {
-                searchModel.DaleResults = new List<DaleResultModel>();
+                searchModel.DaleResultModel = new DaleResultModel();
+                searchModel.DaleResultModel.DaleResults = new List<DaleResultRowModel>();
             }
             else
             {
-                searchModel.DaleResults = _daleService.GetSearchResults(searchModel.ToDto()).ToWeb();
+                searchModel.DaleResultModel = _daleService.GetSearchResults(searchModel.ToDto()).ToWeb();
             }
 
-            JsonResult result = Json(new { data = searchModel.DaleResults}, JsonRequestBehavior.AllowGet);
+            JsonResult result = Json(new { data = searchModel.DaleResultModel.DaleResults}, JsonRequestBehavior.AllowGet);
             result.MaxJsonLength = Int32.MaxValue;  //need to set MaxJsonLength to avoid 500 exceptions because of large json coming back since we are doing client side for max performance
 
             return result;

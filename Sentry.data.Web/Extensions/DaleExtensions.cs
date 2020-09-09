@@ -21,9 +21,9 @@ namespace Sentry.data.Web
             };
         }
 
-        public static DaleResultModel ToWeb(this DaleResultDto dto)
+        public static DaleResultRowModel ToWeb(this DaleResultRowDto dto)
         {
-            return new DaleResultModel()
+            return new DaleResultRowModel()
             {
                 Asset = dto.Asset,
                 Server = dto.Server,
@@ -48,9 +48,22 @@ namespace Sentry.data.Web
             };
         }
 
-        public static List<DaleResultModel> ToWeb(this List<DaleResultDto> dtos)
+
+        public static DaleResultModel ToWeb(this DaleResultDto dto)
         {
-            List<DaleResultModel> models = new List<DaleResultModel>();
+            return new DaleResultModel()
+            {
+                DaleResults = dto.DaleResults.ToWeb(),
+                DaleEvent = dto.DaleEvent
+            };
+        }
+
+
+
+
+        public static List<DaleResultRowModel> ToWeb(this List<DaleResultRowDto> dtos)
+        {
+            List<DaleResultRowModel> models = new List<DaleResultRowModel>();
 
             dtos.ForEach(x => models.Add(x.ToWeb()));
 

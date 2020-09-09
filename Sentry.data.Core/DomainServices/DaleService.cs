@@ -17,28 +17,14 @@ namespace Sentry.data.Core
             _daleSearchProvider = daleSearchProvider;
         }
 
-        public List<DaleResultDto> GetSearchResults(DaleSearchDto dto)
+        public DaleResultDto GetSearchResults(DaleSearchDto dtoSearch)
         {
-            Stopwatch stopWatch = new Stopwatch();
-            stopWatch.Start();
+            DaleResultDto dtoResult = _daleSearchProvider.GetSearchResults(dtoSearch);
 
-            List<DaleResultDto> daleResults = _daleSearchProvider.GetSearchResults(dto);
-
-            stopWatch.Stop();
-            TimeSpan ts = stopWatch.Elapsed;
-
-            DaleEventDto daleEventDto = new DaleEventDto()
-            {
-                Criteria = dto.Criteria,
-                Destiny = dto.Destiny.GetDescription(),
-                QuerySeconds = ts.Seconds,
-                QueryRows = daleResults.Count
-            };
-
-            string queryBlob = Newtonsoft.Json.JsonConvert.SerializeObject(daleEventDto);
+            string queryBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtoResult.DaleEvent);
             _eventService.PublishSuccessEvent("DaleQuery", _userService.GetCurrentUser().AssociateId,"Dale Query Executed", null, queryBlob);
 
-            return daleResults;
+            return dtoResult;
         }
 
         public bool UpdateIsSensitive(List<DaleSensitiveDto> dtos)

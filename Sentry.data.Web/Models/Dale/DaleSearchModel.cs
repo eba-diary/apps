@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Sentry.data.Core.GlobalEnums;
+﻿using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Web
 {
@@ -18,6 +14,7 @@ namespace Sentry.data.Web
 
         public bool CanDaleSensitiveEdit { get; set; }
 
-        public List<DaleResultModel> DaleResults { get; set; }
-    }
+        public DaleResultModel DaleResultModel { get; set; }
+
+}
 }

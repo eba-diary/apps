@@ -405,7 +405,9 @@
     <Compile Include="Models\Config\ValidDatatypesModel.cs" />
     <Compile Include="Models\Config\ManageConfigsModel.cs" />
     <Compile Include="Models\ContactInfoModel.cs" />
+    <Compile Include="Models\Dale\DaleEventModel.cs" />
     <Compile Include="Models\Dale\DaleResultModel.cs" />
+    <Compile Include="Models\Dale\DaleResultRowModel.cs" />
     <Compile Include="Models\Dale\DaleSearchModel.cs" />
     <Compile Include="Models\Dale\DaleSensitiveModel.cs" />
     <Compile Include="Models\DataAsset\AssetUIModel.cs" />
