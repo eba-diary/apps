@@ -72,6 +72,8 @@
             public const string NOTIFICATION_WARNING_UPDATE = "Warning Notification Update";
             public const string NOTIFICATION_INFO_UPDATE = "Info Notification Update";
 
+            public const string DALE_SEARCH = "DaleQuery";
+
         }
 
         public static class Statuses
