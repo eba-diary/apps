@@ -46,7 +46,7 @@
 									(34, 'Warning Notification Update'	,2	,0	,@GroupBUSINESSAREA),
 									(35, 'Info Notification Update'		,3	,0	,@GroupBUSINESSAREA),
 
-									(36, 'DALE'							,3	,0	,@GroupDALE)
+									(36, 'DaleQuery'							,3	,0	,@GroupDALE)
 
 								)
 								AS Source ([Type_ID], [Description], Severity, Display_IND, [Group_CDE]) 
