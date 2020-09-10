@@ -50,6 +50,20 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("person", dtoList.First().Name);
             Assert.IsInstanceOfType(dtoList.First(), typeof(StructFieldDto));
         }
+
+        [TestMethod, TestCategory("ToDto JsonSchema")]
+        public void Can_Boolean_Within_Object_Reference()
+        {
+            JsonSchema schema = BuildMockJsonSchema_ObjectReference_Based();
+            List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+
+            //Action
+            schema.ToDto(dtoList);
+
+            //Assertion
+            Assert.AreEqual(true, dtoList.First().ChildFields.Any(w => w.Name == "haschildren"));
+            Assert.IsInstanceOfType(dtoList.First().ChildFields.First(w => w.Name == "haschildren"), typeof(VarcharFieldDto));
+        }
         [TestMethod, TestCategory("ToDto JsonSchema")]
         public void Can_Find_Object_Property()
         {
@@ -111,7 +125,7 @@ namespace Sentry.data.Web.Tests
             List<BaseFieldDto> childrenList = dtoList.First().ChildFields;
 
             //Assertion
-            Assert.AreEqual(3, childrenList.Count);
+            Assert.AreEqual(4, childrenList.Count);
         }
         [TestMethod, TestCategory("ToDto JsonSchemaProperty")]
         public void Can_Detect_String()
@@ -207,8 +221,6 @@ namespace Sentry.data.Web.Tests
             Assert.IsInstanceOfType(dtoList.First(), typeof(VarcharFieldDto));
             Assert.AreEqual(true, dtoList.First().IsArray);
         }
-
-
         [TestMethod, TestCategory("ToDto JsonSchemaProperty")]
         public void Can_Detect_ArrayofInteger()
         {
@@ -344,7 +356,6 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("Array of VARCHAR", dtoField.Description);
             Assert.AreEqual(391, dtoField.Length);
         }
-
         [TestMethod, TestCategory("ToDto JsonSchemaProperty")]
         public void Can_Detect_ArrayofReference()
         {
@@ -407,8 +418,6 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(1000, childFields.First().Length);
             Assert.IsNull(childFields.First().Description);
         }
-
-
         [TestMethod, TestCategory("ToDto JsonSchemaProperty")]
         public void Get_Default_ArrayOfVarchar_Missing_Array_Ref()
         {
@@ -455,6 +464,22 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(true, dtoField.IsArray);
             Assert.AreEqual("top3favoritenumbers", dtoField.Name);
             Assert.AreEqual("top favorite numbers", dtoField.Description);
+        }
+
+        [TestMethod, TestCategory("ToDto JsonSchemaProperty")]
+        public void Get_Default_Varchar_For_Boolean()
+        {
+            //Setup            
+            JsonSchema schema = BuildMockJsonSchema_ObjectProperty_Based();
+            List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+
+            //Action
+            schema.Properties.First(w => w.Key == "person").ToDto(dtoList);
+
+            //Assertion            
+            Assert.AreEqual(1, dtoList.Count);
+            Assert.IsInstanceOfType(dtoList.First().ChildFields.First(w => w.Name == "haschildren"), typeof(VarcharFieldDto));
+            Assert.AreEqual(false, dtoList.First().ChildFields.First(w => w.Name == "haschildren").IsArray);
         }
 
         [TestMethod, TestCategory("FindArraySchema JsonSchemaProperty")]
@@ -579,7 +604,11 @@ namespace Sentry.data.Web.Tests
                             ""maxlength"": 391
                         },
                         ""description"": ""Array of VARCHAR""
-                    }
+                    },
+                    ""haschildren"": {
+                        ""type"": ""boolean"",
+                        ""description"": ""Indicator whether person has children""
+                    }                    
                   }
                 }
               }
@@ -611,6 +640,10 @@ namespace Sentry.data.Web.Tests
                     ""top3favoritecolors"": {
                         ""type"": ""array"",
                         ""$ref"": ""#/definitions/top3favoritecolors""
+                    },
+                    ""haschildren"": {
+                        ""type"": ""boolean"",
+                        ""description"": ""Indicator whether person has children""
                     }
                   }
                 },
