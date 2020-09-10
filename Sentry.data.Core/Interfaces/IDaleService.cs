@@ -4,7 +4,7 @@ namespace Sentry.data.Core
 {
     public interface IDaleService
     {
-        List<DaleResultDto> GetSearchResults(DaleSearchDto dto);
+        DaleResultDto GetSearchResults(DaleSearchDto dtoSearch);
         bool UpdateIsSensitive(List<DaleSensitiveDto> dtos);
     }
 }

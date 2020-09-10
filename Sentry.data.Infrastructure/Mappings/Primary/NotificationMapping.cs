@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sentry.data.Core;
+﻿using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
-using NHibernate.Mapping.ByCode;
+using Sentry.data.Core;
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
 {
@@ -14,8 +9,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         public NotificationMapping()
         {
             this.Table("Notifications");
-
-            this.Cache(c => c.Usage(CacheUsage.ReadWrite));
 
             this.Id(x => x.NotificationId, m =>
             {

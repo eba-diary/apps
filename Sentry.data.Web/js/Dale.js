@@ -14,6 +14,11 @@
             dataType: 'json',
             success: function (obj) {
                 data.Dale.dataTablCreate(obj);
+
+                var criteriaLen = $('#daleSearchCriteria').val().trim().length;         //if criteria exists at this point, means SAID query so fabricate a click
+                if (criteriaLen > 0) {
+                    $('.input-group-addon').click();    
+                }
             }
         });
 
