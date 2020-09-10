@@ -1,4 +1,5 @@
-﻿@using Sentry.data.Web;
+﻿@using Sentry.data.Core.GlobalEnums;
+@using Sentry.data.Web;
 @model DaleSearchModel
 
 @{
@@ -54,7 +55,7 @@
                                  <em class="fa fa-circle-o-notch fa-spin"></em>
                              </span>
 
-                             <input type="text" id="daleSearchCriteria" name="searchPhrase" class="form-control" style="width:500px" />
+                             <input type="text" id="daleSearchCriteria" name="searchPhrase" class="form-control" style="width:500px" value="@Model.Criteria" />
 
                          </div>
 
@@ -68,16 +69,21 @@
                      @*NOTE! the flex style basically pushes the radio button and sensitive controls to the button of the screen levereging the flex-end tag that sits on the actual control*@
                      <span id="radioMadness" style="display:flex; align-items:flex-end;">
 
-                         <span style="text-align: left; font-family: KievitSlabWeb W03,Lucida Sans,serif;width:200px;">
+                         <span style="text-align: left; font-family: KievitSlabWeb W03,Lucida Sans,serif;width:250px;">
 
                              <label style="text-align:left; width:100px;">
-                                 <input type="radio" name="Destiny" id="DestinyTableRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Object>
+                                 <input type="radio" name="Destiny" id="DestinyTableRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Object   @(Model.Destiny == DaleDestiny.Object ? "checked=\"checked\"" : "")>
                                  Table/View
                              </label>
 
-                             <label style="text-align:left; width:75px;">
-                                 <input type="radio" name="Destiny" id="DestinyColumnRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Column checked="checked">
-                                 @Sentry.data.Core.GlobalEnums.DaleDestiny.Column
+                            <label style="text-align:left; width:75px;">
+                                <input type="radio" name="Destiny" id="DestinyColumnRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Column   @(Model.Destiny == DaleDestiny.Column ? "checked=\"checked\"" : "")   >
+                                @Sentry.data.Core.GlobalEnums.DaleDestiny.Column
+                            </label>
+
+                             <label style="text-align:left; width:50px;">
+                                 <input type="radio" name="Destiny" id="DestinySaidRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.SAID      @(Model.Destiny == DaleDestiny.SAID ? "checked=\"checked\"" : "")>
+                                 @Sentry.data.Core.GlobalEnums.DaleDestiny.SAID
                              </label>
 
                          </span>
