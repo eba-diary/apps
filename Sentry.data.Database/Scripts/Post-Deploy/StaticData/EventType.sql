@@ -3,6 +3,7 @@
 
 		DECLARE	@GroupDATASET VARCHAR(25)			= 'DATASET'
 				,@GroupBUSINESSAREA VARCHAR(25)		= 'BUSINESSAREA'
+				,@GroupDALE VARCHAR(25)		= 'DALE'
 		
 		MERGE INTO EventType AS Target 
 		USING (VALUES 
@@ -43,7 +44,9 @@
 
 									(33, 'Critical Notification Update'	,1	,0	,@GroupBUSINESSAREA),
 									(34, 'Warning Notification Update'	,2	,0	,@GroupBUSINESSAREA),
-									(35, 'Info Notification Update'		,3	,0	,@GroupBUSINESSAREA)
+									(35, 'Info Notification Update'		,3	,0	,@GroupBUSINESSAREA),
+
+									(36, 'DaleQuery'							,3	,0	,@GroupDALE)
 
 								)
 								AS Source ([Type_ID], [Description], Severity, Display_IND, [Group_CDE]) 
