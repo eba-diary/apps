@@ -75,7 +75,9 @@ namespace Sentry.data.Web.Controllers
             bool valid = false;
 
             if (String.IsNullOrEmpty(target))
+            {
                 return false;
+            }
 
             if (target.ToUpper() == "SAID")
             {
