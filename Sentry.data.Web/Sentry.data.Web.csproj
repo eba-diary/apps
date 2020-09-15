@@ -316,6 +316,7 @@
     <Compile Include="Controllers\ExternalFileController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\WebApi\BaseWebApiController.cs" />
+    <Compile Include="Controllers\WebApi\DataInventoryController.cs" />
     <Compile Include="Controllers\WebApi\JobController.cs" />
     <Compile Include="Controllers\LayoutController.cs" />
     <Compile Include="Controllers\WebApi\LineageController.cs" />
