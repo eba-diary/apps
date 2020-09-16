@@ -1,22 +1,9 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NJsonSchema;
-using Sentry.Common.Logging;
-using Sentry.Core;
-using Sentry.data.Common;
-using Sentry.data.Core;
-using Sentry.data.Core.Exceptions;
-using Sentry.data.Core.Factories.Fields;
-using Sentry.data.Web.Models.ApiModels.Dataset;
-using Sentry.data.Web.Models.ApiModels.Schema;
+﻿using Sentry.data.Core;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Results;
+using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Web.WebApi.Controllers
 {
@@ -26,19 +13,43 @@ namespace Sentry.data.Web.WebApi.Controllers
     public class DataInventoryController : BaseWebApiController
     {
 
-       
+        private readonly IDaleService _daleService;
+
+
+        public DataInventoryController(IDaleService daleService)
+        {
+            _daleService = daleService;
+        }
+
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("DoesItContainSensitive")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(bool))]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
-        public async Task<IHttpActionResult> DoesItContainSensitive()
+        public async Task<IHttpActionResult> DoesItemContainSensitive(string target, string search)
         {
-            return Ok(true);
+            DaleContainSensitiveResultModel resultModel ;
+
+            try
+            {
+                DaleSearchModel searchModel = new DaleSearchModel();
+                searchModel.Criteria = search;
+                searchModel.Destiny = target.ToDaleDestiny();
+
+                resultModel = _daleService.DoesItemContainSensitive(searchModel.ToDto()).ToWeb();
+
+                return Ok(resultModel.DoesContainSensitiveResults);
+
+            }
+            catch (DaleUnauthorizedAccessException)
+            {
+                return Content(System.Net.HttpStatusCode.Forbidden, "Not Authorized");
+            }
+            catch (DaleQueryException)
+            {
+                return Content(System.Net.HttpStatusCode.BadRequest, "Invalid target or search parameters");
+            }
+
         }
-
-
-
-
     }
 }

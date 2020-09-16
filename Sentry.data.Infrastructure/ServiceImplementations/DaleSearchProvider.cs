@@ -179,7 +179,13 @@ namespace Sentry.data.Infrastructure
             }
 
             //validate to ensure valid destination
-            if ( (dto.Destiny != DaleDestiny.Object) && (dto.Destiny != DaleDestiny.Column) && (dto.Destiny != DaleDestiny.SAID) )
+            if 
+            (    (dto.Destiny != DaleDestiny.Object) 
+                    && (dto.Destiny != DaleDestiny.Column) 
+                    && (dto.Destiny != DaleDestiny.SAID) 
+                    && (dto.Destiny != DaleDestiny.Database)
+                    && (dto.Destiny != DaleDestiny.Server)  
+            )
             {
                 return false;
             }
@@ -242,5 +248,91 @@ namespace Sentry.data.Infrastructure
 
             return result;
         }
+
+        public DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dto)
+        {
+            DaleContainSensitiveResultDto daleResult = new DaleContainSensitiveResultDto();
+            daleResult.DoesContainSensitiveResults = false;
+
+            daleResult.DaleEvent = new DaleEventDto()
+            {
+                Criteria = dto.Criteria,
+                Destiny = dto.Destiny.GetDescription(),
+                QuerySuccess = true,
+                Sensitive = dto.Sensitive.GetDescription()
+            };
+
+            //make sure incoming criteria is valid, or return empty results
+            if (!IsCriteriaValid(dto))
+            {
+                daleResult.DaleEvent.QueryErrorMessage = "Invalid Criteria.  No Query executed.";
+                daleResult.DaleEvent.QuerySuccess = false;
+      
+            }
+
+            string connectionString = Configuration.Config.GetHostSetting("DaleConnectionString");
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
+
+                string q = BuildDoesContainSensitiveQuery(dto);
+                SqlCommand command = new SqlCommand(q, connection);
+                command.CommandTimeout = 0;
+
+                command.Parameters.AddWithValue("@Criteria", System.Data.SqlDbType.VarChar);
+                command.Parameters["@Criteria"].Value =  dto.Criteria;
+
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        daleResult.DoesContainSensitiveResults = true;
+                    }
+
+                    reader.Close();
+                }
+                catch (Exception ex)
+                {
+                    string daleMessage = "Dale Failed!!  Query: " + q;
+                    daleResult.DaleEvent.QuerySuccess = false;
+                    daleResult.DaleEvent.QueryErrorMessage = daleMessage + " " + ex.Message;
+                    Logger.Fatal(daleMessage, ex);
+                }
+
+                stopWatch.Stop();
+                TimeSpan ts = stopWatch.Elapsed;
+
+                daleResult.DaleEvent.QuerySeconds = ts.Seconds;
+
+                Logger.Info("DaleSearchProvider.DoesItemContainSensitive()  Elapsed Seconds:" + ts.Seconds + " Query:" + q);
+            }
+
+            return daleResult;
+        }
+
+        private string BuildDoesContainSensitiveQuery(DaleSearchDto dto)
+        {
+            string q = String.Empty;
+            string qSelect = "SELECT TOP 1 * ";
+            string qFrom = " FROM Column_v ";
+            string qWhereStatement = " WHERE Expiration_DTM IS NULL AND IsSensitive_FLG = 1 ";
+            string qColumnToFilter = String.Empty;
+
+            if (dto.Destiny == DaleDestiny.SAID)
+                qColumnToFilter = " Asset_CDE ";
+            else if (dto.Destiny == DaleDestiny.Server)
+                qColumnToFilter = " Server_NME ";
+            else qColumnToFilter = " Database_NME ";
+
+            q = qSelect + qFrom + qWhereStatement + " AND " + qColumnToFilter + "= @Criteria";
+            q = "IF EXISTS ( " + q + " ) SELECT 1 AS TESTME";
+
+            return q;
+        }
+
     }
 }

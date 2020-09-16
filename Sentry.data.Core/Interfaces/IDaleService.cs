@@ -6,5 +6,7 @@ namespace Sentry.data.Core
     {
         DaleResultDto GetSearchResults(DaleSearchDto dtoSearch);
         bool UpdateIsSensitive(List<DaleSensitiveDto> dtos);
+
+        DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dto);
     }
 }

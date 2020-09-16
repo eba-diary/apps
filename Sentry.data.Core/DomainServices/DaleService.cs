@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core.Exceptions;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Sentry.data.Core
 {
@@ -22,7 +21,7 @@ namespace Sentry.data.Core
             DaleResultDto dtoResult = _daleSearchProvider.GetSearchResults(dtoSearch);
 
             string queryBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtoResult.DaleEvent);
-            _eventService.PublishSuccessEvent("DaleQuery", _userService.GetCurrentUser().AssociateId,"Dale Query Executed", null, queryBlob);
+            _eventService.PublishSuccessEvent("DaleQuery", _userService.GetCurrentUser().AssociateId, "Dale Query Executed", null, queryBlob);
 
             return dtoResult;
         }
@@ -34,8 +33,38 @@ namespace Sentry.data.Core
 
             string sensitiveBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtos);
             success = _daleSearchProvider.SaveSensitive(sensitiveBlob);
-            
+
             return success;
+        }
+
+        public DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dto)
+        {
+            DaleContainSensitiveResultDto dtoResult;
+
+            if (CanDaleSensitiveView())
+            {
+                dtoResult = _daleSearchProvider.DoesItemContainSensitive(dto);
+            }
+            else
+            {
+                throw new DaleUnauthorizedAccessException();
+            }
+
+            if(!dtoResult.DaleEvent.QuerySuccess)
+            {
+                throw new DaleQueryException();
+            }
+
+            return dtoResult;
+        }
+
+        private bool CanDaleSensitiveView()
+        {
+            if (!_userService.GetCurrentUser().CanDaleSensitiveView)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
