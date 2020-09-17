@@ -24,14 +24,6 @@ namespace Sentry.data.Infrastructure
                 Sensitive = dto.Sensitive.GetDescription()
             };
 
-            //make sure incoming criteria is valid, or return empty results
-            if (!IsCriteriaValid(dto))
-            {
-                daleResult.DaleEvent.QueryErrorMessage = "Invalid Criteria.  No Query executed.";
-                daleResult.DaleEvent.QuerySuccess = false;
-                return daleResult;
-            }
-
             string connectionString = Configuration.Config.GetHostSetting("DaleConnectionString");
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -165,33 +157,6 @@ namespace Sentry.data.Infrastructure
             return qWhereStatement;
         }
 
-        private bool IsCriteriaValid(DaleSearchDto dto)
-        {
-            if (dto.Sensitive == DaleSensitive.SensitiveOnly)
-            {
-                return true;
-            }
-
-            //validate for white space only, null, empty string in criteria
-            if (String.IsNullOrWhiteSpace(dto.Criteria))
-            {
-                return false;
-            }
-
-            //validate to ensure valid destination
-            if 
-            (    (dto.Destiny != DaleDestiny.Object) 
-                    && (dto.Destiny != DaleDestiny.Column) 
-                    && (dto.Destiny != DaleDestiny.SAID) 
-                    && (dto.Destiny != DaleDestiny.Database)
-                    && (dto.Destiny != DaleDestiny.Server)  
-            )
-            {
-                return false;
-            }
-            return true;
-        }
-
         private DaleResultRowDto CreateDaleResultRow(SqlDataReader reader)
         {
             DaleResultRowDto result = new DaleResultRowDto();
@@ -262,14 +227,6 @@ namespace Sentry.data.Infrastructure
                 Sensitive = dto.Sensitive.GetDescription()
             };
 
-            //make sure incoming criteria is valid, or return empty results
-            if (!IsCriteriaValid(dto))
-            {
-                daleResult.DaleEvent.QueryErrorMessage = "Invalid Criteria.  No Query executed.";
-                daleResult.DaleEvent.QuerySuccess = false;
-      
-            }
-
             string connectionString = Configuration.Config.GetHostSetting("DaleConnectionString");
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -305,9 +262,7 @@ namespace Sentry.data.Infrastructure
 
                 stopWatch.Stop();
                 TimeSpan ts = stopWatch.Elapsed;
-
                 daleResult.DaleEvent.QuerySeconds = ts.Seconds;
-
                 Logger.Info("DaleSearchProvider.DoesItemContainSensitive()  Elapsed Seconds:" + ts.Seconds + " Query:" + q);
             }
 

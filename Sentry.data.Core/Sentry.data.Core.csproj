@@ -194,6 +194,7 @@
     <Compile Include="Entities\Schema\VarcharField.cs" />
     <Compile Include="Entities\Subscriptions\BusinessAreaSubscription.cs" />
     <Compile Include="Entities\Subscriptions\EventTypeGroup.cs" />
+    <Compile Include="Exceptions\DaleInvalidSearchException.cs" />
     <Compile Include="Exceptions\DaleQueryException.cs" />
     <Compile Include="Exceptions\DaleUnauthorizedAccessException.cs" />
     <Compile Include="Exceptions\DataFlowNotFound.cs" />

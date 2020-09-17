@@ -35,17 +35,21 @@ namespace Sentry.data.Web.WebApi.Controllers
                 DaleSearchModel searchModel = new DaleSearchModel();
                 searchModel.Criteria = search;
                 searchModel.Destiny = target.ToDaleDestiny();
+                searchModel.Sensitive = Core.GlobalEnums.DaleSensitive.SensitiveAll;
 
                 resultModel = _daleService.DoesItemContainSensitive(searchModel.ToDto()).ToWeb();
 
                 return Ok(resultModel.DoesContainSensitiveResults);
-
             }
             catch (DaleUnauthorizedAccessException)
             {
-                return Content(System.Net.HttpStatusCode.Forbidden, "Not Authorized");
+                return Content(System.Net.HttpStatusCode.Forbidden, "Not Authorized.");
             }
             catch (DaleQueryException)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "DB Query Failure.");
+            }
+            catch (DaleInvalidSearchException)
             {
                 return Content(System.Net.HttpStatusCode.BadRequest, "Invalid target or search parameters");
             }

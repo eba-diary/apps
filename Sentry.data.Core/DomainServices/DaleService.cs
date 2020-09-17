@@ -1,5 +1,7 @@
 ﻿using Sentry.data.Core.Exceptions;
 using System.Collections.Generic;
+using Sentry.data.Core.GlobalEnums;
+using System;
 
 namespace Sentry.data.Core
 {
@@ -28,7 +30,6 @@ namespace Sentry.data.Core
 
         public bool UpdateIsSensitive(List<DaleSensitiveDto> dtos)
         {
-
             bool success = false;
 
             string sensitiveBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtos);
@@ -37,18 +38,14 @@ namespace Sentry.data.Core
             return success;
         }
 
-        public DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dto)
+        public DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dtoSearch)
         {
             DaleContainSensitiveResultDto dtoResult;
 
-            if (CanDaleSensitiveView())
-            {
-                dtoResult = _daleSearchProvider.DoesItemContainSensitive(dto);
-            }
-            else
-            {
-                throw new DaleUnauthorizedAccessException();
-            }
+            CanDaleSensitiveView();
+            IsCriteriaValid(dtoSearch);
+            
+            dtoResult = _daleSearchProvider.DoesItemContainSensitive(dtoSearch);
 
             if(!dtoResult.DaleEvent.QuerySuccess)
             {
@@ -62,7 +59,35 @@ namespace Sentry.data.Core
         {
             if (!_userService.GetCurrentUser().CanDaleSensitiveView)
             {
-                return false;
+                throw new DaleUnauthorizedAccessException();
+            }
+
+            return true;
+        }
+
+        private bool IsCriteriaValid(DaleSearchDto dto)
+        {
+            if (dto.Sensitive == DaleSensitive.SensitiveOnly)
+            {
+                return true;
+            }
+
+            //validate for white space only, null, empty string in criteria
+            if (String.IsNullOrWhiteSpace(dto.Criteria))
+            {
+                throw new DaleInvalidSearchException();
+            }
+
+            //validate to ensure valid destination
+            if
+            ((dto.Destiny != DaleDestiny.Object)
+                    && (dto.Destiny != DaleDestiny.Column)
+                    && (dto.Destiny != DaleDestiny.SAID)
+                    && (dto.Destiny != DaleDestiny.Database)
+                    && (dto.Destiny != DaleDestiny.Server)
+            )
+            {
+                throw new DaleInvalidSearchException();
             }
             return true;
         }
