@@ -23,7 +23,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        [Route("DoesItContainSensitive")]
+        [Route("DoesItemContainSensitive")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(bool))]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> DoesItemContainSensitive(string target, string search)
