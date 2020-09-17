@@ -278,10 +278,17 @@ namespace Sentry.data.Infrastructure
             string qColumnToFilter = String.Empty;
 
             if (dto.Destiny == DaleDestiny.SAID)
+            {
                 qColumnToFilter = " Asset_CDE ";
+            }
             else if (dto.Destiny == DaleDestiny.Server)
+            {
                 qColumnToFilter = " Server_NME ";
-            else qColumnToFilter = " Database_NME ";
+            }
+            else
+            {
+                qColumnToFilter = " Database_NME ";
+            }
 
             q = qSelect + qFrom + qWhereStatement + " AND " + qColumnToFilter + "= @Criteria";
             q = "IF EXISTS ( " + q + " ) SELECT 1 AS TESTME";

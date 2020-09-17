@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Sentry.data.Core.Exceptions
 {
     [Serializable]
-    public class DaleInvalidSearchException : UnauthorizedAccessException, ISerializable
+    public class DaleInvalidSearchException : Exception
     {
         public DaleInvalidSearchException() { }
         public DaleInvalidSearchException(string message) : base(message) { }

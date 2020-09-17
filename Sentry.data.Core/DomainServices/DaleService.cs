@@ -55,21 +55,19 @@ namespace Sentry.data.Core
             return dtoResult;
         }
 
-        private bool CanDaleSensitiveView()
+        private void CanDaleSensitiveView()
         {
             if (!_userService.GetCurrentUser().CanDaleSensitiveView)
             {
                 throw new DaleUnauthorizedAccessException();
             }
-
-            return true;
         }
 
-        private bool IsCriteriaValid(DaleSearchDto dto)
+        private void IsCriteriaValid(DaleSearchDto dto)
         {
             if (dto.Sensitive == DaleSensitive.SensitiveOnly)
             {
-                return true;
+                return;
             }
 
             //validate for white space only, null, empty string in criteria
@@ -89,7 +87,6 @@ namespace Sentry.data.Core
             {
                 throw new DaleInvalidSearchException();
             }
-            return true;
         }
     }
 }
