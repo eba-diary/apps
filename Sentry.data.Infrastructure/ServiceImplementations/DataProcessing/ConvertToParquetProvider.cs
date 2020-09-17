@@ -154,8 +154,8 @@ namespace Sentry.data.Infrastructure
 
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"converttoparquetprovider-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
 
-                //_messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JsonConvert.SerializeObject(stepEvent));
-                _messagePublisher.PublishDSCEvent(string.Empty, JsonConvert.SerializeObject(stepEvent));
+                _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}-{RandomString(6)}", JsonConvert.SerializeObject(stepEvent));
+                //_messagePublisher.PublishDSCEvent(string.Empty, JsonConvert.SerializeObject(stepEvent));
 
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <converttoparquetprovider-publishstartevent", Log_Level.Debug);
             }
