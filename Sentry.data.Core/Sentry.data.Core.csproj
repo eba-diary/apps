@@ -118,6 +118,7 @@
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
+    <Compile Include="DTO\Dale\DaleContainSensitiveResultDto.cs" />
     <Compile Include="DTO\Dale\DaleEventDto.cs" />
     <Compile Include="DTO\Dale\DaleResultDto.cs" />
     <Compile Include="DTO\Dale\DaleSearchDto.cs" />
@@ -193,6 +194,9 @@
     <Compile Include="Entities\Schema\VarcharField.cs" />
     <Compile Include="Entities\Subscriptions\BusinessAreaSubscription.cs" />
     <Compile Include="Entities\Subscriptions\EventTypeGroup.cs" />
+    <Compile Include="Exceptions\DaleInvalidSearchException.cs" />
+    <Compile Include="Exceptions\DaleQueryException.cs" />
+    <Compile Include="Exceptions\DaleUnauthorizedAccessException.cs" />
     <Compile Include="Exceptions\DataFlowNotFound.cs" />
     <Compile Include="Exceptions\DataFlowStepNotFound.cs" />
     <Compile Include="Exceptions\AWSLambdaException.cs" />

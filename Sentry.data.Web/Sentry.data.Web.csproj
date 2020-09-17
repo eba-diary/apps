@@ -316,6 +316,7 @@
     <Compile Include="Controllers\ExternalFileController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\WebApi\BaseWebApiController.cs" />
+    <Compile Include="Controllers\WebApi\DataInventoryController.cs" />
     <Compile Include="Controllers\WebApi\JobController.cs" />
     <Compile Include="Controllers\LayoutController.cs" />
     <Compile Include="Controllers\WebApi\LineageController.cs" />
@@ -378,6 +379,7 @@
     <Compile Include="Helpers\TimeSpanFormattingExtensions.cs" />
     <Compile Include="Helpers\WebCurrentUserIdProvider.cs" />
     <Compile Include="HttpExceptions\NotAuthorizedException.cs" />
+    <Compile Include="Models\ApiModels\Dale\DaleContainSensitiveResultModel.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetDetailModel.cs" />
     <Compile Include="Models\ApiModels\Config\ConfigInfoModel.cs" />
     <Compile Include="Models\ApiModels\Job\JobHistoryModel.cs" />
