@@ -166,7 +166,7 @@ namespace Sentry.data.Infrastructure
                         step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug);
 
                         //_messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JsonConvert.SerializeObject(stepEvent));
-                        _messagePublisher.PublishDSCEvent(null, JsonConvert.SerializeObject(stepEvent));
+                        _messagePublisher.PublishDSCEvent(string.Empty, JsonConvert.SerializeObject(stepEvent));
 
                         stopWatch.Stop();
                         DateTime endTime = DateTime.Now;
