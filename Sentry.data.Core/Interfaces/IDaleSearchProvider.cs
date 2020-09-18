@@ -7,5 +7,6 @@
 
         DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dto);
 
+        DaleCategoryResultDto GetCategoriesByAsset(string search);
     }
 }

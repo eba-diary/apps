@@ -67,6 +67,33 @@ namespace Sentry.data.Web
             };
         }
 
+        public static DaleCategoryResultModel ToWeb(this DaleCategoryResultDto dto)
+        {
+            return new DaleCategoryResultModel()
+            {
+                DaleCategories = dto.DaleCategories.ToWeb(),
+                DaleEvent = dto.DaleEvent
+            };
+        }
+
+        public static List<DaleCategoryModel> ToWeb(this List<DaleCategoryDto> dtos)
+        {
+            List<DaleCategoryModel> models = new List<DaleCategoryModel>();
+
+            dtos.ForEach(x => models.Add(x.ToWeb()));
+
+            return models;
+        }
+
+        public static DaleCategoryModel ToWeb(this DaleCategoryDto dto)
+        {
+            return new DaleCategoryModel()
+            {
+                Category = dto.Category,
+                IsSensitive = dto.IsSensitive
+            };
+        }
+
         public static List<DaleResultRowModel> ToWeb(this List<DaleResultRowDto> dtos)
         {
             List<DaleResultRowModel> models = new List<DaleResultRowModel>();

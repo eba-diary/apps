@@ -296,5 +296,59 @@ namespace Sentry.data.Infrastructure
             return q;
         }
 
+        public DaleCategoryResultDto GetCategoriesByAsset(string search)
+        {
+            DaleCategoryResultDto daleResult = new DaleCategoryResultDto();
+            daleResult.DaleCategories = new List<DaleCategoryDto>();
+
+
+            daleResult.DaleEvent = new DaleEventDto()
+            {
+                Criteria = search,
+                QuerySuccess = true
+            };
+
+            //string connectionString = Configuration.Config.GetHostSetting("DaleConnectionString");
+            //using (SqlConnection connection = new SqlConnection(connectionString))
+            //{
+            //    Stopwatch stopWatch = new Stopwatch();
+            //    stopWatch.Start();
+
+            //    string q = BuildDoesContainSensitiveQuery(dto);
+            //    SqlCommand command = new SqlCommand(q, connection);
+            //    command.CommandTimeout = 0;
+
+            //    command.Parameters.AddWithValue("@Criteria", System.Data.SqlDbType.VarChar);
+            //    command.Parameters["@Criteria"].Value = dto.Criteria;
+
+            //    try
+            //    {
+            //        connection.Open();
+            //        SqlDataReader reader = command.ExecuteReader();
+
+            //        while (reader.Read())
+            //        {
+            //            daleResult.DoesContainSensitiveResults = true;
+            //        }
+
+            //        reader.Close();
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        string daleMessage = "Dale Failed!!  Query: " + q;
+            //        daleResult.DaleEvent.QuerySuccess = false;
+            //        daleResult.DaleEvent.QueryErrorMessage = daleMessage + " " + ex.Message;
+            //        Logger.Fatal(daleMessage, ex);
+            //    }
+
+            //    stopWatch.Stop();
+            //    TimeSpan ts = stopWatch.Elapsed;
+            //    daleResult.DaleEvent.QuerySeconds = ts.Seconds;
+            //    Logger.Info("DaleSearchProvider.GetCategoriesByAsset()  Elapsed Seconds:" + ts.Seconds + " Query:" + q);
+            //}
+
+            return daleResult;
+        }
+
     }
 }

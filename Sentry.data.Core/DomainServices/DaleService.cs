@@ -55,6 +55,28 @@ namespace Sentry.data.Core
             return dtoResult;
         }
 
+        public DaleCategoryResultDto GetCategoriesByAsset(string search)
+        {
+            DaleCategoryResultDto dtoResult;
+
+            CanDaleSensitiveView();
+
+            if (String.IsNullOrWhiteSpace(search))
+            {
+                throw new DaleInvalidSearchException();
+            }
+
+
+            dtoResult = _daleSearchProvider.GetCategoriesByAsset(search);
+
+            if (!dtoResult.DaleEvent.QuerySuccess)
+            {
+                throw new DaleQueryException();
+            }
+
+            return dtoResult;
+        }
+
         private void CanDaleSensitiveView()
         {
             if (!_userService.GetCurrentUser().CanDaleSensitiveView)
