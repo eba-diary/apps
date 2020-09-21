@@ -301,53 +301,87 @@ namespace Sentry.data.Infrastructure
             DaleCategoryResultDto daleResult = new DaleCategoryResultDto();
             daleResult.DaleCategories = new List<DaleCategoryDto>();
 
-
             daleResult.DaleEvent = new DaleEventDto()
             {
                 Criteria = search,
                 QuerySuccess = true
             };
 
-            //string connectionString = Configuration.Config.GetHostSetting("DaleConnectionString");
-            //using (SqlConnection connection = new SqlConnection(connectionString))
-            //{
-            //    Stopwatch stopWatch = new Stopwatch();
-            //    stopWatch.Start();
+            string connectionString = Configuration.Config.GetHostSetting("DaleConnectionString");
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
 
-            //    string q = BuildDoesContainSensitiveQuery(dto);
-            //    SqlCommand command = new SqlCommand(q, connection);
-            //    command.CommandTimeout = 0;
+                string q = BuildGetCategoriesByAssetQuery();
+                SqlCommand command = new SqlCommand(q, connection);
+                command.CommandTimeout = 0;
 
-            //    command.Parameters.AddWithValue("@Criteria", System.Data.SqlDbType.VarChar);
-            //    command.Parameters["@Criteria"].Value = dto.Criteria;
+                command.Parameters.AddWithValue("@Criteria", System.Data.SqlDbType.VarChar);
+                command.Parameters["@Criteria"].Value = search;
 
-            //    try
-            //    {
-            //        connection.Open();
-            //        SqlDataReader reader = command.ExecuteReader();
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
 
-            //        while (reader.Read())
-            //        {
-            //            daleResult.DoesContainSensitiveResults = true;
-            //        }
+                    while (reader.Read())
+                    {
+                        daleResult.DaleCategories.Add(CreateCategoryResult(reader));
 
-            //        reader.Close();
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        string daleMessage = "Dale Failed!!  Query: " + q;
-            //        daleResult.DaleEvent.QuerySuccess = false;
-            //        daleResult.DaleEvent.QueryErrorMessage = daleMessage + " " + ex.Message;
-            //        Logger.Fatal(daleMessage, ex);
-            //    }
+                    }
 
-            //    stopWatch.Stop();
-            //    TimeSpan ts = stopWatch.Elapsed;
-            //    daleResult.DaleEvent.QuerySeconds = ts.Seconds;
-            //    Logger.Info("DaleSearchProvider.GetCategoriesByAsset()  Elapsed Seconds:" + ts.Seconds + " Query:" + q);
-            //}
+                    reader.Close();
+                }
+                catch (Exception ex)
+                {
+                    string daleMessage = "Dale Failed!!  Query: " + q;
+                    daleResult.DaleEvent.QuerySuccess = false;
+                    daleResult.DaleEvent.QueryErrorMessage = daleMessage + " " + ex.Message;
+                    Logger.Fatal(daleMessage, ex);
+                }
+
+                stopWatch.Stop();
+                TimeSpan ts = stopWatch.Elapsed;
+                daleResult.DaleEvent.QuerySeconds = ts.Seconds;
+                Logger.Info("DaleSearchProvider.GetCategoriesByAsset()  Elapsed Seconds:" + ts.Seconds + " Query:" + q);
+            }
 
             return daleResult;
+        }
+
+        private string BuildGetCategoriesByAssetQuery()
+        {
+            string q = @"SELECT ScanAction.Alert_NME, CASE WHEN BaseScanAction_SENSITIVE.ScanAction_ID IS NOT NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS IsSensitive_FLG 
+                        FROM ScanAction ScanAction
+                        LEFT JOIN
+                        (
+                            SELECT BaseScanAction.ScanAction_ID
+                            FROM BaseScanAction BaseScanAction
+                            JOIN Column_v Column_v
+                                ON BaseScanAction.Base_ID = Column_v.BaseColumn_ID
+                            WHERE Sensitive_FLG = 1
+                                    AND Column_v.Expiration_DTM IS NULL
+                                    AND Column_v.Asset_CDE = @Criteria
+                            GROUP BY ScanAction_ID
+                        ) AS BaseScanAction_SENSITIVE
+                            ON ScanAction.ScanAction_ID = BaseScanAction_SENSITIVE.ScanAction_ID
+                        WHERE ScanAction.Active_FLG = 1";
+
+            return q;
+        }
+
+        private DaleCategoryDto CreateCategoryResult(SqlDataReader reader)
+        {
+            DaleCategoryDto result = new DaleCategoryDto();
+            result.Category = (!reader.IsDBNull(0)) ? reader.GetString(0) : String.Empty;
+
+            if (!reader.IsDBNull(1))
+            {
+                result.IsSensitive = reader.GetBoolean(1);
+            }
+
+            return result;
         }
 
     }
