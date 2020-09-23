@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-
-
-
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Sentry.data.Core
 {
@@ -18,10 +17,14 @@ namespace Sentry.data.Core
             _daleSearchProvider = daleSearchProvider;
         }
 
-        public List<DaleResultDto> GetSearchResults(DaleSearchDto dto)
+        public DaleResultDto GetSearchResults(DaleSearchDto dtoSearch)
         {
-            List<DaleResultDto> daleResults = _daleSearchProvider.GetSearchResults(dto);
-            return daleResults;
+            DaleResultDto dtoResult = _daleSearchProvider.GetSearchResults(dtoSearch);
+
+            string queryBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtoResult.DaleEvent);
+            _eventService.PublishSuccessEvent("DaleQuery", _userService.GetCurrentUser().AssociateId,"Dale Query Executed", null, queryBlob);
+
+            return dtoResult;
         }
 
         public bool UpdateIsSensitive(List<DaleSensitiveDto> dtos)
