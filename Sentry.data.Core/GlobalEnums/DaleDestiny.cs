@@ -11,6 +11,12 @@ namespace Sentry.data.Core.GlobalEnums
         Column = 1,
 
         [Description("SAID")]
-        SAID = 2
+        SAID = 2,
+
+        [Description("Server")]
+        Server = 3,
+
+        [Description("Database")]
+        Database = 4
     }
 }
