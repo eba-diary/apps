@@ -61,6 +61,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(us.CanCreateReport);
             Assert.IsTrue(us.CanEditDataset);
             Assert.IsTrue(us.CanEditReport);
+            Assert.IsTrue(us.CanManageSchema);
         }
 
         /// <summary>
