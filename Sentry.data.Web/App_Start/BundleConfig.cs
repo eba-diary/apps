@@ -79,6 +79,15 @@ namespace Sentry.data.Web
                         Include("~/Scripts/prettycron.js"));
 
 
+
+            //This bundle contains quill
+            bundles.Add(new ScriptBundle("~/bundles/quill").
+                        //Include("~/Scripts/quill/quill.js").
+                        IncludeDirectory("~/scripts/quill", "*.js", true)
+                        );
+
+
+
             //This bundle contains styles that are used commonly across the site, including bootstrap and jquery plugins
             bundles.Add(new StyleBundle("~/bundles/css/main").
                         Include("~/Content/bootstrap.min.css", new CssRewriteUrlTransform()).
@@ -122,7 +131,10 @@ namespace Sentry.data.Web
                         Include("~/Content/dataflow.css").
                         Include("~/Content/site.css").
                         Include("~/Content/dale.css").
-                        Include("~/Content/jquery.json-viewer.css"));
+                        Include("~/Content/jquery.json-viewer.css").
+                        Include("~/scripts/quill/quill.snow.css").
+                        IncludeDirectory("~/scripts/quill", "*.css", true)
+                        );
 
             /* If you want to see content bundled/minimized when running locally, uncomment the EnableOptimizations 
                line below.  Otherwise, bundling/optimization will be driven by the compilation debug property.

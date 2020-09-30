@@ -14,6 +14,15 @@ data.Notification = {
 
     },
 
+    InitPeterQuill: function () {
+
+        var quill = new Quill('#editor', { theme: 'snow' });
+        var myStuff = quill.root.innerHTML;
+        alert(myStuff);
+        
+
+    },
+
     NotificationTableInit: function ()
     {
         $('#notificationTable tbody').on('click', 'td.details-control', function () {
