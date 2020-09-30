@@ -82,10 +82,8 @@ namespace Sentry.data.Web
 
             //This bundle contains quill
             bundles.Add(new ScriptBundle("~/bundles/quill").
-                        //Include("~/Scripts/quill/quill.js").
-                        IncludeDirectory("~/scripts/quill", "*.js", true)
+                        Include("~/Scripts/quill/quill.js")
                         );
-
 
 
             //This bundle contains styles that are used commonly across the site, including bootstrap and jquery plugins
@@ -132,8 +130,7 @@ namespace Sentry.data.Web
                         Include("~/Content/site.css").
                         Include("~/Content/dale.css").
                         Include("~/Content/jquery.json-viewer.css").
-                        Include("~/scripts/quill/quill.snow.css").
-                        IncludeDirectory("~/scripts/quill", "*.css", true)
+                        Include("~/scripts/quill/quill.snow.css")
                         );
 
             /* If you want to see content bundled/minimized when running locally, uncomment the EnableOptimizations 

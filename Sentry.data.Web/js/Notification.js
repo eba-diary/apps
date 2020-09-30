@@ -17,10 +17,7 @@ data.Notification = {
     InitPeterQuill: function () {
 
         var quill = new Quill('#editor', { theme: 'snow' });
-        var myStuff = quill.root.innerHTML;
-        alert(myStuff);
-        
-
+        var myStuff = quill.root.innerHTML;         //example of getting what will be stored in DB and displayed in popover and email
     },
 
     NotificationTableInit: function ()
