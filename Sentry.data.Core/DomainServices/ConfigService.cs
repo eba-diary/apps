@@ -62,9 +62,7 @@ namespace Sentry.data.Core
             {
                 if (_bucket == null)
                 {
-                    _bucket = _featureFlags.Use_AWS_v2_Configuration_CLA_1488.GetValue()
-                            ? Config.GetHostSetting("AWS2_0RootBucket")
-                            : Config.GetHostSetting("AWSRootBucket");
+                    _bucket = Config.GetHostSetting("AWS2_0RootBucket");
                 }
                 return _bucket;
             }
