@@ -257,6 +257,15 @@ namespace Sentry.data.Core
             }
         }
 
+
+        public List<RetrieverJob> GetDFSRetrieverJobs()
+        {
+            List<RetrieverJob> jobs;
+            jobs = _datasetContext.RetrieverJob.Where(x => x.IsEnabled).ToList();
+            return jobs.Where(x => x.DataSource.Is<DfsBasic>() || x.DataSource.Is<DfsDataFlowBasic>()).ToList();
+        }
+
+
         #region Private Methods
 
         private void MapToCompression(RetrieverJobDto dto, Compression compress)
