@@ -1,6 +1,6 @@
 ﻿namespace Sentry.data.Web.Models.ApiModels.Job
 {
-    public class DFSMonitorModel
+    public class DfsMonitorModel
     {
         public int JobId { get; set; }
       

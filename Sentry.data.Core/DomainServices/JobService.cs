@@ -258,7 +258,7 @@ namespace Sentry.data.Core
         }
 
 
-        public List<RetrieverJob> GetDFSRetrieverJobs()
+        public List<RetrieverJob> GetDfsRetrieverJobs()
         {
             List<RetrieverJob> jobs;
             jobs = _datasetContext.RetrieverJob.Where(x => x.IsEnabled).ToList();

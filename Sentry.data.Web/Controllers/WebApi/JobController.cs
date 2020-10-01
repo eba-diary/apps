@@ -99,17 +99,17 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(List<DFSMonitorModel>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(List<DfsMonitorModel>))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
         [Route("DFSMonitorList")]
-        public IHttpActionResult GetDFSMonitorList()
+        public IHttpActionResult GetDfsMonitorList()
         {
-            List<DFSMonitorModel> model;
+            List<DfsMonitorModel> model;
             try
             {
 
-                model = _jobService.GetDFSRetrieverJobs().ToModel();
+                model = _jobService.GetDfsRetrieverJobs().ToModel();
 
                 return Ok(model);
             }

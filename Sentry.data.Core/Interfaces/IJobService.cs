@@ -31,6 +31,6 @@ namespace Sentry.data.Core
         void CreateDropLocation(RetrieverJob job);
         void DisableJob(int id);
         void DeleteJob(int id);
-        List<RetrieverJob> GetDFSRetrieverJobs();
+        List<RetrieverJob> GetDfsRetrieverJobs();
     }
 }

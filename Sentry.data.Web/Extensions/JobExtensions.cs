@@ -31,13 +31,13 @@ namespace Sentry.data.Web.Extensions
             return (modelList);
         }
 
-        public static List<DFSMonitorModel> ToModel(this List<Core.RetrieverJob> dtoList)
+        public static List<DfsMonitorModel> ToModel(this List<Core.RetrieverJob> dtoList)
         {
-            List<DFSMonitorModel> modelList = new List<DFSMonitorModel>();
+            List<DfsMonitorModel> modelList = new List<DfsMonitorModel>();
 
             foreach (Core.RetrieverJob dto in dtoList)
             {
-                DFSMonitorModel model = new DFSMonitorModel()
+                DfsMonitorModel model = new DfsMonitorModel()
                 {
                     JobId = dto.Id,
                     MonitorTarget = dto.DataSource.CalcRelativeUri(dto).LocalPath
