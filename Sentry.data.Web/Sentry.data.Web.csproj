@@ -316,6 +316,7 @@
     <Compile Include="Controllers\ExternalFileController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\WebApi\BaseWebApiController.cs" />
+    <Compile Include="Controllers\WebApi\DataInventoryController.cs" />
     <Compile Include="Controllers\WebApi\JobController.cs" />
     <Compile Include="Controllers\LayoutController.cs" />
     <Compile Include="Controllers\WebApi\LineageController.cs" />
@@ -378,6 +379,9 @@
     <Compile Include="Helpers\TimeSpanFormattingExtensions.cs" />
     <Compile Include="Helpers\WebCurrentUserIdProvider.cs" />
     <Compile Include="HttpExceptions\NotAuthorizedException.cs" />
+    <Compile Include="Models\ApiModels\Dale\DaleCategoryResultModel.cs" />
+    <Compile Include="Models\ApiModels\Dale\DaleCategory.cs" />
+    <Compile Include="Models\ApiModels\Dale\DaleContainSensitiveResultModel.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetDetailModel.cs" />
     <Compile Include="Models\ApiModels\Config\ConfigInfoModel.cs" />
     <Compile Include="Models\ApiModels\Job\DfsMonitorModel.cs" />
@@ -644,6 +648,7 @@
     <Content Include="Content\toastr.css" />
     <Content Include="Content\toastr.min.css" />
     <Content Include="Images\BusinessAreaTiles\Meeting3.jpg" />
+    <Content Include="Images\Dale\DataInventoryHomePage.jpg" />
     <Content Include="Images\Dale\DataInventoryIcon.png" />
     <Content Include="Images\DataFlow\ConceptTeamwork1.jpg" />
     <Content Include="Images\DataFlow\Conversation12.jpg" />

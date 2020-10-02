@@ -35,6 +35,7 @@ table.dataTable thead .sorting_desc_disabled {
     color: #fff;
     font-size: small;
     font-weight: 700;
+    max-width: 100% !important;
 }
 
 .tooltip.top .tooltip-arrow {
