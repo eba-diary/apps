@@ -431,7 +431,7 @@ namespace Sentry.data.Core
                 HasHeader = dto.HasHeader,
                 FileFormat = _datasetContext.GetById<FileExtension>(dto.FileExtensionId).Name.Trim(),
                 StorageCode = storageCode,
-                HiveDatabase = "Default",
+                HiveDatabase = GenerateHiveDatabaseName(ds.DatasetCategories.First()),
                 HiveTable = ds.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.SchemaName.Replace(" ", "").ToUpper(),
                 HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
                 HiveLocation = RootBucket + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
@@ -737,6 +737,14 @@ namespace Sentry.data.Core
         }
 
         #region PrivateMethods
+        private string GenerateHiveDatabaseName(Category cat)
+        {
+            string curEnv = Config.GetDefaultEnvironmentName().ToLower();
+            string dbName = "dsc_" + cat.Name.ToLower();
+
+            return (curEnv == "prod" || curEnv == "qual") ? dbName : $"{curEnv}_{dbName}";
+        }
+
         private void MarkForDelete(DatasetFileConfig dfc)
         {
             dfc.DeleteInd = true;

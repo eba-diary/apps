@@ -140,6 +140,7 @@
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Dale" />
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Dale\Sprint_20_04_02" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_04_02" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_04_04" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />

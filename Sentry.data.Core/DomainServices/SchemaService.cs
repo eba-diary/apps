@@ -681,8 +681,11 @@ namespace Sentry.data.Core
         }
 
         private string GenerateHiveDatabaseName(Category cat)
-        {            
-            return "dsc_" + cat.Name.ToLower();
+        {
+            string curEnv = Config.GetDefaultEnvironmentName().ToLower();
+            string dbName = "dsc_" + cat.Name.ToLower();
+
+            return (curEnv == "prod" || curEnv == "qual") ? dbName : $"{curEnv}_{dbName}";
         }
 
         private BaseField AddRevisionField(BaseFieldDto row, SchemaRevision CurrentRevision, BaseField parentRow = null, SchemaRevision previousRevision = null)
