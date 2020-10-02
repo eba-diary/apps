@@ -1,22 +1,21 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Sentry.Common.Logging;
+using Sentry.data.Core;
+using Sentry.data.Core.Entities.Livy;
+using Sentry.data.Core.Exceptions;
+using Sentry.data.Web.Extensions;
+using Sentry.data.Web.Models.ApiModels.Job;
+using Sentry.WebAPI.Versioning;
+using Swashbuckle.Swagger.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Web.Http;
-using Sentry.data.Core;
-using System.Text;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Sentry.data.Core.Entities.Livy;
-using Swashbuckle.Swagger.Annotations;
-using Sentry.Common.Logging;
-using System.Web.Http.Description;
-using Sentry.data.Web.Filters.AuthorizationFilters;
-using Sentry.data.Web.Extensions;
-using Sentry.data.Web.Models.ApiModels.Job;
-using Sentry.data.Core.Exceptions;
+using System.Web.Http;
 
 namespace Sentry.data.Web.WebApi.Controllers
 {
@@ -98,6 +97,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(List<DfsMonitorModel>))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
