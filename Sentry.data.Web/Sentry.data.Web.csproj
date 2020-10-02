@@ -380,6 +380,7 @@
     <Compile Include="HttpExceptions\NotAuthorizedException.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetDetailModel.cs" />
     <Compile Include="Models\ApiModels\Config\ConfigInfoModel.cs" />
+    <Compile Include="Models\ApiModels\Job\DfsMonitorModel.cs" />
     <Compile Include="Models\ApiModels\Job\JobHistoryModel.cs" />
     <Compile Include="Models\ApiModels\Job\SubmissionDetailModel.cs" />
     <Compile Include="Models\ApiModels\Job\SubmissionModel.cs" />
