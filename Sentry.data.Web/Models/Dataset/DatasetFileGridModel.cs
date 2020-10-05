@@ -44,20 +44,20 @@ namespace Sentry.data.Web
             get
             {
                 string href = "";
-                Boolean correctFileTypeForPreview = (Path.GetExtension(Name).Contains("csv") || Path.GetExtension(Name).Contains("txt") || Path.GetExtension(Name).Contains("json"));
+                //Boolean correctFileTypeForPreview = (Path.GetExtension(Name).Contains("csv") || Path.GetExtension(Name).Contains("txt") || Path.GetExtension(Name).Contains("json"));
 
-                if (CanPreviewDataset && correctFileTypeForPreview)
-                {
-                    href += "<a href = \"#\" onclick=\"data.Dataset.PreviewDatafileModal(" + Id + ")\" class=\"table-row-icon row-filepreview-icon\" title=\"Preview file\"><i class='glyphicon glyphicon-search text-primary'></i></a>";
-                }
-                else if (!correctFileTypeForPreview)
-                {
-                    href += "<a disabled class=\"table-row-icon row-filepreview-icon disabled\" title=\"Not available for this file type.\"><i class='glyphicon glyphicon-search text-primary disabled' style='color:gray;'></i></a>";
-                }
-                else
-                {
-                    href += "<a disabled class=\"table-row-icon row-filepreview-icon disabled\" title=\"This operation is not available.\"><i class='glyphicon glyphicon-search text-primary disabled' style='color:gray;'></i></a>";
-                }
+                //if (CanPreviewDataset && correctFileTypeForPreview)
+                //{
+                //    href += "<a href = \"#\" onclick=\"data.Dataset.PreviewDatafileModal(" + Id + ")\" class=\"table-row-icon row-filepreview-icon\" title=\"Preview file\"><i class='glyphicon glyphicon-search text-primary'></i></a>";
+                //}
+                //else if (!correctFileTypeForPreview)
+                //{
+                //    href += "<a disabled class=\"table-row-icon row-filepreview-icon disabled\" title=\"Not available for this file type.\"><i class='glyphicon glyphicon-search text-primary disabled' style='color:gray;'></i></a>";
+                //}
+                //else
+                //{
+                //    href += "<a disabled class=\"table-row-icon row-filepreview-icon disabled\" title=\"This operation is not available.\"><i class='glyphicon glyphicon-search text-primary disabled' style='color:gray;'></i></a>";
+                //}
 
                 if (CanViewFullDataset)
                 {
