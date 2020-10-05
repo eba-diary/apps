@@ -56,8 +56,6 @@
         text-decoration: none;
     }
 
-
-
 /* datasets */
 .bg-photo-ds {
     background-image: url('/Images/photo-datasets.jpg');
@@ -88,3 +86,24 @@
         color: #bb85ab;
         text-decoration: none;
     }
+
+/* data inventory */
+.bg-photo-di {
+    background-image: url('/Images/Dale/DataInventoryHomePage.jpg');
+    background-position: 55% 10%;
+    background-size: cover;
+}
+
+.home-tile-link-di {
+    text-decoration: none;
+    color: #74531C;
+}
+
+    .home-tile-link-di:hover {
+        color: #74531C;
+        text-decoration: none;
+    }
+
+.border-btm-yellow {
+    border-bottom: 4px solid #EAAA00;
+}

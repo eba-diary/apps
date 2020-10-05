@@ -30,5 +30,24 @@ namespace Sentry.data.Web.Extensions
 
             return (modelList);
         }
+
+        public static List<DfsMonitorModel> ToModel(this List<Core.RetrieverJob> dtoList)
+        {
+            List<DfsMonitorModel> modelList = new List<DfsMonitorModel>();
+
+            foreach (Core.RetrieverJob dto in dtoList)
+            {
+                DfsMonitorModel model = new DfsMonitorModel()
+                {
+                    JobId = dto.Id,
+                    MonitorTarget = dto.DataSource.CalcRelativeUri(dto).LocalPath
+                };
+                
+                modelList.Add(model);
+            }
+
+            return (modelList);
+        }
+        
     }
 }
