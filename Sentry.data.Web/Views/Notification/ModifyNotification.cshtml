@@ -20,7 +20,7 @@ else
 
 <hr />
 
-@using (Html.BeginForm("SubmitNotification", "Notification", FormMethod.Post))
+@using (Html.BeginForm("SubmitNotification", "Notification", FormMethod.Post,htmlAttributes: new { @class = "notificationForm" }))
 {
     @Html.AntiForgeryToken()
     @Html.HiddenFor(m => m.CreateUser)
@@ -76,6 +76,9 @@ else
                 <div id="editor">
                     @Model.Message
                 </div>
+
+
+                @Html.TextAreaFor((model) => model.Message,htmlAttributes: new { @class = "messageMe" })
             </div>
         </div>
         <div class="form-group">
@@ -84,7 +87,7 @@ else
         <br />
         <div class="form-group">
             <div>
-                <input type="submit" value="Submit" class="btn btn-primary" />
+                <input value="Submit" class="btn btn-primary" onclick="data.Notification.SubmitPeterQuill() "/>
                 <a class="btn btn-warning" href="/Notification/ManageNotification">Cancel</a>
             </div>
 

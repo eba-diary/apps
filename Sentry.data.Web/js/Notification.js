@@ -4,6 +4,8 @@
 
 data.Notification = {
 
+    Quill: null,
+
     Init: function () {
         data.Notification.NotificationTableInit();
 
@@ -16,8 +18,17 @@ data.Notification = {
 
     InitPeterQuill: function () {
 
-        var quill = new Quill('#editor', { theme: 'snow' });
+        data.Notification.Quill = new Quill('#editor', { theme: 'snow' });
         var myStuff = quill.root.innerHTML;         //example of getting what will be stored in DB and displayed in popover and email
+    },
+
+    SubmitPeterQuill: function () {
+
+
+        var myStuff = data.Notification.Quill.root.innerHTML;         //example of getting what will be stored in DB and displayed in popover and email
+        var myStuffEncoded = $("<div/>").text(myStuff).html(); 
+        $('.messageMe').val(myStuffEncoded);
+        $('.notificationForm').submit();
     },
 
     NotificationTableInit: function ()
