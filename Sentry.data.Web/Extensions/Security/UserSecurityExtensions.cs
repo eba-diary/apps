@@ -19,7 +19,8 @@ namespace Sentry.data.Web
                 CanEditDataSource = core.CanEditDataSource,
                 CanCreateDataSource = core.CanCreateDataSource,
                 CanUseDataSource = core.CanUseDataSource,
-                ShowAdminControls = core.ShowAdminControls
+                ShowAdminControls = core.ShowAdminControls,
+                CanManageSchema = core.CanManageSchema
             };
         }
 

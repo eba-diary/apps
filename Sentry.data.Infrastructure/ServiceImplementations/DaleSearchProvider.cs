@@ -24,14 +24,6 @@ namespace Sentry.data.Infrastructure
                 Sensitive = dto.Sensitive.GetDescription()
             };
 
-            //make sure incoming criteria is valid, or return empty results
-            if (!IsCriteriaValid(dto))
-            {
-                daleResult.DaleEvent.QueryErrorMessage = "Invalid Criteria.  No Query executed.";
-                daleResult.DaleEvent.QuerySuccess = false;
-                return daleResult;
-            }
-
             string connectionString = Configuration.Config.GetHostSetting("DaleConnectionString");
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -165,27 +157,6 @@ namespace Sentry.data.Infrastructure
             return qWhereStatement;
         }
 
-        private bool IsCriteriaValid(DaleSearchDto dto)
-        {
-            if (dto.Sensitive == DaleSensitive.SensitiveOnly)
-            {
-                return true;
-            }
-
-            //validate for white space only, null, empty string in criteria
-            if (String.IsNullOrWhiteSpace(dto.Criteria))
-            {
-                return false;
-            }
-
-            //validate to ensure valid destination
-            if ( (dto.Destiny != DaleDestiny.Object) && (dto.Destiny != DaleDestiny.Column) && (dto.Destiny != DaleDestiny.SAID) )
-            {
-                return false;
-            }
-            return true;
-        }
-
         private DaleResultRowDto CreateDaleResultRow(SqlDataReader reader)
         {
             DaleResultRowDto result = new DaleResultRowDto();
@@ -242,5 +213,176 @@ namespace Sentry.data.Infrastructure
 
             return result;
         }
+
+        public DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dto)
+        {
+            DaleContainSensitiveResultDto daleResult = new DaleContainSensitiveResultDto();
+            daleResult.DoesContainSensitiveResults = false;
+
+            daleResult.DaleEvent = new DaleEventDto()
+            {
+                Criteria = dto.Criteria,
+                Destiny = dto.Destiny.GetDescription(),
+                QuerySuccess = true,
+                Sensitive = dto.Sensitive.GetDescription()
+            };
+
+            string connectionString = Configuration.Config.GetHostSetting("DaleConnectionString");
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
+
+                string q = BuildDoesContainSensitiveQuery(dto);
+                SqlCommand command = new SqlCommand(q, connection);
+                command.CommandTimeout = 0;
+
+                command.Parameters.AddWithValue("@Criteria", System.Data.SqlDbType.VarChar);
+                command.Parameters["@Criteria"].Value =  dto.Criteria;
+
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        daleResult.DoesContainSensitiveResults = true;
+                    }
+
+                    reader.Close();
+                }
+                catch (Exception ex)
+                {
+                    string daleMessage = "Dale Failed!!  Query: " + q;
+                    daleResult.DaleEvent.QuerySuccess = false;
+                    daleResult.DaleEvent.QueryErrorMessage = daleMessage + " " + ex.Message;
+                    Logger.Fatal(daleMessage, ex);
+                }
+
+                stopWatch.Stop();
+                TimeSpan ts = stopWatch.Elapsed;
+                daleResult.DaleEvent.QuerySeconds = ts.Seconds;
+                Logger.Info("DaleSearchProvider.DoesItemContainSensitive()  Elapsed Seconds:" + ts.Seconds + " Query:" + q);
+            }
+
+            return daleResult;
+        }
+
+        private string BuildDoesContainSensitiveQuery(DaleSearchDto dto)
+        {
+            string q = String.Empty;
+            string qSelect = "SELECT TOP 1 * ";
+            string qFrom = " FROM Column_v ";
+            string qWhereStatement = " WHERE Expiration_DTM IS NULL AND IsSensitive_FLG = 1 ";
+            string qColumnToFilter = String.Empty;
+
+            if (dto.Destiny == DaleDestiny.SAID)
+            {
+                qColumnToFilter = " Asset_CDE ";
+            }
+            else if (dto.Destiny == DaleDestiny.Server)
+            {
+                qColumnToFilter = " Server_NME ";
+            }
+            else
+            {
+                qColumnToFilter = " Database_NME ";
+            }
+
+            q = qSelect + qFrom + qWhereStatement + " AND " + qColumnToFilter + "= @Criteria";
+            q = "IF EXISTS ( " + q + " ) SELECT 1 AS TESTME";
+
+            return q;
+        }
+
+        public DaleCategoryResultDto GetCategoriesByAsset(string search)
+        {
+            DaleCategoryResultDto daleResult = new DaleCategoryResultDto();
+            daleResult.DaleCategories = new List<DaleCategoryDto>();
+
+            daleResult.DaleEvent = new DaleEventDto()
+            {
+                Criteria = search,
+                QuerySuccess = true
+            };
+
+            string connectionString = Configuration.Config.GetHostSetting("DaleConnectionString");
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
+
+                string q = BuildGetCategoriesByAssetQuery();
+                SqlCommand command = new SqlCommand(q, connection);
+                command.CommandTimeout = 0;
+
+                command.Parameters.AddWithValue("@Criteria", System.Data.SqlDbType.VarChar);
+                command.Parameters["@Criteria"].Value = search;
+
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        daleResult.DaleCategories.Add(CreateCategoryResult(reader));
+
+                    }
+
+                    reader.Close();
+                }
+                catch (Exception ex)
+                {
+                    string daleMessage = "Dale Failed!!  Query: " + q;
+                    daleResult.DaleEvent.QuerySuccess = false;
+                    daleResult.DaleEvent.QueryErrorMessage = daleMessage + " " + ex.Message;
+                    Logger.Fatal(daleMessage, ex);
+                }
+
+                stopWatch.Stop();
+                TimeSpan ts = stopWatch.Elapsed;
+                daleResult.DaleEvent.QuerySeconds = ts.Seconds;
+                Logger.Info("DaleSearchProvider.GetCategoriesByAsset()  Elapsed Seconds:" + ts.Seconds + " Query:" + q);
+            }
+
+            return daleResult;
+        }
+
+        private string BuildGetCategoriesByAssetQuery()
+        {
+            string q = @"SELECT ScanAction.Alert_NME, CASE WHEN BaseScanAction_SENSITIVE.ScanAction_ID IS NOT NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS IsSensitive_FLG 
+                        FROM ScanAction ScanAction
+                        LEFT JOIN
+                        (
+                            SELECT BaseScanAction.ScanAction_ID
+                            FROM BaseScanAction BaseScanAction
+                            JOIN Column_v Column_v
+                                ON BaseScanAction.Base_ID = Column_v.BaseColumn_ID
+                            WHERE Sensitive_FLG = 1
+                                    AND Column_v.Expiration_DTM IS NULL
+                                    AND Column_v.Asset_CDE = @Criteria
+                            GROUP BY ScanAction_ID
+                        ) AS BaseScanAction_SENSITIVE
+                            ON ScanAction.ScanAction_ID = BaseScanAction_SENSITIVE.ScanAction_ID
+                        WHERE ScanAction.Active_FLG = 1";
+
+            return q;
+        }
+
+        private DaleCategoryDto CreateCategoryResult(SqlDataReader reader)
+        {
+            DaleCategoryDto result = new DaleCategoryDto();
+            result.Category = (!reader.IsDBNull(0)) ? reader.GetString(0) : String.Empty;
+
+            if (!reader.IsDBNull(1))
+            {
+                result.IsSensitive = reader.GetBoolean(1);
+            }
+
+            return result;
+        }
+
     }
 }
