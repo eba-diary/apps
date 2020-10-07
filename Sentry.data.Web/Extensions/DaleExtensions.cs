@@ -58,8 +58,41 @@ namespace Sentry.data.Web
             };
         }
 
+        public static DaleContainSensitiveResultModel ToWeb(this DaleContainSensitiveResultDto dto)
+        {
+            return new DaleContainSensitiveResultModel()
+            {
+                DoesContainSensitiveResults = dto.DoesContainSensitiveResults,
+                DaleEvent = dto.DaleEvent
+            };
+        }
 
+        public static DaleCategoryResultModel ToWeb(this DaleCategoryResultDto dto)
+        {
+            return new DaleCategoryResultModel()
+            {
+                DaleCategories = dto.DaleCategories.ToWeb(),
+                DaleEvent = dto.DaleEvent
+            };
+        }
 
+        public static List<DaleCategoryModel> ToWeb(this List<DaleCategoryDto> dtos)
+        {
+            List<DaleCategoryModel> models = new List<DaleCategoryModel>();
+
+            dtos.ForEach(x => models.Add(x.ToWeb()));
+
+            return models;
+        }
+
+        public static DaleCategoryModel ToWeb(this DaleCategoryDto dto)
+        {
+            return new DaleCategoryModel()
+            {
+                Category = dto.Category,
+                IsSensitive = dto.IsSensitive
+            };
+        }
 
         public static List<DaleResultRowModel> ToWeb(this List<DaleResultRowDto> dtos)
         {
@@ -72,17 +105,25 @@ namespace Sentry.data.Web
 
         public static DaleDestiny ToDaleDestiny(this string destiny)
         {
-            if (destiny == DaleDestiny.Column.GetDescription())
+            if (destiny.ToUpper() == DaleDestiny.Column.GetDescription().ToUpper())
             {
                 return DaleDestiny.Column;
             }
-            else if (destiny == DaleDestiny.Object.GetDescription())
+            else if (destiny.ToUpper() == DaleDestiny.Object.GetDescription().ToUpper())
             {
                 return DaleDestiny.Object;
             }
-            else
+            else if(destiny.ToUpper() == DaleDestiny.SAID.GetDescription().ToUpper())
             {
                 return DaleDestiny.SAID;
+            }
+            else if (destiny.ToUpper() == DaleDestiny.Server.GetDescription().ToUpper())
+            {
+                return DaleDestiny.Server;
+            }
+            else 
+            {
+                return DaleDestiny.Database;
             }
         }
 

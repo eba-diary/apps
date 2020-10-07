@@ -80,7 +80,8 @@ namespace Sentry.data.Core
                 CanCreateReport = user.CanManageReports || IsAdmin,
                 CanEditDataSource = (user.CanModifyDataset && IsOwner) || IsAdmin,
                 CanCreateDataSource = user.CanModifyDataset || IsAdmin,
-                ShowAdminControls = IsAdmin
+                ShowAdminControls = IsAdmin,
+                CanManageSchema = user.CanModifyDataset || IsOwner || IsAdmin
             };
 
             //if it is not secure, it should be wide open except for upload and notifications. call everything out for visibility.
@@ -128,6 +129,7 @@ namespace Sentry.data.Core
             us.CanUploadToDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_UPLOAD_TO_DATASET) || IsOwner || IsAdmin;
             us.CanModifyNotifications = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MODIFY_NOTIFICATIONS) || IsOwner || IsAdmin;
             us.CanUseDataSource = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_USE_DATA_SOURCE) || IsOwner || IsAdmin;
+            us.CanManageSchema = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin;
 
             return us;
         }
