@@ -28,8 +28,8 @@
             <div class="form-group col-md-12">
                 <br />
                 @*@Html.LabelFor(model => model.IngestionType, htmlAttributes: new { @class = "control-label col-md-2" })*@
-                <div class="col-md-5"><h4>How Will The Data be Sent to Us?</h4></div>
-                <div class="col-md-4">
+                <div class="col-md-5"><h4>How Will The Data be Sent to Us?</h4>    </div>
+                <div class="col-md-4" data-toggle="tooltip" data-placement="right" title="Will your process send a file to DSC (User_Push)? Or will DSC need to pick up the file from an external location (DSC_Pull)?">
                     @*@Html.EditorFor(m => m.IngestionType)*@
                     @Html.EnumDropDownListFor(
                         x => x.IngestionType,
@@ -52,7 +52,7 @@
                 @*@Html.HiddenFor(model => model.IsCompressed)*@
                 <div class="form-group col-md-12">
                     <div class="col-md-5"><h4>Is Your Incoming Data Compressed?</h4></div>
-                    <div class="col-md-1">
+                    <div class="col-md-1" data-toggle="tooltip" data-placement="right" title="Yes, if the file ends in .zip or .gzip.">
                         @Html.DropDownListFor((m) => m.IsCompressed, Model.CompressionDropdown, new { @class = "form-control edit-dataset-row" })
                     </div>
                 </div>
@@ -81,7 +81,7 @@
             <div class="preProcessingPanel" style="display:none;">
                 <div class="form-group col-md-12">
                     <div class="col-md-5"><h4>Does Your Data Require Preprocessing?</h4></div>
-                    <div class="col-md-1">
+                    <div class="col-md-1" data-toggle="tooltip" data-placement="right" title="Yes, if the file has a unique delimiter ( ex. ||, ^ ), a non-standard file encoding (ex. combine 1252 and UTF-8), or a heavily nested .json layout.">
                         @Html.DropDownListFor((m) => m.IsPreProcessingRequired, Model.PreProcessingRequiredDropdown, new { @class = "form-control edit-dataset-row" })
                     </div>
                 </div>
@@ -102,7 +102,7 @@
                 </div>
             </div>
             <br />
-            <div class="schemaMapPanel" style="display:none;">
+            <div class="schemaMapPanel" style="display:none;" >
                 <div class="form-group col-md-12">
                     <div class="col-md-5"><h4>Where Do You Want The Data to Go?</h4></div>
                     @*@Html.LabelFor(model => model.SchemaMaps, htmlAttributes: new { @class = "control-label col-md-2" })*@

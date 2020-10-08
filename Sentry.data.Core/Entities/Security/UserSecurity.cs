@@ -28,5 +28,6 @@ namespace Sentry.data.Core
         public bool CanCreateDataSource { get; set; }
 
         public bool ShowAdminControls { get; set; }
+        public bool CanManageSchema { get; set; }
     }
 }

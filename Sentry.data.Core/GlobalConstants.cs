@@ -165,6 +165,7 @@
             public const string CAN_UPLOAD_TO_DATASET = "CanUploadToDataset";
             public const string CAN_MODIFY_NOTIFICATIONS = "CanModifyNotification";
             public const string CAN_USE_DATA_SOURCE = "CanUseDataSource";
+            public const string CAN_MANAGE_SCHEMA = "CanManageSchema";
 
             public const string USE_APP = "UseApp";
 

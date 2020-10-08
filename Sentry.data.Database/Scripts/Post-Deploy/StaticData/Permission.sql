@@ -10,6 +10,7 @@
 									(5, 'CanUseDataSource', 'Use Data Source', 'Access to use Data Source', 'DataSource'),
 									(6, 'CanModifyNotification', 'Modify Notifications', 'Access to modify notifications for Data.sentry.com', 'DataAsset'),
 									(7, 'CanModifyNotification', 'Modify Notifications', 'Access to modify notifications for Data.sentry.com', 'BusinessArea')
+									--(8, 'CanManageSchema', 'Manage Schema', 'Access to manage schema within dataset', 'Dataset')		--per Jered, uncomment later when API work is complete to use permission
 									
 									--(7, 'CanConnectToDataset', 'Connect to Dataset', 'Access to connect to dataset using business intelligence tools', 'Dataset'),
 									--(enter id here, 'CanConnectToDataset', 'Connect to Dataset', 'Access to connect to dataset using business intelligence tools', 'Dataset'),

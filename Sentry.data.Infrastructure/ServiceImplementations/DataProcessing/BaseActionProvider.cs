@@ -5,12 +5,14 @@ using Sentry.data.Core.Interfaces.DataProcessing;
 using Sentry.data.Infrastructure.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sentry.data.Infrastructure
 {
     public abstract class BaseActionProvider : IBaseActionProvider
     {
         private readonly IDataFlowService _dataFlowService;
+        private static Random random = new Random();
 
         public BaseActionProvider(IDataFlowService dataFlowService)
         {
@@ -50,6 +52,13 @@ namespace Sentry.data.Infrastructure
                 targets.Add(target);
             }
             stepEvent.DownstreamTargets = targets;
+        }
+
+        protected static string RandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
 }
