@@ -54,13 +54,9 @@ namespace Sentry.data.Web.Controllers
         {
             get
             {
-#pragma warning disable S3240 // The simplest possible condition syntax should be used
                 if (_bucket == null)
-#pragma warning restore S3240 // The simplest possible condition syntax should be used
                 {
-                    _bucket = _featureFlags.Use_AWS_v2_Configuration_CLA_1488.GetValue()
-                        ? Config.GetHostSetting("AWS2_0RootBucket")
-                        : Config.GetHostSetting("AWSRootBucket");
+                    _bucket = Config.GetHostSetting("AWS2_0RootBucket");
                 }
                 return _bucket;
             }
@@ -72,9 +68,7 @@ namespace Sentry.data.Web.Controllers
             {
                 if (_awsRegion == null)
                 {
-                    _awsRegion = _featureFlags.Use_AWS_v2_Configuration_CLA_1488.GetValue()
-                            ? Config.GetHostSetting("AWS2_0Region")
-                            : Config.GetHostSetting("AWSRegion");
+                    _awsRegion = Config.GetHostSetting("AWS2_0Region");
                 }
                 return _awsRegion;
             }

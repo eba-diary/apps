@@ -23,11 +23,7 @@ namespace Sentry.data.Web
             {
                 if (_isAwsConfigSet == null)
                 {
-                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                    {
-                        IDataFeatures featureFlags = container.GetInstance<IDataFeatures>();
-                        _aws_v2 = featureFlags.Use_AWS_v2_Configuration_CLA_1488.GetValue();
-                    }
+                    _aws_v2 = true;
                     _isAwsConfigSet = "true";
                 }
                 return _aws_v2;
