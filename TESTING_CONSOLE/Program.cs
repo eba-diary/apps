@@ -1,156 +1,134 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.Win32;
 using Sentry.Common.Logging;
 using Sentry.Configuration;
-using System.Linq;
-using System.Text;
 using Sentry.data.Infrastructure;
-using StructureMap;
-using Amazon.Lambda;
-using Amazon;
-using Amazon.Lambda.Model;
-using Sentry.data.Core;
-using Sentry.data.Core.Entities.S3;
-using Newtonsoft.Json;
+using System;
+using System.Data.Odbc;
+using System.Text;
 
 namespace TESTING_CONSOLE
 {
     public class Class1
     {
-        private static IAmazonLambda _lambdaClient = null;
-
         static void Main(string[] args)
         {
-            Logger.LoggingFrameworkAdapter = new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("AppLogger"));
+            //Logger.LoggingFrameworkAdapter = new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("AppLogger"));
 
             Logger.Info("Starting TESTING_CONSOLE");
             //Call your bootstrapper to initialize your application
-            Bootstrapper.Init();
+            //Bootstrapper.Init();
 
-            //create an IOC (structuremap) container to wrap this transaction
-            using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+            var conn = new OdbcConnection
             {
-                //    var service = container.GetInstance<MyService>();
-                //    var result = service.DoWork();
-                //    container.GetInstance<ITESTING_CONSOLEContext>.SaveChanges();
-                AmazonLambdaConfig ldConfig = new AmazonLambdaConfig();
-                ldConfig.RegionEndpoint = RegionEndpoint.GetBySystemName(Config.GetHostSetting("AWSRegion"));
-                //if (!String.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyHost")))
+                //ConnectionString = @"Driver={Cloudera ODBC Driver for Apache Hive};  
+                //                        ServiceDiscoveryMode=1;
+                //                        Host=awe-q-apspml-01:2181,awe-q-apspml-02:2181,awe-q-apspml-03:2181;
+                //                        ZKNamespace=hiveserver2;"
+                //AuthenticationError
+
+                //ConnectionString = @"Driver={Cloudera ODBC Driver for Apache Hive};  
+                //                        ServiceDiscoveryMode=1;
+                //                        Host=awe-q-apspml-01:2181,awe-q-apspml-02:2181,awe-q-apspml-03:2181;
+                //                        ZKNamespace=hiveserver2;"
+
+                //ConnectionString = @"Driver={Cloudera ODBC Driver for Apache Hive};
+                //                        ServiceDiscoveryMode=1;
+                //                        Host=awe-q-apspml-02.sentry.com:2181;
+                //                        ZKNamespace=hive"
+
+                //ConnectionString = @"Driver={Cloudera ODBC Driver for Apache Hive};
+                //                        DSN=DSCQUAL_Sentry;"
+
+                //ConnectionString = @"DSN=DSCQUAL_Sentry;"
+
+                ConnectionString = @"Driver={Cloudera ODBC Driver for Apache Hive};
+                                        ServiceDiscoveryMode=1;
+                                        ZKNamespace=hiveserver2;
+                                        Host=awe-q-apspml-02.sentry.com:2181;
+                                        AuthMech=1;
+                                        KrbHostFQDN=_HOST;
+                                        KrbServiceName=hive;"
+            };
+
+            try
+            {
+
+                ///// <summary>
+                ///// Gets the ODBC driver names from the registry.
+                ///// </summary>
+                ///// <returns>a string array containing the ODBC driver names, if the registry key is present; null, otherwise.</returns>
+                //string[] odbcDriverNames = null;
+                //using (RegistryKey localMachineHive = Registry.LocalMachine)
+                //using (RegistryKey odbcDriversKey = localMachineHive.OpenSubKey(@"SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers"))
                 //{
-                //    ldConfig.ProxyHost = Config.GetHostSetting("SentryS3ProxyHost");
-                //    ldConfig.ProxyPort = int.Parse(Config.GetSetting("SentryS3ProxyPort"));
-                //}
-                ldConfig.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
-                string awsAccessKey = Config.GetHostSetting("AWSAccessKey");
-                string awsSecretKey = Config.GetHostSetting("AWSSecretKey");
-
-                _lambdaClient = new AmazonLambdaClient(awsAccessKey, awsSecretKey, ldConfig);
-
-
-                GetFunctionRequest req = new GetFunctionRequest()
-                {
-                    FunctionName = "dataset-preview-np"
-                };
-
-                ////Mock for testing... sent mock s3object created 
-                //S3LamdaEvent s3e = new S3LamdaEvent()
-                //{
-                //    Records = new List<S3ObjectEvent>()
+                //    if (odbcDriversKey != null)
                 //    {
-                //        new S3ObjectEvent()
-                //        {
-                //            eventName = "ObjectCreated:Put",
-                //            s3 = new S3()
-                //            {
-                //                bucket = new Bucket()
-                //                {
-                //                    name = "sentry-dataset-management-np-nr"
-                //                },
-                //                _object = new Sentry.data.Core.Entities.S3.Object()
-                //                {
-                //                    key = $"data-dev/0020001/2018/5/24/20180524_area_titles_A19E0536EC6.csv"
-                //                }
-                //            }
-                //        }
+                //        odbcDriverNames = odbcDriversKey.GetValueNames();
                 //    }
-                //};
+                //}
 
-                //Mock for testing... sent mock s3object created 
-                S3LamdaEvent s3e = new S3LamdaEvent()
+                //foreach (string ODBCDriver in odbcDriverNames)
+                //{
+                //    Console.WriteLine(ODBCDriver);
+                //}
+
+
+
+                conn.Open();
+                var adp = new OdbcDataAdapter("select * from dsc_sentry.dsctesting_csvtest limit 2",conn);
+                var ds = new System.Data.DataSet();
+                adp.Fill(ds);
+
+                foreach (var table in ds.Tables)
                 {
-                    Records = new List<S3ObjectEvent>()
+                    var dataTable = table as System.Data.DataTable;
+
+                    if (dataTable == null)
+                        continue;
+
+                    var dataRows = dataTable.Rows;
+
+                    if (dataRows == null)
+                        continue;
+
+                    //log.Info("Records found " + dataTable.Rows.Count);
+                    Console.WriteLine("Records found " + dataTable.Rows.Count);
+                    int rowCnt = 1;
+                    int columns = dataTable.Columns.Count;
+
+                    foreach (var row in dataRows)
                     {
-                        new S3ObjectEvent()
+                        var dataRow = row as System.Data.DataRow;
+
+                        StringBuilder sb = new StringBuilder();
+
+                        sb.AppendLine($"*** Row {rowCnt++.ToString()} Data ***");
+
+                        for (int i = 0; i < columns - 1; i++)
                         {
-                            eventName = "ObjectCreated:Put",
-                            s3 = new S3()
-                            {
-                                bucket = new Bucket()
-                                {
-                                    name = "sentry-dataset-management-np"
-                                },
-                                Object = new Sentry.data.Core.Entities.S3.Object()
-                                {
-                                    key = $"data-dev/sentry/customeronelinking/184/2017/7/27/CustomerOneAccountLinking.csv"
-                                }
-                            }
+                            sb.AppendLine($"{dataTable.Columns[i].ColumnName}:{dataRow[i].ToString()}");
                         }
+
+                        if (dataRow == null)
+                            continue;
+
+                        Console.WriteLine(sb.ToString());
+
+                        //log.Info(dataRow[0].ToString() + " " + dataRow[1].ToString());
                     }
-                };
-
-                InvokeRequest invokeReq = new InvokeRequest()
-                {
-                    FunctionName = "dataset-preview-np",
-                    InvocationType = "RequestResponse",
-                    LogType = "Tail",
-                    Payload = JsonConvert.SerializeObject(s3e)
-                };
-
-                try
-                {
-                    //GetFunctionResponse resp = _lambdaClient.GetFunction(req);
-
-
-
-
-                    InvokeResponse resp = _lambdaClient.Invoke(invokeReq);
-                    var logresult = Encoding.UTF8.GetString(Convert.FromBase64String(resp.LogResult));
-                    var payload = Encoding.UTF8.GetString(resp.Payload.ToArray());
-                    Console.WriteLine(logresult);
-                    Console.WriteLine(payload);
-
-                    Logger.Info($"Lambda Log Result: {logresult}");
-                    Logger.Info($"Lambda Payload: {payload}");
-
-
                 }
-                catch (InvalidParameterValueException paramEx)
-                {
-                    Logger.Error("One of the parameters in the request is invalid.", paramEx);
-                }
-                catch (ResourceNotFoundException resourceEx)
-                {
-                    Logger.Error("The resource specified in the request does not exist.", resourceEx);
-                }
-                catch (ServiceException serviceEx)
-                {
-                    Logger.Error("The AWS Lambda service encountered an internal error.", serviceEx);
-                }
-                catch (TooManyRequestsException requestLimitEx)
-                {
-                    Logger.Error("The request throughput limit was exceeded.", requestLimitEx);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("The request throughput limit was exceeded.", ex);
-                }
-                
-
-
-                //provider.ExecuteDependenciesAsync("sentry-dataset-management-np-nr", "data/17/TestFile.csv");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            finally
+            {
+                conn.Close();
             }
 
-            Logger.Info("Console App completed successfully.");
+
+            //Logger.Info("Console App completed successfully.");
         }
     }
 }

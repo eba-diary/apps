@@ -248,22 +248,22 @@
                         <div class="row" style="min-height: 60px;">
                             <div class="col-lg-6">
                                 <h5 class="@color">Last Activity Date</h5>
-                                <h6 class="@color">@Model.ChangedDtm.ToString("MMMM d, yyyy")</h6>
+                                <p>@Model.ChangedDtm.ToString("MMMM d, yyyy")</p>
                             </div>
                             <div class="col-lg-6">
                                 <h5 class="@color">Date Created</h5>
-                                <h6 class="@color">@Model.DatasetDtm.ToString("MMMM d, yyyy")</h6>
+                                <p>@Model.DatasetDtm.ToString("MMMM d, yyyy")</p>
                             </div>
                         </div>
                         <hr />
                         <div class="row">
                             <div class="col-lg-6">
                                 <h5 class="@color">Owner</h5>
-                                <h6 class="@color">@Model.PrimaryOwnerName</h6>
+                                <p>@Model.PrimaryOwnerName</p>
                             </div>
                             <div class="col-lg-6">
                                 <h5 class="@color">Contact</h5>
-                                <h6 class="@color"><a href="@mailTo">@Model.PrimaryContactName</a></h6>
+                                <p><a href="@mailTo">@Model.PrimaryContactName</a></p>
                             </div>
                         </div>
                         <hr />
@@ -271,7 +271,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <h5 class="@color">Data Classification</h5>
-                                <h6 class="@color">@Model.DataClassificationDescription</h6>
+                                <p>@Model.DataClassificationDescription</p>
                             </div>
                         </div>
                         <hr />
@@ -279,11 +279,11 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <h5 class="@color">Dataset Views</h5>
-                                <h6 class="@color" style="font-feature-settings: 'lnum';">@Model.Views</h6>
+                                <p style="font-feature-settings: 'lnum';">@Model.Views</p>
                             </div>
                             <div class="col-lg-6">
                                 <h5 class="@color">Dataset Downloads</h5>
-                                <h6 class="@color" style="font-feature-settings: 'lnum';">@Model.Downloads</h6>
+                                <p style="font-feature-settings: 'lnum';">@Model.Downloads</p>
                             </div>
                         </div>
 
@@ -312,14 +312,14 @@
                         <div class="row" style="margin-bottom:15px;">
                             <div class="col-lg-6">
                                 <h5 class="@color">Data</h5>
-                                <h6 class="@color" data-bind="text: DataLastUpdated"></h6>
+                                <p data-bind="text: DataLastUpdated"></p>
                                 <p id="dataLastUpdatedSpinner" class="mini-sentry-spinner-container sentry-spinner-container">
                                     <span class="sentry-spinner" style="background-size: 25px 25px; margin-left: 290px;"></span>
                                 </p>
                             </div>
                             <div class="col-lg-6">
                                 <h5 class="@color">Metadata</h5>
-                                <h6 class="@color" data-bind="text: MetadataLastDT"></h6>
+                                <p data-bind="text: MetadataLastDT"></p>
                                 <p id="sessionSpinner" class="mini-sentry-spinner-container sentry-spinner-container">
                                     <span class="sentry-spinner" style="background-size: 25px 25px; margin-left: 290px;"></span>
                                 </p>
@@ -336,11 +336,31 @@
                         <div class="row" data-bind="visible: SchemaRows().length > 0">
                             <div class="col-lg-6">
                                 <h5 class="@color">Rows</h5>
-                                <h6 class="@color" id="rowCount" data-bind="text: RowCount"></h6>
+                                <p id="rowCount" data-bind="text: RowCount"></p>
                             </div>
                             <div class="col-lg-6">
                                 <h5 class="@color">Columns</h5>
-                                <h6 class="@color" data-bind="text: SchemaRows().length"></h6>
+                                <p data-bind="text: SchemaRows().length"></p>
+                            </div>
+                        </div>
+
+                        <div class="row" data-bind="visible: SchemaRows().length > 0">
+                            <hr />
+                            <div class="col-lg-12">
+                                <h5 class="@color">Consumption Layer:</h5>
+                            </div>
+                        </div>
+
+                        <div class="row" data-bind="visible: SchemaRows().length > 0">
+                            <div class="col-lg-12">
+                                <h5 class="@color">Hive Database</h5>
+                                <p data-bind="text: HiveDatabase"></p>
+                            </div>
+                            <div class="col-lg-12">
+                                <h5 class="@color">Hive View</h5>
+                                <!-- ko foreach: HiveViews() -->
+                                <p><span class="hideOverflow" data-bind="text: $data"></span></p>
+                                <!-- /ko -->
                             </div>
                         </div>
                     </div>
@@ -442,7 +462,7 @@
                                                             @if (Model.Security.CanEditDataset)
                                                             {
                                                                 <!-- ko if: IsEnabled-->
-                                                                <td class="borderMeta_@color" data-bind="text: Location()"></td>                                                            
+                                                                <td class="borderMeta_@color" data-bind="text: Location()"></td>
                                                                 <!-- /ko -->
                                                                 <!-- ko ifnot: IsEnabled-->
                                                                 <td class="borderMeta_@color"> Disabled</td>
@@ -468,7 +488,7 @@
                                 <p> There are no dataflows sending data to this schema</p>
                                 <!-- /ko -->
                             </div>
-                        }                        
+                        }
                     </div>
                 </div>
             </div>
@@ -554,9 +574,9 @@
 
     @if (Model.Security.CanViewFullDataset)
     {
-        <hr id="schemaHR" />
-
-        <div data-bind="visible: DataLoading() == true && DataTableExists() == true" style="display: none;">
+        
+        <div id="dataPreviewSection" style="display: none;">
+            <hr id="schemaHR" />
             <div class="row">
                 <div class="col-lg-12">
                     <div>
@@ -564,35 +584,26 @@
                     </div>
                 </div>
             </div>
-            <div class="row" style="height: 150px;">
-                <div class="col-lg-12">
-                    <div>
-                        <p id="dataSpinner" class="mini-sentry-spinner-container sentry-spinner-container" style="margin-left: 0; margin-top: 50px;">
-                            <span class="sentry-spinner"></span>
-                        </p>
+            <div data-bind="visible: DataLoading() == true">
+                <div class="row" style="height: 150px;">
+                    <div class="col-lg-12">
+                        <div class="dataPreviewSpinner"></div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div id="dataSection" data-bind="visible: DataLoading() == false  && DataTableExists() == true" style="display: none;">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div>
-                        <h3 class="@color">Data Preview (Top 20 Rows)</h3>
+            <div id="dataSection" data-bind="visible: DataLoading() == false">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <table class="table table-striped table-bordered @color" id="datasetRowTable">
+                            <thead>
+                                <tr id="tableFirstRow" class="filter-row"></tr>
+                                <tr id="tableColumnIDs" class="table-header table-header_@color @headerColor"></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
+                    <hr />
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <table class="table table-striped table-bordered @color" id="datasetRowTable">
-                        <thead>
-                            <tr id="tableFirstRow" class="filter-row"></tr>
-                            <tr id="tableColumnIDs" class="table-header table-header_@color @headerColor"></tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-                <hr />
             </div>
         </div>
     }
@@ -651,6 +662,7 @@
         var schemaAjaxReq;
         //used to abort ajax request incase addition calls are made before original call is received
         var dataAjaxReq;
+
 
         function renderTable(input, push) {
             var filters = input.split("\n");
@@ -711,6 +723,64 @@
 
                 $(".dataTables_filter").parent().addClass("text-right");
             }
+    };
+
+        function renderTable_v2(input, push) {
+
+            //remove table DOM if needed
+            if (table) {
+                table.destroy();
+            }
+
+            //Determine Column metadata
+            var parsedColumns = [];
+            var nullColumns = [];
+
+            //   Remove existing column metadata
+            $('#tableColumnIDs').empty();
+            $('#tableFirstRow').empty();
+            $('#datasetRowTable tbody').empty();
+
+            //Get first row to parse columns
+            Object.keys(input[0]).forEach(function (key)
+            {
+                nullColumns.push(null);
+                parsedColumns.push({ 'title': key.trim(), 'width': "auto" });
+                $('#tableColumnIDs').append("<th>" + key.trim() + "</th>");
+                $('#tableFirstRow').append("<td></td>");
+            });
+
+            var parsedRows = [];
+            //Data for Each Row in the Result Set
+            input.forEach(function (row) {
+                var parsedCells = [];
+
+                for (var key of Object.keys(row)) {
+                    if (row[key] != null) {
+                        parsedCells.push(row[key].trim());
+                    }
+                    else {
+                        parsedCells.push(row[key]);
+                    }
+                }
+
+                if (parsedCells.length >= 1) {
+                    parsedRows.push(parsedCells);
+                }
+            });
+
+            if (!push) {
+                table = $('#datasetRowTable').DataTable({
+                    "scrollX": true,
+                    data: parsedRows,
+                    columns: parsedColumns,
+                });
+            } else {
+                table = $('#datasetRowTable').DataTable({ "scrollX": true }).rows.add(parsedRows).draw();
+                $($('#datasetRowTable_info').children()[2]).text($('#rowCount').text());
+            }
+
+            $(".dataTables_filter").parent().addClass("text-right");
         }
 
         var getUrlParameter = function getUrlParameter(sParam) {
@@ -786,7 +856,6 @@
                     return self.Description();
                 }
             });
-
             self.MoreDescription = ko.computed(function () {
                 if (self.Description() != null && self.Description().length > 300) {
                     $('#schemaHasMoreDescription').show();
@@ -798,7 +867,6 @@
                     return '';
                 }
             });
-
             self.DFSDropLocation = ko.observable();
             self.S3DropLocation = ko.observable();
             self.OtherJobs = ko.observableArray();
@@ -808,6 +876,8 @@
             self.CronJobs = ko.observableArray();
             self.Views = ko.observable();
             self.Downloads = ko.observable();
+            self.HiveDatabase = ko.observable();
+            self.HiveViews = ko.observableArray();
             self.RenderDataFlows = ko.computed(function () {
                 if (self.DataFlows == undefined || self.DataFlows().length == 0) {
                     return false;
@@ -857,29 +927,37 @@
                 var d1 = Date.parse(self.DataLastUpdated());
                 var d2 = Date.parse(self.MetadataLastDT());
 
+                //Not dates for both metadata and data
                 if (!isNaN(d1) && !isNaN(d2)) {
 
                     var d1 = new Date(d1);
                     var d2 = new Date(d2);
                     $('#updatedSpinner').hide();
+                    $('#dataPreviewSection').show();
                     if (d1 > d2) {
                         return d1.toLocaleString("en-us", { month: "long" }) + ' ' + d1.getDate() + ', ' + d1.getFullYear();
                     } else {
                         return d2.toLocaleString("en-us", { month: "long" }) + ' ' + d2.getDate() + ', ' + d2.getFullYear();
-                    }
+                    }                    
                 }
+                //Only metadata date
                 else if (!isNaN(d1) && isNaN(d2)) {
                     $('#updatedSpinner').hide();
+                    $('#dataPreviewSection').show();
                     var d1 = new Date(d1);
                     return d1.toLocaleString("en-us", { month: "long" }) + ' ' + d1.getDate() + ', ' + d1.getFullYear();
                 }
+                //Only data date
                 else if (isNaN(d1) && !isNaN(d2)) {
                     $('#updatedSpinner').hide();
+                    $('#dataPreviewSection').hide();
                     var d2 = new Date(d2);
                     return d2.toLocaleString("en-us", { month: "long" }) + ' ' + d2.getDate() + ', ' + d2.getFullYear();
                 }
+                //Are both dates not populated
                 else if (self.DataLastUpdated() === 'No Data Files Exist' && self.MetadataLastDT() === 'No Columns Exist') {
                     $('#updatedSpinner').hide();
+                    $('#dataPreviewSection').hide();
                     return $('#datasetInfoLastUpdated').text();
                 }
             });
@@ -896,20 +974,19 @@
 
                 $('#panelSpinner').show();
                 self.SchemaRows.removeAll();
-                console.log($('#datasetConfigList').val());
                 var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + $('#datasetConfigList').val();
                 $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
 
                 UpdateMetadata();
 
-                UpdateColumnSchema();
+                //UpdateColumnSchema();
             });
 
             $('#dataLastUpdatedSpinner').show();
             UpdateMetadata();
 
             $('#panelSpinner').show();
-            UpdateColumnSchema();
+            //UpdateColumnSchema();
 
 
             function UpdateMetadata() {
@@ -921,9 +998,16 @@
 
                 var metadataURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val();
                 $.get(metadataURL, function (result) {
+                    //Set schema metadata
                     self.Downloads(result.Downloads);
                     self.Views(result.Views);
                     self.Description(result.Description);
+                    self.HiveDatabase(result.HiveDatabase);
+                    //Remove all HiveViews before adding new list
+                    self.HiveViews.removeAll();
+                    $.each(result.HiveViews, function (i, val) {
+                        self.HiveViews.push(val);
+                    });
 
                     //Populate legacy retriever jobs
                     self.OtherJobs.removeAll();
@@ -943,6 +1027,7 @@
                     });
                     self.DataFlows.notifySubscribers();
 
+                    //Determine last
                     var d = new Date(result.DataLastUpdated);
                     if (d < new Date('1990-01-01')) {
                         self.DataLastUpdated('No Data Files Exist');
@@ -951,6 +1036,8 @@
                         self.DataLastUpdated(d);
                     }
                     $('#dataLastUpdatedSpinner').hide();
+
+                    UpdateColumnSchema();
                 });
             }
 
@@ -958,59 +1045,63 @@
                 if ($('#datasetConfigList').val() === undefined) { return;}
 
                 var schemaURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/columns";
-                var hiveTableURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/hive";
+
+                //remove any children from DOM before injecting spinner
+                $("div.dataPreviewSpinner").empty();
+                //Inject spinner into DOM
+                Sentry.InjectSpinner($(".dataPreviewSpinner"));
 
                 self.DataLoading(true);
                 $('#dataSection').hide();
 
-                $.get(hiveTableURL, function (result) {
-                    //logic to aboart ajax call additional call is triggered before original call finished.
-                    //https://stackoverflow.com/a/4551178
-                    if (dataAjaxReq && dataAjaxReq.readyState != 4) {
-                        dataAjaxReq.abort()
-                    }
+                //logic to aboart ajax call additional call is triggered before original call finished.
+                //https://stackoverflow.com/a/4551178
+                if (dataAjaxReq && dataAjaxReq.readyState != 4) {
+                    dataAjaxReq.abort()
+                }
 
+                //If no data files exist, 1.) do not query table, 2.) do not show Data Preview section
+                if (!self.ShowDataFileTable()) {
+                    $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+                }
+                else {
                     dataAjaxReq = $.ajax({
                         type: "GET",
-                        url: "/api/v1/queryTool/sessions/primary",
+                        url: "/api/v2/querytool/dataset/" + location.pathname.split('/')[3] + "/config/" + $('#datasetConfigList').val() + "/SampleRecords",
+                        data: {
+                            rows: 20
+                        },
                         dataType: "json",
                         success: function (msg) {
-                            var getHiveTableUrl = "/api/v1/queryTool/sessions/" + msg.id + "/hives/" + result.HiveDatabaseName + "/" + result.HiveTableName + "/" + $('#datasetConfigList').val() + "/20/0";
-                            $.get(getHiveTableUrl, function (result2) {
-                                $('#dataSection').hide();
-                                console.log('found a table');
+                            if (msg !== undefined) {
+                                var obj = JSON.parse(msg);
+                                if (obj.length > 0) {
+                                    renderTable_v2(obj, false);
 
-                                renderTable(result2, false);
+                                    $('#dataSection').show();
+                                    self.DataLoading(false);
+                                    self.DataTableExists(true);
 
-                                $('#dataSection').show();
-                                self.DataLoading(false);
-                                self.DataTableExists(true);
-
-                                $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
-
-                            }).fail(function () {
-                                $('#dataSection').hide();
-                                console.log('This hide data section: 3');
-                                self.DataLoading(false);
-                                self.DataTableExists(false);
-                                self.DataLoading.notifySubscribers();
-                            });
+                                    $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
+                                }
+                                else {
+                                    $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+                                    $('#dataSection').hide();
+                                }
+                            }
                         },
                         error: function (error) {
-                            $('#dataSection').hide();
-                            console.log('This hide data section: 1');
-                            self.DataLoading(false);
-                            self.DataTableExists(false);
-                            self.DataLoading.notifySubscribers();
+                            //Schema NotFound response
+                            if (error.status == 404 && error.responseText == "Schema not found") {
+                                $('#dataSection').hide();
+                            }
+
+                            $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
                         }
+                    }).fail(function () {
+                        $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
                     });
-                }).fail(function () {
-                    $('#dataSection').hide();
-                    console.log('This hide data section: 2');
-                    self.DataLoading(false);
-                    self.DataTableExists(false);
-                    self.DataLoading.notifySubscribers();
-                });
+                }
 
                 //logic to aboart ajax call additional call is triggered before original call finished.
                 //https://stackoverflow.com/a/4551178
