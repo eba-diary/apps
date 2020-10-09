@@ -14,17 +14,10 @@ namespace Sentry.data.Infrastructure
 {
     public class HiveOdbcProvider : IHiveOdbcProvider
     {
-        public System.Data.DataTable GetTopNRows(FileSchemaDto schemaDto, int rows)
+        public OdbcConnection GetConnection(string database)
         {
-            Stopwatch stopWatch = new Stopwatch();
-            stopWatch.Start();
-
-            string hiveDatabase = schemaDto.HiveDatabase;
-            string hiveTable = schemaDto.HiveTable;
-            System.Data.DataTable results = new System.Data.DataTable();
 
             //Build Connection String
-
             StringBuilder connSb = new StringBuilder();
             connSb.Append($"Driver={{{Configuration.Config.GetHostSetting("HiveOdbcDriver")}}};");
 
@@ -44,6 +37,8 @@ namespace Sentry.data.Infrastructure
                 connSb.Append($"KrbServiceName={Configuration.Config.GetHostSetting("HiveOdbcKerberosRealm")};");
             }
 
+            connSb.Append($"Initial Catalog={database};");
+
             Logger.Debug(connSb.ToString());
 
             //List out available drivers
@@ -58,9 +53,38 @@ namespace Sentry.data.Infrastructure
             }
             Logger.Debug(driverSb.ToString());
 
+            return new OdbcConnection(connSb.ToString());
+        }
+
+        public bool CheckTableExists(OdbcConnection conn, string table)
+        {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+
+            var queryString = $"SHOW TABLES LIKE '*{table}*'";
+
+            return CheckExists(conn, queryString, table);
+        }
+        public bool CheckViewExists(OdbcConnection conn, string view)
+        {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+
+            var queryString = $"SHOW VIEWS LIKE '*{view}*'";
+
+            return CheckExists(conn, queryString, view);
+        }
+
+        public System.Data.DataTable GetTopNRows(OdbcConnection conn, string table, int rows)
+        {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+
+            System.Data.DataTable results = new System.Data.DataTable();           
+
             try
                 {
-                using (OdbcConnection connection = new OdbcConnection(connSb.ToString()))
+                using (OdbcConnection connection = conn)
                 {
                     var connOpenStart = stopWatch.ElapsedMilliseconds;
                     connection.Open();
@@ -68,7 +92,8 @@ namespace Sentry.data.Infrastructure
 
                     Logger.Debug($"open connection time : {connOpenEnd - connOpenStart}(ms)");
 
-                    var queryString = $"SELECT * FROM {hiveDatabase}.vw_{hiveTable} limit {rows.ToString()}";
+                    //var queryString = $"SELECT * FROM {database}.{table} limit {rows.ToString()}";
+                    var queryString = $"SELECT * FROM {table} limit {rows.ToString()}";
 
                     Logger.Debug($"Hive query: {queryString}");
 
@@ -104,6 +129,48 @@ namespace Sentry.data.Infrastructure
 
             Logger.Info($"query completed", new DoubleVariable("queryduration", stopWatch.Elapsed.TotalSeconds), new LongVariable("numberofrows", rows));
             return results;
+        }
+
+        private bool CheckExists(OdbcConnection conn, string queryString, string compareObject)
+        {
+            System.Data.DataTable results;
+
+            try
+            {
+                using (OdbcConnection connection = conn)
+                {
+                    connection.Open();
+
+                    var adp = new OdbcDataAdapter(queryString, connection);
+                    var ds = new System.Data.DataSet();
+                    adp.Fill(ds);
+
+                    results = ds.Tables[0];
+
+                    foreach (System.Data.DataRow dr in results.Rows)
+                    {
+                        foreach (System.Data.DataColumn col in results.Columns)
+                        {
+                            if (dr[col].ToString().ToLower() == compareObject.ToLower())
+                            {
+                                return true;
+                            }
+                        }
+                    }
+
+                    return false;
+                }
+            }
+            catch (OdbcException oex)
+            {
+                Logger.Error("Odbc query exception", oex);
+                throw new HiveQueryException("Hive ODBC query exception", oex);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("failed hiveodbc query", ex);
+                throw;
+            }
         }
     }
 }

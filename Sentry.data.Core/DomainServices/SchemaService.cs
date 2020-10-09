@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Sentry.Core;
 using System.Text.RegularExpressions;
 using StructureMap;
+using System.Data.Odbc;
 
 namespace Sentry.data.Core
 {
@@ -445,9 +446,24 @@ namespace Sentry.data.Core
                 throw new SchemaUnauthorizedAccessException();
             }
 
+            FileSchemaDto schemaDto = GetFileSchemaDto(id);
 
+            string hiveView = $"vw_{schemaDto.HiveTable}";
 
-            System.Data.DataTable result = _hiveOdbcProvider.GetTopNRows(GetFileSchemaDto(id), rows);
+            //Get connection object
+            OdbcConnection connection = _hiveOdbcProvider.GetConnection(schemaDto.HiveDatabase);
+
+            //Does table exist
+            bool tableExists = _hiveOdbcProvider.CheckViewExists(connection, hiveView);
+
+            //If table does not exist
+            if (!tableExists)
+            {
+                throw new HiveTableViewNotFoundException("Table or view not found");
+            }
+
+            //Query table for rows
+            System.Data.DataTable result = _hiveOdbcProvider.GetTopNRows(_hiveOdbcProvider.GetConnection(schemaDto.HiveDatabase), hiveView, rows);
 
             List<Dictionary<string, object>> dicRows = new List<Dictionary<string, object>>();
             Dictionary<string, object> dicRow = null;
