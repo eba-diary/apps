@@ -58,25 +58,34 @@ namespace Sentry.data.Infrastructure
 
         public bool CheckTableExists(OdbcConnection conn, string table)
         {
+            Logger.Debug($"start method <{System.Reflection.MethodBase.GetCurrentMethod().Name}>");
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
 
             var queryString = $"SHOW TABLES LIKE '*{table}*'";
 
-            return CheckExists(conn, queryString, table);
+            bool result = CheckExists(conn, queryString, table);
+
+            Logger.Debug($"end method <{System.Reflection.MethodBase.GetCurrentMethod().Name}>");
+            return result;
         }
         public bool CheckViewExists(OdbcConnection conn, string view)
         {
+            Logger.Debug($"start method <{System.Reflection.MethodBase.GetCurrentMethod().Name}>");
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
 
             var queryString = $"SHOW VIEWS LIKE '*{view}*'";
 
-            return CheckExists(conn, queryString, view);
+            bool result = CheckExists(conn, queryString, view);
+
+            Logger.Debug($"end method <{System.Reflection.MethodBase.GetCurrentMethod().Name}>");
+            return result;
         }
 
         public System.Data.DataTable GetTopNRows(OdbcConnection conn, string table, int rows)
         {
+            Logger.Debug($"start method <{System.Reflection.MethodBase.GetCurrentMethod().Name}>");
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
 
@@ -92,7 +101,6 @@ namespace Sentry.data.Infrastructure
 
                     Logger.Debug($"open connection time : {connOpenEnd - connOpenStart}(ms)");
 
-                    //var queryString = $"SELECT * FROM {database}.{table} limit {rows.ToString()}";
                     var queryString = $"SELECT * FROM {table} limit {rows.ToString()}";
 
                     Logger.Debug($"Hive query: {queryString}");
@@ -128,12 +136,18 @@ namespace Sentry.data.Infrastructure
             }
 
             Logger.Info($"query completed", new DoubleVariable("queryduration", stopWatch.Elapsed.TotalSeconds), new LongVariable("numberofrows", rows));
+            Logger.Debug($"end method <{System.Reflection.MethodBase.GetCurrentMethod().Name}>");
             return results;
         }
 
         private bool CheckExists(OdbcConnection conn, string queryString, string compareObject)
         {
+            Logger.Debug($"start method <{System.Reflection.MethodBase.GetCurrentMethod().Name}>");
+            Logger.Debug($"queryString: {queryString}");
+            Logger.Debug($"compareObject: {compareObject}");
             System.Data.DataTable results;
+            bool result = false;
+            StringBuilder objList = new StringBuilder();
 
             try
             {
@@ -151,14 +165,19 @@ namespace Sentry.data.Infrastructure
                     {
                         foreach (System.Data.DataColumn col in results.Columns)
                         {
+                            objList.AppendLine(dr[col].ToString().ToLower());
                             if (dr[col].ToString().ToLower() == compareObject.ToLower())
                             {
-                                return true;
+                                result = true;
                             }
                         }
                     }
 
-                    return false;
+                    Logger.Debug($"table list: {objList.ToString()}");
+                    Logger.Debug($"comparision result: {result.ToString()}");
+
+                    Logger.Debug($"end method <{System.Reflection.MethodBase.GetCurrentMethod().Name}>");
+                    return result;
                 }
             }
             catch (OdbcException oex)
