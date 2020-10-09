@@ -57,15 +57,15 @@ namespace TESTING_CONSOLE
                 ///// Gets the ODBC driver names from the registry.
                 ///// </summary>
                 ///// <returns>a string array containing the ODBC driver names, if the registry key is present; null, otherwise.</returns>
-                //string[] odbcDriverNames = null;
-                //using (RegistryKey localMachineHive = Registry.LocalMachine)
-                //using (RegistryKey odbcDriversKey = localMachineHive.OpenSubKey(@"SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers"))
-                //{
-                //    if (odbcDriversKey != null)
-                //    {
-                //        odbcDriverNames = odbcDriversKey.GetValueNames();
-                //    }
-                //}
+                string[] odbcDriverNames = null;
+                using (RegistryKey localMachineHive = Registry.LocalMachine)
+                using (RegistryKey odbcDriversKey = localMachineHive.OpenSubKey(@"SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers"))
+                {
+                    if (odbcDriversKey != null)
+                    {
+                        odbcDriverNames = odbcDriversKey.GetValueNames();
+                    }
+                }
 
                 //foreach (string ODBCDriver in odbcDriverNames)
                 //{

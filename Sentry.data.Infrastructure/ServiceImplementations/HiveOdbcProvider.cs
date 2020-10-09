@@ -8,6 +8,7 @@ using System.Data.Odbc;
 using Sentry.Common.Logging;
 using System.Diagnostics;
 using Sentry.data.Core.Exceptions;
+using Microsoft.Win32;
 
 namespace Sentry.data.Infrastructure
 {
@@ -45,8 +46,20 @@ namespace Sentry.data.Infrastructure
 
             Logger.Debug(connSb.ToString());
 
-            try
+            //List out available drivers
+            StringBuilder driverSb = new StringBuilder();
+            using (RegistryKey localMachineHive = Registry.LocalMachine)
+            using (RegistryKey odbcDriversKey = localMachineHive.OpenSubKey(@"SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers"))
             {
+                if (odbcDriversKey != null)
+                {
+                    Array.ForEach(odbcDriversKey.GetValueNames(), s => driverSb.Append($"{s}; "));
+                }
+            }
+            Logger.Debug(driverSb.ToString());
+
+            try
+                {
                 using (OdbcConnection connection = new OdbcConnection(connSb.ToString()))
                 {
                     var connOpenStart = stopWatch.ElapsedMilliseconds;
@@ -55,9 +68,17 @@ namespace Sentry.data.Infrastructure
 
                     Logger.Debug($"open connection time : {connOpenEnd - connOpenStart}(ms)");
 
-                    var adp = new OdbcDataAdapter($"SELECT * FROM {hiveDatabase}.{hiveTable} limit {rows.ToString()}", connection);
+                    var queryString = $"SELECT * FROM {hiveDatabase}.vw_{hiveTable} limit {rows.ToString()}";
+
+                    Logger.Debug($"Hive query: {queryString}");
+
+                    var queryStart = stopWatch.ElapsedMilliseconds;
+                    var adp = new OdbcDataAdapter(queryString, connection);
                     var ds = new System.Data.DataSet();
                     adp.Fill(ds);
+                    var queryEnd = stopWatch.ElapsedMilliseconds;
+
+                    Logger.Debug($"query time : {queryEnd - queryStart}(ms)");
 
                     results = ds.Tables[0];
                 }
