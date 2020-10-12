@@ -156,18 +156,6 @@ namespace Sentry.data.Core
                 request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
                                                                                                                 x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
 
-                if (Configuration.Config.GetHostSetting("UseCherwell") == "false")
-                {
-                    //Format the business reason here.
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append($"Please grant the Ad Group {request.AdGroupName} the following permissions to {request.SecurableObjectName} dataset within Data.sentry.com.{ Environment.NewLine}");
-                    request.Permissions.ForEach(x => sb.Append($"{x.PermissionName} - {x.PermissionDescription} { Environment.NewLine}"));
-                    sb.Append($"Business Reason: {request.BusinessReason}{ Environment.NewLine}");
-                    sb.Append($"Requestor: {request.RequestorsId} - {request.RequestorsName}");
-
-                    request.BusinessReason = sb.ToString();
-                }
-                
                 return _securityService.RequestPermission(request);
             }
 

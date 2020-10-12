@@ -96,15 +96,8 @@ namespace Sentry.data.Infrastructure
             registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
             registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
-
-            if (Sentry.Configuration.Config.GetHostSetting("UseCherwell") == "true")
-            {
-                registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
-            }
-            else
-            {
-                registry.For<IBaseTicketProvider>().Singleton().Use<HpsmProvider>();
-            }
+            registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
+          
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);
 
