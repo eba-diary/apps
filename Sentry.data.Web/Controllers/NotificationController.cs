@@ -187,5 +187,14 @@ namespace Sentry.data.Web.Controllers
             return Redirect(Request.UrlReferrer.PathAndQuery);
         }
 
+        [HttpGet]
+        //method called by dale.js to return whether user can edit IsSensitive IND
+        public JsonResult GetQuillContents(int notificationId)
+        {
+            NotificationModel model = _notificationService.GetNotificationModelForModify(notificationId).ToWeb();
+            JsonResult result = Json(new { data = model.Message }, JsonRequestBehavior.AllowGet);
+            return result;
+        }
+
     }
 }

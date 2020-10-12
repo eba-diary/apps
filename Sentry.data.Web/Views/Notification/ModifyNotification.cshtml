@@ -19,12 +19,12 @@ else
 }
 
 <hr />
-
-@using (Html.BeginForm("SubmitNotification", "Notification", FormMethod.Post,htmlAttributes: new { @class = "notificationForm" }))
+@*Attach class to form because Notification.js uses class here to submit form because of quill*@
+@using (Html.BeginForm("SubmitNotification", "Notification", FormMethod.Post,htmlAttributes: new { @class = "modifyNotificationForm" }))
 {
     @Html.AntiForgeryToken()
     @Html.HiddenFor(m => m.CreateUser)
-    @Html.HiddenFor(model => model.NotificationId)
+    @Html.HiddenFor(model => model.NotificationId, new { @class = "notificationId" })
 
     <div class="form-horizontal">
         @Html.ValidationSummary(false, "", new { @class = "text-danger" })
@@ -72,13 +72,11 @@ else
         <div class="form-group">
             @Html.LabelFor((model) => model.Message, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <!-- Create quill editor container -->
-                <div id="editor">
-                    @Model.Message
-                </div>
+                <!-- Quill editor container -->
+                <div id="editor"> </div>
 
-
-                @Html.TextAreaFor((model) => model.Message,htmlAttributes: new { @class = "messageMe" })
+                <!-- Bogus TextArea which will hold ACTUAL message too be saved, notification.js will copy an encoded version here upon submit button -->
+                @Html.TextAreaFor((model) => model.Message, htmlAttributes: new { @class = "messageEncoded", @style = "display:none" })
             </div>
         </div>
         <div class="form-group">
@@ -87,7 +85,7 @@ else
         <br />
         <div class="form-group">
             <div>
-                <input value="Submit" class="btn btn-primary" onclick="data.Notification.SubmitPeterQuill() "/>
+                <input value="Submit" class="btn btn-primary" onclick="data.Notification.SubmitChanges() "/>
                 <a class="btn btn-warning" href="/Notification/ManageNotification">Cancel</a>
             </div>
 
@@ -107,7 +105,7 @@ else
             $('#StartTime').datetimepicker();
             $('#ExpirationTime').datetimepicker();
 
-            data.Notification.InitPeterQuill();
+            data.Notification.InitQuill();
         });
 
     </script>

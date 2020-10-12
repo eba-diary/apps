@@ -4,7 +4,7 @@
 
 data.Notification = {
 
-    Quill: null,
+    Quill: null,                //declare as property for use later
 
     Init: function () {
         data.Notification.NotificationTableInit();
@@ -16,19 +16,32 @@ data.Notification = {
 
     },
 
-    InitPeterQuill: function () {
+    InitQuill: function () {
 
         data.Notification.Quill = new Quill('#editor', { theme: 'snow' });
-        var myStuff = quill.root.innerHTML;         //example of getting what will be stored in DB and displayed in popover and email
+
+        //make ajax call to load message
+        $.ajax({
+            url: "/Notification/GetQuillContents/",
+            method: "GET",
+            dataType: 'json',
+            data: { notificationId: $('.notificationId').val() }, 
+    
+            success: function (obj) {
+
+                var messageDecoded = $("<div/>").html(obj.data).text();
+                data.Notification.Quill.root.innerHTML = messageDecoded;
+            }
+        });
     },
 
-    SubmitPeterQuill: function () {
+    SubmitChanges: function () {
 
+        var message = data.Notification.Quill.root.innerHTML;           //get html of quill editor
+        var messageEncoded = $("<div/>").text(message).html();          //encode message to safely pass and store
+        $('.messageEncoded').val(messageEncoded);                       //set messageEncoded TextArea so normal MVC submit will use it
 
-        var myStuff = data.Notification.Quill.root.innerHTML;         //example of getting what will be stored in DB and displayed in popover and email
-        var myStuffEncoded = $("<div/>").text(myStuff).html(); 
-        $('.messageMe').val(myStuffEncoded);
-        $('.notificationForm').submit();
+        $('.modifyNotificationForm').submit();                          //call submit which triggers SubmitNotification controller method
     },
 
     NotificationTableInit: function ()
