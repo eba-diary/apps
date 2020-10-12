@@ -16,7 +16,7 @@
 
     <div class="form-group col-md-12">
         @Html.LabelFor((model) => model.SelectedDataSource, new { @class = "control-label col-md-2" })
-        <div class="col-md-5">
+        <div class="col-md-5" data-toggle="tooltip" data-placement="right" title="If the required data source does not exist, please contact DSCSupport@sentry.com for assistance.">
             @Html.DropDownListFor((model) => model.SelectedDataSource, Model.SourcesForDropdown, new { @class = "form-control edit-dataset-row"})
             @Html.ValidationMessageFor((model) => model.SelectedDataSource, "", new { @class = "text-danger" })
         </div>
