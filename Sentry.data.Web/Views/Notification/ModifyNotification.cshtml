@@ -69,30 +69,30 @@ else
                 @Html.TextBoxFor((model) => model.Title, new { @class = "form-control edit-dataset-row" })
             </div>
         </div>
+        
         <div class="form-group">
             @Html.LabelFor((model) => model.Message, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 <!-- Quill editor container -->
                 <div id="editor"> </div>
 
-                <!-- Bogus TextArea which will hold ACTUAL message too be saved, notification.js will copy an encoded version here upon submit button -->
+                <!-- Bogus TextArea which will hold encoded message too be saved to DB, notification.js will copy an encoded version here upon submit button -->
                 @Html.TextAreaFor((model) => model.Message, htmlAttributes: new { @class = "messageEncoded", @style = "display:none" })
             </div>
         </div>
+        
         <div class="form-group">
             <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
         </div>
         <br />
+
         <div class="form-group">
             <div>
-                <input value="Submit" class="btn btn-primary" onclick="data.Notification.SubmitChanges() "/>
+                <!-- Submit button triggers JS function -->
+                <input value="Submit" class="btn btn-primary" onclick="data.Notification.SubmitChanges() " />
                 <a class="btn btn-warning" href="/Notification/ManageNotification">Cancel</a>
             </div>
-
         </div>
-
-        
-
     </div>
 }
 @section Scripts {
@@ -105,7 +105,7 @@ else
             $('#StartTime').datetimepicker();
             $('#ExpirationTime').datetimepicker();
 
-            data.Notification.InitQuill();
+            data.Notification.InitQuill();      //init Quill RTF editor and fill it with notification message
         });
 
     </script>

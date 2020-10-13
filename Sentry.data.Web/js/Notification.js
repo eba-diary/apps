@@ -16,11 +16,15 @@ data.Notification = {
 
     },
 
+    /******************************************************************************************
+    * Init Quill RTF Editor and load with Notification Message
+    * ManageNotification View has Quill RTF editor which requires JS to load it and extract it
+    ******************************************************************************************/
     InitQuill: function () {
 
         data.Notification.Quill = new Quill('#editor', { theme: 'snow' });
 
-        //make ajax call to load message
+        //make ajax call to load notification message into Quill since we need to decode first
         $.ajax({
             url: "/Notification/GetQuillContents/",
             method: "GET",
@@ -29,12 +33,17 @@ data.Notification = {
     
             success: function (obj) {
 
-                var messageDecoded = $("<div/>").html(obj.data).text();
-                data.Notification.Quill.root.innerHTML = messageDecoded;
+                var messageDecoded = $("<div/>").html(obj.data).text();         //decode message since it is stored encoded
+                data.Notification.Quill.root.innerHTML = messageDecoded;        //set quill contents
             }
         });
     },
 
+    /******************************************************************************************
+    * Because upon save we have to extract/decode message from Quill editor for safe storage, this js function will override the normal MVC subit
+    * we will grab the notification message, encode it and use a bogus text area which is actually the model.message
+    * when submit is triggered the ModifyNotification View will pick up the bogus encoded version and save that 
+    ******************************************************************************************/
     SubmitChanges: function () {
 
         var message = data.Notification.Quill.root.innerHTML;           //get html of quill editor

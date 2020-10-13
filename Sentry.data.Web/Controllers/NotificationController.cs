@@ -188,7 +188,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        //method called by dale.js to return whether user can edit IsSensitive IND
+        //method called by Notification.js to get notification message from DB so JS can decode it and load Quill
         public JsonResult GetQuillContents(int notificationId)
         {
             NotificationModel model = _notificationService.GetNotificationModelForModify(notificationId).ToWeb();
