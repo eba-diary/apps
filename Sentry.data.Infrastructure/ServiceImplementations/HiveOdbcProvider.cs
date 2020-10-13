@@ -75,8 +75,7 @@ namespace Sentry.data.Infrastructure
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            //var queryString = $"SHOW VIEWS LIKE '*{view}*'";
-            var queryString = $"SHOW VIEWS";
+            var queryString = $"SHOW VIEWS LIKE '*{view}*'";
 
             bool result = CheckExists(conn, queryString, view);
 
