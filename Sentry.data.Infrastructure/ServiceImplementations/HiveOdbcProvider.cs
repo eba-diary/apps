@@ -37,7 +37,7 @@ namespace Sentry.data.Infrastructure
                 connSb.Append($"KrbServiceName={Configuration.Config.GetHostSetting("HiveOdbcKerberosRealm")};");
             }
 
-            connSb.Append($"Initial Catalog={database};");
+            connSb.Append($"Schema={database};");
 
             Logger.Debug(connSb.ToString());
 
@@ -75,7 +75,8 @@ namespace Sentry.data.Infrastructure
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            var queryString = $"SHOW VIEWS LIKE '*{view}*'";
+            //var queryString = $"SHOW VIEWS LIKE '*{view}*'";
+            var queryString = $"SHOW VIEWS";
 
             bool result = CheckExists(conn, queryString, view);
 
