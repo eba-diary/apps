@@ -89,7 +89,7 @@ else
         <div class="form-group">
             <div>
                 <!-- Submit button triggers JS function -->
-                <input value="Submit" class="btn btn-primary" onclick="data.Notification.SubmitChanges() " />
+                <input value="Submit" class="btn btn-primary" onclick="data.Notification.submitChanges() " />
                 <a class="btn btn-warning" href="/Notification/ManageNotification">Cancel</a>
             </div>
         </div>
@@ -105,7 +105,7 @@ else
             $('#StartTime').datetimepicker();
             $('#ExpirationTime').datetimepicker();
 
-            data.Notification.InitQuill();      //init Quill RTF editor and fill it with notification message
+            data.Notification.initQuill();      //init Quill RTF editor and fill it with notification message
         });
 
     </script>
