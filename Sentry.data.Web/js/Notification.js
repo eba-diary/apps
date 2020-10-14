@@ -135,16 +135,6 @@ data.Notification = {
 
     formatAssetNotificationTableDetails: function (d)
     {
-        //d is the original data object for the row
-        //var htmlString = '<div id="preview-system-notification-wrapper">' +
-        //    '<div class="critical-notification-container">' +
-        //    '<div class="critical-notification-content-container">' +
-        //    '<div class="critical-notification-body">' + d.Message + d.MessageSeverity + '</div>' +
-        //    '</div>' +
-        //    '</div>' +
-        //    '</div>';
-        //div.innerHTML = htmlString.trim();
-
         var div = document.createElement('div');
         var messageDecoded = $("<div/>").html(d.Message).text();         //decode message since it is stored encoded
         div.innerHTML = messageDecoded.trim();
