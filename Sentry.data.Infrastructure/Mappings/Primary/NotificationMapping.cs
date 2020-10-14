@@ -1,6 +1,7 @@
 ﻿using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
 using Sentry.data.Core;
+using NHibernate;
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
 {
@@ -16,7 +17,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Generator(Generators.Identity);
             });
 
-            this.Property(x => x.Message, m => m.Column("Message_DSC"));
+            this.Property(x => x.Message, m => { m.Column("Message_DSC"); m.Type(NHibernateUtil.StringClob);});
             this.Property(x => x.CreateUser, m => m.Column("CreateUser"));
             this.Property(x => x.StartTime, m => m.Column("Start_DTM"));
             this.Property(x => x.ExpirationTime, m => m.Column("Expire_DTM"));
