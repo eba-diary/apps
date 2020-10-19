@@ -81,7 +81,8 @@ namespace Sentry.data.Core
                 CanEditDataSource = (user.CanModifyDataset && IsOwner) || IsAdmin,
                 CanCreateDataSource = user.CanModifyDataset || IsAdmin,
                 ShowAdminControls = IsAdmin,
-                CanManageSchema = user.CanModifyDataset || IsOwner || IsAdmin
+                CanCreateDataFlow = user.CanModifyDataset || IsAdmin,
+                CanModifyDataflow = user.CanModifyDataset || IsOwner || IsAdmin
             };
 
             //if it is not secure, it should be wide open except for upload and notifications. call everything out for visibility.
@@ -93,6 +94,7 @@ namespace Sentry.data.Core
                 us.CanUploadToDataset = IsOwner || IsAdmin;
                 us.CanModifyNotifications = false;
                 us.CanUseDataSource = true;
+                us.CanManageSchema = IsOwner || IsAdmin;
                 return us;
             }
 
@@ -129,7 +131,7 @@ namespace Sentry.data.Core
             us.CanUploadToDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_UPLOAD_TO_DATASET) || IsOwner || IsAdmin;
             us.CanModifyNotifications = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MODIFY_NOTIFICATIONS) || IsOwner || IsAdmin;
             us.CanUseDataSource = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_USE_DATA_SOURCE) || IsOwner || IsAdmin;
-            us.CanManageSchema = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin;
+            us.CanManageSchema = (user.CanModifyDataset && (userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner)) || IsAdmin;
 
             return us;
         }
