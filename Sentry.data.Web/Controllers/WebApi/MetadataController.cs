@@ -662,9 +662,10 @@ namespace Sentry.data.Web.WebApi.Controllers
         [HttpPost]
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, null)]
-        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Forbidden, null, null)]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        //[AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         [Route("PublishMessage")]
         public IHttpActionResult PublishMessage([FromBody] KafkaMessage message)
         {
@@ -698,9 +699,10 @@ namespace Sentry.data.Web.WebApi.Controllers
         [HttpPost]
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, null)]
-        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Forbidden, null, null)]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        //[AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         [Route("PublishMessageAsString")]
         public IHttpActionResult PublishMessageAsString([FromBody] string message)
         {
