@@ -23,19 +23,19 @@ data.Notification = {
     initQuill: function () {
 
         var toolbarOptions = [
+            [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+            ['link', 'image'],
             ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
             [{ 'header': 1 }, { 'header': 2 }],               // custom button values
             [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-            [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
             [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
             [{ 'direction': 'rtl' }],                         // text direction
-            [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
             [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
             [{ 'font': [] }],
             [{ 'align': [] }],
-            ['link', 'image'],
             ['clean']                                         // remove formatting button
         ];
+
 
         data.Notification.Quill = new Quill('#editor',
         {

@@ -97,7 +97,9 @@ namespace Sentry.data.Web.Controllers
         {
             List<NotificationModel> files = _notificationService.GetAllNotifications().ToWeb();
             DataTablesQueryableAdapter<NotificationModel> dtqa = new DataTablesQueryableAdapter<NotificationModel>(files.AsQueryable(), dtRequest);
-            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+            JsonResult result = Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+            result.MaxJsonLength = Int32.MaxValue;              //need to set MaxJsonLength to avoid 500 exceptions because of large json coming back since notifications contain images now
+            return result;
         }
 
         public ActionResult AccessRequest()
