@@ -53,7 +53,6 @@ data.Notification = {
             dataType: 'json',
             data: { notificationId: $('.notificationId').val() }, 
             success: function (obj) {
-
                 var messageDecoded = $("<div/>").html(obj.data).text();         //decode message since it is stored encoded
                 data.Notification.Quill.root.innerHTML = messageDecoded;        //set quill contents
             }
