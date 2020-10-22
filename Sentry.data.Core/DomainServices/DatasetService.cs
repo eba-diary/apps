@@ -215,6 +215,13 @@ namespace Sentry.data.Core
             {
                 ds.DataClassification = dto.DataClassification;
             }
+            if (ds.Security == null)
+            {
+                ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
+                {
+                    CreatedById = _userService.GetCurrentUser().AssociateId
+                };
+            }
 
             //override the Dto.IsSecured for certain classifications.
             switch (dto.DataClassification)
@@ -231,19 +238,9 @@ namespace Sentry.data.Core
             }
 
             if (!ds.IsSecured && dto.IsSecured)
-            {
-                if (ds.Security == null)
-                {
-                    ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
-                    {
-                        CreatedById = _userService.GetCurrentUser().AssociateId
-                    };
-                }
-                else
-                {
-                    ds.Security.EnabledDate = DateTime.Now;
-                    ds.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
-                }
+            {      
+                ds.Security.EnabledDate = DateTime.Now;
+                ds.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;                
             }
             else if (ds.IsSecured && !dto.IsSecured)
             {
@@ -470,13 +467,13 @@ namespace Sentry.data.Core
                     break;
             }
 
-            if (ds.IsSecured)
+            //All datasets get a Security entry regardless if restricted
+            //  this allows security process for internally managed permissions
+            //  which do not require dataset to be restricted (i.e. CanManageSchema).
+            ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
             {
-                ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
-                {
-                    CreatedById = _userService.GetCurrentUser().AssociateId
-                };
-            }
+                CreatedById = _userService.GetCurrentUser().AssociateId
+            };
 
             return ds;
         }

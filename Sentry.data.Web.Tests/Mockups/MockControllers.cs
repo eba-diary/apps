@@ -165,5 +165,29 @@ namespace Sentry.data.Web.Tests
 
             return cc;
         }
+
+        //public static MetadataController MockMetadataController(Dataset ds, DatasetFileConfig dfc, Schema scm, IApplicationUser user)
+        //{
+        //    var mockConfigService = MockRepository.GenerateStub<IConfigService>();
+        //    var mockDatasetService = MockRepository.GenerateStub<IDatasetService>();
+        //    var mockSchemaService = MockRepository.GenerateStub<ISchemaService>();
+        //    var mockDataFlowService = MockRepository.GenerateStub<IDataFlowService>();
+        //    var mockHostSettings = MockRepository.GenerateStub<IHostSettings>();
+
+        //    var mockDataAssetContext = MockRepository.GenerateStub<IDataAssetContext>();
+        //    var mockExtendedUserInfoProvider = MockRepository.GenerateStub<IExtendedUserInfoProvider>();
+        //    var mockCurrentUserIdProvider = MockRepository.GenerateStub<ICurrentUserIdProvider>();
+        //    var mockUserService = MockRepository.GenerateStub<UserService>(mockDataAssetContext, mockExtendedUserInfoProvider, mockCurrentUserIdProvider);
+
+        //    mockHostSettings.Stub(x => x["S3DataPrefix"]).Return("data/");
+
+
+        //    mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());            
+
+
+        //    var mc = new MetadataController(, mockUserService, mockConfigService, mockDatasetService, mockSchemaService, mockSecurityService, mockDataFlowService);
+
+        //    return mc;
+        //}
     }
 }

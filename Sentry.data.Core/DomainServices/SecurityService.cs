@@ -85,19 +85,6 @@ namespace Sentry.data.Core
                 CanModifyDataflow = user.CanModifyDataset || IsOwner || IsAdmin
             };
 
-            //if it is not secure, it should be wide open except for upload and notifications. call everything out for visibility.
-            if (securable == null || securable.Security == null || !securable.IsSecured)
-            {
-                us.CanPreviewDataset = true;
-                us.CanQueryDataset = true;
-                us.CanViewFullDataset = true;
-                us.CanUploadToDataset = IsOwner || IsAdmin;
-                us.CanModifyNotifications = false;
-                us.CanUseDataSource = true;
-                us.CanManageSchema = IsOwner || IsAdmin;
-                return us;
-            }
-
             //if no tickets have been requested, then there should be no permission given.
             if (securable?.Security?.Tickets != null && securable.Security.Tickets.Count > 0)
             {
@@ -122,6 +109,19 @@ namespace Sentry.data.Core
                         userPermissions.AddRange(item.permissions.Select(x => x.Permission.PermissionCode).ToList());
                     }
                 }
+            }
+
+            //if it is not secure, it should be wide open except for upload and notifications. call everything out for visibility.
+            if (securable == null || securable.Security == null || !securable.IsSecured)
+            {
+                us.CanPreviewDataset = true;
+                us.CanQueryDataset = true;
+                us.CanViewFullDataset = true;
+                us.CanUploadToDataset = IsOwner || IsAdmin;
+                us.CanModifyNotifications = false;
+                us.CanUseDataSource = true;
+                us.CanManageSchema = (userPermissions.Count > 0) ? ((user.CanModifyDataset && (userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner)) || IsAdmin) : (IsOwner || IsAdmin);
+                return us;
             }
 
             //from the list of permissions, build out the security object.

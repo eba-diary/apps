@@ -254,6 +254,7 @@
     <Compile Include="Interfaces\DataProcessing\ISchemaMapProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
+    <Compile Include="Interfaces\IHostSettings.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
     <Compile Include="Interfaces\IDaleSearchProvider.cs" />
     <Compile Include="Interfaces\IDaleService.cs" />

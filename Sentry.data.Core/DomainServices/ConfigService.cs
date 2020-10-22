@@ -353,7 +353,7 @@ namespace Sentry.data.Core
                 throw new DatasetUnauthorizedAccessException();
             }
 
-            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset || us.CanManageSchema))
             {
                 try
                 {
@@ -1110,7 +1110,7 @@ namespace Sentry.data.Core
             dto.FileExtensionName = dfc.Schema.Extension.Name;
             dto.ParentDatasetId = dfc.ParentDataset.DatasetId;
             dto.StorageCode = dfc.Schema.StorageCode;
-            dto.StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + dfc.GetStorageCode() + "\\";
+            dto.StorageLocation = _hostSettings["s3DataPrefix"] Configuration.Config.GetHostSetting("S3DataPrefix") + dfc.GetStorageCode() + "\\";
             dto.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
             dto.CreateCurrentView = (dfc.Schema != null) ? dfc.Schema.CreateCurrentView : false;
             dto.IsInSAS = (dfc.Schema != null) ? dfc.Schema.IsInSAS : false;
