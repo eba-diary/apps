@@ -81,20 +81,9 @@ namespace Sentry.data.Core
                 CanEditDataSource = (user.CanModifyDataset && IsOwner) || IsAdmin,
                 CanCreateDataSource = user.CanModifyDataset || IsAdmin,
                 ShowAdminControls = IsAdmin,
-                CanManageSchema = user.CanModifyDataset || IsOwner || IsAdmin
+                CanCreateDataFlow = user.CanModifyDataset || IsAdmin,
+                CanModifyDataflow = user.CanModifyDataset || IsOwner || IsAdmin
             };
-
-            //if it is not secure, it should be wide open except for upload and notifications. call everything out for visibility.
-            if (securable == null || securable.Security == null || !securable.IsSecured)
-            {
-                us.CanPreviewDataset = true;
-                us.CanQueryDataset = true;
-                us.CanViewFullDataset = true;
-                us.CanUploadToDataset = IsOwner || IsAdmin;
-                us.CanModifyNotifications = false;
-                us.CanUseDataSource = true;
-                return us;
-            }
 
             //if no tickets have been requested, then there should be no permission given.
             if (securable?.Security?.Tickets != null && securable.Security.Tickets.Count > 0)
@@ -122,6 +111,19 @@ namespace Sentry.data.Core
                 }
             }
 
+            //if it is not secure, it should be wide open except for upload and notifications. call everything out for visibility.
+            if (securable == null || securable.Security == null || !securable.IsSecured)
+            {
+                us.CanPreviewDataset = true;
+                us.CanQueryDataset = true;
+                us.CanViewFullDataset = true;
+                us.CanUploadToDataset = IsOwner || IsAdmin;
+                us.CanModifyNotifications = false;
+                us.CanUseDataSource = true;
+                us.CanManageSchema = (userPermissions.Count > 0) ? ((user.CanModifyDataset && (userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner)) || IsAdmin) : (IsOwner || IsAdmin);
+                return us;
+            }
+
             //from the list of permissions, build out the security object.
             us.CanPreviewDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_PREVIEW_DATASET) || IsOwner || IsAdmin;
             us.CanViewFullDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_VIEW_FULL_DATASET) || IsOwner || IsAdmin;
@@ -129,7 +131,7 @@ namespace Sentry.data.Core
             us.CanUploadToDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_UPLOAD_TO_DATASET) || IsOwner || IsAdmin;
             us.CanModifyNotifications = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MODIFY_NOTIFICATIONS) || IsOwner || IsAdmin;
             us.CanUseDataSource = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_USE_DATA_SOURCE) || IsOwner || IsAdmin;
-            us.CanManageSchema = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin;
+            us.CanManageSchema = (user.CanModifyDataset && (userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner)) || IsAdmin;
 
             return us;
         }
