@@ -31,7 +31,8 @@ namespace Sentry.data.Infrastructure
                 //new HiveMetadataHandler(_dsContext)
                 new HiveMetadataService(),
                 new S3EventService(),
-                new DataStepProcessorService()
+                new DataStepProcessorService(),
+                new DfsEventService()
             };
 
             return handlers;
