@@ -5,7 +5,7 @@ using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Text;
 
 namespace Sentry.data.Core
 {
@@ -16,16 +16,19 @@ namespace Sentry.data.Core
         private readonly UserService _userService;
         private readonly IJobService _jobService;
         private readonly IS3ServiceProvider _s3ServiceProvider;
+        private readonly ISecurityService _securityService;
 
 
         public DataFlowService(IDatasetContext datasetContext, IMessagePublisher messagePublisher, 
-            UserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider)
+            UserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider,
+            ISecurityService securityService)
         {
             _datasetContext = datasetContext;
             _messagePublisher = messagePublisher;
             _userService = userService;
             _jobService = jobService;
             _s3ServiceProvider = s3ServiceProvider;
+            _securityService = securityService;
         }
 
         public List<DataFlowDto> ListDataFlows()
@@ -54,6 +57,50 @@ namespace Sentry.data.Core
 
         public int CreateandSaveDataFlow(DataFlowDto dto)
         {
+            //Verify user has permissions to create Dataflow
+            UserSecurity us = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
+
+            if (!us.CanCreateDataFlow)
+            {
+                throw new DataFlowUnauthorizedAccessException();
+            }
+
+            //Verify user has permissions to push data to each schema mapped to dataflow
+            StringBuilder datasetsWithNoPermissions = new StringBuilder();
+            foreach(SchemaMapDto scmMap in dto.SchemaMap)
+            {
+                Dataset ds = _datasetContext.GetById<Dataset>(scmMap.DatasetId);
+                bool IsDatasetDetected = datasetsWithNoPermissions.ToString().Split(',').Any(a => a == ds.DatasetName);
+
+                UserSecurity dsUs = null;
+                //If dataset name is already in list do not retrieve security object again
+                if (!IsDatasetDetected)
+                {
+                    dsUs = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+                }
+
+                //Only check permissions if security object is populated.  Also prevents
+                //  returning list with dataset name listed multiple times.
+                if (dsUs != null && !dsUs.CanManageSchema && !dsUs.CanEditDataset)
+                {
+                    if (datasetsWithNoPermissions.Length > 0)
+                    {
+                        datasetsWithNoPermissions.Append($", {ds.DatasetName}");
+                    }
+                    else
+                    {
+                        datasetsWithNoPermissions.Append($"{ds.DatasetName}");
+                    }                    
+                }
+            }
+
+            //If SchemaMapDto contains dataset which user does not have permissions to 
+            // push data too, then throw an unauthorized exception.
+            if (datasetsWithNoPermissions.Length > 0)
+            {
+                throw new DatasetUnauthorizedAccessException($"No permissions to push data to {datasetsWithNoPermissions.ToString()}");
+            }
+
             try
             {
                 DataFlow df = CreateDataFlow(dto);
