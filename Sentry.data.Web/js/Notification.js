@@ -4,6 +4,8 @@
 
 data.Notification = {
 
+    Quill: null,                //declare as property for use later
+
     Init: function () {
         data.Notification.NotificationTableInit();
 
@@ -12,6 +14,63 @@ data.Notification = {
             data.AccessRequest.InitForNotification();
         });
 
+    },
+
+    /******************************************************************************************
+    * Init Quill RTF Editor and load with Notification Message
+    * ManageNotification View has Quill RTF editor which requires JS to load it and extract it
+    ******************************************************************************************/
+    initQuill: function () {
+
+        var toolbarOptions = [
+            [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+            ['link', 'image'],
+            ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+            [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
+            [{ 'direction': 'rtl' }],                         // text direction
+            [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+            [{ 'font': [] }],
+            [{ 'align': [] }],
+            ['clean']                                         // remove formatting button
+        ];
+
+
+        data.Notification.Quill = new Quill('#editor',
+        {
+            modules: {
+                toolbar: toolbarOptions
+            },
+            theme: 'snow'
+        });
+
+
+        //make ajax call to load notification message into Quill since we need to decode first
+        $.ajax({
+            url: "/Notification/GetQuillContents/",
+            method: "GET",
+            dataType: 'json',
+            data: { notificationId: $('.notificationId').val() }, 
+            success: function (obj) {
+                var messageDecoded = $("<div/>").html(obj.data).text();         //decode message since it is stored encoded
+                data.Notification.Quill.root.innerHTML = messageDecoded;        //set quill contents
+            }
+        });
+    },
+
+    /******************************************************************************************
+    * Because upon save we have to extract/decode message from Quill editor for safe storage, this js function will override the normal MVC subit
+    * we will grab the notification message, encode it and use a bogus text area which is actually the model.message
+    * when submit is triggered the ModifyNotification View will pick up the bogus encoded version and save that 
+    ******************************************************************************************/
+    submitChanges: function ()
+    {
+        var message = data.Notification.Quill.root.innerHTML;           //get html of quill editor
+        var messageEncoded = $("<div/>").text(message).html();          //encode message to safely pass and store
+        $('.messageEncoded').val(messageEncoded);                       //set messageEncoded TextArea so normal MVC submit will use it
+
+        $('.modifyNotificationForm').submit();                          //call submit which triggers SubmitNotification controller method
     },
 
     NotificationTableInit: function ()
@@ -75,17 +134,9 @@ data.Notification = {
 
     formatAssetNotificationTableDetails: function (d)
     {
-        //d is the original data object for the row
-        var htmlString = '<div id="preview-system-notification-wrapper">' +
-            '<div class="critical-notification-container">' +
-            '<div class="critical-notification-content-container">' +
-            '<div class="critical-notification-body">' + d.Message + d.MessageSeverity + '</div>' +
-            '</div>' +
-            '</div>' +
-            '</div>';
-        
         var div = document.createElement('div');
-        div.innerHTML = htmlString.trim();
+        var messageDecoded = $("<div/>").html(d.Message).text();         //decode message since it is stored encoded
+        div.innerHTML = messageDecoded.trim();
 
         return div.childNodes;
     },
