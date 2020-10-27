@@ -259,6 +259,7 @@
     <Compile Include="Interfaces\IDaleSearchProvider.cs" />
     <Compile Include="Interfaces\IDaleService.cs" />
     <Compile Include="Interfaces\IDataFeatures.cs" />
+    <Compile Include="Interfaces\IRetrieverJobService.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />
@@ -488,6 +489,7 @@
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.CSharp.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
