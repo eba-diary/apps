@@ -206,6 +206,7 @@
     <Compile Include="Exceptions\AWSLambdaNotFoundException.cs" />
     <Compile Include="Exceptions\AWSLambdaRequestLimitException.cs" />
     <Compile Include="Exceptions\AWSLambdaServiceException.cs" />
+    <Compile Include="Exceptions\DataFlowUnauthorizedAccessException.cs" />
     <Compile Include="Exceptions\DatasetFileConfigDeletedException.cs" />
     <Compile Include="Exceptions\DatasetNotFoundException.cs" />
     <Compile Include="Exceptions\DatasetUnauthorizedAccessException.cs" />
@@ -253,10 +254,12 @@
     <Compile Include="Interfaces\DataProcessing\ISchemaMapProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
+    <Compile Include="Interfaces\IHostSettings.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
     <Compile Include="Interfaces\IDaleSearchProvider.cs" />
     <Compile Include="Interfaces\IDaleService.cs" />
     <Compile Include="Interfaces\IDataFeatures.cs" />
+    <Compile Include="Interfaces\IRetrieverJobService.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />
@@ -486,6 +489,7 @@
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.CSharp.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

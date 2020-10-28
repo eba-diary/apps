@@ -353,7 +353,7 @@ namespace Sentry.data.Core
                 throw new DatasetUnauthorizedAccessException();
             }
 
-            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset || us.CanManageSchema))
             {
                 try
                 {

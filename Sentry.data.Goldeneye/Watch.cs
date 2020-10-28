@@ -1,19 +1,14 @@
-﻿using System;
+﻿using Hangfire;
+using Sentry.Common.Logging;
+using Sentry.data.Infrastructure;
+using StructureMap;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using Sentry.Common.Logging;
-using Sentry.data.Core;
-using Newtonsoft.Json;
-using System.Security.Cryptography;
-using StructureMap;
-using Sentry.data.Infrastructure;
-using Sentry.data.Common;
-using System.Threading.Tasks;
 using System.Threading;
-using Hangfire;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Goldeneye
 {

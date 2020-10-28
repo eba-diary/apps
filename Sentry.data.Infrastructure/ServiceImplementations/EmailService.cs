@@ -47,7 +47,7 @@ namespace Sentry.data.Infrastructure
             myMail.IsBodyHtml = true;
             
             StringBuilder body = new StringBuilder();
-            body.Append(@"<p><b><font color=""red"">Do Not Reply To This Email, This Inbox Is Not Monitored</font></b></p>");
+            body.Append(@"<p><b>Do Not Reply To This Email, This Inbox Is Not Monitored</b></p>");
             
             switch (interval)
             {
@@ -94,7 +94,7 @@ namespace Sentry.data.Infrastructure
         {
             StringBuilder body = new StringBuilder();
 
-            body.Append(@"<table cellpadding=""0"" cellspacing=""0"" border=""0"" width=""100 %"">");
+            body.Append(@"<table cellpadding=""0"" cellspacing=""0"" border=""0"" width=""100 %""  style=""background-color: aliceblue; "" > ");
             var groups = events.Where(x => x.Parent_Event != null).ToList();
             events.RemoveAll(x => x.Parent_Event != null);
 
@@ -138,16 +138,15 @@ namespace Sentry.data.Infrastructure
         public string FormatEventLine(EventTypeGroup group, Event e)
         {
             StringBuilder body = new StringBuilder();
-            body.Append(@"<tr>");
-            body.Append(@"<td>" + e.TimeCreated + @"</td>");
+
+            string columnStyle = @" style= ""vertical-align: top; padding-top:10px;"" ";                //Add style to add vertical alignment to each column and provide some space between rows
+            body.Append(@" <tr>");
+            body.Append(@" <td" + columnStyle   + " >" + e.TimeCreated + @"</td>");
 
             if (group == EventTypeGroup.BusinessArea)
             {
                 string reason = "<a href=" + Configuration.Config.GetHostSetting("WebApiUrl") + "/Notification/ManageNotification>" + e.Notification.Title + "</a>";
-                if (e.Notification.MessageSeverity == Core.GlobalEnums.NotificationSeverity.Critical)
-                {
-                    reason += "<br>" + e.Notification.Message;
-                }
+                reason += "<br>" + System.Net.WebUtility.HtmlDecode(e.Notification.Message);            //BA Events Message needs to be decoded because its stored as encoded HTML to show a RTF
                 body.Append(@"<td>" + reason + @"</td>");
             }
             else
@@ -159,12 +158,12 @@ namespace Sentry.data.Infrastructure
             //Needed to resolve service accounts
             int n;
             var user = int.TryParse(e.UserWhoStartedEvent.Trim(), out n) ? _associateInfoProvider.GetAssociateInfo(e.UserWhoStartedEvent.Trim()).FullName : e.UserWhoStartedEvent.Trim();
-            body.Append(@"<td>" + user + @"</td>");
-            body.Append(@"<td>" + e.EventType.Description + @"</td>");
+            body.Append(@"<td" + columnStyle + ">" + user + @"</td>");
+            body.Append(@"<td" + columnStyle + ">" + e.EventType.Description + @"</td>");
 
             if(group == EventTypeGroup.BusinessArea)
             {
-                body.Append(@"<td>" + e.Notification.ExpirationTime + @"</td>");
+                body.Append(@"<td" + columnStyle + ">" + e.Notification.ExpirationTime + @"</td>");
             }
 
             body.Append(@" </tr>");

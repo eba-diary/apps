@@ -16,7 +16,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44371</IISExpressSSLPort>
+    <IISExpressSSLPort>44321</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -857,6 +857,16 @@
     <Content Include="Scripts\prettycron.js" />
     <Content Include="Scripts\query-builder.js" />
     <Content Include="Scripts\query-builder.min.js" />
+    <Content Include="Scripts\quill\quill.bubble.css" />
+    <Content Include="Scripts\quill\quill.bubble.min.css" />
+    <Content Include="Scripts\quill\quill.core.css" />
+    <Content Include="Scripts\quill\quill.core.js" />
+    <Content Include="Scripts\quill\quill.core.min.css" />
+    <Content Include="Scripts\quill\quill.core.min.js" />
+    <Content Include="Scripts\quill\quill.js" />
+    <Content Include="Scripts\quill\quill.min.js" />
+    <Content Include="Scripts\quill\quill.snow.css" />
+    <Content Include="Scripts\quill\quill.snow.min.css" />
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\thenBy.min.js" />
@@ -1124,6 +1134,7 @@
     <Content Include="Content\DataTables\css\semanticui.scss" />
     <Content Include="Content\DataTables\css\mixins.scss" />
     <Content Include="Content\DataTables\css\common.scss" />
+    <Content Include="libman.json" />
     <None Include="Scripts\jquery-3.1.0-vsdoc.js" />
     <Content Include="Images\Category\claim.png" />
     <Content Include="Images\Category\claim.svg" />
@@ -1479,6 +1490,11 @@
     <Content Include="Views\Dale\DaleResult.cshtml" />
     <Content Include="Views\DataFlow\_AjaxMakeSchemaMap.cshtml" />
     <Content Include="Views\RetrieverJob\_RetrieverJob.cshtml" />
+    <Content Include="Scripts\quill\quill.bubble.min.css.map" />
+    <Content Include="Scripts\quill\quill.core.min.css.map" />
+    <Content Include="Scripts\quill\quill.core.min.js.map" />
+    <Content Include="Scripts\quill\quill.min.js.map" />
+    <Content Include="Scripts\quill\quill.snow.min.css.map" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1544,9 +1560,9 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2457</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:44371</IISUrl>
+          <IISUrl>https://localhost.sentry.com:44321</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>https://localhost.sentry.com:44371</IISAppRootUrl>
+          <IISAppRootUrl>https://localhost.sentry.com:44321</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
