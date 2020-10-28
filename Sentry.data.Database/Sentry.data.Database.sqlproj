@@ -257,6 +257,8 @@
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Dale\Sprint_20_04_02\1_ColumnSensitivityCurrent_v_UPDATE.sql" />
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Dale\Sprint_20_04_02\2_usp_DALE_BaseScanAction_UPDATE_PREP.sql" />
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Dale\Sprint_20_04_02\3_usp_DALE_BaseScanAction_UPDATE.sql" />
+    <Build Include="Tables\DataProcessing\EventMetrics.sql" />
+    <Build Include="Tables\DataProcessing\FileDetector.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
