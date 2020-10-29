@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Sentry.data.Core.GlobalEnums;
+﻿using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Web
 {
@@ -31,7 +27,17 @@ namespace Sentry.data.Web
                 c = "blue";
             }
 
-           return c;
+            return c;
         }
+
+        //This property used by PL Popover to decode prior to display
+        public System.Web.HtmlString MessageDecoded
+        {
+            get
+            {
+                return new System.Web.HtmlString(System.Net.WebUtility.HtmlDecode(Message));
+            }
+        }
+
     }
 }

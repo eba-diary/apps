@@ -1,12 +1,13 @@
 ﻿@model Sentry.data.Web.SystemNotificationItemModel
 
-<div class="list-group-item ">
+<div class="list-group-item-liberty">
     <div class="liberty-alert-icon-container">
         <div class="liberty-alert-icon glyphicon glyphicon-warning-sign" style="color: @Model.Color"> </div>
     </div>
     <div class="liberty-alert-item-content">
-        <div class="liberty-alert-category">@Model.NotificationDate</div>
+        <div class="liberty-alert-category"><strong>@Model.NotificationDate</strong></div>
         <p Class="list-group-item-text"><strong>@Model.Title</strong></p>
-        <p Class="list-group-item-text">@Model.Message</p>
+        <p Class="list-group-item-text">@Model.MessageDecoded</p>
+
     </div>
 </div>

@@ -72,7 +72,8 @@
 
 .liberty-alert-icon-container {
     display: table-cell;
-    vertical-align: middle;
+    vertical-align: top;
+    padding-top: 4px;
 }
 
 .liberty-alert-icon {
@@ -88,14 +89,13 @@
 
 .liberty-alert-category {
     color: #979797;
-    font-size: 12px;
+    font-size: 14px;
     position: absolute;
     top: 5px;
-    right: 5px;
 }
 
 .liberty-popover-medium {
-    max-width: 750px;
+    max-width: 40%;
 }
 
 .showing-active-notifications #showExpiredNotificationBtn {
@@ -104,4 +104,13 @@
 
 .showing-expired-notifications #showActiveNotificationBtn {
     display: none;
+}
+
+/*use this class for popover items*/
+.list-group-item-liberty {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    margin-bottom: -1px;
+    background-color: #fff;
 }

@@ -76,10 +76,15 @@ namespace Sentry.data.Core
         {
             Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).Select(s => s.ParentDataset).FirstOrDefault();
 
+            if (ds == null)
+            {
+                throw new DatasetNotFoundException();
+            }
+
             try
             {
                 UserSecurity us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
-                if (!(us.CanEditDataset))
+                if (!us.CanEditDataset && !us.CanManageSchema)
                 {
                     try
                     {
@@ -301,7 +306,7 @@ namespace Sentry.data.Core
             {
                 UserSecurity us;
                 us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
-                if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+                if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset || us.CanManageSchema))
                 {
                     try
                     {
@@ -349,7 +354,7 @@ namespace Sentry.data.Core
             {
                 UserSecurity us;
                 us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
-                if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+                if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset || us.CanManageSchema))
                 {
                     try
                     {
@@ -371,7 +376,7 @@ namespace Sentry.data.Core
 
             SchemaRevision revision = _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schemaId).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();
 
-            return revision.ToDto();
+            return (revision == null) ? null : revision.ToDto();
         }
 
         public List<DatasetFile> GetDatasetFilesBySchema(int schemaId)
