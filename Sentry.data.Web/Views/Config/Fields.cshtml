@@ -440,7 +440,7 @@
                                         });
                                     previousId = returnedData.Errors[i].Id;
                                 }
-                                parentvm.Errors.push({ 'Id': returnedData.Errors[i].Id, 'ErrorType': 'Type', 'Description': returnedData.Errors[i].Description });
+                                parentvm.Errors.push({ 'Id': returnedData.Errors[i].Id, 'ErrorType': 'Type', 'Description': returnedData.Errors[i].Description, 'DataObjectField_ID': self.DataObjectField_ID() });
                             }
 
                             //Adjust color of row
@@ -668,10 +668,10 @@
             self.Errors.subscribe(function () { self.ShowHideSaveButton() });
             self.ShowHideSaveButton = function () {
                 //If there are no errors on page, show save button
-                if (self.Errors !== undefined && self.Errors().length === 0) {
+                if (self.Errors() !== undefined && self.Errors().length === 0) {
                     $('#saveBtn').show();
                 }
-                else if (self.Errors === undefined && self.Errors().length > 0) {
+                else if (self.Errors() !== undefined && self.Errors().length > 0) {
                     $('#saveBtn').hide();
                 }
             };
@@ -713,8 +713,8 @@
                 })
 
                 row.DeleteInd(true);
-                self.Rows.valueHasMutated();
                 self.SortRows();
+                self.Rows.valueHasMutated();
             };
 
             self.save = function () {
@@ -766,12 +766,34 @@
                 }
             };
 
+            // Sorts all columns on page and ensures the rowNumberIdtentifier matches the item.position
+            //   Need to take into consideration item may have errors which is tracked by position,
+            //     therefore, need to adjust error records if neccessary
             self.SortRows = function () {
                 newVal = 0;
                 $('.schemaRowContainer').each(function (index) {
                     var httpItem = $(this).children().children().children().children('input[name="dataObjectField_Id"]').val();
                     var match = ko.utils.arrayFirst(self.SortedRows(), function (item) {
                         if (item.DataObjectField_ID() == httpItem && item.Position() != index + 1) {
+
+                            //find associated errors and save off
+                            var errs = vm.Errors().filter(f => f.DataObjectField_ID == item.DataObjectField_ID());
+
+                            //remove associated errors
+                            self.Errors.remove(function (err) {
+                                return err.DataObjectField_ID == item.DataObjectField_ID();
+                            });
+
+                            //change the Id element of error record
+                            for (var i in errs) {
+                                errs[i].Id = (index + 1);
+                            }
+
+                            //Push adjusted error records back onto vm.Errors
+                            ko.utils.arrayPushAll(self.Errors, errs);
+                            self.Errors.valueHasMutated();
+
+                            //Adjust the 
                             item.Position(index + 1);
                         }
                     })
