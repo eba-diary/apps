@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
+using System.Collections.Generic;
 
 namespace Sentry.data.Web
 {
@@ -24,9 +21,9 @@ namespace Sentry.data.Web
             };
         }
 
-        public static DaleResultModel ToWeb(this DaleResultDto dto)
+        public static DaleResultRowModel ToWeb(this DaleResultRowDto dto)
         {
-            return new DaleResultModel()
+            return new DaleResultRowModel()
             {
                 Asset = dto.Asset,
                 Server = dto.Server,
@@ -34,7 +31,7 @@ namespace Sentry.data.Web
                 Object = dto.Object,
                 ObjectType = dto.ObjectType,
                 Column = dto.Column,
-                
+
                 IsSensitive = dto.IsSensitive,
                 Alias = dto.Alias,
                 ProdType = dto.ProdType,
@@ -51,9 +48,55 @@ namespace Sentry.data.Web
             };
         }
 
-        public static List<DaleResultModel> ToWeb(this List<DaleResultDto> dtos)
+
+        public static DaleResultModel ToWeb(this DaleResultDto dto)
         {
-            List<DaleResultModel> models = new List<DaleResultModel>();
+            return new DaleResultModel()
+            {
+                DaleResults = dto.DaleResults.ToWeb(),
+                DaleEvent = dto.DaleEvent
+            };
+        }
+
+        public static DaleContainSensitiveResultModel ToWeb(this DaleContainSensitiveResultDto dto)
+        {
+            return new DaleContainSensitiveResultModel()
+            {
+                DoesContainSensitiveResults = dto.DoesContainSensitiveResults,
+                DaleEvent = dto.DaleEvent
+            };
+        }
+
+        public static DaleCategoryResultModel ToWeb(this DaleCategoryResultDto dto)
+        {
+            return new DaleCategoryResultModel()
+            {
+                DaleCategories = dto.DaleCategories.ToWeb(),
+                DaleEvent = dto.DaleEvent
+            };
+        }
+
+        public static List<DaleCategoryModel> ToWeb(this List<DaleCategoryDto> dtos)
+        {
+            List<DaleCategoryModel> models = new List<DaleCategoryModel>();
+
+            dtos.ForEach(x => models.Add(x.ToWeb()));
+
+            return models;
+        }
+
+        public static DaleCategoryModel ToWeb(this DaleCategoryDto dto)
+        {
+            return new DaleCategoryModel()
+            {
+                Category = dto.Category,
+                IsSensitive = dto.IsSensitive
+            };
+        }
+
+        public static List<DaleResultRowModel> ToWeb(this List<DaleResultRowDto> dtos)
+        {
+            List<DaleResultRowModel> models = new List<DaleResultRowModel>();
 
             dtos.ForEach(x => models.Add(x.ToWeb()));
 
@@ -62,13 +105,25 @@ namespace Sentry.data.Web
 
         public static DaleDestiny ToDaleDestiny(this string destiny)
         {
-            if(destiny == DaleDestiny.Column.GetDescription())
+            if (destiny.ToUpper() == DaleDestiny.Column.GetDescription().ToUpper())
             {
                 return DaleDestiny.Column;
             }
-            else 
+            else if (destiny.ToUpper() == DaleDestiny.Object.GetDescription().ToUpper())
             {
                 return DaleDestiny.Object;
+            }
+            else if(destiny.ToUpper() == DaleDestiny.SAID.GetDescription().ToUpper())
+            {
+                return DaleDestiny.SAID;
+            }
+            else if (destiny.ToUpper() == DaleDestiny.Server.GetDescription().ToUpper())
+            {
+                return DaleDestiny.Server;
+            }
+            else 
+            {
+                return DaleDestiny.Database;
             }
         }
 

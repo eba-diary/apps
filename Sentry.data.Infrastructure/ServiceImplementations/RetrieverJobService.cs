@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
-    public class RetrieverJobService
+    public class RetrieverJobService : IRetrieverJobService
     {
         private RetrieverJob _job;
         private Submission _submission;

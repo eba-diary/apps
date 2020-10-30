@@ -97,7 +97,9 @@ namespace Sentry.data.Web.Controllers
         {
             List<NotificationModel> files = _notificationService.GetAllNotifications().ToWeb();
             DataTablesQueryableAdapter<NotificationModel> dtqa = new DataTablesQueryableAdapter<NotificationModel>(files.AsQueryable(), dtRequest);
-            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+            JsonResult result = Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+            result.MaxJsonLength = Int32.MaxValue;              //need to set MaxJsonLength to avoid 500 exceptions because of large json coming back since notifications contain images now
+            return result;
         }
 
         public ActionResult AccessRequest()
@@ -185,6 +187,15 @@ namespace Sentry.data.Web.Controllers
             SubscriptionDto dto = sm.ToDto();
             _notificationService.CreateUpdateSubscription(dto);
             return Redirect(Request.UrlReferrer.PathAndQuery);
+        }
+
+        [HttpGet]
+        //method called by Notification.js to get notification message from DB so JS can decode it and load Quill
+        public JsonResult GetQuillContents(int notificationId)
+        {
+            NotificationModel model = _notificationService.GetNotificationModelForModify(notificationId).ToWeb();
+            JsonResult result = Json(new { data = model.Message }, JsonRequestBehavior.AllowGet);
+            return result;
         }
 
     }

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sentry.data.Infrastructure</RootNamespace>
     <AssemblyName>Sentry.data.Infrastructure</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <SccProjectName>SAK</SccProjectName>
@@ -153,8 +153,8 @@
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Routing" />
@@ -170,6 +170,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppSettings\HostSettingsWrapper.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Exceptions\S3ServiceProviderException.cs" />
     <Compile Include="FeatureFlags\DataFeatures.cs" />
@@ -267,11 +268,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Service References\HPMSChangeManagement\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Compile>
     <Compile Include="ServiceImplementations\AWSLambdaProvider.cs" />
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
     <Compile Include="ServiceImplementations\DaleSearchProvider.cs" />
@@ -293,6 +289,10 @@
     <Compile Include="ServiceImplementations\DataSourceProviders\FtpDataFlowProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\GoogleAPIDataFlowProvider.cs" />
     <Compile Include="ServiceImplementations\Messaging\DataStepProcessorService.cs" />
+    <Compile Include="ServiceImplementations\Messaging\DfsEventService.cs" />
+    <Compile Include="ServiceImplementations\Messaging\Events\DfsEvent.cs" />
+    <Compile Include="ServiceImplementations\Messaging\Events\Payloads\DfsEventPayload.cs" />
+    <Compile Include="ServiceImplementations\Messaging\Handlers\DfsEventHandler.cs" />
     <Compile Include="ServiceImplementations\Messaging\S3EventService.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\BaseTicketProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\CherwellProvider.cs" />
@@ -364,391 +364,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="Sentry.data.Infrastructure.ruleset" />
-    <None Include="Service References\HPMSChangeManagement\ChangeManagement.wsdl" />
-    <None Include="Service References\HPMSChangeManagement\Common.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ApproveChangeIIAResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ApproveChangeIIAResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ApproveChangeRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ApproveChangeRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ApproveChangeResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ApproveChangeResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ApproveChangeTaskRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ApproveChangeTaskRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ApproveChangeTaskResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ApproveChangeTaskResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CloseChangeIIAResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CloseChangeIIAResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CloseChangeRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CloseChangeRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CloseChangeResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CloseChangeResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CloseChangeTaskRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CloseChangeTaskRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CloseChangeTaskResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CloseChangeTaskResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CreateChangeIIAResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CreateChangeIIAResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CreateChangeRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CreateChangeRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CreateChangeResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CreateChangeResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CreateChangeTaskRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CreateChangeTaskRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CreateChangeTaskResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.CreateChangeTaskResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.DenyChangeIIAResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.DenyChangeIIAResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.DenyChangeRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.DenyChangeRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.DenyChangeResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.DenyChangeResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.DenyChangeTaskRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.DenyChangeTaskRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.DenyChangeTaskResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.DenyChangeTaskResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.GetChangeOperatorInformationResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.GetChangeOperatorInformationResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.GetChangeTaskOperatorInformationResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.GetChangeTaskOperatorInformationResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.MoveToNextPhaseChangeIIAResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.MoveToNextPhaseChangeIIAResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.MoveToNextPhaseChangeRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.MoveToNextPhaseChangeRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.MoveToNextPhaseChangeResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.MoveToNextPhaseChangeResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.MoveToNextPhaseChangeTaskRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.MoveToNextPhaseChangeTaskRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.MoveToNextPhaseChangeTaskResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.MoveToNextPhaseChangeTaskResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ReopenChangeIIAResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ReopenChangeIIAResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ReopenChangeRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ReopenChangeRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ReopenChangeResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ReopenChangeResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ReopenChangeTaskRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ReopenChangeTaskRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ReopenChangeTaskResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.ReopenChangeTaskResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetractChangeIIAResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetractChangeIIAResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetractChangeRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetractChangeRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetractChangeResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetractChangeResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetractChangeTaskRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetractChangeTaskRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetractChangeTaskResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetractChangeTaskResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeIIAKeysListResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeIIAKeysListResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeIIAListResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeIIAListResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeIIAResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeIIAResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeKeysListResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeKeysListResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeListResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeListResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeOperatorInformationKeysListResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeOperatorInformationKeysListResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeOperatorInformationListResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeOperatorInformationListResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeOperatorInformationResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeOperatorInformationResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeRCKeysListResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeRCKeysListResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeRCListResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeRCListResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskKeysListResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskKeysListResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskListResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskListResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskOperatorInformationKeysListResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskOperatorInformationKeysListResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskOperatorInformationListResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskOperatorInformationListResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskOperatorInformationResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskOperatorInformationResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskRCKeysListResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskRCKeysListResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskRCListResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskRCListResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.RetrieveChangeTaskResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.UpdateChangeIIAResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.UpdateChangeIIAResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.UpdateChangeRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.UpdateChangeRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.UpdateChangeResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.UpdateChangeResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.UpdateChangeTaskRCResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.UpdateChangeTaskRCResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.UpdateChangeTaskResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\Sentry.data.Infrastructure.HPMSChangeManagement.UpdateChangeTaskResponse1.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\xmlmime.xsd">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\AWSSDK.Lambda.3.3.107.3\analyzers\dotnet\cs\AWSSDK.Lambda.CodeAnalysis.dll" />
@@ -766,12 +381,6 @@
     <Content Include="Scripts\jquery-1.6.4-vsdoc.js" />
     <Content Include="Scripts\jquery-1.6.4.js" />
     <Content Include="Scripts\jquery-1.6.4.min.js" />
-    <None Include="Service References\HPMSChangeManagement\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
-    <None Include="Service References\HPMSChangeManagement\configuration.svcinfo" />
-    <None Include="Service References\HPMSChangeManagement\configuration91.svcinfo" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

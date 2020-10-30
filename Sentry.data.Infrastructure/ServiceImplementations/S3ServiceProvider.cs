@@ -36,14 +36,7 @@ namespace Sentry.data.Infrastructure
             {
                 if (_bucket == null)
                 {
-                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                    {
-                        IDataFeatures dataFeatures = container.GetInstance<IDataFeatures>();
-
-                        _bucket = dataFeatures.Use_AWS_v2_Configuration_CLA_1488.GetValue()
-                            ? Config.GetHostSetting("AWS2_0RootBucket")
-                            : Config.GetHostSetting("AWSRootBucket");
-                    }
+                    _bucket = Config.GetHostSetting("AWS2_0RootBucket");
                 }
                 return _bucket;
             }
@@ -54,82 +47,32 @@ namespace Sentry.data.Infrastructure
             {
                 if (_awsRegion == null)
                 {
-                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                    {
-                        IDataFeatures dataFeatures = container.GetInstance<IDataFeatures>();
-
-                        _awsRegion = dataFeatures.Use_AWS_v2_Configuration_CLA_1488.GetValue()
-                            ? Config.GetHostSetting("AWS2_0Region")
-                            : Config.GetHostSetting("AWSRegion");
-                    }
+                    _awsRegion = Config.GetHostSetting("AWS2_0Region");
                 }
                 return _awsRegion;
             }
         }
-        private static bool UseAWS2_0
-        {
-            get
-            {
-                if (_useAws2_0 == null)
-                {
-                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                    {
-                        IDataFeatures dataFeatures = container.GetInstance<IDataFeatures>();
 
-                        _useAws2_0 = dataFeatures.Use_AWS_v2_Configuration_CLA_1488.GetValue().ToString();
-                    }
-                }
-                return bool.Parse(_useAws2_0);
-            }
-        }
         private static string GetProxyHost()
-        {
-            if (!UseAWS2_0)
+        {            
+            if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryServerProxyHost")))
             {
-                if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyHost")))
-                {
-                    throw new S3ServiceProviderException("SentryS3ProxyHost cannot be found");
-                }
-                else
-                {
-                    return Config.GetHostSetting("SentryS3ProxyHost");
-                }
+                throw new S3ServiceProviderException("SentryServerProxyHost cannot be found");
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryServerProxyHost")))
-                {
-                    throw new S3ServiceProviderException("SentryServerProxyHost cannot be found");
-                }
-                else
-                {
-                    return Config.GetHostSetting("SentryServerProxyHost");
-                }
+                return Config.GetHostSetting("SentryServerProxyHost");
             }
         }
         private static string GetProxyPort() 
-        {
-            if (!UseAWS2_0)
+        {            
+            if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryServerProxyPort")))
             {
-                if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryS3ProxyPort")))
-                {
-                    throw new S3ServiceProviderException("SentryS3ProxyPort cannot be found");
-                }
-                else
-                {
-                    return Config.GetHostSetting("SentryS3ProxyPort");
-                }
+                throw new S3ServiceProviderException("SentryServerProxyPort cannot be found");
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(Config.GetHostSetting("SentryServerProxyPort")))
-                {
-                    throw new S3ServiceProviderException("SentryServerProxyPort cannot be found");
-                }
-                else
-                {
-                    return Config.GetHostSetting("SentryServerProxyPort");
-                }
+                return Config.GetHostSetting("SentryServerProxyPort");
             }
         }
         private static string GetAwsAccessKey()
@@ -164,6 +107,15 @@ namespace Sentry.data.Infrastructure
             {
                 return Config.GetHostSetting("AWSProfileName");
             }
+        }
+
+        /// <summary>
+        /// This should be removed once application is running on ae2 EC2
+        /// </summary>
+        /// <returns></returns>
+        private static S3CannedACL GetCannedAcl()
+        {
+            return S3CannedACL.BucketOwnerFullControl;
         }
 
         public static S3ServiceProvider Instance
@@ -206,19 +158,20 @@ namespace Sentry.data.Infrastructure
                      *  For AWS 2.0 Running on Server in AWS 1.0, always use Proxy and Key\Secret key
                      *  For AWs 2.0 Running on Server in AWS 2.0, no proxy usage and do not specify credentials (will be set on EC2 Instance)
                      */
-                    Logger.Debug($"<s3serviceprovider> UseAWS2_0 : {UseAWS2_0.ToString()}");
+                    Logger.Debug($"<s3serviceprovider> UseInstanceProfile : {Config.GetHostSetting("UseInstanceProfile")}");
                     Logger.Debug($"<s3serviceprovider> UseAWSProfileName : {Config.GetHostSetting("UseAWSProfileName")}");
                     //Use AWS keys when connecting to 1.0 or 2.0 and profile is not used.
-                    if (!UseAWS2_0 || (UseAWS2_0 && !bool.Parse(Config.GetHostSetting("UseAWSProfileName"))))
+                    if (!bool.Parse(Config.GetHostSetting("UseAWSProfileName")) && !bool.Parse(Config.GetHostSetting("UseInstanceProfile")))
                     {
                         client = GetKeyBasedClient(s3config);
                     }
-                    else if (UseAWS2_0 && bool.Parse(Config.GetHostSetting("UseAWSProfileName")))
+                    else if (bool.Parse(Config.GetHostSetting("UseAWSProfileName")) && !bool.Parse(Config.GetHostSetting("UseInstanceProfile")))
                     {
                         client = GetProfileBasedClient(s3config);
                     }
                     else
                     {
+                        Logger.Debug("<s3serviceprovider> Use EC2 Instance Profile for authentication / access");
                         client = new AmazonS3Client(s3config);
                     }
 
@@ -371,6 +324,7 @@ namespace Sentry.data.Infrastructure
                 s3tuReq.Key = folder + fileName;
                 s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 s3tuReq.AutoCloseStream = true;
+                s3tuReq.CannedACL = GetCannedAcl();
                 s3tu.Upload(s3tuReq);
             }
             catch (AmazonS3Exception e)
@@ -396,6 +350,7 @@ namespace Sentry.data.Infrastructure
                 s3tuReq.Key = key;
                 s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 s3tuReq.AutoCloseStream = true;
+                s3tuReq.CannedACL = GetCannedAcl();
 
                 s3tu.Upload(s3tuReq);
             }
@@ -523,6 +478,7 @@ namespace Sentry.data.Infrastructure
             mReq.BucketName = RootBucket;
             mReq.Key = uniqueKey;
             mReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+            mReq.CannedACL = GetCannedAcl();
             InitiateMultipartUploadResponse mRsp = S3Client.InitiateMultipartUpload(mReq);
 
             Sentry.Common.Logging.Logger.Debug($"Initiated MultipartUpload UploadID: {mRsp.UploadId}");
@@ -712,7 +668,8 @@ namespace Sentry.data.Infrastructure
                 poReq.BucketName = RootBucket;
                 poReq.Key = targetKey;
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
-                poReq.AutoCloseStream = true;                
+                poReq.AutoCloseStream = true;
+                poReq.CannedACL = GetCannedAcl();
 
                 Sentry.Common.Logging.Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
 
@@ -749,6 +706,7 @@ namespace Sentry.data.Infrastructure
                 poReq.BucketName = RootBucket;
                 poReq.Key = targetKey;
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+                poReq.CannedACL = GetCannedAcl();
 
                 Sentry.Common.Logging.Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
 
@@ -1163,7 +1121,8 @@ namespace Sentry.data.Infrastructure
                         SourceKey = srcKey,
                         DestinationBucket = destBucket,
                         DestinationKey = destKey,
-                        ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256
+                        ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256,
+                        CannedACL = S3CannedACL.BucketOwnerFullControl
                     };
 
                     CopyObjectResponse response = S3Client.CopyObject(request);

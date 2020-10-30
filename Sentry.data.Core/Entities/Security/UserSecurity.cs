@@ -28,5 +28,11 @@ namespace Sentry.data.Core
         public bool CanCreateDataSource { get; set; }
 
         public bool ShowAdminControls { get; set; }
+        public bool CanManageSchema { get; set; }
+
+        //Derived Permissions
+        // Based on more than one other permission to contain logic within single property
+        public bool CanCreateDataFlow { get; set; }
+        public bool CanModifyDataflow { get; set; }
     }
 }

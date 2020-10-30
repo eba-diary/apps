@@ -44,9 +44,7 @@ namespace Sentry.data.Core
             {
                 if (_bucket == null)
                 {
-                    _bucket = _featureFlags.Use_AWS_v2_Configuration_CLA_1488.GetValue()
-                        ? Config.GetHostSetting("AWS2_0RootBucket")
-                        : Config.GetHostSetting("AWSRootBucket");
+                    _bucket = Config.GetHostSetting("AWS2_0RootBucket");
                 }
                 return _bucket;
             }
@@ -78,10 +76,15 @@ namespace Sentry.data.Core
         {
             Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).Select(s => s.ParentDataset).FirstOrDefault();
 
+            if (ds == null)
+            {
+                throw new DatasetNotFoundException();
+            }
+
             try
             {
                 UserSecurity us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
-                if (!(us.CanEditDataset))
+                if (!us.CanEditDataset && !us.CanManageSchema)
                 {
                     try
                     {
@@ -303,7 +306,7 @@ namespace Sentry.data.Core
             {
                 UserSecurity us;
                 us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
-                if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+                if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset || us.CanManageSchema))
                 {
                     try
                     {
@@ -351,7 +354,7 @@ namespace Sentry.data.Core
             {
                 UserSecurity us;
                 us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
-                if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+                if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset || us.CanManageSchema))
                 {
                     try
                     {
@@ -373,7 +376,7 @@ namespace Sentry.data.Core
 
             SchemaRevision revision = _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schemaId).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();
 
-            return revision.ToDto();
+            return (revision == null) ? null : revision.ToDto();
         }
 
         public List<DatasetFile> GetDatasetFilesBySchema(int schemaId)
@@ -681,8 +684,11 @@ namespace Sentry.data.Core
         }
 
         private string GenerateHiveDatabaseName(Category cat)
-        {            
-            return "dsc_" + cat.Name.ToLower();
+        {
+            string curEnv = Config.GetDefaultEnvironmentName().ToLower();
+            string dbName = "dsc_" + cat.Name.ToLower();
+
+            return (curEnv == "prod" || curEnv == "qual") ? dbName : $"{curEnv}_{dbName}";
         }
 
         private BaseField AddRevisionField(BaseFieldDto row, SchemaRevision CurrentRevision, BaseField parentRow = null, SchemaRevision previousRevision = null)

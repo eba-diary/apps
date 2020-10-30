@@ -20,13 +20,47 @@ namespace Sentry.data.Web.Controllers
             _daleService = daleService;
         }
 
-        public ActionResult DaleSearch()
+        //ALLOWED TARGETS=entity,column,SAID
+        //https://localhost.sentry.com:44371/DataInventory/Search/?target=column&search=weather&filter=ssn
+        //https://localhost.sentry.com:44371/DataInventory/Search/?target=said&search=CODS
+        [Route("DataInventory/Search/")]
+        public ActionResult DaleSearch(string target=null, string search=null, string filter=null)
         {
             if( CanDaleView() ) 
             {
                 DaleSearchModel searchModel = new DaleSearchModel();
                 searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
                 searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
+                
+                if(String.IsNullOrEmpty(search))
+                {
+                    searchModel.Destiny = DaleDestiny.Column;
+                }
+                else
+                {
+                    searchModel.Criteria = search;                       
+                    bool targetFound = false;
+
+                    if(IsTargetValid(target))
+                    {
+                        if (target.ToUpper() == "SAID")
+                        {
+                            searchModel.Destiny = DaleDestiny.SAID;
+                            targetFound = true;
+                            
+                        }
+                        else if (target.ToUpper() == "ENTITY")
+                        {
+                            searchModel.Destiny = DaleDestiny.Object;
+                            targetFound = true;
+                        }
+                    }
+                    
+                    if(!targetFound)
+                    {
+                        searchModel.Destiny = DaleDestiny.Column;           //default to column
+                    }
+                }
 
                 return View(searchModel);
             }
@@ -34,6 +68,28 @@ namespace Sentry.data.Web.Controllers
             {
                 return View("Forbidden");
             }
+        }
+
+        private bool IsTargetValid(string target)
+        {
+            bool valid = false;
+
+            if (String.IsNullOrEmpty(target))
+            {
+                return false;
+            }
+
+            if (target.ToUpper() == "SAID")
+            {
+                valid = true;
+            }
+            
+            if (target.ToUpper() == "ENTITY")
+            {
+                valid = true;
+            }
+
+            return valid;
         }
 
         //use for ServerSide DataTable processing
@@ -83,14 +139,15 @@ namespace Sentry.data.Web.Controllers
             //DO NOT perform search if invalid criteria OR sensitive and they lack permissions. NOTE: if they lack permissions, VIEW hides ability to even click sensitive link
             if (!IsCriteriaValid(searchModel) || ( sensitive && !CanDaleSensitiveView() ) )            
             {
-                searchModel.DaleResults = new List<DaleResultModel>();
+                searchModel.DaleResultModel = new DaleResultModel();
+                searchModel.DaleResultModel.DaleResults = new List<DaleResultRowModel>();
             }
             else
             {
-                searchModel.DaleResults = _daleService.GetSearchResults(searchModel.ToDto()).ToWeb();
+                searchModel.DaleResultModel = _daleService.GetSearchResults(searchModel.ToDto()).ToWeb();
             }
 
-            JsonResult result = Json(new { data = searchModel.DaleResults}, JsonRequestBehavior.AllowGet);
+            JsonResult result = Json(new { data = searchModel.DaleResultModel.DaleResults}, JsonRequestBehavior.AllowGet);
             result.MaxJsonLength = Int32.MaxValue;  //need to set MaxJsonLength to avoid 500 exceptions because of large json coming back since we are doing client side for max performance
 
             return result;
@@ -111,7 +168,7 @@ namespace Sentry.data.Web.Controllers
             }
 
             //validate to ensure valid destination
-            if ((model.Destiny != DaleDestiny.Object) && (model.Destiny != DaleDestiny.Column))
+            if ((model.Destiny != DaleDestiny.Object) && (model.Destiny != DaleDestiny.Column) && (model.Destiny != DaleDestiny.SAID))
             {
                 return false;
             }

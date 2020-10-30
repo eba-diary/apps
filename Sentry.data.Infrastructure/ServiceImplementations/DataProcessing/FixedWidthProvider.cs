@@ -149,7 +149,8 @@ namespace Sentry.data.Infrastructure
 
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
 
-                _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JsonConvert.SerializeObject(stepEvent));
+                _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}-{RandomString(6)}", JsonConvert.SerializeObject(stepEvent));
+                //_messagePublisher.PublishDSCEvent(string.Empty, JsonConvert.SerializeObject(stepEvent));
 
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <{_step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
             }

@@ -72,6 +72,8 @@
             public const string NOTIFICATION_WARNING_UPDATE = "Warning Notification Update";
             public const string NOTIFICATION_INFO_UPDATE = "Info Notification Update";
 
+            public const string DALE_SEARCH = "DaleQuery";
+
         }
 
         public static class Statuses
@@ -163,6 +165,7 @@
             public const string CAN_UPLOAD_TO_DATASET = "CanUploadToDataset";
             public const string CAN_MODIFY_NOTIFICATIONS = "CanModifyNotification";
             public const string CAN_USE_DATA_SOURCE = "CanUseDataSource";
+            public const string CAN_MANAGE_SCHEMA = "CanManageSchema";
 
             public const string USE_APP = "UseApp";
 
@@ -204,7 +207,7 @@
             public const string DATAASSET_TYPE = "DA";
             public const string BUSINESSAREA_TYPE = "BA";
             public const int TITLE_MAX_SIZE = 250;
-            public const int MESSAGE_MAX_SIZE = 1000;
+            public const int MESSAGE_MAX_SIZE = 1073741823;
         }
 
         public static class JobStates

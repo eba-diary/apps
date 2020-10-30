@@ -61,6 +61,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(us.CanCreateReport);
             Assert.IsTrue(us.CanEditDataset);
             Assert.IsTrue(us.CanEditReport);
+            Assert.IsTrue(us.CanManageSchema);
         }
 
         /// <summary>
@@ -90,6 +91,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsFalse(us.CanCreateReport);
             Assert.IsFalse(us.CanEditDataset);
             Assert.IsFalse(us.CanEditReport);
+            Assert.IsFalse(us.CanManageSchema);
         }
 
         /// <summary>
@@ -115,13 +117,14 @@ namespace Sentry.data.Core.Tests
             Assert.IsFalse(us.CanCreateReport);
             Assert.IsFalse(us.CanEditDataset);
             Assert.IsFalse(us.CanEditReport);
+            Assert.IsFalse(us.CanManageSchema);
         }
 
         /// <summary>
         /// Even though the user has the Modify Dataset permission, they should not be able to edit because they are not the owner.
         /// </summary>
         [TestMethod]
-        public void Security_Can_Edit_Dataset()
+        public void Security_Can_Edit_Dataset_User_With_Modify()
         {
             //ARRAGE
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
@@ -139,7 +142,8 @@ namespace Sentry.data.Core.Tests
             //ASSERT
             Assert.IsFalse(us.CanEditDataset);
         }
-
+        
+        
         /// <summary>
         /// user should be able to edit dataset with Modify permission and being the owner.
         /// </summary>
@@ -184,6 +188,102 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsFalse(us.CanEditDataset);
+        }
+
+        #endregion
+
+        #region CanManageSchema
+        /// <summary>
+        /// Even though the user has the Modify Dataset permission, they should not be able to manage schema because did not request the permission and are not owner.
+        /// </summary>
+        [TestMethod]
+        public void Security_Can_Manage_Schema_NonSecured_User_With_Modify()
+        {
+            //ARRAGE
+            ISecurable securable = MockRepository.GenerateMock<ISecurable>();
+            securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
+            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
+
+            IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(securable, user);
+
+            //ASSERT
+            Assert.IsFalse(us.CanManageSchema);
+        }
+        /// <summary>
+        /// Even though the user has the Modify Dataset permission, they should not be able to manage schema because did not request the permission and are not owner.
+        /// </summary>
+        [TestMethod]
+        public void Security_Can_Manage_Schema_Secured_User_With_Modify()
+        {
+            //ARRAGE
+            ISecurable securable = MockRepository.GenerateMock<ISecurable>();
+            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
+            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
+
+            IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(securable, user);
+
+            //ASSERT
+            Assert.IsFalse(us.CanManageSchema);
+        }
+
+        /// <summary>
+        /// user should be able to manage schema with Modify permission and being the owner.
+        /// </summary>
+        [TestMethod]
+        public void Security_Can_Manage_Schema_NonSecured_As_Owner_With_Modify_Permission()
+        {
+            //ARRAGE
+            ISecurable securable = MockRepository.GenerateMock<ISecurable>();
+            securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
+            securable.Stub(x => x.PrimaryOwnerId).Return("999999").Repeat.Any();
+
+            IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(securable, user);
+
+            //ASSERT
+            Assert.IsTrue(us.CanManageSchema);
+        }
+
+        /// <summary>
+        /// Even though the user is the owner, they do not have the modify permission, they should not be able to manage schema.
+        /// </summary>
+        [TestMethod]
+        public void Security_Can_Manage_Schema_Secured_As_Owner_Without_Modify_Permission()
+        {
+            //ARRAGE
+            Security security = BuildBaseSecurity();
+            ISecurable securable = MockRepository.GenerateMock<ISecurable>();
+            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
+            securable.Stub(x => x.PrimaryOwnerId).Return("999999").Repeat.Any();
+            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+
+            IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            user.Stub(x => x.CanModifyDataset).Return(false).Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(securable, user);
+
+            //ASSERT
+            Assert.IsFalse(us.CanManageSchema);
         }
 
         #endregion
@@ -583,6 +683,63 @@ namespace Sentry.data.Core.Tests
 
         #endregion
 
+        #region CanCreateDataflow
+        /// <summary>
+        /// Can Preview Dataset.  no user available.
+        /// </summary>
+        [TestMethod]
+        public void Security_CanCreateDataflow_NullSecurable_Admin()
+        {
+            //ARRAGE
+            IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(null, user);
+
+            //ASSERT
+            Assert.IsTrue(us.CanCreateDataFlow);
+        }
+
+        /// <summary>
+        /// Can Preview Dataset.  no user available.
+        /// </summary>
+        [TestMethod]
+        public void Security_CanCreateDataflow_NullSecurable_NonAdmin_NoPermissions()
+        {
+            //ARRAGE
+            IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(null, user);
+
+            //ASSERT
+            Assert.IsFalse(us.CanCreateDataFlow);
+        }
+
+        /// <summary>
+        /// Can Preview Dataset.  no user available.
+        /// </summary>
+        [TestMethod]
+        public void Security_CanCreateDataflow_NullSecurable_NonAdmin_With_Modify_Permissions()
+        {
+            //ARRAGE
+            IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(null, user);
+
+            //ASSERT
+            Assert.IsTrue(us.CanCreateDataFlow);
+        }
+        #endregion
 
 
         #region "Private helpers"
@@ -666,6 +823,17 @@ namespace Sentry.data.Core.Tests
                 PermissionCode = GlobalConstants.PermissionCodes.CAN_UPLOAD_TO_DATASET,
                 PermissionDescription = "Can Upload Dataset Description",
                 PermissionName = "Can Upload Dataset Name",
+                SecurableObject = GlobalConstants.SecurableEntityName.DATASET
+            };
+        }
+
+        private Permission CanManageSchema()
+        {
+            return new Permission()
+            {
+                PermissionCode = GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA,
+                PermissionDescription = "Can Manage Schema Description",
+                PermissionName = "Can Manage Schema Name",
                 SecurableObject = GlobalConstants.SecurableEntityName.DATASET
             };
         }

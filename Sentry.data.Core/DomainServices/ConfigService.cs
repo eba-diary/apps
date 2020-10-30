@@ -62,9 +62,7 @@ namespace Sentry.data.Core
             {
                 if (_bucket == null)
                 {
-                    _bucket = _featureFlags.Use_AWS_v2_Configuration_CLA_1488.GetValue()
-                            ? Config.GetHostSetting("AWS2_0RootBucket")
-                            : Config.GetHostSetting("AWSRootBucket");
+                    _bucket = Config.GetHostSetting("AWS2_0RootBucket");
                 }
                 return _bucket;
             }
@@ -355,7 +353,7 @@ namespace Sentry.data.Core
                 throw new DatasetUnauthorizedAccessException();
             }
 
-            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset || us.CanManageSchema))
             {
                 try
                 {
@@ -431,7 +429,7 @@ namespace Sentry.data.Core
                 HasHeader = dto.HasHeader,
                 FileFormat = _datasetContext.GetById<FileExtension>(dto.FileExtensionId).Name.Trim(),
                 StorageCode = storageCode,
-                HiveDatabase = "Default",
+                HiveDatabase = GenerateHiveDatabaseName(ds.DatasetCategories.First()),
                 HiveTable = ds.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.SchemaName.Replace(" ", "").ToUpper(),
                 HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
                 HiveLocation = RootBucket + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
@@ -737,6 +735,14 @@ namespace Sentry.data.Core
         }
 
         #region PrivateMethods
+        private string GenerateHiveDatabaseName(Category cat)
+        {
+            string curEnv = Config.GetDefaultEnvironmentName().ToLower();
+            string dbName = "dsc_" + cat.Name.ToLower();
+
+            return (curEnv == "prod" || curEnv == "qual") ? dbName : $"{curEnv}_{dbName}";
+        }
+
         private void MarkForDelete(DatasetFileConfig dfc)
         {
             dfc.DeleteInd = true;
