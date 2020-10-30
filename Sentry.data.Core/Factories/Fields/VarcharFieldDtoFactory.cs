@@ -43,7 +43,7 @@ namespace Sentry.data.Core.Factories.Fields
             }
             else if (IsProperty)
             {
-                return new VarcharFieldDto(_property, _array, _rowPosition);
+                return new VarcharFieldDto(_property, _rowPosition, _array);
             }
             else if (IsRow)
             {

@@ -342,7 +342,7 @@ namespace Sentry.data.Core
                     default:
                         Logger.Warn($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} which is not handled by DSC");
 
-                        fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, ++rowPosition, true);
+                        fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, ++rowPosition);
 
                         AddToFieldList(dtoList, parentRow, fieldFactory.GetField());
 
