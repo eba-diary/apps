@@ -190,7 +190,7 @@
 
 
     <div id="schemaPanel">
-        <ul class="rules-group-container row fields-sortable-ul" id="fields" data-bind="template: {name: 'RowTemplate' , foreach: SortedRows}, css: SortableRows()" style="list-style-type: none;margin-left:0px;padding-left: 15px;"></ul>
+        <ul class="rules-group-container row fields-sortable-ul" id="fields" data-bind="template: {name: 'RowTemplate' , foreach: SortedRows, afterAdd:SortRows}, css: SortableRows()" style="list-style-type: none;margin-left:0px;padding-left: 15px;"></ul>
     </div>
 
 
@@ -219,9 +219,9 @@
     </script>
 
     <script type="text/html" id="RowTemplate">
-        <li class="ui-sortable-handle schemaRowContainer" data-bind="css: $root.ClickableRows()">
+        <li class="schemaRowContainer ui-sortable-handle" data-bind="css: $root.ClickableRows()">
             <div class="col-lg-12 schemaRow" data-bind="css: Color, style : { 'background-color' : RowColor }">
-                <div class="rowDetails">
+                <div class="rowDetails" data-bind="attr : {'data-id' : Position}">
                     <div class="rowNumberIdentifier">
                         <b><span data-bind="text: Position"></span></b>
                     </div>
@@ -269,7 +269,7 @@
                     <div class="options col-lg-4">
                         <div class="col-lg-12" data-bind="if: ShowAddChild">
                             <div class="col-lg-offset-2 col-lg-7" data-bind="visible: ShowAddChild">
-                                <button class="rightButton" data-bind='click: addChild'>Add a Child</button>
+                                <button class="rightButton" data-bind='click: addChild.bind(1)'>Add a Child</button>
                             </div>
                         </div>
                     </div>
@@ -295,7 +295,7 @@
                 </div>
                 <span class="fieldGuidText" data-bind="text: FieldGuid"></span>
             </div>
-            <ul class="childrenContainer" data-bind="template: {name: 'RowTemplate' , foreach: ChildRows}, visible: ShowChildren" style="list-style-type: none;margin-left:0px;padding-left: 10px;"></ul>
+            <ul class="childrenContainer" data-bind="template: {name: 'RowTemplate' , foreach: SortedChildRows}, visible: ShowChildren, css: $root.SortableRows()" style="list-style-type: none;margin-left:0px;padding-left: 10px;"></ul>
         </li>
     </script>
 }
@@ -386,7 +386,8 @@
             self.ChildRows = ko.observableArray(ko.utils.arrayMap(indata.ChildRows, function (rowInfo) {
                 currentMax++;
                 return new Row(currentMax, rowInfo, parentvm, thisLevel, self);
-            }));
+            }));            
+            self.SortedChildRows = ko.observableArray();
             self.RowColor = ko.observable()
 
             //Call UpdateRow() when any property changes
@@ -417,9 +418,14 @@
                     contentType: "application/json",
                     success: function (returnedData) {
                         if (Sentry.WasAjaxSuccessful(returnedData)) {                            
-                           //No errors for field so remove any existing errors displayed
-                            parentvm.Errors.remove(function (item) {
-                                return item.Id === self.Position().toString();
+                           ////No errors for field so remove any existing errors displayed
+                           // parentvm.Errors.remove(function (item) {
+                           //     return item.Id === self.Position().toString();
+                           // });
+
+                            //remove associated errors
+                            parentvm.Errors.remove(function (err) {
+                                return err.DataObjectField_ID == self.DataObjectField_ID();
                             });
 
                             //Remove error color from row
@@ -434,9 +440,14 @@
                             var previousId = 0;
                             for (var i = 0; i < returnedData.Errors.length; i++) {
                                 if (previousId !== returnedData.Errors[i].Id) {
-                                        //Remove all associated errors with this Id
-                                        parentvm.Errors.remove(function (item) {
-                                            return item.Id === returnedData.Errors[i].Id;
+                                        ////Remove all associated errors with this Id
+                                        //parentvm.Errors.remove(function (item) {
+                                        //    return item.Id === returnedData.Errors[i].Id;
+                                        //});
+
+                                        //remove associated errors
+                                        parentvm.Errors.remove(function (err) {
+                                            return err.DataObjectField_ID == self.DataObjectField_ID();
                                         });
                                     previousId = returnedData.Errors[i].Id;
                                 }
@@ -457,6 +468,24 @@
                     async: false
                 });
             }
+
+            self.ChildRowSorter = function () {
+                if (self.ChildRows().length > 0) {
+                    self.SortedChildRows([]);
+                    self.SortedChildRows(ko.utils.arrayFilter(self.ChildRows(), function (row) {
+                        if (row.DeleteInd() === false) {
+                            row.ChildRowSorter();
+                            return true;
+                        }
+                        else {
+                            return true;
+                        }
+                        //return (row.DeleteInd() === false)
+                    }).sort(function (left, right) {
+                        return left.Position() === right.Position() ? 0 : (left.Position() < right.Position() ? -1 : 1);
+                    }));
+                }
+            };
 
             self.ShowFixed = ko.computed(function () {
                 return parent.IsFixedWidth();
@@ -587,28 +616,39 @@
                 }
             })
 
-            self.addChild = function () {
-                //currentMax++;
-                //self.ChildRows.push(new Row(currentMax, [{ DataObjectField_ID: "", Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }], parent));
+            self.addChild = function (elem, e) {
+                var lastPosition;
+                var nextPosition;
+                var a = $(e.target).closest('.schemaRowContainer');
 
-                currentMax++;
-                var cr = new Row(currentMax, { DataObjectField_ID: "new" + currentMax, Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, parent, thisLevel, self);
+                lastPosition = data.Fields.GetLastRowPositionOfSchemaRowContainer(a);
+                nextPosition = lastPosition + 1;
+
+                var cr = new Row(nextPosition, { DataObjectField_ID: "new" + data.Utils.GenerateRandomString(6), Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, parent, thisLevel, self);
+                
                 self.ChildRows.push(cr);
                 if (!self.Toggled()) {
                     self.ToggleChildren();
                 }
-
+                
                 self.UpdateRow();
+                parentvm.Rows.valueHasMutated();
+                //vm.SortRows();
             };
 
             self.removeChild = function (row) {
-                parentvm.Errors.remove(function (item) { return item.Id === row.Position().toString(); });
+                //remove associated errors
+                vm.Errors.remove(function (err) {
+                    return err.DataObjectField_ID == row.DataObjectField_ID();
+                });
+
                 self.ChildRows.remove(row);
                 //If there are no errors on page, show save button
                 if (parentvm.Errors !== undefined && parentvm.Errors().length === 0) {
                     $('#saveBtn').show();
                 }
 
+                vm.SortRows();
                 self.UpdateRow();
             };
 
@@ -618,8 +658,9 @@
                         cRow.removeChildren();
                     }
 
-                    parentvm.Errors.remove(function (item) {
-                        return item.Id === cRow.Position();
+                    //remove associated errors
+                    vm.Errors.remove(function (err) {
+                        return err.DataObjectField_ID == cRow.DataObjectField_ID();
                     });
 
                     cRow.DeleteInd(true);
@@ -629,10 +670,41 @@
                         $('#saveBtn').show();
                     }
                 });
-            }
+            };
+
+            self.SortChildRows = function (index, httpItem, httpPosition) {
+                newVal = 0;
+                //Foreach DOM object, compare to the current sortedRows list on view model to
+                //  determine if DOM object position changed
+                var match = ko.utils.arrayFirst(self.SortedChildRows(), function (item) {
+                    if (item.DeletedInd == false && item.DataObjectField_ID() == httpItem && httpPosition != (index + 1).toString()) {
+
+                        data.Fields.IncrementAssociatedRowErrors(item, (index + 1));
+
+                        item.Position(index + 1);
+                    }
+                    if (item.HasChildren) {
+                        item.SortChildRows(index, httpItem, httpPosition);
+                    }
+                })
+            };    
 
             self.UpdateRow();
         };
+
+        
+
+
+        function FindLastSchemaRowWithinChildinChildrenContainer(e) {
+            var lastChild = $(e).children('.schemaRowContainer, .childrenContainer').last();
+
+            if ($(lastChild).hasClass('.childrenContainer')) {
+                FindLastChildinChildrenContainer(lastChild);
+            }
+            else {
+                return lastChild;
+            }
+        }
 
         function ValidDataType(item) {
             this.Name = ko.observable(item.Name);
@@ -677,27 +749,47 @@
             };
 
             //Computed properties
-            self.RowSorter = ko.computed(function () {
+            self.RowSorter = function () {
                 self.SortedRows([]);
                 self.SortedRows(ko.utils.arrayFilter(self.Rows(), function (row) {
-                    return (row.DeleteInd() === false)
+                    if (row.DeleteInd() === false) {
+                        row.ChildRowSorter();
+                        return true;
+                    }
+                    else {                        
+                        return false;
+                    }
+                    //return (row.DeleteInd() === false)
                 }).sort(function (left, right) {
                     return left.Position() === right.Position() ? 0 : (left.Position() < right.Position() ? -1 : 1);
                 }));
-            });
+            };
+
             self.SortableRows = ko.computed(function () {
                 return self.IsPositional() ? "sortable-fields-active" : "sortable-fields";
-            })
+            });
+
             self.ClickableRows = ko.computed(function () {
                 return self.IsPositional() ? "clickable" : "";
-            })
+            });
+
+
+            self.Rows.subscribe(function () { self.SortRows() });
 
 
             //Functions
             self.addRow = function () {
-                currentMax++;
-                var r = new Row(currentMax, { DataObjectField_ID: "new" + currentMax, Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, self, 0);
+
+                var lastPosition;
+                var nextPosition;
+                var a = $('.schemaRowContainer').last();
+
+                lastPosition = data.Fields.GetLastRowPositionOfSchemaRowContainer(a);
+                nextPosition = lastPosition + 1;
+
+                var r = new Row(nextPosition, { DataObjectField_ID: "new" + data.Utils.GenerateRandomString(6), Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, self, 0);                
                 self.Rows.push(r);
+                //self.SortRows();
             };
 
             self.removeRow = function (row) {
@@ -706,15 +798,15 @@
                 if (row.HasChildren) {
                     row.removeChildren();
                 }
-                
 
-                self.Errors.remove(function (item) {
-                    return item.Id === position;
-                })
+                //remove associated errors
+                vm.Errors.remove(function (err) {
+                    return err.DataObjectField_ID == row.DataObjectField_ID();
+                });
 
                 row.DeleteInd(true);
                 self.SortRows();
-                self.Rows.valueHasMutated();
+                //self.Rows.valueHasMutated();
             };
 
             self.save = function () {
@@ -771,33 +863,43 @@
             //     therefore, need to adjust error records if neccessary
             self.SortRows = function () {
                 newVal = 0;
-                $('.schemaRowContainer').each(function (index) {
-                    var httpItem = $(this).children().children().children().children('input[name="dataObjectField_Id"]').val();
-                    var match = ko.utils.arrayFirst(self.SortedRows(), function (item) {
-                        if (item.DataObjectField_ID() == httpItem && item.Position() != index + 1) {
+                //Loop through all current rows (DOM objects) on page
+                //$('.schemaRowContainer').each(function (index, elem) {
+                $('#schemaPanel').find('.schemaRowContainer').each(function (index, elem) {
+                    //Store the field Id for matching against sortedRows list
+                    var httpItem_old = $(this).children().children().children().children('input[name="dataObjectField_Id"]').val();
+                    var httpItem = $(elem).children('.schemaRow').find('input[name="dataObjectField_Id"]').val();
 
-                            //find associated errors and save off
-                            var errs = vm.Errors().filter(f => f.DataObjectField_ID == item.DataObjectField_ID());
+                    //Store the rowPosition
+                    var httpPosition = $(this).find('.rowDetails').data('id');
 
-                            //remove associated errors
-                            self.Errors.remove(function (err) {
-                                return err.DataObjectField_ID == item.DataObjectField_ID();
-                            });
+                    //Foreach DOM object, compare to the current sortedRows list on view model to
+                    //  determine if DOM object position changed
 
-                            //change the Id element of error record
-                            for (var i in errs) {
-                                errs[i].Id = (index + 1);
-                            }
+                    ko.utils.arrayForEach(self.SortedRows(), function (item) {
+                        //console.log("SortRows -> DataObjectField_ID:" + item.DataObjectField_ID().toString() + " httpItem:" + httpItem.toString() + " httpPosition:" + httpPosition.toString() + " incrementedIndex:" + (index + 1));
+                        // if changed adjust the position accordingly
+                        if (item.DeleteInd() == false && item.DataObjectField_ID() == httpItem && httpPosition != (index + 1).toString()) {
 
-                            //Push adjusted error records back onto vm.Errors
-                            ko.utils.arrayPushAll(self.Errors, errs);
-                            self.Errors.valueHasMutated();
+                            //adjust associated errors to reflect new position
+                            data.Fields.IncrementAssociatedRowErrors(item, (index + 1));
 
-                            //Adjust the 
+                            //adjust row position
                             item.Position(index + 1);
+                        }
+                        if (item.HasChildren()) {
+                            item.SortChildRows(index, httpItem, httpPosition);
                         }
                     })
                 })
+
+                self.RowSorter();
+
+                $(".sortable-fields-active").sortable({
+                    stop: function (event, ui) {
+                        vm.SortRows();
+                    }
+                });
             }            
 
             $.ajax({
@@ -814,7 +916,34 @@
                 },
                 async: false
             });
-            
+
+            self.RowSorter();
+
+            // Select the node that will be observed for mutations
+            //const targetNode = document.getElementById('schemaPanel');
+
+            //// Options for the observer (which mutations to observe)
+            //const config = { attributes: false, childList: true, subtree: true, characterData: false };
+
+            //// Callback function to execute when mutations are observed
+            //const callback = function(mutationsList, observer) {
+            //    // Use traditional 'for loops' for IE 11
+            //    for(const mutation of mutationsList) {
+            //        if (mutation.type === 'childList') {
+            //            console.log('A child node has been added or removed.');
+            //            console.log(mutation);
+            //        }
+            //        else if (mutation.type === 'attributes') {
+            //            console.log('The ' + mutation.attributeName + ' attribute was modified.');
+            //        }
+            //    }
+            //};
+
+            //// Create an observer instance linked to the callback function
+            //const observer = new MutationObserver(callback);
+
+            //// Start observing the target node for configured mutations
+            //observer.observe(targetNode, config);
         };
 
         var initialData = [
