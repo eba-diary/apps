@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema;
 using Sentry.data.Core.DTO.Schema.Fields;
+using Sentry.data.Core.Factories.Fields;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -1466,6 +1467,99 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(Guid.Empty, dto.FieldGuid);
             Assert.AreEqual(false, dto.DeleteInd);
             Assert.AreEqual(true, dto.IsArray);
+        }
+        #endregion
+
+        #region FieldFactory Tests
+        [TestMethod]
+        public void FieldFactory_GetField_Returns_DeleteInd_True()
+        {
+            //Setup
+            SchemaRow row = new SchemaRow()
+            {
+                ArrayType = null,
+                DeleteInd = true,
+                FieldGuid = Guid.NewGuid(),
+                Name = "VARCHAR Field"
+            };
+            FieldDtoFactory dateFieldFactory;
+            dateFieldFactory = new DateFieldDtoFactory(row);
+
+            FieldDtoFactory decimalFieldFactory;
+            decimalFieldFactory = new DecimalFieldDtoFactory(row);
+
+            FieldDtoFactory integerFieldFactory;
+            integerFieldFactory = new IntegerFieldDtoFactory(row);
+
+            FieldDtoFactory structFieldFactory;
+            structFieldFactory = new StructFieldDtoFactory(row);
+
+            FieldDtoFactory timestampFieldFactory;
+            timestampFieldFactory = new TimestampFieldDtoFactory(row);
+
+            FieldDtoFactory varcharFieldFactory;
+            varcharFieldFactory = new VarcharFieldDtoFactory(row);
+
+            //Action
+            BaseFieldDto dateFieldDto = dateFieldFactory.GetField();
+            BaseFieldDto decimalFieldDto = decimalFieldFactory.GetField();
+            BaseFieldDto integerFieldDto = integerFieldFactory.GetField();
+            BaseFieldDto structFieldDto = structFieldFactory.GetField();
+            BaseFieldDto timestampFieldDto = timestampFieldFactory.GetField();
+            BaseFieldDto varcharFieldDto = varcharFieldFactory.GetField();
+
+            //Assert
+            Assert.IsTrue(dateFieldDto.DeleteInd, "DateFieldDtoFactory failed DeleteInd Check");
+            Assert.IsTrue(decimalFieldDto.DeleteInd, "DecimalFieldDtoFactory failed DeleteInd Check");
+            Assert.IsTrue(integerFieldDto.DeleteInd, "IntegerFieldDtoFactory failed DeleteInd Check");
+            Assert.IsTrue(structFieldDto.DeleteInd, "StructFieldDtoFactory failed DeleteInd Check");
+            Assert.IsTrue(timestampFieldDto.DeleteInd, "TimestampFieldDtoFactory failed DeleteInd Check");
+            Assert.IsTrue(varcharFieldDto.DeleteInd, "VarcharFieldDtoFactory failed DeleteInd Check");
+        }
+        [TestMethod]
+        public void FieldFactory_GetField_Returns_DeleteInd_False()
+        {
+            //Setup
+            SchemaRow row = new SchemaRow()
+            {
+                ArrayType = null,
+                DeleteInd = false,
+                FieldGuid = Guid.NewGuid(),
+                Name = "VARCHAR Field"
+            };
+            FieldDtoFactory dateFieldFactory;
+            dateFieldFactory = new DateFieldDtoFactory(row);
+
+            FieldDtoFactory decimalFieldFactory;
+            decimalFieldFactory = new DecimalFieldDtoFactory(row);
+
+            FieldDtoFactory integerFieldFactory;
+            integerFieldFactory = new IntegerFieldDtoFactory(row);
+
+            FieldDtoFactory structFieldFactory;
+            structFieldFactory = new StructFieldDtoFactory(row);
+
+            FieldDtoFactory timestampFieldFactory;
+            timestampFieldFactory = new TimestampFieldDtoFactory(row);
+
+            FieldDtoFactory varcharFieldFactory;
+            varcharFieldFactory = new VarcharFieldDtoFactory(row);
+
+            //Action
+            BaseFieldDto dateFieldDto = dateFieldFactory.GetField();
+            BaseFieldDto decimalFieldDto = decimalFieldFactory.GetField();
+            BaseFieldDto integerFieldDto = integerFieldFactory.GetField();
+            BaseFieldDto structFieldDto = structFieldFactory.GetField();
+            BaseFieldDto timestampFieldDto = timestampFieldFactory.GetField();
+            BaseFieldDto varcharFieldDto = varcharFieldFactory.GetField();
+
+            //Assert
+            Assert.IsFalse(dateFieldDto.DeleteInd, "DateFieldDtoFactory failed DeleteInd Check");
+            Assert.IsFalse(decimalFieldDto.DeleteInd, "DecimalFieldDtoFactory failed DeleteInd Check");
+            Assert.IsFalse(integerFieldDto.DeleteInd, "IntegerFieldDtoFactory failed DeleteInd Check");
+            Assert.IsFalse(structFieldDto.DeleteInd, "StructFieldDtoFactory failed DeleteInd Check");
+            Assert.IsFalse(timestampFieldDto.DeleteInd, "TimestampFieldDtoFactory failed DeleteInd Check");
+            Assert.IsFalse(varcharFieldDto.DeleteInd, "VarcharFieldDtoFactory failed DeleteInd Check");
         }
         #endregion
 

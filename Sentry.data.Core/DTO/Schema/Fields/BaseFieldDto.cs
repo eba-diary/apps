@@ -44,6 +44,7 @@ namespace Sentry.data.Core
             ChildFields = new List<BaseFieldDto>();
             OrdinalPosition = row.Position;
             Length = (Int32.TryParse(row.Length, out int x) ? x : 0);
+            DeleteInd = row.DeleteInd;
         }
 
         public int FieldId { get; set; }
