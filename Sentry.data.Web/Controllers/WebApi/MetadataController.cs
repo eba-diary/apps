@@ -322,7 +322,8 @@ namespace Sentry.data.Web.WebApi.Controllers
                 //JsonSchema schema_v3 = await JsonSchema.FromJsonAsync(schemaStructure.ToString());
 
                 List<BaseFieldDto> schemarows_v2 = new List<BaseFieldDto>();
-                schema_v3.ToDto(schemarows_v2);
+                int rowCnt = 0;
+                schema_v3.ToDto(schemarows_v2, ref rowCnt);
 
                 _schemaService.Validate(schemaId, schemarows_v2);
 
@@ -934,298 +935,294 @@ namespace Sentry.data.Web.WebApi.Controllers
         }
 
 
-        private static void ToSchemaRows(JsonSchema schema, List<BaseFieldDto> schemaRowList, BaseFieldDto parentSchemaRow = null)
-        {
-            try
-            {
-                switch (schema.Type)
-                {
-                    case JsonObjectType.Object:
-                        foreach (KeyValuePair<string, JsonSchemaProperty> prop in schema.Properties.ToList())
-                        {
-                            prop.ToDto(schemaRowList, parentSchemaRow);
-                        }
-                        break;
-                    case JsonObjectType.None:
-                        if (schema.HasReference)
-                        {
-                            schema.Reference.ToDto(schemaRowList, parentSchemaRow);
-                        }
-                        else
-                        {
-                            if (parentSchemaRow == null)
-                            {
-                                Logger.Warn("Unhandled Scenario");
-                            }
-                            else
-                            {
-                                parentSchemaRow.Description = "MOCKED OUT";
-                            }
-                        }
-                        break;
-                    default:
-                        Logger.Warn($"Unhandled Scenario for schema object type of {schema.Type}");
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("ToSchemaRows Error", ex);
-                throw;
-            }
-        }
-
-        private static void ToSchemaRow(KeyValuePair<string, JsonSchemaProperty> prop, List<BaseFieldDto> schemaRowList, BaseFieldDto parentRow = null)
-        {
-            try
-            {
-                FieldDtoFactory fieldFactory = null;
-
-                JsonSchemaProperty currentProperty = prop.Value;
-                Logger.Debug($"Found property:{prop.Key}");
-                switch (currentProperty.Type)
-                {
-                    case JsonObjectType.None:
-                        Logger.Debug($"Detected type of {currentProperty.Type}");
-                        if (currentProperty.HasReference)
-                        {
-                            Logger.Debug($"Detected ref object: property will be defined as STRUCT");
-                            fieldFactory = new StructFieldDtoFactory(prop, false);
-                            BaseFieldDto noneStructField = fieldFactory.GetField();
-
-                            if (parentRow == null)
-                            {
-                                schemaRowList.Add(noneStructField);
-                            }
-                            else
-                            {
-                                parentRow.ChildFields.Add(noneStructField);
-                            }
-
-                            ToSchemaRows(currentProperty.Reference, schemaRowList, noneStructField);
-                        }
-                        else
-                        {
-                            Logger.Warn($"No ref object detected");
-                            Logger.Warn($"{prop.Key} will be defined as STRUCT");
-                            fieldFactory = new VarcharFieldDtoFactory(prop, false);
-
-                            if (parentRow == null)
-                            {
-                                schemaRowList.Add(fieldFactory.GetField());
-                            }
-                            else
-                            {
-                                parentRow.ChildFields.Add(fieldFactory.GetField());
-                            }
-                        }
-                        break;
-                    case JsonObjectType.Object:
-                        Logger.Debug($"Detected type of {currentProperty.Type}");
-                        Logger.Debug($"Detected ref object: property will be defined as STRUCT");
-                        fieldFactory = new StructFieldDtoFactory(prop, false);
-                        BaseFieldDto objectStructfield = fieldFactory.GetField();
-
-                        if (parentRow == null)
-                        {
-                            schemaRowList.Add(objectStructfield);
-                        }
-                        else
-                        {
-                            parentRow.ChildFields.Add(objectStructfield);
-                        }
-
-                        foreach (KeyValuePair<string, JsonSchemaProperty> nestedProp in currentProperty.Properties)
-                        {
-                            ToSchemaRow(nestedProp, schemaRowList, objectStructfield);
-                        }
-
-                        break;
-                    case JsonObjectType.Array:
-                        Logger.Debug($"Detected type of {currentProperty.Type}");
-
-                        JsonSchema nestedSchema = null;
-                        //While JSON Schema alows an arrays of multiple types, DSC only allows single type.
-
-                        nestedSchema = prop.FindArraySchema();
-
-                        //Determine what this is an array of
-                        if (nestedSchema.IsObject)
-                        {
-                            Logger.Debug($"Detected nested schema as Object");
-                            Logger.Debug($"{prop.Key} will be defined as array of STRUCT");
-                            fieldFactory = new StructFieldDtoFactory(prop, true);
-                        }
-                        else
-                        {
-                            switch (nestedSchema.Type)
-                            {
-                                case JsonObjectType.Object:
-                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
-                                    Logger.Debug($"{prop.Key} will be defined as array of STRUCT");
-                                    fieldFactory = new StructFieldDtoFactory(prop, true);
-                                    break;
-                                case JsonObjectType.Integer:
-                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
-                                    Logger.Debug($"{prop.Key} will be defined as array of INTEGER");
-                                    fieldFactory = new IntegerFieldDtoFactory(prop, true);
-                                    break;
-                                case JsonObjectType.String:
-                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
-                                    switch (nestedSchema.Format)
-                                    {
-                                        case "date-time":
-                                            Logger.Debug($"Detected string format of {nestedSchema.Format}");
-                                            Logger.Debug($"{prop.Key} will be defined as array of TIMESTAMP");
-                                            fieldFactory = new TimestampFieldDtoFactory(prop, true);
-                                            break;
-                                        case "date":
-                                            Logger.Debug($"Detected string format of {nestedSchema.Format}");
-                                            Logger.Debug($"{prop.Key} will be defined as array of DATE");
-                                             fieldFactory = new DateFieldDtoFactory(prop, true);
-                                            break;
-                                        default:
-                                            Logger.Debug($"No string format detected");
-                                            Logger.Debug($"{prop.Key} will be defined as array of VARCHAR");
-                                            fieldFactory = new VarcharFieldDtoFactory(prop, true);
-                                            break;
-                                    }
-                                    break;
-                                case JsonObjectType.Number:
-                                    Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
-                                    Logger.Debug($"{prop.Key} will be defined as array of DECIMAL");
-                                    fieldFactory = new DecimalFieldDtoFactory(prop, true);
-                                    break;
-                                case JsonObjectType.None:
-                                    if (nestedSchema.IsAnyType)
-                                    {
-                                        Logger.Debug($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} and marked as IsAnyType");
-                                        Logger.Debug($"{prop.Key} will be defined as array of VARCHAR");
-                                        fieldFactory = new VarcharFieldDtoFactory(prop, true);
-                                    }
-                                    else
-                                    {
-                                        Logger.Debug($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()}");
-                                        Logger.Debug($"{prop.Key} will be defined as array of VARCHAR");
-                                        fieldFactory = new VarcharFieldDtoFactory(prop, true);
-                                    }
-                                    break;
-                                default:
-                                    Logger.Warn($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} which is not handled by DSC");
-                                    Logger.Warn($"{prop.Key} will be defined as array of VARCHAR");
-                                    fieldFactory = new VarcharFieldDtoFactory(prop, true);
-                                    break;
-                            }
-                        }
-
-                        BaseFieldDto field = fieldFactory.GetField();
-
-                        ToSchemaRows(nestedSchema, schemaRowList, field);
-
-                        if (parentRow == null)
-                        {
-                            schemaRowList.Add(field);
-                        }
-                        else
-                        {
-                            parentRow.ChildFields.Add(field);
-                        }
-                        break;
-                    case JsonObjectType.String:
-                        Logger.Debug($"Detected type of {currentProperty.Type}");
-
-                        if (!String.IsNullOrWhiteSpace(currentProperty.Format))
-                        {
-                            switch (currentProperty.Format)
-                            {
-                                case "date-time":
-                                    Logger.Debug($"Detected string format of {currentProperty.Format}");
-                                    Logger.Debug($"{prop.Key} will be defined as TIMESTAMP");
-                                    fieldFactory = new TimestampFieldDtoFactory(prop, false);
-                                    break;
-                                case "date":
-                                    Logger.Debug($"Detected string format of {currentProperty.Format}");
-                                    Logger.Debug($"{prop.Key} will be defined as DATE");
-                                    fieldFactory = new DateFieldDtoFactory(prop, false);
-                                    break;
-                                default:
-                                    Logger.Warn($"Detected string format of {currentProperty.Format} which is not handled by DSC");
-                                    Logger.Warn($"{prop.Key} will be defined as DATE");
-                                    fieldFactory = new VarcharFieldDtoFactory(prop, false);
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            Logger.Debug($"No string format detected");
-                            Logger.Debug($"{prop.Key} will be defined as VARCHAR");
-                            fieldFactory = new VarcharFieldDtoFactory(prop, false);
-                        }
-
-                        if (parentRow == null)
-                        {
-                            schemaRowList.Add(fieldFactory.GetField());
-                        }
-                        else
-                        {
-                            parentRow.ChildFields.Add(fieldFactory.GetField());
-                        }
-                        break;
-                    case JsonObjectType.Integer:
-                        Logger.Debug($"Detected type of {currentProperty.Type}");
-                        Logger.Debug($"{prop.Key} will be defined as INTEGER");
-
-                        fieldFactory = new IntegerFieldDtoFactory(prop, false);
-
-                        if (parentRow == null)
-                        {
-                            schemaRowList.Add(fieldFactory.GetField());
-                        }
-                        else
-                        {
-                            parentRow.ChildFields.Add(fieldFactory.GetField());
-                        }
-                        break;
-                    case JsonObjectType.Number:
-                        Logger.Debug($"Detected type of {currentProperty.Type}");
-                        Logger.Debug($"{prop.Key} will be defined as DECIMAL");
-                        fieldFactory = new DecimalFieldDtoFactory(prop, false);
-
-                        if (parentRow == null)
-                        {
-                            schemaRowList.Add(fieldFactory.GetField());
-                        }
-                        else
-                        {
-                            parentRow.ChildFields.Add(fieldFactory.GetField());
-                        }
-                        break;
-                    default:
-                        Logger.Warn($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} which is not handled by DSC");
-                        Logger.Warn($"{prop.Key} will be defined as array of VARCHAR");
-                        fieldFactory = new VarcharFieldDtoFactory(prop, true);
-
-                        if (parentRow == null)
-                        {
-                            schemaRowList.Add(fieldFactory.GetField());
-                        }
-                        else
-                        {
-                            parentRow.ChildFields.Add(fieldFactory.GetField());
-                        }
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("ToSchemaRow Error", ex);
-                throw;
-            }
-        }
-
-        //private static Try<TResult> Action<TResult>(Func<TResult> act)
+        //private static void ToSchemaRows(JsonSchema schema, List<BaseFieldDto> schemaRowList, BaseFieldDto parentSchemaRow = null)
         //{
-        //    return new Try<TResult>(act);
+        //    try
+        //    {
+        //        switch (schema.Type)
+        //        {
+        //            case JsonObjectType.Object:
+        //                foreach (KeyValuePair<string, JsonSchemaProperty> prop in schema.Properties.ToList())
+        //                {
+        //                    prop.ToDto(schemaRowList, parentSchemaRow);
+        //                }
+        //                break;
+        //            case JsonObjectType.None:
+        //                if (schema.HasReference)
+        //                {
+        //                    schema.Reference.ToDto(schemaRowList, parentSchemaRow);
+        //                }
+        //                else
+        //                {
+        //                    if (parentSchemaRow == null)
+        //                    {
+        //                        Logger.Warn("Unhandled Scenario");
+        //                    }
+        //                    else
+        //                    {
+        //                        parentSchemaRow.Description = "MOCKED OUT";
+        //                    }
+        //                }
+        //                break;
+        //            default:
+        //                Logger.Warn($"Unhandled Scenario for schema object type of {schema.Type}");
+        //                break;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Error("ToSchemaRows Error", ex);
+        //        throw;
+        //    }
+        //}
+
+        //private static void ToSchemaRow(KeyValuePair<string, JsonSchemaProperty> prop, List<BaseFieldDto> schemaRowList, BaseFieldDto parentRow = null)
+        //{
+        //    try
+        //    {
+        //        FieldDtoFactory fieldFactory = null;
+
+        //        JsonSchemaProperty currentProperty = prop.Value;
+        //        Logger.Debug($"Found property:{prop.Key}");
+        //        switch (currentProperty.Type)
+        //        {
+        //            case JsonObjectType.None:
+        //                Logger.Debug($"Detected type of {currentProperty.Type}");
+        //                if (currentProperty.HasReference)
+        //                {
+        //                    Logger.Debug($"Detected ref object: property will be defined as STRUCT");
+        //                    fieldFactory = new StructFieldDtoFactory(prop, false);
+        //                    BaseFieldDto noneStructField = fieldFactory.GetField();
+
+        //                    if (parentRow == null)
+        //                    {
+        //                        schemaRowList.Add(noneStructField);
+        //                    }
+        //                    else
+        //                    {
+        //                        parentRow.ChildFields.Add(noneStructField);
+        //                    }
+
+        //                    ToSchemaRows(currentProperty.Reference, schemaRowList, noneStructField);
+        //                }
+        //                else
+        //                {
+        //                    Logger.Warn($"No ref object detected");
+        //                    Logger.Warn($"{prop.Key} will be defined as STRUCT");
+        //                    fieldFactory = new VarcharFieldDtoFactory(prop, false);
+
+        //                    if (parentRow == null)
+        //                    {
+        //                        schemaRowList.Add(fieldFactory.GetField());
+        //                    }
+        //                    else
+        //                    {
+        //                        parentRow.ChildFields.Add(fieldFactory.GetField());
+        //                    }
+        //                }
+        //                break;
+        //            case JsonObjectType.Object:
+        //                Logger.Debug($"Detected type of {currentProperty.Type}");
+        //                Logger.Debug($"Detected ref object: property will be defined as STRUCT");
+        //                fieldFactory = new StructFieldDtoFactory(prop, false);
+        //                BaseFieldDto objectStructfield = fieldFactory.GetField();
+
+        //                if (parentRow == null)
+        //                {
+        //                    schemaRowList.Add(objectStructfield);
+        //                }
+        //                else
+        //                {
+        //                    parentRow.ChildFields.Add(objectStructfield);
+        //                }
+
+        //                foreach (KeyValuePair<string, JsonSchemaProperty> nestedProp in currentProperty.Properties)
+        //                {
+        //                    ToSchemaRow(nestedProp, schemaRowList, objectStructfield);
+        //                }
+
+        //                break;
+        //            case JsonObjectType.Array:
+        //                Logger.Debug($"Detected type of {currentProperty.Type}");
+
+        //                JsonSchema nestedSchema = null;
+        //                //While JSON Schema alows an arrays of multiple types, DSC only allows single type.
+
+        //                nestedSchema = prop.FindArraySchema();
+
+        //                //Determine what this is an array of
+        //                if (nestedSchema.IsObject)
+        //                {
+        //                    Logger.Debug($"Detected nested schema as Object");
+        //                    Logger.Debug($"{prop.Key} will be defined as array of STRUCT");
+        //                    fieldFactory = new StructFieldDtoFactory(prop, true);
+        //                }
+        //                else
+        //                {
+        //                    switch (nestedSchema.Type)
+        //                    {
+        //                        case JsonObjectType.Object:
+        //                            Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
+        //                            Logger.Debug($"{prop.Key} will be defined as array of STRUCT");
+        //                            fieldFactory = new StructFieldDtoFactory(prop, true);
+        //                            break;
+        //                        case JsonObjectType.Integer:
+        //                            Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
+        //                            Logger.Debug($"{prop.Key} will be defined as array of INTEGER");
+        //                            fieldFactory = new IntegerFieldDtoFactory(prop, true);
+        //                            break;
+        //                        case JsonObjectType.String:
+        //                            Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
+        //                            switch (nestedSchema.Format)
+        //                            {
+        //                                case "date-time":
+        //                                    Logger.Debug($"Detected string format of {nestedSchema.Format}");
+        //                                    Logger.Debug($"{prop.Key} will be defined as array of TIMESTAMP");
+        //                                    fieldFactory = new TimestampFieldDtoFactory(prop, true);
+        //                                    break;
+        //                                case "date":
+        //                                    Logger.Debug($"Detected string format of {nestedSchema.Format}");
+        //                                    Logger.Debug($"{prop.Key} will be defined as array of DATE");
+        //                                     fieldFactory = new DateFieldDtoFactory(prop, true);
+        //                                    break;
+        //                                default:
+        //                                    Logger.Debug($"No string format detected");
+        //                                    Logger.Debug($"{prop.Key} will be defined as array of VARCHAR");
+        //                                    fieldFactory = new VarcharFieldDtoFactory(prop, true);
+        //                                    break;
+        //                            }
+        //                            break;
+        //                        case JsonObjectType.Number:
+        //                            Logger.Debug($"Detected nested schema as {nestedSchema.Type}");
+        //                            Logger.Debug($"{prop.Key} will be defined as array of DECIMAL");
+        //                            fieldFactory = new DecimalFieldDtoFactory(prop, true);
+        //                            break;
+        //                        case JsonObjectType.None:
+        //                            if (nestedSchema.IsAnyType)
+        //                            {
+        //                                Logger.Debug($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} and marked as IsAnyType");
+        //                                Logger.Debug($"{prop.Key} will be defined as array of VARCHAR");
+        //                                fieldFactory = new VarcharFieldDtoFactory(prop, true);
+        //                            }
+        //                            else
+        //                            {
+        //                                Logger.Debug($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()}");
+        //                                Logger.Debug($"{prop.Key} will be defined as array of VARCHAR");
+        //                                fieldFactory = new VarcharFieldDtoFactory(prop, true);
+        //                            }
+        //                            break;
+        //                        default:
+        //                            Logger.Warn($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} which is not handled by DSC");
+        //                            Logger.Warn($"{prop.Key} will be defined as array of VARCHAR");
+        //                            fieldFactory = new VarcharFieldDtoFactory(prop, true);
+        //                            break;
+        //                    }
+        //                }
+
+        //                BaseFieldDto field = fieldFactory.GetField();
+
+        //                ToSchemaRows(nestedSchema, schemaRowList, field);
+
+        //                if (parentRow == null)
+        //                {
+        //                    schemaRowList.Add(field);
+        //                }
+        //                else
+        //                {
+        //                    parentRow.ChildFields.Add(field);
+        //                }
+        //                break;
+        //            case JsonObjectType.String:
+        //                Logger.Debug($"Detected type of {currentProperty.Type}");
+
+        //                if (!String.IsNullOrWhiteSpace(currentProperty.Format))
+        //                {
+        //                    switch (currentProperty.Format)
+        //                    {
+        //                        case "date-time":
+        //                            Logger.Debug($"Detected string format of {currentProperty.Format}");
+        //                            Logger.Debug($"{prop.Key} will be defined as TIMESTAMP");
+        //                            fieldFactory = new TimestampFieldDtoFactory(prop, false);
+        //                            break;
+        //                        case "date":
+        //                            Logger.Debug($"Detected string format of {currentProperty.Format}");
+        //                            Logger.Debug($"{prop.Key} will be defined as DATE");
+        //                            fieldFactory = new DateFieldDtoFactory(prop, false);
+        //                            break;
+        //                        default:
+        //                            Logger.Warn($"Detected string format of {currentProperty.Format} which is not handled by DSC");
+        //                            Logger.Warn($"{prop.Key} will be defined as DATE");
+        //                            fieldFactory = new VarcharFieldDtoFactory(prop, false);
+        //                            break;
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    Logger.Debug($"No string format detected");
+        //                    Logger.Debug($"{prop.Key} will be defined as VARCHAR");
+        //                    fieldFactory = new VarcharFieldDtoFactory(prop, false);
+        //                }
+
+        //                if (parentRow == null)
+        //                {
+        //                    schemaRowList.Add(fieldFactory.GetField());
+        //                }
+        //                else
+        //                {
+        //                    parentRow.ChildFields.Add(fieldFactory.GetField());
+        //                }
+        //                break;
+        //            case JsonObjectType.Integer:
+        //                Logger.Debug($"Detected type of {currentProperty.Type}");
+        //                Logger.Debug($"{prop.Key} will be defined as INTEGER");
+
+        //                fieldFactory = new IntegerFieldDtoFactory(prop, false);
+
+        //                if (parentRow == null)
+        //                {
+        //                    schemaRowList.Add(fieldFactory.GetField());
+        //                }
+        //                else
+        //                {
+        //                    parentRow.ChildFields.Add(fieldFactory.GetField());
+        //                }
+        //                break;
+        //            case JsonObjectType.Number:
+        //                Logger.Debug($"Detected type of {currentProperty.Type}");
+        //                Logger.Debug($"{prop.Key} will be defined as DECIMAL");
+        //                fieldFactory = new DecimalFieldDtoFactory(prop, false);
+
+        //                if (parentRow == null)
+        //                {
+        //                    schemaRowList.Add(fieldFactory.GetField());
+        //                }
+        //                else
+        //                {
+        //                    parentRow.ChildFields.Add(fieldFactory.GetField());
+        //                }
+        //                break;
+        //            default:
+        //                Logger.Warn($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} which is not handled by DSC");
+        //                Logger.Warn($"{prop.Key} will be defined as array of VARCHAR");
+        //                fieldFactory = new VarcharFieldDtoFactory(prop, true);
+
+        //                if (parentRow == null)
+        //                {
+        //                    schemaRowList.Add(fieldFactory.GetField());
+        //                }
+        //                else
+        //                {
+        //                    parentRow.ChildFields.Add(fieldFactory.GetField());
+        //                }
+        //                break;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Error("ToSchemaRow Error", ex);
+        //        throw;
+        //    }
+
         //}
 
         #endregion
