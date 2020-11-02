@@ -11,5 +11,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> Confluent_Kafka_CLA_1793 { get; }
         IFeatureFlag<bool> Dale_Expose_EditOwnerVerified_CLA_1911 { get; }
         IFeatureFlag<bool> Expose_Dataflow_Metadata_CLA_2146 { get; }
+        IFeatureFlag<bool> Remove_DfsWatchers_CLA_2346 { get; }
     }
 }
