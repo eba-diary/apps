@@ -329,9 +329,17 @@ namespace Sentry.data.Core
         public DatasetFileConfigDto GetDatasetFileConfigDto(int configId)
         {
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
-            DatasetFileConfigDto dto = new DatasetFileConfigDto();
-            MapToDatasetFileConfigDto(dfc, dto);
-            return dto;
+
+            UserSecurity us = _securityService.GetUserSecurity(dfc.ParentDataset, _userService.GetCurrentUser());
+
+            if (us.CanPreviewDataset || us.CanViewFullDataset)
+            {
+                DatasetFileConfigDto dto = new DatasetFileConfigDto();
+                MapToDatasetFileConfigDto(dfc, dto);
+                return dto;
+            }
+
+            throw new SchemaUnauthorizedAccessException();            
         }
 
         /// <summary>

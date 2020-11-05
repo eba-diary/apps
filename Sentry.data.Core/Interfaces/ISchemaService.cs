@@ -41,6 +41,13 @@ namespace Sentry.data.Core
         /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to schema</exception>
         /// <returns></returns>
         int CreateAndSaveSchemaRevision(int schemaId, List<BaseFieldDto> schemaRows, string revisionname, string jsonSchema = null);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="schemaDto"></param>
+        /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to manage schema</exception>
+        /// <returns></returns>
         bool UpdateAndSaveSchema(FileSchemaDto schemaDto);
         FileSchemaDto GetFileSchemaDto(int id);
         List<DatasetFile> GetDatasetFilesBySchema(int schemaId);
