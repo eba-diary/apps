@@ -1603,15 +1603,14 @@ namespace Sentry.data.Web.Controllers
         [Route("Config/{configId}/Schema/{schemaId}/Edit")]
         public ActionResult EditSchema(int configId, int schemaId, EditSchemaModel esm)
         {
-            FileSchemaDto fileDto = _schemaService.GetFileSchemaDto(schemaId);
-
-            UserSecurity us = _DatasetService.GetUserSecurityForDataset(fileDto.ParentDatasetId);
+            UserSecurity us = _schemaService.GetUserSecurityForSchema(schemaId);
 
             if (!us.CanManageSchema)
             {
                 return View("Unauthorized");
             }
 
+            FileSchemaDto fileDto = _schemaService.GetFileSchemaDto(schemaId);
             FileSchemaDto dto = esm.ToDto(fileDto);
             try
             {

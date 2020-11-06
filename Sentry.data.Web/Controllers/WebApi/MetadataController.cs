@@ -455,8 +455,6 @@ namespace Sentry.data.Web.WebApi.Controllers
                     return BadRequest("datasetId is required");
                 }
 
-                ValidateModifyPermissionsForDataset(datasetId);
-
                 bool isSuccessful = _configService.SyncConsumptionLayer(datasetId, schemaId);
 
                 if (isSuccessful)

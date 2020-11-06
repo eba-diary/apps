@@ -55,6 +55,7 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="datasetId">Non-Zero value required</param>
         /// <param name="schemaId"></param>
+        /// <exception cref="SchemaUnauthorizedAccessException">When DatasetFileConfig is already marked for deletion</exception>
         /// <returns></returns>
         bool SyncConsumptionLayer(int datasetId, int schemaId);
 

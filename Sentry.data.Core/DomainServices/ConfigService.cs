@@ -698,6 +698,22 @@ namespace Sentry.data.Core
                 throw new ArgumentException("Argument is required", "datasetId");
             }
 
+            Dataset ds = (schemaId == 0)
+                ? _datasetContext.GetById<Dataset>(datasetId)
+                : _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId && w.ParentDataset.DatasetId == datasetId).ParentDataset;
+
+            if (ds == null)
+            {
+                return false;
+            }
+
+            IApplicationUser user = _userService.GetCurrentUser();
+            UserSecurity us = _securityService.GetUserSecurity(ds, user);
+            if (!us.CanManageSchema)
+            {
+                throw new SchemaUnauthorizedAccessException();
+            }
+
             try
             {
                 List<DatasetFileConfig> configList;

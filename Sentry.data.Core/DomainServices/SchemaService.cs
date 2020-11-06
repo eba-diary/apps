@@ -165,7 +165,7 @@ namespace Sentry.data.Core
 
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
         {
-            Dataset parentDataset = _datasetContext.GetById<Dataset>(schemaDto.ParentDatasetId);
+            Dataset parentDataset = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaDto.SchemaId).ParentDataset;
             IApplicationUser user = _userService.GetCurrentUser();
             UserSecurity us = _securityService.GetUserSecurity(parentDataset, user);
 
@@ -287,6 +287,14 @@ namespace Sentry.data.Core
                 schema.UpdatedBy = _userService.GetCurrentUser().AssociateId;
             } 
             
+        }
+
+        public UserSecurity GetUserSecurityForSchema(int schemaId)
+        {
+            Dataset ds = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId).ParentDataset;
+            IApplicationUser user = _userService.GetCurrentUser();
+            UserSecurity us = _securityService.GetUserSecurity(ds, user);
+            return us;
         }
 
         public FileSchemaDto GetFileSchemaDto(int id)
