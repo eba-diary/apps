@@ -329,9 +329,17 @@ namespace Sentry.data.Core
         public DatasetFileConfigDto GetDatasetFileConfigDto(int configId)
         {
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
-            DatasetFileConfigDto dto = new DatasetFileConfigDto();
-            MapToDatasetFileConfigDto(dfc, dto);
-            return dto;
+
+            UserSecurity us = _securityService.GetUserSecurity(dfc.ParentDataset, _userService.GetCurrentUser());
+
+            if (us.CanPreviewDataset || us.CanViewFullDataset)
+            {
+                DatasetFileConfigDto dto = new DatasetFileConfigDto();
+                MapToDatasetFileConfigDto(dfc, dto);
+                return dto;
+            }
+
+            throw new SchemaUnauthorizedAccessException();            
         }
 
         /// <summary>
@@ -688,6 +696,22 @@ namespace Sentry.data.Core
             if (datasetId == 0)
             {
                 throw new ArgumentException("Argument is required", "datasetId");
+            }
+
+            Dataset ds = (schemaId == 0)
+                ? _datasetContext.GetById<Dataset>(datasetId)
+                : _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId && w.ParentDataset.DatasetId == datasetId).ParentDataset;
+
+            if (ds == null)
+            {
+                return false;
+            }
+
+            IApplicationUser user = _userService.GetCurrentUser();
+            UserSecurity us = _securityService.GetUserSecurity(ds, user);
+            if (!us.CanManageSchema)
+            {
+                throw new SchemaUnauthorizedAccessException();
             }
 
             try
