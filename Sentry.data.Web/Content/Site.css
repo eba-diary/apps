@@ -2779,3 +2779,20 @@ tr.shown td.details-control {
     padding: 5px 10px;
     height: 32px;
 }
+
+
+
+/*styles form forbidden pages*/
+a.forbiddenHero:link {
+    color: #ff0000;
+    text-decoration:underline;
+}
+
+a.forbiddenHero:visited {
+    color: #00a3e0;
+}
+
+a.forbiddenHero:hover {
+    color: #ff0000;
+}
+
