@@ -40,7 +40,7 @@ BEGIN
 
 	SET @CurSecurityRow = @SecurityUpdateIteration + 1
 	SET @NewIDValue = (SELECT NEWID())
-	SET @Securitysql = ('insert into Security select ' + @NewIDValue + ', ''Dataset'', GETDATE(), GETDATE(), NULL, NULL, ''072984''')
+	SET @Securitysql = ('insert into Security select ''' + @NewIDValue + ''', ''Dataset'', GETDATE(), GETDATE(), NULL, NULL, ''072984''')
 	SET @NewIdsql = 'insert into #NewSecurityIds select ' + CAST(@CurSecurityRow as varchar(5)) + ', ''' + @NewIDValue + ''''
 
 	print @Securitysql	
