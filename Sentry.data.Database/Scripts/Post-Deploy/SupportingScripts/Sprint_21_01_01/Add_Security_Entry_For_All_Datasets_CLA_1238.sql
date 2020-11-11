@@ -11,7 +11,7 @@ ROW_NUMBER() OVER (
 DS.Dataset_ID as 'DId'
 into #DatasetList
 from Dataset DS
-where Security_ID = NEWID()
+where Security_ID IS NULL
 
 IF OBJECT_ID('tempdb..#NewSecurityIds') IS NOT NULL DROP TABLE #NewSecurityIds
 Create Table #NewSecurityIds
