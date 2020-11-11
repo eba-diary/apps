@@ -1,0 +1,9 @@
+﻿@model List<SchemaMapDetailModel>
+<ul class="schemaMappingList">
+    @foreach (SchemaMapDetailModel map in Model)
+    {
+        <li class="col-md-12">
+            <div class="col-md-6"><a href="@map.DatasetDetailUrl"><span>@map.DatasetName</span></a></div> <div class="col-md-6"><span>@map.SchemaName</span></div>
+        </li>            
+    }
+</ul>

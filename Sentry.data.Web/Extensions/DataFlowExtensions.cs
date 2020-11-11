@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Sentry.Configuration;
 using Sentry.data.Core;
-using Sentry.data.Infrastructure;
-using StructureMap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -207,6 +205,22 @@ namespace Sentry.data.Web
                 RootAwsUrl = $"https://{AwsRegion.ToLower()}.amazonaws.com/{RootBucket.ToLower()}/"
             };
             return model;
+        }
+
+        public static SchemaMapDetailModel ToDetailModel(this Core.SchemaMapDetailDto dto)
+        {
+            SchemaMapDetailModel model = new SchemaMapDetailModel(dto);
+            return model;
+        }
+        
+        public static List<SchemaMapDetailModel> ToDetailModelList(this List<Core.SchemaMapDetailDto> dtoList)
+        {
+            List<SchemaMapDetailModel> modelList = new List<SchemaMapDetailModel>();
+            foreach(Core.SchemaMapDetailDto dto in dtoList)
+            {
+                modelList.Add(ToDetailModel(dto));                
+            }
+            return modelList;
         }
 
         public static List<AssociatedDataFlowModel> ToModel(this List<Tuple<DataFlowDetailDto, List<RetrieverJob>>> jobList)
