@@ -188,11 +188,6 @@ namespace Sentry.data.Web.Controllers
 
         private bool CanDaleView()
         {
-            if (!SharedContext.CurrentUser.CanDaleView)
-            {
-                return false;
-            }
-
             return true;
         }
 
