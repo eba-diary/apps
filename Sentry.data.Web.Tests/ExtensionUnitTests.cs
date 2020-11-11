@@ -17,33 +17,12 @@ namespace Sentry.data.Web.Tests
         public void Can_Find_Object_Reference()
         {
             //Setup
-            //string jsonSchema = @"{
-            //  ""type"": ""object"",
-            //  ""properties"": {
-            //    ""person"": {
-            //      ""$ref"": ""#/definitions/Person""
-            //    }
-            //  },
-            //  ""definitions"": {
-            //    ""Person"": {
-            //      ""type"": ""object"",
-            //      ""properties"": {
-            //        ""name"": {
-            //          ""type"": ""string""
-            //        },
-            //        ""age"": {
-            //          ""type"": ""integer""
-            //        }
-            //      }
-            //    }
-            //  }
-            //}";
-
             JsonSchema schema = BuildMockJsonSchema_ObjectReference_Based();
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            int position = 1;
 
             //Action
-            schema.ToDto(dtoList);
+            schema.ToDto(dtoList, ref position);
 
             //Assertion
             Assert.AreEqual(1, dtoList.Count);
@@ -54,13 +33,14 @@ namespace Sentry.data.Web.Tests
         [TestMethod, TestCategory("ToDto JsonSchema")]
         public void Can_Boolean_Within_Object_Reference()
         {
+            //SETUP
             JsonSchema schema = BuildMockJsonSchema_ObjectReference_Based();
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            int position = 1;
+            //ACTION
+            schema.ToDto(dtoList, ref position);
 
-            //Action
-            schema.ToDto(dtoList);
-
-            //Assertion
+            //ASSERT
             Assert.AreEqual(true, dtoList.First().ChildFields.Any(w => w.Name == "haschildren"));
             Assert.IsInstanceOfType(dtoList.First().ChildFields.First(w => w.Name == "haschildren"), typeof(VarcharFieldDto));
         }
@@ -68,28 +48,12 @@ namespace Sentry.data.Web.Tests
         public void Can_Find_Object_Property()
         {
             //Setup
-            //string jsonSchema = @"{
-            //  ""type"": ""object"",
-            //  ""properties"": {
-            //    ""person"": {
-            //      ""type"": ""object"",
-            //      ""properties"": {
-            //        ""name"": {
-            //          ""type"": ""string""
-            //        },
-            //        ""age"": {
-            //          ""type"": ""integer""
-            //        }
-            //      }
-            //    }
-            //  }
-            //}";
-
             JsonSchema schema = BuildMockJsonSchema_ObjectProperty_Based();
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            int position = 1;
 
             //Action
-            schema.ToDto(dtoList);
+            schema.ToDto(dtoList, ref position);
 
             //Assertion
             Assert.AreEqual(1, dtoList.Count);
@@ -100,28 +64,13 @@ namespace Sentry.data.Web.Tests
         public void Can_Find_Object_Property_Children()
         {
             //Setup
-            //string jsonSchema = @"{
-            //  ""type"": ""object"",
-            //  ""properties"": {
-            //    ""person"": {
-            //      ""type"": ""object"",
-            //      ""properties"": {
-            //        ""name"": {
-            //          ""type"": ""string""
-            //        },
-            //        ""age"": {
-            //          ""type"": ""integer""
-            //        }
-            //      }
-            //    }
-            //  }
-            //}";
 
             JsonSchema schema = BuildMockJsonSchema_ObjectProperty_Based();
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            int position = 1;
 
             //Action
-            schema.ToDto(dtoList);
+            schema.ToDto(dtoList, ref position);
             List<BaseFieldDto> childrenList = dtoList.First().ChildFields;
 
             //Assertion
@@ -150,9 +99,10 @@ namespace Sentry.data.Web.Tests
 
             JsonSchema schema = BuildMockJsonSchema_ObjectProperty_Based();
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            int position = 1;
 
             //Action
-            schema.Properties.First(w => w.Key == "person").Value.Properties.First(p => p.Key == "name").ToDto(dtoList);
+            schema.Properties.First(w => w.Key == "person").Value.Properties.First(p => p.Key == "name").ToDto(dtoList, ref position);
 
             //Assertion            
             Assert.AreEqual(1, dtoList.Count);
@@ -182,9 +132,10 @@ namespace Sentry.data.Web.Tests
 
             JsonSchema schema = BuildMockJsonSchema_ObjectProperty_Based();
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            int position = 1;
 
             //Action
-            schema.Properties.First(w => w.Key == "person").Value.Properties.First(p => p.Key == "age").ToDto(dtoList);
+            schema.Properties.First(w => w.Key == "person").Value.Properties.First(p => p.Key == "age").ToDto(dtoList, ref position);
 
             //Assertion            
             Assert.AreEqual(1, dtoList.Count);
@@ -197,9 +148,10 @@ namespace Sentry.data.Web.Tests
             //Setup            
             JsonSchema schema = BuildMockJsonSchema_ObjectProperty_Based();
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            int position = 1;
 
             //Action
-            schema.Properties.First(w => w.Key == "person").ToDto(dtoList);
+            schema.Properties.First(w => w.Key == "person").ToDto(dtoList, ref position);
 
             //Assertion            
             Assert.AreEqual(1, dtoList.Count);
@@ -212,9 +164,10 @@ namespace Sentry.data.Web.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchema_ObjectProperty_Based();
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            int position = 1;
 
             //Action
-            schema.Properties.First(w => w.Key == "person").Value.Properties.First(p => p.Key == "top3favoritecolors").ToDto(dtoList);
+            schema.Properties.First(w => w.Key == "person").Value.Properties.First(p => p.Key == "top3favoritecolors").ToDto(dtoList, ref position);
 
             //Assertion            
             Assert.AreEqual(1, dtoList.Count);
@@ -250,9 +203,10 @@ namespace Sentry.data.Web.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            int position = 1;
 
             //Action
-            schema.Properties.First(w => w.Key == "person").Value.Properties.First(p => p.Key == "favoritenumbers").ToDto(dtoList);
+            schema.Properties.First(w => w.Key == "person").Value.Properties.First(p => p.Key == "favoritenumbers").ToDto(dtoList, ref position);
 
             //Assertion            
             Assert.AreEqual(1, dtoList.Count);
@@ -289,9 +243,10 @@ namespace Sentry.data.Web.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            int position = 1;
 
             //Action
-            schema.Properties.First(w => w.Key == "person").Value.Properties.First(p => p.Key == "pastoccurances").ToDto(dtoList);
+            schema.Properties.First(w => w.Key == "person").Value.Properties.First(p => p.Key == "pastoccurances").ToDto(dtoList, ref position);
 
             //Assertion            
             Assert.AreEqual(1, dtoList.Count);
@@ -328,9 +283,10 @@ namespace Sentry.data.Web.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            int position = 1;
 
             //Action
-            schema.Properties.First(w => w.Key == "person").Value.Properties.First(p => p.Key == "pastoccurances").ToDto(dtoList);
+            schema.Properties.First(w => w.Key == "person").Value.Properties.First(p => p.Key == "pastoccurances").ToDto(dtoList, ref position);
 
             //Assertion            
             Assert.AreEqual(1, dtoList.Count);
@@ -343,9 +299,10 @@ namespace Sentry.data.Web.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchema_ObjectProperty_Based();
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            int position = 1;
 
             //Action
-            schema.Properties.First(w => w.Key == "person").Value.Properties.First(p => p.Key == "top3favoritecolors").ToDto(dtoList);
+            schema.Properties.First(w => w.Key == "person").Value.Properties.First(p => p.Key == "top3favoritecolors").ToDto(dtoList, ref position);
             BaseFieldDto dtoField = dtoList.First();
 
             //Assertion
@@ -399,9 +356,10 @@ namespace Sentry.data.Web.Tests
 
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            int position = 1;
 
             //Action
-            schema.Definitions.First(w => w.Key == "Person").Value.Properties.First(p => p.Key == "children").ToDto(dtoList);
+            schema.Definitions.First(w => w.Key == "Person").Value.Properties.First(p => p.Key == "children").ToDto(dtoList, ref position);
             BaseFieldDto dtoField = dtoList.First();
 
             //Assertion
@@ -453,9 +411,10 @@ namespace Sentry.data.Web.Tests
 
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            int position = 1;
 
             //Action
-            schema.Definitions.First(w => w.Key == "Person").Value.Properties.First(p => p.Key == "top3favoritenumbers").ToDto(dtoList);
+            schema.Definitions.First(w => w.Key == "Person").Value.Properties.First(p => p.Key == "top3favoritenumbers").ToDto(dtoList, ref position);
             BaseFieldDto dtoField = dtoList.First();
 
             //Assertion
@@ -472,9 +431,10 @@ namespace Sentry.data.Web.Tests
             //Setup            
             JsonSchema schema = BuildMockJsonSchema_ObjectProperty_Based();
             List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            int position = 1;
 
             //Action
-            schema.Properties.First(w => w.Key == "person").ToDto(dtoList);
+            schema.Properties.First(w => w.Key == "person").ToDto(dtoList, ref position);
 
             //Assertion            
             Assert.AreEqual(1, dtoList.Count);
