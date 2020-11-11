@@ -2784,13 +2784,9 @@ tr.shown td.details-control {
 
 /*styles form forbidden pages*/
 a.forbiddenHero:link {
-    color: #ff0000;
     text-decoration:underline;
 }
 
-a.forbiddenHero:visited {
-    color: #00a3e0;
-}
 
 a.forbiddenHero:hover {
     color: #ff0000;
