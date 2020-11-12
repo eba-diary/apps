@@ -7,7 +7,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 {
     public class DateFieldDto : BaseFieldDto
     {
-        public DateFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, bool array) : base(prop, array)
+        public DateFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, int rowPosition, bool array) : base(prop, rowPosition, array)
         {
             IDictionary<string, object> extData = null;
             extData = prop.Value.IsArray ? prop.FindArraySchema().ExtensionData : prop.Value.ExtensionData;
