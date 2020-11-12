@@ -120,11 +120,15 @@ namespace Sentry.data.Core
 
             AccessRequest ar = new AccessRequest()
             {
-                Permissions = _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList(),
                 ApproverList = new List<KeyValuePair<string, string>>(),
                 SecurableObjectId = ds.DatasetId,
                 SecurableObjectName = ds.DatasetName
             };
+
+            //Set permission list based on if Dataset is secured (restricted)
+            ar.Permissions = !ds.IsSecured
+                ? _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET && x.PermissionCode == GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA).ToList()
+                : _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
 
 
             IApplicationUser primaryUser = _userService.GetByAssociateId(ds.PrimaryOwnerId);

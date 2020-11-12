@@ -332,6 +332,19 @@ namespace Sentry.data.Core
             Logger.Info($"dataflowservice-delete-end - dataflowid:{dataFlowId}");
         }
 
+        public List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId)
+        {
+            List<SchemaMap> schemaMapList = _datasetContext.DataFlowStep.Where(w => w.DataFlow.Id == dataflowId).SelectMany(s => s.SchemaMappings).ToList();
+            List<SchemaMapDetailDto> dtoList = new List<SchemaMapDetailDto>();
+            foreach(SchemaMap map in schemaMapList)
+            {
+                SchemaMapDetailDto dto = new SchemaMapDetailDto();
+                MapToDetailDto(map, dto);
+                dtoList.Add(dto);
+            }
+            return dtoList;
+        }
+
         public ValidationException Validate(DataFlowDto dfDto)
         {
             ValidationResults results = new ValidationResults();
@@ -531,6 +544,15 @@ namespace Sentry.data.Core
             dto.FlowStorageCode = df.FlowStorageCode;
             dto.MappedSchema = GetMappedFileSchema(df.Id);
             dto.AssociatedJobs = GetExternalRetrieverJobs(df.Id);
+
+            List<SchemaMapDto> scmMapDtoList = new List<SchemaMapDto>();
+            foreach (DataFlowStep step in df.Steps.Where(w => w.SchemaMappings != null && w.SchemaMappings.Any()))
+            {
+                foreach(SchemaMap map in step.SchemaMappings)
+                {
+                    scmMapDtoList.Add(map.ToDto());
+                }
+            }
         }
 
         private List<int> GetMappedFileSchema(int dataflowId)
@@ -546,13 +568,21 @@ namespace Sentry.data.Core
 
         private void MapToDetailDto(DataFlow flow, DataFlowDetailDto dto)
         {
+            MapToDto(flow, dto);
+
             List<DataFlowStepDto> stepDtoList = new List<DataFlowStepDto>();
             MapToDtoList(flow.Steps.ToList(), stepDtoList);
 
             dto.steps = stepDtoList;
 
-            MapToDto(flow, dto);
+        }
 
+        private void MapToDetailDto(SchemaMap map, SchemaMapDetailDto dto)
+        {
+            MapToDto(map, dto);
+
+            dto.SchemaName = map.MappedSchema.Name;
+            dto.DatasetName = map.Dataset.DatasetName;
         }
 
         private void MapToDto(DataFlowStep step, DataFlowStepDto dto)
@@ -566,6 +596,16 @@ namespace Sentry.data.Core
             dto.TriggerKey = step.TriggerKey;
             dto.TargetPrefix = step.TargetPrefix;
             dto.DataFlowId = step.DataFlow.Id;
+        }
+
+        private void MapToDto(SchemaMap map, SchemaMapDto dto)
+        {
+            dto.Id = map.Id;
+            dto.DatasetId = map.Dataset.DatasetId;
+            dto.IsDeleted = false;
+            dto.SchemaId = map.MappedSchema.SchemaId;
+            dto.SearchCriteria = map.SearchCriteria;
+            dto.StepId = map.DataFlowStepId.Id;
         }
 
         private void MapToDtoList(List<DataFlowStep> steps, List<DataFlowStepDto> dtoList)
