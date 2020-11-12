@@ -9,9 +9,7 @@ namespace Sentry.data.Web.WebApi
     {
         public override bool DoesUserHaveAccess(IApplicationUser appUser)
         {
-            //return appUser.CanUseApp;
-            //TEMPORARY! hardcode this for now just for testing until Jered uncouples API from UI
-            return true;
+            return appUser.CanUseApp;
         }
     }
 }
