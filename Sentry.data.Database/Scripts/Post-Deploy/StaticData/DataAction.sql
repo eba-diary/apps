@@ -1,18 +1,19 @@
 ﻿BEGIN TRAN 
-	BEGIN TRY 
-		DECLARE	@Bucket VARCHAR(255)		
-		if @@SERVERNAME like '%' + 'FIT-N' + '%' + '11'  AND DB_NAME() like '%_NR'
+	BEGIN TRY
+		DECLARE @ENV VARCHAR(10) = (select value from sys.extended_properties where NAME = 'NamedEnvironment')
+		DECLARE	@Bucket VARCHAR(255)
+		if @ENV = 'NRTEST'
 			SET @Bucket = 'sentry-data-nrtest-dataset-ae2'
-		else if (@@SERVERNAME like 'FIT-N' + '%' + '12' AND DB_NAME() like '%_NR')
+		else if @ENV = 'NRDEV'
 			SET @Bucket = 'sentry-data-nrdev-dataset-ae2'
-		else if (@@SERVERNAME like 'FIT-N' + '%' + '12' AND DB_NAME() not like '%_NR')
+		else if @ENV = 'DEV'
 			SET @Bucket = 'sentry-data-dev-dataset-ae2'
-		else if (@@SERVERNAME like 'FIT-N' + '%' + '11' AND DB_NAME() not like '%_NR')
+		else if @ENV = 'TEST'
 			SET @Bucket = 'sentry-data-test-dataset-ae2'
-		else if ((@@SERVERNAME like 'FIT-N' + '%' + '10' OR @@SERVERNAME like 'FIT-N' + '%' + '20') AND DB_NAME() not like '%_NR')
+		else if @ENV = 'QUAL'
 			SET @Bucket = 'sentry-data-qual-dataset-ae2'
 		else
-			SET @Bucket = 'sentry-dataset-management'
+			SET @Bucket = 'sentry-data-UNKNOWN'
 		
 		
 
