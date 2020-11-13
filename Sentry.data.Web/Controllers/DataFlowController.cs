@@ -1,6 +1,7 @@
 ﻿using Sentry.Core;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Helpers;
 using System;
@@ -10,7 +11,7 @@ using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
 {
-    [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+    [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_VIEW)]
     public class DataFlowController : BaseController
     {
         private readonly IDataFlowService _dataFlowService;
@@ -56,16 +57,17 @@ namespace Sentry.data.Web.Controllers
             List<DataFlowStepDto> stepDtoList = _dataFlowService.GetDataFlowStepDtoByTrigger("temp-file/s3drop/12/");
         }
 
-        //[HttpGet]
-        //[Route("DataFlow/Create/{schemaId}/")]
-        //public void Create(int schemaId)
-        //{
-        //    bool success = _dataFlowService.CreateDataFlow(schemaId);
-        //}
-
         [HttpGet]
         public ViewResult Create()
         {
+
+            UserSecurity us = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
+
+            if (!us.CanCreateDataFlow)
+            {
+                return View("Forbidden");
+            }
+
             DataFlowModel model = new DataFlowModel();
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
@@ -79,14 +81,8 @@ namespace Sentry.data.Web.Controllers
             model.SchemaMaps.Add(schemaModel);
 
             return View("DataFlowForm", model);
+            
         }
-
-        //[HttpGet]
-        //public ViewResult Edit(int dataFlowId)
-        //{
-        //    DataFlowDetailDto dto = _dataFlowService.GetDataFlowDetailDto(dataFlowId);
-        //    DataFlowModel model = dto.ToModel();
-        //}
 
         [HttpPost]
         public ActionResult DataFlowForm(DataFlowModel model)
@@ -114,6 +110,19 @@ namespace Sentry.data.Web.Controllers
 
                     return RedirectToAction("Index");
                 }
+            }
+            catch (DatasetUnauthorizedAccessException dsEx)
+            {
+                //User does not have access to push data to one or more mapped dataset schemas
+                ValidationResults results = new ValidationResults();
+                results.Add(dsEx.Message);
+                AddCoreValidationExceptionsToModel(new ValidationException(results));
+            }
+            catch (DataFlowUnauthorizedAccessException)
+            {
+                //User should not get to this point via UI since navigating to Create page should give them Forbidden error
+                // However, just in case we are going to throw the forbidden here as well.
+                return View("Forbidden");
             }
             catch (ValidationException ex)
             {
@@ -226,11 +235,16 @@ namespace Sentry.data.Web.Controllers
 
         public PartialViewResult NewRetrieverJob(JobModel model)
         {
-            //JobModel model = new JobModel();
-
             CreateDropDownSetup(model);
 
             return PartialView("_RetrieverJob", model);
+        }
+
+        public PartialViewResult _SchemaMapDetail(int dataflowId)
+        {
+            List<SchemaMapDetailDto> dtoList = _dataFlowService.GetMappedSchemaByDataFlow(dataflowId);
+            List<SchemaMapDetailModel> modelList = dtoList.ToDetailModelList();
+            return PartialView("~/Views/Dataflow/_SchemaMapDetail.cshtml", modelList);
         }
 
         private void CreateDropDownSetup(JobModel model)
@@ -267,19 +281,6 @@ namespace Sentry.data.Web.Controllers
             });
 
             model.SourcesForDropdown = temp2.OrderBy(x => x.Value);
-
-            //model.CompressionTypesDropdown = Enum.GetValues(typeof(CompressionTypes)).Cast<CompressionTypes>().Select(v
-            //    => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-
-            //if (model.NewFileNameExclusionList != null)
-            //{
-            //    model.FileNameExclusionList = model.NewFileNameExclusionList.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).ToList();
-            //}
-            //else
-            //{
-            //    model.NewFileNameExclusionList = "";
-            //    model.FileNameExclusionList = new List<string>();
-            //}
 
             model.RequestMethodDropdown = Utility.BuildRequestMethodDropdown(model.SelectedRequestMethod);
 

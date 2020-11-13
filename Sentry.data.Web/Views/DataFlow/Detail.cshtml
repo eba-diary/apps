@@ -50,17 +50,23 @@
                 </li>
             }
         </ul>
+        <br />
+        <hr />
+        <h4><span>Target Schema</span></h4>
+        <div id="targetSchema">
+            <div id="targetSchemaSpinner"></div>
+        </div>
     </div>
 <style>
     .detailContainer {
         width: 75%;
     }
 
-    .stepList {
+    .schemaMappingList, .stepList {
         list-style-type: none;
     }
 
-    .stepList li {
+    .schemaMappingList li, .stepList li {
         width: 75%
     }
 
@@ -170,7 +176,7 @@
 @section Scripts {
     <script>
         $(function () {
-            data.DataFlow.DataFlowDetailInit();
+            data.DataFlow.DataFlowDetailInit(@Model.Id);
         });
     </script>
 }

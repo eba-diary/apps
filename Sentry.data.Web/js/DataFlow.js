@@ -65,7 +65,7 @@
         data.Job.FormInit();
     },
 
-    DataFlowDetailInit: function () {
+    DataFlowDetailInit: function (dataflowId) {
         $('body').on('click', '.jobHeader', function () {
             if ($(this).children('.tracker-menu-icon').hasClass('glyphicon-menu-down')) {
                 $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
@@ -81,6 +81,14 @@
                 $(this).css('border-radius', '5px 5px 0px 0px');
             }
         });
+
+        Sentry.InjectSpinner($('#targetSchemaSpinner'));
+
+        var schemaMapUrl = "/DataFlow/_SchemaMapDetail/?dataflowId=" + encodeURI(dataflowId);
+        $.get(schemaMapUrl, function (e) {
+            $('#targetSchema').html(e);
+        });
+
     },
 
     InitIngestionType() {

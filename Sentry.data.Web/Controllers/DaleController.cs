@@ -20,39 +20,45 @@ namespace Sentry.data.Web.Controllers
             _daleService = daleService;
         }
 
-        //[Route("DataInventory/{q?}")]
         //ALLOWED TARGETS=entity,column,SAID
-        //e.g. https://localhost.sentry.com:44371/DataInventory/CODS/SAID/SSN
-        [Route("DataInventory")]
-        [Route("DataInventory/{search}/{target}")]
-        [Route("DataInventory/{search}/{target}/{filter}")]
-        public ActionResult DaleSearch(string search=null, string target=null, string filter=null)
+        //https://localhost.sentry.com:44371/DataInventory/Search/?target=column&search=weather&filter=ssn
+        //https://localhost.sentry.com:44371/DataInventory/Search/?target=said&search=CODS
+        [Route("DataInventory/Search/")]
+        public ActionResult DaleSearch(string target=null, string search=null, string filter=null)
         {
             if( CanDaleView() ) 
             {
                 DaleSearchModel searchModel = new DaleSearchModel();
                 searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
                 searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
-
-                if(String.IsNullOrEmpty(search))                        //no search , normal Dale WEB default to column
+                
+                if(String.IsNullOrEmpty(search))
                 {
-                    searchModel.Destiny = DaleDestiny.Column;       
+                    searchModel.Destiny = DaleDestiny.Column;
                 }
                 else
                 {
-                    searchModel.Criteria = search;                       //search specified, figure out what is target
+                    searchModel.Criteria = search;                       
+                    bool targetFound = false;
 
-                    if (target.ToUpper() == "SAID")
+                    if(IsTargetValid(target))
                     {
-                        searchModel.Destiny = DaleDestiny.SAID;
+                        if (target.ToUpper() == "SAID")
+                        {
+                            searchModel.Destiny = DaleDestiny.SAID;
+                            targetFound = true;
+                            
+                        }
+                        else if (target.ToUpper() == "ENTITY")
+                        {
+                            searchModel.Destiny = DaleDestiny.Object;
+                            targetFound = true;
+                        }
                     }
-                    else if (target.ToUpper() == "ENTITY")
+                    
+                    if(!targetFound)
                     {
-                        searchModel.Destiny = DaleDestiny.Object;
-                    }
-                    else
-                    {
-                        searchModel.Destiny = DaleDestiny.Column;       //if its not one of above, default too column, this guards against mispelled stuff
+                        searchModel.Destiny = DaleDestiny.Column;           //default to column
                     }
                 }
 
@@ -62,6 +68,28 @@ namespace Sentry.data.Web.Controllers
             {
                 return View("Forbidden");
             }
+        }
+
+        private bool IsTargetValid(string target)
+        {
+            bool valid = false;
+
+            if (String.IsNullOrEmpty(target))
+            {
+                return false;
+            }
+
+            if (target.ToUpper() == "SAID")
+            {
+                valid = true;
+            }
+            
+            if (target.ToUpper() == "ENTITY")
+            {
+                valid = true;
+            }
+
+            return valid;
         }
 
         //use for ServerSide DataTable processing
@@ -160,11 +188,6 @@ namespace Sentry.data.Web.Controllers
 
         private bool CanDaleView()
         {
-            if (!SharedContext.CurrentUser.CanDaleView)
-            {
-                return false;
-            }
-
             return true;
         }
 

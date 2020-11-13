@@ -5,7 +5,7 @@ using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Text;
 
 namespace Sentry.data.Core
 {
@@ -16,16 +16,19 @@ namespace Sentry.data.Core
         private readonly UserService _userService;
         private readonly IJobService _jobService;
         private readonly IS3ServiceProvider _s3ServiceProvider;
+        private readonly ISecurityService _securityService;
 
 
         public DataFlowService(IDatasetContext datasetContext, IMessagePublisher messagePublisher, 
-            UserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider)
+            UserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider,
+            ISecurityService securityService)
         {
             _datasetContext = datasetContext;
             _messagePublisher = messagePublisher;
             _userService = userService;
             _jobService = jobService;
             _s3ServiceProvider = s3ServiceProvider;
+            _securityService = securityService;
         }
 
         public List<DataFlowDto> ListDataFlows()
@@ -54,6 +57,50 @@ namespace Sentry.data.Core
 
         public int CreateandSaveDataFlow(DataFlowDto dto)
         {
+            //Verify user has permissions to create Dataflow
+            UserSecurity us = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
+
+            if (!us.CanCreateDataFlow)
+            {
+                throw new DataFlowUnauthorizedAccessException();
+            }
+
+            //Verify user has permissions to push data to each schema mapped to dataflow
+            StringBuilder datasetsWithNoPermissions = new StringBuilder();
+            foreach(SchemaMapDto scmMap in dto.SchemaMap)
+            {
+                Dataset ds = _datasetContext.GetById<Dataset>(scmMap.DatasetId);
+                bool IsDatasetDetected = datasetsWithNoPermissions.ToString().Split(',').Any(a => a == ds.DatasetName);
+
+                UserSecurity dsUs = null;
+                //If dataset name is already in list do not retrieve security object again
+                if (!IsDatasetDetected)
+                {
+                    dsUs = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+                }
+
+                //Only check permissions if security object is populated.  Also prevents
+                //  returning list with dataset name listed multiple times.
+                if (dsUs != null && !dsUs.CanManageSchema && !dsUs.CanEditDataset)
+                {
+                    if (datasetsWithNoPermissions.Length > 0)
+                    {
+                        datasetsWithNoPermissions.Append($", {ds.DatasetName}");
+                    }
+                    else
+                    {
+                        datasetsWithNoPermissions.Append($"{ds.DatasetName}");
+                    }                    
+                }
+            }
+
+            //If SchemaMapDto contains dataset which user does not have permissions to 
+            // push data too, then throw an unauthorized exception.
+            if (datasetsWithNoPermissions.Length > 0)
+            {
+                throw new DatasetUnauthorizedAccessException($"No permissions to push data to {datasetsWithNoPermissions.ToString()}");
+            }
+
             try
             {
                 DataFlow df = CreateDataFlow(dto);
@@ -285,6 +332,19 @@ namespace Sentry.data.Core
             Logger.Info($"dataflowservice-delete-end - dataflowid:{dataFlowId}");
         }
 
+        public List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId)
+        {
+            List<SchemaMap> schemaMapList = _datasetContext.DataFlowStep.Where(w => w.DataFlow.Id == dataflowId).SelectMany(s => s.SchemaMappings).ToList();
+            List<SchemaMapDetailDto> dtoList = new List<SchemaMapDetailDto>();
+            foreach(SchemaMap map in schemaMapList)
+            {
+                SchemaMapDetailDto dto = new SchemaMapDetailDto();
+                MapToDetailDto(map, dto);
+                dtoList.Add(dto);
+            }
+            return dtoList;
+        }
+
         public ValidationException Validate(DataFlowDto dfDto)
         {
             ValidationResults results = new ValidationResults();
@@ -484,6 +544,15 @@ namespace Sentry.data.Core
             dto.FlowStorageCode = df.FlowStorageCode;
             dto.MappedSchema = GetMappedFileSchema(df.Id);
             dto.AssociatedJobs = GetExternalRetrieverJobs(df.Id);
+
+            List<SchemaMapDto> scmMapDtoList = new List<SchemaMapDto>();
+            foreach (DataFlowStep step in df.Steps.Where(w => w.SchemaMappings != null && w.SchemaMappings.Any()))
+            {
+                foreach(SchemaMap map in step.SchemaMappings)
+                {
+                    scmMapDtoList.Add(map.ToDto());
+                }
+            }
         }
 
         private List<int> GetMappedFileSchema(int dataflowId)
@@ -499,13 +568,21 @@ namespace Sentry.data.Core
 
         private void MapToDetailDto(DataFlow flow, DataFlowDetailDto dto)
         {
+            MapToDto(flow, dto);
+
             List<DataFlowStepDto> stepDtoList = new List<DataFlowStepDto>();
             MapToDtoList(flow.Steps.ToList(), stepDtoList);
 
             dto.steps = stepDtoList;
 
-            MapToDto(flow, dto);
+        }
 
+        private void MapToDetailDto(SchemaMap map, SchemaMapDetailDto dto)
+        {
+            MapToDto(map, dto);
+
+            dto.SchemaName = map.MappedSchema.Name;
+            dto.DatasetName = map.Dataset.DatasetName;
         }
 
         private void MapToDto(DataFlowStep step, DataFlowStepDto dto)
@@ -519,6 +596,16 @@ namespace Sentry.data.Core
             dto.TriggerKey = step.TriggerKey;
             dto.TargetPrefix = step.TargetPrefix;
             dto.DataFlowId = step.DataFlow.Id;
+        }
+
+        private void MapToDto(SchemaMap map, SchemaMapDto dto)
+        {
+            dto.Id = map.Id;
+            dto.DatasetId = map.Dataset.DatasetId;
+            dto.IsDeleted = false;
+            dto.SchemaId = map.MappedSchema.SchemaId;
+            dto.SearchCriteria = map.SearchCriteria;
+            dto.StepId = map.DataFlowStepId.Id;
         }
 
         private void MapToDtoList(List<DataFlowStep> steps, List<DataFlowStepDto> dtoList)

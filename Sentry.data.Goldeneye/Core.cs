@@ -11,6 +11,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Sentry.FeatureFlags;
 
 namespace Sentry.data.Goldeneye
 {
@@ -123,6 +124,8 @@ namespace Sentry.data.Goldeneye
             {
                 using (_container = Bootstrapper.Container.GetNestedContainer())
                 {
+                    IDataFeatures dataFeatures = _container.GetInstance<IDataFeatures>();
+
                     //THIS IS A BANDAID.  No copyright intended.
                     Boolean complete = false;
                     while (!complete)
@@ -176,6 +179,7 @@ namespace Sentry.data.Goldeneye
 
                             //Schedule WallEService every day at midnight
                             RecurringJob.AddOrUpdate("WallEService", () => WallEService.Run(), "00 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                            
                             //Load all scheduled and enabled jobs into hangfire on startup to ensure all jobs are registered
                             List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled).ToList();
 
@@ -210,51 +214,49 @@ namespace Sentry.data.Goldeneye
                             }
 
                             //Starting MetadataProcessor Consumer
+                            Logger.Info("starting metadataprocessorservice");
                             MetadataProcessorService metaProcessor = new MetadataProcessorService();
                             currentTasks.Add(new RunningTask(
                                             Task.Factory.StartNew(() => metaProcessor.Run(), TaskCreationOptions.LongRunning), "metadataProcessor"));
                         }
 
                         ////Dataset Loader
-                        if (true)
+                        //How many loader tasks can be started
+                        var availableLoaderTasks = Int32.Parse(Config.GetHostSetting("activeLoaderTaskThrottle")) - currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute") && !x.Task.IsCompleted).ToList().Count;
+                        foreach (var a in Directory.GetFiles(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"), "*", SearchOption.AllDirectories).Where(w => !IsFileLocked(w)))
                         {
-                            //How many loader tasks can be started
-                            var availableLoaderTasks = Int32.Parse(Config.GetHostSetting("activeLoaderTaskThrottle")) - currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute") && !x.Task.IsCompleted).ToList().Count;
-                            foreach (var a in Directory.GetFiles(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"), "*", SearchOption.AllDirectories).Where(w => !IsFileLocked(w)))
+                            if (availableLoaderTasks > 0)
                             {
-                                if (availableLoaderTasks > 0)
+                                //Disregard any request files picked up via Dataset Loader
+                                //This will need to change when Reading requests from SDP
+                                if (!Path.GetFileName(a).StartsWith(Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
                                 {
-                                    //Disregard any request files picked up via Dataset Loader
-                                    //This will need to change when Reading requests from SDP
-                                    if (!Path.GetFileName(a).StartsWith(Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
-                                    {
-                                        Console.WriteLine("Found : " + a);
-                                        Logger.Info("Found : " + a);
+                                    Console.WriteLine("Found : " + a);
+                                    Logger.Info("Found : " + a);
 
-                                        //Add Processing Prefix to file name so it is not picked up by another DatasetLoader task
-                                        var orginalPath = Path.GetFullPath(a).Replace(Path.GetFileName(a), "");
-                                        var origFileName = Path.GetFileName(a);
-                                        var processingFile = orginalPath + Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix") + origFileName;
+                                    //Add Processing Prefix to file name so it is not picked up by another DatasetLoader task
+                                    var orginalPath = Path.GetFullPath(a).Replace(Path.GetFileName(a), "");
+                                    var origFileName = Path.GetFileName(a);
+                                    var processingFile = orginalPath + Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix") + origFileName;
 
 
-                                        //Rename file to indicate request has been sent for processing
-                                        File.Move(a, processingFile);
+                                    //Rename file to indicate request has been sent for processing
+                                    File.Move(a, processingFile);
 
-                                        //Create a new one.
+                                    //Create a new one.
 
-                                        currentTasks.Add(new RunningTask(
-                                            Task.Factory.StartNew(() => DatasetLoader.Run(processingFile), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
-                                            $"DatasetLoader : Minute : {Path.GetFileNameWithoutExtension(a)}"));
+                                    currentTasks.Add(new RunningTask(
+                                        Task.Factory.StartNew(() => DatasetLoader.Run(processingFile), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
+                                        $"DatasetLoader : Minute : {Path.GetFileNameWithoutExtension(a)}"));
 
-                                        //Remove one available loader task
-                                        availableLoaderTasks--;
-                                    }
+                                    //Remove one available loader task
+                                    availableLoaderTasks--;
                                 }
-                                else
-                                {
-                                    //Max number of loader tasks has been reached.
-                                    break;
-                                }
+                            }
+                            else
+                            {
+                                //Max number of loader tasks has been reached.
+                                break;
                             }
                         }
 
@@ -298,7 +300,7 @@ namespace Sentry.data.Goldeneye
                             Logger.Info($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
                         }
 
-                        //Remove disabled jobs
+                        //Remove disabled jobs, non-instant jobs
                         List<RetrieverJob> DisabledJobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled && (w.Created > config.LastRunMinute.AddSeconds(-5) || w.Modified > config.LastRunMinute.AddSeconds(-5))).ToList();
 
                         foreach (RetrieverJob Job in DisabledJobList)
@@ -308,32 +310,38 @@ namespace Sentry.data.Goldeneye
                             Job.JobLoggerMessage("Info", "Job update detected, performing RemoveIfExists from Hangfire");
                         }
 
-                        /**************************************
-                         *  DFS Directory Monitors                          
-                        ***************************************/                     
-                        //Get all active watch retriever jobs 
-                        List<RetrieverJob> rtJobList = _requestContext.RetrieverJob.Where(w => (w.DataSource is DfsBasic || w.DataSource is DfsCustom || w.DataSource is DfsDataFlowBasic) && w.Schedule == "Instant" && w.IsEnabled).FetchAllConfiguration(_requestContext).ToList();
 
-                        //If initial start of GOLDENEYE, init all jobs else only new jobs
-                        List<RetrieverJob> initJobList = (firstRun) ? rtJobList : rtJobList.Where(s => !currentTasks.Any(ct => ct.JobId == s.Id)).ToList();                        
-
-                        //Initilize filewatcher jobs
-                        foreach (RetrieverJob rJob in initJobList)
+                        //This will ensure directory monitors are not started when 
+                        if (!dataFeatures.Remove_DfsWatchers_CLA_2346.GetValue())
                         {
-                            try
-                            {
-                                var jobId = rJob.Id;
-                                Uri path = rJob.GetUri();
 
-                                Task t = InitializeFileWatcherTask(jobId, path);
+                            /**************************************
+                             *  DFS Directory Monitors                          
+                            ***************************************/
+                            //Get all active watch retriever jobs 
+                            List<RetrieverJob> rtJobList = _requestContext.RetrieverJob.Where(w => (w.DataSource is DfsBasic || w.DataSource is DfsCustom || w.DataSource is DfsDataFlowBasic) && w.Schedule == "Instant" && w.IsEnabled).FetchAllConfiguration(_requestContext).ToList();
 
-                                currentTasks.Add(new RunningTask(t, GenerateWatcherName(rJob), jobId, path));
-                            }
-                            catch (Exception ex)
+                            //If initial start of GOLDENEYE, init all jobs else only new jobs
+                            List<RetrieverJob> initJobList = (firstRun) ? rtJobList : rtJobList.Where(s => !currentTasks.Any(ct => ct.JobId == s.Id)).ToList();
+
+                            //Initilize filewatcher jobs
+                            foreach (RetrieverJob rJob in initJobList)
                             {
-                                Logger.Error($"Initializing retrieverjob jobId:{rJob.Id}", ex);
+                                try
+                                {
+                                    var jobId = rJob.Id;
+                                    Uri path = rJob.GetUri();
+
+                                    Task t = InitializeFileWatcherTask(jobId, path);
+
+                                    currentTasks.Add(new RunningTask(t, GenerateWatcherName(rJob), jobId, path));
+                                }
+                                catch (Exception ex)
+                                {
+                                    Logger.Error($"Initializing retrieverjob jobId:{rJob.Id}", ex);
+                                }
                             }
-                        }
+                        }                        
 
                         config.LastRunMinute = DateTime.Now;
                     }
