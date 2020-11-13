@@ -127,6 +127,8 @@ namespace Sentry.data.Core
             DataFlow df = MapToDataFlow(scm);
 
             MapDataFlowStepsForFileSchema(scm, df);
+
+            _jobService.CreateDropLocation(_datasetContext.RetrieverJob.FirstOrDefault(w => w.DataFlow == df));
         }
 
         public void PublishMessage(string key, string message)
@@ -459,6 +461,8 @@ namespace Sentry.data.Core
 
             //Generate Schema Map step to send files to schema specific data flow
             AddDataFlowStep(dto, df, DataActionType.SchemaMap);
+
+            _jobService.CreateDropLocation(dfsDataFlowBasic);
         }
 
         private void MapDataFlowStepsForPull(DataFlowDto dto, DataFlow df)
