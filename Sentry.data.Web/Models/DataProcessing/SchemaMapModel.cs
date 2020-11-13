@@ -1,5 +1,4 @@
 ﻿using Sentry.Core;
-using Sentry.data.Core.Entities.DataProcessing;
 using System.Collections.Generic;
 using System.Web.Mvc;
 
@@ -11,6 +10,13 @@ namespace Sentry.data.Web
         {
             AllDatasets = new List<SelectListItem>();
             AllSchemas = new List<SelectListItem>();
+        }
+
+        public SchemaMapModel(Core.SchemaMapDto dto)
+        {
+            Id = dto.Id;
+            SelectedDataset = dto.DatasetId;
+            SelectedSchema = dto.SchemaId;
         }
 
         public int Id { get; set; }

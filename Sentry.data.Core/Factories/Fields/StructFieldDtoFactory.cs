@@ -1,10 +1,6 @@
 ﻿using NJsonSchema;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Sentry.data.Core.DTO.Schema.Fields;
+using System.Collections.Generic;
 
 namespace Sentry.data.Core.Factories.Fields
 {
@@ -12,16 +8,18 @@ namespace Sentry.data.Core.Factories.Fields
     {
         private KeyValuePair<string, JsonSchemaProperty> _property;
         private readonly bool _array;
+        private readonly int _position;
         private readonly StructField _baseField;
         private readonly SchemaRow _row;
         private readonly bool IsProperty;
         private readonly bool IsField;
         private readonly bool IsRow;
 
-        public StructFieldDtoFactory(KeyValuePair<string, JsonSchemaProperty> prop, bool array)
+        public StructFieldDtoFactory(KeyValuePair<string, JsonSchemaProperty> prop, int position, bool array)
         {
             _property = prop;
             _array = array;
+            _position = position;
             IsProperty = true;
         }
 
@@ -45,7 +43,7 @@ namespace Sentry.data.Core.Factories.Fields
             }
             else if (IsProperty)
             {
-                return new StructFieldDto(_property, _array);
+                return new StructFieldDto(_property, _position, _array);
             }
             else if (IsRow)
             {

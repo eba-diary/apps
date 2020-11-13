@@ -424,6 +424,7 @@
     <Compile Include="Models\DataProcessing\DFModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowStepModel.cs" />
     <Compile Include="Models\DataProcessing\JobModel.cs" />
+    <Compile Include="Models\DataProcessing\SchemaMapDetailModel.cs" />
     <Compile Include="Models\DataProcessing\SchemaMapModel.cs" />
     <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
     <Compile Include="Models\Dataset\ColumnModel.cs" />
@@ -658,6 +659,7 @@
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
     <Content Include="js\Job.js" />
+    <Content Include="js\Shared\Utils.js" />
     <Content Include="js\Subscription.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
@@ -1495,6 +1497,8 @@
     <Content Include="Scripts\quill\quill.core.min.js.map" />
     <Content Include="Scripts\quill\quill.min.js.map" />
     <Content Include="Scripts\quill\quill.snow.min.css.map" />
+    <Content Include="Views\Shared\Unauthorized.cshtml" />
+    <Content Include="Views\DataFlow\_SchemaMapDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
