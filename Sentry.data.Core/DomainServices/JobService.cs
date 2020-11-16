@@ -110,63 +110,18 @@ namespace Sentry.data.Core
             return basicJob;
         }
 
-        private RetrieverJob InstantiateJob(DatasetFileConfig dfc, DataSource dataSource, DataFlow df)
-        {
-            RetrieverJobOptions.Compression compression = new RetrieverJobOptions.Compression()
-            {
-                IsCompressed = false,
-                CompressionType = null,
-                FileNameExclusionList = new List<string>()
-            };
-
-            RetrieverJobOptions rjo = new RetrieverJobOptions()
-            {
-                OverwriteDataFile = false,
-                TargetFileName = "",
-                CreateCurrentFile = false,
-                IsRegexSearch = true,
-                SearchCriteria = "\\.",
-                CompressionOptions = compression
-            };
-
-            RetrieverJob rj = new RetrieverJob()
-            {
-                TimeZone = "Central Standard Time",
-                RelativeUri = null,
-                DataSource = dataSource,
-                DatasetConfig = dfc,
-                FileSchema = null,
-                DataFlow = df,
-                Created = DateTime.Now,
-                Modified = DateTime.Now,
-                IsGeneric = true,
-                JobOptions = rjo
-            };
-
-            if (dataSource.Is<S3Basic>())
-            {
-                rj.Schedule = "*/1 * * * *";
-            }
-            else if (dataSource.Is<DfsBasic>() || dataSource.Is<DfsDataFlowBasic>())
-            {
-                rj.Schedule = "Instant";
-            }
-            else
-            {
-                throw new NotImplementedException("This method does not support this type of Data Source");
-            }
-
-            return rj;
-        }
-
         public RetrieverJob InstantiateJobsForCreation(DatasetFileConfig dfc, DataSource dataSource)
         {
-            return InstantiateJob(dfc, dataSource, null);
+            RetrieverJob newJob = InstantiateJob(dfc, dataSource, null);
+            //_datasetContext.Add(newJob);
+            return newJob;
         }
 
         public RetrieverJob InstantiateJobsForCreation(DataFlow df, DataSource dataSource)
         {
-            return InstantiateJob(null, dataSource, df);
+            RetrieverJob newJob = InstantiateJob(null, dataSource, df);
+            //_datasetContext.Add(newJob);
+            return newJob;
         }
 
 
@@ -192,14 +147,24 @@ namespace Sentry.data.Core
 
             _datasetContext.Add(job);
 
+            CreateDropLocation(job);
+
             return job;
+        }
+
+        public void CreateDropLocation(List<RetrieverJob> jobList)
+        {
+            foreach (RetrieverJob job in jobList)
+            {
+                CreateDropLocation(job);
+            }
         }
 
         public void CreateDropLocation(RetrieverJob job)
         {
             try
             {
-                if (job.DataSource.Is<DfsBasic>()  && !System.IO.Directory.Exists(job.GetUri().LocalPath))
+                if ((job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsDataFlowBasic>())  && !System.IO.Directory.Exists(job.GetUri().LocalPath))
                 {
                     System.IO.Directory.CreateDirectory(job.GetUri().LocalPath);
                 }
@@ -267,6 +232,55 @@ namespace Sentry.data.Core
 
 
         #region Private Methods
+
+        private RetrieverJob InstantiateJob(DatasetFileConfig dfc, DataSource dataSource, DataFlow df)
+        {
+            RetrieverJobOptions.Compression compression = new RetrieverJobOptions.Compression()
+            {
+                IsCompressed = false,
+                CompressionType = null,
+                FileNameExclusionList = new List<string>()
+            };
+
+            RetrieverJobOptions rjo = new RetrieverJobOptions()
+            {
+                OverwriteDataFile = false,
+                TargetFileName = "",
+                CreateCurrentFile = false,
+                IsRegexSearch = true,
+                SearchCriteria = "\\.",
+                CompressionOptions = compression
+            };
+
+            RetrieverJob rj = new RetrieverJob()
+            {
+                TimeZone = "Central Standard Time",
+                RelativeUri = null,
+                DataSource = dataSource,
+                DatasetConfig = dfc,
+                FileSchema = null,
+                DataFlow = df,
+                Created = DateTime.Now,
+                Modified = DateTime.Now,
+                IsGeneric = true,
+                JobOptions = rjo
+            };
+
+            if (dataSource.Is<S3Basic>())
+            {
+                rj.Schedule = "*/1 * * * *";
+            }
+            else if (dataSource.Is<DfsBasic>() || dataSource.Is<DfsDataFlowBasic>())
+            {
+                rj.Schedule = "Instant";
+            }
+            else
+            {
+                throw new NotImplementedException("This method does not support this type of Data Source");
+            }
+
+            return rj;
+        }
 
         private void MapToCompression(RetrieverJobDto dto, Compression compress)
         {
