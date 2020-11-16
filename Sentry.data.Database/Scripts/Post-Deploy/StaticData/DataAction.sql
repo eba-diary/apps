@@ -1,6 +1,6 @@
 ﻿BEGIN TRAN 
 	BEGIN TRY
-		DECLARE @ENV VARCHAR(10) = (select value from sys.extended_properties where NAME = 'NamedEnvironment')
+		DECLARE @ENV VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
 		DECLARE	@Bucket VARCHAR(255)
 		if @ENV = 'NRTEST'
 			SET @Bucket = 'sentry-data-nrtest-dataset-ae2'
