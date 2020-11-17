@@ -281,6 +281,25 @@ namespace Sentry.data.Core
                 chgDetected = true;
             }
 
+            if (schema.CLA2472_EMRSend != dto.CLA2472_EMRSend)
+            {
+                schema.CLA2472_EMRSend = dto.CLA2472_EMRSend;
+                chgDetected = true;
+            }
+
+            if (schema.CLA2429_SnowflakeCreateTable != dto.CLA2429_SnowflakeCreateTable)
+            {
+                schema.CLA2429_SnowflakeCreateTable = dto.CLA2429_SnowflakeCreateTable;
+                chgDetected = true;
+            }
+
+            if (schema.CLA1286_KafkaFlag != dto.CLA1286_KafkaFlag)
+            {
+                schema.CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag;
+                chgDetected = true;
+            }
+
+
             if (chgDetected)
             {
                 schema.LastUpdatedDTM = DateTime.Now;
@@ -517,7 +536,10 @@ namespace Sentry.data.Core
                 DeleteIssueDTM = DateTime.MaxValue,
                 CreateCurrentView = dto.CreateCurrentView,
                 CLA1396_NewEtlColumns = dto.CLA1396_NewEtlColumns,
-                CLA1580_StructureHive = dto.CLA1580_StructureHive
+                CLA1580_StructureHive = dto.CLA1580_StructureHive,
+                CLA2472_EMRSend = dto.CLA2472_EMRSend,
+                CLA2429_SnowflakeCreateTable = dto.CLA2429_SnowflakeCreateTable,
+                CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag
             };
             _datasetContext.Add(schema);
             return schema;
@@ -549,7 +571,10 @@ namespace Sentry.data.Core
                 RawQueryStorage = (Configuration.Config.GetHostSetting("EnableRawQueryStorageInQueryTool").ToLower() == "true" && _datasetContext.SchemaMap.Any(w => w.MappedSchema.SchemaId == scm.SchemaId)) ? GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\" : Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
                 FileExtenstionName = scm.Extension.Name,
                 CLA1396_NewEtlColumns = scm.CLA1396_NewEtlColumns,
-                CLA1580_StructureHive = scm.CLA1580_StructureHive
+                CLA1580_StructureHive = scm.CLA1580_StructureHive,
+                CLA2472_EMRSend = scm.CLA2472_EMRSend,
+                CLA2429_SnowflakeCreateTable = scm.CLA2429_SnowflakeCreateTable,
+                CLA1286_KafkaFlag = scm.CLA1286_KafkaFlag
             };
 
         }
