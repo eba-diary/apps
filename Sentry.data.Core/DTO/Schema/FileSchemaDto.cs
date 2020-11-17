@@ -18,5 +18,9 @@
         public string StorageLocation { get; set; }
 
         public string RawQueryStorage { get; set; }
+        public string SnowflakeDatabase { get; set; }
+        public string SnowflakeTable { get; set; }
+        public string SnowflakeSchema { get; set; }
+        public string SnowflakeStatus { get; set; }
     }
 }

@@ -1883,6 +1883,10 @@ namespace Sentry.data.Core.Tests
                 SchemaId = 88,
                 StorageCode = "1000002",
                 UpdatedBy = "072984",
+                SnowflakeDatabase = "",
+                SnowflakeTable = "",
+                SnowflakeSchema = "",
+                SnowflakeStatus = "Available",
                 CLA1396_NewEtlColumns = false,
                 CLA1580_StructureHive = false,
                 Revisions = new List<SchemaRevision>()

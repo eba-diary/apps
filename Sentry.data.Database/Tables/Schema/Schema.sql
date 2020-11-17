@@ -23,5 +23,9 @@
     [HiveStatus] VARCHAR(50) NULL, 
     [CLA1396_NewEtlColumns] BIT NOT NULL, 
     [CLA1580_StructureHive ] BIT NOT NULL, 
+    [SnowflakeTable] VARCHAR(250) NULL, 
+    [SnowflakeDatabase] VARCHAR(250) NULL,
+	[SnowflakeSchema] VARCHAR(250) NULL,
+    [SnowflakeStatus] VARCHAR(250) NULL, 
     CONSTRAINT [FK_Schema_FileExtension] FOREIGN KEY ([FileExtension_Id]) REFERENCES [FileExtension]([Extension_Id]) 
 )

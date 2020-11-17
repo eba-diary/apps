@@ -63,6 +63,10 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 Property(x => x.HiveLocation, m => m.Column("HiveLocation"));
                 Property(x => x.StorageCode, m => m.Column("StorageCode"));
                 Property(x => x.HiveTableStatus, m => m.Column("HiveStatus"));
+                Property(x => x.SnowflakeTable, m => m.Column("SnowflakeTable"));
+                Property(x => x.SnowflakeDatabase, m => m.Column("SnowflakeDatabase"));
+                Property(x => x.SnowflakeSchema, m => m.Column("SnowflakeSchema"));
+                Property(x => x.SnowflakeStatus, m => m.Column("SnowflakeStatus"));
             }
         }
     }

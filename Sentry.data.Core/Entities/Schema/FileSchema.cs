@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Sentry.data.Core
+﻿namespace Sentry.data.Core
 {
     public class FileSchema : Schema
     {
@@ -24,5 +18,9 @@ namespace Sentry.data.Core
         public virtual string HiveLocation { get; set; }
         public virtual string HiveTableStatus { get; set; }
         public virtual string StorageCode { get; set; }
+        public virtual string SnowflakeTable { get; set; }
+        public virtual string SnowflakeDatabase { get; set; }
+        public virtual string SnowflakeSchema { get; set; }
+        public virtual string SnowflakeStatus { get; set; }
     }
 }
