@@ -68,6 +68,13 @@ ul.list-group-indented {
     background-color: white !important;
 }
 
+.hideOverflow {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+    display: block;
+}
 /*#endregion TemplateSettings*/
 
 
