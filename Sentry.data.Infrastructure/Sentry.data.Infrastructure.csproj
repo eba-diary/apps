@@ -288,6 +288,7 @@
     <Compile Include="ServiceImplementations\DataSourceProviders\DfsDataFlowBasicProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\FtpDataFlowProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\GoogleAPIDataFlowProvider.cs" />
+    <Compile Include="ServiceImplementations\HiveOdbcProvider.cs" />
     <Compile Include="ServiceImplementations\Messaging\DataStepProcessorService.cs" />
     <Compile Include="ServiceImplementations\Messaging\DfsEventService.cs" />
     <Compile Include="ServiceImplementations\Messaging\Events\DfsEvent.cs" />
