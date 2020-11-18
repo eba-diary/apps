@@ -199,7 +199,11 @@ namespace Sentry.data.Web
                     "CLA1396_NewEtlColumns|" + schemaDto.CLA1396_NewEtlColumns.ToString(),
                     "CLA1580_StructureHive|" + schemaDto.CLA1580_StructureHive.ToString()
                 },
-                DeleteInd = schemaDto.DeleteInd
+                DeleteInd = schemaDto.DeleteInd,
+                SnowflakeDatabase = schemaDto.SnowflakeDatabase,
+                SnowflakeSchema = schemaDto.SnowflakeSchema,
+                SnowflakeTable = schemaDto.SnowflakeTable,
+                SnowflakeStatus = schemaDto.SnowflakeStatus
             };
         }
 

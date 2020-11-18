@@ -553,6 +553,7 @@ namespace Sentry.data.Core
                 FileExtenstionName = scm.Extension.Name,
                 SnowflakeDatabase = scm.SnowflakeDatabase,
                 SnowflakeTable = scm.SnowflakeTable,
+                SnowflakeSchema = scm.SnowflakeSchema,
                 SnowflakeStatus = scm.SnowflakeStatus,
                 CLA1396_NewEtlColumns = scm.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = scm.CLA1580_StructureHive
