@@ -1,8 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Sentry.data.Core;
 
 namespace Sentry.data.Web
 {
@@ -14,9 +11,11 @@ namespace Sentry.data.Web
             foreach (DataFlowStepDto stepDto in dto.steps)
             {
                 Step.Add(stepDto.ToModel());
-            };            
+            };
+
         }
         public List<DataFlowStepModel> Step { get; set; }
+        public List<SchemaMapModel> MappedSchema { get; set; }
         public UserSecurity UserSecurity { get; set; }
     }
 }

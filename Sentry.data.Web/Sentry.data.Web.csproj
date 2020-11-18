@@ -16,7 +16,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44371</IISExpressSSLPort>
+    <IISExpressSSLPort>44321</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -424,6 +424,7 @@
     <Compile Include="Models\DataProcessing\DFModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowStepModel.cs" />
     <Compile Include="Models\DataProcessing\JobModel.cs" />
+    <Compile Include="Models\DataProcessing\SchemaMapDetailModel.cs" />
     <Compile Include="Models\DataProcessing\SchemaMapModel.cs" />
     <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
     <Compile Include="Models\Dataset\ColumnModel.cs" />
@@ -658,6 +659,7 @@
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
     <Content Include="js\Job.js" />
+    <Content Include="js\Shared\Utils.js" />
     <Content Include="js\Subscription.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
@@ -1128,6 +1130,10 @@
     <Content Include="..\.sonarlint\data_data.sentry.comcsharp.ruleset">
       <Link>data_data.sentry.comcsharp.ruleset</Link>
     </Content>
+    <Content Include="..\HiveODBC.config">
+      <Link>HiveODBC.config</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -1495,6 +1501,8 @@
     <Content Include="Scripts\quill\quill.core.min.js.map" />
     <Content Include="Scripts\quill\quill.min.js.map" />
     <Content Include="Scripts\quill\quill.snow.min.css.map" />
+    <Content Include="Views\Shared\Unauthorized.cshtml" />
+    <Content Include="Views\DataFlow\_SchemaMapDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1560,9 +1568,9 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2457</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost.sentry.com:44371</IISUrl>
+          <IISUrl>https://localhost.sentry.com:44321</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>https://localhost.sentry.com:44371</IISAppRootUrl>
+          <IISAppRootUrl>https://localhost.sentry.com:44321</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

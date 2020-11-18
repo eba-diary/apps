@@ -9,6 +9,8 @@ using System.Text;
 using Newtonsoft.Json;
 using Sentry.Core;
 using System.Text.RegularExpressions;
+using StructureMap;
+using System.Data.Odbc;
 
 namespace Sentry.data.Core
 {
@@ -22,11 +24,12 @@ namespace Sentry.data.Core
         private readonly ISecurityService _securityService;
         private readonly IDataFeatures _featureFlags;
         private readonly IMessagePublisher _messagePublisher;
+        private readonly IHiveOdbcProvider _hiveOdbcProvider;
         private string _bucket;
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, IHiveOdbcProvider hiveOdbcProvider)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -36,6 +39,7 @@ namespace Sentry.data.Core
             _securityService = securityService;
             _featureFlags = dataFeatures;
             _messagePublisher = messagePublisher;
+            _hiveOdbcProvider = hiveOdbcProvider;
         }
 
         private string RootBucket
@@ -84,7 +88,7 @@ namespace Sentry.data.Core
             try
             {
                 UserSecurity us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
-                if (!us.CanEditDataset && !us.CanManageSchema)
+                if (!us.CanManageSchema)
                 {
                     try
                     {
@@ -165,6 +169,14 @@ namespace Sentry.data.Core
 
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
         {
+            Dataset parentDataset = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaDto.SchemaId).ParentDataset;
+            IApplicationUser user = _userService.GetCurrentUser();
+            UserSecurity us = _securityService.GetUserSecurity(parentDataset, user);
+
+            if (!us.CanManageSchema)
+            {
+                throw new SchemaUnauthorizedAccessException();
+            }
             
             var SendSASNotification = false;
             string SASNotificationType = null;
@@ -281,6 +293,14 @@ namespace Sentry.data.Core
             
         }
 
+        public UserSecurity GetUserSecurityForSchema(int schemaId)
+        {
+            Dataset ds = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId).ParentDataset;
+            IApplicationUser user = _userService.GetCurrentUser();
+            UserSecurity us = _securityService.GetUserSecurity(ds, user);
+            return us;
+        }
+
         public FileSchemaDto GetFileSchemaDto(int id)
         {
             FileSchema scm = _datasetContext.FileSchema.Where(w => w.SchemaId == id).FirstOrDefault();
@@ -395,6 +415,90 @@ namespace Sentry.data.Core
         {
             FileSchema schema = _datasetContext.FileSchema.Where(w => w.StorageCode == storageCode).FirstOrDefault();
             return schema;
+        }
+
+        public List<Dictionary<string, object>> GetTopNRowsByConfig(int id, int rows)
+        {
+            DatasetFileConfig config = _datasetContext.DatasetFileConfigs.Where(w => w.ConfigId == id).FirstOrDefault();
+            if (config == null)
+            {
+                throw new SchemaNotFoundException("Schema not found");
+            }
+
+            //if there are no revisions (schema metadata not supplied), do not run the query
+            if (!config.Schema.Revisions.Any())
+            {
+                throw new SchemaNotFoundException("Column metadata not added");
+            }
+
+            return GetTopNRowsBySchema(config.Schema.SchemaId, rows);
+        }
+        public List<Dictionary<string, object>> GetTopNRowsBySchema(int id, int rows)
+        {
+            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == id).Select(s => s.ParentDataset).FirstOrDefault();
+            if (ds == null)
+            {
+                throw new SchemaNotFoundException();
+            }
+
+            try
+            {
+                UserSecurity us;
+                us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+                if (!(us.CanPreviewDataset))
+                {
+                    try
+                    {
+                        IApplicationUser user = _userService.GetCurrentUser();
+                        Logger.Info($"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} unauthorized_access: Id:{user.AssociateId}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} unauthorized_access", ex);
+                    }
+                    throw new SchemaUnauthorizedAccessException();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} failed to retrieve UserSecurity object", ex);
+                throw new SchemaUnauthorizedAccessException();
+            }
+
+            FileSchemaDto schemaDto = GetFileSchemaDto(id);
+
+            string hiveView = $"vw_{schemaDto.HiveTable}";
+
+            //Get connection object
+            OdbcConnection connection = _hiveOdbcProvider.GetConnection(schemaDto.HiveDatabase);
+
+            //Does table exist
+            bool tableExists = _hiveOdbcProvider.CheckViewExists(connection, hiveView);
+
+            //If table does not exist
+            if (!tableExists)
+            {
+                throw new HiveTableViewNotFoundException("Table or view not found");
+            }
+
+            //Query table for rows
+            System.Data.DataTable result = _hiveOdbcProvider.GetTopNRows(_hiveOdbcProvider.GetConnection(schemaDto.HiveDatabase), hiveView, rows);
+
+            List<Dictionary<string, object>> dicRows = new List<Dictionary<string, object>>();
+            Dictionary<string, object> dicRow = null;
+            foreach (System.Data.DataRow dr in result.Rows)
+            {
+                dicRow = new Dictionary<string, object>();
+                foreach (System.Data.DataColumn col in result.Columns)
+                {
+                    //R
+                    string colName = col.ColumnName.Split('.')[1];
+                    dicRow.Add(colName, dr[col]);
+                }
+                dicRows.Add(dicRow);
+            }
+
+            return dicRows;
         }
 
         public bool RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent)

@@ -1,7 +1,7 @@
 ﻿using Sentry.Core;
 using Sentry.data.Core;
-using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Helpers;
 using System;
@@ -30,6 +30,7 @@ namespace Sentry.data.Web.Controllers
 
         // GET: DataFlow
         [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         [Route("DataFlow")]
         public ActionResult Index()
         {
@@ -238,6 +239,13 @@ namespace Sentry.data.Web.Controllers
             CreateDropDownSetup(model);
 
             return PartialView("_RetrieverJob", model);
+        }
+
+        public PartialViewResult _SchemaMapDetail(int dataflowId)
+        {
+            List<SchemaMapDetailDto> dtoList = _dataFlowService.GetMappedSchemaByDataFlow(dataflowId);
+            List<SchemaMapDetailModel> modelList = dtoList.ToDetailModelList();
+            return PartialView("~/Views/Dataflow/_SchemaMapDetail.cshtml", modelList);
         }
 
         private void CreateDropDownSetup(JobModel model)
