@@ -26,7 +26,7 @@ All new files added for staic data or scripts should have it's properties update
 :r ..\Post-Deploy\StaticData\BusinessAreaTileRow.sql
 :r ..\Post-Deploy\StaticData\BusinessAreaTileRow_BusinessAreaTile.sql
 :r ..\Post-Deploy\StaticData\DataActionTypes.sql
-/*:r ..\Post-Deploy\StaticData\DataAction.sql*/  /* This will not be executed until extended property is added to DB for Named Environment and script is adjusted */
+:r ..\Post-Deploy\StaticData\DataAction.sql
 
 
 --Now only run these scripts if the versioning allows us.

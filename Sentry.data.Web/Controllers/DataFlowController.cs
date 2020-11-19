@@ -30,6 +30,7 @@ namespace Sentry.data.Web.Controllers
 
         // GET: DataFlow
         [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         [Route("DataFlow")]
         public ActionResult Index()
         {
