@@ -2,7 +2,7 @@
 	Sets all snowflake metadata for existing schema
 ***********************************************/
 
-DECLARE @ENV VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
+DECLARE @SNOW_ENV VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
 
 update [Schema]
 SET
@@ -12,7 +12,7 @@ SET
 	SnowflakeStatus =x.SWStatus
 from (
 	select 
-		'DATA_' + @ENV as 'DBName',
+		'DATA_' + @SNOW_ENV as 'DBName',
 		UPPER(CAT.Name) as 'SWSchemaNME',
 		UPPER(REPLACE(REPLACE(REPLACE(DS.Dataset_NME, ' ', ''), '_', ''), '-', '') + '_' + REPLACE(REPLACE(REPLACE(SC.Schema_NME, ' ', ''), '_', ''), '-', '')) as 'TableNME',
 		'NameReserved' as 'SWStatus',
