@@ -415,6 +415,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<ProducerS3DropAction> ProducerS3DropAction
+        {
+            get
+            {
+                return Query<ProducerS3DropAction>();
+            }
+        }
+
         public IQueryable<SchemaLoadAction> SchemaLoadAction
         {
             get

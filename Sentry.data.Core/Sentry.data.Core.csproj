@@ -149,6 +149,7 @@
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\FixedWidthAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleApiAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\ProducerS3DropAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\SchemaMapAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressGzipAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressZip.cs" />
@@ -248,6 +249,7 @@
     <Compile Include="Interfaces\DataProcessing\IDataStepService.cs" />
     <Compile Include="Interfaces\DataProcessing\IFixedWidthProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IGoogleApiActionProvider.cs" />
+    <Compile Include="Interfaces\DataProcessing\IProducerS3DropProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IQueryStorageProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IRawStorageProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IS3DropProvider.cs" />
