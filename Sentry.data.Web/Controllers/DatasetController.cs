@@ -867,8 +867,6 @@ namespace Sentry.data.Web.Controllers
 
                 IApplicationUser user = _userService.GetCurrentUser();
 
-                LoaderRequest loadReq = null;
-
                 try
                 {
                     if (_datasetService.GetUserSecurityForConfig(configId).CanUploadToDataset)
@@ -879,8 +877,8 @@ namespace Sentry.data.Web.Controllers
 
                         string dsfi;
 
-                        //Adding ProcessedFilePrefix so GoldenEye Watch.cs does not pick up the file since we will create a Dataset Loader request
-                        dsfi = Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix") + System.IO.Path.GetFileName(file.FileName);
+                        //Getting file name
+                        dsfi = System.IO.Path.GetFileName(file.FileName);
 
                         if (dfc != null)
                         {
@@ -915,50 +913,17 @@ namespace Sentry.data.Web.Controllers
                                 }
                             }
 
-                            var hashInput = $"{user.AssociateId.ToString()}_{DateTime.Now.ToString("MM-dd-yyyyHH:mm:ss.fffffff")}_{dsfi}";
-
-                            loadReq = new LoaderRequest(Utilities.GenerateHash(hashInput));
-                            loadReq.File = fileDropLocation;
-                            loadReq.IsBundled = false;
-                            loadReq.DatasetID = dfc.ParentDataset.DatasetId;
-                            loadReq.DatasetFileConfigId = dfc.ConfigId;
-                            loadReq.RetrieverJobId = dfsBasicJob.Id;
-                            loadReq.RequestInitiatorId = user.AssociateId;
-
-                            Logger.Debug($"Submitting Loader Request - File:{dsfi} Guid:{loadReq.RequestGuid} HashInput:{hashInput}");
-
-                            string jsonReq = JsonConvert.SerializeObject(loadReq, Formatting.Indented);
-
-                            //Send request to DFS location loader service is watching for requests
-                            using (MemoryStream ms = new MemoryStream())
-                            {
-                                StreamWriter writer = new StreamWriter(ms);
-
-                                writer.WriteLine(jsonReq);
-                                writer.Flush();
-
-                                //You have to rewind the MemoryStream before copying
-                                ms.Seek(0, SeekOrigin.Begin);
-
-                                using (FileStream fs = new FileStream($"{Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath")}{loadReq.RequestGuid}.json", FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                                {
-                                    ms.CopyTo(fs);
-                                    fs.Flush();
-                                }
-                            }
-
-                            //Create Bundle Success Event
+                            //Create Upload Success Event
                             Event e = new Event();
                             e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault();
                             e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Started").FirstOrDefault();
                             e.TimeCreated = DateTime.Now;
                             e.TimeNotified = DateTime.Now;
                             e.IsProcessed = false;
-                            e.UserWhoStartedEvent = loadReq.RequestInitiatorId;
-                            e.Dataset = loadReq.DatasetID;
-                            e.DataConfig = loadReq.DatasetFileConfigId;
-                            e.Reason = $"Successfully submitted requset to load file [<b>{System.IO.Path.GetFileName(file.FileName)}</b>] to dataset [<b>{dfc.ParentDataset.DatasetName}</b>]";
-                            e.Parent_Event = loadReq.RequestGuid;
+                            e.UserWhoStartedEvent = user.AssociateId;
+                            e.Dataset = dfc.ParentDataset.DatasetId;
+                            e.DataConfig = dfc.ConfigId;
+                            e.Reason = $"Successfully sent file to drop location [<b>{System.IO.Path.GetFileName(file.FileName)}</b>] for dataset [<b>{dfc.ParentDataset.DatasetName} - {dfc.Schema.Name}</b>]";
                             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
                             return Json("File Successfully Sent to Dataset Loader.");

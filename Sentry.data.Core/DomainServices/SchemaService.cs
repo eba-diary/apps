@@ -285,6 +285,25 @@ namespace Sentry.data.Core
                 chgDetected = true;
             }
 
+            if (schema.CLA2472_EMRSend != dto.CLA2472_EMRSend)
+            {
+                schema.CLA2472_EMRSend = dto.CLA2472_EMRSend;
+                chgDetected = true;
+            }
+
+            if (schema.CLA2429_SnowflakeCreateTable != dto.CLA2429_SnowflakeCreateTable)
+            {
+                schema.CLA2429_SnowflakeCreateTable = dto.CLA2429_SnowflakeCreateTable;
+                chgDetected = true;
+            }
+
+            if (schema.CLA1286_KafkaFlag != dto.CLA1286_KafkaFlag)
+            {
+                schema.CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag;
+                chgDetected = true;
+            }
+
+
             if (chgDetected)
             {
                 schema.LastUpdatedDTM = DateTime.Now;
@@ -608,7 +627,10 @@ namespace Sentry.data.Core
                 SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First()),
                 SnowflakeTable = FormateSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormateSnowflakeTableNamePart(dto.Name),
                 CLA1396_NewEtlColumns = dto.CLA1396_NewEtlColumns,
-                CLA1580_StructureHive = dto.CLA1580_StructureHive
+                CLA1580_StructureHive = dto.CLA1580_StructureHive,
+                CLA2472_EMRSend = dto.CLA2472_EMRSend,
+                CLA2429_SnowflakeCreateTable = dto.CLA2429_SnowflakeCreateTable,
+                CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag
             };
             _datasetContext.Add(schema);
             return schema;
@@ -644,7 +666,10 @@ namespace Sentry.data.Core
                 SnowflakeSchema = scm.SnowflakeSchema,
                 SnowflakeStatus = scm.SnowflakeStatus,
                 CLA1396_NewEtlColumns = scm.CLA1396_NewEtlColumns,
-                CLA1580_StructureHive = scm.CLA1580_StructureHive
+                CLA1580_StructureHive = scm.CLA1580_StructureHive,
+                CLA2472_EMRSend = scm.CLA2472_EMRSend,
+                CLA2429_SnowflakeCreateTable = scm.CLA2429_SnowflakeCreateTable,
+                CLA1286_KafkaFlag = scm.CLA1286_KafkaFlag
             };
 
         }
