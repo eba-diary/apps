@@ -623,6 +623,9 @@ namespace Sentry.data.Core
                 LastUpdatedDTM = DateTime.Now,
                 DeleteIssueDTM = DateTime.MaxValue,
                 CreateCurrentView = dto.CreateCurrentView,
+                SnowflakeDatabase = GenerateSnowflakeDatabaseName(),
+                SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First()),
+                SnowflakeTable = FormateSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormateSnowflakeTableNamePart(dto.Name),
                 CLA1396_NewEtlColumns = dto.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = dto.CLA1580_StructureHive,
                 CLA2472_EMRSend = dto.CLA2472_EMRSend,
@@ -658,6 +661,10 @@ namespace Sentry.data.Core
                 StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
                 RawQueryStorage = (Configuration.Config.GetHostSetting("EnableRawQueryStorageInQueryTool").ToLower() == "true" && _datasetContext.SchemaMap.Any(w => w.MappedSchema.SchemaId == scm.SchemaId)) ? GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\" : Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
                 FileExtenstionName = scm.Extension.Name,
+                SnowflakeDatabase = scm.SnowflakeDatabase,
+                SnowflakeTable = scm.SnowflakeTable,
+                SnowflakeSchema = scm.SnowflakeSchema,
+                SnowflakeStatus = scm.SnowflakeStatus,
                 CLA1396_NewEtlColumns = scm.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = scm.CLA1580_StructureHive,
                 CLA2472_EMRSend = scm.CLA2472_EMRSend,
@@ -788,25 +795,6 @@ namespace Sentry.data.Core
             }
         }
 
-        private DataFlowDto MapToDataFlowDto(FileSchema scm)
-        {
-            DataFlowDto dto = new DataFlowDto()
-            {
-                CreatedBy = _userService.GetCurrentUser().AssociateId,
-                CreateDTM = DateTime.Now,
-                Name = $"SchemaFlow_{scm.StorageCode}",
-                IngestionType = GlobalEnums.IngestionType.User_Push
-            };
-
-            SchemaMapDto scmDto = new SchemaMapDto()
-            {
-                SchemaId = scm.SchemaId,
-                SearchCriteria = "\\.",
-            };
-
-            return dto;
-        }
-
         private string FormatHiveTableNamePart(string part)
         {
             return part.Replace(" ", "").Replace("_", "").Replace("-", "").ToUpper();
@@ -818,6 +806,23 @@ namespace Sentry.data.Core
             string dbName = "dsc_" + cat.Name.ToLower();
 
             return (curEnv == "prod" || curEnv == "qual") ? dbName : $"{curEnv}_{dbName}";
+        }
+
+        private string GenerateSnowflakeDatabaseName()
+        {
+            string curEnv = Config.GetDefaultEnvironmentName().ToLower();
+            string dbName = "DATA_" + curEnv;
+            return dbName;
+        }
+
+        private string GenerateSnowflakeSchema(Category cat)
+        {
+            return cat.Name.ToUpper();
+        }
+
+        private string FormateSnowflakeTableNamePart(string part)
+        {
+            return part.Replace(" ", "").Replace("_", "").Replace("-", "").ToUpper();
         }
 
         private BaseField AddRevisionField(BaseFieldDto row, SchemaRevision CurrentRevision, BaseField parentRow = null, SchemaRevision previousRevision = null)
