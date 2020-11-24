@@ -205,7 +205,11 @@ namespace Sentry.data.Web
                     "CLA2429_SnowflakeCreateTable|" + schemaDto.CLA2429_SnowflakeCreateTable.ToString(),
                     "CLA1286_KafkaFlag|" + schemaDto.CLA1286_KafkaFlag.ToString()
                 },
-                DeleteInd = schemaDto.DeleteInd
+                DeleteInd = schemaDto.DeleteInd,
+                SnowflakeDatabase = schemaDto.SnowflakeDatabase,
+                SnowflakeSchema = schemaDto.SnowflakeSchema,
+                SnowflakeTable = schemaDto.SnowflakeTable,
+                SnowflakeStatus = schemaDto.SnowflakeStatus
             };
         }
 
