@@ -66,7 +66,7 @@
                 <dateline>
                     <date when="1910-11-06">Sunday. Nov. 6th.</date>
                 </dateline>
-                <p>Due at <placeName>Alexandria</placeName> tomorrow at 6am &#8211; a warm, lovely passage. I have been writing letter busily.</p>
+                <p>Due at <placeName ref="Alexandria">Alexandria</placeName> tomorrow at 6am &#8211; a warm, lovely passage. I have been writing letter busily.</p>
                 <dateline>
                     <date when="1910-11-07">Monday. Nov. 7th.</date>
                     <name type="hotel">Shepheards Hotel.</name>
@@ -80,7 +80,7 @@
                 <dateline>
                     <date when="1910-11-21">Monday. Nov. 21st.</date>
                 </dateline>
-                <p>We came on board to stay on the 16th and sailed the next day at 10 a.m. passed the <placeName>Ghizeh</placeName> bridge about 10.20. We have a good strong tug. Tied up at 5 P.M. We find a tremendously big, wide river, with very trong current and made 35 miles the first day, 42 the second, 51 the third, 39 the fourth, 47 the 5th, 37 the 6th, 51 the seventh, 43 the eighth, 38 the ninth, 50-&#189; the tenth &#8211; arrived at <placeName>Luxor</placeName> the 27th. We tied up much in our usual place &#8211; to a mite of a sand bank, opposite the castle.</p>
+                <p>We came on board to stay on the 16th and sailed the next day at 10 a.m. passed the <placeName ref="Ghizeh">Ghizeh</placeName> bridge about 10.20. We have a good strong tug. Tied up at 5 P.M. We find a tremendously big, wide river, with very trong current and made 35 miles the first day, 42 the second, 51 the third, 39 the fourth, 47 the 5th, 37 the 6th, 51 the seventh, 43 the eighth, 38 the ninth, 50-&#189; the tenth &#8211; arrived at <placeName>Luxor</placeName> the 27th. We tied up much in our usual place &#8211; to a mite of a sand bank, opposite the castle.</p>
                 <dateline>
                     <date when="1910-12-04">Second Sunday in Advent. Dec. 4th.</date>
                 </dateline>
@@ -146,7 +146,7 @@
                 <dateline>
                     <date when="1911-03-03">Friday. Mar. 3rd.</date>
                 </dateline>
-                <p><persName>El&#232;na</persName> arrived from <placeName>Khartoum</placeName> last evening. Mr. and <persName>Mrs. Newberry</persName> and <persName>Mr. Johnson</persName> (P&#232;re) <persName>Mr. Whymper</persName> were here for tea. <persName>Mr. Nicol</persName> to dine. We started 10 minutes to 11 o'clock &#8211; and at 6 p.m. were at <placeName>Keneh,</placeName> where we waited for <persName>Harry</persName> and <persName>El&#232;na</persName> to visit <placeName>Dendera</placeName> &#8211; then we moved on 2-3 miles for the night &#8211; making altogether 50 miles.</p>
+                <p><persName>El&#232;na</persName> arrived from <placeName ref="Khartoum">Khartoum</placeName> last evening. Mr. and <persName>Mrs. Newberry</persName> and <persName>Mr. Johnson</persName> (P&#232;re) <persName>Mr. Whymper</persName> were here for tea. <persName>Mr. Nicol</persName> to dine. We started 10 minutes to 11 o'clock &#8211; and at 6 p.m. were at <placeName>Keneh,</placeName> where we waited for <persName>Harry</persName> and <persName>El&#232;na</persName> to visit <placeName>Dendera</placeName> &#8211; then we moved on 2-3 miles for the night &#8211; making altogether 50 miles.</p>
                 <dateline>
                     <date when="1911-03-04">Saturday. Mar. 4th.</date>
                 </dateline>
@@ -158,11 +158,11 @@
                 <dateline>
                     <date when="1911-03-07">Tuesday. Mar. 7th.</date>
                 </dateline>
-                <p>Started at 6 A.M. and went on until 6 P.M. - 5 miles from <placeName>Assiut</placeName> &#8211; making 87 miles.</p>
+                <p>Started at 6 A.M. and went on until 6 P.M. - 5 miles from <placeName ref="Assiut">Assiut</placeName> &#8211; making 87 miles.</p>
                 <dateline>
                     <date when="1911-03-08">Wednesday. Mar. 8th.</date>
                 </dateline>
-                <p>52 miles. Arrived at <placeName>Assiut</placeName> early, and waited for various things &#8211; 4 hours &#8211; then on to 7 miles of <placeName>Hadj Kandul.</placeName></p>
+                <p>52 miles. Arrived at <placeName ref="Assiut">Assiut</placeName> early, and waited for various things &#8211; 4 hours &#8211; then on to 7 miles of <placeName>Hadj Kandul.</placeName></p>
                 <dateline>
                     <date when="1911-03-09">Thursday. March 9th.</date>
                 </dateline>
@@ -198,7 +198,7 @@
                 <dateline>
                     <date when="1911-03-19">Sunday. Mar. 19th.</date>
                 </dateline>
-                <p>The weather quite perfect today. I have not been out. Mr. <persName>Bonham Carter</persName> came in this afternoon &#8211; and Capt. <persName>Trefusis</persName> &#8211; looking <pb n="85"/>so well, and announcing his engagement to <persName>Miss Margery Graham</persName> &#8211; the marriage to take place in May. She is a daughter of Sir <persName>John Graham</persName> and a niece of <placeName>Lord Northampton.</placeName></p>
+                <p>The weather quite perfect today. I have not been out. Mr. <persName>Bonham Carter</persName> came in this afternoon &#8211; and Capt. <persName>Trefusis</persName> &#8211; looking <pb n="85"/>so well, and announcing his engagement to <persName>Miss Margery Graham</persName> &#8211; the marriage to take place in May. She is a daughter of Sir <persName>John Graham</persName> and a niece of <persName>Lord Northampton.</persName></p>
                 <dateline>
                     <date when="1911-03">Monday. Mar. 20th.</date>
                 </dateline>
@@ -208,7 +208,7 @@
                     <placeName>Ghezireh Palace Hotel</placeName>
                 </dateline>
                 <p>We came here this afternoon to our old rooms. It was sad to leave the dahabya &#8211; but the garden and lawns and trees are so lovely here, and our big windows let in so much of it to us &#8211; that it is quite lovely.</p>
-                <p><persName>Maspero</persName> to <placeName>Louise,</placeName> 11/10/1910 "Maspero Lettres to <name>Louise</name> p 497 CAIRE, LE 10 NOVEMBRE 1910 Le travail commence &#225; abonder au Mus&#233;e : les touristes et les fouilleurs rentrent. <persName>Davis</persName> est arriv&#233; avant-hier, florissant, <persName>avec Madame Andrews</persName> et une ni&#232;ce nouvelle du nom <persName>de Rathbone,</persName> une grande et belle fille un peu fan&#233;e (wilted), mais de mani&#232;res tr&#232;s sup&#233;rieures &#225; celles des ni&#232;ces des ann&#233;es pr&#233;c&#233;dentes. II est plus bruyant que jamais, mais toujours brave homme, et nous avons &#233;t&#233; contents l'un et I'autre de nous revoir. Ils resteront une huitaine de jours ici, le temps de mettre la B&#233;douine en etat de naviguer. <persName>Parlant de dahabi&#233;h,</persName> o&#249; as-tu mis la clef de notre cabine dans la Miriam? <name>Nous</name> en avons besoin pour faire donner une couche de peinture. Je vais la rechercher encore, mais dis-moi de toute fa&#231;on si tu te rappelles o&#249; elle est: iI-est possible que, malgr&#233; tout, je ne la retrouve point par mes seules lumieres[ ... ] <persName>Callender Livingston?</persName> Per Pelham history website 11      1910-1911 11</p>
+                <p><persName>Maspero</persName> to <persName>Louise</persName>, 11/10/1910 "Maspero Lettres to <persName>Louise</persName> p 497 CAIRE, LE 10 NOVEMBRE 1910 Le travail commence &#225; abonder au Mus&#233;e : les touristes et les fouilleurs rentrent. <persName>Davis</persName> est arriv&#233; avant-hier, florissant, <persName>avec Madame Andrews</persName> et une ni&#232;ce nouvelle du nom <persName>de Rathbone,</persName> une grande et belle fille un peu fan&#233;e (wilted), mais de mani&#232;res tr&#232;s sup&#233;rieures &#225; celles des ni&#232;ces des ann&#233;es pr&#233;c&#233;dentes. II est plus bruyant que jamais, mais toujours brave homme, et nous avons &#233;t&#233; contents l'un et I'autre de nous revoir. Ils resteront une huitaine de jours ici, le temps de mettre la B&#233;douine en etat de naviguer. <persName>Parlant de dahabi&#233;h,</persName> o&#249; as-tu mis la clef de notre cabine dans la Miriam? <name>Nous</name> en avons besoin pour faire donner une couche de peinture. Je vais la rechercher encore, mais dis-moi de toute fa&#231;on si tu te rappelles o&#249; elle est: iI-est possible que, malgr&#233; tout, je ne la retrouve point par mes seules lumieres[ ... ] <persName>Callender Livingston?</persName> Per Pelham history website 11      1910-1911 11</p>
             </div>
         </body>
     </text>
