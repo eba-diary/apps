@@ -626,6 +626,7 @@ namespace Sentry.data.Core
                 SnowflakeDatabase = GenerateSnowflakeDatabaseName(),
                 SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First()),
                 SnowflakeTable = FormateSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormateSnowflakeTableNamePart(dto.Name),
+                SnowflakeStatus = HiveTableStatusEnum.NameReserved.ToString(),
                 CLA1396_NewEtlColumns = dto.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = dto.CLA1580_StructureHive,
                 CLA2472_EMRSend = dto.CLA2472_EMRSend,
@@ -810,7 +811,7 @@ namespace Sentry.data.Core
 
         private string GenerateSnowflakeDatabaseName()
         {
-            string curEnv = Config.GetDefaultEnvironmentName().ToLower();
+            string curEnv = Config.GetDefaultEnvironmentName().ToUpper();
             string dbName = "DATA_" + curEnv;
             return dbName;
         }
