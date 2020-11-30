@@ -12,6 +12,8 @@
 			SET @Bucket = 'sentry-data-test-dataset-ae2'
 		else if @ENV = 'QUAL'
 			SET @Bucket = 'sentry-data-qual-dataset-ae2'
+		else if @ENV = 'PROD'
+			SET @Bucket = 'sentry-data-prod-dataset-ae2'
 		else
 			SET @Bucket = 'sentry-data-UNKNOWN'
 		
