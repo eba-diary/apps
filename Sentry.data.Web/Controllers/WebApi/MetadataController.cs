@@ -62,6 +62,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             public Metadata()
             {
                 DataFlows = new List<DataFlow>();
+                HiveViews = new List<string>();
             }
             public double DataLastUpdated { get; set; }
             public string Description { get; set; }
@@ -74,6 +75,8 @@ namespace Sentry.data.Web.WebApi.Controllers
             public List<DropLocation> OtherJobs { get; set; }
             public List<string> CronJobs { get; set; }
             public List<DataFlow> DataFlows { get; set; }
+            public string HiveDatabase { get; set; }
+            public List<string> HiveViews { get; set; }
 
             //   public int Views { get; set; }
             //   public int Downloads { get; set; }
@@ -859,6 +862,13 @@ namespace Sentry.data.Web.WebApi.Controllers
 
                     df.RetrieverJobs = rjList;
                     m.DataFlows.Add(df);
+                }
+
+                m.HiveDatabase = config.Schema.HiveDatabase;
+                m.HiveViews.Add($"vw_{config.Schema.HiveTable}");
+                if (config.Schema.CreateCurrentView)
+                {
+                    m.HiveViews.Add($"vw_{config.Schema.HiveTable}_cur");
                 }
 
                 return Ok(m);

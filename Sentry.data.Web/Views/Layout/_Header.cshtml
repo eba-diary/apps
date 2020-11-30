@@ -1,30 +1,13 @@
 ﻿@model HeaderModel
 
 
+<div id="internetExplorerWarning" role="banner" aria-hidden="false" style="padding:10px; font-size: 14px; display:none;" class="alert alert-warning">
+    <span class="glyphicon glyphicon-warning-sign" style="margin: 0px 15px 0px 5px;"></span>
+    We noticed you are using <strong>Internet Explorer</strong>.  Many of our site's functionalities use features only available in <strong>
+        Edge, Firefox, or Chrome.
+    </strong>  We recommend you switch to one of those browsers. <a href="microsoft-edge:@Request.Url.AbsoluteUri">Click here to change to Edge.</a>
+</div>
 
-@if (!Model.CanUseApp)
-{
-    <div id="NoAccessWarning" role="banner" aria-hidden="false" style="margin-bottom: -2px; font-size: 14px;" class="alert alert-warning">
-        <span class="glyphicon glyphicon-warning-sign" style="margin: 0px 15px 0px 5px;"></span>
-        You currently <b>Do Not</b> have access to data.sentry.com.    Please <a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/SiteAccess.docx?Web=1">click here</a> or go to our help menu above to find out how to get access through <a target="_blank" href="https://myaccess.sentry.com">My Access</a>.
-    </div>
-
-    <div id="internetExplorerWarning" role="banner" aria-hidden="false" style="font-size: 14px; display:none;" class="alert alert-warning">
-        <span class="glyphicon glyphicon-warning-sign" style="margin: 0px 15px 0px 5px;"></span>
-        We noticed you are using <strong>Internet Explorer</strong>.  Many of our site's functionalities use features only available in <strong>
-            Edge, Firefox, or Chrome.
-        </strong>  We recommend you switch to one of those browsers. <a href="microsoft-edge:@Request.Url.AbsoluteUri">Click here to change to Edge.</a>
-    </div>
-}
-else
-{
-    <div id="internetExplorerWarning" role="banner" aria-hidden="false" style="padding:10px; font-size: 14px; display:none;" class="alert alert-warning">
-        <span class="glyphicon glyphicon-warning-sign" style="margin: 0px 15px 0px 5px;"></span>
-        We noticed you are using <strong>Internet Explorer</strong>.  Many of our site's functionalities use features only available in <strong>
-            Edge, Firefox, or Chrome.
-        </strong>  We recommend you switch to one of those browsers. <a href="microsoft-edge:@Request.Url.AbsoluteUri">Click here to change to Edge.</a>
-    </div>
-}
 
 <nav class="navbar navbar-default navbar-fixed-top sentry-navbar" role="navigation">
     <header class="sentry-header">
@@ -40,9 +23,9 @@ else
         </div>
         @{if (Model.EnvironmentName.ToUpper() != "PROD")
             {
-                <div class="sentry-environment">
-                    <span class="sentry-environment-name">@Model.EnvironmentName.ToUpper()</span>
-                </div>
+            <div class="sentry-environment">
+                <span class="sentry-environment-name">@Model.EnvironmentName.ToUpper()</span>
+            </div>
             }
         }
         <!-- User Menu -->
@@ -50,36 +33,36 @@ else
             <div class="dropdown-toggle sentry-user" data-toggle="dropdown">
                 @{if (Model.IsImpersonating)
                     {
-                        <span class="glyphicon glyphicon-user text-info"></span>
+                    <span class="glyphicon glyphicon-user text-info"></span>
                     }
                     else
                     {
                         //<span class="glyphicon glyphicon-user"></span>
-                        <span><img src="@Model.AssociatePhotoUrl" /></span>
+                    <span><img src="@Model.AssociatePhotoUrl" /></span>
                     }
                 }
                 <span class="sentry-user-name">@Model.CurrentUserName</span>
             </div>
             @if (Model.IsImpersonating || Model.CanUserSwitch)
             {
-                <ul class="dropdown-menu" role="menu">
-                    @{if (Model.IsImpersonating)
+            <ul class="dropdown-menu" role="menu">
+                @{if (Model.IsImpersonating)
                         {
-                            <li role="presentation"><a role="menuitem" tabindex="-1" id="restoreUser" href="#">Switch back to @Model.RealUserName</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" id="restoreUser" href="#">Switch back to @Model.RealUserName</a></li>
                         }
-                    }
-                    @{if (Model.CanUserSwitch)
+                }
+                @{if (Model.CanUserSwitch)
                         {
-                            <li role="presentation"><a id="dscSession" role="menuitem" tabindex="-1" href="">Primary DSC Livy Session</a></li>
-                            <li role="presentation"><a role="menuitem" tabindex="-1" href="@Url.Action("Switch", "User")">User Switch to Anybody</a></li>
-                            <li class="divider"></li>
-                            <li class="dropdown-header">Quick User Switch</li>
-                            <li role="presentation"><a role="menuitem" tabindex="-1" href="@Url.Action("RequestSwitch", "User", new { id = "070557" })">Manage Asset Alerts</a></li>
-                            <li role="presentation"><a role="menuitem" tabindex="-1" href="@Url.Action("RequestSwitch", "User", new { id = "081082" })">Inside IT, No Access</a></li>
-                            <li role="presentation"><a role="menuitem" tabindex="-1" href="@Url.Action("RequestSwitch", "User", new { id = "082728" })">Outside IT, No Access</a></li>
+                    <li role="presentation"><a id="dscSession" role="menuitem" tabindex="-1" href="">Primary DSC Livy Session</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="@Url.Action("Switch", "User")">User Switch to Anybody</a></li>
+                    <li class="divider"></li>
+                    <li class="dropdown-header">Quick User Switch</li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="@Url.Action("RequestSwitch", "User", new { id = "070557" })">Manage Asset Alerts</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="@Url.Action("RequestSwitch", "User", new { id = "081082" })">Inside IT, No Access</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="@Url.Action("RequestSwitch", "User", new { id = "082728" })">Outside IT, No Access</a></li>
                         }
-                    }
-                </ul>
+                }
+            </ul>
             }
         </div>
     </header>
@@ -97,167 +80,157 @@ else
         </div>
         <div class="navbar-collapse collapse" id="navbar-main">
             <ul class="nav navbar-nav text-right">
-                @if (Model.CanViewReports)
-                {
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Business Intelligence <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="~/BusinessIntelligence/Index">Home</a></li>
-                            <li class="dropdown-submenu">
-                                <a data-toggle="dropdown">Search </a>
-                                <ul class="dropdown-menu">
-                                    <li class="text-right"><a href="/Search/BusinessIntelligence/Index?searchPhrase=">All</a></li>
-                                    @foreach (Sentry.data.Web.Models.BusinessIntelligenceUIModel da in ViewBag.BusinessIntelligenceCategories)
-                                    {
-                                        <li class="text-right"><a href="/Search/BusinessIntelligence/Index?category=@da.Name">@da.Name</a></li>
-                                    }
-                                </ul>
-                            </li>
-                            @if (Model.CanManageReports)
-                            {
-                                <li class="divider"></li>
-                                <li class="dropdown-header">Exhibit Actions</li>
-                                <li><a href="/BusinessIntelligence/Create">Create Exhibit</a></li>
-                            }
-                        </ul>
-                    </li>
-                }
 
-                @if (Model.CanUseApp)
-                {
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="~/Dataset/Index">Home</a></li>
-                            <li><a href="~/Search/Datasets">Search</a></li>
-
-                            @if (Model.CanEditDataset)
-                            {
-                                <li class="divider"></li>
-                                <li class="dropdown-header">Dataset Actions</li>
-                                if (Model.DisplayDataflowMetadata)
+                @*BUSINESS INTELLIGENCE*@
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Business Intelligence <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="~/BusinessIntelligence/Index">Home</a></li>
+                        <li class="dropdown-submenu">
+                            <a data-toggle="dropdown">Search </a>
+                            <ul class="dropdown-menu">
+                                <li class="text-right"><a href="/Search/BusinessIntelligence/Index?searchPhrase=">All</a></li>
+                                @foreach (Sentry.data.Web.Models.BusinessIntelligenceUIModel da in ViewBag.BusinessIntelligenceCategories)
                                 {
-                                    <li><a href="/DataFlow/Create">Send Data to DSC</a></li>
+                                <li class="text-right"><a href="/Search/BusinessIntelligence/Index?category=@da.Name">@da.Name</a></li>
                                 }
-                                else
-                                {
-                                    <li><a href="/Dataset/Create">Create Dataset</a></li>
-                                }
-                                <li class="divider"></li>
-                                <li class="dropdown-header">Dataset Administration</li>
-                                <li><a href="/Config/Manage">Manage Configs</a></li>
-                                <li><a href="/Config/Source/Create">Create Retriever Source</a></li>
+                            </ul>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="dropdown-header">Exhibit Actions</li>
+                        <li><a href="/BusinessIntelligence/Create">Create Exhibit</a></li>
+                    </ul>
+                </li>
+
+                @*DATASETS*@
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="~/Dataset/Index">Home</a></li>
+                        <li><a href="~/Search/Datasets">Search</a></li>
+
+
+                        <li class="divider"></li>
+                        <li class="dropdown-header">Dataset Actions</li>
+                        @if (Model.DisplayDataflowMetadata)
+                            {
+                        <li><a href="/DataFlow/Create">Send Data to DSC</a></li>
                             }
-                        </ul>
-                    </li>
-                }
+                            else
+                            {
+                        <li><a href="/Dataset/Create">Create Dataset</a></li>
+                            }
+                        <li class="divider"></li>
+                        <li class="dropdown-header">Dataset Administration</li>
+                        <li><a href="/Config/Manage">Manage Configs</a></li>
+                        <li><a href="/Config/Source/Create">Create Retriever Source</a></li>
 
-                @if (Model.CanViewBusinessArea)
-                {
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Business Areas <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="~/BusinessArea/PersonalLines">Personal Lines</a></li>
+                    </ul>
+                </li>
 
-                            <li class="divider"></li>
-                            <li><a href="/Notification/ManageNotification">Notifications</a></li>
-                        </ul>
-                    </li>
-                }
+                @*BUSINESS AREA*@
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Business Areas <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="~/BusinessArea/PersonalLines">Personal Lines</a></li>
 
-                @if (Model.CanViewDataAsset)
-                {
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Assets <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li class="dropdown-submenu">
-                                <a data-toggle="dropdown">Assets </a>
-                                <ul class="dropdown-menu">
-                                    @foreach (Sentry.data.Web.Models.AssetUIModel da in ViewBag.DataAssets)
+                        <li class="divider"></li>
+                        <li><a href="/Notification/ManageNotification">Notifications</a></li>
+                    </ul>
+                </li>
+
+                @*DATA ASSETS*@
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Assets <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-submenu">
+                            <a data-toggle="dropdown">Assets </a>
+                            <ul class="dropdown-menu">
+                                @foreach (Sentry.data.Web.Models.AssetUIModel da in ViewBag.DataAssets)
                                     {
-                                        <li class="text-right"><a href="/DataAsset/@da.Name">@da.DisplayName</a></li>
+                                <li class="text-right"><a href="/DataAsset/@da.Name">@da.DisplayName</a></li>
                                     }
-                                </ul>
-                            </li>
+                            </ul>
+                        </li>
 
-                            <li class="dropdown-submenu">
-                                <a data-toggle="dropdown">Lineage </a>
-                                <ul class="dropdown-menu">
+                        <li class="dropdown-submenu">
+                            <a data-toggle="dropdown">Lineage </a>
+                            <ul class="dropdown-menu">
 
-                                    <li class="dropdown-submenu">
-                                        <a data-toggle="dropdown">Personal Lines </a>
-                                        <ul class="dropdown-menu">
-                                            <li class="dropdown-header">Search</li>
+                                <li class="dropdown-submenu">
+                                    <a data-toggle="dropdown">Personal Lines </a>
+                                    <ul class="dropdown-menu">
+                                        <li class="dropdown-header">Search</li>
 
-                                            <li class="text-left"><a href="/Lineage/Personal Lines/">Business Term</a></li>
+                                        <li class="text-left"><a href="/Lineage/Personal Lines/">Business Term</a></li>
 
-                                            <li class="divider"></li>
+                                        <li class="divider"></li>
 
-                                            <li class="dropdown-header">Assets</li>
+                                        <li class="dropdown-header">Assets</li>
 
-                                            <li class="dropdown-submenu">
-                                                <a data-toggle="dropdown">SERA PL </a>
-                                                <ul class="dropdown-menu">
+                                        <li class="dropdown-submenu">
+                                            <a data-toggle="dropdown">SERA PL </a>
+                                            <ul class="dropdown-menu">
 
-                                                    <li class="dropdown-header">Search</li>
+                                                <li class="dropdown-header">Search</li>
 
-                                                    <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/">Business Term</a></li>
+                                                <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/">Business Term</a></li>
 
-                                                    <li class="divider"></li>
-                                                    <li class="dropdown-header">Cubes</li>
+                                                <li class="divider"></li>
+                                                <li class="dropdown-header">Cubes</li>
 
                                                     <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/Cubes/SERAPL Loss Triangles">SERAPL Loss Triangles</a></li>
                                                     <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/Cubes/SERAPL Snapshot">SERAPL Snapshot</a></li>
                                                     <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/Cubes/SERAPL Transactional">SERAPL Transactional</a></li>
+                                                    <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/Cubes/SERAPL Quote">SERAPL Quote</a></li>
 
-                                                    <li class="divider"></li>
-                                                    <li class="dropdown-header">Business Objects</li>
+                                                <li class="divider"></li>
+                                                <li class="dropdown-header">Business Objects</li>
 
                                                     <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/BusinessObjects/SERAPL_Adhoc">SERAPL_Adhoc</a></li>
                                                     <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/BusinessObjects/SERAPL_Snapshot">SERAPL_Snapshot</a></li>
                                                     <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/BusinessObjects/SERAPL_Transactional">SERAPL_Transactional</a></li>
+                                                    <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/BusinessObjects/SERAPL_Quote">SERAPL_Quote</a></li>
+                                                
                                                 </ul>
                                             </li>
 
-                                            <li class="dropdown-submenu">
-                                                <a data-toggle="dropdown">PL Policy ODS</a>
-                                                <ul class="dropdown-menu">
+                                        <li class="dropdown-submenu">
+                                            <a data-toggle="dropdown">PL Policy ODS</a>
+                                            <ul class="dropdown-menu">
 
-                                                    <li class="dropdown-header">Search</li>
+                                                <li class="dropdown-header">Search</li>
 
-                                                    <li class="text-left"><a href="/Lineage/Personal Lines/PLPolicyODS/">Business Term</a></li>
+                                                <li class="text-left"><a href="/Lineage/Personal Lines/PLPolicyODS/">Business Term</a></li>
 
-                                                    <li class="divider"></li>
-                                                    <li class="dropdown-header">Business Objects</li>
-                                                    <li class="text-left"><a href="/Lineage/Personal Lines/PLPolicyODS/BusinessObjects/PL_Policy_ODS_Adhoc">PL_Policy_ODS_Adhoc</a></li>
-                                                    <li class="text-left"><a href="/Lineage/Personal Lines/PLPolicyODS/BusinessObjects/PL Billing Adhoc">PL Billing Adhoc </a></li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
+                                                <li class="divider"></li>
+                                                <li class="dropdown-header">Business Objects</li>
+                                                <li class="text-left"><a href="/Lineage/Personal Lines/PLPolicyODS/BusinessObjects/PL_Policy_ODS_Adhoc">PL_Policy_ODS_Adhoc</a></li>
+                                                <li class="text-left"><a href="/Lineage/Personal Lines/PLPolicyODS/BusinessObjects/PL Billing Adhoc">PL Billing Adhoc </a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
 
-                            <li class="divider"></li>
-                            <li><a href="/Notification/ManageNotification">Notifications</a></li>
-                        </ul>
-                    </li>
-                }
+                        <li class="divider"></li>
+                        <li><a href="/Notification/ManageNotification">Notifications</a></li>
+                    </ul>
+                </li>
 
 
-                @if (Model.CanViewDale)
-                {
-                    <li>
-                        <a href="~/DataInventory/Search" class="">Data Inventory</a>
-                    </li>
-                }
+                @*DATA INVENTORY*@
+                <li>
+                    <a href="~/DataInventory/Search" class="">Data Inventory</a>
+                </li>
 
-                @if (Model.CanViewDataset || Model.CanEditDataset)
-                {
-                    <li>
-                        <a href="~/Dataset/QueryTool" class="">Query Tool</a>
-                    </li>
-                }
+
+                @*QUERY TOOL*@
+                <li>
+                    <a href="~/Dataset/QueryTool" class="">Query Tool</a>
+                </li>
+
 
                 <li class="dropdown-xs">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help <b class="caret"></b></a>
@@ -290,8 +263,8 @@ else
 
                 @if (Model.ShowAdminControls)
                 {
-                    <li><a href="~/swagger">API</a></li>
-                    <li><a href="~/hangfire">Hangfire</a></li>
+                <li><a href="~/swagger">API</a></li>
+                <li><a href="~/hangfire">Hangfire</a></li>
                 }
             </ul>
         </div>
