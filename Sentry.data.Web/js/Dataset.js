@@ -6,6 +6,109 @@ data.Dataset = {
 
     DatasetFilesTable: {},
 
+    DelroyResult: {},
+
+
+
+    DelroyInit: function () {
+
+        var schemaURL = "/api/v2/metadata/dataset/230/schema/4039/revision/latest/fields";
+        $.get(schemaURL, function (result)
+        {
+            DelroyResult = result.Fields;
+            data.Dataset.DelroyDataTableCreate();
+            data.Dataset.setupClickAttackGrid();
+
+        }).fail(function () {
+            alert('fail');
+        });
+
+     
+    },
+
+    DelroyDataTableCreate: function () {
+
+        //init DataTable,
+        $("#delroyColumnsTable").DataTable({
+
+            //client side setup
+            pageLength: 100,
+
+            //ajax: {
+            //    url: "/api/v2/metadata/dataset/230/schema/4039/revision/latest/fields",
+            //    type: "GET",
+            //    dataSrc: "Fields"       //since the obj coming back from URL call has multiple properties inside it, need to sepcify WHERE array of columns exists to load
+            //},
+
+            data: DelroyResult,
+
+            columns: [
+                { data: "Name", className: "Name" },
+                { data: "Description", className: "Description" },
+                { data: "FieldType", className: "FieldType" },
+                { data: "Precision", className: "Precision", visible: false },
+                { data: "Scale", className: "Scale", visible: false },
+            ],
+
+            aLengthMenu: [
+                [20, 100, 500],
+                [20, 100, 500]
+            ],
+
+            order: [0, 'desc'],
+
+            //style for columnVisibility and paging to show
+            dom: 'Blrtip',
+
+            //buttons to show and customize text for them
+            buttons:
+                [
+                    { extend: 'colvis', text: 'Columns' },
+                    { extend: 'csv', text: 'Download' }
+                ]
+        });
+
+        //add a filter in each column
+        $("#delroyColumnsTable").dataTable().columnFilter({
+            sPlaceHolder: "head:after",
+            aoColumns: [
+                { type: "text" },
+                { type: "text" },
+                { type: "text" },
+
+                { type: "text" },
+                { type: "text" },
+            ]
+        });
+
+    },
+
+
+
+    //GRID CLICK EVENTS
+    setupClickAttackGrid: function () {
+
+        //setup onChange event to fire when a checkbox is changed.  This will update internal array for user to save later
+        $('#delroyColumnsTable tbody').on('click', 'tr', function () {                                               //filter down to '.IsSensitive' class and child of that which is 'input' which gets you too checkbox
+
+            var table = $('#delroyColumnsTable').DataTable();
+            var d = table.row(this).data();
+
+            //after click reload the grid
+            //do i create a js function to give me the child rows too supply to datatable or create another api function?
+            if (d.Fields != null) {
+                DelroyResult = d.Fields;
+                table.clear();
+                table.rows.add(DelroyResult)
+                table.draw();
+            }
+
+            //next step is too figure out how to 
+        });
+    },
+
+
+
     IndexInit: function () {
         /// Initialize the Index page for data assets (with the categories)
 
@@ -220,6 +323,9 @@ data.Dataset = {
     },
 
     DetailInit: function () {
+
+        data.Dataset.DelroyInit();
+
         $("[id^='EditDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
             window.location = "/Dataset/Edit/" + encodeURI($(this).data("id"));
@@ -1313,4 +1419,13 @@ data.Dataset = {
 
         returnLink.attr('href', returnUrl);
     }
+
+
+
+
+
+
+
+
+
 };
