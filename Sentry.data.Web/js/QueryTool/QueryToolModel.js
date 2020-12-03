@@ -58,11 +58,6 @@ function Config(id, data) {
         }
     });
 
-    this.ModalPopup = function () {
-        console.log(data.primaryFileId);
-        data.Dataset.PreviewDatafileModal(data.primaryFileId);
-    };
-
     this.hasFiles = ko.computed(function () {
         console.log(data.fileCount);
 
