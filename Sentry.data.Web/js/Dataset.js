@@ -6,30 +6,32 @@ data.Dataset = {
 
     DatasetFilesTable: {},
 
-    DelroyResult: {},
+    delroyBreadCrumbs: [],
+    delroyIndex: -1,
 
 
 
-    DelroyInit: function () {
+    delroyInit: function () {
 
         var schemaURL = "/api/v2/metadata/dataset/230/schema/4039/revision/latest/fields";
         $.get(schemaURL, function (result)
         {
-            DelroyResult = result.Fields;
-            data.Dataset.DelroyDataTableCreate();
-            data.Dataset.setupClickAttackGrid();
+            data.Dataset.delroyAddBreadCrumb(result.Fields);
+            data.Dataset.delroyTableCreate();
+            data.Dataset.delroySetupClickAttack();
 
         }).fail(function () {
             alert('fail');
         });
 
-     
+
+       
     },
 
-    DelroyDataTableCreate: function () {
+    delroyTableCreate: function () {
 
         //init DataTable,
-        $("#delroyColumnsTable").DataTable({
+        $("#delroyTable").DataTable({
 
             //client side setup
             pageLength: 100,
@@ -40,7 +42,7 @@ data.Dataset = {
             //    dataSrc: "Fields"       //since the obj coming back from URL call has multiple properties inside it, need to sepcify WHERE array of columns exists to load
             //},
 
-            data: DelroyResult,
+            data: data.Dataset.delroyGetLatestBreadCrumb(),     //NOTE: on initial load we are grabbing root element which has column array immediately inside, no need to drill down to Fields property
 
             columns: [
                 { data: "Name", className: "Name" },
@@ -69,7 +71,7 @@ data.Dataset = {
         });
 
         //add a filter in each column
-        $("#delroyColumnsTable").dataTable().columnFilter({
+        $("#delroyTable").dataTable().columnFilter({
             sPlaceHolder: "head:after",
             aoColumns: [
                 { type: "text" },
@@ -86,26 +88,64 @@ data.Dataset = {
 
 
     //GRID CLICK EVENTS
-    setupClickAttackGrid: function () {
+    delroySetupClickAttack: function () {
 
-        //setup onChange event to fire when a checkbox is changed.  This will update internal array for user to save later
-        $('#delroyColumnsTable tbody').on('click', 'tr', function () {                                               //filter down to '.IsSensitive' class and child of that which is 'input' which gets you too checkbox
+        //setup click event to fire when a row is clicked
+        $('#delroyTable tbody').on('click', 'tr', function () {                                               //filter down to '.IsSensitive' class and child of that which is 'input' which gets you too checkbox
 
-            var table = $('#delroyColumnsTable').DataTable();
-            var d = table.row(this).data();
+            var table = $('#delroyTable').DataTable();
+            var field = table.row(this).data();
 
-            //after click reload the grid
-            //do i create a js function to give me the child rows too supply to datatable or create another api function?
-            if (d.Fields != null) {
-                DelroyResult = d.Fields;
+            //after click reload the grid if children exist
+            if (field.Fields != null) {
+                data.Dataset.delroyAddBreadCrumb(field);
                 table.clear();
-                table.rows.add(DelroyResult)
+                table.rows.add(data.Dataset.delroyGetLatestBreadCrumb().Fields );       //when clicking on an item, we need to specify Fields property since all chidren of ROOT use this
                 table.draw();
             }
 
-            //next step is too figure out how to 
         });
+
+
+        //Breadcrumbs click event
+        $("#delroyBreadcrumb").on('click','li' ,function (d) {
+            var myId = this.id;
+
+            //next order of business is to now load grid with that appropriate index, clean up the breadcrumbs and re-add the breadcrumb they selected
+
+            
+                       
+
+
+        });
+
+
+
     },
+
+    //add new breadcrumb to list and also too global array
+    delroyAddBreadCrumb: function (field) {
+
+        data.Dataset.delroyIndex = data.Dataset.delroyIndex + 1;
+        var bcName = "Home";
+        if (data.Dataset.delroyIndex > 0) {
+            bcName = field.Name;
+        }
+
+        var h = "<li id='" + data.Dataset.delroyIndex.toString() + "' ><a href='#'>" + bcName + "</a></li>"
+        $('#delroyBreadcrumb').append(h);
+
+        data.Dataset.delroyBreadCrumbs.push(field);
+    },
+
+    //get breadcrumb 
+    delroyGetLatestBreadCrumb: function () {
+
+        var index = data.Dataset.delroyBreadCrumbs.length - 1;
+        var crumb = data.Dataset.delroyBreadCrumbs[index];
+        return crumb;
+    },
+    
 
 
 
@@ -324,7 +364,7 @@ data.Dataset = {
 
     DetailInit: function () {
 
-        data.Dataset.DelroyInit();
+        data.Dataset.delroyInit();
 
         $("[id^='EditDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
