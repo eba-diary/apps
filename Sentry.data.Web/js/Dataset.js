@@ -85,42 +85,28 @@ data.Dataset = {
 
     },
 
-
-
     //GRID CLICK EVENTS
     delroySetupClickAttack: function () {
 
-        //setup click event to fire when a row is clicked
-        $('#delroyTable tbody').on('click', 'tr', function () {                                               //filter down to '.IsSensitive' class and child of that which is 'input' which gets you too checkbox
+        //DELROY GRID CLICK
+        $('#delroyTable tbody').on('click', 'tr', function () {                         //anything clicked in delroyTable tbody, filter down to capture 'tr' class clicks only
 
             var table = $('#delroyTable').DataTable();
             var field = table.row(this).data();
 
-            //after click reload the grid if children exist
+            // click reload the grid if children exist
             if (field.Fields != null) {
                 data.Dataset.delroyAddBreadCrumb(field);
-                table.clear();
-                table.rows.add(data.Dataset.delroyGetLatestBreadCrumb().Fields );       //when clicking on an item, we need to specify Fields property since all chidren of ROOT use this
-                table.draw();
+                data.Dataset.delroyRefreshLatest();
             }
-
         });
 
-
-        //Breadcrumbs click event
+        //BREADCRUMBS NAV CLICK EVENT
         $("#delroyBreadcrumb").on('click','li' ,function (d) {
             var myId = this.id;
-
-            //next order of business is to now load grid with that appropriate index, clean up the breadcrumbs and re-add the breadcrumb they selected
-
-            
-                       
-
-
+            data.Dataset.delroyCleanBreadCrumbs(myId);
+            data.Dataset.delroyRefreshLatest();
         });
-
-
-
     },
 
     //add new breadcrumb to list and also too global array
@@ -133,19 +119,71 @@ data.Dataset = {
         }
 
         var h = "<li id='" + data.Dataset.delroyIndex.toString() + "' ><a href='#'>" + bcName + "</a></li>"
-        $('#delroyBreadcrumb').append(h);
 
+        $('#delroyBreadcrumb').append(h);
         data.Dataset.delroyBreadCrumbs.push(field);
     },
 
-    //get breadcrumb 
+    //get latest breadcrumb 
     delroyGetLatestBreadCrumb: function () {
 
         var index = data.Dataset.delroyBreadCrumbs.length - 1;
-        var crumb = data.Dataset.delroyBreadCrumbs[index];
-        return crumb;
+        var crumbRaw = data.Dataset.delroyBreadCrumbs[index];
+        var crumbCooked;
+
+        //NOTE: this is a strange concept:  but a crumb is either a ROOT level one (index 0) or a CHILD level (index > 0)
+        //All levels past the ROOT (index 0) you need too specify the Fields array which is a child property 
+        //whereas the root level(index 0) the array is at that level
+
+        //if ROOT level
+        if (index == 0) {
+            crumbCooked = crumbRaw;     
+        }
+        else {
+            crumbCooked = crumbRaw.Fields;
+        }
+
+        return crumbCooked;
     },
-    
+
+
+    //clear and reload grid with latest breadcrumb
+    delroyRefreshLatest: function () {
+        var table = $('#delroyTable').DataTable();
+        var crumb = data.Dataset.delroyGetLatestBreadCrumb();
+
+        table.clear();
+        table.rows.add(crumb);       //when clicking on an item, we need to specify Fields property since all chidren of ROOT use this
+        table.draw();
+    },
+
+    //create a function too clean up breadcrumbs beyond one passed in
+    //then need to refresh actualy breadcrumb UI
+    //then reload and latest func will work because thats the latest
+    delroyCleanBreadCrumbs: function (lastIndexKeep) {
+
+        //STEP 1: refresh array to reflect current breadcrumb selected
+        data.Dataset.delroyBreadCrumbs.splice(lastIndexKeep + 1);
+
+        //for some reason the array is not being spliced properly above when you drill all the way too austin and then click gary breadcrumb
+
+        //STEP 2: refresh UI breadcrumb to reflect current breadcrumb selected
+        $('#delroyBreadcrumb').empty();
+        for (let i = 0; i < data.Dataset.delroyBreadCrumbs.length; i++) {
+
+            var field = data.Dataset.delroyBreadCrumbs[i];
+            var bcName = "Home";
+            if (i > 0) {
+                bcName = field.Name;
+            }
+            var h = "<li id='" + i.toString() + "' ><a href='#'>" + bcName + "</a></li>"
+            $('#delroyBreadcrumb').append(h);
+        }
+
+        //STEP 3:  refresh global property delroyIndex to reflect newly selected index
+        data.Dataset.delroyIndex = lastIndexKeep;
+    },
+
 
 
 
