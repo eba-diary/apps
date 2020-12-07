@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public enum HiveTableStatusEnum
+    public enum ConsumptionLayerTableStatusEnum
     {
         Pending = 0,
         Requested = 1,
