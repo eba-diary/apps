@@ -439,7 +439,7 @@ namespace Sentry.data.Core
                 StorageCode = storageCode,
                 HiveDatabase = GenerateHiveDatabaseName(ds.DatasetCategories.First()),
                 HiveTable = ds.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.SchemaName.Replace(" ", "").ToUpper(),
-                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
+                HiveTableStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                 HiveLocation = RootBucket + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
                 CreateCurrentView = dto.CreateCurrentView,
                 IsInSAS = dto.IsInSAS,
