@@ -222,7 +222,7 @@ namespace Sentry.data.Core
                 _datasetContext.SaveChanges();
 
                 if (whatPropertiesChanged.Contains("CreateCurrentView")) {
-                    GenerateSchemaEvent(schemaDto, schema);
+                    GenerateSchemaEvent(schema);
                 }
 
 
@@ -241,24 +241,26 @@ namespace Sentry.data.Core
             }
         }
 
-        private void GenerateSchemaEvent(FileSchemaDto dto, FileSchema schema)
+        private void GenerateSchemaEvent(FileSchema schema)
         {
-            SchemaRevisionDto revision = GetLatestSchemaRevisionDtoBySchema(schema.SchemaId);
-            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
-
-
-            HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
+            SchemaRevision latestRevision = null;
+            latestRevision = _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schema.SchemaId).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();
+            
+            if(latestRevision != null)
             {
-                //SchemaID = revision.ParentSchema.SchemaId,
-                SchemaID = schema.SchemaId,
-                //RevisionID = revision.SchemaRevision_Id,
-                RevisionID = revision.RevisionId,
-                DatasetID = ds.DatasetId,
-                HiveStatus = null,
-                InitiatorID = _userService.GetCurrentUser().AssociateId
-            };
-            _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
+                Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
 
+                HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
+                {
+                    SchemaID = latestRevision.ParentSchema.SchemaId,
+                    RevisionID = latestRevision.SchemaRevision_Id,
+                    DatasetID = ds.DatasetId,
+                    HiveStatus = null,
+                    InitiatorID = _userService.GetCurrentUser().AssociateId
+                };
+                _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
+
+            }
         }
 
         private string UpdateAndSaveSchema(FileSchemaDto dto, FileSchema schema)
