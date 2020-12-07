@@ -23,9 +23,6 @@ data.Dataset = {
         }).fail(function () {
             alert('fail');
         });
-
-
-       
     },
 
     delroyTableCreate: function () {
@@ -49,7 +46,7 @@ data.Dataset = {
                 { data: "Description", className: "Description" },
                 { data: "FieldType", className: "FieldType" },
                 { data: "Precision", className: "Precision", visible: false },
-                { data: "Scale", className: "Scale", visible: false },
+                { data: "Scale", className: "Scale", visible: false }
             ],
 
             aLengthMenu: [
@@ -79,7 +76,7 @@ data.Dataset = {
                 { type: "text" },
 
                 { type: "text" },
-                { type: "text" },
+                { type: "text" }
             ]
         });
 
@@ -103,7 +100,7 @@ data.Dataset = {
 
 
         //BREADCRUMBS NAV CLICK EVENT
-        $("#delroyBreadcrumb").on('click','li' ,function (d) {
+        $("#delroyBreadcrumb").on('click','li' ,function () {
             var myId = this.id;
             data.Dataset.delroyCleanBreadCrumbs(myId);
             data.Dataset.delroyRefreshLatest();
@@ -119,7 +116,7 @@ data.Dataset = {
             bcName = field.Name;
         }
 
-        var h = "<li id='" + data.Dataset.delroyIndex.toString() + "' ><a href='#'>" + bcName + "</a></li>"
+        var h = "<li id='" + data.Dataset.delroyIndex.toString() + "' ><a href='#'>" + bcName + "</a></li>";
 
         $('#delroyBreadcrumb').append(h);
         data.Dataset.delroyBreadCrumbs.push(field);
