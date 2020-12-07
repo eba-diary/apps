@@ -218,8 +218,13 @@ namespace Sentry.data.Core
                 }
                 #endregion
 
-                UpdateAndSaveSchema(schemaDto, schema);
+                string whatPropertiesChanged = UpdateAndSaveSchema(schemaDto, schema);
                 _datasetContext.SaveChanges();
+
+                if (whatPropertiesChanged.Contains("CreateCurrentView")) {
+                    GenerateSchemaEvent(schemaDto, schema);
+                }
+
 
                 //Send notification to SAS
                 if (SendSASNotification)
@@ -236,9 +241,31 @@ namespace Sentry.data.Core
             }
         }
 
-        private void UpdateAndSaveSchema(FileSchemaDto dto, FileSchema schema)
+        private void GenerateSchemaEvent(FileSchemaDto dto, FileSchema schema)
+        {
+            SchemaRevisionDto revision = GetLatestSchemaRevisionDtoBySchema(schema.SchemaId);
+            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
+
+
+            HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
+            {
+                //SchemaID = revision.ParentSchema.SchemaId,
+                SchemaID = schema.SchemaId,
+                //RevisionID = revision.SchemaRevision_Id,
+                RevisionID = revision.RevisionId,
+                DatasetID = ds.DatasetId,
+                HiveStatus = null,
+                InitiatorID = _userService.GetCurrentUser().AssociateId
+            };
+            _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
+
+        }
+
+        private string UpdateAndSaveSchema(FileSchemaDto dto, FileSchema schema)
         {
             bool chgDetected = false;
+            string whatPropertiesChanged = String.Empty;
+
             if (schema.Name != dto.Name)
             {
                 schema.Name = dto.Name;
@@ -249,11 +276,14 @@ namespace Sentry.data.Core
                 schema.Description = dto.Description;
                 chgDetected = true;
             }
+
             if (schema.CreateCurrentView != dto.CreateCurrentView)
             {
                 schema.CreateCurrentView = dto.CreateCurrentView;
                 chgDetected = true;
+                whatPropertiesChanged = "CreateCurrentView|";
             }
+
             if (schema.Description != dto.Description)
             {
                 schema.Description = dto.Description;
@@ -308,7 +338,9 @@ namespace Sentry.data.Core
             {
                 schema.LastUpdatedDTM = DateTime.Now;
                 schema.UpdatedBy = _userService.GetCurrentUser().AssociateId;
-            } 
+            }
+
+            return whatPropertiesChanged;
             
         }
 
