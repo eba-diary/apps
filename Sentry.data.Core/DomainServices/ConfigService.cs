@@ -600,10 +600,6 @@ namespace Sentry.data.Core
                         Logger.Info($"configservice-delete-deleterawstorage - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         DeleteRawFilesByStorageCode(scm.StorageCode);
 
-                        //Delete all prefiew files under schema storage code
-                        Logger.Info($"configservice-delete-deletepreviewstorage - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                        DeletePreviewFilesByStorageCode(scm.StorageCode);
-
                         //Delete all DatasetFileParquet metadata  (inserts are managed outside of DSC code)
                         Logger.Info($"configservice-delete-datasetfileparquetmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         List<DatasetFileParquet> parquetFileList = _datasetContext.DatasetFileParquet.Where(w => w.SchemaId == scm.SchemaId).ToList();
@@ -674,11 +670,6 @@ namespace Sentry.data.Core
                 }
             }
             return deleteList;
-        }
-
-        private void DeletePreviewFilesByStorageCode(string storageCode)
-        {
-            _s3ServiceProvider.DeleteS3Prefix($"{Configuration.Config.GetSetting("S3PreviewPrefix")}{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
         }
 
         public void DeleteParquetFilesByStorageCode(string storageCode)
