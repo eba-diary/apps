@@ -101,6 +101,7 @@ data.Dataset = {
             }
         });
 
+
         //BREADCRUMBS NAV CLICK EVENT
         $("#delroyBreadcrumb").on('click','li' ,function (d) {
             var myId = this.id;
@@ -163,9 +164,8 @@ data.Dataset = {
     delroyCleanBreadCrumbs: function (lastIndexKeep) {
 
         //STEP 1: refresh array to reflect current breadcrumb selected
-        data.Dataset.delroyBreadCrumbs.splice(lastIndexKeep + 1);
-
-        //for some reason the array is not being spliced properly above when you drill all the way too austin and then click gary breadcrumb
+        var deleteStartIndex = parseInt(lastIndexKeep, 10) + 1;
+        data.Dataset.delroyBreadCrumbs.splice(deleteStartIndex);
 
         //STEP 2: refresh UI breadcrumb to reflect current breadcrumb selected
         $('#delroyBreadcrumb').empty();
