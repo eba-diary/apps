@@ -570,13 +570,7 @@ namespace Sentry.data.Core
                     MarkForDelete(scm);
                     _datasetContext.SaveChanges();
 
-                    //Send message to create hive table
-                    HiveTableDeleteModel hiveDelete = new HiveTableDeleteModel()
-                    {
-                        SchemaID = dfc.Schema.SchemaId,
-                        DatasetID = dfc.ParentDataset.DatasetId
-                    };
-                    _messagePublisher.PublishDSCEvent(dfc.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveDelete));
+                    GenerateConsumptionLayerDeleteEvent(dfc);
                 }
                 else
                 {
@@ -698,9 +692,18 @@ namespace Sentry.data.Core
                 throw new ArgumentException("Argument is required", "datasetId");
             }
 
-            Dataset ds = (schemaId == 0)
-                ? _datasetContext.GetById<Dataset>(datasetId)
-                : _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId && w.ParentDataset.DatasetId == datasetId).ParentDataset;
+            bool RefreshAllSchema;
+            Dataset ds = null;
+            if (schemaId == 0) 
+            {
+                ds = _datasetContext.GetById<Dataset>(datasetId);
+                RefreshAllSchema = true;
+            }
+            else
+            {
+                ds = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId && w.ParentDataset.DatasetId == datasetId).ParentDataset;
+                RefreshAllSchema = false;
+            }
 
             if (ds == null)
             {
@@ -716,40 +719,26 @@ namespace Sentry.data.Core
 
             try
             {
+                //Get list of schema(s) to refresh
                 List<DatasetFileConfig> configList;
-                if (schemaId == 0)
-                {
-                    configList = _datasetContext.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == datasetId).ToList();
-                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.SYNC_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, "Sync all schemas for dataset", datasetId);
+                configList = (RefreshAllSchema)
+                    ? _datasetContext.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == datasetId).ToList()
+                    : _datasetContext.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == datasetId && w.Schema.SchemaId == schemaId).ToList();
+                
+                GenerateSchemaCreateEvent(configList);
 
+                //Write success event
+                if (RefreshAllSchema)
+                {
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.SYNC_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, "Sync all schemas for dataset", datasetId);
                 }
                 else
                 {
-                    configList = _datasetContext.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == datasetId && w.Schema.SchemaId == schemaId).ToList();
                     _eventService.PublishSuccessEventByConfigId(GlobalConstants.EventType.SYNC_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, "Sync specific schema", configList.First().ConfigId);
                 }
+                                
+                return true;
 
-                if (configList != null)
-                {
-                    foreach (DatasetFileConfig config in configList.Where(w => w.Schema.Revisions.Any() && !w.DeleteInd))
-                    {
-                        HiveTableCreateModel hiveModel = new HiveTableCreateModel()
-                        {
-                            DatasetID = config.ParentDataset.DatasetId,
-                            SchemaID = config.Schema.SchemaId,
-                            RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id,
-                            InitiatorID = _userService.GetCurrentUser().AssociateId
-                        };
-
-                        _messagePublisher.PublishDSCEvent(hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel));
-                    }
-
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }                
             }
             catch (Exception ex)
             {
@@ -759,6 +748,64 @@ namespace Sentry.data.Core
         }
 
         #region PrivateMethods
+        private void GenerateConsumptionLayerDeleteEvent(DatasetFileConfig config)
+        {
+            //Send message to create hive table
+            HiveTableDeleteModel hiveDelete = new HiveTableDeleteModel()
+            {
+                SchemaID = config.Schema.SchemaId,
+                DatasetID = config.ParentDataset.DatasetId
+            };
+            _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveDelete));
+
+            if (config.Schema.CLA2429_SnowflakeCreateTable)
+            {
+                //Send message to create hive table
+                SnowTableDeleteModel snowDelete = new SnowTableDeleteModel()
+                {
+                    SchemaID = config.Schema.SchemaId,
+                    DatasetID = config.ParentDataset.DatasetId
+                };
+                _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(snowDelete));
+            }
+        }
+
+
+        /// <summary>
+        /// Generate the necessary consumption layer create events
+        /// </summary>
+        /// <param name="configList"></param>
+        private void GenerateSchemaCreateEvent(List<DatasetFileConfig> configList)
+        {
+            //Refresh consumption layer
+            foreach (DatasetFileConfig config in configList.Where(w => w.Schema.Revisions.Any() && !w.DeleteInd))
+            {
+                //Always generate hive table create event
+                HiveTableCreateModel hiveModel = new HiveTableCreateModel()
+                {
+                    DatasetID = config.ParentDataset.DatasetId,
+                    SchemaID = config.Schema.SchemaId,
+                    RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id,
+                    InitiatorID = _userService.GetCurrentUser().AssociateId
+                };
+
+                _messagePublisher.PublishDSCEvent(hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel));
+
+                //Only create snowflake table create if feature flag is true
+                if (config.Schema.CLA2429_SnowflakeCreateTable)
+                {
+                    SnowTableCreateModel snowModel = new SnowTableCreateModel()
+                    {
+                        DatasetID = config.ParentDataset.DatasetId,
+                        SchemaID = config.Schema.SchemaId,
+                        RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id,
+                        InitiatorID = _userService.GetCurrentUser().AssociateId
+                    };
+
+                    _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+                }
+            }
+        }
         private string GenerateHiveDatabaseName(Category cat)
         {
             string curEnv = Config.GetDefaultEnvironmentName().ToLower();
