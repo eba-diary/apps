@@ -21,7 +21,8 @@ data.Dataset = {
             data.Dataset.delroySetupClickAttack();
 
         }).fail(function () {
-            alert('fail');
+            //alert('fail');
+            //TODO figure out what to do with grid when fail
         });
     },
 
@@ -173,7 +174,7 @@ data.Dataset = {
             if (i > 0) {
                 bcName = field.Name;
             }
-            var h = "<li id='" + i.toString() + "' ><a href='#'>" + bcName + "</a></li>"
+            var h = "<li id='" + i.toString() + "' ><a href='#'>" + bcName + "</a></li>";
             $('#delroyBreadcrumb').append(h);
         }
 
