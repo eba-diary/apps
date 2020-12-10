@@ -1,7 +1,6 @@
-﻿using Sentry.data.Core;
-using Sentry.Messaging.Common;
+﻿using Sentry.Messaging.Common;
 
-namespace Sentry.data.Infrastructure
+namespace Sentry.data.Core
 {
     public class SnowTableCreateModel : BaseEventMessage
     {

@@ -293,8 +293,6 @@
     <Compile Include="ServiceImplementations\Messaging\DfsEventService.cs" />
     <Compile Include="ServiceImplementations\Messaging\Events\DfsEvent.cs" />
     <Compile Include="ServiceImplementations\Messaging\Events\Payloads\DfsEventPayload.cs" />
-    <Compile Include="ServiceImplementations\Messaging\Events\SnowTableCreateModel.cs" />
-    <Compile Include="ServiceImplementations\Messaging\Events\SnowTableDeleteModel.cs" />
     <Compile Include="ServiceImplementations\Messaging\Handlers\SnowflakeEventHandler.cs" />
     <Compile Include="ServiceImplementations\Messaging\Handlers\DfsEventHandler.cs" />
     <Compile Include="ServiceImplementations\Messaging\S3EventService.cs" />
