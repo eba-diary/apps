@@ -63,6 +63,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 DataFlows = new List<DataFlow>();
                 HiveViews = new List<string>();
+                SnowflakeViews = new List<string>();
             }
             public double DataLastUpdated { get; set; }
             public string Description { get; set; }
@@ -77,6 +78,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             public List<DataFlow> DataFlows { get; set; }
             public string HiveDatabase { get; set; }
             public List<string> HiveViews { get; set; }
+            public List<string> SnowflakeViews { get; set; }
 
             //   public int Views { get; set; }
             //   public int Downloads { get; set; }
@@ -869,6 +871,11 @@ namespace Sentry.data.Web.WebApi.Controllers
                 if (config.Schema.CreateCurrentView)
                 {
                     m.HiveViews.Add($"vw_{config.Schema.HiveTable}_cur");
+                }
+                m.SnowflakeViews.Add($"{config.Schema.SnowflakeDatabase}.{config.Schema.SnowflakeSchema}.vw_{config.Schema.SnowflakeTable}");
+                if (config.Schema.CreateCurrentView)
+                {
+                    m.SnowflakeViews.Add($"{config.Schema.SnowflakeDatabase}.{config.Schema.SnowflakeSchema}.vw_{config.Schema.SnowflakeTable}_cur");
                 }
 
                 return Ok(m);
