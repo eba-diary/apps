@@ -13,6 +13,8 @@ data.Dataset = {
 
     delroyInit: function () {
 
+        
+
         var schemaURL = "/api/v2/metadata/dataset/230/schema/4039/revision/latest/fields";
         $.get(schemaURL, function (result)
         {
@@ -110,16 +112,17 @@ data.Dataset = {
 
     //add new breadcrumb to list and also too global array
     delroyAddBreadCrumb: function (field) {
+        var color = $('#delroyBreadcrumb').data('page-color');
 
         data.Dataset.delroyIndex = data.Dataset.delroyIndex + 1;
         var bcName = "Home";
         if (data.Dataset.delroyIndex > 0) {
             bcName = field.Name;
         }
-
-        var h = "<li id='" + data.Dataset.delroyIndex.toString() + "' ><a href='#'>" + bcName + "</a></li>";
-
+        var h = "<li id='" + data.Dataset.delroyIndex.toString() + "' ><a  style='color:" + color + "' href='#'>" + bcName + "</a></li>";
         $('#delroyBreadcrumb').append(h);
+
+
         data.Dataset.delroyBreadCrumbs.push(field);
     },
 
@@ -161,21 +164,26 @@ data.Dataset = {
     //then reload and latest func will work because thats the latest
     delroyCleanBreadCrumbs: function (lastIndexKeep) {
 
+        var color = $('#delroyBreadcrumb').data('page-color');
+
         //STEP 1: refresh array to reflect current breadcrumb selected
         var deleteStartIndex = parseInt(lastIndexKeep, 10) + 1;
         data.Dataset.delroyBreadCrumbs.splice(deleteStartIndex);
 
         //STEP 2: refresh UI breadcrumb to reflect current breadcrumb selected
         $('#delroyBreadcrumb').empty();
+
         for (let i = 0; i < data.Dataset.delroyBreadCrumbs.length; i++) {
 
             var field = data.Dataset.delroyBreadCrumbs[i];
+
             var bcName = "Home";
             if (i > 0) {
                 bcName = field.Name;
             }
-            var h = "<li id='" + i.toString() + "' ><a href='#'>" + bcName + "</a></li>";
+            var h = "<li id='" + i.toString() + "' ><a  style='color:" + color + "' href='#'>" + bcName + "</a></li>";
             $('#delroyBreadcrumb').append(h);
+            //data.Dataset.delroyAddBreadCrumb(field);
         }
 
         //STEP 3:  refresh global property delroyIndex to reflect newly selected index
