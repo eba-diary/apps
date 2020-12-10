@@ -1,6 +1,6 @@
 ﻿using Sentry.Messaging.Common;
 
-namespace Sentry.data.Infrastructure
+namespace Sentry.data.Core
 {
     public class SnowTableDeleteModel : BaseEventMessage
     {
