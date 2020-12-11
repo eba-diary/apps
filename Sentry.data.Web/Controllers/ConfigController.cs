@@ -1509,7 +1509,7 @@ namespace Sentry.data.Web.Controllers
                         StorageCode = storageCode,
                         HiveDatabase = "Default",
                         HiveTable = dfc.ParentDataset.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfc.Name.Replace(" ", "").ToUpper(),
-                        HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
+                        HiveTableStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                         HiveLocation = RootBucket + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
                     };
 

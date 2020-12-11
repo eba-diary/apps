@@ -293,8 +293,10 @@
     <Compile Include="ServiceImplementations\Messaging\DfsEventService.cs" />
     <Compile Include="ServiceImplementations\Messaging\Events\DfsEvent.cs" />
     <Compile Include="ServiceImplementations\Messaging\Events\Payloads\DfsEventPayload.cs" />
+    <Compile Include="ServiceImplementations\Messaging\Handlers\SnowflakeEventHandler.cs" />
     <Compile Include="ServiceImplementations\Messaging\Handlers\DfsEventHandler.cs" />
     <Compile Include="ServiceImplementations\Messaging\S3EventService.cs" />
+    <Compile Include="ServiceImplementations\Messaging\SnowflakeEventService.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\BaseTicketProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\CherwellProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\CherwellService.cs" />

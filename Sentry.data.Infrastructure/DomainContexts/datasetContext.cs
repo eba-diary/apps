@@ -536,11 +536,6 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public string GetPreviewKey(int id)
-        {
-            string key = Query<DatasetFile>().Where(x => x.DatasetFileId == id).FirstOrDefault().FileLocation;
-            return Configuration.Config.GetSetting("S3PreviewPrefix") + key;
-        }
         /// <summary>
         /// Returns all datasetfiles for dataset
         /// </summary>

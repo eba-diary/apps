@@ -165,17 +165,7 @@ namespace Sentry.data.Goldeneye
             if (job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsCustom>())
             {
                 Utilities.RemoveProcessedFile(df, new FileInfo(_path));
-            }
-
-            if (Configuration.Config.GetHostSetting("GenerateDatasetFilePreview").ToLower() == "true")
-            {
-                //Create Preview file
-                using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                {
-                    IDatasetService dsService = container.GetInstance<IDatasetService>();
-                    dsService.GenerateDatasetFilePreview(df);
-                }
-            }
+            }            
         }
     }
 }

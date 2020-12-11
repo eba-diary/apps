@@ -364,65 +364,6 @@ namespace Sentry.data.Core
             return dsList;
         }
 
-        public void GenerateDatasetFilePreview(DatasetFile df)
-        {
-            //Failure to generate preview files should not hold up any processing
-            try
-            {
-                LambdaClientConfig lConfig = new LambdaClientConfig()
-                {
-                    AWSRegion = Configuration.Config.GetSetting("AWSRegion"),
-                    AccessKey = Configuration.Config.GetHostSetting("AWSAccessKey"),
-                    SecretKey = Configuration.Config.GetHostSetting("AWSSecretKey"),
-                    ProxyHost = Configuration.Config.GetHostSetting("SentryAWSLambdaProxyHost"),
-                    ProxyPort = Configuration.Config.GetHostSetting("SentryAWSLambdaProxyPort")
-                };
-
-                _awsLambdaProvider.ConfigureClient(lConfig);
-                _awsLambdaProvider.SetFunctionName(Configuration.Config.GetHostSetting("AWSPreviewLambdaName"));
-                _awsLambdaProvider.SetInvocationType("RequestResponse");
-                _awsLambdaProvider.SetLogType("Tail");
-                _awsLambdaProvider.InvokeFunction(GeneratePreviewLambdaTriggerEvent(Configuration.Config.GetHostSetting("AWSRootBucket"), df));
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("datasetservice-generatedatasetfilepreview failed to generate preview", ex);
-            }
-        }
-
-        //public bool DeleteDatasetFile(int datasetFileId)
-        //{
-        //    DatasetFile df = _datasetContext.DatasetFile.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
-
-        //    if (df != null)
-        //    {
-        //        try
-        //        {
-        //            //Find associated parquet prefixes and delete from S3
-        //            List<DatasetFileParquet> parquetFileList = _datasetContext.DatasetFileParquet.Where(w => w.DatasetFileId == df.DatasetFileId).ToList();
-        //            List<string> s3PrefixList = parquetFileList.ToObjectKeyVersion();
-        //            _s3ServiceProvider.DeleteS3Prefix(s3PrefixList);
-
-
-        //            _datasetContext.Remove(df);
-        //            _datasetContext.SaveChanges();
-        //            return true;
-        //        }
-        //        catch (Exception ex)
-        //        {
-
-        //            Logger.Error($"deletedatasetfile-")
-        //            return false;
-        //        }
-
-        //    }
-        //    else
-        //    {
-        //        Logger.Info($"deletedatasetfile-nofilefound = datasetfileid:{datasetFileId}");
-        //        return true;
-        //    }
-        //}
-
         #region "private functions"
         private void MarkForDelete(Dataset ds)
         {
