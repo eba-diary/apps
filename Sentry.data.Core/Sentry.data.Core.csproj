@@ -138,6 +138,7 @@
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
     <Compile Include="DTO\Schema\Fields\DateFieldDto.cs" />
     <Compile Include="DTO\Schema\Fields\DecimalFieldDto.cs" />
+    <Compile Include="DTO\Schema\Fields\BigIntFieldDto.cs" />
     <Compile Include="DTO\Schema\Fields\IntegerFieldDto.cs" />
     <Compile Include="DTO\Schema\Fields\StructFieldDto.cs" />
     <Compile Include="DTO\Schema\Fields\TimestampFieldDto.cs" />
@@ -187,7 +188,7 @@
     <Compile Include="Entities\S3\S3LambdaEvent.cs" />
     <Compile Include="Entities\S3\S3ObjectEvent.cs" />
     <Compile Include="Entities\Schema\BaseField.cs" />
-    <Compile Include="Entities\Schema\BigintField.cs" />
+    <Compile Include="Entities\Schema\BigIntField.cs" />
     <Compile Include="Entities\Schema\DateField.cs" />
     <Compile Include="Entities\Schema\DecimalField.cs" />
     <Compile Include="Entities\Schema\FileSchema.cs" />
@@ -227,6 +228,7 @@
     <Compile Include="Factories\Fields\DateFieldDtoFactory.cs" />
     <Compile Include="Factories\Fields\DecimalFieldDtoFactory.cs" />
     <Compile Include="Factories\Fields\FieldDtoFactory.cs" />
+    <Compile Include="Factories\Fields\BigIntFieldDtoFactory.cs" />
     <Compile Include="Factories\Fields\IntegerFieldDtoFactory.cs" />
     <Compile Include="Factories\Fields\StructFieldDtoFactory.cs" />
     <Compile Include="Factories\Fields\TimestampFieldDtoFactory.cs" />
