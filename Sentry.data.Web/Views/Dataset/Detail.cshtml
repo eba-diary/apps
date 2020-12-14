@@ -217,7 +217,7 @@
                             <div class="row">
                                 <div class="col-lg-12" style="margin-left: 20px; margin-top: 10px;">
                                     <select class="form-control" style="margin:1em !important;"
-                                            id="datasetConfigList" name="filterSelector">
+                                        id="datasetConfigList" name="filterSelector" >
                                         @foreach (var a in Model.DatasetFileConfigNames)
                                         {
                                             <option value="@a.Key">@a.Value</option>
@@ -500,7 +500,7 @@
 
     @if (Model.Security.CanPreviewDataset)
     {
-        <div class="row" id="schemaSection">
+        <div class="row" id="schemaSection" style="display:none">
 
 
             <div class="col-lg-12">
@@ -1029,6 +1029,7 @@
 
 
             function UpdateMetadata() {
+
                 if (!isNaN(getUrlParameter('configID'))) {
                     $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
                 }
@@ -1037,6 +1038,10 @@
 
                 var metadataURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val();
                 $.get(metadataURL, function (result) {
+
+            
+
+
                     //Set schema metadata
                     self.Downloads(result.Downloads);
                     self.Views(result.Views);
@@ -1077,6 +1082,13 @@
                     $('#dataLastUpdatedSpinner').hide();
 
                     UpdateColumnSchema();
+
+                    //Delroy:  take care of saving offneet too init delroy AFTER we get metadata
+                    //set SchemaId for delroy to use later
+                    //$('#datasetConfigList').data('DatasetId', result.DatasetId);
+                    //$('#datasetConfigList').data('SchemaId', result.SchemaId);
+
+                    data.Dataset.delroyReloadWholeGrid(result.DatasetId, result.SchemaId);
                 });
             }
 

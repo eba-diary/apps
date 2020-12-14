@@ -77,6 +77,8 @@ namespace Sentry.data.Web.WebApi.Controllers
             public List<DataFlow> DataFlows { get; set; }
             public string HiveDatabase { get; set; }
             public List<string> HiveViews { get; set; }
+            public int SchemaId { get; set; }
+            public int DatasetId { get; set; }
 
             //   public int Views { get; set; }
             //   public int Downloads { get; set; }
@@ -811,6 +813,10 @@ namespace Sentry.data.Web.WebApi.Controllers
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
                 Metadata m = new Metadata();
+
+                //grab DatasetId and  SchemaId to be used to fill delroy Fields grid
+                m.DatasetId = config.ParentDataset.DatasetId;
+                m.SchemaId = config.Schema.SchemaId;
 
                 m.Description = config.Description;
                 //m.DFSDropLocation = config.RetrieverJobs.Where(x => x.DataSource.Is<DfsBasic>()).Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType, JobId = x.Id }).FirstOrDefault();

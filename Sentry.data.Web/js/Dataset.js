@@ -6,27 +6,35 @@ data.Dataset = {
 
     DatasetFilesTable: {},
 
-    delroyBreadCrumbs: [],
-    delroyIndex: -1,
-
-
+    delroyFieldArray: [],
 
     delroyInit: function () {
 
-        
+        data.Dataset.delroyTableCreate();
+        data.Dataset.delroySetupClickAttack();
+    },
 
-        var schemaURL = "/api/v2/metadata/dataset/230/schema/4039/revision/latest/fields";
-        $.get(schemaURL, function (result)
-        {
-            data.Dataset.delroyAddBreadCrumb(result.Fields);
-            data.Dataset.delroyTableCreate();
-            data.Dataset.delroySetupClickAttack();
 
-        }).fail(function () {
-            //alert('fail');
-            //TODO figure out what to do with grid when fail
+
+
+    delroyReloadWholeGrid: function (datasetId, schemaId) {
+
+        data.Dataset.delroyRefreshFieldArray(-1);
+
+        var schemaURL = "/api/v2/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/revision/latest/fields";
+        $.get(schemaURL, function (result) {
+            data.Dataset.delroyAddFieldArray(result.Fields);
+            data.Dataset.delroyAddBreadCrumb2("Home", 0);
+            data.Dataset.delroyGridRefresh();
+            $("#schemaSection").show();
+
+        }).fail(function (result) {
+            if (result.status == 404) {
+                $("#schemaSection").hide();
+            }
         });
     },
+
 
     delroyTableCreate: function () {
 
@@ -39,10 +47,10 @@ data.Dataset = {
             //ajax: {
             //    url: "/api/v2/metadata/dataset/230/schema/4039/revision/latest/fields",
             //    type: "GET",
-            //    dataSrc: "Fields"       //since the obj coming back from URL call has multiple properties inside it, need to sepcify WHERE array of columns exists to load
+            //    dataSrc: "Fields"       //this is a trick too specify a property within the obj coming back from URL call, in this scenario i need to sepcify WHERE array of columns exists to load
             //},
 
-            data: data.Dataset.delroyGetLatestBreadCrumb(),     //NOTE: on initial load we are grabbing root element which has column array immediately inside, no need to drill down to Fields property
+            //data: data.Dataset.delroyGetLatestField(),     //NOTE: on initial load we are grabbing root element which has column array immediately inside, no need to drill down to Fields property
 
             columns: [
                 { data: "Name", className: "Name" },
@@ -64,10 +72,9 @@ data.Dataset = {
 
             //buttons to show and customize text for them
             buttons:
-                [
-                    { extend: 'colvis', text: 'Columns' },
-                    { extend: 'csv', text: 'Download' }
-                ]
+            [
+                { extend: 'colvis', text: 'Columns' }
+            ]
         });
 
         //add a filter in each column
@@ -96,8 +103,9 @@ data.Dataset = {
 
             // click reload the grid if children exist
             if (field.Fields != null) {
-                data.Dataset.delroyAddBreadCrumb(field);
-                data.Dataset.delroyRefreshLatest();
+                data.Dataset.delroyAddFieldArray(field);
+                data.Dataset.delroyAddBreadCrumb2(field.Name, data.Dataset.delroyFieldArray.length - 1);
+                data.Dataset.delroyGridRefresh();
             }
         });
 
@@ -105,90 +113,88 @@ data.Dataset = {
         //BREADCRUMBS NAV CLICK EVENT
         $("#delroyBreadcrumb").on('click','li' ,function () {
             var myId = this.id;
-            data.Dataset.delroyCleanBreadCrumbs(myId);
-            data.Dataset.delroyRefreshLatest();
+            data.Dataset.delroyRefreshFieldArray(myId);
+            data.Dataset.delroyRefreshBreadCrumbs(myId);
+            data.Dataset.delroyGridRefresh();
         });
     },
 
-    //add new breadcrumb to list and also too global array
-    delroyAddBreadCrumb: function (field) {
-        var color = $('#delroyBreadcrumb').data('page-color');
+    //add new field to array
+    delroyAddFieldArray: function (field) {
 
-        data.Dataset.delroyIndex = data.Dataset.delroyIndex + 1;
-        var bcName = "Home";
-        if (data.Dataset.delroyIndex > 0) {
-            bcName = field.Name;
-        }
-        var h = "<li id='" + data.Dataset.delroyIndex.toString() + "' ><a  style='color:" + color + "' href='#'>" + bcName + "</a></li>";
-        $('#delroyBreadcrumb').append(h);
-
-
-        data.Dataset.delroyBreadCrumbs.push(field);
+        data.Dataset.delroyFieldArray.push(field);
     },
 
-    //get latest breadcrumb 
-    delroyGetLatestBreadCrumb: function () {
 
-        var index = data.Dataset.delroyBreadCrumbs.length - 1;
-        var crumbRaw = data.Dataset.delroyBreadCrumbs[index];
-        var crumbCooked;
+    //add new breadcrumb to list
+    delroyAddBreadCrumb2: function (name, index) {
 
-        //NOTE: this is a strange concept:  but a crumb is either a ROOT level one (index 0) or a CHILD level (index > 0)
+        var color = $('#delroyBreadcrumb').data('page-color');
+        var h = "<li id='" + index.toString() + "' ><a  style='color:" + color + "' href='#'>" + name + "</a></li>";
+        $('#delroyBreadcrumb').append(h);
+    },
+
+    //get latest Field from array 
+    delroyGetLatestField: function () {
+
+        var index = data.Dataset.delroyFieldArray.length - 1;
+        var field = data.Dataset.delroyFieldArray[index];
+
+        //NOTE: this is a strange concept:  but a field is either a ROOT level one (index 0) or a CHILD level (index > 0)
         //All levels past the ROOT (index 0) you need too specify the Fields array which is a child property 
         //whereas the root level(index 0) the array is at that level
 
-        //if ROOT level
+        //if ROOT level, that means the array of fields is actually on that level
         if (index == 0) {
-            crumbCooked = crumbRaw;     
+            return field;     
         }
-        else {
-            crumbCooked = crumbRaw.Fields;
+        else {                              //child of ROOT so specify array as a property
+            return field.Fields;
         }
-
-        return crumbCooked;
     },
 
 
-    //clear and reload grid with latest breadcrumb
-    delroyRefreshLatest: function () {
+    //clear and reload grid with latest element in field array
+    delroyGridRefresh: function () {
         var table = $('#delroyTable').DataTable();
-        var crumb = data.Dataset.delroyGetLatestBreadCrumb();
+        var field = data.Dataset.delroyGetLatestField();
 
         table.clear();
-        table.rows.add(crumb);       //when clicking on an item, we need to specify Fields property since all chidren of ROOT use this
+        table.rows.add(field);       //when clicking on an item, we need to specify Fields property since all chidren of ROOT use this
         table.draw();
     },
 
-    //create a function too clean up breadcrumbs beyond one passed in
-    //then need to refresh actualy breadcrumb UI
-    //then reload and latest func will work because thats the latest
-    delroyCleanBreadCrumbs: function (lastIndexKeep) {
+    //Clear all breadcrumbs and refresh up too one passed in
+    delroyRefreshBreadCrumbs: function (lastIndexKeep) {
 
+        //STEP 1: empty all breadcrumbs
+        $('#delroyBreadcrumb').empty();
         var color = $('#delroyBreadcrumb').data('page-color');
 
-        //STEP 1: refresh array to reflect current breadcrumb selected
-        var deleteStartIndex = parseInt(lastIndexKeep, 10) + 1;
-        data.Dataset.delroyBreadCrumbs.splice(deleteStartIndex);
+        //STEP 2: add in all breadcrumbs from start until the one they clicked on
+        for (let i = 0; i < data.Dataset.delroyFieldArray.length; i++) {
 
-        //STEP 2: refresh UI breadcrumb to reflect current breadcrumb selected
-        $('#delroyBreadcrumb').empty();
-
-        for (let i = 0; i < data.Dataset.delroyBreadCrumbs.length; i++) {
-
-            var field = data.Dataset.delroyBreadCrumbs[i];
-
+            var field = data.Dataset.delroyFieldArray[i];
             var bcName = "Home";
             if (i > 0) {
                 bcName = field.Name;
             }
-            var h = "<li id='" + i.toString() + "' ><a  style='color:" + color + "' href='#'>" + bcName + "</a></li>";
-            $('#delroyBreadcrumb').append(h);
-            //data.Dataset.delroyAddBreadCrumb(field);
-        }
 
-        //STEP 3:  refresh global property delroyIndex to reflect newly selected index
-        data.Dataset.delroyIndex = lastIndexKeep;
+            data.Dataset.delroyAddBreadCrumb2(bcName,i);
+        }
     },
+
+    //refresh FieldArray to only contain up through last index too keep
+    delroyRefreshFieldArray: function (lastIndexKeep) {
+
+        //Refresh array to reflect current breadcrumb selected
+        var deleteStartIndex = parseInt(lastIndexKeep, 10) + 1;     //use parseInt to ensure we are dealing with an integer data type
+        data.Dataset.delroyFieldArray.splice(deleteStartIndex);     //splice deletes array from index specified essentially right half deleted
+    },
+
+
+
+
 
 
 
@@ -409,6 +415,7 @@ data.Dataset = {
     DetailInit: function () {
 
         data.Dataset.delroyInit();
+
 
         $("[id^='EditDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
