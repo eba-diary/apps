@@ -45,7 +45,7 @@
                         }
                         <span>
                             <input id="RequestAccessButton" type="button" value="Request Access" class="btn btn-primary" data-id="@Model.DatasetId"
-                                    data-toggle="tooltip" data-placement="top" title="Request Access to Dataset" style="margin-left:40px" />
+                                   data-toggle="tooltip" data-placement="top" title="Request Access to Dataset" style="margin-left:40px" />
                         </span>
                     </h1>
 
@@ -109,7 +109,7 @@
                                             <li>
                                                 <a href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>
                                                 <a class="btn" id="btnSyncConsumptionLayers" data-id="@Model.DatasetId" style="text-align: left">Sync All Consumption Layers</a>
-                                                @if(Model.Security.CanEditDataset)
+                                                @if (Model.Security.CanEditDataset)
                                                 {
                                                     <a class="btn" id="btnDeleteDataset" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured" style="text-align: left">Delete Dataset</a>
                                                 }
@@ -217,7 +217,7 @@
                             <div class="row">
                                 <div class="col-lg-12" style="margin-left: 20px; margin-top: 10px;">
                                     <select class="form-control" style="margin:1em !important;"
-                                        id="datasetConfigList" name="filterSelector" >
+                                            id="datasetConfigList" name="filterSelector">
                                         @foreach (var a in Model.DatasetFileConfigNames)
                                         {
                                             <option value="@a.Key">@a.Value</option>
@@ -498,9 +498,12 @@
         </div>
     }
 
+    @*************************************************************************************************************
+    DELROY
+    *************************************************************************************************************@
     @if (Model.Security.CanPreviewDataset)
     {
-        <div class="row" id="schemaSection" style="display:none">
+        <div class="row" id="schemaSection">
 
 
             <div class="col-lg-12">
@@ -511,97 +514,43 @@
                         <h3 class="detailSection @color">Columns</h3>
                     </div>
 
-                    <ol class="breadcrumb" id="delroyBreadcrumb" style="color:@color" data-page-color="@color">
-                          
-                    </ol>
+                    <div id="delroyBorder" style="border: 1px #DDDDDD solid; background: white; padding: 10px;" class="metadataBody container row">
+                       
+                        <div id="delroySpinner" >
+                            <div class="sentry-spinner-container" style=" width: 1166px; margin-top: 25px;">
+                                <span class="sentry-spinner" style="height:200px"></span>
+                            </div>
+                        </div>
 
-                    <table class="table table-striped table-bordered @color" id="delroyTable" style="width:100%">
-                        <thead>
-                            <tr class="filter-row">
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                        
+                        <div id="delroyFriends">
+                            <ol class="breadcrumb" id="delroyBreadcrumb" style="color:@color" data-page-color="@color">
+                            </ol>
 
-                                <td></td>
-                                <td></td>
-                            </tr>
+                            <table class="table table-striped table-bordered @color" id="delroyTable" style="width:100%; overflow-x:auto;" >
+                                <thead>
+                                    <tr class="filter-row">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
 
-                            <tr class="table-header_@color @headerColor">
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th>Type</th>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
 
-                                <th>Precision</th>
-                                <th>Scale</th>
-                            </tr>
-                        </thead>
-                    </table>
+                                    <tr class="table-header_@color @headerColor">
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Type</th>
 
-                    @*
-        <div class="section-content collapsed" id="hide_detailSectionHeader_Columns">
-            <div class="table-wrapper">
-                <table class="table table-bordered table-striped schema-table">
-                    <thead>
-                        <tr class="@headerColor">
-                            <th scope="col" style="width: 35%;" class="column-type">Column Name</th>
-                            <th scope="col" class="column-type">Description</th>
-                            <th scope="col" class="column-type">Type</th>
-                            <th scope="col" style="width: 10%;" class="column-type">Precision</th>
-                            <th scope="col" style="width: 10%;" class="column-type">Scale</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- ko foreach: SchemaRows -->
-                        <tr class="SchemaRow" data-column="equip_id" aria-expanded="false" aria-haspopup="true" role="link" tabindex="0"
-                            data-bind="css: { odd: ($index() % 2 === 1), even: ($index() % 2 === 0), extra: ($index() >= 10)}, visible: ($index() < 10)">
-                            <td class="column-name @color" scope="row" data-bind="text : Name"></td>
-                            <td class="column-description">
-                                <div class="contents clamped">
-                                    <span class="Linkify" data-bind="text : Description"></span>
-                                </div>
-                            </td>
-                            <td class="column-type">
-                                <div>
-                                    <span class="type-name" data-name="text" data-bind="text : Type"></span>
-                                </div>
-                            </td>
-                            <td class="column-type">
-                                <div>
-                                    <span class="type-name" data-name="text" data-bind="text : Precision"></span>
-                                </div>
-                            </td>
-                            <td class="column-type">
-                                <div>
-                                    <span class="type-name" data-name="text" data-bind="text : Scale"></span>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- /ko -->
-                    </tbody>
-                </table>
-            </div>
-            <div data-bind="if: FooterRow()">
-                <div style="float: right;">
-                    <a onclick="$('.extra').toggle();">
-                        <span>Show</span>
-                        <span class="extra">More</span>
-                        <span class="extra" style="display: none;">Less</span>
-                        <span> (</span>
-
-                        <span data-bind="text: SchemaRows().length"></span>
-                        <span>)</span>
-                    </a>
-                </div>
-            </div>
-            <div id="panelSpinner" style="min-height: 150px;">
-                <div class="sentry-spinner-container" style=" width: 1166px; margin-top: 25px;">
-                    <span class="sentry-spinner" style="height:100px"></span>
-                </div>
-            </div>
-        </div>
-
-                    *@
-
+                                        <th>Precision</th>
+                                        <th>Scale</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        
+                    </div>
 
                 </section>
             </div>
@@ -613,7 +562,7 @@
 
     @if (Model.Security.CanViewFullDataset)
     {
-        
+
         <div id="dataPreviewSection" style="display: none;">
             <hr id="schemaHR" />
             <div class="row">
@@ -1001,33 +950,26 @@
                 }
             });
 
+            //*****************************************************************************************************
+            //CONFIG DROP DOWN CHANGE
+            //*****************************************************************************************************
             $('#datasetConfigList').on('select2:select', function (e) {
 
                 window.history.pushState('Config Changed', 'Title', '?configID=' + $('#datasetConfigList').val());
-
                 Id = $('#datasetConfigList').val();
-
                 self.NoColumnsReturned(false);
-                $('#schemaSection').show();
                 $('#schemaHR').show();
-
-                $('#panelSpinner').show();
                 self.SchemaRows.removeAll();
                 var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + $('#datasetConfigList').val();
                 $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
 
                 UpdateMetadata();
-
-                //UpdateColumnSchema();
             });
 
             $('#dataLastUpdatedSpinner').show();
             UpdateMetadata();
 
-            $('#panelSpinner').show();
-            //UpdateColumnSchema();
-
-
+            
             function UpdateMetadata() {
 
                 if (!isNaN(getUrlParameter('configID'))) {
@@ -1038,9 +980,6 @@
 
                 var metadataURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val();
                 $.get(metadataURL, function (result) {
-
-            
-
 
                     //Set schema metadata
                     self.Downloads(result.Downloads);
@@ -1082,13 +1021,7 @@
                     $('#dataLastUpdatedSpinner').hide();
 
                     UpdateColumnSchema();
-
-                    //Delroy:  take care of saving offneet too init delroy AFTER we get metadata
-                    //set SchemaId for delroy to use later
-                    //$('#datasetConfigList').data('DatasetId', result.DatasetId);
-                    //$('#datasetConfigList').data('SchemaId', result.SchemaId);
-
-                    data.Dataset.delroyReloadWholeGrid(result.DatasetId, result.SchemaId);
+                    data.Dataset.delroyReloadEverything(result.DatasetId, result.SchemaId);
                 });
             }
 

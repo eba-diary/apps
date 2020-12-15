@@ -14,28 +14,32 @@ data.Dataset = {
         data.Dataset.delroySetupClickAttack();
     },
 
+    //RELOAD EVERYTHING:  clean datatable, breadcrumbs and reload with schema selected
+    delroyReloadEverything: function (datasetId, schemaId) {
 
-
-
-    delroyReloadWholeGrid: function (datasetId, schemaId) {
-
+        $('#delroySpinner').show();
+        $('#delroyTable').DataTable().clear();
+        $('#delroyTable').DataTable().draw();
+        $('#delroyBreadcrumb').empty();
         data.Dataset.delroyRefreshFieldArray(-1);
 
         var schemaURL = "/api/v2/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/revision/latest/fields";
         $.get(schemaURL, function (result) {
+
             data.Dataset.delroyAddFieldArray(result.Fields);
             data.Dataset.delroyAddBreadCrumb2("Home", 0);
             data.Dataset.delroyGridRefresh();
-            $("#schemaSection").show();
+            $('#delroySpinner').hide();
 
         }).fail(function (result) {
             if (result.status == 404) {
-                $("#schemaSection").hide();
+                $('#delroySpinner').hide();
+                data.Dataset.delroyAddBreadCrumb2("No Columns Exist",-1);       //PASS -1 which indicates this is a FAKE breadcrumb
             }
         });
     },
 
-
+    //INIT DATATABLE
     delroyTableCreate: function () {
 
         //init DataTable,
@@ -112,21 +116,26 @@ data.Dataset = {
 
         //BREADCRUMBS NAV CLICK EVENT
         $("#delroyBreadcrumb").on('click','li' ,function () {
-            var myId = this.id;
-            data.Dataset.delroyRefreshFieldArray(myId);
-            data.Dataset.delroyRefreshBreadCrumbs(myId);
-            data.Dataset.delroyGridRefresh();
+            var myIndex = this.id;
+
+            //only allow breadcrumbs use if have a valid Id)
+            if (myIndex >= 0) {
+                data.Dataset.delroyRefreshFieldArray(myIndex);
+                data.Dataset.delroyRefreshBreadCrumbs(myIndex);
+                data.Dataset.delroyGridRefresh();
+            }
+            
         });
     },
 
-    //add new field to array
+    //ADD NEW FIELD TOO ARRAY
     delroyAddFieldArray: function (field) {
 
         data.Dataset.delroyFieldArray.push(field);
     },
 
 
-    //add new breadcrumb to list
+    //ADD NEW BREADCRUMB TOO LIST
     delroyAddBreadCrumb2: function (name, index) {
 
         var color = $('#delroyBreadcrumb').data('page-color');
@@ -134,7 +143,7 @@ data.Dataset = {
         $('#delroyBreadcrumb').append(h);
     },
 
-    //get latest Field from array 
+    //GET LATEST FIELD FROM ARRAY
     delroyGetLatestField: function () {
 
         var index = data.Dataset.delroyFieldArray.length - 1;
@@ -154,7 +163,7 @@ data.Dataset = {
     },
 
 
-    //clear and reload grid with latest element in field array
+    //CLEAR AND RELOAD DATATABLE WITH LATEST ELEMENT IN FIELD ARRAY
     delroyGridRefresh: function () {
         var table = $('#delroyTable').DataTable();
         var field = data.Dataset.delroyGetLatestField();
@@ -164,7 +173,7 @@ data.Dataset = {
         table.draw();
     },
 
-    //Clear all breadcrumbs and refresh up too one passed in
+    //REFRESH BREAD CRUMBS:  Clear all breadcrumbs and refresh up too one passed in
     delroyRefreshBreadCrumbs: function (lastIndexKeep) {
 
         //STEP 1: empty all breadcrumbs
@@ -184,7 +193,7 @@ data.Dataset = {
         }
     },
 
-    //refresh FieldArray to only contain up through last index too keep
+    //REFRESH FIELD ARRAY : If user clicks a breadcrumb we need to refresh the array to ONLY contain up through last index too keep
     delroyRefreshFieldArray: function (lastIndexKeep) {
 
         //Refresh array to reflect current breadcrumb selected
