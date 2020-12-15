@@ -46,7 +46,7 @@ namespace Sentry.data.Core
                             case "CREATED":
                             case "EXISTED":
                                 de = _dsContext.FileSchema.Where(w => w.SchemaId == hiveCreatedEvent.SchemaID).FirstOrDefault();
-                                de.HiveTableStatus = HiveTableStatusEnum.Available.ToString();
+                                de.HiveTableStatus = ConsumptionLayerTableStatusEnum.Available.ToString();
 
                                 if (de.IsInSAS)
                                 {
@@ -60,11 +60,11 @@ namespace Sentry.data.Core
                                 break;
                             case "FAILED":
                                 de = _dsContext.GetById<FileSchema>(hiveCreatedEvent.SchemaID);
-                                de.HiveTableStatus = HiveTableStatusEnum.RequestFailed.ToString();
+                                de.HiveTableStatus = ConsumptionLayerTableStatusEnum.RequestFailed.ToString();
                                 break;
                             default:
                                 de = _dsContext.GetById<FileSchema>(hiveCreatedEvent.SchemaID);
-                                de.HiveTableStatus = HiveTableStatusEnum.Pending.ToString();
+                                de.HiveTableStatus = ConsumptionLayerTableStatusEnum.Pending.ToString();
                                 break;
                         }
 
@@ -76,7 +76,7 @@ namespace Sentry.data.Core
                         Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(hiveReqeustedEvent)}");
 
                         de = _dsContext.GetById<FileSchema>(hiveReqeustedEvent.SchemaID);
-                        de.HiveTableStatus = HiveTableStatusEnum.Requested.ToString();
+                        de.HiveTableStatus = ConsumptionLayerTableStatusEnum.Requested.ToString();
 
                         _dsContext.Merge(de);
                         _dsContext.SaveChanges();
@@ -86,7 +86,7 @@ namespace Sentry.data.Core
                         Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(deleteEvent)}");
 
                         de = _dsContext.GetById<FileSchema>(deleteEvent.SchemaID);
-                        de.HiveTableStatus = HiveTableStatusEnum.DeleteRequested.ToString();
+                        de.HiveTableStatus = ConsumptionLayerTableStatusEnum.DeleteRequested.ToString();
                         _dsContext.SaveChanges();
                         break;
                     case "HIVE-TABLE-DELETE-COMPLETED":
@@ -99,13 +99,13 @@ namespace Sentry.data.Core
                         {
                             case "DELETED":
                             case "SKIPPED":
-                                de.HiveTableStatus = HiveTableStatusEnum.Deleted.ToString();
+                                de.HiveTableStatus = ConsumptionLayerTableStatusEnum.Deleted.ToString();
                                 break;
                             case "FAILED":
-                                de.HiveTableStatus = HiveTableStatusEnum.DeleteFailed.ToString();
+                                de.HiveTableStatus = ConsumptionLayerTableStatusEnum.DeleteFailed.ToString();
                                 break;
                             default:
-                                de.HiveTableStatus = HiveTableStatusEnum.Pending.ToString();
+                                de.HiveTableStatus = ConsumptionLayerTableStatusEnum.Pending.ToString();
                                 break;
                         }
 

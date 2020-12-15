@@ -9,11 +9,15 @@
 
         //init GRID based on User Security
         $.ajax({                                                                        
-            url: "/Dale/GetCanDaleSensitiveEdit/",
+            url: "/Dale/GetCanDaleSensitive/",
             method: "GET",
             dataType: 'json',
             success: function (obj) {
                 data.Dale.dataTablCreate(obj);
+
+                if (!obj.canDaleSensitiveView) {
+                    data.Dale.makeToast("error", "All results may not be displayed. Additional permission is needed to view columns marked as sensitive. Please click the Data Inventory info icon for more information.");
+                }
 
                 var criteriaLen = $('#daleSearchCriteria').val().trim().length;         //if criteria exists at this point, means SAID query so fabricate a click
                 if (criteriaLen > 0) {
