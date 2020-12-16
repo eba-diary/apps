@@ -6,6 +6,9 @@ data.Dataset = {
 
     DatasetFilesTable: {},
 
+    //****************************************************************************************************
+    //DELROY FUNCTIONS
+    //****************************************************************************************************
     delroyFieldArray: [],
 
     delroyInit: function () {
@@ -21,20 +24,20 @@ data.Dataset = {
         $('#delroyTable').DataTable().clear();
         $('#delroyTable').DataTable().draw();
         $('#delroyBreadcrumb').empty();
-        data.Dataset.delroyRefreshFieldArray(-1);
+        data.Dataset.delroyRefreshFieldArrayFromIndex(-1);       //tricky way to DELETE ALL ELEMENTS from array
 
         var schemaURL = "/api/v2/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/revision/latest/fields";
         $.get(schemaURL, function (result) {
 
             data.Dataset.delroyAddFieldArray(result.Fields);
-            data.Dataset.delroyAddBreadCrumb2("Home", 0);
+            data.Dataset.delroyAddBreadCrumb("Home", 0);
             data.Dataset.delroyGridRefresh();
             $('#delroySpinner').hide();
 
         }).fail(function (result) {
             if (result.status == 404) {
                 $('#delroySpinner').hide();
-                data.Dataset.delroyAddBreadCrumb2("No Columns Exist",-1);       //PASS -1 which indicates this is a FAKE breadcrumb
+                data.Dataset.delroyAddBreadCrumb("No Columns Exist",-1);       //PASS -1 which indicates this is a FAKE breadcrumb
             }
         });
     },
@@ -60,12 +63,16 @@ data.Dataset = {
                 { data: "Name", className: "Name" },
                 { data: "Description", className: "Description" },
                 { data: "FieldType", className: "FieldType" },
-                { data: "Precision", className: "Precision", visible: false },
-                { data: "Scale", className: "Scale", visible: false }
+
+                { data: "Length", className: "Length", visible: false, render: function (d)         { return data.Dataset.delroyFillGridCheckForNull(d);    }   },
+
+                { data: "Precision", className: "Precision", visible: false, render: function (d)   { return data.Dataset.delroyFillGridCheckForNull(d);    }   },
+
+                { data: "Scale", className: "Scale", visible: false, render: function (d)           { return data.Dataset.delroyFillGridCheckForNull(d);    }   }
             ],
 
             aLengthMenu: [
-                [20, 100, 500],
+                [20, 100, 500],    
                 [20, 100, 500]
             ],
 
@@ -90,11 +97,14 @@ data.Dataset = {
                 { type: "text" },
 
                 { type: "text" },
+                { type: "text" },
                 { type: "text" }
             ]
         });
 
     },
+
+    
 
     //GRID CLICK EVENTS
     delroySetupClickAttack: function () {
@@ -108,7 +118,7 @@ data.Dataset = {
             // click reload the grid if children exist
             if (field.Fields != null) {
                 data.Dataset.delroyAddFieldArray(field);
-                data.Dataset.delroyAddBreadCrumb2(field.Name, data.Dataset.delroyFieldArray.length - 1);
+                data.Dataset.delroyAddBreadCrumb(field.Name, data.Dataset.delroyFieldArray.length - 1);
                 data.Dataset.delroyGridRefresh();
             }
         });
@@ -120,8 +130,8 @@ data.Dataset = {
 
             //only allow breadcrumbs use if have a valid Id)
             if (myIndex >= 0) {
-                data.Dataset.delroyRefreshFieldArray(myIndex);
-                data.Dataset.delroyRefreshBreadCrumbs(myIndex);
+                data.Dataset.delroyRefreshFieldArrayFromIndex(myIndex);
+                data.Dataset.delroyRefreshBreadCrumbsFromIndex(myIndex);
                 data.Dataset.delroyGridRefresh();
             }
             
@@ -136,7 +146,7 @@ data.Dataset = {
 
 
     //ADD NEW BREADCRUMB TOO LIST
-    delroyAddBreadCrumb2: function (name, index) {
+    delroyAddBreadCrumb: function (name, index) {
 
         var color = $('#delroyBreadcrumb').data('page-color');
         var h = "<li id='" + index.toString() + "' ><a  style='color:" + color + "' href='#'>" + name + "</a></li>";
@@ -173,8 +183,9 @@ data.Dataset = {
         table.draw();
     },
 
+
     //REFRESH BREAD CRUMBS:  Clear all breadcrumbs and refresh up too one passed in
-    delroyRefreshBreadCrumbs: function (lastIndexKeep) {
+    delroyRefreshBreadCrumbsFromIndex: function (lastIndexKeep) {
 
         //STEP 1: empty all breadcrumbs
         $('#delroyBreadcrumb').empty();
@@ -189,18 +200,32 @@ data.Dataset = {
                 bcName = field.Name;
             }
 
-            data.Dataset.delroyAddBreadCrumb2(bcName,i);
+            data.Dataset.delroyAddBreadCrumb(bcName,i);
         }
     },
 
+
     //REFRESH FIELD ARRAY : If user clicks a breadcrumb we need to refresh the array to ONLY contain up through last index too keep
-    delroyRefreshFieldArray: function (lastIndexKeep) {
+    delroyRefreshFieldArrayFromIndex: function (lastIndexKeep) {
 
         //Refresh array to reflect current breadcrumb selected
         var deleteStartIndex = parseInt(lastIndexKeep, 10) + 1;     //use parseInt to ensure we are dealing with an integer data type
         data.Dataset.delroyFieldArray.splice(deleteStartIndex);     //splice deletes array from index specified essentially right half deleted
     },
 
+
+    //ONLY RETURN DATA IF VALID
+    delroyFillGridCheckForNull: function (d) {
+        if (d) {
+            return d;
+        }
+        else {
+            return ' ';
+        }
+    },
+    //****************************************************************************************************
+    //END DELROY FUNCTIONS
+    //****************************************************************************************************
 
 
 
