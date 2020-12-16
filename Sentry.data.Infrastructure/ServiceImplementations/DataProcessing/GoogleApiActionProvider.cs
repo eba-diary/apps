@@ -127,7 +127,7 @@ namespace Sentry.data.Infrastructure
                 stopWatch.Start();
                 DateTime startTime = DateTime.Now;
                 MetricData.AddOrUpdateValue("start_process_time", $"{DateTime.Now.ToString()}");
-                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(startTime - s3Event.eventTime).TotalMilliseconds}");
+                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(startTime.ToUniversalTime() - s3Event.eventTime).TotalMilliseconds}");
                 MetricData.AddOrUpdateValue("message_value", $"{JsonConvert.SerializeObject(s3Event)}");
                 MetricData.AddOrUpdateValue("log", $"start-method <{_step.DataAction_Type_Id.ToString()}>-publishstartevent");
                 _step.LogExecution(flowExecutionGuid, runInstanceGuid, MetricData, Log_Level.Debug);
@@ -150,7 +150,7 @@ namespace Sentry.data.Infrastructure
                     StepTargetPrefix = null, //This step does push data to long term storage, only pushes result to next steps
                     EventType = GlobalConstants.DataFlowStepEvent.GOOGLEAPI_PREPROCESSING_START,
                     FileSize = s3Event.s3.Object.size.ToString(),
-                    S3EventTime = s3Event.eventTime.ToString("s"),
+                    S3EventTime = s3Event.eventTime.ToString("o"),
                     OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                 };
 

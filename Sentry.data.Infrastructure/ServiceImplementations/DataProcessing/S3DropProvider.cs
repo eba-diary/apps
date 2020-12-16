@@ -43,7 +43,7 @@ namespace Sentry.data.Infrastructure
                 stopWatch.Start();
                 DateTime startTime = DateTime.Now;
                 MetricData.AddOrUpdateValue("start_process_time", $"{startTime}");
-                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(startTime - DateTime.Parse(stepEvent.S3EventTime)).TotalMilliseconds}");
+                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(startTime.ToUniversalTime() - DateTime.Parse(stepEvent.S3EventTime)).TotalMilliseconds}");
                 MetricData.AddOrUpdateValue("message_value", $"{JsonConvert.SerializeObject(stepEvent)}");
 
                 string fileName = Path.GetFileName(stepEvent.SourceKey);
@@ -143,7 +143,7 @@ namespace Sentry.data.Infrastructure
             {
                 stopWatch.Start();
                 MetricData.AddOrUpdateValue("start_process_time", $"{startTime}");
-                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(startTime - s3Event.eventTime).TotalMilliseconds}");
+                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(startTime.ToUniversalTime() - s3Event.eventTime).TotalMilliseconds}");
                 MetricData.AddOrUpdateValue("message_value", $"{JsonConvert.SerializeObject(s3Event)}");
                 MetricData.AddOrUpdateValue("log", $"start-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent");
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, MetricData, Log_Level.Debug);
@@ -164,7 +164,7 @@ namespace Sentry.data.Infrastructure
                     StepTargetPrefix = (step.TargetPrefix == null) ? null : step.TargetPrefix + $"{flowExecutionGuid}{((runInstanceGuid == null) ? string.Empty : "-" + runInstanceGuid)}/",
                     EventType = GlobalConstants.DataFlowStepEvent.S3_DROP_START,
                     FileSize = s3Event.s3.Object.size.ToString(),
-                    S3EventTime = s3Event.eventTime.ToString("s"),
+                    S3EventTime = s3Event.eventTime.ToString("o"),
                     OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                 };
 

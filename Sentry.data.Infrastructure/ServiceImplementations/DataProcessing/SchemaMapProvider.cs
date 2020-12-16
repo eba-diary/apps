@@ -48,7 +48,7 @@ namespace Sentry.data.Infrastructure
                 DateTime startTime = DateTime.Now;
                 MetricData.AddOrUpdateValue("start_process_time", $"{startTime}");
                 MetricData.AddOrUpdateValue("message_value", $"{JsonConvert.SerializeObject(stepEvent)}");
-                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(startTime - DateTime.Parse(stepEvent.S3EventTime)).TotalMilliseconds}");
+                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(startTime.ToUniversalTime() - DateTime.Parse(stepEvent.S3EventTime)).TotalMilliseconds}");
 
                 string fileName = Path.GetFileName(stepEvent.SourceKey);
 
@@ -143,7 +143,7 @@ namespace Sentry.data.Infrastructure
             try
             {
                 MetricData.AddOrUpdateValue("start_process_time", $"{stepStartTime}");
-                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(stepStartTime - s3Event.eventTime).TotalMilliseconds}");
+                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(stepStartTime.ToUniversalTime() - s3Event.eventTime).TotalMilliseconds}");
                 MetricData.AddOrUpdateValue("message_value", $"{JsonConvert.SerializeObject(s3Event)}");
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug);
 
@@ -200,7 +200,7 @@ namespace Sentry.data.Infrastructure
                             DownstreamTargets = new List<DataFlowStepEventTarget>() { new DataFlowStepEventTarget() { BucketName = targetSchemaS3Bucket, ObjectKey = targetSchemaS3DropPrefix + $"{flowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/" } },
                             EventType = GlobalConstants.DataFlowStepEvent.SCHEMA_MAP_START,
                             FileSize = s3Event.s3.Object.size.ToString(),
-                            S3EventTime = s3Event.eventTime.ToString("s"),
+                            S3EventTime = s3Event.eventTime.ToString("o"),
                             OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                         };
 

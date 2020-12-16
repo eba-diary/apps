@@ -49,7 +49,7 @@ namespace Sentry.data.Infrastructure
                 DateTime startTime = DateTime.Now;
                 MetricData.AddOrUpdateValue("start_process_time", $"{startTime}");
                 MetricData.AddOrUpdateValue("message_value", $"{JsonConvert.SerializeObject(stepEvent)}");
-                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(startTime - DateTime.Parse(stepEvent.S3EventTime)).TotalMilliseconds}");
+                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(startTime.ToUniversalTime() - DateTime.Parse(stepEvent.S3EventTime)).TotalMilliseconds}");
 
                 string fileName = Path.GetFileName(stepEvent.SourceKey);
 
@@ -169,7 +169,7 @@ namespace Sentry.data.Infrastructure
                 stopWatch.Start();
                 DateTime startTime = DateTime.Now;
                 MetricData.AddOrUpdateValue("start_process_time", $"{DateTime.Now.ToString()}");
-                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(startTime - s3Event.eventTime).TotalMilliseconds}");
+                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(startTime.ToUniversalTime() - s3Event.eventTime).TotalMilliseconds}");
                 MetricData.AddOrUpdateValue("message_value", $"{JsonConvert.SerializeObject(s3Event)}");
                 MetricData.AddOrUpdateValue("log", $"start-method <{_step.DataAction_Type_Id.ToString()}>-publishstartevent");
                 _step.LogExecution(_flowGuid, _runInstGuid, MetricData, Log_Level.Debug);
@@ -206,7 +206,7 @@ namespace Sentry.data.Infrastructure
                         StepTargetPrefix = _step.TargetPrefix + $"{flowGuidDTM.Year.ToString()}/{flowGuidDTM.Month.ToString()}/{flowGuidDTM.Day.ToString()}/",
                         EventType = GlobalConstants.DataFlowStepEvent.QUERY_STORAGE_START,
                         FileSize = s3Event.s3.Object.size.ToString(),
-                        S3EventTime = s3Event.eventTime.ToString("s"),
+                        S3EventTime = s3Event.eventTime.ToString("o"),
                         OriginalS3Event = JsonConvert.SerializeObject(s3Event),
                         SchemaId = schema.SchemaId,
                         DatasetID = _dataset.DatasetId
