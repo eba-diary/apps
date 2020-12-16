@@ -35,9 +35,10 @@ data.Dataset = {
             $('#delroySpinner').hide();
 
         }).fail(function (result) {
-            if (result.status == 404) {
+            if (result.status === 404) {
                 $('#delroySpinner').hide();
-                data.Dataset.delroyAddBreadCrumb("No Columns Exist",-1);       //PASS -1 which indicates this is a FAKE breadcrumb
+                data.Dataset.delroyAddBreadCrumb("No Columns Exist", -1);       //PASS -1 which indicates this is a FAKE breadcrumb
+                data.Dale.makeToast("success", "No columns Exist.  Keep trying.");
             }
         });
     },
@@ -57,17 +58,25 @@ data.Dataset = {
             //    dataSrc: "Fields"       //this is a trick too specify a property within the obj coming back from URL call, in this scenario i need to sepcify WHERE array of columns exists to load
             //},
 
-            //data: data.Dataset.delroyGetLatestField(),     //NOTE: on initial load we are grabbing root element which has column array immediately inside, no need to drill down to Fields property
-
             columns: [
-                { data: "Name", className: "Name" },
+                {
+                    data: "Name", className: "Name",
+                    render: function (d, type, row, meta) {
+                        var color = $('#delroyBreadcrumb').data('page-color');
+                        var innerLink = '<a class="' + color + "' href='#'>" + d + '</a>';
+                        if (row.Fields != null) {
+                            //return '<em class="glyphicon glyphicon-folder-close "' + color + ' ></em>   ' + d;
+                            return '<em class="glyphicon glyphicon-folder-close "' + color + ' > ' + innerLink + '</em>';
+                        }
+                        else {
+                            return d; 
+                        }
+                    }
+                },
                 { data: "Description", className: "Description" },
                 { data: "FieldType", className: "FieldType" },
-
                 { data: "Length", className: "Length", visible: false, render: function (d)         { return data.Dataset.delroyFillGridCheckForNull(d);    }   },
-
                 { data: "Precision", className: "Precision", visible: false, render: function (d)   { return data.Dataset.delroyFillGridCheckForNull(d);    }   },
-
                 { data: "Scale", className: "Scale", visible: false, render: function (d)           { return data.Dataset.delroyFillGridCheckForNull(d);    }   }
             ],
 
@@ -149,7 +158,7 @@ data.Dataset = {
     delroyAddBreadCrumb: function (name, index) {
 
         var color = $('#delroyBreadcrumb').data('page-color');
-        var h = "<li id='" + index.toString() + "' ><a  style='color:" + color + "' href='#'>" + name + "</a></li>";
+        var h = "<li id='" + index.toString() + "' ><a  class='" + color + "' href='#'>" + name + "</a></li>";
         $('#delroyBreadcrumb').append(h);
     },
 
@@ -186,10 +195,8 @@ data.Dataset = {
 
     //REFRESH BREAD CRUMBS:  Clear all breadcrumbs and refresh up too one passed in
     delroyRefreshBreadCrumbsFromIndex: function (lastIndexKeep) {
-
         //STEP 1: empty all breadcrumbs
         $('#delroyBreadcrumb').empty();
-        var color = $('#delroyBreadcrumb').data('page-color');
 
         //STEP 2: add in all breadcrumbs from start until the one they clicked on
         for (let i = 0; i < data.Dataset.delroyFieldArray.length; i++) {
@@ -827,14 +834,14 @@ data.Dataset = {
                 range.moveToElementText(document.getElementById("PreviewText"));
                 range.select().createTextRange();
                 document.execCommand("Copy");
-                alert("Text Copied to Clipboard");
+                data.Dale.makeToast("success", "Text Copied to Clipboard.");
 
             } else if (window.getSelection) {
                 range = document.createRange();
                 range.selectNode(document.getElementById("PreviewText"));
                 window.getSelection().addRange(range);
                 document.execCommand("Copy");
-                alert("Text Copied to Clipboard");
+                data.Dale.makeToast("success", "Text Copied to Clipboard.");
             }
         });
     },
