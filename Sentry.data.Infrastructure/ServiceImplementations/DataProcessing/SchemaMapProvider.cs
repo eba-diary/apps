@@ -143,7 +143,7 @@ namespace Sentry.data.Infrastructure
             try
             {
                 MetricData.AddOrUpdateValue("start_process_time", $"{stepStartTime}");
-                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{((int)(startTime.ToUniversalTime() - s3Event.eventTime.ToUniversalTime()).TotalMilliseconds)}");
+                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{((int)(stepStartTime.ToUniversalTime() - s3Event.eventTime.ToUniversalTime()).TotalMilliseconds)}");
                 MetricData.AddOrUpdateValue("message_value", $"{JsonConvert.SerializeObject(s3Event)}");
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug);
 
