@@ -43,7 +43,7 @@ namespace Sentry.data.Infrastructure
                 stopWatch.Start();
                 DateTime startTime = DateTime.Now;
                 MetricData.AddOrUpdateValue("start_process_time", $"{startTime}");
-                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(startTime.ToUniversalTime() - DateTime.Parse(stepEvent.S3EventTime)).TotalMilliseconds}");
+                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{((int)(startTime.ToUniversalTime() - DateTime.Parse(stepEvent.S3EventTime).ToUniversalTime()).TotalMilliseconds)}");
                 MetricData.AddOrUpdateValue("message_value", $"{JsonConvert.SerializeObject(stepEvent)}");
 
                 string fileName = Path.GetFileName(stepEvent.SourceKey);
@@ -143,7 +143,7 @@ namespace Sentry.data.Infrastructure
             {
                 stopWatch.Start();
                 MetricData.AddOrUpdateValue("start_process_time", $"{startTime}");
-                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{(startTime.ToUniversalTime() - s3Event.eventTime).TotalMilliseconds}");
+                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{((int)(startTime.ToUniversalTime() - s3Event.eventTime.ToUniversalTime()).TotalMilliseconds)}");
                 MetricData.AddOrUpdateValue("message_value", $"{JsonConvert.SerializeObject(s3Event)}");
                 MetricData.AddOrUpdateValue("log", $"start-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent");
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, MetricData, Log_Level.Debug);
