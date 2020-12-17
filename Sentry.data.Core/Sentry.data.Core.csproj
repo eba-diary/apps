@@ -265,6 +265,7 @@
     <Compile Include="Interfaces\IDataFeatures.cs" />
     <Compile Include="Interfaces\IRetrieverJobService.cs" />
     <Compile Include="Interfaces\IHiveOdbcProvider.cs" />
+    <Compile Include="Interfaces\ISAIDRestClient.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />
