@@ -38,7 +38,7 @@ data.Dataset = {
             if (result.status === 404) {
                 $('#delroySpinner').hide();
                 data.Dataset.delroyAddBreadCrumb("No Columns Exist", -1);       //PASS -1 which indicates this is a FAKE breadcrumb
-                data.Dale.makeToast("success", "No columns Exist.  Keep trying.");
+                data.Dale.makeToast("success", "No columns Exist.");
             }
         });
     },
@@ -63,10 +63,11 @@ data.Dataset = {
                     data: "Name", className: "Name",
                     render: function (d, type, row, meta) {
                         var color = $('#delroyBreadcrumb').data('page-color');
-                        var innerLink = '<a class="' + color + "' href='#'>" + d + '</a>';
+                        var innerLink = "<a  class='" + color + "' href='#'>" + d + "</a >";
+                        var parent = "<em class='glyphicon glyphicon-folder-close " + color + "' > " + innerLink + "</em>";
+
                         if (row.Fields != null) {
-                            //return '<em class="glyphicon glyphicon-folder-close "' + color + ' ></em>   ' + d;
-                            return '<em class="glyphicon glyphicon-folder-close "' + color + ' > ' + innerLink + '</em>';
+                            return parent;
                         }
                         else {
                             return d; 
@@ -154,13 +155,7 @@ data.Dataset = {
     },
 
 
-    //ADD NEW BREADCRUMB TOO LIST
-    delroyAddBreadCrumb: function (name, index) {
-
-        var color = $('#delroyBreadcrumb').data('page-color');
-        var h = "<li id='" + index.toString() + "' ><a  class='" + color + "' href='#'>" + name + "</a></li>";
-        $('#delroyBreadcrumb').append(h);
-    },
+   
 
     //GET LATEST FIELD FROM ARRAY
     delroyGetLatestField: function () {
@@ -192,6 +187,13 @@ data.Dataset = {
         table.draw();
     },
 
+    //ADD NEW BREADCRUMB TOO LIST
+    delroyAddBreadCrumb: function (name, index) {
+
+        var color = $('#delroyBreadcrumb').data('page-color');
+        var h = "<li id='" + index.toString() + "' ><a  class='" + color + "' href='#'>" + name + "</a></li>";
+        $('#delroyBreadcrumb').append(h);
+    },
 
     //REFRESH BREAD CRUMBS:  Clear all breadcrumbs and refresh up too one passed in
     delroyRefreshBreadCrumbsFromIndex: function (lastIndexKeep) {
@@ -207,7 +209,7 @@ data.Dataset = {
                 bcName = field.Name;
             }
 
-            data.Dataset.delroyAddBreadCrumb(bcName,i);
+            data.Dataset.delroyAddBreadCrumb(bcName, i);
         }
     },
 
