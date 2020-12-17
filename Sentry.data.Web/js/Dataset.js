@@ -63,7 +63,7 @@ data.Dataset = {
                     data: "Name", className: "Name",
                     render: function (d, type, row, meta) {
                         var color = $('#delroyBreadcrumb').data('page-color');
-                        var innerLink = "<a  class='" + color + "' href='#'>" + d + "</a >";
+                        var innerLink = "<a  class='" + color + "' style='cursor:pointer' > " + d + "</a >";                        //want cursor too turn pointer
                         var parent = "<em class='glyphicon glyphicon-folder-close " + color + "' > " + innerLink + "</em>";
 
                         if (row.Fields != null) {
@@ -155,8 +155,6 @@ data.Dataset = {
     },
 
 
-   
-
     //GET LATEST FIELD FROM ARRAY
     delroyGetLatestField: function () {
 
@@ -191,7 +189,7 @@ data.Dataset = {
     delroyAddBreadCrumb: function (name, index) {
 
         var color = $('#delroyBreadcrumb').data('page-color');
-        var h = "<li id='" + index.toString() + "' ><a  class='" + color + "' href='#'>" + name + "</a></li>";
+        var h = "<li id='" + index.toString() + "' ><a  class='" + color + "' style='cursor:pointer' >" + name + "</a></li>";
         $('#delroyBreadcrumb').append(h);
     },
 
