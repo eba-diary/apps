@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 
 namespace Sentry.data.Infrastructure
 {
@@ -43,6 +44,15 @@ namespace Sentry.data.Infrastructure
                 stopWatch.Start();
                 DateTime startTime = DateTime.Now;
                 MetricData.AddOrUpdateValue("start_process_time", $"{startTime}");
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine($"startTime_tostring: {startTime}");
+                sb.AppendLine($"startTime_UTC_tostring: {startTime.ToUniversalTime()}");
+                sb.AppendLine($"stepEvent_S3EventTime_tostring: {stepEvent.S3EventTime}");
+                sb.AppendLine($"stepEvent_S3EventTime_DateTime_tostring: {DateTime.Parse(stepEvent.S3EventTime)}");
+                sb.AppendLine($"stepEvent_S3EventTime_DateTime_UTC_tostring: {DateTime.Parse(stepEvent.S3EventTime).ToUniversalTime()}");
+                Logger.Debug(sb.ToString());
+
                 MetricData.AddOrUpdateValue("s3_to_process_lag", $"{((int)(startTime.ToUniversalTime() - DateTime.Parse(stepEvent.S3EventTime).ToUniversalTime()).TotalMilliseconds)}");
                 MetricData.AddOrUpdateValue("message_value", $"{JsonConvert.SerializeObject(stepEvent)}");
 
@@ -143,6 +153,14 @@ namespace Sentry.data.Infrastructure
             {
                 stopWatch.Start();
                 MetricData.AddOrUpdateValue("start_process_time", $"{startTime}");
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine($"startTime_tostring: {startTime}");
+                sb.AppendLine($"startTime_UTC_tostring: {startTime.ToUniversalTime()}");
+                sb.AppendLine($"s3Event_eventTime_tostring: {s3Event.eventTime}");
+                sb.AppendLine($"s3Event_eventTime_UTC_tostring: {s3Event.eventTime.ToUniversalTime()}");
+                Logger.Debug(sb.ToString());
+
                 MetricData.AddOrUpdateValue("s3_to_process_lag", $"{((int)(startTime.ToUniversalTime() - s3Event.eventTime.ToUniversalTime()).TotalMilliseconds)}");
                 MetricData.AddOrUpdateValue("message_value", $"{JsonConvert.SerializeObject(s3Event)}");
                 MetricData.AddOrUpdateValue("log", $"start-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent");
