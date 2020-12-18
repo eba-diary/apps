@@ -4,6 +4,10 @@ namespace Sentry.data.Core.Entities
 {
     public class SAIDAsset
     {
+        public SAIDAsset()
+        {
+            Roles = new List<SAIDRole>();
+        }
         public int? Id { get; set; }
         public string Name { get; set; }
         public string SaidKeyCode { get; set; }

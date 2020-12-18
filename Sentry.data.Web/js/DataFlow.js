@@ -59,6 +59,18 @@
                 data.DataFlow.InitSchemaMaps();               
             });
         });
+
+        $(document).ready(function () {
+            $('.selectpicker').selectpicker({
+                liveSearch: false,
+                showSubtext: true
+            });
+
+            $('.selectpicker .select-filtering').selectpicker({
+                liveSearch: true,
+                showSubtext: true
+            });
+        });
         
         data.DataFlow.InitSchemaMaps();
 
