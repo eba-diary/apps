@@ -142,17 +142,8 @@ namespace Sentry.data.Core
 
                     _datasetContext.SaveChanges();
 
-                    //Send message to create hive table
-                    HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
-                    {
-                        SchemaID = revision.ParentSchema.SchemaId,
-                        RevisionID = revision.SchemaRevision_Id,
-                        DatasetID = ds.DatasetId,
-                        HiveStatus = null,
-                        InitiatorID = _userService.GetCurrentUser().AssociateId
-                    };
-                    _messagePublisher.PublishDSCEvent(schemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
-
+                    GenerateConsumptionLayerCreateEvent(schema);
+                                        
                     return revision.SchemaRevision_Id;
                 }
 
@@ -218,8 +209,10 @@ namespace Sentry.data.Core
                 }
                 #endregion
 
-                UpdateAndSaveSchema(schemaDto, schema);
+                string whatPropertiesChanged = UpdateAndSaveSchema(schemaDto, schema);
                 _datasetContext.SaveChanges();
+
+                GenerateConsumptionLayerEvents(schema, whatPropertiesChanged);
 
                 //Send notification to SAS
                 if (SendSASNotification)
@@ -236,9 +229,82 @@ namespace Sentry.data.Core
             }
         }
 
-        private void UpdateAndSaveSchema(FileSchemaDto dto, FileSchema schema)
+        private void GenerateConsumptionLayerEvents(FileSchema schema, string propertyDeltaList)
+        {
+            /*Generate create event when:
+            *  - CreateCurrentView changes, regardless which way
+            *  - CLA2429_SnowflakeCreateTable changes to true
+            */
+            if (propertyDeltaList.Contains("CreateCurrentView") ||
+                propertyDeltaList.Contains("CLA2429_SnowflakeCreateTable:true"))
+            {
+                GenerateConsumptionLayerCreateEvent(schema);
+            }
+
+            /*Generate delete event when:
+             *  - CLA2429_SnowflakeCreateTable changes to false
+             */
+            if (propertyDeltaList.Contains("CLA2429_SnowflakeCreateTable:false"))
+            {
+                GenerateConsumptionLayerDeleteEvent(schema);
+            }
+        }
+
+        private void GenerateConsumptionLayerCreateEvent(FileSchema schema)
+        {
+            SchemaRevision latestRevision = null;
+            latestRevision = _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schema.SchemaId).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();
+
+            //Do nothing if there is no revision associated with schema
+            if (latestRevision == null) { return; }
+                        
+            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
+
+            HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
+            {
+                SchemaID = latestRevision.ParentSchema.SchemaId,
+                RevisionID = latestRevision.SchemaRevision_Id,
+                DatasetID = ds.DatasetId,
+                HiveStatus = null,
+                InitiatorID = _userService.GetCurrentUser().AssociateId
+            };
+            _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
+            
+            if (schema.CLA2429_SnowflakeCreateTable)
+            {
+                SnowTableCreateModel snowModel = new SnowTableCreateModel()
+                {
+                    DatasetID = ds.DatasetId,
+                    SchemaID = schema.SchemaId,
+                    RevisionID = latestRevision.SchemaRevision_Id,
+                    InitiatorID = _userService.GetCurrentUser().AssociateId
+                };
+
+                _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+            }            
+        }
+
+        private void GenerateConsumptionLayerDeleteEvent(FileSchema schema)
+        {
+            //Do nothing if there is no revision associated with schema 
+            if (!_datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schema.SchemaId).Any()) { return; }
+
+            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
+
+            SnowTableDeleteModel snowModel = new SnowTableDeleteModel()
+            {
+                DatasetID = ds.DatasetId,
+                SchemaID = schema.SchemaId
+            };
+
+            _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+        }
+
+        private string UpdateAndSaveSchema(FileSchemaDto dto, FileSchema schema)
         {
             bool chgDetected = false;
+            string whatPropertiesChanged = String.Empty;
+
             if (schema.Name != dto.Name)
             {
                 schema.Name = dto.Name;
@@ -249,11 +315,14 @@ namespace Sentry.data.Core
                 schema.Description = dto.Description;
                 chgDetected = true;
             }
+
             if (schema.CreateCurrentView != dto.CreateCurrentView)
             {
                 schema.CreateCurrentView = dto.CreateCurrentView;
                 chgDetected = true;
+                whatPropertiesChanged = $"CreateCurrentView:{schema.CreateCurrentView.ToString().ToLower()}|";
             }
+
             if (schema.Description != dto.Description)
             {
                 schema.Description = dto.Description;
@@ -295,6 +364,7 @@ namespace Sentry.data.Core
             {
                 schema.CLA2429_SnowflakeCreateTable = dto.CLA2429_SnowflakeCreateTable;
                 chgDetected = true;
+                whatPropertiesChanged = $"CLA2429_SnowflakeCreateTable:{schema.CLA2429_SnowflakeCreateTable.ToString().ToLower()}|";
             }
 
             if (schema.CLA1286_KafkaFlag != dto.CLA1286_KafkaFlag)
@@ -308,7 +378,9 @@ namespace Sentry.data.Core
             {
                 schema.LastUpdatedDTM = DateTime.Now;
                 schema.UpdatedBy = _userService.GetCurrentUser().AssociateId;
-            } 
+            }
+
+            return whatPropertiesChanged;
             
         }
 
@@ -617,7 +689,7 @@ namespace Sentry.data.Core
                 StorageCode = storageCode,
                 HiveDatabase = GenerateHiveDatabaseName(parentDataset.DatasetCategories.First()),
                 HiveTable = FormatHiveTableNamePart(parentDataset.DatasetName) + "_" + FormatHiveTableNamePart(dto.Name),
-                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
+                HiveTableStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                 HiveLocation = RootBucket + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
                 CreatedDTM = DateTime.Now,
                 LastUpdatedDTM = DateTime.Now,
@@ -626,7 +698,7 @@ namespace Sentry.data.Core
                 SnowflakeDatabase = GenerateSnowflakeDatabaseName(),
                 SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First()),
                 SnowflakeTable = FormateSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormateSnowflakeTableNamePart(dto.Name),
-                SnowflakeStatus = HiveTableStatusEnum.NameReserved.ToString(),
+                SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                 CLA1396_NewEtlColumns = dto.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = dto.CLA1580_StructureHive,
                 CLA2472_EMRSend = dto.CLA2472_EMRSend,

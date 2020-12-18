@@ -23,6 +23,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Generator(Generators.Identity);
             });
 
+            Property(x => x.JobGuid, m =>
+            {
+                m.Column("Job_Guid");
+                m.Type(NHibernateUtil.Guid);
+            });
+
             Property(x => x.RelativeUri, m =>
             {
                 m.Column("RelativeUri_DSC");
