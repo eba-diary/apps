@@ -84,6 +84,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
             switch (actionType)
             {
                 case DataActionType.S3Drop:
+                case DataActionType.ProducerS3Drop:
                     _provider = container.GetInstance<IS3DropProvider>();
                     break;
                 case DataActionType.RawStorage:
