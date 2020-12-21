@@ -186,6 +186,7 @@
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Entities\S3\S3LambdaEvent.cs" />
     <Compile Include="Entities\S3\S3ObjectEvent.cs" />
+    <Compile Include="Entities\Security\SAIDAsset.cs" />
     <Compile Include="Entities\Schema\BaseField.cs" />
     <Compile Include="Entities\Schema\BigintField.cs" />
     <Compile Include="Entities\Schema\DateField.cs" />
@@ -197,6 +198,7 @@
     <Compile Include="Entities\Schema\StructField.cs" />
     <Compile Include="Entities\Schema\TimestampField.cs" />
     <Compile Include="Entities\Schema\VarcharField.cs" />
+    <Compile Include="Entities\Security\SAIDRole.cs" />
     <Compile Include="Entities\Subscriptions\BusinessAreaSubscription.cs" />
     <Compile Include="Entities\Subscriptions\EventTypeGroup.cs" />
     <Compile Include="Exceptions\DaleInvalidSearchException.cs" />
@@ -267,6 +269,8 @@
     <Compile Include="Interfaces\IDataFeatures.cs" />
     <Compile Include="Interfaces\IRetrieverJobService.cs" />
     <Compile Include="Interfaces\IHiveOdbcProvider.cs" />
+    <Compile Include="Interfaces\ISAIDRestClient.cs" />
+    <Compile Include="Interfaces\ISAIDService.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />

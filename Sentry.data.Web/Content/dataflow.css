@@ -58,3 +58,30 @@
 .error-over-color .text-danger {
     color:#fff; 
 }
+
+.bootstrap-select .dropdown-menu > li > a small.muted {
+    display: none;
+    position: absolute;
+}
+
+.bootstrap-select .dropdown-toggle .filter-option {
+    position: relative;
+    /*padding-left: 38px;*/
+}
+
+.bootstrap-select .dropdown-toggle .filter-option:before {
+    /*content: "Size:";*/
+    font-size: 14px;
+    font-weight: 700;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.dropdown-container {
+    position: relative;
+}
+
+.dropdown-menu {
+    position: relative;
+}

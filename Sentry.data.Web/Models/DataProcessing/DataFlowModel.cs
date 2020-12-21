@@ -42,6 +42,7 @@ namespace Sentry.data.Web
         /// Target
         /// </summary>
         public int SchemaId { get; set; }
+        public string SAIDAssetKeyCode { get; set; }
 
         [DisplayName("Where should this data be loaded?")]
         public List<SchemaMapModel> SchemaMaps { get; set; }
@@ -56,6 +57,7 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> CompressionDropdown { get; set; }
         public IEnumerable<SelectListItem> PreProcessingRequiredDropdown { get; set; }
         public IEnumerable<SelectListItem> PreProcessingOptionsDropdown { get; set; }
+        public IEnumerable<SelectListItem> SAIDAssetDropDown { get; set; }
         [DisplayName("Pre Processing Options")]
         public List<int> PreprocessingOptions { get; set; }
 

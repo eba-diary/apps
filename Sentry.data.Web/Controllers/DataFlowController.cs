@@ -8,6 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using Sentry.data.Core.Interfaces;
+using System.Threading.Tasks;
+using Sentry.data.Core.Entities;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -18,14 +21,16 @@ namespace Sentry.data.Web.Controllers
         private readonly IDatasetService _datasetService;
         private readonly IConfigService _configService;
         private readonly ISecurityService _securityService;
+        private readonly ISAIDService _saidService;
 
         public DataFlowController(IDataFlowService dataFlowService, IDatasetService datasetService, IConfigService configService,
-            ISecurityService securityService)
+            ISecurityService securityService, ISAIDService saidService)
         {
             _dataFlowService = dataFlowService;
             _datasetService = datasetService;
             _configService = configService;
             _securityService = securityService;
+            _saidService = saidService;
         }
 
         // GET: DataFlow
@@ -59,7 +64,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        public ViewResult Create()
+        public async Task<ViewResult> Create()
         {
 
             UserSecurity us = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
@@ -73,6 +78,7 @@ namespace Sentry.data.Web.Controllers
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreprocessingOptions);
+
             CreateDropDownSetup(model.RetrieverJob);
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
             SchemaMapModel schemaModel = new SchemaMapModel
@@ -80,6 +86,7 @@ namespace Sentry.data.Web.Controllers
                 SelectedDataset = 0
             };
             model.SchemaMaps.Add(schemaModel);
+            model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
 
             return View("DataFlowForm", model);
             
@@ -305,6 +312,38 @@ namespace Sentry.data.Web.Controllers
         {
             model.CompressionTypesDropdown = Enum.GetValues(typeof(CompressionTypes)).Cast<CompressionTypes>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+        }
+
+        private async Task<List<SelectListItem>> BuildSAIDAssetDropDown(string keyCode)
+        {
+            List<SelectListItem> output = new List<SelectListItem>();
+
+            //SAIDAsset asset = await _saidService.GetAssetByKeyCode("DATA").ConfigureAwait(false);
+            List<SAIDAsset> assetList = await _saidService.GetAllAssets().ConfigureAwait(false);
+
+            if(String.IsNullOrWhiteSpace(keyCode) || !assetList.Any(a => a.SaidKeyCode == keyCode))
+            {
+                output.Add(new SelectListItem
+                {
+                    Value = "None",
+                    Text = "Select Asset",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
+
+            //Filtering out assets not assigned a SaidKeyCode
+            foreach (SAIDAsset asset in assetList.Where(w => !String.IsNullOrWhiteSpace(w.SaidKeyCode)).OrderBy(o => o.Name))
+            {
+                output.Add(new SelectListItem
+                {
+                    Value = asset.SaidKeyCode,
+                    Text = $"{asset.Name} ({asset.SaidKeyCode})",
+                    Selected = (!String.IsNullOrWhiteSpace(keyCode) && asset.SaidKeyCode == keyCode)
+                });
+            }
+
+            return output;
         }
 
         private List<SelectListItem> DataSourcesByType(string sourceType, string selectedId)
