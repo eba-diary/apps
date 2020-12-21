@@ -66,7 +66,7 @@
                 showSubtext: true
             });
 
-            $('.selectpicker .select-filtering').selectpicker({
+            $(".selectpicker-filtering").selectpicker({
                 liveSearch: true,
                 showSubtext: true
             });

@@ -77,6 +77,7 @@ namespace Sentry.data.Web
             {
                 Id = model.DataFlowId,
                 Name = model.Name,
+                SaidKeyCode = model.SAIDAssetKeyCode,
                 CreatedBy = model.CreatedBy,
                 CreateDTM = model.CreatedDTM,
                 IngestionType = model.IngestionType,

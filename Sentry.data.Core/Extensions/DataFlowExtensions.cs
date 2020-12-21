@@ -21,6 +21,7 @@ namespace Sentry.data.Core
             {
                 Id = df.Id,
                 FlowGuid = df.FlowGuid,
+                SaidKeyCode = df.SaidKeyCode,
                 Name = df.Name,
                 CreateDTM = df.CreatedDTM,
                 CreatedBy = df.CreatedBy

@@ -93,7 +93,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult DataFlowForm(DataFlowModel model)
+        public async Task<ActionResult> DataFlowForm(DataFlowModel model)
         {
             AddCoreValidationExceptionsToModel(model.Validate());
 
@@ -151,6 +151,7 @@ namespace Sentry.data.Web.Controllers
                     SetSchemaModelLists(mapModel);
                 }
             }
+            model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
             return View("DataFlowForm", model);
         }
 
@@ -410,6 +411,9 @@ namespace Sentry.data.Web.Controllers
                     case DataFlow.ValidationErrors.nameMustBeUnique:
                     case DataFlow.ValidationErrors.nameContainsReservedWords:
                         ModelState.AddModelError("Name", vr.Description);
+                        break;
+                    case DataFlow.ValidationErrors.saidAssetIsBlank:
+                        ModelState.AddModelError("SAIDAssetKeyCode", vr.Description);
                         break;
                     case "PreprocessingOptions":
                     case SchemaMap.ValidationErrors.schemamapMustContainDataset:

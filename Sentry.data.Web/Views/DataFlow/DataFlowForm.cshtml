@@ -34,11 +34,11 @@
                 @Html.EnumDropDownListFor(
                     x => x.IngestionType,
                     "Select Ingestion Type",
-                    new { @class = "form-control selectpicker select-filtering" })
+                    new { @class = "form-control selectpicker" })
                 @*@Html.RadioButtonFor(model => model.IngestionType, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })*@
             </div>
         </div>
-        @*<div class="namePanel" style="display:none;">
+        <div class="namePanel" style="display:none;">
             <div class="form-group col-md-12">
                 <div class="col-md-5"><h4>What SAID asset will be sending data?</h4></div>
                 <div class="col-md-4">
@@ -48,7 +48,7 @@
                             Model.SAIDAssetDropDown,
                             new
                                  {
-                                @class = "selectpicker",
+                                @class = "selectpicker-filtering",
                         })
                     </div>
                 </div>
@@ -60,7 +60,7 @@
                     @Html.ValidationMessageFor(model => Model.Name, "", new { @class = "text-danger" })
                 </div>
             </div>
-        </div>*@
+        </div>
         <br />
         <div class="compressionPanel" style="display:none;">
             @*@Html.HiddenFor(model => model.IsCompressed)*@

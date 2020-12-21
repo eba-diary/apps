@@ -404,7 +404,8 @@ namespace Sentry.data.Core
                 CreatedDTM = DateTime.Now,
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
                 Questionnaire = dto.DFQuestionnaire,
-                FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE()
+                FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE(),
+                SaidKeyCode = dto.SaidKeyCode
             };
 
             _datasetContext.Add(df);
@@ -422,7 +423,7 @@ namespace Sentry.data.Core
             _datasetContext.Add(dfsDataFlowBasic);
 
             //Generate ingestion steps (get file to raw location)
-            AddDataFlowStep(dto, df, DataActionType.S3Drop);
+            AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop);
 
             AddDataFlowStep(dto, df, DataActionType.RawStorage);
 
@@ -471,7 +472,7 @@ namespace Sentry.data.Core
             _jobService.CreateAndSaveRetrieverJob(dto.RetrieverJob);
 
             //Generate ingestion steps (get file to raw location)
-            AddDataFlowStep(dto, df, DataActionType.S3Drop);
+            AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop);
 
             AddDataFlowStep(dto, df, DataActionType.RawStorage);
 
@@ -542,6 +543,7 @@ namespace Sentry.data.Core
         {
             dto.Id = df.Id;
             dto.FlowGuid = df.FlowGuid;
+            dto.SaidKeyCode = df.SaidKeyCode;
             dto.Name = df.Name;
             dto.CreateDTM = df.CreatedDTM;
             dto.CreatedBy = df.CreatedBy;
@@ -650,6 +652,9 @@ namespace Sentry.data.Core
                 case DataActionType.S3Drop:
                     action = _datasetContext.S3DropAction.FirstOrDefault();
                     break;
+                case DataActionType.ProducerS3Drop:
+                    action = _datasetContext.ProducerS3DropAction.FirstOrDefault();
+                    break;
                 case DataActionType.RawStorage:
                     action = _datasetContext.RawStorageAction.FirstOrDefault();
                     break;
@@ -736,6 +741,10 @@ namespace Sentry.data.Core
             {
                 step.TriggerKey = $"droplocation/{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
             }
+            else if (step.DataAction_Type_Id == DataActionType.ProducerS3Drop)
+            {
+                step.TriggerKey = $"droplocation/data/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}";
+            }
             else
             {
                 step.TriggerKey = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
@@ -764,6 +773,7 @@ namespace Sentry.data.Core
                 case DataActionType.UncompressGzip:
                 case DataActionType.SchemaMap:
                 case DataActionType.S3Drop:
+                case DataActionType.ProducerS3Drop:
                 case DataActionType.FixedWidth:
                     step.TargetPrefix = null;
                     break;
