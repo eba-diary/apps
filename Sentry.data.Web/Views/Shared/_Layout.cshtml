@@ -68,16 +68,6 @@
             }
 
             data._Layout.Init();
-            
-            $.ajax({
-                type: "GET",
-                url: "/api/v1/queryTool/sessions/primary",
-                dataType: "json",
-                success: function (msg) {
-                    console.log(msg);
-                    $('#dscSession').attr("href", msg.livyURL + "/ui/session/" + msg.id);
-                }
-            });
         });
     </script>
 

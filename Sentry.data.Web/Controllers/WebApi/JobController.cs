@@ -13,6 +13,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -329,6 +330,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.OK, null, typeof(string))]
         [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(string))]
+        [SwaggerResponse(HttpStatusCode.NotFound, null, typeof(string))]
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
         [Route("{JobId}/submit/{JobGuid}")]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
@@ -336,7 +338,25 @@ namespace Sentry.data.Web.WebApi.Controllers
         {
             try
             {
-                RetrieverJob job = _datasetContext.GetById<RetrieverJob>(JobId);
+                Logger.Info($"Start method <>");
+                if (JobId == 0)
+                {
+                    return BadRequest("JobId parameter required");
+                }
+
+                if (JobGuid == null || JobGuid == Guid.Empty)
+                {
+                    return BadRequest("JobGuid parameter required");
+                }
+
+                Logger.Info($"Start method <{MethodBase.GetCurrentMethod().Name.ToLower()}>  JobId: {JobId.ToString()} JobGuid: {JobGuid.ToString()}");
+
+                RetrieverJob job = _datasetContext.RetrieverJob.FirstOrDefault(w => w.Id == JobId && JobGuid == w.JobGuid);
+
+                if (job == null)
+                {
+                    return Content(HttpStatusCode.NotFound, $"JobId:{JobId.ToString()} | JobGuid:{JobGuid.ToString()}");
+                }
 
                 if (!job.DataSource.Is<JavaAppSource>())
                 {
@@ -487,6 +507,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                         _datasetContext.Add(histRecord);
                         _datasetContext.SaveChanges();
 
+                        Logger.Info($"End method <>");
                         return Ok(result);
                     }
                     else if (response.StatusCode == HttpStatusCode.BadRequest)

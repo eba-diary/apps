@@ -80,8 +80,7 @@
       <HintPath>..\packages\Sentry.Configuration.3.0.0\lib\net40\Sentry.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Sentry.Core.1.0.0.1\lib\net451\Sentry.Core.dll</HintPath>
+      <HintPath>..\packages\Sentry.Core.1.1.0\lib\net452\Sentry.Core.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.FeatureFlags, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.FeatureFlags.1.0.3\lib\net461\Sentry.FeatureFlags.dll</HintPath>
@@ -183,6 +182,8 @@
     <Compile Include="Entities\MessageFormats\HiveTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\RawFileAddModel.cs" />
     <Compile Include="Entities\MessageFormats\S3Event.cs" />
+    <Compile Include="Entities\MessageFormats\SnowTableCreateModel.cs" />
+    <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Entities\S3\S3LambdaEvent.cs" />
     <Compile Include="Entities\S3\S3ObjectEvent.cs" />
     <Compile Include="Entities\Schema\BaseField.cs" />
@@ -212,6 +213,8 @@
     <Compile Include="Exceptions\DatasetFileConfigDeletedException.cs" />
     <Compile Include="Exceptions\DatasetNotFoundException.cs" />
     <Compile Include="Exceptions\DatasetUnauthorizedAccessException.cs" />
+    <Compile Include="Exceptions\HiveQueryException.cs" />
+    <Compile Include="Exceptions\HiveTableViewNotFoundException.cs" />
     <Compile Include="Exceptions\JobNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaUnauthorizedAccessException.cs" />
@@ -263,6 +266,7 @@
     <Compile Include="Interfaces\IDaleService.cs" />
     <Compile Include="Interfaces\IDataFeatures.cs" />
     <Compile Include="Interfaces\IRetrieverJobService.cs" />
+    <Compile Include="Interfaces\IHiveOdbcProvider.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />
@@ -467,6 +471,7 @@
     <None Include="ClassDiagram2.cd" />
     <None Include="ClassDiagram3.cd" />
     <None Include="ClassDiagram4.cd" />
+    <None Include="ClassDiagram5.cd" />
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -492,7 +497,9 @@
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.CSharp.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Interfaces\MessageFormats\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
