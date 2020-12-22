@@ -163,7 +163,7 @@ namespace Sentry.data.Web
         public bool CLA2429_SnowflakeCreateTable { get; set; }
         public bool CLA1286_KafkaFlag { get; set; }
         public IList<RetrieverJob> RetrieverJobs { get; set; }
-        public Tuple<List<RetrieverJob>, List<DataFlowStepModel>> DataFlowJobs { get; set; }
+        public AssociatedDataFlowModel DataFlowJobs { get; set; }
         public IList<AssociatedDataFlowModel> ExternalDataFlowJobs { get; set; }
 
         public IList<DataElement> Schemas { get; set; }  

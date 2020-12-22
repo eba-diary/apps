@@ -161,7 +161,7 @@ namespace Sentry.data.Core
 
             string schemaFlowName = GenerateDataFlowNameForFileSchema(scm);
             DataFlow flow = _datasetContext.DataFlow.Where(w => w.Name == schemaFlowName).FirstOrDefault();
-            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow == flow && w.DataAction_Type_Id == DataActionType.S3Drop).FirstOrDefault();
+            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow == flow && (w.DataAction_Type_Id == DataActionType.S3Drop || w.DataAction_Type_Id == DataActionType.ProducerS3Drop)).FirstOrDefault();
             if (step == null)
             {
                 throw new DataFlowStepNotFound();
@@ -600,6 +600,7 @@ namespace Sentry.data.Core
             dto.ActionName = step.Action.Name;
             dto.ActionDescription = step.Action.Description;
             dto.TriggerKey = step.TriggerKey;
+            dto.TriggerBucket = step.Action.TargetStorageBucket;
             dto.TargetPrefix = step.TargetPrefix;
             dto.DataFlowId = step.DataFlow.Id;
         }

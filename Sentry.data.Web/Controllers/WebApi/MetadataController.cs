@@ -2,11 +2,9 @@
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Sentry.Common.Logging;
-using Sentry.Core;
 using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
-using Sentry.data.Core.Factories.Fields;
 using Sentry.data.Web.Models.ApiModels.Dataset;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using Sentry.WebAPI.Versioning;
@@ -860,7 +858,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                         });                        
                     }
 
-                    rjList.Add(item.Item1.steps.Where(w => w.DataActionType == Core.Entities.DataProcessing.DataActionType.S3Drop).Select(s => new DropLocation() { Name = s.ActionName, JobId = s.Id, IsEnabled = true, Location = s.TriggerKey }).FirstOrDefault());
+                    rjList.Add(item.Item1.steps.Where(w => w.DataActionType == Core.Entities.DataProcessing.DataActionType.S3Drop || w.DataActionType == Core.Entities.DataProcessing.DataActionType.ProducerS3Drop).Select(s => new DropLocation() { Name = s.ActionName, JobId = s.Id, IsEnabled = true, Location = $"{s.TriggerBucket}/{s.TriggerKey}" }).FirstOrDefault());
 
                     df.RetrieverJobs = rjList;
                     m.DataFlows.Add(df);

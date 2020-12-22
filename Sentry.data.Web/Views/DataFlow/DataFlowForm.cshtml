@@ -34,7 +34,7 @@
                 @Html.EnumDropDownListFor(
                     x => x.IngestionType,
                     "Select Ingestion Type",
-                    new { @class = "form-control selectpicker" })
+                    new { @class = "selectpicker" })
                 @*@Html.RadioButtonFor(model => model.IngestionType, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })*@
             </div>
         </div>
@@ -46,10 +46,7 @@
                         @Html.DropDownListFor(x =>
                             x.SAIDAssetKeyCode,
                             Model.SAIDAssetDropDown,
-                            new
-                                 {
-                                @class = "selectpicker-filtering",
-                        })
+                            new { @class = "selectpicker-filtering" })
                     </div>
                 </div>
             </div>
