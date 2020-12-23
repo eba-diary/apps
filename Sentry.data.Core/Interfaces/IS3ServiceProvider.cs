@@ -53,9 +53,9 @@ namespace Sentry.data.Core
         /// <summary>
         /// Returns object metadata for S3 object.
         /// </summary>
-        /// <param name="bucket"></param>
+        /// <param name="bucket"> Will default to DSC root bucket if null or empty string</param>
         /// <param name="key"></param>
-        /// <param name="versionId"></param>
+        /// <param name="versionId"> If left null willl perform action on latest version of S3 object</param>
         /// <returns></returns>
         Dictionary<string, string> GetObjectMetadata(string bucket, string key, string versionId = null);
 

@@ -550,7 +550,7 @@ namespace Sentry.data.Infrastructure
 
             try
             {
-                Dictionary<string, string> metadataresp = GetObjectMetadata(sourceBucket, sourceKey);
+                Dictionary<string, string> metadataresp = GetObjectMetadata(sourceBucket, sourceKey, null);
 
                 long objectSize = Convert.ToInt64(metadataresp["ContentLength"]);
 
@@ -904,12 +904,14 @@ namespace Sentry.data.Infrastructure
 
             return dsList;
         }
+
         public Dictionary<string, string> GetObjectMetadata(string bucket, string key, string versionId = null)
         {
+            string awsBucket = (String.IsNullOrWhiteSpace(bucket)) ? RootBucket : bucket;
             GetObjectMetadataRequest req = new GetObjectMetadataRequest();
             GetObjectMetadataResponse resp = null;
 
-            req.BucketName = bucket;
+            req.BucketName = awsBucket;
             req.Key = key;
             req.VersionId = versionId;
 
@@ -1100,7 +1102,7 @@ namespace Sentry.data.Infrastructure
                 Logger.Debug("s3serviceprovider-copyobject-startmethod");
                 Logger.Debug($"s3serviceprovider-copyobject processing sourcebucket:{srcBucket} sourcekey:{srcKey} targetbucket:{destBucket} targetkey:{destKey}");
                 
-                Dictionary<string, string> resp = GetObjectMetadata(srcBucket, srcKey);
+                Dictionary<string, string> resp = GetObjectMetadata(srcBucket, srcKey, null);
 
                 long objectSize = Convert.ToInt64(resp["ContentLength"]);
 
@@ -1131,7 +1133,7 @@ namespace Sentry.data.Infrastructure
                     CopyObjectResponse response = S3Client.CopyObject(request);
                     if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
                     {
-                        resp = GetObjectMetadata(destBucket, destKey);
+                        resp = GetObjectMetadata(destBucket, destKey, null);
                     }
                     stopWatch.Stop();
 
