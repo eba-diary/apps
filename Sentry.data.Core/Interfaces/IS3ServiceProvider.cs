@@ -50,11 +50,27 @@ namespace Sentry.data.Core
 
         string GetDatasetDownloadURL(string key, string versionId, string fileName);
 
+        /// <summary>
+        /// Returns object metadata for S3 object.
+        /// </summary>
+        /// <param name="bucket"></param>
+        /// <param name="key"></param>
+        /// <param name="versionId"></param>
+        /// <returns></returns>
+        Dictionary<string, string> GetObjectMetadata(string bucket, string key, string versionId = null);
+
+        /// <summary>
+        /// Returns object metadata for S3 object.  Will default
+        ///   bucket to DSC root bucket
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="versionId"></param>
+        /// <returns></returns>
         Dictionary<string, string> GetObjectMetadata(string key, string versionId = null);
 
         Stream GetObject(string key, string versionId);
 
-        string StartUpload(string uniqueKey);
+        string StartUpload(string bucket, string uniqueKey);
 
         List<string> FindObject(string keyPrefix);
 

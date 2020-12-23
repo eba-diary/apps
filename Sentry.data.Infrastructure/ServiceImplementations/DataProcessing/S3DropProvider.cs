@@ -1,15 +1,14 @@
 ﻿using Newtonsoft.Json;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
-using Sentry.data.Core.Interfaces.DataProcessing;
-using System;
-using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing.Actions;
 using Sentry.data.Core.Entities.S3;
-using System.IO;
-using StructureMap;
+using Sentry.data.Core.Interfaces.DataProcessing;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 
 namespace Sentry.data.Infrastructure
 {
