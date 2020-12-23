@@ -16,7 +16,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44371</IISExpressSSLPort>
+    <IISExpressSSLPort>44321</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -171,8 +171,7 @@
       <HintPath>..\packages\Sentry.Configuration.3.0.0\lib\net40\Sentry.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Sentry.Core.1.0.0.1\lib\net451\Sentry.Core.dll</HintPath>
+      <HintPath>..\packages\Sentry.Core.1.1.0\lib\net452\Sentry.Core.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.DataTables.Mvc, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry_DataTables_ServerSide_MVC.1.0.5\lib\net45\Sentry.DataTables.Mvc.dll</HintPath>
@@ -424,6 +423,7 @@
     <Compile Include="Models\DataProcessing\DFModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowStepModel.cs" />
     <Compile Include="Models\DataProcessing\JobModel.cs" />
+    <Compile Include="Models\DataProcessing\SchemaMapDetailModel.cs" />
     <Compile Include="Models\DataProcessing\SchemaMapModel.cs" />
     <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
     <Compile Include="Models\Dataset\ColumnModel.cs" />
@@ -435,7 +435,6 @@
     <Compile Include="Models\Dataset\DatasetFileVersionsModel.cs" />
     <Compile Include="Models\Config\EditDatasetFileConfigModel.cs" />
     <Compile Include="Models\Dataset\ObsoleteDatasetModel.cs" />
-    <Compile Include="Models\Dataset\PreviewDataModel.cs" />
     <Compile Include="Models\Dataset\PushToDatasetModel.cs" />
     <Compile Include="Models\Favorites\FavoriteItemDetailModel.cs" />
     <Compile Include="Models\Favorites\FavoritesDetailModel.cs" />
@@ -658,6 +657,7 @@
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
     <Content Include="js\Job.js" />
+    <Content Include="js\Shared\Utils.js" />
     <Content Include="js\Subscription.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
@@ -857,12 +857,21 @@
     <Content Include="Scripts\prettycron.js" />
     <Content Include="Scripts\query-builder.js" />
     <Content Include="Scripts\query-builder.min.js" />
+    <Content Include="Scripts\quill\quill.bubble.css" />
+    <Content Include="Scripts\quill\quill.bubble.min.css" />
+    <Content Include="Scripts\quill\quill.core.css" />
+    <Content Include="Scripts\quill\quill.core.js" />
+    <Content Include="Scripts\quill\quill.core.min.css" />
+    <Content Include="Scripts\quill\quill.core.min.js" />
+    <Content Include="Scripts\quill\quill.js" />
+    <Content Include="Scripts\quill\quill.min.js" />
+    <Content Include="Scripts\quill\quill.snow.css" />
+    <Content Include="Scripts\quill\quill.snow.min.css" />
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\thenBy.min.js" />
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
-    <Content Include="Views\Dataset\_PreviewData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
@@ -1118,12 +1127,17 @@
     <Content Include="..\.sonarlint\data_data.sentry.comcsharp.ruleset">
       <Link>data_data.sentry.comcsharp.ruleset</Link>
     </Content>
+    <Content Include="..\HiveODBC.config">
+      <Link>HiveODBC.config</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>
     <Content Include="Content\DataTables\css\semanticui.scss" />
     <Content Include="Content\DataTables\css\mixins.scss" />
     <Content Include="Content\DataTables\css\common.scss" />
+    <Content Include="libman.json" />
     <None Include="Scripts\jquery-3.1.0-vsdoc.js" />
     <Content Include="Images\Category\claim.png" />
     <Content Include="Images\Category\claim.svg" />
@@ -1479,6 +1493,13 @@
     <Content Include="Views\Dale\DaleResult.cshtml" />
     <Content Include="Views\DataFlow\_AjaxMakeSchemaMap.cshtml" />
     <Content Include="Views\RetrieverJob\_RetrieverJob.cshtml" />
+    <Content Include="Scripts\quill\quill.bubble.min.css.map" />
+    <Content Include="Scripts\quill\quill.core.min.css.map" />
+    <Content Include="Scripts\quill\quill.core.min.js.map" />
+    <Content Include="Scripts\quill\quill.min.js.map" />
+    <Content Include="Scripts\quill\quill.snow.min.css.map" />
+    <Content Include="Views\Shared\Unauthorized.cshtml" />
+    <Content Include="Views\DataFlow\_SchemaMapDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1544,9 +1565,9 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2457</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:44371</IISUrl>
+          <IISUrl>https://localhost.sentry.com:44321</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>https://localhost.sentry.com:44371</IISAppRootUrl>
+          <IISAppRootUrl>https://localhost.sentry.com:44321</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

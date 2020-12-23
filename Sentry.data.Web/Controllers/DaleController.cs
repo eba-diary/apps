@@ -188,11 +188,6 @@ namespace Sentry.data.Web.Controllers
 
         private bool CanDaleView()
         {
-            if (!SharedContext.CurrentUser.CanDaleView)
-            {
-                return false;
-            }
-
             return true;
         }
 
@@ -220,9 +215,9 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         //method called by dale.js to return whether user can edit IsSensitive IND
-        public JsonResult GetCanDaleSensitiveEdit()
+        public JsonResult GetCanDaleSensitive()
         {
-            return Json(new {canDaleSensitiveEdit = CanDaleSensitiveEdit(), canDaleOwnerVerifiedEdit = CanDaleOwnerVerifiedEdit() },JsonRequestBehavior.AllowGet);
+            return Json(new {canDaleSensitiveEdit = CanDaleSensitiveEdit(), canDaleOwnerVerifiedEdit = CanDaleOwnerVerifiedEdit(), canDaleSensitiveView = CanDaleSensitiveView() },JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]

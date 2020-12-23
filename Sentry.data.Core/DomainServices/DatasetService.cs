@@ -120,11 +120,15 @@ namespace Sentry.data.Core
 
             AccessRequest ar = new AccessRequest()
             {
-                Permissions = _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList(),
                 ApproverList = new List<KeyValuePair<string, string>>(),
                 SecurableObjectId = ds.DatasetId,
                 SecurableObjectName = ds.DatasetName
             };
+
+            //Set permission list based on if Dataset is secured (restricted)
+            ar.Permissions = !ds.IsSecured
+                ? _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET && x.PermissionCode == GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA).ToList()
+                : _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
 
 
             IApplicationUser primaryUser = _userService.GetByAssociateId(ds.PrimaryOwnerId);
@@ -215,6 +219,13 @@ namespace Sentry.data.Core
             {
                 ds.DataClassification = dto.DataClassification;
             }
+            if (ds.Security == null)
+            {
+                ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
+                {
+                    CreatedById = _userService.GetCurrentUser().AssociateId
+                };
+            }
 
             //override the Dto.IsSecured for certain classifications.
             switch (dto.DataClassification)
@@ -231,19 +242,9 @@ namespace Sentry.data.Core
             }
 
             if (!ds.IsSecured && dto.IsSecured)
-            {
-                if (ds.Security == null)
-                {
-                    ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
-                    {
-                        CreatedById = _userService.GetCurrentUser().AssociateId
-                    };
-                }
-                else
-                {
-                    ds.Security.EnabledDate = DateTime.Now;
-                    ds.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
-                }
+            {      
+                ds.Security.EnabledDate = DateTime.Now;
+                ds.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;                
             }
             else if (ds.IsSecured && !dto.IsSecured)
             {
@@ -363,65 +364,6 @@ namespace Sentry.data.Core
             return dsList;
         }
 
-        public void GenerateDatasetFilePreview(DatasetFile df)
-        {
-            //Failure to generate preview files should not hold up any processing
-            try
-            {
-                LambdaClientConfig lConfig = new LambdaClientConfig()
-                {
-                    AWSRegion = Configuration.Config.GetSetting("AWSRegion"),
-                    AccessKey = Configuration.Config.GetHostSetting("AWSAccessKey"),
-                    SecretKey = Configuration.Config.GetHostSetting("AWSSecretKey"),
-                    ProxyHost = Configuration.Config.GetHostSetting("SentryAWSLambdaProxyHost"),
-                    ProxyPort = Configuration.Config.GetHostSetting("SentryAWSLambdaProxyPort")
-                };
-
-                _awsLambdaProvider.ConfigureClient(lConfig);
-                _awsLambdaProvider.SetFunctionName(Configuration.Config.GetHostSetting("AWSPreviewLambdaName"));
-                _awsLambdaProvider.SetInvocationType("RequestResponse");
-                _awsLambdaProvider.SetLogType("Tail");
-                _awsLambdaProvider.InvokeFunction(GeneratePreviewLambdaTriggerEvent(Configuration.Config.GetHostSetting("AWSRootBucket"), df));
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("datasetservice-generatedatasetfilepreview failed to generate preview", ex);
-            }
-        }
-
-        //public bool DeleteDatasetFile(int datasetFileId)
-        //{
-        //    DatasetFile df = _datasetContext.DatasetFile.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
-
-        //    if (df != null)
-        //    {
-        //        try
-        //        {
-        //            //Find associated parquet prefixes and delete from S3
-        //            List<DatasetFileParquet> parquetFileList = _datasetContext.DatasetFileParquet.Where(w => w.DatasetFileId == df.DatasetFileId).ToList();
-        //            List<string> s3PrefixList = parquetFileList.ToObjectKeyVersion();
-        //            _s3ServiceProvider.DeleteS3Prefix(s3PrefixList);
-
-
-        //            _datasetContext.Remove(df);
-        //            _datasetContext.SaveChanges();
-        //            return true;
-        //        }
-        //        catch (Exception ex)
-        //        {
-
-        //            Logger.Error($"deletedatasetfile-")
-        //            return false;
-        //        }
-
-        //    }
-        //    else
-        //    {
-        //        Logger.Info($"deletedatasetfile-nofilefound = datasetfileid:{datasetFileId}");
-        //        return true;
-        //    }
-        //}
-
         #region "private functions"
         private void MarkForDelete(Dataset ds)
         {
@@ -470,13 +412,13 @@ namespace Sentry.data.Core
                     break;
             }
 
-            if (ds.IsSecured)
+            //All datasets get a Security entry regardless if restricted
+            //  this allows security process for internally managed permissions
+            //  which do not require dataset to be restricted (i.e. CanManageSchema).
+            ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
             {
-                ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
-                {
-                    CreatedById = _userService.GetCurrentUser().AssociateId
-                };
-            }
+                CreatedById = _userService.GetCurrentUser().AssociateId
+            };
 
             return ds;
         }

@@ -23,6 +23,13 @@ namespace Sentry.data.Core
         UserSecurity GetUserSecurityForDataSource(int id);
         AccessRequest GetDataSourceAccessRequest(int dataSourceId);
         string RequestAccessToDataSource(AccessRequest request);
+
+        /// <summary>
+        /// Return DastasetFileConfig Dto object
+        /// </summary>
+        /// <param name="configId"></param>
+        /// <returns></returns>
+        /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to schema</exception>
         DatasetFileConfigDto GetDatasetFileConfigDto(int configId);
 
         /// <summary>
@@ -48,6 +55,7 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="datasetId">Non-Zero value required</param>
         /// <param name="schemaId"></param>
+        /// <exception cref="SchemaUnauthorizedAccessException">When DatasetFileConfig is already marked for deletion</exception>
         /// <returns></returns>
         bool SyncConsumptionLayer(int datasetId, int schemaId);
 

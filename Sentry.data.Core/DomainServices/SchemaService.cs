@@ -9,6 +9,8 @@ using System.Text;
 using Newtonsoft.Json;
 using Sentry.Core;
 using System.Text.RegularExpressions;
+using StructureMap;
+using System.Data.Odbc;
 
 namespace Sentry.data.Core
 {
@@ -22,11 +24,12 @@ namespace Sentry.data.Core
         private readonly ISecurityService _securityService;
         private readonly IDataFeatures _featureFlags;
         private readonly IMessagePublisher _messagePublisher;
+        private readonly IHiveOdbcProvider _hiveOdbcProvider;
         private string _bucket;
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, IHiveOdbcProvider hiveOdbcProvider)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -36,6 +39,7 @@ namespace Sentry.data.Core
             _securityService = securityService;
             _featureFlags = dataFeatures;
             _messagePublisher = messagePublisher;
+            _hiveOdbcProvider = hiveOdbcProvider;
         }
 
         private string RootBucket
@@ -76,10 +80,15 @@ namespace Sentry.data.Core
         {
             Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).Select(s => s.ParentDataset).FirstOrDefault();
 
+            if (ds == null)
+            {
+                throw new DatasetNotFoundException();
+            }
+
             try
             {
                 UserSecurity us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
-                if (!(us.CanEditDataset))
+                if (!us.CanManageSchema)
                 {
                     try
                     {
@@ -133,17 +142,8 @@ namespace Sentry.data.Core
 
                     _datasetContext.SaveChanges();
 
-                    //Send message to create hive table
-                    HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
-                    {
-                        SchemaID = revision.ParentSchema.SchemaId,
-                        RevisionID = revision.SchemaRevision_Id,
-                        DatasetID = ds.DatasetId,
-                        HiveStatus = null,
-                        InitiatorID = _userService.GetCurrentUser().AssociateId
-                    };
-                    _messagePublisher.PublishDSCEvent(schemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
-
+                    GenerateConsumptionLayerCreateEvent(schema);
+                                        
                     return revision.SchemaRevision_Id;
                 }
 
@@ -160,6 +160,14 @@ namespace Sentry.data.Core
 
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
         {
+            Dataset parentDataset = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaDto.SchemaId).ParentDataset;
+            IApplicationUser user = _userService.GetCurrentUser();
+            UserSecurity us = _securityService.GetUserSecurity(parentDataset, user);
+
+            if (!us.CanManageSchema)
+            {
+                throw new SchemaUnauthorizedAccessException();
+            }
             
             var SendSASNotification = false;
             string SASNotificationType = null;
@@ -201,8 +209,10 @@ namespace Sentry.data.Core
                 }
                 #endregion
 
-                UpdateAndSaveSchema(schemaDto, schema);
+                string whatPropertiesChanged = UpdateAndSaveSchema(schemaDto, schema);
                 _datasetContext.SaveChanges();
+
+                GenerateConsumptionLayerEvents(schema, whatPropertiesChanged);
 
                 //Send notification to SAS
                 if (SendSASNotification)
@@ -219,9 +229,82 @@ namespace Sentry.data.Core
             }
         }
 
-        private void UpdateAndSaveSchema(FileSchemaDto dto, FileSchema schema)
+        private void GenerateConsumptionLayerEvents(FileSchema schema, string propertyDeltaList)
+        {
+            /*Generate create event when:
+            *  - CreateCurrentView changes, regardless which way
+            *  - CLA2429_SnowflakeCreateTable changes to true
+            */
+            if (propertyDeltaList.Contains("CreateCurrentView") ||
+                propertyDeltaList.Contains("CLA2429_SnowflakeCreateTable:true"))
+            {
+                GenerateConsumptionLayerCreateEvent(schema);
+            }
+
+            /*Generate delete event when:
+             *  - CLA2429_SnowflakeCreateTable changes to false
+             */
+            if (propertyDeltaList.Contains("CLA2429_SnowflakeCreateTable:false"))
+            {
+                GenerateConsumptionLayerDeleteEvent(schema);
+            }
+        }
+
+        private void GenerateConsumptionLayerCreateEvent(FileSchema schema)
+        {
+            SchemaRevision latestRevision = null;
+            latestRevision = _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schema.SchemaId).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();
+
+            //Do nothing if there is no revision associated with schema
+            if (latestRevision == null) { return; }
+                        
+            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
+
+            HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
+            {
+                SchemaID = latestRevision.ParentSchema.SchemaId,
+                RevisionID = latestRevision.SchemaRevision_Id,
+                DatasetID = ds.DatasetId,
+                HiveStatus = null,
+                InitiatorID = _userService.GetCurrentUser().AssociateId
+            };
+            _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
+            
+            if (schema.CLA2429_SnowflakeCreateTable)
+            {
+                SnowTableCreateModel snowModel = new SnowTableCreateModel()
+                {
+                    DatasetID = ds.DatasetId,
+                    SchemaID = schema.SchemaId,
+                    RevisionID = latestRevision.SchemaRevision_Id,
+                    InitiatorID = _userService.GetCurrentUser().AssociateId
+                };
+
+                _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+            }            
+        }
+
+        private void GenerateConsumptionLayerDeleteEvent(FileSchema schema)
+        {
+            //Do nothing if there is no revision associated with schema 
+            if (!_datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schema.SchemaId).Any()) { return; }
+
+            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
+
+            SnowTableDeleteModel snowModel = new SnowTableDeleteModel()
+            {
+                DatasetID = ds.DatasetId,
+                SchemaID = schema.SchemaId
+            };
+
+            _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+        }
+
+        private string UpdateAndSaveSchema(FileSchemaDto dto, FileSchema schema)
         {
             bool chgDetected = false;
+            string whatPropertiesChanged = String.Empty;
+
             if (schema.Name != dto.Name)
             {
                 schema.Name = dto.Name;
@@ -232,11 +315,14 @@ namespace Sentry.data.Core
                 schema.Description = dto.Description;
                 chgDetected = true;
             }
+
             if (schema.CreateCurrentView != dto.CreateCurrentView)
             {
                 schema.CreateCurrentView = dto.CreateCurrentView;
                 chgDetected = true;
+                whatPropertiesChanged = $"CreateCurrentView:{schema.CreateCurrentView.ToString().ToLower()}|";
             }
+
             if (schema.Description != dto.Description)
             {
                 schema.Description = dto.Description;
@@ -268,12 +354,42 @@ namespace Sentry.data.Core
                 chgDetected = true;
             }
 
+            if (schema.CLA2472_EMRSend != dto.CLA2472_EMRSend)
+            {
+                schema.CLA2472_EMRSend = dto.CLA2472_EMRSend;
+                chgDetected = true;
+            }
+
+            if (schema.CLA2429_SnowflakeCreateTable != dto.CLA2429_SnowflakeCreateTable)
+            {
+                schema.CLA2429_SnowflakeCreateTable = dto.CLA2429_SnowflakeCreateTable;
+                chgDetected = true;
+                whatPropertiesChanged = $"CLA2429_SnowflakeCreateTable:{schema.CLA2429_SnowflakeCreateTable.ToString().ToLower()}|";
+            }
+
+            if (schema.CLA1286_KafkaFlag != dto.CLA1286_KafkaFlag)
+            {
+                schema.CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag;
+                chgDetected = true;
+            }
+
+
             if (chgDetected)
             {
                 schema.LastUpdatedDTM = DateTime.Now;
                 schema.UpdatedBy = _userService.GetCurrentUser().AssociateId;
-            } 
+            }
+
+            return whatPropertiesChanged;
             
+        }
+
+        public UserSecurity GetUserSecurityForSchema(int schemaId)
+        {
+            Dataset ds = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId).ParentDataset;
+            IApplicationUser user = _userService.GetCurrentUser();
+            UserSecurity us = _securityService.GetUserSecurity(ds, user);
+            return us;
         }
 
         public FileSchemaDto GetFileSchemaDto(int id)
@@ -301,7 +417,7 @@ namespace Sentry.data.Core
             {
                 UserSecurity us;
                 us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
-                if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+                if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset || us.CanManageSchema))
                 {
                     try
                     {
@@ -349,7 +465,7 @@ namespace Sentry.data.Core
             {
                 UserSecurity us;
                 us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
-                if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+                if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset || us.CanManageSchema))
                 {
                     try
                     {
@@ -371,7 +487,7 @@ namespace Sentry.data.Core
 
             SchemaRevision revision = _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schemaId).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();
 
-            return revision.ToDto();
+            return (revision == null) ? null : revision.ToDto();
         }
 
         public List<DatasetFile> GetDatasetFilesBySchema(int schemaId)
@@ -390,6 +506,90 @@ namespace Sentry.data.Core
         {
             FileSchema schema = _datasetContext.FileSchema.Where(w => w.StorageCode == storageCode).FirstOrDefault();
             return schema;
+        }
+
+        public List<Dictionary<string, object>> GetTopNRowsByConfig(int id, int rows)
+        {
+            DatasetFileConfig config = _datasetContext.DatasetFileConfigs.Where(w => w.ConfigId == id).FirstOrDefault();
+            if (config == null)
+            {
+                throw new SchemaNotFoundException("Schema not found");
+            }
+
+            //if there are no revisions (schema metadata not supplied), do not run the query
+            if (!config.Schema.Revisions.Any())
+            {
+                throw new SchemaNotFoundException("Column metadata not added");
+            }
+
+            return GetTopNRowsBySchema(config.Schema.SchemaId, rows);
+        }
+        public List<Dictionary<string, object>> GetTopNRowsBySchema(int id, int rows)
+        {
+            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == id).Select(s => s.ParentDataset).FirstOrDefault();
+            if (ds == null)
+            {
+                throw new SchemaNotFoundException();
+            }
+
+            try
+            {
+                UserSecurity us;
+                us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+                if (!(us.CanPreviewDataset))
+                {
+                    try
+                    {
+                        IApplicationUser user = _userService.GetCurrentUser();
+                        Logger.Info($"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} unauthorized_access: Id:{user.AssociateId}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} unauthorized_access", ex);
+                    }
+                    throw new SchemaUnauthorizedAccessException();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} failed to retrieve UserSecurity object", ex);
+                throw new SchemaUnauthorizedAccessException();
+            }
+
+            FileSchemaDto schemaDto = GetFileSchemaDto(id);
+
+            string hiveView = $"vw_{schemaDto.HiveTable}";
+
+            //Get connection object
+            OdbcConnection connection = _hiveOdbcProvider.GetConnection(schemaDto.HiveDatabase);
+
+            //Does table exist
+            bool tableExists = _hiveOdbcProvider.CheckViewExists(connection, hiveView);
+
+            //If table does not exist
+            if (!tableExists)
+            {
+                throw new HiveTableViewNotFoundException("Table or view not found");
+            }
+
+            //Query table for rows
+            System.Data.DataTable result = _hiveOdbcProvider.GetTopNRows(_hiveOdbcProvider.GetConnection(schemaDto.HiveDatabase), hiveView, rows);
+
+            List<Dictionary<string, object>> dicRows = new List<Dictionary<string, object>>();
+            Dictionary<string, object> dicRow = null;
+            foreach (System.Data.DataRow dr in result.Rows)
+            {
+                dicRow = new Dictionary<string, object>();
+                foreach (System.Data.DataColumn col in result.Columns)
+                {
+                    //R
+                    string colName = col.ColumnName.Split('.')[1];
+                    dicRow.Add(colName, dr[col]);
+                }
+                dicRows.Add(dicRow);
+            }
+
+            return dicRows;
         }
 
         public bool RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent)
@@ -489,14 +689,21 @@ namespace Sentry.data.Core
                 StorageCode = storageCode,
                 HiveDatabase = GenerateHiveDatabaseName(parentDataset.DatasetCategories.First()),
                 HiveTable = FormatHiveTableNamePart(parentDataset.DatasetName) + "_" + FormatHiveTableNamePart(dto.Name),
-                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
+                HiveTableStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                 HiveLocation = RootBucket + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
                 CreatedDTM = DateTime.Now,
                 LastUpdatedDTM = DateTime.Now,
                 DeleteIssueDTM = DateTime.MaxValue,
                 CreateCurrentView = dto.CreateCurrentView,
+                SnowflakeDatabase = GenerateSnowflakeDatabaseName(),
+                SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First()),
+                SnowflakeTable = FormateSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormateSnowflakeTableNamePart(dto.Name),
+                SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                 CLA1396_NewEtlColumns = dto.CLA1396_NewEtlColumns,
-                CLA1580_StructureHive = dto.CLA1580_StructureHive
+                CLA1580_StructureHive = dto.CLA1580_StructureHive,
+                CLA2472_EMRSend = dto.CLA2472_EMRSend,
+                CLA2429_SnowflakeCreateTable = dto.CLA2429_SnowflakeCreateTable,
+                CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag
             };
             _datasetContext.Add(schema);
             return schema;
@@ -527,8 +734,15 @@ namespace Sentry.data.Core
                 StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
                 RawQueryStorage = (Configuration.Config.GetHostSetting("EnableRawQueryStorageInQueryTool").ToLower() == "true" && _datasetContext.SchemaMap.Any(w => w.MappedSchema.SchemaId == scm.SchemaId)) ? GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\" : Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
                 FileExtenstionName = scm.Extension.Name,
+                SnowflakeDatabase = scm.SnowflakeDatabase,
+                SnowflakeTable = scm.SnowflakeTable,
+                SnowflakeSchema = scm.SnowflakeSchema,
+                SnowflakeStatus = scm.SnowflakeStatus,
                 CLA1396_NewEtlColumns = scm.CLA1396_NewEtlColumns,
-                CLA1580_StructureHive = scm.CLA1580_StructureHive
+                CLA1580_StructureHive = scm.CLA1580_StructureHive,
+                CLA2472_EMRSend = scm.CLA2472_EMRSend,
+                CLA2429_SnowflakeCreateTable = scm.CLA2429_SnowflakeCreateTable,
+                CLA1286_KafkaFlag = scm.CLA1286_KafkaFlag
             };
 
         }
@@ -654,25 +868,6 @@ namespace Sentry.data.Core
             }
         }
 
-        private DataFlowDto MapToDataFlowDto(FileSchema scm)
-        {
-            DataFlowDto dto = new DataFlowDto()
-            {
-                CreatedBy = _userService.GetCurrentUser().AssociateId,
-                CreateDTM = DateTime.Now,
-                Name = $"SchemaFlow_{scm.StorageCode}",
-                IngestionType = GlobalEnums.IngestionType.User_Push
-            };
-
-            SchemaMapDto scmDto = new SchemaMapDto()
-            {
-                SchemaId = scm.SchemaId,
-                SearchCriteria = "\\.",
-            };
-
-            return dto;
-        }
-
         private string FormatHiveTableNamePart(string part)
         {
             return part.Replace(" ", "").Replace("_", "").Replace("-", "").ToUpper();
@@ -684,6 +879,23 @@ namespace Sentry.data.Core
             string dbName = "dsc_" + cat.Name.ToLower();
 
             return (curEnv == "prod" || curEnv == "qual") ? dbName : $"{curEnv}_{dbName}";
+        }
+
+        private string GenerateSnowflakeDatabaseName()
+        {
+            string curEnv = Config.GetDefaultEnvironmentName().ToUpper();
+            string dbName = "DATA_" + curEnv;
+            return dbName;
+        }
+
+        private string GenerateSnowflakeSchema(Category cat)
+        {
+            return cat.Name.ToUpper();
+        }
+
+        private string FormateSnowflakeTableNamePart(string part)
+        {
+            return part.Replace(" ", "").Replace("_", "").Replace("-", "").ToUpper();
         }
 
         private BaseField AddRevisionField(BaseFieldDto row, SchemaRevision CurrentRevision, BaseField parentRow = null, SchemaRevision previousRevision = null)

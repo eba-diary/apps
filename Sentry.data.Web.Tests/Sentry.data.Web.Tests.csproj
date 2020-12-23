@@ -83,8 +83,7 @@
       <HintPath>..\packages\Sentry.Configuration.3.0.0\lib\net40\Sentry.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Core.1.0.0.1\lib\net451\Sentry.Core.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\Sentry.Core.1.1.0\lib\net452\Sentry.Core.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.DataTables.Mvc, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry_DataTables_ServerSide_MVC.1.0.5\lib\net45\Sentry.DataTables.Mvc.dll</HintPath>
@@ -102,6 +101,9 @@
     <Reference Include="Sentry.Web, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Web.5.0.2\lib\net40\Sentry.Web.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="StructureMap, Version=4.3.0.449, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\StructureMap.4.4.0\lib\net45\StructureMap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -160,6 +162,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AccessControlTests.cs" />
+    <Compile Include="BaseWebUnitTests.cs" />
     <Compile Include="CategoryTests.cs" />
     <Compile Include="ConfigTests.cs" />
     <Compile Include="DataAssetTests.cs" />
@@ -168,6 +171,7 @@
     <Compile Include="DomainModelUnitTests.cs" />
     <Compile Include="ExtensionUnitTests.cs" />
     <Compile Include="LiveDatabaseUnitTests.cs" />
+    <Compile Include="MetadataControllerTests.cs" />
     <Compile Include="MockBasedUnitTests.cs" />
     <Compile Include="Mockups\MockClasses.cs" />
     <Compile Include="Mockups\MockControllers.cs" />

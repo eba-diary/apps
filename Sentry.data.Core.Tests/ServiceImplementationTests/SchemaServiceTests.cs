@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema;
 using Sentry.data.Core.DTO.Schema.Fields;
+using Sentry.data.Core.Factories.Fields;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,23 +17,30 @@ namespace Sentry.data.Core.Tests
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Get_Precision_From_DecimalFieldDto_Json_Constructor()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+            int position = 1;
 
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(6, dto.Precision);
         }
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Get_Precision_From_DecimalFieldDto_Json_Constructor__Array()
         {
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithDecimalFieldArray();
+            int position = 1;
 
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(6, dto.Precision);
         }
@@ -53,9 +61,10 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -64,6 +73,7 @@ namespace Sentry.data.Core.Tests
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Can_Default_Null_dscprecision_From_DecimalFieldDto_Json_Constructor__Array()
         {
+            //SETUP
             string jsonSchema = @"{
                 ""type"": ""object"",
                 ""properties"": { 
@@ -78,12 +88,14 @@ namespace Sentry.data.Core.Tests
                     }
                 }
             }";
-
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            int position = 1;
 
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT, dto.Precision);
         }
@@ -103,9 +115,10 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -131,9 +144,10 @@ namespace Sentry.data.Core.Tests
 
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -144,24 +158,30 @@ namespace Sentry.data.Core.Tests
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Get_Scale_From_DecimalFieldDto_Json_Constructor()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+            int position = 1;
 
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(2, dto.Scale);
         }
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Get_Scale_From_DecimalFieldDto_Json_Constructor__Array()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithDecimalFieldArray();
-
+            int position = 1;
+            
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, true);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(2, dto.Scale);
         }
@@ -181,9 +201,10 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -192,6 +213,7 @@ namespace Sentry.data.Core.Tests
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Can_Default_Null_dscscale_From_DecimalFieldDto_Json_Constructor__Array() 
         {
+            //SETUP
             string jsonSchema = @"{
                 ""type"": ""object"",
                 ""properties"": { 
@@ -208,10 +230,13 @@ namespace Sentry.data.Core.Tests
             }";
 
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
+            int position = 1;
 
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
+            //ACTION
             Assert.IsNotNull(dto);
             Assert.AreEqual(GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT, dto.Scale);
         }
@@ -230,9 +255,10 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -257,9 +283,10 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -270,24 +297,30 @@ namespace Sentry.data.Core.Tests
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Get_Null_SourceFormat_From_DecimalFieldDto_Json_Constructor()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+            int position = 1;
 
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, true);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(null, dto.SourceFormat);
         }
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Get_Null_SourceFormat_From_DecimalFieldDto_Json_Constructor__Array()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithDecimalFieldArray();
+            int position = 1;
 
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, true);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(null, dto.SourceFormat);
         }
@@ -296,24 +329,30 @@ namespace Sentry.data.Core.Tests
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Get_0_Length_From_DecimalFieldDto_Json_Constructor()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+            int position = 1;
 
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(0, dto.Length);
         }
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Get_0_Length_From_DecimalFieldDto_Json_Constructor__Array()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithDecimalFieldArray();
+            int position = 1;
 
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, true);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(0, dto.Length);
         }
@@ -322,50 +361,61 @@ namespace Sentry.data.Core.Tests
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Get_0_OrdinalPosition_From_DecimalFieldDto_Json_Constructor()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+            int position = 1;
 
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
+            //ASSERT
             Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.OrdinalPosition);
+            Assert.AreEqual(1, dto.OrdinalPosition);
         }
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Get_0_OrdinalPosition_From_DecimalFieldDto_Json_Constructor__Array()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithDecimalFieldArray();
-
+            int position = 1;
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, true);
 
+            //ASSERT
             Assert.IsNotNull(dto);
-            Assert.AreEqual(0, dto.OrdinalPosition);
+            Assert.AreEqual(1, dto.OrdinalPosition);
         }
         #endregion
 
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Get_False_IsArray_From_BaseFieldDto_Json_Constructor()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+            int position = 1;
 
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
-
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
+            
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(false, dto.IsArray);
         }
         [TestMethod, TestCategory("DecimalFieldDto JsonContructor")]
         public void Get_True_IsArray_From_BaseFieldDto_Json_Constructor()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithDecimalFieldArray();
+            int position = 1;
 
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, true);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(true, dto.IsArray);
         }
@@ -386,9 +436,10 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -400,9 +451,9 @@ namespace Sentry.data.Core.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-
+            int position = 1;
             //Action
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -426,9 +477,9 @@ namespace Sentry.data.Core.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithDecimalFieldArray();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-
+            int position = 1;
             //Action
-            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, true);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -454,10 +505,11 @@ namespace Sentry.data.Core.Tests
         {
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+            int position = 1;
 
             //Action
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             //Assersion
             Assert.IsNotNull(dto);
@@ -571,9 +623,10 @@ namespace Sentry.data.Core.Tests
         {
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+            int position = 1;
 
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             //Action
             BaseField entity = dto.ToEntity(null, null);
@@ -587,9 +640,10 @@ namespace Sentry.data.Core.Tests
         {
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+            int position = 1;
 
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             //Action
             BaseField entity = dto.ToEntity(null, null);
@@ -603,9 +657,10 @@ namespace Sentry.data.Core.Tests
         {
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithDecimalField();
+            int position = 1;
 
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             //Action
             BaseField entity = dto.ToEntity(null, null);
@@ -634,7 +689,8 @@ namespace Sentry.data.Core.Tests
             //Build Dto object
             JsonSchema jschema = BuildMockJsonSchemaWithDecimalField();
             KeyValuePair<string, JsonSchemaProperty> prop = jschema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            int position = 1;
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             //Build ParentRevision and ParentField objects
             FileSchema fschema = BuildMockFileSchema("csv", true, false, 0, new string[] { "decimal" });
@@ -657,7 +713,8 @@ namespace Sentry.data.Core.Tests
             //Build Dto object
             JsonSchema jschema = BuildMockJsonSchemaWithDecimalField();
             KeyValuePair<string, JsonSchemaProperty> prop = jschema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            int position = 1;
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             //Build ParentRevision and ParentField objects
             FileSchema fschema = BuildMockFileSchema("csv", true, false, 0, new string[] { "decimal" });
@@ -680,7 +737,8 @@ namespace Sentry.data.Core.Tests
             //Build Dto object
             JsonSchema jschema = BuildMockJsonSchemaWithDecimalField();
             KeyValuePair<string, JsonSchemaProperty> prop = jschema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            int position = 1;
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             dto.FieldGuid = Guid.Empty;
 
@@ -704,7 +762,8 @@ namespace Sentry.data.Core.Tests
             //Build Dto object
             JsonSchema jschema = BuildMockJsonSchemaWithDecimalField();
             KeyValuePair<string, JsonSchemaProperty> prop = jschema.Properties.First();
-            DecimalFieldDto dto = new DecimalFieldDto(prop, false);
+            int position = 1;
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, false);
 
             Guid g = Guid.NewGuid();
             dto.FieldGuid = g;
@@ -729,23 +788,29 @@ namespace Sentry.data.Core.Tests
         [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
         public void Get_Length_From_VarcharFieldDto_Json_Constructor()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithVarcharField();
-
+            int position = 1;
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            VarcharFieldDto dto = new VarcharFieldDto(prop, false);
+            VarcharFieldDto dto = new VarcharFieldDto(prop, position, false);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(99, dto.Length);
         }
         [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
         public void Get_Length_From_VarcharFieldDto_Json_Constructor__Array()
         {
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithVarcharFieldArray();
+            int position = 1;
 
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            VarcharFieldDto dto = new VarcharFieldDto(prop, true);
+            VarcharFieldDto dto = new VarcharFieldDto(prop, position, true);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(15, dto.Length);
         }
@@ -766,9 +831,10 @@ namespace Sentry.data.Core.Tests
 
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            VarcharFieldDto dto = new VarcharFieldDto(prop, false);
+            VarcharFieldDto dto = new VarcharFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -794,9 +860,10 @@ namespace Sentry.data.Core.Tests
 
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            VarcharFieldDto dto = new VarcharFieldDto(prop, true);
+            VarcharFieldDto dto = new VarcharFieldDto(prop, position, true);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -817,9 +884,10 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
-            //Action
-            VarcharFieldDto dto = new VarcharFieldDto(prop, false);
+             //Action
+            VarcharFieldDto dto = new VarcharFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -843,9 +911,10 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            VarcharFieldDto dto = new VarcharFieldDto(prop, true);
+            VarcharFieldDto dto = new VarcharFieldDto(prop, position, true);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -858,24 +927,28 @@ namespace Sentry.data.Core.Tests
         [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
         public void Get_IsArray_False_From_VarcharFieldDto_Json_Constructor()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithVarcharField();
-
+            int position = 1;
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            VarcharFieldDto dto = new VarcharFieldDto(prop, false);
+            VarcharFieldDto dto = new VarcharFieldDto(prop, position, false);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(false, dto.IsArray);
         }
         [TestMethod, TestCategory("VarcharFieldDto JsonContructor")]
         public void Get_IsArray_True_From_VarcharFieldDto_Json_Constructor()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithVarcharFieldArray();
-
+            int position = 1;
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            VarcharFieldDto dto = new VarcharFieldDto(prop, true);
+            VarcharFieldDto dto = new VarcharFieldDto(prop, position, true);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(true, dto.IsArray);
         }
@@ -885,9 +958,10 @@ namespace Sentry.data.Core.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithVarcharField();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            VarcharFieldDto dto = new VarcharFieldDto(prop, false);
+            VarcharFieldDto dto = new VarcharFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -910,9 +984,10 @@ namespace Sentry.data.Core.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithVarcharFieldArray();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            DecimalFieldDto dto = new DecimalFieldDto(prop, true);
+            DecimalFieldDto dto = new DecimalFieldDto(prop, position, true);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -936,9 +1011,10 @@ namespace Sentry.data.Core.Tests
 
             JsonSchema schema = BuildMockJsonSchemaWithVarcharField();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            VarcharFieldDto dto = new VarcharFieldDto(prop, false);
+            VarcharFieldDto dto = new VarcharFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -951,9 +1027,10 @@ namespace Sentry.data.Core.Tests
 
             JsonSchema schema = BuildMockJsonSchemaWithVarcharFieldArray();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            VarcharFieldDto dto = new VarcharFieldDto(prop, true);
+            VarcharFieldDto dto = new VarcharFieldDto(prop, position, true);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -965,12 +1042,16 @@ namespace Sentry.data.Core.Tests
         [TestMethod, TestCategory("DateFieldDto JsonContructor")]
         public void Get_IsArray_False_From_DateFieldDto_Json_Constructor()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithDateField();
+            int position = 1;
 
+
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DateFieldDto dto = new DateFieldDto(prop, false);
+            DateFieldDto dto = new DateFieldDto(prop, position, false);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(false, dto.IsArray);
         }
@@ -979,10 +1060,11 @@ namespace Sentry.data.Core.Tests
         {
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithDateFieldArray();
+            int position = 1;
 
             //Action
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            DateFieldDto dto = new DateFieldDto(prop, true);
+            DateFieldDto dto = new DateFieldDto(prop, position, true);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -994,9 +1076,10 @@ namespace Sentry.data.Core.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithDateField();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            DateFieldDto dto = new DateFieldDto(prop, false);
+            DateFieldDto dto = new DateFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1019,9 +1102,10 @@ namespace Sentry.data.Core.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithDateFieldArray();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            DateFieldDto dto = new DateFieldDto(prop, true);
+            DateFieldDto dto = new DateFieldDto(prop, position, true);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1044,9 +1128,10 @@ namespace Sentry.data.Core.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithDateField();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            DateFieldDto dto = new DateFieldDto(prop, false);
+            DateFieldDto dto = new DateFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1058,9 +1143,10 @@ namespace Sentry.data.Core.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithDateFieldArray();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            DateFieldDto dto = new DateFieldDto(prop, true);
+            DateFieldDto dto = new DateFieldDto(prop, position, true);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1084,9 +1170,10 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            DateFieldDto dto = new DateFieldDto(prop, false);
+            DateFieldDto dto = new DateFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1113,9 +1200,11 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
+
 
             //Action
-            DateFieldDto dto = new DateFieldDto(prop, false);
+            DateFieldDto dto = new DateFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1137,9 +1226,10 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            DateFieldDto dto = new DateFieldDto(prop, false);
+            DateFieldDto dto = new DateFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1165,9 +1255,10 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            DateFieldDto dto = new DateFieldDto(prop, false);
+            DateFieldDto dto = new DateFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1179,12 +1270,15 @@ namespace Sentry.data.Core.Tests
         [TestMethod, TestCategory("TimestampFieldDto JsonContructor")]
         public void Get_IsArray_False_From_TimestampFieldDto_Json_Constructor()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithTimestampField();
+            int position = 1;
 
+            //ACTION
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            TimestampFieldDto dto = new TimestampFieldDto(prop, false);
+            TimestampFieldDto dto = new TimestampFieldDto(prop, position, false);
 
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(false, dto.IsArray);
         }
@@ -1193,10 +1287,11 @@ namespace Sentry.data.Core.Tests
         {
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithTimestampFieldArray();
+            int position = 1;
 
             //Action
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            TimestampFieldDto dto = new TimestampFieldDto(prop, true);
+            TimestampFieldDto dto = new TimestampFieldDto(prop, position, true);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1208,9 +1303,10 @@ namespace Sentry.data.Core.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithTimestampField();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            TimestampFieldDto dto = new TimestampFieldDto(prop, false);
+            TimestampFieldDto dto = new TimestampFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1233,9 +1329,10 @@ namespace Sentry.data.Core.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithTimestampFieldArray();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            TimestampFieldDto dto = new TimestampFieldDto(prop, true);
+            TimestampFieldDto dto = new TimestampFieldDto(prop, position, true);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1258,9 +1355,10 @@ namespace Sentry.data.Core.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithDateField();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            TimestampFieldDto dto = new TimestampFieldDto(prop, false);
+            TimestampFieldDto dto = new TimestampFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1272,9 +1370,10 @@ namespace Sentry.data.Core.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithDateFieldArray();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            TimestampFieldDto dto = new TimestampFieldDto(prop, true);
+            TimestampFieldDto dto = new TimestampFieldDto(prop, position, true);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1298,9 +1397,10 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            TimestampFieldDto dto = new TimestampFieldDto(prop, false);
+            TimestampFieldDto dto = new TimestampFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1327,9 +1427,10 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            TimestampFieldDto dto = new TimestampFieldDto(prop, false);
+            TimestampFieldDto dto = new TimestampFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1351,9 +1452,10 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            TimestampFieldDto dto = new TimestampFieldDto(prop, false);
+            TimestampFieldDto dto = new TimestampFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1379,9 +1481,10 @@ namespace Sentry.data.Core.Tests
             }";
             JsonSchema schema = JsonSchema.FromJsonAsync(jsonSchema).GetAwaiter().GetResult();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            TimestampFieldDto dto = new TimestampFieldDto(prop, false);
+            TimestampFieldDto dto = new TimestampFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1394,12 +1497,15 @@ namespace Sentry.data.Core.Tests
         [TestMethod, TestCategory("IntegerFieldDto JsonContructor")]
         public void Get_IsArray_False_From_IntegerFieldDto_Json_Constructor()
         {
-
+            //SETUP
             JsonSchema schema = BuildMockJsonSchemaWithIntegerField();
-
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            IntegerFieldDto dto = new IntegerFieldDto(prop, false);
+            int position = 1;
 
+            //ACTION
+            IntegerFieldDto dto = new IntegerFieldDto(prop, position, false);
+
+            //ASSERT
             Assert.IsNotNull(dto);
             Assert.AreEqual(false, dto.IsArray);
         }
@@ -1408,10 +1514,10 @@ namespace Sentry.data.Core.Tests
         {
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithIntegerFieldArray();
-
+            int position = 1;
             //Action
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
-            IntegerFieldDto dto = new IntegerFieldDto(prop, true);
+            IntegerFieldDto dto = new IntegerFieldDto(prop, position, true);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1423,9 +1529,10 @@ namespace Sentry.data.Core.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithIntegerField();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            IntegerFieldDto dto = new IntegerFieldDto(prop, false);
+            IntegerFieldDto dto = new IntegerFieldDto(prop, position, false);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1448,9 +1555,10 @@ namespace Sentry.data.Core.Tests
             //Setup
             JsonSchema schema = BuildMockJsonSchemaWithIntegerFieldArray();
             KeyValuePair<string, JsonSchemaProperty> prop = schema.Properties.First();
+            int position = 1;
 
             //Action
-            IntegerFieldDto dto = new IntegerFieldDto(prop, true);
+            IntegerFieldDto dto = new IntegerFieldDto(prop, position, true);
 
             //Assertion
             Assert.IsNotNull(dto);
@@ -1466,6 +1574,99 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(Guid.Empty, dto.FieldGuid);
             Assert.AreEqual(false, dto.DeleteInd);
             Assert.AreEqual(true, dto.IsArray);
+        }
+        #endregion
+
+        #region FieldFactory Tests
+        [TestMethod]
+        public void FieldFactory_GetField_Returns_DeleteInd_True()
+        {
+            //Setup
+            SchemaRow row = new SchemaRow()
+            {
+                ArrayType = null,
+                DeleteInd = true,
+                FieldGuid = Guid.NewGuid(),
+                Name = "VARCHAR Field"
+            };
+            FieldDtoFactory dateFieldFactory;
+            dateFieldFactory = new DateFieldDtoFactory(row);
+
+            FieldDtoFactory decimalFieldFactory;
+            decimalFieldFactory = new DecimalFieldDtoFactory(row);
+
+            FieldDtoFactory integerFieldFactory;
+            integerFieldFactory = new IntegerFieldDtoFactory(row);
+
+            FieldDtoFactory structFieldFactory;
+            structFieldFactory = new StructFieldDtoFactory(row);
+
+            FieldDtoFactory timestampFieldFactory;
+            timestampFieldFactory = new TimestampFieldDtoFactory(row);
+
+            FieldDtoFactory varcharFieldFactory;
+            varcharFieldFactory = new VarcharFieldDtoFactory(row);
+
+            //Action
+            BaseFieldDto dateFieldDto = dateFieldFactory.GetField();
+            BaseFieldDto decimalFieldDto = decimalFieldFactory.GetField();
+            BaseFieldDto integerFieldDto = integerFieldFactory.GetField();
+            BaseFieldDto structFieldDto = structFieldFactory.GetField();
+            BaseFieldDto timestampFieldDto = timestampFieldFactory.GetField();
+            BaseFieldDto varcharFieldDto = varcharFieldFactory.GetField();
+
+            //Assert
+            Assert.IsTrue(dateFieldDto.DeleteInd, "DateFieldDtoFactory failed DeleteInd Check");
+            Assert.IsTrue(decimalFieldDto.DeleteInd, "DecimalFieldDtoFactory failed DeleteInd Check");
+            Assert.IsTrue(integerFieldDto.DeleteInd, "IntegerFieldDtoFactory failed DeleteInd Check");
+            Assert.IsTrue(structFieldDto.DeleteInd, "StructFieldDtoFactory failed DeleteInd Check");
+            Assert.IsTrue(timestampFieldDto.DeleteInd, "TimestampFieldDtoFactory failed DeleteInd Check");
+            Assert.IsTrue(varcharFieldDto.DeleteInd, "VarcharFieldDtoFactory failed DeleteInd Check");
+        }
+        [TestMethod]
+        public void FieldFactory_GetField_Returns_DeleteInd_False()
+        {
+            //Setup
+            SchemaRow row = new SchemaRow()
+            {
+                ArrayType = null,
+                DeleteInd = false,
+                FieldGuid = Guid.NewGuid(),
+                Name = "VARCHAR Field"
+            };
+            FieldDtoFactory dateFieldFactory;
+            dateFieldFactory = new DateFieldDtoFactory(row);
+
+            FieldDtoFactory decimalFieldFactory;
+            decimalFieldFactory = new DecimalFieldDtoFactory(row);
+
+            FieldDtoFactory integerFieldFactory;
+            integerFieldFactory = new IntegerFieldDtoFactory(row);
+
+            FieldDtoFactory structFieldFactory;
+            structFieldFactory = new StructFieldDtoFactory(row);
+
+            FieldDtoFactory timestampFieldFactory;
+            timestampFieldFactory = new TimestampFieldDtoFactory(row);
+
+            FieldDtoFactory varcharFieldFactory;
+            varcharFieldFactory = new VarcharFieldDtoFactory(row);
+
+            //Action
+            BaseFieldDto dateFieldDto = dateFieldFactory.GetField();
+            BaseFieldDto decimalFieldDto = decimalFieldFactory.GetField();
+            BaseFieldDto integerFieldDto = integerFieldFactory.GetField();
+            BaseFieldDto structFieldDto = structFieldFactory.GetField();
+            BaseFieldDto timestampFieldDto = timestampFieldFactory.GetField();
+            BaseFieldDto varcharFieldDto = varcharFieldFactory.GetField();
+
+            //Assert
+            Assert.IsFalse(dateFieldDto.DeleteInd, "DateFieldDtoFactory failed DeleteInd Check");
+            Assert.IsFalse(decimalFieldDto.DeleteInd, "DecimalFieldDtoFactory failed DeleteInd Check");
+            Assert.IsFalse(integerFieldDto.DeleteInd, "IntegerFieldDtoFactory failed DeleteInd Check");
+            Assert.IsFalse(structFieldDto.DeleteInd, "StructFieldDtoFactory failed DeleteInd Check");
+            Assert.IsFalse(timestampFieldDto.DeleteInd, "TimestampFieldDtoFactory failed DeleteInd Check");
+            Assert.IsFalse(varcharFieldDto.DeleteInd, "VarcharFieldDtoFactory failed DeleteInd Check");
         }
         #endregion
 
@@ -1682,6 +1883,10 @@ namespace Sentry.data.Core.Tests
                 SchemaId = 88,
                 StorageCode = "1000002",
                 UpdatedBy = "072984",
+                SnowflakeDatabase = "",
+                SnowflakeTable = "",
+                SnowflakeSchema = "",
+                SnowflakeStatus = "Available",
                 CLA1396_NewEtlColumns = false,
                 CLA1580_StructureHive = false,
                 Revisions = new List<SchemaRevision>()
