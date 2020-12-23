@@ -1,10 +1,11 @@
-﻿using Sentry.data.Core.Interfaces.DataProcessing;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Sentry.Common.Logging;
+using Sentry.data.Core.Interfaces.DataProcessing;
+using Sentry.data.Core.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Sentry.Common.Logging;
 
 namespace Sentry.data.Core.Entities.DataProcessing
 {
@@ -20,7 +21,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual string SourceDependencyPrefix { get; set; }
         public virtual string SourceDependencyBucket { get; set; }
         public virtual IList<SchemaMap> SchemaMappings { get; set; }
-        public virtual IList<DataFlow_Log> Executions { get; set; }
+        public virtual IList<EventMetric> Executions { get; set; }
 
         public virtual void ProcessEvent(DataFlowStepEvent stepEvent, string FlowExecutionGuid)
         {
@@ -35,70 +36,87 @@ namespace Sentry.data.Core.Entities.DataProcessing
             return sb.ToString();
         }
 
-        public virtual DataFlow_Log LogExecution(string executionGuid, string runInstanceGuid, string log, Log_Level level, List<Variable> contextVariables, Exception ex = null)
-        {            
-            //string logMsg = $"{executionGuid}{((runInstanceGuid != null) ? "-" + runInstanceGuid : String.Empty)} {log}";
-            switch (level)
-            {
-                case Log_Level.Info:
-                    Logger.Info(log, contextVariables.ToArray());
-                    break;
-                case Log_Level.Warning:
-                    Logger.Warn(log, contextVariables.ToArray());
-                    break;
-                case Log_Level.Debug:
-                    Logger.Debug(log, contextVariables.ToArray());
-                    break;
-                default:
-                case Log_Level.Error:
-                    Logger.Error(log, ex, contextVariables.ToArray());
-                    break;
-            }
+        //public virtual EventMetric LogExecution(string executionGuid, string runInstanceGuid, string log, Log_Level level, Exception ex = null)
+        //{
+        //    string logMsg = $"{executionGuid}{((runInstanceGuid != null) ? "-" + runInstanceGuid : String.Empty)} {log}";
+        //    LoggingUtils.LogMessage(logMsg, level, null, ex);
 
-            return new DataFlow_Log()
-            {
-                DataFlow = this.DataFlow,
-                FlowExecutionGuid = executionGuid,
-                RunInstanceGuid = runInstanceGuid,
-                Log_Entry = log,
-                Machine_Name = System.Environment.MachineName,
-                Level = level,
-                CreatedDTM = DateTime.Now,
-                Step = this
-            };
-        }
+        //    return new EventMetric()
+        //    {
+        //        //DataFlow = this.DataFlow,
+        //        FlowExecutionGuid = executionGuid,
+        //        RunInstanceGuid = runInstanceGuid,
+        //        MachineName = System.Environment.MachineName,
+        //        CreatedDTM = DateTime.Now,
+        //        Step = this
+        //    };
+        //}
+        //public virtual EventMetric LogExecution(string executionGuid, string runInstanceGuid, string log, Log_Level level, List<Variable> contextVariables, Exception ex = null)
+        //{
+        //    //string logMsg = $"{executionGuid}{((runInstanceGuid != null) ? "-" + runInstanceGuid : String.Empty)} {log}";
+        //    LoggingUtils.LogMessage(log, level, contextVariables, ex);
 
-        public virtual DataFlow_Log LogExecution(string executionGuid, string runInstanceGuid, string log, Log_Level level, Exception ex = null)
-        {
-            string logMsg = $"{executionGuid}{((runInstanceGuid != null) ? "-" + runInstanceGuid : String.Empty)} {log}";
-            switch (level)
-            {
-                case Log_Level.Info:
-                    Logger.Info(logMsg);
-                    break;
-                case Log_Level.Warning:
-                    Logger.Warn(logMsg);
-                    break;
-                case Log_Level.Debug:
-                    Logger.Debug(logMsg);
-                    break;
-                default:
-                case Log_Level.Error:
-                    Logger.Error(logMsg, ex);
-                    break;
-            }
+        //    return new EventMetric()
+        //    {
+        //        //DataFlow = this.DataFlow,
+        //        FlowExecutionGuid = executionGuid,
+        //        RunInstanceGuid = runInstanceGuid,
+        //        Step = this,
+        //        MachineName = System.Environment.MachineName,
+        //        CreatedDTM = DateTime.Now,
+        //        MetricsData = log,
+        //        ApplicationName = "S"
+        //    };
+        //}
+        //public virtual EventMetric LogExecution(string executionGuid, string runInstanceGuid, JObject metricData, string log, Log_Level level, Exception ex = null)
+        //{
+        //    LoggingUtils.LogMessage(metricData.ToString(), level, null, ex);
 
-            return new DataFlow_Log()
-            {
-                DataFlow = this.DataFlow,
-                FlowExecutionGuid = executionGuid,
-                RunInstanceGuid = runInstanceGuid,
-                Log_Entry = log,
-                Machine_Name = System.Environment.MachineName,
-                Level = level,
-                CreatedDTM = DateTime.Now,
-                Step = this
-            };
-        }
+        //    EventMetric envMet = new EventMetric()
+        //    {
+        //        FlowExecutionGuid = executionGuid,
+        //        RunInstanceGuid = runInstanceGuid,
+        //        Step = this,
+        //        MessageValue = null,
+        //        ApplicationName = "S",
+        //        MachineName = System.Environment.MachineName,
+        //        MetricsData = metricData.ToString(),
+        //        CreatedDTM = DateTime.Now,
+        //        StatusCode = (metricData.ContainsKey("status")) ? metricData.GetValue("status").ToString() : null
+        //    };
+
+        //    return envMet;
+        //}
+        //public virtual EventMetric LogExecution(string executionGuid, string runInstanceGuid, JObject metricData, string log, Log_Level level, List<Variable> contextVariables, Exception ex = null)
+        //{
+        //    LoggingUtils.LogMessage(metricData.ToString(), level, contextVariables, ex);
+
+        //    EventMetric envMet = new EventMetric()
+        //    {
+        //        FlowExecutionGuid = executionGuid,
+        //        RunInstanceGuid = runInstanceGuid,
+        //        Step = this,
+        //        MessageValue = null,
+        //        ApplicationName = "S",
+        //        MachineName = System.Environment.MachineName,
+        //        MetricsData = metricData.ToString(),
+        //        CreatedDTM = DateTime.Now,
+        //        StatusCode = (metricData.ContainsKey("status")) ? metricData.GetValue("status").ToString() : null
+        //    };
+
+        //    return envMet;
+        //}
+        //public virtual EventMetric LogExecution(DataFlowStepEvent eventItem, JObject metricData, Log_Level level, Exception ex = null)
+        //{
+        //    return LogExecution(eventItem, metricData, level, null, ex);
+        //}
+        //public virtual EventMetric LogExecution(DataFlowStepEvent eventItem, JObject metricData, Log_Level level, List<Variable> contextVariables, Exception ex = null)
+        //{
+        //    LoggingUtils.LogMessage(string.Empty, level, contextVariables, ex);
+
+        //    EventMetric envMet = new EventMetric(this, eventItem, metricData);
+
+        //    return envMet;
+        //}
     }
 }

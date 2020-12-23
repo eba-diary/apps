@@ -45,7 +45,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 {
                     k.Column("DataFlow_Id");
                 });
-            }, map => map.OneToMany(a => a.Class(typeof(DataFlow_Log))));
+            }, map => map.OneToMany(a => a.Class(typeof(EventMetric))));
         }
     }
 }
