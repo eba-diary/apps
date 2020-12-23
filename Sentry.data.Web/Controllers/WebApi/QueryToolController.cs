@@ -1,11 +1,14 @@
 ﻿using Newtonsoft.Json;
+using Sentry.Common.Logging;
 using Sentry.Configuration;
 using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities;
 using Sentry.data.Core.Entities.Livy;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
+using Sentry.WebAPI.Versioning;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,11 +37,12 @@ namespace Sentry.data.Web.WebApi.Controllers
         private ISchemaService _schemaService;
         private ISecurityService _securityService;
         private readonly IDataFeatures _featureFlags;
+        private IDatasetService _datasetService;
         private string _bucket;
 
         public QueryToolController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, 
             ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService,
-            ISchemaService schemaService, ISecurityService securityService, IDataFeatures dataFeatures)
+            ISchemaService schemaService, ISecurityService securityService, IDataFeatures dataFeatures, IDatasetService datasetService)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
@@ -50,6 +54,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             _schemaService = schemaService;
             _securityService = securityService;
             _featureFlags = dataFeatures;
+            _datasetService = datasetService;
         }
 
         private string RootBucket
@@ -679,9 +684,9 @@ namespace Sentry.data.Web.WebApi.Controllers
                             //This is assuming only a single hive table per schema revision.
                             // Checking status to ensure table is ready for querying.
                             if (schemaDto.HiveTable != null && 
-                                (schemaDto.HiveStatus == HiveTableStatusEnum.Pending.ToString() || 
-                                 schemaDto.HiveStatus == HiveTableStatusEnum.Requested.ToString() || 
-                                 schemaDto.HiveStatus == HiveTableStatusEnum.Available.ToString())
+                                (schemaDto.HiveStatus == ConsumptionLayerTableStatusEnum.Pending.ToString() || 
+                                 schemaDto.HiveStatus == ConsumptionLayerTableStatusEnum.Requested.ToString() || 
+                                 schemaDto.HiveStatus == ConsumptionLayerTableStatusEnum.Available.ToString())
                                  )
                             {
                                 qs.HiveDatabase = schemaDto.HiveDatabase;
@@ -774,6 +779,74 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             //return Ok(output);
         }
+
+
+        [HttpGet]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("dataset/{datasetId}/config/{configId}/SampleRecords")]
+        public async Task<IHttpActionResult> GetSampleRecords(int datasetId, int configId, int rows)
+        {
+            Logger.AddContextVariable(new TextVariable("requestcontextguid", DateTime.UtcNow.ToString(GlobalConstants.System.REQUEST_CONTEXT_GUID_FORMAT)));
+            Logger.AddContextVariable(new TextVariable("requestcontextdatasetid", datasetId.ToString()));
+            Logger.AddContextVariable(new TextVariable("requestcontextconfigid", configId.ToString()));
+            Logger.AddContextVariable(new TextVariable("requestcontextuserid", _userService.GetCurrentUser().AssociateId));
+
+
+            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
+            
+            if (!us.CanPreviewDataset)
+            {
+                return Content(System.Net.HttpStatusCode.Unauthorized, "Unauthroized Access to Dataset");
+            }
+
+            try
+            {
+                List<Dictionary<string, object>> results = _schemaService.GetTopNRowsByConfig(configId, rows);
+
+                string sJSON = JsonConvert.SerializeObject(results);
+                return Ok(sJSON);
+            }
+            catch (HiveTableViewNotFoundException)
+            {
+                return Content(System.Net.HttpStatusCode.NotFound, "Table or view not found");
+            }
+            catch (SchemaNotFoundException snfex)
+            {
+                return Content(System.Net.HttpStatusCode.NotFound, snfex.Message);
+            }
+
+            //System.Data.DataTable _dt = new System.Data.DataTable();
+
+            //_dt.Columns.Add("ID");
+            //_dt.Columns.Add("Name");
+
+            //System.Data.DataRow dr1 = _dt.NewRow();
+            //dr1["ID"] = 1;
+            //dr1["Name"] = "Smruti";
+            //_dt.Rows.Add(dr1);
+
+            //System.Data.DataRow dr2 = _dt.NewRow();
+            //dr2["ID"] = 2;
+            //dr2["Name"] = "Ranjan";
+            //_dt.Rows.Add(dr2);
+
+
+            //List<Dictionary<string, object>> dicRows = new List<Dictionary<string, object>>();
+            //Dictionary<string, object> dicRow = null;
+            //foreach (System.Data.DataRow dr in _dt.Rows)
+            //{
+            //    dicRow = new Dictionary<string, object>();
+            //    foreach (System.Data.DataColumn col in _dt.Columns)
+            //    {
+            //        dicRow.Add(col.ColumnName, dr[col]);
+            //    }
+            //    dicRows.Add(dicRow);
+            //}
+
+            //string sJSON = JsonConvert.SerializeObject(dicRows);
+            //return Ok(sJSON);
+        }
+
 
 
         private async Task<LivyReply> WaitForLivyReply(int SessionID, int StatementID)

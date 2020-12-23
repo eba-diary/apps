@@ -19,7 +19,7 @@ namespace Sentry.data.Core
         public int RevisionID { get; set; }
         public string InitiatorID { get; set; }
         
-        public void UpdateStatus(HiveTableStatusEnum status)
+        public void UpdateStatus(ConsumptionLayerTableStatusEnum status)
         {
             HiveStatus = status.ToString();
         }
