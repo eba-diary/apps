@@ -8,16 +8,18 @@ namespace Sentry.data.Core.Factories.Fields
     {
         private KeyValuePair<string, JsonSchemaProperty> _property;
         private readonly bool _array;
+        private readonly int _rowPosition;
         private readonly DecimalField _baseField;
         private readonly SchemaRow _row;
         private readonly bool IsProperty;
         private readonly bool IsField;
         private readonly bool IsRow;
 
-        public DecimalFieldDtoFactory(KeyValuePair<string, JsonSchemaProperty> prop, bool array)
+        public DecimalFieldDtoFactory(KeyValuePair<string, JsonSchemaProperty> prop,int rowPosition, bool array)
         {
             _property = prop;
             _array = array;
+            _rowPosition = rowPosition;
             IsProperty = true;
         }
 
@@ -41,7 +43,7 @@ namespace Sentry.data.Core.Factories.Fields
             }
             else if (IsProperty)
             {
-                return new DecimalFieldDto(_property, _array);
+                return new DecimalFieldDto(_property, _rowPosition, _array);
             }
             else if (IsRow)
             {

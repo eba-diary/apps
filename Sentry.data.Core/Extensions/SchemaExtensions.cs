@@ -2,7 +2,6 @@
 using Sentry.Common.Logging;
 using Sentry.data.Core.Factories.Fields;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,7 +9,6 @@ namespace Sentry.data.Core
 {
     public static class SchemaExtensions
     {
-
         public static SchemaRevisionDto ToDto(this SchemaRevision revision)
         {
             return new SchemaRevisionDto()
@@ -49,6 +47,9 @@ namespace Sentry.data.Core
                     break;
                 case StructField s:
                     factory = new StructFieldDtoFactory(s);
+                    break;
+                case BigIntField bi:
+                    factory = new BigIntFieldDtoFactory(bi);
                     break;
                 default:
                     factory = null;
@@ -155,8 +156,48 @@ namespace Sentry.data.Core
             return outSchema;
 
         }
+        public static void ToDto(this JsonSchema schema, IList<BaseFieldDto> dtoList, ref int rowPosition, BaseFieldDto parentRow = null)
+        {
+            try
+            {
+                switch (schema.Type)
+                {
+                    case JsonObjectType.Object:
+                        foreach (KeyValuePair<string, JsonSchemaProperty> prop in schema.Properties.ToList())
+                        {
+                            prop.ToDto(dtoList, ref rowPosition, parentRow);
+                        }
+                        break;
+                    case JsonObjectType.None:
+                        if (schema.HasReference)
+                        {
+                            schema.Reference.ToDto(dtoList, ref rowPosition, parentRow);
+                        }
+                        else
+                        {
+                            if (parentRow == null)
+                            {
+                                Logger.Warn("Unhandled Scenario");
+                            }
+                            else
+                            {
+                                parentRow.Description = "MOCKED OUT";
+                            }
+                        }
+                        break;
+                    default:
+                        Logger.Warn($"Unhandled Scenario for schema object type of {schema.Type}");
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("ToSchemaRows Error", ex);
+                throw;
+            }
+        }
 
-        public static void ToDto(this KeyValuePair<string, JsonSchemaProperty> prop, IList<BaseFieldDto> dtoList, BaseFieldDto parentRow = null)
+        public static void ToDto(this KeyValuePair<string, JsonSchemaProperty> prop, IList<BaseFieldDto> dtoList, ref int rowPosition, BaseFieldDto parentRow = null)
         {
             try
             {
@@ -172,19 +213,19 @@ namespace Sentry.data.Core
                         if (currentProperty.HasReference)
                         {
                             Logger.Debug($"Detected ref object: property will be defined as STRUCT");
-                            fieldFactory = BuildStructFactory(prop, JsonObjectType.Object);
+                            fieldFactory = BuildStructFactory(prop, JsonObjectType.Object, ++rowPosition);
                             BaseFieldDto noneStructField = fieldFactory.GetField();
 
-                            AddToFieldList(dtoList, parentRow, noneStructField);
+                            AddToFieldList(dtoList, parentRow, noneStructField);                            
 
-                            currentProperty.Reference.ToDto(dtoList.ToList(), noneStructField);
+                            currentProperty.Reference.ToDto(dtoList.ToList(), ref rowPosition, noneStructField);
                             
                         }
                         else
                         {
                             Logger.Warn($"No ref object detected");
                             Logger.Warn($"{prop.Key} will be defined as STRUCT");
-                            fieldFactory = new VarcharFieldDtoFactory(prop, false);
+                            fieldFactory = new VarcharFieldDtoFactory(prop, ++rowPosition, false);                            
 
                             if (parentRow == null)
                             {
@@ -198,7 +239,7 @@ namespace Sentry.data.Core
                         break;
                     case JsonObjectType.Object:
                     case JsonObjectType.Null | JsonObjectType.Object:
-                        fieldFactory = BuildStructFactory(prop, currentProperty.Type);
+                        fieldFactory = BuildStructFactory(prop, currentProperty.Type, ++rowPosition);
 
                         BaseFieldDto objectStructfield = fieldFactory.GetField();
 
@@ -206,7 +247,7 @@ namespace Sentry.data.Core
 
                         foreach (KeyValuePair<string, JsonSchemaProperty> nestedProp in currentProperty.Properties)
                         {
-                            nestedProp.ToDto(dtoList, objectStructfield);
+                            nestedProp.ToDto(dtoList, ref rowPosition, objectStructfield);
                         }
                         break;
                     case JsonObjectType.Array:
@@ -223,13 +264,13 @@ namespace Sentry.data.Core
                         {
                             Logger.Warn($"Schema could not be detected for {prop.Key} property");
 
-                            fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, true);
+                            fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, ++rowPosition, true);
                         }
                         else if (nestedSchema.IsObject)
                         {
                             Logger.Debug($"Detected nested schema as Object");
 
-                            fieldFactory = BuildStructFactory(prop, JsonObjectType.Object, true);
+                            fieldFactory = BuildStructFactory(prop, JsonObjectType.Object, ++rowPosition, true);
                         }
                         else
                         {
@@ -237,35 +278,35 @@ namespace Sentry.data.Core
                             {
                                 case JsonObjectType.Object:
                                 case JsonObjectType.Null | JsonObjectType.Object:
-                                    fieldFactory = BuildStructFactory(prop, nestedSchema.Type, true);
+                                    fieldFactory = BuildStructFactory(prop, nestedSchema.Type, ++rowPosition, true);
                                     break;
                                 case JsonObjectType.Integer:
                                 case JsonObjectType.Null | JsonObjectType.Integer:
-                                    fieldFactory = BuildIntegerFactory(prop, nestedSchema.Type, true);
+                                    fieldFactory = BuildIntegerFactory(prop, nestedSchema.Type, nestedSchema.Format, ++rowPosition, true);
                                     break;
                                 case JsonObjectType.String:
                                 case JsonObjectType.Null | JsonObjectType.String:                                    
-                                    fieldFactory = BuildStringFactory(prop, nestedSchema.Type, nestedSchema.Format, true);
+                                    fieldFactory = BuildStringFactory(prop, nestedSchema.Type, nestedSchema.Format, ++rowPosition, true);
                                     break;
                                 case JsonObjectType.Number:
                                 case JsonObjectType.Null | JsonObjectType.Number:
-                                    fieldFactory = BuildDecimalFactory(prop, nestedSchema.Type, true);
+                                    fieldFactory = BuildDecimalFactory(prop, nestedSchema.Type, ++rowPosition, true);
                                     break;
                                 case JsonObjectType.None:
                                     if (nestedSchema.IsAnyType)
                                     {
                                         Logger.Debug($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} and marked as IsAnyType");
-                                        fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, true);
+                                        fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, ++rowPosition, true);
                                     }
                                     else
                                     {
                                         Logger.Debug($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()}");
-                                        fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, true);
+                                        fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, ++rowPosition, true);
                                     }
                                     break;
                                 default:
                                     Logger.Warn($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} which is not handled by DSC");
-                                    fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, true);
+                                    fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, ++rowPosition, true);
                                     break;
                             }
                         }
@@ -274,7 +315,7 @@ namespace Sentry.data.Core
 
                         if (nestedSchema != null)
                         {
-                            nestedSchema.ToDto(dtoList.ToList(), field);
+                            nestedSchema.ToDto(dtoList.ToList(), ref rowPosition, field);
                         }
 
                         AddToFieldList(dtoList, parentRow, field);
@@ -282,21 +323,21 @@ namespace Sentry.data.Core
                         break;
                     case JsonObjectType.String:
                     case JsonObjectType.Null | JsonObjectType.String:
-                        fieldFactory = BuildStringFactory(prop, currentProperty.Type, currentProperty.Format);
+                        fieldFactory = BuildStringFactory(prop, currentProperty.Type, currentProperty.Format, ++rowPosition);
 
                         AddToFieldList(dtoList, parentRow, fieldFactory.GetField());
 
                         break;
                     case JsonObjectType.Integer:
                     case JsonObjectType.Null | JsonObjectType.Integer:
-                        fieldFactory = BuildIntegerFactory(prop, currentProperty.Type);
+                        fieldFactory = BuildIntegerFactory(prop, currentProperty.Type, currentProperty.Format, ++rowPosition);
 
                         AddToFieldList(dtoList, parentRow, fieldFactory.GetField());
 
                         break;
                     case JsonObjectType.Number:
                     case JsonObjectType.Null | JsonObjectType.Number:
-                        fieldFactory = BuildDecimalFactory(prop, currentProperty.Type);
+                        fieldFactory = BuildDecimalFactory(prop, currentProperty.Type, ++rowPosition);
 
                         AddToFieldList(dtoList, parentRow, fieldFactory.GetField());
 
@@ -304,7 +345,7 @@ namespace Sentry.data.Core
                     default:
                         Logger.Warn($"The {prop.Key} property is defined as {JsonObjectType.None.ToString()} which is not handled by DSC");
 
-                        fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null);
+                        fieldFactory = BuildStringFactory(prop, JsonObjectType.String, null, ++rowPosition);
 
                         AddToFieldList(dtoList, parentRow, fieldFactory.GetField());
 
@@ -317,27 +358,36 @@ namespace Sentry.data.Core
                 throw;
             }
         }
-
-        private static FieldDtoFactory BuildDecimalFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objectType, bool isArray = false)
+        
+        private static FieldDtoFactory BuildDecimalFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objectType, int rowPosition, bool isArray = false)
         {
             FieldDtoFactory fieldFactory;
             Logger.Debug($"Detected type of {objectType}");
             Logger.Debug($"{prop.Key} will be defined as DECIMAL");
-            fieldFactory = new DecimalFieldDtoFactory(prop, isArray);
+            fieldFactory = new DecimalFieldDtoFactory(prop, rowPosition, isArray);
             return fieldFactory;
         }
 
-        private static FieldDtoFactory BuildIntegerFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objectType, bool isArray = false)
+        private static FieldDtoFactory BuildIntegerFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objectType, string format, int rowPosition, bool isArray = false)
         {
             FieldDtoFactory fieldFactory;
             Logger.Debug($"Detected type of {objectType}");
-            Logger.Debug($"{prop.Key} will be defined as INTEGER");
 
-            fieldFactory = new IntegerFieldDtoFactory(prop, isArray);
+            //
+            if (!String.IsNullOrWhiteSpace(format) && format == "biginteger")
+            {
+                Logger.Debug($"{prop.Key} will be defined as BIGINT");
+                fieldFactory = new BigIntFieldDtoFactory(prop, rowPosition, isArray);
+                return fieldFactory;
+            }
+
+            Logger.Debug($"{prop.Key} will be defined as INTEGER");
+            fieldFactory = new IntegerFieldDtoFactory(prop, rowPosition, isArray);
             return fieldFactory;
+            
         }
 
-        private static FieldDtoFactory BuildStringFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objectType, string format, bool isArray = false)
+        private static FieldDtoFactory BuildStringFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objectType, string format, int rowPosition, bool isArray = false)
         {
             FieldDtoFactory fieldFactory;
             Logger.Debug($"Detected type of {objectType}");
@@ -349,17 +399,17 @@ namespace Sentry.data.Core
                     case "date-time":
                         Logger.Debug($"Detected string format of {format}");
                         Logger.Debug($"{prop.Key} will be defined as TIMESTAMP");
-                        fieldFactory = new TimestampFieldDtoFactory(prop, isArray);
+                        fieldFactory = new TimestampFieldDtoFactory(prop, rowPosition, isArray);
                         break;
                     case "date":
                         Logger.Debug($"Detected string format of {format}");
                         Logger.Debug($"{prop.Key} will be defined as DATE");
-                        fieldFactory = new DateFieldDtoFactory(prop, isArray);
+                        fieldFactory = new DateFieldDtoFactory(prop, rowPosition, isArray);
                         break;
                     default:
                         Logger.Warn($"Detected string format of {format} which is not handled by DSC");
                         Logger.Warn($"{prop.Key} will be defined as DATE");
-                        fieldFactory = new VarcharFieldDtoFactory(prop, isArray);
+                        fieldFactory = new VarcharFieldDtoFactory(prop, rowPosition, isArray);
                         break;
                 }
             }
@@ -367,18 +417,18 @@ namespace Sentry.data.Core
             {
                 Logger.Debug($"No string format detected");
                 Logger.Debug($"{prop.Key} will be defined as VARCHAR");
-                fieldFactory = new VarcharFieldDtoFactory(prop, isArray);
+                fieldFactory = new VarcharFieldDtoFactory(prop, rowPosition, isArray);
             }
 
             return fieldFactory;
         }
 
-        private static FieldDtoFactory BuildStructFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objecType, bool isArray = false)
+        private static FieldDtoFactory BuildStructFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objecType, int rowPosition, bool isArray = false)
         {
             FieldDtoFactory fieldFactory;
             Logger.Debug($"Detected type of {objecType}");
             Logger.Debug($"Detected ref object: property will be defined as STRUCT");
-            fieldFactory = new StructFieldDtoFactory(prop, isArray);
+            fieldFactory = new StructFieldDtoFactory(prop, rowPosition, isArray);
 
             return fieldFactory;
         }
@@ -395,46 +445,6 @@ namespace Sentry.data.Core
                 parentRow.HasChildren = true;
             }
         }
-
-        public static void ToDto(this JsonSchema schema, List<BaseFieldDto> schemaRowList, BaseFieldDto parentSchemaRow = null)
-        {
-            try
-            {
-                switch (schema.Type)
-                {
-                    case JsonObjectType.Object:
-                        foreach (KeyValuePair<string, JsonSchemaProperty> prop in schema.Properties.ToList())
-                        {
-                            prop.ToDto(schemaRowList, parentSchemaRow);
-                        }
-                        break;
-                    case JsonObjectType.None:
-                        if (schema.HasReference)
-                        {
-                            schema.Reference.ToDto(schemaRowList, parentSchemaRow);
-                        }
-                        else
-                        {
-                            if (parentSchemaRow == null)
-                            {
-                                Logger.Warn("Unhandled Scenario");
-                            }
-                            else
-                            {
-                                parentSchemaRow.Description = "MOCKED OUT";
-                            }
-                        }
-                        break;
-                    default:
-                        Logger.Warn($"Unhandled Scenario for schema object type of {schema.Type}");
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("ToSchemaRows Error", ex);
-                throw;
-            }
-        }
+        
     }
 }

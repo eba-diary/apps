@@ -255,11 +255,6 @@ data.Dataset = {
             data.Dataset.FileNameModal($(this).data("id"));
         });
 
-        $("[id^='PreviewLatestData']").off('click').on('click', function (e) {
-            e.preventDefault();
-            data.Dataset.PreviewLatestDatafileModal($(this).data("id"));
-        });
-
         $("[id^='SubscribeModal']").click(function (e) {
             e.preventDefault();
             data.Dataset.SubscribeModal($(this).data("id"));
@@ -563,13 +558,6 @@ data.Dataset = {
         });
     },
 
-    PreviewLatestDatafileModal: function (id) {
-        var modal = Sentry.ShowModalWithSpinner("Preview Datafile");
-        $.get("/Dataset/PreviewLatestDatafile/" + encodeURI(id), function (result) {
-            modal.ReplaceModalBody(result);
-        });
-    },
-
     SubscribeModal: function (id) {
         var modal = Sentry.ShowModalWithSpinner("Subscribe");
         $.get("/Dataset/Subscribe/?id=" + encodeURI(id), function (e) {
@@ -584,27 +572,6 @@ data.Dataset = {
         $.get("/Dataset/PushToFileNameOverride/" + id, function (result) {
             modal.ReplaceModalBody(result);
             modal.SetFocus("#FileNameOverride");
-        });
-    },
-
-    PreviewInit: function () {
-        $("[id^='CopyToClipboard']").off('click').on('click', function (e) {
-            e.preventDefault();
-            var range;
-            if (document.selection) {
-                range = document.body.createTextRange();
-                range.moveToElementText(document.getElementById("PreviewText"));
-                range.select().createTextRange();
-                document.execCommand("Copy");
-                alert("Text Copied to Clipboard");
-
-            } else if (window.getSelection) {
-                range = document.createRange();
-                range.selectNode(document.getElementById("PreviewText"));
-                window.getSelection().addRange(range);
-                document.execCommand("Copy");
-                alert("Text Copied to Clipboard");
-            }
         });
     },
 
@@ -1253,15 +1220,6 @@ data.Dataset = {
             '</table>';
 
         return table;
-    },
-
-    PreviewDatafileModal: function (id) {
-
-        var modal = Sentry.ShowModalWithSpinner("Preview Datafile");
-
-        $.get("/Dataset/PreviewDatafile/" + id, function (result) {
-            modal.ReplaceModalBody(result);
-        });
     },
 
     SetReturntoSearchUrl: function () {

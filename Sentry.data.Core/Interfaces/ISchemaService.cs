@@ -41,11 +41,42 @@ namespace Sentry.data.Core
         /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to schema</exception>
         /// <returns></returns>
         int CreateAndSaveSchemaRevision(int schemaId, List<BaseFieldDto> schemaRows, string revisionname, string jsonSchema = null);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="schemaDto"></param>
+        /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to manage schema</exception>
+        /// <returns></returns>
         bool UpdateAndSaveSchema(FileSchemaDto schemaDto);
+        UserSecurity GetUserSecurityForSchema(int schemaId);
         FileSchemaDto GetFileSchemaDto(int id);
         List<DatasetFile> GetDatasetFilesBySchema(int schemaId);
         DatasetFile GetLatestDatasetFileBySchema(int schemaId);
         FileSchema GetFileSchemaByStorageCode(string storageCode);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">Config id</param>
+        /// <param name="rows">Number of rows to return</param>
+        /// <exception cref="SchemaNotFoundException">Thrown when schema is not found</exception>
+        /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to schema</exception>
+        /// <exception cref="HiveTableViewNotFoundException">Thrown when table or view not found</exception>
+        /// <exception cref="HiveQueryException">Thrown when odbc driver throws an error</exception>
+        /// <returns></returns>
+        List<Dictionary<string, object>> GetTopNRowsByConfig(int id, int rows);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">Schema Id</param>
+        /// <param name="rows">Number of rows to return</param>
+        /// <exception cref="SchemaNotFoundException">Thrown when schema is not found</exception>
+        /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to schema</exception>
+        /// <exception cref="HiveTableViewNotFoundException">Thrown when table or view not found</exception>
+        /// <exception cref="HiveQueryException">Thrown when odbc driver throws an error</exception>
+        /// <returns></returns>
+        List<Dictionary<string, object>> GetTopNRowsBySchema(int id, int rows);
         bool RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent);
         bool SasUpdateNotification(int schemaId, int revisionId, string initiatorId);
 

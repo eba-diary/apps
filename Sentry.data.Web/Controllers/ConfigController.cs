@@ -84,7 +84,7 @@ namespace Sentry.data.Web.Controllers
 
             UserSecurity us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
 
-            if (us != null && us.CanEditDataset)
+            if (us != null && us.CanManageSchema)
             {
                 DatasetDto dsDto = _DatasetService.GetDatasetDto(id);
 
@@ -136,7 +136,7 @@ namespace Sentry.data.Web.Controllers
             }
             else
             {
-                return View("Forbidden");
+                return View("Unauthorized");
             }
         }
 
@@ -300,28 +300,40 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Edit/{configId}")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Edit(int configId)
         {
-            DatasetFileConfigDto dto = _configService.GetDatasetFileConfigDto(configId);
-
-            //Users are unable to edit 
-            if (dto.DeleteInd)
+            try
             {
-                return View("Forbidden");
+                UserSecurity us = _DatasetService.GetUserSecurityForConfig(configId);
+
+                DatasetFileConfigDto dto = _configService.GetDatasetFileConfigDto(configId);
+
+                //Users are unable to edit 
+                if (!us.CanManageSchema || dto.DeleteInd)
+                {
+                    return View("Unauthorized");
+                }
+
+                DatasetFileConfigsModel dfcm = new DatasetFileConfigsModel(dto);
+
+                dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, dfcm.DatasetScopeTypeID);
+                dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+                dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, dfcm.FileExtensionID);
+
+                //ViewBag.ModifyType = "Edit";
+
+                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Configuration Edit Page", dfcm.DatasetId);
+
+                return View(dfcm);
             }
-
-            DatasetFileConfigsModel dfcm = new DatasetFileConfigsModel(dto);
-
-            dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, dfcm.DatasetScopeTypeID);
-            dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-            dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, dfcm.FileExtensionID);
-
-            //ViewBag.ModifyType = "Edit";
-
-            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Configuration Edit Page", dfcm.DatasetId);
-
-            return View(dfcm);
+            catch (SchemaUnauthorizedAccessException)
+            {
+                return View("Unauthorized");
+            }
+            catch (Exception)
+            {
+                return View("ServerError");
+            }
         }
 
         [HttpGet]
@@ -1322,55 +1334,59 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/{configId}/Schema/{schemaId}/Fields")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Fields(int configId, int schemaId)
         {
-            DatasetFileConfigDto configDto = _configService.GetDatasetFileConfigDto(configId);
-
-            if (configDto.DeleteInd)
+            try
             {
-                return View("Forbidden");
-            }
+                DatasetFileConfigDto configDto = _configService.GetDatasetFileConfigDto(configId);
 
-            if (configDto.Schema.SchemaId == schemaId)
-            {
                 UserSecurity us = _DatasetService.GetUserSecurityForConfig(configId);
 
-
-                ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(_datasetContext.GetById<Dataset>(configDto.ParentDatasetId), _associateInfoProvider, _datasetContext)
+                if (!us.CanManageSchema || configDto.DeleteInd)
                 {
-                    CanEditDataset = us.CanEditDataset,
-                    CanUpload = us.CanUploadToDataset,
-                    Security = us
-                };
+                    return View("Unauthorized");
+                }
 
-                Event e = new Event();
-                e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-                e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                e.TimeCreated = DateTime.Now;
-                e.TimeNotified = DateTime.Now;
-                e.IsProcessed = false;
-                e.DataConfig = configDto.ConfigId;
-                e.Dataset = configDto.ParentDatasetId;
-                e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-                e.Reason = "Viewed Edit Fields";
-                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+                if (configDto.Schema.SchemaId == schemaId)
+                {
+                    ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(_datasetContext.GetById<Dataset>(configDto.ParentDatasetId), _associateInfoProvider, _datasetContext)
+                    {
+                        CanEditDataset = us.CanEditDataset,
+                        CanUpload = us.CanUploadToDataset,
+                        Security = us
+                    };
 
-                ViewBag.Schema = _datasetContext.GetById<FileSchema>(schemaId);
-                ViewBag.Date_Default = GlobalConstants.Datatypes.Defaults.DATE_DEFAULT;
-                ViewBag.Timestamp_Default = GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT;
+                    Event e = new Event();
+                    e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+                    e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                    e.TimeCreated = DateTime.Now;
+                    e.TimeNotified = DateTime.Now;
+                    e.IsProcessed = false;
+                    e.DataConfig = configDto.ConfigId;
+                    e.Dataset = configDto.ParentDatasetId;
+                    e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+                    e.Reason = "Viewed Edit Fields";
+                    Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
-                return View(bdm);
+                    ViewBag.Schema = _datasetContext.GetById<FileSchema>(schemaId);
+                    ViewBag.Date_Default = GlobalConstants.Datatypes.Defaults.DATE_DEFAULT;
+                    ViewBag.Timestamp_Default = GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT;
+
+                    return View(bdm);
+                }
+                else
+                {
+                    return RedirectToAction("Index", new { id = configDto.ParentDatasetId });
+                }
             }
-            else
+            catch (SchemaUnauthorizedAccessException)
             {
-                return RedirectToAction("Index", new { id = configDto.ParentDatasetId });
+                return View("Unauthorized");
             }
         }
 
         [HttpPost]
         [Route("Config/{configId}/Schema/{schemaId}/UpdateFields")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public JsonResult UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows)
         {
             try
@@ -1380,6 +1396,10 @@ namespace Sentry.data.Web.Controllers
                 _schemaService.Validate(schemaId, schemaRowsDto);
                 _schemaService.CreateAndSaveSchemaRevision(schemaId, schemaRowsDto, "blah");
 
+            }
+            catch (SchemaUnauthorizedAccessException)
+            {
+                return Json(new { Success = false, Message = "Unauthorized access"}, JsonRequestBehavior.AllowGet);
             }
             catch (ValidationException vEx)
             {
@@ -1489,7 +1509,7 @@ namespace Sentry.data.Web.Controllers
                         StorageCode = storageCode,
                         HiveDatabase = "Default",
                         HiveTable = dfc.ParentDataset.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfc.Name.Replace(" ", "").ToUpper(),
-                        HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
+                        HiveTableStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                         HiveLocation = RootBucket + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
                     };
 
@@ -1524,59 +1544,72 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/{configId}/Schema/{schemaId}/Edit")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSchema(int configId, int schemaId)
         {
-            DatasetFileConfigDto config = _configService.GetDatasetFileConfigDto(configId);
-
-            if (config.DeleteInd)
+            try
             {
-                return View("Forbidden");
-            }
+                UserSecurity us = _DatasetService.GetUserSecurityForConfig(configId);
 
-            FileSchemaDto schema = (config.Schema.SchemaId == schemaId) ? config.Schema : null;
-            //DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
-            if (schema != null)
-            {
-                EditSchemaModel editSchemaModel = new EditSchemaModel()
+                DatasetFileConfigDto config = _configService.GetDatasetFileConfigDto(configId);
+
+                if (!us.CanManageSchema || config.DeleteInd)
                 {
-                    Name = schema.Name,
-                    Description = schema.Description,
-                    IsForceMatch = false,
-                    IsPrimary = false,
-                    DatasetId = config.ParentDatasetId,
-                    Delimiter = schema.Delimiter,
-                    Schema_Id = schema.SchemaId,
-                    HasHeader = schema.HasHeader,
-                    FileTypeId = schema.FileExtensionId
-                };
+                    return View("Unauthorized");
+                }
 
-                Event e = new Event
+                FileSchemaDto schema = (config.Schema.SchemaId == schemaId) ? config.Schema : null;
+                //DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
+                if (schema != null)
                 {
-                    EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
-                    Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                    TimeCreated = DateTime.Now,
-                    TimeNotified = DateTime.Now,
-                    IsProcessed = false,
-                    UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
-                    Reason = "Viewed Retrieval Edit Page"
-                };
-                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+                    EditSchemaModel editSchemaModel = new EditSchemaModel()
+                    {
+                        Name = schema.Name,
+                        Description = schema.Description,
+                        IsForceMatch = false,
+                        IsPrimary = false,
+                        DatasetId = config.ParentDatasetId,
+                        Delimiter = schema.Delimiter,
+                        Schema_Id = schema.SchemaId,
+                        HasHeader = schema.HasHeader,
+                        FileTypeId = schema.FileExtensionId
+                    };
 
-                return View(editSchemaModel);
+                    Event e = new Event
+                    {
+                        EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                        Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                        TimeCreated = DateTime.Now,
+                        TimeNotified = DateTime.Now,
+                        IsProcessed = false,
+                        UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
+                        Reason = "Viewed Retrieval Edit Page"
+                    };
+                    Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
+                    return View(editSchemaModel);
+                }
+                else
+                {
+                    return RedirectToAction("Index", new { id = config.ParentDatasetId });
+                }
             }
-            else
+            catch (SchemaUnauthorizedAccessException)
             {
-                return RedirectToAction("Index", new { id = config.ParentDatasetId });
+                return View("Unauthorized");
             }
-
         }
 
         [HttpPost]
         [Route("Config/{configId}/Schema/{schemaId}/Edit")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSchema(int configId, int schemaId, EditSchemaModel esm)
         {
+            UserSecurity us = _schemaService.GetUserSecurityForSchema(schemaId);
+
+            if (!us.CanManageSchema)
+            {
+                return View("Unauthorized");
+            }
+
             FileSchemaDto fileDto = _schemaService.GetFileSchemaDto(schemaId);
             FileSchemaDto dto = esm.ToDto(fileDto);
             try
@@ -1589,6 +1622,10 @@ namespace Sentry.data.Web.Controllers
 
                     return RedirectToAction("Index", new { id = esm.DatasetId });
                 }
+            }
+            catch (SchemaUnauthorizedAccessException)
+            {
+                return View("Unauthorized");
             }
             catch (Sentry.Core.ValidationException ex)
             {
