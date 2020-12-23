@@ -181,16 +181,19 @@ namespace Sentry.data.Infrastructure
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CLAIMIQ_PREPROCESSING_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.FIXEDWIDTH_PREPROCESSING_PREFIX))
             {
+                Logger.Debug($"Using Get4thIndex strategy to detect prefix");
                 int idx = GetNthIndex(key, '/', 4);
                 filePrefix = key.Substring(0, (idx + 1));
             }
 
             if (filePrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.DROP_LOCATION_PREFIX))
             {
+                Logger.Debug($"Using Get3thIndex strategy to detect prefix");
                 int idx = GetNthIndex(key, '/', 3);
                 filePrefix = key.Substring(0, (idx + 1));
             }
 
+            Logger.Debug($"key:{key} | filePrefix: {filePrefix}");
             Logger.Info($"end-method <getdataflowstepprefix>");
 
             return filePrefix;            
