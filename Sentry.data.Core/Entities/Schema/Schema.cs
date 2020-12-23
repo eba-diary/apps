@@ -43,6 +43,12 @@ namespace Sentry.data.Core
         /// This feature triggers the creation of JSON structures within Parquet
         /// </summary>
         public virtual bool CLA1580_StructureHive { get; set; }
+
+        public virtual bool CLA2472_EMRSend { get; set; }
+        public virtual bool CLA2429_SnowflakeCreateTable { get; set; }
+        public virtual bool CLA1286_KafkaFlag { get; set; }
+
+
         #endregion
 
         protected internal virtual void AddRevision(SchemaRevision revision)

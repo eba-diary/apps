@@ -68,6 +68,13 @@ ul.list-group-indented {
     background-color: white !important;
 }
 
+.hideOverflow {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+    display: block;
+}
 /*#endregion TemplateSettings*/
 
 
@@ -2779,3 +2786,16 @@ tr.shown td.details-control {
     padding: 5px 10px;
     height: 32px;
 }
+
+
+
+/*styles form forbidden pages*/
+a.forbiddenHero:link {
+    text-decoration:underline;
+}
+
+
+a.forbiddenHero:hover {
+    color: #ff0000;
+}
+
