@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
@@ -40,7 +41,7 @@ namespace Sentry.data.Infrastructure
                 Logger.Info($"start-method <executedependencies>");
                 Logger.Debug($"<executedependencies> bucket:{bucket} key:{key} s3Event:{JsonConvert.SerializeObject(s3Event)}");
                 //Get prefix
-                string stepPrefix = GetDataFlowStepPrefix(key);
+                string stepPrefix = GetDataFlowStepPrefix(bucket, key);
                 if (stepPrefix != null)
                 {
                     try
@@ -163,7 +164,7 @@ namespace Sentry.data.Infrastructure
             logs.Add(flow.LogExecution(executionGuid, sb.ToString(), Log_Level.Info));
         }
 
-        protected string GetDataFlowStepPrefix(string key)
+        protected string GetDataFlowStepPrefix(string bucket, string key)
         {
             Logger.Info($"start-method <getdataflowstepprefix>");
 
@@ -179,7 +180,8 @@ namespace Sentry.data.Infrastructure
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_MAP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.GOOGLEAPI_PREPROCESSING_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CLAIMIQ_PREPROCESSING_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.FIXEDWIDTH_PREPROCESSING_PREFIX))
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.FIXEDWIDTH_PREPROCESSING_PREFIX) ||
+                (Regex.IsMatch(bucket, "^sentry-data-[\\S]*-droplocation-ae2$") && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.DROP_LOCATION_PREFIX)))
             {
                 Logger.Debug($"Using Get4thIndex strategy to detect prefix");
                 int idx = GetNthIndex(key, '/', 4);
