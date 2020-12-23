@@ -171,8 +171,7 @@
       <HintPath>..\packages\Sentry.Configuration.3.0.0\lib\net40\Sentry.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Sentry.Core.1.0.0.1\lib\net451\Sentry.Core.dll</HintPath>
+      <HintPath>..\packages\Sentry.Core.1.1.0\lib\net452\Sentry.Core.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.DataTables.Mvc, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry_DataTables_ServerSide_MVC.1.0.5\lib\net45\Sentry.DataTables.Mvc.dll</HintPath>
@@ -436,7 +435,6 @@
     <Compile Include="Models\Dataset\DatasetFileVersionsModel.cs" />
     <Compile Include="Models\Config\EditDatasetFileConfigModel.cs" />
     <Compile Include="Models\Dataset\ObsoleteDatasetModel.cs" />
-    <Compile Include="Models\Dataset\PreviewDataModel.cs" />
     <Compile Include="Models\Dataset\PushToDatasetModel.cs" />
     <Compile Include="Models\Favorites\FavoriteItemDetailModel.cs" />
     <Compile Include="Models\Favorites\FavoritesDetailModel.cs" />
@@ -874,7 +872,6 @@
     <Content Include="Scripts\thenBy.min.js" />
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
-    <Content Include="Views\Dataset\_PreviewData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
@@ -1129,6 +1126,10 @@
     </Content>
     <Content Include="..\.sonarlint\data_data.sentry.comcsharp.ruleset">
       <Link>data_data.sentry.comcsharp.ruleset</Link>
+    </Content>
+    <Content Include="..\HiveODBC.config">
+      <Link>HiveODBC.config</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>

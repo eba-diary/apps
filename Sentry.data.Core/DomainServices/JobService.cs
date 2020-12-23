@@ -235,6 +235,7 @@ namespace Sentry.data.Core
 
         private RetrieverJob InstantiateJob(DatasetFileConfig dfc, DataSource dataSource, DataFlow df)
         {
+            Guid g = Guid.NewGuid();
             RetrieverJobOptions.Compression compression = new RetrieverJobOptions.Compression()
             {
                 IsCompressed = false,
@@ -263,7 +264,8 @@ namespace Sentry.data.Core
                 Created = DateTime.Now,
                 Modified = DateTime.Now,
                 IsGeneric = true,
-                JobOptions = rjo
+                JobOptions = rjo,
+                JobGuid = g
             };
 
             if (dataSource.Is<S3Basic>())

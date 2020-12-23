@@ -26,5 +26,9 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public string HiveLocation { get; set; }
         public List<string> Options { get; set; }
         public bool DeleteInd { get; set; }
+        public string SnowflakeDatabase { get; set; }
+        public string SnowflakeSchema { get; set; }
+        public string SnowflakeTable { get; set; }
+        public string SnowflakeStatus { get; set; }
     }
 }

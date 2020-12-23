@@ -63,8 +63,7 @@
       <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Core.1.0.0.1\lib\net451\Sentry.Core.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\Sentry.Core.1.1.0\lib\net452\Sentry.Core.dll</HintPath>
     </Reference>
     <Reference Include="StructureMap">
       <HintPath>..\packages\StructureMap.4.4.5\lib\net45\StructureMap.dll</HintPath>
@@ -99,16 +98,16 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
-      <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
-      <Name>Sentry.data.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\Google.Protobuf.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.CFG.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.CSharp.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
+      <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
+      <Name>Sentry.data.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
