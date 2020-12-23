@@ -73,7 +73,6 @@ namespace Sentry.data.Core
         Dataset GetById(int id);
         int GetDatasetCount();
         Boolean isDatasetNameDuplicate(string datasetName, string category);
-        string GetPreviewKey(int id);
         IEnumerable<Dataset> GetDatasetByCategoryID(int id);
 
         IEnumerable<DatasetScopeType> GetAllDatasetScopeTypes();

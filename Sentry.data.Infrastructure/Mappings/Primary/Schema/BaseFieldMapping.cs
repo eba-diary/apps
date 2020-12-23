@@ -68,7 +68,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             }
         }
 
-        public class BigintFieldMapping : SubclassMapping<BigintField>
+        public class BigintFieldMapping : SubclassMapping<BigIntField>
         {
             public BigintFieldMapping()
             {
