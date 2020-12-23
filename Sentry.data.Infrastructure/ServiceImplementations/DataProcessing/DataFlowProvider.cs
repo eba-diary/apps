@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
@@ -17,24 +18,39 @@ namespace Sentry.data.Infrastructure
     public class DataFlowProvider : IDataFlowProvider
     {
 
-        private List<DataFlow_Log> logs = new List<DataFlow_Log>();
+        private List<EventMetric> logs = new List<EventMetric>();
         private DataFlow _flow;
-        private string flowExecutionGuid = null;
-        private string runInstanceGuid = null;
+        private string flowExecutionGuid;
+        private string runInstanceGuid;
+        private JObject _metricData;
+
+        private JObject MetricData
+        {
+            get
+            {
+                if (_metricData == null)
+                {
+                    _metricData = new JObject();
+                    return _metricData;
+                }
+
+                return _metricData;
+            }
+            set { _metricData = value; }
+        }
+
 
         public async Task ExecuteDependenciesAsync(S3ObjectEvent s3e)
         {
             await ExecuteDependenciesAsync(s3e.s3.bucket.name, s3e.s3.Object.key, s3e);
-            //await ExecuteDependenciesAsync("sentry-dataset-management-np-nr", "data/17/TestFile.csv");
         }
         public async Task ExecuteDependenciesAsync(string bucket, string key, S3ObjectEvent s3Event)
         {
-            bool IsNewFile = true;
+            bool IsNewFile = false;
 
             using (IContainer container = Bootstrapper.Container.GetNestedContainer())
             {
                 IDatasetContext dsContext = container.GetInstance<IDatasetContext>();
-                IDataFlowService dfService = container.GetInstance<IDataFlowService>();
                 IDataStepService _stepService = container.GetInstance<IDataStepService>();
 
                 Logger.Info($"start-method <executedependencies>");
@@ -61,7 +77,6 @@ namespace Sentry.data.Infrastructure
                             IsNewFile = true;
 
                             Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
-                            _flow.Logs.Add(_flow.LogExecution(flowExecutionGuid, $"Initialize flow execution bucket:{bucket}, key:{key}, file:{Path.GetFileName(key)}", Log_Level.Info));
                         }
                         else
                         {
@@ -88,19 +103,27 @@ namespace Sentry.data.Infrastructure
                                 Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
                             }
 
+                            if (IsNewFile)
+                            {
+                                MetricData.Add("status", "C");
+                                MetricData.Add("log", $"Initialize flow execution bucket:{bucket}, key:{key}, file:{Path.GetFileName(key)}");
+                                step.Executions.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, MetricData, Log_Level.Info));
+                                //step.Executions.Add(step.LogExecution(flowExecutionGuid, $"Initialize flow execution bucket:{bucket}, key:{key}, file:{Path.GetFileName(key)}", Log_Level.Info));
+                            }
+
                             _stepService.PublishStartEvent(step, flowExecutionGuid, runInstanceGuid, s3Event);
                         }
 
-                        _flow.LogExecution(flowExecutionGuid, $"end-method <executedependencies>", Log_Level.Info);
+                        _flow.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <executedependencies>", Log_Level.Info);
 
                         //save new logs
                         dsContext.SaveChanges();
                     }
                     catch (Exception ex)
                     {
-                        logs.Add(_flow.LogExecution(flowExecutionGuid, $"dataflowprovider-ExecuteDependenciesAsync-failed", Log_Level.Error, ex));
+                        logs.Add(_flow.LogExecution(flowExecutionGuid, runInstanceGuid, $"dataflowprovider-ExecuteDependenciesAsync-failed", Log_Level.Error, ex));
 
-                        _flow.LogExecution(flowExecutionGuid, $"end-method <executedependencies>", Log_Level.Info);
+                        _flow.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <executedependencies>", Log_Level.Info);
 
                         foreach (var log in logs)
                         {
@@ -160,7 +183,7 @@ namespace Sentry.data.Infrastructure
                 sb.AppendLine(step.ToString());
             }
 
-            logs.Add(flow.LogExecution(executionGuid, sb.ToString(), Log_Level.Info));
+            logs.Add(flow.LogExecution(executionGuid, runInstanceGuid, sb.ToString(), Log_Level.Info));
         }
 
         protected string GetDataFlowStepPrefix(string key)

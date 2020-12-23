@@ -41,13 +41,13 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Bag(x => x.Executions, (m) =>
             {
                 m.Inverse(true);
-                m.Table("DataFlowLog");
+                m.Table("EventMetrics");
                 m.Cascade(Cascade.All);
                 m.Key((k) =>
                 {
-                    k.Column("DataFlowStep_Id");
+                    k.Column("DataFlowStepId");
                 });
-            }, map => map.OneToMany(a => a.Class(typeof(DataFlow_Log))));
+            }, map => map.OneToMany(a => a.Class(typeof(EventMetric))));
 
             this.Bag(x => x.SchemaMappings, (m) =>
             {
