@@ -1,9 +1,9 @@
 ﻿using Sentry.Core;
-using System;
-using System.Linq;
-using System.Collections.Generic;
 using Sentry.data.Core.Entities;
 using Sentry.data.Core.Entities.DataProcessing;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Sentry.data.Core
 {
@@ -57,6 +57,7 @@ namespace Sentry.data.Core
         IQueryable<DataFlow> DataFlow { get; }
         IQueryable<DataFlowStep> DataFlowStep { get; }
         IQueryable<S3DropAction> S3DropAction { get; }
+        IQueryable<ProducerS3DropAction> ProducerS3DropAction { get; }
         IQueryable<SchemaLoadAction> SchemaLoadAction { get; }
         IQueryable<RawStorageAction> RawStorageAction { get; }
         IQueryable<QueryStorageAction> QueryStorageAction { get; }

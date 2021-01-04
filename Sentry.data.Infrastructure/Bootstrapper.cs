@@ -5,6 +5,8 @@ using Sentry.data.Core;
 using NHibernate.Dialect;
 using NHibernate.Cfg;
 using Sentry.data.Infrastructure.Mappings.Primary;
+using System.Net.Http;
+using Sentry.data.Core.Interfaces.SAIDRestClient;
 
 namespace Sentry.data.Infrastructure
 {
@@ -97,6 +99,11 @@ namespace Sentry.data.Infrastructure
             registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
             registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
+
+            var saidHttpClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
+            registry.For<IAssetClient>().Use<SAIDRestClient.AssetClient>().
+                Ctor<HttpClient>().Is(saidHttpClient).
+                SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("SaidAssetBaseUrl"));
           
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);

@@ -10,6 +10,7 @@ namespace Sentry.data.Web
         {
             Id = dto.Id;
             FlowGuid = dto.FlowGuid;
+            SaidKeyCode = dto.SaidKeyCode;
             Name = dto.Name;
             CreatedBy = dto.CreatedBy;
             CreatedDTM = dto.CreateDTM;
@@ -19,6 +20,7 @@ namespace Sentry.data.Web
 
         public int Id { get; set; }
         public Guid FlowGuid { get; set; }
+        public string SaidKeyCode { get; set; }
         public string Name { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedDTM { get; set; }

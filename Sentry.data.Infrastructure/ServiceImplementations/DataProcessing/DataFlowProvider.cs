@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
@@ -56,7 +57,7 @@ namespace Sentry.data.Infrastructure
                 Logger.Info($"start-method <executedependencies>");
                 Logger.Debug($"<executedependencies> bucket:{bucket} key:{key} s3Event:{JsonConvert.SerializeObject(s3Event)}");
                 //Get prefix
-                string stepPrefix = GetDataFlowStepPrefix(key);
+                string stepPrefix = GetDataFlowStepPrefix(bucket, key);
                 if (stepPrefix != null)
                 {
                     try
@@ -186,12 +187,13 @@ namespace Sentry.data.Infrastructure
             logs.Add(flow.LogExecution(executionGuid, runInstanceGuid, sb.ToString(), Log_Level.Info));
         }
 
-        protected string GetDataFlowStepPrefix(string key)
+        protected string GetDataFlowStepPrefix(string bucket, string key)
         {
             Logger.Info($"start-method <getdataflowstepprefix>");
 
             string filePrefix = null;
             if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.PRODUCER_S3_DROP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_ZIP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_GZIP_PREFIX) ||
@@ -201,18 +203,22 @@ namespace Sentry.data.Infrastructure
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_MAP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.GOOGLEAPI_PREPROCESSING_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CLAIMIQ_PREPROCESSING_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.FIXEDWIDTH_PREPROCESSING_PREFIX))
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.FIXEDWIDTH_PREPROCESSING_PREFIX) ||
+                (Regex.IsMatch(bucket, "^sentry-data-[\\S]*-droplocation-ae2$") && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.DROP_LOCATION_PREFIX)))
             {
+                Logger.Debug($"Using Get4thIndex strategy to detect prefix");
                 int idx = GetNthIndex(key, '/', 4);
                 filePrefix = key.Substring(0, (idx + 1));
             }
 
             if (filePrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.DROP_LOCATION_PREFIX))
             {
+                Logger.Debug($"Using Get3thIndex strategy to detect prefix");
                 int idx = GetNthIndex(key, '/', 3);
                 filePrefix = key.Substring(0, (idx + 1));
             }
 
+            Logger.Debug($"key:{key} | filePrefix: {filePrefix}");
             Logger.Info($"end-method <getdataflowstepprefix>");
 
             return filePrefix;            
@@ -227,6 +233,7 @@ namespace Sentry.data.Infrastructure
             //five level prefixes - temp locations
             //temp-file/<step prefix>/<env ind>/<data flow id>/<flowGuid>/
             if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.PRODUCER_S3_DROP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_ZIP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_GZIP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) ||

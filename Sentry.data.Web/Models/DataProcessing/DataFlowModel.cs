@@ -42,6 +42,7 @@ namespace Sentry.data.Web
         /// Target
         /// </summary>
         public int SchemaId { get; set; }
+        public string SAIDAssetKeyCode { get; set; }
 
         [DisplayName("Where should this data be loaded?")]
         public List<SchemaMapModel> SchemaMaps { get; set; }
@@ -56,6 +57,7 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> CompressionDropdown { get; set; }
         public IEnumerable<SelectListItem> PreProcessingRequiredDropdown { get; set; }
         public IEnumerable<SelectListItem> PreProcessingOptionsDropdown { get; set; }
+        public IEnumerable<SelectListItem> SAIDAssetDropDown { get; set; }
         [DisplayName("Pre Processing Options")]
         public List<int> PreprocessingOptions { get; set; }
 
@@ -103,36 +105,16 @@ namespace Sentry.data.Web
                 }
             }
 
-            //else if (SchemaMaps.Any(w => !w.IsDeleted))
-            //{
-            //    bool dsSelectionErr = false;
-            //    bool scmSelectionErr = false;
-            //    foreach (SchemaMapModel model in SchemaMaps.Where(w => !w.IsDeleted))
-            //    {
-            //        if (model.SelectedDataset == 0)
-            //        {
-            //            dsSelectionErr = true;
-            //        }
-            //        if (model.SelectedSchema == 0)
-            //        {
-            //            scmSelectionErr = true;
-            //        }
-            //    }
-
-            //    if (dsSelectionErr)
-            //    {
-            //        results.Add(SchemaMap.ValidationErrors.schemamapMustContainDataset, "Must select dataset for schema mapping");
-            //    }
-            //    if (scmSelectionErr)
-            //    {
-            //        results.Add(SchemaMap.ValidationErrors.schemamapMustContainSchema, "Must select schema for schema mapping");
-            //    }
-            //}
-
             if (IsPreProcessingRequired && PreprocessingOptions.Count == 1 && PreprocessingOptions.First() == 0)
             {
                 results.Add("PreprocessingOptions", "Pre Processing selection is required");
             }
+
+            if (String.IsNullOrWhiteSpace(SAIDAssetKeyCode))
+            {
+                results.Add(DataFlow.ValidationErrors.saidAssetIsBlank, "Must associate data flow with SAID asset");
+            }
+
             ValidationException ex = new ValidationException(results);            
             return ex;
         }

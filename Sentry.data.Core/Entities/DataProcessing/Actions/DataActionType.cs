@@ -26,6 +26,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
         [Description("ClaimIQ")]
         ClaimIq = 10,
         [Description("Fixed Width")]
-        FixedWidth = 11
+        FixedWidth = 11,
+        [Description("Producer S3 Drop")]
+        ProducerS3Drop = 12
     }
 }

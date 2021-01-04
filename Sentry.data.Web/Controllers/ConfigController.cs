@@ -93,17 +93,10 @@ namespace Sentry.data.Web.Controllers
                 {
                     DatasetFileConfigsModel model = new DatasetFileConfigsModel(config, true, false);
 
-                    Tuple<List<RetrieverJob>, List<DataFlowStepDto>> jobs =  _configService.GetDataFlowDropLocationJobs(config);
-                    List<DataFlowStepModel> stepModels = new List<DataFlowStepModel>();
-                    foreach (DataFlowStepDto stepDto in jobs.Item2)
-                    {
-                        DataFlowStepModel stepModel = stepDto.ToModel();
-                        stepModel.RootAwsUrl = $"https://{AwsRegion.ToLower()}.amazonaws.com/{RootBucket.ToLower()}/";
-                        stepModels.Add(stepModel);
-                    }
-
                     model.RetrieverJobs = config.RetrieverJobs;
-                    model.DataFlowJobs = new Tuple<List<RetrieverJob>, List<DataFlowStepModel>>( jobs.Item1, stepModels );
+                    Tuple<DataFlowDetailDto, List<RetrieverJob>> jobs2 = _configService.GetDataFlowForSchema(config);
+                    model.DataFlowJobs = (jobs2.Item1 != null) ? jobs2.ToModel() : null;
+
                     model.ExternalDataFlowJobs = _configService.GetExternalDataFlowsBySchema(config).ToModel();
                     configModelList.Add(model);
                 }

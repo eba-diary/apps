@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Sentry.Common.Logging;
-using Sentry.data.Core.Exceptions;
 using Sentry.Configuration;
+using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Sentry.data.Core.Entities.DataProcessing;
 
 namespace Sentry.data.Core
 {
@@ -1206,6 +1206,25 @@ namespace Sentry.data.Core
             }
 
             return jobTuple;
+        }
+
+        public Tuple<DataFlowDetailDto, List<RetrieverJob>> GetDataFlowForSchema(DatasetFileConfig config)
+        {
+            
+            ///Determine all SchemaMap steps which reference this schema
+            SchemaMap schemaMap = _datasetContext.SchemaMap.FirstOrDefault(w => w.MappedSchema == config.Schema && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaLoad);
+            DataFlowDetailDto dfDto = (schemaMap != null) ? _dataFlowService.GetDataFlowDetailDto(schemaMap.DataFlowStepId.DataFlow.Id) : null;
+            //DataFlowDetailDto dfDto = _dataFlowService.GetDataFlowDetailDto(schemaMap.DataFlowStepId.DataFlow.Id);
+
+            List<RetrieverJob> rjList = new List<RetrieverJob>();
+            if (dfDto != null)
+            {
+                rjList.AddRange(_datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == dfDto.Id).ToList());
+            }
+
+            Tuple<DataFlowDetailDto, List<RetrieverJob>> schemaDataflow = new Tuple<DataFlowDetailDto, List<RetrieverJob>>(dfDto, rjList);
+
+            return schemaDataflow;
         }
 
         public List<Tuple<DataFlowDetailDto, List<RetrieverJob>>> GetExternalDataFlowsBySchema(DatasetFileConfig config)
