@@ -12,7 +12,8 @@
 		  (8,	'Schema Map'),
 		  (9,	'Google Api'),
 		  (10,	'ClaimIQ'),
-		  (11,	'Fixed Width')
+		  (11,	'Fixed Width'),
+		  (12,	'Producer S3 Drop')
         )
         AS Source ([ID], [Name])
         ON Target.[ID] = Source.[ID]   

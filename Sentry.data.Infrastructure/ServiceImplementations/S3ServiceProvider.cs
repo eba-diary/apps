@@ -8,7 +8,6 @@ using Sentry.Common.Logging;
 using Sentry.Configuration;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure.Exceptions;
-using StructureMap;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -399,7 +398,7 @@ namespace Sentry.data.Infrastructure
             List<UploadPartResponse> uploadResponses = new List<UploadPartResponse>();
             string versionId = null;
             
-            string uploadId = StartUpload(targetKey);
+            string uploadId = StartUpload(RootBucket, targetKey);
 
             long contentLength = new FileInfo(sourceFilePath).Length;
 
@@ -472,10 +471,10 @@ namespace Sentry.data.Infrastructure
         /// </summary>
         /// <param name="uniqueKey"></param>
         /// <returns></returns>
-        public string StartUpload(string uniqueKey)
+        public string StartUpload(string bucket, string uniqueKey)
         {
             InitiateMultipartUploadRequest mReq = new InitiateMultipartUploadRequest();
-            mReq.BucketName = RootBucket;
+            mReq.BucketName = bucket;
             mReq.Key = uniqueKey;
             mReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
             mReq.CannedACL = GetCannedAcl();
@@ -543,15 +542,15 @@ namespace Sentry.data.Infrastructure
 
         #region MultiPartUpload - Copy
 
-        private async Task MultiPartCopy(string sourceKey, string targetKey)
+        private async Task MultiPartCopy(string sourceBucket, string sourceKey, string targetBucket, string targetKey)
         {
             List<CopyPartResponse> copyPartResponses = new List<CopyPartResponse>();
 
-            string uploadId = StartUpload(targetKey);
+            string uploadId = StartUpload(targetBucket, targetKey);
 
             try
             {
-                Dictionary<string, string> metadataresp = GetObjectMetadata(sourceKey);
+                Dictionary<string, string> metadataresp = GetObjectMetadata(sourceBucket, sourceKey, null);
 
                 long objectSize = Convert.ToInt64(metadataresp["ContentLength"]);
 
@@ -582,9 +581,9 @@ namespace Sentry.data.Infrastructure
                 {
                     CopyPartRequest copyRequest = new CopyPartRequest
                     {
-                        DestinationBucket = RootBucket,
+                        DestinationBucket = targetBucket,
                         DestinationKey = targetKey,
-                        SourceBucket = RootBucket,
+                        SourceBucket = sourceBucket,
                         SourceKey = sourceKey,
                         UploadId = uploadId,
                         FirstByte = bytePosition,
@@ -596,12 +595,12 @@ namespace Sentry.data.Infrastructure
 
                     CopyPartResponse resp = copyPartResponses.Last();
                     Sentry.Common.Logging.Logger.Debug($"UploadID: {uploadId}: Processed part #{i} (source file position: {bytePosition}), and recieved response status {resp.HttpStatusCode} with ETag ({resp.ETag})");
-                    
+
                     bytePosition += partSize;
                 }
 
                 // Complete the copy.
-                await StopUpload(targetKey, uploadId, copyPartResponses);
+                await StopUpload(targetBucket, targetKey, uploadId, copyPartResponses);
             }
 
             catch (AmazonS3Exception e)
@@ -615,10 +614,10 @@ namespace Sentry.data.Infrastructure
                     UploadId = uploadId
                 };
 
-                AbortMultipartUploadResponse abortresp =  S3Client.AbortMultipartUpload(abortreq);
+                AbortMultipartUploadResponse abortresp = S3Client.AbortMultipartUpload(abortreq);
                 Logger.Info($"Abort request was {abortresp.HttpStatusCode.ToString()}");
                 throw new AmazonS3Exception(e);
-                
+
             }
             catch (Exception e)
             {
@@ -637,11 +636,11 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        private static async Task StopUpload(string uniqueKey, string uploadId, List<CopyPartResponse> responses)
+        private static async Task StopUpload(string bucket, string uniqueKey, string uploadId, List<CopyPartResponse> responses)
         {
             CompleteMultipartUploadRequest cReq = new CompleteMultipartUploadRequest
             { 
-                BucketName = RootBucket,
+                BucketName = bucket,
                 Key = uniqueKey,
                 UploadId = uploadId
             };
@@ -906,12 +905,13 @@ namespace Sentry.data.Infrastructure
             return dsList;
         }
 
-        public Dictionary<string,string> GetObjectMetadata(string key, string versionId = null)
+        public Dictionary<string, string> GetObjectMetadata(string bucket, string key, string versionId = null)
         {
+            string awsBucket = (String.IsNullOrWhiteSpace(bucket)) ? RootBucket : bucket;
             GetObjectMetadataRequest req = new GetObjectMetadataRequest();
             GetObjectMetadataResponse resp = null;
 
-            req.BucketName = RootBucket;
+            req.BucketName = awsBucket;
             req.Key = key;
             req.VersionId = versionId;
 
@@ -928,7 +928,7 @@ namespace Sentry.data.Infrastructure
                     ||
                     amazonS3Exception.ErrorCode.Equals("Forbidden")))
                 {
-                    throw new Exception($"Failed GetObjectMetadata - Check the provided AWS Credentials ({amazonS3Exception.Message})");                    
+                    throw new Exception($"Failed GetObjectMetadata - Check the provided AWS Credentials ({amazonS3Exception.Message})");
                 }
                 else
                 {
@@ -941,6 +941,11 @@ namespace Sentry.data.Infrastructure
             }
 
             return ConvertObjectMetadataResponse(resp);
+        }
+
+        public Dictionary<string,string> GetObjectMetadata(string key, string versionId = null)
+        {
+            return GetObjectMetadata(RootBucket, key, versionId);
         }
 
         //public string GetObject(string key, string versionId)
@@ -1097,7 +1102,7 @@ namespace Sentry.data.Infrastructure
                 Logger.Debug("s3serviceprovider-copyobject-startmethod");
                 Logger.Debug($"s3serviceprovider-copyobject processing sourcebucket:{srcBucket} sourcekey:{srcKey} targetbucket:{destBucket} targetkey:{destKey}");
                 
-                Dictionary<string, string> resp = GetObjectMetadata(srcKey);
+                Dictionary<string, string> resp = GetObjectMetadata(srcBucket, srcKey, null);
 
                 long objectSize = Convert.ToInt64(resp["ContentLength"]);
 
@@ -1105,7 +1110,7 @@ namespace Sentry.data.Infrastructure
                 if (objectSize > 5 * (long)Math.Pow(2, 30))
                 {
                     Logger.Info($"Using MultiPartCopy - FileSize({objectSize})");
-                    MultiPartCopy(srcKey, destKey).Wait();
+                    MultiPartCopy(srcBucket, srcKey, destBucket, destKey).Wait();
                     stopWatch.Stop();
 
                     Logger.Debug($"s3serviceprovider-copyobject-successful", new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }.ToArray());
@@ -1128,7 +1133,7 @@ namespace Sentry.data.Infrastructure
                     CopyObjectResponse response = S3Client.CopyObject(request);
                     if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
                     {
-                        resp = GetObjectMetadata(destKey, null);
+                        resp = GetObjectMetadata(destBucket, destKey, null);
                     }
                     stopWatch.Stop();
 

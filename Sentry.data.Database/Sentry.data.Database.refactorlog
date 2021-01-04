@@ -945,4 +945,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[CLA1396_NewEtlColumns]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="1b719c1c-49c4-4b27-8d5b-f0b4f47faf14" ChangeDateTime="12/21/2020 18:44:47">
+    <Property Name="ElementName" Value="[dbo].[DataFlow].[SaidKeyCdoe]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataFlow]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[SaidKeyCode]" />
+  </Operation>
 </Operations>
