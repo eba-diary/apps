@@ -131,13 +131,13 @@
                 <dateline>
                     <date when="1910-12-31">Saturday. Dec. 31st.</date>
                 </dateline>
-                <p>We have had a cold week. <persName ref="#Davis_Theodore_M">Theo</persName> spent his usual 3 days in the <placeName ref="#Valley_of_the_Kings">Valley</placeName> &#8211; nothing has yet been found. We have seen a good deal of <persName ref="#Whitaker_Mr">Mr. Whitaker</persName> and his party. They are on the old <name type="boat">Cleopatra</name> &#8211; but he has done a great deal to it and put about a great many pretty things, and <pb n="77"/> It looks very attractive. <personGrp ref="#Newberry">Mr. and Mrs. Newberry</personGrp> are with him, and they are to excavate somewhere near <placeName ref="#Akhmim">Akmim.</placeName></p>
+                <p>We have had a cold week. <persName ref="#Davis_Theodore_M">Theo</persName> spent his usual 3 days in the <placeName ref="#Valley_of_the_Kings">Valley</placeName> &#8211; nothing has yet been found. We have seen a good deal of <persName ref="#Whitaker_Mr">Mr. Whitaker</persName> and his party. They are on the old <name type="boat" ref="#Cleopatra">Cleopatra</name> &#8211; but he has done a great deal to it and put about a great many pretty things, and <pb n="77"/> it looks very attractive. <personGrp ref="#Newberry">Mr. and Mrs. Newberry</personGrp> are with him, and they are to excavate somewhere near <placeName ref="#Akhmim">Akmim.</placeName></p>
             </div>
             <div xml:id="EBA-1911-01-07" type="entry">
                 <dateline>
                     <date when="1911-01-07">Saturday Jan. 7. 1911</date>
                 </dateline>
-                <p>The <name type="boat">"Miriam"</name> with the <personGrp ref="#Maspero">Masperos</personGrp> arrived on <date when="1911-01-03">the 3rd</date>. <persName ref="#Davis_Theodore_M">Theo</persName> and I called on them the next morning. <persName ref="#Maspero_Mme">Madame Maspero</persName> has been very ill on the way up with a bronchial attack. They are to stay 3 weeks. <persName ref="#McCormick_Mrs">Mrs. McCormick</persName> and <persName ref="#Scott_Miss">Miss Scott</persName> dined here tonight.</p>
+                <p>The <name type="boat" ref="#Miriam">"Miriam"</name> with the <personGrp ref="#Maspero">Masperos</personGrp> arrived on <date when="1911-01-03">the 3rd</date>. <persName ref="#Davis_Theodore_M">Theo</persName> and I called on them the next morning. <persName ref="#Maspero_Mme">Madame Maspero</persName> has been very ill on the way up with a bronchial attack. They are to stay 3 weeks. <persName ref="#McCormick_Mrs">Mrs. McCormick</persName> and <persName ref="#Scott_Miss">Miss Scott</persName> dined here tonight.</p>
             </div>
             <div xml:id="EBA-1911-01-14" type="entry">
                 <dateline>
@@ -155,14 +155,14 @@
                 <dateline>
                     <date when="1911-01-28">Saturday. Jan. 28th.</date>
                 </dateline>
-                <p>A rather cold stormy week, with a little rain. <persName ref="#Hunter_Mrs">Mrs. Hunter</persName> of <placeName ref="#London">London</placeName> dined on Monday &#8211; <personGrp ref="#Warner">Mrs. and Miss Warner</personGrp> of <placeName ref="#Boston">Boston</placeName> and <persName ref="#Webb_Miss">Miss Webb</persName>, a <personGrp ref="#Guadalmina">Marquise Guadalmina and her son</personGrp>, Spaniards, here to tea on Wednesday. <persName ref="#Davis_Theodore_M">Theo</persName> and I at <persName ref="#Mohassib_Mohammed">Mohassib</persName>'s' one morning &#8211; met <persName ref="#Cassatt_Mary_S">Miss Cassatt</persName>, the artist who lives in <placeName ref="#Paris">Paris.</placeName> <personGrp ref="#Kelekian">Mr. and Mrs. Kelekian</personGrp> came with her afterwards for tea. <persName ref="#Nicol_Mr">Mr Nicol</persName> dined on Friday. Cold and stormy.</p>
+                <p>A rather cold stormy week, with a little rain. <persName ref="#Hunter_Mrs">Mrs. Hunter</persName> of <placeName ref="#London">London</placeName> dined on Monday &#8211; <personGrp ref="#Warner">Mrs. and Miss Warner</personGrp> of <placeName ref="#Boston">Boston</placeName> and <persName ref="#Webb_Miss">Miss Webb</persName>, a <personGrp ref="#Guadalmina">Marquise Guadalmina and her son</personGrp>, Spaniards, here to tea on Wednesday. <persName ref="#Davis_Theodore_M">Theo</persName> and I at <persName ref="#Mohassib_Mohammed">Mohassib</persName>'s' one morning &#8211; met <persName ref="#Cassatt_Mary_S">Miss Cassatt</persName>, the artist who lives in <placeName ref="#Paris">Paris</placeName>. <personGrp ref="#Kelekian">Mr. and Mrs. Kelekian</personGrp> came with her afterwards for tea. <persName ref="#Nicol_Erskine">Mr Nicol</persName> dined on Friday. Cold and stormy.</p>
             </div>
             <pb n="78"/>
             <div xml:id="EBA-1911-02-04" type="entry">
                 <dateline>
                     <date when="1911-02-04">Saturday. Feb. 4th</date>
                 </dateline>
-                <p>Among our visitors this week was the Rev. <persName ref="#Peabody_Endicott">Endicott Peabody</persName>, Head Master of the famous school for boys at <placeName ref="#Groton">Groton, Mass.</placeName> Introduced by cable from Mr. <persName ref="#Osborn_Fairfield">Fairfield Osborn</persName>. A very interesting man. <personGrp ref='#Newberry'>Mr. and Mrs. Newberry</personGrp> dined on Tuesday. <personGrp ref="#Nahmstock">Mr. and Mrs. Nahmstock</personGrp> to lunch on Wednesday. <persName ref="#Davis_Theodore_M">Theo</persName> as usual in the Valley 3 days.</p>
+                <p>Among our visitors this week was the <persName ref="#Peabody_Endicott">Rev. Endicott Peabody</persName>, Head Master of the famous school for boys at <placeName ref="#Groton">Groton, Mass.</placeName> Introduced by cable from Mr. <persName ref="#Osborn_Fairfield">Fairfield Osborn</persName>. A very interesting man. <personGrp ref='#Newberry'>Mr. and Mrs. Newberry</personGrp> dined on Tuesday. <personGrp ref="#Nahmstock">Mr. and Mrs. Nahmstock</personGrp> to lunch on Wednesday. <persName ref="#Davis_Theodore_M">Theo</persName> as usual in the Valley 3 days.</p>
             </div>
             <div xml:id="EBA-1911-02-11" type="entry">
                 <dateline>
