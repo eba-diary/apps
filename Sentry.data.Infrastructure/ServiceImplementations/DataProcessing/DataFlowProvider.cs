@@ -130,7 +130,7 @@ namespace Sentry.data.Infrastructure
                     Logger.AddContextVariable(new TextVariable("flowexecutionguid", stepEvent.FlowExecutionGuid));
 
                     S3ObjectEvent s3Event = JsonConvert.DeserializeObject<S3ObjectEvent>(stepEvent.OriginalS3Event);
-                    Logger.AddContextVariable(new LongVariable("objectsize", (long)s3Event.s3.Object.size));
+                    Logger.AddContextVariable(new LongVariable("objectsize", s3Event.s3.Object.size));
                     if (stepEvent.RunInstanceGuid != null)
                     {
                         Logger.AddContextVariable(new TextVariable("runinstanceguid", stepEvent.RunInstanceGuid));
