@@ -96,7 +96,7 @@ namespace Sentry.data.Core.Entities.S3
         /// <summary>
         /// object-size
         /// </summary>
-        public int size { get; set; }
+        public long size { get; set; }
         /// <summary>
         /// object eTag
         /// </summary>
