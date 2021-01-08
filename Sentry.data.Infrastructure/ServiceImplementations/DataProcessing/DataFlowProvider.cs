@@ -204,7 +204,7 @@ namespace Sentry.data.Infrastructure
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.GOOGLEAPI_PREPROCESSING_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CLAIMIQ_PREPROCESSING_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.FIXEDWIDTH_PREPROCESSING_PREFIX) ||
-                (Regex.IsMatch(bucket, "^sentry-data-[\\S]*-droplocation-ae2$") && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.DROP_LOCATION_PREFIX)))
+                ((bucket.EndsWith("-droplocation-ae2") && bucket.StartsWith("sentry-data-")) && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.DROP_LOCATION_PREFIX)))
             {
                 Logger.Debug($"Using Get4thIndex strategy to detect prefix");
                 int idx = GetNthIndex(key, '/', 4);
