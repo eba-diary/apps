@@ -94,7 +94,19 @@ data.Dataset = {
             //buttons to show and customize text for them
             buttons:
             [
-                { extend: 'colvis', text: 'Columns' }
+                { extend: 'colvis', text: 'Columns' },
+                {
+                    text: 'Snowflake',
+                    action: function (e, dt, node, config) {
+                        data.Dataset.delroyQueryGenerator('snow');
+                    }
+                },
+                {
+                    text: 'Hive',
+                    action: function (e, dt, node, config) {
+                        data.Dataset.delroyQueryGenerator('hive');
+                    }
+                }
             ]
         });
 
@@ -230,6 +242,40 @@ data.Dataset = {
             return ' ';
         }
     },
+
+
+    //Generate Query     
+    delroyQueryGenerator: function (queryType) {
+
+        var field = data.Dataset.delroyGetLatestField();
+
+        //Send the JSON array to Controller using AJAX.
+        $.ajax({
+            type: "POST",
+            url: "/Dataset/DelroyGenerateQuery",
+            traditional: true,
+            data: JSON.stringify({ models: field, queryType: queryType }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (r) {
+                if (r.success) {
+
+
+                    data.Dale.makeToast("success", "Success!  Changes Saved.");
+                }
+                else {
+                    data.Dale.makeToast("error", "Failure!  Please try again.");
+                }
+            },
+            failure: function () {
+                data.Dale.makeToast("error", "Failure!  Please try again.");
+            },
+            error: function () {
+                data.Dale.makeToast("error", "Failure!  Please try again.");
+            }
+        });
+    },
+
     //****************************************************************************************************
     //END DELROY FUNCTIONS
     //****************************************************************************************************

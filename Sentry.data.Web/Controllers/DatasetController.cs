@@ -1018,5 +1018,23 @@ namespace Sentry.data.Web.Controllers
             return View("QueryTool");
         }
 
+
+        [HttpPost]
+        public ActionResult DelroyGenerateQuery(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType)
+        {
+            bool success = false;
+
+            //success = _daleService.UpdateIsSensitive(models.ToDto());
+
+            if (success)
+            {
+                return Json(new { success = true });
+            }
+            else
+            {
+                return Json(new { success = false });
+            }
+        }
+
     }
 }
