@@ -134,7 +134,19 @@ namespace Sentry.data.Infrastructure
 
                 S3ServiceProvider s3Service = new S3ServiceProvider();
                 string targetkey = _targetPath;
-                var versionId = s3Service.UploadDataFile(tempFile, targetkey);
+
+                string versionId;
+                //Need to handle both a retrieverjob target (legacy platform) and 
+                //  S3Drop or ProducerS3Drop (new processing platform) data flow steps
+                //  as targets.
+                if (_targetStep != null)
+                {
+                    versionId = s3Service.UploadDataFile(tempFile, _targetStep.Action.TargetStorageBucket, targetkey);
+                }
+                else
+                {
+                   versionId = s3Service.UploadDataFile(tempFile, targetkey);
+                }
 
                 _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
 
