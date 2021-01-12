@@ -285,15 +285,28 @@ namespace Sentry.data.Infrastructure
 
         /// <summary>
         /// Upload a dataset to S3, pulling directly from the given source file path.  Files size less than
-        /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload.
+        /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload.  Target bucket will be
+        /// defaulted to DSC root bucket.
         /// </summary>
         /// <param name="sourceFilePath"></param>
         /// <param name="dataSet"></param>
         public string UploadDataFile(string sourceFilePath, string targetKey)
         {
+            return UploadDataFile(sourceFilePath, RootBucket, targetKey);
+        }
+
+        /// <summary>
+        /// Upload a dataset to S3, pulling directly from the given source file path.  Files size less than
+        /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload.
+        /// </summary>
+        /// <param name="sourceFilePath"></param>
+        /// <param name="targetKey"></param>
+        /// <param name="dataSet"></param>
+        public string UploadDataFile(string sourceFilePath, string targetBucket, string targetKey)
+        {
             System.IO.FileInfo fInfo = new System.IO.FileInfo(sourceFilePath);
 
-            return fInfo.Length > 5 * (long)Math.Pow(2, 20) ? MultiPartUpload(sourceFilePath, targetKey) : PutObject(sourceFilePath, targetKey);
+            return fInfo.Length > 5 * (long)Math.Pow(2, 20) ? MultiPartUpload(sourceFilePath, targetBucket, targetKey) : PutObject(sourceFilePath, targetBucket, targetKey);
         }
 
         /// <summary>
@@ -391,14 +404,14 @@ namespace Sentry.data.Infrastructure
         {
             //Number of parts need to be less that 95% of S3 multipart limit ("buffer" set by us)
             return ((incomingLength / partSize) > (partLimit * .95));            
-        }
+        }        
 
-        public string MultiPartUpload(string sourceFilePath, string targetKey)
+        public string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey)
         {
             List<UploadPartResponse> uploadResponses = new List<UploadPartResponse>();
             string versionId = null;
             
-            string uploadId = StartUpload(RootBucket, targetKey);
+            string uploadId = StartUpload(targetBucket, targetKey);
 
             long contentLength = new FileInfo(sourceFilePath).Length;
 
@@ -695,14 +708,14 @@ namespace Sentry.data.Infrastructure
             return versionId;
         }
 
-        private string PutObject(string sourceFilePath, string targetKey)
+        private string PutObject(string sourceFilePath, string targetBucket, string targetKey)
         {
             string versionId = null;
             try
             {
                 PutObjectRequest poReq = new PutObjectRequest();
                 poReq.FilePath = sourceFilePath;
-                poReq.BucketName = RootBucket;
+                poReq.BucketName = targetBucket;
                 poReq.Key = targetKey;
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 poReq.CannedACL = GetCannedAcl();
