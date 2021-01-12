@@ -445,7 +445,7 @@ namespace Sentry.data.Infrastructure
                 while (filePosition < contentLength)
                 {
                     //Adding responses to list as returned ETags are needed to close Multipart upload
-                    UploadPartResponse resp = UploadPart(targetKey, sourceFilePath, filePosition, partSize, partnumber, uploadId);
+                    UploadPartResponse resp = UploadPart(targetBucket, targetKey, sourceFilePath, filePosition, partSize, partnumber, uploadId);
 
                     Sentry.Common.Logging.Logger.Debug($"UploadID: {uploadId}: Processed part #{partnumber} (source file position: {filePosition}), and recieved response status {resp.HttpStatusCode} with ETag ({resp.ETag})");
 
@@ -457,7 +457,7 @@ namespace Sentry.data.Infrastructure
                 }
 
                 //Complete successful Multipart Upload so we do not continue to get chared for upload storage
-                versionId = StopUpload(targetKey, uploadId, uploadResponses);
+                versionId = StopUpload(targetBucket, targetKey, uploadId, uploadResponses);
 
             }
             catch (Exception ex)
@@ -498,10 +498,10 @@ namespace Sentry.data.Infrastructure
             return mRsp.UploadId;
         }
 
-        private UploadPartResponse UploadPart(string uniqueKey, string sourceFilePath, long filePosition, long partSize, int partNumber, string uploadId)
+        private UploadPartResponse UploadPart(string bucket, string uniqueKey, string sourceFilePath, long filePosition, long partSize, int partNumber, string uploadId)
         {
             UploadPartRequest uReq = new UploadPartRequest();
-            uReq.BucketName = RootBucket;
+            uReq.BucketName = bucket;
             uReq.Key = uniqueKey;
             uReq.FilePath = sourceFilePath;
             uReq.FilePosition = filePosition;
@@ -523,10 +523,10 @@ namespace Sentry.data.Infrastructure
         /// <param name="uniqueKey"></param>
         /// <param name="uploadId"></param>
         /// <returns></returns>
-        private string StopUpload(string uniqueKey, string uploadId, List<UploadPartResponse> responses)
+        private string StopUpload(string bucket, string uniqueKey, string uploadId, List<UploadPartResponse> responses)
         {
             CompleteMultipartUploadRequest cReq = new CompleteMultipartUploadRequest();
-            cReq.BucketName = RootBucket;
+            cReq.BucketName = bucket;
             cReq.Key = uniqueKey;
             cReq.UploadId = uploadId;
             cReq.AddPartETags(responses);
