@@ -1,4 +1,4 @@
-<TEI xmlns="http://www.tei-c.org/ns/1.0">
+f<TEI xmlns="http://www.tei-c.org/ns/1.0">
   <teiHeader>
     <fileDesc>
       <titleStmt>
@@ -40,7 +40,7 @@
                     <date when="1908-11-05">Thursday. Nov. 5th 1908.</date>
                     <name type="boat" ref="#SS_Princess_Irene">SS. Princess Irene</name>.
                 </dateline>
-                <p>We are nearing the end of this part of our voyage &#8211; having sailed from <placeName>New York</placeName> Saturday the 24th Oct. <persName>Mary Newberry</persName> who had been spending the week there, and <persName>Anita Ohio</persName> went down to see us off. Mrs. And Mr. <persName>Walter Jennings</persName> and family &#8211; 2 children, 2 maids, tutor and governess, with <persName>Miss Gallandet,</persName> and sister <persName>Miss Jennings,</persName> were fellow passengers. They are relatives of Mrs. <persName>Hugh Amkincloss,</persName> who was <persName>Miss Jennings.</persName> Mr. and Mrs. <persName>Herbert Pell,</persName> also on board. A dull voyage, much rain and warm &#8211; I occupied for the 3rd time the <orgName>Captain's</orgName> charming rooms on the bridge &#8211; and what lovely hours of rest and quiet I had, after all the din and stir of the summer. The steamer is comfortable but slow, we reached <placeName>Gibraltar</placeName> on the 11th day and ought to be in <placeName>Naples</placeName> tonight, only we won't, at least we hope to make our steamer tomorrow.</p>
+                <p>We are nearing the end of this part of our voyage &#8211; having sailed from <placeName ref="#New_York">New York</placeName> <date when="1908-10-24">Saturday the 24th Oct.</date> <persName ref="#Newberry_Mary">Mary Newberry</persName> who had been spending the week there, and <persName ref="#Ghio_Anita">Anita Ghio</persName> went down to see us off. <personGrp ref="#Jennings">Mrs. And Mr. Walter Jennings and family</personGrp> &#8211; 2 children, 2 maids, tutor and governess, with <persName ref="#Gallandet_Miss">Miss Gallandet</persName>, and sister <persName ref="#Jennings_Miss">Miss Jennings,</persName> were fellow passengers. They are relatives of <persName ref="#Auchincloss_Hugh">Mrs. Hugh Auchincloss</persName>, who was <persName ref="#Jennings_Miss">Miss Jennings</persName>. <personGrp ref="#Pell">Mr. and Mrs. Herbert Pell</personGrp>, also on board. A dull voyage, much rain and warm &#8211; I occupied for the 3rd time the Captain's charming rooms on the bridge &#8211; and what lovely hours of rest and quiet I had, after all the din and stir of the summer. The steamer is comfortable but slow, we reached <placeName ref="#Gibraltar">Gibraltar</placeName> on the 11th day and ought to be in <placeName ref="#Naples">Naples</placeName> tonight, only we won't, at least we hope to make our steamer tomorrow.</p>
             </div>
             <div xml:id="EBA-1908-11-09" type="entry">
                 <dateline>
