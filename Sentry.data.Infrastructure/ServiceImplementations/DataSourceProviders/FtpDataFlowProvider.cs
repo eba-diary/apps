@@ -87,7 +87,7 @@ namespace Sentry.data.Infrastructure
             var tempFile = SetupTempWorkSpace(absoluteUri);
 
             //Find the target prefix (s3) from S3DropAction on the DataFlow attached to RetrieverJob
-            DataFlowStep s3DropStep = _dataFlowService.GetDataFlowStepForDataFlowByActionType(_job.DataFlow.Id, DataActionType.S3Drop);
+            DataFlowStep s3DropStep = _dataFlowService.GetDataFlowStepForDataFlowByActionType(_job.DataFlow.Id, DataActionType.ProducerS3Drop);
 
             _job.JobLoggerMessage("Info", "Sending file to Temp location");
 
