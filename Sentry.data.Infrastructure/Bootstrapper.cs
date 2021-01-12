@@ -89,6 +89,13 @@ namespace Sentry.data.Infrastructure
             //Register other services
             Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();
             obsidianUserProvider.CacheTimeoutSeconds = int.Parse(Sentry.Configuration.Config.GetHostSetting("ObsidianUserCacheTimeoutMinutes")) * 60;
+            //The connection to obsidian it basic auth (since NTLM is significantly slower), therefore, wiring up user\pass credentials
+            obsidianUserProvider.Credentials = new System.Net.NetworkCredential(
+                Sentry.Configuration.Config.GetHostSetting("ServiceAccountID"),
+                Sentry.Configuration.Config.GetHostSetting("ServiceAccountPassword")
+                );
+
+
             registry.For<Sentry.Web.CachedObsidianUserProvider.IObsidianUserProvider>().Singleton().Use(obsidianUserProvider);
             registry.For<IAssociateInfoProvider>().Singleton().Use<AssociateInfoProvider>();
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
