@@ -57,9 +57,8 @@
     <Reference Include="Namotion.Reflection, Version=1.0.11.0, Culture=neutral, PublicKeyToken=c2f9c3bdfae56102, processorArchitecture=MSIL">
       <HintPath>..\packages\Namotion.Reflection.1.0.11\lib\net45\Namotion.Reflection.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NJsonSchema, Version=10.1.18.0, Culture=neutral, PublicKeyToken=c2f9c3bdfae56102, processorArchitecture=MSIL">
       <HintPath>..\packages\NJsonSchema.10.1.18\lib\net45\NJsonSchema.dll</HintPath>
@@ -137,6 +136,7 @@
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
     <Compile Include="DTO\Schema\Fields\DateFieldDto.cs" />
     <Compile Include="DTO\Schema\Fields\DecimalFieldDto.cs" />
+    <Compile Include="DTO\Schema\Fields\BigIntFieldDto.cs" />
     <Compile Include="DTO\Schema\Fields\IntegerFieldDto.cs" />
     <Compile Include="DTO\Schema\Fields\StructFieldDto.cs" />
     <Compile Include="DTO\Schema\Fields\TimestampFieldDto.cs" />
@@ -148,10 +148,11 @@
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\FixedWidthAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleApiAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\ProducerS3DropAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\SchemaMapAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressGzipAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressZip.cs" />
-    <Compile Include="Entities\DataProcessing\DataFlow_Log.cs" />
+    <Compile Include="Entities\DataProcessing\EventMetric.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ActionTypeAttribute.cs" />
     <Compile Include="Entities\DataProcessing\Actions\BaseAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ConvertToParquetAction.cs" />
@@ -185,8 +186,9 @@
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Entities\S3\S3LambdaEvent.cs" />
     <Compile Include="Entities\S3\S3ObjectEvent.cs" />
+    <Compile Include="Entities\Security\SAIDAsset.cs" />
     <Compile Include="Entities\Schema\BaseField.cs" />
-    <Compile Include="Entities\Schema\BigintField.cs" />
+    <Compile Include="Entities\Schema\BigIntField.cs" />
     <Compile Include="Entities\Schema\DateField.cs" />
     <Compile Include="Entities\Schema\DecimalField.cs" />
     <Compile Include="Entities\Schema\FileSchema.cs" />
@@ -196,6 +198,7 @@
     <Compile Include="Entities\Schema\StructField.cs" />
     <Compile Include="Entities\Schema\TimestampField.cs" />
     <Compile Include="Entities\Schema\VarcharField.cs" />
+    <Compile Include="Entities\Security\SAIDRole.cs" />
     <Compile Include="Entities\Subscriptions\BusinessAreaSubscription.cs" />
     <Compile Include="Entities\Subscriptions\EventTypeGroup.cs" />
     <Compile Include="Exceptions\DaleInvalidSearchException.cs" />
@@ -226,6 +229,7 @@
     <Compile Include="Factories\Fields\DateFieldDtoFactory.cs" />
     <Compile Include="Factories\Fields\DecimalFieldDtoFactory.cs" />
     <Compile Include="Factories\Fields\FieldDtoFactory.cs" />
+    <Compile Include="Factories\Fields\BigIntFieldDtoFactory.cs" />
     <Compile Include="Factories\Fields\IntegerFieldDtoFactory.cs" />
     <Compile Include="Factories\Fields\StructFieldDtoFactory.cs" />
     <Compile Include="Factories\Fields\TimestampFieldDtoFactory.cs" />
@@ -241,6 +245,7 @@
     <Compile Include="GlobalEnums\RetrieverJobScheduleTypes.cs" />
     <Compile Include="GlobalEnums\SchemaDatatypes.cs" />
     <Compile Include="Helpers\LambdaClientConfig.cs" />
+    <Compile Include="Helpers\LoggingUtils.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IConvertToParquetProvider.cs" />
@@ -251,6 +256,7 @@
     <Compile Include="Interfaces\DataProcessing\IDataStepService.cs" />
     <Compile Include="Interfaces\DataProcessing\IFixedWidthProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IGoogleApiActionProvider.cs" />
+    <Compile Include="Interfaces\DataProcessing\IProducerS3DropProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IQueryStorageProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IRawStorageProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IS3DropProvider.cs" />
@@ -265,6 +271,8 @@
     <Compile Include="Interfaces\IDataFeatures.cs" />
     <Compile Include="Interfaces\IRetrieverJobService.cs" />
     <Compile Include="Interfaces\IHiveOdbcProvider.cs" />
+    <Compile Include="Interfaces\ISAIDRestClient.cs" />
+    <Compile Include="Interfaces\ISAIDService.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />

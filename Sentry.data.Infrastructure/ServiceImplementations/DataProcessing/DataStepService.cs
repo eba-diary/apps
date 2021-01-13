@@ -35,7 +35,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
             {
                 IDatasetContext _dsContext = container.GetInstance<IDatasetContext>();
 
-                List<DataFlow_Log> Logs = new List<DataFlow_Log>();
+                List<EventMetric> Logs = new List<EventMetric>();
                 try
                 {                
                     SetStepProvider(step.DataAction_Type_Id, container);
@@ -84,6 +84,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
             switch (actionType)
             {
                 case DataActionType.S3Drop:
+                case DataActionType.ProducerS3Drop:
                     _provider = container.GetInstance<IS3DropProvider>();
                     break;
                 case DataActionType.RawStorage:

@@ -1,4 +1,9 @@
-﻿using Sentry.data.Core.Entities.DataProcessing;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Sentry.Common.Logging;
+using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Helpers;
+using System;
 using System.Collections.Generic;
 
 namespace Sentry.data.Core
@@ -8,7 +13,7 @@ namespace Sentry.data.Core
         public static List<DataFlowDto> ToDtoList(this List<DataFlow> dfList)
         {
             List<DataFlowDto> dtoList = new List<DataFlowDto>();
-            foreach(DataFlow df in dfList)
+            foreach (DataFlow df in dfList)
             {
                 dtoList.Add(df.ToDto());
             }
@@ -21,6 +26,7 @@ namespace Sentry.data.Core
             {
                 Id = df.Id,
                 FlowGuid = df.FlowGuid,
+                SaidKeyCode = df.SaidKeyCode,
                 Name = df.Name,
                 CreateDTM = df.CreatedDTM,
                 CreatedBy = df.CreatedBy
@@ -73,6 +79,82 @@ namespace Sentry.data.Core
                 }
             }
             return -1;
+        }
+
+        public static EventMetric LogExecution(this DataFlowStep step, string executionGuid, string runInstanceGuid, string log, Log_Level level, Exception ex = null)
+        {
+            return step.LogExecution(executionGuid, runInstanceGuid, log, level, null, ex);
+        }
+        public static EventMetric LogExecution(this DataFlowStep step, string executionGuid, string runInstanceGuid, string log, Log_Level level, List<Variable> contextVariables, Exception ex = null)
+        {
+            EventMetric metricData = LoggingUtils.LogExecution(executionGuid, runInstanceGuid, log, level, contextVariables, ex);
+            metricData.Step = step;
+            return metricData;
+        }
+        public static EventMetric LogExecution(this DataFlowStep step, string executionGuid, string runInstanceGuid, JObject metricData, Log_Level level, Exception ex = null)
+        {
+            return step.LogExecution(executionGuid, runInstanceGuid, metricData, level, null, ex);
+        }
+        public static EventMetric LogExecution(this DataFlowStep step, string executionGuid, string runInstanceGuid, JObject metricData, Log_Level level, List<Variable> contextVariables, Exception ex = null)
+        {
+            //log specific log message if it exists, otherwise log the metricData object
+            string msg = (metricData.ContainsKey("log")) ? metricData.GetValue("log").ToString() : metricData.ToString();
+            LoggingUtils.LogMessage(msg, level, contextVariables, ex);
+            return step.ToEventMetric(executionGuid, runInstanceGuid, metricData);
+        }
+        public static EventMetric LogExecution(this DataFlowStep step, DataFlowStepEvent eventItem, JObject metricData, Log_Level level, Exception ex = null)
+        {
+            return step.LogExecution(eventItem, metricData, level, null, ex);
+        }
+        public static EventMetric LogExecution(this DataFlowStep step, DataFlowStepEvent eventItem, JObject metricData, Log_Level level, List<Variable> contextVariables, Exception ex = null)
+        {
+            string logMsg = (metricData.ContainsKey("log")) ? metricData.GetValue("log").ToString() : null;
+            LoggingUtils.LogMessage(logMsg, level, contextVariables, ex);
+            return step.ToEventMetric(eventItem, metricData);
+        }
+        public static EventMetric LogExecution(this DataFlow flow, string executionGuid, string runInstanceGuid, string log, Log_Level level, Exception ex = null)
+        {
+            return LogExecution(flow, executionGuid, runInstanceGuid, log, level, null, ex);
+        }
+        public static EventMetric LogExecution(this DataFlow flow, string executionGuid, string runInstanceGuid, string log, Log_Level level, List<Variable> contextVariables, Exception ex = null)
+        {
+            EventMetric metricData = LoggingUtils.LogExecution(executionGuid, runInstanceGuid, log, level, contextVariables, ex);
+            return metricData;
+        }
+
+
+        //Convert to EventMetric extensions
+        public static EventMetric ToEventMetric(this DataFlowStep step, string executionGuid, string runInstanceGuid, JObject metricData)
+        {
+            return new EventMetric()
+            {
+                FlowExecutionGuid = executionGuid,
+                RunInstanceGuid = runInstanceGuid,
+                Step = step,
+                MessageValue = (metricData.ContainsKey("message_value")) ? metricData.GetValue("message_value").ToString() : null,
+                MachineName = System.Environment.MachineName,
+                //ApplicationName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name,
+                ApplicationName = AppDomain.CurrentDomain.FriendlyName.Replace(".exe", "").ToUpper(),
+                MetricsData = metricData.ToString(),
+                CreatedDTM = DateTime.Now,
+                StatusCode = (metricData.ContainsKey("status")) ? metricData.GetValue("status").ToString() : null
+            };
+        }
+        public static EventMetric ToEventMetric(this DataFlowStep step, DataFlowStepEvent eventItem, JObject metricData)
+        {
+            return new EventMetric()
+            {
+                FlowExecutionGuid = eventItem.FlowExecutionGuid,
+                RunInstanceGuid = eventItem.RunInstanceGuid,
+                Step = step,
+                MessageValue = (metricData.ContainsKey("message_value")) ? metricData.GetValue("message_value").ToString() : null,
+                MachineName = System.Environment.MachineName,
+                MetricsData = metricData.ToString(),
+                CreatedDTM = DateTime.Now,
+                //ApplicationName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name,
+                ApplicationName = AppDomain.CurrentDomain.FriendlyName.Replace(".exe", "").ToUpper(),
+                StatusCode = (metricData.ContainsKey("status")) ? metricData.GetValue("status").ToString() : null
+            };
         }
     }
 }

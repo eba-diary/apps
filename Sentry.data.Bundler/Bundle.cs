@@ -519,7 +519,7 @@ namespace Sentry.data.Bundler
                     obj.VersionId = item.Item2;
 
                     //Get object metadata, without retrieving whole object, specifically for the size of the object
-                    Dictionary<string, string> resp = _s3Service.GetObjectMetadata(obj.Key, obj.VersionId);
+                    Dictionary<string, string> resp = _s3Service.GetObjectMetadata(null, obj.Key, obj.VersionId);
 
                     obj.ContentLenght = Convert.ToInt64(resp["ContentLength"]);
 

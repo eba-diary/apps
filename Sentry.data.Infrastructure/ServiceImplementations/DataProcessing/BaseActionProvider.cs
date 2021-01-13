@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core;
+﻿using Newtonsoft.Json.Linq;
+using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.S3;
 using Sentry.data.Core.Interfaces.DataProcessing;
@@ -13,6 +14,22 @@ namespace Sentry.data.Infrastructure
     {
         private readonly IDataFlowService _dataFlowService;
         private static Random random = new Random();
+        private JObject _metricData;
+
+        public JObject MetricData
+        {
+            get
+            {
+                if (_metricData == null)
+                {
+                    _metricData = new JObject();
+                    return _metricData;
+                }
+
+                return _metricData;
+            }
+            set { _metricData = value; }
+        }
 
         public BaseActionProvider(IDataFlowService dataFlowService)
         {

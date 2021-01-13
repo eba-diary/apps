@@ -12,6 +12,16 @@ namespace Sentry.data.Core
         /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload.
         /// </summary>
         /// <param name="sourceFilePath"></param>
+        /// <param name="targetKey"></param>
+        /// <param name="dataSet"></param>
+        string UploadDataFile(string sourceFilePath, string targetBucket, string targetKey);
+
+        /// <summary>
+        /// Upload a dataset to S3, pulling directly from the given source file path.  Files size less than
+        /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload. Target bucket will be 
+        /// defaulted to DSC root bucket.
+        /// </summary>
+        /// <param name="sourceFilePath"></param>
         /// <param name="dataSet"></param>
         string UploadDataFile(string sourceFilePath, string targetKey);
 
@@ -46,15 +56,31 @@ namespace Sentry.data.Core
         #endregion
         void DeleteMulitpleS3keys(List<string> keys);
 
-        string MultiPartUpload(string sourceFilePath, string targetKey);
+        string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey);
 
         string GetDatasetDownloadURL(string key, string versionId, string fileName);
 
+        /// <summary>
+        /// Returns object metadata for S3 object.
+        /// </summary>
+        /// <param name="bucket"> Will default to DSC root bucket if null or empty string</param>
+        /// <param name="key"></param>
+        /// <param name="versionId"> If left null willl perform action on latest version of S3 object</param>
+        /// <returns></returns>
+        Dictionary<string, string> GetObjectMetadata(string bucket, string key, string versionId = null);
+
+        /// <summary>
+        /// Returns object metadata for S3 object.  Will default
+        ///   bucket to DSC root bucket
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="versionId"></param>
+        /// <returns></returns>
         Dictionary<string, string> GetObjectMetadata(string key, string versionId = null);
 
         Stream GetObject(string key, string versionId);
 
-        string StartUpload(string uniqueKey);
+        string StartUpload(string bucket, string uniqueKey);
 
         List<string> FindObject(string keyPrefix);
 

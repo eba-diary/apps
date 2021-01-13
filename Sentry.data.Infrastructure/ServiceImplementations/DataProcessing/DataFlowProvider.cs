@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
@@ -17,30 +19,45 @@ namespace Sentry.data.Infrastructure
     public class DataFlowProvider : IDataFlowProvider
     {
 
-        private List<DataFlow_Log> logs = new List<DataFlow_Log>();
+        private List<EventMetric> logs = new List<EventMetric>();
         private DataFlow _flow;
-        private string flowExecutionGuid = null;
-        private string runInstanceGuid = null;
+        private string flowExecutionGuid;
+        private string runInstanceGuid;
+        private JObject _metricData;
+
+        private JObject MetricData
+        {
+            get
+            {
+                if (_metricData == null)
+                {
+                    _metricData = new JObject();
+                    return _metricData;
+                }
+
+                return _metricData;
+            }
+            set { _metricData = value; }
+        }
+
 
         public async Task ExecuteDependenciesAsync(S3ObjectEvent s3e)
         {
             await ExecuteDependenciesAsync(s3e.s3.bucket.name, s3e.s3.Object.key, s3e);
-            //await ExecuteDependenciesAsync("sentry-dataset-management-np-nr", "data/17/TestFile.csv");
         }
         public async Task ExecuteDependenciesAsync(string bucket, string key, S3ObjectEvent s3Event)
         {
-            bool IsNewFile = true;
+            bool IsNewFile = false;
 
             using (IContainer container = Bootstrapper.Container.GetNestedContainer())
             {
                 IDatasetContext dsContext = container.GetInstance<IDatasetContext>();
-                IDataFlowService dfService = container.GetInstance<IDataFlowService>();
                 IDataStepService _stepService = container.GetInstance<IDataStepService>();
 
                 Logger.Info($"start-method <executedependencies>");
                 Logger.Debug($"<executedependencies> bucket:{bucket} key:{key} s3Event:{JsonConvert.SerializeObject(s3Event)}");
                 //Get prefix
-                string stepPrefix = GetDataFlowStepPrefix(key);
+                string stepPrefix = GetDataFlowStepPrefix(bucket, key);
                 if (stepPrefix != null)
                 {
                     try
@@ -61,7 +78,6 @@ namespace Sentry.data.Infrastructure
                             IsNewFile = true;
 
                             Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
-                            _flow.Logs.Add(_flow.LogExecution(flowExecutionGuid, $"Initialize flow execution bucket:{bucket}, key:{key}, file:{Path.GetFileName(key)}", Log_Level.Info));
                         }
                         else
                         {
@@ -88,19 +104,27 @@ namespace Sentry.data.Infrastructure
                                 Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
                             }
 
+                            if (IsNewFile)
+                            {
+                                MetricData.Add("status", "C");
+                                MetricData.Add("log", $"Initialize flow execution bucket:{bucket}, key:{key}, file:{Path.GetFileName(key)}");
+                                step.Executions.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, MetricData, Log_Level.Info));
+                                //step.Executions.Add(step.LogExecution(flowExecutionGuid, $"Initialize flow execution bucket:{bucket}, key:{key}, file:{Path.GetFileName(key)}", Log_Level.Info));
+                            }
+
                             _stepService.PublishStartEvent(step, flowExecutionGuid, runInstanceGuid, s3Event);
                         }
 
-                        _flow.LogExecution(flowExecutionGuid, $"end-method <executedependencies>", Log_Level.Info);
+                        _flow.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <executedependencies>", Log_Level.Info);
 
                         //save new logs
                         dsContext.SaveChanges();
                     }
                     catch (Exception ex)
                     {
-                        logs.Add(_flow.LogExecution(flowExecutionGuid, $"dataflowprovider-ExecuteDependenciesAsync-failed", Log_Level.Error, ex));
+                        logs.Add(_flow.LogExecution(flowExecutionGuid, runInstanceGuid, $"dataflowprovider-ExecuteDependenciesAsync-failed", Log_Level.Error, ex));
 
-                        _flow.LogExecution(flowExecutionGuid, $"end-method <executedependencies>", Log_Level.Info);
+                        _flow.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <executedependencies>", Log_Level.Info);
 
                         foreach (var log in logs)
                         {
@@ -160,15 +184,16 @@ namespace Sentry.data.Infrastructure
                 sb.AppendLine(step.ToString());
             }
 
-            logs.Add(flow.LogExecution(executionGuid, sb.ToString(), Log_Level.Info));
+            logs.Add(flow.LogExecution(executionGuid, runInstanceGuid, sb.ToString(), Log_Level.Info));
         }
 
-        protected string GetDataFlowStepPrefix(string key)
+        protected string GetDataFlowStepPrefix(string bucket, string key)
         {
             Logger.Info($"start-method <getdataflowstepprefix>");
 
             string filePrefix = null;
             if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.PRODUCER_S3_DROP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_ZIP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_GZIP_PREFIX) ||
@@ -178,18 +203,22 @@ namespace Sentry.data.Infrastructure
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_MAP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.GOOGLEAPI_PREPROCESSING_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CLAIMIQ_PREPROCESSING_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.FIXEDWIDTH_PREPROCESSING_PREFIX))
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.FIXEDWIDTH_PREPROCESSING_PREFIX) ||
+                ((bucket.EndsWith("-droplocation-ae2") && bucket.StartsWith("sentry-data-")) && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.DROP_LOCATION_PREFIX)))
             {
+                Logger.Debug($"Using Get4thIndex strategy to detect prefix");
                 int idx = GetNthIndex(key, '/', 4);
                 filePrefix = key.Substring(0, (idx + 1));
             }
 
             if (filePrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.DROP_LOCATION_PREFIX))
             {
+                Logger.Debug($"Using Get3thIndex strategy to detect prefix");
                 int idx = GetNthIndex(key, '/', 3);
                 filePrefix = key.Substring(0, (idx + 1));
             }
 
+            Logger.Debug($"key:{key} | filePrefix: {filePrefix}");
             Logger.Info($"end-method <getdataflowstepprefix>");
 
             return filePrefix;            
@@ -204,6 +233,7 @@ namespace Sentry.data.Infrastructure
             //five level prefixes - temp locations
             //temp-file/<step prefix>/<env ind>/<data flow id>/<flowGuid>/
             if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.PRODUCER_S3_DROP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_ZIP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_GZIP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) ||

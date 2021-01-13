@@ -161,7 +161,7 @@ namespace Sentry.data.Core
 
             string schemaFlowName = GenerateDataFlowNameForFileSchema(scm);
             DataFlow flow = _datasetContext.DataFlow.Where(w => w.Name == schemaFlowName).FirstOrDefault();
-            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow == flow && w.DataAction_Type_Id == DataActionType.S3Drop).FirstOrDefault();
+            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow == flow && (w.DataAction_Type_Id == DataActionType.S3Drop || w.DataAction_Type_Id == DataActionType.ProducerS3Drop)).FirstOrDefault();
             if (step == null)
             {
                 throw new DataFlowStepNotFound();
@@ -404,7 +404,8 @@ namespace Sentry.data.Core
                 CreatedDTM = DateTime.Now,
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
                 Questionnaire = dto.DFQuestionnaire,
-                FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE()
+                FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE(),
+                SaidKeyCode = dto.SaidKeyCode
             };
 
             _datasetContext.Add(df);
@@ -422,7 +423,7 @@ namespace Sentry.data.Core
             _datasetContext.Add(dfsDataFlowBasic);
 
             //Generate ingestion steps (get file to raw location)
-            AddDataFlowStep(dto, df, DataActionType.S3Drop);
+            AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop);
 
             AddDataFlowStep(dto, df, DataActionType.RawStorage);
 
@@ -471,7 +472,7 @@ namespace Sentry.data.Core
             _jobService.CreateAndSaveRetrieverJob(dto.RetrieverJob);
 
             //Generate ingestion steps (get file to raw location)
-            AddDataFlowStep(dto, df, DataActionType.S3Drop);
+            AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop);
 
             AddDataFlowStep(dto, df, DataActionType.RawStorage);
 
@@ -542,6 +543,7 @@ namespace Sentry.data.Core
         {
             dto.Id = df.Id;
             dto.FlowGuid = df.FlowGuid;
+            dto.SaidKeyCode = df.SaidKeyCode;
             dto.Name = df.Name;
             dto.CreateDTM = df.CreatedDTM;
             dto.CreatedBy = df.CreatedBy;
@@ -598,6 +600,7 @@ namespace Sentry.data.Core
             dto.ActionName = step.Action.Name;
             dto.ActionDescription = step.Action.Description;
             dto.TriggerKey = step.TriggerKey;
+            dto.TriggerBucket = step.Action.TargetStorageBucket;
             dto.TargetPrefix = step.TargetPrefix;
             dto.DataFlowId = step.DataFlow.Id;
         }
@@ -649,6 +652,9 @@ namespace Sentry.data.Core
             {                
                 case DataActionType.S3Drop:
                     action = _datasetContext.S3DropAction.FirstOrDefault();
+                    break;
+                case DataActionType.ProducerS3Drop:
+                    action = _datasetContext.ProducerS3DropAction.FirstOrDefault();
                     break;
                 case DataActionType.RawStorage:
                     action = _datasetContext.RawStorageAction.FirstOrDefault();
@@ -736,6 +742,10 @@ namespace Sentry.data.Core
             {
                 step.TriggerKey = $"droplocation/{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
             }
+            else if (step.DataAction_Type_Id == DataActionType.ProducerS3Drop)
+            {
+                step.TriggerKey = $"droplocation/data/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/";
+            }
             else
             {
                 step.TriggerKey = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
@@ -764,6 +774,7 @@ namespace Sentry.data.Core
                 case DataActionType.UncompressGzip:
                 case DataActionType.SchemaMap:
                 case DataActionType.S3Drop:
+                case DataActionType.ProducerS3Drop:
                 case DataActionType.FixedWidth:
                     step.TargetPrefix = null;
                     break;

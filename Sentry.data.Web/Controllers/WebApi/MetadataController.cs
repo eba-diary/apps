@@ -2,11 +2,9 @@
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Sentry.Common.Logging;
-using Sentry.Core;
 using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
-using Sentry.data.Core.Factories.Fields;
 using Sentry.data.Web.Models.ApiModels.Dataset;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using Sentry.WebAPI.Versioning;
@@ -78,6 +76,8 @@ namespace Sentry.data.Web.WebApi.Controllers
             public List<DataFlow> DataFlows { get; set; }
             public string HiveDatabase { get; set; }
             public List<string> HiveViews { get; set; }
+            public int SchemaId { get; set; }
+            public int DatasetId { get; set; }
             public List<string> SnowflakeViews { get; set; }
 
             //   public int Views { get; set; }
@@ -814,6 +814,10 @@ namespace Sentry.data.Web.WebApi.Controllers
 
                 Metadata m = new Metadata();
 
+                //grab DatasetId and  SchemaId to be used to fill delroy Fields grid
+                m.DatasetId = config.ParentDataset.DatasetId;
+                m.SchemaId = config.Schema.SchemaId;
+
                 m.Description = config.Description;
                 //m.DFSDropLocation = config.RetrieverJobs.Where(x => x.DataSource.Is<DfsBasic>()).Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType, JobId = x.Id }).FirstOrDefault();
 
@@ -860,7 +864,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                         });                        
                     }
 
-                    rjList.Add(item.Item1.steps.Where(w => w.DataActionType == Core.Entities.DataProcessing.DataActionType.S3Drop).Select(s => new DropLocation() { Name = s.ActionName, JobId = s.Id, IsEnabled = true, Location = s.TriggerKey }).FirstOrDefault());
+                    rjList.Add(item.Item1.steps.Where(w => w.DataActionType == Core.Entities.DataProcessing.DataActionType.S3Drop || w.DataActionType == Core.Entities.DataProcessing.DataActionType.ProducerS3Drop).Select(s => new DropLocation() { Name = s.ActionName, JobId = s.Id, IsEnabled = true, Location = $"{s.TriggerBucket}/{s.TriggerKey}" }).FirstOrDefault());
 
                     df.RetrieverJobs = rjList;
                     m.DataFlows.Add(df);
