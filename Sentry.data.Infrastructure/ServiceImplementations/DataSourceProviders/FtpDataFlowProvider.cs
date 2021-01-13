@@ -87,7 +87,7 @@ namespace Sentry.data.Infrastructure
             var tempFile = SetupTempWorkSpace(absoluteUri);
 
             //Find the target prefix (s3) from S3DropAction on the DataFlow attached to RetrieverJob
-            DataFlowStep s3DropStep = _dataFlowService.GetDataFlowStepForDataFlowByActionType(_job.DataFlow.Id, DataActionType.S3Drop);
+            DataFlowStep s3DropStep = _dataFlowService.GetDataFlowStepForDataFlowByActionType(_job.DataFlow.Id, DataActionType.ProducerS3Drop);
 
             _job.JobLoggerMessage("Info", "Sending file to Temp location");
 
@@ -118,9 +118,9 @@ namespace Sentry.data.Infrastructure
             _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
 
             string targetkey = $"{s3DropStep.TriggerKey}{Path.GetFileName(absoluteUri)}";
-            var versionId = _s3ServiceProvider.UploadDataFile(tempFile, targetkey);
+            var versionId = _s3ServiceProvider.UploadDataFile(tempFile, s3DropStep.Action.TargetStorageBucket, targetkey);
 
-            _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
+            _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{s3DropStep.Action.TargetStorageBucket + "/" + targetkey} | VersionId:{versionId})");
         }
 
         private void ProcessRegexFileNoDelete()

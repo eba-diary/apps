@@ -44,7 +44,7 @@ namespace Sentry.data.Infrastructure
         {
             string targetPath;
 
-            if (s3DropStep.DataAction_Type_Id != DataActionType.S3Drop)
+            if (s3DropStep.DataAction_Type_Id != DataActionType.S3Drop && s3DropStep.DataAction_Type_Id != DataActionType.ProducerS3Drop)
             {
                 throw new NotImplementedException("Only Configured to determine target path for S3DropSteps");
             }

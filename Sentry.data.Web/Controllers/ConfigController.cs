@@ -612,9 +612,10 @@ namespace Sentry.data.Web.Controllers
 
             try
             {
-                if (rj.FileSchema.DeleteInd)
+                if ((rj.DatasetConfig != null && rj.DatasetConfig.DeleteInd) ||
+                (rj.FileSchema != null && rj.FileSchema.DeleteInd))
                 {
-                    throw new DatasetFileConfigDeletedException("Parent Schema ");
+                    throw new DatasetFileConfigDeletedException("Parent Schema is marked for deletion");
                 }
 
                 AddCoreValidationExceptionsToModel(ejm.Validate());
