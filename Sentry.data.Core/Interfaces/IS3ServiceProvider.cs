@@ -12,6 +12,16 @@ namespace Sentry.data.Core
         /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload.
         /// </summary>
         /// <param name="sourceFilePath"></param>
+        /// <param name="targetKey"></param>
+        /// <param name="dataSet"></param>
+        string UploadDataFile(string sourceFilePath, string targetBucket, string targetKey);
+
+        /// <summary>
+        /// Upload a dataset to S3, pulling directly from the given source file path.  Files size less than
+        /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload. Target bucket will be 
+        /// defaulted to DSC root bucket.
+        /// </summary>
+        /// <param name="sourceFilePath"></param>
         /// <param name="dataSet"></param>
         string UploadDataFile(string sourceFilePath, string targetKey);
 
@@ -46,7 +56,7 @@ namespace Sentry.data.Core
         #endregion
         void DeleteMulitpleS3keys(List<string> keys);
 
-        string MultiPartUpload(string sourceFilePath, string targetKey);
+        string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey);
 
         string GetDatasetDownloadURL(string key, string versionId, string fileName);
 

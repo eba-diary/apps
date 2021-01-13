@@ -285,15 +285,28 @@ namespace Sentry.data.Infrastructure
 
         /// <summary>
         /// Upload a dataset to S3, pulling directly from the given source file path.  Files size less than
-        /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload.
+        /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload.  Target bucket will be
+        /// defaulted to DSC root bucket.
         /// </summary>
         /// <param name="sourceFilePath"></param>
         /// <param name="dataSet"></param>
         public string UploadDataFile(string sourceFilePath, string targetKey)
         {
+            return UploadDataFile(sourceFilePath, RootBucket, targetKey);
+        }
+
+        /// <summary>
+        /// Upload a dataset to S3, pulling directly from the given source file path.  Files size less than
+        /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload.
+        /// </summary>
+        /// <param name="sourceFilePath"></param>
+        /// <param name="targetKey"></param>
+        /// <param name="dataSet"></param>
+        public string UploadDataFile(string sourceFilePath, string targetBucket, string targetKey)
+        {
             System.IO.FileInfo fInfo = new System.IO.FileInfo(sourceFilePath);
 
-            return fInfo.Length > 5 * (long)Math.Pow(2, 20) ? MultiPartUpload(sourceFilePath, targetKey) : PutObject(sourceFilePath, targetKey);
+            return fInfo.Length > 5 * (long)Math.Pow(2, 20) ? MultiPartUpload(sourceFilePath, targetBucket, targetKey) : PutObject(sourceFilePath, targetBucket, targetKey);
         }
 
         /// <summary>
@@ -391,14 +404,14 @@ namespace Sentry.data.Infrastructure
         {
             //Number of parts need to be less that 95% of S3 multipart limit ("buffer" set by us)
             return ((incomingLength / partSize) > (partLimit * .95));            
-        }
+        }        
 
-        public string MultiPartUpload(string sourceFilePath, string targetKey)
+        public string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey)
         {
             List<UploadPartResponse> uploadResponses = new List<UploadPartResponse>();
             string versionId = null;
             
-            string uploadId = StartUpload(RootBucket, targetKey);
+            string uploadId = StartUpload(targetBucket, targetKey);
 
             long contentLength = new FileInfo(sourceFilePath).Length;
 
@@ -432,7 +445,7 @@ namespace Sentry.data.Infrastructure
                 while (filePosition < contentLength)
                 {
                     //Adding responses to list as returned ETags are needed to close Multipart upload
-                    UploadPartResponse resp = UploadPart(targetKey, sourceFilePath, filePosition, partSize, partnumber, uploadId);
+                    UploadPartResponse resp = UploadPart(targetBucket, targetKey, sourceFilePath, filePosition, partSize, partnumber, uploadId);
 
                     Sentry.Common.Logging.Logger.Debug($"UploadID: {uploadId}: Processed part #{partnumber} (source file position: {filePosition}), and recieved response status {resp.HttpStatusCode} with ETag ({resp.ETag})");
 
@@ -444,7 +457,7 @@ namespace Sentry.data.Infrastructure
                 }
 
                 //Complete successful Multipart Upload so we do not continue to get chared for upload storage
-                versionId = StopUpload(targetKey, uploadId, uploadResponses);
+                versionId = StopUpload(targetBucket, targetKey, uploadId, uploadResponses);
 
             }
             catch (Exception ex)
@@ -485,10 +498,10 @@ namespace Sentry.data.Infrastructure
             return mRsp.UploadId;
         }
 
-        private UploadPartResponse UploadPart(string uniqueKey, string sourceFilePath, long filePosition, long partSize, int partNumber, string uploadId)
+        private UploadPartResponse UploadPart(string bucket, string uniqueKey, string sourceFilePath, long filePosition, long partSize, int partNumber, string uploadId)
         {
             UploadPartRequest uReq = new UploadPartRequest();
-            uReq.BucketName = RootBucket;
+            uReq.BucketName = bucket;
             uReq.Key = uniqueKey;
             uReq.FilePath = sourceFilePath;
             uReq.FilePosition = filePosition;
@@ -510,10 +523,10 @@ namespace Sentry.data.Infrastructure
         /// <param name="uniqueKey"></param>
         /// <param name="uploadId"></param>
         /// <returns></returns>
-        private string StopUpload(string uniqueKey, string uploadId, List<UploadPartResponse> responses)
+        private string StopUpload(string bucket, string uniqueKey, string uploadId, List<UploadPartResponse> responses)
         {
             CompleteMultipartUploadRequest cReq = new CompleteMultipartUploadRequest();
-            cReq.BucketName = RootBucket;
+            cReq.BucketName = bucket;
             cReq.Key = uniqueKey;
             cReq.UploadId = uploadId;
             cReq.AddPartETags(responses);
@@ -695,14 +708,14 @@ namespace Sentry.data.Infrastructure
             return versionId;
         }
 
-        private string PutObject(string sourceFilePath, string targetKey)
+        private string PutObject(string sourceFilePath, string targetBucket, string targetKey)
         {
             string versionId = null;
             try
             {
                 PutObjectRequest poReq = new PutObjectRequest();
                 poReq.FilePath = sourceFilePath;
-                poReq.BucketName = RootBucket;
+                poReq.BucketName = targetBucket;
                 poReq.Key = targetKey;
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 poReq.CannedACL = GetCannedAcl();
