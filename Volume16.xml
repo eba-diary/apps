@@ -40,27 +40,27 @@
                     <date when="1908-11-05">Thursday. Nov. 5th 1908.</date>
                     <name type="boat" ref="#SS_Princess_Irene">SS. Princess Irene</name>.
                 </dateline>
-                <p>We are nearing the end of this part of our voyage &#8211; having sailed from <placeName>New York</placeName> Saturday the 24th Oct. <persName>Mary Newberry</persName> who had been spending the week there, and <persName>Anita Ohio</persName> went down to see us off. Mrs. And Mr. <persName>Walter Jennings</persName> and family &#8211; 2 children, 2 maids, tutor and governess, with <persName>Miss Gallandet,</persName> and sister <persName>Miss Jennings,</persName> were fellow passengers. They are relatives of Mrs. <persName>Hugh Amkincloss,</persName> who was <persName>Miss Jennings.</persName> Mr. and Mrs. <persName>Herbert Pell,</persName> also on board. A dull voyage, much rain and warm &#8211; I occupied for the 3rd time the <orgName>Captain's</orgName> charming rooms on the bridge &#8211; and what lovely hours of rest and quiet I had, after all the din and stir of the summer. The steamer is comfortable but slow, we reached <placeName>Gibraltar</placeName> on the 11th day and ought to be in <placeName>Naples</placeName> tonight, only we won't, at least we hope to make our steamer tomorrow.</p>
+                <p>We are nearing the end of this part of our voyage &#8211; having sailed from <placeName ref="#New_York">New York</placeName> <date when="1908-10-24">Saturday the 24th Oct.</date> <persName ref="#Newberry_Mary">Mary Newberry</persName> who had been spending the week there, and <persName ref="#Ghio_Anita">Anita Ghio</persName> went down to see us off. <personGrp ref="#Jennings">Mrs. And Mr. Walter Jennings and family</personGrp> &#8211; 2 children, 2 maids, tutor and governess, with <persName ref="#Gallandet_Miss">Miss Gallandet</persName>, and sister <persName ref="#Jennings_Miss">Miss Jennings,</persName> were fellow passengers. They are relatives of <persName ref="#Auchincloss_Hugh">Mrs. Hugh Auchincloss</persName>, who was <persName ref="#Jennings_Miss">Miss Jennings</persName>. <personGrp ref="#Pell">Mr. and Mrs. Herbert Pell</personGrp>, also on board. A dull voyage, much rain and warm &#8211; I occupied for the 3rd time the Captain's charming rooms on the bridge &#8211; and what lovely hours of rest and quiet I had, after all the din and stir of the summer. The steamer is comfortable but slow, we reached <placeName ref="#Gibraltar">Gibraltar</placeName> on the 11th day and ought to be in <placeName ref="#Naples">Naples</placeName> tonight, only we won't, at least we hope to make our steamer tomorrow.</p>
             </div>
             <div xml:id="EBA-1908-11-09" type="entry">
                 <dateline>
                     <date when="1908-11-09">Monday. Nov. 9.</date>
                     <placeName ref="#Cairo">Cairo–Shepheards</placeName>
                 </dateline>
-                <p>We did just make our steamer the <orgName>&#8216;Preussen'</orgName> on Friday &#8211; Mr. and <persName>Mrs. Pell</persName> with us. We all occupied the <orgName>Captain's</orgName> and officer's rooms on the bridge &#8211; and were very comfortable &#8211; landed at <placeName>Alexandria</placeName> at 3 this P.M. got the train, and at 7 o'clock were installed in our familiar rooms on the pleasant garden. We have never been so early before. Not many people yet. <pb n="61"/> <persName>Eldon</persName> and <persName>Lady Gorst.</persName> <persName>Mr.</persName> and <persName>Mrs. Pell</persName> have been dining with us. We have had a busy 10 days in <placeName>Cairo.</placeName> Every one has been so kind. We went to <placeName>Lady Gorsts</placeName> to a garden party &#8211; to the <orgName>Iddings</orgName> to dine &#8211; and to a tea, where we met delightful people. Mr. and <persName>Mrs. Iddings</persName> dined with us that evening, and Capt. <persName>Trefusis</persName> &#8211; <persName>M. Maspero</persName> another evening, and the Capt. Who also lunched with us. The great event was <name>Theo's</name> presentation to the <orgName>Khedive,</orgName> which Mr <persName>Iddings</persName> has been trying to persuade him to do for 3 years &#8211; but this year he consented &#8211; and he was received in a private audience. Mr. <persName>Iddings</persName> came for him in his own carriage, with his decorative <orgName>Kavass,</orgName> and 2 gorgeous running <persName>Sayces,</persName> and <persName>Theo</persName> had to appear in frock coat and top hat at 10 in the morning. I couldn't but laugh when I saw them drive off in such style, for I knew how he hated it. It was very successful however, and Mr. <persName>Iddings</persName> told me he had never seen the <persName>Khedive</persName> so interested in an interview.</p>
+                <p>We did just make our steamer the '<name type="boat" ref="#Preussen">Preussen</name>' on Friday &#8211; <personGrp ref="#Pell">Mr. and Mrs. Pell</personGrp> with us. We all occupied the Captain's and officer's rooms on the bridge &#8211; and were very comfortable &#8211; landed at <placeName ref="#Alexandria">Alexandria</placeName> at 3 this P.M. got the train, and at 7 o'clock were installed in our familiar rooms on the pleasant garden. We have never been so early before. Not many people yet.<pb n="61"/> <personGrp ref="#Gorst"Eldon and Lady Gorst</personGrp>. <personGrp ref="#Pell">Mr. and Mrs. Pell</personGrp> have been dining with us. We have had a busy 10 days in <placeName ref="#Cairo">Cairo</placeName>. Every one has been so kind. We went to <persName ref="#Gorst_Lady"Lady Gorst</persName>s to a garden party &#8211; to the <personGrp ref="#Iddings">Iddings</personGrp> to dine &#8211; and to a tea, where we met delightful people. <personGrp ref="#Iddings">Mr. and Mrs. Iddings</personGrp> dined with us that evening, and <persName ref="#Trefusis_Capt">Capt. Trefusis</persName> &#8211; <persName ref="#Maspero_Gaston">M. Maspero</persName> another evening, and <persName ref="#Trefusis_Capt">the Capt.</persName> Who also lunched with us. The great event was<persName ref="#Davis_Theodore_M">Theo</persName>'s presentation to <persName ref="#Abbas_II">the Khedive</persName>, which <persName ref="#Iddings_Mr.">Mr. Iddings</persName> has been trying to persuade him to do for 3 years &#8211; but this year he consented &#8211; and he was received in a private audience. <persName ref="#Iddings_Mr.">Mr. Iddings</persName> came for him in his own carriage, with his decorative Kavass, and 2 gorgeous running Sayces, and <persName ref="#Davis_Theodore_M">Theo</persName> had to appear in frock coat and top hat at 10 in the morning. I couldn't but laugh when I saw them drive off in such style, for I knew how he hated it. It was very successful however, and <persName ref="#Iddings_Mr.">Mr. Iddings</persName> told me he had never seen the <persName ref="#Abbas_II">the Khedive</persName> so interested in an interview.</p>
             </div>
             <div xml:id="EBA-1908-11-20" type="entry">
                 <dateline>
                     <date when="1908-11-20">Friday. Nov. 20.</date>
                 </dateline>
-                <p>In town with <persName>Theo</persName> this morning, doing last things. <persName>Capt. Trefusis</persName> lunched with us. Our tug took us to the bridge landing at 1 o'clock and we hoped to get through the draw comfortably. But the usual scrimmage occurred &#8211; and we came near losing the top of our big boom. Then we had to get through the new <placeName>Ghizeh</placeName> bridge &#8211; we landed the Capt. And waited until most of the gyassas had passed through. We got as far as the big Sugar station, 5 miles below <placeName>Bedreschein</placeName> &#8211; very cold.</p>
+                <p>In town with <persName ref="#Davis_Theodore_M">Theo</persName> this morning, doing last things. <persName ref="#Trefusis_Capt">Capt. Trefusis</persName> lunched with us. Our tug took us to the bridge landing at 1 o'clock and we hoped to get through the draw comfortably. But the usual scrimmage occurred &#8211; and we came near losing the top of our big boom. Then we had to get through the new <placeName ref="#Ghizeh">Ghizeh</placeName> bridge &#8211; we landed <persName ref="#Trefusis_Capt">the Capt.</persName> And waited until most of the gyassas had passed through. We got as far as the big Sugar station, 5 miles below <placeName ref="#Bedrashyn">Bedreschein</placeName> &#8211; very cold.</p>
             </div>
             <pb n="62" />
             <div xml:id="EBA-1908-11-21" type="entry">
                 <dateline>
                     <date when="1908-11-21">Saturday. Nov. 21st.</date>
                 </dateline>
-              <p>Very busy settling- made <name>Wasta</name> at 5 P.M. warmer. The river is tremendous and the current very strong &#8211; it is a mighty flood &#8211; but will do great good to the country.</p>
+              <p>Very busy settling- made Wasta at 5 P.M. warmer. The river is tremendous and the current very strong &#8211; it is a mighty flood &#8211; but will do great good to the country.</p>
             </div> 
             <div xml:id="EBA-1908-11-22" type="entry">
                 <dateline>
@@ -72,54 +72,54 @@
                 <dateline>
                     <date when="1908-11-23">Monday. Nov. 23rd.</date>
                 <dateline>
-                <p>Sailed from 6 a.m. to 6 p.m. Delayed for 4 hours at <placeName>Sheik Fadl</placeName> for coal for the tug &#8211; have made 40 miles and are now lying 10 miles below <placeName>Minia.</placeName> A most wonderful river &#8211; no one knows its channel and our tug goes scalloping about on it in an extraordinary way.<p/>
+                <p>Sailed from 6 a.m. to 6 p.m. Delayed for 4 hours at <placeName ref="#Sheik_Fadl">Sheik Fadl</placeName> for coal for the tug &#8211; have made 40 miles and are now lying 10 miles below <placeName ref="#Minieh">Minia.</placeName> A most wonderful river &#8211; no one knows its channel and our tug goes scalloping about on it in an extraordinary way.<p/>
             </div>
             <div xml:id="EBA-1908-11-24" type="entry">
                 <dateline>
                     <date when="1908-11-24">Tuesday. Nov. 24th.</date>
                 <dateline>
-                <p>We made an early start at 5:30 and are now at <placeName>Mellawi</placeName> &#8211; having made 41-&#189; miles &#8211; beautiful weather, though the wind is cold.</p>
+                <p>We made an early start at 5:30 and are now at <placeName ref="#Mellawi">Mellawi</placeName> &#8211; having made 41-&#189; miles &#8211; beautiful weather, though the wind is cold.</p>
             </div>
             <div xml:id="EBA-1908-11-25" type="entry">
                 <dateline>
                     <date when="1908-11-25">Wednesday. Nov. 25th.</date>
                     <measure type="distance">48 miles.</measure>
                 <dateline>
-                <p>An early start &#8211; we are about 10 miles below <placeName>Asy&#251;t,</placeName> weather charming.</p>
+                <p>An early start &#8211; we are about 10 miles below <placeName ref="#Assiout">Asyût</placeName>, weather charming.</p>
             </div>
             <div xml:id="EBA-1908-11-26" type="entry">
                 <dateline>
                     <date when="1908-11-26">Thursday. Nov. 26.</date>
                     <measure type="distance">40 miles.</measure>
                 <dateline>          
-                <p>Reached <persName>Asy&#251;t</persName> at 8 this morning &#8211; we were passing <pb n="63"/>the great <persName>Weir</persName> before I knew it &#8211; the draw open and all the sluices &#8211; and such a tremendous body of water running through. Our tug had hard work to pull us. Stopped for mail. Mr. <persName>Russell</persName> called.</p>
+                <p>Reached <placeName ref="#Assiout">Asyût</placeName>, at 8 this morning &#8211; we were passing <pb n="63"/>the great Weir before I knew it &#8211; the draw open and all the sluices &#8211; and such a tremendous body of water running through. Our tug had hard work to pull us. Stopped for mail. <persName ref="#Russell_Mr.">Mr. Russell</persName> called.</p>
             </div>
             <div xml:id="EBA-1908-11-27" type="entry">
                 <dateline>
                     <date when="1908-11-27">Friday. Nov. 27.</date>
                     <measure type="distance">45 miles.</measure>
                 <dateline>             
-                <p>In spite of strong <placeName>N.W.</placeName> wind. We are lying 6 miles below <placeName>Girga.</placeName></p>
+                <p>In spite of strong N.W. wind. We are lying 6 miles below <placeName ref="#Girgeh">Girga</placeName>.</p>
             </div>
             <div xml:id="EBA-1908-11-28" type="entry">
                 <dateline>
                     <date when="1908-11-28">Saturday. Nov. 28.</date>
                     <measure type="distance">32 miles.</measure>
                 <dateline>             
-                <p>A very early start, before dawn. Such a beautiful hour followed! The sunrise, and this strange, interesting land, and the quiet hour of reading and reflection, nothing can ever take it from me. A fine day, with strong <placeName>N.W.</placeName> wind, which meeting the strong current of the river, made quite a sea. We reached <persName>Nagh Hamadi</persName> at 3 o'clock thinking the bridge opened at 3:30 but found it opened at 3 o'clock &#8211; so we were forced to stay the night. It was quiet enough &#8211; and the late afternoon and evening most lovely.</p>
+                <p>A very early start, before dawn. Such a beautiful hour followed! The sunrise, and this strange, interesting land, and the quiet hour of reading and reflection, nothing can ever take it from me. A fine day, with strong N.W. wind, which meeting the strong current of the river, made quite a sea. We reached <placeName ref="#Nagh Hamadi">Nagh Hamadi</placeName> at 3 o'clock thinking the bridge opened at 3:30 but found it opened at 3 o'clock &#8211; so we were forced to stay the night. It was quiet enough &#8211; and the late afternoon and evening most lovely.</p>
             </div> 
             <div xml:id="EBA-1908-11-29" type="entry">
                 <dateline>
                     <date when="1908-11-29">First Sunday in Advent. Nov. 29.</date>
                 <dateline> 
-                <p>We passed the bridge most easily at 7:30 &#8211; before I got up. The tug took us up as far as the difficult turn at <placeName>Kasr es Sayd</placeName> &#8211; then left us with much hearty leave-takings and receiving of liberal backsheesh. The day was absolutely calm, and we were left alone in the middle of the river, with both sails limply hanging &#8211; we have tracked, pulled to the anchor and sailed a little very quietly and are now lying <pb n="64"/> within sight of <persName>Dishneh</persName> &#8211; a most exquisite evening. 17 miles.</p>
+                <p>We passed the bridge most easily at 7:30 &#8211; before I got up. The tug took us up as far as the difficult turn at <placeName ref="#Kasr es Sayd">Kasr es Sayd</placeName> &#8211; then left us with much hearty leave-takings and receiving of liberal backsheesh. The day was absolutely calm, and we were left alone in the middle of the river, with both sails limply hanging &#8211; we have tracked, pulled to the anchor and sailed a little very quietly and are now lying <pb n="64"/> within sight of <placeName ref="#Dishna">Dishneh</placeName> &#8211; a most exquisite evening. 17 miles.</p>
             </div>
             <div xml:id="EBA-1908-11-30" type="entry">
                 <dateline>
                     <date when="1908-11-30">Monday. Nov. 30.</date>
                     <measure type="distance">42 &#189; miles.</measure>
                 <dateline>              
-                 <p>Made an early start this morning in a good wind, and reached this high bank, one mile below <placeName>Nagada</placeName> at 5.30. An exciting day &#8211; the boat careering madly along &#8211; sailors shouting &#8211; sails changing, and all the clamor of a sharp sailing. The morning was delicious &#8211; I was on deck all the time until we were delayed by a gyassa which cut across our bow in an awkward way, and going immediately upon the sand just in front of us, we had to pull up so sharply that we went with a great thump on the bank &#8211; there was a great tumbling about of all movable things &#8211; and when I came below to see about it - I found <persName>Amelie, Jones, Hassein,</persName> and <persName>Hassoun</persName> busy setting everything straight. Last year we came on the boat Nov. 30. We are much in advance this year!</p>
+                 <p>Made an early start this morning in a good wind, and reached this high bank, one mile below <placeName ref="Nagadah">Nagada</placeName> at 5.30. An exciting day &#8211; the boat careering madly along &#8211; sailors shouting &#8211; sails changing, and all the clamor of a sharp sailing. The morning was delicious &#8211; I was on deck all the time until we were delayed by a gyassa which cut across our bow in an awkward way, and going immediately upon the sand just in front of us, we had to pull up so sharply that we went with a great thump on the bank &#8211; there was a great tumbling about of all movable things &#8211; and when I came below to see about it - I found <persName ref="#Amelie">Amelie</persName>, <persName ref="#Jones_Harold">Jones</persName>, <persName ref="#Hassein">Hassein</persName>, and <persName ref="#Hassoun">Hassoun</persName> busy setting everything straight. Last year we came on the boat <date when="1907-11-30">Nov. 30.</date> We are much in advance this year!</p>
             </div>
             <div xml:id="EBA-1908-12-01" type="entry">
                 <dateline>
@@ -127,7 +127,7 @@
                     <measure type="distance">23-&#189; miles.</measure>
                     <placeName ref=”#Luxor”>Luxor</placeName>
                 <dateline>
-                 <p>A high wind, but not favourable, all day. However we came gallantly in with sails filled at 5.30 and found ourselves the first arrival of the season. Everyone was on the lookout for us, and we were told that we made a splendid appearance, as we rushed along past the town to our old mooring ground on the island. <persName>Harold Jones</persName> was waiting for us at the <placeName>Winter Palace,</placeName> Tuesday being his off day. He came over at once, and stayed to dinner and gave us the news. It took us 10 days and part of another day from <placeName>Cairo</placeName> here.</p>    
+                 <p>A high wind, but not favourable, all day. However we came gallantly in with sails filled at 5.30 and found ourselves the first arrival of the season. Everyone was on the lookout for us, and we were told that we made a splendid appearance, as we rushed along past the town to our old mooring ground on the island. <persName ref="#Jones_Harold">Harold Jones</persName> was waiting for us at the <name type="hotel" ref="#Winter_Palace">Winter Palace,</name> Tuesday being his off day. He came over at once, and stayed to dinner and gave us the news. It took us 10 days and part of another day from <placeName ref="#Cairo">Cairo</placeName> here.</p>    
             </div>
             <pb n="65"/>
             <div xml:id="EBA-1908-12-02" type="entry">
