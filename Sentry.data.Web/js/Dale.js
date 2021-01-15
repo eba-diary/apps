@@ -101,6 +101,13 @@
         return sensitiveList;
     },
 
+    createAssetValue: function (data) {
+
+        return '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + data.Asset + '\>' + data.Asset + '</a>';
+
+    },
+
+
     dataTablCreate: function (obj) {
 
         //init DataTable
@@ -120,7 +127,19 @@
             },
 
             columns: [
-                { data: null, className: "Asset", render: function (data) { return '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + data.Asset + '\>' + data.Asset + '</a>'; } },
+                {
+                    data: null, className: "Asset", 
+
+                    render: function (data) {
+
+                        //put for loop here too look through data.AssetList if it exists!
+                        var olTag = '<ol class="breadcrumb">';
+                        olTag = olTag + '</ol>';
+                        //return olTag;
+
+                        return '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + data.Asset + '\>' + data.Asset + '</a>';
+                    }
+                },
                 { data: "Server", className: "Server" },
                 { data: "Database", className: "Database" },
                 { data: "Object", className: "Object" },
@@ -233,6 +252,9 @@
         data.Dale.setupClickAttackSearch();                                                                         //SETUP SEARCH CLICK EVENTS
         data.Dale.setupClickAttackGrid();                                                                           //SETUP GRID CLICK EVENTS
     },
+
+
+
 
     //edit storage array since user is changing data
     editArray: function (rowIndex, rowData, columnIndex, columnValue) {
