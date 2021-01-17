@@ -43,54 +43,95 @@
 
       <div xml:id="EBA-1908-03-01" type="entry">
         <dateline><date ref="#Quinquagesima">Quinquagesima</date> - <date when="1908-03-01">March 1st.</date>.</dateline>
-        Sunday. <persName ref="#Davis_Theodore_M">Theo</persName> met the <personGrp ref="#Connaughts">Connaught</personGrp> party at <placeName ref="#Karnak">Karnac</placeName> this afternoon - and invited them to tea tomorrow! 
+        <p>Sunday. <persName ref="#Davis_Theodore_M">Theo</persName> met the <personGrp ref="#Connaughts">Connaught</personGrp> party at <placeName ref="#Karnak">Karnac</placeName> this afternoon - and invited them to tea tomorrow!</p>
       </div>
       <div xml:id="EBA-1907-03-02" type="entry">
         <dateline><date ref="#Quinquagesima">Quinquagesima</date> - <date when="1908-03-02">March 2. Monday</date>.</dateline>
-        The <personGrp ref="#Connaughts">Connaughts</personGrp> arrived from the <placeName ref="#Valley_of_the_Kings">Valley</placeName> about 4:30 - quite an imposing array - several mounted guards arrived before them - and the <persName ref="#Connaught_Duchess">Duchess</persName> and <persName ref="#Connaught_Patricia_Princess">Princess Patricia</persName> arrived first. I took them to my room, and left them to tidy themselves. I found in the salon <persName ref="#Pelly_Miss">Miss Pelly</persName>, whom I had met before, Lady in waiting, then came the <persName ref="#Connaught_Duke">Duke</persName> with members of his staff - <persName ref="#Murray_M_Major">Major M. Murray</persName> - <persName ref="#Ponsonby_M_B_Lieutenant">Lieut. the Hon. M. B. Ponsonby</persName> - <persName ref="#Maxwell_John_Sir">Sir John Maxwell</persName>, whom we knew, <persName ref="#Watson_Major">Major Watson,</persName> an old friend, and <persName ref="#Weigall_Arthur">Mr. Weigall<persName>. They looked first at the gold find, and then went on deck for tea. I thought I had never seen so many nice looking men together - and the <personGrp ref="#Connaughts">Connaughts</personGrp> are delightful, simple people to entertain. After they went away the <personGrp ref="#McKewers">McKewers</personGrp> and <personGrp ref="#Forbes">Mr. and Mrs. Forbes</personGrp> came. They said they had been watching from the Hotel opposite the royal entourage on the sand, waiting until it was over. 
+        <p>The <personGrp ref="#Connaughts">Connaughts</personGrp> arrived from the <placeName ref="#Valley_of_the_Kings">Valley</placeName> about 4:30 - quite an imposing array - several mounted guards arrived before them - and the <persName ref="#Connaught_Duchess">Duchess</persName> and <persName ref="#Connaught_Patricia_Princess">Princess Patricia</persName> arrived first. I took them to my room, and left them to tidy themselves. I found in the salon <persName ref="#Pelly_Miss">Miss Pelly</persName>, whom I had met before, Lady in waiting, then came the <persName ref="#Connaught_Duke">Duke</persName> with members of his staff - <persName ref="#Murray_M_Major">Major M. Murray</persName> - <persName ref="#Ponsonby_M_B_Lieutenant">Lieut. the Hon. M. B. Ponsonby</persName> - <persName ref="#Maxwell_John_Sir">Sir John Maxwell</persName>, whom we knew, <persName ref="#Watson_Major">Major Watson,</persName> an old friend, and <persName ref="#Weigall_Arthur">Mr. Weigall<persName>. They looked first at the gold find, and then went on deck for tea. I thought I had never seen so many nice looking men together - and the <personGrp ref="#Connaughts">Connaughts</personGrp> are delightful, simple people to entertain. After they went away the <personGrp ref="#McKewers">McKewers</personGrp> and <personGrp ref="#Forbes">Mr. and Mrs. Forbes</personGrp> came. They said they had been watching from the Hotel opposite the royal entourage on the sand, waiting until it was over.</p>
       </div>
-        <dateline><placeName>Quinquagesima</placeName> - <date when="1908-03-03">March 3rd.</date>.</dateline>
-        Tuesday. <persName>Mr. Dalison</persName> and <persName>Ayrton</persName> came to lunch. <persName>Theo</persName> and <persName>Carrie</persName> again [cut off--illegible] when they met the <name>Duke's</name> party. Lovely day. 
-        <dateline><placeName>Quinquagesima</placeName> - <date when="1908-03-04">March 4th.</date>.</dateline>
-        Ash Wednesday. All the family at <placeName>Karnac</placeName> this afternoon. 
-        <dateline><placeName>Quinquagesima</placeName> - <date when="1908-03-05">March 5th.</date>.</dateline>
-        Thursday. <persName>Theo</persName> and <persName>Harold</persName> at the <placeName>Valley</placeName> today. I went over to <placeName>Luxor</placeName> to say goodbye to <persName>Miss Buchanan.</persName> 
-        <dateline><placeName>Quinquagesima</placeName> - <date when="1908-03-06">March 6th.</date>.</dateline>
-        Friday. A really hot day. <persName>Mr.</persName> and <persName>Mrs. Roa</persName> and <persName>Mohamed Mohassib</persName> to tea. 
-        <dateline><placeName>Quinquagesima</placeName> - <date when="1908-03-07">March 7th.</date>.</dateline>
-        Saturday. <persName>Harold</persName> and <persName>Theo</persName> have been in the <placeName>Valley</placeName> all day with the photographer, who came up from <placeName>Cairo,</placeName> to do the tomb. 
-        <dateline><placeName>Quinquagesima</placeName> - <date when="1908-03-08">March 8th.</date>.</dateline>
-        First Sunday in Lent. I am the only member of the household who did not go to the <placeName>Valley</placeName> today. All went into the tomb. Mr. <persName>Dalison</persName> and Mr. <persName>Ayrton</persName> dined with us, and spent the night - sleeping on the dock divans - very jolly evening. 
-        <dateline><placeName>Nag Hamadi</placeName> - <date when="1908-03-09">March 9.</date>.</dateline>
-        Monday. 82-1/2 miles. <persName>Theo</persName> had engaged a sugar tug to take us down the river. We started at 9:10 and reached <placeName>Nag Hamadi</placeName> at 7:30 P.M. No wind, very warm, anchored just above the bridge. 
+      <div xml:id="EBA-1907-03-03" type="entry">
+        <dateline><placeName ref="#Quinquagesima">Quinquagesima</placeName> - <date when="1908-03-03">March 3rd.</date>.</dateline>
+        <p>Tuesday. <persName ref="#Dalison_Max_Mr">Mr. Dalison</persName> and <persName ref="#Ayrton_Edward">Ayrton</persName> came to lunch. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Carrie">Carrie</persName> again [cut off--illegible] when they met the <persName ref="#Connaught_Duke">Duke's</persName> party. Lovely day.</p>
+      </div>
+      <div xml:id="EBA-1907-03-04" type="entry">
+        <dateline><placeName ref="#Quinquagesima">Quinquagesima</placeName> - <date when="1908-03-04">March 4th.</date>.</dateline>
+        <p>Ash Wednesday. All the family at <placeName ref="#Karnac">Karnac</placeName> this afternoon.</p>
+      <div>
+      <div xml:id="EBA-1907-03-05" type="entry">
+        <dateline><placeName ref="#Quinquagesima">Quinquagesima</placeName> - <date when="1908-03-05">March 5th.</date>.</dateline>
+        <p>Thursday. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Jones_Harold">Harold</persName> at the <placeName ref="#Valley_of_the_Kings">Valley</placeName> today. I went over to <placeName type="hotel" ref="#Hotel_Luxor">Luxor</placeName> to say goodbye to <persName ref="#Buchanan_Carrie">Miss Buchanan</persName>.</p>
+      </div>
+      <div xml:id="EBA-1907-03-06" type="entry">
+        <dateline><placeName ref="#Quinquagesima">Quinquagesima</placeName> - <date when="1908-03-06">March 6th.</date>.</dateline>
+        <p>Friday. A really hot day. <persName ref="#Roa_Mr">Mr.</persName> and <persName ref="#Roa_Mrs">Mrs. Roa</persName> and <persName ref="#Mohassib_Mohamed">Mohamed Mohassib</persName> to tea.</p>
+      </div>
+      <div xml:id="EBA-1907-03-07" type="entry">
+        <dateline><placeName ref="#Quinquagesima">Quinquagesima</placeName> - <date when="1908-03-07">March 7th.</date>.</dateline>
+        <p>Saturday. <persName ref="#Jones_Harold">Harold</persName> and <persName ref="#Davis_Theodore_M">Theo</persName> have been in the <placeName ref="#Valley_of_the_Kings">Valley</placeName> all day with the photographer, who came up from <placeName ref="#Cairo">Cairo</placeName>, to do the tomb.</p>
+      </div>
+      <div xml:id="EBA-1907-03-08" type="entry">
+        <dateline><placeName ref="#Quinquadesima">Quinquagesima</placeName> - <date when="1908-03-08">March 8th.</date>.</dateline>
+        <p>First Sunday in Lent. I am the only member of the household who did not go to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> today. All went into the tomb. <persName ref="#Dalison_Max_Mr">Mr. Dalison</persName> and <persName ref="#Ayrton_Edward">Mr. Ayrton</persName> dined with us, and spent the night - sleeping on the dock divans - very jolly evening.</p>
+      </div>
+      <div xml:id="EBA-1907-03-09" type="entry">
+        <dateline><placeName ref="#Nag_Hamadi">Nag Hamadi</placeName> - <date when="1908-03-09">March 9.</date>.</dateline>
+        <p>Monday. 82-1/2 miles. <persName ref="#Davis_Theodore_M">Theo</persName> had engaged a sugar tug to take us down the river. We started at 9:10 and reached <placeName ref="#Nag_Hamadi">Nag Hamadi</placeName> at 7:30 P.M. No wind, very warm, anchored just above the bridge.</p>
+      </div>
+      <div xml:id="EBA-1907-03-10" type="entry">
         <dateline><date when="1908-03-10">March 10.</date>.</dateline>
-        Tuesday. 51 miles. Passed the bridge at 8 A.M. and then anchored until 25 M. before 11 - allowed the tug to cool. Very hot all day. The sunset was wonderfully beautiful. 
-        <dateline><placeName>Asyt.</placeName> - <date when="1908-03-11">March 11.</date>.</dateline>
-        Wed. 68 miles. A gale all day - tug on the sand for an hour this morning - afterwards sticking again for 3 hours - arrived in spite of all at <placeName>Asy&#251;t</placeName> at 6:30. 
-        <dateline><placeName>Beni Hassan</placeName> - <date when="1908-03-12">March 12.</date>.</dateline>
-        Thursday. Passed the lock at 8 o'clock, early. The sand is bad in this part of the river - we have to go carefully. 
+        <p>Tuesday. 51 miles. Passed the bridge at 8 A.M. and then anchored until 25 M. before 11 - allowed the tug to cool. Very hot all day. The sunset was wonderfully beautiful.</p>
+      </div>
+      <div xml:id="EBA-1907-03-11" type="entry">
+        <dateline><placeName ref="#Assiout">Asyt.</placeName> - <date when="1908-03-11">March 11.</date>.</dateline>
+        <p>Wed. 68 miles. A gale all day - tug on the sand for an hour this morning - afterwards sticking again for 3 hours - arrived in spite of all at <placeName ref="#Assiout">Asy&#251;t</placeName> at 6:30.</p>
+      </div>
+      <div xml:id="EBA-1907-03-12" type="entry">
+        <dateline><placeName ref="#Beni_Hassan">Beni Hassan</placeName> - <date when="1908-03-12">March 12.</date>.</dateline>
+        <p>Thursday. Passed the lock at 8 o'clock, early. The sand is bad in this part of the river - we have to go carefully.</p>
+      </div>
+      <div xml:id="EBA-1907-03-13" type="entry">
         <dateline><date when="1908-03-13">March 13.</date>.</dateline>
-        Friday. 60 miles. Started at 6. Stopped at <placeName>Minia,</placeName> for mail one hour and 3 hours at <placeName>Sheik Fadl</placeName> to cool. Rather cool out of the sun. 
-        <dateline><placeName>Bedrescheyn</placeName> - <date when="1908-03-14">March 14.</date>.</dateline>
-        Saturday. near <placeName>Bedrescheyn.</placeName> 90 miles. Started again at 6, stopping about 10 to assist a dahabya sticking in the mud, to get off. It proved to be a party from <placeName>Chicago</placeName> - <persName>Mr. Smith</persName> the father of <persName>Harold Smith.</persName> 
+        <p>Friday. 60 miles. Started at 6. Stopped at <placeName ref="#Minieh">Minia,</placeName> for mail one hour and 3 hours at <placeName ref="#Sheik_Fadl">Sheik Fadl</placeName> to cool. Rather cool out of the sun.</p>
+      </div>
+      <div xml:id="EBA-1907-03-14" type="entry">
+        <dateline><placeName ref="#Bedrescheyn">Bedrescheyn</placeName> - <date when="1908-03-14">March 14.</date>.</dateline>
+        <p>Saturday. near <placeName ref="#Bedrescheyn">Bedrescheyn</placeName>. 90 miles. Started again at 6, stopping about 10 to assist a dahabya sticking in the mud, to get off. It proved to be a party from <placeName ref="#Chicago">Chicago</placeName> - <persName ref="#Smith_Mr">Mr. Smith</persName> the father of <persName ref="#Smith_Harold">Harold Smith</persName>.</p>
+      </div>
+      <div xml:id="EBA-1907-03-15" type="entry">
         <dateline><date when="1908-03-15">March 15.</date>.</dateline>
-        2nd Sunday in Lent. Arrived at the <placeName>Ghezireh bridge</placeName> at 11 A.M. having made our 450 miles from <placeName>Luxor</placeName> in 7 days. <persName>Lord Fielding</persName> dined with us. 
-        <dateline><placeName>Cairo.</placeName> - <date when="1908-03-16">March 16.</date>.</dateline>
-        Came to our old place at the <placeName>Ghezireh Palace</placeName> this A.M. Spent the morning at the <placeName>Museum</placeName> and and had tea with the <personGrp ref="#Iddings">Iddings</personGrp> in the afternoon. A visit from <persName>Mr.</persName> and <persName>Mrs. Fraser</persName> this evening. 
-        <dateline><date when="1908-03-17">March 17th.</date>.</dateline>
-        Tuesday. <persName>Capt. Lyons</persName> and <persName>Mrs. Lyons</persName> and <persName>Mr.</persName> and <persName>Mrs. Iddings</persName> came this A.M. to see the find. We took all the things to the <placeName>Museum</placeName> this morning. A good riddance. 
-        <dateline><date when="1908-03-18">March 18th.</date>.</dateline>
-        Wednesday. Morning at <placeName>Museum</placeName> - afternoon driving and visiting. 
-        <dateline><date when="1908-03-19">March 19th.</date>.</dateline>
-        Thursday. We were again at the <placeName>Museum</placeName> this morning. Dinner at the <personGrp ref="#Iddings">Iddings</personGrp> where we met some pleasant people: <persName>Mr.</persName> and <persName>Miss Farnell</persName> - <name>Major Skifeuton</name> - <name>Smythe</name> - <persName>Sir John Beard</persName> and daughter, <persName>Lady Bathhurst</persName> and others. 
-        <dateline><date when="1908-03-20">March 20th.</date>.</dateline>
-        Friday. Driving and shopping this morning - <persName>Major Watson</persName> called this afternoon. 
-        <dateline><date when="1908-03-21">March 21st.</date>.</dateline>
-        Saturday. Lunched at the <placeName>British Embassy</placeName> - a charming visit - <persName>Sir Eldon</persName> was particularly interesting and agreeable. <persName>Lady Gorst,</persName> very pretty, chic and pleasant. <persName>Mr. Hall Caine</persName> and his wife were there among others. 
-        <dateline><date when="1908-03-22">March 22nd.</date>.</dateline>
-        3rd Sunday in Lent. We have been staying at the <placeName>Ghezireh Palace Hotel</placeName> since Thursday. Rain all day. <persName>Mr. Sayce</persName> dined with us. 
-        <dateline><date when="1908-03-23">March 23rd.</date>.</dateline>
-        Monday. Very busy. Our last day. Went in the afternoon to <persName>Madame Artin Pashat</persName> to tea - interesting. <persName>Mr. Dalison</persName> and <persName>Joe Smith</persName> dined with us. <persName>Mr. Dalison</persName> has been with us for 2 days, and is crossing with us to <placeName>Naples</placeName> where we are to spend 3 days. <persName>Mr. Carter</persName> came to tea with us this afternoon. 1</p>
+        <p>2nd Sunday in Lent. Arrived at the <placeName ref="#Ghezireh_Bridge">Ghezireh bridge</placeName> at 11 A.M. having made our 450 miles from <placeName ref="#Luxor">Luxor</placeName> in 7 days. <persName ref="#Fielding_Lord">Lord Fielding</persName> dined with us.</p>
+      </div>
+      <div xml:id="EBA-1907-03-16" type="entry">
+        <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-16">March 16.</date>.</dateline>
+        <p>Came to our old place at the <placeName type="hotel" ref="#Ghezireh_Palace_Hotel">Ghezireh Palace</placeName> this A.M. Spent the morning at the <placeName ref="#Boulaq_Museum">Museum</placeName> and and had tea with the <personGrp ref="#Iddings">Iddings</personGrp> in the afternoon. A visit from <persName ref="#Fraser_Mr">Mr.</persName> and <persName ref="#Fraser_Mrs">Mrs. Fraser</persName> this evening.</p>
+      </div>
+      <div xml:id="EBA-1907-03-17" type="entry">
+        <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-17">March 17th.</date>.</dateline>
+        <p>Tuesday. <persName ref="#Lyons_Capt">Capt. Lyons</persName> and <persName ref="#Lyons_Mrs">Mrs. Lyons</persName> and <persName ref="#Iddings_Mr">Mr.</persName> and <persName ref="#Iddings_Mrs">Mrs. Iddings</persName> came this A.M. to see the find. We took all the things to the <placeName ref="#Boulaq_Museum">Museum</placeName> this morning. A good riddance.</p>
+      </div>
+      <div xml:id="EBA-1907-03-18" type="entry">
+        <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-18">March 18th.</date>.</dateline>
+        <p>Wednesday. Morning at <placeName ref="#Boulaq_Museum">Museum</placeName> - afternoon driving and visiting.</p>
+      </div>
+      <div xml:id="EBA-1907-03-19" type="entry">
+        <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-19">March 19th.</date>.</dateline>
+        <p>Thursday. We were again at the <placeName ref="#Boulaq_Museum">Museum</placeName> this morning. Dinner at the <personGrp ref="#Iddings">Iddings</personGrp> where we met some pleasant people: <persName ref="#Farnell_Mr">Mr.</persName> and <persName ref="#Farnell_Miss">Miss Farnell</persName> - <persName ref="#Skifeuton_Smythe_Major">Major Skifeuton</persName> - Smythe - <persName ref="#Beard_Sir_John">Sir John Beard</persName> and daughter, <persName ref="#Bathhurst_Lady">Lady Bathhurst</persName> and others.</p>
+      </div>
+      <div xml:id="EBA-1907-03-20" type="entry">
+        <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-20">March 20th.</date>.</dateline>
+        <p>Friday. Driving and shopping this morning - <persName ref="#Watson_Major">Major Watson</persName> called this afternoon.</p>
+      </div>
+      <div xml:id="EBA-1907-03-21" type="entry">
+        <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-21">March 21st.</date>.</dateline>
+        <p>Saturday. Lunched at the <placeName ref="#British_Embassy">British Embassy</placeName> - a charming visit - <persName ref="#Gorst_Sir_John_Eldon">Sir Eldon</persName> was particularly interesting and agreeable. <persName ref="#Gorst_Lady">Lady Gorst</persName>, very pretty, chic and pleasant. <persName ref="#Hall_Caine_Mr">Mr. Hall Caine</persName> and his wife were there among others.</p>
+      </div>
+      <div xml:id="EBA-1907-03-22" type="entry">
+        <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-22">March 22nd.</date>.</dateline>
+        <p>3rd Sunday in Lent. We have been staying at the <placeName type="hotel" ref="#Ghezireh_Palace_Hotel">Ghezireh Palace Hotel</placeName> since Thursday. Rain all day. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> dined with us.</p>
+      </div>
+      <div xml:id="EBA-1907-03-23" type="entry">
+        <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-23">March 23rd.</date>.</dateline>
+        <p>Monday. Very busy. Our last day. Went in the afternoon to <persName ref="#Pasha_Artin">Madame Artin Pashat</persName> to tea - interesting. <persName ref="#Dalison_Max_Mr">Mr. Dalison</persName> and <persName ref="#Lindon_Smith_Joseph">Joe Smith</persName> dined with us. <persName ref="#Dalison_Max_Mr">Mr. Dalison</persName> has been with us for 2 days, and is crossing with us to <placeName ref="#Naples">Naples</placeName> where we are to spend 3 days. <persName ref="#Carter_Howard">Mr. Carter</persName> came to tea with us this afternoon. 1</p>
       </div>
     </body>
   </text>
