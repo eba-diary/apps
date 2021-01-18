@@ -101,13 +101,6 @@
         return sensitiveList;
     },
 
-    createAssetValue: function (data) {
-
-        return '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + data.Asset + '\>' + data.Asset + '</a>';
-
-    },
-
-
     dataTablCreate: function (obj) {
 
         //init DataTable
@@ -128,18 +121,27 @@
 
             columns: [
                 {
-                    data: null, className: "Asset", 
+                    data: null, className: "Asset", render: function (data)
+                    {
+                        //the following render func is called for every single row column and passes in data as the specific value.  our func body below will insert our list of assets as links
+                        if (data.AssetList != null) {
 
-                    render: function (data) {
+                            var len = data.AssetList.length;
+                            var assetHtml = '';
 
-                        //put for loop here too look through data.AssetList if it exists!
-                        var olTag = '<ol class="breadcrumb">';
-                        olTag = olTag + '</ol>';
-                        //return olTag;
+                            if (len > 0) {
+                                for (let i = 0; i < len; i++) {
 
-                        return '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + data.Asset + '\>' + data.Asset + '</a>';
+                                    var ri = data.AssetList[i];
+                                    var aTag = '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + ri + '\>' + ri + '</a>'
+                                    assetHtml = assetHtml + ' ' + aTag;
+                                }
+                            }
+                        }
+                        return assetHtml;
                     }
                 },
+
                 { data: "Server", className: "Server" },
                 { data: "Database", className: "Database" },
                 { data: "Object", className: "Object" },

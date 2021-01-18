@@ -154,15 +154,16 @@ namespace Sentry.data.Web
             return dtos;
         }
 
+        //create a List of Assets that belong to the given column row.  DataInventory view passes a comma delimited Asset list since one column can have many assets tied too it
         private static List<string> CreateAssetList(string asset)
         {
-            List<string> assets = asset.Split(',').ToList();
-
-            return assets;
-
-
+            if (!string.IsNullOrWhiteSpace(asset))
+            {
+                List<string> assets = asset.Split(',').Select(x => x != null ? x.TrimStart() : null).ToList();
+                return assets;
+            }
+            return new List<string>();
         }
-
 
     }
 }
