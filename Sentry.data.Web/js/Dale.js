@@ -133,7 +133,7 @@
                                 for (let i = 0; i < len; i++) {
 
                                     var ri = data.AssetList[i];
-                                    var aTag = '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + ri + '\>' + ri + '</a>'
+                                    var aTag = '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + ri + '\>' + ri + '</a>';
                                     assetHtml = assetHtml + ' ' + aTag;
                                 }
                             }
