@@ -173,20 +173,16 @@ namespace Sentry.data.Web.Controllers
             }
 
             var dsList = dsQuery.FetchAllChildren(_datasetContext);
-            var dsIds = dsList.Select(x => x.DatasetId.ToString()).ToList();
 
-            var events = new List<Event>();
-            foreach (var group in dsIds.Split(1000))
-            {
-                events.AddRange(_datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset.HasValue && dsIds.Contains(x.Dataset.Value.ToString())).ToList());
-            }
-
+            var eventlist = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset.HasValue).GroupBy(g => g.Dataset).Select(s => new { ds_id = s.Key, count = s.Count() }).OrderBy(o => o.ds_id).ToList();
+            
             foreach (Dataset ds in dsList.OrderBy(x => x.DatasetName).ToList())
             {
                 SearchModel sm = new SearchModel(ds, _associateInfoProvider)
                 {
                     IsFavorite = ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId),
-                    PageViews = events.Count(x => x.Dataset == ds.DatasetId),
+                    //PageViews = events.Count(x => x.Dataset == ds.DatasetId),
+                    PageViews = (eventlist.Any(x => x.ds_id == ds.DatasetId)) ? eventlist.First(x => x.ds_id == ds.DatasetId).count : 0,
                     CanEditDataset = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? SharedContext.CurrentUser.CanManageReports : false
                 };
                 models.Add(sm);
