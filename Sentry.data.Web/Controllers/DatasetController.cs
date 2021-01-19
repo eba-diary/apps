@@ -1006,6 +1006,7 @@ namespace Sentry.data.Web.Controllers
             return Json(obj, JsonRequestBehavior.AllowGet);
         }
 
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public ActionResult QueryTool()
         {
             IApplicationUser user = _userService.GetCurrentUser();
