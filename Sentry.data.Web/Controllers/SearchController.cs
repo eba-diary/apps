@@ -36,15 +36,19 @@ namespace Sentry.data.Web.Controllers
         public IDatasetContext _datasetContext;
         private UserService _userService;
         private readonly IEventService _eventService;
+        private readonly IDatasetService _datasetService;
 
         private string Title { get; set; }
 
-        public SearchController(IDatasetContext dsCtxt, UserService userService, IAssociateInfoProvider associateInfoService, IEventService eventService)
+        public SearchController(IDatasetContext dsCtxt, UserService userService, 
+            IAssociateInfoProvider associateInfoService, IEventService eventService,
+            IDatasetService datasetService)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
             _associateInfoProvider = associateInfoService;
             _eventService = eventService;
+            _datasetService = datasetService;
         }
 
         // GET: Search
@@ -174,6 +178,9 @@ namespace Sentry.data.Web.Controllers
 
             var dsList = dsQuery.FetchAllChildren(_datasetContext);
 
+            List<DatasetSummaryMetadataDTO> dsSummaryList = _datasetService.GetDatasetSummaryMetadataDTO();
+            //var dsList = _datasetContext.Datasets.ToList();
+
             var eventlist = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset.HasValue).GroupBy(g => g.Dataset).Select(s => new { ds_id = s.Key, count = s.Count() }).OrderBy(o => o.ds_id).ToList();
             
             foreach (Dataset ds in dsList.OrderBy(x => x.DatasetName).ToList())
@@ -185,6 +192,9 @@ namespace Sentry.data.Web.Controllers
                     PageViews = (eventlist.Any(x => x.ds_id == ds.DatasetId)) ? eventlist.First(x => x.ds_id == ds.DatasetId).count : 0,
                     CanEditDataset = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? SharedContext.CurrentUser.CanManageReports : false
                 };
+
+                sm.ChangedDtm = (dsSummaryList.Any(w => w.DatasetId == ds.DatasetId)) ? dsSummaryList.FirstOrDefault(w => w.DatasetId == ds.DatasetId).Max_Created_DTM.ToShortDateString() : ds.ChangedDtm.ToShortDateString();
+
                 models.Add(sm);
             }
 

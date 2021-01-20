@@ -51,14 +51,14 @@ namespace Sentry.data.Web
             this.BusinessUnits = ds.BusinessUnits.Select(x => x.Name).ToList();
             this.DatasetFunctions = ds.DatasetFunctions.Select(x => x.Name).ToList();
 
-            if (ds.DatasetFiles.Any())
-            {
-                this.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM).ToShortDateString();
-            }
-            else
-            {
-                this.ChangedDtm = ds.ChangedDtm.ToShortDateString();
-            }
+            //if (ds.DatasetFiles.Any())
+            //{
+            //    this.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM).ToShortDateString();
+            //}
+            //else
+            //{
+            //    this.ChangedDtm = ds.ChangedDtm.ToShortDateString();
+            //}
 
             this.Type = ds.DatasetType;
 

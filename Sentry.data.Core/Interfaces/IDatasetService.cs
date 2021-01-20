@@ -17,5 +17,6 @@ namespace Sentry.data.Core
         string RequestAccessToDataset(AccessRequest request);
         List<Dataset> GetDatasetsForQueryTool();
         List<Dataset> GetDatasetMarkedDeleted();
+        List<DatasetSummaryMetadataDTO> GetDatasetSummaryMetadataDTO();
     }
 }
