@@ -231,19 +231,19 @@ f<TEI xmlns="http://www.tei-c.org/ns/1.0">
                 <dateline>
                     <date when="1908-12-23">Wednesday. Dec. 23rd.</date>
                 </dateline>
-                <p>The <orgName>&#8216;Scarab'</orgName> and <orgName>&#8216;Osiris'</orgName> up today, and came to our side, directly behind us. The <orgName>Scarab</orgName> almost poking her nose into my cabin.</p> <!---[confused abt this entry, what are Scarab and Osiris]-->
+                <p>The &#8216;<name type="boat" ref="#Scarab">Scarab</name>&#8216; and &#8216;<name type="boat" ref="#Osiris">Osiris</name>&#8216; up today, and came to our side, directly behind us. The <name type="boat" ref="#Scarab">Scarab</name> almost poking her nose into my cabin.</p>
             </div>
             <div xml:id="EBA-1908-12-25" type="entry">
                 <dateline>
                     <date when="1908-12-25">Friday. Dec. 25th.</date>
                 </dateline>
-                <p><persName ref="#Paget_Almerio">Mr. Almerio Paget</persName> called this morning. He is on the <orgName>Scarab</orgName> with his wife <persName ref="#Whitney_Pauline">(Pauline Whitney)</persName> and family. We had our usual little celebration with the men this morning. The usual Christmas festivities. <persName ref="#Jones_Harold">Harold</persName> spent the night here &#8211; and with those 3 nice men <persName ref="#Whymper_Charles">Mr. Whymper,</persName> and <persName ref="#Nicol_Mr.">Mr. Nicol,</persName> dined here. <persName ref="#Smith_Joe">Joe Smith</persName> arrived with his wife today, they are staying at <personGrp ref="#Weigall">Weigalls.</personGrp></p>
+                <p><persName ref="#Paget_Almerio">Mr. Almerio Paget</persName> called this morning. He is on the <name type="boat" ref="#Scarab">Scarab</name> with his wife <persName ref="#Whitney_Pauline">(Pauline Whitney)</persName> and family. We had our usual little celebration with the men this morning. The usual Christmas festivities. <persName ref="#Jones_Harold">Harold</persName> spent the night here &#8211; and with those 3 nice men <persName ref="#Whymper_Charles">Mr. Whymper,</persName> and <persName ref="#Nicol_Mr.">Mr. Nicol,</persName> dined here. <persName ref="#Smith_Joe">Joe Smith</persName> arrived with his wife today, they are staying at <personGrp ref="#Weigall">Weigalls.</personGrp></p>
             </div>
             <div xml:id="EBA-1908-12-29" type="entry">
                 <dateline>
                     <date when="1908-12-29">Tuesday. Dec. 29th.</date>
                 </dateline>
-                <p>At tea with the <personGrp ref="#Scofield">Scofields</personGrp> on the Maat. <persName ref="#Jones_Harold">Harold</persName> here for the day. <persName ref="#Lagge_F">Mr. F. Lagge</persName> and his friend <persName ref="#Pease_Mr.">Mr. Pease</persName> dined with us. <persName ref="#Davis_Theodore_M">Theo</persName> has <pb n="69"/> bought one of <persName ref="#Nicol_Mr.">Mr. Nicol's</persName> best pictures. The <orgName>Scarab</orgName> with the <personGrp ref="#Paget">Pagets</personGrp> and the Osiris< with <persName ref="#Arthur_James">Sir Arthur</persName> and <persName ref="#Whitney_Paule">Lady Paget</persName> went up today. Lovely weather.</p>
+                <p>At tea with the <personGrp ref="#Scofield">Scofields</personGrp> on the Maat. <persName ref="#Jones_Harold">Harold</persName> here for the day. <persName ref="#Lagge_F">Mr. F. Lagge</persName> and his friend <persName ref="#Pease_Mr.">Mr. Pease</persName> dined with us. <persName ref="#Davis_Theodore_M">Theo</persName> has <pb n="69"/> bought one of <persName ref="#Nicol_Mr.">Mr. Nicol's</persName> best pictures. The <name type="boat" ref="#Scarab">Scarab</name> with the <personGrp ref="#Paget">Pagets</personGrp> and the <name type="boat" ref="#Osiris">Osiris</name> with <persName ref="#Arthur_James">Sir Arthur</persName> and <persName ref="#Whitney_Paule">Lady Paget</persName> went up today. Lovely weather.</p>
             </div>
             <div xml:id="EBA-1908-12-30" type="entry">
                 <dateline>
