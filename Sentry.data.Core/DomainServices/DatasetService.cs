@@ -79,6 +79,17 @@ namespace Sentry.data.Core
                     Max_Created_DTM = s.Max(m => m.CreateDTM)
                 }).ToList();
 
+                var eventlist = _datasetContext.Events
+                .Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset.HasValue)
+                .GroupBy(g => g.Dataset)
+                .Select(s => new { ds_id = s.Key, count = s.Count() })
+                .OrderBy(o => o.ds_id).ToList();
+
+                foreach (DatasetSummaryMetadataDTO summary in summaryResults)
+                {
+                    summary.ViewCount = (eventlist.Any(w => w.ds_id == summary.DatasetId)) ? eventlist.First(w => w.ds_id == summary.DatasetId).count : 0;
+                }
+
                 //Assign result list to cache object
                 cache.Set("DatasetSummaryMetadata", summaryResults, policy);
             }

@@ -179,21 +179,25 @@ namespace Sentry.data.Web.Controllers
             var dsList = dsQuery.FetchAllChildren(_datasetContext);
 
             List<DatasetSummaryMetadataDTO> dsSummaryList = _datasetService.GetDatasetSummaryMetadataDTO();
-            //var dsList = _datasetContext.Datasets.ToList();
-
-            var eventlist = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset.HasValue).GroupBy(g => g.Dataset).Select(s => new { ds_id = s.Key, count = s.Count() }).OrderBy(o => o.ds_id).ToList();
             
             foreach (Dataset ds in dsList.OrderBy(x => x.DatasetName).ToList())
             {
+                Boolean summaryExists = dsSummaryList.Any(x => x.DatasetId == ds.DatasetId);
                 SearchModel sm = new SearchModel(ds, _associateInfoProvider)
                 {
                     IsFavorite = ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId),
-                    //PageViews = events.Count(x => x.Dataset == ds.DatasetId),
-                    PageViews = (eventlist.Any(x => x.ds_id == ds.DatasetId)) ? eventlist.First(x => x.ds_id == ds.DatasetId).count : 0,
-                    CanEditDataset = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? SharedContext.CurrentUser.CanManageReports : false
-                };
+                    PageViews = (summaryExists) ? dsSummaryList.First(x => x.DatasetId == ds.DatasetId).ViewCount : 0,
+                    CanEditDataset = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? SharedContext.CurrentUser.CanManageReports : false,
+                    ChangedDtm = (summaryExists) ? dsSummaryList.FirstOrDefault(w => w.DatasetId == ds.DatasetId).Max_Created_DTM.ToShortDateString() : ds.ChangedDtm.ToShortDateString()
+            };
 
-                sm.ChangedDtm = (dsSummaryList.Any(w => w.DatasetId == ds.DatasetId)) ? dsSummaryList.FirstOrDefault(w => w.DatasetId == ds.DatasetId).Max_Created_DTM.ToShortDateString() : ds.ChangedDtm.ToShortDateString();
+                //sm.DistinctFileExtensions = ds.DatasetType == GlobalConstants.DataEntityCodes.REPORT
+                //    ? new List<string> { ((ReportType)ds.DatasetFileConfigs.First().FileTypeId).ToString() }
+                //    : new List<string>();
+
+                //sm.DistinctFileExtensions = (ds.DatasetType == GlobalConstants.DataEntityCodes.REPORT) ?
+                //new List<string> { ((ReportType)ds.DatasetFileConfigs.First().FileTypeId).ToString() } :
+                //dsSummaryList.FirstOrDefault(w => w.DatasetId == ds.DatasetId).FileExtentions.ToList();
 
                 models.Add(sm);
             }

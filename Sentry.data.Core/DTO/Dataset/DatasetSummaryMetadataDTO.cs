@@ -11,5 +11,6 @@ namespace Sentry.data.Core
         public int DatasetId { get; set; }
         public long FileCount { get; set; }
         public DateTime Max_Created_DTM { get; set; }
+        public int ViewCount { get; set; }
     }
 }
