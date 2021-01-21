@@ -178,6 +178,7 @@ namespace Sentry.data.Web.Controllers
 
             var dsList = dsQuery.FetchAllChildren(_datasetContext);
 
+            //get cached summary metadata
             List<DatasetSummaryMetadataDTO> dsSummaryList = _datasetService.GetDatasetSummaryMetadataDTO();
             
             foreach (Dataset ds in dsList.OrderBy(x => x.DatasetName).ToList())
@@ -190,15 +191,6 @@ namespace Sentry.data.Web.Controllers
                     CanEditDataset = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? SharedContext.CurrentUser.CanManageReports : false,
                     ChangedDtm = (summaryExists) ? dsSummaryList.FirstOrDefault(w => w.DatasetId == ds.DatasetId).Max_Created_DTM.ToShortDateString() : ds.ChangedDtm.ToShortDateString()
             };
-
-                //sm.DistinctFileExtensions = ds.DatasetType == GlobalConstants.DataEntityCodes.REPORT
-                //    ? new List<string> { ((ReportType)ds.DatasetFileConfigs.First().FileTypeId).ToString() }
-                //    : new List<string>();
-
-                //sm.DistinctFileExtensions = (ds.DatasetType == GlobalConstants.DataEntityCodes.REPORT) ?
-                //new List<string> { ((ReportType)ds.DatasetFileConfigs.First().FileTypeId).ToString() } :
-                //dsSummaryList.FirstOrDefault(w => w.DatasetId == ds.DatasetId).FileExtentions.ToList();
-
                 models.Add(sm);
             }
 

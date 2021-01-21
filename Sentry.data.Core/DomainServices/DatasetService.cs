@@ -71,6 +71,7 @@ namespace Sentry.data.Core
                 //SlidingExpriration will restart the experation timer when the cache is accessed, if it has not already expired.
                 policy.AbsoluteExpiration = new DateTimeOffset(DateTime.UtcNow.AddHours(24));
 
+                //Pull summarized metadata from datasetfile table
                 summaryResults = _datasetContext.DatasetFile.GroupBy(g => new { g.Dataset })
                 .Select(s => new DatasetSummaryMetadataDTO
                 {
@@ -79,12 +80,14 @@ namespace Sentry.data.Core
                     Max_Created_DTM = s.Max(m => m.CreateDTM)
                 }).ToList();
 
+                //pull summarized metadata from events table
                 var eventlist = _datasetContext.Events
-                .Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset.HasValue)
-                .GroupBy(g => g.Dataset)
-                .Select(s => new { ds_id = s.Key, count = s.Count() })
-                .OrderBy(o => o.ds_id).ToList();
+                    .Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset.HasValue)
+                    .GroupBy(g => g.Dataset)
+                    .Select(s => new { ds_id = s.Key, count = s.Count() })
+                    .OrderBy(o => o.ds_id).ToList();
 
+                //Add events metadata to summaryResults metadata
                 foreach (DatasetSummaryMetadataDTO summary in summaryResults)
                 {
                     summary.ViewCount = (eventlist.Any(w => w.ds_id == summary.DatasetId)) ? eventlist.First(w => w.ds_id == summary.DatasetId).count : 0;

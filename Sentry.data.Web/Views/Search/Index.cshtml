@@ -658,29 +658,29 @@
                 temp = [];
 
 
-                //EXTENSION FILTER
-                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
-                for (var item, i = 0; item = datasets[i++];) {
-                    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
-                        if (!(ext in extensionLookup)) {
-                            extensionLookup[ext] = 1;
-                            self.ExtensionFilters.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
+                ////EXTENSION FILTER
+                //counter = 0; //Needs seperate counter as multiple objects can appear per iteration
+                //for (var item, i = 0; item = datasets[i++];) {
+                //    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
+                //        if (!(ext in extensionLookup)) {
+                //            extensionLookup[ext] = 1;
+                //            self.ExtensionFilters.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
 
-                            temp.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
-                            counter++;
-                        }
-                    }
-                }
-                ko.utils.arrayForEach(self.AllFilters(), function (v) {
-                    if (v.Name == 'Extension') {
-                        item = v;
-                    }
-                });
-                if (item !== undefined) {
-                    temp = item.Filters().concat(temp);
-                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
-                }
-                self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 3, true));
+                //            temp.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
+                //            counter++;
+                //        }
+                //    }
+                //}
+                //ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                //    if (v.Name == 'Extension') {
+                //        item = v;
+                //    }
+                //});
+                //if (item !== undefined) {
+                //    temp = item.Filters().concat(temp);
+                //    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                //}
+                //self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 3, true));
 
                 // sort the filters by Sequence
                 self.AllFilters.sort(function (left, right) {
