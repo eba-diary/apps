@@ -76,6 +76,7 @@ data.Dataset = {
                 },
                 { data: "Description", className: "Description" },
                 { data: "FieldType", className: "FieldType" },
+                { data: "IsArray", className: "IsArray" },
                 { data: "Length", className: "Length", visible: false, render: function (d)         { return data.Dataset.delroyFillGridCheckForNull(d);    }   },
                 { data: "Precision", className: "Precision", visible: false, render: function (d)   { return data.Dataset.delroyFillGridCheckForNull(d);    }   },
                 { data: "Scale", className: "Scale", visible: false, render: function (d)           { return data.Dataset.delroyFillGridCheckForNull(d);    }   }
@@ -100,13 +101,8 @@ data.Dataset = {
                     action: function (e, dt, node, config) {
                         data.Dataset.delroyQueryGenerator('snow');
                     }
-                },
-                {
-                    text: 'Hive',
-                    action: function (e, dt, node, config) {
-                        data.Dataset.delroyQueryGenerator('hive');
-                    }
                 }
+                
             ]
         });
 
@@ -118,6 +114,7 @@ data.Dataset = {
                 { type: "text" },
                 { type: "text" },
 
+                { type: "text" },
                 { type: "text" },
                 { type: "text" },
                 { type: "text" }

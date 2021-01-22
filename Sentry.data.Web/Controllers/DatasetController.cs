@@ -1024,6 +1024,10 @@ namespace Sentry.data.Web.Controllers
         {
             bool success = false;
 
+            string query = String.Empty;
+            query = makeSnow(models, String.Empty);
+           
+
             //success = _daleService.UpdateIsSensitive(models.ToDto());
 
             if (success)
@@ -1034,6 +1038,25 @@ namespace Sentry.data.Web.Controllers
             {
                 return Json(new { success = false });
             }
+        }
+
+        private string makeSnow(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string parentStructs)
+        {
+            string line = String.Empty;
+
+            foreach (var field in models)
+            {
+                if(field.FieldType != "STRUCT")
+                {
+                    line = line +  parentStructs + field.Name + "," + System.Environment.NewLine;
+                }
+                else
+                {
+                    line = line + makeSnow(field.Fields, parentStructs + field.Name + ":");
+
+                }
+            }
+            return line;
         }
 
     }
