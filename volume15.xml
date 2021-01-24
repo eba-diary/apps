@@ -59,7 +59,7 @@
       <div>
       <div xml:id="EBA-1908-03-05" type="entry">
         <dateline><placeName ref="#Quinquagesima">Quinquagesima</placeName> - <date when="1908-03-05">March 5th.</date>.</dateline>
-        <p>Thursday. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Jones_Harold">Harold</persName> at the <placeName ref="#Valley_of_the_Kings">Valley</placeName> today. I went over to <placeName type="hotel" ref="#Hotel_Luxor">Luxor</placeName> to say goodbye to <persName ref="#Buchanan_Carrie">Miss Buchanan</persName>.</p>
+        <p>Thursday. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Jones_Harold">Harold</persName> at the <placeName ref="#Valley_of_the_Kings">Valley</placeName> today. I went over to <name type="hotel" ref="#Hotel_Luxor">Luxor</name> to say goodbye to <persName ref="#Buchanan_Carrie">Miss Buchanan</persName>.</p>
       </div>
       <div xml:id="EBA-1908-03-06" type="entry">
         <dateline><placeName ref="#Quinquagesima">Quinquagesima</placeName> - <date when="1908-03-06">March 6th.</date>.</dateline>
@@ -103,19 +103,19 @@
       </div>
       <div xml:id="EBA-1908-03-16" type="entry">
         <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-16">March 16.</date>.</dateline>
-        <p>Came to our old place at the <placeName type="hotel" ref="#Ghezireh_Palace_Hotel">Ghezireh Palace</placeName> this A.M. Spent the morning at the <placeName ref="#Boulaq_Museum">Museum</placeName> and and had tea with the <personGrp ref="#Iddings">Iddings</personGrp> in the afternoon. A visit from <personGrp ref="#Fraser">Mr. and Mrs. Fraser</personGrp> this evening.</p>
+        <p>Came to our old place at the <name type="hotel" ref="#Ghezireh_Palace_Hotel">Ghezireh Palace</name> this A.M. Spent the morning at the <orgName ref="#Boulaq_Museum">Museum</orgName> and and had tea with the <personGrp ref="#Iddings">Iddings</personGrp> in the afternoon. A visit from <personGrp ref="#Fraser">Mr. and Mrs. Fraser</personGrp> this evening.</p>
       </div>
       <div xml:id="EBA-1908-03-17" type="entry">
         <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-17">March 17th.</date>.</dateline>
-        <p>Tuesday. <personGrp ref="#Lyons">Capt. Lyons and Mrs. Lyons</personGrp> and <personGrp ref="#Iddings">Mr. and Mrs. Iddings</personGrp> came this A.M. to see the find. We took all the things to the <placeName ref="#Boulaq_Museum">Museum</placeName> this morning. A good riddance.</p>
+        <p>Tuesday. <personGrp ref="#Lyons">Capt. Lyons and Mrs. Lyons</personGrp> and <personGrp ref="#Iddings">Mr. and Mrs. Iddings</personGrp> came this A.M. to see the find. We took all the things to the <orgName ref="#Boulaq_Museum">Museum</orgName> this morning. A good riddance.</p>
       </div>
       <div xml:id="EBA-1908-03-18" type="entry">
         <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-18">March 18th.</date>.</dateline>
-        <p>Wednesday. Morning at <placeName ref="#Boulaq_Museum">Museum</placeName> - afternoon driving and visiting.</p>
+        <p>Wednesday. Morning at <orgName ref="#Boulaq_Museum">Museum</orgName> - afternoon driving and visiting.</p>
       </div>
       <div xml:id="EBA-1908-03-19" type="entry">
         <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-19">March 19th.</date>.</dateline>
-        <p>Thursday. We were again at the <placeName ref="#Boulaq_Museum">Museum</placeName> this morning. Dinner at the <personGrp ref="#Iddings">Iddings</personGrp> where we met some pleasant people: <personGrp ref="#Farnell">Mr. and Miss Farnell</personGrp> - <persName ref="#Skifeuton_Smythe_Major">Major Skifeuton</persName> - Smythe - <persName ref="#Beard_Sir_John">Sir John Beard</persName> and daughter, <persName ref="#Bathhurst_Lady">Lady Bathhurst</persName> and others.</p>
+        <p>Thursday. We were again at the <orgName ref="#Boulaq_Museum">Museum</orgName> this morning. Dinner at the <personGrp ref="#Iddings">Iddings</personGrp> where we met some pleasant people: <personGrp ref="#Farnell">Mr. and Miss Farnell</personGrp> - <persName ref="#Skifeuton_Smythe_Major">Major Skifeuton</persName> - Smythe - <persName ref="#Beard_Sir_John">Sir John Beard</persName> and daughter, <persName ref="#Bathhurst_Lady">Lady Bathhurst</persName> and others.</p>
       </div>
       <div xml:id="EBA-1908-03-20" type="entry">
         <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-20">March 20th.</date>.</dateline>
@@ -127,7 +127,7 @@
       </div>
       <div xml:id="EBA-1908-03-22" type="entry">
         <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-22">March 22nd.</date>.</dateline>
-        <p>3rd Sunday in Lent. We have been staying at the <placeName type="hotel" ref="#Ghezireh_Palace_Hotel">Ghezireh Palace Hotel</placeName> since Thursday. Rain all day. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> dined with us.</p>
+        <p>3rd Sunday in Lent. We have been staying at the <name type="hotel" ref="#Ghezireh_Palace_Hotel">Ghezireh Palace Hotel</name> since Thursday. Rain all day. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> dined with us.</p>
       </div>
       <div xml:id="EBA-1908-03-23" type="entry">
         <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-23">March 23rd.</date>.</dateline>
