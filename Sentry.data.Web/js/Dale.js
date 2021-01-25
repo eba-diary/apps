@@ -120,7 +120,28 @@
             },
 
             columns: [
-                { data: null, className: "Asset", render: function (data) { return '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + data.Asset + '\>' + data.Asset + '</a>'; } },
+                {
+                    data: null, className: "Asset", render: function (data)
+                    {
+                        //the following render func is called for every single row column and passes in data as the specific value.  our func body below will insert our list of assets as links
+                        if (data.AssetList != null) {
+
+                            var len = data.AssetList.length;
+                            var assetHtml = '';
+
+                            if (len > 0) {
+                                for (let i = 0; i < len; i++) {
+
+                                    var ri = data.AssetList[i];
+                                    var aTag = '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + ri + '\>' + ri + '</a>';
+                                    assetHtml = assetHtml + ' ' + aTag;
+                                }
+                            }
+                        }
+                        return assetHtml;
+                    }
+                },
+
                 { data: "Server", className: "Server" },
                 { data: "Database", className: "Database" },
                 { data: "Object", className: "Object" },
@@ -233,6 +254,9 @@
         data.Dale.setupClickAttackSearch();                                                                         //SETUP SEARCH CLICK EVENTS
         data.Dale.setupClickAttackGrid();                                                                           //SETUP GRID CLICK EVENTS
     },
+
+
+
 
     //edit storage array since user is changing data
     editArray: function (rowIndex, rowData, columnIndex, columnValue) {
