@@ -1020,27 +1020,28 @@ namespace Sentry.data.Web.Controllers
 
 
         [HttpPost]
-        public ActionResult DelroyGenerateQuery(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType)
+        public ActionResult DelroyGenerateQuery(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType, List<string> snowflakeViews)
         {
             bool success = false;
-
-            string query = String.Empty;
-            query = makeSnow(models, String.Empty);
-           
+            bool outerfirst = true;
+            string query = query = GenerateSnow(models, String.Empty,ref outerfirst);
+            query = "SELECT " + System.Environment.NewLine + query;
 
             //success = _daleService.UpdateIsSensitive(models.ToDto());
+            bool first = true;
+            foreach(var s in snowflakeViews)
+            {
+                if (first)
+                {
+                    query = query + "FROM " + s + System.Environment.NewLine; 
+                    first = false;
+                }
+            }
 
-            if (success)
-            {
-                return Json(new { success = true });
-            }
-            else
-            {
-                return Json(new { success = false });
-            }
+            return Json(new { snowQuery = query });
         }
 
-        private string makeSnow(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string parentStructs)
+        private string GenerateSnow(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string parentStructs, ref bool first)
         {
             string line = String.Empty;
 
@@ -1048,16 +1049,51 @@ namespace Sentry.data.Web.Controllers
             {
                 if(field.FieldType != "STRUCT")
                 {
-                    line = line +  parentStructs + field.Name + "," + System.Environment.NewLine;
+                    if (first)
+                    {
+                        line = line + parentStructs + field.Name + System.Environment.NewLine;
+                        first = false;
+                    }
+                    else
+                    {
+                        line =  line + "," + parentStructs + field.Name + System.Environment.NewLine;
+                    }
+                    
                 }
                 else
                 {
-                    line = line + makeSnow(field.Fields, parentStructs + field.Name + ":");
-
+                    line = line + GenerateSnow(field.Fields, parentStructs + field.Name + ":",ref first);
                 }
             }
             return line;
         }
+
+
+
+        //[HttpPost]
+        //public ActionResult DelroyGenerateQuery2(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType, List<string> snowflakeViews)
+        //{
+        //    bool success = false;
+
+        //    string query = query = GenerateSnow(models, String.Empty, true);
+        //    query = "SELECT " + System.Environment.NewLine + query;
+
+        //    //success = _daleService.UpdateIsSensitive(models.ToDto());
+        //    bool first = true;
+        //    foreach (var s in snowflakeViews)
+        //    {
+        //        if (first)
+        //        {
+        //            query = query + "FROM " + s + System.Environment.NewLine;
+        //            first = false;
+        //        }
+        //    }
+
+        //    DelroyQueryModel queryModel = new DelroyQueryModel();
+        //    queryModel.SnowQuery = query;
+
+        //    return PartialView("_DelroyQueryView", queryModel);
+        //}
 
     }
 }

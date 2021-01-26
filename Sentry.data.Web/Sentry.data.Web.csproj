@@ -434,6 +434,7 @@
     <Compile Include="Models\Dataset\DatasetFileGridModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileVersionsModel.cs" />
     <Compile Include="Models\Config\EditDatasetFileConfigModel.cs" />
+    <Compile Include="Models\Dataset\DelroyQueryModel.cs" />
     <Compile Include="Models\Dataset\ObsoleteDatasetModel.cs" />
     <Compile Include="Models\Dataset\PushToDatasetModel.cs" />
     <Compile Include="Models\Favorites\FavoriteItemDetailModel.cs" />
@@ -1500,6 +1501,7 @@
     <Content Include="Scripts\quill\quill.snow.min.css.map" />
     <Content Include="Views\Shared\Unauthorized.cshtml" />
     <Content Include="Views\DataFlow\_SchemaMapDetail.cshtml" />
+    <Content Include="Views\Dataset\_DelroyQueryView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

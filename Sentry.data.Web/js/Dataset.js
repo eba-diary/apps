@@ -10,6 +10,7 @@ data.Dataset = {
     //DELROY FUNCTIONS
     //****************************************************************************************************
     delroyFieldArray: [],
+    delroySnowflakeViewsArray: [],
 
     delroyInit: function () {
 
@@ -18,13 +19,14 @@ data.Dataset = {
     },
 
     //RELOAD EVERYTHING:  clean datatable, breadcrumbs and reload with schema selected
-    delroyReloadEverything: function (datasetId, schemaId) {
+    delroyReloadEverything: function (datasetId, schemaId, snowflakeViews) {
 
         $('#delroySpinner').show();
         $('#delroyTable').DataTable().clear();
         $('#delroyTable').DataTable().draw();
         $('#delroyBreadcrumb').empty();
         data.Dataset.delroyRefreshFieldArrayFromIndex(-1);       //tricky way to DELETE ALL ELEMENTS from array
+        data.Dataset.delroySnowflakeViewsArray = snowflakeViews;
 
         var schemaURL = "/api/v2/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/revision/latest/fields";
         $.get(schemaURL, function (result) {
@@ -97,7 +99,7 @@ data.Dataset = {
             [
                 { extend: 'colvis', text: 'Columns' },
                 {
-                    text: 'Snowflake',
+                    text: 'Snowflake Query',
                     action: function (e, dt, node, config) {
                         data.Dataset.delroyQueryGenerator('snow');
                     }
@@ -246,31 +248,59 @@ data.Dataset = {
 
         var field = data.Dataset.delroyGetLatestField();
 
-        //Send the JSON array to Controller using AJAX.
+        //send the json array to controller using ajax.
         $.ajax({
             type: "POST",
             url: "/Dataset/DelroyGenerateQuery",
             traditional: true,
-            data: JSON.stringify({ models: field, queryType: queryType }),
+            data: JSON.stringify({ models: field, queryType: queryType, snowflakeViews: data.Dataset.delroySnowflakeViewsArray }),
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (r) {
-                if (r.success) {
+                //Sentry.ShowModalAlert(r.snowQuery);
+                
 
+                var tempInput = document.createElement("input");
+                tempInput.value = r.snowQuery;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempInput);
 
-                    data.Dale.makeToast("success", "Success!  Changes Saved.");
-                }
-                else {
-                    data.Dale.makeToast("error", "Failure!  Please try again.");
-                }
+                data.Dale.makeToast("success", "Snowflake Query Copied to Clipboard!!");
+
             },
             failure: function () {
-                data.Dale.makeToast("error", "Failure!  Please try again.");
+                data.Dale.makeToast("error", "Error creating Snowflake Query.");
             },
             error: function () {
-                data.Dale.makeToast("error", "Failure!  Please try again.");
+                data.Dale.makeToast("error", "Error creating Snowflake Query.");
             }
         });
+
+
+
+        //$.ajax({
+        //    type: "POST",
+        //    url: "/Dataset/DelroyGenerateQuery2",
+        //    traditional: true,
+        //    data: JSON.stringify({ models: field, queryType: queryType, snowflakeViews: data.Dataset.delroySnowflakeViewsArray }),
+        //    contentType: "application/json",
+            
+        //    success: function (r) {
+        //        var modal = Sentry.ShowModalWithSpinner("Query Generator");
+        //        modal.ReplaceModalBody(r);
+        //    },
+        //    failure: function () {
+        //        data.Dale.makeToast("error", "Failure!  Please try again.");
+        //    },
+        //    error: function () {
+        //        data.Dale.makeToast("error", "Failure!  Please try again.");
+        //    }
+        //});
+
+
+
     },
 
     //****************************************************************************************************
