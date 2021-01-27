@@ -11,11 +11,13 @@ data.Dataset = {
     //****************************************************************************************************
     delroyFieldArray: [],
     delroySnowflakeViewsArray: [],
+    delroyStructTrackerArray: [],
 
     delroyInit: function () {
 
         data.Dataset.delroyTableCreate();
         data.Dataset.delroySetupClickAttack();
+        data.Dataset.delroyStructTrackerArray = [];
     },
 
     //RELOAD EVERYTHING:  clean datatable, breadcrumbs and reload with schema selected
@@ -199,9 +201,15 @@ data.Dataset = {
     //ADD NEW BREADCRUMB TOO LIST
     delroyAddBreadCrumb: function (name, index) {
 
+        //add breadcrumb to UI
         var color = $('#delroyBreadcrumb').data('page-color');
         var h = "<li id='" + index.toString() + "' ><a  class='" + color + "' style='cursor:pointer' >" + name + "</a></li>";
         $('#delroyBreadcrumb').append(h);
+
+        //add struct too tracker to hold if a query needs to be generated
+        if (name != "Home" && index > 0) {
+            data.Dataset.delroyStructTrackerArray.push(name);    
+        }
     },
 
     //REFRESH BREAD CRUMBS:  Clear all breadcrumbs and refresh up too one passed in
@@ -209,7 +217,12 @@ data.Dataset = {
         //STEP 1: empty all breadcrumbs
         $('#delroyBreadcrumb').empty();
 
-        //STEP 2: add in all breadcrumbs from start until the one they clicked on
+        //STEP 2: empty breadcrumb Tracker which feeds Query Generator
+        var deleteStartIndex = parseInt(0);
+        data.Dataset.delroyStructTrackerArray.splice(deleteStartIndex);     
+        
+
+        //STEP 3: add in all breadcrumbs from start until the one they clicked on
         for (let i = 0; i < data.Dataset.delroyFieldArray.length; i++) {
 
             var field = data.Dataset.delroyFieldArray[i];
@@ -242,31 +255,29 @@ data.Dataset = {
         }
     },
 
-
-    //Generate Query     
+    //GENERATE QUERY BASED ON WHERE THEY ARE IN SCHEMA     
     delroyQueryGenerator: function (queryType) {
 
         var field = data.Dataset.delroyGetLatestField();
 
-        //send the json array to controller using ajax.
+        //pass the current field array and necessary info to controller and get back the query
         $.ajax({
             type: "POST",
             url: "/Dataset/DelroyGenerateQuery",
             traditional: true,
-            data: JSON.stringify({ models: field, queryType: queryType, snowflakeViews: data.Dataset.delroySnowflakeViewsArray }),
+            data: JSON.stringify({ models: field, queryType: queryType, snowflakeViews: data.Dataset.delroySnowflakeViewsArray, structTracker: data.Dataset.delroyStructTrackerArray }),
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (r) {
-                //Sentry.ShowModalAlert(r.snowQuery);
-                
 
-                var tempInput = document.createElement("input");
-                tempInput.value = r.snowQuery;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                document.execCommand("copy");
-                document.body.removeChild(tempInput);
-
+                //this is the logic too copy to the clipboard! note that i tried creating like a textarea but operation on document seemed too be the only thing that worked.
+                var tempInput = document.createElement("input");                            //create an html element of type "input"  to hold the snowQuery returned from ajax
+                tempInput.value = r.snowQuery;                                              //set the value too be the query
+                document.body.appendChild(tempInput);                                       //append new html element to document
+                tempInput.select();                                                         //select it, (imitates user selecting)
+                document.execCommand("copy");                                               //issue copy command                              
+                document.body.removeChild(tempInput);                                       //delete element
+                    
                 data.Dale.makeToast("success", "Snowflake Query Copied to Clipboard!!");
 
             },
@@ -277,30 +288,6 @@ data.Dataset = {
                 data.Dale.makeToast("error", "Error creating Snowflake Query.");
             }
         });
-
-
-
-        //$.ajax({
-        //    type: "POST",
-        //    url: "/Dataset/DelroyGenerateQuery2",
-        //    traditional: true,
-        //    data: JSON.stringify({ models: field, queryType: queryType, snowflakeViews: data.Dataset.delroySnowflakeViewsArray }),
-        //    contentType: "application/json",
-            
-        //    success: function (r) {
-        //        var modal = Sentry.ShowModalWithSpinner("Query Generator");
-        //        modal.ReplaceModalBody(r);
-        //    },
-        //    failure: function () {
-        //        data.Dale.makeToast("error", "Failure!  Please try again.");
-        //    },
-        //    error: function () {
-        //        data.Dale.makeToast("error", "Failure!  Please try again.");
-        //    }
-        //});
-
-
-
     },
 
     //****************************************************************************************************

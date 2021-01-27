@@ -1020,20 +1020,20 @@ namespace Sentry.data.Web.Controllers
 
 
         [HttpPost]
-        public ActionResult DelroyGenerateQuery(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType, List<string> snowflakeViews)
+        public ActionResult DelroyGenerateQuery(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType, List<string> snowflakeViews, List<string> structTracker)
         {
             bool success = false;
             bool outerfirst = true;
-            string query = query = GenerateSnow(models, String.Empty,ref outerfirst);
+            string parentStructs = DelroyStructMonster(structTracker);
+            string query = query = GenerateSnow(models, parentStructs, ref outerfirst);
             query = "SELECT " + System.Environment.NewLine + query;
 
-            //success = _daleService.UpdateIsSensitive(models.ToDto());
             bool first = true;
             foreach(var s in snowflakeViews)
             {
                 if (first)
                 {
-                    query = query + "FROM " + s + System.Environment.NewLine; 
+                    query = query + " FROM " + s + System.Environment.NewLine; 
                     first = false;
                 }
             }
@@ -1068,32 +1068,19 @@ namespace Sentry.data.Web.Controllers
             return line;
         }
 
+        private string DelroyStructMonster(List<string> structTracker)
+        {
+            string parentStructs = String.Empty;
 
+            if(structTracker != null)
+            {
+                foreach (var s in structTracker)
+                {
+                    parentStructs = parentStructs + s + ":";
+                }
+            }
 
-        //[HttpPost]
-        //public ActionResult DelroyGenerateQuery2(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType, List<string> snowflakeViews)
-        //{
-        //    bool success = false;
-
-        //    string query = query = GenerateSnow(models, String.Empty, true);
-        //    query = "SELECT " + System.Environment.NewLine + query;
-
-        //    //success = _daleService.UpdateIsSensitive(models.ToDto());
-        //    bool first = true;
-        //    foreach (var s in snowflakeViews)
-        //    {
-        //        if (first)
-        //        {
-        //            query = query + "FROM " + s + System.Environment.NewLine;
-        //            first = false;
-        //        }
-        //    }
-
-        //    DelroyQueryModel queryModel = new DelroyQueryModel();
-        //    queryModel.SnowQuery = query;
-
-        //    return PartialView("_DelroyQueryView", queryModel);
-        //}
-
+            return parentStructs;
+        }
     }
 }
