@@ -7,16 +7,17 @@ using Sentry.Messaging.Common;
 using Sentry.Common.Logging;
 using Newtonsoft.Json;
 using StructureMap;
+using Newtonsoft.Json.Linq;
 
 namespace Sentry.data.Core
 {
     public class HiveMetadataHandler : IMessageHandler<string>
     {
         #region Declarations
-        private IDatasetContext _dsContext;
+        private readonly IDatasetContext _dsContext;
         private UserService _userService;
-        private IEmailService _emailService;
-        private ISchemaService _schemaService;
+        private readonly IEmailService _emailService;
+        private readonly ISchemaService _schemaService;
         #endregion
 
         #region Constructor
@@ -48,9 +49,11 @@ namespace Sentry.data.Core
                                 de = _dsContext.FileSchema.Where(w => w.SchemaId == hiveCreatedEvent.SchemaID).FirstOrDefault();
                                 de.HiveTableStatus = ConsumptionLayerTableStatusEnum.Available.ToString();
 
+
                                 if (de.IsInSAS)
                                 {
-                                    bool IsSuccessful = _schemaService.SasUpdateNotification(hiveCreatedEvent.SchemaID, hiveCreatedEvent.RevisionID, hiveCreatedEvent.InitiatorID);
+                                    var changeIndicator = JObject.Parse(hiveCreatedEvent.ChangeIND);
+                                    bool IsSuccessful = _schemaService.SasAddOrUpdateNotification(hiveCreatedEvent.SchemaID, hiveCreatedEvent.RevisionID, hiveCreatedEvent.InitiatorID, changeIndicator, "HIVE");
 
                                     if (!IsSuccessful)
                                     {
