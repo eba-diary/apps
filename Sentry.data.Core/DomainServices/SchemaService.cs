@@ -143,7 +143,8 @@ namespace Sentry.data.Core
 
                     _datasetContext.SaveChanges();
 
-                    GenerateConsumptionLayerCreateEvent(schema, new JObject() { "revision:added" });
+                    
+                    GenerateConsumptionLayerCreateEvent(schema, JObject.Parse("{\"revision\":\"added\"}"));
                                         
                     return revision.SchemaRevision_Id;
                 }
@@ -280,7 +281,11 @@ namespace Sentry.data.Core
         private void GenerateConsumptionLayerCreateEvent(FileSchema schema, JObject propertyDeltaList)
         {
             //SchemaRevision latestRevision = null;
-            var latestRevision = _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schema.SchemaId).Select(s => new {s.ParentSchema.SchemaId, s.SchemaRevision_Id, s.Revision_NBR }).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();
+            var latestRevision = _datasetContext.SchemaRevision
+                .Where(w => w.ParentSchema.SchemaId == schema.SchemaId)
+                .Select(s => new {s.ParentSchema.SchemaId, s.SchemaRevision_Id, s.Revision_NBR })
+                .OrderByDescending(o => o.Revision_NBR)
+                .Take(1).FirstOrDefault();
 
             //Do nothing if there is no revision associated with schema
             if (latestRevision == null)
@@ -324,7 +329,11 @@ namespace Sentry.data.Core
 
 
             bool sendSnowMessage = false;
-            if (propertyDeltaList.ContainsKey("cla2429_snowflakecreatetable") && propertyDeltaList.GetValue("cla2429_snowflakecreatetable").ToString().ToLower() == "true")
+            if (propertyDeltaList.ContainsKey("revision") && propertyDeltaList.GetValue("revision").ToString().ToLower() == "added" && schema.CLA2429_SnowflakeCreateTable)
+            {
+                sendSnowMessage = true;
+            }
+            else if (propertyDeltaList.ContainsKey("cla2429_snowflakecreatetable") && propertyDeltaList.GetValue("cla2429_snowflakecreatetable").ToString().ToLower() == "true")
             {
                 sendSnowMessage = true;
             }
@@ -866,18 +875,22 @@ namespace Sentry.data.Core
                 {
                     sasNotificationType = "ADD";
                 }
-                else if (currentView && rev.ParentSchema.IsInSAS)
+                else if (rev.ParentSchema.IsInSAS && currentView)
                 {
                     sasNotificationType = "ADD";
                     currentViewNotficationType = "ADD";
                 }
-                else if (changeIndicator.ContainsKey("cla2429_snowflakecreatetable") && changeIndicator.GetValue("cla2429_snowflakecreatetable").ToString().ToLower() == "true" && rev.ParentSchema.IsInSAS)
+                else if (rev.ParentSchema.IsInSAS && changeIndicator.ContainsKey("cla2429_snowflakecreatetable") && changeIndicator.GetValue("cla2429_snowflakecreatetable").ToString().ToLower() == "true" )
                 {
                     sasNotificationType = "ADD";
                     if (rev.ParentSchema.CreateCurrentView)
                     {
                         currentViewNotficationType = "ADD";
                     }
+                }
+                else if (rev.ParentSchema.IsInSAS && changeIndicator.ContainsKey("revision") && changeIndicator.GetValue("revision").ToString().ToLower() == "added")
+                {
+                    sasNotificationType = "UPDATE";
                 }
 
                 //string sasNotificationType = (
@@ -901,29 +914,35 @@ namespace Sentry.data.Core
             }
         }
 
-        public bool SasDeleteNotification(int schemaId, int revisionId, string initiatorId, string externalSystemIndictator)
+        public bool SasDeleteNotification(int schemaId, string initiatorId, string externalSystemIndictator)
         {
-            SchemaRevision rev = null;
+            FileSchema schema = null;
             IApplicationUser user;
 
             try
             {
-
-                rev = _datasetContext.SchemaRevision.Where(w => w.SchemaRevision_Id == revisionId && w.ParentSchema.SchemaId == schemaId).FirstOrDefault();
+                
+                schema = _datasetContext.FileSchema.FirstOrDefault(w => w.SchemaId == schemaId);
 
                 //Use incoming initiator id.  If invalid or not supplied, use CreatedBy id on revision.
-                user = !string.IsNullOrWhiteSpace(initiatorId)
-                    ? _userService.GetByAssociateId(initiatorId)
-                    : _userService.GetByAssociateId(rev.CreatedBy);
+                if (!string.IsNullOrWhiteSpace(initiatorId))
+                {
+                    user = _userService.GetByAssociateId(initiatorId);
+                }
+                else
+                {
+                    var contact = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).Select(s => s.ParentDataset.PrimaryContactId).FirstOrDefault();
+                    user = _userService.GetByAssociateId(contact);
+                }
 
-                SasNotification(rev.ParentSchema, "DELETE", null, user, externalSystemIndictator);
+                SasNotification(schema, "REMOVE", null, user, externalSystemIndictator);
 
                 return true;
             }
             catch (Exception ex)
             {
-                int revId = (rev != null) ? rev.SchemaRevision_Id : 0;
-                Logger.Error($"Failed sending SAS notification - revision:{revId}", ex);
+                int scmId = (schema != null) ? schema.SchemaId : 0;
+                Logger.Error($"<sasdeletenotification> Failed sending SAS delete notification - schemaId:{schemaId}", ex);
 
                 return false;
             }

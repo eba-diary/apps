@@ -103,6 +103,13 @@ namespace Sentry.data.Core
                             case "DELETED":
                             case "SKIPPED":
                                 de.HiveTableStatus = ConsumptionLayerTableStatusEnum.Deleted.ToString();
+
+                                bool IsSuccessful = _schemaService.SasDeleteNotification(deleteCompletedEvent.SchemaID, null, "HIVE");
+
+                                if (!IsSuccessful)
+                                {
+                                    Logger.Error($"HiveMetadataHandler failed sending SAS delete email - schema:{deleteCompletedEvent.SchemaID}");
+                                }
                                 break;
                             case "FAILED":
                                 de.HiveTableStatus = ConsumptionLayerTableStatusEnum.DeleteFailed.ToString();

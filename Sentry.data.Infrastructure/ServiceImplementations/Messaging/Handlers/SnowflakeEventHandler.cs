@@ -98,6 +98,13 @@ namespace Sentry.data.Infrastructure
                             case "DELETED":
                             case "SKIPPED":
                                 de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Deleted.ToString();
+
+                                bool IsSuccessful = _schemaService.SasDeleteNotification(deleteCompletedEvent.SchemaID, null, "SNOWFLAKE");
+
+                                if (!IsSuccessful)
+                                {
+                                    Logger.Error($"snowflakeeventhandler failed sending SAS delete email - schema:{deleteCompletedEvent.SchemaID}");
+                                }
                                 break;
                             case "FAILED":
                                 de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteFailed.ToString();
