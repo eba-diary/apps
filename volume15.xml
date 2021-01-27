@@ -1,4 +1,4 @@
-<TEI xmlns="http://www.tei-c.org/ns/1.0">
+f<TEI xmlns="http://www.tei-c.org/ns/1.0">
   <teiHeader>
     <fileDesc>
       <titleStmt>
@@ -186,7 +186,7 @@
       <!-- The Smiths just arrived the day before, so is this Harold Jones or Harold Smith? -->
       <div xml:id="EBA-1908-02-01" type = "entry">
         <dateline><date when="1908-01-01">Feb. 1. Saturday.</date></dateline>
-        <p>A day at home. <persName ref="#Cassel_Ernest">Sir Ernest Cassel</persName> and his daughter <persName ref="Maud_Amalia">Mrs. Ashley</persName> and the <persName>Princess Teano</persName> of <placeName>Rome</placeName> came to tea also <persName>Mr. and Mrs. Schiff</persName> of New York, <persName>Mr. Villiers,</persName> <persName>Weigall</persName> and others.</p>
+        <p>A day at home. <persName ref="#Cassel_Ernest">Sir Ernest Cassel</persName> and his daughter <persName ref="#Maud_Amalia">Mrs. Ashley</persName> and the <persName>Princess Teano</persName> of <placeName>Rome</placeName> came to tea also <persName>Mr. and Mrs. Schiff</persName> of New York, <persName>Mr. Villiers,</persName> <persName>Weigall</persName> and others.</p>
       </div>
       <!-- Corrected misspelling: Cassal -> Cassel -->
       <!-- Ernest Cassel did not have a daughter named Mrs. Ashley. His daughter was Amalia Mary Maud (nee Cassel). Oddly, the EBA Indices page does mention a Mrs. Ashley Maud, but this wasn't her name either. Maybe, because her name was Prussian, she took on an English name as a kind of nickname?-->
