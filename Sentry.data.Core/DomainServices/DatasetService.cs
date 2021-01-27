@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Text;
 using Newtonsoft.Json;
 using Sentry.Common.Logging;
@@ -18,6 +19,7 @@ namespace Sentry.data.Core
         private readonly IConfigService _configService;
         private readonly ISchemaService _schemaService;
         private readonly IAWSLambdaProvider _awsLambdaProvider;
+        private readonly ObjectCache cache = MemoryCache.Default;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
                             UserService userService, IConfigService configService, 
@@ -55,6 +57,47 @@ namespace Sentry.data.Core
             {
                 return null;
             }            
+        }
+
+        public List<DatasetSummaryMetadataDTO> GetDatasetSummaryMetadataDTO()
+        {
+            List<DatasetSummaryMetadataDTO> summaryResults = cache["DatasetSummaryMetadata"] as List<DatasetSummaryMetadataDTO>;
+
+            if (summaryResults == null)
+            {
+                //Create cache policy and set expiration policy based on config
+                CacheItemPolicy policy = new CacheItemPolicy();
+
+                //SlidingExpriration will restart the experation timer when the cache is accessed, if it has not already expired.
+                policy.AbsoluteExpiration = new DateTimeOffset(DateTime.UtcNow.AddHours(24));
+
+                //Pull summarized metadata from datasetfile table
+                summaryResults = _datasetContext.DatasetFile.GroupBy(g => new { g.Dataset })
+                .Select(s => new DatasetSummaryMetadataDTO
+                {
+                    DatasetId = s.Key.Dataset.DatasetId,
+                    FileCount = s.Count(),
+                    Max_Created_DTM = s.Max(m => m.CreateDTM)
+                }).ToList();
+
+                //pull summarized metadata from events table
+                var eventlist = _datasetContext.Events
+                    .Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset.HasValue)
+                    .GroupBy(g => g.Dataset)
+                    .Select(s => new { ds_id = s.Key, count = s.Count() })
+                    .OrderBy(o => o.ds_id).ToList();
+
+                //Add events metadata to summaryResults metadata
+                foreach (DatasetSummaryMetadataDTO summary in summaryResults)
+                {
+                    summary.ViewCount = (eventlist.Any(w => w.ds_id == summary.DatasetId)) ? eventlist.First(w => w.ds_id == summary.DatasetId).count : 0;
+                }
+
+                //Assign result list to cache object
+                cache.Set("DatasetSummaryMetadata", summaryResults, policy);
+            }
+
+            return summaryResults;
         }
 
         public List<DatasetDto> GetAllDatasetDto()
