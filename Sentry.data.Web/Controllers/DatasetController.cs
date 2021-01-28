@@ -1019,5 +1019,68 @@ namespace Sentry.data.Web.Controllers
             return View("QueryTool");
         }
 
+
+        [HttpPost]
+        public ActionResult DelroyGenerateQuery(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType, List<string> snowflakeViews, List<string> structTracker)
+        {
+            bool outerfirst = true;
+            string parentStructs = DelroyStructMonster(structTracker);
+            string query = GenerateSnow(models, parentStructs, ref outerfirst);
+            query = "SELECT " + System.Environment.NewLine + query;
+
+            bool first = true;
+            foreach (var s in snowflakeViews)
+            {
+                if (first)
+                {
+                    query = query + " FROM " + s + System.Environment.NewLine; 
+                    first = false;
+                }
+            }
+
+            return Json(new { snowQuery = query });
+        }
+
+        private string GenerateSnow(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string parentStructs, ref bool first)
+        {
+            string line = String.Empty;
+
+            foreach (var field in models)
+            {
+                if(field.FieldType != "STRUCT")
+                {
+                    if (first)
+                    {
+                        line = line + parentStructs + field.Name + System.Environment.NewLine;
+                        first = false;
+                    }
+                    else
+                    {
+                        line =  line + "," + parentStructs + field.Name + System.Environment.NewLine;
+                    }
+                    
+                }
+                else
+                {
+                    line = line + GenerateSnow(field.Fields, parentStructs + field.Name + ":",ref first);
+                }
+            }
+            return line;
+        }
+
+        private string DelroyStructMonster(List<string> structTracker)
+        {
+            string parentStructs = String.Empty;
+
+            if(structTracker != null)
+            {
+                foreach (var s in structTracker)
+                {
+                    parentStructs = parentStructs + s + ":";
+                }
+            }
+
+            return parentStructs;
+        }
     }
 }
