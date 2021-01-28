@@ -102,11 +102,10 @@ data.Dataset = {
                 { extend: 'colvis', text: 'Columns' },
                 {
                     text: 'Snowflake Query',
-                    action: function (e, dt, node, config) {
+                    action: function () {
                         data.Dataset.delroyQueryGenerator('snow');
                     }
                 }
-                
             ]
         });
 
@@ -207,7 +206,7 @@ data.Dataset = {
         $('#delroyBreadcrumb').append(h);
 
         //add struct too tracker to hold if a query needs to be generated
-        if (name != "Home" && index > 0) {
+        if (name !== "Home" && index > 0) {
             data.Dataset.delroyStructTrackerArray.push(name);    
         }
     },
@@ -220,7 +219,6 @@ data.Dataset = {
         //STEP 2: empty breadcrumb Tracker which feeds Query Generator
         var deleteStartIndex = parseInt(0);
         data.Dataset.delroyStructTrackerArray.splice(deleteStartIndex);     
-        
 
         //STEP 3: add in all breadcrumbs from start until the one they clicked on
         for (let i = 0; i < data.Dataset.delroyFieldArray.length; i++) {
@@ -230,7 +228,6 @@ data.Dataset = {
             if (i > 0) {
                 bcName = field.Name;
             }
-
             data.Dataset.delroyAddBreadCrumb(bcName, i);
         }
     },
@@ -277,7 +274,6 @@ data.Dataset = {
                 tempInput.select();                                                         //select it, (imitates user selecting)
                 document.execCommand("copy");                                               //issue copy command                              
                 document.body.removeChild(tempInput);                                       //delete element
-                    
                 data.Dale.makeToast("success", "Snowflake Query Copied to Clipboard!!");
 
             },

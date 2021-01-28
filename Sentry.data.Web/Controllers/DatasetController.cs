@@ -1022,14 +1022,13 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public ActionResult DelroyGenerateQuery(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType, List<string> snowflakeViews, List<string> structTracker)
         {
-            bool success = false;
             bool outerfirst = true;
             string parentStructs = DelroyStructMonster(structTracker);
-            string query = query = GenerateSnow(models, parentStructs, ref outerfirst);
+            string query = GenerateSnow(models, parentStructs, ref outerfirst);
             query = "SELECT " + System.Environment.NewLine + query;
 
             bool first = true;
-            foreach(var s in snowflakeViews)
+            foreach (var s in snowflakeViews)
             {
                 if (first)
                 {
