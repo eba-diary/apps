@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?><?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml"
 	schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="places">
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="people">
     <teiHeader>
         <fileDesc>
             <titleStmt>
@@ -11,10 +11,22 @@
                 <p>Publication Information</p>
             </publicationStmt>
             <sourceDesc>
-                <p>Encyclopedia Britannica</p>
+                <p>Information about the source</p>
             </sourceDesc>
         </fileDesc>
         <profileDesc>
+            <particDesc>
+                <listPerson>
+                    <person xml:id="Troyon_Constant">
+                        <persName>Constant Troyon</persName>
+                        <note>Constant Troyon (August 28, 1810 – February 21, 1865) was a French painter of the Barbizon school.</note>
+                    </person>
+                    <person xml:id="Corot_Jean_Baptiste_Camille">
+                        <persName>Jean-Baptiste-Camille Corot</persName>
+                        <note>Jean-Baptiste-Camille Corot (July 16, 1796 - February 22, 1875) was a French landscape and portrait painter as well as a printmaker in etching.</note>
+                    </person>
+                </listPerson>
+            </particDesc>
             <settingDesc>
                 <listPlace>
                     <place xml:id="Cairo">
@@ -31,7 +43,7 @@
                     </place>
                     <place xml:id="Naples">
                         <placeName>Naples</placeName>
-                        <note></note>
+                        <note>Naples, Italian Napoli, ancient (Latin) Neapolis (“New Town”), city, capital of Naples provincia, Campania regione, southern Italy. It lies on the west coast of the Italian peninsula, 120 miles (190 km) southeast of Rome.</note>
                     </place>
                     <place xml:id="New_York">
                         <placeName>New_York</placeName>
