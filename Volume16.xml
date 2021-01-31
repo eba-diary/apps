@@ -7,7 +7,7 @@
           <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
         </author>
         <editor>
-          <persName ref="SK">Sarah Ketchley</persName>
+          <persName ref="#SK">Sarah Ketchley</persName>
         </editor>
       </titleStmt>
       <publicationStmt>
@@ -72,7 +72,7 @@
                 <dateline>
                     <date when="1908-11-23">Monday. Nov. 23rd.</date>
                 </dateline>
-                <p>Sailed from 6 a.m. to 6 p.m. Delayed for 4 hours at <placeName ref="#Shaykh_Fadl">Sheik Fadl</placeName> for coal for the tug &#8211; have made 40 miles and are now lying 10 miles below <placeName ref="#Minya">Minia.</placeName> A most wonderful river &#8211; no one knows its channel and our tug goes scalloping about on it in an extraordinary way.</p>
+                <p>Sailed from 6 a.m. to 6 p.m. Delayed for 4 hours at <placeName ref="#Shaykh_Fadl">Sheik Fadl</placeName> for coal for the tug &#8211; have made 40 miles and are now lying 10 miles below <placeName ref="#Minya">Minia</placeName>. A most wonderful river &#8211; no one knows its channel and our tug goes scalloping about on it in an extraordinary way.</p>
             </div>
             <div xml:id="EBA-1908-11-24" type="entry">
                 <dateline>
@@ -158,7 +158,7 @@
                 <dateline>
                     <date when="1908-12-06">Second Sunday in Advent. Dec. 6.</date>
                 </dateline>    
-                <p>A quiet day at home &#8211; <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> over at the <placeName ref="#Valley_of_the_Kings">Valley.</placeName> The roads and embankments have been so spoiled by the river, that they are well nigh impossible &#8211; and I cannot get over in my chair until they <pb n="66"/> are better. Last night about 12 o'clock, I was aroused by cries that I thought must be those of a jackal &#8211; it proved to have been a man in the river. Six men had gone to our opposite neighbor <persName ref="#Insinger_Mr.">Mr. Insinger</persName>s, to rob and steal. They overpowered the night watchman, and one of them got into the house. <persName ref="#Insinger_Mr.">Mr. Insinger</persName> sent a shot at the man, who ran, followed by <persName ref="#Insinger_Mr.">Mr. Insinger</persName> firing at him &#8211; the man took to the river, and found the current so strong that he screamed for help. The police appeared and caught the man, who gave the names of the men with him. There is a great deal of lawlessness about the country and some alarm felt.</p>
+                <p>A quiet day at home &#8211; <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> over at the <placeName ref="#Valley_of_the_Kings">Valley.</placeName> The roads and embankments have been so spoiled by the river, that they are well nigh impossible &#8211; and I cannot get over in my chair until they <pb n="66"/>are better. Last night about 12 o'clock, I was aroused by cries that I thought must be those of a jackal &#8211; it proved to have been a man in the river. Six men had gone to our opposite neighbor <persName ref="#Insinger_Mr.">Mr. Insinger</persName>s, to rob and steal. They overpowered the night watchman, and one of them got into the house. <persName ref="#Insinger_Mr.">Mr. Insinger</persName> sent a shot at the man, who ran, followed by <persName ref="#Insinger_Mr.">Mr. Insinger</persName> firing at him &#8211; the man took to the river, and found the current so strong that he screamed for help. The police appeared and caught the man, who gave the names of the men with him. There is a great deal of lawlessness about the country and some alarm felt.</p>
             </div>
             <div xml:id="EBA-1908-12-07" type="entry">
                 <dateline>
