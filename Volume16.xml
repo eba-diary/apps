@@ -1,0 +1,292 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Diary of Mrs. Emma B. Andrews. Volume 16 1908-1909</title>
+        <author>
+          <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
+        </author>
+        <editor>
+          <persName ref="#SK">Sarah Ketchley</persName>
+        </editor>
+      </titleStmt>
+      <publicationStmt>
+        <publisher>
+          <orgName ref="#Emma_B_Andrews_Diary_Project">Emma B. Andrews Diary Project</orgName>
+        </publisher>
+        <address>
+          <addrLine>University of Washington, Seattle, WA</addrLine>
+        </address>
+        <availability>
+          <licence target="https://creativecommons.org/licenses/by-nc-sa/4.0/">This work is licensed under a Creative Commons Attribution-NonCommercial Share-Alike 4.0 International License.</licence>
+        </availability>
+        <date>2021-01-10</date>
+      </publicationStmt>
+      <sourceDesc>
+        <p><placeName ref="#American_Philosophical_Society_Philadelphia">American Philosophical Society, Philadelphia</placeName></p>
+      </sourceDesc>
+      <encodingStmt>
+        <projectDesc>
+          <p>Established in 2010, the goals of the <name ref="#Emma_B_Andrews_Diary_Project">Emma B. Andrews Diary Project</name> include the transcription and digitization of a wide range of primary historical material from the <orgName ref="#'Golden_Age'">'Golden Age'</orgName> of <orgName ref="#Egyptian">Egyptian</orgName> archaeology at the end of the 19th and beginning of the 20th centuries. A founding partner of <name ref="#Newbook_Digital_Texts">Newbook Digital Texts</name> (www.newbookdigitaltexts.org), the <name ref="#EBA_Diary_Project">EBA Diary Project</name> offers undergraduate and graduate digital humanities education and internships at the <name ref="#University_of_Washington">University of Washington.</name> <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName> is best remembered for her association with the millionaire lawyer turned archaeologist/art and antiquities collector, <persName ref="#Davis_Theodore_M">Theodore M. Davis</persName>. Traveling to <placeName ref="#Egypt">Egypt</placeName> with him between 1889 and 1912, she kept detailed journals of these voyages along the <orgName ref="#Nile">Nile</orgName>, including his important yet under-reported excavations of over 20 significant tombs in the <placeName ref="#Valley_of_the_Kings">Valley of the Kings</placeName>. <persName ref="#Andrews_Emma_B">Emma</persName> provides a vital commentary on the archaeology and pioneering Egyptologists of the time, painting a revealing picture of the lives of the colonial gentry and the cultural and scientific literati in at the dawn of the twentieth century. Analysis of the content of her diaries, along with a broad range of additional primary source material, will afford scholars information about important historical resources for the first time.</p>
+        </projectDesc>
+      </encodingStmt>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <pb n="60"/>
+            <div xml:id="EBA-1908-11-05" type="entry">
+                <dateline>
+                    <date when="1908-11-05">Thursday. Nov. 5th 1908.</date>
+                    <name type="boat" ref="#SS_Princess_Irene">SS. Princess Irene</name>.
+                </dateline>
+                <p>We are nearing the end of this part of our voyage &#8211; having sailed from <placeName ref="#New_York">New York</placeName> <date when="1908-10-24">Saturday the 24th Oct.</date> <persName ref="#Newberry_Mary">Mary Newberry</persName> who had been spending the week there, and <persName ref="#Ghio_Anita">Anita Ghio</persName> went down to see us off. <personGrp ref="#Jennings">Mrs. And Mr. Walter Jennings and family</personGrp> &#8211; 2 children, 2 maids, tutor and governess, with <persName ref="#Gallandet_Miss">Miss Gallandet</persName>, and sister <persName ref="#Jennings_Miss">Miss Jennings</persName>, were fellow passengers. They are relatives of <persName ref="#Auchincloss_Hugh">Mrs. Hugh Auchincloss</persName>, who was <persName ref="#Jennings_Miss">Miss Jennings</persName>. <personGrp ref="#Pell">Mr. and Mrs. Herbert Pell</personGrp>, also on board. A dull voyage, much rain and warm &#8211; I occupied for the 3rd time the Captain's charming rooms on the bridge &#8211; and what lovely hours of rest and quiet I had, after all the din and stir of the summer. The steamer is comfortable but slow, we reached <placeName ref="#Gibraltar">Gibraltar</placeName> on the 11th day and ought to be in <placeName ref="#Naples">Naples</placeName> tonight, only we won't, at least we hope to make our steamer tomorrow.</p>
+            </div>
+            <div xml:id="EBA-1908-11-09" type="entry">
+                <dateline>
+                    <date when="1908-11-09">Monday. Nov. 9.</date>
+                    <placeName ref="#Cairo">Cairo–Shepheards</placeName>
+                </dateline>
+                <p>We did just make our steamer the '<name type="boat" ref="#Preussen">Preussen</name>' on Friday &#8211; <personGrp ref="#Pell">Mr. and Mrs. Pell</personGrp> with us. We all occupied the Captain's and officer's rooms on the bridge &#8211; and were very comfortable &#8211; landed at <placeName ref="#Alexandria">Alexandria</placeName> at 3 this P.M. got the train, and at 7 o'clock were installed in our familiar rooms on the pleasant garden. We have never been so early before. Not many people yet.<pb n="61"/> <personGrp ref="#Gorst">Eldon and Lady Gorst</personGrp>. <personGrp ref="#Pell">Mr. and Mrs. Pell</personGrp> have been dining with us. We have had a busy 10 days in <placeName ref="#Cairo">Cairo</placeName>. Every one has been so kind. We went to <persName ref="#Gorst_Lady">Lady Gorst</persName>s to a garden party &#8211; to the <personGrp ref="#Iddings">Iddings</personGrp> to dine &#8211; and to a tea, where we met delightful people. <personGrp ref="#Iddings">Mr. and Mrs. Iddings</personGrp> dined with us that evening, and <persName ref="#Trefusis_Walter">Capt. Trefusis</persName> &#8211; <persName ref="#Maspero_Gaston">M. Maspero</persName> another evening, and <persName ref="#Trefusis_Walter">the Capt.</persName> Who also lunched with us. The great event was<persName ref="#Davis_Theodore_M">Theo</persName>'s presentation to <persName ref="#Abbas_II">the Khedive</persName>, which <persName ref="#Iddings_Mr.">Mr. Iddings</persName> has been trying to persuade him to do for 3 years &#8211; but this year he consented &#8211; and he was received in a private audience. <persName ref="#Iddings_Mr.">Mr. Iddings</persName> came for him in his own carriage, with his decorative Kavass, and 2 gorgeous running Sayces, and <persName ref="#Davis_Theodore_M">Theo</persName> had to appear in frock coat and top hat at 10 in the morning. I couldn't but laugh when I saw them drive off in such style, for I knew how he hated it. It was very successful however, and <persName ref="#Iddings_Mr.">Mr. Iddings</persName> told me he had never seen the <persName ref="#Abbas_II">the Khedive</persName> so interested in an interview.</p>
+            </div>
+            <div xml:id="EBA-1908-11-20" type="entry">
+                <dateline>
+                    <date when="1908-11-20">Friday. Nov. 20.</date>
+                </dateline>
+                <p>In town with <persName ref="#Davis_Theodore_M">Theo</persName> this morning, doing last things. <persName ref="#Trefusis_Walter">Capt. Trefusis</persName> lunched with us. Our tug took us to the bridge landing at 1 o'clock and we hoped to get through the draw comfortably. But the usual scrimmage occurred &#8211; and we came near losing the top of our big boom. Then we had to get through the new <placeName ref="#Giza">Ghizeh</placeName> bridge &#8211; we landed <persName ref="#Trefusis_Walter">the Capt.</persName> And waited until most of the gyassas had passed through. We got as far as the big Sugar station, 5 miles below <placeName ref="#Bedrashyn">Bedreschein</placeName> &#8211; very cold.</p>
+            </div>
+            <pb n="62" />
+            <div xml:id="EBA-1908-11-21" type="entry">
+                <dateline>
+                    <date when="1908-11-21">Saturday. Nov. 21st.</date>
+                </dateline>
+              <p>Very busy settling - made <placeName ref="#Wasta">Wasta</placeName> at 5 P.M. warmer. The river is tremendous and the current very strong &#8211; it is a mighty flood &#8211; but will do great good to the country.</p>
+            </div> 
+            <div xml:id="EBA-1908-11-22" type="entry">
+                <dateline>
+                    <date when="1908-11-22">23rd Sunday after Trinity. Nov. 22.</date>
+                </dateline>
+                <p>Sailed at 6 a.m. and tied up at 7 P.M. making 50 miles &#8211; warmer and a wonderful sunset.</p>
+            </div>
+            <div xml:id="EBA-1908-11-23" type="entry">
+                <dateline>
+                    <date when="1908-11-23">Monday. Nov. 23rd.</date>
+                </dateline>
+                <p>Sailed from 6 a.m. to 6 p.m. Delayed for 4 hours at <placeName ref="#Shaykh_Fadl">Sheik Fadl</placeName> for coal for the tug &#8211; have made 40 miles and are now lying 10 miles below <placeName ref="#Minya">Minia</placeName>. A most wonderful river &#8211; no one knows its channel and our tug goes scalloping about on it in an extraordinary way.</p>
+            </div>
+            <div xml:id="EBA-1908-11-24" type="entry">
+                <dateline>
+                    <date when="1908-11-24">Tuesday. Nov. 24th.</date>
+                </dateline>
+                <p>We made an early start at 5:30 and are now at <placeName ref="#Mallawi">Mellawi</placeName> &#8211; having made 41-&#189; miles &#8211; beautiful weather, though the wind is cold.</p>
+            </div>
+            <div xml:id="EBA-1908-11-25" type="entry">
+                <dateline>
+                    <date when="1908-11-25">Wednesday. Nov. 25th.</date>
+                    <measure type="distance">48 miles.</measure>
+                </dateline>
+                <p>An early start &#8211; we are about 10 miles below <placeName ref="#Assiout">Asyût</placeName>, weather charming.</p>
+            </div>
+            <div xml:id="EBA-1908-11-26" type="entry">
+                <dateline>
+                    <date when="1908-11-26">Thursday. Nov. 26.</date>
+                    <measure type="distance">40 miles.</measure>
+                </dateline>          
+                <p>Reached <placeName ref="#Assiout">Asyût</placeName>, at 8 this morning &#8211; we were passing <pb n="63"/>the great Weir before I knew it &#8211; the draw open and all the sluices &#8211; and such a tremendous body of water running through. Our tug had hard work to pull us. Stopped for mail. <persName ref="#Russell_Mr.">Mr. Russell</persName> called.</p>
+            </div>
+            <div xml:id="EBA-1908-11-27" type="entry">
+                <dateline>
+                    <date when="1908-11-27">Friday. Nov. 27.</date>
+                    <measure type="distance">45 miles.</measure>
+                </dateline>             
+                <p>In spite of strong N.W. wind. We are lying 6 miles below <placeName ref="#Jirja">Girga</placeName>.</p>
+            </div>
+            <div xml:id="EBA-1908-11-28" type="entry">
+                <dateline>
+                    <date when="1908-11-28">Saturday. Nov. 28.</date>
+                    <measure type="distance">32 miles.</measure>
+                </dateline>             
+                <p>A very early start, before dawn. Such a beautiful hour followed! The sunrise, and this strange, interesting land, and the quiet hour of reading and reflection, nothing can ever take it from me. A fine day, with strong N.W. wind, which meeting the strong current of the river, made quite a sea. We reached <placeName ref="#Naj_Hammadi">Nagh Hamadi</placeName> at 3 o'clock thinking the bridge opened at 3:30 but found it opened at 3 o'clock &#8211; so we were forced to stay the night. It was quiet enough &#8211; and the late afternoon and evening most lovely.</p>
+            </div> 
+            <div xml:id="EBA-1908-11-29" type="entry">
+                <dateline>
+                    <date when="1908-11-29">First Sunday in Advent. Nov. 29.</date>
+                </dateline> 
+                <p>We passed the bridge most easily at 7:30 &#8211; before I got up. The tug took us up as far as the difficult turn at <placeName ref="#Qasr_wa_as_Sayyad">Kasr es Sayd</placeName> &#8211; then left us with much hearty leave-takings and receiving of liberal backsheesh. The day was absolutely calm, and we were left alone in the middle of the river, with both sails limply hanging &#8211; we have tracked, pulled to the anchor and sailed a little very quietly and are now lying <pb n="64"/>within sight of <placeName ref="#Dishna">Dishneh</placeName> &#8211; a most exquisite evening. 17 miles.</p>
+            </div>
+            <div xml:id="EBA-1908-11-30" type="entry">
+                <dateline>
+                    <date when="1908-11-30">Monday. Nov. 30.</date>
+                    <measure type="distance">42 &#189; miles.</measure>
+                </dateline>              
+                 <p>Made an early start this morning in a good wind, and reached this high bank, one mile below <placeName ref="#Naqadah">Nagada</placeName> at 5.30. An exciting day &#8211; the boat careering madly along &#8211; sailors shouting &#8211; sails changing, and all the clamor of a sharp sailing. The morning was delicious &#8211; I was on deck all the time until we were delayed by a gyassa which cut across our bow in an awkward way, and going immediately upon the sand just in front of us, we had to pull up so sharply that we went with a great thump on the bank &#8211; there was a great tumbling about of all movable things &#8211; and when I came below to see about it - I found <persName ref="#Amelie">Amelie</persName>, <persName ref="#Jones_Harold">Jones</persName>, <persName ref="#Hassein">Hassein</persName>, and <persName ref="#Hassoun">Hassoun</persName> busy setting everything straight. Last year we came on the boat <date when="1907-11-30">Nov. 30</date>. We are much in advance this year!</p>
+            </div>
+            <div xml:id="EBA-1908-12-01" type="entry">
+                <dateline>
+                    <date when="1908-12-01">Tuesday. Dec. 1st.</date>
+                    <measure type="distance">23-&#189; miles.</measure>
+                    <placeName ref="#Luxor">Luxor</placeName>
+                </dateline>
+                 <p>A high wind, but not favourable, all day. However we came gallantly in with sails filled at 5.30 and found ourselves the first arrival of the season. Everyone was on the lookout for us, and we were told that we made a splendid appearance, as we rushed along past the town to our old mooring ground on the island. <persName ref="#Jones_Harold">Harold Jones</persName> was waiting for us at the <name type="hotel" ref="#Winter_Palace">Winter Palace</name>, Tuesday being his off day. He came over at once, and stayed to dinner and gave us the news. It took us 10 days and part of another day from <placeName ref="#Cairo">Cairo</placeName> here.</p>    
+            </div>
+            <pb n="65"/>
+            <div xml:id="EBA-1908-12-02" type="entry">
+                <dateline>
+                    <date when="1908-12-02">Wednesday. Dec. 2nd.</date>
+                </dateline>
+                <p>I have had a quietly busy and most pleasant day at home. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> were at <placeName ref="#Karnak">Karnak</placeName> and the Luxor temple. A big mail last night, and reams of papers. No bad news. <persName ref="#Mathilde">Mathilde</persName> better.</p>
+            </div>
+            <div xml:id="EBA-1908-12-03" type="entry">
+                <dateline>
+                    <date when="1908-12-03">Thursday. Dec. 3rd.</date>
+                </dateline>
+                <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> went to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> today and did not get back until 4 o'clock. They report the road very bad as far as the bridge. <persName ref="#Jones_Harold">Harold</persName> is working between <persName ref="#Horemheb">Hor-em-heb</persName> and <persName ref="#Amenhotep_II">Amenhotep II</persName> tomb. Cold.</p>
+            </div>
+            <div xml:id="EBA-1908-12-04" type="entry">
+                <dateline>
+                    <date when="1908-12-04">Friday. Dec. 4th.</date>
+                </dateline>
+                <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> at <placeName ref="#Karnak">Karnak</placeName> today &#8211; and I over to the town. <personGrp ref="#Weigall">Mr. and Mrs. Weigall</personGrp> were here this afternoon.</p>
+            </div>
+            <div xml:id="EBA-1908-12-05" type="entry">
+                <dateline>
+                    <date when="1908-12-05">Saturday. Dec. 5th.</date>
+                </dateline>
+                <p><persName ref="#Davis_Theodore_M">Theo</persName> at the boat very busy with letters. <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> and I went over and called on <persName ref="#Buchanan_Carrie">Miss Buchanan</persName> &#8211; such a very nice visit. The school very prospering &#8211; over 280 pupils. The place has much improved &#8211; a fine stone wall all about it &#8211; and a beautiful garden making.</p>
+            </div>
+            <div xml:id="EBA-1908-12-06" type="entry">
+                <dateline>
+                    <date when="1908-12-06">Second Sunday in Advent. Dec. 6.</date>
+                </dateline>    
+                <p>A quiet day at home &#8211; <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> over at the <placeName ref="#Valley_of_the_Kings">Valley.</placeName> The roads and embankments have been so spoiled by the river, that they are well nigh impossible &#8211; and I cannot get over in my chair until they <pb n="66"/>are better. Last night about 12 o'clock, I was aroused by cries that I thought must be those of a jackal &#8211; it proved to have been a man in the river. Six men had gone to our opposite neighbor <persName ref="#Insinger_Mr.">Mr. Insinger</persName>s, to rob and steal. They overpowered the night watchman, and one of them got into the house. <persName ref="#Insinger_Mr.">Mr. Insinger</persName> sent a shot at the man, who ran, followed by <persName ref="#Insinger_Mr.">Mr. Insinger</persName> firing at him &#8211; the man took to the river, and found the current so strong that he screamed for help. The police appeared and caught the man, who gave the names of the men with him. There is a great deal of lawlessness about the country and some alarm felt.</p>
+            </div>
+            <div xml:id="EBA-1908-12-07" type="entry">
+                <dateline>
+                    <date when="1908-12-07">Monday. Dec. 7th.</date>
+                </dateline>    
+                <p><persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> and I went to see <persName ref="#Buchanan_Carrie">Miss Buchanan</persName> this morning &#8211; such a brave little woman. Our nights are now most beautiful &#8211; full moon.</p>
+            </div>
+            <div xml:id="EBA-1908-12-08" type="entry">
+                <dateline>
+                    <date when="1908-12-08">Tuesday. Dec. 8th.</date>
+                </dateline>         
+                <p>Beautiful weather &#8211; <persName ref="#Jones_Harold">Harold Jones</persName> came over this morning and stayed all night.</p>
+            </div>
+            <div xml:id="EBA-1908-12-09" type="entry">
+                <dateline>
+                    <date when="1908-12-09">Wednesday. Dec. 9th.</date>
+                </dateline>   
+                <p>A cold day &#8211; <personGrp ref="#Weigall">Mr. and Mrs. Weigall</personGrp> here this afternoon.</p>
+            </div>
+            <div xml:id="EBA-1908-12-10" type="entry">
+                <dateline>
+                    <date when="1908-12-10">Thursday. Dec. 10th.</date>
+                </dateline>
+                <p><persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> and I went over to <placeName ref="#Luxor">Luxor</placeName> and drove out to see <persName ref="#Weigall_Mrs.">Mrs. Weigall</persName>. Found <persName ref="#Whymper_Charles">Mr. Whymper</persName> and <persName ref="#Dunn_Dr.">Dr. Dunn</persName> there. Afterwards to the <name type="hotel" ref="#Savoy_Hotel">Savoy</name><pb n="67"/> to call on <persName ref="#Quibell_Mrs.">Mrs. Quibell</persName> and <persName ref="#Pirie_Miss">Miss Pirie</persName> &#8211; not at home &#8211; then asked for <persName ref="#Bruce_Miss">Miss Bruce</persName> and <persName ref="#Dobie_Miss">Miss Dobie</persName> &#8211; the former in bed &#8211; and I went up to her room to see her. <persName ref="#Davis_Theodore_M">Theo</persName> in the <placeName ref="#Valley_of_the_Kings">Valley</placeName> today.</p>
+            </div>
+            <div xml:id="EBA-1908-12-11" type="entry">
+                <dateline>
+                    <date when="1908-12-11">Friday. Dec. 11.</date>
+                </dateline>
+                <p>Another fine day &#8211; but still cold. Everybody growling about the continued cold.</p>
+            </div>
+            <div xml:id="EBA-1908-12-12" type="entry">
+                <dateline>
+                    <date when="1908-12-12">Saturday. Dec. 12th.</date>
+                </dateline>
+                <p>Very busy with catalogues and gardening plans.</p>
+            </div>
+            <div xml:id="EBA-1908-12-13" type="entry">
+                <dateline>
+                    <date when="1908-12-13">Third Sunday in Advent. Dec. 13.</date>
+                </dateline>
+                <p><persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> and <persName ref="#Davis_Theodore_M">Theo</persName> in the <placeName ref="#Valley_of_the_Kings">Valley.</placeName> Had a nice visit from <persName ref="#Howard_Carter">Mr. Carter</persName> this morning &#8211; <persName ref="#Whymper_Charles">Mr. Whymper</persName>, <personGrp ref="#Weigall">Mr. and Mrs. Weigall</personGrp> dined with us, a pleasant evening.</p>
+            </div>
+            <div xml:id="EBA-1908-12-14" type="entry">
+                <dateline>
+                    <date when="1908-12-14">Monday. Dec. 14th.</date>
+                </dateline>
+                <p>Rather warmer today. <persName ref="#Quibell_Mrs.">Mrs. Quibell</persName> and <persName ref="#Pirie_Miss">Miss Pirie</persName> called. So glad to see them.</p>
+            </div>
+            <div xml:id="EBA-1908-12-15" type="entry">
+                <dateline>
+                    <date when="1908-12-15">Tuesday. Dec. 15th.</date>
+                </dateline>
+                <p><persName ref="#Jones_Harold">Harold Jones</persName> lunched here &#8211; having spent the night with the <personGrp ref="#Weigall">Weigalls</personGrp> &#8211; and intending to return there for the night. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> at <placeName ref="#Dayr_al_Bahri">Der el Bahari.</placeName></p>
+            </div>
+            <pb n="68"/>
+            <div xml:id="EBA-1908-12-16" type="entry">
+                <dateline>
+                    <date when="1908-12-16">Wednesday. Dec. 16th.</date>
+                </dateline>
+                <p>In doors, except for a long walk on the sands &#8211; <persName ref="#Bruce_Miss">Miss Bruce</persName> and <persName ref="#Dobie_Miss">Miss Dobie</persName> here this afternoon.</p>
+            </div>
+            <div xml:id="EBA-1908-12-21" type="entry">
+                <dateline>
+                    <date when="1908-12-21">Monday. Dec. 21st.</date>
+                </dateline>
+                <p><personGrp ref="#Campbell">Dr. and Mrs. Campbell</personGrp> and daughter came this afternoon, bringing with them <personGrp ref="#D'Albertis">Count and Countess d'Albertis</personGrp> of <placeName ref="#Genoa">Genoa</placeName>. <persName ref="#Jones_Harold">Harold Jones</persName> later, all stayed to tea. The days are so quiet and monotonous there is little to chronicle.</p>
+            </div>
+            <div xml:id="EBA-1908-12-23" type="entry">
+                <dateline>
+                    <date when="1908-12-23">Wednesday. Dec. 23rd.</date>
+                </dateline>
+                <p>The &#8216;<name type="boat" ref="#Scarab">Scarab</name>&#8216; and &#8216;<name type="boat" ref="#Osiris">Osiris</name>&#8216; up today, and came to our side, directly behind us. The <name type="boat" ref="#Scarab">Scarab</name> almost poking her nose into my cabin.</p>
+            </div>
+            <div xml:id="EBA-1908-12-25" type="entry">
+                <dateline>
+                    <date when="1908-12-25">Friday. Dec. 25th.</date>
+                </dateline>
+                <p><persName ref="#Paget_Almerio">Mr. Almerio Paget</persName> called this morning. He is on the <name type="boat" ref="#Scarab">Scarab</name> with his wife (<persName ref="#Whitney_Pauline">Pauline Whitney</persName>) and family. We had our usual little celebration with the men this morning. The usual Christmas festivities. <persName ref="#Jones_Harold">Harold</persName> spent the night here &#8211; and with those 3 nice men <persName ref="#Whymper_Charles">Mr. Whymper</persName>, and <persName ref="#Nicol_Mr.">Mr. Nicol</persName>, dined here. <persName ref="#Smith_Joe">Joe Smith</persName> arrived with his wife today, they are staying at <personGrp ref="#Weigall">Weigalls</personGrp>.</p>
+            </div>
+            <div xml:id="EBA-1908-12-29" type="entry">
+                <dateline>
+                    <date when="1908-12-29">Tuesday. Dec. 29th.</date>
+                </dateline>
+                <p>At tea with the <personGrp ref="#Scofield">Scofields</personGrp> on the Maat. <persName ref="#Jones_Harold">Harold</persName> here for the day. <persName ref="#Lagge_F">Mr. F. Lagge</persName> and his friend <persName ref="#Pease_Mr.">Mr. Pease</persName> dined with us. <persName ref="#Davis_Theodore_M">Theo</persName> has <pb n="69"/>bought one of <persName ref="#Nicol_Mr.">Mr. Nicol</persName>'s best pictures. The <name type="boat" ref="#Scarab">Scarab</name> with the <personGrp ref="#Paget">Pagets</personGrp> and the <name type="boat" ref="#Osiris">Osiris</name> with <persName ref="#Arthur_James">Sir Arthur</persName> and <persName ref="#Whitney_Paule">Lady Paget</persName> went up today. Lovely weather.</p>
+            </div>
+            <div xml:id="EBA-1908-12-30" type="entry">
+                <dateline>
+                    <date when="1908-12-30">Wednesday. Dec. 30th.</date>
+                </dateline>
+                <p><persName ref="#Weigall_Mrs.">Mrs. Weigall</persName>, <persName ref="#Smith_Mrs.">Mrs. Smith</persName>, and <persName ref="#Buchanan_Carrie">Miss Buchanan</persName> lunched here. <persName ref="#Bissing_Baron">Baron de Vos</persName> of the <placeName ref="#Dongola">Dongola</placeName> called, also <persName ref="#Mandsley_Mr.">Mr. Mandsley</persName> bringing the horrible news of the <placeName ref="#Messina">Messina</placeName> earthquake.</p>
+            </div>
+            <div xml:id="EBA-1908-12-31" type="entry">
+                <dateline>
+                    <date when="1908-12-31">Thursday. Dec. 31st.</date>
+                </dateline>
+                <p><persName ref="#Scofield_Grace">Miss Grace Scofield</persName>, <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> and I, and <persName ref="#Davis_Theodore_M">Theo</persName> went to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> today, lunched in our comfortable little stone house. Perfect day.</p>
+            </div>
+            <div xml:id="EBA-1909-01-12" type="entry">
+                <dateline>
+                    <date when="1909-01-12">Jan. 12th. Tuesday.</date>
+                </dateline>
+                <p>Various happenings social and otherwise since the month came in. <persName ref="#Weigall_Mrs.">Mrs. Weigall</persName> and <persName ref="#Smith_Corinna">Corinna Smith</persName> come every Saturday morning to read. <personGrp ref="#Brown">Mr. and Mrs. Walter Brown</personGrp> of <placeName ref="#Venice">Venice</placeName> are here for a month, with Mrs. B's mother, <persName ref="#Beckwith_Mrs.">Mrs. Beckwith</persName>. <persName ref="#Davis_Theodore_M">Theo</persName> had <persName ref="#Nicol_Mr.">Mr. Nicol</persName> out one day in the <placeName ref="#Valley_of_the_Kings">Valley</placeName> wishing to show him the western valley. <persName ref="#Taft_Mrs.">Mrs. Henry Taft</persName> with her daughters dined with us one evening, with <persName ref="#Nicol_Mr.">Mr. Nicol</persName>, <personGrp ref="#Weigall">Weigall</personGrp> and <persName ref="#Smith_Joe">Joe Smith</persName>. Then we had them (<personGrp ref="#Taft">Mrs. and Miss Taft</personGrp>) out to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> next day. The <personGrp ref="#Jennings">Jennings</personGrp> have turned up. <persName ref="#Bissing_Baron">Baron de Vos</persName> called &#8211; some things quite interesting have been found in the debris of the pit tomb <persName ref="#Davis_Theodore_M">Theo</persName> has been working in lately. Bits of gold foil, stamped with the cartouches of <pb n="70"/><persName ref="#Thut_ankh_amon">Thut-ankh-amon</persName>, <persName ref="#Ay_II">Ai</persName> and <persName ref="#S_ankh_aten">S-ankh-aten</persName>, wife of <persName ref="#Thut_ankh_amon">T.A.A.</persName> She was the 3rd daughter of <persName ref="#Akenaten">Akenaten</persName>.</p>
+            </div>
+            <div xml:id="EBA-1909-01-15" type="entry">
+                <dateline>
+                    <date when="1909-01-15">Friday. Jan. 15th.</date>
+                </dateline>
+                <p><persName ref="#Davis_Theodore_M">Theo</persName> again in the <placeName ref="#Valley_of_the_Kings">Valley</placeName> &#8211; <persName ref="#Erskine_David">Mr. Erskine</persName> has turned up again &#8211; he lunched with <persName ref="#Davis_Theodore_M">Theo</persName> today.</p>
+            </div>
+            <div xml:id="EBA-1909-01-16" type="entry">
+                <dateline>
+                    <date when="1909-01-16">Saturday. Jan 16th.</date>
+                </dateline>
+                <p><persName ref="#Weigall_Hortense">Hortense Weigall</persName>, and <persName ref="#Smith_Corinna">Corinna Smith</persName> were her this morning for the usual reading. They are all camping out up at the <placeName ref="#Wilkinson_Beit">Beit Wilkinson</placeName> place &#8211; and <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> and I went up there to lunch. <persName ref="#Erskine_David">Mr. Erskine</persName> and <persName ref="#Campbell_Colins">Rev. Colins Campbell</persName> were there &#8211; a pleasant day.</p>
+            </div>
+            <div xml:id="EBA-1909-01-21" type="entry">
+                <dateline>
+                    <date when="1909-01-21">Jan. 21 &#8211; Thursday.</date>
+                </dateline>
+                <p><persName ref="#Jones_Harold">Harold</persName> found yesterday in the last corner of the pit tomb, a most lovely alabaster statuette of a woman &#8211; about 9 in. high, the most perfect specimen of Egyptian art I have ever seen, and in perfect condition. To think of her lying under that hard mud for nearly 3000 years! no inscription. It is thought it may represent the wife of <persName ref="#Thut_ankh_amon">Thut-ankh-amen</persName>. <persName ref="#Davis_Theodore_M">Theo</persName>, <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> and <personGrp ref="#Maspero">M. and Mme. Maspero</persName> in the <placeName ref="#Valley_of_the_Kings">valley</placeName> today. Lovely weather.</p>
+            </div>
+            <div xml:id="EBA-1909-01-24" type="entry">
+                <dateline>
+                    <date when="1909-01-24">Third Sunday after Epiphany. Jan. 24th.</date>
+                </dateline>
+                <p>We were distressed and amazed this morning at breakfast to <pb n="71"/>hear of poor <persName ref="#Smith_Corinna">Corinna</persName>'s disaster. She was here yesterday morning as usual. I thought she looked very tired and troubled. She had many things to do in town, before she went back to their camp. The <personGrp ref="#Petrie">Petries</personGrp> were dining with them. She was then suffering extremely from pain in one eye &#8211; which grew so bad that she became delirious. They (<personGrp ref="#Smith">she and Joe</personGrp>) got some donkeys and came at a walk all the way to the river, where they quietly aroused some of our sailors, who rowed them across to <placeName ref="#Luxor">Luxor</placeName> to the doctor. He advised them to go at once to <placeName ref="#Cairo">Cairo</placeName> &#8211; and they now are on their way there. It is a hideous experience for the poor things &#8211; a very bad case of opthalmia. The <persName ref="#Brown_Walter">Walter Browns</persName> here to tea.</p>
+      </div>
+    </body>
+  </text>
+</TEI>
