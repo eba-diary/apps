@@ -27,7 +27,7 @@
       </sourceDesc>
       <encodingStmt>
         <projectDesc>
-          <p>Established in 2010, the goals of the <name ref="#Emma_B_Andrews_Diary_Project">Emma B. Andrews Diary Project</name> include the transcription and digitization of a wide range of primary historical material from the <orgName ref="#'Golden_Age'_of_Egyptian">'Golden Age' of Egyptian</orgName> archaeology at the end of the 19th and beginning of the 20th centuries. A founding partner of <name ref="#Newbook_Digital_Texts">Newbook Digital Texts</name> (www.newbookdigitaltexts.org), the <name ref="#EBA_Diary_Project">EBA Diary Project</name> offers undergraduate and graduate digital humanities education and internships at the <name ref="#University_of_Washington">University of Washington.</name> <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName> is best remembered for her association with the millionaire lawyer turned archaeologist/art and antiquities collector, <persName ref="#Davis_Theodore_M">Theodore M. Davis.</persName> Traveling to <placeName ref="#Egypt">Egypt</placeName> with him between 1889 and 1912, she kept detailed journals of these voyages along the <orgName ref="#Nile">Nile,</orgName> including his important yet under-reported excavations of over 20 significant tombs in the <orgName ref="#Valley_of_the_Kings">Valley of the Kings.</orgName> <persName ref="#Emma">Emma</persName> provides a vital commentary on the archaeology and pioneering Egyptologists of the time, painting a revealing picture of the lives of the colonial gentry and the cultural and scientific literati in at the dawn of the twentieth century. Analysis of the content of her diaries, along with a broad range of additional primary source material, will afford scholars information about important historical resources for the first time.</p>
+          <p>Established in 2010, the goals of the <name ref="#Emma_B_Andrews_Diary_Project">Emma B. Andrews Diary Project</name> include the transcription and digitization of a wide range of primary historical material from the <orgName ref="#'Golden_Age'_of_Egyptian">'Golden Age' of Egyptian</orgName> archaeology at the end of the 19th and beginning of the 20th centuries. A founding partner of <name ref="#Newbook_Digital_Texts">Newbook Digital Texts</name> (www.newbookdigitaltexts.org), the <name ref="#EBA_Diary_Project">EBA Diary Project</name> offers undergraduate and graduate digital humanities education and internships at the <name ref="#University_of_Washington">University of Washington.</name> <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName> is best remembered for her association with the millionaire lawyer turned archaeologist/art and antiquities collector, <persName ref="#Davis_Theodore_M">Theodore M. Davis.</persName> Traveling to <placeName ref="#Egypt">Egypt</placeName> with him between 1889 and 1912, she kept detailed journals of these voyages along the <orgName ref="#Nile">Nile,</orgName> including his important yet under-reported excavations of over 20 significant tombs in the <orgName ref="#Valley_of_the_Kings">Valley of the Kings.</orgName> <persName ref="#Andrews_Emma_B">Emma</persName> provides a vital commentary on the archaeology and pioneering Egyptologists of the time, painting a revealing picture of the lives of the colonial gentry and the cultural and scientific literati in at the dawn of the twentieth century. Analysis of the content of her diaries, along with a broad range of additional primary source material, will afford scholars information about important historical resources for the first time.</p>
         </projectDesc>
       </encodingStmt>
     </fileDesc>
@@ -44,7 +44,7 @@
         </div>
         <div xml:id="EBA-1907-12-17" type="entry">
           <dateline><placeName ref="#Keneh">Keneh</placeName> - <date when="1907-12-17">Tuesday, Dec. 17</date>.</dateline>
-          <p>30 miles. We got quietly through the bridge at 8 o'clock this morning. Found the <name type="boat" ref="#Istar">Istar</name> lying there, closed, and with flags down. Her men said that <persName ref="Sayce_Archibald">Mr. Sayce</persName> had gone to <placeName ref="#Cairo">Cairo</placeName> to see his dentist. We have had a splendid day and fine wind, and are now lying at <placeName ref="#Dendera">Dendera</placeName>, as <persName ref="#David_Theodore_M">Theo</persName> wants <persName ref="#Williams_Caroline_Ransom">Carrie</persName> to see it tomorrow.</p> 
+          <p>30 miles. We got quietly through the bridge at 8 o'clock this morning. Found the <name type="boat" ref="#Istar">Istar</name> lying there, closed, and with flags down. Her men said that <persName ref="Sayce_Archibald">Mr. Sayce</persName> had gone to <placeName ref="#Cairo">Cairo</placeName> to see his dentist. We have had a splendid day and fine wind, and are now lying at <placeName ref="#Dendera">Dendera</placeName>, as <persName ref="#Davis_Theodore_M">Theo</persName> wants <persName ref="#Williams_Caroline_Ransom">Carrie</persName> to see it tomorrow.</p> 
         </div>
         <div xml:id="EBA-1907-12-18" type="entry">
           <dateline><date when="1907-12-18">Wednesday, Dec. 18</date>.</dateline>
@@ -88,7 +88,7 @@
         </div>
         <div xml:id="EBA-1907-12-28" type="entry">
           <dateline><placeName ref="#Luxor">Luxor</placeName> - <date when="1907-12-28">Saturday, Dec. 28</date>.</dateline>
-          <p>A quiet day, mostly at home. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Williams_Caroline__Ransom">Carrie</persName> at the <personGrp ref="#Weigalls">Weigalls</personGrp> for tea, and afterwards met the <personGrp ref="#Iddings">Iddings</personGrp> at <placeName ref="#Karnak">Karnae</placeName>.</p> 
+          <p>A quiet day, mostly at home. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Williams_Caroline_Ransom">Carrie</persName> at the <personGrp ref="#Weigalls">Weigalls</personGrp> for tea, and afterwards met the <personGrp ref="#Iddings">Iddings</personGrp> at <placeName ref="#Karnak">Karnae</placeName>.</p> 
         </div>
         <div xml:id="EBA-1907-12-29" type="entry">
           <dateline><placeName ref="#Luxor">Luxor</placeName> - <date when="1907-12-29">Sunday, Dec. 29</date>.</dateline>
@@ -144,7 +144,7 @@
         </div>
         <div xml:id="EBA-1908-01-10" type = "entry">
           <dateline><date when="1908-01-10">Jan. 10th.</date></dateline>
-          <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Williams_Caroline_Ransom">Carrie</persName> to  <placeName ref="#Karnak">Karnac.</placeName> I had a delightful visit from <persName ref="#Gardner_Mrs.">Mrs. Gardner.</persName></p>
+          <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Williams_Caroline_Ransom">Carrie</persName> to  <placeName ref="#Karnak">Karnac.</placeName> I had a delightful visit from <persName ref="#Gardner_Mrs">Mrs. Gardner</persName>.</p>
         </div>
   <!-- She says "Karnac" instead of "Karnak" 5 times in Jan/Feb, according to the original book transcript. -->
         <div xml:id="EBA-1908-01-11" type = "entry">
@@ -159,7 +159,7 @@
   <!-- HOW SHOULD I MARK "Mr. and Mrs. Weigall"? IT'S 2 PEOPLE REFERENCED AT ONCE -->
         <div xml:id="EBA-1908-01-13" type = "entry">
           <dateline><date when="1908-01-13">Jan. 13th.</date></dateline>
-          <p><persName ref="#Ayrton_Edward">Ayrton</persName> here all day - inexpressibly shocked to hear of dear <persName ref="Collins_Frances">Miss Frances Collins'</persName> death in church last evening. She was playing the organ in the little chapel and was in the midst of the "Gloria" when she suddenly stood up and fell to the floor dead! It was a beautiful passing away of her lovely, useful spirit.</p>
+          <p><persName ref="#Ayrton_Edward">Ayrton</persName> here all day - inexpressibly shocked to hear of dear <persName ref="Collins_Frances">Miss Frances Collins</persName>' death in church last evening. She was playing the organ in the little chapel and was in the midst of the "Gloria" when she suddenly stood up and fell to the floor dead! It was a beautiful passing away of her lovely, useful spirit.</p>
         </div>
         <div xml:id="EBA-1908-01-14" type = "entry">
           <dateline><date when="1908-01-14">Jan. 14th. Tuesday.</date></dateline>
@@ -177,7 +177,7 @@
   <!-- COLLINSES: AGAIN, 2 PEOPLE REFERENCED AT ONCE. ALSO, DIDN'T SHE TALK ABOUT FRANCES' DEATH ON JAN 13TH? -->
         <div xml:id="EBA-1908-01-17" type = "entry">
           <dateline><date when="1908-01-17">Jan. 17th. Friday.</date></dateline>
-          <p><persName>Mr. and Mrs. Elliot Smith</persName> and her sister called soon after breakfast on their way to the Valley. We started ourselves after they left, as the <persName>Gorsts</persName> were to lunch with us. They arrived in time. <persName ref="#Gorst_John_Eldon">Sir Eldon,</persName> <persName ref="#Gorst_Lady">Lady Gorst,</persName> his Sec. and <persName ref="#Weigall_Mrs.">Mrs. Weigall.</persName> It was a very pleasant lunch. I liked <persName ref="#Gorst_John Eldon">Sir Eldon</persName> very much - <persName ref="#Gorst_Lady">Lady G.</persName> exceedingly pretty and chic. <persName ref="#Ayrton_Edward">Ayrton</persName> found a few more small gold objects yesterday. The <persName>Gorsts</persName> came to tea with us after we got home, to see all the gold.</p>
+          <p><persName>Mr. and Mrs. Elliot Smith</persName> and her sister called soon after breakfast on their way to the Valley. We started ourselves after they left, as the <persName>Gorsts</persName> were to lunch with us. They arrived in time. <persName ref="#Gorst_John_Eldon">Sir Eldon</persName>, <persName ref="#Gorst_Lady">Lady Gorst,</persName> his Sec. and <persName ref="#Weigall_Mrs.">Mrs. Weigall</persName>. It was a very pleasant lunch. I liked <persName ref="#Gorst_John_Eldon">Sir Eldon</persName> very much - <persName ref="#Gorst_Lady">Lady G.</persName> exceedingly pretty and chic. <persName ref="#Ayrton_Edward">Ayrton</persName> found a few more small gold objects yesterday. The <persName>Gorsts</persName> came to tea with us after we got home, to see all the gold.</p>
         </div>
   <!-- SMITHS: 2 PEOPLE REFERENCED AT ONCE; GORSTS: 2 AT ONCE (at beg. and end of entry)-->
         <div xml:id="EBA-1908-01-18" type = "entry">
@@ -188,7 +188,7 @@
   <!-- NEW PEOPLE: Gasfords, Mr. Davis (I would think she wouldn't talk about Theodore so formally, but in the next part of the sentence she talks about the Duchess inviting "Theo" to lunch, so I'm not completely sure) -->
         <div xml:id="EBA-1908-01-19" type = "entry">
           <dateline><date when="1908-01-19">19th Sunday after Epiphany. Jan, 19.</date></dateline>
-          <p><persName ref="#Davis_Theodore_M">Theo</persName> was again in the <placeName ref="Valley_of_the_Kings">Valley</placeName> today, with <persName ref="#Winlock_Herbert">Mr. Winlock.</persName> <persName>M. Maspero</persName> and <persName ref="#Loret_M">M. Loret</persName> called and I showed them the gold things.</p>
+          <p><persName ref="#Davis_Theodore_M">Theo</persName> was again in the <placeName ref="Valley_of_the_Kings">Valley</placeName> today, with <persName ref="#Winlock_Herbert">Mr. Winlock</persName>. <persName>M. Maspero</persName> and <persName ref="#Loret_M">M. Loret</persName> called and I showed them the gold things.</p>
         </div>
         <div xml:id="EBA-1908-01-20" type = "entry">
           <dateline><date when="1908-01-20">Jan. 20, Monday.</date></dateline>
@@ -202,7 +202,7 @@
         <div xml:id="EBA-1908-01-22" type = "entry">
           <dateline><date when="1908-01-22">Jan. 22. Wednesday.</date></dateline>
           <p><persName ref="#Davis_Theodore_M">Theo</persName> again to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> to meet <persName>M. Maspero,</persName> <persName>Erskine</persName> and <persName>Weigall,</persName> and entered the new tomb. This was uncovered a few days since, but was shallow, and contained only some remains of workmens houses, and a number of large vases - filled with broken potsherds and small objects - the most important being a head about 7 in. high, which crowned the head of a mummied bird.</p>
-          <p><persName>Major Watson,</persName> and <persName>Mrs. Graham,</persName> an English woman came to tea and were shown the find, when <persName ref="#Davis_Theodore_M">Theo</persName> was in the <placeName ref="#Valley_of_the_Kings">valley</placeName> this A.M. they opened a jar found in the gold tomb. It contained a broken vase, which was beautifully enamelled and bearing the cartouche of <persName>Sety II.</persName> This can be restored - also an alabaster vase, broken, with cartouche of <orgName>Rameses II,</orgName> of very good work. A lovely warm day. <persName ref="#Erskine_David">Mr. Erskine</persName> dined with us.</p>
+          <p><persName>Major Watson</persName>, and <persName>Mrs. Graham,</persName> an English woman came to tea and were shown the find, when <persName ref="#Davis_Theodore_M">Theo</persName> was in the <placeName ref="#Valley_of_the_Kings">valley</placeName> this A.M. they opened a jar found in the gold tomb. It contained a broken vase, which was beautifully enamelled and bearing the cartouche of <persName>Sety II.</persName> This can be restored - also an alabaster vase, broken, with cartouche of <orgName>Rameses II,</orgName> of very good work. A lovely warm day. <persName ref="#Erskine_David">Mr. Erskine</persName> dined with us.</p>
         </div>
   <!-- MISS-TRANSLATION/TYPO? Erakine might be Erskine. Also, the EBA Indices page says "Erksine", but everything in Jan/Feb 1907 says "Erskine" -->
         <div xml:id="EBA-1908-01-23" type = "entry">
@@ -224,7 +224,7 @@
         </div>
         <div xml:id="EBA-1908-01-27" type = "entry">
           <dateline><date when="1908-01-27">Jan. 27. Monday.</date></dateline>
-          <p><persName ref="#Davis_Theodore_M">Theo</persName> busy this morning with publication matter to send to <placeName ref="#London">London</placeName> and <persName ref="#Jones_Harold">Harold</persName> began his drawing of plates. <persName ref="#dalison_Max">Mr. Dalison</persName> and <persName ref="#Lythgoe_Albert">Lythgoe</persName> dined here. A very cold wind today.</p>
+          <p><persName ref="#Davis_Theodore_M">Theo</persName> busy this morning with publication matter to send to <placeName ref="#London">London</placeName> and <persName ref="#Jones_Harold">Harold</persName> began his drawing of plates. <persName ref="#Dalison_Max">Mr. Dalison</persName> and <persName ref="#Lythgoe_Albert">Lythgoe</persName> dined here. A very cold wind today.</p>
         </div>
   <!-- Should Dalison's reference have "Mr" in it? Some entries (like this and Mr. Max Dalison) have their titles in their references on the EBA Indices list, but others don't. -->
         <div xml:id="EBA-1908-01-28" type = "entry">
@@ -237,7 +237,7 @@
         </div>
         <div xml:id="EBA-1908-01-30" type = "entry">
           <dateline><date when="1908-01-30">Jan. 30. Thursday.</date></dateline>
-          <p>A lot of people on the boat today - among them <persName>Mr. and Mrs. Smith</persName> of <placeName ref="#New_York">New York</placeName> - he is something at the <placeName ref="#Metropolitan_Museum">Met. Museum,</placeName> wand with them <persName>Mr. and Mrs. Patterson</persName> of <placeName ref="Chicago">Chicago</placeName>. <persName ref="#Loret_M">M. Loret</persName> also called - a pleasant and charming personage. <persName ref="#dalison_Max">Mr. Dalison</persName> dined here.</p>
+          <p>A lot of people on the boat today - among them <persName>Mr. and Mrs. Smith</persName> of <placeName ref="#New_York">New York</placeName> - he is something at the <placeName ref="#Metropolitan_Museum">Met. Museum,</placeName> wand with them <persName>Mr. and Mrs. Patterson</persName> of <placeName ref="Chicago">Chicago</placeName>. <persName ref="#Loret_M">M. Loret</persName> also called - a pleasant and charming personage. <persName ref="#Dalison_Max">Mr. Dalison</persName> dined here.</p>
         </div>
         <div xml:id="EBA-1908-01-31" type = "entry">
           <dateline><date when="1908-01-31">Jan. 31. Friday.</date></dateline>
@@ -354,7 +354,7 @@
   <!-- Harold Jones or Harold Smith? -->
         <div xml:id="EBA-1908-02-26" type = "entry">
           <dateline><date when="1908-02-26">Feb. 26. Wednesday.</date></dateline>
-          <p>All of us went to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> this morning. The first door of the tomb is cleared - the corridor filled with rubbish. <persName ref="#Ayrton_Edward">Ayrton</persName> crawled through with great difficulty and said he could see another door quite filled up. <persName ref="#Davis_Theodore_M">Theo</persName> thinks it an 18th dynasty tomb. <persName>Mr. and Mrs. Spreston</persName> called this evening, bringing a letter of introduction from <persName ref="#Fielding_Everard">Everard Fielding.</persName> She was a <persName ref="#de_Trafford_Miss">Miss de Trafford.</persName> The <persName>McKeever girls</persName> and <persName ref="#Forbes_Mr">Mr. Forbes</persName> called before dinner, and <persName ref="#Dalison_Max">Mr. Dalison</persName> this evening.</p>
+          <p>All of us went to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> this morning. The first door of the tomb is cleared - the corridor filled with rubbish. <persName ref="#Ayrton_Edward">Ayrton</persName> crawled through with great difficulty and said he could see another door quite filled up. <persName ref="#Davis_Theodore_M">Theo</persName> thinks it an 18th dynasty tomb. <persName>Mr. and Mrs. Spreston</persName> called this evening, bringing a letter of introduction from <persName ref="#Fielding_Everard">Everard Fielding.</persName> She was a <persName ref="#de_Trafford_Miss">Miss de Trafford</persName>. The <persName>McKeever girls</persName> and <persName ref="#Forbes_Mr">Mr. Forbes</persName> called before dinner, and <persName ref="#Dalison_Max">Mr. Dalison</persName> this evening.</p>
         </div>
   <!-- Person Group - Sprestons, McKeever girls -->
   <!-- 2nd half of this entry makes no sense... -->
@@ -369,7 +369,7 @@
         </div>
         <div xml:id="EBA-1908-02-29" type = "entry">
           <dateline><date when="1908-02-29">Feb. 29. Saturday.</date></dateline>
-          <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Jones_Harold">Harold</persName> went of course to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> this morning. They found <persName ref="#Ayrton_Edward">Ayrton</persName>, <persName ref="#dalison_Max">Dalison</persName> and <persName>Weigall</persName> waiting for them, and in spite of their protestations <persName ref="#Davis_Theodore_M">Theo</persName> insisted upon entering the tomb, and going first. They found it very difficult and hot. It soon declared itself as the tomb of <persName ref="#Heromheb">Heromheb</persName> - a very long tomb - with corridors, well, fully fresh, of Gods, a magnificent Sarcophagus, and figures in wood and marble - a few bones - no mummy - 200 ft. long.</p>
+          <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Jones_Harold">Harold</persName> went of course to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> this morning. They found <persName ref="#Ayrton_Edward">Ayrton</persName>, <persName ref="#Dalison_Max">Dalison</persName> and <persName>Weigall</persName> waiting for them, and in spite of their protestations <persName ref="#Davis_Theodore_M">Theo</persName> insisted upon entering the tomb, and going first. They found it very difficult and hot. It soon declared itself as the tomb of <persName ref="#Heromheb">Heromheb</persName> - a very long tomb - with corridors, well, fully fresh, of Gods, a magnificent Sarcophagus, and figures in wood and marble - a few bones - no mummy - 200 ft. long.</p>
         </div>
   <!-- Olivia Myhre's Code: -->
         <div xml:id="EBA-1908-03-01" type="entry">
@@ -378,11 +378,11 @@
       </div>
       <div xml:id="EBA-1908-03-02" type="entry">
         <dateline><placeName ref="#Quinquagesima">Quinquagesima</placeName> - <date when="1908-03-02">March 2. Monday</date>.</dateline>
-        <p>The <personGrp ref="#Connaughts">Connaughts</personGrp> arrived from the <placeName ref="#Valley_of_the_Kings">Valley</placeName> about 4:30 - quite an imposing array - several mounted guards arrived before them - and the <persName ref="#Connaught_Duchess">Duchess</persName> and <persName ref="#Connaught_Patricia_Princess">Princess Patricia</persName> arrived first. I took them to my room, and left them to tidy themselves. I found in the salon <persName ref="#Pelly_Miss">Miss Pelly</persName>, whom I had met before, Lady in waiting, then came the <persName ref="#Connaught_Duke">Duke</persName> with members of his staff - <persName ref="#Murray_M_Major">Major M. Murray</persName> - <persName ref="#Ponsonby_M_B_Lieutenant">Lieut. the Hon. M. B. Ponsonby</persName> - <persName ref="#Maxwell_John_Sir">Sir John Maxwell</persName>, whom we knew, <persName ref="#Watson_Major">Major Watson,</persName> an old friend, and <persName ref="#Weigall_Arthur">Mr. Weigall</persName>. They looked first at the gold find, and then went on deck for tea. I thought I had never seen so many nice looking men together - and the <personGrp ref="#Connaughts">Connaughts</personGrp> are delightful, simple people to entertain. After they went away the <personGrp ref="#McKewers">McKewers</personGrp> and <personGrp ref="#Forbes">Mr. and Mrs. Forbes</personGrp> came. They said they had been watching from the Hotel opposite the royal entourage on the sand, waiting until it was over.</p>
+        <p>The <personGrp ref="#Connaughts">Connaughts</personGrp> arrived from the <placeName ref="#Valley_of_the_Kings">Valley</placeName> about 4:30 - quite an imposing array - several mounted guards arrived before them - and the <persName ref="#Connaught_Duchess">Duchess</persName> and <persName ref="#Connaught_Patricia_Princess">Princess Patricia</persName> arrived first. I took them to my room, and left them to tidy themselves. I found in the salon <persName ref="#Pelly_Miss">Miss Pelly</persName>, whom I had met before, Lady in waiting, then came the <persName ref="#Connaught_Duke">Duke</persName> with members of his staff - <persName ref="#Murray_M_Major">Major M. Murray</persName> - <persName ref="#Ponsonby_M_B_Lieutenant">Lieut. the Hon. M. B. Ponsonby</persName> - <persName ref="#Maxwell_John_Sir">Sir John Maxwell</persName>, whom we knew, <persName ref="#Watson_Major">Major Watson</persName>, an old friend, and <persName ref="#Weigall_Arthur">Mr. Weigall</persName>. They looked first at the gold find, and then went on deck for tea. I thought I had never seen so many nice looking men together - and the <personGrp ref="#Connaughts">Connaughts</personGrp> are delightful, simple people to entertain. After they went away the <personGrp ref="#McKewers">McKewers</personGrp> and <personGrp ref="#Forbes">Mr. and Mrs. Forbes</personGrp> came. They said they had been watching from the Hotel opposite the royal entourage on the sand, waiting until it was over.</p>
       </div>
       <div xml:id="EBA-1908-03-03" type="entry">
         <dateline><placeName ref="#Quinquagesima">Quinquagesima</placeName> - <date when="1908-03-03">March 3rd.</date>.</dateline>
-        <p>Tuesday. <persName ref="#Dalison_Max_Mr">Mr. Dalison</persName> and <persName ref="#Ayrton_Edward">Ayrton</persName> came to lunch. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Williams_Caroline_Ransom">Carrie</persName> again [cut off--illegible] when they met the <persName ref="#Connaught_Duke">Duke's</persName> party. Lovely day.</p>
+        <p>Tuesday. <persName ref="#Dalison_Max">Mr. Dalison</persName> and <persName ref="#Ayrton_Edward">Ayrton</persName> came to lunch. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Williams_Caroline_Ransom">Carrie</persName> again [cut off--illegible] when they met the <persName ref="#Connaught_Duke">Duke's</persName> party. Lovely day.</p>
       </div>
       <div xml:id="EBA-1908-03-04" type="entry">
         <dateline><placeName ref="#Quinquagesima">Quinquagesima</placeName> - <date when="1908-03-04">March 4th.</date>.</dateline>
@@ -402,7 +402,7 @@
       </div>
       <div xml:id="EBA-1908-03-08" type="entry">
         <dateline><placeName ref="#Quinquadesima">Quinquagesima</placeName> - <date when="1908-03-08">March 8th.</date>.</dateline>
-        <p>First Sunday in Lent. I am the only member of the household who did not go to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> today. All went into the tomb. <persName ref="#Dalison_Max_Mr">Mr. Dalison</persName> and <persName ref="#Ayrton_Edward">Mr. Ayrton</persName> dined with us, and spent the night - sleeping on the dock divans - very jolly evening.</p>
+        <p>First Sunday in Lent. I am the only member of the household who did not go to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> today. All went into the tomb. <persName ref="#Dalison_Max">Mr. Dalison</persName> and <persName ref="#Ayrton_Edward">Mr. Ayrton</persName> dined with us, and spent the night - sleeping on the dock divans - very jolly evening.</p>
       </div>
       <div xml:id="EBA-1908-03-09" type="entry">
         <dateline><placeName ref="#Naj_Hammadi">Nag Hamadi</placeName> - <date when="1908-03-09">March 9.</date>.</dateline>
@@ -462,7 +462,7 @@
       </div>
       <div xml:id="EBA-1908-03-23" type="entry">
         <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-23">March 23rd.</date>.</dateline>
-        <p>Monday. Very busy. Our last day. Went in the afternoon to <persName ref="#Pasha_Artin">Madame Artin Pashat</persName> to tea - interesting. <persName ref="#Dalison_Max_Mr">Mr. Dalison</persName> and <persName ref="#Lindon_Smith_Joseph">Joe Smith</persName> dined with us. <persName ref="#Dalison_Max_Mr">Mr. Dalison</persName> has been with us for 2 days, and is crossing with us to <placeName ref="#Naples">Naples</placeName> where we are to spend 3 days. <persName ref="#Carter_Howard">Mr. Carter</persName> came to tea with us this afternoon.</p>
+        <p>Monday. Very busy. Our last day. Went in the afternoon to <persName ref="#Pasha_Artin">Madame Artin Pashat</persName> to tea - interesting. <persName ref="#Dalison_Max">Mr. Dalison</persName> and <persName ref="#Lindon_Smith_Joseph">Joe Smith</persName> dined with us. <persName ref="#Dalison_Max">Mr. Dalison</persName> has been with us for 2 days, and is crossing with us to <placeName ref="#Naples">Naples</placeName> where we are to spend 3 days. <persName ref="#Carter_Howard">Mr. Carter</persName> came to tea with us this afternoon.</p>
       </div>
     </body>
   </text>
