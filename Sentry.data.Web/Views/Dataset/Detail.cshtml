@@ -501,8 +501,8 @@
     }
 
     @*************************************************************************************************************
-    DELROY
-    *************************************************************************************************************@
+        DELROY
+        *************************************************************************************************************@
     @if (Model.Security.CanPreviewDataset)
     {
         <div class="row" id="schemaSection">
@@ -517,24 +517,25 @@
                     </div>
 
                     <div id="delroyBorder" style="border: 1px #DDDDDD solid; background: white; padding: 10px;" class="metadataBody container row">
-                       
-                        <div id="delroySpinner" >
+
+                        <div id="delroySpinner">
                             <div class="sentry-spinner-container" style=" width: 1166px; margin-top: 25px;">
                                 <span class="sentry-spinner" style="height:200px"></span>
                             </div>
                         </div>
 
-                        
-                        <div id="delroyFriends">
-                            <ol  class="breadcrumb orange" id="delroyBreadcrumb" data-page-color="@color">   </ol>
 
-                            <table class="table table-striped table-bordered @color" id="delroyTable" style="width:100%; overflow-x:auto;" >
+                        <div id="delroyFriends">
+                            <ol class="breadcrumb orange" id="delroyBreadcrumb" data-page-color="@color">   </ol>
+
+                            <table class="table table-striped table-bordered @color" id="delroyTable" style="width:100%; overflow-x:auto;">
                                 <thead>
                                     <tr class="filter-row">
                                         <td></td>
                                         <td></td>
                                         <td></td>
 
+                                        <td></td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
@@ -545,6 +546,7 @@
                                         <th>Description</th>
                                         <th>Type</th>
 
+                                        <th>Is Array</th>
                                         <th>Length</th>
                                         <th>Precision</th>
                                         <th>Scale</th>
@@ -552,7 +554,7 @@
                                 </thead>
                             </table>
                         </div>
-                        
+
                     </div>
 
                 </section>
@@ -561,6 +563,7 @@
 
             <br />
         </div>
+
     }
 
     @if (Model.Security.CanViewFullDataset)
@@ -1032,7 +1035,7 @@
                     $('#dataLastUpdatedSpinner').hide();
 
                     UpdateColumnSchema();
-                    data.Dataset.delroyReloadEverything(result.DatasetId, result.SchemaId);
+                    data.Dataset.delroyReloadEverything(result.DatasetId, result.SchemaId, result.SnowflakeViews);
                 });
             }
 

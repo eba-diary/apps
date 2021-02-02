@@ -10,21 +10,25 @@ data.Dataset = {
     //DELROY FUNCTIONS
     //****************************************************************************************************
     delroyFieldArray: [],
+    delroySnowflakeViewsArray: [],
+    delroyStructTrackerArray: [],
 
     delroyInit: function () {
 
         data.Dataset.delroyTableCreate();
         data.Dataset.delroySetupClickAttack();
+        data.Dataset.delroyStructTrackerArray = [];
     },
 
     //RELOAD EVERYTHING:  clean datatable, breadcrumbs and reload with schema selected
-    delroyReloadEverything: function (datasetId, schemaId) {
+    delroyReloadEverything: function (datasetId, schemaId, snowflakeViews) {
 
         $('#delroySpinner').show();
         $('#delroyTable').DataTable().clear();
         $('#delroyTable').DataTable().draw();
         $('#delroyBreadcrumb').empty();
         data.Dataset.delroyRefreshFieldArrayFromIndex(-1);       //tricky way to DELETE ALL ELEMENTS from array
+        data.Dataset.delroySnowflakeViewsArray = snowflakeViews;
 
         var schemaURL = "/api/v2/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/revision/latest/fields";
         $.get(schemaURL, function (result) {
@@ -76,6 +80,7 @@ data.Dataset = {
                 },
                 { data: "Description", className: "Description" },
                 { data: "FieldType", className: "FieldType" },
+                { data: "IsArray", className: "IsArray" },
                 { data: "Length", className: "Length", visible: false, render: function (d)         { return data.Dataset.delroyFillGridCheckForNull(d);    }   },
                 { data: "Precision", className: "Precision", visible: false, render: function (d)   { return data.Dataset.delroyFillGridCheckForNull(d);    }   },
                 { data: "Scale", className: "Scale", visible: false, render: function (d)           { return data.Dataset.delroyFillGridCheckForNull(d);    }   }
@@ -94,7 +99,13 @@ data.Dataset = {
             //buttons to show and customize text for them
             buttons:
             [
-                { extend: 'colvis', text: 'Columns' }
+                { extend: 'colvis', text: 'Columns' },
+                {
+                    text: 'Snowflake Query',
+                    action: function () {
+                        data.Dataset.delroyQueryGenerator('snow');
+                    }
+                }
             ]
         });
 
@@ -106,6 +117,7 @@ data.Dataset = {
                 { type: "text" },
                 { type: "text" },
 
+                { type: "text" },
                 { type: "text" },
                 { type: "text" },
                 { type: "text" }
@@ -188,9 +200,15 @@ data.Dataset = {
     //ADD NEW BREADCRUMB TOO LIST
     delroyAddBreadCrumb: function (name, index) {
 
+        //add breadcrumb to UI
         var color = $('#delroyBreadcrumb').data('page-color');
         var h = "<li id='" + index.toString() + "' ><a  class='" + color + "' style='cursor:pointer' >" + name + "</a></li>";
         $('#delroyBreadcrumb').append(h);
+
+        //add struct too tracker to hold if a query needs to be generated
+        if (name !== "Home" && index > 0) {
+            data.Dataset.delroyStructTrackerArray.push(name);    
+        }
     },
 
     //REFRESH BREAD CRUMBS:  Clear all breadcrumbs and refresh up too one passed in
@@ -198,7 +216,11 @@ data.Dataset = {
         //STEP 1: empty all breadcrumbs
         $('#delroyBreadcrumb').empty();
 
-        //STEP 2: add in all breadcrumbs from start until the one they clicked on
+        //STEP 2: empty breadcrumb Tracker which feeds Query Generator
+        var deleteStartIndex = parseInt(0);
+        data.Dataset.delroyStructTrackerArray.splice(deleteStartIndex);     
+
+        //STEP 3: add in all breadcrumbs from start until the one they clicked on
         for (let i = 0; i < data.Dataset.delroyFieldArray.length; i++) {
 
             var field = data.Dataset.delroyFieldArray[i];
@@ -206,7 +228,6 @@ data.Dataset = {
             if (i > 0) {
                 bcName = field.Name;
             }
-
             data.Dataset.delroyAddBreadCrumb(bcName, i);
         }
     },
@@ -230,6 +251,41 @@ data.Dataset = {
             return ' ';
         }
     },
+
+    //GENERATE QUERY BASED ON WHERE THEY ARE IN SCHEMA     
+    delroyQueryGenerator: function (queryType) {
+
+        var field = data.Dataset.delroyGetLatestField();
+
+        //pass the current field array and necessary info to controller and get back the query
+        $.ajax({
+            type: "POST",
+            url: "/Dataset/DelroyGenerateQuery",
+            traditional: true,
+            data: JSON.stringify({ models: field, queryType: queryType, snowflakeViews: data.Dataset.delroySnowflakeViewsArray, structTracker: data.Dataset.delroyStructTrackerArray }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (r) {
+
+                //this is the logic too copy to the clipboard! note that i tried creating like a textarea but operation on document seemed too be the only thing that worked.
+                var tempInput = document.createElement("input");                            //create an html element of type "input"  to hold the snowQuery returned from ajax
+                tempInput.value = r.snowQuery;                                              //set the value too be the query
+                document.body.appendChild(tempInput);                                       //append new html element to document
+                tempInput.select();                                                         //select it, (imitates user selecting)
+                document.execCommand("copy");                                               //issue copy command                              
+                document.body.removeChild(tempInput);                                       //delete element
+                data.Dale.makeToast("success", "Snowflake Query Copied to Clipboard!!");
+
+            },
+            failure: function () {
+                data.Dale.makeToast("error", "Error creating Snowflake Query.");
+            },
+            error: function () {
+                data.Dale.makeToast("error", "Error creating Snowflake Query.");
+            }
+        });
+    },
+
     //****************************************************************************************************
     //END DELROY FUNCTIONS
     //****************************************************************************************************
