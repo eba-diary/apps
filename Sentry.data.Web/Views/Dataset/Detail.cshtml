@@ -74,17 +74,7 @@
                                     </button>
                                 </div>
                             </div>
-
-                            @if (Model.Security.CanUploadToDataset)
-                            {
-                                <div class="col-md-2 col-lg-2 ">
-                                    <button type="button"
-                                            class="btn btn-default dataset-operation-button borderdk_gray borderdk_@color"
-                                            id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
-                                        <span class="glyphicon glyphicon-cloud-upload @color"></span>
-                                    </button>
-                                </div>
-                            }
+                            
                             @if (Model.Security.CanEditDataset)
                             {
                                 <div class="col-md-2 col-lg-2">
