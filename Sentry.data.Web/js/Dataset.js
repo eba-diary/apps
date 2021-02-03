@@ -296,6 +296,7 @@ data.Dataset = {
             success: function (r) {
                 var modal = Sentry.ShowModalWithSpinner("Query Generator");
                 modal.ReplaceModalBody(r);
+
             },
             failure: function () {
                 data.Dale.makeToast("error", "Error creating Snowflake Query.");

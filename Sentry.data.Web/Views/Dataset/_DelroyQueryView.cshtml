@@ -4,11 +4,20 @@
 
     @Html.AntiForgeryToken()
 
-   @Model.Query
+    <div style="white-space: pre-line; overflow-y: auto;  overflow-x: auto;">
+
+        <div id="delroyQueryMania" style="max-height:600px;">
+
+            @Model.Query
+        </div>
+        
+
+    </div>   
+
 
 
     <div class="modal-footer">
         @*<button type="button" class="btn btn-primary" id="btnUploadFile" data-id="0" style="display:none">Upload Data File</button>*@
-        <button type="button" class="btn btn-warning" data-dismiss="modal">Thank You</button>
+        <input id="delroyClipBoard" type="button" class="btn btn-warning" value="Copy"/> 
     </div>
 
