@@ -50,7 +50,6 @@ namespace Sentry.data.Core
             query.Fetch(d => d.Security).ThenFetchMany(s => s.Tickets).ToFuture();
 
             //all other
-            query.FetchMany(d => d.DatasetFiles).ThenFetch(f => f.Schema).ToFuture();
             query.FetchMany(d => d.DatasetCategories).ToFuture();
             query.FetchMany(d => d.Tags).ToFuture();
             query.FetchMany(d => d.BusinessUnits).ToFuture();

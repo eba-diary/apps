@@ -115,14 +115,6 @@
                                                 }
                                             </li>
                                         }
-                                        @if (Model.Security.CanQueryDataset)
-                                        {
-                                            <li title="Query Dataset">
-                                                <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
-                                                    Query this Dataset
-                                                </a>
-                                            </li>
-                                        }
                                         <li>
                                             <a href="@Model.MailtoLink">Share Dataset</a>
                                         </li>
