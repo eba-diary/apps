@@ -24,7 +24,7 @@ using System.Web.Http.Results;
 namespace Sentry.data.Web.WebApi.Controllers
 {
     [RoutePrefix(WebConstants.Routes.VERSION_QUERYTOOL)]
-    [WebApiAuthorizeUseApp]
+    [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
     public class QueryToolController : BaseWebApiController
     {
         public IAssociateInfoProvider _associateInfoProvider;

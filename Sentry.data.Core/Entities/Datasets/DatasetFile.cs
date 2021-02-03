@@ -40,6 +40,7 @@ namespace Sentry.data.Core
         public virtual string FlowExecutionGuid { get; set; }
 
         public virtual string RunInstanceGuid { get; set; }
+        public virtual string FileExtension { get; set; }
     }
 
 }

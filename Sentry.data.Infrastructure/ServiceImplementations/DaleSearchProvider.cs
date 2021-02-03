@@ -109,7 +109,7 @@ namespace Sentry.data.Infrastructure
         private string BuildAQuery(DaleSearchDto dto)
         {
             string q = String.Empty;
-            string qSelect = "SELECT Asset_CDE, Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM,Alias_NME,Prod_Typ,BaseColumn_ID,IsSensitive_FLG,IsOwnerVerified_FLG ";
+            string qSelect = "SELECT Asset_CDE, Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM,Prod_Typ,BaseColumn_ID,IsSensitive_FLG,IsOwnerVerified_FLG ";
             string qFrom = (dto.Sensitive == DaleSensitive.SensitiveOnly)? "FROM ColumnSensitivityCurrent_v " : "FROM Column_v ";
             string qWhereStatement = BuildAWhere(dto);
 
@@ -193,22 +193,21 @@ namespace Sentry.data.Infrastructure
                 result.EffectiveDate = reader.GetDateTime(11);
             }
 
-            result.Alias = (!reader.IsDBNull(12)) ? reader.GetString(12) : String.Empty;
-            result.ProdType = (!reader.IsDBNull(13)) ? reader.GetString(13) : String.Empty;
+            result.ProdType = (!reader.IsDBNull(12)) ? reader.GetString(12) : String.Empty;
             
+            if (!reader.IsDBNull(13))
+            {
+                result.BaseColumnId = reader.GetInt32(13);
+            }
+
             if (!reader.IsDBNull(14))
             {
-                result.BaseColumnId = reader.GetInt32(14);
+                result.IsSensitive = reader.GetBoolean(14);
             }
 
             if (!reader.IsDBNull(15))
             {
-                result.IsSensitive = reader.GetBoolean(15);
-            }
-
-            if (!reader.IsDBNull(16))
-            {
-                result.IsOwnerVerified = reader.GetBoolean(16);
+                result.IsOwnerVerified = reader.GetBoolean(15);
             }
 
             return result;

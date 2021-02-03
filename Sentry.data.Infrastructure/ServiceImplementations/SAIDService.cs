@@ -54,7 +54,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
                     string configEntry = Configuration.Config.GetHostSetting("SaidCacheExpiration");
                     if (String.IsNullOrWhiteSpace(configEntry))
                     {
-                        Logger.Debug($"SaidCacheExpiration no found: using default of 2 hours");
+                        Logger.Debug($"SaidCacheExpiration not found: using default of 2 hours");
                         configEntry = "2,0,0";
                     }
                     int[] cacheExpiration = configEntry.Split(',').Select(Int32.Parse).ToArray();
