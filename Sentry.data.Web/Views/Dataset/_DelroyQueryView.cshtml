@@ -1,0 +1,14 @@
+﻿
+@model Sentry.data.Web.DelroyQueryModel
+
+
+    @Html.AntiForgeryToken()
+
+   @Model.Query
+
+
+    <div class="modal-footer">
+        @*<button type="button" class="btn btn-primary" id="btnUploadFile" data-id="0" style="display:none">Upload Data File</button>*@
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Thank You</button>
+    </div>
+

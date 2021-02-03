@@ -257,25 +257,45 @@ data.Dataset = {
 
         var field = data.Dataset.delroyGetLatestField();
 
+        ////pass the current field array and necessary info to controller and get back the query
+        //$.ajax({
+        //    type: "POST",
+        //    url: "/Dataset/DelroyGenerateQuery",
+        //    traditional: true,
+        //    data: JSON.stringify({ models: field, queryType: queryType, snowflakeViews: data.Dataset.delroySnowflakeViewsArray, structTracker: data.Dataset.delroyStructTrackerArray }),
+        //    contentType: "application/json; charset=utf-8",
+        //    dataType: "json",
+        //    success: function (r) {
+
+        //        //this is the logic too copy to the clipboard! note that i tried creating like a textarea but operation on document seemed too be the only thing that worked.
+        //        var tempInput = document.createElement("input");                            //create an html element of type "input"  to hold the snowQuery returned from ajax
+        //        tempInput.value = r.snowQuery;                                              //set the value too be the query
+        //        document.body.appendChild(tempInput);                                       //append new html element to document
+        //        tempInput.select();                                                         //select it, (imitates user selecting)
+        //        document.execCommand("copy");                                               //issue copy command                              
+        //        document.body.removeChild(tempInput);                                       //delete element
+        //        data.Dale.makeToast("success", "Snowflake Query Copied to Clipboard!!");
+
+        //    },
+        //    failure: function () {
+        //        data.Dale.makeToast("error", "Error creating Snowflake Query.");
+        //    },
+        //    error: function () {
+        //        data.Dale.makeToast("error", "Error creating Snowflake Query.");
+        //    }
+        //});
+
+
         //pass the current field array and necessary info to controller and get back the query
         $.ajax({
             type: "POST",
-            url: "/Dataset/DelroyGenerateQuery",
+            url: "/Dataset/DelroyGenerateQuery2",
             traditional: true,
             data: JSON.stringify({ models: field, queryType: queryType, snowflakeViews: data.Dataset.delroySnowflakeViewsArray, structTracker: data.Dataset.delroyStructTrackerArray }),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
+            contentType: "application/json",
             success: function (r) {
-
-                //this is the logic too copy to the clipboard! note that i tried creating like a textarea but operation on document seemed too be the only thing that worked.
-                var tempInput = document.createElement("input");                            //create an html element of type "input"  to hold the snowQuery returned from ajax
-                tempInput.value = r.snowQuery;                                              //set the value too be the query
-                document.body.appendChild(tempInput);                                       //append new html element to document
-                tempInput.select();                                                         //select it, (imitates user selecting)
-                document.execCommand("copy");                                               //issue copy command                              
-                document.body.removeChild(tempInput);                                       //delete element
-                data.Dale.makeToast("success", "Snowflake Query Copied to Clipboard!!");
-
+                var modal = Sentry.ShowModalWithSpinner("Query Generator");
+                modal.ReplaceModalBody(r);
             },
             failure: function () {
                 data.Dale.makeToast("error", "Error creating Snowflake Query.");
@@ -284,6 +304,10 @@ data.Dataset = {
                 data.Dale.makeToast("error", "Error creating Snowflake Query.");
             }
         });
+
+
+
+
     },
 
     //****************************************************************************************************

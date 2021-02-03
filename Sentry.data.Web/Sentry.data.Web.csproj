@@ -16,7 +16,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44321</IISExpressSSLPort>
+    <IISExpressSSLPort>44371</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -434,6 +434,7 @@
     <Compile Include="Models\Dataset\DatasetFileGridModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileVersionsModel.cs" />
     <Compile Include="Models\Config\EditDatasetFileConfigModel.cs" />
+    <Compile Include="Models\Dataset\DelroyQueryModel.cs" />
     <Compile Include="Models\Dataset\ObsoleteDatasetModel.cs" />
     <Compile Include="Models\Dataset\PushToDatasetModel.cs" />
     <Compile Include="Models\Favorites\FavoriteItemDetailModel.cs" />
@@ -1500,6 +1501,7 @@
     <Content Include="Scripts\quill\quill.snow.min.css.map" />
     <Content Include="Views\Shared\Unauthorized.cshtml" />
     <Content Include="Views\DataFlow\_SchemaMapDetail.cshtml" />
+    <Content Include="Views\Dataset\_DelroyQueryView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1565,9 +1567,9 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2457</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost.sentry.com:44321</IISUrl>
+          <IISUrl>https://localhost.sentry.com:44371</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>https://localhost.sentry.com:44321</IISAppRootUrl>
+          <IISAppRootUrl>https://localhost.sentry.com:44371</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

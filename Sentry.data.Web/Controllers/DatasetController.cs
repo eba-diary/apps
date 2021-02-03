@@ -1081,5 +1081,31 @@ namespace Sentry.data.Web.Controllers
 
             return parentStructs;
         }
+
+        [HttpPost]
+        public ActionResult DelroyGenerateQuery2(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType, List<string> snowflakeViews, List<string> structTracker)
+        {
+            bool outerfirst = true;
+            string parentStructs = DelroyStructMonster(structTracker);
+            string query = GenerateSnow(models, parentStructs, ref outerfirst);
+            query = "SELECT " + System.Environment.NewLine + query;
+
+            bool first = true;
+            foreach (var s in snowflakeViews)
+            {
+                if (first)
+                {
+                    query = query + " FROM " + s + System.Environment.NewLine;
+                    first = false;
+                }
+            }
+            DelroyQueryModel model = new DelroyQueryModel();
+            model.Query = query;
+
+            return PartialView("_DelroyQueryView", model);
+        }
+
+
+
     }
 }
