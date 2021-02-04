@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using StructureMap;
 using System.Data.Odbc;
 using Newtonsoft.Json.Linq;
+using System.Reflection;
 
 namespace Sentry.data.Core
 {
@@ -162,6 +163,7 @@ namespace Sentry.data.Core
 
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
         {
+            MethodBase m = MethodBase.GetCurrentMethod();
             Dataset parentDataset = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaDto.SchemaId).ParentDataset;
             IApplicationUser user = _userService.GetCurrentUser();
             UserSecurity us = _securityService.GetUserSecurity(parentDataset, user);
@@ -174,82 +176,86 @@ namespace Sentry.data.Core
             //var SendSASNotification = false;
             string SASNotificationType = null;
             string CurrentViewNotificationType = null;
+            JObject whatPropertiesChanged;
+            FileSchema schema;
+            /* Any exceptions saving schema changes, do not execute remaining line of code */
             try
             {
-                FileSchema schema = _datasetContext.GetById<FileSchema>(schemaDto.SchemaId);
-                var SchemaRevisionExists = _datasetContext.SchemaRevision.Where(w => w.ParentSchema == schema).Any();
-
-                //#region SAS Notification Determination Logic
-                ////      This logic needs to be determine prior to mapping DTO to schema so change detection occurs properly
-                ////      Notification logic occurs after changes successfully saved to database
-
-                ///*
-                // * Detect change within IsInSAS property when
-                // *      Schema Revision exists
-                // * if change,
-                // *      set notification trigger to true
-                // *      set type of notification
-                // */
-                //if (SchemaRevisionExists && schema.IsInSAS != schemaDto.IsInSas)
-                //{
-                //    SendSASNotification = true;
-                //    SASNotificationType = (schemaDto.IsInSas) ? "ADD" : "REMOVE";
-                //}
-
-                ///*
-                // * Determine change within CurrentView property when 
-                // *      Schema Revision exists
-                // *      IsInSAS is true or when IsInSAS has changed to false
-                // * if change,
-                // *      set notification trigger to true
-                // *      set type of notification
-                // */
-                //if (SchemaRevisionExists && (schemaDto.IsInSas || (SASNotificationType != null && SASNotificationType.ToUpper() == "REMOVE")) && schema.CreateCurrentView != schemaDto.CreateCurrentView)
-                //{
-                //    SendSASNotification = true;
-                //    CurrentViewNotificationType = (schemaDto.CreateCurrentView) ? "ADD" : "REMOVE";
-                //}
-                //#endregion
+                schema = _datasetContext.GetById<FileSchema>(schemaDto.SchemaId);
 
                 //Update/save schema within DSC metadata
-                JObject whatPropertiesChanged = UpdateSchema(schemaDto, schema);
+                whatPropertiesChanged = UpdateSchema(schemaDto, schema);
                 _datasetContext.SaveChanges();
-
-
-                /* Trigger email only if IsInSAS has changed, otherwise, let consumption layer event processing drive the email to SAS Admins */
-                if (whatPropertiesChanged.ContainsKey("isinsas") &&
-                    (!whatPropertiesChanged.ContainsKey("createcurrentview") && !whatPropertiesChanged.ContainsKey("cla2429_snowflakecreatetable")))
-                {
-
-                    CurrentViewNotificationType = (schemaDto.CreateCurrentView) ? "ADD" : "REMOVE";
-                    SASNotificationType = (schema.IsInSAS) ? "ADD" : "REMOVE";
-
-                    Logger.Debug($"<updateandsaveschema> sending sas notification email for hive...");
-                    SasNotification(schema, SASNotificationType, CurrentViewNotificationType, _userService.GetCurrentUser(), "HIVE");
-                    Logger.Debug($"<updateandsaveschema> sent sas notification email for hive");
-
-                    if (schema.CLA2429_SnowflakeCreateTable)
-                    {
-                        Logger.Debug($"<updateandsaveschema> sending sas notification email for snowflake...");
-                        SasNotification(schema, SASNotificationType, CurrentViewNotificationType, _userService.GetCurrentUser(), "SNOWFLAKE");
-                        Logger.Debug($"<updateandsaveschema> sent sas notification email for snowflake...");
-                    }
-                }
-
-                /*
-                 * Generate consumption layer events to dsc event topic
-                 *  This ensures schema is updated appropriately with
-                 *  adjustements made within 
-                */
-                GenerateConsumptionLayerEvents(schema, whatPropertiesChanged);
-
-                return true;
             }
             catch (Exception ex)
             {
-                Logger.Error("schemaservice-updateandsaveschema", ex);
+                Logger.Error($"<{m.ReflectedType.Name.ToLower()}> Failed schema save", ex);
                 return false;
             }
+
+            /* The remaining actions should all be executed even if one fails
+             * If there are any exceptions, log the exceptions and continue on */
+            var exceptions = new List<Exception>();
+
+            /* Trigger email only if IsInSAS has changed, otherwise, let consumption layer event processing drive the email to SAS Admins */
+            if (whatPropertiesChanged.ContainsKey("isinsas") &&
+                (!whatPropertiesChanged.ContainsKey("createcurrentview") && !whatPropertiesChanged.ContainsKey("cla2429_snowflakecreatetable")))
+            {
+
+                CurrentViewNotificationType = (schemaDto.CreateCurrentView) ? "ADD" : "REMOVE";
+                SASNotificationType = (schema.IsInSAS) ? "ADD" : "REMOVE";
+
+                try
+                {
+                    Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sending sas notification email for hive...");
+                    SasNotification(schema, SASNotificationType, CurrentViewNotificationType, _userService.GetCurrentUser(), "HIVE");
+                    Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sent sas notification email for hive");
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
+
+
+                if (schema.CLA2429_SnowflakeCreateTable)
+                {
+                    try
+                    {
+                        Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sending sas notification email for snowflake...");
+                        SasNotification(schema, SASNotificationType, CurrentViewNotificationType, _userService.GetCurrentUser(), "SNOWFLAKE");
+                        Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sent sas notification email for snowflake...");
+                    }
+                    catch (Exception ex)
+                    {
+                        exceptions.Add(ex);
+                    }
+                }
+            }
+
+            /*
+            * Generate consumption layer events to dsc event topic
+            *  This ensures schema is updated appropriately with
+            *  adjustements made within 
+            */
+            try
+            {
+                GenerateConsumptionLayerEvents(schema, whatPropertiesChanged);
+            }
+            catch (Exception ex)
+            {
+                exceptions.Add(ex);
+            }
+
+            /* Allow changes to be saved if notification or events are not generated, therefore,
+            *   log the error and return true 
+            */
+            if (exceptions.Count > 0)
+            {
+                Logger.Error($"<{m.ReflectedType.Name.ToLower()}> Failed sending downstream notifications or events", new AggregateException(exceptions));
+            }
+
+            return true;
+            
         }
 
         private void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
@@ -948,68 +954,54 @@ namespace Sentry.data.Core
             }
         }
 
-        //public bool SASSnowflakeUpdateNotification(int schemaId, int revisionId, string initiatorId)
-        //{
-        //    SchemaRevision rev = null;
-        //    IApplicationUser user;
-        //    try
-        //    {
-        //        rev = _datasetContext.SchemaRevision.Where(w => w.SchemaRevision_Id == revisionId && w.ParentSchema.SchemaId == schemaId).FirstOrDefault();
-        //        bool fieldChanges = rev.Fields.Where(w => w.LastUpdateDTM == rev.LastUpdatedDTM).Any();
-
-        //        //Use incoming initiator id.  If invalid or not supplied, use CreatedBy id on revision.
-        //        if (!string.IsNullOrWhiteSpace(initiatorId))
-        //        {
-        //            user = _userService.GetByAssociateId(initiatorId);
-        //        }
-        //        else
-        //        {
-        //            user = _userService.GetByAssociateId(rev.CreatedBy);
-        //        }
-
-        //        if (fieldChanges && rev.Revision_NBR == 1)
-        //        {
-        //            SasNotification(rev.ParentSchema, "ADD", null, user);
-        //        }
-        //        else if (fieldChanges)
-        //        {
-        //            SasNotification(rev.ParentSchema, "UPDATE", null, user);
-        //        }
-
-        //        return true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        int revId = (rev != null) ? rev.SchemaRevision_Id : 0;
-        //        Logger.Error($"Failed sending SAS email - revision:{revId}", ex);
-
-        //        return false;
-        //    }
-        //}
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="schema"></param>
+        /// <param name="sasNotificationType"></param>
+        /// <param name="currentViewNotificationType"></param>
+        /// <param name="changeInitiator"></param>
+        /// <param name="externalSystemIndicator"></param>
+        /// <exception cref="Sentry.data.Core.Exceptions.SASNotificationNotSentException">Notification was not sent successfully to SAS</exception>
         private void SasNotification(FileSchema schema, string sasNotificationType, string currentViewNotificationType, IApplicationUser changeInitiator, string externalSystemIndicator)
         {
             StringBuilder bodySb = new StringBuilder();
-            string subject = null;
-            IApplicationUser user = changeInitiator;
-            //Ensure properties are initialized
-            sasNotificationType = (sasNotificationType == null) ? string.Empty : sasNotificationType;
-            currentViewNotificationType = (currentViewNotificationType == null) ? string.Empty : currentViewNotificationType;
-            subject = GenerateSchemaSyncNotification(schema, externalSystemIndicator, sasNotificationType, currentViewNotificationType, bodySb, subject, user);
-
-            string ccEmailList = Configuration.Config.GetHostSetting("EmailDSCSupportAsCC") == "true" ? $"{user.EmailAddress};DSCSupport@sentry.com" : $"{user.EmailAddress}";
-
-            if (bodySb.Length > 0)
+            try
             {
-                bodySb.Append($"<p>Thank you from your friendly data.sentry.com Administration team</p>");
+                string subject = null;
+                IApplicationUser user = changeInitiator;
+                //Ensure properties are initialized
+                sasNotificationType = (sasNotificationType == null) ? string.Empty : sasNotificationType;
+                currentViewNotificationType = (currentViewNotificationType == null) ? string.Empty : currentViewNotificationType;
+                subject = GenerateSchemaSyncNotification(schema, externalSystemIndicator, sasNotificationType, currentViewNotificationType, bodySb, subject, user);
 
-                _emailService.SendGenericEmail(Configuration.Config.GetHostSetting("SASAdministrationEmail"), subject, bodySb.ToString(), ccEmailList);
+                string ccEmailList = Configuration.Config.GetHostSetting("EmailDSCSupportAsCC") == "true" ? $"{user.EmailAddress};DSCSupport@sentry.com" : $"{user.EmailAddress}";
 
+                if (bodySb.Length > 0)
+                {
+                    bodySb.Append($"<p>Thank you from your friendly data.sentry.com Administration team</p>");
+
+                    _emailService.SendGenericEmail(Configuration.Config.GetHostSetting("SASAdministrationEmail"), subject, bodySb.ToString(), ccEmailList);
+
+                }
+                else
+                {
+                    Logger.Warn($"SAS Notification was not configured");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Logger.Warn($"SAS Notification was not configured");
-            }
+                StringBuilder sb = new StringBuilder();
+                sb.Append($"schema-name:{schema.Name}");
+                sb.Append($"|schema-id:{schema.SchemaId}");
+                sb.Append($"|notification-type:{sasNotificationType}");
+                sb.Append($"|current-view-notification-type:{currentViewNotificationType}");
+                sb.Append($"|change-initiator:{changeInitiator.AssociateId}");
+                sb.Append($"|external-system-indicator:{externalSystemIndicator}");
+                sb.Append($"|notification-body:{bodySb.ToString()}");
+
+                throw new SASNotificationNotSentException($"Failed sending SAS Notification: {sb.ToString()}", ex);
+            }            
         }
 
         private static string GenerateSchemaSyncNotification(FileSchema schema, string systemIndicator, string sasNotificationType, string currentViewNotificationType, StringBuilder bodySb, string subject, IApplicationUser user)
