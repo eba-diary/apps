@@ -158,7 +158,10 @@ data.Dataset = {
             }
             
         });
+
+
     },
+
 
     //ADD NEW FIELD TOO ARRAY
     delroyAddFieldArray: function (field) {
@@ -255,60 +258,57 @@ data.Dataset = {
     //GENERATE QUERY BASED ON WHERE THEY ARE IN SCHEMA     
     delroyQueryGenerator: function (queryType) {
 
+        $('#delroySpinner').show();
+
         var field = data.Dataset.delroyGetLatestField();
 
-        ////pass the current field array and necessary info to controller and get back the query
-        //$.ajax({
-        //    type: "POST",
-        //    url: "/Dataset/DelroyGenerateQuery",
-        //    traditional: true,
-        //    data: JSON.stringify({ models: field, queryType: queryType, snowflakeViews: data.Dataset.delroySnowflakeViewsArray, structTracker: data.Dataset.delroyStructTrackerArray }),
-        //    contentType: "application/json; charset=utf-8",
-        //    dataType: "json",
-        //    success: function (r) {
-
-        //        //this is the logic too copy to the clipboard! note that i tried creating like a textarea but operation on document seemed too be the only thing that worked.
-        //        var tempInput = document.createElement("input");                            //create an html element of type "input"  to hold the snowQuery returned from ajax
-        //        tempInput.value = r.snowQuery;                                              //set the value too be the query
-        //        document.body.appendChild(tempInput);                                       //append new html element to document
-        //        tempInput.select();                                                         //select it, (imitates user selecting)
-        //        document.execCommand("copy");                                               //issue copy command                              
-        //        document.body.removeChild(tempInput);                                       //delete element
-        //        data.Dale.makeToast("success", "Snowflake Query Copied to Clipboard!!");
-
-        //    },
-        //    failure: function () {
-        //        data.Dale.makeToast("error", "Error creating Snowflake Query.");
-        //    },
-        //    error: function () {
-        //        data.Dale.makeToast("error", "Error creating Snowflake Query.");
-        //    }
-        //});
-
-
-        //pass the current field array and necessary info to controller and get back the query
+        //pass the current field array and necessary info to controller and get back a partial view which we place into the Sentry Modal
         $.ajax({
             type: "POST",
-            url: "/Dataset/DelroyGenerateQuery2",
+            url: "/Dataset/DelroyGenerateQuery",
             traditional: true,
             data: JSON.stringify({ models: field, queryType: queryType, snowflakeViews: data.Dataset.delroySnowflakeViewsArray, structTracker: data.Dataset.delroyStructTrackerArray }),
             contentType: "application/json",
             success: function (r) {
-                var modal = Sentry.ShowModalWithSpinner("Query Generator");
-                modal.ReplaceModalBody(r);
-
+                var modal = Sentry.ShowModalWithSpinner("Snowflake Query");
+                //modal.ReplaceModalBody(r);
+                modal.ReplaceModalBody(data.Dataset.delroyCreateModalHTML(r.snowQuery));
+                $('#delroySpinner').hide();
             },
             failure: function () {
                 data.Dale.makeToast("error", "Error creating Snowflake Query.");
+                $('#delroySpinner').hide();
             },
             error: function () {
                 data.Dale.makeToast("error", "Error creating Snowflake Query.");
+                $('#delroySpinner').hide();
             }
         });
+    },
+
+    //FORMAT HTML TO SEND TOO MODAL
+    //NOTE: instead of returning an entire partial view from controller, i just pass the snow query and format HTML in here, it shaved seconds off
+    delroyCreateModalHTML: function (snowQuery) {
+
+        var delroyQueryView = "<div class='delroyQueryView'> ";
+        var delroyQueryMania = " <div id='delroyQueryMania' style='max-height: 600px; white-space: pre-line; overflow-y: auto; overflow-x: auto; '> " + snowQuery + " </div >";
+        var delroyModalFooter = " <div class='modal-footer'>  <input id='delroyCopyClipboard' type='button' class='btn btn-warning' value='Copy to Clipboard' onclick='data.Dataset.delroyCopyClipboard()' />     </div >";
+        delroyQueryView = delroyQueryView + delroyQueryMania + delroyModalFooter + " </div>";
+        return delroyQueryView;
+    },
 
 
+    //COPY TEXT IN MODAL TO CLIPBOARD
+    //NOTE: the reason I need to copy from delroyQueryMania is because it has the white-space style which interprets newlines and therefore a copy gets me a nicely formatted line
+    //without that extra tag the copy directly from the output of the controller method DelroyGenerateQuery2 has the newlines but doesn't actually show formatting
+    delroyCopyClipboard: function () {
 
-
+        var range = document.createRange();
+        range.selectNode(document.getElementById("delroyQueryMania"));
+        window.getSelection().removeAllRanges(); // clear current selection
+        window.getSelection().addRange(range); // to select text
+        document.execCommand("copy");
+        window.getSelection().removeAllRanges();// to deselect
     },
 
     //****************************************************************************************************
