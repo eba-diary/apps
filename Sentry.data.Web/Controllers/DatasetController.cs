@@ -1019,7 +1019,7 @@ namespace Sentry.data.Web.Controllers
             return View("QueryTool");
         }
 
-        //CONTROLLER ACTION called from JS to return a partial view with the snow query
+        //CONTROLLER ACTION called from JS to return the snowflake query
         [HttpPost]
         public ActionResult DelroyGenerateQuery(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType, List<string> snowflakeViews, List<string> structTracker)
         {
@@ -1037,11 +1037,7 @@ namespace Sentry.data.Web.Controllers
                     first = false;
                 }
             }
-            DelroyQueryModel model = new DelroyQueryModel();
-            model.Query = query;
-
-            //return PartialView("_DelroyQueryView", model);
-            return Json(new { snowQuery = model.Query });
+            return Json(new { snowQuery = query });
         }
 
         //RECURSIVE FUNCTION

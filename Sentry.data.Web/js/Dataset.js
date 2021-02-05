@@ -56,6 +56,7 @@ data.Dataset = {
             //client side setup
             pageLength: 100,
 
+            //Code if i wanted the grid to reload and make AJAX call, but i reload manually without AJAX call in delroyGridRefresh
             //ajax: {
             //    url: "/api/v2/metadata/dataset/230/schema/4039/revision/latest/fields",
             //    type: "GET",
@@ -271,7 +272,6 @@ data.Dataset = {
             contentType: "application/json",
             success: function (r) {
                 var modal = Sentry.ShowModalWithSpinner("Snowflake Query");
-                //modal.ReplaceModalBody(r);
                 modal.ReplaceModalBody(data.Dataset.delroyCreateModalHTML(r.snowQuery));
                 $('#delroySpinner').hide();
             },
