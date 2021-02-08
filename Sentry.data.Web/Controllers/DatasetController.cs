@@ -1062,7 +1062,7 @@ namespace Sentry.data.Web.Controllers
                     }
                     
                 }
-                else
+                else if(!field.IsArray)
                 {
                     //pass first as reference to know whether to append a comma or not
                     line = line + GenerateSnow(field.Fields, parentStructs + field.Name + ":",ref first);
