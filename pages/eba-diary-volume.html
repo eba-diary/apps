@@ -49,6 +49,33 @@
                 }
             }
 
+            .breadcrumbs {
+                max-width: 850px;
+                margin: 0 auto 25px;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            #title-view1 {
+                margin-left: 0;
+            }
+
+            #view1 {
+                max-width: 850px;
+            }
+
+            #info-drawer {
+                max-width: 350px;
+            }
+
+            #page-view-toggle {
+                margin: auto 0;
+            }
+
+            .tei-title3 {
+                margin-block-end: 0.75em;
+            }
+
             .content-body {
                 position: relative;
                 display: flex;
@@ -95,10 +122,10 @@
                         </div>
                     </pb-drawer>
                     <section class="breadcrumbs">
-                        <pb-toggle-feature emit="transcription" name="view" on="div" off="single" default="off">Single entry view</pb-toggle-feature>
                         <pb-view id="title-view1" src="document1" xpath="//teiHeader/fileDesc/titleStmt/title" view="single">
                             <pb-param name="header" value="short"/>
                         </pb-view>
+                        <pb-toggle-feature id="page-view-toggle" emit="transcription" name="view" on="div" off="single" default="off">Single entry view</pb-toggle-feature>
                     </section>
                     <main class="content-body">
                         <pb-navigation direction="backward" unit="single" emit="transcription" subscribe="transcription">
