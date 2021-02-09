@@ -15,6 +15,33 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald&amp;display=swap"/>
         <link rel="stylesheet" href="resources/css/theme.css"/>
         <script type="module" src="pb-components-bundle.js" data-template="pages:load-components"/>
+        <script>
+            window.addEventListener('DOMContentLoaded', () => {
+                // wait for the transcription to be loaded, then search the loaded HTML for
+                // names
+                pbEvents.subscribe('pb-update', 'transcription', (ev) => {
+                    // the HTML content to be displayed is passed in ev.detail.root
+                    const root = ev.detail.root;
+                    root.querySelectorAll('.tei-persName4, .tei-placeName4').forEach((name) => {
+                        // disable the popover behaviour
+                        name.command('disable', true);
+                        // register click listener on each name
+                        name.addEventListener('click', (ev) => {
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                            // get the alternate content of each name ...
+                            const tmpl = name.querySelector('template');
+                            // ... and copy it into the drawer
+                            const div = document.getElementById('info-content');
+                            div.innerHTML = '';
+                            div.appendChild(tmpl.content.cloneNode(true));
+                            // finally display the drawer
+                            document.getElementById('info-drawer').opened = true;
+                        });
+                    });
+                });
+            });
+        </script>
         <style>
             @media (min-width: 769px) {
                 .toolbar pb-navigation {
@@ -67,16 +94,6 @@
                             <div id="info-content"></div>
                         </div>
                     </pb-drawer>
-                    <pb-drawer toggle="tocToggle" class="toc" emit="toc" subscribe="transcription">
-                        <div class="drawer-content">
-                            <h3>
-                                <pb-i18n key="document.contents">Contents</pb-i18n>
-                            </h3>
-                            <pb-load id="toc" url="templates/toc.html?target=transcription&amp;icons=true" src="document1" subscribe="toc" load-once="load-once">
-                                <pb-i18n key="dialogs.loading">Loading</pb-i18n>
-                            </pb-load>
-                        </div>
-                    </pb-drawer>
                     <section class="breadcrumbs">
                         <pb-toggle-feature emit="transcription" name="view" on="div" off="single" default="off">Single entry view</pb-toggle-feature>
                         <pb-view id="title-view1" src="document1" xpath="//teiHeader/fileDesc/titleStmt/title" view="single">
@@ -97,31 +114,4 @@
         </pb-page>
         <div class="splash"/>
     </body>
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            // wait for the transcription to be loaded, then search the loaded HTML for
-            // names
-            pbEvents.subscribe('pb-update', 'transcription', (ev) => {
-                // the HTML content to be displayed is passed in ev.detail.root
-                const root = ev.detail.root;
-                root.querySelectorAll('.tei-persName4, .tei-placeName4').forEach((name) => {
-                    // disable the popover behaviour
-                    name.command('disable', true);
-                    // register click listener on each name
-                    name.addEventListener('click', (ev) => {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        // get the alternate content of each name ...
-                        const tmpl = name.querySelector('template');
-                        // ... and copy it into the drawer
-                        const div = document.getElementById('info-content');
-                        div.innerHTML = '';
-                        div.appendChild(tmpl.content.cloneNode(true));
-                        // finally display the drawer
-                        document.getElementById('info-drawer').opened = true;
-                    });
-                });
-            });
-        });
-    </script>
 </html>
