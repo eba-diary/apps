@@ -1019,75 +1019,136 @@ namespace Sentry.data.Web.Controllers
             return View("QueryTool");
         }
 
+
+
+
+
         //CONTROLLER ACTION called from JS to return the snowflake query
         [HttpPost]
-        public ActionResult DelroyGenerateQuery(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType, List<string> snowflakeViews, List<string> structTracker)
+        public ActionResult DelroyGenerateQuery(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType, List<string> snowflakeViews, List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
             bool outerfirst = true;
-            string parentStructs = DelroyStructMonster(structTracker);
-            string query = GenerateSnow(models, parentStructs, ref outerfirst);
-            query = "SELECT " + System.Environment.NewLine + query;
+            bool columnExists = false;
 
-            bool first = true;
-            foreach (var s in snowflakeViews)
+            string alias = DelroyAliasMonster(structTracker);
+            string query = GenerateSnow(models, alias, ref outerfirst, ref columnExists, structTracker);
+            if (!columnExists)
             {
-                if (first)
-                {
-                    query = query + " FROM " + s + System.Environment.NewLine;
-                    first = false;
-                }
+                query = "*" + Environment.NewLine;
             }
+            query = "SELECT " + System.Environment.NewLine + query;
+            query = query + DelroyCreateFROM(snowflakeViews, structTracker);
+
             return Json(new { snowQuery = query });
         }
 
         //RECURSIVE FUNCTION
         //pass array of Fields and will format a line for each child field it finds
         //if the child field is a STRUCT, call itself again and pass the STRUCT's children
-        private string GenerateSnow(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string parentStructs, ref bool first)
+        private string GenerateSnow(List<Models.ApiModels.Schema.SchemaFieldModel> models, string alias, ref bool first, ref bool columnExists,List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
             string line = String.Empty;
 
             foreach (var field in models)
             {
-                if(field.FieldType != "STRUCT")
+                if (field.FieldType != "STRUCT")
                 {
                     if (first)
                     {
-                        line = line + parentStructs + field.Name + System.Environment.NewLine;
+                        line = line + alias + field.Name + Environment.NewLine;
                         first = false;
                     }
                     else
                     {
-                        line =  line + "," + parentStructs + field.Name + System.Environment.NewLine;
+                        line =  line + "," + alias + field.Name + Environment.NewLine;
                     }
-                    
+                    columnExists = true;
                 }
                 else if(!field.IsArray)
                 {
-                    //pass first as reference to know whether to append a comma or not
-                    line = line + GenerateSnow(field.Fields, parentStructs + field.Name + ":",ref first);
+                    //pass "parentStructs" plus append current field so child nodes can get all parent structs appended
+                    //pass "first" as reference to know whether to append a comma or not
+                    line = line + GenerateSnow(field.Fields, alias + field.Name + ":",ref first, ref columnExists, structTracker);
                 }
             }
             return line;
         }
 
-        //CREATE LIST OF STRUCTS in the event the query is being generated at something other then the top level
-        private string DelroyStructMonster(List<string> structTracker)
-        {
-            string parentStructs = String.Empty;
 
-            if(structTracker != null)
+        private string DelroyAliasMonster(List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
+        {
+            string alias = String.Empty;
+            Models.ApiModels.Schema.SchemaFieldModel closestArray = structTracker.LastOrDefault(w => w.IsArray);
+
+            if(closestArray != null)
+            {
+                alias = closestArray.Name + "_flatten.value:element:";
+            }
+            else
             {
                 foreach (var s in structTracker)
                 {
-                    parentStructs = parentStructs + s + ":";
+                    alias += s.Name + ":";
                 }
             }
 
-            return parentStructs;
+            return alias;
         }
 
-       
+
+
+
+        //CREATE FROM STATEMENT FOR SNOWFLAKE
+        private string DelroyCreateFROM(List<string> snowflakeViews, List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
+        {
+            string fromStatement = String.Empty;
+            string flattenStatement = String.Empty;
+            bool first = true;
+
+            //CREATE FROM
+            //there can be multiple views associated with a given schema, just pick first one for now
+            foreach (var s in snowflakeViews)
+            {
+                if (first)
+                {
+                    fromStatement = fromStatement + " FROM " + s + Environment.NewLine;
+                    first = false;
+                }
+            }
+
+            first = true;
+            string parentFlatten = String.Empty;
+            string currentFlatten = String.Empty;
+
+            if (structTracker == null)
+            {
+                return fromStatement;
+            }
+            else
+            {
+                //CREATE FLATTEN FOR ARRAYS ONLY
+                foreach (var s in structTracker.Where(w => w.IsArray))
+                {
+                    currentFlatten = s.Name + "_flatten";
+                    if (first)
+                    {
+                        flattenStatement += ",lateral flatten(" + s.Name + ":list) " + currentFlatten;
+                        first = false;
+                    }
+                    else
+                    {
+                        flattenStatement += ",lateral flatten(" + parentFlatten + ".value:element:" + s.Name + ":list) " + currentFlatten;
+                    }
+                    parentFlatten = currentFlatten;
+                    flattenStatement += Environment.NewLine;
+                    
+                }
+
+                return fromStatement + flattenStatement;
+            }
+            
+        }
+
 
 
 

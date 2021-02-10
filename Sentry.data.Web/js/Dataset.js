@@ -34,17 +34,27 @@ data.Dataset = {
         $.get(schemaURL, function (result) {
 
             data.Dataset.delroyAddFieldArray(result.Fields);
-            data.Dataset.delroyAddBreadCrumb("Home", 0);
+            data.Dataset.delroyAddBreadCrumb(data.Dataset.delroyCreateBogusField("Home"), 0);
             data.Dataset.delroyGridRefresh();
             $('#delroySpinner').hide();
 
         }).fail(function (result) {
             if (result.status === 404) {
                 $('#delroySpinner').hide();
-                data.Dataset.delroyAddBreadCrumb("No Columns Exist", -1);       //PASS -1 which indicates this is a FAKE breadcrumb
+                data.Dataset.delroyAddBreadCrumb(data.Dataset.delroyCreateBogusField("No Columns Exist"), -1);       //PASS -1 which indicates this is a FAKE breadcrumb
                 data.Dale.makeToast("success", "No columns Exist.");
             }
         });
+    },
+
+    //CREATE BOGUS FIELD OBJ FOR HOME OR NO COLUMNS EXIST
+    delroyCreateBogusField: function (name) {
+
+        //create new obj to represent a BOGUS field
+        var o = new Object();
+        o.Name = name;
+
+        return o;
     },
 
     //INIT DATATABLE
@@ -141,7 +151,7 @@ data.Dataset = {
             // click reload the grid if children exist
             if (field.Fields != null) {
                 data.Dataset.delroyAddFieldArray(field);
-                data.Dataset.delroyAddBreadCrumb(field.Name, data.Dataset.delroyFieldArray.length - 1);
+                data.Dataset.delroyAddBreadCrumb(field, data.Dataset.delroyFieldArray.length - 1);
                 data.Dataset.delroyGridRefresh();
             }
         });
@@ -202,18 +212,22 @@ data.Dataset = {
     },
 
     //ADD NEW BREADCRUMB TOO LIST
-    delroyAddBreadCrumb: function (name, index) {
+    delroyAddBreadCrumb: function (field, index) {
 
         //add breadcrumb to UI
         var color = $('#delroyBreadcrumb').data('page-color');
-        var h = "<li id='" + index.toString() + "' ><a  class='" + color + "' style='cursor:pointer' >" + name + "</a></li>";
+        var h = "<li id='" + index.toString() + "' ><a  class='" + color + "' style='cursor:pointer' >" + field.Name + "</a></li>";
         $('#delroyBreadcrumb').append(h);
 
         //add struct too tracker to hold if a query needs to be generated
-        if (name !== "Home" && index > 0) {
-            data.Dataset.delroyStructTrackerArray.push(name);    
+        if (field.Name !== "Home" && index > 0) {
+            //data.Dataset.delroyStructTrackerArray.push(field.Name);    
+            data.Dataset.delroyStructTrackerArray.push(field);    
         }
     },
+
+
+    
 
     //REFRESH BREAD CRUMBS:  Clear all breadcrumbs and refresh up too one passed in
     delroyRefreshBreadCrumbsFromIndex: function (lastIndexKeep) {
@@ -227,12 +241,14 @@ data.Dataset = {
         //STEP 3: add in all breadcrumbs from start until the one they clicked on
         for (let i = 0; i < data.Dataset.delroyFieldArray.length; i++) {
 
-            var field = data.Dataset.delroyFieldArray[i];
-            var bcName = "Home";
+            var field = {};
             if (i > 0) {
-                bcName = field.Name;
+                field = data.Dataset.delroyFieldArray[i];
             }
-            data.Dataset.delroyAddBreadCrumb(bcName, i);
+            else
+                field = data.Dataset.delroyCreateBogusField("Home");
+
+            data.Dataset.delroyAddBreadCrumb(field, i);
         }
     },
 
