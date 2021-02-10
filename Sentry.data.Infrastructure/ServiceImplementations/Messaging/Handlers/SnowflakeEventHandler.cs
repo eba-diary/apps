@@ -99,7 +99,7 @@ namespace Sentry.data.Infrastructure
                             case "SKIPPED":
                                 de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Deleted.ToString();
 
-                                bool IsSuccessful = _schemaService.SasDeleteNotification(deleteCompletedEvent.SchemaID, null, "SNOWFLAKE");
+                                bool IsSuccessful = _schemaService.SasDeleteNotification(deleteCompletedEvent.SchemaID, deleteCompletedEvent.InitiatorID, "SNOWFLAKE");
 
                                 if (!IsSuccessful)
                                 {

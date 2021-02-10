@@ -376,7 +376,8 @@ namespace Sentry.data.Core
             SnowTableDeleteModel snowModel = new SnowTableDeleteModel()
             {
                 DatasetID = ds.DatasetId,
-                SchemaID = schema.SchemaId
+                SchemaID = schema.SchemaId,
+                InitiatorID = _userService.GetCurrentUser().AssociateId
             };
 
             _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
@@ -931,7 +932,7 @@ namespace Sentry.data.Core
                 
                 schema = _datasetContext.FileSchema.FirstOrDefault(w => w.SchemaId == schemaId);
 
-                //Use incoming initiator id.  If invalid or not supplied, use CreatedBy id on revision.
+                //Use incoming initiator id.  If invalid or not supplied, use PrimaryContactId id on Parent dataset.
                 if (!string.IsNullOrWhiteSpace(initiatorId))
                 {
                     user = _userService.GetByAssociateId(initiatorId);

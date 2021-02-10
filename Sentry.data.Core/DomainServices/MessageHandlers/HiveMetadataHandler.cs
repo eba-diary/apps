@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sentry.Messaging.Common;
-using Sentry.Common.Logging;
-using Newtonsoft.Json;
-using StructureMap;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Sentry.Common.Logging;
+using Sentry.Messaging.Common;
+using System;
+using System.Linq;
 
 namespace Sentry.data.Core
 {
@@ -104,7 +100,7 @@ namespace Sentry.data.Core
                             case "SKIPPED":
                                 de.HiveTableStatus = ConsumptionLayerTableStatusEnum.Deleted.ToString();
 
-                                bool IsSuccessful = _schemaService.SasDeleteNotification(deleteCompletedEvent.SchemaID, null, "HIVE");
+                                bool IsSuccessful = _schemaService.SasDeleteNotification(deleteCompletedEvent.SchemaID, deleteCompletedEvent.InitiatorID, "HIVE");
 
                                 if (!IsSuccessful)
                                 {
