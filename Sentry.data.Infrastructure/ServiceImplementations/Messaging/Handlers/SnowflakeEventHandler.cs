@@ -93,7 +93,7 @@ namespace Sentry.data.Infrastructure
                         Logger.Info($"snowflakeeventhandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(deleteCompletedEvent)}");
                         de = _dsContext.GetById<FileSchema>(deleteCompletedEvent.SchemaID);
 
-                        switch (deleteCompletedEvent.SnowStatus.ToString())
+                        switch (deleteCompletedEvent.SnowStatus.ToUpper())
                         {
                             case "DELETED":
                             case "SKIPPED":
