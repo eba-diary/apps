@@ -185,6 +185,7 @@ namespace Sentry.data.Core
 
                 //Update/save schema within DSC metadata
                 whatPropertiesChanged = UpdateSchema(schemaDto, schema);
+                Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {parentDataset.DatasetName}\\{schema.Name} | {whatPropertiesChanged.ToString()}");
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -965,6 +966,8 @@ namespace Sentry.data.Core
         /// <exception cref="Sentry.data.Core.Exceptions.SASNotificationNotSentException">Notification was not sent successfully to SAS</exception>
         private void SasNotification(FileSchema schema, string sasNotificationType, string currentViewNotificationType, IApplicationUser changeInitiator, string externalSystemIndicator)
         {
+            MethodBase m = MethodBase.GetCurrentMethod();
+
             StringBuilder bodySb = new StringBuilder();
             try
             {
@@ -981,6 +984,7 @@ namespace Sentry.data.Core
                 {
                     bodySb.Append($"<p>Thank you from your friendly data.sentry.com Administration team</p>");
 
+                    Logger.Debug($"<{m.ReflectedType.Name.ToLower()}> Sending email to {Configuration.Config.GetHostSetting("SASAdministrationEmail")} and including CCs ({ccEmailList})");
                     _emailService.SendGenericEmail(Configuration.Config.GetHostSetting("SASAdministrationEmail"), subject, bodySb.ToString(), ccEmailList);
 
                 }
