@@ -1019,7 +1019,7 @@ namespace Sentry.data.Web.Controllers
             return View("QueryTool");
         }
 
-
+        //CONTROLLER ACTION called from JS to return the snowflake query
         [HttpPost]
         public ActionResult DelroyGenerateQuery(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType, List<string> snowflakeViews, List<string> structTracker)
         {
@@ -1033,14 +1033,16 @@ namespace Sentry.data.Web.Controllers
             {
                 if (first)
                 {
-                    query = query + " FROM " + s + System.Environment.NewLine; 
+                    query = query + " FROM " + s + System.Environment.NewLine;
                     first = false;
                 }
             }
-
             return Json(new { snowQuery = query });
         }
 
+        //RECURSIVE FUNCTION
+        //pass array of Fields and will format a line for each child field it finds
+        //if the child field is a STRUCT, call itself again and pass the STRUCT's children
         private string GenerateSnow(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string parentStructs, ref bool first)
         {
             string line = String.Empty;
@@ -1062,12 +1064,14 @@ namespace Sentry.data.Web.Controllers
                 }
                 else
                 {
+                    //pass first as reference to know whether to append a comma or not
                     line = line + GenerateSnow(field.Fields, parentStructs + field.Name + ":",ref first);
                 }
             }
             return line;
         }
 
+        //CREATE LIST OF STRUCTS in the event the query is being generated at something other then the top level
         private string DelroyStructMonster(List<string> structTracker)
         {
             string parentStructs = String.Empty;
@@ -1082,5 +1086,10 @@ namespace Sentry.data.Web.Controllers
 
             return parentStructs;
         }
+
+       
+
+
+
     }
 }
