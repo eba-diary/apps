@@ -191,12 +191,13 @@ data.Dataset = {
         //All levels past the ROOT (index 0) you need too specify the Fields array which is a child property 
         //whereas the root level(index 0) the array is at that level
 
-        //if ROOT level, that means the array of fields is actually on that level
-        if (index == 0) {
-            return field;     
+       
+        //also check if field is NULL, because in that case return a null field else returning field.Fields will cause an error
+        if (index == 0 || field == null) {
+            return field;                //index=0 means ROOT level where array of fields is actually on that level
         }
-        else {                              //child of ROOT so specify array as a property
-            return field.Fields;
+        else {                              
+            return field.Fields;        //child of ROOT so specify array as a property of the field
         }
     },
 
@@ -279,27 +280,34 @@ data.Dataset = {
 
         var field = data.Dataset.delroyGetLatestField();
 
-        //pass the current field array and necessary info to controller and get back a partial view which we place into the Sentry Modal
-        $.ajax({
-            type: "POST",
-            url: "/Dataset/DelroyGenerateQuery",
-            traditional: true,
-            data: JSON.stringify({ models: field, queryType: queryType, snowflakeViews: data.Dataset.delroySnowflakeViewsArray, structTracker: data.Dataset.delroyStructTrackerArray }),
-            contentType: "application/json",
-            success: function (r) {
-                var modal = Sentry.ShowModalWithSpinner("Snowflake Query");
-                modal.ReplaceModalBody(data.Dataset.delroyCreateModalHTML(r.snowQuery));
-                $('#delroySpinner').hide();
-            },
-            failure: function () {
-                data.Dale.makeToast("error", "Error creating Snowflake Query.");
-                $('#delroySpinner').hide();
-            },
-            error: function () {
-                data.Dale.makeToast("error", "Error creating Snowflake Query.");
-                $('#delroySpinner').hide();
-            }
-        });
+        //if field is null, means no columns to generate a query so hide spinner and create a toastr
+        if (field == null) {
+            data.Dale.makeToast("warning", "No columns Exist, Query not Generated.  Please select a schema with columns to see a query.");
+            $('#delroySpinner').hide();
+        }
+        else {
+            //pass the current field array and necessary info to controller and get back the snowflake query
+            $.ajax({
+                type: "POST",
+                url: "/Dataset/DelroyGenerateQuery",
+                traditional: true,
+                data: JSON.stringify({ models: field, queryType: queryType, snowflakeViews: data.Dataset.delroySnowflakeViewsArray, structTracker: data.Dataset.delroyStructTrackerArray }),
+                contentType: "application/json",
+                success: function (r) {
+                    var modal = Sentry.ShowModalWithSpinner("Snowflake Query");
+                    modal.ReplaceModalBody(data.Dataset.delroyCreateModalHTML(r.snowQuery));
+                    $('#delroySpinner').hide();
+                },
+                failure: function () {
+                    data.Dale.makeToast("error", "Error creating Snowflake Query.");
+                    $('#delroySpinner').hide();
+                },
+                error: function () {
+                    data.Dale.makeToast("error", "Error creating Snowflake Query.");
+                    $('#delroySpinner').hide();
+                }
+            });
+        }
     },
 
     //FORMAT HTML TO SEND TOO MODAL

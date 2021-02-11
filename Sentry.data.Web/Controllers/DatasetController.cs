@@ -1078,19 +1078,31 @@ namespace Sentry.data.Web.Controllers
         private string DelroyAliasMonster(List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
             string alias = String.Empty;
-            Models.ApiModels.Schema.SchemaFieldModel closestArray = structTracker.LastOrDefault(w => w.IsArray);
 
-            if(closestArray != null)
+            if(structTracker == null)
             {
-                alias = closestArray.Name + "_flatten.value:element:";
+                return alias;
             }
             else
             {
-                foreach (var s in structTracker)
+                //get the last struct that is an ARRAY which would be the closest parent ARRAY.  This will be our starting ALIAS
+                Models.ApiModels.Schema.SchemaFieldModel closestArray = structTracker.LastOrDefault(w => w.IsArray);
+
+                //if we find an ARRAY, that means we need to ALIAS starting with ARRAY
+                if (closestArray != null)
                 {
-                    alias += s.Name + ":";
+                    alias = closestArray.Name + "_flatten.value:element:";
+                }
+                else
+                {
+                    //NO ARRAY EXISTS so assume our alias turns into all parent STRUCTS
+                    foreach (var s in structTracker)
+                    {
+                        alias += s.Name + ":";
+                    }
                 }
             }
+            
 
             return alias;
         }
