@@ -1037,7 +1037,7 @@ namespace Sentry.data.Web.Controllers
                 query = "*" + Environment.NewLine;
             }
             query = "SELECT " + System.Environment.NewLine + query;
-            query = query + DelroyCreateFROM(snowflakeViews, structTracker);
+            query += DelroyCreateFROM(snowflakeViews, structTracker);
 
             return Json(new { snowQuery = query });
         }
@@ -1055,20 +1055,20 @@ namespace Sentry.data.Web.Controllers
                 {
                     if (first)
                     {
-                        line = line + alias + field.Name + Environment.NewLine;
                         first = false;
                     }
                     else
                     {
-                        line =  line + "," + alias + field.Name + Environment.NewLine;
+                        line += ",";
                     }
+                    line += alias + field.Name + "::VARCHAR AS " + field.Name + Environment.NewLine;
                     columnExists = true;
                 }
                 else if(!field.IsArray)
                 {
                     //pass "parentStructs" plus append current field so child nodes can get all parent structs appended
                     //pass "first" as reference to know whether to append a comma or not
-                    line = line + GenerateSnow(field.Fields, alias + field.Name + ":",ref first, ref columnExists, structTracker);
+                    line += GenerateSnow(field.Fields, alias + field.Name + ":",ref first, ref columnExists, structTracker);
                 }
             }
             return line;
@@ -1093,6 +1093,24 @@ namespace Sentry.data.Web.Controllers
                 {
                     alias = closestArray.Name + "_flatten.value:element:";
                 }
+
+                //if we found an array somewhere in the parent hierarchy, then need to start appending structs after that ONLY
+                if (closestArray != null)
+                {
+                    bool parentFound = false;
+
+                    foreach (var s in structTracker)
+                    {
+                        if (parentFound)
+                        {
+                            alias += s.Name + ":";
+                        }
+                        else if (s.FieldGuid == closestArray.FieldGuid)
+                        {
+                            parentFound = true;
+                        }
+                    }
+                }
                 else
                 {
                     //NO ARRAY EXISTS so assume our alias turns into all parent STRUCTS
@@ -1101,8 +1119,12 @@ namespace Sentry.data.Web.Controllers
                         alias += s.Name + ":";
                     }
                 }
+
+
+
             }
-            
+            //TODO: figure out when you are in a non array struct how to add in array plus the series of non array structs prior
+            //closest array gives you where too start in the tracker, do a foreach through tracker and AFTER matching alias, start concatenating
 
             return alias;
         }
@@ -1123,7 +1145,7 @@ namespace Sentry.data.Web.Controllers
             {
                 if (first)
                 {
-                    fromStatement = fromStatement + " FROM " + s + Environment.NewLine;
+                    fromStatement += " FROM " + s + Environment.NewLine;
                     first = false;
                 }
             }
@@ -1144,12 +1166,12 @@ namespace Sentry.data.Web.Controllers
                     currentFlatten = s.Name + "_flatten";
                     if (first)
                     {
-                        flattenStatement += ",lateral flatten(" + s.Name + ":list) " + currentFlatten;
+                        flattenStatement += ",LATERAL FLATTEN(" + s.Name + ":list) " + currentFlatten;
                         first = false;
                     }
                     else
                     {
-                        flattenStatement += ",lateral flatten(" + parentFlatten + ".value:element:" + s.Name + ":list) " + currentFlatten;
+                        flattenStatement += ",LATERAL FLATTEN(" + parentFlatten + ".value:element:" + s.Name + ":list) " + currentFlatten;
                     }
                     parentFlatten = currentFlatten;
                     flattenStatement += Environment.NewLine;
@@ -1158,11 +1180,6 @@ namespace Sentry.data.Web.Controllers
 
                 return fromStatement + flattenStatement;
             }
-            
         }
-
-
-
-
     }
 }

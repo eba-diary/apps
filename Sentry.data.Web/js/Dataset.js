@@ -28,6 +28,7 @@ data.Dataset = {
         $('#delroyTable').DataTable().draw();
         $('#delroyBreadcrumb').empty();
         data.Dataset.delroyRefreshFieldArrayFromIndex(-1);       //tricky way to DELETE ALL ELEMENTS from array
+        data.Dataset.delroyStructTrackerArray = [];
         data.Dataset.delroySnowflakeViewsArray = snowflakeViews;
 
         var schemaURL = "/api/v2/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/revision/latest/fields";
@@ -222,7 +223,6 @@ data.Dataset = {
 
         //add struct too tracker to hold if a query needs to be generated
         if (field.Name !== "Home" && index > 0) {
-            //data.Dataset.delroyStructTrackerArray.push(field.Name);    
             data.Dataset.delroyStructTrackerArray.push(field);    
         }
     },
