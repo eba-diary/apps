@@ -296,14 +296,14 @@
             <date when="1906-3-8">Thursday, Mar. 8th.</date>
             <placeName ref="#Naviles">Naviles</placeName>
           </dateline>
-          <p>Our men began rowing just as soon as there was light enough, but at 9 o'clock the gale was so strong, we had to pull up here, a mile below <placeName>Girga</placeName> - the <orgName>"Nakt-Heb"</orgName> french flag, is lying just above us, the "Gazelle" with Sir <persName>Talton Page</persName> 122 <persName>Sykes,</persName> just below.</p> 
+          <p>Our men began rowing just as soon as there was light enough, but at 9 o'clock the gale was so strong, we had to pull up here, a mile below <placeName ref="#Girga">Girga</placeName> - the <orgName ref="#Nakt-Heb">"Nakt-Heb"</orgName> french flag, is lying just above us, the <name type="boat" ref="#Gazelle">"Gazelle"</name> with Sir <persName ref="#Sykes_Talton">Talton</persName> <pb n="122"/> <persName ref="#Sykes_Talton">Sykes</persName>, just below.</p> 
         </div>
         <div xml:id="EBA-1906-3-9" type="entry">
           <dateline>
             <date when="1906-3-9">Friday, March 9th.</date>
             <measure type="distance">24 miles.</measure>
           </dateline>
-          <p>The men worked with a will all day - though against the wind. We brought up at <placeName>Sohag,</placeName> about 6:30 this evening - posted letters and got a lot of fresh butter from <placeName>Cairo.</placeName> A wonderful moon tonight - full.</p> 
+          <p>The men worked with a will all day - though against the wind. We brought up at <placeName ref="#Sohag">Sohag</placeName>, about 6:30 this evening - posted letters and got a lot of fresh butter from <placeName ref="#Cairo">Cairo</placeName>. A wonderful moon tonight - full.</p> 
         </div>
         <div xml:id="EBA-1906-3-10" type="entry">
           <dateline>
@@ -316,35 +316,35 @@
             <date when="1906-3-11">Second Sunday in Lent. March 11th.</date>
             <measure type="distance">25 miles.</measure>
           </dateline>
-          <p>Our men began rowing at 4:30 this morning - as the night was very brilliant with a full moon. The north wind has been blowing all the time, sometimes less, but never ceasing. We are now lying against the cliffs of the northernmost end of the <placeName>Gebel Har&#234;di</placeName> - opposite <placeName>Tahtah.</placeName></p>
+          <p>Our men began rowing at 4:30 this morning - as the night was very brilliant with a full moon. The north wind has been blowing all the time, sometimes less, but never ceasing. We are now lying against the cliffs of the northernmost end of the <placeName ref="#Gebel_Harêdi">Gebel Harêdi</placeName> - opposite <placeName ref="#Tahta">Tahtah</placeName>.</p>
         </div>
         <div xml:id="EBA-1906-3-12" type="entry">
           <dateline>
             <date when="1906-3-12">Monday, Mar. 12th.</date>
             <measure type="distance">23 miles.</measure>
           </dateline>
-          <p>The usual conditions prevailed today, by hard work we made our miles - and are within 4 miles of <placeName>Aboutig</placeName> - we suppose.</p> 
+          <p>The usual conditions prevailed today, by hard work we made our miles - and are within <measure type="distance">4 miles</measure> of <placeName ref="#Abu_Tij">Aboutig</placeName> - we suppose.</p> 
         </div>
         <pb n="123"/>
         <div xml:id="EBA-1906-3-13" type="entry">
           <dateline>
             <date when="1906-3-13">Tuesday, Mar. 13th.</date>
           </dateline>
-          <p>We must have made 10 miles today and are within 5 miles of Asy&#251;t. Cold wind all day - tonight is overclouded and warmer.</p> 
+          <p>We must have made <measure type="distance">10 miles</measure> today and are within <measure type="distance">5 miles</measure> of <placeName ref="#Assiout">Asyût</placeName>. Cold wind all day - tonight is overclouded and warmer.</p> 
         </div>
         <div xml:id="EBA-1906-3-14" type="entry">
           <dateline>
             <date when="1906-3-14">Wednesday, March 14th.</date>
             <measure type="distance">25 miles.</measure>
           </dateline>
-          <p>Made Asy&#251;t at 7:30 this morning - stopped only long enough for <persName>Jones</persName> to get the mail, and <persName>Hassoon</persName> to get vegetables, meat etc. Got through the <persName>Weir</persName> very easily - and have had no wind or very little. It has been very warm - we are probably within 6 miles of <placeName ref="#Manfalout">Manfalout</placeName>.</p>
+          <p>Made <placeName ref="#Assiout">Asyût</placeName> at 7:30 this morning - stopped only long enough for <persName ref="#Jones_Harold">Jones</persName> to get the mail, and <persName ref="#Hassoun">Hassoon</persName> to get vegetables, meat etc. Got through the Weir very easily - and have had no wind or very little. It has been very warm - we are probably within <measure type="distance">6 miles</measure> of <placeName ref="#Manfalout">Manfalout</placeName>.</p>
         </div>
         <div xml:id="EBA-1906-3-15" type="entry">
           <dateline>
             <date when="1906-3-15">Thursday, March 15th.</date>
             <measure type="distance">36 miles.</measure>
           </dateline>
-          <p>A very warm day - and an absolutely quiet one. The sailors worked valiantly, with an awning over them, from 5:30 A.M. We brought up at <placeName>Hag Kandil</placeName> at 6:30. Found the <orgName>Gazelle</orgName> lying here. At 6 o'clock this evening the mercury stood at 84 in my room - but a cool refreshing little wind from the south is going now.</p> 
+          <p>A very warm day - and an absolutely quiet one. The sailors worked valiantly, with an awning over them, from 5:30 A.M. We brought up at <placeName ref="#Hag_Kandil">Hag Kandil</placeName> at 6:30. Found the <name type="boat" ref="#Gazelle">Gazelle</name> lying here. At 6 o'clock this evening the mercury stood at 84 in my room - but a cool refreshing little wind from the south is going now.</p> 
         </div>
         <div xml:id="EBA-1906-3-16" type="entry">
           <dateline>
