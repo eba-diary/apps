@@ -27,7 +27,7 @@ data.Dataset = {
         $('#delroyTable').DataTable().clear();
         $('#delroyTable').DataTable().draw();
         $('#delroyBreadcrumb').empty();
-        data.Dataset.delroyRefreshFieldArrayFromIndex(-1);       //tricky way to DELETE ALL ELEMENTS from array
+        data.Dataset.delroyFieldArray = [];
         data.Dataset.delroyStructTrackerArray = [];
         data.Dataset.delroySnowflakeViewsArray = snowflakeViews;
 
@@ -115,7 +115,7 @@ data.Dataset = {
                 {
                     text: 'Snowflake Query',
                     action: function () {
-                        data.Dataset.delroyQueryGenerator('snow');
+                        data.Dataset.delroyQueryGenerator();
                     }
                 }
             ]
@@ -189,10 +189,7 @@ data.Dataset = {
         var field = data.Dataset.delroyFieldArray[index];
 
         //NOTE: this is a strange concept:  but a field is either a ROOT level one (index 0) or a CHILD level (index > 0)
-        //All levels past the ROOT (index 0) you need too specify the Fields array which is a child property 
-        //whereas the root level(index 0) the array is at that level
-
-       
+        //All levels > (index 0) you need too specify the Fields array which is a child property whereas the root level(index 0) the array is at that level
         //also check if field is NULL, because in that case return a null field else returning field.Fields will cause an error
         if (index == 0 || field == null) {
             return field;                //index=0 means ROOT level where array of fields is actually on that level
@@ -274,7 +271,7 @@ data.Dataset = {
     },
 
     //GENERATE QUERY BASED ON WHERE THEY ARE IN SCHEMA     
-    delroyQueryGenerator: function (queryType) {
+    delroyQueryGenerator: function () {
 
         $('#delroySpinner').show();
 
@@ -291,7 +288,7 @@ data.Dataset = {
                 type: "POST",
                 url: "/Dataset/DelroyGenerateQuery",
                 traditional: true,
-                data: JSON.stringify({ models: field, queryType: queryType, snowflakeViews: data.Dataset.delroySnowflakeViewsArray, structTracker: data.Dataset.delroyStructTrackerArray }),
+                data: JSON.stringify({ models: field, snowflakeViews: data.Dataset.delroySnowflakeViewsArray, structTracker: data.Dataset.delroyStructTrackerArray }),
                 contentType: "application/json",
                 success: function (r) {
                     var modal = Sentry.ShowModalWithSpinner("Snowflake Query");

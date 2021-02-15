@@ -1025,7 +1025,7 @@ namespace Sentry.data.Web.Controllers
 
         //CONTROLLER ACTION called from JS to return the snowflake query
         [HttpPost]
-        public ActionResult DelroyGenerateQuery(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType, List<string> snowflakeViews, List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
+        public ActionResult DelroyGenerateQuery(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, List<string> snowflakeViews, List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
             bool outerfirst = true;
             bool columnExists = false;
@@ -1044,7 +1044,7 @@ namespace Sentry.data.Web.Controllers
 
         //RECURSIVE FUNCTION
         //pass array of Fields and will format a line for each child field it finds
-        //if the child field is a STRUCT, call itself again and pass the STRUCT's children
+        //IF child field is a NON ARRAY STRUCT, call itself again and pass the STRUCT's children and print out all children and keep going
         private string GenerateSnow(List<Models.ApiModels.Schema.SchemaFieldModel> models, string alias, ref bool first, ref bool columnExists,List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
             string line = String.Empty;
@@ -1061,7 +1061,7 @@ namespace Sentry.data.Web.Controllers
                     {
                         line += ",";
                     }
-                    line += alias + field.Name + "::VARCHAR AS " + field.Name + Environment.NewLine;
+                    line += alias + field.Name + "::VARCHAR(1000) AS " + field.Name + Environment.NewLine;
                     columnExists = true;
                 }
                 else if(!field.IsArray)
@@ -1074,7 +1074,10 @@ namespace Sentry.data.Web.Controllers
             return line;
         }
 
-
+        //Set initial alias of query:
+        //RULE: find the nearest ARRAY STRUCT and make that the initial ALIAS followed by all non ARRAY STRUCTS
+        //Then the GenerateSnow() will append all STRUCTS it digs through
+        //e.g. gary_flatten.value:element:austin:lily  gary here is an array struct
         private string DelroyAliasMonster(List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
             string alias = String.Empty;
@@ -1088,17 +1091,13 @@ namespace Sentry.data.Web.Controllers
                 //get the last struct that is an ARRAY which would be the closest parent ARRAY.  This will be our starting ALIAS
                 Models.ApiModels.Schema.SchemaFieldModel closestArray = structTracker.LastOrDefault(w => w.IsArray);
 
-                //if we find an ARRAY, that means we need to ALIAS starting with ARRAY
-                if (closestArray != null)
-                {
-                    alias = closestArray.Name + "_flatten.value:element:";
-                }
-
                 //if we found an array somewhere in the parent hierarchy, then need to start appending structs after that ONLY
                 if (closestArray != null)
                 {
                     bool parentFound = false;
+                    alias = closestArray.Name + "_flatten.value:element:";
 
+                    //start at top and work through each struct until you hit the closest parent, then after you start appending all structs
                     foreach (var s in structTracker)
                     {
                         if (parentFound)
@@ -1119,13 +1118,7 @@ namespace Sentry.data.Web.Controllers
                         alias += s.Name + ":";
                     }
                 }
-
-
-
             }
-            //TODO: figure out when you are in a non array struct how to add in array plus the series of non array structs prior
-            //closest array gives you where too start in the tracker, do a foreach through tracker and AFTER matching alias, start concatenating
-
             return alias;
         }
 
