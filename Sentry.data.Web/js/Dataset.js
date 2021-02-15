@@ -13,12 +13,14 @@ data.Dataset = {
     delroySnowflakeViewsArray: [],
     delroyStructTrackerArray: [],
 
+
     delroyInit: function () {
 
         data.Dataset.delroyTableCreate();
         data.Dataset.delroySetupClickAttack();
         data.Dataset.delroyStructTrackerArray = [];
     },
+
 
     //RELOAD EVERYTHING:  clean datatable, breadcrumbs and reload with schema selected
     delroyReloadEverything: function (datasetId, schemaId, snowflakeViews) {
@@ -48,6 +50,7 @@ data.Dataset = {
         });
     },
 
+
     //CREATE BOGUS FIELD OBJ FOR HOME OR NO COLUMNS EXIST
     delroyCreateBogusField: function (name) {
 
@@ -57,6 +60,7 @@ data.Dataset = {
 
         return o;
     },
+
 
     //INIT DATATABLE
     delroyTableCreate: function () {
@@ -210,6 +214,7 @@ data.Dataset = {
         table.draw();
     },
 
+
     //ADD NEW BREADCRUMB TOO LIST
     delroyAddBreadCrumb: function (field, index) {
 
@@ -224,8 +229,6 @@ data.Dataset = {
         }
     },
 
-
-    
 
     //REFRESH BREAD CRUMBS:  Clear all breadcrumbs and refresh up too one passed in
     delroyRefreshBreadCrumbsFromIndex: function (lastIndexKeep) {
@@ -243,9 +246,10 @@ data.Dataset = {
             if (i > 0) {
                 field = data.Dataset.delroyFieldArray[i];
             }
-            else
+            else {
                 field = data.Dataset.delroyCreateBogusField("Home");
-
+            }
+                
             data.Dataset.delroyAddBreadCrumb(field, i);
         }
     },

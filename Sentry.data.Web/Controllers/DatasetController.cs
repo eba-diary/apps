@@ -1037,7 +1037,9 @@ namespace Sentry.data.Web.Controllers
                 query = "*" + Environment.NewLine;
             }
             query = "SELECT " + System.Environment.NewLine + query;
-            query += DelroyCreateFROM(snowflakeViews, structTracker);
+            query += DelroyCreateFrom(snowflakeViews, structTracker);
+            query += "LIMIT 10";
+
 
             return Json(new { snowQuery = query });
         }
@@ -1047,7 +1049,7 @@ namespace Sentry.data.Web.Controllers
         //IF child field is a NON ARRAY STRUCT, call itself again and pass the STRUCT's children and print out all children and keep going
         private string GenerateSnow(List<Models.ApiModels.Schema.SchemaFieldModel> models, string alias, ref bool first, ref bool columnExists,List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
-            string line = String.Empty;
+            StringBuilder line = new StringBuilder();
 
             foreach (var field in models)
             {
@@ -1059,19 +1061,19 @@ namespace Sentry.data.Web.Controllers
                     }
                     else
                     {
-                        line += ",";
+                        line.Append(",");
                     }
-                    line += alias + field.Name + "::VARCHAR(1000) AS " + field.Name + Environment.NewLine;
+                    line.Append(alias).Append(field.Name).Append("::VARCHAR(1000) AS ").Append(field.Name).Append(Environment.NewLine);
                     columnExists = true;
                 }
                 else if(!field.IsArray)
                 {
                     //pass "parentStructs" plus append current field so child nodes can get all parent structs appended
                     //pass "first" as reference to know whether to append a comma or not
-                    line += GenerateSnow(field.Fields, alias + field.Name + ":",ref first, ref columnExists, structTracker);
+                    line.Append(GenerateSnow(field.Fields, alias + field.Name + ":", ref first, ref columnExists, structTracker));
                 }
             }
-            return line;
+            return line.ToString();
         }
 
         //Set initial alias of query:
@@ -1080,11 +1082,11 @@ namespace Sentry.data.Web.Controllers
         //e.g. gary_flatten.value:element:austin:lily  gary here is an array struct
         private string DelroyAliasMonster(List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
-            string alias = String.Empty;
+            StringBuilder alias = new StringBuilder();
 
             if(structTracker == null)
             {
-                return alias;
+                return alias.ToString();
             }
             else
             {
@@ -1095,14 +1097,14 @@ namespace Sentry.data.Web.Controllers
                 if (closestArray != null)
                 {
                     bool parentFound = false;
-                    alias = closestArray.Name + "_flatten.value:element:";
+                    alias.Append(closestArray.Name + "_flatten.value:element:");
 
                     //start at top and work through each struct until you hit the closest parent, then after you start appending all structs
                     foreach (var s in structTracker)
                     {
                         if (parentFound)
                         {
-                            alias += s.Name + ":";
+                            alias.Append(s.Name + ":");
                         }
                         else if (s.FieldGuid == closestArray.FieldGuid)
                         {
@@ -1115,21 +1117,19 @@ namespace Sentry.data.Web.Controllers
                     //NO ARRAY EXISTS so assume our alias turns into all parent STRUCTS
                     foreach (var s in structTracker)
                     {
-                        alias += s.Name + ":";
+                        alias.Append(s.Name + ":");
                     }
                 }
             }
-            return alias;
+            return alias.ToString();
         }
 
 
-
-
         //CREATE FROM STATEMENT FOR SNOWFLAKE
-        private string DelroyCreateFROM(List<string> snowflakeViews, List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
+        private string DelroyCreateFrom(List<string> snowflakeViews, List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
-            string fromStatement = String.Empty;
-            string flattenStatement = String.Empty;
+            StringBuilder fromStatement = new StringBuilder();
+            StringBuilder flattenStatement = new StringBuilder();
             bool first = true;
 
             //CREATE FROM
@@ -1138,7 +1138,7 @@ namespace Sentry.data.Web.Controllers
             {
                 if (first)
                 {
-                    fromStatement += " FROM " + s + Environment.NewLine;
+                    fromStatement.Append(" FROM ").Append(s).Append(Environment.NewLine);
                     first = false;
                 }
             }
@@ -1149,7 +1149,7 @@ namespace Sentry.data.Web.Controllers
 
             if (structTracker == null)
             {
-                return fromStatement;
+                return fromStatement.ToString();
             }
             else
             {
@@ -1159,19 +1159,18 @@ namespace Sentry.data.Web.Controllers
                     currentFlatten = s.Name + "_flatten";
                     if (first)
                     {
-                        flattenStatement += ",LATERAL FLATTEN(" + s.Name + ":list) " + currentFlatten;
+                        flattenStatement.Append(",LATERAL FLATTEN(" + s.Name + ":list) " + currentFlatten);
                         first = false;
                     }
                     else
                     {
-                        flattenStatement += ",LATERAL FLATTEN(" + parentFlatten + ".value:element:" + s.Name + ":list) " + currentFlatten;
+                        flattenStatement.Append(",LATERAL FLATTEN(" + parentFlatten + ".value:element:" + s.Name + ":list) " + currentFlatten);
                     }
                     parentFlatten = currentFlatten;
-                    flattenStatement += Environment.NewLine;
+                    flattenStatement.Append(Environment.NewLine);
                     
                 }
-
-                return fromStatement + flattenStatement;
+                return fromStatement.ToString() + flattenStatement.ToString();
             }
         }
     }
