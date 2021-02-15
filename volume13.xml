@@ -351,27 +351,27 @@
           <dateline>
             <date when="1906-3-16">Friday, March 16th.</date>
           </dateline>
-          <p>We left our landing place this morning early though a north wind was blowing hard - after an hour of struggle with it, we were forced to a big sand bank opposite <persName>Gebel Sheik Said</persName> - where we now are. The wind has raged all day - it has not been cold - but walking or staying on deck was impossible.</p> 
+          <p>We left our landing place this morning early though a north wind was blowing hard - after an hour of struggle with it, we were forced to a big sand bank opposite <placeName ref="#Gebel_Sheik_Said">Gebel Sheik Said</placeName> - where we now are. The wind has raged all day - it has not been cold - but walking or staying on deck was impossible.</p> 
         </div>
         <pb n="124"/>
         <div xml:id="EBA-1906-3-17" type="entry">
           <dateline>
             <date when="1906-3-17">Saturday, March 17th.</date>
           </dateline>
-          <p>We are still lying where we were yesterday - and the weather has been the same. <persName>Theo</persName> sent one of the sailors this morning 7 miles across the sand to <persName>Melawi,</persName> to carry a telegram to <persName>Cook,</persName> ordering a tug to come up to us.We ought to have done this a week ago.</p> 
+          <p>We are still lying where we were yesterday - and the weather has been the same. <persName ref="#Davis_Theodore_M">Theo</persName> sent one of the sailors this morning <measure type="distance">7 miles</measure> across the sand to <placeName ref="#Mallawi">Melawi</placeName>, to carry a telegram to <persName ref="#Cook_Thomas">Cook</persName>, ordering a tug to come up to us.We ought to have done this a week ago.</p> 
         </div>
         <div xml:id="EBA-1906-3-18" type="entry">
           <dateline>
             <date when="1906-3-18">Sunday, Mar. 18th. 3d Sunday in <placeName>Lent.</placeName></date>
           </dateline>
-          <p><persName>Rodah.</persName> 13 miles. We brought up here suddenly about 11 o'clock this morning, with a strong wind from the east, and here we are still. We hope to meet our tug tomorrow. Indeed we have 2 tugs coming for us - one from <persName ref="#Shaykh_Fadl">Sheik Fadl,</persName> ordered this morning, and one from <placeName>Cooks, Cairo,</placeName> which started up yesterday - and which we ought to pick up on Tuesday - when we will dismiss the other one.</p> 
+          <p><placeName ref="#Rhodah">Rodah</persName>. <measure type="distance">13 miles</measure>. We brought up here suddenly about 11 o'clock this morning, with a strong wind from the east, and here we are still. We hope to meet our tug tomorrow. Indeed we have 2 tugs coming for us - one from <persName ref="#Shaykh_Fadl">Sheik Fadl</persName>, ordered this morning, and one from <placeName>Cooks, Cairo,</placeName> which started up yesterday - and which we ought to pick up on Tuesday - when we will dismiss the other one.</p> 
         </div>
         <div xml:id="EBA-1906-3-18" type="entry">
           <dateline>
             <date when="1906-3-18">Monday, Mar. 19th.</date>
             <measure type="distance">11 miles.</measure>
           </dateline>
-          <p><persName>Beni Hassan.</persName> Started very early, but had to tie up about 10 o'clock - opposite the tombs - a spot we well know as we had to stay just here years ago for a week, on our way up - a gale is going on.</p>
+          <p><persName ref="#Hassan">Beni Hassan</persName>. Started very early, but had to tie up about 10 o'clock - opposite the tombs - a spot we well know as we had to stay just here years ago for a week, on our way up - a gale is going on.</p>
         </div> 
         <!--[last 25 after this]-->
      <div xml:id="EBA-1906-03-20" type="entry">
