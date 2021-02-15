@@ -1037,9 +1037,9 @@ namespace Sentry.data.Web.Controllers
                 query = "*" + Environment.NewLine;
             }
             query = "SELECT " + System.Environment.NewLine + query;
-            query += DelroyCreateFrom(snowflakeViews, structTracker);
+            query += DelroyCreateFrom(snowflakeViews);
+            query += DelroyCreateLateralFlatten(structTracker);
             query += "LIMIT 10";
-
 
             return Json(new { snowQuery = query });
         }
@@ -1126,10 +1126,9 @@ namespace Sentry.data.Web.Controllers
 
 
         //CREATE FROM STATEMENT FOR SNOWFLAKE
-        private string DelroyCreateFrom(List<string> snowflakeViews, List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
+        private string DelroyCreateFrom(List<string> snowflakeViews)
         {
             StringBuilder fromStatement = new StringBuilder();
-            StringBuilder flattenStatement = new StringBuilder();
             bool first = true;
 
             //CREATE FROM
@@ -1143,13 +1142,21 @@ namespace Sentry.data.Web.Controllers
                 }
             }
 
-            first = true;
+            return fromStatement.ToString();
+        }
+
+        //CREATE LATERAL FLATTEN STATEMENT FOR SNOWFLAKE
+        private string DelroyCreateLateralFlatten(List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
+        {
+            
+            StringBuilder flattenStatement = new StringBuilder();
+            bool first = true;
             string parentFlatten = String.Empty;
             string currentFlatten = String.Empty;
 
             if (structTracker == null)
             {
-                return fromStatement.ToString();
+                return flattenStatement.ToString();
             }
             else
             {
@@ -1168,10 +1175,12 @@ namespace Sentry.data.Web.Controllers
                     }
                     parentFlatten = currentFlatten;
                     flattenStatement.Append(Environment.NewLine);
-                    
+
                 }
-                return fromStatement.ToString() + flattenStatement.ToString();
+
+                return flattenStatement.ToString();
             }
         }
+
     }
 }
