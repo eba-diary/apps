@@ -418,19 +418,19 @@
        <dateline>
           <date when="1906-03-26">Monday, Mar. 26th.</date>
         </dateline>
-        <p>Went to the <placeName>Bazaars</placeName> with <persName ref="#Newberry_Percy">Mr. Newberry</persName> this morning and to <placeName>Dataris</placeName> this afternoon to see some fine antiquities. A lovely little thing of <persName>Khuenaten</persName> and his wife - going to the <placeName>Berlin Museum</placeName>. <persName ref="#von_Bissing_Baron">V. Bissing</persName> came to dine.</p>
+        <p>Went to the <placeName>Bazaars</placeName> with <persName ref="#Newberry_Percy">Mr. Newberry</persName> this morning and to <placeName>Dataris</placeName> this afternoon to see some fine antiquities. A lovely little thing of <persName ref="Khuenaten">Khuenaten</persName> <!--[check this]-->and his wife - going to the <placeName ref="#Berlin_Museum">Berlin Museum</placeName>. <persName ref="#von_Bissing_Baron">V. Bissing</persName> came to dine.</p>
       </div>
       <div xml:id="EBA-1906-03-27" type="entry">
        <dateline>
           <date when="1906-03-27">Tuesday, Mar. 27th.</date>
         </dateline>
-        <p>Visiting etc. all day. <persName>Mr. Newberry</persName> to dine.</p>
+        <p>Visiting etc. all day. <persName ref="#Newberry_Percy">Mr. Newberry</persName> to dine.</p>
       </div>
       <div xml:id="EBA-1906-03-31" type="entry">
         <dateline>
           <date when="1906-03-31">Saturday, Mar. 31st.</date>
         </dateline>
-        <p>This is our last day here. Yesterday we lunched with <persName ref="#Newberry_Percy">Mr. Newberry</persName> at the Angelterre. Dr. <persName>Sandwith</persName> dined with us last evening.<pb n="127"/> <persName>Mrs. Dennis</persName> asked us to tea over here on the lawn, and then found that tea was never served there for less than 20 people. So we had it on the terrace. <persName ref="#Newberry_Percy">Mr. Newberry</persName> is dining with us tonight - and <persName>v. Bissing</persName> and Mr. <persName>Currelly</persName> came in after tea to say goodbye.</p>
+        <p>This is our last day here. Yesterday we lunched with <persName ref="#Newberry_Percy">Mr. Newberry</persName> at the Angelterre.<!--[check hotel?]--> <persName ref="#Sandwith_Dr">Dr. Sandwith</persName> dined with us last evening.<pb n="127"/> <persName ref="#Dennis_Mrs">Mrs. Dennis</persName> asked us to tea over here on the lawn, and then found that tea was never served there for less than 20 people. So we had it on the terrace. <persName ref="#Newberry_Percy">Mr. Newberry</persName> is dining with us tonight - and <persName ref="#von_Bissing_Baron">V. Bissing</persName> and <persName ref="#Currelly_Charles_Trick">Mr. Currelly</persName> came in after tea to say goodbye.</p>
       </div>
       <div xml:id="EBA-1906-04-06" type="entry">
         <dateline>
@@ -438,7 +438,7 @@
           <placeName ref="#Venice">Venice</placeName>
           <name type="hotel" ref="#Hotel_Britannia">Hotel Britannia</name>
         </dateline>      
-        <p>We are thankful indeed to find ourselves safely and comfortably settled in our spacious usual appartments here. Such an uncomfortable transit as we have had across the <orgName>Mediterranean!</orgName> We left <placeName ref="#Cairo">Cairo</placeName> Sunday morning the 1st for <placeName ref="Port_Said">Port Said</placeName>. Mr. and <persName>Mrs. Dennis</persName> were on the train. <persName ref="#Newberry_Percy">Mr. Newberry</persName> at the station to say goodbye. We found the <persName>Osiris</persName> had a very full passenger list - we had to wait until Monday noon before the mail steamer got through the canal. We had feared rough weather, for the wind had been high for days. But our experience was more trying than anything we had ever met - we went directly out into a very rough sea - and soon almost every passenger had taken to his berth. I was not sick at any time - but I went to bed at 5 o'clock and did not get up until 10 o'clock P.M. on Wednesday - as it was too rough and dreadful to be up. That little <persName>Osiris</persName> not only stood on both ends, but rolled over and jumped out of the water fairly - speed was of course slackened, and we reached <placeName>Brindisi</placeName> on Thursday morning at 1:30 - 14 hours behind time. The boat was really much of the time under water and I heard tons of water pouring over the deck above me. Our train left at 3 o'clock A.M. we arrived at <name>Bologna</name> at 6 P.M. spent the night at that good hotel <placeName>Brum</placeName> - and were comforted by an excellent<pb n="128"/> dinner and good beds, and arrived here about 6 o'clock this afternoon.</p>
+        <p>We are thankful indeed to find ourselves safely and comfortably settled in our spacious usual appartments here. Such an uncomfortable transit as we have had across the <placeName ref="#Mediterranean_Sea">Mediterranean</placeName>! We left <placeName ref="#Cairo">Cairo</placeName> Sunday morning the 1st for <placeName ref="Port_Said">Port Said</placeName>. Mr. and <persName>Mrs. Dennis</persName> were on the train. <persName ref="#Newberry_Percy">Mr. Newberry</persName> at the station to say goodbye. We found the <name type="boat" ref="#Osiris">Osiris</name> had a very full passenger list - we had to wait until Monday noon before the mail steamer got through the canal. We had feared rough weather, for the wind had been high for days. But our experience was more trying than anything we had ever met - we went directly out into a very rough sea - and soon almost every passenger had taken to his berth. I was not sick at any time - but I went to bed at 5 o'clock and did not get up until 10 o'clock P.M. on Wednesday - as it was too rough and dreadful to be up. That little <name type="boat" ref="#Osiris">Osiris</name> not only stood on both ends, but rolled over and jumped out of the water fairly - speed was of course slackened, and we reached <placeName>Brindisi</placeName> on Thursday morning at 1:30 - 14 hours behind time. The boat was really much of the time under water and I heard tons of water pouring over the deck above me. Our train left at 3 o'clock A.M. we arrived at <name>Bologna</name> at 6 P.M. spent the night at that good hotel <placeName>Brum</placeName> - and were comforted by an excellent<pb n="128"/> dinner and good beds, and arrived here about 6 o'clock this afternoon.</p>
       </div>
       <div xml:id="EBA-1906-04-07" type="entry">
         <dateline>
@@ -493,7 +493,7 @@
         <dateline>
           <date when="1906-04-16">Monday, April 16.</date>
         </dateline>   
-        <p>Quite a busy day - tea at the <placeName>Villino</placeName> - <persName>Mary, Jean</persName> and <persName>Robert</persName> go off to <placeName  ref="#Rome">Rome</placeName> tomorrow for a week.</p>
+        <p>Quite a busy day - tea at the <placeName>Villino</placeName> - Mary, <persName ref="#Hardy_Jean">Jean</persName> and <persName>Robert</persName> go off to <placeName  ref="#Rome">Rome</placeName> tomorrow for a week.</p>
       </div>
       <div xml:id="EBA-1906-04-17" type="entry">
         <dateline>
