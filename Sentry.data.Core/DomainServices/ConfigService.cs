@@ -745,7 +745,8 @@ namespace Sentry.data.Core
             HiveTableDeleteModel hiveDelete = new HiveTableDeleteModel()
             {
                 SchemaID = config.Schema.SchemaId,
-                DatasetID = config.ParentDataset.DatasetId
+                DatasetID = config.ParentDataset.DatasetId,
+                InitiatorID = _userService.GetCurrentUser().AssociateId
             };
             _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveDelete));
 
@@ -755,7 +756,8 @@ namespace Sentry.data.Core
                 SnowTableDeleteModel snowDelete = new SnowTableDeleteModel()
                 {
                     SchemaID = config.Schema.SchemaId,
-                    DatasetID = config.ParentDataset.DatasetId
+                    DatasetID = config.ParentDataset.DatasetId,
+                    InitiatorID = _userService.GetCurrentUser().AssociateId
                 };
                 _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(snowDelete));
             }
