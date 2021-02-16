@@ -208,6 +208,8 @@ namespace Sentry.data.Infrastructure
 
             _request.Method = Method.GET;
 
+            _request.Resource = _job.GetUri().ToString();
+
             //Add datasource specific headers to request
             List<RequestHeader> headerList = ((HTTPSSource)_job.DataSource).RequestHeaders;
 
