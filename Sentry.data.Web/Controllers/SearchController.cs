@@ -36,15 +36,19 @@ namespace Sentry.data.Web.Controllers
         public IDatasetContext _datasetContext;
         private UserService _userService;
         private readonly IEventService _eventService;
+        private readonly IDatasetService _datasetService;
 
         private string Title { get; set; }
 
-        public SearchController(IDatasetContext dsCtxt, UserService userService, IAssociateInfoProvider associateInfoService, IEventService eventService)
+        public SearchController(IDatasetContext dsCtxt, UserService userService, 
+            IAssociateInfoProvider associateInfoService, IEventService eventService,
+            IDatasetService datasetService)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
             _associateInfoProvider = associateInfoService;
             _eventService = eventService;
+            _datasetService = datasetService;
         }
 
         // GET: Search
@@ -173,22 +177,20 @@ namespace Sentry.data.Web.Controllers
             }
 
             var dsList = dsQuery.FetchAllChildren(_datasetContext);
-            var dsIds = dsList.Select(x => x.DatasetId.ToString()).ToList();
 
-            var events = new List<Event>();
-            foreach (var group in dsIds.Split(1000))
-            {
-                events.AddRange(_datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset.HasValue && dsIds.Contains(x.Dataset.Value.ToString())).ToList());
-            }
-
+            //get cached summary metadata
+            List<DatasetSummaryMetadataDTO> dsSummaryList = _datasetService.GetDatasetSummaryMetadataDTO();
+            
             foreach (Dataset ds in dsList.OrderBy(x => x.DatasetName).ToList())
             {
+                Boolean summaryExists = dsSummaryList.Any(x => x.DatasetId == ds.DatasetId);
                 SearchModel sm = new SearchModel(ds, _associateInfoProvider)
                 {
                     IsFavorite = ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId),
-                    PageViews = events.Count(x => x.Dataset == ds.DatasetId),
-                    CanEditDataset = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? SharedContext.CurrentUser.CanManageReports : false
-                };
+                    PageViews = (summaryExists) ? dsSummaryList.First(x => x.DatasetId == ds.DatasetId).ViewCount : 0,
+                    CanEditDataset = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? SharedContext.CurrentUser.CanManageReports : false,
+                    ChangedDtm = (summaryExists) ? dsSummaryList.FirstOrDefault(w => w.DatasetId == ds.DatasetId).Max_Created_DTM.ToShortDateString() : ds.ChangedDtm.ToShortDateString()
+            };
                 models.Add(sm);
             }
 

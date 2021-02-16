@@ -35,3 +35,5 @@ GO
 CREATE INDEX [Search_Lineage_Table] ON [dbo].[Event] ([Lineage_Table])
 
 GO
+
+CREATE INDEX [IDX_Event__EventType_Dataset_ID] ON [dbo].[Event] ([EventType], [Dataset_ID])

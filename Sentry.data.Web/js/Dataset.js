@@ -10,21 +10,25 @@ data.Dataset = {
     //DELROY FUNCTIONS
     //****************************************************************************************************
     delroyFieldArray: [],
+    delroySnowflakeViewsArray: [],
+    delroyStructTrackerArray: [],
 
     delroyInit: function () {
 
         data.Dataset.delroyTableCreate();
         data.Dataset.delroySetupClickAttack();
+        data.Dataset.delroyStructTrackerArray = [];
     },
 
     //RELOAD EVERYTHING:  clean datatable, breadcrumbs and reload with schema selected
-    delroyReloadEverything: function (datasetId, schemaId) {
+    delroyReloadEverything: function (datasetId, schemaId, snowflakeViews) {
 
         $('#delroySpinner').show();
         $('#delroyTable').DataTable().clear();
         $('#delroyTable').DataTable().draw();
         $('#delroyBreadcrumb').empty();
         data.Dataset.delroyRefreshFieldArrayFromIndex(-1);       //tricky way to DELETE ALL ELEMENTS from array
+        data.Dataset.delroySnowflakeViewsArray = snowflakeViews;
 
         var schemaURL = "/api/v2/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/revision/latest/fields";
         $.get(schemaURL, function (result) {
@@ -52,6 +56,7 @@ data.Dataset = {
             //client side setup
             pageLength: 100,
 
+            //Code if i wanted the grid to reload and make AJAX call, but i reload manually without AJAX call in delroyGridRefresh
             //ajax: {
             //    url: "/api/v2/metadata/dataset/230/schema/4039/revision/latest/fields",
             //    type: "GET",
@@ -76,6 +81,7 @@ data.Dataset = {
                 },
                 { data: "Description", className: "Description" },
                 { data: "FieldType", className: "FieldType" },
+                { data: "IsArray", className: "IsArray" },
                 { data: "Length", className: "Length", visible: false, render: function (d)         { return data.Dataset.delroyFillGridCheckForNull(d);    }   },
                 { data: "Precision", className: "Precision", visible: false, render: function (d)   { return data.Dataset.delroyFillGridCheckForNull(d);    }   },
                 { data: "Scale", className: "Scale", visible: false, render: function (d)           { return data.Dataset.delroyFillGridCheckForNull(d);    }   }
@@ -94,7 +100,13 @@ data.Dataset = {
             //buttons to show and customize text for them
             buttons:
             [
-                { extend: 'colvis', text: 'Columns' }
+                { extend: 'colvis', text: 'Columns' },
+                {
+                    text: 'Snowflake Query',
+                    action: function () {
+                        data.Dataset.delroyQueryGenerator('snow');
+                    }
+                }
             ]
         });
 
@@ -106,6 +118,7 @@ data.Dataset = {
                 { type: "text" },
                 { type: "text" },
 
+                { type: "text" },
                 { type: "text" },
                 { type: "text" },
                 { type: "text" }
@@ -146,7 +159,10 @@ data.Dataset = {
             }
             
         });
+
+
     },
+
 
     //ADD NEW FIELD TOO ARRAY
     delroyAddFieldArray: function (field) {
@@ -188,9 +204,15 @@ data.Dataset = {
     //ADD NEW BREADCRUMB TOO LIST
     delroyAddBreadCrumb: function (name, index) {
 
+        //add breadcrumb to UI
         var color = $('#delroyBreadcrumb').data('page-color');
         var h = "<li id='" + index.toString() + "' ><a  class='" + color + "' style='cursor:pointer' >" + name + "</a></li>";
         $('#delroyBreadcrumb').append(h);
+
+        //add struct too tracker to hold if a query needs to be generated
+        if (name !== "Home" && index > 0) {
+            data.Dataset.delroyStructTrackerArray.push(name);    
+        }
     },
 
     //REFRESH BREAD CRUMBS:  Clear all breadcrumbs and refresh up too one passed in
@@ -198,7 +220,11 @@ data.Dataset = {
         //STEP 1: empty all breadcrumbs
         $('#delroyBreadcrumb').empty();
 
-        //STEP 2: add in all breadcrumbs from start until the one they clicked on
+        //STEP 2: empty breadcrumb Tracker which feeds Query Generator
+        var deleteStartIndex = parseInt(0);
+        data.Dataset.delroyStructTrackerArray.splice(deleteStartIndex);     
+
+        //STEP 3: add in all breadcrumbs from start until the one they clicked on
         for (let i = 0; i < data.Dataset.delroyFieldArray.length; i++) {
 
             var field = data.Dataset.delroyFieldArray[i];
@@ -206,7 +232,6 @@ data.Dataset = {
             if (i > 0) {
                 bcName = field.Name;
             }
-
             data.Dataset.delroyAddBreadCrumb(bcName, i);
         }
     },
@@ -230,6 +255,62 @@ data.Dataset = {
             return ' ';
         }
     },
+
+    //GENERATE QUERY BASED ON WHERE THEY ARE IN SCHEMA     
+    delroyQueryGenerator: function (queryType) {
+
+        $('#delroySpinner').show();
+
+        var field = data.Dataset.delroyGetLatestField();
+
+        //pass the current field array and necessary info to controller and get back a partial view which we place into the Sentry Modal
+        $.ajax({
+            type: "POST",
+            url: "/Dataset/DelroyGenerateQuery",
+            traditional: true,
+            data: JSON.stringify({ models: field, queryType: queryType, snowflakeViews: data.Dataset.delroySnowflakeViewsArray, structTracker: data.Dataset.delroyStructTrackerArray }),
+            contentType: "application/json",
+            success: function (r) {
+                var modal = Sentry.ShowModalWithSpinner("Snowflake Query");
+                modal.ReplaceModalBody(data.Dataset.delroyCreateModalHTML(r.snowQuery));
+                $('#delroySpinner').hide();
+            },
+            failure: function () {
+                data.Dale.makeToast("error", "Error creating Snowflake Query.");
+                $('#delroySpinner').hide();
+            },
+            error: function () {
+                data.Dale.makeToast("error", "Error creating Snowflake Query.");
+                $('#delroySpinner').hide();
+            }
+        });
+    },
+
+    //FORMAT HTML TO SEND TOO MODAL
+    //NOTE: instead of returning an entire partial view from controller, i just pass the snow query and format HTML in here, it shaved seconds off
+    delroyCreateModalHTML: function (snowQuery) {
+
+        var delroyQueryView = "<div class='delroyQueryView'> ";
+        var delroyQueryMania = " <div id='delroyQueryMania' style='max-height: 600px; white-space: pre-line; overflow-y: auto; overflow-x: auto; '> " + snowQuery + " </div >";
+        var delroyModalFooter = " <div class='modal-footer'>  <input id='delroyCopyClipboard' type='button' class='btn btn-warning' value='Copy to Clipboard' onclick='data.Dataset.delroyCopyClipboard()' />     </div >";
+        delroyQueryView = delroyQueryView + delroyQueryMania + delroyModalFooter + " </div>";
+        return delroyQueryView;
+    },
+
+
+    //COPY TEXT IN MODAL TO CLIPBOARD
+    //NOTE: the reason I need to copy from delroyQueryMania is because it has the white-space style which interprets newlines and therefore a copy gets me a nicely formatted line
+    //without that extra tag the copy directly from the output of the controller method DelroyGenerateQuery2 has the newlines but doesn't actually show formatting
+    delroyCopyClipboard: function () {
+
+        var range = document.createRange();
+        range.selectNode(document.getElementById("delroyQueryMania"));
+        window.getSelection().removeAllRanges(); // clear current selection
+        window.getSelection().addRange(range); // to select text
+        document.execCommand("copy");
+        window.getSelection().removeAllRanges();// to deselect
+    },
+
     //****************************************************************************************************
     //END DELROY FUNCTIONS
     //****************************************************************************************************
