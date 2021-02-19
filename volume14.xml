@@ -273,11 +273,10 @@
 <!-- Molly Taylor's code -->
       <div xml:id="EBA-1907-01-01" type="entry">
         <dateline><date when="1907-01-01">Jan. 1st. 1907.</date></dateline>
-        <persName ref="#Ayrton_Edward">Mr. Ayrton</persName> to lunch and <personGrp ref="#Pumpelly">Mr. and Mrs. Pumpelly</personGrp> with <persName ref="#Pumpelly_Raphael">Raphael Pumpelly</persName> were here to tea and <persName ref="#Smith_Joe">Joe Smith</persName> to dine. Very warm.
+        <persName ref="#Ayrton_Edward">Mr. Ayrton</persName> to lunch and <personGrp ref="#Pumpelly">Mr. and Mrs. Pumpelly</personGrp> with <persName ref="#Pumpelly_Raphael">Raphael Pumpelly</persName> were here to tea and <persName ref="#Lindon_Smith_JosephSmith_Joe">Joe Smith</persName> to dine. Very warm.
       </div>
 <!-- Jan 1st entry doesn't make sense to me -->
 <!-- New people: Pumpellys -->
-<!-- Is "Joe Smith" "Joseph Lindon Smith"? -->
 
       <div xml:id="EBA-1907-01-02" type="entry">
         <dateline><date when="1907-01-02">Jan. 2nd. Wednesday.</date></dateline>
@@ -294,11 +293,8 @@
       <pb n="15"/>
       <div xml:id="EBA-1907-01-05" type="entry">
         <dateline><date when="1907-01-05">Saturday, Jan 5.</date></dateline>
-        <p>Another note from <persName ref="#Ayrton_Edward">Mr. Ayrton</persName> saying the tomb was not a tomb! <persName ref="#Buttles_Jeanette">Nettie</persName> was so disappointed. <personGrp ref=>Dr. Wiedemann and his wife</personGrp> dined with us tonight. They are delightful people, and we had a charming evening.</p>
+        <p>Another note from <persName ref="#Ayrton_Edward">Mr. Ayrton</persName> saying the tomb was not a tomb! <persName ref="#Buttles_Jeanette">Nettie</persName> was so disappointed. <personGrp ref="#Wiedemann">Dr. Wiedemann and his wife</personGrp> dined with us tonight. They are delightful people, and we had a charming evening.</p>
       </div>
-<!-- New people: The Wiedemanns - also referred to as "Wiedeman", "Wiedermann", "Weiderman", "Weideman".
-          I'm not tagging them just yet because I'm unsure of how the name is spelled.
-          I am, however, going to mark each time the name comes up for easy tagging later on. -->
       <div xml:id="EBA-1907-01-06" type="entry">
         <dateline><date when="1907-01-06">Sunday, Jan. 6.</date></dateline>
         <p>A quiet delightful morning - <persName ref="#Dalison_Max">Mr. Dalison</persName> came to lunch - some of <persName ref="#Hardy_Jean">Jean's</persName> friends to tea.</p>
@@ -308,7 +304,6 @@
         <p><persName ref="#Davis_Theodore_M">Theodore</persName> went over to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> this morning - found it very hot - and when he got back quite late, told us that <persName ref="#Ayrton_Edward">Ayrton</persName> had this time found a real tomb. We are all going over tomorrow, and so are <personGrp ref="#Weigall">Mr. and Mrs. Weigall.</personGrp> <persName ref="#Lindon_Smith_Joseph">Joe Smith</persName> is staying at the <placeName ref="#Valley_of_the_Kings">Valley</placeName> tonight with Ayrton. <persName ref="#Hardy_Jean">Jean</persName> went to the hotel to lunch with <persName ref="#Peckett_Mrs">Mrs. Peckett</persName> - <persName ref="#Buttles_Jeanette">Nettie</persName> and I had a beautiful lunch on deck, and at 3 o'clock went over to the hotel for her - <persName ref="#Peckett_Mrs">Mrs. Peckett,</persName> the <personGrp ref="#Collins">Misses Collins,</personGrp> and <persName ref="#Carter_Howard">Carter</persName> were there - we brought <persName ref="#Carter_Howard">Carter</persName> home with us, calling on our way back on their <name type="boat" ref="#Stella">dahabya "Stella"</name> on the <personGrp ref="#Smith">Smiths.</personGrp> <personGrp ref="#Weigall">Mr. and Mrs. Weigall</personGrp> came to tea.</p>
       </div>
 <!-- New person: Mrs. Peckett -->
-<!-- "Carter" likely Howard Carter, but could it also be Edgar Bonham Carter? -->
 <!-- New boat: "Stella" -->
       <div xml:id="EBA-1907-01-08" type="entry">
         <dateline><date when="1907-01-08">Tuesday, Jan. 8th.</date></dateline>
@@ -318,7 +313,7 @@
         <dateline><date when="1907-01-09">Jan. 9. Wednesday.</date></dateline>
         <p>We made rather an early start this morning - <persName ref="#Davis_Theodore_M">Theo</persName> and I, with <persName ref="#Amelie">Amelie</persName> and <placeName ref="#Jones_Harold">Jones,</placeName> and <persName ref="#Hassein">Hassein.</persName> When we arrived at the tomb, every one was waiting for us as the doorway and steps had been cleared, and everything ready for an entrance. <persName ref="#Ayrton_Edward">Ayrton, <persName ref="#Weigall_Arthur">Weigall</persName> and <persName ref="#Davis_Theodore_M">Theo</persName> scrambled along the corridor over the tombs, and made a very difficult entrance. <persName ref="#Erskine_David">Mr. Erskine,</persName> by invitation had joined us, we women, with <persName ref="#Erskine_David">Mr. E.,</persName> <persName ref="#Weigall_Arthur">Mrs. Weigall,</persName> and <persName ref="#Lindon_Smith_Joseph">Joe</persName> and his wife, sat about on the rocks above, and waited straining our ears to catch the broken exclamations that reached us from below - "<persName="#Aten">Aton!</persName> The rays of the Sun" <persName ref="#Tutankhamen">Tut-ankh-amen"</persName> etc. and at last <persName ref=>Mr. Davis's</persName> voice rang out, "By Jove, <persName ref="#Tiyi">Queen Tyi,</persName> and no mistake" and so it proved. On the rough stones of the corridor rested a wooden door, 12 x 14 ft. long - 6 ft. wide, and a smaller one about 2 x 4 - with bronze doors and hinges - both doors covered with gold foil - the <pb n="17"/> smaller one in quite good condition, and on it the cartouche of <persName ref="#Tiyi">Tyi,</persName> and that of her husband <persName ref="#Amenhotep_III">Amenhotep III.</persName> The burial chamber was not large, but in a state of great confusion. The <persName ref="#Tiyi">Queen</persName> would seem to have been laid in a great, highly decorated, wood shrine - parts of which were on the floor, or leaning against the wall, - the coffin on the floor - all showing hasty burial, or robbery or desecration. I did not go down - but <persName ref="#Buttles_Jeanette">Nettie,</persName> <persName ref="#Weigall_Hortense">Mrs. Weigall,</persName> and <persName ref="#Hardy_Jean">Jean</persName> went down - one by one - <persName ref="#Davis_Theodore_M">Theo</persName> was determined that <persName ref="#Buttles_Jeanette">Nettie</persName> should be the first one to see it, and she was the first woman to enter. All the men had been down. We had a big lunch with everyone, and a charming day. Very warm today.</p>
       </div>
-<!-- I didn't know how to label Aton, since he's a deit, so I labeled him with "persName" (as "Aten") -->
+<!-- I didn't know how to label Aton, since he's a deity, so I labeled him with "persName" (as "Aten") -->
       <div xml:id="EBA-1907-01-10" type="entry">
         <dateline><date when="1907-01-10">Thursday,Jan.10.</date></dateline>
         <p><persName ref="#Davis_Theodore_M">Theo</persName> and the girls went again to <placeName ref="#Valley_of_the_Kings">the Valley.</placeName> I wouldn't face that long ride in the hot sun today - and so had a nice quiet day at home. They came back very tired, bringing word of the many treasures of the tomb. Tomorrow the tomb is to be given over into the hands of a skillful photographer sent for from <placeName ref="#Cairo">Cairo</placeName> - and <persName ref="#Lindon_Smith_Joseph">Joe Smith</persName> is also painting there.</p>
@@ -365,9 +360,8 @@
       </div>
       <div xml:id="EBA-1907-01-19"
         <dateline><date when="1907-01-19">Saturday, Jan, 19.</date></dateline>
-        At the <placeName ref="#Valley_of_the_Kings">Valley.</placeName> <persName ref=>Dr. Wiedermann</persName> and wife, and <persName ref="#Sayce_Archibald">Mr. Sayce</persName> were over and lunched with us in the lunch tomb. I went down to the burial chamber and it is now almost easy of access - and saw <placeName ref="#Tiyi">the poor Queen<placeName> as she lies now just a bit outside her magnificent coffin, with the vulture crown on her head - all the woodwork of the shrine, doors, etc. are heavily overlaid with gold foil - which under the influence of the <pb n="20"/> outer air is now peeling off - and I seemed to be walking on gold - and even the Arab working inside had some of it sticking in his wooly hair. Here is the sketch of the tomb and situation of objects. No. 1. mummy of <placeName ref="#Tiyi">Queen</placeName> - partly overlaid by coffin No. 2 - both on the floor. 3,3,3,3, doors or panels - very large, heavily overlaid with gold, - the one with the x, has a beautiful portrait of <placeName ref="#Tiyi">Queen.</placeName> All of them beautifully incised on the gold leaf. <persName ref="#Aten">Aton</persName> rays on all and <persName ref="#Akhenaten">Khuenatens</persName> cartouche followed by an inscription "I made this for the great <placeName ref="#Tiyi">Queen Tyi,</placeName> royal mother". The 4 x-a against the wall are 4 large panels, all gold and inscriptions.</p>
+        At the <placeName ref="#Valley_of_the_Kings">Valley.</placeName> <persName ref="#Wiedemann_Alfred">Dr. Wiedermann</persName> and wife, and <persName ref="#Sayce_Archibald">Mr. Sayce</persName> were over and lunched with us in the lunch tomb. I went down to the burial chamber and it is now almost easy of access - and saw <placeName ref="#Tiyi">the poor Queen<placeName> as she lies now just a bit outside her magnificent coffin, with the vulture crown on her head - all the woodwork of the shrine, doors, etc. are heavily overlaid with gold foil - which under the influence of the <pb n="20"/> outer air is now peeling off - and I seemed to be walking on gold - and even the Arab working inside had some of it sticking in his wooly hair. Here is the sketch of the tomb and situation of objects. No. 1. mummy of <placeName ref="#Tiyi">Queen</placeName> - partly overlaid by coffin No. 2 - both on the floor. 3,3,3,3, doors or panels - very large, heavily overlaid with gold, - the one with the x, has a beautiful portrait of <placeName ref="#Tiyi">Queen.</placeName> All of them beautifully incised on the gold leaf. <persName ref="#Aten">Aton</persName> rays on all and <persName ref="#Akhenaten">Khuenatens</persName> cartouche followed by an inscription "I made this for the great <placeName ref="#Tiyi">Queen Tyi,</placeName> royal mother". The 4 x-a against the wall are 4 large panels, all gold and inscriptions.</p>
       </div>
-<!-- "Dr. Wiedermann" -->
 <!-- Should I mark the "lunch tomb"? -->
 <!-- As before, labeling "Aton" with "persName" as "Aten"-->
       <div xml:id="EBA-1907-01-20" type="entry">
@@ -378,9 +372,8 @@
 <!-- New person: Mr. Briggs -->
       <div xml:id="EBA-1907-01-21" type="entry">
         <dateline><date when="1907-01-21">Monday, Jan. 21.</date></dateline>
-        <p><persName ref="#Davis_Theodore_M">Theo</persName> at the <placeName ref="#Valley_of_the_Kings">Valley</placeName> all day - he reports all the panels being treated to paraffin to hold the gold in place. <persName ref=>Weidermans</persName> dined with us. Our new moon should have shown.</p>
+        <p><persName ref="#Davis_Theodore_M">Theo</persName> at the <placeName ref="#Valley_of_the_Kings">Valley</placeName> all day - he reports all the panels being treated to paraffin to hold the gold in place. <personGrp ref="#Wiedemann">Weidermans</personGrp> dined with us. Our new moon should have shown.</p>
       </div>
-<!-- "Weidermans" -->
       <div xml:id="EBA-1907-01-22" type="entry">
         <dateline><date when="1907-01-22">Tuesday, Jan. 22.</date></dateline>
         <p><persName ref=>Prof. Tarbell</persName>, <placeName ref="#Chicago_University">Chicago University,</placeName> called with a letter from <persName ref="Lythgoe_Albert">Mr. Lythgoe.</persName> <persName ref="#Trefusis_Robert">Robert Trefusis</persName> and <persName ref="#Jones_Harold">Harold Jones</persName> arrived from <placeName ref="#Abydos">Abydos</placeName> - on coming back after some visits this afternoon found them here. They came back to dine.</p>
@@ -408,9 +401,8 @@
 <!-- New people: Mrs. Harriman, Miss Bishop -->
       <div xml:id="EBA-1907-01-27" type="entry">
         <dateline><date when="1907-01-27">Septuagesima Sunday, Jan. 27.</date></dateline>
-        <p>I had my quiet little church today - about 4 o'clock as we were waiting for tea, on deck, we saw coming across the distant sands the procession of the treasures of the tomb on its way to us - <persName ref="#Weigall_Arthur">Weigall</persName> and <persName ref="#Ayrton_Edward">Ayrton</persName> on horses led the way, and a long procession of Arabs following carrying the boxes - and the sun striking the rifles of the accompanying sailors. It was really impressive. Our faluccas were sent for them, and a large native gyassa pressed into service - and they are now safely stowed on deck - the smaller things below. Dr. <persName ref=>Weideman</persName> and his wife and <persName ref="#Sayce_Archibald">Mr. Sayce</persName> dined with us.</p>
+        <p>I had my quiet little church today - about 4 o'clock as we were waiting for tea, on deck, we saw coming across the distant sands the procession of the treasures of the tomb on its way to us - <persName ref="#Weigall_Arthur">Weigall</persName> and <persName ref="#Ayrton_Edward">Ayrton</persName> on horses led the way, and a long procession of Arabs following carrying the boxes - and the sun striking the rifles of the accompanying sailors. It was really impressive. Our faluccas were sent for them, and a large native gyassa pressed into service - and they are now safely stowed on deck - the smaller things below. Dr. <persName ref="#Wiedemann_Alfred">Weideman</persName> and his wife and <persName ref="#Sayce_Archibald">Mr. Sayce</persName> dined with us.</p>
       </div>
-<!-- "Mr. Weideman" -->
       <div xml:id="EBA-1907-01-28" type="entry">
         <dateline><date when="1907-01-28">Monday, Jan. 28.</date></dateline>
         <p>A lovely warm day - <persName ref="#Davis_Theodore_M">Theo</persName> in the <placeName ref="#Valley_of_the_Kings">Valley.</placeName> He says everything that is to be moved is out of the tomb. The ashes and bones of the Queen have been reverently gathered and put into a box - and left there - and the tomb is to be hermetically sealed. <persName ref="#Erskine_David">Mr. Erskine</persName> dined with us.</p>
@@ -455,8 +447,7 @@
       </div>
       <div xml:id="EBA-1907-02-05" type="entry">
         <dateline><date when="1907-02-05">Tuesday, Feb. 5.</date></dateline>
-        <p><persName ref="#Ayrton_Edward">Ayrton</persName> to lunch - the <personGrp ref=>Wiedemans</personGrp> and <persName ref="#Harte">Harte</persName> to tea.</p>
-<!-- "Wiedemans" -->
+        <p><persName ref="#Ayrton_Edward">Ayrton</persName> to lunch - the <personGrp ref="#Wiedemann">Wiedemans</personGrp> and <persName ref="#Harte">Harte</persName> to tea.</p>
 <!-- New person: Harte -->
       </div>
       <div xml:id="EBA-1907-02-06" type="entry">
@@ -550,7 +541,7 @@
         <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Buttles_Jeanette">Nettie</persName> went to <placeName ref="#Der_el_Medinet">Der el Medinet</placeName> this afternoon. <persName ref="#Trefusis_Robert">Robert Trefusis</persName> arrived unexpectedly. <persName ref="#Osborn_Fairfield">Prof. Fairfield Osborn,</persName> his son, and <persName ref="#Wendell_Mrs">Mrs. Evert Jansen Wendell</persName> came - having sent on their letters of introduction <pb n="31"/> from <persName ref="#Parsons_Mrs">Mrs. Parsons</persName> and <persName ref="Buttles_Mary">Mary,</persName> some days before their arrival.</p>
       </div>
 <!-- New person: Prof. Fairfield Osborn, Mrs. Wendell, Mrs. Parsons -->
-<!-- Mary is Marry Buttles, right? -->
+<!-- Mary is Mary Buttles, right? -->
       <div xml:id="EBA-1907-02-24" type="entry">
         <dateline><date when="1907-02-24"Second Sunday in Lent. Feb. 24.</date></dateline>
         <p>Such a busy day - and such a tiresome afternoon. The very nice <personGrp ref="Osborn">Osborns,</orgName> son and <persName ref="#Wendell_Mr">Mr. Wendell</persName> came at 11 A.M. to be shown the treasures - enraptured with them. <persName ref="#Dalison_Max">Dalison</persName> and <persName ref="#Trefusis_Robert">Robert</persName> to lunch. At 3 o'clock a farewell visit from <personGrp ref="#Naville">M. and Mme. Naville,</personGrp> and <personGrp ref="#Fatio">M. and Mme. Fatio</personGrp> - also from <persName ref="#Henckel_Countess">Countess Henckel</persName> and <persName ref="#Hahn_Countess">Countess Hahn</persName> - <persName ref="#Legrain_M"> Mr. Le Grain</persName> and his wife had been formally asked to tea some days ago and <persName ref="#Weigall_Arthur">Mr. Weigall</persName> had written last evening asking if he might bring <personGrp ref="#Carnarvon">Lord and Lady Carnarvon,</personGrp> and <persName ref=>Mrs. Loring</persName> and her friend of <placeName ref=>Boston</placeName> to see the find, <persName ref=>Dr. Johnson</persName> belonging to the <orgName>Carnarvons.</orgName> These latter I thought simply intolerable. But it was tiresome! The nice <persName ref=>Osborns</persName> and <persName ref=>Mr. Wendell</persName> and <persName ref="#Trefusis_Robert">Robert</persName> dined here. A charming evening with charming people.</p>
