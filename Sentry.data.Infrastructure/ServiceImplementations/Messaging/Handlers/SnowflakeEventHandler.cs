@@ -48,6 +48,7 @@ namespace Sentry.data.Infrastructure
                         de = _dsContext.GetById<FileSchema>(snowRequestedEvent.SchemaID);
                         de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Requested.ToString();
                         _dsContext.SaveChanges();
+                        Logger.Info($"snowflakeeventhandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     case "SNOW-TABLE-CREATE-COMPLETED":
                         SnowTableCreateModel snowCompletedEvent = JsonConvert.DeserializeObject<SnowTableCreateModel>(msg);
@@ -80,6 +81,7 @@ namespace Sentry.data.Infrastructure
                         }
 
                         _dsContext.SaveChanges();
+                        Logger.Info($"snowflakeeventhandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     case "SNOW-TABLE-DELETE-REQUESTED":
                         SnowTableDeleteModel snowDeleteEvent = JsonConvert.DeserializeObject<SnowTableDeleteModel>(msg);
@@ -87,6 +89,7 @@ namespace Sentry.data.Infrastructure
                         de = _dsContext.GetById<FileSchema>(snowDeleteEvent.SchemaID);
                         de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteRequested.ToString();
                         _dsContext.SaveChanges();
+                        Logger.Info($"snowflakeeventhandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     case "SNOW-TABLE-DELETE-COMPLETED":
                         SnowTableDeleteModel deleteCompletedEvent = JsonConvert.DeserializeObject<SnowTableDeleteModel>(msg);
@@ -115,6 +118,7 @@ namespace Sentry.data.Infrastructure
                         }
 
                         _dsContext.SaveChanges();
+                        Logger.Info($"snowflakeeventhandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     default:
                         Logger.Info($"snowflakeeventhandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");

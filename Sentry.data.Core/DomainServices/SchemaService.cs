@@ -164,6 +164,7 @@ namespace Sentry.data.Core
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
+            Logger.Info($"startmethod <{m.ReflectedType.Name.ToString()}>");
             Dataset parentDataset = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaDto.SchemaId).ParentDataset;
             IApplicationUser user = _userService.GetCurrentUser();
             UserSecurity us = _securityService.GetUserSecurity(parentDataset, user);
@@ -255,6 +256,7 @@ namespace Sentry.data.Core
                 Logger.Error($"<{m.ReflectedType.Name.ToLower()}> Failed sending downstream notifications or events", new AggregateException(exceptions));
             }
 
+            Logger.Info($"endmethod <{m.ReflectedType.Name.ToString()}>");
             return true;
             
         }
@@ -266,7 +268,8 @@ namespace Sentry.data.Core
             *  - CLA2429_SnowflakeCreateTable changes to true
             */
             if (
-                (propertyDeltaList.ContainsKey("createcurrentview") && propertyDeltaList.GetValue("createcurrentview").ToString().ToLower() == "true") ||
+                //(propertyDeltaList.ContainsKey("createcurrentview") && propertyDeltaList.GetValue("createcurrentview").ToString().ToLower() == "true") ||
+                (propertyDeltaList.ContainsKey("createcurrentview")) ||
                 (propertyDeltaList.ContainsKey("cla2429_snowflakecreatetable") && propertyDeltaList.GetValue("cla2429_snowflakecreatetable").ToString().ToLower() == "true")
                 )
             {
@@ -277,11 +280,11 @@ namespace Sentry.data.Core
              *  - CLA2429_SnowflakeCreateTable changes to false
              */
             if (
-                (propertyDeltaList.ContainsKey("createcurrentview") && propertyDeltaList.GetValue("createcurrentview").ToString() == "false") ||
+                //(propertyDeltaList.ContainsKey("createcurrentview") && propertyDeltaList.GetValue("createcurrentview").ToString() == "false") ||
                 (propertyDeltaList.ContainsKey("cla2429_snowflakecreatetable") && propertyDeltaList.GetValue("cla2429_snowflakecreatetable").ToString() == "false")
                 )
             {
-                GenerateConsumptionLayerDeleteEvent(schema);
+                GenerateConsumptionLayerDeleteEvent(schema, propertyDeltaList);
             }
         }
 
@@ -311,8 +314,8 @@ namespace Sentry.data.Core
             {
                 sendHiveMessage = true;
             }
-            /* schema configuration trigger for createCurrentView */
-            else if (propertyDeltaList.ContainsKey("createcurrentview") && propertyDeltaList.GetValue("createcurrentview").ToString().ToLower() == "true")
+            /* schema configuration trigger for createCurrentView regardless true\false */
+            else if (propertyDeltaList.ContainsKey("createcurrentview"))
             {
                 sendHiveMessage = true;
             }
@@ -344,7 +347,8 @@ namespace Sentry.data.Core
             {
                 sendSnowMessage = true;
             }
-            else if (propertyDeltaList.ContainsKey("createcurrentview") && propertyDeltaList.GetValue("createcurrentview").ToString().ToLower() == "true" && schema.CLA2429_SnowflakeCreateTable)
+            /* schema configuration trigger for createCurrentView regardless true\false */
+            else if (propertyDeltaList.ContainsKey("createcurrentview") && schema.CLA2429_SnowflakeCreateTable)
             {
                 sendSnowMessage = true;
             }
@@ -366,12 +370,16 @@ namespace Sentry.data.Core
             }       
         }
 
-        private void GenerateConsumptionLayerDeleteEvent(FileSchema schema)
+        private void GenerateConsumptionLayerDeleteEvent(FileSchema schema, JObject propertyDeltaList)
         {
             //Do nothing if there is no revision associated with schema 
             if (!_datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schema.SchemaId).Any()) { return; }
 
             Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
+
+
+
+
 
             SnowTableDeleteModel snowModel = new SnowTableDeleteModel()
             {
@@ -985,9 +993,9 @@ namespace Sentry.data.Core
                 {
                     bodySb.Append($"<p>Thank you from your friendly data.sentry.com Administration team</p>");
 
-                    Logger.Debug($"<{m.ReflectedType.Name.ToLower()}> Sending email to {Configuration.Config.GetHostSetting("SASAdministrationEmail")} and including CCs ({ccEmailList})");
+                    Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Sending email to {Configuration.Config.GetHostSetting("SASAdministrationEmail")} and including CCs ({ccEmailList})");
                     _emailService.SendGenericEmail(Configuration.Config.GetHostSetting("SASAdministrationEmail"), subject, bodySb.ToString(), ccEmailList);
-
+                    Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Email sent");
                 }
                 else
                 {
@@ -1033,31 +1041,30 @@ namespace Sentry.data.Core
             {
                 //Addition of all schema views to SAS0
                 case "ADD":
-                    Logger.Debug($"Configuring SAS Notification to ADD all view(s)");
                     subject = $"Library Add Request to {libraryName}";
-                    bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be added to {libraryName}:</p>");
+                    bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be <strong style=\"color:#008000;\">ADDED</strong> to {libraryName}:</p>");
                     bodySb.AppendLine($"<p>- {viewName}</p>");
                     //Include current view if checked
                     if (systemIndicator != "SNOWFLAKE" && (currentViewNotificationType == "ADD" || schema.CreateCurrentView))
                     {
                         bodySb.AppendLine($"<p>- {viewName}_cur</p>");
                     }
+                    Logger.Debug($"Configuring SAS Notification to ADD all view(s)  {bodySb.ToString()}");
                     break;
                 //Removal of all schema views from SAS
                 case "REMOVE":
-                    Logger.Debug($"Configuring SAS Notification to REMOVE all view(s)");
                     subject = $"Library Remove Request from {libraryName}";
-                    bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be removed from {libraryName}:</p>");
+                    bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be <strong style=\"color:#FF0000;\">REMOVED</strong> from {libraryName}:</p>");
                     bodySb.AppendLine($"<p>- {viewName}</p>");
                     //if current view is being updated to unchecked or is currently checked, ensure it is removed from SAS
                     if (systemIndicator != "SNOWFLAKE" && (currentViewNotificationType.ToUpper() == "REMOVE" || schema.CreateCurrentView))
                     {
                         bodySb.AppendLine($"<p>- {viewName}_cur</p>");
                     }
+                    Logger.Debug($"Configuring SAS Notification to REMOVE all view(s)  {bodySb.ToString()}");
                     break;
                 //Update of all SAS libraries
                 case "UPDATE":
-                    Logger.Debug($"Configuring SAS Notification to UDPATE all view(s)");
                     subject = $"Library Refresh Request from {libraryName}";
                     bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be updated in {libraryName}:</p>");
                     bodySb.AppendLine($"<p>- {viewName}</p>");
@@ -1065,6 +1072,7 @@ namespace Sentry.data.Core
                     {
                         bodySb.AppendLine($"<p>- {viewName}_cur</p>");
                     }
+                    Logger.Debug($"Configuring SAS Notification to UDPATE all view(s)  {bodySb.ToString()}");
                     break;
                 //Current View propery can be changed independently of IsInSAS property
                 //  Ensure notification is sent for current view propery changes if IsInSAS is checked
@@ -1073,15 +1081,17 @@ namespace Sentry.data.Core
                     {
                         Logger.Debug($"Configuring SAS Notification to ADD current view");
                         subject = $"Library Add Request from {libraryName}";
-                        bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be added to {libraryName}:</p>");
+                        bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be <strong style=\"color:#008000;\">ADDED</strong> to {libraryName}:</p>");
                         bodySb.AppendLine($"<p>- {viewName}_cur</p>");
+                        Logger.Debug($"Configuring SAS Notification to ADD current view  {bodySb.ToString()}");
                     }
                     else if (schema.IsInSAS && currentViewNotificationType.ToUpper() == "REMOVE")
                     {
                         Logger.Debug($"Configuring SAS Notification to REMOVE current view");
                         subject = $"Library Remove Request from {libraryName}";
-                        bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be removed from {libraryName}:</p>");
+                        bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be <strong style=\"color:#FF0000;\">REMOVED</strong> from {libraryName}:</p>");
                         bodySb.AppendLine($"<p>- {viewName}_cur</p>");
+                        Logger.Debug($"Configuring SAS Notification to REMOVE current view  {bodySb.ToString()}");
                     }
                     break;
             }
