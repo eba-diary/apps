@@ -1063,7 +1063,7 @@ namespace Sentry.data.Web.Controllers
                     {
                         line.Append(",");
                     }
-                    line.Append(alias).Append(field.Name).Append("::VARCHAR(1000) AS ").Append(field.Name).Append(Environment.NewLine);
+                    line.Append(alias).Append(field.Name).Append(DelroyCastMonster(field) + Environment.NewLine);
                     columnExists = true;
                 }
                 else if(!field.IsArray)
@@ -1075,6 +1075,25 @@ namespace Sentry.data.Web.Controllers
             }
             return line.ToString();
         }
+
+
+        //CAST Each column to its native datatype
+        private string DelroyCastMonster(Models.ApiModels.Schema.SchemaFieldModel field)
+        {
+            string cast = "::" + field.FieldType;
+
+            if(field.FieldType.ToUpper() == "DECIMAL")
+            {
+                cast += "(" + field.Precision.ToString() + "," + field.Scale.ToString() + ") ";
+            }
+            else if(field.FieldType.ToUpper() == "VARCHAR")
+            {
+                cast +="(" + field.Length.ToString() + ") ";
+            }
+
+            return cast;
+        }
+
 
         //Set initial alias of query:
         //RULE: find the nearest ARRAY STRUCT and make that the initial ALIAS followed by all non ARRAY STRUCTS
@@ -1123,6 +1142,8 @@ namespace Sentry.data.Web.Controllers
             }
             return alias.ToString();
         }
+
+       
 
 
         //CREATE FROM STATEMENT FOR SNOWFLAKE
