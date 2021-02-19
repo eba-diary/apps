@@ -36,7 +36,7 @@ namespace Sentry.data.Core
                 {
                     case "HIVE-TABLE-CREATE-COMPLETED":
                         HiveTableCreateModel hiveCreatedEvent = JsonConvert.DeserializeObject<HiveTableCreateModel>(msg);
-                        Logger.Info("HiveMetadataHandler processing HIVE-TABLE-CREATE-COMPLETED message: " + JsonConvert.SerializeObject(hiveCreatedEvent));
+                        Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(hiveCreatedEvent)}");
 
                         switch (hiveCreatedEvent.HiveStatus.ToUpper())
                         {
@@ -69,6 +69,7 @@ namespace Sentry.data.Core
 
                         _dsContext.Merge(de);
                         _dsContext.SaveChanges();
+                        Logger.Info($"HiveMetadataHandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     case "HIVE-TABLE-CREATE-REQUESTED":
                         HiveTableCreateModel hiveReqeustedEvent = JsonConvert.DeserializeObject<HiveTableCreateModel>(msg);
@@ -79,6 +80,7 @@ namespace Sentry.data.Core
 
                         _dsContext.Merge(de);
                         _dsContext.SaveChanges();
+                        Logger.Info($"HiveMetadataHandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     case "HIVE-TABLE-DELETE-REQUESTED":
                         HiveTableDeleteModel deleteEvent = JsonConvert.DeserializeObject<HiveTableDeleteModel>(msg);
@@ -87,6 +89,7 @@ namespace Sentry.data.Core
                         de = _dsContext.GetById<FileSchema>(deleteEvent.SchemaID);
                         de.HiveTableStatus = ConsumptionLayerTableStatusEnum.DeleteRequested.ToString();
                         _dsContext.SaveChanges();
+                        Logger.Info($"HiveMetadataHandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     case "HIVE-TABLE-DELETE-COMPLETED":
                         HiveTableDeleteModel deleteCompletedEvent = JsonConvert.DeserializeObject<HiveTableDeleteModel>(msg);
@@ -116,7 +119,7 @@ namespace Sentry.data.Core
                         }
 
                         _dsContext.SaveChanges();
-
+                        Logger.Info($"HiveMetadataHandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     default:
                         Logger.Info($"HiveMetadataHandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");
