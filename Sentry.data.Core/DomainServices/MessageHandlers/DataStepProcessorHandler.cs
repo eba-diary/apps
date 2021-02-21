@@ -26,6 +26,7 @@ namespace Sentry.data.Core
             {
                 if (baseEvent.EventType.ToUpper().StartsWith("DATAFLOWSTEP"))
                 {
+                    //TODO: Add feature flag filtering around specific DATAFLOWSTEP events
                     DataFlowStepEvent stepEvent = JsonConvert.DeserializeObject<DataFlowStepEvent>(msg);
                     Logger.Info("DataStepProcessorHandler processing DATAFLOWSTEP message: " + JsonConvert.SerializeObject(stepEvent));
                     Task.Factory.StartNew(() => _dataFlowProvider.ExecuteStep(stepEvent),
