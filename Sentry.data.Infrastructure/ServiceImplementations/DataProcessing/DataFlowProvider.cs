@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
@@ -40,10 +39,9 @@ namespace Sentry.data.Infrastructure
             set { _metricData = value; }
         }
 
-
-        public async Task ExecuteDependenciesAsync(S3ObjectEvent s3e)
+        public void ExecuteDependencies(string bucket, string key, S3ObjectEvent s3Event)
         {
-            await ExecuteDependenciesAsync(s3e.s3.bucket.name, s3e.s3.Object.key, s3e);
+            throw new NotImplementedException();
         }
         public async Task ExecuteDependenciesAsync(string bucket, string key, S3ObjectEvent s3Event)
         {
@@ -112,7 +110,7 @@ namespace Sentry.data.Infrastructure
                                 //step.Executions.Add(step.LogExecution(flowExecutionGuid, $"Initialize flow execution bucket:{bucket}, key:{key}, file:{Path.GetFileName(key)}", Log_Level.Info));
                             }
 
-                            _stepService.PublishStartEvent(step, flowExecutionGuid, runInstanceGuid, s3Event);
+                            await _stepService.PublishStartEventAsync(step, flowExecutionGuid, runInstanceGuid, s3Event).ConfigureAwait(false);
                         }
 
                         _flow.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <executedependencies>", Log_Level.Info);
@@ -142,7 +140,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public async Task ExecuteStep(DataFlowStepEvent stepEvent)
+        public async Task ExecuteStepAsync(DataFlowStepEvent stepEvent)
         {
             try
             {
@@ -160,7 +158,7 @@ namespace Sentry.data.Infrastructure
                         Logger.AddContextVariable(new TextVariable("runinstanceguid", stepEvent.RunInstanceGuid));
                     }
 
-                    stepService.ExecuteStep(stepEvent);
+                    await stepService.ExecuteStepAsync(stepEvent).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)

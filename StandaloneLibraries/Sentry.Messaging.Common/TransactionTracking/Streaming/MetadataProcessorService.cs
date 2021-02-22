@@ -44,7 +44,16 @@ namespace Sentry.Messaging.Common
 
         protected override void _consumer_MessageReady(object sender, string msg)
         {
-            Parallel.ForEach(_handlers, (h) => h.Handle(msg));
+            List<Task> TaskList = new List<Task>();
+
+            foreach (var handler in _handlers)
+            {
+                TaskList.Add(handler.HandleAsync(msg));
+            }
+
+            Task.WaitAll(TaskList.ToArray());
+
+            //Parallel.ForEach(_handlers, (h) => h.Handle(msg));
         }
 
         public MetadataProcessorService(IMessageConsumer<string> consumer,

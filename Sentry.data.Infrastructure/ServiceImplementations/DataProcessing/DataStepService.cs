@@ -5,13 +5,20 @@ using Sentry.data.Core.Interfaces.DataProcessing;
 using StructureMap;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
 {
     public class DataStepService : IDataStepService
     {
         private IBaseActionProvider _provider;
+
         public void ExecuteStep(DataFlowStepEvent stepEvent)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task ExecuteStepAsync(DataFlowStepEvent stepEvent)
         {
             using(IContainer container = Bootstrapper.Container.GetNestedContainer())
             {
@@ -21,7 +28,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
 
                 SetStepProvider(step.DataAction_Type_Id, container);
 
-                _provider.ExecuteAction(step, stepEvent);
+                await _provider.ExecuteActionAsync(step, stepEvent).ConfigureAwait(false);
 
                 dsContext.SaveChanges();
 
@@ -30,6 +37,11 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
         }
 
         public void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task PublishStartEventAsync(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
             using (IContainer container = Bootstrapper.Container.GetNestedContainer())
             {
@@ -43,7 +55,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
                     if (_provider != null)
                     {
                         step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <datastepservice-publishstartevent>", Log_Level.Debug);
-                        _provider.PublishStartEvent(step, flowExecutionGuid, runInstanceGuid, s3Event);
+                        await _provider.PublishStartEventAsync(step, flowExecutionGuid, runInstanceGuid, s3Event).ConfigureAwait(false);
                         step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <datastepservice-publishstartevent>", Log_Level.Debug);
                     }
                     else
