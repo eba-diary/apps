@@ -5,6 +5,7 @@ using Sentry.Messaging.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ConsumerTesting
 {
@@ -73,6 +74,10 @@ namespace ConsumerTesting
 
         }
 
+        public async Task HandleAsync(string msg)
+        {
+            throw new NotImplementedException();
+        }
         public void Handle(string msg)
         {
             using (var Container = Bootstrapper.Container.GetNestedContainer())
@@ -102,6 +107,11 @@ namespace ConsumerTesting
         #region Constructor
         public ConsoleWriteHandler() { }
         #endregion
+
+        public async Task HandleAsync(string msg)
+        {
+            throw new NotImplementedException();
+        }
 
         void IMessageHandler<string>.Handle(string msg)
         {
