@@ -116,7 +116,6 @@
     <Compile Include="TransactionTracking\Interfaces\ITrackableMessage.cs" />
     <Compile Include="TransactionTracking\MessageTrackingCodes.cs" />
     <Compile Include="TransactionTracking\Streaming\MessageTransactionKafkaConsumer.cs" />
-    <Compile Include="TransactionTracking\Streaming\MetadataProcessorService.cs" />
     <Compile Include="TransactionTracking\Streaming\TransactionConsumptionService.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
