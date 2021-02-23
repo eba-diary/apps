@@ -22,6 +22,8 @@ namespace Sentry.data.Infrastructure
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IDataFeatures _featureFlags;
+        private readonly Lazy<IDatasetContext> _datasetContext;
+        private readonly Lazy<ISchemaService> _schemaService;
         private JObject _metricData;
 
         public JObject MetricData
@@ -40,12 +42,25 @@ namespace Sentry.data.Infrastructure
         }
 
         public ConvertToParquetProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, 
-            IDataFlowService dataFlowService, IDataFeatures dataFeatures) : base(dataFlowService)
+            IDataFlowService dataFlowService, IDataFeatures dataFeatures, Lazy<IDatasetContext> datasetContext,
+            Lazy<ISchemaService> schemaService) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
             _featureFlags = dataFeatures;
+            _datasetContext = datasetContext;
+            _schemaService = schemaService;
         }
+
+        public IDatasetContext DatasetContext
+        {
+            get { return _datasetContext.Value; }
+        }
+        public ISchemaService SchemaService
+        {
+            get { return _schemaService.Value; }
+        }
+
 
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
@@ -161,16 +176,10 @@ namespace Sentry.data.Infrastructure
                 Dataset _dataset;
 
                 //Get StorageCode and FileSchema
-                using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                {
-                    ISchemaService schemaService = container.GetInstance<ISchemaService>();
-                    IDatasetContext datasetContext = container.GetInstance<IDatasetContext>();
-
-                    storageCode = GetStorageCode(objectKey);
-                    schema = schemaService.GetFileSchemaByStorageCode(storageCode);
-                    _dataset = datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).FirstOrDefault().ParentDataset;
-                }
-
+                storageCode = GetStorageCode(objectKey);
+                schema = SchemaService.GetFileSchemaByStorageCode(storageCode);
+                _dataset = DatasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).FirstOrDefault().ParentDataset;
+                
                 //Convert FlowExecutionGuid to DateTime, then to local time
                 DateTime flowGuidDTM = DataFlowHelpers.ConvertFlowGuidToDateTime(flowExecutionGuid).ToLocalTime();
 

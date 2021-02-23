@@ -21,15 +21,13 @@ namespace Sentry.data.Infrastructure
     {
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
-        private readonly IDatasetContext _datasetContext;
 
         public S3DropProvider(IMessagePublisher messagePublisher, 
-            IS3ServiceProvider s3ServiceProvider, IDatasetContext datasetContext,
+            IS3ServiceProvider s3ServiceProvider,
             IDataFlowService dataFlowService) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
-            _datasetContext = datasetContext;
         }
 
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)

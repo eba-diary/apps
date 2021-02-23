@@ -19,14 +19,12 @@ namespace Sentry.data.Infrastructure
     {
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
-        private readonly IDataFeatures _featureFlags;
         private DataFlowStep _step;
 
-        public UncompressGzipProvider(IMessagePublisher messagePublisher, IDataFeatures dataFeatures,
+        public UncompressGzipProvider(IMessagePublisher messagePublisher,
             IDataFlowService dataFlowService, IS3ServiceProvider s3ServiceProvider) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
-            _featureFlags = dataFeatures;
             _s3ServiceProvider = s3ServiceProvider;
         }
 

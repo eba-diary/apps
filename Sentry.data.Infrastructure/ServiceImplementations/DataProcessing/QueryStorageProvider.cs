@@ -21,17 +21,32 @@ namespace Sentry.data.Infrastructure
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IDataFlowService _dataFlowService;
+        private readonly Lazy<IDatasetContext> _datasetContext;
+        private readonly Lazy<ISchemaService> _schemaService;
         private DataFlowStep _step;
         private string _flowGuid;
         private string _runInstGuid;
 
         public QueryStorageProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider,
-            IDataFlowService dataFlowService) : base(dataFlowService)
+            IDataFlowService dataFlowService, Lazy<IDatasetContext> datasetContext,
+            Lazy<ISchemaService> schemaService) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
             _dataFlowService = dataFlowService;
+            _datasetContext = datasetContext;
+            _schemaService = schemaService;
         }
+
+        public IDatasetContext DatasetContext
+        {
+            get { return _datasetContext.Value; }
+        }
+        public ISchemaService SchemaService
+        {
+            get { return _schemaService.Value; }
+        }
+
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
             throw new NotImplementedException();
@@ -185,15 +200,9 @@ namespace Sentry.data.Infrastructure
                 _step.LogExecution(_flowGuid, _runInstGuid, MetricData, Log_Level.Debug);
 
                 //Get StorageCode and FileSchema
-                using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                {
-                    ISchemaService schemaService = container.GetInstance<ISchemaService>();
-                    IDatasetContext datasetContext = container.GetInstance<IDatasetContext>();
-
-                    schemaStorageCode = _dataFlowService.GetSchemaStorageCodeForDataFlow(step.DataFlow.Id);
-                    schema = schemaService.GetFileSchemaByStorageCode(schemaStorageCode);
-                    _dataset = datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).FirstOrDefault().ParentDataset;
-                }
+                schemaStorageCode = _dataFlowService.GetSchemaStorageCodeForDataFlow(step.DataFlow.Id);
+                schema = SchemaService.GetFileSchemaByStorageCode(schemaStorageCode);
+                _dataset = DatasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).FirstOrDefault().ParentDataset;
 
                 //Convert FlowExecutionGuid to DateTime, then to local time
                 DateTime flowGuidDTM = DataFlowHelpers.ConvertFlowGuidToDateTime(_flowGuid).ToLocalTime();

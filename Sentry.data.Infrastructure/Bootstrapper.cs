@@ -7,6 +7,7 @@ using NHibernate.Cfg;
 using Sentry.data.Infrastructure.Mappings.Primary;
 using System.Net.Http;
 using Sentry.data.Core.Interfaces.SAIDRestClient;
+using Sentry.Messaging.Common;
 
 namespace Sentry.data.Infrastructure
 {
@@ -80,6 +81,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IMetadataRepositoryProvider>().Use(() => new MetadataRepositoryProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IODCFileProvider>().Use(() => new ODCFileProvider(_defaultSessionFactory.OpenSession()));
             registry.For<IRequestContext>().Use(() => new RequestContext(_defaultSessionFactory.OpenSession()));
+            //Register other services
             registry.For<IBaseJobProvider>().AddInstances(x =>
             {
                 x.Type<GenericHttpsProvider>().Named(GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE);
@@ -88,7 +90,14 @@ namespace Sentry.data.Infrastructure
                 x.Type<FtpDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.FTP_DATAFLOW_SOURCE);
                 x.Type<GoogleAPIDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
             });
-            //Register other services
+
+            //Register event handlers for MetadataProcessorService
+            registry.For<IMessageHandler<string>>().Add<S3EventService>();
+            registry.For<IMessageHandler<string>>().Add<HiveMetadataService>();
+            registry.For<IMessageHandler<string>>().Add<DataStepProcessorService>();
+            registry.For<IMessageHandler<string>>().Add<DfsEventService>();
+            registry.For<IMessageHandler<string>>().Add<SnowflakeEventService>();
+
             Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();
             obsidianUserProvider.CacheTimeoutSeconds = int.Parse(Sentry.Configuration.Config.GetHostSetting("ObsidianUserCacheTimeoutMinutes")) * 60;
             registry.For<Sentry.Web.CachedObsidianUserProvider.IObsidianUserProvider>().Singleton().Use(obsidianUserProvider);

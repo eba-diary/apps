@@ -17,6 +17,14 @@ namespace Sentry.data.Infrastructure
 {
     public class DataFlowProvider : IDataFlowProvider
     {
+        private readonly IDataStepService _dataStepService;
+        private readonly IDatasetContext _datasetContext;
+
+        public DataFlowProvider(IDataStepService dataStepService, IDatasetContext datasetContext)
+        {
+            _dataStepService = dataStepService;
+            _datasetContext = datasetContext;
+        }
 
         private List<EventMetric> logs = new List<EventMetric>();
         private DataFlow _flow;
@@ -47,119 +55,106 @@ namespace Sentry.data.Infrastructure
         {
             bool IsNewFile = false;
 
-            using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+            Logger.Info($"start-method <executedependencies>");
+            Logger.Debug($"<executedependencies> bucket:{bucket} key:{key} s3Event:{JsonConvert.SerializeObject(s3Event)}");
+            //Get prefix
+            string stepPrefix = GetDataFlowStepPrefix(bucket, key);
+            if (stepPrefix != null)
             {
-                IDatasetContext dsContext = container.GetInstance<IDatasetContext>();
-                IDataStepService _stepService = container.GetInstance<IDataStepService>();
-
-                Logger.Info($"start-method <executedependencies>");
-                Logger.Debug($"<executedependencies> bucket:{bucket} key:{key} s3Event:{JsonConvert.SerializeObject(s3Event)}");
-                //Get prefix
-                string stepPrefix = GetDataFlowStepPrefix(bucket, key);
-                if (stepPrefix != null)
+                try
                 {
-                    try
+                    //Find DataFlow step which should be started based on step trigger prefix
+                    List<DataFlowStep> stepList = _datasetContext.DataFlowStep.Where(w => w.TriggerKey == stepPrefix).ToList();
+
+                    _flow = stepList.Select(s => s.DataFlow).Distinct().Single();
+
+                    //determine DataFlow execution and run instance guids to ensure processing is tied.
+                    GetExecutionGuids(key);
+
+                    //establish flow execution guid if null and log data flow level initalization message
+                    if (flowExecutionGuid == null)
                     {
-                        //Find DataFlow step which should be started based on step trigger prefix
-                        List<DataFlowStep> stepList = dsContext.DataFlowStep.Where(w => w.TriggerKey == stepPrefix).ToList();
+                        flowExecutionGuid = GetNewGuid();
 
-                        _flow = stepList.Select(s => s.DataFlow).Distinct().Single();
+                        IsNewFile = true;
 
-                        //determine DataFlow execution and run instance guids to ensure processing is tied.
-                        GetExecutionGuids(key);
-
-                        //establish flow execution guid if null and log data flow level initalization message
-                        if (flowExecutionGuid == null)
-                        {
-                            flowExecutionGuid = GetNewGuid();
-
-                            IsNewFile = true;
-
-                            Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
-                        }
-                        else
-                        {
-                            Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
-                        }
-
-                        //log dependency steps
-                        LogDetectedSteps(key, stepList, flowExecutionGuid, _flow);
-
-                        //save new logs
-                        dsContext.SaveChanges();
-
-                        //Generate Start Events
-                        foreach (DataFlowStep step in stepList)
-                        {
-                            //Generate new runinstance quid if in rerun scenario
-                            if (step.Executions.Where(w => w.FlowExecutionGuid == flowExecutionGuid).Any() && runInstanceGuid == null)
-                            {
-                                runInstanceGuid = GetNewGuid();
-                            }
-
-                            if (runInstanceGuid != null)
-                            {
-                                Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
-                            }
-
-                            if (IsNewFile)
-                            {
-                                MetricData.Add("status", "C");
-                                MetricData.Add("log", $"Initialize flow execution bucket:{bucket}, key:{key}, file:{Path.GetFileName(key)}");
-                                step.Executions.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, MetricData, Log_Level.Info));
-                                //step.Executions.Add(step.LogExecution(flowExecutionGuid, $"Initialize flow execution bucket:{bucket}, key:{key}, file:{Path.GetFileName(key)}", Log_Level.Info));
-                            }
-
-                            await _stepService.PublishStartEventAsync(step, flowExecutionGuid, runInstanceGuid, s3Event).ConfigureAwait(false);
-                        }
-
-                        _flow.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <executedependencies>", Log_Level.Info);
-
-                        //save new logs
-                        dsContext.SaveChanges();
+                        Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        logs.Add(_flow.LogExecution(flowExecutionGuid, runInstanceGuid, $"dataflowprovider-ExecuteDependenciesAsync-failed", Log_Level.Error, ex));
+                        Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
+                    }
 
-                        _flow.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <executedependencies>", Log_Level.Info);
+                    //log dependency steps
+                    LogDetectedSteps(key, stepList, flowExecutionGuid, _flow);
 
-                        foreach (var log in logs)
+                    //save new logs
+                    _datasetContext.SaveChanges();
+
+                    //Generate Start Events
+                    foreach (DataFlowStep step in stepList)
+                    {
+                        //Generate new runinstance quid if in rerun scenario
+                        if (step.Executions.Any(w => w.FlowExecutionGuid == flowExecutionGuid) && runInstanceGuid == null)
                         {
-                            _flow.Logs.Add(log);
+                            runInstanceGuid = GetNewGuid();
                         }
 
-                        dsContext.SaveChanges();
-                    }                    
+                        if (runInstanceGuid != null)
+                        {
+                            Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
+                        }
+
+                        if (IsNewFile)
+                        {
+                            MetricData.Add("status", "C");
+                            MetricData.Add("log", $"Initialize flow execution bucket:{bucket}, key:{key}, file:{Path.GetFileName(key)}");
+                            step.Executions.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, MetricData, Log_Level.Info));
+                        }
+
+                        await _dataStepService.PublishStartEventAsync(step, flowExecutionGuid, runInstanceGuid, s3Event).ConfigureAwait(false);
+                    }
+
+                    _flow.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <executedependencies>", Log_Level.Info);
+
+                    //save new logs
+                    _datasetContext.SaveChanges();
                 }
-                else
+                catch (Exception ex)
                 {
-                    Logger.Info($"executedependencies - invalidstepprefix bucket: {bucket} key:{key}");
-                    Logger.Info($"end-method <executedependencies>");
-                }                
+                    logs.Add(_flow.LogExecution(flowExecutionGuid, runInstanceGuid, $"dataflowprovider-ExecuteDependenciesAsync-failed", Log_Level.Error, ex));
+
+                    _flow.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <executedependencies>", Log_Level.Info);
+
+                    foreach (var log in logs)
+                    {
+                        _flow.Logs.Add(log);
+                    }
+
+                    _datasetContext.SaveChanges();
+                }                    
             }
+            else
+            {
+                Logger.Info($"executedependencies - invalidstepprefix bucket: {bucket} key:{key}");
+                Logger.Info($"end-method <executedependencies>");
+            }     
         }
 
         public async Task ExecuteStepAsync(DataFlowStepEvent stepEvent)
         {
             try
-            {
-                using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+            {                
+                Logger.AddContextVariable(new TextVariable("flowexecutionguid", stepEvent.FlowExecutionGuid));
+
+                S3ObjectEvent s3Event = JsonConvert.DeserializeObject<S3ObjectEvent>(stepEvent.OriginalS3Event);
+                Logger.AddContextVariable(new LongVariable("objectsize", s3Event.s3.Object.size));
+                if (stepEvent.RunInstanceGuid != null)
                 {
-                    IDataStepService stepService = container.GetInstance<IDataStepService>();
-
-                    //GetExecutionGuids(stepEvent.SourceKey);
-                    Logger.AddContextVariable(new TextVariable("flowexecutionguid", stepEvent.FlowExecutionGuid));
-
-                    S3ObjectEvent s3Event = JsonConvert.DeserializeObject<S3ObjectEvent>(stepEvent.OriginalS3Event);
-                    Logger.AddContextVariable(new LongVariable("objectsize", s3Event.s3.Object.size));
-                    if (stepEvent.RunInstanceGuid != null)
-                    {
-                        Logger.AddContextVariable(new TextVariable("runinstanceguid", stepEvent.RunInstanceGuid));
-                    }
-
-                    await stepService.ExecuteStepAsync(stepEvent).ConfigureAwait(false);
+                    Logger.AddContextVariable(new TextVariable("runinstanceguid", stepEvent.RunInstanceGuid));
                 }
+
+                await _dataStepService.ExecuteStepAsync(stepEvent).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

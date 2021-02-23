@@ -28,7 +28,7 @@ namespace ConsumerTesting
 
             consumer = GetKafkamessageConsumer(Config.GetHostSetting("MetadataProcessorConsumerGroup"));
 
-            Sentry.Messaging.Common.MetadataProcessorService service = new Sentry.Messaging.Common.MetadataProcessorService(consumer, GetMessageHandlers(), cfg);
+            MetadataProcessorProvider service = new MetadataProcessorProvider(consumer, GetMessageHandlers(), cfg);
             service.ConsumeMessages();
 
             Logger.Info("Console App completed successfully.");

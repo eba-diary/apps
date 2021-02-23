@@ -1,14 +1,12 @@
-﻿using System;
+﻿using Sentry.Common.Logging;
+using Sentry.Messaging.Common;
+using StructureMap;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Sentry.Common.Logging;
 
-namespace Sentry.Messaging.Common
+namespace Sentry.data.Infrastructure
 {
-    public class MetadataProcessorService : BaseConsumptionService<string>
+    public class MetadataProcessorProvider : BaseConsumptionService<string>
     {
         #region Declarations
         private readonly IList<IMessageHandler<string>> _handlers;
@@ -45,10 +43,14 @@ namespace Sentry.Messaging.Common
         protected override void _consumer_MessageReady(object sender, string msg)
         {
             List<Task> TaskList = new List<Task>();
-
-            foreach (var handler in _handlers)
+            using (IContainer container = Bootstrapper.Container.GetNestedContainer())
             {
-                TaskList.Add(handler.HandleAsync(msg));
+                IList<IMessageHandler<string>> handlerList = container.GetInstance<IList<IMessageHandler<string>>>();
+
+                foreach (var handler in handlerList)
+                {
+                    TaskList.Add(handler.HandleAsync(msg));
+                }
             }
 
             Task.WaitAll(TaskList.ToArray());
@@ -56,7 +58,7 @@ namespace Sentry.Messaging.Common
             //Parallel.ForEach(_handlers, (h) => h.Handle(msg));
         }
 
-        public MetadataProcessorService(IMessageConsumer<string> consumer,
+        public MetadataProcessorProvider(IMessageConsumer<string> consumer,
                                              IList<IMessageHandler<string>> handler,
                                              ConsumptionConfig config) : base(consumer, config)
         {
