@@ -28,6 +28,11 @@ namespace Sentry.data.Core
 
         void IMessageHandler<string>.Handle(string msg)
         {
+            throw new NotImplementedException();
+        }
+
+        async Task IMessageHandler<string>.HandleAsync(string msg)
+        {
             BaseEventMessage baseEvent = JsonConvert.DeserializeObject<BaseEventMessage>(msg);
             FileSchema de = null;            
             try

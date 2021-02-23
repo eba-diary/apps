@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Sentry.data.Infrastructure.Helpers;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
@@ -133,9 +134,34 @@ namespace Sentry.data.Infrastructure
             }            
         }
 
+        public async Task PublishAsync(string topic, string key, string value)
+        {
+            try
+            {
+                if (_producer_str_str == null)
+                {
+                    Producer p = Producer;
+                }
+
+                Logger.Info($"Publishing message - Topic:{KafkaHelper.GetDSCEventTopic()} Key:{key} Message:{value}");
+
+                await Task.Factory.StartNew(() => _producer_str_str.ProduceAsync(topic, key, value, new ProducerDeliveryHandler())).ConfigureAwait(false);
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Kafka Producer failed to send message", ex);
+            }
+        }
+
         public void PublishDSCEvent(string key, string value)
         {
             Publish(KafkaHelper.GetDSCEventTopic(), key, value);
+        }
+
+        public async Task PublishDSCEventAsync(string key, string value)
+        {
+             await PublishAsync(KafkaHelper.GetDSCEventTopic(), key, value).ConfigureAwait(false);
         }
         #endregion
         

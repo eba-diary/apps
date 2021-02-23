@@ -19,10 +19,15 @@ namespace Sentry.data.Infrastructure
 
         public void Handle(string msg)
         {
+            throw new NotImplementedException();
+        }
+
+        public async Task HandleAsync(string msg)
+        {
             using (var Container = Bootstrapper.Container.GetNestedContainer())
             {
                 IMessageHandler<string> handler = Container.GetInstance<HiveMetadataHandler>();
-                handler.Handle(msg);
+                await handler.HandleAsync(msg).ConfigureAwait(false);
             }
         }
 

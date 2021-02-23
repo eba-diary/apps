@@ -5,117 +5,190 @@ using Sentry.data.Core.Interfaces.DataProcessing;
 using StructureMap;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
 {
     public class DataStepService : IDataStepService
     {
         private IBaseActionProvider _provider;
+        private readonly IDatasetContext _dsContext;
+
+        //This approach was used for providers as temporary until code is refactor into java
+        private readonly Lazy<IS3DropProvider> _s3DropProvider;
+        private readonly Lazy<IRawStorageProvider> _rawStorageProvider;
+        private readonly Lazy<IQueryStorageProvider> _queryStorageProvider;
+        private readonly Lazy<ISchemaLoadProvider> _schemaLoadProvider;
+        private readonly Lazy<IConvertToParquetProvider> _convertToParquetProvider;
+        private readonly Lazy<IUncompressZipProvider> _uncompressZipProvider;
+        private readonly Lazy<IUncompressGzipProvider> _uncompressGzipProvider;
+        private readonly Lazy<ISchemaMapProvider> _schemaMapProvider;
+        private readonly Lazy<IGoogleApiActionProvider> _googleApiActionProvider;
+        private readonly Lazy<IClaimIQActionProvider> _claimIQActionProvider;
+        private readonly Lazy<IFixedWidthProvider> _fixedWidthProvider;
+
+        public DataStepService(IDatasetContext datasetContext, Lazy<IS3DropProvider> s3DropProvider, Lazy<IRawStorageProvider> rawStorageProvider,
+            Lazy<IQueryStorageProvider> queryStorageProvider, Lazy<ISchemaLoadProvider> schemaLoadProvider, Lazy<IConvertToParquetProvider> convertToParquetProvider,
+            Lazy<IUncompressZipProvider> uncompressZipProvider, Lazy<IUncompressGzipProvider> uncompressGzipProvider, Lazy<ISchemaMapProvider> schemaMapProvider,
+            Lazy<IGoogleApiActionProvider> googleApiActionProvider, Lazy<IClaimIQActionProvider> claimIQActionProvider, Lazy<IFixedWidthProvider> fixedWidthProvider)
+        {
+            _dsContext = datasetContext;
+            _s3DropProvider = s3DropProvider;
+            _rawStorageProvider = rawStorageProvider;
+            _queryStorageProvider = queryStorageProvider;
+            _schemaLoadProvider = schemaLoadProvider;
+            _convertToParquetProvider = convertToParquetProvider;
+            _uncompressZipProvider = uncompressZipProvider;
+            _uncompressGzipProvider = uncompressGzipProvider;
+            _schemaMapProvider = schemaMapProvider;
+            _googleApiActionProvider = googleApiActionProvider;
+            _claimIQActionProvider = claimIQActionProvider;
+            _fixedWidthProvider = fixedWidthProvider;
+        }
+
+        #region Provider Properties
+        public IS3DropProvider S3DropProvider
+        {
+            get { return _s3DropProvider.Value; }
+        }
+        public IRawStorageProvider RawStorageProvider
+        {
+            get { return _rawStorageProvider.Value; }
+        }
+
+        public IQueryStorageProvider QueryStorageProvider
+        {
+            get { return _queryStorageProvider.Value; }
+        }
+
+        public ISchemaLoadProvider SchemaLoadProvider
+        {
+            get { return _schemaLoadProvider.Value; }
+        }
+
+        public IConvertToParquetProvider ConvertToParquetProvider
+        {
+            get { return _convertToParquetProvider.Value; }
+        }
+
+        public IUncompressZipProvider UncompressZipProvider
+        {
+            get { return _uncompressZipProvider.Value; }
+        }
+
+        public IUncompressGzipProvider UncompressGzipProvider
+        {
+            get { return _uncompressGzipProvider.Value; }
+        }
+
+        public ISchemaMapProvider SchemaMapProvider
+        {
+            get { return _schemaMapProvider.Value; }
+        }
+
+        public IGoogleApiActionProvider GoogleApiActionProvider
+        {
+            get { return _googleApiActionProvider.Value; }
+        }
+
+        public IClaimIQActionProvider ClaimIQActionProvider
+        {
+            get { return _claimIQActionProvider.Value; }
+        }
+
+        public IFixedWidthProvider FixedWidthProvider
+        {
+            get { return _fixedWidthProvider.Value; }
+        }
+        #endregion
+
+
+
         public void ExecuteStep(DataFlowStepEvent stepEvent)
         {
-            using(IContainer container = Bootstrapper.Container.GetNestedContainer())
-            {
-                IDatasetContext dsContext = container.GetInstance<IDatasetContext>();
+            throw new NotImplementedException();
+        }
 
-                DataFlowStep step = dsContext.GetById<DataFlowStep>(stepEvent.StepId);
+        public async Task ExecuteStepAsync(DataFlowStepEvent stepEvent)
+        {
+            DataFlowStep step = _dsContext.GetById<DataFlowStep>(stepEvent.StepId);
 
-                SetStepProvider(step.DataAction_Type_Id, container);
+            SetStepProvider(step.DataAction_Type_Id);
 
-                _provider.ExecuteAction(step, stepEvent);
+            await _provider.ExecuteActionAsync(step, stepEvent).ConfigureAwait(false);
 
-                dsContext.SaveChanges();
-
-                //step.ProcessEvent(stepEvent, stepEvent.ExecutionGuid);
-            }
+            _dsContext.SaveChanges();
         }
 
         public void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
-            using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-            {
-                IDatasetContext _dsContext = container.GetInstance<IDatasetContext>();
+            throw new NotImplementedException();
+        }
 
-                List<EventMetric> Logs = new List<EventMetric>();
-                try
-                {                
-                    SetStepProvider(step.DataAction_Type_Id, container);
+        public async Task PublishStartEventAsync(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
+        {
+            try
+            {                
+                SetStepProvider(step.DataAction_Type_Id);
 
-                    if (_provider != null)
-                    {
-                        step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <datastepservice-publishstartevent>", Log_Level.Debug);
-                        _provider.PublishStartEvent(step, flowExecutionGuid, runInstanceGuid, s3Event);
-                        step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <datastepservice-publishstartevent>", Log_Level.Debug);
-                    }
-                    else
-                    {
-                        step.LogExecution(flowExecutionGuid, runInstanceGuid, $"datastepserivce-notconfiguredforprovider provider:{step.DataAction_Type_Id.ToString()}", Log_Level.Warning);
-                        step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <datastepservice-publishstartevent>", Log_Level.Debug);
-                    }
-
-                    _dsContext.SaveChanges();
-                }
-                catch (Exception ex)
+                if (_provider != null)
                 {
+                    step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <datastepservice-publishstartevent>", Log_Level.Debug);
+                    await _provider.PublishStartEventAsync(step, flowExecutionGuid, runInstanceGuid, s3Event).ConfigureAwait(false);
                     step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <datastepservice-publishstartevent>", Log_Level.Debug);
-                    _dsContext.SaveChanges();
                 }
+                else
+                {
+                    step.LogExecution(flowExecutionGuid, runInstanceGuid, $"datastepserivce-notconfiguredforprovider provider:{step.DataAction_Type_Id.ToString()}", Log_Level.Warning);
+                    step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <datastepservice-publishstartevent>", Log_Level.Debug);
+                }
+
+                _dsContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <datastepservice-publishstartevent>", Log_Level.Debug);
+                _dsContext.SaveChanges();
             }
         }
 
-        private void SetStepProvider(DataActionType actionType, IContainer container)
+        private void SetStepProvider(DataActionType actionType)
         {
-
-            //Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-
-            //var types = from type in assemblies.GetType()
-            //            where Attribute.IsDefined(type, typeof(ActionTypeAttribute)) && ((ActionTypeAttribute)type).ActionType == step.DataAction_Type_Id
-            //            select type
-
-            //foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-            //{
-            //    foreach(Type item in assembly.GetTypes())
-            //    {
-            //        ActionTypeAttribute attribs = from type in assembly.GetTypes()
-            //                                      where Attribute.IsDefined(type, typeof(ActionTypeAttribute)) && ((ActionTypeAttribute)type).ActionType == step.DataAction_Type_Id
-            //                                      select type
-            //    }
-            //    List<ActionTypeAttribute = assembly.GetTypes().Where(w => w.IsDefined(typeof(ActionTypeAttribute)))
-            //}
             switch (actionType)
             {
                 case DataActionType.S3Drop:
                 case DataActionType.ProducerS3Drop:
-                    _provider = container.GetInstance<IS3DropProvider>();
+                    _provider = S3DropProvider;
                     break;
                 case DataActionType.RawStorage:
-                    _provider = container.GetInstance<IRawStorageProvider>();
+                    _provider = RawStorageProvider;
                     break;
                 case DataActionType.QueryStorage:
-                    _provider = container.GetInstance<IQueryStorageProvider>();
+                    _provider = QueryStorageProvider;
                     break;
                 case DataActionType.SchemaLoad:
-                    _provider = container.GetInstance<ISchemaLoadProvider>();
+                    _provider = SchemaLoadProvider;
                     break;
                 case DataActionType.ConvertParquet:
-                    _provider = container.GetInstance<IConvertToParquetProvider>();
+                    _provider = ConvertToParquetProvider;
                     break;
                 case DataActionType.UncompressZip:
-                    _provider = container.GetInstance<IUncompressZipProvider>();
+                    _provider = UncompressZipProvider;
                     break;
                 case DataActionType.UncompressGzip:
-                    _provider = container.GetInstance<IUncompressGzipProvider>();
+                    _provider = UncompressGzipProvider;
                     break;
                 case DataActionType.SchemaMap:
-                    _provider = container.GetInstance<ISchemaMapProvider>();
+                    _provider = SchemaMapProvider;
                     break;
                 case DataActionType.GoogleApi:
-                    _provider = container.GetInstance<IGoogleApiActionProvider>();
+                    _provider = GoogleApiActionProvider;
                     break;
                 case DataActionType.ClaimIq:
-                    _provider = container.GetInstance<IClaimIQActionProvider>();
+                    _provider = ClaimIQActionProvider;
                     break;
                 case DataActionType.FixedWidth:
-                    _provider = container.GetInstance<IFixedWidthProvider>();
+                    _provider = FixedWidthProvider;
                     break;
                 case DataActionType.None:
                 default:

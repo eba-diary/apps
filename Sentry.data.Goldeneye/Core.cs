@@ -28,6 +28,8 @@ namespace Sentry.data.Goldeneye
         private ITicketMonitorService _ticketMonitorService;
         private Scheduler _backgroundJobServer;
         private List<RunningTask> currentTasks = new List<RunningTask>();
+        private Configuration _config;
+        private IDataFeatures _dataFeatures;
 
         /// <summary>
         /// Start the core worker
@@ -110,21 +112,23 @@ namespace Sentry.data.Goldeneye
             //Start all the internal processes.
 
             //Get or Create the Runtime Configuration
-            Configuration config = new Configuration();
-            config.TimeLastStarted = DateTime.Now;  //The last time Goldeneye was started.
+            _config = new Configuration
+            {
+                TimeLastStarted = DateTime.Now,  //The last time Goldeneye was started.
 
-            config.LastRunSecond = DateTime.Now;    //For Logging Purposes.  Don't need logs more then once per second.
-            config.LastRunMinute = DateTime.Now;    //Keeps track of the processes that must run once per minute.
-            config.LastRunHour = DateTime.Now;      //  once per hour
-            config.LastRunDay = DateTime.Now;       //  once per day
-            config.LastRunWeek = DateTime.Now;      //  once per week
-            
+                LastRunSecond = DateTime.Now,    //For Logging Purposes.  Don't need logs more then once per second.
+                LastRunMinute = DateTime.Now,    //Keeps track of the processes that must run once per minute.
+                LastRunHour = DateTime.Now,      //  once per hour
+                LastRunDay = DateTime.Now,       //  once per day
+                LastRunWeek = DateTime.Now      //  once per week
+            };
+
             Boolean firstRun = true;
             do
             {
                 using (_container = Bootstrapper.Container.GetNestedContainer())
                 {
-                    IDataFeatures dataFeatures = _container.GetInstance<IDataFeatures>();
+                    _dataFeatures = _container.GetInstance<IDataFeatures>();
 
                     //THIS IS A BANDAID.  No copyright intended.
                     Boolean complete = false;
@@ -143,207 +147,24 @@ namespace Sentry.data.Goldeneye
                         }
                     }
 
-                    //Run All the Processes that MUST BE run once per SECOND
-                    if ((DateTime.Now - config.LastRunSecond).TotalSeconds >= 1 || firstRun)
+                    if (firstRun)
                     {
-                        Console.WriteLine("There are currently " + currentTasks.Count + " processes running. " + currentTasks.Count(x => x.Task.IsCompleted) + " Completed.");
-                        foreach (RunningTask rt in currentTasks)
-                        {
-                            if (rt.Task.IsFaulted)
-                            {
-                                Console.WriteLine(rt.Name + " faulted.");
-                            }
-                        }
-
-                        if (firstRun)
-                        {
-                            _backgroundJobServer = new Scheduler();
-                            currentTasks.Add(new RunningTask(
-                                Task.Factory.StartNew(() => _backgroundJobServer.Run(_token), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted), "BackgroundJobServer")
-                            );
-
-                            //https://crontab.guru/
-                            //Schecule SpamFactory:Instance to run every minute
-                            // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
-
-                            RecurringJob.AddOrUpdate("spamfactory_instant", () => SpamFactory.Run("Instant"), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                            RecurringJob.AddOrUpdate("spamfactory_hourly", () => SpamFactory.Run("Hourly"), "00 * * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                            RecurringJob.AddOrUpdate("spamfactory_daily", () => SpamFactory.Run("Daily"), "00 8 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                            RecurringJob.AddOrUpdate("spamfactory_weekly", () => SpamFactory.Run("Weekly"), "00 8 * * MON", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-
-                            //Schedule Livy Job state monitor to run every minute
-                            RecurringJob.AddOrUpdate("LivyJobStateMonitor", () => RetrieverJobService.UpdateJobStatesAsync(), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-
-                            //Schedule the Ticket Monitor to run based on cron within configuration file.
-                            RecurringJob.AddOrUpdate("HPSMTicketMonitor", () => _ticketMonitorService.CheckTicketStatus(), Config.GetHostSetting("HpsmTicketMonitorTimeInterval"), TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-
-                            //Schedule WallEService every day at midnight
-                            RecurringJob.AddOrUpdate("WallEService", () => WallEService.Run(), "00 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                            
-                            //Load all scheduled and enabled jobs into hangfire on startup to ensure all jobs are registered
-                            List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled).ToList();
-
-                            foreach (RetrieverJob Job in JobList)
-                            {
-                                try
-                                {
-                                    // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
-                                    RecurringJob.AddOrUpdate<RetrieverJobService>($"{Job.JobName()}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                                    Job.JobLoggerMessage("Info", "Goldeneye initialization, performing AddOrUpdate to Hangfire");
-                                }
-                                catch (Exception ex)
-                                {
-                                    Job.JobLoggerMessage("Error", "Failed to AddOrUpdate job on Goldeneye initialization", ex);
-                                }
-                            }
-
-                            //Remove all jobs that are marked as disabled
-                            List<RetrieverJob> DisabledJobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled).ToList();
-
-                            foreach (RetrieverJob Job in DisabledJobList)
-                            {
-                                try
-                                {
-                                    RecurringJob.RemoveIfExists($"{Job.JobName()}");
-                                    Job.JobLoggerMessage("Info", "Marked as disabled, performing RemoveIfExists from Hangfire");
-                                }
-                                catch (Exception ex)
-                                {
-                                    Job.JobLoggerMessage("Error", "Failed to remove disabled job on Goldeneye initialization", ex);
-                                }
-                            }
-
-                            //Starting MetadataProcessor Consumer
-                            Logger.Info("starting metadataprocessorservice");
-                            MetadataProcessorService metaProcessor = new MetadataProcessorService();
-                            currentTasks.Add(new RunningTask(
-                                            Task.Factory.StartNew(() => metaProcessor.Run(), TaskCreationOptions.LongRunning), "metadataProcessor"));
-                        }
-
-                        ////Dataset Loader
-                        //How many loader tasks can be started
-                        var availableLoaderTasks = Int32.Parse(Config.GetHostSetting("activeLoaderTaskThrottle")) - currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute") && !x.Task.IsCompleted).ToList().Count;
-                        foreach (var a in Directory.GetFiles(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"), "*", SearchOption.AllDirectories).Where(w => !IsFileLocked(w)))
-                        {
-                            if (availableLoaderTasks > 0)
-                            {
-                                //Disregard any request files picked up via Dataset Loader
-                                //This will need to change when Reading requests from SDP
-                                if (!Path.GetFileName(a).StartsWith(Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
-                                {
-                                    Console.WriteLine("Found : " + a);
-                                    Logger.Info("Found : " + a);
-
-                                    //Add Processing Prefix to file name so it is not picked up by another DatasetLoader task
-                                    var orginalPath = Path.GetFullPath(a).Replace(Path.GetFileName(a), "");
-                                    var origFileName = Path.GetFileName(a);
-                                    var processingFile = orginalPath + Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix") + origFileName;
-
-
-                                    //Rename file to indicate request has been sent for processing
-                                    File.Move(a, processingFile);
-
-                                    //Create a new one.
-
-                                    currentTasks.Add(new RunningTask(
-                                        Task.Factory.StartNew(() => DatasetLoader.Run(processingFile), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
-                                        $"DatasetLoader : Minute : {Path.GetFileNameWithoutExtension(a)}"));
-
-                                    //Remove one available loader task
-                                    availableLoaderTasks--;
-                                }
-                            }
-                            else
-                            {
-                                //Max number of loader tasks has been reached.
-                                break;
-                            }
-                        }
-
-                        config.LastRunSecond = DateTime.Now;
+                        InitializeHangFireServer();
+                        InitializeStandardHangfireJobs();
+                        InitializeRetrieverJobsInHangFire();
+                        InitializeEventProcessor();
                     }
 
-
+                    //Run All the Processes that MUST BE run once per SECOND
+                    if ((DateTime.Now - _config.LastRunSecond).TotalSeconds >= 1 || firstRun)
+                    {
+                        RunSecondlyProcessing();
+                    }
 
                     //Run All the Processes that MUST BE run once per MINUTE
-                    if ((DateTime.Now - config.LastRunMinute).TotalMinutes >= 1 || firstRun)
+                    if ((DateTime.Now - _config.LastRunMinute).TotalMinutes >= 1 || firstRun)
                     {
-                        //Reload and modifed\new jobs
-                        List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled && (w.Created > config.LastRunMinute.AddSeconds(-5) || w.Modified > config.LastRunMinute.AddSeconds(-5))).ToList();
-
-                        foreach (RetrieverJob Job in JobList)
-                        {
-                            // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
-                            RecurringJob.AddOrUpdate<RetrieverJobService>($"{Job.JobName()}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                            Job.JobLoggerMessage("Info", "Job update detected, performing AddOrUpdate to Hangfire");
-                        }
-
-
-                        if (JobList.Count > 0)
-                        {
-                            string jobIds = null;
-                            int cnt = 0;
-                            foreach (RetrieverJob a in JobList)
-                            {
-                                if (cnt > 0)
-                                {
-                                    jobIds += " | " + a.Id.ToString();
-                                }
-                                else
-                                {
-                                    jobIds += a.Id.ToString();
-                                }
-                                cnt++;
-                            }
-
-                            Console.WriteLine($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
-                            Logger.Info($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
-                        }
-
-                        //Remove disabled jobs, non-instant jobs
-                        List<RetrieverJob> DisabledJobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled && (w.Created > config.LastRunMinute.AddSeconds(-5) || w.Modified > config.LastRunMinute.AddSeconds(-5))).ToList();
-
-                        foreach (RetrieverJob Job in DisabledJobList)
-                        {
-                            // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
-                            RecurringJob.RemoveIfExists($"{Job.JobName()}");
-                            Job.JobLoggerMessage("Info", "Job update detected, performing RemoveIfExists from Hangfire");
-                        }
-
-
-                        //This will ensure directory monitors are not started when 
-                        if (!dataFeatures.Remove_DfsWatchers_CLA_2346.GetValue())
-                        {
-
-                            /**************************************
-                             *  DFS Directory Monitors                          
-                            ***************************************/
-                            //Get all active watch retriever jobs 
-                            List<RetrieverJob> rtJobList = _requestContext.RetrieverJob.Where(w => (w.DataSource is DfsBasic || w.DataSource is DfsCustom || w.DataSource is DfsDataFlowBasic) && w.Schedule == "Instant" && w.IsEnabled).FetchAllConfiguration(_requestContext).ToList();
-
-                            //If initial start of GOLDENEYE, init all jobs else only new jobs
-                            List<RetrieverJob> initJobList = (firstRun) ? rtJobList : rtJobList.Where(s => !currentTasks.Any(ct => ct.JobId == s.Id)).ToList();
-
-                            //Initilize filewatcher jobs
-                            foreach (RetrieverJob rJob in initJobList)
-                            {
-                                try
-                                {
-                                    var jobId = rJob.Id;
-                                    Uri path = rJob.GetUri();
-
-                                    Task t = InitializeFileWatcherTask(jobId, path);
-
-                                    currentTasks.Add(new RunningTask(t, GenerateWatcherName(rJob), jobId, path));
-                                }
-                                catch (Exception ex)
-                                {
-                                    Logger.Error($"Initializing retrieverjob jobId:{rJob.Id}", ex);
-                                }
-                            }
-                        }                        
-
-                        config.LastRunMinute = DateTime.Now;
+                        RunMinutelyProcessing(firstRun);
                     }
                 }
 
@@ -357,6 +178,216 @@ namespace Sentry.data.Goldeneye
             };
 
             Logger.Info("Worker task stopped.");
+        }
+
+        private void RunMinutelyProcessing(bool firstRun)
+        {
+            //Reload and modifed\new jobs
+            List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled && (w.Created > _config.LastRunMinute.AddSeconds(-5) || w.Modified > _config.LastRunMinute.AddSeconds(-5))).ToList();
+
+            foreach (RetrieverJob Job in JobList)
+            {
+                // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
+                RecurringJob.AddOrUpdate<RetrieverJobService>($"{Job.JobName()}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                Job.JobLoggerMessage("Info", "Job update detected, performing AddOrUpdate to Hangfire");
+            }
+
+
+            if (JobList.Count > 0)
+            {
+                string jobIds = null;
+                int cnt = 0;
+                foreach (RetrieverJob a in JobList)
+                {
+                    if (cnt > 0)
+                    {
+                        jobIds += " | " + a.Id.ToString();
+                    }
+                    else
+                    {
+                        jobIds += a.Id.ToString();
+                    }
+                    cnt++;
+                }
+
+                Console.WriteLine($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
+                Logger.Info($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
+            }
+
+            //Remove disabled jobs, non-instant jobs
+            List<RetrieverJob> DisabledJobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled && (w.Created > _config.LastRunMinute.AddSeconds(-5) || w.Modified > _config.LastRunMinute.AddSeconds(-5))).ToList();
+
+            foreach (RetrieverJob Job in DisabledJobList)
+            {
+                // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
+                RecurringJob.RemoveIfExists($"{Job.JobName()}");
+                Job.JobLoggerMessage("Info", "Job update detected, performing RemoveIfExists from Hangfire");
+            }
+
+
+            //This will ensure directory monitors are not started when 
+            if (!_dataFeatures.Remove_DfsWatchers_CLA_2346.GetValue())
+            {
+
+                /**************************************
+                 *  DFS Directory Monitors                          
+                ***************************************/
+                //Get all active watch retriever jobs 
+                List<RetrieverJob> rtJobList = _requestContext.RetrieverJob.Where(w => (w.DataSource is DfsBasic || w.DataSource is DfsCustom || w.DataSource is DfsDataFlowBasic) && w.Schedule == "Instant" && w.IsEnabled).FetchAllConfiguration(_requestContext).ToList();
+
+                //If initial start of GOLDENEYE, init all jobs else only new jobs
+                List<RetrieverJob> initJobList = (firstRun) ? rtJobList : rtJobList.Where(s => !currentTasks.Any(ct => ct.JobId == s.Id)).ToList();
+
+                //Initilize filewatcher jobs
+                foreach (RetrieverJob rJob in initJobList)
+                {
+                    try
+                    {
+                        var jobId = rJob.Id;
+                        Uri path = rJob.GetUri();
+
+                        Task t = InitializeFileWatcherTask(jobId, path);
+
+                        currentTasks.Add(new RunningTask(t, GenerateWatcherName(rJob), jobId, path));
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"Initializing retrieverjob jobId:{rJob.Id}", ex);
+                    }
+                }
+            }
+
+            _config.LastRunMinute = DateTime.Now;
+        }
+
+        private void RunSecondlyProcessing()
+        {
+            Console.WriteLine("There are currently " + currentTasks.Count + " processes running. " + currentTasks.Count(x => x.Task.IsCompleted) + " Completed.");
+            foreach (RunningTask rt in currentTasks)
+            {
+                if (rt.Task.IsFaulted)
+                {
+                    Console.WriteLine(rt.Name + " faulted.");
+                }
+            }
+
+
+
+            ////Dataset Loader
+            //How many loader tasks can be started
+            var availableLoaderTasks = Int32.Parse(Config.GetHostSetting("activeLoaderTaskThrottle")) - currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute") && !x.Task.IsCompleted).ToList().Count;
+            foreach (var a in Directory.GetFiles(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"), "*", SearchOption.AllDirectories).Where(w => !IsFileLocked(w)))
+            {
+                if (availableLoaderTasks > 0)
+                {
+                    //Disregard any request files picked up via Dataset Loader
+                    //This will need to change when Reading requests from SDP
+                    if (!Path.GetFileName(a).StartsWith(Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
+                    {
+                        Console.WriteLine("Found : " + a);
+                        Logger.Info("Found : " + a);
+
+                        //Add Processing Prefix to file name so it is not picked up by another DatasetLoader task
+                        var orginalPath = Path.GetFullPath(a).Replace(Path.GetFileName(a), "");
+                        var origFileName = Path.GetFileName(a);
+                        var processingFile = orginalPath + Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix") + origFileName;
+
+
+                        //Rename file to indicate request has been sent for processing
+                        File.Move(a, processingFile);
+
+                        //Create a new one.
+
+                        currentTasks.Add(new RunningTask(
+                            Task.Factory.StartNew(() => DatasetLoader.Run(processingFile), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
+                            $"DatasetLoader : Minute : {Path.GetFileNameWithoutExtension(a)}"));
+
+                        //Remove one available loader task
+                        availableLoaderTasks--;
+                    }
+                }
+                else
+                {
+                    //Max number of loader tasks has been reached.
+                    break;
+                }
+            }
+
+            _config.LastRunSecond = DateTime.Now;
+        }
+
+        private void InitializeEventProcessor()
+        {
+            //Starting MetadataProcessor Consumer
+            Logger.Info("starting metadataprocessorservice");
+            MetadataProcessorService metaProcessor = new MetadataProcessorService();
+            currentTasks.Add(new RunningTask(
+                            Task.Factory.StartNew(() => metaProcessor.Run(), TaskCreationOptions.LongRunning), "metadataProcessor"));
+        }
+
+        private void InitializeRetrieverJobsInHangFire()
+        {
+            //Load all scheduled and enabled jobs into hangfire on startup to ensure all jobs are registered
+            List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled).ToList();
+
+            foreach (RetrieverJob Job in JobList)
+            {
+                try
+                {
+                    // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
+                    RecurringJob.AddOrUpdate<RetrieverJobService>($"{Job.JobName()}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                    Job.JobLoggerMessage("Info", "Goldeneye initialization, performing AddOrUpdate to Hangfire");
+                }
+                catch (Exception ex)
+                {
+                    Job.JobLoggerMessage("Error", "Failed to AddOrUpdate job on Goldeneye initialization", ex);
+                }
+            }
+
+            //Remove all jobs that are marked as disabled
+            List<RetrieverJob> DisabledJobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled).ToList();
+
+            foreach (RetrieverJob Job in DisabledJobList)
+            {
+                try
+                {
+                    RecurringJob.RemoveIfExists($"{Job.JobName()}");
+                    Job.JobLoggerMessage("Info", "Marked as disabled, performing RemoveIfExists from Hangfire");
+                }
+                catch (Exception ex)
+                {
+                    Job.JobLoggerMessage("Error", "Failed to remove disabled job on Goldeneye initialization", ex);
+                }
+            }
+        }
+
+        private void InitializeStandardHangfireJobs()
+        {
+            //https://crontab.guru/
+            //Schecule SpamFactory:Instance to run every minute
+            // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
+
+            RecurringJob.AddOrUpdate("spamfactory_instant", () => SpamFactory.Run("Instant"), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            RecurringJob.AddOrUpdate("spamfactory_hourly", () => SpamFactory.Run("Hourly"), "00 * * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            RecurringJob.AddOrUpdate("spamfactory_daily", () => SpamFactory.Run("Daily"), "00 8 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            RecurringJob.AddOrUpdate("spamfactory_weekly", () => SpamFactory.Run("Weekly"), "00 8 * * MON", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+
+            //Schedule Livy Job state monitor to run every minute
+            RecurringJob.AddOrUpdate("LivyJobStateMonitor", () => RetrieverJobService.UpdateJobStatesAsync(), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+
+            //Schedule the Ticket Monitor to run based on cron within configuration file.
+            RecurringJob.AddOrUpdate("HPSMTicketMonitor", () => _ticketMonitorService.CheckTicketStatus(), Config.GetHostSetting("HpsmTicketMonitorTimeInterval"), TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+
+            //Schedule WallEService every day at midnight
+            RecurringJob.AddOrUpdate("WallEService", () => WallEService.Run(), "00 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+        }
+
+        private void InitializeHangFireServer()
+        {
+            _backgroundJobServer = new Scheduler();
+            currentTasks.Add(new RunningTask(
+                Task.Factory.StartNew(() => _backgroundJobServer.Run(_token), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted), "BackgroundJobServer")
+            );
         }
 
         /// <summary>

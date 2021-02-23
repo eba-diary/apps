@@ -4,6 +4,7 @@ using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.Messaging.Common;
 using System;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
@@ -21,8 +22,13 @@ namespace Sentry.data.Infrastructure
             _schemaService = schemaService;
         }
         #endregion
-               
+
         void IMessageHandler<string>.Handle(string msg)
+        {
+            throw new NotImplementedException();
+        }
+
+        async Task IMessageHandler<string>.HandleAsync(string msg)
         {
             Logger.Info($"Start method <snowflakeeventhandler-handle>");
             BaseEventMessage baseEvent = null;

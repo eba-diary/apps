@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
@@ -20,19 +21,38 @@ namespace Sentry.data.Infrastructure
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IDataFlowService _dataFlowService;
+        private readonly Lazy<IDatasetContext> _datasetContext;
+        private readonly Lazy<ISchemaService> _schemaService;
         private DataFlowStep _step;
         private string _flowGuid;
         private string _runInstGuid;
 
         public QueryStorageProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider,
-            IDataFlowService dataFlowService) : base(dataFlowService)
+            IDataFlowService dataFlowService, Lazy<IDatasetContext> datasetContext,
+            Lazy<ISchemaService> schemaService) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
             _dataFlowService = dataFlowService;
+            _datasetContext = datasetContext;
+            _schemaService = schemaService;
+        }
+
+        public IDatasetContext DatasetContext
+        {
+            get { return _datasetContext.Value; }
+        }
+        public ISchemaService SchemaService
+        {
+            get { return _schemaService.Value; }
         }
 
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override async Task ExecuteActionAsync(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
             Stopwatch stopWatch = new Stopwatch();
             _step = step;
@@ -112,7 +132,7 @@ namespace Sentry.data.Infrastructure
                             }
                         }
                     };
-                    _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+                    await _messagePublisher.PublishDSCEventAsync("99999", JsonConvert.SerializeObject(s3e)).ConfigureAwait(false);
 #endif
                 }
 
@@ -153,6 +173,11 @@ namespace Sentry.data.Infrastructure
 
         public override void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
+            throw new NotImplementedException();
+        }
+
+        public override async Task PublishStartEventAsync(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
+        {
             List<EventMetric> logs = new List<EventMetric>();
             Stopwatch stopWatch = new Stopwatch();
             _step = step;
@@ -175,15 +200,9 @@ namespace Sentry.data.Infrastructure
                 _step.LogExecution(_flowGuid, _runInstGuid, MetricData, Log_Level.Debug);
 
                 //Get StorageCode and FileSchema
-                using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                {
-                    ISchemaService schemaService = container.GetInstance<ISchemaService>();
-                    IDatasetContext datasetContext = container.GetInstance<IDatasetContext>();
-
-                    schemaStorageCode = _dataFlowService.GetSchemaStorageCodeForDataFlow(step.DataFlow.Id);
-                    schema = schemaService.GetFileSchemaByStorageCode(schemaStorageCode);
-                    _dataset = datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).FirstOrDefault().ParentDataset;
-                }
+                schemaStorageCode = _dataFlowService.GetSchemaStorageCodeForDataFlow(step.DataFlow.Id);
+                schema = SchemaService.GetFileSchemaByStorageCode(schemaStorageCode);
+                _dataset = DatasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).FirstOrDefault().ParentDataset;
 
                 //Convert FlowExecutionGuid to DateTime, then to local time
                 DateTime flowGuidDTM = DataFlowHelpers.ConvertFlowGuidToDateTime(_flowGuid).ToLocalTime();
@@ -217,7 +236,7 @@ namespace Sentry.data.Infrastructure
                     MetricData.AddOrUpdateValue("log", $"{_step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}");
                     _step.LogExecution(_flowGuid, _runInstGuid, MetricData, Log_Level.Debug);
 
-                    _messagePublisher.PublishDSCEvent($"{_step.DataFlow.Id}-{_step.Id}-{RandomString(12)}", JsonConvert.SerializeObject(stepEvent));
+                    await _messagePublisher.PublishDSCEventAsync($"{_step.DataFlow.Id}-{_step.Id}-{RandomString(12)}", JsonConvert.SerializeObject(stepEvent)).ConfigureAwait(false);
 
                     stopWatch.Stop();
                     DateTime endTime = DateTime.Now;
