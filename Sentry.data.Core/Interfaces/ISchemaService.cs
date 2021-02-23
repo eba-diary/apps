@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using Sentry.Core;
 using Sentry.data.Core.Exceptions;
 
@@ -78,8 +79,8 @@ namespace Sentry.data.Core
         /// <returns></returns>
         List<Dictionary<string, object>> GetTopNRowsBySchema(int id, int rows);
         bool RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent);
-        bool SasUpdateNotification(int schemaId, int revisionId, string initiatorId);
-
+        bool SasAddOrUpdateNotification(int schemaId, int revisionId, string initiatorId, JObject changeIndicator, string externalSystemIndictator);
+        bool SasDeleteNotification(int schemaId, string initiatorId, string externalSystemIndictator);
         /// <summary>
         /// 
         /// </summary>
