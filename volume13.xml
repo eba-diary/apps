@@ -450,19 +450,19 @@
         <dateline>
           <date when="1906-04-08">Sunday, April 8th. Palm Sunday.</date>
         </dateline>   
-        <p>The family went to the <placeName>Academia</placeName> this morning, I stayed home for a quiet morning and service. <persName ref="#Davis_Theodore_M">Theo</persName> and I went to <placeName ref="#Palazzo_Capello">Palazzo Capello</placeName> at 3:30 and after a talk with <personGrp ref="#Benson">Mr. and Mrs. Benson</personGrp>, went to <placeName>Palazzo Mula</placeName>, to have tea with the <personGrp ref="#Brown">Browns</personGrp> in their pretty appartments.</p>
+        <p>The family went to the <placeName ref="#Gallerie_dell_Accademia">Academia</placeName> this morning, I stayed home for a quiet morning and service. <persName ref="#Davis_Theodore_M">Theo</persName> and I went to <placeName ref="#Palazzo_Capello">Palazzo Capello</placeName> at 3:30 and after a talk with <personGrp ref="#Benson">Mr. and Mrs. Benson</personGrp>, went to <placeName ref="#Palazzo_Mula">Palazzo Mula</placeName>, to have tea with the <personGrp ref="#Brown">Browns</personGrp> in their pretty appartments.</p>
       </div>
       <div xml:id="EBA-1906-04-09" type="entry">
         <dateline>
           <date when="1906-04-09">Monday, April 9th.</date>
         </dateline>   
-        <p>To the <persName>Frari</persName> to see the pictures - found they had all been removed to the church of <placeName>S. Toma</placeName>, where we found it too dark to see them - the <placeName>Frari</placeName> actually seems to be under process of entire reconstruction - all the monuments taken down from the walls, and filled with scaffolding and derricks. After lunch to <placeName>Barozzi's</placeName> where we bought some beautiful stuffs - and then to <placeName>Florian's</placeName> to tea.</p>
+        <p>To the <placeName ref="#Basilica_di_Santa_Maria_Gloriosa_dei_Frari">Frari</placeName> to see the pictures - found they had all been removed to the church of <placeName ref="#San_Toma">S. Toma</placeName>, where we found it too dark to see them - the <placeName ref="#Basilica_di_Santa_Maria_Gloriosa_dei_Frari">Frari</placeName> actually seems to be under process of entire reconstruction - all the monuments taken down from the walls, and filled with scaffolding and derricks. After lunch to <placeName>Barozzi's</placeName> <!--[check Barozzi and Florian]-->where we bought some beautiful stuffs - and then to <placeName>Florian's</placeName> to tea.</p>
       </div>
       <div xml:id="EBA-1906-04-10" type="entry">
         <dateline>
           <date when="1906-04-10">Tuesday, April 10.</date>
         </dateline>   
-        <p>I spent the morning with the <orgName>Bensons</orgName> - to the <placeName>Academia</placeName> in the afternoon - and again to tea at <placeName>Florians</placeName> - <persName>Mr.</persName> and <persName>Mrs. Brown</persName> dined with us.</p> 
+        <p>I spent the morning with the <personGrp ref="#Benson">Bensons</personGrp> - to the <placeName ref="#Gallerie_dell_Accademia">Academia</placeName> in the afternoon - and again to tea at <placeName>Florians</placeName> - <personGrp ref="#Brown">Mr. and Mrs. Brown</personGrp> dined with us.</p> 
       </div>
       <pb n="129"/>
       <div xml:id="EBA-1906-04-11" type="entry">
