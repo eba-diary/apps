@@ -493,26 +493,32 @@
         <dateline>
           <date when="1906-04-16">Monday, April 16.</date>
         </dateline>   
-        <p>Quite a busy day - tea at the <name type="type" ref="#Residenza_Il_Villino">Villino</name> - Mary, <persName ref="#Hardy_Jean">Jean</persName> and <persName>Robert</persName> go off to <placeName  ref="#Rome">Rome</placeName> tomorrow for a week.</p>
+        <p>Quite a busy day - tea at the <name type="type" ref="#Residenza_Il_Villino">Villino</name> - Mary, <persName ref="#Hardy_Jean">Jean</persName> and <persName>Robert</persName><!--[Robert?]--> go off to <placeName  ref="#Rome">Rome</placeName> tomorrow for a week.</p>
       </div>
       <div xml:id="EBA-1906-04-17" type="entry">
         <dateline>
           <date when="1906-04-17">Tuesday, April 17.</date>
         </dateline>   
-        <p>The children got off today. <persName>Lizzie</persName> not very well.<pb n="131"/> Mme.<persName>Costantini</persName> made me a visit this afternoon - looking remarkably well, and very smart - asked me to lunch for Saturday. Wednesday. Cold, disagreeable weather - at home most of the day.</p>
+        <p>The children got off today. <persName ref="#Buttles_Lizzie">Lizzie</persName> not very well.<pb n="131"/> <persName ref="#Sahopek_Ida">Mme. Costantini</persName> made me a visit this afternoon - looking remarkably well, and very smart - asked me to lunch for Saturday.</p>
+      </div>
+      <div xml:id="EBA-1906-04-18" type="entry">
+        <dateline>
+          <date when="1906-04-18">Wednesday.</date>
+        </dateline>
+         <p>Cold, disagreeable weather - at home most of the day.</p>
       </div>
       <div xml:id="EBA-1906-04-21" type="entry">
         <dateline>
           <date when="1906-04-21">Saturday, April 21st.</date>
         </dateline>   
-        <p>I have been in the house for 2 days - weather bad, and slight cold. <persName>David Costantini</persName> called and left the <orgName>Ivories.</orgName> Mr. <persName>Berenson</persName> called. <persName>Nettie</persName> and I drove out today - and did some errands - <persName>Lizzie</persName> and she lunched with me - lovely day. The whole world is electrified by the horrible disaster in <placeName ref="#California">California</placeName>. An earthquake has practically destroyed <placeName  ref="#San_Francisco">San Francisco</placeName>! The accounts that have reached us from the wrecked and burning city seem too dreadful to be possible.</p>
+        <p>I have been in the house for 2 days - weather bad, and slight cold. <persName ref="#Constantini_David">David Costantini</persName> called and left the <orgName>Ivories.</orgName><!--[check]--> <persName ref="#Berenson_Bernard">Mr. Berenson</persName> called. <persName ref="#Buttles_Jeanette">Nettie</persName> and I drove out today - and did some errands - <persName ref="#Buttles_Lizzie">Lizzie</persName> and she lunched with me - lovely day. The whole world is electrified by the horrible disaster in <placeName ref="#California">California</placeName>. An earthquake has practically destroyed <placeName  ref="#San_Francisco">San Francisco</placeName>! The accounts that have reached us from the wrecked and burning city seem too dreadful to be possible.</p>
       </div>
       <div xml:id="EBA-1906-05-04" type="entry">
         <dateline>
           <date when="1906-05-04">May 4th. Saturday.</date>
           <placeName ref="#Florence">Florence</placeName>
         </dateline>   
-        <p>We have now been here for 3 weeks and two days - and will leave for <placeName ref="#Paris">Paris</placeName> tomorrow, where <persName ref="#Davis_Theodore_M">Theodore</persName> and <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> are now waiting for us. With the exception of two or three days, we have had the worst kind of weather - rain, cold winds and several hail storms. Driving for pleasure has been out of the question. I have had constant pleasant visits from and with <persName>Lizzie</persName> and the girls. <persName>Nettie</persName> and I lunched one day at "La <placeName>Loggia"</placeName> - the charming country home of the <orgName>Costantini's</orgName> - which they are thoroughly changing - making it as far [not able to read] the 15th century. It will be an enchanting place. We had one of the very pleasant teas with the <orgName>Newmans</orgName> which they always give us - and were to have lunched with the <persName>Berenson's</persName> at <placeName>I Tatti</placeName>, but the weather has been too cold.</p>
+        <p>We have now been here for 3 weeks and two days - and will leave for <placeName ref="#Paris">Paris</placeName> tomorrow, where <persName ref="#Davis_Theodore_M">Theodore</persName> and <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> are now waiting for us. With the exception of two or three days, we have had the worst kind of weather - rain, cold winds and several hail storms. Driving for pleasure has been out of the question. I have had constant pleasant visits from and with <persName ref="#Buttles_Lizzie">Lizzie</persName> and the girls. <persName ref="#Buttles_Jeanette">Nettie</persName> and I lunched one day at "La <placeName>Loggia"</placeName> - the charming country home of the <personGrp ref="#Constantini">Costantini</personGrp>'s - which they are thoroughly changing - making it as far [not able to read] the 15th century. It will be an enchanting place. We had one of the very pleasant teas with the <orgName>Newmans</orgName> which they always give us - and were to have lunched with the <personGrp>Berenson</personGrp>'s at <placeName>I Tatti</placeName>, but the weather has been too cold.</p>
       </div>
       <div xml:id="EBA-1906-05-06" type="entry">
         <dateline>
@@ -520,7 +526,7 @@
           <placeName ref="#Paris">Paris</placeName>
           <name type="hotel" ref="#Hotel_Westminster">Hotel Westminster</name>
         </dateline>   
-        <p>We had quite a comfortable journey on - though in a very shabby carriage for a "train de luxe". <persName>Lizzie</persName> and the girls lunched with us - <persName>Nettie</persName> and <persName>Mary</persName> went to the station with us. <persName>Costantini</persName> kindly turned up to wish us goodbye. Arrived in <placeName ref="#Paris">Paris</placeName> on time! and found <persName ref="#Davis_Theodore_M">Theo</persName>, <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> and <persName>Jones</persName> at the station. In our old rooms here.</p>
+        <p>We had quite a comfortable journey on - though in a very shabby carriage for a "train de luxe". <persName ref="#Buttles_Lizzie">Lizzie</persName> and the girls lunched with us - <persName ref="#Buttles_Jeanette">Nettie</persName> and <persName>Mary</persName> went to the station with us. <persName ref="#Constantini_David">Costantini</persName> kindly turned up to wish us goodbye. Arrived in <placeName ref="#Paris">Paris</placeName> on time! and found <persName ref="#Davis_Theodore_M">Theo</persName>, <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> and <persName ref="Jones_Harold">Jones</persName> at the station. In our old rooms here.</p>
       </div>
       <div xml:id="EBA-1906-05-08" type="entry">
         <dateline>
