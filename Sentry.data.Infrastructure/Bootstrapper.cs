@@ -107,13 +107,31 @@ namespace Sentry.data.Infrastructure
             registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
             registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
-            registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
 
-            var saidHttpClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
-            registry.For<IAssetClient>().Use<SAIDRestClient.AssetClient>().
-                Ctor<HttpClient>().Is(saidHttpClient).
+            
+
+            //establish httpclient specific to cherwellprovider
+            var cherwellClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
+            registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>().
+                Ctor<HttpClient>().Is(cherwellClient);
+
+            //establish generic httpclient singleton to be used where needed across the application
+            var client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true });
+            registry.For<HttpClient>().Singleton().Use(client);
+
+            //establish IAssetClient using generic httpClient singleton
+            registry.For<IAssetClient>().Singleton().Use<SAIDRestClient.AssetClient>().
+                Ctor<HttpClient>().Is(client).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("SaidAssetBaseUrl"));
-          
+
+            //establish httpclient specific to ApacheLivyProvider
+            var apacheLivyClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
+            apacheLivyClient.DefaultRequestHeaders.Accept.Clear();
+            apacheLivyClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            apacheLivyClient.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
+            registry.For<IApacheLivyProvider>().Singleton().Use<ApacheLivyProvider>().
+                Ctor<HttpClient>().Is(apacheLivyClient);
+
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);
 

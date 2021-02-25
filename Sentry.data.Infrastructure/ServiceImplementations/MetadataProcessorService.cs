@@ -51,9 +51,9 @@ namespace Sentry.data.Infrastructure
                 {
                     TaskList.Add(handler.HandleAsync(msg));
                 }
-            }
 
-            Task.WaitAll(TaskList.ToArray());
+                Task.WaitAll(TaskList.ToArray());
+            }
 
             //Parallel.ForEach(_handlers, (h) => h.Handle(msg));
         }
