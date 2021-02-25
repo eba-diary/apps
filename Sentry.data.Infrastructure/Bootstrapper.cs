@@ -117,7 +117,7 @@ namespace Sentry.data.Infrastructure
 
             //establish generic httpclient singleton to be used where needed across the application
             var client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true });
-            registry.For<HttpClient>().Singleton().Use(client);
+            registry.For<HttpClient>().Use(client);
 
             //establish IAssetClient using generic httpClient singleton
             registry.For<IAssetClient>().Singleton().Use<SAIDRestClient.AssetClient>().
