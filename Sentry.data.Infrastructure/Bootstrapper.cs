@@ -107,13 +107,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
             registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
-
-            
-
-            //establish httpclient specific to cherwellprovider
-            var cherwellClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
-            registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>().
-                Ctor<HttpClient>().Is(cherwellClient);
+            registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
 
             //establish generic httpclient singleton to be used where needed across the application
             var client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true });
