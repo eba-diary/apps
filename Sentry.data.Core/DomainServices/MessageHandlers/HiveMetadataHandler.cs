@@ -1,22 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sentry.Messaging.Common;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
-using Newtonsoft.Json;
-using StructureMap;
+using Sentry.Messaging.Common;
+using System;
+using System.Linq;
 
 namespace Sentry.data.Core
 {
     public class HiveMetadataHandler : IMessageHandler<string>
     {
         #region Declarations
-        private IDatasetContext _dsContext;
+        private readonly IDatasetContext _dsContext;
         private UserService _userService;
-        private IEmailService _emailService;
-        private ISchemaService _schemaService;
+        private readonly IEmailService _emailService;
+        private readonly ISchemaService _schemaService;
         #endregion
 
         #region Constructor
@@ -44,7 +41,7 @@ namespace Sentry.data.Core
                 {
                     case "HIVE-TABLE-CREATE-COMPLETED":
                         HiveTableCreateModel hiveCreatedEvent = JsonConvert.DeserializeObject<HiveTableCreateModel>(msg);
-                        Logger.Info("HiveMetadataHandler processing HIVE-TABLE-CREATE-COMPLETED message: " + JsonConvert.SerializeObject(hiveCreatedEvent));
+                        Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(hiveCreatedEvent)}");
 
                         switch (hiveCreatedEvent.HiveStatus.ToUpper())
                         {
@@ -53,9 +50,11 @@ namespace Sentry.data.Core
                                 de = _dsContext.FileSchema.Where(w => w.SchemaId == hiveCreatedEvent.SchemaID).FirstOrDefault();
                                 de.HiveTableStatus = ConsumptionLayerTableStatusEnum.Available.ToString();
 
+
                                 if (de.IsInSAS)
                                 {
-                                    bool IsSuccessful = _schemaService.SasUpdateNotification(hiveCreatedEvent.SchemaID, hiveCreatedEvent.RevisionID, hiveCreatedEvent.InitiatorID);
+                                    var changeIndicator = JObject.Parse(hiveCreatedEvent.ChangeIND);
+                                    bool IsSuccessful = _schemaService.SasAddOrUpdateNotification(hiveCreatedEvent.SchemaID, hiveCreatedEvent.RevisionID, hiveCreatedEvent.InitiatorID, changeIndicator, "HIVE");
 
                                     if (!IsSuccessful)
                                     {
@@ -75,6 +74,7 @@ namespace Sentry.data.Core
 
                         _dsContext.Merge(de);
                         _dsContext.SaveChanges();
+                        Logger.Info($"HiveMetadataHandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     case "HIVE-TABLE-CREATE-REQUESTED":
                         HiveTableCreateModel hiveReqeustedEvent = JsonConvert.DeserializeObject<HiveTableCreateModel>(msg);
@@ -85,6 +85,7 @@ namespace Sentry.data.Core
 
                         _dsContext.Merge(de);
                         _dsContext.SaveChanges();
+                        Logger.Info($"HiveMetadataHandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     case "HIVE-TABLE-DELETE-REQUESTED":
                         HiveTableDeleteModel deleteEvent = JsonConvert.DeserializeObject<HiveTableDeleteModel>(msg);
@@ -93,6 +94,7 @@ namespace Sentry.data.Core
                         de = _dsContext.GetById<FileSchema>(deleteEvent.SchemaID);
                         de.HiveTableStatus = ConsumptionLayerTableStatusEnum.DeleteRequested.ToString();
                         _dsContext.SaveChanges();
+                        Logger.Info($"HiveMetadataHandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     case "HIVE-TABLE-DELETE-COMPLETED":
                         HiveTableDeleteModel deleteCompletedEvent = JsonConvert.DeserializeObject<HiveTableDeleteModel>(msg);
@@ -105,6 +107,13 @@ namespace Sentry.data.Core
                             case "DELETED":
                             case "SKIPPED":
                                 de.HiveTableStatus = ConsumptionLayerTableStatusEnum.Deleted.ToString();
+
+                                bool IsSuccessful = _schemaService.SasDeleteNotification(deleteCompletedEvent.SchemaID, deleteCompletedEvent.InitiatorID, "HIVE");
+
+                                if (!IsSuccessful)
+                                {
+                                    Logger.Error($"HiveMetadataHandler failed sending SAS delete email - schema:{deleteCompletedEvent.SchemaID}");
+                                }
                                 break;
                             case "FAILED":
                                 de.HiveTableStatus = ConsumptionLayerTableStatusEnum.DeleteFailed.ToString();
@@ -115,7 +124,7 @@ namespace Sentry.data.Core
                         }
 
                         _dsContext.SaveChanges();
-
+                        Logger.Info($"HiveMetadataHandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     default:
                         Logger.Info($"HiveMetadataHandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");

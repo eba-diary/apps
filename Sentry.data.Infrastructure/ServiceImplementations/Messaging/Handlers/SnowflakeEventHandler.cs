@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.Messaging.Common;
@@ -11,12 +12,14 @@ namespace Sentry.data.Infrastructure
     {
         #region Declarations
         private readonly IDatasetContext _dsContext;
+        private readonly ISchemaService _schemaService;
         #endregion
 
         #region Constructor
-        public SnowflakeEventHandler(IDatasetContext dsContext)
+        public SnowflakeEventHandler(IDatasetContext dsContext, ISchemaService schemaService)
         {
             _dsContext = dsContext;
+            _schemaService = schemaService;
         }
         #endregion
 
@@ -46,15 +49,16 @@ namespace Sentry.data.Infrastructure
                 {
                     case "SNOW-TABLE-CREATE-REQUESTED":
                         SnowTableCreateModel snowRequestedEvent = JsonConvert.DeserializeObject<SnowTableCreateModel>(msg);
-                        Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(snowRequestedEvent)}");
+                        Logger.Info($"snowflakeeventhandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(snowRequestedEvent)}");
 
                         de = _dsContext.GetById<FileSchema>(snowRequestedEvent.SchemaID);
                         de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Requested.ToString();
                         _dsContext.SaveChanges();
+                        Logger.Info($"snowflakeeventhandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     case "SNOW-TABLE-CREATE-COMPLETED":
                         SnowTableCreateModel snowCompletedEvent = JsonConvert.DeserializeObject<SnowTableCreateModel>(msg);
-                        Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(snowCompletedEvent)}");
+                        Logger.Info($"snowflakeeventhandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(snowCompletedEvent)}");
                         de = _dsContext.GetById<FileSchema>(snowCompletedEvent.SchemaID);
 
                         switch (snowCompletedEvent.SnowStatus.ToUpper())
@@ -63,6 +67,16 @@ namespace Sentry.data.Infrastructure
                             case "EXISTED":
                                 de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Available.ToString();
                                 //Add SAS notification logic here if needed for snowflake
+                                var changeIndicator = JObject.Parse(snowCompletedEvent.ChangeIND);
+                                if (de.IsInSAS)
+                                {
+                                    bool IsSuccessful = _schemaService.SasAddOrUpdateNotification(snowCompletedEvent.SchemaID, snowCompletedEvent.RevisionID, snowCompletedEvent.InitiatorID, changeIndicator, "SNOWFLAKE");
+
+                                    if (!IsSuccessful)
+                                    {
+                                        Logger.Error($"snowflakeeventhandler failed sending SAS email - revision:{snowCompletedEvent.RevisionID}");
+                                    }
+                                }
                                 break;
                             case "FAILED":
                                 de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.RequestFailed.ToString();
@@ -73,24 +87,33 @@ namespace Sentry.data.Infrastructure
                         }
 
                         _dsContext.SaveChanges();
+                        Logger.Info($"snowflakeeventhandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     case "SNOW-TABLE-DELETE-REQUESTED":
                         SnowTableDeleteModel snowDeleteEvent = JsonConvert.DeserializeObject<SnowTableDeleteModel>(msg);
-                        Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(snowDeleteEvent)}");
+                        Logger.Info($"snowflakeeventhandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(snowDeleteEvent)}");
                         de = _dsContext.GetById<FileSchema>(snowDeleteEvent.SchemaID);
                         de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteRequested.ToString();
                         _dsContext.SaveChanges();
+                        Logger.Info($"snowflakeeventhandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     case "SNOW-TABLE-DELETE-COMPLETED":
                         SnowTableDeleteModel deleteCompletedEvent = JsonConvert.DeserializeObject<SnowTableDeleteModel>(msg);
-                        Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(deleteCompletedEvent)}");
+                        Logger.Info($"snowflakeeventhandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(deleteCompletedEvent)}");
                         de = _dsContext.GetById<FileSchema>(deleteCompletedEvent.SchemaID);
 
-                        switch (deleteCompletedEvent.SnowStatus.ToString())
+                        switch (deleteCompletedEvent.SnowStatus.ToUpper())
                         {
                             case "DELETED":
                             case "SKIPPED":
                                 de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Deleted.ToString();
+
+                                bool IsSuccessful = _schemaService.SasDeleteNotification(deleteCompletedEvent.SchemaID, deleteCompletedEvent.InitiatorID, "SNOWFLAKE");
+
+                                if (!IsSuccessful)
+                                {
+                                    Logger.Error($"snowflakeeventhandler failed sending SAS delete email - schema:{deleteCompletedEvent.SchemaID}");
+                                }
                                 break;
                             case "FAILED":
                                 de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteFailed.ToString();
@@ -101,9 +124,10 @@ namespace Sentry.data.Infrastructure
                         }
 
                         _dsContext.SaveChanges();
+                        Logger.Info($"snowflakeeventhandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     default:
-                        Logger.Info($"SnowflakeHandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");
+                        Logger.Info($"snowflakeeventhandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");
                         break;
                 }
 
