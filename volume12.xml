@@ -348,221 +348,233 @@
       </div>
 
 <!-- Hannah Burrows -->
-      <div xml:id="EBA-1904-11-27" type="entry">
-        Thursday, Feb. 2d.
+      <div xml:id="EBA-1905-02-02" type="entry">
+        <dateline>
+          <date when="1905-02-02">Thursday, Feb. 2d.</date>
+        </dateline>
         <p>Two very quiet days - the <name>Picketts</name> from <placeName ref="">Cairo</placeName>, who are here in their <orgName>R.R</orgName>. car, dined with us.<pb n="72"/></p>
+        <!-- R.R. - Rolls Royce? Is that an orgName? -->
+        <!-- also, should we have pb's in the paragraph, as above, or in between divs? -->
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
-        Friday, Feb. 3d.
+      <pb n="72"/>
+      <div xml:id="EBA-1905-02-03" type="entry">
+        <dateline>
+          <date when="1905-02-03">Friday, Feb. 3d.</date>
+        </dateline>
         <p>We were at home all day, until in the afternoon we visited the <persName ref="">Agiz</persName>, who arrived today - then to the <placeName ref="">Sabiha</placeName> to see the <orgName>Campbells</orgName>. They have an interesting and rather pretty little boat - built in the <placeName ref="">Hareem</placeName> style - it was built and belongs to the <placeName ref="">Khedives</placeName> mother. A visit from <persName ref="">M. Maspero</persName> after we got home - and <persName ref="">Smith</persName> and <persName ref="">Ream</persName> came for bridge in the evening. Maspero's dined with us and the <orgName>Abb&#233; Th&#232;odant</orgName>.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
-        Fifth Sunday after Epiphany. Feb. 5th.
+      <div xml:id="EBA-1905-02-05" type="entry">
+        <dateline>
+          <date when="1905-02-05">Fifth Sunday after Epiphany. Feb. 5th.</date>
+        </dateline> 
         <p><persName ref="">Smith</persName> and <persName ref="">Ream</persName> came to breakfast - <persName ref="">Jean</persName> went over with them afterwards to church. Mr. <persName ref="">Ayrton</persName> to lunch and a visit from the <orgName>Agiz</orgName> people, who came to tea, and we made Mrs. <persName ref="">Perkins</persName> and <persName ref="">Miss Hale</persName> stay for dinner. <persName ref="">Theo</persName> went immediately after lunch with Mr. <persName ref="">Ayrton</persName> over to the <orgName>Quibells</orgName> and the busy day came to an end.</p>
+        <!-- who/what are the Agiz? Not in the master indices so far -->
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Monday, Feb. 6th.
         <p>A very windy day - <persName ref="">Theo</persName> and <personGrp ref="">the girls<personGrp> in spite of it, went over to the <placeName ref="">Valley</placeName>, where when <persName ref="">Theodore</persName> appeared the workmen greeted him with a cheer, and he knew it meant some sign of promise - and the men had found the lintel of a door to a tomb. They said they might clear it to the entrance in a few days. Very encouraging.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Tuesday, Feb. 7th.
         <p>A calm, warm day. <persName ref="">Theo</persName> came back from <placeName ref="">Luxor</placeName> this noon, with a most beautiful statuette in silver he had bought of Mohassib. In<pb n="73"/> style and treatment it suggests that <orgName>Egyptian</orgName> statuette in bronze and silver, the <orgName>Lady Tak&#251;shit</orgName>, now in <placeName ref="">Athens</placeName> and shown in the "Struggle of Nations" by Maspero. <persName ref="">Smith</persName> and <persName ref="">Ream</persName> went with <persName ref="">Theo</persName> and <persName ref="">Weigal</persName>, who had lunched here, to the <persName ref="">Valley</persName>, and the two first dined with us. Mr. and Mrs. <persName ref="">Joe Smith</persName> came in during the evening.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Friday, Feb. 10.
         <p>This is the third day of cold, strong <orgName>S</orgName>. wind we have had. Sand flying in clouds. There was literally no stirring abroad.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Saturday, Feb. 11th.
         <p><persName ref="">Theo</persName> and <persName ref="">Mr. Weigall</persName> went over to the <placeName ref="">Valley</placeName> today; several steps leading to the door of the tomb uncovered. <persName ref="">Weigall</persName> came in for tea - after which <persName ref="">Theo</persName> went over to the <persName ref="">Miriam</persName> to see <persName ref="">M. Maspero</persName> about the tomb, <persName ref="">Quibell</persName> being away. He authorized <persName ref="">Theo</persName> to open it, and Mr. <persName ref="">Weigall</persName> will look after it. <persName ref="">Theo</persName> wrote <persName ref="">Mrs. Quibell</persName> about it, explaining.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         6th Sunday after Epiphany - Feb. 12.
         <p>A Mr. <persName ref="">Porch</persName> came to lunch with <persName ref="">Mr. Weigall</persName>. <persName ref="">Theo</persName> met him the other day. He is <orgName>English</orgName>, a devot&#233; to flints. He has been encamped near <placeName ref="">G&#251;rna</placeName>, at the mouth of a little rock tomb, he is a handsome agreeable little fellow - seems to know every one - and especially all <placeName ref="">Italy</placeName> and Italians. He travels everywhere with an <orgName>Italian</orgName> servant who would seem to be a half savant. His ancestral home in <placeName ref="">England</placeName><pb n="74"/> is <placeName ref="">Glastenbury Abbey</placeName> - he goes very soon to <placeName ref="">India</placeName> - with this servant and a camel he has come all the way from the <placeName ref="">Red Sea</placeName> to Luxor. <persName ref="">Theo</persName> and <persName ref="">Weigall</persName> rode over to the <placeName ref="">Valley of the Kings</placeName> this afternoon - when <persName ref="">Theo</persName> got home he brought with him two or three queer parcels - and he had an air of great elation. He first unwrapped a yoke of a chariot, finely decorated in gold and colour - in perfect condition, then a long baton, or wand of office - also finely decorated - then produced a large beautiful green, hard stone scarab, with gilded bands, beautifully inscribed even to the wings. He said that the workmen had reached the door of the tomb chamber, and they went down into it. A small aperture had been broken in this door, large enough to admit a man. This door was of stone, plastered with mud - with many seals on it - and the tomb had been broken into in ages gone by - for the things <persName ref="">Theo</persName> found in the corridor and brought home, had no doubt been dropped by the thieves. <persName ref="">Weigall</persName> remained behind, to sleep with the guards at the tomb, and Mr. and Mrs. <persName ref="">Smith</persName> also went over to stay with him. <persName ref="">Theo</persName> wrote a note to <persName ref="">M. Maspero</persName> and <persName ref="">Mr. Sayce</persName> who arrived on the <name>Istar</name> yesterday, to come and see the things. They all came over in the evening. Mrs. <persName ref="">Sheldon Amos</persName>, who is staying with Mr. <persName ref="">Sayce</persName>, also came.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Monday, Feb. 13th.
         <p>We all made an early start for the <placeName ref="">Valley</placeName> this morning. <persName ref="#Wilson_Alice">Alice</persName> has not been feeling very well for a few days - and was so melancholy at the idea of being left behind on the opening day of the tomb, that I persuaded <persName ref="">Theodore</persName> to send for one of the <placeName ref="">Victorias</placeName> that occasionally take people over - and she and I rode over most comfortably. We had to<pb n="75"/> go on our donkeys across the wide sand waste - and then take the carriage and we had to get out for the ascent and the descent of the high canal embankment. But the moment we entered the valley, the going was very good. We found <persName ref="">Weigall</persName> and the <persName ref="">Smiths</persName>, the native <persName ref="">Inspector</persName>, and <persName ref="">Maspero</persName> and his Secretary soon arrived. The inner door was ordered down - and while it was being done, <persName ref="">Theo</persName> and <persName ref="">M. Maspero</persName> made a long hot climb to look at a certain site the latter thought favourable - and the rest of us sat on the rocks, or in the carriage from which the horses had been taken. <persName ref="">Mrs. Smith</persName> who was wildly enthusiastic about the whole thing, said that the night had been one of the most beautiful she had ever spent. They felt the cold very much, and got up twice to make tea - and again very early and climbed to one of the highest points to see the sun rise. In half an hour the native Inspector came out of the tomb and said to <placeName ref="">Weigall</placeName> "the entrance is free". He and Mr. <persName ref="">Smith</persName> went down, and in a short time <persName ref="">Weigall</persName> came up pale and breathless. I thought he had been affected by bad air - but it was only excitement - for he ejaculated "wonderful" "extraordinary" etc. <persName ref="">Mr. Smith</persName> said, "there is everything there but a grand piano., - the place is crowded with furniture and coffins". We waited until <persName ref="">M. Maspero</persName> and <persName ref="">Theodore</persName> were back, when they at once went down and stayed a long time. The tomb was so accessible, opening by its first flight of steps on a level with the pathway - from which a short descending corridor leads to another short stairway, which gives immediate access to the tomb chamber. It lies just between <name>No's</name> 3 and 4 - the former an unfinished tomb intended for <orgName>Ramses III</orgName> - 4 also unfinished - the tomb of <placeName ref="">Ramses XII</placeName>. Neither <persName ref="">M. Maspero</persName> or <persName ref="">Quibell</persName> thought<pb n="76"/> this site worth working, but <persName ref="">Theo</persName> in his thorough way said he should go on clearing up both sides of that side valley - and it was just by this method that he found the tomb of <name>Thothmes IV</name> and Hatshepsut. it is remarkable that this tomb, crowded in between 3 and 4 could have escaped complete spoilation. When these men at last appeared they told us wondrous tales, and allowed us one by one to go down - by the light of candles I could see a dim glitter of gold everywhere and a confusion of coffins and mummies. Arrangements were made at once for bringing electric wires into the tomb, as the <name>Duke of Connaught</name> was expected in the afternoon and <persName ref="">M. Maspero</persName> was very pleased to be able to give him such a sight. Then we all went up to the <orgName>Thothmes IV</orgName> plateau, where <persName ref="">Jones</persName> had lunch for us. Too soon after this <persName ref="">M. Maspero</persName> and <persName ref="">Theo</persName> started for the tomb again in the hot sun -- and we followed. They went immediately into it - and when in about 20 minutes I saw one rushing up and demanding water and brandy, I knew that <persName ref="">Theo</persName> must have fainted as he did a few years ago, under exactly the same circumstances. When I reached the first flight of steps, I saw that two people were supporting him at the bottom step, bathing his head and hands. He called up to me however that he was about over it - and was soon able to be helped up - and took refuge in the carriage - and soon seemed none the worse for it. About 4 o'clock, the <persName ref="">Duke</persName> and his party arrived with a military escort - and went down into the tomb. We had withdrawn to a respectful distance and were sitting on the rocks - when the <persName ref="">Duke</persName>, a fine soldierly looking fellow and <persName ref="">M. Maspero</persName> emerged. The <persName ref="">Duke</persName> strode over the rocks to where <persName ref="">Theodore</persName> was, and heartily congratulated him, and begged to<pb n="77"/> present him to the <orgName>Duchess</orgName>. After they left, Mr. <persName ref="">Quibell</persName> came very much disgruntled, to find the tomb had been opened in his absence. <persName ref="">M. Maspero</persName> discovered by the various inscriptions in the tomb, that it was the burial place of <persName ref="">Yuaa</persName> and <persName ref="">Tuaa</persName>, the father and mother of the great Queen Tyi, wife of <persName ref="">Amenhotep</persName> III. The cartouche of this king is on many of these things - and that of a daughter of his - <persName ref="">Set-amen</persName>. All the objects so far as they have been seen, are in perfect order and good and very beautiful.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Tuesday, Feb. 14th.
         <p>Another day with all the family again to the <orgName>Valley</orgName>. Again I had the carriage and took Mme. <persName ref="">Maspero</persName> with me. Mr. <persName ref="">Sayce</persName> and Mrs. <persName ref="">Sheldon Amos</persName> also went over - and we had an open lunch table at the <placeName ref="">Thothmes</placeName> plateau - all of these, with the <persName ref="">Abbe Th&#233;adant, Weigall, Smith</persName> and Ayrton. After we got home, Capt. <persName ref="">Watson</persName> of the <name>Duke's</name> party called, also <persName ref="">Maspero, Lacau</persName>, and the <orgName>Abb&#233;</orgName>. Sir <persName ref="">John</persName> and <persName ref="">Lady Evans</persName> dined with us. The tomb was visited today by the <name>Ex-Empress Eug&#233;nie</name>, and also by Prince <persName ref="">Gustave Adolphe</persName> of Sweden. He and <persName ref="">Theo</persName> seem to have struck up quite a friendship. <persName ref="">Theo</persName> was much pleased with him - a sensible, intelligent young fellow. He was very enthusiastic over what he saw, and said, "Moi, Je suis aussi explorer - je fouille dans mon pays - si ca m'arrivera de venir ice pour fouiller comme vous!" One of his aid-de-camps after sent Mr. <persName ref="">Davis</persName> a note thanking him again and again. Also the Duke and <name>Duchess of Devonshire</name> saw it.<pb n="78"/></p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Wednesday, Feb. 15.
         <p><persName ref="">Theo</persName> and Mr. <persName ref="">Sayce</persName> went over to the tomb and spent the day - we stayed at home - a calm day - <persName ref="">Theo</persName> sent his <orgName>Thothmes</orgName> book to the Duke of Connaught. In the evening after he got back, Capt. <name>Yarde-Buller A.D.C</name>. to his H.R.H. called to thank him, and afterwards Capt. <persName ref="">Watson</persName> came in and joined him. Capt. <persName ref="">W</persName>. was very entertaining with his talk about his experiences - having been with <persName ref="">Kitchener</persName> through the whole of the campaign in the <placeName ref="">Soudan</placeName>. <persName ref="">M. Lacau</persName> dined with us.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Thursday, Feb. 16.
         <p>A warm, calm day - over to the <placeName ref="">Valley</placeName> again, but I in my donkey chair. I saw the different things found in the tombs well today for the first time - as they had been brought out of the tomb and placed in that of <placeName ref="">Ramses XII</placeName>. The most wonderful and varied collection of beautiful things in perfect condition. The 2 mummies of <orgName>Yuaa</orgName> and <persName ref="">Tuaa</persName>, well preserved and very impressive, despite the fact that <orgName>Tuaa's</orgName> eyes are wide open. They had double coffins of the finest workmanship literally overlaid with gold - chairs, boxes, 3 funeral couches, vases, scarabs, a great roll of papyrus, etc etc. extraordinarily rich - a wonderful find. At 3 o'clock <persName ref="">Theo</persName> received a note from Capt. <persName ref="">Waters</persName>, which had been sent over from the dahabya, saying their <orgName>Royal Highnesses</orgName> would be glad to come about 5 o'clock to the boat if it would be convenient. So we had to drop everything, order out donkeys, and hurry home the 7 miles. We had just time to wash our faces, and take off our hats, when they arrived, also in riding dress. The <persName ref="">Duke, Duchess</persName>, their daughter<pb n="79"/> Princess <persName ref="">Margaret</persName>, a Lady in Waiting and Capt. Buller. I never met simpler, pleasanter people. They were very much interested in every thing - and it was queer to see them in my room, which they declared lovely. They stayed over an hour, and evidently enjoyed themselves, and parted most fraternally from <persName ref="">Theodore</persName> - Gen. Sir <persName ref="">John Maxwell</persName> was also with them. <persName ref="">M</persName>. and <persName ref="">Mme</persName>. <persName ref="">Maspero</persName>, the <persName ref="">Abb&#233;</persName>, called to say goodbye as they start down the river tomorrow. Mr. <persName ref="">Sayce</persName> and <persName ref="">Mrs. Amos</persName> also called.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Friday, Feb. 17.
         <p>A quiet day and evening at home! Lovely!</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Saturday, Feb. 18.
         <p><persName ref="">Theo</persName> and <personGrp ref="">the girls<personGrp> went to the <placeName ref="">Valley</placeName> again - <persName ref="">Weigall</persName> came back with them and had tea. He still sleeps at the tomb. <persName ref="">M</persName>. and <persName ref="">Mme</persName>. <persName ref="">Naville</persName> to tea. Mr. <persName ref="">Sayce</persName> dined with us. He starts down on Monday. We start for <persName ref="">Asw&#226;n</persName> tomorrow - I don't know for what unless to give <persName ref="">Theodore</persName> a rest. We can only stay a day or two.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Septuagesima Sunday - Feb. 19. 9 miles.
         <p>Mr. <persName ref="">Ayrton</persName> came to breakfast - we were off at noon, and with difficulty reached Erment. It is so nice to be free of people once more.<pb n="80"/></p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Monday, Feb. 20. 42 miles.
         <p>A beautiful warm day - we are about a mile below <placeName ref="">El Kab</placeName>.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Tuesday, Feb. 21. 53 miles.
         <p>A fine sailing day - we are from 2 to 3 miles below <placeName ref="">Kom Ombo</placeName>.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Wednesday, Feb. 22. Asw&#226;n. 28-1/2 miles.
         <p>We arrived about 3 o'clock - and have ever since been wondering why we came. But the dry, warm air is delicious, and so are the red-yellow sands. Are lying at our old island.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Thursday, Feb. 23.
         <p><persName ref="">Theodore</persName> and I have been home all day - <personGrp ref="">the girls<personGrp> went to the <placeName ref="">Barrage</placeName> this afternoon with <persName ref="#Amelie">Amelie</persName> - wind.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Friday, Feb. 24.
         <p>A very high wind all day. Girls lunched at the <placeName ref="">Cataract Hotel</placeName> with the <name>Boston Hooper</name> girls - who came over to the boat late in the afternoon. Dr. <persName ref="">Morrall</persName> called this morning. <personGrp ref="">the girls<personGrp> and I with <persName ref="">Jones</persName> were at the <placeName ref="">Bazaar</placeName> this morning - <persName ref="">Jean</persName> and I went for tea to the <placeName ref="">Savoy</placeName> - and had it in the garden back of the hotel. it was charming - the gardens are of real extent, and wonderfully improved. So much more attractive<pb n="81"/> than the <placeName ref="">Cataract Hotel</placeName>. <persName ref="">Theo</persName> has been trying to find a tug - but failed.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Saturday, Feb. 25. 12 miles.
         <p>We got off at 7:30 and are now within 14 miles of <placeName ref="">Kom Ombo</placeName> - a really warm day.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Sexigesima Sunday. Feb. 26. 26 miles.
         <p>The men have worked nobly from since 4 o'clock this morning - working most of the time - we are lying 3 miles above <placeName ref="">Silsileh</placeName>.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Monday, Feb. 27. 40-1/2 miles.
         <p>The men began at 3 o'clock, and have rowed until 6 P.M. We passed 3 dahabyas going up.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Near <placeName ref="">El Kab</placeName>. Tuesday, Feb. 28. 38 miles.
         <p>We have had a warm day and evening - many clouds about - fear <placeName ref="">N</placeName>. wind tomorrow.<placeName ref="">Gebelen</placeName>.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Wednesday, March 1st. 9 miles.
         <p>We have had such gales of wind today, and have worked along in all sorts of ways, but have only reached Erment, or a little below it, and tied up at 6 o'clock.<pb n="82"/></p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         <placeName ref="">Luxor</placeName> - March 2nd. - Thursday.
         <p>Starting very early this morning we reached our old mooring place on the sand opposite the <name>Castle</name>, at 8 o'clock. <placeName ref="">Luxor</placeName> looks quite deserted. We were a little over 5 days coming down. We found the <persName ref="">Campbells</persName> here, and they came over to see us at once. Mr. <persName ref="">Weigall</persName> also came in with many interesting things to say. Quite warm - we all rode over to <persName ref="">Der el Bahari</persName> - and had tea with Mr. <persName ref="">Ayrton</persName> at the little stone house. I saw for the first time the beautiful sarcophagus found by <persName ref="">Naville</persName> on the terrace of the <placeName ref="">Mentuhotep</placeName> temple - of one of the "favourites" of the King - <name>Kau-it</name> - quite exquisite. Mr. <persName ref="">Ayrton</persName> says there were several graves found. I think he said 7 - three of them bearing names of which the above was one - the rest were nameless. <persName ref="#Wilson_Alice">Alice</persName> and I came directly home, but <persName ref="">Theo</persName> and <persName ref="">Jean</persName> went on to the <orgName>Quibells</orgName>. The <persName ref="">Campbells</persName> started down the river this afternoon.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Friday, March 3rd. Very warm.
         <p><persName ref="">Theodore</persName> and <persName ref="">Jean</persName> off to <placeName ref="">Karnak</placeName> this morning. The boxes began arriving from the tomb this morning, and were taken to a big felucca just behind us. It looked quite awful to see the long line of men, staggering over those wide burning sands, in that hot sun, carrying such loads. Mr. <persName ref="">Quibell</persName> and <persName ref="">Weigall</persName> came with them, and the latter in to lunch with us. It will be impossible to get them all over today. There were several policemen - and Mr. <persName ref="">Quibell</persName> and a force will sleep there tonight. <persName ref="">Ayrton</persName> came to dine. I had expected <persName ref="">Miss Buchanan</persName> and <persName ref="">Nubaweeya</persName> to tea this afternoon and was so disappointed that they were<pb n="83"/> prevented. <persName ref="">M. Lacau</persName> was here however, and <persName ref="">Miss Insinger</persName>. To tea with <persName ref="">Miss Buchanan, Theo, Jean</persName> and I, and had such a pleasant visit.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Saturday, March 4th.
         <p>A very hot day - we all went over to <placeName ref="">Luxor</placeName> and met the <persName ref="">Forbes-Leiths</persName>, who are coming to dine tonight. <persName ref="">Theo</persName> has arranged with the <name>Sugar Co</name>. of <placeName ref="">Nag Hamadi</placeName>, to give us a tug on the 8th. We have had a charming dinner - <persName ref="">Mrs. Forbes-Leith</persName> - Col. and Mrs. Burn (her daughter and son-in-law) and Mrs. Tweedah. They were delighted with everything here. We get off tomorrow.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Quinquagesima Sunday. March 5th.
         <p>We did not get off this morning, as a gale from the north was raging. <persName ref="">Weigall</persName> here for breakfast. We had waffles - which he said always seemed to him like eating "warm pillows". Mr. <persName ref="">Ayrton</persName> came in late this afternoon, with the Capt. from <persName ref="">Kons</persName>, with whom he had been to look at the huge prehistoric cemetery up near <placeName ref="">Kom Ombo</placeName>. It is supposed to be a secret - and he reported most favourably about it - and says it has the appearance of being absolutely untouched. He will begin work upon it at once for <orgName>Theodore</orgName>. The <orgName>Quibells</orgName> called to say goodbye. Altogether we have been at <placeName ref="">Luxor</placeName> this year 5 weeks and 3 days.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Monday March 6th. 22-1/2 miles.
         <p>We got off this morning at 7 o'clock - in almost a calm - but had to give up rowing and begin floating<pb n="84"/> before we were out of sight of <placeName ref="">Luxor</placeName> - and so we have come along, and are now near <placeName ref="">Nagada</placeName> - day has been very cool.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Tuesday, March 7th. 28 miles.
         <p>The usual north wind has prevailed today - but in spite of it we are now lying nearly opposite <persName ref="">Keneh</persName>, having been driven to the bank at 5 o'clock, with our nose down stream. The wind is howling tonight - everything is banging and rattling. We are hoping our tug may come to meet us tomorrow.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Ash-Wednesday, Mar. 8th.
         <p>We laid at our place of last night, until a few minutes before 3 o'clock, our tug appeared - and soon we were swiftly and smoothly putting the miles behind us - until at 8 o'clock, we had tied up at <placeName ref="">Nag Hamadi</placeName> - very cold - and high winds.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Thursday, Mar. 9th. 51 miles.
         <p>Passed the bridge at 8:30 and pulled up on the other side for mail, marketing etc. Got a huge mail bag of letters and papers - and were soon off - the tug is a powerful one, and we have come 51 miles since 9:30 - against this northern gale. It has been astounding to see the towns appear one after the other. First Balliana, where were lying the <persName ref="">Sabiha</persName> with the <persName ref="">Campbells</persName>, and the <persName ref="">Zenet-el-Nil</persName> with the <orgName>Birds</orgName> - we had only time to wave to them as we rushed by. Then came <persName ref="">Girga</persName> - and then <persName ref="">Menshia</persName> appeared as if by magic - then<pb n="85"/> we were upon <persName ref="">Akmim</persName> - and about 5:30 pulled up at <placeName ref="">Sohag</placeName>. The sky has been filled with clouds - no sunshine - and the exquisite little moon seen tonight for the first time. Passed the <orgName>Isis</orgName>, and the <persName ref="">Ammon-Ra</persName>, late in the afternoon.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Friday, Mar. 10th. 73 miles.
         <p>Started at 6:30 much of the time a high wind - and cold. The thermometer in my room was at 50 this morning - but the air most delicious - with a bright sun, and almost a winters crispness in the air. The tug went on the sand for a few minutes this morning. <name>Made Asy&#251;t</name> about 3 o'clock - having passed the <persName ref="">Bijou</persName> with the <persName ref="">Smith</persName> family aboard this side of <placeName ref="">Aboutig</placeName>. Got our mail at <placeName ref="">Asy&#251;t</placeName> - had an exciting time getting through the Weir. Heard that Mr. <persName ref="">Sayce</persName> left <persName ref="">Asy&#251;t</persName> yesterday.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Saturday, Mar. 11th. 88 miles.
         <p>A cold north wind all day - tug was twice on the sand. We passed Mr. <persName ref="">Sayce</persName> just above <persName ref="">Rada</persName> - and pulled up at <placeName ref="">Minia</placeName> at 5:30 at the edge of the wide sand bank that lies in front of the town -which seems to make a general promenade, and playground for the town - many boys engaged in football.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         First Sunday in Lent, Mar. 12th. 64-1/2 miles.
         <p>Fashen. We have had a difficult river in places today - and a crowd of gyassas, so that we had to<pb n="86"/> leave the tug, and the men rowed a short distance to <placeName ref="">Fashen</placeName>. Were detained 3 hours at <placeName ref="">Sheik Fadle</placeName>, the tug getting coal.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         <placeName ref="">Wasta</placeName> - Monday, Mar. 13th. 37 miles.
         <p>We dismissed our tug as by agreement at <placeName ref="">Wasta</placeName> - where we arrived at noon, and have had to wait, as the <placeName ref="">N</placeName>. wind was so strong.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Tuesday, Mar. 14. 30 miles.
         <p>We started at 7 this morning - not being in a hurry now to reach Cairo. It has been cool, but most delightful - the air having such a delicious quality, and we did so enjoy being without a tug.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Wednesday, Mar. 15th. 11 miles.
         <p>We pulled up here at <placeName ref="">Bedresheyn</placeName> at 6 o'clock - such a pretty resting place - with the splendid palms characteristic of this neighborhood above us across the sand. We stopped about a mile above <placeName ref="">Helouan</placeName> on the opposite side for an hour to rest the men this afternoon, and had a charming walk through the fields and among the palms - and saw on the high road just beyond us, the carriages, omnibusses, automobiles, and other horrid evidences of civilization.<pb n="87"/></p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Thursday, Mar. 16th.
         <p>We have had the day at <placeName ref="">Sakara</placeName> - it was hot. About 40 people lunching at <placeName ref="">Mariette's</placeName> house. I did not go to a single tomb - having gone only for the ride which is so beautiful until you reach the desert and even then, that great plateau of wavy, undulating, uncompromising desert, has its impressiveness - and always its splendid air. But those paths through those great palm forests, and the fertile fields is charming beyond description. But it was not coming home - the donkeys in my chair were miserable, tired to death poor things by the hard service of the winter - and the donkey boys vociferous and unpleasant, and I was glad to reach the comfort of the shaded deck, tea, and <orgName>Billy's</orgName> affectionate greetings.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Friday, Mar. 17. 15 miles.
         <p>Cairo. We reached here at 11:30 - got through the bridge in the usual exciting manner, and tied up in our old quarters beneath the <name>Ghezireh Palace Hotel</name> at 3 o'clock. Very hot. <persName ref="">Weigall</persName> down from <placeName ref="">Luxor</placeName> for his exams - dined with us.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Saturday, Mar. 18.
         <p>Home all day. <persName ref="">Theodore, Jones</persName> and the men, carried by boat over to the museum this morning the antiquities we brought down from <placeName ref="">Luxor</placeName>. I was glad to get rid of them.<pb n="88"/></p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Second Sunday in Lent, Mar. 19.
         <p>Col. and <persName ref="">Mrs. Watson</persName> and baby to tea this afternoon. Mr. <persName ref="">Edgar</persName> came in and Mr. <persName ref="">Carter</persName> down from <placeName ref="">Tanta</placeName> to dine and talk our affairs over with <persName ref="">Theo</persName> - he looks wretched.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Monday, Mar. 20.
         <p>Wasted the morning in <placeName ref="">Cairo</placeName>.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Tuesday, Mar. 21.
         <p>A cold disagreeable day - with gale - thunder and lightning. The 3 <persName ref="">Hooper</persName> girls of <placeName ref="#Boston">Boston</placeName> dined with us - very nice people. To the Museum this morning, to see the things from the tomb which are now pretty well unpacked. A whole, large room has been given them. The <persName ref="">Bijou</persName>, with the <persName ref="">Smiths</persName> came down on Sunday, and is just ahead of us.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Wednesday, Mar. 22.
         <p><persName ref="">Mr. Carter</persName> to lunch - we dined at the <placeName ref="">Hotel</placeName> - <persName ref="">(Ghezireh)</persName> with the <orgName>Forbes-Leiths</orgName> - several pleasant people.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Thursday, Mar. 23rd.
         <p>A really, cold day, with high wind - went to the <placeName ref="">Continental Hotel</placeName> this afternoon to hear <persName ref="">M. Maspero</persName>, on "the Find" - a lecture for the benefit of the <name>Y.M.C.A</name>. of <placeName ref="">Cairo</placeName> - a crowded hall. Everyone showed much interest. It was difficult to hear him - as his voice was low, with the usual <orgName>French</orgName> monotonous manner.<pb n="89"/></p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1904-15-27" type="entry">
         Friday, March 24th.
         <p>At home and busy all the morning - <persName ref="">Theo</persName> engaged the <orgName>Nitseris</orgName> the other day to take us to the <placeName ref="">Barrage</placeName> this afternoon. We asked Mr. and <persName ref="">Mrs. Watson</persName>, and the <persName ref="">Hooper</persName> girls. We had never seen this <orgName>Barrage</orgName> and I have always wanted to see the river below <placeName ref="">Cairo</placeName>, and so it was very interesting. It took us about an hour and a half - so that we didn't have any time for the <orgName>Barrage</orgName>, and very little time for that beautiful garden - the best in Egypt. The whole thing was very un-Egyptian - the two barrages, one over the <persName ref="">Damietta</persName>, the other over the <placeName ref="">Rosetta</placeName> branch - with their long line of arches and towers - with the land between made into this park-like garden. The whole effect was rather <orgName>Venetian</orgName>. Home by 7 o'clock - having had tea on the way back.
       </div>
 <!-- This should not say November... -->
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Saturday, Nov. 25.
         <p>At the Museum this morning - <persName ref="">Theo</persName> showed Mrs. <persName ref="">Burn</persName> about - as she was not able to be with her mother and father, <persName ref="">Admiral</persName> and Mrs. <persName ref="">Forbes Leith</persName> the other day, when they saw the things. She went from there to the train, as they all join their yacht at <placeName ref="">Alexandria</placeName>, and go for a <orgName>Mediterranean</orgName> tour to the <placeName ref="">Holy Land, Greece</placeName>, etc.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         3d Sunday in Lent, Mar. 26.
         <p>Home all day - a worse <orgName>Khamsin</orgName> condition than yesterday. Ther. 86 in the shade, about 5 o'clock we went for a drive towards the <placeName ref="">Pyramids</placeName> - very delightful. <persName ref="">Dr. Sandwith</persName> for dinner. He seemed tired and dull - without his old sparkle. He sails on Thursday for 2<pb n="90"/> months in <orgName>America</orgName>.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Monday, Mar. 28th.
         <p>This has been a busy day - in town in the morning - <persName ref="">Jean</persName> and <persName ref="#Wilson_Alice">Alice</persName> to the <orgName>Linton-Smiths</orgName> to lunch. Mr. and Mrs. <persName ref="">Newman</persName> in the afternoon came in and after that we all went to <placeName ref="">Miss Morgans</placeName> garden reception - which was charming - a delightful band playing and many people we knew. A quiet evening - our last on the boat.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Tuesday, Mar. 29th.
         <p>To the Museum with <persName ref="">Theodore</persName> - the room with the "find" is now open to the public. Dr. and <persName ref="">Mrs. Campbell</persName> were there. They leave tomorrow on the <orgName>Roumanie</orgName>. <persName ref="">Miss Morgan</persName> and <persName ref="">Dr. Sandwith</persName> also go on it. Left the boat for the Hotel and are now up at the <placeName ref="">Ghezireh Palace</placeName>.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
+      <div xml:id="EBA-1905-11-27" type="entry">
         Wednesday, Mar. 30th.
         <p><persName ref="">Jean</persName> and <persName ref="#Wilson_Alice">Alice</persName> dined in town with the <persName ref="">Pecketts</persName> this evening and <persName ref="">Joe Smith</persName> and wife dined with us and we all went in to the concert at <placeName ref="">Shepheards</placeName>.</p>
       </div>
-      <div xml:id="EBA-1904-11-27" type="entry">
-        Thursday, Mar. 31st.
+      <div xml:id="EBA-1905-03-31" type="entry">
+        <dateline>
+          <date when="1905-03-31">Thursday, Mar. 31st.</date>
+        </dateline>
         <p><persName ref="#Wilson_Alice">Alice</persName> and I spent the morning at the <orgName>Zoo</orgName>. After the rain of last night the gardens were lovely. <persName ref="">Monsieur Lackau</persName> dined with us.<pb n="91"/></p>
       </div>
 
