@@ -10,3 +10,7 @@
     [JsonSchemaObject] VARCHAR(MAX) NULL, 
     CONSTRAINT [FK_SchemaRevision_Schema] FOREIGN KEY ([ParentSchema_Id]) REFERENCES [Schema]([Schema_Id])
 )
+
+GO
+
+CREATE INDEX [IDX_SchemaRevision_ParentSchema_Id] ON [dbo].[SchemaRevision] ([ParentSchema_Id]) INCLUDE (Revision_NBR)

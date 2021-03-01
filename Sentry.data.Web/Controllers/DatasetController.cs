@@ -1019,77 +1019,189 @@ namespace Sentry.data.Web.Controllers
             return View("QueryTool");
         }
 
+
+
+
+
         //CONTROLLER ACTION called from JS to return the snowflake query
         [HttpPost]
-        public ActionResult DelroyGenerateQuery(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string queryType, List<string> snowflakeViews, List<string> structTracker)
+        public ActionResult DelroyGenerateQuery(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, List<string> snowflakeViews, List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
             bool outerfirst = true;
-            string parentStructs = DelroyStructMonster(structTracker);
-            string query = GenerateSnow(models, parentStructs, ref outerfirst);
-            query = "SELECT " + System.Environment.NewLine + query;
+            bool columnExists = false;
 
-            bool first = true;
-            foreach (var s in snowflakeViews)
+            string alias = DelroyAliasMonster(structTracker);
+            string query = GenerateSnow(models, alias, ref outerfirst, ref columnExists, structTracker);
+            if (!columnExists)
             {
-                if (first)
-                {
-                    query = query + " FROM " + s + System.Environment.NewLine;
-                    first = false;
-                }
+                query = "*" + Environment.NewLine;
             }
+            query = "SELECT " + System.Environment.NewLine + query;
+            query += DelroyCreateFrom(snowflakeViews);
+            query += DelroyCreateLateralFlatten(structTracker);
+            query += "LIMIT 10";
+
             return Json(new { snowQuery = query });
         }
 
         //RECURSIVE FUNCTION
         //pass array of Fields and will format a line for each child field it finds
-        //if the child field is a STRUCT, call itself again and pass the STRUCT's children
-        private string GenerateSnow(List<Sentry.data.Web.Models.ApiModels.Schema.SchemaFieldModel> models, string parentStructs, ref bool first)
+        //IF child field is a NON ARRAY STRUCT, call itself again and pass the STRUCT's children and print out all children and keep going
+        private string GenerateSnow(List<Models.ApiModels.Schema.SchemaFieldModel> models, string alias, ref bool first, ref bool columnExists,List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
-            string line = String.Empty;
+            StringBuilder line = new StringBuilder();
 
             foreach (var field in models)
             {
-                if(field.FieldType != "STRUCT")
+                if (field.FieldType != "STRUCT")
                 {
                     if (first)
                     {
-                        line = line + parentStructs + field.Name + System.Environment.NewLine;
                         first = false;
                     }
                     else
                     {
-                        line =  line + "," + parentStructs + field.Name + System.Environment.NewLine;
+                        line.Append(",");
                     }
-                    
+                    line.Append(alias).Append(field.Name).Append(DelroyCastMonster(field) + Environment.NewLine);
+                    columnExists = true;
+                }
+                else if(!field.IsArray)
+                {
+                    //pass "parentStructs" plus append current field so child nodes can get all parent structs appended
+                    //pass "first" as reference to know whether to append a comma or not
+                    line.Append(GenerateSnow(field.Fields, alias + field.Name + ":", ref first, ref columnExists, structTracker));
+                }
+            }
+            return line.ToString();
+        }
+
+
+        //CAST Each column to its native datatype
+        private string DelroyCastMonster(Models.ApiModels.Schema.SchemaFieldModel field)
+        {
+            string cast = "::" + field.FieldType;
+
+            if(field.FieldType.ToUpper() == "DECIMAL")
+            {
+                cast += "(" + field.Precision.ToString() + "," + field.Scale.ToString() + ") ";
+            }
+            else if(field.FieldType.ToUpper() == "VARCHAR")
+            {
+                cast +="(" + field.Length.ToString() + ") ";
+            }
+
+            return cast;
+        }
+
+
+        //Set initial alias of query:
+        //RULE: find the nearest ARRAY STRUCT and make that the initial ALIAS followed by all non ARRAY STRUCTS
+        //Then the GenerateSnow() will append all STRUCTS it digs through
+        //e.g. gary_flatten.value:element:austin:lily  gary here is an array struct
+        private string DelroyAliasMonster(List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
+        {
+            StringBuilder alias = new StringBuilder();
+
+            if(structTracker == null)
+            {
+                return alias.ToString();
+            }
+            else
+            {
+                //get the last struct that is an ARRAY which would be the closest parent ARRAY.  This will be our starting ALIAS
+                Models.ApiModels.Schema.SchemaFieldModel closestArray = structTracker.LastOrDefault(w => w.IsArray);
+
+                //if we found an array somewhere in the parent hierarchy, then need to start appending structs after that ONLY
+                if (closestArray != null)
+                {
+                    bool parentFound = false;
+                    alias.Append(closestArray.Name + "_flatten.value:element:");
+
+                    //start at top and work through each struct until you hit the closest parent, then after you start appending all structs
+                    foreach (var s in structTracker)
+                    {
+                        if (parentFound)
+                        {
+                            alias.Append(s.Name + ":");
+                        }
+                        else if (s.FieldGuid == closestArray.FieldGuid)
+                        {
+                            parentFound = true;
+                        }
+                    }
                 }
                 else
                 {
-                    //pass first as reference to know whether to append a comma or not
-                    line = line + GenerateSnow(field.Fields, parentStructs + field.Name + ":",ref first);
+                    //NO ARRAY EXISTS so assume our alias turns into all parent STRUCTS
+                    foreach (var s in structTracker)
+                    {
+                        alias.Append(s.Name + ":");
+                    }
                 }
             }
-            return line;
-        }
-
-        //CREATE LIST OF STRUCTS in the event the query is being generated at something other then the top level
-        private string DelroyStructMonster(List<string> structTracker)
-        {
-            string parentStructs = String.Empty;
-
-            if(structTracker != null)
-            {
-                foreach (var s in structTracker)
-                {
-                    parentStructs = parentStructs + s + ":";
-                }
-            }
-
-            return parentStructs;
+            return alias.ToString();
         }
 
        
 
 
+        //CREATE FROM STATEMENT FOR SNOWFLAKE
+        private string DelroyCreateFrom(List<string> snowflakeViews)
+        {
+            StringBuilder fromStatement = new StringBuilder();
+            bool first = true;
+
+            //CREATE FROM
+            //there can be multiple views associated with a given schema, just pick first one for now
+            foreach (var s in snowflakeViews)
+            {
+                if (first)
+                {
+                    fromStatement.Append(" FROM ").Append(s).Append(Environment.NewLine);
+                    first = false;
+                }
+            }
+
+            return fromStatement.ToString();
+        }
+
+        //CREATE LATERAL FLATTEN STATEMENT FOR SNOWFLAKE
+        private string DelroyCreateLateralFlatten(List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
+        {
+            
+            StringBuilder flattenStatement = new StringBuilder();
+            bool first = true;
+            string parentFlatten = String.Empty;
+            string currentFlatten = String.Empty;
+
+            if (structTracker == null)
+            {
+                return flattenStatement.ToString();
+            }
+            else
+            {
+                //CREATE FLATTEN FOR ARRAYS ONLY
+                foreach (var s in structTracker.Where(w => w.IsArray))
+                {
+                    currentFlatten = s.Name + "_flatten";
+                    if (first)
+                    {
+                        flattenStatement.Append(",LATERAL FLATTEN(" + s.Name + ":list) " + currentFlatten);
+                        first = false;
+                    }
+                    else
+                    {
+                        flattenStatement.Append(",LATERAL FLATTEN(" + parentFlatten + ".value:element:" + s.Name + ":list) " + currentFlatten);
+                    }
+                    parentFlatten = currentFlatten;
+                    flattenStatement.Append(Environment.NewLine);
+
+                }
+
+                return flattenStatement.ToString();
+            }
+        }
 
     }
 }
