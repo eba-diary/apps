@@ -4,6 +4,7 @@ using Sentry.Common.Logging;
 using Sentry.Messaging.Common;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {

@@ -26,11 +26,14 @@ namespace Sentry.data.Web.WebApi.Controllers
     {
         private readonly IDatasetContext _datasetContext;
         private readonly IJobService _jobService;
+        private HttpClient _httpClient;
+        private IApacheLivyProvider _apacheLivyProvider;
 
-        public JobController(IDatasetContext datasetContext, IJobService jobService)
+        public JobController(IDatasetContext datasetContext, IJobService jobService, IApacheLivyProvider apacheLivyProvider)
         {
             _datasetContext = datasetContext;
             _jobService = jobService;
+            _apacheLivyProvider = apacheLivyProvider;
         }
         /// <summary>
         /// Gets all Jobs
@@ -365,161 +368,158 @@ namespace Sentry.data.Web.WebApi.Controllers
                 }
 
                 JavaAppSource dsrc = _datasetContext.GetById<JavaAppSource>(job.DataSource.Id);
-
-                using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
-                using (var client = new HttpClient(handler))
-                {
-
-                    StringBuilder json = new StringBuilder();
-                    json.Append($"{{\"file\": \"{dsrc.Options.JarFile}\"");
+                
+                StringBuilder json = new StringBuilder();
+                json.Append($"{{\"file\": \"{dsrc.Options.JarFile}\"");
                     
-                    json.Append($", \"className\": \"{dsrc.Options.ClassName}\"");
-                    json.Append($", \"name\": \"{dsrc.Name}\"");
+                json.Append($", \"className\": \"{dsrc.Options.ClassName}\"");
+                json.Append($", \"name\": \"{dsrc.Name}\"");
 
-                    if (javaOptionsOverride != null && !String.IsNullOrWhiteSpace(javaOptionsOverride.DriverMemory))
+                if (javaOptionsOverride != null && !String.IsNullOrWhiteSpace(javaOptionsOverride.DriverMemory))
+                {
+                    json.Append($", \"driverMemory\": \"{javaOptionsOverride.DriverMemory}\"");
+                }
+                else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && !String.IsNullOrWhiteSpace(job.JobOptions.JavaAppOptions.DriverMemory))
+                {
+                    json.Append($", \"driverMemory\": \"{job.JobOptions.JavaAppOptions.DriverMemory}\"");
+                }
+
+                if (javaOptionsOverride != null && javaOptionsOverride.DriverCores != null)
+                {
+                    json.Append($", \"driverCores\": {javaOptionsOverride.DriverCores}");
+                }
+                else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && job.JobOptions.JavaAppOptions.DriverCores != null)
+                {
+                    json.Append($", \"driverCores\": {job.JobOptions.JavaAppOptions.DriverCores}");
+                }
+
+                if (javaOptionsOverride != null && !String.IsNullOrWhiteSpace(javaOptionsOverride.ExecutorMemory))
+                {
+                    json.Append($", \"executorMemory\": \"{javaOptionsOverride.ExecutorMemory}\"");
+                }
+                else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && !String.IsNullOrWhiteSpace(job.JobOptions.JavaAppOptions.ExecutorMemory))
+                {
+                    json.Append($", \"executorMemory\": \"{job.JobOptions.JavaAppOptions.ExecutorMemory}\"");
+                }
+
+                if (javaOptionsOverride != null && javaOptionsOverride.ExecutorCores != null)
+                {
+                    json.Append($", \"executorCores\": {javaOptionsOverride.ExecutorCores}");
+                }
+                else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && job.JobOptions.JavaAppOptions.ExecutorCores != null)
+                {
+                    json.Append($", \"executorCores\": {job.JobOptions.JavaAppOptions.ExecutorCores}");
+                }
+
+                if (javaOptionsOverride != null && javaOptionsOverride.NumExecutors != null)
+                {
+                    json.Append($", \"numExecutors\": {javaOptionsOverride.NumExecutors}");
+                }
+                else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && job.JobOptions.JavaAppOptions.NumExecutors != null)
+                {
+                    json.Append($", \"numExecutors\": {job.JobOptions.JavaAppOptions.NumExecutors}");
+                }
+
+                // THIS HAS BRACKETS javaOptionsOverride.ConfigurationParameters  { }
+                if (javaOptionsOverride != null && javaOptionsOverride.ConfigurationParameters != null)
+                {
+                    json.Append(", \"conf\":" + javaOptionsOverride.ConfigurationParameters);
+                }
+                else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && job.JobOptions.JavaAppOptions.ConfigurationParameters != null)
+                {
+                    json.Append(", \"conf\":" + job.JobOptions.JavaAppOptions.ConfigurationParameters);
+                }
+
+                // THIS HAS BRACKETS javaOptionsOverride.ConfigurationParameters  [ ]
+                if (javaOptionsOverride != null && javaOptionsOverride.Arguments != null && javaOptionsOverride.Arguments.Any())
+                {
+                    GenerateArguments(javaOptionsOverride.Arguments, json);
+                }
+                else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && job.JobOptions.JavaAppOptions.Arguments != null && job.JobOptions.JavaAppOptions.Arguments.Any())
+                {
+                    GenerateArguments(job.JobOptions.JavaAppOptions.Arguments, json);
+                }
+
+                string[] jars = dsrc.Options.JarDepenencies;
+
+                for (int i = 0; i < jars.Count(); i++)
+                {
+                    if (i == 0)
                     {
-                        json.Append($", \"driverMemory\": \"{javaOptionsOverride.DriverMemory}\"");
+                        json.Append($", \"jars\": [");
                     }
-                    else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && !String.IsNullOrWhiteSpace(job.JobOptions.JavaAppOptions.DriverMemory))
+                    json.Append($"\"{jars[i]}\"");
+                    if (i != jars.Count() - 1)
                     {
-                        json.Append($", \"driverMemory\": \"{job.JobOptions.JavaAppOptions.DriverMemory}\"");
-                    }
-
-                    if (javaOptionsOverride != null && javaOptionsOverride.DriverCores != null)
-                    {
-                        json.Append($", \"driverCores\": {javaOptionsOverride.DriverCores}");
-                    }
-                    else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && job.JobOptions.JavaAppOptions.DriverCores != null)
-                    {
-                        json.Append($", \"driverCores\": {job.JobOptions.JavaAppOptions.DriverCores}");
-                    }
-
-                    if (javaOptionsOverride != null && !String.IsNullOrWhiteSpace(javaOptionsOverride.ExecutorMemory))
-                    {
-                        json.Append($", \"executorMemory\": \"{javaOptionsOverride.ExecutorMemory}\"");
-                    }
-                    else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && !String.IsNullOrWhiteSpace(job.JobOptions.JavaAppOptions.ExecutorMemory))
-                    {
-                        json.Append($", \"executorMemory\": \"{job.JobOptions.JavaAppOptions.ExecutorMemory}\"");
-                    }
-
-                    if (javaOptionsOverride != null && javaOptionsOverride.ExecutorCores != null)
-                    {
-                        json.Append($", \"executorCores\": {javaOptionsOverride.ExecutorCores}");
-                    }
-                    else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && job.JobOptions.JavaAppOptions.ExecutorCores != null)
-                    {
-                        json.Append($", \"executorCores\": {job.JobOptions.JavaAppOptions.ExecutorCores}");
-                    }
-
-                    if (javaOptionsOverride != null && javaOptionsOverride.NumExecutors != null)
-                    {
-                        json.Append($", \"numExecutors\": {javaOptionsOverride.NumExecutors}");
-                    }
-                    else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && job.JobOptions.JavaAppOptions.NumExecutors != null)
-                    {
-                        json.Append($", \"numExecutors\": {job.JobOptions.JavaAppOptions.NumExecutors}");
-                    }
-
-                    // THIS HAS BRACKETS javaOptionsOverride.ConfigurationParameters  { }
-                    if (javaOptionsOverride != null && javaOptionsOverride.ConfigurationParameters != null)
-                    {
-                        json.Append(", \"conf\":" + javaOptionsOverride.ConfigurationParameters);
-                    }
-                    else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && job.JobOptions.JavaAppOptions.ConfigurationParameters != null)
-                    {
-                        json.Append(", \"conf\":" + job.JobOptions.JavaAppOptions.ConfigurationParameters);
-                    }
-
-                    // THIS HAS BRACKETS javaOptionsOverride.ConfigurationParameters  [ ]
-                    if (javaOptionsOverride != null && javaOptionsOverride.Arguments != null && javaOptionsOverride.Arguments.Any())
-                    {
-                        GenerateArguments(javaOptionsOverride.Arguments, json);
-                    }
-                    else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && job.JobOptions.JavaAppOptions.Arguments != null && job.JobOptions.JavaAppOptions.Arguments.Any())
-                    {
-                        GenerateArguments(job.JobOptions.JavaAppOptions.Arguments, json);
-                    }
-
-                    string[] jars = dsrc.Options.JarDepenencies;
-
-                    for (int i = 0; i < jars.Count(); i++)
-                    {
-                        if (i == 0)
-                        {
-                            json.Append($", \"jars\": [");
-                        }
-                        json.Append($"\"{jars[i]}\"");
-                        if (i != jars.Count() - 1)
-                        {
-                            json.Append(",");
-                        }
-                        else
-                        {
-                            json.Append("]");
-                        }
-                    }
-
-
-                    //DO NOT KILL THIS
-                    json.Append("}");
-
-                    HttpContent contentPost = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
-
-                    client.DefaultRequestHeaders.Accept.Clear();
-
-                    client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));//ACCEPT header
-
-                    HttpResponseMessage response = await client.PostAsync(Sentry.Configuration.Config.GetHostSetting("ApacheLivy") + "/batches", contentPost);
-
-                    //Record submission regardless if target deems it a bad request.
-                    Submission sub = new Submission()
-                    {
-                        JobId = job,
-                        JobGuid = JobGuid,
-                        Created = DateTime.Now,
-                        Serialized_Job_Options = json.ToString()
-                    };
-
-                    _datasetContext.Add(sub);
-                    _datasetContext.SaveChanges();
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string result = response.Content.ReadAsStringAsync().Result;
-
-                        LivyBatch batchResult = JsonConvert.DeserializeObject<LivyBatch>(result);                        
-
-                        JobHistory histRecord = new JobHistory()
-                        {
-                            JobId = job,
-                            BatchId = batchResult.Id,
-                            JobGuid = JobGuid,
-                            State = batchResult.State,
-                            LivyAppId = batchResult.Appid,
-                            LivyDriverLogUrl = batchResult.AppInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
-                            LivySparkUiUrl = batchResult.AppInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault(),
-                            Active = true,
-                            Submission = sub
-                        };
-
-                        _datasetContext.Add(histRecord);
-                        _datasetContext.SaveChanges();
-
-                        Logger.Info($"End method <>");
-                        return Ok(result);
-                    }
-                    else if (response.StatusCode == HttpStatusCode.BadRequest)
-                    {
-                        Logger.Debug($"BadRequest from Spark (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}");
-                        return BadRequest(response.Content.ReadAsStringAsync().Result);
+                        json.Append(",");
                     }
                     else
                     {
-                        Logger.Debug($"Status NotFound (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}");
-                        return NotFound();
+                        json.Append("]");
                     }
+                }
+
+
+                //DO NOT KILL THIS
+                json.Append("}");
+
+                HttpContent contentPost = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
+
+
+                //client.DefaultRequestHeaders.Accept.Clear();
+                //client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
+                //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));//ACCEPT header
+                //HttpResponseMessage response = await client.PostAsync(Sentry.Configuration.Config.GetHostSetting("ApacheLivy") + "/batches", contentPost).ConfigureAwait(false);
+
+                var client = _httpClient;
+                HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("batches", contentPost).ConfigureAwait(false);
+
+                //Record submission regardless if target deems it a bad request.
+                Submission sub = new Submission()
+                {
+                    JobId = job,
+                    JobGuid = JobGuid,
+                    Created = DateTime.Now,
+                    Serialized_Job_Options = json.ToString()
+                };
+
+                _datasetContext.Add(sub);
+                _datasetContext.SaveChanges();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = response.Content.ReadAsStringAsync().Result;
+
+                    LivyBatch batchResult = JsonConvert.DeserializeObject<LivyBatch>(result);                        
+
+                    JobHistory histRecord = new JobHistory()
+                    {
+                        JobId = job,
+                        BatchId = batchResult.Id,
+                        JobGuid = JobGuid,
+                        State = batchResult.State,
+                        LivyAppId = batchResult.Appid,
+                        LivyDriverLogUrl = batchResult.AppInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
+                        LivySparkUiUrl = batchResult.AppInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault(),
+                        Active = true,
+                        Submission = sub
+                    };
+
+                    _datasetContext.Add(histRecord);
+                    _datasetContext.SaveChanges();
+
+                    Logger.Info($"End method <>");
+                    return Ok(result);
+                }
+                else if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    Logger.Debug($"BadRequest from Spark (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}");
+                    return BadRequest(response.Content.ReadAsStringAsync().Result);
+                }
+                else
+                {
+                    Logger.Debug($"Status NotFound (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}");
+                    return NotFound();
                 }
             }
             catch (Exception ex)
@@ -553,85 +553,82 @@ namespace Sentry.data.Web.WebApi.Controllers
                     return BadRequest("No history of Job\\Batch ID combination");
                 }
 
-                using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
-                using (var client = new HttpClient(handler))
+
+                //var client = _httpClient;
+                //HttpResponseMessage response = await client.GetAsync(Sentry.Configuration.Config.GetHostSetting("ApacheLivy") + $"/batches/{batchId}").ConfigureAwait(false);
+                HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync($"/batches/{batchId}").ConfigureAwait(false);
+
+                if (response.IsSuccessStatusCode)
                 {
+                    string result = response.Content.ReadAsStringAsync().Result;
 
-                    HttpResponseMessage response = await client.GetAsync(Sentry.Configuration.Config.GetHostSetting("ApacheLivy") + $"/batches/{batchId}");
-
-
-                    if (response.IsSuccessStatusCode)
+                    if (result == $"Session '{batchId}' not found.")
                     {
-                        string result = response.Content.ReadAsStringAsync().Result;
-
-                        if (result == $"Session '{batchId}' not found.")
-                        {
-                            return BadRequest("Session not found");
-                        }
-
-                        LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(result);
-
-                        //create history record and set it active
-                        JobHistory histRecord = new JobHistory()
-                        {
-                            JobId = hr.JobId,
-                            BatchId = hr.BatchId,
-                            Created = hr.Created,
-                            Modified = DateTime.Now,
-                            State = lr.state,
-                            LivyAppId = lr.appId,
-                            LivyDriverLogUrl = lr.appInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
-                            LivySparkUiUrl = lr.appInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault(),
-                            JobGuid = hr.JobGuid,
-                            Submission = hr.Submission
-                        };
-
-                        if (lr.state == "dead" || lr.state == "error" || lr.state == "success")
-                        {
-                            histRecord.Active = false;
-                        }
-                        else
-                        {
-                            histRecord.Active = true;
-                        }
-
-                        _datasetContext.Add(histRecord);
-
-                        //set previous active record to inactive
-                        hr.Modified = DateTime.Now;
-                        hr.Active = false;
-
-                        _datasetContext.SaveChanges();
+                        return BadRequest("Session not found");
                     }
-                    else if (response.StatusCode == HttpStatusCode.NotFound)
+
+                    LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(result);
+
+                    //create history record and set it active
+                    JobHistory histRecord = new JobHistory()
                     {
-                        //create new history record, however, set active to false as livy did not find any record of it
-                        JobHistory histRecord = new JobHistory()
-                        {
-                            JobId = hr.JobId,
-                            BatchId = hr.BatchId,
-                            Created = hr.Created,
-                            Modified = DateTime.Now,
-                            State = "Unknown",
-                            LivyAppId = hr.LivyAppId,
-                            LivyDriverLogUrl = hr.LivyDriverLogUrl,
-                            LivySparkUiUrl = hr.LivySparkUiUrl,
-                            LogInfo = "Livy did not return a status for this batch job.",
-                            Active = false,
-                            JobGuid = hr.JobGuid,
-                            Submission = hr.Submission
-                        };
+                        JobId = hr.JobId,
+                        BatchId = hr.BatchId,
+                        Created = hr.Created,
+                        Modified = DateTime.Now,
+                        State = lr.state,
+                        LivyAppId = lr.appId,
+                        LivyDriverLogUrl = lr.appInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
+                        LivySparkUiUrl = lr.appInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault(),
+                        JobGuid = hr.JobGuid,
+                        Submission = hr.Submission
+                    };
 
-                        _datasetContext.Add(histRecord);
-
-                        //set previous active record to inactive
-                        hr.Modified = DateTime.Now;
-                        hr.Active = false;
-
-                        _datasetContext.SaveChanges();
+                    if (lr.state == "dead" || lr.state == "error" || lr.state == "success")
+                    {
+                        histRecord.Active = false;
                     }
-                    return Ok();
+                    else
+                    {
+                        histRecord.Active = true;
+                    }
+
+                    _datasetContext.Add(histRecord);
+
+                    //set previous active record to inactive
+                    hr.Modified = DateTime.Now;
+                    hr.Active = false;
+
+                    _datasetContext.SaveChanges();
                 }
+                else if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    //create new history record, however, set active to false as livy did not find any record of it
+                    JobHistory histRecord = new JobHistory()
+                    {
+                        JobId = hr.JobId,
+                        BatchId = hr.BatchId,
+                        Created = hr.Created,
+                        Modified = DateTime.Now,
+                        State = "Unknown",
+                        LivyAppId = hr.LivyAppId,
+                        LivyDriverLogUrl = hr.LivyDriverLogUrl,
+                        LivySparkUiUrl = hr.LivySparkUiUrl,
+                        LogInfo = "Livy did not return a status for this batch job.",
+                        Active = false,
+                        JobGuid = hr.JobGuid,
+                        Submission = hr.Submission
+                    };
+
+                    _datasetContext.Add(histRecord);
+
+                    //set previous active record to inactive
+                    hr.Modified = DateTime.Now;
+                    hr.Active = false;
+
+                    _datasetContext.SaveChanges();
+                }
+                return Ok();
             }
             catch (Exception ex)
             {
