@@ -1719,6 +1719,7 @@ namespace Sentry.data.Web.Controllers
                     model.IsFixedWidth = true;
                     break;
                 case "JSON":
+                case "XML":
                     model.IsPositional = false;
                     model.IsFixedWidth = false;
                     model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A struct", "Complex Data Types"));
