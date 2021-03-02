@@ -153,6 +153,7 @@
     <Compile Include="Entities\DataProcessing\Actions\SchemaMapAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressGzipAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressZip.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\XMLAction.cs" />
     <Compile Include="Entities\DataProcessing\EventMetric.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ActionTypeAttribute.cs" />
     <Compile Include="Entities\DataProcessing\Actions\BaseAction.cs" />
@@ -265,6 +266,7 @@
     <Compile Include="Interfaces\DataProcessing\ISchemaMapProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
+    <Compile Include="Interfaces\DataProcessing\IXMLAction.cs" />
     <Compile Include="Interfaces\IHostSettings.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
     <Compile Include="Interfaces\IDaleSearchProvider.cs" />
