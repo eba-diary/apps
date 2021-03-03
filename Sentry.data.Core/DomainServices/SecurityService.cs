@@ -68,17 +68,17 @@ namespace Sentry.data.Core
             //if the user is one of the primary owners or primary contact, they should have all permissions without even requesting it.
             //Admins also get all the permissions.
             bool IsAdmin = user.IsAdmin;
-            bool IsOwner = (user.AssociateId == securable?.PrimaryOwnerId || user.AssociateId == securable?.PrimaryContactId);
+            bool IsOwner = (user.AssociateId == securable?.PrimaryOwnerId || user.AssociateId == securable?.PrimaryContactId) && user.CanModifyDataset;
             List<string> userPermissions = new List<string>();
 
             //set the user based permissions based off obsidian and ownership
             UserSecurity us = new UserSecurity()
             {
-                CanEditDataset = (user.CanModifyDataset && IsOwner) || IsAdmin,
+                CanEditDataset = IsOwner || IsAdmin,
                 CanCreateDataset = user.CanModifyDataset || IsAdmin,
                 CanEditReport = user.CanManageReports || IsAdmin,
                 CanCreateReport = user.CanManageReports || IsAdmin,
-                CanEditDataSource = (user.CanModifyDataset && IsOwner) || IsAdmin,
+                CanEditDataSource = IsOwner || IsAdmin,
                 CanCreateDataSource = user.CanModifyDataset || IsAdmin,
                 ShowAdminControls = IsAdmin,
                 CanCreateDataFlow = user.CanModifyDataset || IsAdmin,
@@ -121,7 +121,7 @@ namespace Sentry.data.Core
                 us.CanModifyNotifications = false;
                 us.CanUseDataSource = true;
                 //us.CanManageSchema = (userPermissions.Count > 0) ? ((user.CanModifyDataset && (userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner)) || IsAdmin) : (IsOwner || IsAdmin);
-                us.CanManageSchema = (userPermissions.Count > 0) ? userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || (IsOwner && user.CanModifyDataset) || IsAdmin : ((IsOwner && user.CanModifyDataset) || IsAdmin);
+                us.CanManageSchema = (userPermissions.Count > 0) ? userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin : (IsOwner || IsAdmin);
                 return us;
             }
 
@@ -133,7 +133,7 @@ namespace Sentry.data.Core
             us.CanModifyNotifications = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MODIFY_NOTIFICATIONS) || IsOwner || IsAdmin;
             us.CanUseDataSource = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_USE_DATA_SOURCE) || IsOwner || IsAdmin;
             //us.CanManageSchema = (user.CanModifyDataset && (userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner)) || IsAdmin;
-            us.CanManageSchema = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || (IsOwner && user.CanModifyDataset) || IsAdmin;
+            us.CanManageSchema = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin;
 
             return us;
         }

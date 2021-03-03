@@ -358,6 +358,7 @@ namespace Sentry.data.Core.Tests
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
             user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
             user.Stub(x => x.IsInGroup(ticket.AdGroupName)).Return(true).Repeat.Any();
+            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
@@ -482,6 +483,7 @@ namespace Sentry.data.Core.Tests
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
             user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
             user.Stub(x => x.IsInGroup(ticket.AdGroupName)).Return(false).Repeat.Any();
+            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
