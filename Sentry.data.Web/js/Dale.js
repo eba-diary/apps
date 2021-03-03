@@ -425,6 +425,7 @@
 
         //MOUSE CLICK EVENT NEW SEARCH
         $('.input-group-addon').click(function (e) {
+            data.Dale.resetAfterSave();                                             //if they do another search, reset everything in grid back to original state
             data.Dale.sensitive = false;                                            //set sensitive property to true so grid does sensitive search back to controller
             data.Dale.disableDale();
             daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
@@ -435,6 +436,7 @@
         input.addEventListener("keyup", function (event) {
             if (event.keyCode === 13) {
                 event.preventDefault();
+                data.Dale.resetAfterSave();                                             //if they do another search, reset everything in grid back to original state
                 data.Dale.disableDale();
                 daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
             }
@@ -442,7 +444,7 @@
 
         //SENSITIVE SEARCH CLICK EVENT
         $("#sensitiveSearchLink").on('click', function () {
-
+            data.Dale.resetAfterSave();                                             //if they do another search, reset everything in grid back to original state
             data.Dale.sensitive = true;                                             //set sensitive property to true so grid does sensitive search back to controller
             $("#daleSearchCriteria").val("");
             data.Dale.disableDale();

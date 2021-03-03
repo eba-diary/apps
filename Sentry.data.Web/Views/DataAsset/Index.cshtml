@@ -6,8 +6,6 @@
     List<Sentry.data.Web.Models.AssetUIModel> assets = ViewBag.DataAssets;
     string disabled;
     string arch = "http://sharepoint.sentry.com/it/DataArch/_layouts/15/VisioWebAccess/VisioWebAccess.aspx?id=/it/DataArch/Shared%20Documents/Data%20Services%20Architecture%20Diagrams/" + Model.ArchLink;
-    string guide = "http://sharepoint.sentry.com/it/DataArch/Consumer%20Guides/Pages/" + Model.GuideLink;
-    
     Model.Components = Model.Components.OrderBy(x => x.Type.Name).ToList();
 }
 
@@ -149,7 +147,7 @@
                     <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
 
                     @{ disabled = (Model.GuideLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
+                    <li class="@disabled"><a href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
 
                     @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
                     <li class="@disabled"><a href="mailto:@Model.Contact">Contact the @Model.DisplayName Team</a></li>
@@ -170,7 +168,7 @@
                     <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
 
                     @{ disabled = (Model.GuideLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
+                    <li class="@disabled"><a href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
 
                     @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
                     <li class="@disabled"><a href="mailto:@Model.Contact">Contact the @Model.DisplayName Team</a></li>
