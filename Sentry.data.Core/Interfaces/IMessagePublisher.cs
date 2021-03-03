@@ -17,6 +17,8 @@ namespace Sentry.data.Core
         /// <param name="value"></param>
         void Publish(string topic, string key, string value);
 
+        Task PublishDSCEventAsync(string key, string value);
+
         /// <summary>
         /// Publish message to data.sentry.com event topic
         /// </summary>

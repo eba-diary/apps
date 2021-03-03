@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
@@ -21,6 +22,8 @@ namespace Sentry.data.Infrastructure
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IDataFeatures _featureFlags;
+        private readonly Lazy<IDatasetContext> _datasetContext;
+        private readonly Lazy<ISchemaService> _schemaService;
         private JObject _metricData;
 
         public JObject MetricData
@@ -39,14 +42,32 @@ namespace Sentry.data.Infrastructure
         }
 
         public ConvertToParquetProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, 
-            IDataFlowService dataFlowService, IDataFeatures dataFeatures) : base(dataFlowService)
+            IDataFlowService dataFlowService, IDataFeatures dataFeatures, Lazy<IDatasetContext> datasetContext,
+            Lazy<ISchemaService> schemaService) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
             _featureFlags = dataFeatures;
+            _datasetContext = datasetContext;
+            _schemaService = schemaService;
         }
 
+        public IDatasetContext DatasetContext
+        {
+            get { return _datasetContext.Value; }
+        }
+        public ISchemaService SchemaService
+        {
+            get { return _schemaService.Value; }
+        }
+
+
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override async Task ExecuteActionAsync(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
             MetricData.AddOrUpdateValue("log", $"start-method <{step.DataAction_Type_Id.ToString()}>-executeaction");
             step.LogExecution(stepEvent, MetricData, Log_Level.Debug);
@@ -96,7 +117,7 @@ namespace Sentry.data.Infrastructure
                                 }
                             }
                         };
-                        _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+                        await _messagePublisher.PublishDSCEventAsync("99999", JsonConvert.SerializeObject(s3e)).ConfigureAwait(false);
 #endif
                     }
 
@@ -131,6 +152,11 @@ namespace Sentry.data.Infrastructure
 
         public override void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
+            throw new NotImplementedException();
+        }
+
+        public override async Task PublishStartEventAsync(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
+        {
             Stopwatch stopWatch = new Stopwatch();
 
             try
@@ -150,16 +176,10 @@ namespace Sentry.data.Infrastructure
                 Dataset _dataset;
 
                 //Get StorageCode and FileSchema
-                using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                {
-                    ISchemaService schemaService = container.GetInstance<ISchemaService>();
-                    IDatasetContext datasetContext = container.GetInstance<IDatasetContext>();
-
-                    storageCode = GetStorageCode(objectKey);
-                    schema = schemaService.GetFileSchemaByStorageCode(storageCode);
-                    _dataset = datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).FirstOrDefault().ParentDataset;
-                }
-
+                storageCode = GetStorageCode(objectKey);
+                schema = SchemaService.GetFileSchemaByStorageCode(storageCode);
+                _dataset = DatasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).FirstOrDefault().ParentDataset;
+                
                 //Convert FlowExecutionGuid to DateTime, then to local time
                 DateTime flowGuidDTM = DataFlowHelpers.ConvertFlowGuidToDateTime(flowExecutionGuid).ToLocalTime();
 
@@ -189,7 +209,7 @@ namespace Sentry.data.Infrastructure
                 MetricData.AddOrUpdateValue("log", $"{step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}");
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, MetricData, Log_Level.Debug);
 
-                _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}-{RandomString(6)}", JsonConvert.SerializeObject(stepEvent));
+                await _messagePublisher.PublishDSCEventAsync($"{step.DataFlow.Id}-{step.Id}-{RandomString(6)}", JsonConvert.SerializeObject(stepEvent)).ConfigureAwait(false);
 
                 stopWatch.Stop();
                 DateTime endTime = DateTime.Now;
