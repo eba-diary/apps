@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
@@ -29,8 +30,12 @@ namespace Sentry.data.Infrastructure
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
         }
-
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override async Task ExecuteActionAsync(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
             Stopwatch stopWatch = new Stopwatch();
             _step = step;
@@ -101,7 +106,7 @@ namespace Sentry.data.Infrastructure
                             }
                         }
                     };
-                    _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+                    await _messagePublisher.PublishDSCEventAsync("99999", JsonConvert.SerializeObject(s3e)).ConfigureAwait(false);
 #endif
                 }
 
@@ -143,6 +148,11 @@ namespace Sentry.data.Infrastructure
         }
 
         public override void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override async Task PublishStartEventAsync(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
             List<EventMetric> logs = new List<EventMetric>();
             Stopwatch stopWatch = new Stopwatch();
@@ -197,7 +207,7 @@ namespace Sentry.data.Infrastructure
                 MetricData.AddOrUpdateValue("log", $"{_step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}");
                 _step.LogExecution(_flowGuid, _runInstGuid, MetricData, Log_Level.Debug);
 
-                _messagePublisher.PublishDSCEvent($"{_step.DataFlow.Id}-{_step.Id}-{RandomString(6)}", JsonConvert.SerializeObject(stepEvent));
+                await _messagePublisher.PublishDSCEventAsync($"{_step.DataFlow.Id}-{_step.Id}-{RandomString(6)}", JsonConvert.SerializeObject(stepEvent)).ConfigureAwait(false);
 
                 stopWatch.Stop();
                 DateTime endTime = DateTime.Now;

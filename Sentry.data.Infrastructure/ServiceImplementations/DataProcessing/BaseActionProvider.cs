@@ -7,6 +7,7 @@ using Sentry.data.Infrastructure.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
@@ -37,8 +38,11 @@ namespace Sentry.data.Infrastructure
         }
 
         public abstract void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent);
+        public abstract Task ExecuteActionAsync(DataFlowStep step, DataFlowStepEvent stepEvent);
 
         public abstract void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event);
+
+        public abstract Task PublishStartEventAsync(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event);
 
         public void GenerateDependencyTargets(DataFlowStepEvent stepEvent)
         {

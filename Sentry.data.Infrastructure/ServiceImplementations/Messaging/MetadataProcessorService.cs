@@ -20,7 +20,7 @@ namespace Sentry.data.Infrastructure
 
             consumer = GetKafkamessageConsumer(Configuration.Config.GetHostSetting("MetadataProcessorConsumerGroup"));
 
-            Messaging.Common.MetadataProcessorService service = new Messaging.Common.MetadataProcessorService(consumer, GetMessageHandlers(), cfg);
+            MetadataProcessorProvider service = new MetadataProcessorProvider(consumer, GetMessageHandlers(), cfg);
             service.ConsumeMessages();
         }
 

@@ -4,6 +4,7 @@ using Sentry.Common.Logging;
 using Sentry.Messaging.Common;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -27,6 +28,11 @@ namespace Sentry.data.Core
         #endregion
 
         void IMessageHandler<string>.Handle(string msg)
+        {
+            throw new NotImplementedException();
+        }
+
+        async Task IMessageHandler<string>.HandleAsync(string msg)
         {
             BaseEventMessage baseEvent = JsonConvert.DeserializeObject<BaseEventMessage>(msg);
             FileSchema de = null;            

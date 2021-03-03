@@ -13,8 +13,13 @@ namespace Sentry.data.Infrastructure
         #region Constructor
         public DfsEventHandler() { }
         #endregion
-               
+        
         void IMessageHandler<string>.Handle(string msg)
+        {
+            throw new NotImplementedException();
+        }
+
+        async Task IMessageHandler<string>.HandleAsync(string msg)
         {
             BaseEventMessage baseEvent = JsonConvert.DeserializeObject<BaseEventMessage>(msg);
             try

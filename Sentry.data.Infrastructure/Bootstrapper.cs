@@ -7,6 +7,7 @@ using NHibernate.Cfg;
 using Sentry.data.Infrastructure.Mappings.Primary;
 using System.Net.Http;
 using Sentry.data.Core.Interfaces.SAIDRestClient;
+using Sentry.Messaging.Common;
 
 namespace Sentry.data.Infrastructure
 {
@@ -80,6 +81,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IMetadataRepositoryProvider>().Use(() => new MetadataRepositoryProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IODCFileProvider>().Use(() => new ODCFileProvider(_defaultSessionFactory.OpenSession()));
             registry.For<IRequestContext>().Use(() => new RequestContext(_defaultSessionFactory.OpenSession()));
+            //Register other services
             registry.For<IBaseJobProvider>().AddInstances(x =>
             {
                 x.Type<GenericHttpsProvider>().Named(GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE);
@@ -89,7 +91,14 @@ namespace Sentry.data.Infrastructure
                 x.Type<GoogleAPIDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
                 x.Type<GenericHttpsDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
             });
-            //Register other services
+
+            //Register event handlers for MetadataProcessorService
+            registry.For<IMessageHandler<string>>().Add<S3EventService>();
+            registry.For<IMessageHandler<string>>().Add<HiveMetadataService>();
+            registry.For<IMessageHandler<string>>().Add<DataStepProcessorService>();
+            registry.For<IMessageHandler<string>>().Add<DfsEventService>();
+            registry.For<IMessageHandler<string>>().Add<SnowflakeEventService>();
+
             Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();
             obsidianUserProvider.CacheTimeoutSeconds = int.Parse(Sentry.Configuration.Config.GetHostSetting("ObsidianUserCacheTimeoutMinutes")) * 60;
             registry.For<Sentry.Web.CachedObsidianUserProvider.IObsidianUserProvider>().Singleton().Use(obsidianUserProvider);
@@ -101,11 +110,23 @@ namespace Sentry.data.Infrastructure
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
             registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
 
-            var saidHttpClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
-            registry.For<IAssetClient>().Use<SAIDRestClient.AssetClient>().
-                Ctor<HttpClient>().Is(saidHttpClient).
+            //establish generic httpclient singleton to be used where needed across the application
+            var client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true });
+            registry.For<HttpClient>().Use(client);
+
+            //establish IAssetClient using generic httpClient singleton
+            registry.For<IAssetClient>().Singleton().Use<SAIDRestClient.AssetClient>().
+                Ctor<HttpClient>().Is(client).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("SaidAssetBaseUrl"));
-          
+
+            //establish httpclient specific to ApacheLivyProvider
+            var apacheLivyClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
+            apacheLivyClient.DefaultRequestHeaders.Accept.Clear();
+            apacheLivyClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            apacheLivyClient.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
+            registry.For<IApacheLivyProvider>().Singleton().Use<ApacheLivyProvider>().
+                Ctor<HttpClient>().Is(apacheLivyClient);
+
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);
 

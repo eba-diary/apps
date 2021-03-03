@@ -123,6 +123,7 @@ namespace Sentry.data.Infrastructure
                             Timeout = new TimeSpan(0, 0, 30),
                             BaseAddress = new Uri(_apiUrl)
                         };
+
                         client.DefaultRequestHeaders.Add("Authorization", "Bearer " + _token);
 
                         _businessObjectClient = new BusinessObjectClient(client);
@@ -149,6 +150,7 @@ namespace Sentry.data.Infrastructure
                             Timeout = new TimeSpan(0, 0, 30),
                             BaseAddress = new Uri(_apiUrl)
                         };
+
                         client.DefaultRequestHeaders.Add("Authorization", "Bearer " + _token);
 
                         _searchesClient = new SearchesClient(client);
@@ -167,6 +169,7 @@ namespace Sentry.data.Infrastructure
                     if (_tokenClient is null)
                     {
                         Logger.Info("cherwell_initialize_tokenclient");
+
                         var httpClientHandler = new HttpClientHandler() { UseDefaultCredentials = true };
                         var client = new HttpClient(httpClientHandler)
                         {
