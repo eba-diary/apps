@@ -10,5 +10,6 @@ namespace Sentry.data.Core
         }
         public int SchemaID { get; set; }
         public string SnowStatus { get; set; }
+        public string InitiatorID { get; set; }
     }
 }

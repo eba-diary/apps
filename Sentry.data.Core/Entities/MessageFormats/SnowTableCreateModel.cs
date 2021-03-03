@@ -13,6 +13,7 @@ namespace Sentry.data.Core
         public int SchemaID { get; set; }
         public int RevisionID { get; set; }
         public string InitiatorID { get; set; }
+        public string ChangeIND { get; set; }
         public void UpdateStatus(ConsumptionLayerTableStatusEnum status)
         {
             SnowStatus = status.ToString();

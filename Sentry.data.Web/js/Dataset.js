@@ -13,12 +13,14 @@ data.Dataset = {
     delroySnowflakeViewsArray: [],
     delroyStructTrackerArray: [],
 
+
     delroyInit: function () {
 
         data.Dataset.delroyTableCreate();
         data.Dataset.delroySetupClickAttack();
         data.Dataset.delroyStructTrackerArray = [];
     },
+
 
     //RELOAD EVERYTHING:  clean datatable, breadcrumbs and reload with schema selected
     delroyReloadEverything: function (datasetId, schemaId, snowflakeViews) {
@@ -27,25 +29,38 @@ data.Dataset = {
         $('#delroyTable').DataTable().clear();
         $('#delroyTable').DataTable().draw();
         $('#delroyBreadcrumb').empty();
-        data.Dataset.delroyRefreshFieldArrayFromIndex(-1);       //tricky way to DELETE ALL ELEMENTS from array
+        data.Dataset.delroyFieldArray = [];
+        data.Dataset.delroyStructTrackerArray = [];
         data.Dataset.delroySnowflakeViewsArray = snowflakeViews;
 
         var schemaURL = "/api/v2/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/revision/latest/fields";
         $.get(schemaURL, function (result) {
 
             data.Dataset.delroyAddFieldArray(result.Fields);
-            data.Dataset.delroyAddBreadCrumb("Home", 0);
+            data.Dataset.delroyAddBreadCrumb(data.Dataset.delroyCreateBogusField("Home"), 0);
             data.Dataset.delroyGridRefresh();
             $('#delroySpinner').hide();
 
         }).fail(function (result) {
             if (result.status === 404) {
                 $('#delroySpinner').hide();
-                data.Dataset.delroyAddBreadCrumb("No Columns Exist", -1);       //PASS -1 which indicates this is a FAKE breadcrumb
+                data.Dataset.delroyAddBreadCrumb(data.Dataset.delroyCreateBogusField("No Columns Exist"), -1);       //PASS -1 which indicates this is a FAKE breadcrumb
                 data.Dale.makeToast("success", "No columns Exist.");
             }
         });
     },
+
+
+    //CREATE BOGUS FIELD OBJ FOR HOME OR NO COLUMNS EXIST
+    delroyCreateBogusField: function (name) {
+
+        //create new obj to represent a BOGUS field
+        var o = new Object();
+        o.Name = name;
+
+        return o;
+    },
+
 
     //INIT DATATABLE
     delroyTableCreate: function () {
@@ -104,7 +119,7 @@ data.Dataset = {
                 {
                     text: 'Snowflake Query',
                     action: function () {
-                        data.Dataset.delroyQueryGenerator('snow');
+                        data.Dataset.delroyQueryGenerator();
                     }
                 }
             ]
@@ -141,7 +156,7 @@ data.Dataset = {
             // click reload the grid if children exist
             if (field.Fields != null) {
                 data.Dataset.delroyAddFieldArray(field);
-                data.Dataset.delroyAddBreadCrumb(field.Name, data.Dataset.delroyFieldArray.length - 1);
+                data.Dataset.delroyAddBreadCrumb(field, data.Dataset.delroyFieldArray.length - 1);
                 data.Dataset.delroyGridRefresh();
             }
         });
@@ -178,15 +193,13 @@ data.Dataset = {
         var field = data.Dataset.delroyFieldArray[index];
 
         //NOTE: this is a strange concept:  but a field is either a ROOT level one (index 0) or a CHILD level (index > 0)
-        //All levels past the ROOT (index 0) you need too specify the Fields array which is a child property 
-        //whereas the root level(index 0) the array is at that level
-
-        //if ROOT level, that means the array of fields is actually on that level
-        if (index == 0) {
-            return field;     
+        //All levels > (index 0) you need too specify the Fields array which is a child property whereas the root level(index 0) the array is at that level
+        //also check if field is NULL, because in that case return a null field else returning field.Fields will cause an error
+        if (index == 0 || field == null) {
+            return field;                //index=0 means ROOT level where array of fields is actually on that level
         }
-        else {                              //child of ROOT so specify array as a property
-            return field.Fields;
+        else {                              
+            return field.Fields;        //child of ROOT so specify array as a property of the field
         }
     },
 
@@ -201,19 +214,21 @@ data.Dataset = {
         table.draw();
     },
 
+
     //ADD NEW BREADCRUMB TOO LIST
-    delroyAddBreadCrumb: function (name, index) {
+    delroyAddBreadCrumb: function (field, index) {
 
         //add breadcrumb to UI
         var color = $('#delroyBreadcrumb').data('page-color');
-        var h = "<li id='" + index.toString() + "' ><a  class='" + color + "' style='cursor:pointer' >" + name + "</a></li>";
+        var h = "<li id='" + index.toString() + "' ><a  class='" + color + "' style='cursor:pointer' >" + field.Name + "</a></li>";
         $('#delroyBreadcrumb').append(h);
 
         //add struct too tracker to hold if a query needs to be generated
-        if (name !== "Home" && index > 0) {
-            data.Dataset.delroyStructTrackerArray.push(name);    
+        if (field.Name !== "Home" && index > 0) {
+            data.Dataset.delroyStructTrackerArray.push(field);    
         }
     },
+
 
     //REFRESH BREAD CRUMBS:  Clear all breadcrumbs and refresh up too one passed in
     delroyRefreshBreadCrumbsFromIndex: function (lastIndexKeep) {
@@ -227,12 +242,15 @@ data.Dataset = {
         //STEP 3: add in all breadcrumbs from start until the one they clicked on
         for (let i = 0; i < data.Dataset.delroyFieldArray.length; i++) {
 
-            var field = data.Dataset.delroyFieldArray[i];
-            var bcName = "Home";
+            var field = {};
             if (i > 0) {
-                bcName = field.Name;
+                field = data.Dataset.delroyFieldArray[i];
             }
-            data.Dataset.delroyAddBreadCrumb(bcName, i);
+            else {
+                field = data.Dataset.delroyCreateBogusField("Home");
+            }
+
+            data.Dataset.delroyAddBreadCrumb(field, i);
         }
     },
 
@@ -257,33 +275,40 @@ data.Dataset = {
     },
 
     //GENERATE QUERY BASED ON WHERE THEY ARE IN SCHEMA     
-    delroyQueryGenerator: function (queryType) {
+    delroyQueryGenerator: function () {
 
         $('#delroySpinner').show();
 
         var field = data.Dataset.delroyGetLatestField();
 
-        //pass the current field array and necessary info to controller and get back a partial view which we place into the Sentry Modal
-        $.ajax({
-            type: "POST",
-            url: "/Dataset/DelroyGenerateQuery",
-            traditional: true,
-            data: JSON.stringify({ models: field, queryType: queryType, snowflakeViews: data.Dataset.delroySnowflakeViewsArray, structTracker: data.Dataset.delroyStructTrackerArray }),
-            contentType: "application/json",
-            success: function (r) {
-                var modal = Sentry.ShowModalWithSpinner("Snowflake Query");
-                modal.ReplaceModalBody(data.Dataset.delroyCreateModalHTML(r.snowQuery));
-                $('#delroySpinner').hide();
-            },
-            failure: function () {
-                data.Dale.makeToast("error", "Error creating Snowflake Query.");
-                $('#delroySpinner').hide();
-            },
-            error: function () {
-                data.Dale.makeToast("error", "Error creating Snowflake Query.");
-                $('#delroySpinner').hide();
-            }
-        });
+        //if field is null, means no columns to generate a query so hide spinner and create a toastr
+        if (field == null) {
+            data.Dale.makeToast("warning", "No columns Exist, Query not Generated.  Please select a schema with columns to see a query.");
+            $('#delroySpinner').hide();
+        }
+        else {
+            //pass the current field array and necessary info to controller and get back the snowflake query
+            $.ajax({
+                type: "POST",
+                url: "/Dataset/DelroyGenerateQuery",
+                traditional: true,
+                data: JSON.stringify({ models: field, snowflakeViews: data.Dataset.delroySnowflakeViewsArray, structTracker: data.Dataset.delroyStructTrackerArray }),
+                contentType: "application/json",
+                success: function (r) {
+                    var modal = Sentry.ShowModalWithSpinner("Snowflake Query");
+                    modal.ReplaceModalBody(data.Dataset.delroyCreateModalHTML(r.snowQuery));
+                    $('#delroySpinner').hide();
+                },
+                failure: function () {
+                    data.Dale.makeToast("error", "Error creating Snowflake Query.");
+                    $('#delroySpinner').hide();
+                },
+                error: function () {
+                    data.Dale.makeToast("error", "Error creating Snowflake Query.");
+                    $('#delroySpinner').hide();
+                }
+            });
+        }
     },
 
     //FORMAT HTML TO SEND TOO MODAL
