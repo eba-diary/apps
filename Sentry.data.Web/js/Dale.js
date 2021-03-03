@@ -205,7 +205,8 @@
                 { data: "Precision", className: "Precision", visible: false },
                 { data: "Scale", className: "Scale", visible: false },
                 { data: "IsNullable", className: "IsNullable", visible: false },
-                { data: "EffectiveDate", className: "EffectiveDate", visible: false }
+                { data: "EffectiveDate", className: "EffectiveDate", visible: false },
+                { data: "SourceType", className: "SourceType", visible: false }
             ],
 
             aLengthMenu: [
@@ -241,6 +242,7 @@
                 { type: "text" },
                 { type: "text" },
 
+                { type: "text" },
                 { type: "text" },
                 { type: "text" },
                 { type: "text" },
