@@ -120,7 +120,8 @@ namespace Sentry.data.Core
                 us.CanUploadToDataset = IsOwner || IsAdmin;
                 us.CanModifyNotifications = false;
                 us.CanUseDataSource = true;
-                us.CanManageSchema = (userPermissions.Count > 0) ? ((user.CanModifyDataset && (userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner)) || IsAdmin) : (IsOwner || IsAdmin);
+                //us.CanManageSchema = (userPermissions.Count > 0) ? ((user.CanModifyDataset && (userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner)) || IsAdmin) : (IsOwner || IsAdmin);
+                us.CanManageSchema = (userPermissions.Count > 0) ? userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || (IsOwner && user.CanModifyDataset) || IsAdmin : ((IsOwner && user.CanModifyDataset) || IsAdmin);
                 return us;
             }
 
@@ -131,7 +132,8 @@ namespace Sentry.data.Core
             us.CanUploadToDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_UPLOAD_TO_DATASET) || IsOwner || IsAdmin;
             us.CanModifyNotifications = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MODIFY_NOTIFICATIONS) || IsOwner || IsAdmin;
             us.CanUseDataSource = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_USE_DATA_SOURCE) || IsOwner || IsAdmin;
-            us.CanManageSchema = (user.CanModifyDataset && (userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner)) || IsAdmin;
+            //us.CanManageSchema = (user.CanModifyDataset && (userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner)) || IsAdmin;
+            us.CanManageSchema = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || (IsOwner && user.CanModifyDataset) || IsAdmin;
 
             return us;
         }
