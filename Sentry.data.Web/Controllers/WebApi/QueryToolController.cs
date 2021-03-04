@@ -23,7 +23,6 @@ using System.Web.Http.Results;
 namespace Sentry.data.Web.WebApi.Controllers
 {
     [RoutePrefix(WebConstants.Routes.VERSION_QUERYTOOL)]
-    [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
     public class QueryToolController : BaseWebApiController
     {
         public IAssociateInfoProvider _associateInfoProvider;
@@ -77,6 +76,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("sessions/primary")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> GetPrimarySessionID()
         {
             LivyCreation lc = null;
@@ -201,6 +201,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("sessions/{Language}")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> CreateSession(string Language)
         {
             string json;
@@ -253,6 +254,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("internalSessions/{Language}")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> CreateInternalSession(string Language = "", [FromBody] LivyCreation lc = null)
         {
             string json;
@@ -339,6 +341,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("sessions/{SessionID}/sendCode")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> SendCode(int SessionID, [FromBody] string Code)
         {
             //dynamic json = Code;
@@ -371,6 +374,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("sessions/name/{name}")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> GetSessions(String name = null)
         {
             HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync("/sessions").ConfigureAwait(false);
@@ -403,6 +407,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("sessions/{SessionID}")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> GetSession(int SessionID)
         {
             HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync("/sessions/" + SessionID).ConfigureAwait(false);
@@ -430,6 +435,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("sessions/{SessionID}/statements/{StatementID}")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> GetStatement(int SessionID, int StatementID)
         {
             HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync("/sessions/" + SessionID + "/statements/" + StatementID).ConfigureAwait(false);
@@ -457,6 +463,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("sessions/{SessionID}/statements/{StatementID}")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> CancelStatement(int SessionID, int StatementID)
         {
             HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("/sessions/" + SessionID + "/statements/" + StatementID + "/cancel", null).ConfigureAwait(false);
@@ -483,6 +490,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("sessions/{SessionID}")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> DeleteSession(int SessionID)
         {
             HttpResponseMessage response = await _apacheLivyProvider.DeleteRequestAsync("/sessions/" + SessionID);
@@ -508,6 +516,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("files/fileDropLocation")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> FileDropLocation()
         {
             IApplicationUser user = _userService.GetCurrentUser();
@@ -527,6 +536,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("files/{s3Key}/fileCount")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> FileCount(string s3Key)
         {
             try
@@ -546,6 +556,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("files/DownloadUrl/{*s3Key}")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> GetDatasetFileDownloadURL(string s3Key)
         {
             var key = s3Key.Substring(0, s3Key.LastIndexOf('/') + 1);
@@ -579,6 +590,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("datasets/{datasetID}")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> GetS3Key(int datasetID)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(datasetID);
@@ -791,8 +803,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             //return Ok(sJSON);
         }
 
-
-
         private async Task<LivyReply> WaitForLivyReply(int SessionID, int StatementID)
         {
             LivyReply lr = new LivyReply();
@@ -945,6 +955,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("sessions/{SessionID}/hives/{hiveDatabaseName}/{hiveTableName}/{configID}/{rows}/{skip}")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> GetHiveTable(int SessionID, int configID, int rows, int skip, string hiveTableName, string hiveDatabaseName)
         {
             String python;
@@ -989,6 +1000,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("sessions/{SessionID}/hives/{configID}/{guid}")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> SaveRowCount(int SessionID, String guid, int configID)
         {
             return StatusCode(HttpStatusCode.NoContent);
@@ -1059,6 +1071,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("sessions/{SessionID}/hives/{hiveTableExists}/{configID}/{guid}")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> CreateParquet(int SessionID, String guid, int configID, Boolean hiveTableExists)
         {
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
@@ -1141,6 +1154,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("sessions/{SessionID}/hives/{configID}")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> CreateHiveTable(int SessionID, int configID)
         {
             return StatusCode(HttpStatusCode.NoContent);
