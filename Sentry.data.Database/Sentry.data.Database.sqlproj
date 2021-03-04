@@ -146,6 +146,7 @@
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_01_01" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_01_02" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_01_03" />
+    <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Dale\Sprint_21_02_03" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -265,6 +266,7 @@
     <Build Include="Tables\DataProcessing\EventMetrics.sql" />
     <Build Include="Tables\DataProcessing\FileDetector.sql" />
     <Build Include="Tables\DatasetFileConverted.sql" />
+    <None Include="Scripts\Pre-Deploy\SupportingScripts\Dale\Sprint_21_02_03\0_usp_DALE_BaseScanAction_UPDATE.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
