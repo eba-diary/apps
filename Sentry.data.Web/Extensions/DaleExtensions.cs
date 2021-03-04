@@ -45,7 +45,8 @@ namespace Sentry.data.Web
                 BaseColumnId = dto.BaseColumnId,
 
                 IsOwnerVerified = dto.IsOwnerVerified,
-                AssetList = CreateAssetList(dto.Asset)
+                AssetList = CreateAssetList(dto.Asset),
+                SourceType = dto.SourceType
             };
         }
 
