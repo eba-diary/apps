@@ -9,9 +9,8 @@ namespace Sentry.data.Infrastructure.FeatureFlags
     public class DataFeatures : IDataFeatures
     {
         private static SqlConfiguration databaseConfig = new SqlConfiguration(Sentry.Configuration.Config.GetHostSetting("DatabaseConnectionString"));
-        public readonly static IWritableFeatureRepository databaseRepo = FeatureRepository.CreateCachedRepository(databaseConfig, TimeSpan.FromSeconds(30));
-
-        private static IReadableFeatureRepository configRepo = new Sentry.FeatureFlags.SentryConfig.FeatureRepository();
+        public readonly static IWritableFeatureRepository databaseRepo_longCache = FeatureRepository.CreateCachedRepository(databaseConfig, TimeSpan.FromDays(1));
+        private static readonly IReadableFeatureRepository configRepo = new Sentry.FeatureFlags.SentryConfig.FeatureRepository();
 
         /* 
             Configuration file feature flags
@@ -28,7 +27,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         /* 
             Database feature flags
         */
-        public IFeatureFlag<string> CLA2671_RefactorEventsToJava { get; } = new StringFeatureFlag("CLA2671_RefactorEventsToJava", databaseRepo);
-        public IFeatureFlag<string> CLA2671_RefactoredDataFlows { get; } = new StringFeatureFlag("CLA2671_RefactoredDataFlows", databaseRepo);
+        public IFeatureFlag<string> CLA2671_RefactorEventsToJava { get; } = new StringFeatureFlag("CLA2671_RefactorEventsToJava", databaseRepo_longCache);
+        public IFeatureFlag<string> CLA2671_RefactoredDataFlows { get; } = new StringFeatureFlag("CLA2671_RefactoredDataFlows", databaseRepo_longCache);
     }
 }
