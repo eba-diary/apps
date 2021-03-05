@@ -357,7 +357,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error($"metadatacontroller-validateviewpermissionsfordataset failed to retrieve UserSecurity object", ex);
+                Logger.Error($"configservice-validateviewpermissionsfordataset failed to retrieve UserSecurity object", ex);
                 throw new DatasetUnauthorizedAccessException();
             }
 
@@ -366,11 +366,11 @@ namespace Sentry.data.Core
                 try
                 {
                     IApplicationUser user = _userService.GetCurrentUser();
-                    Logger.Info($"metadatacontroller-validateviewpermissionsfordataset unauthorized_access: Id:{user.AssociateId}");
+                    Logger.Warn($"configservice-validateviewpermissionsfordataset unauthorized_access: Id:{user.AssociateId}");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error("metadatacontroller-validateviewpermissionsfordataset unauthorized_access", ex);
+                    Logger.Error("configservice-validateviewpermissionsfordataset unauthorized_access", ex);
                 }
                 throw new DatasetUnauthorizedAccessException();
             }

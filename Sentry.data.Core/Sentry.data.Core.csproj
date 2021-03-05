@@ -222,6 +222,7 @@
     <Compile Include="Exceptions\JobNotFoundException.cs" />
     <Compile Include="Exceptions\SASNotificationNotSentException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
+    <Compile Include="Exceptions\SchemaConversionException.cs" />
     <Compile Include="Exceptions\SchemaUnauthorizedAccessException.cs" />
     <Compile Include="Extensions\DataFlowExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
