@@ -1,6 +1,4 @@
-﻿using Sentry.data.Core;
-using Sentry.Messaging.Common;
-using Sentry.Common.Logging;
+﻿using Sentry.Messaging.Common;
 
 namespace Sentry.data.Infrastructure
 {
@@ -17,16 +15,8 @@ namespace Sentry.data.Infrastructure
         {
             using (var Container = Bootstrapper.Container.GetNestedContainer())
             {
-                IDataFeatures _featureFlags = Container.GetInstance<IDataFeatures>();
-                if (!_featureFlags.CLA2671_DFSEVENTEventHandler.GetValue())
-                {
-                    IMessageHandler<string> handler = Container.GetInstance<DfsEventHandler>();
-                    handler.Handle(msg);
-                }
-                else
-                {
-                    Logger.Info($"DfsEventService skipping event - CLA2671_DFSEVENTEventHandler:{_featureFlags.CLA2671_DFSEVENTEventHandler.GetValue().ToString()}");
-                }
+                IMessageHandler<string> handler = Container.GetInstance<DfsEventHandler>();
+                handler.Handle(msg);
             }
         }
 

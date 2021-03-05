@@ -247,6 +247,7 @@
     <Compile Include="GlobalEnums\SchemaDatatypes.cs" />
     <Compile Include="Helpers\LambdaClientConfig.cs" />
     <Compile Include="Helpers\LoggingUtils.cs" />
+    <Compile Include="Helpers\ParsingHelpers.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IConvertToParquetProvider.cs" />

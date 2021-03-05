@@ -9,7 +9,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
     public class DataFeatures : IDataFeatures
     {
         private static SqlConfiguration databaseConfig = new SqlConfiguration(Sentry.Configuration.Config.GetHostSetting("DatabaseConnectionString"));
-        public static IWritableFeatureRepository databaseRepo = FeatureRepository.CreateCachedRepository(databaseConfig, TimeSpan.FromSeconds(30));
+        public readonly static IWritableFeatureRepository databaseRepo = FeatureRepository.CreateCachedRepository(databaseConfig, TimeSpan.FromSeconds(30));
 
         private static IReadableFeatureRepository configRepo = new Sentry.FeatureFlags.SentryConfig.FeatureRepository();
 
@@ -28,11 +28,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         /* 
             Database feature flags
         */
-        public IFeatureFlag<bool> CLA2671_DFSEVENTEventHandler { get; } = new BooleanFeatureFlag("CLA2671_DFSEVENTEventHandler", databaseRepo);
-        public IFeatureFlag<bool> CLA2671_S3DropEventHandler { get; } = new BooleanFeatureFlag("CLA2671_S3DropEventHandler", databaseRepo);
-        public IFeatureFlag<bool> CLA2671_RawStorageEventHandler { get; } = new BooleanFeatureFlag("CLA2671_RawStorageEventHandler", databaseRepo);
-        public IFeatureFlag<bool> CLA2671_QueryStorageEventHandler { get; } = new BooleanFeatureFlag("CLA2671_QueryStorageEventHandler", databaseRepo);
-        public IFeatureFlag<bool> CLA2671_SchemaMapEventHandler { get; } = new BooleanFeatureFlag("CLA2671_SchemaMapEventHandler", databaseRepo);
-        public IFeatureFlag<bool> CLA2671_SchemaLoadEventHandler { get; } = new BooleanFeatureFlag("CLA2671_SchemaLoadEventHandler", databaseRepo);
+        public IFeatureFlag<string> CLA2671_RefactorEventsToJava { get; } = new StringFeatureFlag("CLA2671_RefactorEventsToJava", databaseRepo);
+        public IFeatureFlag<string> CLA2671_RefactoredDataFlows { get; } = new StringFeatureFlag("CLA2671_RefactoredDataFlows", databaseRepo);
     }
 }

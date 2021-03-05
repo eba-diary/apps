@@ -12,12 +12,8 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> Dale_Expose_EditOwnerVerified_CLA_1911 { get; }
         IFeatureFlag<bool> Expose_Dataflow_Metadata_CLA_2146 { get; }
         IFeatureFlag<bool> Remove_DfsWatchers_CLA_2346 { get; }
-        IFeatureFlag<bool> CLA2671_DFSEVENTEventHandler { get; }
-        IFeatureFlag<bool> CLA2671_S3DropEventHandler { get; }
-        IFeatureFlag<bool> CLA2671_RawStorageEventHandler { get; }
-        IFeatureFlag<bool> CLA2671_QueryStorageEventHandler { get; }
-        IFeatureFlag<bool> CLA2671_SchemaMapEventHandler { get; }
-        IFeatureFlag<bool> CLA2671_SchemaLoadEventHandler { get; }
+        IFeatureFlag<string> CLA2671_RefactorEventsToJava { get; }
+        IFeatureFlag<string> CLA2671_RefactoredDataFlows { get; }
 
     }
 }
