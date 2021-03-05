@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Swashbuckle.Application;
+using Swashbuckle.Swagger;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Description;
+using System.Web.Http.ExceptionHandling;
 using System.Web.Http.Routing;
-using Swashbuckle.Application;
-using Swashbuckle.Swagger;
 
 namespace Sentry.data.Web
 {
@@ -17,7 +17,11 @@ namespace Sentry.data.Web
             Sentry.WebAPI.Versioning.Register.ApiVersions(config, Sentry.data.Web.WebAPI.Version.v1); // Replace "1" with a different default API version if you desire
             config.MapHttpAttributeRoutes(constraintResolver);
 
-            
+            // Web API exception handling/logging
+            config.Services.Replace(typeof(IExceptionHandler), new UnhandledExceptionHandler());
+            config.Services.Add(typeof(IExceptionLogger), new UnhandledExceptionLogger());
+
+
             config.EnableSwagger("{apiVersion}/swagger", c =>
                 {
                     Sentry.WebAPI.Versioning.Register.SwaggerMultipleApiVersions(config, c, "Data.sentry.com");
