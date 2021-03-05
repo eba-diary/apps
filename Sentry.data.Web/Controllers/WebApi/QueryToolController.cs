@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,10 +38,12 @@ namespace Sentry.data.Web.WebApi.Controllers
         private readonly IDataFeatures _featureFlags;
         private IDatasetService _datasetService;
         private string _bucket;
+        private IApacheLivyProvider _apacheLivyProvider;
 
         public QueryToolController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, 
             ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService,
-            ISchemaService schemaService, ISecurityService securityService, IDataFeatures dataFeatures, IDatasetService datasetService)
+            ISchemaService schemaService, ISecurityService securityService, IDataFeatures dataFeatures, IDatasetService datasetService,
+            IApacheLivyProvider apacheLivyProvider)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
@@ -55,6 +56,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             _securityService = securityService;
             _featureFlags = dataFeatures;
             _datasetService = datasetService;
+            _apacheLivyProvider = apacheLivyProvider;
         }
 
         private string RootBucket
@@ -101,7 +103,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     HeartbeatTimeoutInSecond = 86400
                 };
 
-                IHttpActionResult creationResponse = await (CreateInternalSession(lc.Kind, lc));
+                IHttpActionResult creationResponse = await CreateInternalSession(lc.Kind, lc).ConfigureAwait(false);
 
                 if (creationResponse.GetType() == typeof(OkNegotiatedContentResult<String>))
                 {
@@ -129,7 +131,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             }
 
 
-            IHttpActionResult response = await (GetSession(lc.LivySession_ID));
+            IHttpActionResult response = await GetSession(lc.LivySession_ID).ConfigureAwait(false);
 
             //Reply from Livy.
             if (response.GetType() == typeof(OkNegotiatedContentResult<String>))
@@ -201,54 +203,45 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("sessions/{Language}")]
         public async Task<IHttpActionResult> CreateSession(string Language)
         {
-            using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
-            using (var client = new HttpClient(handler))
+            string json;
+            switch (Language)
             {
-                string json;
-                switch (Language)
-                {
-                    default:
-                    case "Python":
-                        json = "{\"kind\": \"pyspark\"";
-                        break;
-                    case "Scala":
-                        json = "{\"kind\": \"spark\"";
-                        break;
-                    case "R":
-                        json = "{\"kind\": \"rspark\"";
-                        break;
-                }
+                default:
+                case "Python":
+                    json = "{\"kind\": \"pyspark\"";
+                    break;
+                case "Scala":
+                    json = "{\"kind\": \"spark\"";
+                    break;
+                case "R":
+                    json = "{\"kind\": \"rspark\"";
+                    break;
+            }
 
-                json += ", \"name\": \"DSC_" + _userService.GetCurrentUser().AssociateId + "\"";
+            json += ", \"name\": \"DSC_" + _userService.GetCurrentUser().AssociateId + "\"";
 
 
 
-                json += ", \"conf\": { \"spark.hadoop.fs.s3a.security.credential.provider.path\" : \"" + Config.GetHostSetting("SparkS3AKeyLocation") + "\"," +
-                                        "\"spark.sql.hive.convertMetastoreParquet\" : \"false\"}";
-                json += "}";
+            json += ", \"conf\": { \"spark.hadoop.fs.s3a.security.credential.provider.path\" : \"" + Config.GetHostSetting("SparkS3AKeyLocation") + "\"," +
+                                    "\"spark.sql.hive.convertMetastoreParquet\" : \"false\"}";
+            json += "}";
 
 
-                HttpContent contentPost = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpContent contentPost = new StringContent(json, Encoding.UTF8, "application/json");
 
-                client.DefaultRequestHeaders.Accept.Clear();
+            HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("/sessions", contentPost).ConfigureAwait(false);
 
-                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));//ACCEPT header
-
-                HttpResponseMessage response = await client.PostAsync(_livyUrl + "/sessions", contentPost);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return Ok(response.Content.ReadAsStringAsync().Result);
-                }
-                else if (response.StatusCode == HttpStatusCode.BadRequest)
-                {
-                    return BadRequest();
-                }
-                else
-                {
-                    return NotFound();
-                }
+            if (response.IsSuccessStatusCode)
+            {
+                return Ok(response.Content.ReadAsStringAsync().Result);
+            }
+            else if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return NotFound();
             }
         }
 
@@ -262,88 +255,79 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("internalSessions/{Language}")]
         public async Task<IHttpActionResult> CreateInternalSession(string Language = "", [FromBody] LivyCreation lc = null)
         {
-            using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
-            using (var client = new HttpClient(handler))
+            string json;
+            switch (Language)
             {
-                string json;
-                switch (Language)
+                default:
+                case "Python":
+                    json = "{\"kind\": \"pyspark\"";
+                    break;
+                case "Scala":
+                    json = "{\"kind\": \"spark\"";
+                    break;
+                case "R":
+                    json = "{\"kind\": \"rspark\"";
+                    break;
+            }
+
+            if (lc != null)
+            {
+                if (lc.Session_NME != null)
                 {
-                    default:
-                    case "Python":
-                        json = "{\"kind\": \"pyspark\"";
-                        break;
-                    case "Scala":
-                        json = "{\"kind\": \"spark\"";
-                        break;
-                    case "R":
-                        json = "{\"kind\": \"rspark\"";
-                        break;
+                    json += ", \"name\": \"" + lc.Session_NME + "\"";
                 }
 
-                if (lc != null)
+                if (lc.Queue != null)
                 {
-                    if (lc.Session_NME != null)
-                    {
-                        json += ", \"name\": \"" + lc.Session_NME + "\"";
-                    }
-
-                    if (lc.Queue != null)
-                    {
-                        json += ", \"queue\": \"" + lc.Queue + "\"";
-                    }
-
-                    if (lc.ExecutorCores != 0)
-                    {
-                        json += ", \"executorCores\": " + lc.ExecutorCores + "";
-                    }
-
-                    if (lc.ExecutorMemory != null)
-                    {
-                        json += ", \"executorMemory\": \"" + lc.ExecutorMemory + "\"";
-                    }
-
-                    if (lc.NumExecutors != 0)
-                    {
-                        json += ", \"numExecutors\": " + lc.NumExecutors + "";
-                    }
-
-                    if (lc.HeartbeatTimeoutInSecond != 0)
-                    {
-                        json += ", \"heartbeatTimeoutInSecond\": " + lc.HeartbeatTimeoutInSecond + "";
-                    }
-                }
-                else
-                {
-                    json += ", \"name\": \"DSC_" + _userService.GetCurrentUser().AssociateId + "\"";
+                    json += ", \"queue\": \"" + lc.Queue + "\"";
                 }
 
-
-                json += ", \"conf\": { \"spark.hadoop.fs.s3a.security.credntial.provider.path\" : \"" + Config.GetHostSetting("SparkS3AKeyLocation") + "\"," +
-                                        "\"spark.sql.hive.convertMetastoreParquet\" : \"false\"}";
-                json += "}";
-
-
-                HttpContent contentPost = new StringContent(json, Encoding.UTF8, "application/json");
-
-                client.DefaultRequestHeaders.Accept.Clear();
-
-                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));//ACCEPT header
-
-                HttpResponseMessage response = await client.PostAsync(_livyUrl + "/sessions", contentPost);
-
-                if (response.IsSuccessStatusCode)
+                if (lc.ExecutorCores != 0)
                 {
-                    return Ok(response.Content.ReadAsStringAsync().Result);
+                    json += ", \"executorCores\": " + lc.ExecutorCores + "";
                 }
-                else if (response.StatusCode == HttpStatusCode.BadRequest)
+
+                if (lc.ExecutorMemory != null)
                 {
-                    return BadRequest();
+                    json += ", \"executorMemory\": \"" + lc.ExecutorMemory + "\"";
                 }
-                else
+
+                if (lc.NumExecutors != 0)
                 {
-                    return NotFound();
+                    json += ", \"numExecutors\": " + lc.NumExecutors + "";
                 }
+
+                if (lc.HeartbeatTimeoutInSecond != 0)
+                {
+                    json += ", \"heartbeatTimeoutInSecond\": " + lc.HeartbeatTimeoutInSecond + "";
+                }
+            }
+            else
+            {
+                json += ", \"name\": \"DSC_" + _userService.GetCurrentUser().AssociateId + "\"";
+            }
+
+
+            json += ", \"conf\": { \"spark.hadoop.fs.s3a.security.credntial.provider.path\" : \"" + Config.GetHostSetting("SparkS3AKeyLocation") + "\"," +
+                                    "\"spark.sql.hive.convertMetastoreParquet\" : \"false\"}";
+            json += "}";
+
+
+            HttpContent contentPost = new StringContent(json, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("/sessions", contentPost).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return Ok(response.Content.ReadAsStringAsync().Result);
+            }
+            else if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return NotFound();
             }
         }
 
@@ -357,36 +341,26 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("sessions/{SessionID}/sendCode")]
         public async Task<IHttpActionResult> SendCode(int SessionID, [FromBody] string Code)
         {
-            using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
-            using (var client = new HttpClient(handler))
+            //dynamic json = Code;
+            var json = "{\"code\": \"" + Code + "\"}";
+
+            //json = new JavaScriptSerializer().Serialize();
+
+            HttpContent contentPost = new StringContent(json, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("/sessions/" + SessionID + "/statements", contentPost).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode)
             {
-
-                //dynamic json = Code;
-                var json = "{\"code\": \"" + Code + "\"}";
-
-                //json = new JavaScriptSerializer().Serialize();
-
-                HttpContent contentPost = new StringContent(json, Encoding.UTF8, "application/json");
-
-                client.DefaultRequestHeaders.Accept.Clear();
-
-                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));//ACCEPT header
-
-                HttpResponseMessage response = await client.PostAsync(_livyUrl + "/sessions/" + SessionID + "/statements", contentPost);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return Ok(response.Content.ReadAsStringAsync().Result);
-                }
-                else if (response.StatusCode == HttpStatusCode.BadRequest)
-                {
-                    return BadRequest();
-                }
-                else
-                {
-                    return NotFound();
-                }
+                return Ok(response.Content.ReadAsStringAsync().Result);
+            }
+            else if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return NotFound();
             }
         }
 
@@ -399,33 +373,27 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("sessions/name/{name}")]
         public async Task<IHttpActionResult> GetSessions(String name = null)
         {
-            using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
-            using (var client = new HttpClient(handler))
+            HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync("/sessions").ConfigureAwait(false);
+
+            if (name != null && response.IsSuccessStatusCode)
             {
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
+                LivySessionList livySessionList = JsonConvert.DeserializeObject<LivySessionList>(response.Content.ReadAsStringAsync().Result);
 
-                HttpResponseMessage response = await client.GetAsync(_livyUrl + "/sessions");
-
-                if (name != null && response.IsSuccessStatusCode)
-                {
-                    LivySessionList livySessionList = JsonConvert.DeserializeObject<LivySessionList>(response.Content.ReadAsStringAsync().Result);
-
-                    return Ok(livySessionList.sessions.Where(x => x.appId.Contains(name)));
-                }
-                else if (response.IsSuccessStatusCode)
-                {
-                    return Ok(response.Content.ReadAsStringAsync().Result);
-                }
-                else if (response.StatusCode == HttpStatusCode.BadRequest)
-                {
-                    return BadRequest();
-                }
-                else
-                {
-                    return NotFound();
-                }
+                return Ok(livySessionList.sessions.Where(x => x.appId.Contains(name)));
             }
+            else if (response.IsSuccessStatusCode)
+            {
+                return Ok(response.Content.ReadAsStringAsync().Result);
+            }
+            else if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return NotFound();
+            }
+            
         }
 
         /// <summary>
@@ -437,27 +405,21 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("sessions/{SessionID}")]
         public async Task<IHttpActionResult> GetSession(int SessionID)
         {
-            using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
-            using (var client = new HttpClient(handler))
+            HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync("/sessions/" + SessionID).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode)
             {
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
-
-                HttpResponseMessage response = await client.GetAsync(_livyUrl + "/sessions/" + SessionID);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return Ok(response.Content.ReadAsStringAsync().Result);
-                }
-                else if (response.StatusCode == HttpStatusCode.BadRequest)
-                {
-                    return BadRequest();
-                }
-                else
-                {
-                    return NotFound();
-                }
+                return Ok(response.Content.ReadAsStringAsync().Result);
             }
+            else if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return NotFound();
+            }
+            
         }
 
         /// <summary>
@@ -470,27 +432,21 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("sessions/{SessionID}/statements/{StatementID}")]
         public async Task<IHttpActionResult> GetStatement(int SessionID, int StatementID)
         {
-            using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
-            using (var client = new HttpClient(handler))
+            HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync("/sessions/" + SessionID + "/statements/" + StatementID).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode)
             {
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
-
-                HttpResponseMessage response = await client.GetAsync(_livyUrl + "/sessions/" + SessionID + "/statements/" + StatementID);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return Ok(response.Content.ReadAsStringAsync().Result);
-                }
-                else if (response.StatusCode == HttpStatusCode.BadRequest)
-                {
-                    return BadRequest();
-                }
-                else
-                {
-                    return NotFound();
-                }
+                return Ok(response.Content.ReadAsStringAsync().Result);
             }
+            else if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return NotFound();
+            }
+            
         }
 
         /// <summary>
@@ -503,27 +459,21 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("sessions/{SessionID}/statements/{StatementID}")]
         public async Task<IHttpActionResult> CancelStatement(int SessionID, int StatementID)
         {
-            using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
-            using (var client = new HttpClient(handler))
+            HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("/sessions/" + SessionID + "/statements/" + StatementID + "/cancel", null).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode)
             {
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
-
-                HttpResponseMessage response = await client.PostAsync(_livyUrl + "/sessions/" + SessionID + "/statements/" + StatementID + "/cancel", null);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return Ok(response.Content.ReadAsStringAsync().Result);
-                }
-                else if (response.StatusCode == HttpStatusCode.BadRequest)
-                {
-                    return BadRequest();
-                }
-                else
-                {
-                    return NotFound();
-                }
+                return Ok(response.Content.ReadAsStringAsync().Result);
             }
+            else if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return NotFound();
+            }
+            
         }
 
         /// <summary>
@@ -535,27 +485,21 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("sessions/{SessionID}")]
         public async Task<IHttpActionResult> DeleteSession(int SessionID)
         {
-            using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
-            using (var client = new HttpClient(handler))
+            HttpResponseMessage response = await _apacheLivyProvider.DeleteRequestAsync("/sessions/" + SessionID);
+
+            if (response.IsSuccessStatusCode)
             {
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
-
-                HttpResponseMessage response = await client.DeleteAsync(_livyUrl + "/sessions/" + SessionID);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return Ok(response.Content.ReadAsStringAsync().Result);
-                }
-                else if (response.StatusCode == HttpStatusCode.BadRequest)
-                {
-                    return BadRequest();
-                }
-                else
-                {
-                    return NotFound();
-                }
+                return Ok(response.Content.ReadAsStringAsync().Result);
             }
+            else if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return NotFound();
+            }
+            
         }
 
         /// <summary>
@@ -855,7 +799,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             while (lr.state != "available")
             {
-                IHttpActionResult response = await (GetStatement(SessionID, StatementID));
+                IHttpActionResult response = await GetStatement(SessionID, StatementID).ConfigureAwait(false);
 
                 if (response.GetType() == typeof(OkNegotiatedContentResult<String>))
                 {
@@ -1017,7 +961,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             String quoted = System.Web.Helpers.Json.Encode(python);
             quoted = quoted.Substring(1, quoted.Length - 2);
 
-            IHttpActionResult response = await (SendCode(SessionID, quoted));
+            IHttpActionResult response = await SendCode(SessionID, quoted).ConfigureAwait(false);
 
             if (response.GetType() == typeof(OkNegotiatedContentResult<String>))
             {
@@ -1025,7 +969,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 var a = response as OkNegotiatedContentResult<String>;
                 LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(a.Content);
 
-                lr = await WaitForLivyReply(SessionID, lr.id);
+                lr = await WaitForLivyReply(SessionID, lr.id).ConfigureAwait(false);
 
                 return Ok(lr.output.data.text);
             }
@@ -1171,7 +1115,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             String quoted = System.Web.Helpers.Json.Encode(python);
             quoted = quoted.Substring(1, quoted.Length - 2);
 
-            IHttpActionResult response = await (SendCode(SessionID, quoted));
+            IHttpActionResult response = await SendCode(SessionID, quoted).ConfigureAwait(false);
 
             if (response.GetType() == typeof(OkNegotiatedContentResult<String>))
             {
@@ -1179,7 +1123,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 var a = response as OkNegotiatedContentResult<String>;
                 LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(a.Content);
 
-                lr = await WaitForLivyReply(SessionID, lr.id);
+                lr = await WaitForLivyReply(SessionID, lr.id).ConfigureAwait(false);
 
                 return Ok(dropLocation);
             }

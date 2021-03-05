@@ -219,6 +219,7 @@
     <Compile Include="Exceptions\HiveQueryException.cs" />
     <Compile Include="Exceptions\HiveTableViewNotFoundException.cs" />
     <Compile Include="Exceptions\JobNotFoundException.cs" />
+    <Compile Include="Exceptions\SASNotificationNotSentException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaUnauthorizedAccessException.cs" />
     <Compile Include="Extensions\DataFlowExtensions.cs" />
@@ -266,6 +267,7 @@
     <Compile Include="Interfaces\DataProcessing\ISchemaMapProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
+    <Compile Include="Interfaces\IApacheLivyProvider.cs" />
     <Compile Include="Interfaces\IHostSettings.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
     <Compile Include="Interfaces\IDaleSearchProvider.cs" />

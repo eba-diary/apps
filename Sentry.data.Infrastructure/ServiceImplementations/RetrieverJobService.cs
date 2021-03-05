@@ -86,6 +86,9 @@ namespace Sentry.data.Infrastructure
                             case GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE:
                                 _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
                                 break;
+                            case GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE:
+                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSoureDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
+                                break;
                             case GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION:
                                 includeFilename = true;
                                 _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
@@ -1132,28 +1135,11 @@ namespace Sentry.data.Infrastructure
                 using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
                 {
                     IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
+                    HttpClient client = Container.GetInstance<HttpClient>();
 
-                    ////Retrieve all Active states in Job History
-                    //IList<JobHistory> activeJobs = _datasetContext.JobHistory.Where(w => w.Active).ToList();
-                    
-                    //foreach (JobHistory job in activeJobs)
-                    //{
-                    using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
-                    using (var client = new HttpClient(handler))
-                    {
+                    var tasks = _datasetContext.JobHistory.Where(w => w.Active && w.BatchId != 0).ToList().Select(s => client.GetAsync($"{Configuration.Config.GetHostSetting("WebApiUrl")}/api/v1/jobs/{s.JobId.Id}/batches/{s.BatchId}"));
 
-                        var tasks = _datasetContext.JobHistory.Where(w => w.Active && w.BatchId != 0).ToList().Select(s => client.GetAsync($"{Configuration.Config.GetHostSetting("WebApiUrl")}/api/v1/jobs/{s.JobId.Id}/batches/{s.BatchId}"));
-
-                        var results = await Task.WhenAll(tasks);
-
-                        //HttpResponseMessage response = await client.GetAsync($"{Configuration.Config.GetHostSetting("WebApiUrl")}/api/v1/jobs/{job.JobId.Id}/batches/{job.BatchId}");
-
-                        //if (!response.IsSuccessStatusCode)
-                        //{
-                        //    Logger.Error($"Failed to update job status - JobID:{job.JobId.Id} BatchId:{job.BatchId}");
-                        //}
-                    }
-                    //}
+                    var results = await Task.WhenAll(tasks);
                 }
             }
             catch (Exception ex)

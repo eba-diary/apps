@@ -260,7 +260,8 @@ namespace Sentry.data.Web.Controllers
         {
             var temp = _dataFlowService.GetDataSourceTypes()
                 .Where(w => w.DiscrimatorValue == GlobalConstants.DataSoureDiscriminator.FTP_SOURCE ||
-                    w.DiscrimatorValue == GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE)
+                    w.DiscrimatorValue == GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE ||
+                    w.DiscrimatorValue == GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE)
                 .Select(v => new SelectListItem { Text = v.Name, Value = v.DiscrimatorValue })
                 .ToList();
 

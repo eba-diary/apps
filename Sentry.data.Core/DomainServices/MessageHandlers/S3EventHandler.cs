@@ -12,8 +12,8 @@ namespace Sentry.data.Core
     public class S3EventHandler : IMessageHandler<string>
     {
         #region Declarations
-        private IDataFlowProvider _dataFlowProvider;
-        private IDataFeatures _dataFeatures;
+        private readonly IDataFlowProvider _dataFlowProvider;
+        private readonly IDataFeatures _dataFeatures;
         #endregion
 
         #region Constructor
@@ -26,13 +26,18 @@ namespace Sentry.data.Core
 
         void IMessageHandler<string>.Handle(string msg)
         {
+            throw new NotImplementedException();
+        }
+
+        async Task IMessageHandler<string>.HandleAsync(string msg)
+        {
             BaseEventMessage baseEvent = JsonConvert.DeserializeObject<BaseEventMessage>(msg);
             try
             {
                 if (baseEvent.EventType.ToUpper() == "S3EVENT")
                 {
                     S3Event s3Event = JsonConvert.DeserializeObject<S3Event>(msg);
-                    Logger.Info("S3EventHandler processing S3EVENT message: " + JsonConvert.SerializeObject(s3Event));
+                    Logger.Info("s3eventhandler processing S3EVENT message: " + JsonConvert.SerializeObject(s3Event));
 
                     switch (s3Event.PayLoad.eventName.ToUpper())
                     {
@@ -44,9 +49,7 @@ namespace Sentry.data.Core
                             if (!FilterEvent(s3Event))
                             {
                                 Logger.Info($"S3EventHandler processing AWS event - {JsonConvert.SerializeObject(s3Event)}");
-                                Task.Factory.StartNew(() => _dataFlowProvider.ExecuteDependenciesAsync(s3Event.PayLoad),
-                                                                        TaskCreationOptions.LongRunning).ContinueWith(TaskException,
-                                                                        TaskContinuationOptions.OnlyOnFaulted);
+                                await _dataFlowProvider.ExecuteDependenciesAsync(s3Event.PayLoad.s3.bucket.name, s3Event.PayLoad.s3.Object.key, s3Event.PayLoad).ConfigureAwait(false);
                             }
                             else
                             {
@@ -54,18 +57,18 @@ namespace Sentry.data.Core
                             }
                             break;
                         default:
-                            Logger.Info($"S3EventHandler not configured to handle AWS event type ({s3Event.EventType}), skipping event.");
+                            Logger.Info($"s3eventhandler not configured to handle AWS event type ({s3Event.EventType}), skipping event.");
                             break;
                     }
                 }
                 else
                 {
-                    Logger.Info($"S3EventHandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");
+                    Logger.Info($"s3eventhandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error($"S3EventHandler failed to process message: EventType:{baseEvent.EventType.ToUpper()} - Msg:({msg})", ex);
+                Logger.Error($"s3eventhandler failed to process message: EventType:{baseEvent.EventType.ToUpper()} - Msg:({msg})", ex);
             }
         }
 
@@ -151,11 +154,6 @@ namespace Sentry.data.Core
         void IMessageHandler<string>.Init()
         {
             Logger.Info("S3EventHandlerInitialized");
-        }
-
-        private void TaskException(Task t)
-        {
-            Logger.Fatal("Exception occurred on main Windows Service Task. Stopping Service immediately.", t.Exception);
         }
     }
 }

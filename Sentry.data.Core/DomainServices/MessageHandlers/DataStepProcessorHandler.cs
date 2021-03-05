@@ -19,7 +19,13 @@ namespace Sentry.data.Core
             _dataStepProvider = dataStepProvider;
             _dataFlowProvider = dataFlowProvider;
         }
-        public void Handle(string msg)
+
+        public void Handle(String msg)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task HandleAsync(string msg)
         {
             BaseEventMessage baseEvent = JsonConvert.DeserializeObject<BaseEventMessage>(msg);
             try
@@ -29,9 +35,7 @@ namespace Sentry.data.Core
                     //TODO: Add feature flag filtering around specific DATAFLOWSTEP events
                     DataFlowStepEvent stepEvent = JsonConvert.DeserializeObject<DataFlowStepEvent>(msg);
                     Logger.Info("DataStepProcessorHandler processing DATAFLOWSTEP message: " + JsonConvert.SerializeObject(stepEvent));
-                    Task.Factory.StartNew(() => _dataFlowProvider.ExecuteStep(stepEvent),
-                                                                    TaskCreationOptions.LongRunning).ContinueWith(TaskException,
-                                                                    TaskContinuationOptions.OnlyOnFaulted);
+                    await _dataFlowProvider.ExecuteStepAsync(stepEvent).ConfigureAwait(false);
                 }
                 else
                 {

@@ -13,7 +13,6 @@
         ViewBag.Title = dataAsset.DisplayName + " Lineage";
         DisplayName = dataAsset.DisplayName;
         arch = "http://sharepoint.sentry.com/it/DataArch/_layouts/15/VisioWebAccess/VisioWebAccess.aspx?id=/it/DataArch/Shared%20Documents/Data%20Services%20Architecture%20Diagrams/" + Model.ArchLink;
-        guide = "http://sharepoint.sentry.com/it/DataArch/Consumer%20Guides/Pages/" + Model.GuideLink;
     }
 
     string disabled;
@@ -69,7 +68,7 @@
                     <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = dataAsset.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
 
                     @{ disabled = (dataAsset.GuideLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
+                    <li class="@disabled"><a href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
 
                     @{ disabled = (dataAsset.Contact != null) ? "" : "disabled"; }
                     <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
@@ -92,7 +91,7 @@
                     <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = dataAsset.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
 
                     @{ disabled = (dataAsset.GuideLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
+                    <li class="@disabled"><a href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
 
                     @{ disabled = (dataAsset.Contact != null) ? "" : "disabled"; }
                     <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
