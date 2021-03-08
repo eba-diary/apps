@@ -13,7 +13,8 @@
 		  (9,	'Google Api'),
 		  (10,	'ClaimIQ'),
 		  (11,	'Fixed Width'),
-		  (12,	'Producer S3 Drop')
+		  (12,	'Producer S3 Drop'),
+		  (13,	'XML')
         )
         AS Source ([ID], [Name])
         ON Target.[ID] = Source.[ID]   

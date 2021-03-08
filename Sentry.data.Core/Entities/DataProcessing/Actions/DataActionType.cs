@@ -28,6 +28,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
         [Description("Fixed Width")]
         FixedWidth = 11,
         [Description("Producer S3 Drop")]
-        ProducerS3Drop = 12
+        ProducerS3Drop = 12,
+        [Description("XML")]
+        XML = 13
     }
 }
