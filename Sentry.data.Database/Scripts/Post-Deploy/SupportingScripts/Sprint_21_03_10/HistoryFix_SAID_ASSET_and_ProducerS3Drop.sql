@@ -5,7 +5,7 @@
 *  
 *  Change history
 *	1.0		1/6		initial creation
-*	1.1		1/14	Split Raw Storage and S3 Drop updates, adjusted @OldDropPrefix__CLA2413 logic
+*	1.1		1/14	Split Raw Storage and S3 Drop updates, adjusted @OldDropPrefix__CLA2542 logic
 *   1.2		3/8		Added populated all producer flows into  #FlowsFromSpreadsheet with DATA asset key code
 ***********************/
 --Use SentryDatasets_NR
@@ -15,31 +15,31 @@ IF OBJECT_ID('tempdb..#ExistingFlows') IS NOT NULL DROP TABLE #ExistingFlows
 IF OBJECT_ID('tempdb..#S3DropUpdates') IS NOT NULL DROP TABLE #S3DropUpdates
 IF OBJECT_ID('tempdb..#RawStorageUpdates') IS NOT NULL DROP TABLE #RawStorageUpdates
 
-DECLARE @ENV__CLA2413 VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
-DECLARE @NewSourceBucket__CLA2413 VARCHAR(40) = (select TargetStorageBucket from DataAction where ActionType = 'ProducerS3Drop')
-DECLARE @NewProducerS3DropActionId__CLA2413 INT = (Select Id from DataAction where Name = 'Producer S3 Drop')
-DECLARE @OldDropPrefix__CLA2413 VARCHAR(25)
+DECLARE @ENV__CLA2542 VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
+DECLARE @NewSourceBucket__CLA2542 VARCHAR(40) = (select TargetStorageBucket from DataAction where ActionType = 'ProducerS3Drop')
+DECLARE @NewProducerS3DropActionId__CLA2542 INT = (Select Id from DataAction where Name = 'Producer S3 Drop')
+DECLARE @OldDropPrefix__CLA2542 VARCHAR(25)
 
-Select @ENV__CLA2413
+Select @ENV__CLA2542
 
-if (@ENV__CLA2413 = 'PROD' or @ENV__CLA2413 = 'QUAL')
+if (@ENV__CLA2542 = 'PROD' or @ENV__CLA2542 = 'QUAL')
 BEGIN
-	SET @OldDropPrefix__CLA2413 = 'droplocation/data/'
+	SET @OldDropPrefix__CLA2542 = 'droplocation/data/'
 END
-else if (@ENV__CLA2413 = 'NRTEST' or @ENV__CLA2413 = 'TEST')
+else if (@ENV__CLA2542 = 'NRTEST' or @ENV__CLA2542 = 'TEST')
 BEGIN
-	SET @OldDropPrefix__CLA2413 = 'droplocation/data-test/'
+	SET @OldDropPrefix__CLA2542 = 'droplocation/data-test/'
 END
-else if (@ENV__CLA2413 = 'NRDEV' or @ENV__CLA2413 = 'DEV')
+else if (@ENV__CLA2542 = 'NRDEV' or @ENV__CLA2542 = 'DEV')
 BEGIN
-	SET @OldDropPrefix__CLA2413 = 'droplocation/data-dev/'
+	SET @OldDropPrefix__CLA2542 = 'droplocation/data-dev/'
 END
 else
 BEGIN
-	SET @OldDropPrefix__CLA2413 = 'droplocation/data-' + LOWER(@ENV__CLA2413) + '/'
+	SET @OldDropPrefix__CLA2542 = 'droplocation/data-' + LOWER(@ENV__CLA2542) + '/'
 END
 
-select 'OldDropPrefix: ' + @OldDropPrefix__CLA2413
+select 'OldDropPrefix: ' + @OldDropPrefix__CLA2542
 /**********************************
 	Create temp table, contains Id's of all dataflows
 	 to be adjusted and associated SAID ASSET key code
@@ -58,7 +58,7 @@ Create Table #FlowsFromSpreadsheet
 ***********************************/
 /*<replace_with_insert_statements_for_existingflows_table>*/
 
-if (@ENV__CLA2413 = 'TEST' or @ENV__CLA2413 = 'NRTEST' or @ENV__CLA2413 = 'DEV' or @ENV__CLA2413 = 'NRDEV')
+if (@ENV__CLA2542 = 'TEST' or @ENV__CLA2542 = 'NRTEST' or @ENV__CLA2542 = 'DEV' or @ENV__CLA2542 = 'NRDEV')
 BEGIN
 	insert into #FlowsFromSpreadsheet
 	select
@@ -71,7 +71,7 @@ BEGIN
 		DA.Id = DFS.Action_Id
 	where DA.Name = 'Schema Map'
 END
-else if (@ENV__CLA2413 = 'QUAL')
+else if (@ENV__CLA2542 = 'QUAL')
 BEGIN
 	insert into #FlowsFromSpreadsheet select 15,	'DATA'
 	insert into #FlowsFromSpreadsheet select 19,	'DATA'
@@ -187,7 +187,7 @@ BEGIN
 	insert into #FlowsFromSpreadsheet select 415,	'DATA'
 	insert into #FlowsFromSpreadsheet select 417,	'DATA'
 END
-else if (@ENV__CLA2413 = 'PROD')
+else if (@ENV__CLA2542 = 'PROD')
 BEGIN
 	insert into #FlowsFromSpreadsheet select 34, 'PLBI'
 	insert into #FlowsFromSpreadsheet select 55, 'DATA'
@@ -275,11 +275,11 @@ select
 	EF.SaidAsset,
 	DFS.Id as 'DataFlowStepId',
 	DFS.Action_Id,
-	@NewProducerS3DropActionId__CLA2413 as 'NewActionId',
+	@NewProducerS3DropActionId__CLA2542 as 'NewActionId',
 	DFS.DataAction_Type_Id,
 	12 as 'NewDataAction_Type_Id',
 	DFS.TriggerKey,
-	REPLACE(DFS.TriggerKey, @OldDropPrefix__CLA2413, 'droplocation/data/' + EF.SaidAsset + '/') as 'NewTriggerKey',
+	REPLACE(DFS.TriggerKey, @OldDropPrefix__CLA2542, 'droplocation/data/' + EF.SaidAsset + '/') as 'NewTriggerKey',
 	DFS.TargetPrefix,
 	DAT.Name as 'DataActionTypeName',
 	DFS.SourceDependencyBucket
@@ -314,9 +314,9 @@ select
 	DFS.Id as 'DataFlowStepId',
 	EF.SaidAsset,
 	DFS.SourceDependencyBucket,
-	@NewSourceBucket__CLA2413 as 'NewSourceDependencyBucket',
+	@NewSourceBucket__CLA2542 as 'NewSourceDependencyBucket',
 	DFS.SourceDependencyPrefix,
-	REPLACE(DFS.SourceDependencyPrefix, @OldDropPrefix__CLA2413, 'droplocation/data/' + EF.SaidAsset + '/') as 'NewSourceDependencyPrefix',	
+	REPLACE(DFS.SourceDependencyPrefix, @OldDropPrefix__CLA2542, 'droplocation/data/' + EF.SaidAsset + '/') as 'NewSourceDependencyPrefix',	
 	DA.Name as 'DataActionName'
 into #RawStorageUpdates
 from DataFlow DF
