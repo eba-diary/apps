@@ -47,6 +47,7 @@ IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion)
 BEGIN TRY 
 
   --insert one off script files here
+  :r ..\Post-Deploy\SupportingScripts\Sprint_21_02_02\NewFeatureFlags.sql
   :r ..\Post-Deploy\SupportingScripts\Sprint_21_03_10\HistoryFix_SAID_ASSET_and_ProducerS3Drop.sql
 
   --insert into the verision table so these scripts do not run again.

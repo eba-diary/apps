@@ -1,5 +1,6 @@
 ﻿using NJsonSchema;
 using Sentry.Common.Logging;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Factories.Fields;
 using System;
 using System.Collections.Generic;
@@ -177,7 +178,8 @@ namespace Sentry.data.Core
                         {
                             if (parentRow == null)
                             {
-                                Logger.Warn("Unhandled Scenario");
+                                Logger.Warn($"Unhandled Scenario:::jsonobjecttype:{JsonObjectType.None.ToString()}:::parentrownull");
+                                throw new SchemaConversionException("Unhandled Schema Scenario");
                             }
                             else
                             {
