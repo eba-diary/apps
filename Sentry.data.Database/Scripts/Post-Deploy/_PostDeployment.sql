@@ -40,7 +40,7 @@ DECLARE @ErrorState INT;
 --Now only run these scritps if the versioning allows us.
 --ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
 --SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
-SET @ScriptVersion = '2020.03.10.01_PostDeploy'
+SET @ScriptVersion = '2021.03.10.01_PostDeploy'
 
 BEGIN TRAN 
 IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion) 
