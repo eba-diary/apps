@@ -19,7 +19,6 @@ namespace Sentry.data.Core
         public virtual bool CLA1396_NewEtlColumns { get; set; }
         public virtual bool CLA1580_StructureHive { get; set; }
         public virtual bool CLA2472_EMRSend { get; set; }
-        public virtual bool CLA2429_SnowflakeCreateTable { get; set; }
         public virtual bool CLA1286_KafkaFlag { get; set; }
     }
 }
