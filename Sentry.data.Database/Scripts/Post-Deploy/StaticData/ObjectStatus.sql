@@ -9,7 +9,7 @@
 								)
 								AS Source ([ObjectStatus_Id], [ObjectStatus_CDE], [ObjectStatus_DSC]) 
 
-		ON Target.[ObjectStatusId] = Source.[ObjectStatusId] AND Target.[ObjectStatus_CDE] = Source.[ObjectStatus_CDE]
+		ON Target.[ObjectStatus_Id] = Source.[ObjectStatus_Id] AND Target.[ObjectStatus_CDE] = Source.[ObjectStatus_CDE]
 		WHEN MATCHED THEN 
 			-- update matched rows 
 			UPDATE SET 
@@ -18,8 +18,8 @@
 
 		WHEN NOT MATCHED BY TARGET THEN 
 			-- insert new rows 
-			INSERT ([ObjectStatusId], [ObjectStatus_CDE], [ObjectStatus_DSC])
-			VALUES ([ObjectStatusId], [ObjectStatus_CDE], [ObjectStatus_DSC])
+			INSERT ([ObjectStatus_Id], [ObjectStatus_CDE], [ObjectStatus_DSC])
+			VALUES ([ObjectStatus_Id], [ObjectStatus_CDE], [ObjectStatus_DSC])
 					  
 		WHEN NOT MATCHED BY SOURCE THEN 
 			-- delete rows that are in the target but not the source 
