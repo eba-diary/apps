@@ -185,6 +185,7 @@
     <Compile Include="Entities\MessageFormats\S3Event.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableCreateModel.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
+    <Compile Include="Entities\ObjectStatus.cs" />
     <Compile Include="Entities\S3\S3LambdaEvent.cs" />
     <Compile Include="Entities\S3\S3ObjectEvent.cs" />
     <Compile Include="Entities\Security\SAIDAsset.cs" />
@@ -244,6 +245,7 @@
     <Compile Include="GlobalEnums\IngestionType.cs" />
     <Compile Include="GlobalEnums\OAuthClaims.cs" />
     <Compile Include="GlobalEnums\OAuthGrantType.cs" />
+    <Compile Include="GlobalEnums\ObjectStatus.cs" />
     <Compile Include="GlobalEnums\RetrieverJobScheduleTypes.cs" />
     <Compile Include="GlobalEnums\SchemaDatatypes.cs" />
     <Compile Include="Helpers\LambdaClientConfig.cs" />

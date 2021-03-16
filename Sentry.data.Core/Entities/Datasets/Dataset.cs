@@ -12,7 +12,7 @@ namespace Sentry.data.Core
     {
         private string _metadata;
 
-        public Dataset(){ }
+        public Dataset() { }
 
         public virtual int DatasetId { get; set; }
 
@@ -82,6 +82,15 @@ namespace Sentry.data.Core
         public virtual string PrimaryContactId { get; set; }
         public virtual bool IsSecured { get; set; }
         public virtual Security Security { get; set; }
+
+        //Delete Implementation
+        public virtual ObjectStatusEnum ObjectStatus {
+            get
+            {
+                //TODO: CLA-2765 Remove Getter logic and add Set
+                return (DatasetId == 60) ? ObjectStatusEnum.Pending_Delete : ObjectStatusEnum.Active;
+            }
+        }
         public virtual bool DeleteInd { get; set; }
         public virtual string DeleteIssuer { get; set; }
         public virtual DateTime DeleteIssueDTM { get; set; }
