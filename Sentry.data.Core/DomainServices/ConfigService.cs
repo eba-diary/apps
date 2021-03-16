@@ -549,7 +549,10 @@ namespace Sentry.data.Core
                 DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
 
                 //Do not proceed with dataset file configuration is already marked for deletion
-                if (logicalDelete && dfc.DeleteInd)
+                //TODO: CLA-2765 - Remove deleteInd filter after testing completed
+                if (logicalDelete && (dfc.DeleteInd || 
+                    dfc.ObjectStatus == GlobalEnums.ObjectStatusEnum.Pending_Delete || 
+                    dfc.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted))
                 {
                     throw new DatasetFileConfigDeletedException("Already marked for deletion");
                 }
@@ -560,19 +563,24 @@ namespace Sentry.data.Core
                 {
                     Logger.Info($"configservice-delete-logical - configid:{id} configname:{dfc.Name}");
 
-                    //Disable all associated RetrieverJobs
+                    /*  
+                     *  Legacy processing platform jobs where associated directly to datasetfileconfig object
+                     *  Disable all associated RetrieverJobs
+                    */
                     foreach (var job in dfc.RetrieverJobs)
                     {
                         _jobService.DisableJob(job.Id);
                     }
 
+                    /*
+                     *  Disable dataflows associated with schema on new processing platform
+                     */
                     //Disable all retriever jobs, associated with schema flow
-                    
+                    _dataFlowService.DisableFlowsByFileSchema(scm);
 
                     /*  Mark objects for delete to ensure they are not displaed in UI
                      *  WallEService, long running task within Goldeneye service, will perform delete after determined amount of time
                     */
-
                     /* Mark dataset file config object for delete */
                     MarkForDelete(dfc);
 
@@ -826,6 +834,7 @@ namespace Sentry.data.Core
             dfc.DeleteInd = true;
             dfc.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
             dfc.DeleteIssueDTM = DateTime.Now;
+            dfc.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
         }
 
         private void MarkForDelete(FileSchema scm)
@@ -834,6 +843,7 @@ namespace Sentry.data.Core
             scm.DeleteInd = true;
             scm.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
             scm.DeleteIssueDTM = DateTime.Now;
+            scm.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
         }
 
         private void MapToDto(DataElement de, SchemaApiDTO dto)

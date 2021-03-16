@@ -301,6 +301,56 @@ namespace Sentry.data.Core
 
         }
 
+        public void DisableFlowsByFileSchema(FileSchema scm)
+        {
+            /* Get Schema Flow */
+            var schemaflowName = GetDataFlowNameForFileSchema(scm);
+            int schemaFlowId = _datasetContext.DataFlow.FirstOrDefault(w => w.Name == schemaflowName).Id;
+
+            /* Get any Retriever Jobs associated with schema flow */
+            List<int> schemaFlowJobList = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == schemaFlowId).Select(s => s.Id).ToList();
+
+            foreach (int jobId in schemaFlowJobList)
+            {
+                _jobService.DisableJob(jobId);
+            }
+
+
+            /* Get Producer flows associated with Schema flow */
+            List<int> singleChildProducerFlowIdList = GetProducerFlowsWithSingleSchemaMapBySchemaId(scm.SchemaId);
+
+            /* Disable all retrieverJobs associated with producer flow */
+
+            List<int> producerFlowJobList = _datasetContext.RetrieverJob.Where(w => singleChildProducerFlowIdList.Contains(w.DataFlow.Id)).Select(s => s.Id).ToList();
+
+            foreach(int jobId in producerFlowJobList)
+            {
+                _jobService.DisableJob(jobId);
+            }
+        }
+
+        private List<int> GetProducerFlowsWithSingleSchemaMapBySchemaId(int schemaId)
+        {
+            List<int> producerFlowIdList = new List<int>();
+
+            /* Get producer flow Ids which map to schema */
+            List<Tuple<int, int>> producerSchemaMapIds = _datasetContext.SchemaMap.Where(w => w.MappedSchema.SchemaId == schemaId && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaMap).Select(s => new Tuple<int, int>( s.DataFlowStepId.Id, s.DataFlowStepId.DataFlow.Id)).ToList();
+   
+            foreach (Tuple<int, int> item in producerSchemaMapIds)
+            {
+                /*
+                 *  Of the producer flows that map to this schema
+                 *      add the data flow id for those that do not map to any other schema
+                 */
+                if(!_datasetContext.SchemaMap.Any(w => w.DataFlowStepId.Id == item.Item1 && w.MappedSchema.SchemaId != schemaId))
+                {
+                    producerFlowIdList.Add(item.Item2);
+                }
+            }
+
+            return producerFlowIdList;            
+        }
+
         public void Delete(int dataFlowId)
         {
             Logger.Info($"dataflowservice-delete-start - dataflowid:{dataFlowId}");
