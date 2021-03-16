@@ -403,7 +403,8 @@ namespace Sentry.data.Core
                 ParentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId),
                 FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId),
                 DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
-                Schemas = deList
+                Schemas = deList,
+                ObjectStatus = dto.ObjectStatus
             };
             dfc.IsSchemaTracked = true;
             dfc.Schema = _datasetContext.GetById<FileSchema>(dto.SchemaId);
@@ -547,33 +548,45 @@ namespace Sentry.data.Core
             {
                 DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
 
-                if (logicalDelete & dfc.DeleteInd)
+                //Do not proceed with dataset file configuration is already marked for deletion
+                if (logicalDelete && dfc.DeleteInd)
                 {
                     throw new DatasetFileConfigDeletedException("Already marked for deletion");
                 }
 
                 FileSchema scm = _datasetContext.GetById<FileSchema>(dfc.Schema.SchemaId);
-                FileSchema de = dfc.Schema;
 
                 if (logicalDelete)
                 {
                     Logger.Info($"configservice-delete-logical - configid:{id} configname:{dfc.Name}");
+
                     //Disable all associated RetrieverJobs
                     foreach (var job in dfc.RetrieverJobs)
                     {
                         _jobService.DisableJob(job.Id);
                     }
 
-                    //Mark Object for delete to ensure they are not displaed in UI
-                    //Goldeneye service will perform delete after determined amount of time
+                    //Disable all retriever jobs, associated with schema flow
+                    
+
+                    /*  Mark objects for delete to ensure they are not displaed in UI
+                     *  WallEService, long running task within Goldeneye service, will perform delete after determined amount of time
+                    */
+
+                    /* Mark dataset file config object for delete */
                     MarkForDelete(dfc);
+
+                    /* Mark schema object for delete */
                     MarkForDelete(scm);
+
                     _datasetContext.SaveChanges();
 
                     GenerateConsumptionLayerDeleteEvent(dfc);
                 }
                 else
                 {
+                    // TODO: CLA-2765 - Revisit physical delete
+                    // TODO: CLA-2765 - Update ObjectStatus to DELETED
                     Logger.Info($"configservice-delete-physical - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                     try
                     {
@@ -809,6 +822,7 @@ namespace Sentry.data.Core
 
         private void MarkForDelete(DatasetFileConfig dfc)
         {
+            // TODO: CLA-2765 - Set ObjectStatus to PENDING_DELETE status
             dfc.DeleteInd = true;
             dfc.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
             dfc.DeleteIssueDTM = DateTime.Now;
@@ -816,6 +830,7 @@ namespace Sentry.data.Core
 
         private void MarkForDelete(FileSchema scm)
         {
+            // TODO: CLA-2765 - Set ObjectStatus to PENDING_DELETE status
             scm.DeleteInd = true;
             scm.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
             scm.DeleteIssueDTM = DateTime.Now;
@@ -1189,6 +1204,7 @@ namespace Sentry.data.Core
             dto.DeleteInd = dfc.DeleteInd;
             dto.DeleteIssuer = dfc.DeleteIssuer;
             dto.DeleteIssueDTM = dfc.DeleteIssueDTM;
+            dto.ObjectStatus = dfc.ObjectStatus;
         }
 
         public Tuple<List<RetrieverJob>, List<DataFlowStepDto>> GetDataFlowDropLocationJobs(DatasetFileConfig config)

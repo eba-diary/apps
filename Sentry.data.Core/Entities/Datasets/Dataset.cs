@@ -84,13 +84,7 @@ namespace Sentry.data.Core
         public virtual Security Security { get; set; }
 
         //Delete Implementation
-        public virtual ObjectStatusEnum ObjectStatus {
-            get
-            {
-                //TODO: CLA-2765 Remove Getter logic and add Set
-                return (DatasetId == 60) ? ObjectStatusEnum.Pending_Delete : ObjectStatusEnum.Active;
-            }
-        }
+        public virtual ObjectStatusEnum ObjectStatus { get; set; }
         public virtual bool DeleteInd { get; set; }
         public virtual string DeleteIssuer { get; set; }
         public virtual DateTime DeleteIssueDTM { get; set; }

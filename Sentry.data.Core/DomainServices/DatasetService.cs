@@ -441,7 +441,8 @@ namespace Sentry.data.Core
                 DatasetFiles = null,
                 DatasetFileConfigs = null,
                 DeleteInd = false,
-                DeleteIssueDTM = DateTime.MaxValue
+                DeleteIssueDTM = DateTime.MaxValue,
+                ObjectStatus = GlobalEnums.ObjectStatusEnum.Active
             };
 
             switch (dto.DataClassification)
