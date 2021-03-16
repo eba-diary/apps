@@ -837,6 +837,7 @@ namespace Sentry.data.Core
                 SchemaEntity_NME = scm.SchemaEntity_NME,
                 SchemaId = scm.SchemaId,
                 Description = scm.Description,
+                ObjectStatus = scm.ObjectStatus,
                 DeleteInd = scm.DeleteInd,
                 DeleteIssuer = scm.DeleteIssuer,
                 DeleteIssueDTM = scm.DeleteIssueDTM,

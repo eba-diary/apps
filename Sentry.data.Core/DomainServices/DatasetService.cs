@@ -36,6 +36,7 @@ namespace Sentry.data.Core
 
         public DatasetDto GetDatasetDto(int id)
         {
+            // TODO: CLA-2765 - Filter only datasets with ACTIVE or PENDING_DELETE status
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
             DatasetDto dto = new DatasetDto();
             MapToDto(ds, dto);
@@ -414,6 +415,7 @@ namespace Sentry.data.Core
             ds.DeleteInd = true;
             ds.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
             ds.DeleteIssueDTM = DateTime.Now;
+            // TODO: CLA-2765 - update ObjectStatus with PENDING_DELETE status
         }
 
         private Dataset CreateDataset(DatasetDto dto)
@@ -486,6 +488,7 @@ namespace Sentry.data.Core
             dto.DatasetType = ds.DatasetType;
             dto.DataClassification = ds.DataClassification;
             dto.CategoryColor = ds.DatasetCategories.FirstOrDefault().Color;
+            dto.ObjectStatus = ds.ObjectStatus;
 
             dto.CreationUserId = ds.CreationUserName;
             dto.CreationUserName = ds.CreationUserName;
