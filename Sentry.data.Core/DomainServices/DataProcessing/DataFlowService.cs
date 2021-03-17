@@ -5,6 +5,7 @@ using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Sentry.data.Core
@@ -303,33 +304,65 @@ namespace Sentry.data.Core
 
         public void DisableFlowsByFileSchema(FileSchema scm)
         {
+            string methodName = MethodBase.GetCurrentMethod().Name.ToLower();
+            Logger.Debug($"Start method <{methodName}>");
+
             /* Get Schema Flow */
             var schemaflowName = GetDataFlowNameForFileSchema(scm);
             int schemaFlowId = _datasetContext.DataFlow.FirstOrDefault(w => w.Name == schemaflowName).Id;
 
             /* Get any Retriever Jobs associated with schema flow */
-            List<int> schemaFlowJobList = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == schemaFlowId).Select(s => s.Id).ToList();
+            List<int> schemaFlowJobList = new List<int>();
+            schemaFlowJobList = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == schemaFlowId).Select(s => s.Id).ToList();
 
-            foreach (int jobId in schemaFlowJobList)
+            if (schemaFlowJobList.Any())
             {
-                _jobService.DisableJob(jobId);
+                Logger.Debug($"{methodName} - detected jobs for schema dataflow - count:{schemaFlowJobList.Count.ToString()}:::jobids:{("[{0}]",string.Join(", ", schemaFlowJobList.Select(e => e.ToString()).ToArray()))}");
+
+                foreach (int jobId in schemaFlowJobList)
+                {
+                    _jobService.DisableJob(jobId);
+                }
+            }
+            else
+            {
+                Logger.Debug($"no jobs detected for schema dataflow");
             }
 
 
             /* Get Producer flows associated with Schema flow */
-            List<int> singleChildProducerFlowIdList = GetProducerFlowsWithSingleSchemaMapBySchemaId(scm.SchemaId);
+            List<int> producerDataflowIdForDisableList = GetProducerFlowsToBeDisabledBySchemaId(scm.SchemaId);
 
-            /* Disable all retrieverJobs associated with producer flow */
-
-            List<int> producerFlowJobList = _datasetContext.RetrieverJob.Where(w => singleChildProducerFlowIdList.Contains(w.DataFlow.Id)).Select(s => s.Id).ToList();
-
-            foreach(int jobId in producerFlowJobList)
+            if (producerDataflowIdForDisableList.Any())
             {
-                _jobService.DisableJob(jobId);
+                Logger.Debug($"{methodName} - detected producer flows associated with  - count:{producerDataflowIdForDisableList.Count.ToString()}:::jobids:{("[{0}]", string.Join(", ", producerDataflowIdForDisableList.Select(e => e.ToString()).ToArray()))}");
+
+                /* Disable all retrieverJobs associated with producer flow */
+                List<int> producerFlowJobList = _datasetContext.RetrieverJob.Where(w => producerDataflowIdForDisableList.Contains(w.DataFlow.Id)).Select(s => s.Id).ToList();
+
+                if (producerFlowJobList.Any())
+                {
+                    Logger.Debug($"{methodName} - detected jobs for produer dataflow - count:{producerFlowJobList.Count.ToString()}:::jobids:{("[{0}]", string.Join(", ", producerFlowJobList.Select(e => e.ToString()).ToArray()))}");
+
+                    foreach (int jobId in producerFlowJobList)
+                    {
+                        _jobService.DisableJob(jobId);
+                    }
+                }
+                else
+                {
+                    Logger.Debug($"no jobs detected for producer dataflow");
+                }
             }
+            else
+            {
+                Logger.Debug($"no producer dataflows detected");
+            }
+
+            Logger.Debug($"End method <{methodName}>");
         }
 
-        private List<int> GetProducerFlowsWithSingleSchemaMapBySchemaId(int schemaId)
+        private List<int> GetProducerFlowsToBeDisabledBySchemaId(int schemaId)
         {
             List<int> producerFlowIdList = new List<int>();
 
@@ -338,11 +371,17 @@ namespace Sentry.data.Core
    
             foreach (Tuple<int, int> item in producerSchemaMapIds)
             {
-                /*
-                 *  Of the producer flows that map to this schema
-                 *      add the data flow id for those that do not map to any other schema
+                /*  Add producer dataflow id to list if the
+                 *  dataflow does not map to any other schema
+                 *  
+                 *  else add producer dataflow id to list if all
+                 *  other mapped schema are not Active    
                  */
-                if(!_datasetContext.SchemaMap.Any(w => w.DataFlowStepId.Id == item.Item1 && w.MappedSchema.SchemaId != schemaId))
+                if (!_datasetContext.SchemaMap.Any(w => w.DataFlowStepId.Id == item.Item1 && w.MappedSchema.SchemaId != schemaId))
+                {
+                    producerFlowIdList.Add(item.Item2);
+                }
+                else if (!_datasetContext.SchemaMap.Any(w => w.DataFlowStepId.Id == item.Item1 && w.MappedSchema.SchemaId != schemaId && w.MappedSchema.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active))
                 {
                     producerFlowIdList.Add(item.Item2);
                 }
