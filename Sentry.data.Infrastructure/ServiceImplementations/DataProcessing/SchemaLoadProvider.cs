@@ -248,8 +248,8 @@ namespace Sentry.data.Infrastructure
             //temp-file/schemaloade/<flowId>/<storagecode>/<guids>/
             if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX))
             {
-                int strtIdx = ParsingHelpers.GetNthIndex(key, '/', 4);
-                int endIdx = ParsingHelpers.GetNthIndex(key, '/', 5);
+                int strtIdx = Sentry.data.Infrastructure.Helpers.ParsingHelpers.GetNthIndex(key, '/', 4);
+                int endIdx = Sentry.data.Infrastructure.Helpers.ParsingHelpers.GetNthIndex(key, '/', 5);
                 storageCode = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
             }
 

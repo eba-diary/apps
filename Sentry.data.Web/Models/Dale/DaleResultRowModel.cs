@@ -30,6 +30,8 @@ namespace Sentry.data.Web
 
         public List<string> AssetList { get; set; }
 
+        public string SourceType { get; set; }
+
 
     }
 }
