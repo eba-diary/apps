@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json.Linq;
+﻿using Sentry.data.Core;
 using Sentry.data.Web.Models.ApiModels.Config;
 using Sentry.data.Web.Models.ApiModels.Schema;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Sentry.data.Web
 {
@@ -102,7 +101,8 @@ namespace Sentry.data.Web
                 IsInSAS = model.IncludedInSAS,
                 HasHeader = model.HasHeader,
                 Delimiter = model.Delimiter,
-                CreateCurrentView = model.CreateCurrentView
+                CreateCurrentView = model.CreateCurrentView,
+                ObjectStatus = model.ObjectStatus
             };
         }
 
@@ -125,7 +125,8 @@ namespace Sentry.data.Web
                 CLA1580_StructureHive = model.CLA1580_StructureHive,
                 CLA2472_EMRSend = model.CLA2472_EMRSend,
                 CLA2429_SnowflakeCreateTable = model.CLA2429_SnowflakeCreateTable,
-                CLA1286_KafkaFlag = model.CLA1286_KafkaFlag
+                CLA1286_KafkaFlag = model.CLA1286_KafkaFlag,
+                ObjectStatus = model.ObjectStatus
             };
         }
 
@@ -209,7 +210,8 @@ namespace Sentry.data.Web
                 SnowflakeDatabase = schemaDto.SnowflakeDatabase,
                 SnowflakeSchema = schemaDto.SnowflakeSchema,
                 SnowflakeTable = schemaDto.SnowflakeTable,
-                SnowflakeStatus = schemaDto.SnowflakeStatus
+                SnowflakeStatus = schemaDto.SnowflakeStatus,
+                ObjectStatus = schemaDto.ObjectStatus.GetDescription().ToUpper()
             };
         }
 
