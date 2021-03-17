@@ -415,7 +415,7 @@ namespace Sentry.data.Core
             ds.DeleteInd = true;
             ds.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
             ds.DeleteIssueDTM = DateTime.Now;
-            // TODO: CLA-2765 - update ObjectStatus with PENDING_DELETE status
+            ds.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
         }
 
         private Dataset CreateDataset(DatasetDto dto)
