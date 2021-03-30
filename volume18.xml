@@ -259,48 +259,51 @@
         <p>Another warm lovely day - and all those nights are so wonderfully beautiful with the full moon. After the <persName>Hyksos</persName> moved off this A.M. we pulled around the sand to her place - and are so quiet here. Mr. <persName>Morgan</persName> on his fine new steamer came in last night at 10 o'clock and soon after breakfast <persName>Theo</persName> and I went across to see them. They were very glad to see me. He has his nice sister Mrs. <persName>Burns, Mr.</persName> and <persName>Mrs. Lythgoe</persName> and <persName>Bishop Lawrence</persName> and his wife with him.</p>
       <pb n="97"/>
       </div>
+      <!--[Izzy]-->
       <div xml:id="EBA-1912-02-07" type="entry">
         <dateline>
            <date when="1912-02-07">Wednesday. Feb. 7th</date>.
         </dateline>
-        <p>A really hot day - quite delightful - at home all the time. Mr. <persName>Morgan</persName> and Mrs. <persName>Burns</persName> came to lunch - and we had a very pleasant visit. <persName>Theo</persName> went to the <name>Valley</name> at 5 o'clock - accompanied by <persName>Jones.</persName> We had a call from Mr. <persName>Pandolfi Ralli</persName> - of <placeName>London</placeName> - who brought me a letter from <persName>Lady Layard</persName> saying he was an old friend of theirs - rather an interesting person.</p>
+        <p>A really hot day - quite delightful - at home all the time. Mr. <persName ref=#"#Morgan_John_Pierpont">Morgan</persName> and Mrs. <persName ref="#Burns_Miss">Burns</persName> came to lunch - and we had a very pleasant visit. <persName ref="#Davis_Theodore_M">Theo</persName> went to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> at 5 o'clock - accompanied by <persName ref="#Jones_Daniel"=>Jones.</persName> We had a call from Mr. <persName ref="#Ralli_Pandolfi">Pandolfi Ralli</persName> - of <placeName ref="#London">London</placeName> - who brought me a letter from <persName ref="#layard_Lady">Lady Layard</persName> saying he was an old friend of theirs - rather an interesting person.</p>
       </div>
       <div xml:id="EBA-1912-02-08" type="entry">
         <dateline>
            <date when="1912-02-08">Thursday. Feb. 8th</date>.
         </dateline>
-        <p><persName>Nettie</persName> and <persName>Mary</persName> went out to the <placeName>Valley</placeName> - taking one of the sand carts - I wrote letters and in the afternoon made some calls - very warm, but delightful.</p>
+        <p><persName ref="#Buttles_Jeanette">Nettie</persName> and <persName ref="#Buttles_Mary">Mary</persName> went out to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> - taking one of the sand carts - I wrote letters and in the afternoon made some calls - very warm, but delightful.</p>
       </div>
       <div xml:id="EBA-1912-02-09" type="entry">
         <dateline>
            <date when="1912-02-09">Friday. Feb. 9th</date>.
         </dateline>
-        <p>Another warm day - and some wind. Mr. <persName>Morgan</persName> went up at 2 o'clock.</p>
+        <p>Another warm day - and some wind. Mr. <persName ref=#"#Morgan_John_Pierpont">Morgan</persName> went up at 2 o'clock.</p>
       </div>
       <div xml:id="EBA-1912-02-10" type="entry">
         <dateline>
            <date when="1912-02-10">Saturday. Feb. 10th</date>.
         </dateline>
-        <p><persName>Mary</persName> and I went off this morning to the <placeName>Mennon,</placeName> but found on one at home. Mr. and <persName>Mrs. Nicol</persName> to tea - a charming day.</p>
+        <p><persName ref="#Buttles_Mary">Mary</persName> and I went off this morning to the <choice> 
+          <sic>Mennon</sic> 
+          <corr><name type="boat" ref="#Memnon">Mennon,</name></corr><choice> but found no one at home. <persGrp ref="#Nicol">Mr. and Mrs. Nicol</persGrp> to tea - a charming day.</p>
       </div>
       <div xml:id="EBA-1912-02-11" type="entry">
         <dateline>
            <date when="1912-02-11">Sexigesima Sunday, Feb. 11th</date>.
         </dateline>
-        <p>At home all day. In the afternoon <orgName>Lady Molesworth, the Contessa</orgName> and that nice young man, <persName>Count Luis de Cuadra,</persName> son of the <persName>Marquisa de Guadolmina,</persName> and Mr. <persName>Robert Grey</persName> called. A lovely night.</p>
+        <p>At home all day. In the afternoon <persName ref="#Molesworth_Lady">Lady Molesworth, the Contessa</persName> and that nice young man, <persName ref="#de_Cuadra_Luis_Count">Count Luis de Cuadra,</persName> son of the <persName ref="#Guadalmina_Marquise">Marquisa de Guadolmina,</persName> and Mr. <persName ref="#Grey_Robert">Robert Grey</persName> called. A lovely night.</p>
       <pb n="98"/>
       </div>
       <div xml:id="EBA-1912-02-12" type="entry">
         <dateline>
            <date when="1912-02-12">Monday, Feb. 12th</date>.
         </dateline>
-        <p>Another absolutely perfect day. We went over by appointment to the <persName>Mavis</persName> to see <persName>Mr. Nicol's</persName> pictures - two beautiful ones. One of them already sold to Mr. <persName>Barbour</persName> Lathrop. They are busy packing, as they leave on Thursday, for <orgName>Palestine,</orgName> where he wished to get a few weeks of painting in the desert before the hot weather. This afternoon Mr. and <persName>Mrs. Eastwick</persName> came to tea - a very pleasant visit.</p>
+        <p>Another absolutely perfect day. We went over by appointment to the <name type="boat" ref="#Mavis">Mavis</name> to see <persName ref="#Nichol_Erskine">Mr. Nicol's</persName> pictures - two beautiful ones. One of them already sold to Mr. <persName ref="#Lanthrop_Barbour">Barbour Lathrop </persName>. They are busy packing, as they leave on Thursday, for <placName ref="#Palestine">Palestine,</placName> where he wished to get a few weeks of painting in the desert before the hot weather. This afternoon <personGrp ref="#Eastwick">Mr. and Mrs. Eastwick</persName> came to tea - a very pleasant visit.</p>
       </div>
       <div xml:id="EBA-1912-02-13" type="entry">
         <dateline>
            <date when="1912-02-13">Tuesday. Feb. 13th</date>.
         </dateline>
-        <p>Such a warm, nice day - until about 2 o'clock it grew hotter and a furious wind came up, filling the air with dust, - at 5 o'clock it was all over. The afternoon was busy. <persName>Harry</persName> here to lunch. Young <persName>Keith Murray, Mr. McDonnel,</persName> of <placeName>England,</placeName> sent here by <persName>Alice Wilson</persName> - Mr. and <persName>Mrs. Bauldwin</persName> (New <persName>York), Lord</persName> and <persName>Lady Carnarvon,</persName> Mr. <persName>John L. Cadwalader, Miss Ruth</persName> from <placeName>N.Y.</placeName> and <persName>Mrs. Markow</persName> of <placeName>Philadelphia,</placeName> called, followed by <persName>Mr.</persName> and Mrs. <persName>D. Merriman,</persName> of <placeName>Boston,</placeName> to our very great pleasure and surprise coming from the &#8216;Egypt'. This evening a splendid display of the <orgName>Zodiacal</orgName> light.</p>
+        <p>Such a warm, nice day - until about 2 o'clock it grew hotter and a furious wind came up, filling the air with dust, - at 5 o'clock it was all over. The afternoon was busy. <persName ref="#Burton_Harry">Harry</persName> here to lunch. Young <persName ref="#Murray_Keith">Keith Murray</persName>, <persName ref="#McDonnel_Mr">Mr. McDonnel</persName>, of <placeName>England,</placeName> sent here by <persName ref="#Wilson_Alice">Alice Wilson</persName> - <personGrp ref="">Mr. and Mrs. Bauldwin</personGrp> (New York), <personGrp>Lord and Lady Carnarvon,</personGrp> Mr. <persName>John L. Cadwalader</persName> , <persName>Miss Ruth</persName> from <placeName>N.Y.</placeName> and <persName>Mrs. Markow</persName> of <placeName>Philadelphia,</placeName> called, followed by <personGrp>Mr. and Mrs. D. Merriman,</personGrp> of <placeName>Boston</placeName>, to our very great pleasure and surprise coming from the &#8216;Egypt'. This evening a splendid display of the Zodiacal light.</p>
       </div>
       <div xml:id="EBA-1912-02-21" type="entry">
         <dateline>
