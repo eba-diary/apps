@@ -1,11 +1,10 @@
-﻿using StructureMap;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core;
+using StructureMap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Sentry.data.Core;
-using Sentry.Common.Logging;
 
 namespace Sentry.data.Infrastructure
 {
@@ -31,23 +30,38 @@ namespace Sentry.data.Infrastructure
         {
             using (IContainer container = Bootstrapper.Container.GetNestedContainer())
             {
+                IDatasetContext _datasetContext = container.GetInstance<IDatasetContext>();
                 IConfigService configService = container.GetInstance<IConfigService>();
-                List<DatasetFileConfig> DeleteSchemaList = configService.GetSchemaMarkedDeleted();
+                
+                /*  Return list which meet the following:
+                 *  1.) Parent dataset is Active
+                 *  2.) Config objectstatus == Pending_Delete
+                 *  3.) DeleteIssueDTM meets the SchemaDeleteWaitDays configuration
+                 *  
+                 *  Save the list to the following Tuple format
+                 *  Dataset_Id, Dataset_NME, Config_ID, Schema_NME
+                 */
+                List<Tuple<int, string, int, string>> tupleList  = _datasetContext.DatasetFileConfigs.Where(w => w.ParentDataset.ObjectStatus == Core.GlobalEnums.ObjectStatusEnum.Active &&
+                                                                                                    w.ObjectStatus == Core.GlobalEnums.ObjectStatusEnum.Pending_Delete &&
+                                                                                                    w.DeleteIssueDTM < DateTime.Now.AddDays(Double.Parse(Configuration.Config.GetHostSetting("SchemaDeleteWaitDays")))
+                                                                                                ).Select(s => new { s.ParentDataset.DatasetId, s.ParentDataset.DatasetName, s.ConfigId, s.Schema.Name })
+                                                                                                .AsEnumerable()
+                                                                                                .Select(c => new Tuple<int, string, int, string>(c.DatasetId, c.DatasetName, c.ConfigId, c.Name)).ToList();
 
-                if (DeleteSchemaList != null && DeleteSchemaList.Count > 0)
+                if (tupleList != null && tupleList.Count > 0)
                 {
-                    Logger.Info($"walleservice-schemadeletes-detected - {DeleteSchemaList.Count} schemas found - guid:{_runGuid}");
-                    foreach (DatasetFileConfig config in DeleteSchemaList)
+                    Logger.Info($"walleservice-schemadeletes-detected - {tupleList.Count} schemas found - guid:{_runGuid}");
+                    foreach (Tuple<int, string, int, string> listItem in tupleList)
                     {
-                        Logger.Info($"walleservice-schemadelete-start - DatasetId:{config.ParentDataset.DatasetId} DatasetName:{config.ParentDataset.DatasetName} ConfigId:{config.ConfigId} ConfigName:{config.Name} guid:{_runGuid}");
-                        bool IsSuccessful = configService.Delete(config.ConfigId, false, false);
+                        Logger.Info($"walleservice-schemadelete-start - DatasetId:{listItem.Item1} DatasetName:{listItem.Item2} ConfigId:{listItem.Item3} ConfigName:{listItem.Item4} guid:{_runGuid}");
+                        bool IsSuccessful = configService.Delete(listItem.Item3, false, false);
                         if (!IsSuccessful)
                         {
-                            Logger.Info($"walleservice-schemadelete ended with failures - DatasetId:{config.ParentDataset.DatasetId} DatasetName:{config.ParentDataset.DatasetName} ConfigId:{config.ConfigId} ConfigName:{config.Name} guid:{_runGuid}");
+                            Logger.Info($"walleservice-schemadelete ended with failures - DatasetId:{listItem.Item1} DatasetName:{listItem.Item2} ConfigId:{listItem.Item3} ConfigName:{listItem.Item4} guid:{_runGuid}");
                         }
                         else
                         {
-                            Logger.Info($"walleservice-schemadelete-end - DatasetId:{config.ParentDataset.DatasetId} DatasetName:{config.ParentDataset.DatasetName} ConfigId:{config.ConfigId} ConfigName:{config.Name} guid:{_runGuid}");
+                            Logger.Info($"walleservice-schemadelete-end -DatasetId:{listItem.Item1} DatasetName:{listItem.Item2} ConfigId:{listItem.Item3} ConfigName:{listItem.Item4} guid:{_runGuid}");
                         }
                     }
                 }
@@ -62,23 +76,27 @@ namespace Sentry.data.Infrastructure
         {
             using (IContainer container = Bootstrapper.Container.GetNestedContainer())
             {
-                IDatasetService datasetService = container.GetInstance<IDatasetService>();
-                List<Dataset> deleteDatasetList = datasetService.GetDatasetMarkedDeleted();
+                IDatasetContext _datasetContext = container.GetInstance<IDatasetContext>();
+                IDatasetService _datasetService = container.GetInstance<IDatasetService>();
+                Dictionary<int, string> dsList = _datasetContext.Datasets.Where(w => w.ObjectStatus == Core.GlobalEnums.ObjectStatusEnum.Pending_Delete
+                                                                                && w.DeleteIssueDTM < DateTime.Now.AddDays(Double.Parse(Configuration.Config.GetHostSetting("DatasetDeleteWaitDays"))))
+                                                                                .Select(s => new { s.DatasetId, s.DatasetName })
+                                                                                .ToDictionary(d => d.DatasetId, d => d.DatasetName);
 
-                if (deleteDatasetList != null && deleteDatasetList.Count > 0)
+                if (dsList != null && dsList.Count > 0)
                 {
-                    Logger.Info($"walleservice-datasetdeletes-detected - {deleteDatasetList.Count} datasets found - guid:{_runGuid}");
-                    foreach (var ds in deleteDatasetList)
+                    Logger.Info($"walleservice-datasetdeletes-detected - {dsList.Count} datasets found - guid:{_runGuid}");
+                    foreach (var ds in dsList)
                     {
-                        Logger.Info($"walleservice-datasetdelete-start - DatasetId:{ds.DatasetId} DatasetName:{ds.DatasetName} guid:{_runGuid}");
-                        bool IsSuccessful = datasetService.Delete(ds.DatasetId, false);
+                        Logger.Info($"walleservice-datasetdelete-start - DatasetId:{ds.Key} DatasetName:{ds.Value} guid:{_runGuid}");
+                        bool IsSuccessful = _datasetService.Delete(ds.Key, false);
                         if (IsSuccessful)
                         {
-                            Logger.Info($"walleservice-datasetdelete-end - DatasetId:{ds.DatasetId} DatasetName:{ds.DatasetName} guid:{_runGuid}");
+                            Logger.Info($"walleservice-datasetdelete-end - DatasetId:{ds.Key} DatasetName:{ds.Value} guid:{_runGuid}");
                         }
                         else
                         {
-                            Logger.Warn($"walleservice-datasetdelete ended with failures - DatasetId:{ds.DatasetId} DatasetName:{ds.DatasetName} guid:{_runGuid}");
+                            Logger.Warn($"walleservice-datasetdelete ended with failures - DatasetId:{ds.Key} DatasetName:{ds.Value} guid:{_runGuid}");
                         }                        
                     }
                 }
