@@ -39,28 +39,28 @@
         <dateline>
           <date when="1911-10-16">Sunday, October 16. 1911</date>.
         </dateline>
-        <p>We left home by <placeName>Fall River</placeName> boat, and reached <placeName>New York</placeName> the next morning. I did some shopping that day, went to the theatre to hear an amusing play of &#8216;Bunty pulls the strings' a Scotch play, given by <orgName>Scotch</orgName> actors, and much in vogue now. <persName>Chilton Powell</persName> dined with us and saw the play with us - and <persName>Mary Newberry</persName> and <persName>Anita</persName> were with us - both stopping at the <placeName>Holland</placeName> with us.</p>
+        <p>We left home by <placeName ref="#Fall_River">Fall River</placeName> boat, and reached <placeName ref="#New_York">New York</placeName> the next morning. I did some shopping that day, went to the theatre to hear an amusing play of &#8216;Bunty pulls the strings' a Scotch play, given by Scotch actors, and much in vogue now. <persName ref="#Powell_Chilton">Chilton Powell</persName> dined with us and saw the play with us - and <persName ref="#Newberry_Mary">Mary Newberry</persName> and <persName ref="#Ghio_Anita">Anita</persName> were with us - both stopping at the <placeName type="hotel" ref="#Holland_Hotel">Holland</placeName> with us.</p>
       </div>
       <div xml:id="EBA-1911-10-21" type="entry">
         <dateline>
            <date when="1911-10-21">Oct. 21st</date>.
            <name type="boat" ref="#SS_Berlin">SS. Berlin</name>.
         </dateline>
-        <p>Sailed this morning for <name>Genoa</name> - where we will wait 15 days for our boat for <orgName>Alexandria.</orgName> Have my old appartment which is the <orgName>Captain's,</orgName> and very commodious and comfortable, and which I occupied two years ago. We know a few of the passengers. The 4 days we passed in <placeName>New York</placeName> were dismal in the extreme - it rained all the time, I took a severe cold, and did not go out of the house after the first day - and had to cancel a long standing engagement to drive with the <orgName>Fairfield Osborns,</orgName> who had invited a lot of pleasant people to meet us. It was altogether a great piece of disappointment, that visit in <placeName>New York.</placeName>.</p>
+        <p>Sailed this morning for <placeName ref="#Genoa">Genoa</placeName> - where we will wait 15 days for our boat for <placeName ref="#Alexandria">Alexandria</placeName>. Have my old appartment which is the Captain's, and very commodious and comfortable, and which I occupied two years ago. We know a few of the passengers. The 4 days we passed in <placeName ref="#New_York">New York</placeName> were dismal in the extreme - it rained all the time, I took a severe cold, and did not go out of the house after the first day - and had to cancel a long standing engagement to drive with the <personGrp ref="#Osborn">Fairfield Osborns</personGrp>, who had invited a lot of pleasant people to meet us. It was altogether a great piece of disappointment, that visit in <placeName ref="#New_York">New York</placeName>.</p>
       </div>
       <div xml:id="EBA-1911-10-21" type="entry">
         <dateline>
            <date when="1911-10-21">Oct. 2. Wednesday</date><!--[Actually after November 21st]-->
            <placeName ref="Genoa">Genoa</placeName>
         </dateline>
-        <p>Arrived on a cold, damp morning - came to the <orgName>Hotel Miramare</orgName><pb n="87"/> which had been recommended to us. Until we passed the <persName>Azores,</persName> we had a fairly good passage - though warm and misty - after that to <placeName>Gibraltar</placeName> bright weather, but tremendous rolling - slow but very disconcerting. After leaving <placeName>Gibraltar</placeName> we began a hustle with the <orgName>Mediterranean,</orgName> and we were cruelly battered about - could not make the landing at <placeName>Algiers</placeName> and the little mail boat that came out to us, on returning lost her Captain and one sailor. We find this hotel the most delightful one we have ever known - large airy appartments, with every luxury - perfect service - and food. My corner room is the most charming room I have ever seen - and the large sitting room next it is the same - and the string of bedrooms next the salon, made an imposing array. <persName>David Costantini</persName> arrived for a few days and <persName>Harry Burton</persName> met us at the steamer and stayed the night, going back to <placeName>Florence</placeName> and coming with the girls, <persName>Nettie</persName> and <persName>Mary Buttles</persName> for a week before the steamer sailed. We motored a good deal along that lovely coast, and it would have been delightful had the roads been good and the motors comfortable. We were all glad when the <persName>Prinz Heinrich</persName> arrived and took us off for <placeName>Alexandria</placeName> on the 18th. I was really tired of that wide view from our windows of the <placeName>Miramare</placeName> which stands high, but rather close to that busy port. We arrived at <placeName>Alexandria</placeName> on the 21st, Nov. having again been cruelly buffetted by that merciless Mediterranean. Arrived in <placeName>Cairo</placeName> at 9:20 and were immediately installed in our old pleasant appartment, looking on the garden, which we have occupied for several years.</p>
+        <p>Arrived on a cold, damp morning - came to the <placeName type="hotel" ref="#Hotel_Miramare">Hotel Miramare</placeName><pb n="87"/> which had been recommended to us. Until we passed the <placeName ref="#Azores">Azores</placeName>, we had a fairly good passage - though warm and misty - after that to <placeName ref="#Gibraltar">Gibraltar</placeName> bright weather, but tremendous rolling - slow but very disconcerting. After leaving <placeName ref="#Gibraltar">Gibraltar</placeName> we began a hustle with the <placeName ref="#Mediterranean_Sea">Mediterranean</placeName>, and we were cruelly battered about - could not make the landing at <placeName ref="#Algiers">Algiers</placeName> and the little mail boat that came out to us, on returning lost her Captain and one sailor. We find this hotel the most delightful one we have ever known - large airy appartments, with every luxury - perfect service - and food. My corner room is the most charming room I have ever seen - and the large sitting room next it is the same - and the string of bedrooms next the salon, made an imposing array. <persName ref="#Constantini_David">David Costantini</persName> arrived for a few days and <persName ref="#Burton_Harry">Harry Burton</persName> met us at the steamer and stayed the night, going back to <placeName ref="#Florence">Florence</placeName> and coming with the girls, <persName ref="#Buttles_Jeanette">Nettie</persName> and <persName ref="#Buttles_Mary">Mary Buttles</persName> for a week before the steamer sailed. We motored a good deal along that lovely coast, and it would have been delightful had the roads been good and the motors comfortable. We were all glad when the <name type="boat" ref="#SS_Prinz_Heinrich">Prinz Heinrich</name> arrived and took us off for <placeName ref="#Alexandria">Alexandria</placeName> on the 18th. I was really tired of that wide view from our windows of the <placeName type="hotel" ref="#Hotel_Miramare">Miramare</placeName> which stands high, but rather close to that busy port. We arrived at <placeName ref="#Alexandria">Alexandria</placeName> on the <date when="1911-11-21">21st, Nov.</date> having again been cruelly buffetted by that merciless <placeName ref="#Mediterranean_Sea">Mediterranean</placeName>. Arrived in <placeName ref="#Cairo">Cairo</placeName> at 9:20 and were immediately installed in our old pleasant appartment, looking on the garden, which we have occupied for several years.</p>
         <pb n="88"/>
       </div>
       <div xml:id="EBA-1911-12-02" type="entry">
         <dateline>
            <date when="1911-12-02">Saturday. Dec. 2nd</date>.
         </dateline>        
-        <p>We came on the <placeName>Beduin</placeName> this afternoon to stay, and were indeed happy to take up this enchanting life again. Everything was in order, and we were soon settled. <persName>Harry</persName> left for <placeName>Luxor</placeName> today. We had a pleasant week in <placeName>Cairo</placeName> - saw many of our old friends. Judge <persName>Alston</persName> and his wife lunched with us on the boat, Capt. <persName>Trefusis</persName> and his wife lunched another day.</p>
+        <p>We came on the <name type="boat" ref="#Beduin">Beduin</name> this afternoon to stay, and were indeed happy to take up this enchanting life again. Everything was in order, and we were soon settled. <persName ref="#Burton_Harry">Harry</persName> left for <placeName ref="#Luxor">Luxor</placeName> today. We had a pleasant week in <placeName ref="#Cairo">Cairo</placeName> - saw many of our old friends. <personGrp ref="Alston">Judge Alston and his wife</personGrp> lunched with us on the boat, <personGrp ref="#Trefusis">Capt. Trefusis and his wife</persName> lunched another day.</p>
       </div>
       <div xml:id="EBA-1911-12-03" type="entry">
         <dateline>
@@ -72,26 +72,26 @@
         <dateline>
            <date when="1911-12-04">Monday. Dec. 4th</date>.
         </dateline>              
-        <p>Tug arrived about 9 o'clock - and we were off for the opening of the bridge at 10 - a good run of about 25 miles, and tied up about 5 o'clock.</p>
+        <p>Tug arrived about 9 o'clock - and we were off for the opening of the bridge at 10 - a good run of about <measure type="distance">25 miles</measure>, and tied up about 5 o'clock.</p>
       </div>
       <div xml:id="EBA-1911-12-05" type="entry">
         <dateline>
            <date when="1911-12-05">Tuesday, Dec. 5th</date>
         </dateline>
-        <p>Started about 6 this morning - tied up at 5 o'clock, and are 8 miles from <placeName>Benisoef.</placeName> 40 miles.</p>
+        <p>Started about 6 this morning - tied up at 5 o'clock, and are 8 miles from <placeName ref="#Benisoef">Benisoef</placeName>. <measure type="distance">40 miles</measure>.</p>
       </div>
       <div xml:id="EBA-1911-12-06" type="entry">
         <dateline>
            <date when="1911-12-06">Wednesday. Dec. 6th</date>.
         </dateline>   
-        <p>Went from 6 A.M. to 6 P.M. 34 miles - a wonderful moon tonight.</p>
+        <p>Went from 6 A.M. to 6 P.M. <measure type="distance">34 miles</measure> - a wonderful moon tonight.</p>
         <pb n="89"/>
       </div>
       <div xml:id="EBA-1911-12-07" type="entry">
         <dateline>
            <date when="1911-12-07">Thursday. Dec. 7th</date>
         </dateline>
-       <p>50-1/2 miles The usual start at 6 A.M. - reached <persName>Sheik Fadl</persName> at 10, where the tug stopped for coal, so that we sailed away to <persName>Minia</persName> in fine style and made it at 5 o'clock. A lovely day.</p>
+       <p><measure type="distance">50-1/2 miles</measure>. The usual start at 6 A.M. - reached <persName>Sheik Fadl</persName> at 10, where the tug stopped for coal, so that we sailed away to <persName>Minia</persName> in fine style and made it at 5 o'clock. A lovely day.</p>
       </div>
       <div xml:id="EBA-1911-12-08" type="entry">
         <dateline>
@@ -139,13 +139,13 @@
         <dateline>
            <date when="1911-12-24">Sunday. Dec. 24th. Fourth Sunday in Advent</date>.
         </dateline> 
-        <p>I have little to chronicle this week. <persName>Theo</persName> did not come until the afternoon of the 6th day of his absence - and looking so much better - and happy to be in his beloved <placeName>Valley</placeName> and at work once more. <persName>Harry Burton</persName> and <persName>Lancelot Crane</persName> are there and hard at work, and <persName>Theo</persName> says the little house is in fine order, cleaned, disinfected, colour washed etc. and that it is comfortable and pleasant. <pb n="91"/>Mrs. Weigall, Mr. Winlock, Mr. <persName>Carter</persName> and <persName>Mr. Lasco</persName> have been here.</p>
+        <p>I have little to chronicle this week. <persName ref="#Davis_Theodore_M">Theo</persName> did not come until the afternoon of the 6th day of his absence - and looking so much better - and happy to be in his beloved <placeName>Valley</placeName> and at work once more. <persName>Harry Burton</persName> and <persName>Lancelot Crane</persName> are there and hard at work, and <persName ref="#Davis_Theodore_M">Theo</persName> says the little house is in fine order, cleaned, disinfected, colour washed etc. and that it is comfortable and pleasant. <pb n="91"/>Mrs. Weigall, Mr. Winlock, Mr. <persName>Carter</persName> and <persName>Mr. Lasco</persName> have been here.</p>
       </div>
       <div xml:id="EBA-1911-12-31" type="entry">
         <dateline>
-           <date when="1911-12-21">Sunday. Dec. 31st. First Sunday after Christmas</date>.
+           <date when="1911-12-31">Sunday. Dec. 31st. First Sunday after Christmas</date>.
         </dateline>
-        <p>A quiet week. <persName>Theo</persName> in the <placeName>Valley</placeName> since Wednesday - but returns today. Mr. <persName>Anthony</persName> had tea with us on Friday. The girls and I have amused ourselves in many ways. The weather cold, with high winds. River falling rapidly - and the sand roof which has formed so rapidly between us and the main channel shows each day more prominently.</p>
+        <p>A quiet week. <persName ref="#Davis_Theodore_M">Theo</persName> in the <placeName>Valley</placeName> since Wednesday - but returns today. Mr. <persName>Anthony</persName> had tea with us on Friday. The girls and I have amused ourselves in many ways. The weather cold, with high winds. River falling rapidly - and the sand roof which has formed so rapidly between us and the main channel shows each day more prominently.</p>
       </div>
       <div xml:id="EBA-1912-01-07" type="entry">
         <dateline>
