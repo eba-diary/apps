@@ -97,7 +97,7 @@
           the world, <pb n="109"/>evidently very fond of him - but the disparity in years would seem
           perhaps to make the result unhappy. She was a <persName ref="#Sahopek_Ida">Miss Ida
             Sahopek</persName> of <placeName ref="#New_York">New York</placeName>, and then a
-            <persName ref="Wilderming_Mrs">Mrs. Wilmerding</persName>, from which marriage she gets
+            <persName ref="#Wilderming_Mrs">Mrs. Wilmerding</persName>, from which marriage she gets
           her money. We had the usual tiring ride over here, arriving at 10:30 P.M. This hotel is
           drearier and dirtier than ever but the Captain of the <name type="boat" ref="#Isis"
             >Isis</name> has take pity on us, and says we may go aboard for luncheon.</p>
@@ -148,7 +148,7 @@
           and her mother, on intimate terms. We got off with a tug about 2 o'clock, which we will
           take as far as <placeName ref="#Assiout">Asy&#251;t</placeName> - <persName
             ref="#Davis_Theodore_M">Theodore</persName> being impatient to reach <placeName
-            ref="#Luxor">Luxor</placeName>. <persName ref="Edwards_Amelia">Amelia</persName> has
+            ref="#Luxor">Luxor</placeName>. <persName ref="#Edwards_Amelia">Amelia</persName> has
           been the victim of repeated colds since she came to <placeName ref="#Egypt"
             >Egypt</placeName> - and was in bed 2 days with rheumatism before we started. We made
             <measure type="distance">16 miles</measure> today.</p>
@@ -166,7 +166,7 @@
           <measure type="distance">30 miles</measure>
         </dateline>
         <p>Are lying at <placeName ref="#Fashen">Fashen</placeName> - having made 30 miles.
-            <persName ref="Edwards_Amelia">Amelia</persName> much of the time in bed with cold and
+            <persName ref="#Edwards_Amelia">Amelia</persName> much of the time in bed with cold and
           repeated attacks of dysentery. <persName ref="#Jones_Harold">Jones</persName> half ill
           with a cold.</p>
       </div>
@@ -310,9 +310,9 @@
           and no sun, and soon began to rain - and kept on raining steadily the whole day. It was a
           miserable day for the men, who worked manfully at their oars, saturated as they must have
           been - and we are now lying below <placeName ref="#Silsilis">Silsilis</placeName>. Passed
-          the <orgName>Zenet-et-Nil</orgName> the other side of <placeName ref="#Silsilis"
+          the <!---[???]--> <orgName>Zenet-et-Nil</orgName> the other side of <placeName ref="#Silsilis"
             >Silsilis</placeName> just before dark. Did not see <personGrp ref="#Bird">Mr. and Mrs.
-            Bird.</personGrp></p>
+            Bird</personGrp>.</p>
       </div>
       <div xml:id="EBA-1906-02-15" type="entry">
         <dateline>
@@ -430,8 +430,8 @@
         </dateline>
         <p>At home all day - wind strong. Called on <persName ref="#Acland_Lady">Lady
             Acland</persName> at <name type="hotel" ref="#Savoy_Hotel">Savoy</name>. <persName
-            ref="#Bruce_Miss">Miss Bruce</persName>, the <personGrp ref="#Collins">Miss
-            Collins</personGrp> - and <persName ref="#Dennis_Mrs">Mrs Dennis</persName> to tea.</p>
+            ref="#Bruce_Miss">Miss Bruce</persName>, the <persName ref="#Collins_Frances">Miss
+            Collins</persName> - and <persName ref="#Dennis_Mrs">Mrs Dennis</persName> to tea.</p>
       </div>
       <div xml:id="EBA-1906-02-25" type="entry">
         <dateline>
@@ -975,7 +975,7 @@
         </dateline>
         <p>The children got off today. <persName ref="#Buttles_Lizzie">Lizzie</persName> not very
             well.<pb n="131"/>
-          <persName ref="#Sahopek_Ida">Mme. Costantini</persName> made me a visit this afternoon -
+          <persName ref="#Constantini_David">Mme. Costantini</persName> made me a visit this afternoon -
           looking remarkably well, and very smart - asked me to lunch for Saturday.</p>
       </div>
       <div xml:id="EBA-1906-04-18" type="entry">
