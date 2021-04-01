@@ -250,6 +250,7 @@ namespace Sentry.data.Web
             model.CLA2429_SnowflakeCreateTable = (config.Schema != null) ? config.Schema.CLA2429_SnowflakeCreateTable : false;
             model.CLA1286_KafkaFlag = (config.Schema != null) ? config.Schema.CLA1286_KafkaFlag : false;
             model.DeleteInd = config.Schema.DeleteInd;
+            model.ObjectStatus = config.ObjectStatus;
         }
     }
 }

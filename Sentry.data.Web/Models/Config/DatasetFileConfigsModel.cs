@@ -65,6 +65,7 @@ namespace Sentry.data.Web
             this.CLA2472_EMRSend = (dto.Schema != null) ? dto.Schema.CLA2472_EMRSend : false;
             this.CLA2429_SnowflakeCreateTable = (dto.Schema != null) ? dto.Schema.CLA2429_SnowflakeCreateTable : false;
             this.CLA1286_KafkaFlag = (dto.Schema != null) ? dto.Schema.CLA1286_KafkaFlag : false;
+            this.ObjectStatus = dto.ObjectStatus;
             //this.CLA24 = (dto.Schema != null) ? dto.Schema.CLA1580_StructureHive : false;
         }
 

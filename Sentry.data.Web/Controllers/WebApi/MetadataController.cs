@@ -377,7 +377,9 @@ namespace Sentry.data.Web.WebApi.Controllers
         {
             IHttpActionResult GetLatestSchemaRevisionDetailFunction()
             {
-                if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Where(w => !w.DeleteInd).Any(w => w.Schema.SchemaId == schemaId))
+               
+                //if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Where(w => !w.DeleteInd).Any(w => w.Schema.SchemaId == schemaId))
+                if (!_dsContext.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == datasetId && !w.DeleteInd).Select(s => s.Schema.SchemaId).Any(a => a == schemaId))
                 {
                     throw new SchemaNotFoundException();
                 }

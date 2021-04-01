@@ -150,5 +150,6 @@ namespace Sentry.data.Web
         public int PageViews { get; set; }
         public List<ContactInfoModel> ContactDetails { get; set; }
         public string ObjectStatus { get; set; }
+        public Boolean IsAdmin { get; set; }
     }
 }

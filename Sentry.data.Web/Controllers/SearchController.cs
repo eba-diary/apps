@@ -191,6 +191,7 @@ namespace Sentry.data.Web.Controllers
                     IsFavorite = ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId),
                     PageViews = (summaryExists) ? dsSummaryList.First(x => x.DatasetId == ds.DatasetId).ViewCount : 0,
                     CanEditDataset = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? SharedContext.CurrentUser.CanManageReports : false,
+                    IsAdmin = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? false : SharedContext.CurrentUser.IsAdmin,
                     ChangedDtm = (summaryExists) ? dsSummaryList.FirstOrDefault(w => w.DatasetId == ds.DatasetId).Max_Created_DTM.ToShortDateString() : ds.ChangedDtm.ToShortDateString()
             };
                 models.Add(sm);
