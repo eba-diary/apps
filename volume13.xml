@@ -6,7 +6,7 @@
   <teiHeader>
     <fileDesc>
       <titleStmt>
-        <title>Diary of Mrs. Emma B. Andrews. Volume 16 1908-1909</title>
+        <title>Diary of Mrs. Emma B. Andrews. Volume 13 1905-1906</title>
         <author>
           <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
         </author>
@@ -148,7 +148,7 @@
           and her mother, on intimate terms. We got off with a tug about 2 o'clock, which we will
           take as far as <placeName ref="#Assiout">Asy&#251;t</placeName> - <persName
             ref="#Davis_Theodore_M">Theodore</persName> being impatient to reach <placeName
-            ref="#Luxor">Luxor</placeName>. <persName ref="#Amelie">Amelie</persName> has
+            ref="#Luxor">Luxor</placeName>. <persName ref="#Burgoyne_Amelie">Amelie</persName> has
           been the victim of repeated colds since she came to <placeName ref="#Egypt"
             >Egypt</placeName> - and was in bed 2 days with rheumatism before we started. We made
             <measure type="distance">16 miles</measure> today.</p>
@@ -166,7 +166,7 @@
           <measure type="distance">30 miles</measure>
         </dateline>
         <p>Are lying at <placeName ref="#Fashen">Fashen</placeName> - having made 30 miles.
-            <persName ref="#Amelie">Amelie</persName> much of the time in bed with cold and
+            <persName ref="#Burgoyne_Amelie">Amelie</persName> much of the time in bed with cold and
           repeated attacks of dysentery. <persName ref="#Jones_Daniel">Jones</persName> half ill
           with a cold.</p>
       </div>
@@ -1039,7 +1039,7 @@
         <dateline>
           <date when="1906-05-08">May 8th. Tuesday.</date>
         </dateline>
-        <p>Bad weather yesterday - in the house all day. This morning <persName ref="#Amelie"
+        <p>Bad weather yesterday - in the house all day. This morning <persName ref="#Burgoyne_Amelie"
             >Amelie</persName> and I drove out to the <placeName ref="#Bois">Bois</placeName>.
           Charming - rained this afternoon.</p>
       </div>
