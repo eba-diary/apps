@@ -95,9 +95,9 @@
             <persName ref="#Constantini_David">David Costantini</persName>, who had brought his new
           wife down to see us. We were quite pleased with her. A well dressed, lady like woman of
           the world, <pb n="109"/>evidently very fond of him - but the disparity in years would seem
-          perhaps to make the result unhappy. She was a <persName ref="#Sahopek_Ida">Miss Ida
-            Sahopek</persName> of <placeName ref="#New_York">New York</placeName>, and then a
-            <persName ref="#Wilderming_Mrs">Mrs. Wilmerding</persName>, from which marriage she gets
+          perhaps to make the result unhappy. She was a <persName ref="#Schenck_Ida">Miss Ida
+            Schenck</persName> of <placeName ref="#New_York">New York</placeName>, and then a
+            <persName ref="#Wilmerding_Mrs">Mrs. Wilmerding</persName>, from which marriage she gets
           her money. We had the usual tiring ride over here, arriving at 10:30 P.M. This hotel is
           drearier and dirtier than ever but the Captain of the <name type="boat" ref="#Isis"
             >Isis</name> has take pity on us, and says we may go aboard for luncheon.</p>
@@ -802,7 +802,7 @@
         <p>Went to the <placeName ref="#Khan_al_Khalili">Bazaars</placeName> with <persName
             ref="#Newberry_Percy">Mr. Newberry</persName> this morning and to <placeName
             ref="#Dataris">Dataris</placeName> this afternoon to see some fine antiquities. A lovely
-          little thing of <persName ref="Khuenaten">Khuenaten</persName> and his wife - going to the
+          little thing of <persName ref="Akhenaten">Khuenaten</persName> and his wife - going to the
             <placeName ref="#Berlin_Museum">Berlin Museum</placeName>. <persName
             ref="#von_Bissing_Baron">V. Bissing</persName> came to dine.</p>
       </div>
@@ -976,7 +976,7 @@
         </dateline>
         <p>The children got off today. <persName ref="#Buttles_Lizzie">Lizzie</persName> not very
             well.<pb n="131"/>
-          <persName ref="#Constantini_David">Mme. Costantini</persName> made me a visit this afternoon -
+          <persName ref="#Constantini_Mme">Mme. Costantini</persName> made me a visit this afternoon -
           looking remarkably well, and very smart - asked me to lunch for Saturday.</p>
       </div>
       <div xml:id="EBA-1906-04-18" type="entry">
@@ -1033,13 +1033,13 @@
             >Costantini</persName> kindly turned up to wish us goodbye. Arrived in <placeName
             ref="#Paris">Paris</placeName> on time! and found <persName ref="#Davis_Theodore_M"
             >Theo</persName>, <persName ref="#Knagenhjelm_Eleanor">Eleanor</persName> and <persName
-            ref="Jones_Harold">Jones</persName> at the station. In our old rooms here.</p>
+            ref="#Jones_Harold">Jones</persName> at the station. In our old rooms here.</p>
       </div>
       <div xml:id="EBA-1906-05-08" type="entry">
         <dateline>
           <date when="1906-05-08">May 8th. Tuesday.</date>
         </dateline>
-        <p>Bad weather yesterday - in the house all day. This morning <persName ref="Edwards_Amelia"
+        <p>Bad weather yesterday - in the house all day. This morning <persName ref="#Edwards_Amelia"
             >Amelia</persName> and I drove out to the <placeName ref="#Bois">Bois</placeName>.
           Charming - rained this afternoon.</p>
       </div>
