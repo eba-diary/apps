@@ -438,7 +438,7 @@
           <date when="1906-02-25">Sunday - Feb. 25.</date>
           <placeName ref="#Quinquagesima">Quinquagesima</placeName>
         </dateline>
-        <p><persName ref="#Corelly_Mr">Mr. Corelly</persName> came to lunch. <persName
+        <p><choice><sic>Mr. Corelly</sic><corr><persName ref="#Curelly_Mr">Mr. Curelly</persName></choice>came to lunch. <persName
             ref="#Hunt_Mrs">Mrs. Hunt</persName> and <persName ref="#von_Baron_Bissing">Baron v.
             Bissing</persName> to tea - <personGrp ref="#Naville">M. and Mme. Naville</personGrp>
           and <persName ref="#Sayce_Archibald">Mr. Sayce</persName> to dine. I was very tired and
@@ -718,8 +718,9 @@
         <dateline>
           <date when="1906-03-19">Monday, Mar. 19th.</date>
           <measure type="distance">11 miles.</measure>
+          <placeName ref="#Beni_Hassan">Beni Hassan</placeName>.
         </dateline>
-        <p><persName ref="#Hassan">Beni Hassan</persName>. Started very early, but had to tie up
+        <p> Started very early, but had to tie up
           about 10 o'clock - opposite the tombs - a spot we well know as we had to stay just here
           years ago for a week, on our way up - a gale is going on.</p>
       </div>
