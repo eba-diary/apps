@@ -260,7 +260,7 @@
       <pb n="97"/>
       </div>
       <!--[Izzy]-->
-      <!--tag for distances and currencys as well; make sure titles are in the elements as well-->
+      <!--tag for distances and currencys as well; make sure titles are in the tags as well-->
       <div xml:id="EBA-1912-02-07" type="entry">
         <dateline>
            <date when="1912-02-07">Wednesday. Feb. 7th</date>.
@@ -298,7 +298,7 @@
         <dateline>
            <date when="1912-02-12">Monday, Feb. 12th</date>.
         </dateline>
-        <p>Another absolutely perfect day. We went over by appointment to the <name type="boat" ref="#Mavis">Mavis</name> to see <persName ref="#Nichol_Erskine">Mr. Nicol's</persName> pictures - two beautiful ones. One of them already sold to <persName ref="#Lanthrop_Barbour">Mr. Barbour Lathrop </persName>. They are busy packing, as they leave on Thursday, for <placName ref="#Palestine">Palestine</placName>, where he wished to get a few weeks of painting in the desert before the hot weather. This afternoon <personGrp ref="#Eastwick">Mr. and Mrs. Eastwick</persName> came to tea - a very pleasant visit.</p>
+        <p>Another absolutely perfect day. We went over by appointment to the <name type="boat" ref="#Mavis">Mavis</name> to see <persName ref="#Nichol_Erskine">Mr. Nicol's</persName> <!--typo?-->pictures - two beautiful ones. One of them already sold to <persName ref="#Lanthrop_Barbour">Mr. Barbour Lathrop </persName>. They are busy packing, as they leave on Thursday, for <placName ref="#Palestine">Palestine</placName>, where he wished to get a few weeks of painting in the desert before the hot weather. This afternoon <personGrp ref="#Eastwick">Mr. and Mrs. Eastwick</persName> came to tea - a very pleasant visit.</p>
       </div>
       <div xml:id="EBA-1912-02-13" type="entry">
         <dateline>
