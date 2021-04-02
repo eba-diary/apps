@@ -136,9 +136,9 @@
             Ramesis</name> was lying by us all day - with a handful of passengers - but went off at
           6 o'clock. The carpenter and painter have been here all day repairing damages.</p>
       </div>
-      <div xml:id="EBA-1907-12-04" type="entry">> <dateline>
+      <div xml:id="EBA-1907-12-04" type="entry"> <dateline>
           <date when="1907-12-04">Wednesday, Dec. 4.</date>
-          <measure quantity="41" unit="mile">41 miles.</measure>
+        <measure type="distance">41 miles.</measure>
         </dateline>
         <p>We get away from <placeName ref="#Bedrashyn">Bedraschein</placeName> at 7 o'clock this
           morning - and have had a lovely day - river like glass, both of our sails out much of the
@@ -148,17 +148,17 @@
           entrancing. We had tea on deck - and are now lying opposite <placeName ref="#Wasta"
             >Wasta.</placeName></p>
       </div>
-      <div xml:id="EBA-1907-12-05" type="entry">> <dateline>
+      <div xml:id="EBA-1907-12-05" type="entry"> <dateline>
           <date when="1907-12-05">Thursday, Dec. 5th.</date>
-          <measure quantity="29" unit="mile">29 miles.</measure>
+        <measure type="distance">29 miles.</measure>
         </dateline>
         <p>A quiet uneventful day - though the tug went on the sand once for a few minutes. It is a
           slow heavy tug, but was the only one cook had reoccupied. We are about a mile above
           Ribbeh.</p>
       </div>
-      <div xml:id="EBA-1907-12-06" type="entry">> <dateline>
+      <div xml:id="EBA-1907-12-06" type="entry"> <dateline>
           <date when="1907-12-06">Friday Dec. 6th.</date>
-          <measure quantity="25" unit="mile">25 miles.</measure>
+        <measure type="distance">25 miles.</measure>
         </dateline>
         <p>Our tug, <name type="boat" ref="#Anubis">Anubis</name> by name, went on the sand soon
           after nine this morning, and got off at 10:25. The river is so very broad here, that it is
@@ -167,25 +167,24 @@
           horizon, above which shone Venus, quite resplendent, and the new moon, the veriest silver
           thread of a little crescent, just below the cloud.</p>
       </div>
-      <div xml:id="EBA-1907-12-07" type="entry">> <dateline>
+      <div xml:id="EBA-1907-12-07" type="entry"> <dateline>
           <date when="1907-12-07">Saturday, Dec. 7.</date>
-          <measure quantity="44" unit="mile">44 miles.</measure>
+        <measure type="distance">44 miles.</measure>
         </dateline>
-        <p>Made an early start - and tied up at 5:30 within 3 miles of <placeName ref="#Minya"
+        <p>Made an early start - and tied up at 5:30 within <measure type="distance">3 miles</measure> of <placeName ref="#Minya"
             >Minia.</placeName> Lovely day, and perfect evening.</p>
       </div>
-      <div xml:id="EBA-1907-12-08" type="entry">> <dateline>
+      <div xml:id="EBA-1907-12-08" type="entry"> <dateline>
           <date when="1907-12-08">Second Sunday in Advent. Dec. 8th.</date>
-          <measure quantity="28.5" unit="mile">28-1/2 miles.</measure>
+        <measure type="distance">28-1/2 miles.</measure>
         </dateline>
         <p>A very heavy fog on the river this morning delayed our starting until 9:25 - spent about
           2 hours at <placeName ref="#Minya">Minia</placeName> waiting for mail and express parcels
           - a good sailing day - tied up at <placeName ref="#Redah">Redah</placeName> about 6
           o'clock.</p>
       </div>
-      <div xml:id="EBA-1907-12-09" type="entry">> <dateline>
-          <date when="1907-12-09">Monday. Dec. 9th. 41-1/2 miles.</date>
-          <measure quantity="41.5" unit="mile">41-1/2 miles.</measure>
+      <div xml:id="EBA-1907-12-09" type="entry"> <dateline>
+        <date when="1907-12-09">Monday. Dec. 9th.</date><measure type="distance">41-1/2 miles.</measure>
         </dateline>
         <p>Started at 6 o'clock - a cloudy day - and cold wind. Passed <placeName ref="#Mellawi"
             >Mellawi</placeName>, <placeName ref="#Hadji_Kandel">Hadji Kandel</placeName>, and the
@@ -200,7 +199,7 @@
         <dateline>
           <date when="1907-12-10">Tuesday, Dec. 10. <placeName ref="#Assiout"
             >Asyut.</placeName></date>
-          <measure quantity="8" unit="mile">8 miles.</measure>
+          <measure type="distance">8 miles.</measure>
         </dateline>
         <p>Arrived at 1 o'clock having had the tug one hour on the sand. <persName
             ref="#Davis_Theodore_M">Theo</persName> dismissed the tug at 2 o'clock and we sailed at
@@ -214,7 +213,7 @@
       <div xml:id="EBA-1907-12-11" type="entry">
         <dateline>
           <date when="1907-12-11">Wednesday, Dec. 11th.</date>
-          <measure quantity="19" unit="mile">19 miles.</measure>
+          <measure type="distance">19 miles.</measure>
         </dateline>
         <p>We had no wind until noon - but a very good one until 5:40 when we tied up and with the
           towing we did before noon we made our 19 miles - lovely and warm.</p>
@@ -222,7 +221,7 @@
       <div xml:id="EBA-1907-12-12" type="entry">
         <dateline>
           <date when="1907-12-12">Thursday, Dec. 12. Sohag.</date>
-          <measure quantity="41.5" unit="mile">41-1/2 miles.</measure>
+          <measure type="distance">41-1/2 miles.</measure>
         </dateline>
         <p>Started at 7 - the wind freshened finely at 8 o'clock and we came splendidly on until
           within a mile of the <placeName ref="#Sohag">Sohag</placeName> about 7 o'clock we struck
@@ -235,31 +234,31 @@
           her. It is impossible to say why this kind of thing occurs so often - it is one of the
           greatest dangers on the <placeName ref="Nile">Nile</placeName>. A delightful day.</p>
       </div>
-      <div xml:id="EBA-1907-12-13" type="entry">> <dateline>
+      <div xml:id="EBA-1907-12-13" type="entry"> <dateline>
           <date when="1907-12-13">Friday, Dec. 13.</date>
-          <measure quantity="28.5" unit="mile">28-1/2 miles.</measure>
+        <measure type="distance">28-1/2 miles.</measure>
         </dateline>
         <p>We waited at <placeName ref="#Sohag">Sohgg</placeName> this morning until 9:30 for mail
           and provisions. Stopped within 4 miles of <placeName ref="#Balliana">Balliana</placeName>
           at 6 P.M. A good wind, a heavenly day. The nights too, with the young moon and the
           resplendent Venus, are wonderful.</p>
       </div>
-      <div xml:id="EBA-1907-12-14" type="entry">> <dateline>
+      <div xml:id="EBA-1907-12-14" type="entry"> <dateline>
           <date when="1907-12-14">Saturday, Dec. 14.</date>
-          <measure quantity="8.5" unit="mile">8-1/2 miles.</measure>
+        <measure type="distance">8-1/2 miles.</measure>
         </dateline>
         <p>A perfectly calm morning - but tracking and polling we made <placeName ref="#Balliana"
             >Balliana</placeName> at 4:30 - no mail, so we were off at once, and with a light wind
           went on until 6 P.M.</p>
       </div>
-      <div xml:id="EBA-1907-12-15" type="entry">> <dateline>
+      <div xml:id="EBA-1907-12-15" type="entry"> <dateline>
           <date when="1907-12-15">Sunday - Third in Advent. Dec. 15.</date>
-          <measure quantity="6" unit="mile">6 miles.</measure>
-        </dateline>
+        <measure type="distance">6 miles.</measure>
+      </dateline>
         <p>A perfectly windless day - bright and hot. Our men have worked like Trojans every minute
           of the day - polling and tracking, we think we have made 6 miles.</p>
       </div>
-      <div xml:id="EBA-1907-12-16" type="entry">> <dateline>
+      <div xml:id="EBA-1907-12-16" type="entry"> <dateline>
           <date when="1907-12-16">Monday, Dec. 16.</date>
         </dateline>
         <p>A repetition of yesterday - clear, hot, windless day. The men have been polling,
@@ -270,7 +269,7 @@
       <div xml:id="EBA-1907-12-17" type="entry">
         <dateline>
           <date when="1907-12-17">Tuesday, Dec. 17.</date>
-          <measure quantity="30" unit="mile">30 miles.</measure>
+          <measure type="distance">30 miles.</measure>
           <placeName ref="#Keneh">Keneh.</placeName>
         </dateline>
         <p>We got quietly through the bridge at 8 o'clock this morning. Found the <name type="boat"
@@ -283,21 +282,19 @@
       </div>
       <div xml:id="EBA-1907-12-18" type="entry">
         <dateline>
-          <date when="1907-12-18">Wednesday, Dec. 18</date>. <measure quantity="18" unit="mile">18
-            miles.</measure>
+          <date when="1907-12-18">Wednesday, Dec. 18</date>.<measure type="distance">18 miles.</measure>
         </dateline>
         <p>We got off as soon as <persName ref="#Davis_Theodore_M">T</persName>. and <persName
             ref="#Williams_Caroline_Ransom">C</persName>. came back from the <placeName
             ref="#Temple_of_Dendera">Temple</placeName>, about 11 o'clock - and with good wind came
-          to within 4 miles of <placeName ref="#Naqadah">Nagadah</placeName>.</p>
+          to within <measure type="distance">4 miles</measure> of <placeName ref="#Naqadah">Nagadah</placeName>.</p>
       </div>
       <div xml:id="EBA-1907-12-19" type="entry">
         <dateline>
-          <date when="1907-12-19">Thursday, Dec. 19</date>. <measure quantity="21" unit="mile">21
-            miles.</measure>
+          <date when="1907-12-19">Thursday, Dec. 19</date>.<measure type="distance">21 miles.</measure>
         </dateline>
         <p>Started early, 6 o'clock, hoping to make <placeName ref="#Luxor">Luxor</placeName>
-          tonight, but are tied up 4 miles below it. Very contrary and shifting wind - and cold -
+          tonight, but are tied up <measure type="distance">4 miles</measure> below it. Very contrary and shifting wind - and cold -
           pulled to the anchor for hours. Beautiful night.</p>
       </div>
       <div xml:id="EBA-1907-12-20" type="entry">
@@ -742,17 +739,17 @@
           boat to see <persName ref="#Erskine_David">Mr. Nicol's</persName> pictures. <persName
             ref="#Davis_Theodore_M">Theo</persName> bought a beauty for &#163;50. We started for
             <placeName ref="#Aswan">Aswan</placeName> at 1 o'clock and having a light wind got
-          within 3 miles of <placeName ref="#Erment">Erment,</placeName> where we had to stop for
+          within <measure type="distance">3 miles.</measure> of <placeName ref="#Erment">Erment,</placeName> where we had to stop for
           the night.</p>
       </div>
       <div xml:id="EBA-1908-02-07" type="entry">
         <dateline><date when="1908-02-07">Feb. 7th. Friday.</date></dateline>
         <p>A cold west wind blowing all day - a real gale - we towed and pulled to anchor, making
-          1-1/2 miles!</p>
+          <measure type="distance">1-1/2 miles</measure>!</p>
       </div>
       <div xml:id="EBA-1908-02-08" type="entry">
         <dateline><date when="1908-02-08">Feb. 8th. Saturday.</date></dateline>
-        <p>30 miles. Towed from 7 A.M. to 10 o'clock. Then the gale began again and was so strong we
+        <p><measure type="distance">30 miles</measure>. Towed from 7 A.M. to 10 o'clock. Then the gale began again and was so strong we
           furled the big sail and went on with the felucca sail, but struck a sand bank with such
           force that I was thrown off my feet - lamp overturned - ornaments etc. thrown. We then
           went on more slowly passing the <placeName ref="#Esneh_Bridge">Esneh bridge</placeName>
@@ -760,18 +757,18 @@
       </div>
       <div xml:id="EBA-1908-02-09" type="entry">
         <dateline><date when="1908-02-09">Fifth Sunday after Epiphany. Feb. 9th.</date></dateline>
-        <p>31 miles. Started at 7 A.M. with light wind, growing stronger at 10 proving a gale. We
+        <p><measure type="distance">31 miles</measure>. Started at 7 A.M. with light wind, growing stronger at 10 proving a gale. We
           again put up our felucca sail and went on with it until driven to the bank at 4 o'clock -
           afterwards going on until 5:30 - cold - and atmosphere filled with dust.</p>
       </div>
       <div xml:id="EBA-1908-02-10" type="entry">
         <dateline><date when="1908-02-10">Feb. 10. Monday.</date></dateline>
-        <p>A fine good sailing day - have made 41 miles, and are 3 miles above <placeName
+        <p>A fine good sailing day - have made <measure type="distance">41 miles</measure>, and are <measure type="distance">3 miles</measure> above <placeName
             ref="#Kom_OMbo">Kom Ombo.</placeName></p>
       </div>
       <div xml:id="EBA-1908-02-11" type="entry">
         <dateline><date when="1908-02-11">Feb. 11. Tuesday.</date></dateline>
-        <p>23 miles. A difficult day, light, variable winds - which have brought us our old
+        <p><measure type="distance">23 miles</measure>. A difficult day, light, variable winds - which have brought us our old
           "Sycamore tree".</p>
       </div>
       <div xml:id="EBA-1908-02-12" type="entry">
@@ -809,26 +806,26 @@
       </div>
       <div xml:id="EBA-1908-02-17" type="entry">
         <dateline><date when="1908-02-17">Feb. 17. Monday.</date></dateline>
-        <p>5 miles. Difficult to make even this distance.</p>
+        <p><measure type="distance">5 miles</measure>. Difficult to make even this distance.</p>
       </div>
       <div xml:id="EBA-1908-02-18" type="entry">
         <dateline><date when="1908-02-18">Feb. 18. Tuesday.</date></dateline>
-        <p>13 miles. Hard wind all day - cold.</p>
+        <p><measure type="distance">13 miles</measure>. Hard wind all day - cold.</p>
       </div>
       <div xml:id="EBA-1908-02-19" type="entry">
         <dateline><date when="1908-02-19">Feb. 19. Wednesday.</date></dateline>
-        <p>16 miles. Ditto yesterday.</p>
+        <p><measure type="distance">16 miles</measure>. Ditto yesterday.</p>
       </div>
       <div xml:id="EBA-1908-02-20" type="entry">
         <dateline><date when="1908-02-20">Feb. 20. Thursday.</date></dateline>
-        <p>34 miles. <placeName ref="Edfu">Edfu,</placeName> a good days sail. <persName
+        <p><measure type="distance">34 miles</measure>. <placeName ref="Edfu">Edfu,</placeName> a good days sail. <persName
             ref="#Davis_Theodore_M">Theo</persName>, <persName ref="#Jones_Harold">Harold</persName>
           and <persName ref="#Williams_Caroline_Ransom">Carrie</persName> visited the temple.</p>
       </div>
       <!-- Harold Jones or Harold Smith? -->
       <div xml:id="EBA-1908-02-21" type="entry">
         <dateline><date when="1908-02-21">Feb. 21. Friday.</date></dateline>
-        <p>32 miles. Very hot all day - sailing all the time.</p>
+        <p><measure type="distance">32 miles</measure>. Very hot all day - sailing all the time.</p>
       </div>
       <div xml:id="EBA-1908-02-22" type="entry">
         <dateline><date when="1908-02-22">Feb. 22. Saturday.</date></dateline>
@@ -836,11 +833,11 @@
       </div>
       <div xml:id="EBA-1908-02-23" type="entry">
         <dateline><date when="1908-02-23">Feb. 23. Sexagesima Sunday.</date></dateline>
-        <p>7 miles. Strong wind.</p>
+        <p><measure type="distance">7 miles</measure>. Strong wind.</p>
       </div>
       <div xml:id="EBA-1908-02-24" type="entry">
         <dateline><date when="1908-02-24">Feb. 24. Monday.</date></dateline>
-        <p>26 miles. We reached <placeName ref="#Luxor">Luxor</placeName> at 7 P.M. making 8 days
+        <p><measure type="distance">26 miles</measure>. We reached <placeName ref="#Luxor">Luxor</placeName> at 7 P.M. making 8 days
           from <placeName ref="#Aswan">Aswan.</placeName></p>
       </div>
       <div xml:id="EBA-1908-02-25" type="entry">
@@ -962,15 +959,15 @@
       <div xml:id="EBA-1908-03-09" type="entry">
         <dateline><placeName ref="#Naj_Hammadi">Nag Hamadi</placeName> - <date when="1908-03-09"
             >March 9. Monday.</date>
-          <measure quantity="82.5" unit="mile">82-1/2 miles.</measure>
+          <measure type="distance">82-1/2 miles.</measure>
         </dateline>
         <p><persName ref="#Davis_Theodore_M">Theo</persName> had engaged a sugar tug to take us down
           the river. We started at 9:10 and reached <placeName ref="#Naj_Hammadi">Nag
             Hamadi</placeName> at 7:30 P.M. No wind, very warm, anchored just above the bridge.</p>
       </div>
       <div xml:id="EBA-1908-03-10" type="entry">
-        <dateline><date when="1908-03-10">March 10. Tuesday.</date>.</dateline>
-        <measure quantity="51" unit="mile">51 miles.</measure>
+        <dateline><date when="1908-03-10">March 10. Tuesday.</date>.
+          <measure type="distance">51 miles.</measure></dateline>
         <p>Passed the bridge at 8 A.M. and then anchored until 25 M. before 11 - allowed the tug to
           cool. Very hot all day. The sunset was wonderfully beautiful.</p>
       </div>
@@ -978,7 +975,7 @@
         <dateline>
           <date when="1908-03-11">March 11. Wed.</date><placeName ref="#Assiout"
             >Asy&#251;t.</placeName>
-          <measure quantity="68" unit="mile">68 miles.</measure>
+          <measure type="distance">68 miles.</measure>
         </dateline>
         <p>A gale all day - tug on the sand for an hour this morning - afterwards sticking again for
           3 hours - arrived in spite of all at <placeName ref="#Assiout">Asy&#251;t</placeName> at
@@ -992,7 +989,7 @@
       </div>
       <div xml:id="EBA-1908-03-13" type="entry">
         <dateline><date when="1908-03-13">March 13. Friday.</date>.</dateline>
-        <measure quantity="60" unit="mile">60 miles.</measure>
+        <measure type="distance">60 miles.</measure>
         <p>Started at 6. Stopped at <placeName ref="#Minya">Minia</placeName>, for mail one hour and
           3 hours at <placeName ref="#Sheik_Fadl">Sheik Fadl</placeName> to cool. Rather cool out of
           the sun.</p>
@@ -1000,7 +997,7 @@
       <div xml:id="EBA-1908-03-14" type="entry">
         <dateline><date when="1908-03-14">March 14. Saturday.</date> Near <placeName
             ref="#Bedrescheyn">Bedrescheyn.</placeName></dateline>
-        <measure quantity="90" unit="mile">90 miles.</measure>
+        <measure type="distance">90 miles.</measure>
         <p>Started again at 6, stopping about 10 to assist a dahabya sticking in the mud, to get
           off. It proved to be a party from <placeName ref="#Chicago">Chicago</placeName> -
             <persName ref="#Smith_Mr">Mr. Smith</persName> the father of <persName
@@ -1009,7 +1006,7 @@
       <div xml:id="EBA-1908-03-15" type="entry">
         <dateline><date when="1908-03-15">March 15. 2nd Sunday in Lent.</date>.</dateline>
         <p>Arrived at the <placeName ref="#Ghezireh_Bridge">Ghezireh bridge</placeName> at 11 A.M.
-          having made our 450 miles from <placeName ref="#Luxor">Luxor</placeName> in 7 days.
+          having made our <measure type="distance">450 miles</measure> from <placeName ref="#Luxor">Luxor</placeName> in 7 days.
             <persName ref="#Fielding_Lord">Lord Fielding</persName> dined with us.</p>
       </div>
       <div xml:id="EBA-1908-03-16" type="entry">
