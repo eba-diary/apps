@@ -61,19 +61,19 @@
             >Dec. 2d. 1907</date>.</dateline>
         <p>This little record of travel should have begun a month ago - as we sailed from <placeName
             ref="New_York">New York</placeName> just a month ago - the <date when="1907-11-02">2d of
-            Nov.</date> on the <name type="boat" ref="#Freiderick_der_Grosse">Freiderick der
+              Nov.</date> on the <name type="boat" ref="#SS_Friedrich_der_Grosse">Freiderick der
             Grosse</name>. We had a rough unpleasant passage - there was no day on which I could
           have written with comfort. It was the worst passage I ever made. On some days, the best
           thing was to stay in bed - and that was a difficult thing to do. A friend of ours was
           thrown from his berth, and dislocated his shoulder - several accidents occured - sprains
           etc. Reached <placeName ref="#Naples">Naples</placeName> finally the morning of the 15th.
             <persName ref="#Baldwin_Dr">Dr. Baldwin</persName> of <placeName ref="#Rome"
-            >Rome,</placeName> and <persName ref="#Beck_Mrs">Mrs. Beck</persName> of <placeName
-            ref="Milwaukee">Milwaukie,</placeName> were on the boat, and added much to the pleasure
+            >Rome</placeName>, and <persName ref="#Beck_Mrs">Mrs. Beck</persName> of <placeName
+            ref="Milwaukee">Milwaukie</placeName>, were on the boat, and added much to the pleasure
           of the voyage - coming when possible to my sitting room for tea. We knew that <persName
             ref="#Buttles_Jeanette">Nettie</persName> and <persName ref="#Ransom_Williams_Caroline"
             >Carrie</persName> would be waiting for us at <placeName ref="#Naples"
-            >Naples,</placeName> and we hoped to have at least a night and day with <persName
+            >Naples</placeName>, and we hoped to have at least a night and day with <persName
             ref="#Buttles_Jeanette">Nettie</persName> at the <name type="hotel" ref="#Grand_Hotel"
             >Grand Hotel</name>. But we were so belated that we had only time to drive to the hotel
           and get them, and drive back to the dock - and that was so disappointing. <persName
@@ -84,10 +84,9 @@
           horrid. We arrived at <placeName ref="#Alexandria">Alexandria</placeName> at 8 o'clock on
           Monday the 18th, stopped at the <placeName ref="#New_Khedivial_Hotel">New Khedivial
             Hotel</placeName> long enough to have a lunch put up for us, then paid a visit to
-            <placeName>the Museum</placeName> (our first) though it is hardly worth a visit, and
+            <orgName ref="#Museum_of_Graeco-Roman_Antiquities">the Museum</orgName> (our first) though it is hardly worth a visit, and
           were off for <placeName ref="#Cairo">Cairo</placeName> at noon - and found our old rooms
-          ready for us, and were eating dinner on the evening of the 16th. A sister with them - a
-          quiet, beautiful day from <placeName ref="#New_York">N.Y.</placeName> A very good record.
+          ready for us, and were eating dinner on the evening of the 16th day from <placeName ref="#New_York">N.Y.</placeName> A very good record.
           We got away from <placeName ref="#Cairo">Cairo</placeName> today - having settled
           ourselves on the <name type="boat" ref="#Beduin">Beduin</name> the 1st. We tried to get
           through the bridge yesterday - but there was such a crowd of gyassas at the draw, that we
@@ -97,14 +96,14 @@
           barracks, and waited for today. We were so near when the draw was opened at 1 o'clock that
           we started as soon as the down boats had got through - but there was a good wind, and the
           reckless gyassas in spite of orders and shreiks of the bridge officers crowded upon us in
-          full sail - and it was a very nasty twenty mimrtes we had - such noise, such frantic
+          full sail - and it was a very nasty twenty minutes we had - such noise, such frantic
           efforts. One of them crashed her bow into us, fortunately broke her bow sprit, and left
           her anchor embedded in the landing stage, or she would have ripper our side open. She did
           break one of the window frames, but luckily spared the glass, knocked much of our nice new
           paint off us etc. One of our men took out the window frame, and we left him in <placeName
-            ref="#Cairo">Cairo,</placeName> to take it to the carpenters and painters. He rejoined
+            ref="#Cairo">Cairo</placeName>, to take it to the carpenters and painters. He rejoined
           us at <placeName ref="Tourah">Tourah</placeName> by rail and says the carpenters and
-          painters will reach <placeName ref="#Bedrashyn">Bedreshein</placeName> tomorrow at 8
+          painters will reach <placeName ref="#Al Badrashayn">Bedreshein</placeName> tomorrow at 8
           o'clock. As <persName ref="Davis_Theodore_M">Theo</persName> and <persName
             ref="Ransom_Williams_Caroline">Carrie</persName> are to make a visit to <placeName
             ref="Sakkarah">Sakkarah</placeName> we will not be detained.</p>
@@ -114,25 +113,22 @@
             <placeName ref="#Helwan">Helouan</placeName>) and go with <persName
             ref="#Ransom_Williams_Caroline">Carrie</persName> early the next morning to see the
           ceremony of the Kishwa. He is now in a large business at <placeName ref="#Cairo"
-            >Cairo.</placeName> We also made the acquaintance of <persName
-            ref="#Feilding_Rudolph_Lord">Lord Denbigh's</persName> eldest son, <persName
-            ref="#Feilding_Rudolph_Viscount">Viscount Fielding.</persName> He is in the Coldstream
-          Guards, who have lately been sent out here. He is a nice young fellow simple and natural.
+            >Cairo</placeName>. We also made the acquaintance of <persName
+            ref="#Feilding_Rudolph_Lord">Lord Denbigh</persName>'s eldest son, <persName
+            ref="#Feilding_Rudolph_Viscount">Viscount Fielding</persName>. He is in the <orgName ref="#Coldstream_Guards">Coldstream
+          Guards</orgName>, who have lately been sent out here. He is a nice young fellow simple and natural.
             <persName ref="#Peck_Mrs">Mrs. Peck</persName> of <placeName ref="#Milwaukee"
-            >Milwaukie</placeName> was at <personGrp ref="#Shepheard">Shepheards</personGrp> most of
-          the time we were there, and we saw much of her. <placeName ref="#Cairo">Cairo,</placeName>
-          and the whole of <placeName ref="Egypt">Egypt</placeName> is now in serious financial
+            >Milwaukie</placeName> was at <name type="hotel" ref="#Shepheards_Hotel">Shepheards</name> most of
+          the time we were there, and we saw much of her. <placeName ref="#Cairo">Cairo</placeName>,
+          and the whole of <placeName ref="#Egypt">Egypt</placeName> is now in serious financial
           straits, following the absurd speculative craze of the last 2 years. Prices are incredibly
           high.</p>
       </div>
-      <!-- The boat's name might actually be Friedrich (not Freiderick) der Grosse, German for Frederick the Great (Prussian king) -->
-      <!-- Not sure what "the Museum" is. It seems to be some not-so-great museum in Alexandria, likely close to the New Khedivial Hotel. Maybe this one: https://en.wikipedia.org/wiki/Graeco-Roman_Museum -->
-      <!-- "Shepheards" (near end of entry) is referring to the Shepheard family - I think she just missed an apostrophe. -->
-      <div xml:id="EBA-1907-12-03" type="entry">
+       <div xml:id="EBA-1907-12-03" type="entry">
         <dateline><date when="1907-12-03">Tuesday, Dec. 3rd.</date></dateline>
         <p>I have had a busy day settling - while <persName ref="#Davis_Theodore_M">Theo</persName>
           and <persName ref="#Williams_Caroline_Ransom">Carrie</persName> went to <placeName
-            ref="#Sakkarah">Sakkarah.</placeName> A lovely day. <name type="boat" ref="#Ramesis">The
+            ref="#Sakkarah">Sakkarah</placeName>. A lovely day. <name type="boat" ref="#Ramesis">The
             Ramesis</name> was lying by us all day - with a handful of passengers - but went off at
           6 o'clock. The carpenter and painter have been here all day repairing damages.</p>
       </div>
@@ -140,13 +136,12 @@
           <date when="1907-12-04">Wednesday, Dec. 4.</date>
         <measure type="distance">41 miles.</measure>
         </dateline>
-        <p>We get away from <placeName ref="#Bedrashyn">Bedraschein</placeName> at 7 o'clock this
+        <p>We get away from <placeName ref="#Al Badrashayn">Bedraschein</placeName> at 7 o'clock this
           morning - and have had a lovely day - river like glass, both of our sails out much of the
           time. The river is enormously broad about here. When I went on deck about 4 o'clock, I
           found a scene of ravishing beauty - the broad smooth river, the distant cliffs and Mts.
           and desert, with the heliotrope shadows, and the soft brilliant sun. It was too
-          entrancing. We had tea on deck - and are now lying opposite <placeName ref="#Wasta"
-            >Wasta.</placeName></p>
+          entrancing. We had tea on deck - and are now lying opposite <placeName ref="#Al-Wasta">Wasta</placeName>.</p>
       </div>
       <div xml:id="EBA-1907-12-05" type="entry"> <dateline>
           <date when="1907-12-05">Thursday, Dec. 5th.</date>
@@ -154,7 +149,7 @@
         </dateline>
         <p>A quiet uneventful day - though the tug went on the sand once for a few minutes. It is a
           slow heavy tug, but was the only one cook had reoccupied. We are about a mile above
-          Ribbeh.</p>
+          <placeName ref="#Biba">Bibbeh</placeName>.</p>
       </div>
       <div xml:id="EBA-1907-12-06" type="entry"> <dateline>
           <date when="1907-12-06">Friday Dec. 6th.</date>
@@ -171,15 +166,15 @@
           <date when="1907-12-07">Saturday, Dec. 7.</date>
         <measure type="distance">44 miles.</measure>
         </dateline>
-        <p>Made an early start - and tied up at 5:30 within <measure type="distance">3 miles</measure> of <placeName ref="#Minya"
-            >Minia.</placeName> Lovely day, and perfect evening.</p>
+        <p>Made an early start - and tied up at 5:30 within <measure type="distance">3 miles</measure> of <placeName ref="#Al_Minya"
+            >Minia</placeName>. Lovely day, and perfect evening.</p>
       </div>
       <div xml:id="EBA-1907-12-08" type="entry"> <dateline>
           <date when="1907-12-08">Second Sunday in Advent. Dec. 8th.</date>
         <measure type="distance">28-1/2 miles.</measure>
         </dateline>
         <p>A very heavy fog on the river this morning delayed our starting until 9:25 - spent about
-          2 hours at <placeName ref="#Minya">Minia</placeName> waiting for mail and express parcels
+          2 hours at <placeName ref="#Al_Minya">Minia</placeName> waiting for mail and express parcels
           - a good sailing day - tied up at <placeName ref="#Redah">Redah</placeName> about 6
           o'clock.</p>
       </div>
@@ -862,13 +857,11 @@
             >McKeever girls</personGrp> and <persName ref="#Forbes_Mr">Mr. Forbes</persName> called
           before dinner, and <persName ref="#Dalison_Max">Mr. Dalison</persName> this evening.</p>
       </div>
-      <!-- 2nd half of this entry makes no sense to me? -->
       <div xml:id="EBA-1908-02-27" type="entry">
         <dateline><date when="1908-02-27">Feb. 27. Thursday.</date></dateline>
         <p>A quiet day - <persName ref="#Jones_Harold">Harold</persName> has stayed in the
             <placeName ref="#Valley_of_the_Kings">Valley</placeName> yesterday and today.</p>
       </div>
-      <!-- Harold Jones or Harold Smith? -->
       <div xml:id="EBA-1908-02-28" type="entry">
         <dateline><date when="1908-02-28">Feb. 28. Friday.</date></dateline>
         <p><persName ref="#Davis_Theodore_M">Theo</persName> over in the <placeName
@@ -889,7 +882,6 @@
           corridors, well, fully fresh, of Gods, a magnificent Sarcophagus, and figures in wood and
           marble - a few bones - no mummy - 200 ft. long.</p>
       </div>
-      <!-- Olivia Myhre's Code: -->
       <div xml:id="EBA-1908-03-01" type="entry">
         <dateline><date when="1908-03-01">March 1st. Quinquagesima Sunday.</date>.</dateline>
         <p><persName ref="#Davis_Theodore_M">Theo</persName> met the <personGrp ref="#Connaughts"
@@ -990,7 +982,7 @@
       <div xml:id="EBA-1908-03-13" type="entry">
         <dateline><date when="1908-03-13">March 13. Friday.</date>.</dateline>
         <measure type="distance">60 miles.</measure>
-        <p>Started at 6. Stopped at <placeName ref="#Minya">Minia</placeName>, for mail one hour and
+        <p>Started at 6. Stopped at <placeName ref="#Al_Minya">Minia</placeName>, for mail one hour and
           3 hours at <placeName ref="#Sheik_Fadl">Sheik Fadl</placeName> to cool. Rather cool out of
           the sun.</p>
       </div>
