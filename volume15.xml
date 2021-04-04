@@ -342,7 +342,7 @@
             ref="#Murch_Mrs">Mrs. Murch</persName> - who is most sad - but very brave. Then we
           encountered <persName ref="#Davis_Theodore_M">Theo</persName> on our way home - and
           stopped at the <name type="hotel" ref="#Winter_Palace">Winter Palace</name> to see the
-            <personGrp ref="#Iddings">Iddings</personGrp>. <persName ref="#Iddings_Mr">Mr.
+            <persName ref="#Iddings_Mr #Iddings_Mrs">Iddings</persName>. <persName ref="#Iddings_Mr">Mr.
             Iddings</persName>, the girl, <persName ref="#Williams_Caroline_Ransom"
             >Carrie</persName> and <persName ref="#Davis_Theodore_M">Theo</persName> went to
             <placeName ref="#Karnac">Karnak</placeName> at 4 o'clock and <persName
@@ -394,7 +394,7 @@
         <p>A quiet day, mostly at home. <persName ref="#Davis_Theodore_M">Theo</persName> and
             <persName ref="#Williams_Caroline_Ransom">Carrie</persName> at the <personGrp
             ref="#Weigalls">Weigalls</personGrp> for tea, and afterwards met the <personGrp
-            ref="#Iddings">Iddings</personGrp> at <placeName ref="#Karnak">Karnae</placeName>.</p>
+            ref="#Iddings">Iddings</personGrp> at <placeName ref="#Karnak">Karnac</placeName>.</p>
       </div>
       <div xml:id="EBA-1907-12-29" type="entry">
         <dateline><placeName ref="#Luxor">Luxor</placeName> - <date when="1907-12-29">Sunday, Dec.
@@ -441,10 +441,9 @@
       <div xml:id="EBA-1908-01-04" type="entry">
         <dateline><date when="1908-01-04">Jan. 4th</date></dateline>
         <p>A warm wind - quiet day at home for me, <persName ref="#Davis_Theodore_M">Theo</persName>
-          and <persName ref="#Williams_Caroline_Ransom">Carry</persName> to <placeName ref="#Karnak"
-            >Karnak.</placeName></p>
+          and <persName ref="#Williams_Caroline_Ransom">Carrie</persName> to <placeName ref="#Karnak"
+            >Karnak</placeName>.</p>
       </div>
-      <!-- MISSPELLED NAME - LIKELY CARRIE, NOT CARRY -->
       <div xml:id="EBA-1908-01-05" type="entry">
         <dateline><date when="1908-01-05">Jan. 5th.</date></dateline>
         <p><persName ref="#Erskine_David">Mr. Erskine</persName> to dinner. <persName
@@ -453,11 +452,10 @@
           morning - coming home he reports a promising tomb in sight - thinks it will take several
           days to clear the doorway.</p>
       </div>
-      <!-- This tomb is KV56, AKA "Gold Tomb" (https://en.wikipedia.org/wiki/KV56) -->
       <div xml:id="EBA-1908-01-06" type="entry">
         <dateline><date when="1908-01-06">Jan. 6th.</date></dateline>
         <p>At home all day. <persName ref="#Davis_Theodore_M">Theo</persName> at <placeName
-            ref="#Karnak">Karnak.</placeName></p>
+            ref="#Karnak">Karnak</placeName>.</p>
       </div>
       <div xml:id="EBA-1908-01-07" type="entry">
         <dateline><date when="1908-01-07">Jan. 7th.</date></dateline>
@@ -479,10 +477,9 @@
         <dateline><date when="1908-01-10">Jan. 10th.</date></dateline>
         <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName
             ref="#Williams_Caroline_Ransom">Carrie</persName> to <placeName ref="#Karnak"
-            >Karnac.</placeName> I had a delightful visit from <persName ref="#Gardner_Mrs">Mrs.
+            >Karnac</placeName>. I had a delightful visit from <persName ref="#Gardner_Mrs">Mrs.
             Gardner</persName>.</p>
       </div>
-      <!-- She writes "Karnac" instead of "Karnak" several times in Jan/Feb, according to the original book transcript. -->
       <div xml:id="EBA-1908-01-11" type="entry">
         <dateline><date when="1908-01-11">Jan. 11th.</date></dateline>
         <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName
@@ -521,12 +518,11 @@
             >Harold Jones.</persName></p>
       </div>
       <div xml:id="EBA-1908-01-15" type="entry">
-        <dateline><date when="1908-01-15">Jan. 16. Wednesday.</date></dateline>
+        <dateline><date when="1908-01-15">Jan. 15. Wednesday.</date></dateline>
         <p>Cold, cloudy day. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName
             ref="#Williams_Caroline_Ransom">Carrie</persName> to the <placeName
             ref="#Valley_of_the_Kings">Valley.</placeName> Several beads etc. had been found.</p>
       </div>
-      <!-- INCORRECT DATE - WEDS. 15TH, NOT WEDS. 16TH -->
       <div xml:id="EBA-1908-01-16" type="entry">
         <dateline><date when="1908-01-16">Jan. 16th. Thursday.</date></dateline>
         <p><persName ref="#Humphreys_Mr.">Mr. Humphreys</persName> called and <persName
