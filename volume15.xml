@@ -80,8 +80,8 @@
             >Rome</placeName> to meet her husband - the voyage across the <placeName
             ref="#Mediterranean_Sea">Mediterranean</placeName> was as charming as the other was
           horrid. We arrived at <placeName ref="#Alexandria">Alexandria</placeName> at 8 o'clock on
-          Monday the 18th, stopped at the <placeName ref="#New_Khedivial_Hotel">New Khedivial
-            Hotel</placeName> long enough to have a lunch put up for us, then paid a visit to
+          Monday the 18th, stopped at the <name type="hotel" ref="#New_Khedivial_Hotel">New Khedivial
+            Hotel</name> long enough to have a lunch put up for us, then paid a visit to
             <orgName ref="#Museum_of_Graeco-Roman_Antiquities">the Museum</orgName> (our first) though it is hardly worth a visit, and
           were off for <placeName ref="#Cairo">Cairo</placeName> at noon - and found our old rooms
           ready for us, and were eating dinner on the evening of the 16th day from <placeName ref="#New_York">N.Y.</placeName> A very good record.
@@ -757,9 +757,9 @@
       </div>
       <div xml:id="EBA-1908-02-12" type="entry">
         <dateline><date when="1908-02-12">Feb. 12. Wednesday.</date></dateline>
-        <p>We pulled to anchor around to our old place opposite the <placeName type="hotel"
-            ref="#Cataract">Cataract Hotel.</placeName> Rowed around to the <placeName type="hotel"
-            ref="#Savoy">Savoy,</placeName> and had tea in the lovely garden.</p>
+        <p>We pulled to anchor around to our old place opposite the <name type="hotel"
+            ref="#Cataract">Cataract Hotel.</name> Rowed around to the <name type="hotel"
+            ref="#Savoy">Savoy</name>, and had tea in the lovely garden.</p>
       </div>
       <div xml:id="EBA-1908-02-13" type="entry">
         <dateline><date when="1908-02-13">Feb. 13. Thursday.</date></dateline>
@@ -778,7 +778,7 @@
       <div xml:id="EBA-1908-02-15" type="entry">
         <dateline><date when="1908-02-15">Feb. 15. Saturday.</date></dateline>
         <p>We started down at 9:40 this morning - but the north wind drove us to anchor very near
-          the <placeName type="hotel" ref="#Savoy">Savoy,</placeName> where we have remained all day
+          the <name type="hotel" ref="#Savoy">Savoy</name>, where we have remained all day
           - wind, still strong.</p>
       </div>
       <div xml:id="EBA-1908-02-16" type="entry">
