@@ -20,9 +20,9 @@ namespace Sentry.data.Web
         public bool AllowArrays {
             get
             {
-                return (FileExtensionName == "JSON") ? true : false;
+                return (FileExtensionName == "JSON" || FileExtensionName == "XML") ? true : false;
             }
-            set => AllowArrays = (FileExtensionName == "JSON") ? true : false;            
+            set => AllowArrays = (FileExtensionName == "JSON" || FileExtensionName == "XML") ? true : false;            
         }
     }
 

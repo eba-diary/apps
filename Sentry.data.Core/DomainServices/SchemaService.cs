@@ -1129,6 +1129,9 @@ namespace Sentry.data.Core
 
         public void Validate(int schemaId, List<BaseFieldDto> fieldDtoList)
         {
+            MethodBase mBase = System.Reflection.MethodBase.GetCurrentMethod();
+            Logger.Debug($"schemaservice start method <{mBase.Name.ToLower()}>");
+
             FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
             ValidationResults errors = new ValidationResults();
 
@@ -1138,6 +1141,8 @@ namespace Sentry.data.Core
             {
                 throw new ValidationException(errors);
             }
+
+            Logger.Debug($"schemaservice end method <{mBase.Name.ToLower()}>");
         }
 
         private ValidationResults Validate(FileSchema scm, List<BaseFieldDto> fieldDtoList)

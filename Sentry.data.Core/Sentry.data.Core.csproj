@@ -153,6 +153,7 @@
     <Compile Include="Entities\DataProcessing\Actions\SchemaMapAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressGzipAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressZip.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\XMLAction.cs" />
     <Compile Include="Entities\DataProcessing\EventMetric.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ActionTypeAttribute.cs" />
     <Compile Include="Entities\DataProcessing\Actions\BaseAction.cs" />
@@ -221,6 +222,7 @@
     <Compile Include="Exceptions\JobNotFoundException.cs" />
     <Compile Include="Exceptions\SASNotificationNotSentException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
+    <Compile Include="Exceptions\SchemaConversionException.cs" />
     <Compile Include="Exceptions\SchemaUnauthorizedAccessException.cs" />
     <Compile Include="Extensions\DataFlowExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
@@ -248,6 +250,7 @@
     <Compile Include="GlobalEnums\SchemaDatatypes.cs" />
     <Compile Include="Helpers\LambdaClientConfig.cs" />
     <Compile Include="Helpers\LoggingUtils.cs" />
+    <Compile Include="Helpers\ParsingHelpers.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IConvertToParquetProvider.cs" />
@@ -267,6 +270,7 @@
     <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\IApacheLivyProvider.cs" />
+    <Compile Include="Interfaces\DataProcessing\IXMLAction.cs" />
     <Compile Include="Interfaces\IHostSettings.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
     <Compile Include="Interfaces\IDaleSearchProvider.cs" />
