@@ -68,6 +68,13 @@ namespace Sentry.data.Infrastructure
 
                     _flow = stepList.Select(s => s.DataFlow).Distinct().Single();
 
+                    // Only process data for ACTIVE dataflows
+                    if (_flow.ObjectStatus != Core.GlobalEnums.ObjectStatusEnum.Active)
+                    {
+                        Logger.Warn($"dataflow not active - skipping s3event dataflowId:{_flow.Id.ToString()}:::dataflowname:{_flow.Name}:::s3event:{JsonConvert.SerializeObject(s3Event)}");
+                        return;
+                    }
+
                     //determine DataFlow execution and run instance guids to ensure processing is tied.
                     GetExecutionGuids(key);
 

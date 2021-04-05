@@ -5,6 +5,7 @@ using Sentry.Common.Logging;
 using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Models.ApiModels.Dataset;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using Sentry.WebAPI.Versioning;
@@ -105,6 +106,10 @@ namespace Sentry.data.Web.WebApi.Controllers
             public string DetailUrl { get; set; }
             public List<DropLocation> RetrieverJobs { get; set; }
             public bool PopulatesMultipleSchema { get; set; }
+            public ObjectStatusEnum ObjectStatus { get; set; }
+            public string DeleteIssuer { get; set; }
+            public DateTime DeleteIssueDTM { get; set; }
+
         }
         #endregion
 
@@ -852,7 +857,10 @@ namespace Sentry.data.Web.WebApi.Controllers
                         Name = item.Item1.Name,
                         Id = item.Item1.Id,
                         DetailUrl = $"DataFlow/{item.Item1.Id.ToString()}/Detail",
-                        PopulatesMultipleSchema = (item.Item1.MappedSchema.Count > 1)
+                        PopulatesMultipleSchema = (item.Item1.MappedSchema.Count > 1),
+                        ObjectStatus = item.Item1.ObjectStatus,
+                        DeleteIssuer = item.Item1.DeleteIssuer,
+                        DeleteIssueDTM = item.Item1.DeleteIssueDTM
                     };
                     List<DropLocation> rjList = new List<DropLocation>();
                     foreach (var job in item.Item2)

@@ -573,10 +573,10 @@ namespace Sentry.data.Core
                     }
 
                     /*
-                     *  Disable dataflows associated with schema on new processing platform
+                     *  Mark all dataflows, for deletion, associated with schema on new processing platform
                      */
                     //Disable all retriever jobs, associated with schema flow
-                    _dataFlowService.DisableFlowsByFileSchema(scm);
+                    _dataFlowService.DeleteFlowsByFileSchema(scm, logicalDelete);
 
                     /*  Mark objects for delete to ensure they are not displaed in UI
                      *  WallEService, long running task within Goldeneye service, will perform delete after determined amount of time
@@ -601,7 +601,6 @@ namespace Sentry.data.Core
                         //TODO: CLA-2765 - Revist moving Parquet files to glacier storage tier
                         //TODO: CLA-2765 - Revist moving raw data files to glacier storage tier
                         //TODO: CLA-2765 - Do Datasetfile records need an objectstatus?
-                        //TODO: CLA-2765 - Do dataflows need objectstatus?
 
                         ////Delete associated dataflows\steps
                         //Logger.Info($"configservice-delete-dataflowmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
@@ -611,6 +610,12 @@ namespace Sentry.data.Core
                         //Mark DatasetFileConfig record deleted
                         dfc.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
                         dfc.Schema.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
+
+                        /*
+                         *  Mark all dataflows, for deletion, associated with schema on new processing platform
+                         */
+                        //Disable all retriever jobs, associated with schema flow
+                        _dataFlowService.DeleteFlowsByFileSchema(scm, logicalDelete);
 
                         //Logger.Info($"configservice-delete-configmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         //if (!parentDriven)
