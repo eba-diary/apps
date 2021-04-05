@@ -13,6 +13,7 @@ using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Results;
@@ -203,6 +204,11 @@ namespace Sentry.data.Web.WebApi.Controllers
                 Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedexception schema - {errorMetadata}");
                 return Content(System.Net.HttpStatusCode.Forbidden, "Unauthroized Access to Schema");
             }
+            catch (SchemaConversionException ex)
+            {
+                Logger.Warn($"{controllerName.ToLower()}_{methodName.ToLower()}_schemaconversionexception - {errorMetadata}", ex);
+                return Content(System.Net.HttpStatusCode.BadRequest, ex.Message);
+            }
             catch (Exception ex)
             {
                 Logger.Error($"{controllerName.ToLower()}_{methodName.ToLower()}_internalservererror - {errorMetadata}", ex);
@@ -319,23 +325,47 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, "Failed schema validation", typeof(List<string>))]
         public async Task<IHttpActionResult> AddSchemaRevision(int datasetId, int schemaId, string revisionName, [FromBody] JObject schemaStructure)
         {
+            MethodBase mBase = System.Reflection.MethodBase.GetCurrentMethod();
+            string methodName = mBase.Name.ToLower();
+
             IHttpActionResult AddSchemaRevisionFunction()
             {
-                //ValidateModifyPermissionsForDataset(datasetId);
-
+                Logger.Debug($"metadataapi start method <{methodName}>");
                 if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
                 {
                     throw new SchemaNotFoundException();
                 }
 
-                JsonSchema schema_v3 = deserializeJSONStringtoJsonSchema().GetAwaiter().GetResult();
-                //JsonSchema schema_v3 = await JsonSchema.FromJsonAsync(schemaStructure.ToString());
+                Logger.Debug($"metadataapi_{methodName} - datasetid:{datasetId}:::schemaId:{schemaId}:::incomingjson:{schemaStructure.ToString()}");
+
+                JsonSchema schema_v3;
+                schema_v3 = deserializeJSONStringtoJsonSchema().GetAwaiter().GetResult();
 
                 List<BaseFieldDto> schemarows_v2 = new List<BaseFieldDto>();
-                int rowCnt = 0;
-                schema_v3.ToDto(schemarows_v2, ref rowCnt);
+                try
+                {
+                    int rowCnt = 0;
+                    Logger.Debug($"metadataapi schema conversion to dsc structures starting...");
+                    schema_v3.ToDto(schemarows_v2, ref rowCnt);
+                    Logger.Debug($"metadataapi schema conversion to dsc structures ended ");
 
-                _schemaService.Validate(schemaId, schemarows_v2);
+                    if (!schemarows_v2.Any())
+                    {
+                        return Content(System.Net.HttpStatusCode.BadRequest, "Schema conversion resulted in 0 fields.  Schema not updated.");
+                    }
+
+                    Logger.Debug($"metadataapi schema dsc validations starting...");
+                    _schemaService.Validate(schemaId, schemarows_v2);
+                    Logger.Debug($"metadataapi schema dsc validations ended");
+                }
+                catch (SchemaConversionException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw new SchemaConversionException($"Schema conversion failed", ex);
+                }
 
                 int savedRevisionId = _schemaService.CreateAndSaveSchemaRevision(schemaId, schemarows_v2, revisionName, schema_v3.ToJson());
 
@@ -343,15 +373,27 @@ namespace Sentry.data.Web.WebApi.Controllers
                 {
                     return Content(System.Net.HttpStatusCode.BadRequest, "Unable to Save Revision");
                 }
+
+                Logger.Debug($"metadataapi end method <{methodName}>");
                 return Ok(savedRevisionId);
             }
 
             async Task<JsonSchema> deserializeJSONStringtoJsonSchema()
             {
-                return await JsonSchema.FromJsonAsync(schemaStructure.ToString());
+                try
+                {
+                    Logger.Debug($"metadataapi start method <{methodName}>");
+                    JsonSchema result = await JsonSchema.FromJsonAsync(schemaStructure.ToString()).ConfigureAwait(false);
+                    Logger.Debug($"metadataapi end method <{methodName}>");
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    throw new SchemaConversionException($"Incoming json not properly formated", ex);
+                }
             }
 
-            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", AddSchemaRevisionFunction);
+            return ApiTryCatch("metdataapi", mBase.Name, $"datasetid:{datasetId} schemaId{schemaId}", AddSchemaRevisionFunction);
         }
 
         [HttpPost]

@@ -26,6 +26,7 @@ namespace Sentry.data.Core
 
         public bool IsOwnerVerified { get; set; }
 
+        public string SourceType { get; set; }
 
 
     }

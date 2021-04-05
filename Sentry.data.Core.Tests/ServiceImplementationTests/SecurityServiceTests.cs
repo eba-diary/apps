@@ -286,6 +286,53 @@ namespace Sentry.data.Core.Tests
             Assert.IsFalse(us.CanManageSchema);
         }
 
+        [TestMethod]
+        public void Security_Can_Manage_Schema_NonSecured_As_ServiceAccount_With_CanManageSchema_Permission()
+        {
+            //ARRAGE
+            //Security security = BuildBaseSecurity();
+            //ISecurable securable = MockRepository.GenerateMock<ISecurable>();
+            //securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
+            //securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
+            //securable.Stub(x => x.PrimaryContactId).Return("123456").Repeat.Any();
+            //securable.Stub(x => x.Security).Return(security).Repeat.Any();
+
+            //IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
+            //user.Stub(x => x.AssociateId).Return("BT_ICCM_I_QUAL_V1").Repeat.Any();
+            //user.Stub(x => x.Can)
+
+            //Create security ticket for AD group granting CanManageSchema permission
+            Security security = BuildBaseSecurity();
+            SecurityTicket ticket1 = BuildBaseTicket(security, "MyServiceAccountGroup");
+            SecurityPermission previewPermission1 = BuildBasePermission(ticket1, CanManageSchema(), true);
+            ticket1.Permissions.Add(previewPermission1);
+            security.Tickets.Add(ticket1);
+
+            //mock out securable object and attach security object established above
+            ISecurable securable = MockRepository.GenerateMock<ISecurable>();
+            securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
+            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
+            securable.Stub(x => x.PrimaryContactId).Return("123456").Repeat.Any();
+            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+
+            //Establish user, ensure users it part of AD group and is not DSC admin
+            IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
+            //User is part of AD group
+            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            user.Stub(x => x.IsInGroup(ticket1.AdGroupName)).Return(true).Repeat.Any();
+            //User is not DSC Admin
+            user.Stub(x => x.IsAdmin).Return(false).Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(securable, user);
+
+
+            //ASSERT
+            Assert.IsTrue(us.CanManageSchema);
+
+        }
+
         #endregion
 
         #region "CanPreviewDataset"
@@ -311,6 +358,7 @@ namespace Sentry.data.Core.Tests
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
             user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
             user.Stub(x => x.IsInGroup(ticket.AdGroupName)).Return(true).Repeat.Any();
+            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
@@ -435,6 +483,7 @@ namespace Sentry.data.Core.Tests
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
             user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
             user.Stub(x => x.IsInGroup(ticket.AdGroupName)).Return(false).Repeat.Any();
+            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();

@@ -76,7 +76,6 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Dataset/{id}")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Index(int id)
         {
 
@@ -1412,7 +1411,6 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/Schema/{schemaId}/ValidateField")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public JsonResult ValidateField(int schemaId, SchemaRow schemaRow)
         {
             try
@@ -1721,6 +1719,7 @@ namespace Sentry.data.Web.Controllers
                     model.IsFixedWidth = true;
                     break;
                 case "JSON":
+                case "XML":
                     model.IsPositional = false;
                     model.IsFixedWidth = false;
                     model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A struct", "Complex Data Types"));

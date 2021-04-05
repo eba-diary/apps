@@ -810,6 +810,9 @@ namespace Sentry.data.Core
                 case DataActionType.FixedWidth:
                     action = _datasetContext.FixedWidthAction.FirstOrDefault();
                     break;
+                case DataActionType.XML:
+                    action = _datasetContext.XMLAction.FirstOrDefault();
+                    break;
                 case DataActionType.SchemaLoad:
                     action = _datasetContext.SchemaLoadAction.FirstOrDefault();
                     DataFlowStep schemaLoadStep = MapToDataFlowStep(df, action, actionType);
@@ -972,6 +975,10 @@ namespace Sentry.data.Core
             if (scm.Extension.Name.ToUpper() == "FIXEDWIDTH")
             {
                 AddDataFlowStep(dto, df, DataActionType.FixedWidth);
+            }
+            else if (scm.Extension.Name.ToUpper() == "XML")
+            {
+                AddDataFlowStep(dto, df, DataActionType.XML);
             }
         }
 

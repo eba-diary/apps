@@ -146,6 +146,9 @@
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_01_01" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_01_02" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_01_03" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_02_02" />
+    <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Dale\Sprint_21_02_03" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_03_10" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -265,6 +268,8 @@
     <Build Include="Tables\DataProcessing\EventMetrics.sql" />
     <Build Include="Tables\DataProcessing\FileDetector.sql" />
     <Build Include="Tables\DatasetFileConverted.sql" />
+    <None Include="Scripts\Pre-Deploy\SupportingScripts\Dale\Sprint_21_02_03\0_usp_DALE_BaseScanAction_UPDATE.sql" />
+    <Build Include="Tables\FeatureEntity.sql" />
     <Build Include="Tables\ObjectStatus.sql" />
   </ItemGroup>
   <ItemGroup>
@@ -308,6 +313,8 @@
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_01_01\Add_Security_Entry_For_All_Datasets_CLA_1238.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_01_02\HistoryFix_Add_Snowflake_Metadata.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_01_03\HistoryFix_Assign_JobGuid_CLA_2381.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_02_02\NewFeatureFlags.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_03_10\HistoryFix_SAID_ASSET_and_ProducerS3Drop.sql" />
     <None Include="Scripts\Post-Deploy\StaticData\ObjectStatus.sql" />
   </ItemGroup>
   <ItemGroup>

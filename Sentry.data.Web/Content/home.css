@@ -87,7 +87,20 @@
         text-decoration: none;
     }
 
+
+
 /* data inventory */
+.home-tile-link-di-large {
+    text-decoration: none;
+    color: #74531c;
+}
+
+    .home-tile-link-di-large:hover {
+        color: #00a3e0;
+        text-decoration: none;
+    }
+
+
 .bg-photo-di {
     background-image: url('/Images/Dale/DataInventoryHomePage.jpg');
     background-position: 55% 10%;
@@ -100,10 +113,11 @@
 }
 
     .home-tile-link-di:hover {
-        color: #74531C;
+        color: #EAAA00;
         text-decoration: none;
     }
 
 .border-btm-yellow {
     border-bottom: 4px solid #EAAA00;
 }
+
