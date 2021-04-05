@@ -106,7 +106,7 @@
           painters will reach <placeName ref="#Al Badrashayn">Bedreshein</placeName> tomorrow at 8
           o'clock. As <persName ref="Davis_Theodore_M">Theo</persName> and <persName
             ref="Ransom_Williams_Caroline">Carrie</persName> are to make a visit to <placeName
-            ref="Sakkarah">Sakkarah</placeName> we will not be detained.</p>
+              ref="#Ṣaqqâra">Sakkarah</placeName> we will not be detained.</p>
         <p>We saw <persName ref="#Trefusis_Walter">Capt. Trefusis</persName> and his sweet sister
             <persName ref="#Trefusis_Evelyn">Evelyn</persName> who is out with him this winter. They
           lunched with us several times, and she came in to stay one night (they are staying at
@@ -175,7 +175,7 @@
         </dateline>
         <p>A very heavy fog on the river this morning delayed our starting until 9:25 - spent about
           2 hours at <placeName ref="#Al_Minya">Minia</placeName> waiting for mail and express parcels
-          - a good sailing day - tied up at <placeName ref="#Rodah">Rodah</placeName> about 6
+          - a good sailing day - tied up at <placeName ref="#Ar_Rawḍah">Rodah</placeName> about 6
           o'clock.</p>
       </div>
       <div xml:id="EBA-1907-12-09" type="entry"> <dateline>
@@ -700,7 +700,7 @@
             ref="#Williams_Caroline_Ransom">Carrie</persName> and <persName ref="#Jones_Harold"
             >Harold</persName> visited the interesting tombs in <placeName
             ref="#Sheikh_Abd_el-Qurna">Sheik Abdul Gurnah.</placeName>
-          <personGrp ref="Maspero">M. and Mme. Maspero</personGrp> and <persName ref="#Loret_M">M.
+          <persName ref="#Maspero_Gaston" "#Maspero_Louise">M. and Mme. Maspero</persName> and <persName ref="#Loret_M">M.
             Loret</persName> dined with us. Very warm this afternoon.</p>
       </div>
       <div xml:id="EBA-1908-02-03" type="entry">
@@ -772,17 +772,15 @@
         <p>A great gale of wind - filling the air with dust from the excavations on the island. I
           never knew a more disagreeable day. <persName ref="#Jones_Harold">Harold</persName> and
             <persName ref="#Williams_Caroline_Ransom">Carrie</persName> went to <placeName
-            ref="Philae">Philae,</placeName> in spite of it. The big boom was taken down this
+            ref="Philae">Philae</placeName>, in spite of it. The big boom was taken down this
           morning, and we are ready to go down tomorrow.</p>
       </div>
-      <!-- Harold Jones or Harold Smith? -->
       <div xml:id="EBA-1908-02-14" type="entry">
         <dateline><date when="1908-02-14">Feb. 14. Friday.</date></dateline>
         <p>The wind has prevented our starting. <persName ref="#Williams_Caroline_Ransom"
             >Carrie</persName> and I and <persName ref="#Jones_Harold">Harold</persName> tried to
           see the excavations today, but the dust and wind drove us home.</p>
       </div>
-      <!-- Harold Jones or Harold Smith? -->
       <div xml:id="EBA-1908-02-15" type="entry">
         <dateline><date when="1908-02-15">Feb. 15. Saturday.</date></dateline>
         <p>We started down at 9:40 this morning - but the north wind drove us to anchor very near
@@ -808,11 +806,10 @@
       </div>
       <div xml:id="EBA-1908-02-20" type="entry">
         <dateline><date when="1908-02-20">Feb. 20. Thursday.</date></dateline>
-        <p><measure type="distance">34 miles</measure>. <placeName ref="Edfu">Edfu,</placeName> a good days sail. <persName
+        <p><measure type="distance">34 miles</measure>. <placeName ref="Idfu">Edfu</placeName>, a good days sail. <persName
             ref="#Davis_Theodore_M">Theo</persName>, <persName ref="#Jones_Harold">Harold</persName>
           and <persName ref="#Williams_Caroline_Ransom">Carrie</persName> visited the temple.</p>
       </div>
-      <!-- Harold Jones or Harold Smith? -->
       <div xml:id="EBA-1908-02-21" type="entry">
         <dateline><date when="1908-02-21">Feb. 21. Friday.</date></dateline>
         <p><measure type="distance">32 miles</measure>. Very hot all day - sailing all the time.</p>
