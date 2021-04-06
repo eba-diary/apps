@@ -124,7 +124,6 @@ namespace Sentry.data.Web
                 CLA1396_NewEtlColumns = model.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = model.CLA1580_StructureHive,
                 CLA2472_EMRSend = model.CLA2472_EMRSend,
-                CLA2429_SnowflakeCreateTable = model.CLA2429_SnowflakeCreateTable,
                 CLA1286_KafkaFlag = model.CLA1286_KafkaFlag,
                 ObjectStatus = model.ObjectStatus
             };
@@ -203,7 +202,6 @@ namespace Sentry.data.Web
                     "CLA1396_NewEtlColumns|" + schemaDto.CLA1396_NewEtlColumns.ToString(),
                     "CLA1580_StructureHive|" + schemaDto.CLA1580_StructureHive.ToString(),
                     "CLA2472_EMRSend|" + schemaDto.CLA2472_EMRSend.ToString(),
-                    "CLA2429_SnowflakeCreateTable|" + schemaDto.CLA2429_SnowflakeCreateTable.ToString(),
                     "CLA1286_KafkaFlag|" + schemaDto.CLA1286_KafkaFlag.ToString()
                 },
                 DeleteInd = schemaDto.DeleteInd,
@@ -247,7 +245,6 @@ namespace Sentry.data.Web
             model.CLA1396_NewEtlColumns = (config.Schema != null) ? config.Schema.CLA1396_NewEtlColumns : false;
             model.CLA1580_StructureHive = (config.Schema != null) ? config.Schema.CLA1580_StructureHive : false;
             model.CLA2472_EMRSend = (config.Schema != null) ? config.Schema.CLA2472_EMRSend : false;
-            model.CLA2429_SnowflakeCreateTable = (config.Schema != null) ? config.Schema.CLA2429_SnowflakeCreateTable : false;
             model.CLA1286_KafkaFlag = (config.Schema != null) ? config.Schema.CLA1286_KafkaFlag : false;
             model.DeleteInd = config.Schema.DeleteInd;
             model.ObjectStatus = config.ObjectStatus;

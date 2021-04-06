@@ -725,7 +725,7 @@ namespace Sentry.data.Core
         #region PrivateMethods
         private void GenerateConsumptionLayerDeleteEvent(DatasetFileConfig config)
         {
-            //Send message to create hive table
+            //Send message to delete hive table\views
             HiveTableDeleteModel hiveDelete = new HiveTableDeleteModel()
             {
                 SchemaID = config.Schema.SchemaId,
@@ -734,17 +734,14 @@ namespace Sentry.data.Core
             };
             _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveDelete));
 
-            if (config.Schema.CLA2429_SnowflakeCreateTable)
+            //Send message to delete snowflake table\views
+            SnowTableDeleteModel snowDelete = new SnowTableDeleteModel()
             {
-                //Send message to create hive table
-                SnowTableDeleteModel snowDelete = new SnowTableDeleteModel()
-                {
-                    SchemaID = config.Schema.SchemaId,
-                    DatasetID = config.ParentDataset.DatasetId,
-                    InitiatorID = _userService.GetCurrentUser().AssociateId
-                };
-                _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(snowDelete));
-            }
+                SchemaID = config.Schema.SchemaId,
+                DatasetID = config.ParentDataset.DatasetId,
+                InitiatorID = _userService.GetCurrentUser().AssociateId
+            };
+            _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(snowDelete));
         }
 
 
@@ -768,19 +765,16 @@ namespace Sentry.data.Core
 
                 _messagePublisher.PublishDSCEvent(hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel));
 
-                //Only create snowflake table create if feature flag is true
-                if (config.Schema.CLA2429_SnowflakeCreateTable)
+                //Always generate snowflake table create event
+                SnowTableCreateModel snowModel = new SnowTableCreateModel()
                 {
-                    SnowTableCreateModel snowModel = new SnowTableCreateModel()
-                    {
-                        DatasetID = config.ParentDataset.DatasetId,
-                        SchemaID = config.Schema.SchemaId,
-                        RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id,
-                        InitiatorID = _userService.GetCurrentUser().AssociateId
-                    };
+                    DatasetID = config.ParentDataset.DatasetId,
+                    SchemaID = config.Schema.SchemaId,
+                    RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id,
+                    InitiatorID = _userService.GetCurrentUser().AssociateId
+                };
 
-                    _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
-                }
+                _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
             }
         }
         private string GenerateHiveDatabaseName(Category cat)
