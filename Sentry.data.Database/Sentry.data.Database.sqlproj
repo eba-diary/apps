@@ -270,6 +270,9 @@
     <Build Include="Tables\DatasetFileConverted.sql" />
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Dale\Sprint_21_02_03\0_usp_DALE_BaseScanAction_UPDATE.sql" />
     <Build Include="Tables\FeatureEntity.sql" />
+    <Build Include="Views\vw_WeeklyDatasetCheck.sql" />
+    <Build Include="Views\vw_MonthlyDatasetCheck.sql" />
+    <Build Include="Views\vw_DailyDatasetCheck.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
