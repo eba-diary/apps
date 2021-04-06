@@ -78,7 +78,7 @@
         <dateline>
            <date when="1911-12-05">Tuesday, Dec. 5th</date>
         </dateline>
-        <p>Started about 6 this morning - tied up at 5 o'clock, and are 8 miles from <placeName ref="#Benisoef">Benisoef</placeName>. <measure type="distance">40 miles</measure>.</p>
+        <p>Started about 6 this morning - tied up at 5 o'clock, and are <measure type="distance">8 miles<measure> from <placeName ref="#Benisoef">Benisoef</placeName>. <measure type="distance">40 miles</measure>.</p>
       </div>
       <div xml:id="EBA-1911-12-06" type="entry">
         <dateline>
@@ -91,7 +91,7 @@
         <dateline>
            <date when="1911-12-07">Thursday. Dec. 7th</date>
         </dateline>
-       <p><measure type="distance">50-1/2 miles</measure>. The usual start at 6 A.M. - reached <persName>Sheik Fadl</persName> at 10, where the tug stopped for coal, so that we sailed away to <persName>Minia</persName> in fine style and made it at 5 o'clock. A lovely day.</p>
+       <p><measure type="distance">50-1/2 miles</measure>. The usual start at 6 A.M. - reached <placeName ref="#Sheik_Fadl">Sheik Fadl</placeName> at 10, where the tug stopped for coal, so that we sailed away to <placeName ref="#Minieh">Minia</placeName> in fine style and made it at 5 o'clock. A lovely day.</p>
       </div>
       <div xml:id="EBA-1911-12-08" type="entry">
         <dateline>
@@ -103,31 +103,31 @@
         <dateline>
            <date when="1911-12-09">Saturday. Dec. 9th</date>.
         </dateline>
-        <p>55 miles. Started at 6, but there was such a dense fog, that after slowly feeling our way, we stopped at 7:30 sailed until 4:30, when in a sudden turn of the river, the dahabya collided with the tug with such force, that she broke her steering gear. The men are working at it now.</p>
+        <p><measure type="distance">55 miles</measure>. Started at 6, but there was such a dense fog, that after slowly feeling our way, we stopped at 7:30 sailed until 4:30, when in a sudden turn of the river, the dahabya collided with the tug with such force, that she broke her steering gear. The men are working at it now.</p>
       </div>
       <div xml:id="EBA-1911-12-10" type="entry">
         <dateline>
            <date when="1911-12-10">Sunday. Dec. 10th</date>.
         </dateline>
-        <p>34 miles. The men worked all night, and the tug was able to go on as usual. We landed at <placeName>Asy&#251;t</placeName> at 10:20, staying until 12 - and tied up at 5:30. Monday.</p>
+        <p><measure type="distance">34 miles</measure>. The men worked all night, and the tug was able to go on as usual. We landed at <placeName>Asy&#251;t</placeName> at 10:20, staying until 12 - and tied up at 5:30.</p>
       </div>
       <div xml:id="EBA-1911-12-11" type="entry">
         <dateline>
-           <date when="1911-12-11">Dec. 11th</date>.
+           <date when="1911-12-11">Monday. Dec. 11th</date>.
         </dateline>
-        <p>43 miles. The river about here is enormously wide, and the channel difficult, so we have had to proceed<pb n="90"/> cautiously - and are now lying at <placeName>Sohag</placeName>.</p>
+        <p><measure type="distance">43 miles</measure>. The river about here is enormously wide, and the channel difficult, so we have had to proceed<pb n="90"/> cautiously - and are now lying at <placeName>Sohag</placeName>.</p>
       </div>
       <div xml:id="EBA-1911-12-12" type="entry">
         <dateline>
            <date when="1911-12-12">Tuesday. Dec. 12 and Wed. 13th</date>.
         </dateline>
-        <p>51 miles. Reached <persName>Nag Hamadi</persName> at 7:30, just after the bridge opened, indeed we practically reached it last night. A most lovely day.</p>
+        <p><measure type="distance">51 miles</measure>. Reached <persName>Nag Hamadi</persName> at 7:30, just after the bridge opened, indeed we practically reached it last night. A most lovely day.</p>
       </div>
       <div xml:id="EBA-1911-12-14" type="entry">
         <dateline>
            <date when="1911-12-14">Dec. 14th. Thursday</date>.
         </dateline>
-        <p>47 miles. We arrived this afternoon about 3:30, and came very nearly to our old tying ground. The sand bank is vast - and water very shallow. We have made our voyage in 14 days from our landing place in <placeName>Cairo</placeName> - but last year we took only 10 days.</p>
+        <p><measure type="distance">47 miles</measure>. We arrived this afternoon about 3:30, and came very nearly to our old tying ground. The sand bank is vast - and water very shallow. We have made our voyage in 14 days from our landing place in <placeName>Cairo</placeName> - but last year we took only 10 days.</p>
       </div>
       <div xml:id="EBA-1911-12-16" type="entry">
         <dateline>
@@ -145,8 +145,9 @@
         <dateline>
            <date when="1911-12-31">Sunday. Dec. 31st. First Sunday after Christmas</date>.
         </dateline>
-        <p>A quiet week. <persName ref="#Davis_Theodore_M">Theo</persName> in the <placeName>Valley</placeName> since Wednesday - but returns today. Mr. <persName>Anthony</persName> had tea with us on Friday. The girls and I have amused ourselves in many ways. The weather cold, with high winds. River falling rapidly - and the sand roof which has formed so rapidly between us and the main channel shows each day more prominently.</p>
+        <p>A quiet week. <persName ref="#Davis_Theodore_M">Theo</persName> in the <placeName ref="#Valley_of_the_Kings">Valley</placeName> since Wednesday - but returns today. Mr. <persName>Anthony</persName> had tea with us on Friday. The girls and I have amused ourselves in many ways. The weather cold, with high winds. River falling rapidly - and the sand roof which has formed so rapidly between us and the main channel shows each day more prominently.</p>
       </div>
+      <!--[Next 1/3]-->
       <div xml:id="EBA-1912-01-07" type="entry">
         <dateline>
            <date when="1912-01-07">Sunday. 1st after Epiphany. Jan. 7th</date>.
