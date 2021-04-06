@@ -312,6 +312,28 @@ namespace Sentry.data.Core
             var schemaflowName = GetDataFlowNameForFileSchema(scm);
             DataFlow schemaFlow = _datasetContext.DataFlow.FirstOrDefault(w => w.Name == schemaflowName);
 
+            //some legacy dataset\schema may not have associated schema flow
+            if (schemaFlow == null)
+            {
+                Logger.Debug($"Schema Flow not found by name, attempting to detect by id...");
+
+                SchemaMap mappedStep = _datasetContext.SchemaMap.SingleOrDefault(w => w.MappedSchema.SchemaId == scm.SchemaId && w.DataFlowStepId.Action.Name == "Schema Load");
+                if (mappedStep != null)
+                {
+                    Logger.Debug($"detected schema flow by Id");
+                    schemaFlow = _datasetContext.DataFlowStep.FirstOrDefault(w => w.Id == mappedStep.Id).DataFlow;
+                }
+                else
+                {
+                    Logger.Debug($"schema flow not detected by id");
+                    Logger.Debug($"no schema flow associated with schema");
+                    Logger.Debug($"End method <{methodName}>");
+                    return;
+                }
+            }
+
+            Logger.Debug($"schema flow name: {schemaFlow.Name}");
+
             if (logicalDelete)
             {
 
@@ -386,10 +408,13 @@ namespace Sentry.data.Core
 
                 List<int> producerDataflowIdForDeleteList = GetProducerFlowsToBeDisabledBySchemaId(scm.SchemaId);
 
+                Logger.Debug(producerDataflowIdForDeleteList.Any() ? $"detected {producerDataflowIdForDeleteList.Count} producer flows for delete" : $"detected 0 producer flows for delete");
+
                 /* Mark Dataflow for deletion */
                 foreach (int dataFlowId in producerDataflowIdForDeleteList)
                 {
                     DataFlow producerFlow = _datasetContext.DataFlow.FirstOrDefault(w => w.Id == dataFlowId);
+                    Logger.Debug($"marking {producerFlow.Name} producer flow as deleted");
                     producerFlow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
                 }
             }

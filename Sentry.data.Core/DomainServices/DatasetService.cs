@@ -305,7 +305,7 @@ namespace Sentry.data.Core
         public bool Delete(int datasetId, bool logicalDelete = true)
         {
             string methodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-            Logger.Debug($"Start Method <{methodName}");
+            Logger.Debug($"Start Method <{methodName}>");
             bool result;
             Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
 
@@ -370,7 +370,7 @@ namespace Sentry.data.Core
                 }                    
             }
 
-            Logger.Debug($"End Method <{methodName}");
+            Logger.Debug($"End Method <{methodName}>");
 
             return result;
         }

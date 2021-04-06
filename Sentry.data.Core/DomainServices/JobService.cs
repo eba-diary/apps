@@ -191,10 +191,20 @@ namespace Sentry.data.Core
             {
                 RetrieverJob job = _datasetContext.GetById<RetrieverJob>(id);
 
-                job.IsEnabled = false;
-                job.Modified = DateTime.Now;
+                if (job != null)
+                {
+                    Logger.Debug($"disabling job - jobid:{job.Id.ToString()}:::datasource:{job.DataSource.Name}");
 
-                _datasetContext.SaveChanges();
+                    job.IsEnabled = false;
+                    job.Modified = DateTime.Now;
+
+                    _datasetContext.SaveChanges();
+                }
+                else
+                {
+                    Logger.Debug($"job not found - jobid:{id.ToString()}");
+                }
+                
             } catch (Exception ex)
             {
                 Logger.Error($"{methodName} - failed to disable job - jobid:{id}", ex);
