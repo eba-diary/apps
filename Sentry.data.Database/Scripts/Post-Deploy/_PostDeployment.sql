@@ -27,6 +27,7 @@ All new files added for staic data or scripts should have it's properties update
 :r ..\Post-Deploy\StaticData\BusinessAreaTileRow_BusinessAreaTile.sql
 :r ..\Post-Deploy\StaticData\DataActionTypes.sql
 :r ..\Post-Deploy\StaticData\DataAction.sql
+:r ..\Post-Deploy\StaticData\ObjectStatus.sql
 
 
 --Now only run these scripts if the versioning allows us.
