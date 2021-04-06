@@ -36,6 +36,7 @@ namespace Sentry.data.Core
 
         public DatasetDto GetDatasetDto(int id)
         {
+            // TODO: CLA-2765 - Filter only datasets with ACTIVE or PENDING_DELETE status
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
             DatasetDto dto = new DatasetDto();
             MapToDto(ds, dto);
@@ -302,7 +303,10 @@ namespace Sentry.data.Core
         }
 
         public bool Delete(int datasetId, bool logicalDelete = true)
-        {            
+        {
+            string methodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
+            Logger.Debug($"Start Method <{methodName}>");
+            bool result;
             Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
 
             if (logicalDelete)
@@ -314,17 +318,17 @@ namespace Sentry.data.Core
                     //Mark dataset for soft delete
                     MarkForDelete(ds);
 
-                    //Remove any favorite links to ensure users do not get dead link
-                    foreach(var fav in ds.Favorities)
-                    {
-                        _datasetContext.RemoveById<Favorite>(fav.FavoriteId);
-                    }
+                    ////Remove any favorite links to ensure users do not get dead link
+                    //foreach(var fav in ds.Favorities)
+                    //{
+                    //    _datasetContext.RemoveById<Favorite>(fav.FavoriteId);
+                    //}
 
-                    //Remove any notification subscriptions to dataset
-                    foreach (var subscib in _datasetContext.GetSubscriptionsForDataset(ds.DatasetId))
-                    {
-                        _datasetContext.RemoveById<DatasetSubscription>(subscib.ID);
-                    }
+                    ////Remove any notification subscriptions to dataset
+                    //foreach (var subscib in _datasetContext.GetSubscriptionsForDataset(ds.DatasetId))
+                    //{
+                    //    _datasetContext.RemoveById<DatasetSubscription>(subscib.ID);
+                    //}
                     
                     //Mark Configs for soft delete to ensure no editing and jobs are disabled
                     foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
@@ -334,12 +338,12 @@ namespace Sentry.data.Core
 
                     _datasetContext.SaveChanges();
 
-                    return true;
+                    result = true;
                 }
                 catch (Exception ex)
                 {
                     Logger.Error($"datasetservice-delete-logical failed", ex);
-                    return false;
+                    result = false;
                 }
                     
             }
@@ -354,18 +358,21 @@ namespace Sentry.data.Core
                         _configService.Delete(config.ConfigId, logicalDelete, true);
                     }
 
-                    _datasetContext.RemoveById<Dataset>(ds.DatasetId);
+                    ds.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
                     _datasetContext.SaveChanges();
 
-                    return true;
+                    result = true;
                 }
                 catch (Exception ex)
                 {
                     Logger.Error($"datasetservice-delete failed", ex);
-                    return false;
+                    result = false;
                 }                    
             }
-            
+
+            Logger.Debug($"End Method <{methodName}>");
+
+            return result;
         }
         
         public List<string> Validate(DatasetDto dto)
@@ -414,6 +421,7 @@ namespace Sentry.data.Core
             ds.DeleteInd = true;
             ds.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
             ds.DeleteIssueDTM = DateTime.Now;
+            ds.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
         }
 
         private Dataset CreateDataset(DatasetDto dto)
@@ -439,7 +447,8 @@ namespace Sentry.data.Core
                 DatasetFiles = null,
                 DatasetFileConfigs = null,
                 DeleteInd = false,
-                DeleteIssueDTM = DateTime.MaxValue
+                DeleteIssueDTM = DateTime.MaxValue,
+                ObjectStatus = GlobalEnums.ObjectStatusEnum.Active
             };
 
             switch (dto.DataClassification)
@@ -486,6 +495,7 @@ namespace Sentry.data.Core
             dto.DatasetType = ds.DatasetType;
             dto.DataClassification = ds.DataClassification;
             dto.CategoryColor = ds.DatasetCategories.FirstOrDefault().Color;
+            dto.ObjectStatus = ds.ObjectStatus;
 
             dto.CreationUserId = ds.CreationUserName;
             dto.CreationUserName = ds.CreationUserName;

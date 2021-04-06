@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 
@@ -16,6 +17,9 @@ namespace Sentry.data.Web
             CreatedDTM = dto.CreateDTM;
             FlowStorageCode = dto.FlowStorageCode;
             AssociatedJobs = dto.AssociatedJobs;
+            ObjectStatus = dto.ObjectStatus;
+            DeleteIssuer = dto.DeleteIssuer;
+            DeleteIssueDTM = dto.DeleteIssueDTM;
         }
 
         public int Id { get; set; }
@@ -29,5 +33,8 @@ namespace Sentry.data.Web
         /// Associated retriever job which pull data from external sources
         /// </summary>
         public List<int> AssociatedJobs { get; set; }
+        public ObjectStatusEnum ObjectStatus { get; set; }
+        public string DeleteIssuer { get; set; }
+        public DateTime DeleteIssueDTM { get; set; }
     }
 }

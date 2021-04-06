@@ -218,19 +218,15 @@ namespace Sentry.data.Core
                     exceptions.Add(ex);
                 }
 
-
-                if (schema.CLA2429_SnowflakeCreateTable)
+                try
                 {
-                    try
-                    {
-                        Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sending sas notification email for snowflake...");
-                        SasNotification(schema, SASNotificationType, CurrentViewNotificationType, _userService.GetCurrentUser(), "SNOWFLAKE");
-                        Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sent sas notification email for snowflake...");
-                    }
-                    catch (Exception ex)
-                    {
-                        exceptions.Add(ex);
-                    }
+                    Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sending sas notification email for snowflake...");
+                    SasNotification(schema, SASNotificationType, CurrentViewNotificationType, _userService.GetCurrentUser(), "SNOWFLAKE");
+                    Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sent sas notification email for snowflake...");
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
                 }
             }
 
@@ -263,28 +259,12 @@ namespace Sentry.data.Core
 
         private void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
         {
-            /*Generate create event when:
-            *  - CreateCurrentView changes, regardless which way
-            *  - CLA2429_SnowflakeCreateTable changes to true
+            /*Generate *-CREATE-TABLE-REQUESTED event when:
+            *  - CreateCurrentView changes
             */
-            if (
-                //(propertyDeltaList.ContainsKey("createcurrentview") && propertyDeltaList.GetValue("createcurrentview").ToString().ToLower() == "true") ||
-                (propertyDeltaList.ContainsKey("createcurrentview")) ||
-                (propertyDeltaList.ContainsKey("cla2429_snowflakecreatetable") && propertyDeltaList.GetValue("cla2429_snowflakecreatetable").ToString().ToLower() == "true")
-                )
+            if (propertyDeltaList.ContainsKey("createcurrentview"))
             {
                 GenerateConsumptionLayerCreateEvent(schema, propertyDeltaList);
-            }
-
-            /*Generate delete event when:
-             *  - CLA2429_SnowflakeCreateTable changes to false
-             */
-            if (
-                //(propertyDeltaList.ContainsKey("createcurrentview") && propertyDeltaList.GetValue("createcurrentview").ToString() == "false") ||
-                (propertyDeltaList.ContainsKey("cla2429_snowflakecreatetable") && propertyDeltaList.GetValue("cla2429_snowflakecreatetable").ToString() == "false")
-                )
-            {
-                GenerateConsumptionLayerDeleteEvent(schema, propertyDeltaList);
             }
         }
 
@@ -299,28 +279,26 @@ namespace Sentry.data.Core
 
             //Do nothing if there is no revision associated with schema
             if (latestRevision == null)
-            { return; }
+            {
+                Logger.Debug($"<generateconsumptionlayercreateevent> - consumption layer event not generated - no schema revision");
+                return;
+            }
                         
             int dsId = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset.DatasetId).FirstOrDefault();
 
-            bool sendHiveMessage = false;
+            bool generateEvent = false;
             /* schema column updates trigger, this will trigger for initial schema column add along with any updates there after */
             if (propertyDeltaList.ContainsKey("revision") && propertyDeltaList.GetValue("revision").ToString().ToLower() == "added")
             {
-                sendHiveMessage = true;
-            }
-            /* schema configuration trigger for IsInSAS */
-            else if (propertyDeltaList.ContainsKey("isinsas") && propertyDeltaList.GetValue("isinsas").ToString().ToLower() == "true")
-            {
-                sendHiveMessage = true;
+                generateEvent = true;
             }
             /* schema configuration trigger for createCurrentView regardless true\false */
             else if (propertyDeltaList.ContainsKey("createcurrentview"))
             {
-                sendHiveMessage = true;
+                generateEvent = true;
             }
 
-            if (sendHiveMessage)
+            if (generateEvent)
             {
                 HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
                 {
@@ -335,26 +313,8 @@ namespace Sentry.data.Core
                 Logger.Debug($"<generateconsumptionlayercreateevent> sending {hiveCreate.EventType.ToLower()} event...");
                 _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
                 Logger.Debug($"<generateconsumptionlayercreateevent> sent {hiveCreate.EventType.ToLower()} event");
-            }
 
 
-            bool sendSnowMessage = false;
-            if (propertyDeltaList.ContainsKey("revision") && propertyDeltaList.GetValue("revision").ToString().ToLower() == "added" && schema.CLA2429_SnowflakeCreateTable)
-            {
-                sendSnowMessage = true;
-            }
-            else if (propertyDeltaList.ContainsKey("cla2429_snowflakecreatetable") && propertyDeltaList.GetValue("cla2429_snowflakecreatetable").ToString().ToLower() == "true")
-            {
-                sendSnowMessage = true;
-            }
-            /* schema configuration trigger for createCurrentView regardless true\false */
-            else if (propertyDeltaList.ContainsKey("createcurrentview") && schema.CLA2429_SnowflakeCreateTable)
-            {
-                sendSnowMessage = true;
-            }
-
-            if (sendSnowMessage)
-            {
                 SnowTableCreateModel snowModel = new SnowTableCreateModel()
                 {
                     DatasetID = dsId,
@@ -367,7 +327,7 @@ namespace Sentry.data.Core
                 Logger.Debug($"<generateconsumptionlayercreateevent> sending {snowModel.EventType.ToLower()} event...");
                 _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
                 Logger.Debug($"<generateconsumptionlayercreateevent> sent {snowModel.EventType.ToLower()} event");
-            }       
+            }     
         }
 
         private void GenerateConsumptionLayerDeleteEvent(FileSchema schema, JObject propertyDeltaList)
@@ -464,17 +424,6 @@ namespace Sentry.data.Core
             {
                 schema.CLA2472_EMRSend = dto.CLA2472_EMRSend;
                 chgDetected = true;
-            }
-
-            if (schema.CLA2429_SnowflakeCreateTable != dto.CLA2429_SnowflakeCreateTable)
-            {
-                schema.CLA2429_SnowflakeCreateTable = dto.CLA2429_SnowflakeCreateTable;
-                chgDetected = true;
-
-                if (whatPropertiesChanged != "{")
-                { whatPropertiesChanged += ","; }
-
-                whatPropertiesChanged += $"\"cla2429_snowflakecreatetable\":\"{schema.CLA2429_SnowflakeCreateTable.ToString().ToLower()}\"";
             }
 
             if (schema.CLA1286_KafkaFlag != dto.CLA1286_KafkaFlag)
@@ -816,8 +765,8 @@ namespace Sentry.data.Core
                 CLA1396_NewEtlColumns = dto.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = dto.CLA1580_StructureHive,
                 CLA2472_EMRSend = dto.CLA2472_EMRSend,
-                CLA2429_SnowflakeCreateTable = dto.CLA2429_SnowflakeCreateTable,
-                CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag
+                CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag,
+                ObjectStatus = dto.ObjectStatus
             };
             _datasetContext.Add(schema);
             return schema;
@@ -837,6 +786,7 @@ namespace Sentry.data.Core
                 SchemaEntity_NME = scm.SchemaEntity_NME,
                 SchemaId = scm.SchemaId,
                 Description = scm.Description,
+                ObjectStatus = scm.ObjectStatus,
                 DeleteInd = scm.DeleteInd,
                 DeleteIssuer = scm.DeleteIssuer,
                 DeleteIssueDTM = scm.DeleteIssueDTM,
@@ -855,7 +805,6 @@ namespace Sentry.data.Core
                 CLA1396_NewEtlColumns = scm.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = scm.CLA1580_StructureHive,
                 CLA2472_EMRSend = scm.CLA2472_EMRSend,
-                CLA2429_SnowflakeCreateTable = scm.CLA2429_SnowflakeCreateTable,
                 CLA1286_KafkaFlag = scm.CLA1286_KafkaFlag
             };
 

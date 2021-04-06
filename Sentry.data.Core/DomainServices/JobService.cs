@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using static Sentry.data.Core.RetrieverJobOptions;
 using Hangfire;
+using System.Reflection;
 
 namespace Sentry.data.Core
 {
@@ -184,19 +185,32 @@ namespace Sentry.data.Core
 
         public void DisableJob(int id)
         {
+            string methodName = MethodBase.GetCurrentMethod().Name.ToLower();
+            Logger.Debug($"Start method <{methodName}>");
             try
             {
                 RetrieverJob job = _datasetContext.GetById<RetrieverJob>(id);
 
-                job.IsEnabled = false;
-                job.Modified = DateTime.Now;
+                if (job != null)
+                {
+                    Logger.Debug($"disabling job - jobid:{job.Id.ToString()}:::datasource:{job.DataSource.Name}");
 
-                _datasetContext.SaveChanges();
+                    job.IsEnabled = false;
+                    job.Modified = DateTime.Now;
+
+                    _datasetContext.SaveChanges();
+                }
+                else
+                {
+                    Logger.Debug($"job not found - jobid:{id.ToString()}");
+                }
+                
             } catch (Exception ex)
             {
-                Logger.Error($"jobservice-disablejob-failed - jobid:{id}", ex);
+                Logger.Error($"{methodName} - failed to disable job - jobid:{id}", ex);
                 throw;
-            }            
+            }
+            Logger.Debug($"End method <{methodName}>");
         }
 
         public void DeleteJob(int id)

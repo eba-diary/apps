@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 
 namespace Sentry.data.Core
@@ -41,6 +42,7 @@ namespace Sentry.data.Core
         public string CategoryColor { get; set; }
         public List<string> CategoryNames { get; set; }
         public UserSecurity Security { get; set; }
+        public ObjectStatusEnum ObjectStatus { get; set; }
 
     }
 }

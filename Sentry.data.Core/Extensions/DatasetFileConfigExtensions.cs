@@ -24,7 +24,8 @@ namespace Sentry.data.Core
                 FileExtensionId = dsDto.FileExtensionId,
                 Delimiter = dsDto.Delimiter,
                 HasHeader = dsDto.HasHeader,
-                CreateCurrentView = dsDto.CreateCurrentView
+                CreateCurrentView = dsDto.CreateCurrentView,
+                ObjectStatus = dsDto.ObjectStatus
             };
             dto.Schemas = delist;
             return dto;
@@ -41,7 +42,8 @@ namespace Sentry.data.Core
                 IsInSas = dsDto.IsInSAS,
                 Description = dsDto.ConfigFileDesc,
                 ParentDatasetId = dsDto.DatasetId,
-                CreateCurrentView = dsDto.CreateCurrentView
+                CreateCurrentView = dsDto.CreateCurrentView,
+                ObjectStatus = dsDto.ObjectStatus
             };
         }
     }

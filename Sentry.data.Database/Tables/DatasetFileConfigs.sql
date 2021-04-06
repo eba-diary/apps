@@ -12,6 +12,7 @@
     [DeleteIssueDTM] VARCHAR(100) NULL, 
     [IsSchemaTracked] BIT NOT NULL, 
     [Schema_Id] INT NULL, 
+    [ObjectStatus] INT NULL DEFAULT 1, 
     CONSTRAINT [PK_DatasetFileConfigs] PRIMARY KEY CLUSTERED ([Config_ID] ASC),
     CONSTRAINT [FK_DatasetFileConfigs_Dataset] FOREIGN KEY ([Dataset_ID]) REFERENCES [dbo].[Dataset] ([Dataset_ID]),
     CONSTRAINT [FK_DatasetFileConfigs_DatasetScopeTypes] FOREIGN KEY ([DatasetScopeType_ID]) REFERENCES [dbo].[DatasetScopeTypes] ([ScopeType_ID]),

@@ -161,7 +161,7 @@ namespace Sentry.data.Infrastructure
 
             foreach (Favorite fav in favsList)
             {
-                Dataset ds = Query<Dataset>().Where(w => w.DatasetId == fav.DatasetId).FetchMany(w => w.DatasetFileConfigs).FirstOrDefault();
+                Dataset ds = Query<Dataset>().Where(w => w.DatasetId == fav.DatasetId && w.ObjectStatus == Core.GlobalEnums.ObjectStatusEnum.Active).FetchMany(w => w.DatasetFileConfigs).FirstOrDefault();
 
                 if (ds != null)
                 {
