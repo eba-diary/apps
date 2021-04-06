@@ -83,7 +83,8 @@ namespace Sentry.data.Web
                 IngestionType = model.IngestionType,
                 IsCompressed = model.IsCompressed,
                 IsPreProcessingRequired = model.IsPreProcessingRequired,
-                PreProcessingOptions = model.PreprocessingOptions.Select(s => (DataFlowPreProcessingTypes)Enum.ToObject(typeof(DataFlowPreProcessingTypes), s)).ToList()
+                PreProcessingOptions = model.PreprocessingOptions.Select(s => (DataFlowPreProcessingTypes)Enum.ToObject(typeof(DataFlowPreProcessingTypes), s)).ToList(),
+                ObjectStatus = model.ObjectStatus
             };            
 
             if (model.SchemaMaps != null)

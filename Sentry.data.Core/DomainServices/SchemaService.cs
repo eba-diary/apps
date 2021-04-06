@@ -765,7 +765,8 @@ namespace Sentry.data.Core
                 CLA1396_NewEtlColumns = dto.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = dto.CLA1580_StructureHive,
                 CLA2472_EMRSend = dto.CLA2472_EMRSend,
-                CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag
+                CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag,
+                ObjectStatus = dto.ObjectStatus
             };
             _datasetContext.Add(schema);
             return schema;
@@ -785,6 +786,7 @@ namespace Sentry.data.Core
                 SchemaEntity_NME = scm.SchemaEntity_NME,
                 SchemaId = scm.SchemaId,
                 Description = scm.Description,
+                ObjectStatus = scm.ObjectStatus,
                 DeleteInd = scm.DeleteInd,
                 DeleteIssuer = scm.DeleteIssuer,
                 DeleteIssueDTM = scm.DeleteIssueDTM,

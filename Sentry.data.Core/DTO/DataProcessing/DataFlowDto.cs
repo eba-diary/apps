@@ -26,5 +26,8 @@ namespace Sentry.data.Core
         /// Associated RetrieverJobs which pull data from external sources
         /// </summary>
         public List<int> AssociatedJobs { get; set; }
+        public ObjectStatusEnum ObjectStatus { get; set; }
+        public string DeleteIssuer { get; set; }
+        public DateTime DeleteIssueDTM { get; set; }
     }
 }

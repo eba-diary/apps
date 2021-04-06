@@ -1,7 +1,4 @@
-﻿using Sentry.data.Common;
-using Sentry.data.Core;
-using Sentry.data.Infrastructure;
-using StructureMap;
+﻿using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -110,6 +107,7 @@ namespace Sentry.data.Web
             }
 
             this.CreatedDtm = ds.DatasetDtm.ToShortDateString();
+            this.ObjectStatus = ds.ObjectStatus.GetDescription();
         }
 
         public string Category { get; set; }
@@ -151,5 +149,7 @@ namespace Sentry.data.Web
         public List<string> DatasetFunctions { get; set; }
         public int PageViews { get; set; }
         public List<ContactInfoModel> ContactDetails { get; set; }
+        public string ObjectStatus { get; set; }
+        public Boolean IsAdmin { get; set; }
     }
 }

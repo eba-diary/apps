@@ -22,6 +22,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property(x => x.CreatedDTM, m => m.Column("Created_DTM"));
             Property(x => x.LastUpdatedDTM, m => m.Column("LastUpdatd_DTM"));
             Property(x => x.Description, m => m.Column("Description"));
+            Property(x => x.ObjectStatus, m => m.Column("ObjectStatus"));
             Property(x => x.DeleteInd, m => m.Column("DeleteInd"));
             Property(x => x.DeleteIssuer, m => m.Column("DeleteIssuer"));
             Property(x => x.DeleteIssueDTM, m => m.Column("DeleteIssueDTM"));

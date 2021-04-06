@@ -21,6 +21,7 @@
     [DeleteInd] BIT NOT NULL DEFAULT 0, 
     [DeleteIssuer] VARCHAR(10) NULL, 
     [DeleteIssueDTM] DATETIME NOT NULL, 
+    [ObjectStatus] INT NOT NULL DEFAULT 1, 
     PRIMARY KEY CLUSTERED 
 (
 	[Dataset_ID] ASC

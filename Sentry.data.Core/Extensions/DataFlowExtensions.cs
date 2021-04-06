@@ -29,7 +29,10 @@ namespace Sentry.data.Core
                 SaidKeyCode = df.SaidKeyCode,
                 Name = df.Name,
                 CreateDTM = df.CreatedDTM,
-                CreatedBy = df.CreatedBy
+                CreatedBy = df.CreatedBy,
+                ObjectStatus = df.ObjectStatus,
+                DeleteIssuer = df.DeleteIssuer,
+                DeleteIssueDTM = df.DeleteIssueDTM
             };
         }
 

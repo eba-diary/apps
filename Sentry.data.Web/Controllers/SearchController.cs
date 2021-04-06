@@ -1,31 +1,11 @@
-﻿using Sentry.Core;
+﻿using Newtonsoft.Json;
 using Sentry.data.Core;
-using Amazon;
-using Amazon.S3;
-using Amazon.S3.Model;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Linq.Dynamic;
 using System.Web.Mvc;
 using System.Web.SessionState;
-using System.Linq.Dynamic;
-using System.Web;
-using Sentry.data.Web.Helpers;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using System.Net;
-using System.Text;
-using Sentry.data.Infrastructure;
-using Sentry.DataTables.Shared;
-using Sentry.DataTables.Mvc;
-using Sentry.DataTables.QueryableAdapter;
-using Sentry.data.Common;
-using System.Diagnostics;
-using LazyCache;
-using StackExchange.Profiling;
-using Sentry.Common.Logging;
-using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -161,11 +141,13 @@ namespace Sentry.data.Web.Controllers
 
             switch (searchType)
             {
+                // TODO: CLA-2765 - Add filtering on ObjectStatus = 'Active' || 'Delete Pending' status
                 case "BusinessIntelligence":
                     dsQuery = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.REPORT && x.CanDisplay);
                     break;
                 case "Datasets":
-                    dsQuery = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET && w.CanDisplay);
+                    dsQuery = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET 
+                                        && (w.ObjectStatus == Core.GlobalEnums.ObjectStatusEnum.Active || w.ObjectStatus == Core.GlobalEnums.ObjectStatusEnum.Pending_Delete));
                     break;
                 default:
                     if (user.IsAdmin)
@@ -189,6 +171,7 @@ namespace Sentry.data.Web.Controllers
                     IsFavorite = ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId),
                     PageViews = (summaryExists) ? dsSummaryList.First(x => x.DatasetId == ds.DatasetId).ViewCount : 0,
                     CanEditDataset = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? SharedContext.CurrentUser.CanManageReports : false,
+                    IsAdmin = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? false : SharedContext.CurrentUser.IsAdmin,
                     ChangedDtm = (summaryExists) ? dsSummaryList.FirstOrDefault(w => w.DatasetId == ds.DatasetId).Max_Created_DTM.ToShortDateString() : ds.ChangedDtm.ToShortDateString()
             };
                 models.Add(sm);

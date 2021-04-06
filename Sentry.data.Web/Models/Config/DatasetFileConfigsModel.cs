@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -63,6 +64,7 @@ namespace Sentry.data.Web
             this.CLA1580_StructureHive = (dto.Schema != null) ? dto.Schema.CLA1580_StructureHive : false;
             this.CLA2472_EMRSend = (dto.Schema != null) ? dto.Schema.CLA2472_EMRSend : false;
             this.CLA1286_KafkaFlag = (dto.Schema != null) ? dto.Schema.CLA1286_KafkaFlag : false;
+            this.ObjectStatus = dto.ObjectStatus;
             //this.CLA24 = (dto.Schema != null) ? dto.Schema.CLA1580_StructureHive : false;
         }
 
@@ -174,5 +176,6 @@ namespace Sentry.data.Web
         public UserSecurity Security { get; set; }
         public string SasLibrary { get; set; }
         public bool DeleteInd { get; set; }
+        public ObjectStatusEnum ObjectStatus { get; set; }
     }
 }

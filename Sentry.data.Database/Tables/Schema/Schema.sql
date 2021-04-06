@@ -29,5 +29,6 @@
     [SnowflakeDatabase] VARCHAR(250) NULL,
 	[SnowflakeSchema] VARCHAR(250) NULL,
     [SnowflakeStatus] VARCHAR(250) NULL, 
+    [ObjectStatus] INT NULL DEFAULT 1, 
     CONSTRAINT [FK_Schema_FileExtension] FOREIGN KEY ([FileExtension_Id]) REFERENCES [FileExtension]([Extension_Id]) 
 )
