@@ -99,7 +99,7 @@
            <date when="1911-12-08">Friday. Dec. 8th</date>.
            <measure type="distance">50 miles</measure>.
         </dateline>
-        <p>Off at 6 A.M. bringing up at 5:30 P.M. at the beginning of the <placeName>Abu Feda</placeName> Gebel.</p>
+        <p>Off at 6 A.M. bringing up at 5:30 P.M. at the beginning of the <placeName ref="#Abu_Fudah_Jabal">Abu Feda Gebel</placeName>.</p>
       </div>
       <div xml:id="EBA-1911-12-09" type="entry">
         <dateline>
@@ -113,21 +113,21 @@
            <date when="1911-12-10">Sunday. Dec. 10th</date>.
            <measure type="distance">34 miles</measure>.
         </dateline>
-        <p>The men worked all night, and the tug was able to go on as usual. We landed at <placeName>Asy&#251;t</placeName> at 10:20, staying until 12 - and tied up at 5:30.</p>
+        <p>The men worked all night, and the tug was able to go on as usual. We landed at <placeName ref="#Asyut">Asy&#251;t</placeName> at 10:20, staying until 12 - and tied up at 5:30.</p>
       </div>
       <div xml:id="EBA-1911-12-11" type="entry">
         <dateline>
            <date when="1911-12-11">Monday. Dec. 11th</date>.
            <measure type="distance">43 miles</measure>.
         </dateline>
-        <p>The river about here is enormously wide, and the channel difficult, so we have had to proceed<pb n="90"/> cautiously - and are now lying at <placeName>Sohag</placeName>.</p>
+        <p>The river about here is enormously wide, and the channel difficult, so we have had to proceed<pb n="90"/> cautiously - and are now lying at <placeName ref="#Sohag">Sohag</placeName>.</p>
       </div>
       <div xml:id="EBA-1911-12-12" type="entry">
         <dateline>
            <date when="1911-12-12">Tuesday. Dec. 12 and Wed. 13th</date>.
            <measure type="distance">51 miles</measure>.
         </dateline>
-        <p>Reached <persName>Nag Hamadi</persName> at 7:30, just after the bridge opened, indeed we practically reached it last night. A most lovely day.</p>
+        <p>Reached <placeName ref="#Naj_Hammadi ">Nag Hamadi</placeName> at 7:30, just after the bridge opened, indeed we practically reached it last night. A most lovely day.</p>
       </div>
       <div xml:id="EBA-1911-12-14" type="entry">
         <dateline>
@@ -146,13 +146,13 @@
         <dateline>
            <date when="1911-12-24">Sunday. Dec. 24th. Fourth Sunday in Advent</date>.
         </dateline> 
-        <p>I have little to chronicle this week. <persName ref="#Davis_Theodore_M">Theo</persName> did not come until the afternoon of the 6th day of his absence - and looking so much better - and happy to be in his beloved <placeName ref="#Valley_of_the_Kings">Valley</placeName> and at work once more. <persName>Harry Burton</persName> and <persName>Lancelot Crane</persName> are there and hard at work, and <persName ref="#Davis_Theodore_M">Theo</persName> says the little house is in fine order, cleaned, disinfected, colour washed etc. and that it is comfortable and pleasant. <pb n="91"/>Mrs. Weigall, Mr. Winlock, Mr. <persName>Carter</persName> and <persName>Mr. Lasco</persName> have been here.</p>
+        <p>I have little to chronicle this week. <persName ref="#Davis_Theodore_M">Theo</persName> did not come until the afternoon of the 6th day of his absence - and looking so much better - and happy to be in his beloved <placeName ref="#Valley_of_the_Kings">Valley</placeName> and at work once more. <persName ref="#Burton_Harry">Harry Burton</persName> and <persName ref="#Crane_Lancelot">Lancelot Crane</persName> are there and hard at work, and <persName ref="#Davis_Theodore_M">Theo</persName> says the little house is in fine order, cleaned, disinfected, colour washed etc. and that it is comfortable and pleasant. <pb n="91"/><persName ref="#Weigall_Hortense">Mrs. Weigall</persName>, <persName ref="Winlock_Herbert">Mr. Winlock</persName>, <persName ref="#Carter_Howard">Mr. Carter</persName> and <persName ref="#Lasco_Mr">Mr. Lasco</persName> have been here.</p>
       </div>
       <div xml:id="EBA-1911-12-31" type="entry">
         <dateline>
            <date when="1911-12-31">Sunday. Dec. 31st. First Sunday after Christmas</date>.
         </dateline>
-        <p>A quiet week. <persName ref="#Davis_Theodore_M">Theo</persName> in the <placeName ref="#Valley_of_the_Kings">Valley</placeName> since Wednesday - but returns today. Mr. <persName>Anthony</persName> had tea with us on Friday. The girls and I have amused ourselves in many ways. The weather cold, with high winds. River falling rapidly - and the sand roof which has formed so rapidly between us and the main channel shows each day more prominently.</p>
+        <p>A quiet week. <persName ref="#Davis_Theodore_M">Theo</persName> in the <placeName ref="#Valley_of_the_Kings">Valley</placeName> since Wednesday - but returns today. <persName ref="#Anthony_Mr">Mr. Anthony</persName> had tea with us on <date when="1911-12-29">Friday</date>. The girls and I have amused ourselves in many ways. The weather cold, with high winds. River falling rapidly - and the sand roof which has formed so rapidly between us and the main channel shows each day more prominently.</p>
       </div>
       <!--[Next 1/3]-->
       <div xml:id="EBA-1912-01-07" type="entry">
