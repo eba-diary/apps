@@ -46,7 +46,7 @@
            <date when="1911-10-21">Oct. 21st</date>.
            <name type="boat" ref="#SS_Berlin">SS. Berlin</name>.
         </dateline>
-        <p>Sailed this morning for <placeName ref="#Genoa">Genoa</placeName> - where we will wait 15 days for our boat for <placeName ref="#Alexandria">Alexandria</placeName>. Have my old appartment which is the Captain's, and very commodious and comfortable, and which I occupied two years ago. We know a few of the passengers. The 4 days we passed in <placeName ref="#New_York">New York</placeName> were dismal in the extreme - it rained all the time, I took a severe cold, and did not go out of the house after the first day - and had to cancel a long standing engagement to drive with the <persName ref="#Fairfield_Osborn_Henry #Osborne_Mrs">Fairfield Osborns</persName>, who had invited a lot of pleasant people to meet us. It was altogether a great piece of disappointment, that visit in <placeName ref="#New_York">New York</placeName>.</p>
+        <p>Sailed this morning for <placeName ref="#Genoa">Genoa</placeName> - where we will wait 15 days for our boat for <placeName ref="#Alexandria">Alexandria</placeName>. Have my old appartment which is the Captain's, and very commodious and comfortable, and which I occupied two years ago. We know a few of the passengers. The 4 days we passed in <placeName ref="#New_York">New York</placeName> were dismal in the extreme - it rained all the time, I took a severe cold, and did not go out of the house after the first day - and had to cancel a long standing engagement to drive with the <persName ref="#Fairfield_Osborn_Henry #Fairfield_Osborn_Mrs">Fairfield Osborns</persName>, who had invited a lot of pleasant people to meet us. It was altogether a great piece of disappointment, that visit in <placeName ref="#New_York">New York</placeName>.</p>
       </div>
       <div xml:id="EBA-1911-10-21" type="entry">
         <dateline>
@@ -60,7 +60,7 @@
         <dateline>
            <date when="1911-12-02">Saturday. Dec. 2nd</date>.
         </dateline>        
-        <p>We came on the <name type="boat" ref="#Beduin">Beduin</name> this afternoon to stay, and were indeed happy to take up this enchanting life again. Everything was in order, and we were soon settled. <persName ref="#Burton_Harry">Harry</persName> left for <placeName ref="#Luxor">Luxor</placeName> today. We had a pleasant week in <placeName ref="#Cairo">Cairo</placeName> - saw many of our old friends.<!---[Revisit the following tags "#Alston" and #Trefusis" to change from Group to Person Names; and for the discussion of introducing "Nee" tags]--> <personGrp ref="Alston">Judge Alston and his wife</personGrp> lunched with us on the boat, <persName ref="#Trefusis_Walter #Graham_Margery_Miss">Capt. Trefusis and his wife</persName> lunched another day.</p>
+        <p>We came on the <name type="boat" ref="#Beduin">Beduin</name> this afternoon to stay, and were indeed happy to take up this enchanting life again. Everything was in order, and we were soon settled. <persName ref="#Burton_Harry">Harry</persName> left for <placeName ref="#Luxor">Luxor</placeName> today. We had a pleasant week in <placeName ref="#Cairo">Cairo</placeName> - saw many of our old friends.<!---[Revisit the persName tags for the wives]--> <persName ref="#Alston_Judge #Alston_Mrs">Judge Alston and his wife</persName> lunched with us on the boat, <persName ref="#Trefusis_Walter #Graham_Margery_Miss">Capt. Trefusis and his wife</persName> lunched another day.</p>
       </div>
       <div xml:id="EBA-1911-12-03" type="entry">
         <dateline>
@@ -78,7 +78,7 @@
         <dateline>
            <date when="1911-12-05">Tuesday, Dec. 5th</date>
         </dateline>
-        <p>Started about 6 this morning - tied up at 5 o'clock, and are <measure type="distance">8 miles<measure> from <placeName ref="#Benisoef">Benisoef</placeName>. <measure type="distance">40 miles</measure>.</p>
+        <p>Started about 6 this morning - tied up at 5 o'clock, and are <measure type="distance">8 miles</measure> from <placeName ref="#Benisoef">Benisoef</placeName>. <measure type="distance">40 miles</measure>.</p>
       </div>
       <div xml:id="EBA-1911-12-06" type="entry">
         <dateline>
