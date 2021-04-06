@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace Sentry.data.Web.Models.ApiModels.Dataset
+﻿namespace Sentry.data.Web.Models.ApiModels.Dataset
 {
     public class DatasetInfoModel
     {
@@ -15,5 +10,6 @@ namespace Sentry.data.Web.Models.ApiModels.Dataset
         public string PrimarContactEmail { get; set; }
         public string PrimaryOwnerName { get; set; }
         public string Category { get; set; }
+        public string ObjectStatus { get; set; }
     }
 }

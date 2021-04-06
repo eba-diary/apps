@@ -67,5 +67,6 @@ namespace Sentry.data.Core
         void DeleteByFileSchema(FileSchema scm);
         ValidationException Validate(DataFlowDto dfDto);
         List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId);
+        void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true);
     }
 }

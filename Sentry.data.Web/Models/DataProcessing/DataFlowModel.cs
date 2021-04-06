@@ -51,6 +51,7 @@ namespace Sentry.data.Web
         public string CreatedBy { get; set; }
         public DateTime CreatedDTM { get; set; }
         public int DataFlowId { get; set; }
+        public ObjectStatusEnum ObjectStatus { get; set; }
 
 
 
