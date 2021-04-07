@@ -243,7 +243,7 @@
         <dateline>
            <date when="1912-02-02">Friday. Feb. 2nd</date>.
         </dateline>
-        <p>A very busy morning letter writing - about noon <persName ref="#layard_Lady">Lady Layard</persName> and <persName ref="#Alderson_Miss">Miss Alderson</persName> came in for a farewell visit - they go to <placeName ref="#Cairo">Cairo</placeName> tomorrow to stay with <persName ref="#Kitchener_Herbert">Lord Kitchener</persName>. We saw them again this afternoon at the <!--How to tag Maspero's boat? Is M. Maspero a typo?--><placeName>Maspero's</placeName> boat, where <persName ref="#Maspero_Gaston">M. Maspero</persName> gave a farewell tea to a few friends. They start down the river on Monday. A lovely moonlit, quiet night - a boon indeed.</p> 
+        <p>A very busy morning letter writing - about noon <persName ref="#layard_Lady">Lady Layard</persName> and <persName ref="#Alderson_Miss">Miss Alderson</persName> came in for a farewell visit - they go to <placeName ref="#Cairo">Cairo</placeName> tomorrow to stay with <persName ref="#Kitchener_Herbert">Lord Kitchener</persName>. We saw them again this afternoon at the <name type="boat" ref="#Miriam">Maspero's boat</name>, where <persName ref="#Maspero_Gaston">M. Maspero</persName> gave a farewell tea to a few friends. They start down the river on Monday. A lovely moonlit, quiet night - a boon indeed.</p> 
       </div>
       <div xml:id="EBA-1912-02-03" type="entry">
         <dateline>
