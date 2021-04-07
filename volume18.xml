@@ -159,69 +159,75 @@
         <dateline>
            <date when="1912-01-07">Sunday. 1st after Epiphany. Jan. 7th</date>.
         </dateline>
-        <p>Mr. <persName>Mcquay</persName> and Mr. <persName>Baird</persName> called on <orgName>New Years Day</orgName> - and the girls and I went over to the hotel for tea with Mr. Anthony. <persName>Theo</persName> went to the <placeName>Valley</placeName> on Wednesday. On Thursday we had a frightful gale, dust blowing everywhere. We went on Friday to the commencement exercises at the <name>Mission School</name> - remarkable and interesting. <persName>Nettie</persName> tremendously impressed. Mr. <persName>Carter</persName> to breakfast - and on Saturday we drove out to Mr. <persName>Carters</persName> for tea and saw his paintings. The girls had not seen his pictures for 5 years, and thought he had advanced enormously. Among them was the one I ordered last year. Three delicious little girls from the tomb of <placeName>Menna</placeName> in the <placeName>Sheik Abu el Negga.</placeName> I am delighted with them. Mr. <persName>Whymper</persName> lunched with us before we went. <persName>Theo</persName> came back from the <placeName>Valley</placeName> this afternoon.</p>
+        <p> <persName ref="#Mcquay_Mr">Mr. Mcquay</persName> and <persName ref="#Baird_Mr">Mr. Baird</persName> called on New Years Day - and the girls and I went over to the hotel for tea with <persName ref="#Anthony_Mr">Mr. Anthony</persName>. <persName ref="#Davis_Theodore_M">Theo</persName> went to <placeName ref="#Valley_of_the_Kings">the Valley</placeName> on Wednesday. On Thursday we had a frightful gale, dust blowing everywhere. We went on Friday to the commencement exercises at the <orgName ref="#American_Mission">Mission School</orgName> - remarkable and interesting. <persName ref="#Buttles_Jeanette">Nettie</persName> tremendously impressed. <persName ref="#Carter_Howard">Mr. Carter</persName> to breakfast - and on Saturday we drove out to <persName ref="#Carter_Howard">Mr. Carters</persName> for tea and saw his paintings. The girls had not seen his pictures for 5 years, and thought he had advanced enormously. Among them was the one I ordered last year. <!---[waiting to see how to tag art/antiquities]--> Three delicious little girls from the tomb of <placeName>Menna</placeName> in the <placeName>Sheik Abu el Negga.</placeName> I am delighted with them. <persName ref="#Whymper_Charles">Mr. Whymper</persName> lunched with us before we went. <persName ref="#Davis_Theodore_M">Theo</persName> came back from <placeName ref="#Valley_of_the_Kings">the Valley</placeName> this afternoon.</p>
       <pb n="92"/>
       </div>
       <div xml:id="EBA-1912-01-10" type="entry">
         <dateline>
            <date when="1912-01-10">Wednesday. Jan. 10th</date>.
         </dateline>
-        <p>We are having a very cold winter - and this morning the air was so thick the mountains could not be seen. Our little stoves have been in use almost every day lately. <persName>Harry Burton</persName> lunched with us yesterday. <persName>Theo</persName> to the <placeName>Valley</placeName> this afternoon to stay over Sunday.</p>
+        <p>We are having a very cold winter - and this morning the air was so thick the mountains could not be seen. Our little stoves have been in use almost every day lately. <persName ref="#Burton_Harry">Harry Burton</persName> lunched with us yesterday. <persName ref="#Davis_Theodore_M">Theo</persName> to <placeName ref="#Valley_of_the_Kings">the Valley</placeName> this afternoon to stay over Sunday.</p>
       </div>
       <div xml:id="EBA-1912-01-12" type="entry">
         <dateline>
            <date when="1912-01-12">Friday. Jan. 12th</date>.
         </dateline>
-        <p><persName>Miss Whiting</persName> and her party came to tea - and Mr. <persName>Carter</persName> happened along too, and a nice, long visit.</p>
+        <p> <!---[Miss/Mrs Whiting?]--> <persName ref="#Whiting_Mrs">Miss Whiting</persName> and her party came to tea - and <persName ref="#Carter_Howard">Mr. Carter</persName> happened along too, and a nice, long visit.</p>
       </div>
       <div xml:id="EBA-1912-01-13" type="entry">
         <dateline>
            <date when="1912-01-13">Saturday. Jan. 13th</date>.
         </dateline>
-        <p><persName>Lady Layard</persName> and her nice nice <persName>Miss Alderson</persName> came to tea. <persName>Theo</persName> arrived while they were here, from the <placeName>Valley.</placeName> He has asked them to lunch with him in the bungalow in the <placeName>Valley.</placeName></p>
+        <p><persName ref="#layard_Lady">Lady Layard</persName> and her nice <choice>
+        <sic>nice</sic>
+        <corr>niece</corr>
+        </choice> <persName ref="#Alderson_Miss">Miss Alderson</persName> came to tea. <persName ref="#Davis_Theodore_M">Theo</persName> arrived while they were here, from <placeName ref="#Valley_of_the_Kings">the Valley</placeName>. He has asked them to lunch with him in the bungalow in <placeName ref="#Valley_of_the_Kings">the Valley</placeName>.</p>
       </div>
       <div xml:id="EBA-1912-01-16" type="entry">
         <dateline>
            <date when="1912-01-16">Tuesday. Jan. 16</date>.
         </dateline>
-        <p><persName>Robert Trefusis</persName> to dinner.</p>
+        <p><persName ref="#Trefusis_Robert">Robert Trefusis</persName> to dinner.</p>
       </div>
       <div xml:id="EBA-1912-01-17" type="entry">
         <dateline>
            <date when="1912-01-17">Wednesday. Jan. 17</date>.
         </dateline>
-        <p><persName>Mary</persName> and I called on the <persName>Adam Gordon Morris</persName> party, who have that hideous little <persName>Nitocris</persName> - a very pleasant woman was with them - a <persName>Miss Godwin</persName> of <placeName>New York.</placeName> We then went to see <persName>Madame Maspero,</persName> and <persName>Lady Layard</persName> who were out - and then into the <placeName>Winter Palace</placeName> for tea, and found the <persName>Ernest Longfellows, Mr. Whymper</persName> and <persName>Robert Trefusis</persName> and sat a long time talking.</p>
+        <p><persName ref="#Buttles_Mary">Mary</persName> and I called on the <!---[GMA pGrp tag temporary]--> <personGrp ref="#Gordon_Morris_Adam">Adam Gordon Morris</persName> party, who have that hideous little <persName ref="#Nitocris">Nitocris</persName> - a very pleasant woman was with them - a <persName ref="#Godwin_Miss">Miss Godwin</persName> of <placeName ref="#New_York">New York</placeName>. We then went to see <persName ref="#Maspero_Louise">Madame Maspero</persName>, and <persName ref="#layard_Lady">Lady Layard</persName> who were out - and then into the <placeName ref="#Winter_Palace">Winter Palace</placeName> for tea, and found the <!---[Ernest and Henry?]--><persName>Ernest Longfellows, <persName ref="#Whymper_Charles">Mr. Whymper</persName> and <persName ref="#Trefusis_Robert">Robert Trefusis</persName> and sat a long time talking.</p>
       <pb n="93"/>
       </div>
       <div xml:id="EBA-1912-01-20" type="entry">
         <dateline>
            <date when="1912-01-20">Saturday. Jan. 20th</date>.
         </dateline>
-        <p><persName>Lady Layard, Miss Alderson,</persName> and I drove out to the <placeName>Bungalow</placeName> for lunch - a charming companion - <persName>Miss Alderson</persName> was on a donkey - <persName>Lady Layard</persName> is very much of a grand personage - but is simple and charming. Our visit was somewhat intruded upon by <persName>M. Maspero</persName> and a large party of <orgName>French</orgName> people - they brought their own luncheon and crockery - and were soon out of the way. A charming ride home. A jackal ran across our path and disappeared.</p>
+        <p><persName ref="#layard_Lady">Lady Layard</persName>, <persName ref="#Alderson_Miss">Miss Alderson</persName>, and I drove out to the Bungalow for lunch - a charming companion - <persName ref="#Alderson_Miss">Miss Alderson</persName> was on a donkey - <persName ref="#layard_Lady">Lady Layard</persName> is very much of a grand personage - but is simple and charming. Our visit was somewhat intruded upon by <persName ref="#Maspero_Louise">M. Maspero</persName> and a large party of French people - they brought their own luncheon and crockery - and were soon out of the way. A charming ride home. A jackal ran across our path and disappeared.</p>
       </div>
       <div xml:id="EBA-1912-01-24" type="entry">
         <dateline>
            <date when="1912-01-24">Wednesday. Jan. 24th</date>.
         </dateline>
-        <p><persName>Theo</persName> came back from the <placeName>Valley</placeName> on Monday - and returned this afternoon - <persName>Nettie</persName> and <persName>Mary</persName> with <persName>Lady Layard</persName> and <persName>Miss Alderson</persName> spent the morning at <placeName>Medinet</placeName> Habu.</p>
+        <p><persName ref="#Davis_Theodore_M">Theo</persName> came back from <placeName ref="#Valley_of_the_Kings">the Valley</placeName> on Monday - and returned this afternoon - <persName ref="#Buttles_Jeanette">Nettie</persName> and <persName ref="#Buttles_Mary">Mary</persName> with <persName ref="#layard_Lady">Lady Layard</persName> and <persName ref="#Alderson_Miss">Miss Alderson</persName> spent the morning at <placeName ref="#Medinet_Habu">Medinet Habu.</p>
       </div>
       <div xml:id="EBA-1912-01-26" type="entry">
         <dateline>
            <date when="1912-01-26">Sunday. Jan. 26th</date>.
         </dateline>
-        <p>I had the misfortune to break one of my teeth the other day, and had to go to <placeName>Cairo</placeName> to get it mended - arranged by telegram with Dr. <persName>Duprey</persName> - we, <persName>Nettie, Mary</persName> and I left <placeName>Luxor</placeName> on the evening on the 7 o'clock train de luxe, and reached <placeName>Cairo</placeName> at 8:30 A.M. the next day. They had our rooms ready for us at Shepheards. We spent the morning at <placeName>Madame C&#233;ciles</placeName> after clothes - at 2 P.M. <persName>Nettie</persName> went with me to the dentist for an hour, afterwards the girls went to the bazaar - crowds of <orgName>Americans</orgName> arrived in the afternoon at <placeName>Shepheards</placeName> from SS. Adriatic. The girls much amused with the show in the evening. The next morning the girls went to the <orgName>Museum,</orgName> and I stayed at home<pb n="94"/> to welcome my dear <persName>Mrs. Perkins,</persName> who is passing through <placeName>Cairo</placeName> for <placeName>America</placeName> on her way home from India. Such a nice talk we had. In the afternoon another successful and a farewell visit to <persName>Dr. Duprey,</persName> and we left <placeName>Cairo</placeName> at 6:30 P.M. for <persName>Luxor.</persName> I have never been in more comfortable sleeping trains. The girls and I went to tea with <persName>Lady Layard</persName> at the <placeName>Luxor Hotel, Madame Le</placeName> Grain, the <name>Marquesa Guadalmina, Mr. Whymper</name> and ourselves.</p>
+        <p>I had the misfortune to break one of my teeth the other day, and had to go to <placeName ref="#Cairo">Cairo</placeName> to get it mended - arranged by telegram with <persName ref="#Duprey_Dr">Dr. Duprey</persName> - we, <persName ref="#Buttles_Jeanette">Nettie</persName>, <persName ref="#Buttles_Mary">Mary</persName> and I left <placeName ref="#Luxor">Luxor</placeName> on the evening on the 7 o'clock train de luxe, and reached <placeName ref="#Cairo">Cairo</placeName> at 8:30 A.M. the next day. They had our rooms ready for us at <placeName ref="#Shepheards_Hotel">Shepheards</placeName>. We spent the morning at <persName ref="#Cecile_Madame">Madame C&#233;ciles</persName> after clothes - at 2 P.M. <persName ref="#Buttles_Jeanette">Nettie</persName> went with me to the dentist for an hour, afterwards the girls went to the bazaar - crowds of Americans arrived in the afternoon at <placeName ref="#Shepheards_Hotel">Shepheards</placeName> from <name type="boat" ref="#SS_Adriatic">SS. Adriatic</name>. The girls much amused with the show in the evening. The next morning the girls went to the <placeName ref="#Boulaq_Museum">Museum</placeName>, and I stayed at home<pb n="94"/> to welcome my dear <persName ref="#Perkins_Mrs">Mrs. Perkins,</persName> who is passing through <placeName ref="#Cairo">Cairo</placeName> for <placeName ref="#United_States_of_America">America</placeName> on her way home from <placeName ref="#India">India</placeName>. Such a nice talk we had. In the afternoon another successful and a farewell visit to <persName ref="#Duprey_Dr">Dr. Duprey</persName>, and we left <placeName ref="#Cairo">Cairo</placeName> at 6:30 P.M. for <placeName ref="#Luxor">Luxor</placeName>. I have never been in more comfortable sleeping trains. The girls and I went to tea with <persName ref="#layard_Lady">Lady Layard</persName> at the <name type= "hotel" ref="#Luxor_Hotel">Luxor Hotel</name>, <persName ref="#Legrain_Madame">Madame LeGrain</persName>, the <persName ref="#Guadalmina_Marquesa">Marquesa Guadalmina</persName>, <persName ref="#Whymper_Charles">Mr. Whymper</persName> and ourselves.</p>
       </div>
       <div xml:id="EBA-1912-01-29" type="entry">
         <dateline>
            <date when="1912-01-29">Monday 29</date>.
         </dateline>
-        <p><persName>Lady Layard,</persName> Miss <persName>Alderson, Nettie</persName> and <persName>Mary</persName> went to <placeName>Der el Bahri,</placeName> taking lunch with them, a very hot day for such an excursion. In the afternoon M. and Mme. <persName>Maspero,</persName> with the <orgName>Servian</orgName> minister and <persName>Mlle.</persName> <persName>Jeannot,</persName> and Mr. <persName>Carter</persName> were here for tea, and <persName>Theo</persName> came home from the <orgName>Valley.</orgName></p>
+        <p><persName ref="#layard_Lady">Lady Layard</persName>, <persName ref="#Alderson_Miss">Miss Alderson</persName>, <persName ref="#Buttles_Jeanette">Nettie</persName> and <persName ref="#Buttles_Mary">Mary</persName> went to <placeName ref="#Der_el_Bahari">Der el Bahri</placeName>, <!---[sic?]--> taking lunch with them, a very hot day for such an excursion. In the afternoon <persName ref="#Maspero_Gaston #Maspero_Louise">M. and Mme. Maspero</persName>, with the <!---[who is Servian minister?]--> <orgName>Servian</orgName> minister and <persName ref="#Jeannot_Mlle">Mlle. Jeannot</persName>, and <persName ref="#Carter_Howard">Mr. Carter</persName> were here for tea, and <persName ref="#Davis_Theodore_M">Theo</persName> came home from <placeName ref="#Valley_of_the_Kings">the Valley</placeName>.</p>
       </div>
       <div xml:id="EBA-1912-01-30" type="entry">
         <dateline>
            <date when="1912-01-30">Tuesday. Jan. 30th</date>.
         </dateline>
-        <p>It has been deliciously warm for two days - that light, pure warm air that is a happiness to breathe. We were shocked to hear of the death of the Duke of <placeName>Fife</placeName> at <placeName>Assuan</placeName> - what a winter those unfortunate people have had! The girls went with <persName>Lady Laird</persName> and <persName>Miss Alderson</persName> to the <placeName>Luxor Hotel.</placeName> Mr. <persName>Baird</persName> and Mr. <persName>McQuay</persName> lunched with us. Young <persName>Lloyd Warren</persName> came after with letters from <persName>Joe Stevens</persName> and <persName>Mrs. Rowland.</persName> <persName>Lady Layard</persName> and <persName>Miss Alderson</persName> came to dine.</p>
+        <p>It has been deliciously warm for two days - that light, pure warm air that is a happiness to breathe. We were shocked to hear of the death of the <persName ref="#Duke_of_Fife">Duke of Fife</persName> at <!---[LEAVING OFF HERE]---> <placeName>Assuan</placeName> - what a winter those unfortunate people have had! The girls went with <choice> <sic>Lady Laird<sic>
+        <corr>Lady Layard</corr>
+        </choice>
+        and <persName>Miss Alderson</persName> to the <placeName>Luxor Hotel.</placeName> Mr. <persName>Baird</persName> and Mr. <persName>McQuay</persName> lunched with us. Young <persName>Lloyd Warren</persName> came after with letters from <persName>Joe Stevens</persName> and <persName>Mrs. Rowland.</persName> <persName>Lady Layard</persName> and <persName>Miss Alderson</persName> came to dine.</p>
       <pb n="95"/>
       </div>
       <div xml:id="EBA-1912-01-31" type="entry">
