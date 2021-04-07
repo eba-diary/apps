@@ -159,6 +159,7 @@ namespace Sentry.data.Web.Controllers
                 ConfigFileName = "Default",
                 ConfigFileDesc = "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
                 UploadUserId = SharedContext.CurrentUser.AssociateId,
+                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };
 
             Utility.SetupLists(_datasetContext, cdm);

@@ -17,6 +17,7 @@ namespace Sentry.data.Web
             IsCompressed = false;
             IsPreProcessingRequired = false;
             RetrieverJob = new JobModel();
+            ObjectStatus = ObjectStatusEnum.Active;
         }
 
         [System.ComponentModel.DataAnnotations.Required]
