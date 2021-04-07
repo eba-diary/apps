@@ -166,31 +166,34 @@
         <dateline>
            <date when="1912-01-10">Wednesday. Jan. 10th</date>.
         </dateline>
-        <p>We are having a very cold winter - and this morning the air was so thick the mountains could not be seen. Our little stoves have been in use almost every day lately. <persName>Harry Burton</persName> lunched with us yesterday. <persName>Theo</persName> to the <placeName>Valley</placeName> this afternoon to stay over Sunday.</p>
+        <p>We are having a very cold winter - and this morning the air was so thick the mountains could not be seen. Our little stoves have been in use almost every day lately. <persName ref="#Burton_Harry">Harry Burton</persName> lunched with us yesterday. <persName ref="#Davis_Theodore_M">Theo</persName> to <placeName ref="#Valley_of_the_Kings">the Valley</placeName> this afternoon to stay over Sunday.</p>
       </div>
       <div xml:id="EBA-1912-01-12" type="entry">
         <dateline>
            <date when="1912-01-12">Friday. Jan. 12th</date>.
         </dateline>
-        <p><persName>Miss Whiting</persName> and her party came to tea - and Mr. <persName>Carter</persName> happened along too, and a nice, long visit.</p>
+        <p> <!---[Miss/Mrs Whiting?]--> <persName ref="#Whiting_Mrs">Miss Whiting</persName> and her party came to tea - and <persName ref="#Carter_Howard">Mr. Carter</persName> happened along too, and a nice, long visit.</p>
       </div>
       <div xml:id="EBA-1912-01-13" type="entry">
         <dateline>
            <date when="1912-01-13">Saturday. Jan. 13th</date>.
         </dateline>
-        <p><persName>Lady Layard</persName> and her nice nice <persName>Miss Alderson</persName> came to tea. <persName>Theo</persName> arrived while they were here, from the <placeName>Valley.</placeName> He has asked them to lunch with him in the bungalow in the <placeName>Valley.</placeName></p>
+        <p><persName ref="#layard_Lady">Lady Layard</persName> and her nice <choice>
+        <sic>nice</sic>
+        <corr>niece</corr>
+        </choice> <persName ref="#Alderson_Miss">Miss Alderson</persName> came to tea. <persName ref="#Davis_Theodore_M">Theo</persName> arrived while they were here, from <placeName ref="#Valley_of_the_Kings">the Valley</placeName>. He has asked them to lunch with him in the bungalow in <placeName ref="#Valley_of_the_Kings">the Valley</placeName>.</p>
       </div>
       <div xml:id="EBA-1912-01-16" type="entry">
         <dateline>
            <date when="1912-01-16">Tuesday. Jan. 16</date>.
         </dateline>
-        <p><persName>Robert Trefusis</persName> to dinner.</p>
+        <p><persName ref="#Trefusis_Robert">Robert Trefusis</persName> to dinner.</p>
       </div>
       <div xml:id="EBA-1912-01-17" type="entry">
         <dateline>
            <date when="1912-01-17">Wednesday. Jan. 17</date>.
         </dateline>
-        <p><persName>Mary</persName> and I called on the <persName>Adam Gordon Morris</persName> party, who have that hideous little <persName>Nitocris</persName> - a very pleasant woman was with them - a <persName>Miss Godwin</persName> of <placeName>New York.</placeName> We then went to see <persName>Madame Maspero,</persName> and <persName>Lady Layard</persName> who were out - and then into the <placeName>Winter Palace</placeName> for tea, and found the <persName>Ernest Longfellows, Mr. Whymper</persName> and <persName>Robert Trefusis</persName> and sat a long time talking.</p>
+        <p><persName ref="#Buttles_Mary">Mary</persName> and I called on the <persName>Adam Gordon Morris</persName> party, who have that hideous little <persName>Nitocris</persName> - a very pleasant woman was with them - a <persName>Miss Godwin</persName> of <placeName>New York.</placeName> We then went to see <persName ref="#Maspero_Louise">Madame Maspero,</persName> and <persName ref="#layard_Lady">Lady Layard</persName> who were out - and then into the <placeName ref="#Winter_Palace">Winter Palace</placeName> for tea, and found the <persName>Ernest Longfellows, Mr. Whymper</persName> and <persName>Robert Trefusis</persName> and sat a long time talking.</p>
       <pb n="93"/>
       </div>
       <div xml:id="EBA-1912-01-20" type="entry">
