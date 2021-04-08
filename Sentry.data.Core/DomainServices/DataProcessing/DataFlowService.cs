@@ -555,9 +555,9 @@ namespace Sentry.data.Core
                 Questionnaire = dto.DFQuestionnaire,
                 FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE(),
                 SaidKeyCode = dto.SaidKeyCode,
-                ObjectStatus = dto.ObjectStatus,
+                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
                 DeleteIssuer = dto.DeleteIssuer,
-                DeleteIssueDTM = dto.DeleteIssueDTM
+                DeleteIssueDTM = DateTime.MaxValue
             };
 
             _datasetContext.Add(df);
@@ -957,7 +957,9 @@ namespace Sentry.data.Core
                 Name = GenerateDataFlowNameForFileSchema(scm),
                 CreatedDTM = DateTime.Now,
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
-                FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE()
+                FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE(),
+                DeleteIssueDTM = DateTime.MaxValue,
+                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };
 
             _datasetContext.Add(df);
