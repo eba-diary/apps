@@ -3,7 +3,9 @@ using Sentry.Common.Logging;
 using Sentry.Configuration;
 using Sentry.data.Infrastructure;
 using System;
+using System.Collections.Generic;
 using System.Data.Odbc;
+using System.Linq;
 using System.Text;
 
 namespace TESTING_CONSOLE
@@ -17,6 +19,12 @@ namespace TESTING_CONSOLE
             Logger.Info("Starting TESTING_CONSOLE");
             //Call your bootstrapper to initialize your application
             //Bootstrapper.Init();
+
+            List<int> intList = new List<int>() { 1, 2, 3 };
+
+            Console.WriteLine("[{0}]", string.Join(", ", intList.Select(e => e.ToString()).ToArray()));
+
+            //("[{0}]", string.Join(", ", yourArray))
 
             var conn = new OdbcConnection
             {

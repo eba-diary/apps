@@ -59,6 +59,8 @@ namespace Sentry.data.Web
 
         [DisplayName("Create Current View")]
         public bool CreateCurrentView { get; set; }
+
+        public ObjectStatusEnum ObjectStatus { get; set; }
     }
 
 

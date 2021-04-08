@@ -146,7 +146,8 @@ namespace Sentry.data.Web.Controllers
                 AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext),
                 AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList(),
                 ExtensionList = Utility.GetFileExtensionListItems(_datasetContext),
-                Security = _securityService.GetUserSecurity(null, SharedContext.CurrentUser)
+                Security = _securityService.GetUserSecurity(null, SharedContext.CurrentUser),
+                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Configuration Creation Page", dfcm.DatasetId);
@@ -166,7 +167,8 @@ namespace Sentry.data.Web.Controllers
                 AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext),
                 AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList(),
                 ExtensionList = Utility.GetFileExtensionListItems(_datasetContext),
-                Security = _securityService.GetUserSecurity(null, SharedContext.CurrentUser)
+                Security = _securityService.GetUserSecurity(null, SharedContext.CurrentUser),
+                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Configuration Creation Page", dfcm.DatasetId);

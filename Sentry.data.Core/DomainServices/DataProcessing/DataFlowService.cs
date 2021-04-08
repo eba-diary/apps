@@ -5,6 +5,7 @@ using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Sentry.data.Core
@@ -301,6 +302,154 @@ namespace Sentry.data.Core
 
         }
 
+        public void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true)
+        {
+            string methodName = MethodBase.GetCurrentMethod().Name.ToLower();
+            Logger.Debug($"Start method <{methodName}>");
+
+
+            /* Get Schema Flow */
+            var schemaflowName = GetDataFlowNameForFileSchema(scm);
+            DataFlow schemaFlow = _datasetContext.DataFlow.FirstOrDefault(w => w.Name == schemaflowName);
+
+            //some legacy dataset\schema may not have associated schema flow
+            if (schemaFlow == null)
+            {
+                Logger.Debug($"Schema Flow not found by name, attempting to detect by id...");
+
+                SchemaMap mappedStep = _datasetContext.SchemaMap.SingleOrDefault(w => w.MappedSchema.SchemaId == scm.SchemaId && w.DataFlowStepId.Action.Name == "Schema Load");
+                if (mappedStep != null)
+                {
+                    Logger.Debug($"detected schema flow by Id");
+                    schemaFlow = _datasetContext.DataFlowStep.FirstOrDefault(w => w.Id == mappedStep.Id).DataFlow;
+                }
+                else
+                {
+                    Logger.Debug($"schema flow not detected by id");
+                    Logger.Debug($"no schema flow associated with schema");
+                    Logger.Debug($"End method <{methodName}>");
+                    return;
+                }
+            }
+
+            Logger.Debug($"schema flow name: {schemaFlow.Name}");
+
+            if (logicalDelete)
+            {
+
+                /* Mark dataflow for deletion */
+                schemaFlow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
+                schemaFlow.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
+                schemaFlow.DeleteIssueDTM = DateTime.Now;
+
+
+                /* Get any Retriever Jobs associated with schema flow */
+                List<int> schemaFlowJobList = new List<int>();
+                schemaFlowJobList = _datasetContext.RetrieverJob.Where(w => w.DataFlow == schemaFlow).Select(s => s.Id).ToList();
+
+                if (schemaFlowJobList.Any())
+                {
+                    Logger.Debug($"{methodName} - detected jobs for schema dataflow - count:{schemaFlowJobList.Count.ToString()}:::jobids:{("[{0}]", string.Join(", ", schemaFlowJobList.Select(e => e.ToString()).ToArray()))}");
+
+                    foreach (int jobId in schemaFlowJobList)
+                    {
+                        _jobService.DisableJob(jobId);
+                    }
+                }
+                else
+                {
+                    Logger.Debug($"no jobs detected for schema dataflow");
+                }
+
+
+                /* Get Producer flows associated with Schema flow */
+                List<int> producerDataflowIdForDisableList = GetProducerFlowsToBeDisabledBySchemaId(scm.SchemaId);
+
+                if (producerDataflowIdForDisableList.Any())
+                {
+                    Logger.Debug($"{methodName} - detected producer flows associated with  - count:{producerDataflowIdForDisableList.Count.ToString()}:::jobids:{("[{0}]", string.Join(", ", producerDataflowIdForDisableList.Select(e => e.ToString()).ToArray()))}");
+
+                    /* Mark Dataflow for deletion */
+                    foreach(int dataFlowId in producerDataflowIdForDisableList)
+                    {
+                        DataFlow producerFlow = _datasetContext.DataFlow.FirstOrDefault(w => w.Id == dataFlowId);
+                        producerFlow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
+                        producerFlow.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
+                        producerFlow.DeleteIssueDTM = DateTime.Now;
+                    }
+
+
+                    /* Disable all retrieverJobs associated with producer flow */
+                    List<int> producerFlowJobList = _datasetContext.RetrieverJob.Where(w => producerDataflowIdForDisableList.Contains(w.DataFlow.Id)).Select(s => s.Id).ToList();
+
+                    if (producerFlowJobList.Any())
+                    {
+                        Logger.Debug($"{methodName} - detected jobs for produer dataflow - count:{producerFlowJobList.Count.ToString()}:::jobids:{("[{0}]", string.Join(", ", producerFlowJobList.Select(e => e.ToString()).ToArray()))}");
+
+                        foreach (int jobId in producerFlowJobList)
+                        {
+                            _jobService.DisableJob(jobId);
+                        }
+                    }
+                    else
+                    {
+                        Logger.Debug($"no jobs detected for producer dataflow");
+                    }
+                }
+                else
+                {
+                    Logger.Debug($"no producer dataflows detected");
+                }
+            }
+            else
+            {
+                // Mark Schema flow deleted
+                schemaFlow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
+
+                List<int> producerDataflowIdForDeleteList = GetProducerFlowsToBeDisabledBySchemaId(scm.SchemaId);
+
+                Logger.Debug(producerDataflowIdForDeleteList.Any() ? $"detected {producerDataflowIdForDeleteList.Count} producer flows for delete" : $"detected 0 producer flows for delete");
+
+                /* Mark Dataflow for deletion */
+                foreach (int dataFlowId in producerDataflowIdForDeleteList)
+                {
+                    DataFlow producerFlow = _datasetContext.DataFlow.FirstOrDefault(w => w.Id == dataFlowId);
+                    Logger.Debug($"marking {producerFlow.Name} producer flow as deleted");
+                    producerFlow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
+                }
+            }
+
+            Logger.Debug($"End method <{methodName}>");
+        }
+
+        private List<int> GetProducerFlowsToBeDisabledBySchemaId(int schemaId)
+        {
+            List<int> producerFlowIdList = new List<int>();
+
+            /* Get producer flow Ids which map to schema */
+            List<Tuple<int, int>> producerSchemaMapIds = _datasetContext.SchemaMap.Where(w => w.MappedSchema.SchemaId == schemaId && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaMap).Select(s => new Tuple<int, int>( s.DataFlowStepId.Id, s.DataFlowStepId.DataFlow.Id)).ToList();
+   
+            foreach (Tuple<int, int> item in producerSchemaMapIds)
+            {
+                /*  Add producer dataflow id to list if the
+                 *  dataflow does not map to any other schema
+                 *  
+                 *  Or add producer dataflow id to list if all
+                 *  other mapped schema are NOT Active    
+                 */
+                if (!_datasetContext.SchemaMap.Any(w => w.DataFlowStepId.Id == item.Item1 && w.MappedSchema.SchemaId != schemaId))
+                {
+                    producerFlowIdList.Add(item.Item2);
+                }
+                else if (!_datasetContext.SchemaMap.Any(w => w.DataFlowStepId.Id == item.Item1 && w.MappedSchema.SchemaId != schemaId && w.MappedSchema.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active))
+                {
+                    producerFlowIdList.Add(item.Item2);
+                }
+            }
+
+            return producerFlowIdList;            
+        }
+
         public void Delete(int dataFlowId)
         {
             Logger.Info($"dataflowservice-delete-start - dataflowid:{dataFlowId}");
@@ -405,7 +554,10 @@ namespace Sentry.data.Core
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
                 Questionnaire = dto.DFQuestionnaire,
                 FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE(),
-                SaidKeyCode = dto.SaidKeyCode
+                SaidKeyCode = dto.SaidKeyCode,
+                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
+                DeleteIssuer = dto.DeleteIssuer,
+                DeleteIssueDTM = DateTime.MaxValue
             };
 
             _datasetContext.Add(df);
@@ -550,6 +702,9 @@ namespace Sentry.data.Core
             dto.FlowStorageCode = df.FlowStorageCode;
             dto.MappedSchema = GetMappedFileSchema(df.Id);
             dto.AssociatedJobs = GetExternalRetrieverJobs(df.Id);
+            dto.ObjectStatus = df.ObjectStatus;
+            dto.DeleteIssuer = df.DeleteIssuer;
+            dto.DeleteIssueDTM = df.DeleteIssueDTM;
 
             List<SchemaMapDto> scmMapDtoList = new List<SchemaMapDto>();
             foreach (DataFlowStep step in df.Steps.Where(w => w.SchemaMappings != null && w.SchemaMappings.Any()))
@@ -802,7 +957,9 @@ namespace Sentry.data.Core
                 Name = GenerateDataFlowNameForFileSchema(scm),
                 CreatedDTM = DateTime.Now,
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
-                FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE()
+                FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE(),
+                DeleteIssueDTM = DateTime.MaxValue,
+                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };
 
             _datasetContext.Add(df);

@@ -17,6 +17,7 @@ namespace Sentry.data.Web
             IsCompressed = false;
             IsPreProcessingRequired = false;
             RetrieverJob = new JobModel();
+            ObjectStatus = ObjectStatusEnum.Active;
         }
 
         [System.ComponentModel.DataAnnotations.Required]
@@ -51,6 +52,7 @@ namespace Sentry.data.Web
         public string CreatedBy { get; set; }
         public DateTime CreatedDTM { get; set; }
         public int DataFlowId { get; set; }
+        public ObjectStatusEnum ObjectStatus { get; set; }
 
 
 

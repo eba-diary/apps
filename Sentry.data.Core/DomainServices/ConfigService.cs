@@ -403,7 +403,8 @@ namespace Sentry.data.Core
                 ParentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId),
                 FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId),
                 DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
-                Schemas = deList
+                Schemas = deList,
+                ObjectStatus = dto.ObjectStatus
             };
             dfc.IsSchemaTracked = true;
             dfc.Schema = _datasetContext.GetById<FileSchema>(dto.SchemaId);
@@ -547,27 +548,45 @@ namespace Sentry.data.Core
             {
                 DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
 
-                if (logicalDelete & dfc.DeleteInd)
+                //Do not proceed with dataset file configuration is already marked for deletion
+                //TODO: CLA-2765 - Remove deleteInd filter after testing completed
+                if (logicalDelete && (dfc.DeleteInd || 
+                    dfc.ObjectStatus == GlobalEnums.ObjectStatusEnum.Pending_Delete || 
+                    dfc.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted))
                 {
                     throw new DatasetFileConfigDeletedException("Already marked for deletion");
                 }
 
                 FileSchema scm = _datasetContext.GetById<FileSchema>(dfc.Schema.SchemaId);
-                FileSchema de = dfc.Schema;
 
                 if (logicalDelete)
                 {
                     Logger.Info($"configservice-delete-logical - configid:{id} configname:{dfc.Name}");
-                    //Disable all associated RetrieverJobs
+
+                    /*  
+                     *  Legacy processing platform jobs where associated directly to datasetfileconfig object
+                     *  Disable all associated RetrieverJobs
+                    */
                     foreach (var job in dfc.RetrieverJobs)
                     {
                         _jobService.DisableJob(job.Id);
                     }
 
-                    //Mark Object for delete to ensure they are not displaed in UI
-                    //Goldeneye service will perform delete after determined amount of time
+                    /*
+                     *  Mark all dataflows, for deletion, associated with schema on new processing platform
+                     */
+                    //Disable all retriever jobs, associated with schema flow
+                    _dataFlowService.DeleteFlowsByFileSchema(scm, logicalDelete);
+
+                    /*  Mark objects for delete to ensure they are not displaed in UI
+                     *  WallEService, long running task within Goldeneye service, will perform delete after determined amount of time
+                    */
+                    /* Mark dataset file config object for delete */
                     MarkForDelete(dfc);
+
+                    /* Mark schema object for delete */
                     MarkForDelete(scm);
+
                     _datasetContext.SaveChanges();
 
                     GenerateConsumptionLayerDeleteEvent(dfc);
@@ -578,51 +597,32 @@ namespace Sentry.data.Core
                     try
                     {
                         //Ensure all associated RetrieverJobs are disabled
-                        Logger.Info($"configservice-delete-disabledjobs - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                        List<RetrieverJob> jobs = dfc.RetrieverJobs.ToList();
-                        foreach (var job in jobs)
-                        {
-                            dfc.RetrieverJobs.Remove(job);
-                            _jobService.DeleteJob(job.Id);
-                        }
+                        //TODO: CLA-2765 - Revist adding ObjectStatus to RetrieverJobs
+                        //TODO: CLA-2765 - Revist moving Parquet files to glacier storage tier
+                        //TODO: CLA-2765 - Revist moving raw data files to glacier storage tier
+                        //TODO: CLA-2765 - Do Datasetfile records need an objectstatus?
 
-                        //Delete all parquet files under schema storage code
-                        Logger.Info($"configservice-delete-deleteparquetstorage - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                        DeleteParquetFilesByStorageCode(scm.StorageCode);
-
-                        //Delete all raw data files under schema storage code
-                        Logger.Info($"configservice-delete-deleterawstorage - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                        DeleteRawFilesByStorageCode(scm.StorageCode);
-
-                        //Delete all DatasetFileParquet metadata  (inserts are managed outside of DSC code)
-                        Logger.Info($"configservice-delete-datasetfileparquetmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                        List<DatasetFileParquet> parquetFileList = _datasetContext.DatasetFileParquet.Where(w => w.SchemaId == scm.SchemaId).ToList();
-                        Logger.Info($"configservice-delete-datasetfileparquetmetadata - recordsfound:{parquetFileList.Count} datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                        foreach (DatasetFileParquet record in parquetFileList)
-                        {
-                            _datasetContext.Remove(record);
-                        }
-
-                        //Delete all DatasetFileReply metadata  (inserts are managed outside of DSC code)
-                        Logger.Info($"configservice-delete-datasetfilereplymetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                        List<DatasetFileReply> replyList = _datasetContext.DatasetFileReply.Where(w => w.SchemaID == scm.SchemaId).ToList();
-                        Logger.Info($"configservice-delete-datasetfilereplymetadata - recordsfound:{parquetFileList.Count} datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                        foreach (DatasetFileReply record in replyList)
-                        {
-                            _datasetContext.Remove(record);
-                        }
-
-                        //Delete associated dataflows\steps
-                        Logger.Info($"configservice-delete-dataflowmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                        _dataFlowService.DeleteByFileSchema(scm);
+                        ////Delete associated dataflows\steps
+                        //Logger.Info($"configservice-delete-dataflowmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
+                        //_dataFlowService.DeleteByFileSchema(scm);
 
 
-                        //Delete all Schema metadata (will cascade delete to datafiles, dataelement, dataobject, dataobjectfield tables (including detail tables))
-                        Logger.Info($"configservice-delete-configmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                        if (!parentDriven)
-                        {
-                            _datasetContext.Remove(dfc);
-                        }                        
+                        //Mark DatasetFileConfig record deleted
+                        dfc.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
+                        dfc.Schema.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
+
+                        /*
+                         *  Mark all dataflows, for deletion, associated with schema on new processing platform
+                         */
+                        //Disable all retriever jobs, associated with schema flow
+                        _dataFlowService.DeleteFlowsByFileSchema(scm, logicalDelete);
+
+                        //Logger.Info($"configservice-delete-configmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
+                        //if (!parentDriven)
+                        //{
+                        //    _datasetContext.Remove(dfc);
+                        //}
+
                         _datasetContext.SaveChanges();
 
                     }
@@ -648,29 +648,13 @@ namespace Sentry.data.Core
             return _securityService.GetUserSecurity(dfc.ParentDataset, _userService.GetCurrentUser());
         }
 
-        /// <summary>
-        /// Returns list of DatasetFileConfig objects where they are marked for delete, DeleteIssueDTM older than SchemaDeleteWaitDays, and parent dataset not marked for delete.
-        /// </summary>
-        /// <returns></returns>
-        public List<DatasetFileConfig> GetSchemaMarkedDeleted()
-        {
-            List<DatasetFileConfig> configList = _datasetContext.DatasetFileConfigs.Where(w => w.DeleteInd && w.DeleteIssueDTM < DateTime.Now.AddDays(Double.Parse(Configuration.Config.GetHostSetting("SchemaDeleteWaitDays")))).ToList();
-            List<DatasetFileConfig> deleteList = new List<DatasetFileConfig>();
-            foreach (var config in configList)
-            {
-                if (!config.ParentDataset.DeleteInd)
-                {
-                    deleteList.Add(config);
-                }
-            }
-            return deleteList;
-        }
-
+        //TODO CLA-2765 - Remove unused method DeleteParquetFilesByStorageCode
         public void DeleteParquetFilesByStorageCode(string storageCode)
         {
             _s3ServiceProvider.DeleteS3Prefix($"parquet/{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
         }
 
+        //TODO CLA-2765 - Remove unused method DeleteRawFilesByStorageCode
         public void DeleteRawFilesByStorageCode(string storageCode)
         {
             _s3ServiceProvider.DeleteS3Prefix($"{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
@@ -741,7 +725,7 @@ namespace Sentry.data.Core
         #region PrivateMethods
         private void GenerateConsumptionLayerDeleteEvent(DatasetFileConfig config)
         {
-            //Send message to create hive table
+            //Send message to delete hive table\views
             HiveTableDeleteModel hiveDelete = new HiveTableDeleteModel()
             {
                 SchemaID = config.Schema.SchemaId,
@@ -750,17 +734,14 @@ namespace Sentry.data.Core
             };
             _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveDelete));
 
-            if (config.Schema.CLA2429_SnowflakeCreateTable)
+            //Send message to delete snowflake table\views
+            SnowTableDeleteModel snowDelete = new SnowTableDeleteModel()
             {
-                //Send message to create hive table
-                SnowTableDeleteModel snowDelete = new SnowTableDeleteModel()
-                {
-                    SchemaID = config.Schema.SchemaId,
-                    DatasetID = config.ParentDataset.DatasetId,
-                    InitiatorID = _userService.GetCurrentUser().AssociateId
-                };
-                _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(snowDelete));
-            }
+                SchemaID = config.Schema.SchemaId,
+                DatasetID = config.ParentDataset.DatasetId,
+                InitiatorID = _userService.GetCurrentUser().AssociateId
+            };
+            _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(snowDelete));
         }
 
 
@@ -784,19 +765,16 @@ namespace Sentry.data.Core
 
                 _messagePublisher.PublishDSCEvent(hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel));
 
-                //Only create snowflake table create if feature flag is true
-                if (config.Schema.CLA2429_SnowflakeCreateTable)
+                //Always generate snowflake table create event
+                SnowTableCreateModel snowModel = new SnowTableCreateModel()
                 {
-                    SnowTableCreateModel snowModel = new SnowTableCreateModel()
-                    {
-                        DatasetID = config.ParentDataset.DatasetId,
-                        SchemaID = config.Schema.SchemaId,
-                        RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id,
-                        InitiatorID = _userService.GetCurrentUser().AssociateId
-                    };
+                    DatasetID = config.ParentDataset.DatasetId,
+                    SchemaID = config.Schema.SchemaId,
+                    RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id,
+                    InitiatorID = _userService.GetCurrentUser().AssociateId
+                };
 
-                    _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
-                }
+                _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
             }
         }
         private string GenerateHiveDatabaseName(Category cat)
@@ -809,16 +787,20 @@ namespace Sentry.data.Core
 
         private void MarkForDelete(DatasetFileConfig dfc)
         {
+            // TODO: CLA-2765 - Set ObjectStatus to PENDING_DELETE status
             dfc.DeleteInd = true;
             dfc.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
             dfc.DeleteIssueDTM = DateTime.Now;
+            dfc.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
         }
 
         private void MarkForDelete(FileSchema scm)
         {
+            // TODO: CLA-2765 - Set ObjectStatus to PENDING_DELETE status
             scm.DeleteInd = true;
             scm.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
             scm.DeleteIssueDTM = DateTime.Now;
+            scm.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
         }
 
         private void MapToDto(DataElement de, SchemaApiDTO dto)
@@ -1189,6 +1171,7 @@ namespace Sentry.data.Core
             dto.DeleteInd = dfc.DeleteInd;
             dto.DeleteIssuer = dfc.DeleteIssuer;
             dto.DeleteIssueDTM = dfc.DeleteIssueDTM;
+            dto.ObjectStatus = dfc.ObjectStatus;
         }
 
         public Tuple<List<RetrieverJob>, List<DataFlowStepDto>> GetDataFlowDropLocationJobs(DatasetFileConfig config)

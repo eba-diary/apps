@@ -106,6 +106,7 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Edit(int id)
         {
+            // TODO: CLA-2765 - Add filtering to ensure EDIT only occurs for ACTIVE object status
             UserSecurity us = _datasetService.GetUserSecurityForDataset(id);
             if(us != null && us.CanEditDataset)
             {
@@ -158,6 +159,7 @@ namespace Sentry.data.Web.Controllers
                 ConfigFileName = "Default",
                 ConfigFileDesc = "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
                 UploadUserId = SharedContext.CurrentUser.AssociateId,
+                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };
 
             Utility.SetupLists(_datasetContext, cdm);

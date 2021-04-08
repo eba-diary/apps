@@ -23,6 +23,9 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.CreatedBy, m => m.Column("CreatedBy"));
             this.Property(x => x.Questionnaire, m => m.Column("Questionnaire"));
             this.Property(x => x.FlowStorageCode, m => m.Column("FlowStorageCode"));
+            this.Property(x => x.ObjectStatus, m => m.Column("ObjectStatus"));
+            this.Property(x => x.DeleteIssuer, m => m.Column("DeleteIssuer"));
+            this.Property(x => x.DeleteIssueDTM, m => m.Column("DeleteIssueDTM"));
 
             this.Bag(x => x.Steps, (m) =>
             {

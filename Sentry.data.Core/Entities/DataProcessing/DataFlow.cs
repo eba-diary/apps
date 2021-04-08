@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.Core;
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 
@@ -24,7 +25,12 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual string Questionnaire { get; set; }
         public virtual IList<DataFlowStep> Steps { get; set; }
         public virtual IList<EventMetric> Logs { get; set; }
-        
+
+        //Delete implementation
+        public virtual ObjectStatusEnum ObjectStatus { get; set; }
+        public virtual string DeleteIssuer { get; set; }
+        public virtual DateTime DeleteIssueDTM { get; set; }
+
         public virtual ValidationResults ValidateForDelete()
         {
             return new ValidationResults();
