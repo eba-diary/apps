@@ -38,7 +38,8 @@ namespace Sentry.data.Web
                 IsSecured = model.IsSecured,
                 HasHeader = model.HasHeader,
                 IsInSAS = model.IncludeInSas,
-                CreateCurrentView = model.CreateCurrentView
+                CreateCurrentView = model.CreateCurrentView,
+                ObjectStatus = model.ObjectStatus
 
             };
         }
