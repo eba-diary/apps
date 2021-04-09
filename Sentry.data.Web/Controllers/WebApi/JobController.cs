@@ -471,8 +471,12 @@ namespace Sentry.data.Web.WebApi.Controllers
                 //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));//ACCEPT header
                 //HttpResponseMessage response = await client.PostAsync(Sentry.Configuration.Config.GetHostSetting("ApacheLivy") + "/batches", contentPost).ConfigureAwait(false);
 
-                var client = _httpClient;
                 HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("batches", contentPost).ConfigureAwait(false);
+
+                string result = response.Content.ReadAsStringAsync().Result;
+                string postResult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
+
+                Logger.Debug($"postbatches_livyresponse statuscode:{response.StatusCode.ToString()}:::result:{postResult}");
 
                 //Record submission regardless if target deems it a bad request.
                 Submission sub = new Submission()
@@ -488,8 +492,6 @@ namespace Sentry.data.Web.WebApi.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    string result = response.Content.ReadAsStringAsync().Result;
-
                     LivyBatch batchResult = JsonConvert.DeserializeObject<LivyBatch>(result);                        
 
                     JobHistory histRecord = new JobHistory()
@@ -524,6 +526,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             }
             catch (Exception ex)
             {
+
                 Logger.Error($"Internal Error (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}", ex);
                 return InternalServerError(ex);
             }
@@ -558,10 +561,13 @@ namespace Sentry.data.Web.WebApi.Controllers
                 //HttpResponseMessage response = await client.GetAsync(Sentry.Configuration.Config.GetHostSetting("ApacheLivy") + $"/batches/{batchId}").ConfigureAwait(false);
                 HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync($"/batches/{batchId}").ConfigureAwait(false);
 
+                string result = response.Content.ReadAsStringAsync().Result;
+                string sendresult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
+
+                Logger.Debug($"getbatchstate_livyresponse statuscode:{response.StatusCode.ToString()}:::result:{sendresult}");
+
                 if (response.IsSuccessStatusCode)
                 {
-                    string result = response.Content.ReadAsStringAsync().Result;
-
                     if (result == $"Session '{batchId}' not found.")
                     {
                         return BadRequest("Session not found");
