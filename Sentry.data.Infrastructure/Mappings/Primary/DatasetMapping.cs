@@ -32,6 +32,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.DatasetInformation, (m) => m.Column("Information_DSC"));
             this.Property((x) => x.DatasetType, (m) => m.Column("Dataset_TYP"));
             this.Property((x) => x.DataClassification, (m) => m.Column("DataClassification_CDE"));
+            this.Property((x) => x.ObjectStatus, (m) => m.Column("ObjectStatus"));
             this.Property((x) => x.DeleteInd, (m) => m.Column("DeleteInd"));
             this.Property((x) => x.DeleteIssuer, (m) => m.Column("DeleteIssuer"));
             this.Property((x) => x.DeleteIssueDTM, (m) => m.Column("DeleteIssueDTM"));

@@ -1,5 +1,4 @@
-﻿using Sentry.data.Common;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +11,7 @@ namespace Sentry.data.Web
         {
 
             Sentry.Associates.Associate sentryAssociate = String.IsNullOrWhiteSpace(ds.PrimaryOwnerId)? null : _associateInfoProvider.GetAssociateInfo(ds.PrimaryOwnerId);
-
+            
             if (ds.DatasetCategories.Count > 1)
             {
                 List<string> catNameList = new List<string>();
@@ -46,19 +45,19 @@ namespace Sentry.data.Web
             this.DatasetDesc = ds.DatasetDesc;
             this.DatasetInformation = ds.DatasetInformation;
             this.SentryOwnerName = (sentryAssociate == null) ? null : Sentry.data.Core.Helpers.DisplayFormatter.FormatAssociateName(sentryAssociate);
-            this.DistinctFileExtensions = ds.DatasetFiles.Select(x => Utilities.GetFileExtension(x.FileName).ToLower()).Distinct().ToList();
+            //this.DistinctFileExtensions = ds.DatasetFiles.Select(x => Utilities.GetFileExtension(x.FileName).ToLower()).Distinct().ToList();
             this.Frequencies = null;
             this.BusinessUnits = ds.BusinessUnits.Select(x => x.Name).ToList();
             this.DatasetFunctions = ds.DatasetFunctions.Select(x => x.Name).ToList();
 
-            if (ds.DatasetFiles.Any())
-            {
-                this.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM).ToShortDateString();
-            }
-            else
-            {
-                this.ChangedDtm = ds.ChangedDtm.ToShortDateString();
-            }
+            //if (ds.DatasetFiles.Any())
+            //{
+            //    this.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM).ToShortDateString();
+            //}
+            //else
+            //{
+            //    this.ChangedDtm = ds.ChangedDtm.ToShortDateString();
+            //}
 
             this.Type = ds.DatasetType;
 
@@ -104,10 +103,11 @@ namespace Sentry.data.Web
             else
             {
                 this.Link = "/Dataset/Detail/" + ds.DatasetId;
-                this.DistinctFileExtensions = ds.DatasetFiles.Select(x => Utilities.GetFileExtension(x.FileName).ToLower()).Distinct().ToList();
+                this.DistinctFileExtensions = new List<string>();//ds.DatasetFiles.Select(x => Utilities.GetFileExtension(x.FileName).ToLower()).Distinct().ToList();
             }
 
             this.CreatedDtm = ds.DatasetDtm.ToShortDateString();
+            this.ObjectStatus = ds.ObjectStatus.GetDescription();
         }
 
         public string Category { get; set; }
@@ -149,5 +149,7 @@ namespace Sentry.data.Web
         public List<string> DatasetFunctions { get; set; }
         public int PageViews { get; set; }
         public List<ContactInfoModel> ContactDetails { get; set; }
+        public string ObjectStatus { get; set; }
+        public Boolean IsAdmin { get; set; }
     }
 }

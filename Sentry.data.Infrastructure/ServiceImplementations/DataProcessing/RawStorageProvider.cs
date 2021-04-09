@@ -3,13 +3,15 @@ using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.S3;
+using Sentry.data.Core.Helpers;
 using Sentry.data.Core.Interfaces.DataProcessing;
 using Sentry.data.Infrastructure.Helpers;
-using StructureMap;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
@@ -17,35 +19,55 @@ namespace Sentry.data.Infrastructure
     {
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
-        private readonly IDatasetService _datasetService;
-        private readonly IDataFlowService _dataFlowService;
         private DataFlowStep _step;
         private string _flowGuid;
         private string _runInstGuid;
 
 
         public RawStorageProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider,
-            IDatasetService datasetService, IDataFlowService dataFlowService) : base(dataFlowService)
+            IDataFlowService dataFlowService) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
-            _datasetService = datasetService;
-            _dataFlowService = dataFlowService;
+        }
+        public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
+        {
+            throw new NotImplementedException();
         }
 
-        public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
+        public override async Task ExecuteActionAsync(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
             Stopwatch stopWatch = new Stopwatch();
             _step = step;
             _flowGuid = stepEvent.FlowExecutionGuid;
             _runInstGuid = stepEvent.RunInstanceGuid;
 
-            _step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"start-method <{_step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug);
+            //log standard start method statement
+            MetricData.AddOrUpdateValue("log", $"start-method <{step.DataAction_Type_Id.ToString()}>-executeaction");
+            step.LogExecution(stepEvent, MetricData, Log_Level.Debug);
 
             try
             {
                 stopWatch.Start();
+                DateTime startTime = DateTime.Now;
+                MetricData.AddOrUpdateValue("start_process_time", $"{startTime}");
+                MetricData.AddOrUpdateValue("message_value", $"{JsonConvert.SerializeObject(stepEvent)}");
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine($"startTime_tostring: {startTime}");
+                sb.AppendLine($"startTime_UTC_tostring: {startTime.ToUniversalTime()}");
+                sb.AppendLine($"stepEvent_S3EventTime_tostring: {stepEvent.S3EventTime}");
+                sb.AppendLine($"stepEvent_S3EventTime_DateTime_tostring: {DateTime.Parse(stepEvent.S3EventTime)}");
+                sb.AppendLine($"stepEvent_S3EventTime_DateTime_UTC_tostring: {DateTime.Parse(stepEvent.S3EventTime).ToUniversalTime()}");
+                Logger.Debug(sb.ToString());
+
+                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{((int)(startTime.ToUniversalTime() - DateTime.Parse(stepEvent.S3EventTime).ToUniversalTime()).TotalMilliseconds)}");
+
                 string fileName = Path.GetFileName(stepEvent.SourceKey);
+
+                MetricData.AddOrUpdateValue("filename", fileName);
+                MetricData.AddOrUpdateValue("log", $"{step.DataAction_Type_Id.ToString()} processing event - {JsonConvert.SerializeObject(stepEvent)}");
+                step.LogExecution(stepEvent, MetricData, Log_Level.Debug);
 
                 /***************************************
                  *  Perform provider specific processing
@@ -70,6 +92,7 @@ namespace Sentry.data.Infrastructure
                         PayLoad = new S3ObjectEvent()
                         {
                             eventName = "ObjectCreated:Put",
+                            eventTime = DateTime.Now,
                             s3 = new S3()
                             {
                                 bucket = new Bucket()
@@ -83,28 +106,55 @@ namespace Sentry.data.Infrastructure
                             }
                         }
                     };
-                    _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+                    await _messagePublisher.PublishDSCEventAsync("99999", JsonConvert.SerializeObject(s3e)).ConfigureAwait(false);
 #endif
                 }
 
                 stopWatch.Stop();
+                DateTime endTime = DateTime.Now;
 
-                _step.Executions.Add(_step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-executeaction-success", Log_Level.Debug, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }));
+                //Set Standard metric data
+                MetricData.AddOrUpdateValue("duration", $"{stopWatch.ElapsedMilliseconds}");
+                MetricData.AddOrUpdateValue("status", "C");
+                MetricData.AddOrUpdateValue("log", $"{step.DataAction_Type_Id.ToString()}-executeaction-successful  start:{startTime} end:{endTime} duration:{endTime - startTime}");
+
+                step.Executions.Add(step.LogExecution(stepEvent, MetricData, Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }));
+                //_step.Executions.Add(_step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-executeaction-success", Log_Level.Debug, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }));
+
+                //Log end of method statement
+                MetricData.AddOrUpdateValue("log", $"end-method <{step.DataAction_Type_Id.ToString()}>-executeaction");
+                step.LogExecution(stepEvent, MetricData, Log_Level.Debug);
             }
             catch(Exception ex)
             {
+                //Stop stopwatch if running
                 if (stopWatch.IsRunning)
                 {
                     stopWatch.Stop();
                 }
-                _step.Executions.Add(_step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-executeaction-failed", Log_Level.Error, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, ex));
-                _step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"end-method <{_step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug);
+
+                //Set statndard metric data
+                MetricData.AddOrUpdateValue("duration", $"{stopWatch.ElapsedMilliseconds}");
+                MetricData.AddOrUpdateValue("status", "F");
+                MetricData.AddOrUpdateValue("log", $"{step.DataAction_Type_Id.ToString()}-executeaction-failed");
+
+                //Log standard metric data
+                _step.Executions.Add(_step.LogExecution(stepEvent, MetricData, Log_Level.Error, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, ex));
+
+                //Log end of method statement
+                MetricData.AddOrUpdateValue("log", $"end-method <{_step.DataAction_Type_Id.ToString()}>-executeaction");
+                _step.LogExecution(stepEvent, MetricData, Log_Level.Debug);
             }
         }
 
         public override void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
-            List<DataFlow_Log> logs = new List<DataFlow_Log>();
+            throw new NotImplementedException();
+        }
+
+        public override async Task PublishStartEventAsync(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
+        {
+            List<EventMetric> logs = new List<EventMetric>();
             Stopwatch stopWatch = new Stopwatch();
             _step = step;
             _flowGuid = flowExecutionGuid;
@@ -115,7 +165,20 @@ namespace Sentry.data.Infrastructure
             try
             {
                 stopWatch.Start();
-                _step.LogExecution(_flowGuid, _runInstGuid, $"start-method <{_step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug);
+                DateTime startTime = DateTime.Now;
+                MetricData.AddOrUpdateValue("start_process_time", $"{DateTime.Now.ToString()}");
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine($"startTime_tostring: {startTime}");
+                sb.AppendLine($"startTime_UTC_tostring: {startTime.ToUniversalTime()}");
+                sb.AppendLine($"s3Event_eventTime_tostring: {s3Event.eventTime}");
+                sb.AppendLine($"s3Event_eventTime_UTC_tostring: {s3Event.eventTime.ToUniversalTime()}");
+                Logger.Debug(sb.ToString());
+
+                MetricData.AddOrUpdateValue("s3_to_process_lag", $"{((int)(startTime.ToUniversalTime() - s3Event.eventTime.ToUniversalTime()).TotalMilliseconds)}");
+                MetricData.AddOrUpdateValue("message_value", $"{JsonConvert.SerializeObject(s3Event)}");
+                MetricData.AddOrUpdateValue("log", $"start-method <{_step.DataAction_Type_Id.ToString()}>-publishstartevent");
+                _step.LogExecution(_flowGuid, _runInstGuid, MetricData, Log_Level.Debug);
 
                 //Convert FlowExecutionGuid to DateTime, then to local time
                 DateTime flowGuidDTM = DataFlowHelpers.ConvertFlowGuidToDateTime(flowExecutionGuid).ToLocalTime();
@@ -135,19 +198,29 @@ namespace Sentry.data.Infrastructure
                     StepTargetPrefix = _step.TargetPrefix + $"{flowGuidDTM.Year.ToString()}/{flowGuidDTM.Month.ToString()}/{flowGuidDTM.Day.ToString()}/{DataFlowHelpers.GenerateGuid(flowExecutionGuid, runInstanceGuid)}/",
                     EventType = GlobalConstants.DataFlowStepEvent.RAW_STORAGE_START,
                     FileSize = s3Event.s3.Object.size.ToString(),
-                    S3EventTime = s3Event.eventTime.ToString("s"),
+                    S3EventTime = s3Event.eventTime.ToString("o"),
                     OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                 };
 
                 base.GenerateDependencyTargets(stepEvent);
 
-                _step.LogExecution(_flowGuid, _runInstGuid, $"{_step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug);
+                MetricData.AddOrUpdateValue("log", $"{_step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}");
+                _step.LogExecution(_flowGuid, _runInstGuid, MetricData, Log_Level.Debug);
 
-                _messagePublisher.PublishDSCEvent($"{_step.DataFlow.Id}-{_step.Id}-{RandomString(6)}", JsonConvert.SerializeObject(stepEvent));
-                //_messagePublisher.PublishDSCEvent(string.Empty, JsonConvert.SerializeObject(stepEvent));
+                await _messagePublisher.PublishDSCEventAsync($"{_step.DataFlow.Id}-{_step.Id}-{RandomString(6)}", JsonConvert.SerializeObject(stepEvent)).ConfigureAwait(false);
+
                 stopWatch.Stop();
+                DateTime endTime = DateTime.Now;
 
-                _step.LogExecution(_flowGuid, _runInstGuid, $"{_step.DataAction_Type_Id.ToString()}-publishstartevent-successful", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) });
+                //Add metricdata values
+                MetricData.AddOrUpdateValue("duration", $"{stopWatch.ElapsedMilliseconds}");
+                MetricData.AddOrUpdateValue("status", "C");
+                MetricData.AddOrUpdateValue("log", $"{step.DataAction_Type_Id.ToString()}-publishstartevent-successful  start:{startTime} end:{endTime} duration:{stopWatch.ElapsedMilliseconds}");
+                step.Executions.Add(step.LogExecution(stepEvent, MetricData, Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }));
+
+                //Log end of method statement
+                MetricData.AddOrUpdateValue("log", $"end-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent");
+                step.LogExecution(stepEvent, MetricData, Log_Level.Debug);
             }
             catch (Exception ex)
             {
@@ -155,8 +228,16 @@ namespace Sentry.data.Infrastructure
                 {
                     stopWatch.Stop();
                 }
-                _step.Executions.Add(_step.LogExecution(_flowGuid, _runInstGuid, $"{_step.DataAction_Type_Id.ToString()}-publishstartevent-failed", Log_Level.Error, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, ex));
-                _step.LogExecution(_flowGuid, _runInstGuid, $"end-method <{_step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug);
+
+                MetricData.AddOrUpdateValue("duration", $"{stopWatch.ElapsedMilliseconds}");
+                MetricData.AddOrUpdateValue("status", "F");
+                MetricData.AddOrUpdateValue("log", $"{step.DataAction_Type_Id.ToString()}-publishstartevent-failed");
+
+                step.Executions.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, MetricData, Log_Level.Error, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, ex));
+
+                //Log end of method statement
+                MetricData.AddOrUpdateValue("log", $"end-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent");
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, MetricData, Log_Level.Debug);
             }
         }
     }

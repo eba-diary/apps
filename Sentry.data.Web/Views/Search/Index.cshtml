@@ -163,12 +163,12 @@
                         </div>
 
                         <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults.pageItems">
-                            <li class="ul-dataset-list-item borderSide_gray boxShadowSm" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
+                            <li class="ul-dataset-list-item borderSide_gray boxShadowSm" data-bind="css: BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
                                 <div>
                                     <div data-bind="if: $index > 20"></div>
                                     <div class="category-type-wrap">
-                                        <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none" title="Click to toggle favorite"></div>
-                                        <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none" title="Click to toggle favorite"></div>
+                                        <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId, title: FavoriteTitle}, visible: IsFavorite, enable: ObjectStatus === 'Active'" style="display: none"></div>
+                                        <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId, title: FavoriteTitle}, visible: IsFavorite == false, enable: ObjectStatus === 'Active'" style="display: none"></div>
                                         <div class="category-type" data-bind="css: BannerColor, attr: {title: AbbreviatedCategory}">
                                             <span data-bind="text: AbbreviatedCategory" />
                                         </div>
@@ -180,7 +180,7 @@
                                             <span data-bind="text: $data" />
                                         </div>
                                         <!-- /ko -->
-                                        <span class="search-dataset-name" data-bind="text: DatasetName"></span>
+                                        <span class="search-dataset-name" data-bind="text: computedDatasetName"></span>
                                         <!-- ko if: IsSecured-->
                                         <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></i>
                                         <!-- /ko -->
@@ -356,6 +356,8 @@
             self.DatasetDesc = data.DatasetDesc;
             self.SentryOwner = data.SentryOwnerName;
             self.DatasetId = data.DatasetId;
+            self.ObjectStatus = data.ObjectStatus;
+            self.IsAdmin = data.IsAdmin;
 
             self.DatasetInformation = data.DatasetInformation;
             self.DatasetName = data.DatasetName;
@@ -368,9 +370,23 @@
                 if (self.Type === "RPT") {
                     return "Click here to open.";
                 } else {
-                    return "Click here to go to the Dataset Detail Page.";
+                    if (self.ObjectStatus == "Active") {
+                        return "Click here to go to the Dataset Detail Page";
+                    }
+                    else if (self.ObjectStatus == "Pending Delete") {
+                        return "Dataset is marked for deletion";
+                    }
                 }
             });
+
+            self.FavoriteTitle = ko.computed(function () {
+                if (self.type === "RPT" || (self.ObjectStatus === "Active")) {
+                    return "Click to toggle favorite";
+                }
+                else if (self.ObjectStatus === "Pending Delete") {
+                    return "Dataset is marked for deletion, favorite functionality disabled";
+                }
+            })
 
             self.TileClicked = function (item, e) {
 
@@ -412,7 +428,9 @@
 
                 } else {
                      //What is the primary function of clicking on the tile if its a Dataset.
-                    window.location.href = "/Dataset/Detail/" + data.DatasetId;
+                    if (self.ObjectStatus === "Active") {
+                        window.location.href = "/Dataset/Detail/" + data.DatasetId;
+                    }
                 }
 
                 return false;
@@ -483,6 +501,29 @@
                 }
                 else {
                     return false;
+                }
+            });
+
+            // TODO: CLA-2765 Get search card background to change based on objectstatus
+            //self.ObjectStatusClass = ko.pureComputed(function () {
+            //    if (self.ObjectStatus == "Pending Delete") {
+            //        return 'objectStatusPendingDelete';
+            //    }
+            //    else if (self.ObjectStatus == "Deleted") {
+            //        return 'objectStatusDeleted';
+            //    }
+            //    else {
+            //        return 'objectStatusActive';
+            //    }
+            //});
+
+            self.computedDatasetName = ko.pureComputed(function () {
+                if (self.ObjectStatus == "Pending Delete") {
+                    var newName = self.DatasetName.concat(" (", self.ObjectStatus, ")");
+                    return newName;
+                }
+                else {
+                    return self.DatasetName;
                 }
             });
 
@@ -658,29 +699,29 @@
                 temp = [];
 
 
-                //EXTENSION FILTER
-                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
-                for (var item, i = 0; item = datasets[i++];) {
-                    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
-                        if (!(ext in extensionLookup)) {
-                            extensionLookup[ext] = 1;
-                            self.ExtensionFilters.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
+                ////EXTENSION FILTER
+                //counter = 0; //Needs seperate counter as multiple objects can appear per iteration
+                //for (var item, i = 0; item = datasets[i++];) {
+                //    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
+                //        if (!(ext in extensionLookup)) {
+                //            extensionLookup[ext] = 1;
+                //            self.ExtensionFilters.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
 
-                            temp.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
-                            counter++;
-                        }
-                    }
-                }
-                ko.utils.arrayForEach(self.AllFilters(), function (v) {
-                    if (v.Name == 'Extension') {
-                        item = v;
-                    }
-                });
-                if (item !== undefined) {
-                    temp = item.Filters().concat(temp);
-                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
-                }
-                self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 3, true));
+                //            temp.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
+                //            counter++;
+                //        }
+                //    }
+                //}
+                //ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                //    if (v.Name == 'Extension') {
+                //        item = v;
+                //    }
+                //});
+                //if (item !== undefined) {
+                //    temp = item.Filters().concat(temp);
+                //    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                //}
+                //self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 3, true));
 
                 // sort the filters by Sequence
                 self.AllFilters.sort(function (left, right) {
@@ -1082,7 +1123,16 @@
 
             // Load initial state from server, convert it to Dataset instances, then populate self.datasets
             $.getJSON( "/Search/" + self.SearchType() + "/List", function (allData) {
-                var mappedTasks = $.map(allData, function (item) { return new Dataset(item) });
+                var mappedTasks = $.map(allData, function (item)
+                {
+                    //  Display all Reports
+                    //  Display all Active Datasets
+                    //  Display all non-active datasets if user IsAdmin
+                    x = new Dataset(item);
+                    if (x.Type === "RPT" || x.ObjectStatus === "Active" || x.IsAdmin) {                        
+                        return x
+                    }
+                });
 
                 self.datasets(mappedTasks);
 

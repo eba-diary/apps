@@ -129,6 +129,11 @@ namespace Sentry.Messaging.Common
             }
         }
 
+        async Task IMessageHandler<IPublishable>.HandleAsync(IPublishable msg)
+        {
+            throw new NotImplementedException();
+        }
+
         void IMessageHandler<IPublishable>.Handle(IPublishable msg)
         {
             lock (_locker)

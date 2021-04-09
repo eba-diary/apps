@@ -46,7 +46,7 @@ namespace Sentry.data.Infrastructure
                 {
                     IDatasetContext _dsContext = Container.GetInstance<IDatasetContext>();
 
-                    targetS3DropStep = _dsContext.DataFlowStep.Where(w => w.DataFlow == job.DataFlow && w.DataAction_Type_Id == DataActionType.S3Drop).FirstOrDefault();
+                    targetS3DropStep = _dsContext.DataFlowStep.Where(w => w.DataFlow == job.DataFlow && (w.DataAction_Type_Id == DataActionType.S3Drop || w.DataAction_Type_Id == DataActionType.ProducerS3Drop)).FirstOrDefault();
 
                     //find target s3 drop location
                     string targetPrefix = targetS3DropStep.TriggerKey;
@@ -61,7 +61,7 @@ namespace Sentry.data.Infrastructure
                     try
                     {
                         //https://docs.microsoft.com/en-us/dotnet/standard/parallel-programming/how-to-handle-exceptions-in-parallel-loops
-                        ProcessFilesInParallel(files, targetPrefix);
+                        ProcessFilesInParallel(files, targetS3DropStep.Action.TargetStorageBucket, targetPrefix);
                     }
                     catch (AggregateException ae)
                     {
@@ -95,7 +95,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        private void ProcessFilesInParallel(string[] fileArray, string targetPrefix)
+        private void ProcessFilesInParallel(string[] fileArray, string targetBucket, string targetPrefix)
         {
             _job.JobLoggerMessage("Debug", $"start method {System.Reflection.MethodBase.GetCurrentMethod().Name}");
             // Use ConcurrentQueue to enable safe enqueueing from multiple threads.
@@ -109,7 +109,8 @@ namespace Sentry.data.Infrastructure
                     {
                         IS3ServiceProvider _s3ServiceProvider = Container.GetInstance<IS3ServiceProvider>();
 
-                        _s3ServiceProvider.UploadDataFile(item, GenerateTargetKey(targetPrefix, item));
+                        //_s3ServiceProvider.UploadDataFile(item, GenerateTargetKey(targetPrefix, item));
+                        _s3ServiceProvider.UploadDataFile(item, targetBucket, GenerateTargetKey(targetPrefix, item));
 
                         //Delete file within drop location
                         try

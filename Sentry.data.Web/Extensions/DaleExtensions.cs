@@ -1,6 +1,7 @@
 ﻿using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sentry.data.Web
 {
@@ -33,7 +34,6 @@ namespace Sentry.data.Web
                 Column = dto.Column,
 
                 IsSensitive = dto.IsSensitive,
-                Alias = dto.Alias,
                 ProdType = dto.ProdType,
 
                 ColumnType = dto.ColumnType,
@@ -44,9 +44,13 @@ namespace Sentry.data.Web
                 EffectiveDate = dto.EffectiveDate.ToString("MM/dd/yyyy HH:mm:ss"),
                 BaseColumnId = dto.BaseColumnId,
 
-                IsOwnerVerified = dto.IsOwnerVerified
+                IsOwnerVerified = dto.IsOwnerVerified,
+                AssetList = CreateAssetList(dto.Asset),
+                SourceType = dto.SourceType
             };
         }
+
+
 
 
         public static DaleResultModel ToWeb(this DaleResultDto dto)
@@ -151,6 +155,16 @@ namespace Sentry.data.Web
             return dtos;
         }
 
+        //create a List of Assets that belong to the given column row.  DataInventory view passes a comma delimited Asset list since one column can have many assets tied too it
+        private static List<string> CreateAssetList(string asset)
+        {
+            if (!string.IsNullOrWhiteSpace(asset))
+            {
+                List<string> assets = asset.Split(',').Select(x => x != null ? x.TrimStart() : null).ToList();
+                return assets;
+            }
+            return new List<string>();
+        }
 
     }
 }

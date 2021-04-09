@@ -6,6 +6,10 @@
 
     <div class="detailContainer">
         <h2> @Model.Name - DataFlow Details </h2>
+        @if (Model.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete)
+        {
+            <h3 style="color:red"><strong>Pending Delete - Data will not be processed through this data flow</strong></h3>
+        }
         <br />
         <h4>Associated Retriever Jobs</h4>
         @if (Model.AssociatedJobs == null || Model.AssociatedJobs.Count > 0)

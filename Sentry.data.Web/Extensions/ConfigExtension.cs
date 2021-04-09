@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json.Linq;
+﻿using Sentry.data.Core;
 using Sentry.data.Web.Models.ApiModels.Config;
 using Sentry.data.Web.Models.ApiModels.Schema;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Sentry.data.Web
 {
@@ -24,7 +23,8 @@ namespace Sentry.data.Web
                 Description = model.ConfigFileDesc,
                 Delimiter = model.Delimiter,
                 HasHeader = model.HasHeader,
-                FileExtensionId = model.FileExtensionId                
+                FileExtensionId = model.FileExtensionId,
+                ObjectStatus = model.ObjectStatus
             };
         }
 
@@ -102,7 +102,8 @@ namespace Sentry.data.Web
                 IsInSAS = model.IncludedInSAS,
                 HasHeader = model.HasHeader,
                 Delimiter = model.Delimiter,
-                CreateCurrentView = model.CreateCurrentView
+                CreateCurrentView = model.CreateCurrentView,
+                ObjectStatus = model.ObjectStatus
             };
         }
 
@@ -124,8 +125,8 @@ namespace Sentry.data.Web
                 CLA1396_NewEtlColumns = model.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = model.CLA1580_StructureHive,
                 CLA2472_EMRSend = model.CLA2472_EMRSend,
-                CLA2429_SnowflakeCreateTable = model.CLA2429_SnowflakeCreateTable,
-                CLA1286_KafkaFlag = model.CLA1286_KafkaFlag
+                CLA1286_KafkaFlag = model.CLA1286_KafkaFlag,
+                ObjectStatus = model.ObjectStatus
             };
         }
 
@@ -202,14 +203,14 @@ namespace Sentry.data.Web
                     "CLA1396_NewEtlColumns|" + schemaDto.CLA1396_NewEtlColumns.ToString(),
                     "CLA1580_StructureHive|" + schemaDto.CLA1580_StructureHive.ToString(),
                     "CLA2472_EMRSend|" + schemaDto.CLA2472_EMRSend.ToString(),
-                    "CLA2429_SnowflakeCreateTable|" + schemaDto.CLA2429_SnowflakeCreateTable.ToString(),
                     "CLA1286_KafkaFlag|" + schemaDto.CLA1286_KafkaFlag.ToString()
                 },
                 DeleteInd = schemaDto.DeleteInd,
                 SnowflakeDatabase = schemaDto.SnowflakeDatabase,
                 SnowflakeSchema = schemaDto.SnowflakeSchema,
                 SnowflakeTable = schemaDto.SnowflakeTable,
-                SnowflakeStatus = schemaDto.SnowflakeStatus
+                SnowflakeStatus = schemaDto.SnowflakeStatus,
+                ObjectStatus = schemaDto.ObjectStatus.GetDescription().ToUpper()
             };
         }
 
@@ -245,9 +246,9 @@ namespace Sentry.data.Web
             model.CLA1396_NewEtlColumns = (config.Schema != null) ? config.Schema.CLA1396_NewEtlColumns : false;
             model.CLA1580_StructureHive = (config.Schema != null) ? config.Schema.CLA1580_StructureHive : false;
             model.CLA2472_EMRSend = (config.Schema != null) ? config.Schema.CLA2472_EMRSend : false;
-            model.CLA2429_SnowflakeCreateTable = (config.Schema != null) ? config.Schema.CLA2429_SnowflakeCreateTable : false;
             model.CLA1286_KafkaFlag = (config.Schema != null) ? config.Schema.CLA1286_KafkaFlag : false;
             model.DeleteInd = config.Schema.DeleteInd;
+            model.ObjectStatus = config.ObjectStatus;
         }
     }
 }

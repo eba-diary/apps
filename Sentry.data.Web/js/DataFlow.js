@@ -59,6 +59,22 @@
                 data.DataFlow.InitSchemaMaps();               
             });
         });
+
+        $(document).ready(function () {
+            $('.selectpicker').selectpicker({
+                liveSearch: false,
+                showSubtext: true,
+                size: '5',
+                dropupAuto: false
+            });
+
+            $(".selectpicker-filtering").selectpicker({
+                liveSearch: true,
+                showSubtext: true,
+                size: '5',
+                dropupAuto: false
+            });
+        });
         
         data.DataFlow.InitSchemaMaps();
 
@@ -379,7 +395,7 @@
 
             $('[id$=__SelectedDataset]').each(function (index) {
                 var cur = $(this);
-                var dsSpinner = cur.parent().find('.datasetSpinner');
+                var dsSpinner = cur.parent().find('.datasetSpinner');                
                 var curVal = cur.val();
 
                 dsSpinner.html('');

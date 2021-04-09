@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,5 +35,6 @@ namespace Sentry.data.Core
         public bool DeleteInd { get; set; }
         public string DeleteIssuer { get; set; }
         public DateTime? DeleteIssueDTM { get; set; }
+        public ObjectStatusEnum ObjectStatus { get; set; }
     }
 }

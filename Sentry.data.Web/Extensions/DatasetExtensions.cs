@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sentry.data.Core;
 using Sentry.data.Web.Models.ApiModels.Dataset;
 
 
@@ -37,7 +38,8 @@ namespace Sentry.data.Web
                 IsSecured = model.IsSecured,
                 HasHeader = model.HasHeader,
                 IsInSAS = model.IncludeInSas,
-                CreateCurrentView = model.CreateCurrentView
+                CreateCurrentView = model.CreateCurrentView,
+                ObjectStatus = model.ObjectStatus
 
             };
         }
@@ -63,7 +65,8 @@ namespace Sentry.data.Web
                 IsSecure = dto.IsSecured,
                 PrimaryContactName = dto.PrimaryContactName,
                 PrimarContactEmail = dto.PrimaryContactEmail,
-                PrimaryOwnerName = dto.PrimaryOwnerName
+                PrimaryOwnerName = dto.PrimaryOwnerName,
+                ObjectStatus = dto.ObjectStatus.GetDescription().ToUpper()
             };
         }
     }

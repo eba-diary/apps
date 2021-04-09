@@ -1,9 +1,6 @@
 ﻿using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -11,6 +8,7 @@ namespace Sentry.data.Core
     {
         public int Id { get; set; }
         public Guid FlowGuid { get; set; }
+        public string SaidKeyCode { get; set; }
         public string Name { get; set; }
         public DateTime CreateDTM { get; set; }
         public string CreatedBy { get; set; }
@@ -28,5 +26,8 @@ namespace Sentry.data.Core
         /// Associated RetrieverJobs which pull data from external sources
         /// </summary>
         public List<int> AssociatedJobs { get; set; }
+        public ObjectStatusEnum ObjectStatus { get; set; }
+        public string DeleteIssuer { get; set; }
+        public DateTime DeleteIssueDTM { get; set; }
     }
 }

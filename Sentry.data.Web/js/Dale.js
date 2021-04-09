@@ -120,7 +120,28 @@
             },
 
             columns: [
-                { data: null, className: "Asset", render: function (data) { return '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + data.Asset + '\>' + data.Asset + '</a>'; } },
+                {
+                    data: null, className: "Asset", render: function (data)
+                    {
+                        //the following render func is called for every single row column and passes in data as the specific value.  our func body below will insert our list of assets as links
+                        if (data.AssetList != null) {
+
+                            var len = data.AssetList.length;
+                            var assetHtml = '';
+
+                            if (len > 0) {
+                                for (let i = 0; i < len; i++) {
+
+                                    var ri = data.AssetList[i];
+                                    var aTag = '<a target="_blank" rel="noopener noreferrer" href=https://said.sentry.com/ViewAsset.aspx?ID=' + ri + '\>' + ri + '</a>';
+                                    assetHtml = assetHtml + ' ' + aTag;
+                                }
+                            }
+                        }
+                        return assetHtml;
+                    }
+                },
+
                 { data: "Server", className: "Server" },
                 { data: "Database", className: "Database" },
                 { data: "Object", className: "Object" },
@@ -184,7 +205,8 @@
                 { data: "Precision", className: "Precision", visible: false },
                 { data: "Scale", className: "Scale", visible: false },
                 { data: "IsNullable", className: "IsNullable", visible: false },
-                { data: "EffectiveDate", className: "EffectiveDate", visible: false }
+                { data: "EffectiveDate", className: "EffectiveDate", visible: false },
+                { data: "SourceType", className: "SourceType", visible: false }
             ],
 
             aLengthMenu: [
@@ -225,6 +247,7 @@
                 { type: "text" },
                 { type: "text" },
                 { type: "text" },
+                { type: "text" },
                 { type: "text" }
             ]
         });
@@ -233,6 +256,9 @@
         data.Dale.setupClickAttackSearch();                                                                         //SETUP SEARCH CLICK EVENTS
         data.Dale.setupClickAttackGrid();                                                                           //SETUP GRID CLICK EVENTS
     },
+
+
+
 
     //edit storage array since user is changing data
     editArray: function (rowIndex, rowData, columnIndex, columnValue) {
@@ -401,7 +427,8 @@
 
         //MOUSE CLICK EVENT NEW SEARCH
         $('.input-group-addon').click(function (e) {
-            data.Dale.sensitive = false;                                            //set sensitive property to true so grid does sensitive search back to controller
+            data.Dale.interruptedSaveCheck();                                       //if they do another search, reset everything in grid back to original state
+            data.Dale.sensitive = false;                                            //reset sensitive property since sensitive query is only done from special link
             data.Dale.disableDale();
             daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
         });
@@ -411,6 +438,8 @@
         input.addEventListener("keyup", function (event) {
             if (event.keyCode === 13) {
                 event.preventDefault();
+                data.Dale.interruptedSaveCheck();                                       //if they do another search, reset everything in grid back to original state
+                data.Dale.sensitive = false;                                            //reset sensitive property since sensitive query is only done from special link
                 data.Dale.disableDale();
                 daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
             }
@@ -418,7 +447,7 @@
 
         //SENSITIVE SEARCH CLICK EVENT
         $("#sensitiveSearchLink").on('click', function () {
-
+            data.Dale.interruptedSaveCheck();                                       //if they do another search, reset everything in grid back to original state
             data.Dale.sensitive = true;                                             //set sensitive property to true so grid does sensitive search back to controller
             $("#daleSearchCriteria").val("");
             data.Dale.disableDale();
@@ -476,6 +505,15 @@
 
         localStorage.clear();                   // Clear all items in our array
         $('#btnSaveMe').hide();                 //hide the save button again
+    },
+
+    //IF USER IN MIDDLE OF SAVE AND STARTS NEW SEARCH, THEN RESET GRID AND NOTIFY
+    interruptedSaveCheck: function () {
+
+        if ($('#btnSaveMe').is(":visible")) {
+            data.Dale.resetAfterSave();                                             //if they do another search, reset everything in grid back to original state
+            data.Dale.makeToast("warning", "Save Cancelled.  New search started.");
+        }
     },
 
     makeToast: function (severity, message) {

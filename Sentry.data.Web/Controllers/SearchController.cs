@@ -1,31 +1,11 @@
-﻿using Sentry.Core;
+﻿using Newtonsoft.Json;
 using Sentry.data.Core;
-using Amazon;
-using Amazon.S3;
-using Amazon.S3.Model;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Linq.Dynamic;
 using System.Web.Mvc;
 using System.Web.SessionState;
-using System.Linq.Dynamic;
-using System.Web;
-using Sentry.data.Web.Helpers;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using System.Net;
-using System.Text;
-using Sentry.data.Infrastructure;
-using Sentry.DataTables.Shared;
-using Sentry.DataTables.Mvc;
-using Sentry.DataTables.QueryableAdapter;
-using Sentry.data.Common;
-using System.Diagnostics;
-using LazyCache;
-using StackExchange.Profiling;
-using Sentry.Common.Logging;
-using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -36,15 +16,19 @@ namespace Sentry.data.Web.Controllers
         public IDatasetContext _datasetContext;
         private UserService _userService;
         private readonly IEventService _eventService;
+        private readonly IDatasetService _datasetService;
 
         private string Title { get; set; }
 
-        public SearchController(IDatasetContext dsCtxt, UserService userService, IAssociateInfoProvider associateInfoService, IEventService eventService)
+        public SearchController(IDatasetContext dsCtxt, UserService userService, 
+            IAssociateInfoProvider associateInfoService, IEventService eventService,
+            IDatasetService datasetService)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
             _associateInfoProvider = associateInfoService;
             _eventService = eventService;
+            _datasetService = datasetService;
         }
 
         // GET: Search
@@ -157,11 +141,13 @@ namespace Sentry.data.Web.Controllers
 
             switch (searchType)
             {
+                // TODO: CLA-2765 - Add filtering on ObjectStatus = 'Active' || 'Delete Pending' status
                 case "BusinessIntelligence":
                     dsQuery = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.REPORT && x.CanDisplay);
                     break;
                 case "Datasets":
-                    dsQuery = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET && w.CanDisplay);
+                    dsQuery = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET 
+                                        && (w.ObjectStatus == Core.GlobalEnums.ObjectStatusEnum.Active || w.ObjectStatus == Core.GlobalEnums.ObjectStatusEnum.Pending_Delete));
                     break;
                 default:
                     if (user.IsAdmin)
@@ -173,22 +159,21 @@ namespace Sentry.data.Web.Controllers
             }
 
             var dsList = dsQuery.FetchAllChildren(_datasetContext);
-            var dsIds = dsList.Select(x => x.DatasetId.ToString()).ToList();
 
-            var events = new List<Event>();
-            foreach (var group in dsIds.Split(1000))
-            {
-                events.AddRange(_datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset.HasValue && dsIds.Contains(x.Dataset.Value.ToString())).ToList());
-            }
-
+            //get cached summary metadata
+            List<DatasetSummaryMetadataDTO> dsSummaryList = _datasetService.GetDatasetSummaryMetadataDTO();
+            
             foreach (Dataset ds in dsList.OrderBy(x => x.DatasetName).ToList())
             {
+                Boolean summaryExists = dsSummaryList.Any(x => x.DatasetId == ds.DatasetId);
                 SearchModel sm = new SearchModel(ds, _associateInfoProvider)
                 {
                     IsFavorite = ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId),
-                    PageViews = events.Count(x => x.Dataset == ds.DatasetId),
-                    CanEditDataset = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? SharedContext.CurrentUser.CanManageReports : false
-                };
+                    PageViews = (summaryExists) ? dsSummaryList.First(x => x.DatasetId == ds.DatasetId).ViewCount : 0,
+                    CanEditDataset = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? SharedContext.CurrentUser.CanManageReports : false,
+                    IsAdmin = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? false : SharedContext.CurrentUser.IsAdmin,
+                    ChangedDtm = (summaryExists) ? dsSummaryList.FirstOrDefault(w => w.DatasetId == ds.DatasetId).Max_Created_DTM.ToShortDateString() : ds.ChangedDtm.ToShortDateString()
+            };
                 models.Add(sm);
             }
 

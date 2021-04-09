@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Sentry.data.Core.GlobalEnums;
+using System;
 
 namespace Sentry.data.Core
 {
@@ -13,13 +10,13 @@ namespace Sentry.data.Core
         public string Name { get; set; }
         public string Description { get; set; }
         public int ParentDatasetId { get; set; }
+        public virtual ObjectStatusEnum ObjectStatus { get; set; }
         public virtual bool DeleteInd { get; set; }
         public virtual string DeleteIssuer { get; set; }
         public virtual DateTime DeleteIssueDTM { get; set; }
         public virtual bool CLA1396_NewEtlColumns { get; set; }
         public virtual bool CLA1580_StructureHive { get; set; }
         public virtual bool CLA2472_EMRSend { get; set; }
-        public virtual bool CLA2429_SnowflakeCreateTable { get; set; }
         public virtual bool CLA1286_KafkaFlag { get; set; }
     }
 }

@@ -115,10 +115,13 @@
       <HintPath>..\packages\Sentry.Core.1.1.0\lib\net452\Sentry.Core.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.FeatureFlags, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.FeatureFlags.1.0.3\lib\net461\Sentry.FeatureFlags.dll</HintPath>
+      <HintPath>..\packages\Sentry.FeatureFlags.1.0.4\lib\net452\Sentry.FeatureFlags.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.FeatureFlags.SentryConfig, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.FeatureFlags.SentryConfig.1.0.3\lib\net461\Sentry.FeatureFlags.SentryConfig.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.FeatureFlags.Sql, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.FeatureFlags.Sql.1.0.4\lib\net452\Sentry.FeatureFlags.Sql.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.NHibernate, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.NHibernate.1.1.0\lib\net452\Sentry.NHibernate.dll</HintPath>
@@ -138,6 +141,9 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.SqlClient, Version=4.6.1.2, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SqlClient.4.8.2\lib\net461\System.Data.SqlClient.dll</HintPath>
+    </Reference>
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
@@ -194,9 +200,11 @@
     <Compile Include="Mappings\Primary\DataProcessing\Actions\ClaimIQActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\FixedWidthActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleApiActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\ProducerS3DropActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\SchemaMapActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\UncompressGzipActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\UncompressZipActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\XMLActionMapping.cs" />
     <Compile Include="Mappings\Primary\NotificationMapping.cs" />
     <Compile Include="Mappings\Primary\AssetSourceMapping.cs" />
     <Compile Include="Mappings\Primary\BusinessAreaMapping.cs" />
@@ -262,6 +270,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="ServiceImplementations\ApacheLivyProvider.cs" />
     <Compile Include="ServiceImplementations\AWSLambdaProvider.cs" />
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
     <Compile Include="ServiceImplementations\DaleSearchProvider.cs" />
@@ -281,6 +290,7 @@
     <Compile Include="ServiceImplementations\DataProcessing\UncompressZipProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\DfsDataFlowBasicProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\FtpDataFlowProvider.cs" />
+    <Compile Include="ServiceImplementations\DataSourceProviders\GenericHttpsDataFlowProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\GoogleAPIDataFlowProvider.cs" />
     <Compile Include="ServiceImplementations\HiveOdbcProvider.cs" />
     <Compile Include="ServiceImplementations\Messaging\DataStepProcessorService.cs" />
@@ -291,6 +301,9 @@
     <Compile Include="ServiceImplementations\Messaging\Handlers\DfsEventHandler.cs" />
     <Compile Include="ServiceImplementations\Messaging\S3EventService.cs" />
     <Compile Include="ServiceImplementations\Messaging\SnowflakeEventService.cs" />
+    <Compile Include="ServiceImplementations\MetadataProcessorService.cs" />
+    <Compile Include="ServiceImplementations\SAIDRestClient.cs" />
+    <Compile Include="ServiceImplementations\SAIDService.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\BaseTicketProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\CherwellProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\CherwellService.cs" />
@@ -360,6 +373,8 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="RestServiceGenerators\SAIDRestServiceGen.bat" />
+    <None Include="RestServiceGenerators\SAIDRestServiceGen.ps1" />
     <None Include="Sentry.data.Infrastructure.ruleset" />
   </ItemGroup>
   <ItemGroup>

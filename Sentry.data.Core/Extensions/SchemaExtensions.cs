@@ -1,5 +1,6 @@
 ﻿using NJsonSchema;
 using Sentry.Common.Logging;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Factories.Fields;
 using System;
 using System.Collections.Generic;
@@ -47,6 +48,9 @@ namespace Sentry.data.Core
                     break;
                 case StructField s:
                     factory = new StructFieldDtoFactory(s);
+                    break;
+                case BigIntField bi:
+                    factory = new BigIntFieldDtoFactory(bi);
                     break;
                 default:
                     factory = null;
@@ -174,7 +178,8 @@ namespace Sentry.data.Core
                         {
                             if (parentRow == null)
                             {
-                                Logger.Warn("Unhandled Scenario");
+                                Logger.Warn($"Unhandled Scenario:::jsonobjecttype:{JsonObjectType.None.ToString()}:::parentrownull");
+                                throw new SchemaConversionException("Unhandled Schema Scenario");
                             }
                             else
                             {
@@ -279,7 +284,7 @@ namespace Sentry.data.Core
                                     break;
                                 case JsonObjectType.Integer:
                                 case JsonObjectType.Null | JsonObjectType.Integer:
-                                    fieldFactory = BuildIntegerFactory(prop, nestedSchema.Type, ++rowPosition, true);
+                                    fieldFactory = BuildIntegerFactory(prop, nestedSchema.Type, nestedSchema.Format, ++rowPosition, true);
                                     break;
                                 case JsonObjectType.String:
                                 case JsonObjectType.Null | JsonObjectType.String:                                    
@@ -327,7 +332,7 @@ namespace Sentry.data.Core
                         break;
                     case JsonObjectType.Integer:
                     case JsonObjectType.Null | JsonObjectType.Integer:
-                        fieldFactory = BuildIntegerFactory(prop, currentProperty.Type, ++rowPosition);
+                        fieldFactory = BuildIntegerFactory(prop, currentProperty.Type, currentProperty.Format, ++rowPosition);
 
                         AddToFieldList(dtoList, parentRow, fieldFactory.GetField());
 
@@ -365,14 +370,23 @@ namespace Sentry.data.Core
             return fieldFactory;
         }
 
-        private static FieldDtoFactory BuildIntegerFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objectType, int rowPosition, bool isArray = false)
+        private static FieldDtoFactory BuildIntegerFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objectType, string format, int rowPosition, bool isArray = false)
         {
             FieldDtoFactory fieldFactory;
             Logger.Debug($"Detected type of {objectType}");
-            Logger.Debug($"{prop.Key} will be defined as INTEGER");
 
+            //
+            if (!String.IsNullOrWhiteSpace(format) && format == "biginteger")
+            {
+                Logger.Debug($"{prop.Key} will be defined as BIGINT");
+                fieldFactory = new BigIntFieldDtoFactory(prop, rowPosition, isArray);
+                return fieldFactory;
+            }
+
+            Logger.Debug($"{prop.Key} will be defined as INTEGER");
             fieldFactory = new IntegerFieldDtoFactory(prop, rowPosition, isArray);
             return fieldFactory;
+            
         }
 
         private static FieldDtoFactory BuildStringFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objectType, string format, int rowPosition, bool isArray = false)

@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Sentry.data.Core.Exceptions;
+using System;
 using System.Collections.Generic;
-using Sentry.data.Core.Entities.DataProcessing;
-using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Core
 {
@@ -18,7 +17,6 @@ namespace Sentry.data.Core
         bool UpdateAndSaveDataSource(DataSourceDto dto);
         bool CreateAndSaveDatasetFileConfig(DatasetFileConfigDto dto);
         bool UpdateAndSaveDatasetFileConfig(DatasetFileConfigDto dto);
-        List<DatasetFileConfig> GetSchemaMarkedDeleted();
         DataSourceDto GetDataSourceDto(int Id);
         UserSecurity GetUserSecurityForDataSource(int id);
         AccessRequest GetDataSourceAccessRequest(int dataSourceId);
@@ -60,14 +58,21 @@ namespace Sentry.data.Core
         bool SyncConsumptionLayer(int datasetId, int schemaId);
 
         /// <summary>
-        /// 
+        /// Returns Schema data flow for given schema
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        Tuple<DataFlowDetailDto, List<RetrieverJob>> GetDataFlowForSchema(DatasetFileConfig config);
+
+        /// <summary>
+        /// Returns the Schema data flow for given schema
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>
         Tuple<List<RetrieverJob>, List<DataFlowStepDto>> GetDataFlowDropLocationJobs(DatasetFileConfig config);
 
         /// <summary>
-        /// 
+        /// Returns a list of Producer data flows for given schema
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>

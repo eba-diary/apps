@@ -119,6 +119,7 @@
             public const string DEFAULT_DATAFLOW_DFS_DROP_LOCATION = "DFSDataFlowBasic";
             public const string FTP_DATAFLOW_SOURCE = "FTPDATAFLOW";
             public const string GOOGLE_API_DATAFLOW_SOURCE = "GOOGLEAPIDATAFLOW";
+            public const string GENERIC_HTTPS_DATAFLOW_SOURCE = "GENERICHTTPSDATAFLOW";
         }
 
         public static class DataFeedType
@@ -291,6 +292,7 @@
             public const string RAW_STORAGE_PREFIX = TEMP_FILE_PREFIX + "raw/";
             public const string RAW_QUERY_STORAGE_PREFIX = TEMP_FILE_PREFIX + "rawquery/";
             public const string S3_DROP_PREFIX = TEMP_FILE_PREFIX + "s3drop/";
+            public const string PRODUCER_S3_DROP_PREFIX = TEMP_FILE_PREFIX + "producers3drop/";
             public const string SCHEMA_LOAD_PREFIX = TEMP_FILE_PREFIX + "schemaload/";
             public const string CONVERT_TO_PARQUET_PREFIX = TEMP_FILE_PREFIX + "parquet/";
             public const string SCHEMA_MAP_PREFIX = TEMP_FILE_PREFIX + "schemamap/";
@@ -304,6 +306,7 @@
         public static class DataFlowStepEvent
         {
             public const string S3_DROP_START = "DATAFLOWSTEP_S3DROP_START";
+            public const string PRODUCER_S3_DROP_START = "DATAFLOWSTEP_PRODUCERS3DROP_START";
             public const string RAW_STORAGE_START = "DATAFLOWSTEP_RAWSTORAGE_START";
             public const string QUERY_STORAGE_START = "DATAFLOWSTEP_QUERYSTORAGE_START";
             public const string SCHEMA_LOAD_START = "DATAFLOWSTEP_SCHEMA_LOAD_START";

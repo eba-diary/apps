@@ -1,9 +1,4 @@
 ﻿using Sentry.data.Core.Entities.DataProcessing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -20,6 +15,7 @@ namespace Sentry.data.Core
         public string ActionDescription { get; set; }
         public int ExeuctionOrder { get; set; }
         public string TriggerKey { get; set; }
+        public string TriggerBucket { get; set; }
         public string TargetPrefix { get; set; }
     }
 }

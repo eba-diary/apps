@@ -27,6 +27,7 @@ All new files added for staic data or scripts should have it's properties update
 :r ..\Post-Deploy\StaticData\BusinessAreaTileRow_BusinessAreaTile.sql
 :r ..\Post-Deploy\StaticData\DataActionTypes.sql
 :r ..\Post-Deploy\StaticData\DataAction.sql
+:r ..\Post-Deploy\StaticData\ObjectStatus.sql
 
 
 --Now only run these scripts if the versioning allows us.
@@ -40,14 +41,15 @@ DECLARE @ErrorState INT;
 --Now only run these scritps if the versioning allows us.
 --ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
 --SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
-SET @ScriptVersion = '2020.12.09.01_PostDeploy'
+SET @ScriptVersion = '2021.03.10.01_PostDeploy'
 
 BEGIN TRAN 
 IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion) 
 BEGIN TRY 
 
   --insert one off script files here
-  :r ..\Post-Deploy\SupportingScripts\Sprint_21_01_03\HistoryFix_Assign_JobGuid_CLA_2381.sql
+  :r ..\Post-Deploy\SupportingScripts\Sprint_21_02_02\NewFeatureFlags.sql
+  :r ..\Post-Deploy\SupportingScripts\Sprint_21_03_10\HistoryFix_SAID_ASSET_and_ProducerS3Drop.sql
 
   --insert into the verision table so these scripts do not run again.
   INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 

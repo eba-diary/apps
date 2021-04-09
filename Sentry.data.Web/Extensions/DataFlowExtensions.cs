@@ -77,12 +77,14 @@ namespace Sentry.data.Web
             {
                 Id = model.DataFlowId,
                 Name = model.Name,
+                SaidKeyCode = model.SAIDAssetKeyCode,
                 CreatedBy = model.CreatedBy,
                 CreateDTM = model.CreatedDTM,
                 IngestionType = model.IngestionType,
                 IsCompressed = model.IsCompressed,
                 IsPreProcessingRequired = model.IsPreProcessingRequired,
-                PreProcessingOptions = model.PreprocessingOptions.Select(s => (DataFlowPreProcessingTypes)Enum.ToObject(typeof(DataFlowPreProcessingTypes), s)).ToList()
+                PreProcessingOptions = model.PreprocessingOptions.Select(s => (DataFlowPreProcessingTypes)Enum.ToObject(typeof(DataFlowPreProcessingTypes), s)).ToList(),
+                ObjectStatus = model.ObjectStatus
             };            
 
             if (model.SchemaMaps != null)
@@ -202,7 +204,7 @@ namespace Sentry.data.Web
                 ExecutionOrder = dto.ExeuctionOrder,
                 TriggetKey = dto.TriggerKey,
                 TargetPrefix = dto.TargetPrefix,
-                RootAwsUrl = $"https://{AwsRegion.ToLower()}.amazonaws.com/{RootBucket.ToLower()}/"
+                RootAwsUrl = $"https://{AwsRegion.ToLower()}.amazonaws.com/{dto.TriggerBucket}/"
             };
             return model;
         }
@@ -228,9 +230,14 @@ namespace Sentry.data.Web
             List<AssociatedDataFlowModel> resultList = new List<AssociatedDataFlowModel>();
             foreach (Tuple<DataFlowDetailDto, List<RetrieverJob>> item in jobList)
             {
-                resultList.Add(new AssociatedDataFlowModel(item));
+                resultList.Add(item.ToModel());
             }
             return resultList;
+        }
+
+        public static AssociatedDataFlowModel ToModel(this Tuple<DataFlowDetailDto, List<RetrieverJob>> job)
+        {
+            return new AssociatedDataFlowModel(job);
         }
     }
 }

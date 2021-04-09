@@ -6,6 +6,346 @@ data.Dataset = {
 
     DatasetFilesTable: {},
 
+    //****************************************************************************************************
+    //DELROY FUNCTIONS
+    //****************************************************************************************************
+    delroyFieldArray: [],
+    delroySnowflakeViewsArray: [],
+    delroyStructTrackerArray: [],
+
+
+    delroyInit: function () {
+
+        data.Dataset.delroyTableCreate();
+        data.Dataset.delroySetupClickAttack();
+        data.Dataset.delroyStructTrackerArray = [];
+    },
+
+
+    //RELOAD EVERYTHING:  clean datatable, breadcrumbs and reload with schema selected
+    delroyReloadEverything: function (datasetId, schemaId, snowflakeViews) {
+
+        $('#delroySpinner').show();
+        $('#delroyTable').DataTable().clear();
+        $('#delroyTable').DataTable().draw();
+        $('#delroyBreadcrumb').empty();
+        data.Dataset.delroyFieldArray = [];
+        data.Dataset.delroyStructTrackerArray = [];
+        data.Dataset.delroySnowflakeViewsArray = snowflakeViews;
+
+        var schemaURL = "/api/v2/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/revision/latest/fields";
+        $.get(schemaURL, function (result) {
+
+            data.Dataset.delroyAddFieldArray(result.Fields);
+            data.Dataset.delroyAddBreadCrumb(data.Dataset.delroyCreateBogusField("Home"), 0);
+            data.Dataset.delroyGridRefresh();
+            $('#delroySpinner').hide();
+
+        }).fail(function (result) {
+            if (result.status === 404) {
+                $('#delroySpinner').hide();
+                data.Dataset.delroyAddBreadCrumb(data.Dataset.delroyCreateBogusField("No Columns Exist"), -1);       //PASS -1 which indicates this is a FAKE breadcrumb
+                data.Dale.makeToast("success", "No columns Exist.");
+            }
+        });
+    },
+
+
+    //CREATE BOGUS FIELD OBJ FOR HOME OR NO COLUMNS EXIST
+    delroyCreateBogusField: function (name) {
+
+        //create new obj to represent a BOGUS field
+        var o = new Object();
+        o.Name = name;
+
+        return o;
+    },
+
+
+    //INIT DATATABLE
+    delroyTableCreate: function () {
+
+        //init DataTable,
+        $("#delroyTable").DataTable({
+
+            //client side setup
+            pageLength: 100,
+
+            //Code if i wanted the grid to reload and make AJAX call, but i reload manually without AJAX call in delroyGridRefresh
+            //ajax: {
+            //    url: "/api/v2/metadata/dataset/230/schema/4039/revision/latest/fields",
+            //    type: "GET",
+            //    dataSrc: "Fields"       //this is a trick too specify a property within the obj coming back from URL call, in this scenario i need to sepcify WHERE array of columns exists to load
+            //},
+
+            columns: [
+                {
+                    data: "Name", className: "Name",
+                    render: function (d, type, row, meta) {
+                        var color = $('#delroyBreadcrumb').data('page-color');
+                        var innerLink = "<a  class='" + color + "' style='cursor:pointer' > " + d + "</a >";                        //want cursor too turn pointer
+                        var parent = "<em class='glyphicon glyphicon-folder-close " + color + "' > " + innerLink + "</em>";
+
+                        if (row.Fields != null) {
+                            return parent;
+                        }
+                        else {
+                            return d; 
+                        }
+                    }
+                },
+                { data: "Description", className: "Description" },
+                { data: "FieldType", className: "FieldType" },
+                { data: "IsArray", className: "IsArray" },
+                { data: "Length", className: "Length", visible: false, render: function (d)         { return data.Dataset.delroyFillGridCheckForNull(d);    }   },
+                { data: "Precision", className: "Precision", visible: false, render: function (d)   { return data.Dataset.delroyFillGridCheckForNull(d);    }   },
+                { data: "Scale", className: "Scale", visible: false, render: function (d)           { return data.Dataset.delroyFillGridCheckForNull(d);    }   }
+            ],
+
+            aLengthMenu: [
+                [20, 100, 500],    
+                [20, 100, 500]
+            ],
+
+            order: [0, 'desc'],
+
+            //style for columnVisibility and paging to show
+            dom: 'Blrtip',
+
+            //buttons to show and customize text for them
+            buttons:
+            [
+                { extend: 'colvis', text: 'Columns' },
+                {
+                    text: 'Snowflake Query',
+                    action: function () {
+                        data.Dataset.delroyQueryGenerator();
+                    }
+                }
+            ]
+        });
+
+        //add a filter in each column
+        $("#delroyTable").dataTable().columnFilter({
+            sPlaceHolder: "head:after",
+            aoColumns: [
+                { type: "text" },
+                { type: "text" },
+                { type: "text" },
+
+                { type: "text" },
+                { type: "text" },
+                { type: "text" },
+                { type: "text" }
+            ]
+        });
+
+    },
+
+    
+
+    //GRID CLICK EVENTS
+    delroySetupClickAttack: function () {
+
+        //DELROY GRID CLICK
+        $('#delroyTable tbody').on('click', 'tr', function () {                         //anything clicked in delroyTable tbody, filter down to capture 'tr' class clicks only
+
+            var table = $('#delroyTable').DataTable();
+            var field = table.row(this).data();
+
+            // click reload the grid if children exist
+            if (field.Fields != null) {
+                data.Dataset.delroyAddFieldArray(field);
+                data.Dataset.delroyAddBreadCrumb(field, data.Dataset.delroyFieldArray.length - 1);
+                data.Dataset.delroyGridRefresh();
+            }
+        });
+
+
+        //BREADCRUMBS NAV CLICK EVENT
+        $("#delroyBreadcrumb").on('click','li' ,function () {
+            var myIndex = this.id;
+
+            //only allow breadcrumbs use if have a valid Id)
+            if (myIndex >= 0) {
+                data.Dataset.delroyRefreshFieldArrayFromIndex(myIndex);
+                data.Dataset.delroyRefreshBreadCrumbsFromIndex(myIndex);
+                data.Dataset.delroyGridRefresh();
+            }
+            
+        });
+
+
+    },
+
+
+    //ADD NEW FIELD TOO ARRAY
+    delroyAddFieldArray: function (field) {
+
+        data.Dataset.delroyFieldArray.push(field);
+    },
+
+
+    //GET LATEST FIELD FROM ARRAY
+    delroyGetLatestField: function () {
+
+        var index = data.Dataset.delroyFieldArray.length - 1;
+        var field = data.Dataset.delroyFieldArray[index];
+
+        //NOTE: this is a strange concept:  but a field is either a ROOT level one (index 0) or a CHILD level (index > 0)
+        //All levels > (index 0) you need too specify the Fields array which is a child property whereas the root level(index 0) the array is at that level
+        //also check if field is NULL, because in that case return a null field else returning field.Fields will cause an error
+        if (index == 0 || field == null) {
+            return field;                //index=0 means ROOT level where array of fields is actually on that level
+        }
+        else {                              
+            return field.Fields;        //child of ROOT so specify array as a property of the field
+        }
+    },
+
+
+    //CLEAR AND RELOAD DATATABLE WITH LATEST ELEMENT IN FIELD ARRAY
+    delroyGridRefresh: function () {
+        var table = $('#delroyTable').DataTable();
+        var field = data.Dataset.delroyGetLatestField();
+
+        table.clear();
+        table.rows.add(field);       //when clicking on an item, we need to specify Fields property since all chidren of ROOT use this
+        table.draw();
+    },
+
+
+    //ADD NEW BREADCRUMB TOO LIST
+    delroyAddBreadCrumb: function (field, index) {
+
+        //add breadcrumb to UI
+        var color = $('#delroyBreadcrumb').data('page-color');
+        var h = "<li id='" + index.toString() + "' ><a  class='" + color + "' style='cursor:pointer' >" + field.Name + "</a></li>";
+        $('#delroyBreadcrumb').append(h);
+
+        //add struct too tracker to hold if a query needs to be generated
+        if (field.Name !== "Home" && index > 0) {
+            data.Dataset.delroyStructTrackerArray.push(field);    
+        }
+    },
+
+
+    //REFRESH BREAD CRUMBS:  Clear all breadcrumbs and refresh up too one passed in
+    delroyRefreshBreadCrumbsFromIndex: function (lastIndexKeep) {
+        //STEP 1: empty all breadcrumbs
+        $('#delroyBreadcrumb').empty();
+
+        //STEP 2: empty breadcrumb Tracker which feeds Query Generator
+        var deleteStartIndex = parseInt(0);
+        data.Dataset.delroyStructTrackerArray.splice(deleteStartIndex);     
+
+        //STEP 3: add in all breadcrumbs from start until the one they clicked on
+        for (let i = 0; i < data.Dataset.delroyFieldArray.length; i++) {
+
+            var field = {};
+            if (i > 0) {
+                field = data.Dataset.delroyFieldArray[i];
+            }
+            else {
+                field = data.Dataset.delroyCreateBogusField("Home");
+            }
+
+            data.Dataset.delroyAddBreadCrumb(field, i);
+        }
+    },
+
+
+    //REFRESH FIELD ARRAY : If user clicks a breadcrumb we need to refresh the array to ONLY contain up through last index too keep
+    delroyRefreshFieldArrayFromIndex: function (lastIndexKeep) {
+
+        //Refresh array to reflect current breadcrumb selected
+        var deleteStartIndex = parseInt(lastIndexKeep, 10) + 1;     //use parseInt to ensure we are dealing with an integer data type
+        data.Dataset.delroyFieldArray.splice(deleteStartIndex);     //splice deletes array from index specified essentially right half deleted
+    },
+
+
+    //ONLY RETURN DATA IF VALID
+    delroyFillGridCheckForNull: function (d) {
+        if (d) {
+            return d;
+        }
+        else {
+            return ' ';
+        }
+    },
+
+    //GENERATE QUERY BASED ON WHERE THEY ARE IN SCHEMA     
+    delroyQueryGenerator: function () {
+
+        $('#delroySpinner').show();
+
+        var field = data.Dataset.delroyGetLatestField();
+
+        //if field is null, means no columns to generate a query so hide spinner and create a toastr
+        if (field == null) {
+            data.Dale.makeToast("warning", "No columns Exist, Query not Generated.  Please select a schema with columns to see a query.");
+            $('#delroySpinner').hide();
+        }
+        else {
+            //pass the current field array and necessary info to controller and get back the snowflake query
+            $.ajax({
+                type: "POST",
+                url: "/Dataset/DelroyGenerateQuery",
+                traditional: true,
+                data: JSON.stringify({ models: field, snowflakeViews: data.Dataset.delroySnowflakeViewsArray, structTracker: data.Dataset.delroyStructTrackerArray }),
+                contentType: "application/json",
+                success: function (r) {
+                    var modal = Sentry.ShowModalWithSpinner("Snowflake Query");
+                    modal.ReplaceModalBody(data.Dataset.delroyCreateModalHTML(r.snowQuery));
+                    $('#delroySpinner').hide();
+                },
+                failure: function () {
+                    data.Dale.makeToast("error", "Error creating Snowflake Query.");
+                    $('#delroySpinner').hide();
+                },
+                error: function () {
+                    data.Dale.makeToast("error", "Error creating Snowflake Query.");
+                    $('#delroySpinner').hide();
+                }
+            });
+        }
+    },
+
+    //FORMAT HTML TO SEND TOO MODAL
+    //NOTE: instead of returning an entire partial view from controller, i just pass the snow query and format HTML in here, it shaved seconds off
+    delroyCreateModalHTML: function (snowQuery) {
+
+        var delroyQueryView = "<div class='delroyQueryView'> ";
+        var delroyQueryMania = " <div id='delroyQueryMania' style='max-height: 600px; white-space: pre-line; overflow-y: auto; overflow-x: auto; '> " + snowQuery + " </div >";
+        var delroyModalFooter = " <div class='modal-footer'>  <input id='delroyCopyClipboard' type='button' class='btn btn-warning' value='Copy to Clipboard' onclick='data.Dataset.delroyCopyClipboard()' />     </div >";
+        delroyQueryView = delroyQueryView + delroyQueryMania + delroyModalFooter + " </div>";
+        return delroyQueryView;
+    },
+
+
+    //COPY TEXT IN MODAL TO CLIPBOARD
+    //NOTE: the reason I need to copy from delroyQueryMania is because it has the white-space style which interprets newlines and therefore a copy gets me a nicely formatted line
+    //without that extra tag the copy directly from the output of the controller method DelroyGenerateQuery2 has the newlines but doesn't actually show formatting
+    delroyCopyClipboard: function () {
+
+        var range = document.createRange();
+        range.selectNode(document.getElementById("delroyQueryMania"));
+        window.getSelection().removeAllRanges(); // clear current selection
+        window.getSelection().addRange(range); // to select text
+        document.execCommand("copy");
+        window.getSelection().removeAllRanges();// to deselect
+    },
+
+    //****************************************************************************************************
+    //END DELROY FUNCTIONS
+    //****************************************************************************************************
+
+
+
+
+
+
+
     IndexInit: function () {
         /// Initialize the Index page for data assets (with the categories)
 
@@ -220,6 +560,10 @@ data.Dataset = {
     },
 
     DetailInit: function () {
+
+        data.Dataset.delroyInit();
+
+
         $("[id^='EditDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
             window.location = "/Dataset/Edit/" + encodeURI($(this).data("id"));
@@ -1271,4 +1615,13 @@ data.Dataset = {
 
         returnLink.attr('href', returnUrl);
     }
+
+
+
+
+
+
+
+
+
 };

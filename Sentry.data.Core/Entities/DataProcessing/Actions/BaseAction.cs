@@ -1,6 +1,7 @@
 ﻿using Sentry.data.Core.Entities.S3;
 using Sentry.data.Core.Interfaces.DataProcessing;
 using System;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core.Entities.DataProcessing
 {
@@ -33,6 +34,11 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual void PublishStartEvent(DataFlowStep step, string FlowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
             _baseActionProvider.PublishStartEvent(step, FlowExecutionGuid, runInstanceGuid, s3Event);
+        }
+
+        public virtual async Task PublishStartEventAsync(DataFlowStep step, string FlowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
+        {
+            await _baseActionProvider.PublishStartEventAsync(step, FlowExecutionGuid, runInstanceGuid, s3Event).ConfigureAwait(false);
         }
     }
 }

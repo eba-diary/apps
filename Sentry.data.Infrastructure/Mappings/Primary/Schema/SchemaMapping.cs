@@ -22,13 +22,13 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property(x => x.CreatedDTM, m => m.Column("Created_DTM"));
             Property(x => x.LastUpdatedDTM, m => m.Column("LastUpdatd_DTM"));
             Property(x => x.Description, m => m.Column("Description"));
+            Property(x => x.ObjectStatus, m => m.Column("ObjectStatus"));
             Property(x => x.DeleteInd, m => m.Column("DeleteInd"));
             Property(x => x.DeleteIssuer, m => m.Column("DeleteIssuer"));
             Property(x => x.DeleteIssueDTM, m => m.Column("DeleteIssueDTM"));
             Property(x => x.CLA1396_NewEtlColumns, m => m.Column("CLA1396_NewEtlColumns"));
             Property(x => x.CLA1580_StructureHive, m => m.Column("CLA1580_StructureHive"));
             Property(x => x.CLA2472_EMRSend, m => m.Column("CLA2472_EMRSend"));
-            Property(x => x.CLA2429_SnowflakeCreateTable, m => m.Column("CLA2429_SnowflakeCreateTable"));
             Property(x => x.CLA1286_KafkaFlag, m => m.Column("CLA1286_KafkaFlag"));
             this.Bag((x) => x.Revisions, (m) =>
             {

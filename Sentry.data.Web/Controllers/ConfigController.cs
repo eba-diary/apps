@@ -76,7 +76,6 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Dataset/{id}")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Index(int id)
         {
 
@@ -93,17 +92,10 @@ namespace Sentry.data.Web.Controllers
                 {
                     DatasetFileConfigsModel model = new DatasetFileConfigsModel(config, true, false);
 
-                    Tuple<List<RetrieverJob>, List<DataFlowStepDto>> jobs =  _configService.GetDataFlowDropLocationJobs(config);
-                    List<DataFlowStepModel> stepModels = new List<DataFlowStepModel>();
-                    foreach (DataFlowStepDto stepDto in jobs.Item2)
-                    {
-                        DataFlowStepModel stepModel = stepDto.ToModel();
-                        stepModel.RootAwsUrl = $"https://{AwsRegion.ToLower()}.amazonaws.com/{RootBucket.ToLower()}/";
-                        stepModels.Add(stepModel);
-                    }
-
                     model.RetrieverJobs = config.RetrieverJobs;
-                    model.DataFlowJobs = new Tuple<List<RetrieverJob>, List<DataFlowStepModel>>( jobs.Item1, stepModels );
+                    Tuple<DataFlowDetailDto, List<RetrieverJob>> jobs2 = _configService.GetDataFlowForSchema(config);
+                    model.DataFlowJobs = (jobs2.Item1 != null) ? jobs2.ToModel() : null;
+
                     model.ExternalDataFlowJobs = _configService.GetExternalDataFlowsBySchema(config).ToModel();
                     configModelList.Add(model);
                 }
@@ -154,7 +146,8 @@ namespace Sentry.data.Web.Controllers
                 AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext),
                 AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList(),
                 ExtensionList = Utility.GetFileExtensionListItems(_datasetContext),
-                Security = _securityService.GetUserSecurity(null, SharedContext.CurrentUser)
+                Security = _securityService.GetUserSecurity(null, SharedContext.CurrentUser),
+                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Configuration Creation Page", dfcm.DatasetId);
@@ -174,7 +167,8 @@ namespace Sentry.data.Web.Controllers
                 AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext),
                 AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList(),
                 ExtensionList = Utility.GetFileExtensionListItems(_datasetContext),
-                Security = _securityService.GetUserSecurity(null, SharedContext.CurrentUser)
+                Security = _securityService.GetUserSecurity(null, SharedContext.CurrentUser),
+                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Configuration Creation Page", dfcm.DatasetId);
@@ -619,9 +613,10 @@ namespace Sentry.data.Web.Controllers
 
             try
             {
-                if (rj.FileSchema.DeleteInd)
+                if ((rj.DatasetConfig != null && rj.DatasetConfig.DeleteInd) ||
+                (rj.FileSchema != null && rj.FileSchema.DeleteInd))
                 {
-                    throw new DatasetFileConfigDeletedException("Parent Schema ");
+                    throw new DatasetFileConfigDeletedException("Parent Schema is marked for deletion");
                 }
 
                 AddCoreValidationExceptionsToModel(ejm.Validate());
@@ -1416,7 +1411,6 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/Schema/{schemaId}/ValidateField")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public JsonResult ValidateField(int schemaId, SchemaRow schemaRow)
         {
             try
@@ -1725,6 +1719,7 @@ namespace Sentry.data.Web.Controllers
                     model.IsFixedWidth = true;
                     break;
                 case "JSON":
+                case "XML":
                     model.IsPositional = false;
                     model.IsFixedWidth = false;
                     model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A struct", "Complex Data Types"));

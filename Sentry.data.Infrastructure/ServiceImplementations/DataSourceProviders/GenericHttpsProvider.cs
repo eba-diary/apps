@@ -10,7 +10,9 @@ namespace Sentry.data.Infrastructure
 {
     public class GenericHttpsProvider : BaseHttpsProvider
     {
-        private IJobService _jobService;
+        private readonly IJobService _jobService;
+        protected bool _IsTargetS3;
+        protected string _targetPath;
 
         public GenericHttpsProvider(IDatasetContext datasetContext,
             IConfigService configService, IEncryptionService encryptionService, IJobService jobService) : base(datasetContext, configService, encryptionService)
@@ -30,21 +32,10 @@ namespace Sentry.data.Infrastructure
 
             IRestResponse resp = SendRequest();
 
-            //Find appropriate drop location (S3Basic or DfsBasic)
-            RetrieverJob targetJob = _jobService.FindBasicJob(this._job);
+            FindTargetJob();
 
-            //Get target path based on basic job found
-            string extension = resp.ParseContentType();
+            SetTargetPath(resp.ParseContentType());
 
-            try
-            {
-                targetFullPath = $"{targetJob.GetTargetPath(_job)}.{extension}";
-            }
-            catch (Exception ex)
-            {
-                _job.JobLoggerMessage("Error", "targetjob_gettargetpath_failure", ex);
-                throw;
-            }
 
             //Setup temporary work space for job
             var tempFile = _job.SetupTempWorkSpace();
@@ -78,7 +69,7 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
-                if (targetJob.DataSource.Is<S3Basic>())
+                if (_IsTargetS3)
                 {
                     _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
 
@@ -102,8 +93,20 @@ namespace Sentry.data.Infrastructure
                     }
 
                     S3ServiceProvider s3Service = new S3ServiceProvider();
-                    string targetkey = targetFullPath;
-                    var versionId = s3Service.UploadDataFile(tempFile, targetkey);
+                    string targetkey = _targetPath;
+
+                    string versionId;
+                    //Need to handle both a retrieverjob target (legacy platform) and 
+                    //  S3Drop or ProducerS3Drop (new processing platform) data flow steps
+                    //  as targets.
+                    if (_targetStep != null)
+                    {
+                        versionId = s3Service.UploadDataFile(tempFile, _targetStep.Action.TargetStorageBucket, targetkey);
+                    }
+                    else
+                    {
+                        versionId = s3Service.UploadDataFile(tempFile, targetkey);
+                    }
 
                     _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
 
@@ -113,13 +116,13 @@ namespace Sentry.data.Infrastructure
                         File.Delete(tempFile);
                     }
                 }
-                else if (targetJob.DataSource.Is<DfsBasic>())
+                else
                 {
                     _job.JobLoggerMessage("Info", "Sending file to DFS drop location");
 
                     try
                     {
-                        using (Stream filestream = new FileStream(targetFullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
+                        using (Stream filestream = new FileStream(_targetPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
                         {
                             resp.CopyToStream(filestream);
                         }
@@ -130,9 +133,9 @@ namespace Sentry.data.Infrastructure
                         _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
 
                         //Cleanup target file if exists
-                        if (File.Exists(targetFullPath))
+                        if (File.Exists(_targetPath))
                         {
-                            File.Delete(targetFullPath);
+                            File.Delete(_targetPath);
                         }
                     }
                     catch (Exception ex)
@@ -141,9 +144,9 @@ namespace Sentry.data.Infrastructure
                         _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
 
                         //Cleanup target file if exists
-                        if (File.Exists(targetFullPath))
+                        if (File.Exists(_targetPath))
                         {
-                            File.Delete(targetFullPath);
+                            File.Delete(_targetPath);
                         }
                     }
                 }
@@ -205,6 +208,8 @@ namespace Sentry.data.Infrastructure
 
             _request.Method = Method.GET;
 
+            _request.Resource = _job.GetUri().ToString();
+
             //Add datasource specific headers to request
             List<RequestHeader> headerList = ((HTTPSSource)_job.DataSource).RequestHeaders;
 
@@ -243,8 +248,25 @@ namespace Sentry.data.Infrastructure
             throw new NotImplementedException();
         }
 
-        protected override void FindTargetJob() { }
+        protected override void FindTargetJob()
+        {
+            //Find appropriate drop location (S3Basic or DfsBasic)
+            _targetJob = _jobService.FindBasicJob(this._job);
 
-        protected override void SetTargetPath(string extension) { }
+            _IsTargetS3 = _targetJob.DataSource.Is<S3Basic>();
+        }
+
+        protected override void SetTargetPath(string extension)
+        {
+            try
+            {
+                _targetPath = $"{_targetJob.GetTargetPath(_job)}.{extension}";
+            }
+            catch (Exception ex)
+            {
+                _job.JobLoggerMessage("Error", "targetjob_gettargetpath_failure", ex);
+                throw;
+            }
+        }
     }
 }

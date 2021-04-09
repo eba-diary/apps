@@ -1,19 +1,37 @@
 ﻿BEGIN TRAN 
 	BEGIN TRY
 		DECLARE @ENV VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
-		DECLARE	@Bucket VARCHAR(255)
+		DECLARE	@Bucket VARCHAR(255), @ProducerS3DropBucket VARCHAR(255)
 		if @ENV = 'NRTEST'
-			SET @Bucket = 'sentry-data-nrtest-dataset-ae2'
+			BEGIN
+				SET @Bucket = 'sentry-data-nrtest-dataset-ae2'
+				SET @ProducerS3DropBucket = 'sentry-data-nrtest-droplocation-ae2'
+			END
 		else if @ENV = 'NRDEV'
-			SET @Bucket = 'sentry-data-nrdev-dataset-ae2'
+			BEGIN
+				SET @Bucket = 'sentry-data-nrdev-dataset-ae2'
+				SET @ProducerS3DropBucket = 'sentry-data-nrdev-droplocation-ae2'
+			END
 		else if @ENV = 'DEV'
-			SET @Bucket = 'sentry-data-dev-dataset-ae2'
+			BEGIN			
+				SET @Bucket = 'sentry-data-dev-dataset-ae2'
+				SET @ProducerS3DropBucket = 'sentry-data-dev-droplocation-ae2'
+			END
 		else if @ENV = 'TEST'
-			SET @Bucket = 'sentry-data-test-dataset-ae2'
+			BEGIN
+				SET @Bucket = 'sentry-data-test-dataset-ae2'
+				SET @ProducerS3DropBucket = 'sentry-data-test-droplocation-ae2'
+			END
 		else if @ENV = 'QUAL'
-			SET @Bucket = 'sentry-data-qual-dataset-ae2'
+			BEGIN
+				SET @Bucket = 'sentry-data-qual-dataset-ae2'
+				SET @ProducerS3DropBucket = 'sentry-data-qual-droplocation-ae2'
+			END
 		else if @ENV = 'PROD'
-			SET @Bucket = 'sentry-data-prod-dataset-ae2'
+			BEGIN
+				SET @Bucket = 'sentry-data-prod-dataset-ae2'
+				SET @ProducerS3DropBucket = 'sentry-data-prod-droplocation-ae2'
+			END
 		else
 			SET @Bucket = 'sentry-data-UNKNOWN'
 		
@@ -31,7 +49,9 @@
 									(8, '0ED73692-AB69-42D9-8935-6B040164DDA7', 'Google Api', 'googleapipreprocessing/', @Bucket, 'GoogleApi', 0, 'Converts Google API JSON output to data processing friendly format'),
 									(9, '23A7A07F-0B54-4990-AEFE-90C4611E5C69', 'ClaimIQ', 'claimiqpreprocessing/', @Bucket, 'ClaimIq', 0, 'Encodes and converts ClaimIQ file to data processing friendly format'),
 									(10, 'C9B8BED8-A3C5-48F8-8A46-873240D66952', 'Uncompress Gzip', 'uncompressgzip/', @Bucket, 'UncompressGzip', 0, 'Decompresses incoming gzip file'),
-									(11, 'C3B3CC25-2F94-48C4-90E8-084BAF117BFA', 'Fixed Width', 'fixedwidthpreprocessing/', @Bucket, 'FixedWidth', 0, 'Converts fixed width file into data processing friendly format')
+									(11, 'C3B3CC25-2F94-48C4-90E8-084BAF117BFA', 'Fixed Width', 'fixedwidthpreprocessing/', @Bucket, 'FixedWidth', 0, 'Converts fixed width file into data processing friendly format'),
+									(12, '7C4BAF8E-697A-477C-8471-57BF5871DA47', 'Producer S3 Drop', 'producers3drop/', @ProducerS3DropBucket, 'ProducerS3Drop', 0, 'S3 drop location exposed to data producers for sending data to DSC data processing platform'),
+									(13, '4A543410-1D8E-4132-BD92-A9A299012C85', 'XML', 'xmlpreprocessing/', @Bucket, 'XML', 0, 'Converts xml file into data processing friendly format')
 								)
 								AS Source ([Id], [ActionGuid], [Name], [TargetStoragePrefix], [TargetStorageBucket], [ActionType], [TargetStorageSchemaAware], [Description]) 
 

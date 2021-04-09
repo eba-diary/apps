@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -62,8 +63,8 @@ namespace Sentry.data.Web
             this.CLA1396_NewEtlColumns = (dto.Schema != null) ? dto.Schema.CLA1396_NewEtlColumns : false;
             this.CLA1580_StructureHive = (dto.Schema != null) ? dto.Schema.CLA1580_StructureHive : false;
             this.CLA2472_EMRSend = (dto.Schema != null) ? dto.Schema.CLA2472_EMRSend : false;
-            this.CLA2429_SnowflakeCreateTable = (dto.Schema != null) ? dto.Schema.CLA2429_SnowflakeCreateTable : false;
             this.CLA1286_KafkaFlag = (dto.Schema != null) ? dto.Schema.CLA1286_KafkaFlag : false;
+            this.ObjectStatus = dto.ObjectStatus;
             //this.CLA24 = (dto.Schema != null) ? dto.Schema.CLA1580_StructureHive : false;
         }
 
@@ -160,10 +161,9 @@ namespace Sentry.data.Web
         public bool CLA1396_NewEtlColumns { get; set; }
         public bool CLA1580_StructureHive { get; set; }
         public bool CLA2472_EMRSend { get; set; }
-        public bool CLA2429_SnowflakeCreateTable { get; set; }
         public bool CLA1286_KafkaFlag { get; set; }
         public IList<RetrieverJob> RetrieverJobs { get; set; }
-        public Tuple<List<RetrieverJob>, List<DataFlowStepModel>> DataFlowJobs { get; set; }
+        public AssociatedDataFlowModel DataFlowJobs { get; set; }
         public IList<AssociatedDataFlowModel> ExternalDataFlowJobs { get; set; }
 
         public IList<DataElement> Schemas { get; set; }  
@@ -176,5 +176,6 @@ namespace Sentry.data.Web
         public UserSecurity Security { get; set; }
         public string SasLibrary { get; set; }
         public bool DeleteInd { get; set; }
+        public ObjectStatusEnum ObjectStatus { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,6 +27,7 @@ namespace Sentry.data.Core
         public virtual DateTime LastUpdatedDTM { get; set; }
         public virtual string UpdatedBy { get; set; }
         public virtual string Description { get; set; }
+        public virtual ObjectStatusEnum ObjectStatus { get; set; }
         public virtual bool DeleteInd { get; set; }
         public virtual string DeleteIssuer { get; set; }
         public virtual DateTime DeleteIssueDTM { get; set; }

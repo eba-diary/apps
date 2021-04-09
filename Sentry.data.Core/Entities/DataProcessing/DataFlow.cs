@@ -1,5 +1,7 @@
-﻿using Sentry.Common.Logging;
+﻿using Newtonsoft.Json.Linq;
+using Sentry.Common.Logging;
 using Sentry.Core;
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 
@@ -16,43 +18,18 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual int Id { get; set; }
         public virtual Guid FlowGuid { get; set; }
         public virtual string FlowStorageCode { get; set; }
+        public virtual string SaidKeyCode { get; set; }
         public virtual string Name { get; set; }
         public virtual DateTime CreatedDTM { get; set; }
         public virtual string CreatedBy { get; set; }
         public virtual string Questionnaire { get; set; }
         public virtual IList<DataFlowStep> Steps { get; set; }
-        public virtual IList<DataFlow_Log> Logs { get; set; }
-        public virtual DataFlow_Log LogExecution(string executionGuid, string log, Log_Level level, Exception ex = null)
-        {
-            string logMsg = $"{executionGuid} {log}";
-            switch (level)
-            {
-                case Log_Level.Info:
-                    Logger.Info(logMsg);
-                    break;
-                case Log_Level.Warning:
-                    Logger.Warn(logMsg);
-                    break;
-                case Log_Level.Debug:
-                    Logger.Debug(logMsg);
-                    break;
-                default:
-                case Log_Level.Error:
-                    Logger.Error(logMsg, ex);
-                    break;
-            }
+        public virtual IList<EventMetric> Logs { get; set; }
 
-            return new DataFlow_Log()
-            {
-                DataFlow = this,
-                FlowExecutionGuid = executionGuid,
-                Log_Entry = log,
-                Machine_Name = System.Environment.MachineName,
-                Level = level,
-                CreatedDTM = DateTime.Now,
-                Step = null
-            };
-        }
+        //Delete implementation
+        public virtual ObjectStatusEnum ObjectStatus { get; set; }
+        public virtual string DeleteIssuer { get; set; }
+        public virtual DateTime DeleteIssueDTM { get; set; }
 
         public virtual ValidationResults ValidateForDelete()
         {
@@ -75,6 +52,34 @@ namespace Sentry.data.Core.Entities.DataProcessing
             public const string nameContainsReservedWords = "nameContainsReservedWords";
             public const string nameMustBeUnique = "nameMustBeUnique";
             public const string stepsContainsAtLeastOneSchemaMap = "stepsContainsAtLeastOneSchemaMap";
+            public const string saidAssetIsBlank = "saidAssetIsBlank";
+        }
+
+        private void LogMessage(string msg, Log_Level level,  Exception ex = null)
+        {
+            switch (level)
+            {
+                case Log_Level.Info:
+                    Logger.Info(msg);
+                    break;
+                case Log_Level.Warning:
+                    Logger.Warn(msg);
+                    break;
+                case Log_Level.Debug:
+                    Logger.Debug(msg);
+                    break;
+                default:
+                case Log_Level.Error:
+                    if (ex == null)
+                    {
+                        Logger.Error(msg);
+                    }
+                    else
+                    {
+                        Logger.Error(msg, ex);
+                    }
+                    break;
+            }
         }
     }
 }

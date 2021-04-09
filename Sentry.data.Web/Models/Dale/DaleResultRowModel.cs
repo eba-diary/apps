@@ -15,7 +15,6 @@ namespace Sentry.data.Web
         public string Column { get; set; }
 
         public bool IsSensitive { get; set; }
-        public string Alias { get; set; }
         public string ProdType { get; set; }
 
 
@@ -28,5 +27,11 @@ namespace Sentry.data.Web
         public int BaseColumnId { get; set; }
 
         public bool IsOwnerVerified { get; set; }
+
+        public List<string> AssetList { get; set; }
+
+        public string SourceType { get; set; }
+
+
     }
 }
