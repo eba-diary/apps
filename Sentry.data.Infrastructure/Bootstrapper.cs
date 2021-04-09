@@ -8,6 +8,8 @@ using Sentry.data.Infrastructure.Mappings.Primary;
 using System.Net.Http;
 using Sentry.data.Core.Interfaces.SAIDRestClient;
 using Sentry.Messaging.Common;
+using System.Net;
+using System.Net;
 
 namespace Sentry.data.Infrastructure
 {
