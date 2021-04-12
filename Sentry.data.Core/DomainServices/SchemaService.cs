@@ -63,8 +63,6 @@ namespace Sentry.data.Core
             {
                 newSchema = CreateSchema(schemaDto);
 
-                //_dataFlowService.CreateandSaveDataFlow(MapToDataFlowDto(newSchema));
-
                 _dataFlowService.CreateDataFlowForSchema(newSchema);
 
                 _datasetContext.SaveChanges();
@@ -200,8 +198,7 @@ namespace Sentry.data.Core
             var exceptions = new List<Exception>();
 
             /* Trigger email only if IsInSAS has changed, otherwise, let consumption layer event processing drive the email to SAS Admins */
-            if (whatPropertiesChanged.ContainsKey("isinsas") &&
-                (!whatPropertiesChanged.ContainsKey("createcurrentview") && !whatPropertiesChanged.ContainsKey("cla2429_snowflakecreatetable")))
+            if (whatPropertiesChanged.ContainsKey("isinsas"))
             {
 
                 CurrentViewNotificationType = (schemaDto.CreateCurrentView) ? "ADD" : "REMOVE";
@@ -212,17 +209,6 @@ namespace Sentry.data.Core
                     Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sending sas notification email for hive...");
                     SasNotification(schema, SASNotificationType, CurrentViewNotificationType, _userService.GetCurrentUser(), "HIVE");
                     Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sent sas notification email for hive");
-                }
-                catch (Exception ex)
-                {
-                    exceptions.Add(ex);
-                }
-
-                try
-                {
-                    Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sending sas notification email for snowflake...");
-                    SasNotification(schema, SASNotificationType, CurrentViewNotificationType, _userService.GetCurrentUser(), "SNOWFLAKE");
-                    Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sent sas notification email for snowflake...");
                 }
                 catch (Exception ex)
                 {
@@ -330,27 +316,6 @@ namespace Sentry.data.Core
             }     
         }
 
-        private void GenerateConsumptionLayerDeleteEvent(FileSchema schema, JObject propertyDeltaList)
-        {
-            //Do nothing if there is no revision associated with schema 
-            if (!_datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schema.SchemaId).Any()) { return; }
-
-            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
-
-
-
-
-
-            SnowTableDeleteModel snowModel = new SnowTableDeleteModel()
-            {
-                DatasetID = ds.DatasetId,
-                SchemaID = schema.SchemaId,
-                InitiatorID = _userService.GetCurrentUser().AssociateId
-            };
-
-            _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
-        }
-
         /// <summary>
         /// Updates existing schema object from DTO.
         /// </summary>
@@ -441,10 +406,7 @@ namespace Sentry.data.Core
 
             whatPropertiesChanged += "}";
 
-            return JObject.Parse(whatPropertiesChanged);
-            //return Newtonsoft.Json.JsonConvert.DeserializeObject<object>(whatPropertiesChanged);
-
-            //return whatPropertiesChanged;           
+            return JObject.Parse(whatPropertiesChanged);          
         }
 
         public UserSecurity GetUserSecurityForSchema(int schemaId)
@@ -845,26 +807,10 @@ namespace Sentry.data.Core
                     sasNotificationType = "ADD";
                     currentViewNotficationType = "ADD";
                 }
-                else if (rev.ParentSchema.IsInSAS && changeIndicator.ContainsKey("cla2429_snowflakecreatetable") && changeIndicator.GetValue("cla2429_snowflakecreatetable").ToString().ToLower() == "true" )
-                {
-                    sasNotificationType = "ADD";
-                    if (rev.ParentSchema.CreateCurrentView)
-                    {
-                        currentViewNotficationType = "ADD";
-                    }
-                }
                 else if (rev.ParentSchema.IsInSAS && changeIndicator.ContainsKey("revision") && changeIndicator.GetValue("revision").ToString().ToLower() == "added")
                 {
                     sasNotificationType = "UPDATE";
                 }
-
-                //string sasNotificationType = (
-                //    //changeIndicator.ToLower().Contains("revision:add") ||                                   /* triggered by updated to schema columns */
-                //    isInSAS ||                                   /* triggered by schema configuration change to isinsas property */
-                //    currentView && rev.ParentSchema.IsInSAS)     /* triggered by schema configuration change to currentview property*/
-                //    ? "ADD" 
-                //    : "UPDATE";
-
                 
                 SasNotification(rev.ParentSchema, sasNotificationType, currentViewNotficationType, user, externalSystemIndictator);
 
@@ -906,7 +852,6 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                int scmId = (schema != null) ? schema.SchemaId : 0;
                 Logger.Error($"<sasdeletenotification> Failed sending SAS delete notification - schemaId:{schemaId}", ex);
 
                 return false;
@@ -971,12 +916,7 @@ namespace Sentry.data.Core
             string libraryName = schema.SasLibrary;
             string viewName;
 
-            if (systemIndicator.ToUpper() == "SNOWFLAKE")
-            {
-                libraryName += "_SNFC";
-                viewName = $"{schema.SnowflakeDatabase}.{schema.SnowflakeSchema}.vw_{schema.SnowflakeTable}";
-            }
-            else if (systemIndicator.ToUpper() == "HIVE")
+            if (systemIndicator.ToUpper() == "HIVE")
             {
                 viewName = $"vw_{schema.HiveTable}";
             }
@@ -994,7 +934,7 @@ namespace Sentry.data.Core
                     bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be <strong style=\"color:#008000;\">ADDED</strong> to {libraryName}:</p>");
                     bodySb.AppendLine($"<p>- {viewName}</p>");
                     //Include current view if checked
-                    if (systemIndicator != "SNOWFLAKE" && (currentViewNotificationType == "ADD" || schema.CreateCurrentView))
+                    if (currentViewNotificationType == "ADD" || schema.CreateCurrentView)
                     {
                         bodySb.AppendLine($"<p>- {viewName}_cur</p>");
                     }
@@ -1006,7 +946,7 @@ namespace Sentry.data.Core
                     bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be <strong style=\"color:#FF0000;\">REMOVED</strong> from {libraryName}:</p>");
                     bodySb.AppendLine($"<p>- {viewName}</p>");
                     //if current view is being updated to unchecked or is currently checked, ensure it is removed from SAS
-                    if (systemIndicator != "SNOWFLAKE" && (currentViewNotificationType.ToUpper() == "REMOVE" || schema.CreateCurrentView))
+                    if (currentViewNotificationType.ToUpper() == "REMOVE" || schema.CreateCurrentView)
                     {
                         bodySb.AppendLine($"<p>- {viewName}_cur</p>");
                     }
@@ -1017,7 +957,7 @@ namespace Sentry.data.Core
                     subject = $"Library Refresh Request from {libraryName}";
                     bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be updated in {libraryName}:</p>");
                     bodySb.AppendLine($"<p>- {viewName}</p>");
-                    if (systemIndicator != "SNOWFLAKE" && schema.CreateCurrentView)
+                    if (schema.CreateCurrentView)
                     {
                         bodySb.AppendLine($"<p>- {viewName}_cur</p>");
                     }

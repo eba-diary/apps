@@ -66,17 +66,6 @@ namespace Sentry.data.Infrastructure
                             case "CREATED":
                             case "EXISTED":
                                 de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Available.ToString();
-                                //Add SAS notification logic here if needed for snowflake
-                                var changeIndicator = JObject.Parse(snowCompletedEvent.ChangeIND);
-                                if (de.IsInSAS)
-                                {
-                                    bool IsSuccessful = _schemaService.SasAddOrUpdateNotification(snowCompletedEvent.SchemaID, snowCompletedEvent.RevisionID, snowCompletedEvent.InitiatorID, changeIndicator, "SNOWFLAKE");
-
-                                    if (!IsSuccessful)
-                                    {
-                                        Logger.Error($"snowflakeeventhandler failed sending SAS email - revision:{snowCompletedEvent.RevisionID}");
-                                    }
-                                }
                                 break;
                             case "FAILED":
                                 de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.RequestFailed.ToString();
@@ -107,13 +96,6 @@ namespace Sentry.data.Infrastructure
                             case "DELETED":
                             case "SKIPPED":
                                 de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Deleted.ToString();
-
-                                bool IsSuccessful = _schemaService.SasDeleteNotification(deleteCompletedEvent.SchemaID, deleteCompletedEvent.InitiatorID, "SNOWFLAKE");
-
-                                if (!IsSuccessful)
-                                {
-                                    Logger.Error($"snowflakeeventhandler failed sending SAS delete email - schema:{deleteCompletedEvent.SchemaID}");
-                                }
                                 break;
                             case "FAILED":
                                 de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteFailed.ToString();
