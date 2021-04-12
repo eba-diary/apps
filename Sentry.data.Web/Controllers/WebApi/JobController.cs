@@ -531,7 +531,34 @@ namespace Sentry.data.Web.WebApi.Controllers
                 return InternalServerError(ex);
             }
         }
-        
+
+        [HttpGet]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(string))]
+        [SwaggerResponse(HttpStatusCode.InternalServerError)]
+        [Route("batches")]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        public async Task<IHttpActionResult> GetBatchList()
+        {
+            try
+            {
+                HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync($"/batches").ConfigureAwait(false);
+
+                string result = response.Content.ReadAsStringAsync().Result;
+                string sendresult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
+
+                Logger.Debug($"getbatchstate_livyresponse statuscode:{response.StatusCode.ToString()}:::result:{sendresult}");
+                
+                return Ok();
+
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
         /// <summary>
         /// Gets a batch from a job
         /// </summary>
