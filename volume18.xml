@@ -291,15 +291,13 @@
         <dateline>
            <date when="1912-02-10">Saturday. Feb. 10th</date>.
         </dateline>
-        <p><persName ref="#Buttles_Mary">Mary</persName> and I went off this morning to the <choice> 
-          <sic>Mennon</sic> 
-          <corr><name type="boat" ref="#Memnon">Mennon</name></corr></choice>, but found no one at home. <persName ref="#Nicol_Erskine #Nicol_Mrs">Mr. and Mrs. Nicol</persName> to tea - a charming day.</p>
+        <p><persName ref="#Buttles_Mary">Mary</persName> and I went off this morning to the <name type="boat" ref="#Memnon"><choice><sic>Mennon</sic><corr>Memnon</corr></choice></name>, but found no one at home. <persName ref="#Nicol_Erskine #Nicol_Mrs">Mr. and Mrs. Nicol</persName> to tea - a charming day.</p>
       </div>
       <div xml:id="EBA-1912-02-11" type="entry">
         <dateline>
            <date when="1912-02-11">Sexigesima Sunday, Feb. 11th</date>.
         </dateline>
-        <p>At home all day. In the afternoon <persName ref="#Molesworth_Lady">Lady Molesworth</persName>, <persName ref="#Contardone_Contessa">the Contessa</persName> and that nice young man, <persName ref="#de_Cuadra_Luis_Count">Count Luis de Cuadra</persName>, son of the <persName ref="#Guadalmina_Marquesa"><choice><sic>Marquisa de Guadolmina</sic><corr>Marquesa de Guadalmina</choice></persName>, and <persName ref="#Grey_Robert">Mr. Robert Grey</persName> called. A lovely night.</p>
+        <p>At home all day. In the afternoon <persName ref="#Molesworth_Lady">Lady Molesworth</persName>, <persName ref="#Contardone_Contessa">the Contessa</persName> and that nice young man, <persName ref="#de_Cuadra_Luis_Count">Count Luis de Cuadra</persName>, son of the <persName ref="#Guadalmina_Marquesa"><choice><sic>Marquisa de Guadolmina</sic><corr>Marquesa de Guadalmina</corr></choice></persName>, and <persName ref="#Grey_Robert">Mr. Robert Grey</persName> called. A lovely night.</p>
       <pb n="98"/>
       </div>
       <div xml:id="EBA-1912-02-12" type="entry">
@@ -318,7 +316,7 @@
         <dateline>
            <date when="1912-02-21">Wednesday. Feb. 21st</date>.
         </dateline>
-        <p>I went over to the town this morning with <persName ref="#Davis_Theodore_M">Theodore</persName> - and after attending to some necessary things we walked in the garden of the <name type="hotel" ref="#Winter_Palace">Winter Palace</name> - it was very warm and the flies were tormenting - but the hoopoes were lovely. <persName ref="#Whymper_Charles">Mr. Whymper</persName> came to lunch - and in the afternoon <persName ref="#Wheelright_Mrs">Mrs. Wheelright</persName> and her daughter from the <placeName ref="#Thames">Thames</placeName> were here to tea. Such<pb n="99"/> charming people. <persName ref="#Davis_Theodore_M">Theo</persName> went to the <placeName ref="#Valley_of_the_Kings">Valley</placeName>.</p>
+        <p>I went over to the town this morning with <persName ref="#Davis_Theodore_M">Theodore</persName> - and after attending to some necessary things we walked in the garden of the <name type="hotel" ref="#Winter_Palace">Winter Palace</name> - it was very warm and the flies were tormenting - but the hoopoes were lovely. <persName ref="#Whymper_Charles">Mr. Whymper</persName> came to lunch - and in the afternoon <persName ref="#Wheelright_Mrs">Mrs. Wheelright</persName> and her daughter from the <placeName ref="#Thames">Thames</placeName> <!--river of boat?-->were here to tea. Such<pb n="99"/> charming people. <persName ref="#Davis_Theodore_M">Theo</persName> went to the <placeName ref="#Valley_of_the_Kings">Valley</placeName>.</p>
       </div>
       <div xml:id="EBA-1912-02-22" type="entry">
         <dateline>
@@ -364,14 +362,12 @@
            <placeName ref="#Florence">Florence</placeName>
         </dateline>
         <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Burton_Harry">Harry</persName> elected to go by motor here - and we went by train - we expected them to arrive before we did, at 10 o'clock P.M. But we passed them near <placeName ref="#Spezia_La">Spezia</placeName>, the rain pouring in torrents - and we thought they would stop somewhere for the night. But they did not arrive<pb n="102"/> until 12:30 - and <persName ref="#Jones_Daniel">Jones</persName> and I who were sitting up for them, were very anxious. They had bad roads and continuous rain. Our pleasure in being once more in <placeName ref="#Florence">Florence</placeName>, was marred by an illness of <persName ref="#Davis_Theodore_M">Theodore</persName>'s. It began with an ulcerated tooth, which gave him extreme pain, but the dentist treated it, and we hoped it was over. <persName ref="#Burton_Harry">Harry</persName> was every day at the hotel with us, and <persName ref="#Constantini_David">David Costantini</persName> was very kind and devoted - and was with us almost every day, and motored and played cards with <persName ref="#Davis_Theodore_M">Theodore</persName> - when the weather was good, which was seldom. We had fires every day. Pleasant visits with the <persName ref="#Hagermeyer_Mr #Hagermeyer_Mrs">Hagermeyer</persName>'s and with the <persName ref="#Kirk_Mr #Kirk_Mrs">Kirks</persName> - old <persName ref="#Kirk_Mrs"> Mrs. Kirk</persName> is very remarkable. She is 86 years old and as active mentally and physically as ever, and very intelligent. She rises very early, and works in her garden of which she is extravagantly fond, and is now amusing herself in writing a history of her life. It is a pleasure to meet her and talk to her. We spent all afternoon with them, such a pleasant old Italian house just outside <placeName ref="#Florence">Florence</placeName> - we could only walk through part of it, as it was cold and windy.</p>
-        <p>I only went into one church while here because of the cold, and <persName ref="#Buttles_Jeanette">Nettie</persName> and I went into <placeName ref="#Santa_Croce">S. Croce</placeName>, my favourite Florentine church, one morning. We were all devoted to <persName ref="#Davis_Theodore_M">Theo</persName> - in his wretched state - and the last day of our stay we went out to <persName ref="#Constantini_David">David Costantini</persName>'s beautiful house and had tea. <persName ref="#Constantini_Mrs.">Mrs. Costantini</persName> was in <placeName ref="#Paris">Paris</placeName> - we are leaving on the 24th for <placeName ref="#Milan">Milan</placeName> for 3 or 4 days - and will go from there directly to <placeName ref="#London">London</placeName>.</p>
+        <p>I only went into one church while here because of the cold, and <persName ref="#Buttles_Jeanette">Nettie</persName> and I went into <placeName ref="#Santa_Croce">S. Croce</placeName>, my favourite Florentine church, one morning. We were all devoted to <persName ref="#Davis_Theodore_M">Theo</persName> - in his wretched state - and the last day of our stay we went out to <persName ref="#Constantini_David">David Costantini</persName>'s beautiful house and had tea. <persName ref="#Constantini_Mrs">Mrs. Costantini</persName> was in <placeName ref="#Paris">Paris</placeName> - we are leaving on the 24th for <placeName ref="#Milan">Milan</placeName> for 3 or 4 days - and will go from there directly to <placeName ref="#London">London</placeName>.</p>
       <pb n="103"/>
       </div>
       <div xml:id="EBA-1912-05-05" type="entry">
         <dateline>
-           <date when="1912-05-05"><choice>
-              <sic>Sunday. April 5th</sic>
-              <corr>Sunday. May 5th</corr></choice></date>
+           <date when="1912-05-05"><choice><sic>Sunday. April 5th</sic><corr>Sunday. May 5th</corr></choice></date>
         </dateline>
         <p>We had 5 miserable days in <placeName ref="#Milan">Milan</placeName>. <persName ref="#Davis_Theodore_M">Theo</persName> was so suffering. We were as usual at that pleasant <name type="hotel" ref="#Hotel_Cavour">Cavour</name>, and <persName ref="#Buttles_Jeanette">Nettie</persName> and <persName ref="#Burton_Harry">Harry</persName> went with us to see us off to <placeName ref="#London">London</placeName>. <persName ref="#Davis_Theodore_M">Theo</persName> fortunately found an excellent dentist - who came twice to see him each day. He was so brave and patient - but the treatment was very heroic, and he is much pulled down by it - quite a comfortable ride to the <placeName ref="#Calais">Calais</placeName> landing, and on Tuesday afternoon at 5 o'clock we reached <placeName ref="#London">London</placeName>, and settled ourselves in our old pleasant appartment at <placeName ref="#Bucklands">Bucklands</placeName>.</p>
       </div>
