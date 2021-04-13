@@ -301,10 +301,7 @@
         <dateline>
            <date when="1912-02-11">Sexigesima Sunday, Feb. 11th</date>.
         </dateline>
-        <p>At home all day. In the afternoon <persName ref="#Molesworth_Lady">Lady Molesworth</persName>, <persName ref="#Contardone_Contessa">the Contessa</persName> and that nice young man, <persName ref="#de_Cuadra_Luis_Count">Count Luis de Cuadra</persName>, son of the <choice>
-        <sic>Marquisa de Guadolmina</sic>
-        <corr><persName ref="#Guadalmina_Marquesa">Marquesa de Guadalmina</persName></corr>
-        </choice>, and <persName ref="#Grey_Robert">Mr. Robert Grey</persName> called. A lovely night.</p>
+        <p>At home all day. In the afternoon <persName ref="#Molesworth_Lady">Lady Molesworth</persName>, <persName ref="#Contardone_Contessa">the Contessa</persName> and that nice young man, <persName ref="#de_Cuadra_Luis_Count">Count Luis de Cuadra</persName>, son of the <persName ref="#Guadalmina_Marquesa"><choice><sic>Marquisa de Guadolmina</sic><corr>Marquesa de Guadalmina</choice></persName>, and <persName ref="#Grey_Robert">Mr. Robert Grey</persName> called. A lovely night.</p>
       <pb n="98"/>
       </div>
       <div xml:id="EBA-1912-02-12" type="entry">
@@ -361,10 +358,7 @@
         <dateline>
            <date when="1912-04-08">Easter Monday. April 8th. 1912</date>.
         </dateline>
-        <p><placeName ref="#Genoa">Genoa</placeName> - we had such a tiresome voyage. It was interesting seeing <placeName ref="#Corfu">Corfu</placeName> again - but it added to the days. The <persName ref="#Wilhelm_Friedrich_II">German Emperor</persName>was there at his Castle - and 3 great German Steamships in the harbour. We reached <placeName ref="#Naples">Naples</placeName> yesterday - but did not land - and here we are back in our old quarters at this best of hotels, the <choice>
-        <sic>Mimare</sic>
-        <corr><name type="hotel" ref="#Hotel_Miramare">Miramare</name></corr>
-        </choice> which seems something like home. Tomorrow we go to <placeName ref="#Florence">Florence</placeName>.</p>
+        <p><placeName ref="#Genoa">Genoa</placeName> - we had such a tiresome voyage. It was interesting seeing <placeName ref="#Corfu">Corfu</placeName> again - but it added to the days. The <persName ref="#Wilhelm_Friedrich_II">German Emperor</persName>was there at his Castle - and 3 great German Steamships in the harbour. We reached <placeName ref="#Naples">Naples</placeName> yesterday - but did not land - and here we are back in our old quarters at this best of hotels, the <name type="hotel" ref="#Hotel_Miramare"><choice><sic>Mimare</sic><corr>Miramare</corr></name> which seems something like home. Tomorrow we go to <placeName ref="#Florence">Florence</placeName>.</p>
       </div>
       <div xml:id="EBA-1912-04-09" type="entry">
         <dateline>
