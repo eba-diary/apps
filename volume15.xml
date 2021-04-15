@@ -630,8 +630,8 @@
       <div xml:id="EBA-1908-01-24" type="entry">
         <dateline><date when="1908-01-24">Jan. 24. Friday.</date></dateline>
         <p>A quiet day for all at home. This afternoon <persName ref="#Erskine_David">Mr.
-            Erskine</persName> came to say goodbye. <personGrp ref="#Maspero">M. and Madame
-            Maspero</personGrp> with their sons came to see the find.</p>
+            Erskine</persName> came to say goodbye. <persName ref="#Maspero_Gaston #Maspero_Louise">M. and Madame
+            Maspero</persName> with their sons came to see the find.</p>
       </div>
       <div xml:id="EBA-1908-01-25" type="entry">
         <dateline><date when="1908-01-25">Jan. 25. Saturday.</date></dateline>
@@ -673,8 +673,8 @@
         <dateline><date when="1908-01-30">Jan. 30. Thursday.</date></dateline>
         <p>A lot of people on the boat today - among them <persName ref="#Smith_Mr Smith_Mrs">Mr. and Mrs.
             Smith</persName> of <placeName ref="#New_York">New York</placeName> - he is something
-          at the <orgName ref="#Metropolitan_Museum">Met. Museum</orgName>, and with them <personGrp
-            ref="#Patterson">Mr. and Mrs. Patterson</personGrp> of <placeName ref="#Chicago"
+          at the <orgName ref="#Metropolitan_Museum">Met. Museum</orgName>, and with them <persName
+            ref="#Patterson_Mr #Patterson_Mrs">Mr. and Mrs. Patterson</persName> of <placeName ref="#Chicago"
             >Chicago</placeName>. <persName ref="#Loret_M">M. Loret</persName> also called - a
           pleasant and charming personage. <persName ref="#Dalison_Max">Mr. Dalison</persName> dined
           here.</p>
@@ -691,8 +691,8 @@
         <p>A day at home. <persName ref="#Cassel_Ernest">Sir Ernest Cassel</persName> and his
           daughter <persName ref="#Maud_Amalia">Mrs. Ashley</persName> and the <persName
             ref="#Di_Teano_Princess">Princess Teano</persName> of <placeName ref="#Rome"
-            >Rome</placeName> came to tea also <personGrp ref="#Schiff">Mr. and Mrs.
-            Schiff</personGrp> of <placeName ref="#New_York">New York</placeName>, <persName
+            >Rome</placeName> came to tea also <persName ref="#Schiff_Mr #Schiff_Mrs">Mr. and Mrs.
+            Schiff</persName> of <placeName ref="#New_York">New York</placeName>, <persName
             ref="#Villiers_Eric">Mr. Villiers</persName>, <persName ref="#Weigall_Arthur"
             >Weigall</persName> and others.</p>
       </div>
@@ -1003,8 +1003,8 @@
         <p>Came to our old place at the <name type="hotel" ref="#Ghezireh_Palace_Hotel">Ghezireh
             Palace</name> this A.M. Spent the morning at the <orgName ref="#Boulaq_Museum"
             >Museum</orgName> and and had tea with the <persName ref="#Iddings_Mr #Iddings_Mrs"
-            >Iddings</persName> in the afternoon. A visit from <personGrp ref="#Fraser">Mr. and Mrs.
-            Fraser</personGrp> this evening.</p>
+            >Iddings</persName> in the afternoon. A visit from <persName ref="#Fraser_Mr #Fraser_Mrs">Mr. and Mrs.
+            Fraser</persName> this evening.</p>
       </div>
       <div xml:id="EBA-1908-03-17" type="entry">
         <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-17">March 17th.
@@ -1025,7 +1025,7 @@
             Thursday.</date>.</dateline>
         <p>We were again at the <orgName ref="#Boulaq_Museum">Museum</orgName> this morning. Dinner
           at the <persName ref="#Iddings_Mr #Iddings_Mrs">Iddings</persName> where we met some
-          pleasant people: <personGrp ref="#Farnell">Mr. and Miss Farnell</personGrp> - <persName
+          pleasant people: <persName ref="#Farnell_Mr #Farnell_Miss">Mr. and Miss Farnell</persName> - <persName
             ref="#Skifeuton_Smythe_Major">Major Skifeuton-Smythe</persName> - <persName
             ref="#Beard_Sir_John">Sir John Beard</persName> and daughter, <persName
             ref="#Bathhurst_Lady">Lady Bathhurst</persName> and others.</p>
