@@ -122,13 +122,13 @@
                 <dateline>
                     <date when="1912-01-19">Sunday. Jan. 19.</date>
                 </dateline>
-                <p>We have had among other visitors this week, the <persName ref="#Hardy_Mr #Hardy_Mrs">Hardys</persName> to tea,  <persName ref="#Maspero_Gaston">Sir Gaston</persName> and <persName ref="#Maspero_Louise">Lady Maspero</persName>, and  <persName ref="#Sprague_Carleton #Sprague_Mrs"><choice><sic>Mr. and Mrs. Carlstone Sprague</sic><corr>Mr. and Mrs. Carleton Sprague</corr></choice></persName> sent by <persName ref="#Metcalf_Mrs">Mrs. Metcalf</persName>, and Mr. <persName>Allen Marquand, <!--who is Allen/Allan Marquand?--></persName> windy and cold.</p>
+                <p>We have had among other visitors this week, the <persName ref="#Hardy_Mr #Hardy_Mrs">Hardys</persName> to tea,  <persName ref="#Maspero_Gaston">Sir Gaston</persName> and <persName ref="#Maspero_Louise">Lady Maspero</persName>, and  <persName ref="#Sprague_Carleton #Sprague_Mrs"><choice><sic>Mr. and Mrs. Carlstone Sprague</sic><corr>Mr. and Mrs. Carleton Sprague</corr></choice></persName> sent by <persName ref="#Metcalf_Mrs">Mrs. Metcalf</persName>, and <persName ref= "#Marquand_Allan"><choice><sic>Mr. Allen Marquand</sic><corr>Mr. Allan Marquand</corr></choice></persName>, windy and cold.</p>
             </div>
             <div xml:id="EBA-1913-01-26" type="entry">
                 <dateline>
                     <date when="1913-01-26">Sunday. Jan. 26.</date>
                 </dateline>
-                <p>It has been warm and charming most of the week. We have had the <persName ref="#Contardone_Contessa">Contessa</persName> and <persName ref="#Tremaine_Mr">Mr. Tremaine</persName>, <persName ref="#Gardiner_Alan"><choice><sic>Mr. Alan Gardner</sic><corr>Mr. Alan Gardiner</corr></choice></persName>, <persName ref="#Longyear_Mr #Longyear_Mrs">Mr. and Mrs. Longyear</persName> and son <!--who is the son?--> on their homeward bound voyage from <orgName>India,</orgName> Mr. <persName>Fahnstock</persName> to tea, <persName ref="#Tremaine_Mr">Mr. Tremaine</persName> to lunch, and <persName ref="#Whymper_Charles">Mr. Whymper</persName> to breakfast this week, to say nothing of a charming little white baby donkey, which one of the sailors brought on the lower deck, to amuse the <persName ref="#Pier_Mr #Pier_Mrs">Pier</persName> children. We have had some warm days.</p>
+                <p>It has been warm and charming most of the week. We have had the <persName ref="#Contardone_Contessa">Contessa</persName> and <persName ref="#Tremaine_Mr">Mr. Tremaine</persName>, <persName ref="#Gardiner_Alan"><choice><sic>Mr. Alan Gardner</sic><corr>Mr. Alan Gardiner</corr></choice></persName>, <persName ref="#Longyear_Mr #Longyear_Mrs">Mr. and Mrs. Longyear</persName> and son on their homeward bound voyage from <placeName ref="#India">India</placeName>, <persName ref="#Fahnestock_Gibson"><choice><sic>Mr. Fahnstock</sic><corr>Mr. Fahnestock</corr></choice></persName> to tea, <persName ref="#Tremaine_Mr">Mr. Tremaine</persName> to lunch, and <persName ref="#Whymper_Charles">Mr. Whymper</persName> to breakfast this week, to say nothing of a charming little white baby donkey, which one of the sailors brought on the lower deck, to amuse the <persName ref="#Pier_Mr #Pier_Mrs">Pier</persName> children. We have had some warm days.</p>
             </div>
             <div xml:id="EBA-1913-02-02" type="entry">
                 <dateline>
@@ -146,7 +146,7 @@
                 <dateline>
                     <date when="1913-02-16">Sunday. Feb. 16th.</date>
                 </dateline>    
-                <p>We dressed the ship on Wednesday - <persName ref="#Lincoln_Abraham">Lincoln</persName>'s birthday - the <pb n="110"/>usual routine - this week - we have had light rain on one day and cold stormy weather since. <persName ref="#Contardone_Contessa">Contessa</persName> here for luncheon.</p>
+                <p>We dressed the ship on <date when="1913-02-12">Wednesday</date> - <persName ref="#Lincoln_Abraham">Lincoln</persName>'s birthday - the <pb n="110"/>usual routine - this week - we have had light rain on one day and cold stormy weather since. <persName ref="#Contardone_Contessa">Contessa</persName> here for luncheon.</p>
             <!--[2/3]-->
             </div>
             <div xml:id="EBA-1913-02-16" type="entry">
