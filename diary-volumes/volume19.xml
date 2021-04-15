@@ -7,7 +7,7 @@
           <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
         </author>
         <editor>
-          <persName ref="SK">Sarah Ketchley</persName>
+          <persName ref="#SK">Sarah Ketchley</persName>
         </editor>
       </titleStmt>
       <publicationStmt>
@@ -97,57 +97,57 @@
                 <dateline>
                     <date when="1913-01-03">Saturday. Jan. 3rd.</date>
                 </dateline>
-                <p><persName>Mary, Doris</persName> and I crossed over and paid a visit to Mr. <persName>Nicol.</persName> He has the very best picture I ever saw of his - the wonderful mountain range opposite <placeName>Luxor</placeName> - the finest view in all <placeName>Egypt</placeName> I think. He says he painted it for me - but Mr. and <persName>Mrs. Pier</persName> who were her to lunch, say that they are to have it.</p>
+                <p><persName ref="#Newberry_Mary">Mary</persName>, <persName ref="#Newberry_Doris">Doris</persName> and I crossed over and paid a visit to <persName ref="#Nicol_Erskine">Mr. Nicol</persName>. He has the very best picture I ever saw of his - the wonderful mountain range opposite <placeName ref="#Luxor">Luxor</placeName> - the finest view in all <placeName ref="#Egypt">Egypt</placeName> I think. He says he painted it for me - but <persName ref="#Pier_Mr #Pier_Mrs">Mr. and Mrs. Pier</persName> who were <choice><sic>her</sic><corr>here</corr><choice> to lunch, say that they are to have it.</p>
             </div>
             <div xml:id="EBA-1913-01-06" type="entry">
                 <dateline>
                     <date when="1913-01-06">Monday. Jan. 6th.</date>
                 </dateline>
-                <p>The <persName>v. Bissings</persName> were here to tea - and Mr. <persName>Nicol</persName> dined with us.</p>
+                <p>The <persName ref="#von_Bissing_Baron #von_Bissing_Baroness">v. Bissings</persName> were here to tea - and <persName ref="#Nicol_Erskine">Mr. Nicol</persName> dined with us.</p>
             </div>
             <div xml:id="EBA-1913-01-07" type="entry">
                 <dateline>
                     <date when="1913-01-07">Tuesday. Jan. 7th.</date>
                 </dateline>
-                <p>We have all been over to see <orgName>Harry's</orgName> diggings at <placeName>Medinet Habu.</placeName></p>
+                <p>We have all been over to see <persName ref="#Burton_Harry">Harry</persName>'s diggings at <placeName ref="#Medinet_Habu">Medinet Habu</placeName>.</p>
             </div>
             <div xml:id="EBA-1913-01-12" type="entry">
                 <dateline>
                     <date when="1913-01-12">Sunday. Jan. 12th.</date>
                 </dateline>
-                <p>We have had <persName>Baron</persName> and <persName>Baroness v. Bissing</persName> to lunch, <persName>Miss Ferroir</persName> to tea and <persName>Miss Downie</persName> and the <persName>Piers</persName> to lunch this week. We have paid a visit to the <placeName>Fahnstocks,</placeName> who are lying near. The weather is at last clear and warm.</p>
+                <p>We have had <persName ref="#von_Bissing_Baron #von_Bissing_Baroness">Baron and Baroness v. Bissing</persName> to lunch, <persName ref="#Ferroir_Miss">Miss Ferroir</persName> to tea and <persName ref="#Downie_Miss">Miss Downie</persName> and the <persName ref="#Pier_Mr #Pier_Mrs">Piers</persName> to lunch this week. We have paid a visit to the <persName ref="#Fahnestock_Gibson #Fahnestock_Mrs"><choice><sic>Fahnstocks</sic><corr>Fahnestocks</corr></choice></persName>, who are lying near. The weather is at last clear and warm.</p>
             </div>
             <pb n="109"/>
             <div xml:id="EBA-1912-01-19" type="entry">
                 <dateline>
                     <date when="1912-01-19">Sunday. Jan. 19.</date>
                 </dateline>
-                <p>We have had among other visitors this week, the <name>Hardys</name> to tea, Sir <persName>Gaston</persName> and <persName>Lady Maspero,</persName> and Mr. and Mrs. <persName>Carlstone Sprague</persName> sent by Mrs. <persName>Metcalf,</persName> and Mr. <persName>Allen Marquand,</persName> windy and cold.</p>
+                <p>We have had among other visitors this week, the <persName ref="#Hardy_Mr #Hardy_Mrs">Hardys</persName> to tea,  <persName ref="#Maspero_Gaston">Sir Gaston</persName> and <persName ref="#Maspero_Louise">Lady Maspero</persName>, and  <persName ref="#Sprague_Carleton #Sprague_Mrs"><choice><sic>Mr. and Mrs. Carlstone Sprague</sic><corr>Mr. and Mrs. Carleton Sprague</corr></choice></persName> sent by <persName ref="#Metcalf_Mrs">Mrs. Metcalf</persName>, and Mr. <persName>Allen Marquand, <!--who is Allen/Allan Marquand?--></persName> windy and cold.</p>
             </div>
             <div xml:id="EBA-1913-01-26" type="entry">
                 <dateline>
                     <date when="1913-01-26">Sunday. Jan. 26.</date>
                 </dateline>
-                <p>It has been warm and charming most of the week. We have had the <name>Contessa</name> and Mr. Tremaine, Mr. <persName>Alan Gardner</persName> (Sarah:sic), Mr. and <persName>Mrs. Longyear</persName> and son on their homeward bound voyage from <orgName>India,</orgName> Mr. <persName>Fahnstock</persName> to tea, <persName>Mr. Tremaine</persName> to lunch, and Mr. <persName>Whymper</persName> to breakfast this week, to say nothing of a charming little white baby donkey, which one of the sailors brought on the lower deck, to amuse the <placeName>Pier</placeName> children. We have had some warm days.</p>
+                <p>It has been warm and charming most of the week. We have had the <persName ref="#Contardone_Contessa">Contessa</persName> and <persName ref="#Tremaine_Mr">Mr. Tremaine</persName>, <persName ref="#Gardiner_Alan"><choice><sic>Mr. Alan Gardner</sic><corr>Mr. Alan Gardiner</corr></choice></persName>, <persName ref="#Longyear_Mr #Longyear_Mrs">Mr. and Mrs. Longyear</persName> and son <!--who is the son?--> on their homeward bound voyage from <orgName>India,</orgName> Mr. <persName>Fahnstock</persName> to tea, <persName ref="#Tremaine_Mr">Mr. Tremaine</persName> to lunch, and <persName ref="#Whymper_Charles">Mr. Whymper</persName> to breakfast this week, to say nothing of a charming little white baby donkey, which one of the sailors brought on the lower deck, to amuse the <persName ref="#Pier_Mr #Pier_Mrs">Pier</persName> children. We have had some warm days.</p>
             </div>
             <div xml:id="EBA-1913-02-02" type="entry">
                 <dateline>
                     <date when="1913-02-02">Sunday. Feb. 2nd.</date>
                 </dateline>
-                <p>Various visits from friends - we have lunched with the <orgName>Fahnstocks</orgName> and <orgName>Masperos</orgName> - visits to the diggings etc - cold and windy.</p>
+                <p>Various visits from friends - we have lunched with the <persName ref="#Fahnestock_Gibson #Fahnestock_Mrs"><choice><sic>Fahnstocks</sic><corr>Fahnestocks</corr></choice></persName> and <persName ref="#Maspero_Gaston #Maspero_Louise">Masperos</persName> - visits to the diggings etc - cold and windy.</p>
             </div>
             <div xml:id="EBA-1913-02-09" type="entry">
                 <dateline>
                     <date when="1913-02-09">Sunday. Feb 9th.</date>
                 </dateline>
-                <p>It has been very warm - various visitors - among them the <orgName>Longyears</orgName> back from the <placeName>South</placeName> as far as Khartoum. <persName>Mr. Whymper</persName> to breakfast this morning.</p>
+                <p>It has been very warm - various visitors - among them the <persName ref="#Longyear_Mr #Longyear_Mrs">Longyears</persName> back from the South as far as <placeName ref="#Khartoum">Khartoum</placeName>. <persName ref="#Whymper_Charles">Mr. Whymper</persName> to breakfast this morning.</p>
             </div>
             <div xml:id="EBA-1913-02-16" type="entry">
                 <dateline>
                     <date when="1913-02-16">Sunday. Feb. 16th.</date>
                 </dateline>    
-                <p>We dressed the ship on Wednesday - <persName>Lincoln's</persName> birthday - the <pb n="110"/>usual routine - this week - we have had light rain on one day and cold stormy weather since. Contessa here for luncheon.</p>
-            <!--Izzy-->
+                <p>We dressed the ship on Wednesday - <persName ref="#Lincoln_Abraham">Lincoln</persName>'s birthday - the <pb n="110"/>usual routine - this week - we have had light rain on one day and cold stormy weather since. <persName ref="#Contardone_Contessa">Contessa</persName> here for luncheon.</p>
+            <!--[2/3]-->
             </div>
             <div xml:id="EBA-1913-02-16" type="entry">
                 <dateline>
