@@ -12,6 +12,7 @@ data.Dataset = {
     delroyFieldArray: [],
     delroySnowflakeViewsArray: [],
     delroyStructTrackerArray: [],
+    firstTime: true,
 
 
     delroyInit: function () {
@@ -213,8 +214,16 @@ data.Dataset = {
         table.rows.add(field);       //when clicking on an item, we need to specify Fields property since all chidren of ROOT use this
         table.draw();
 
-        //this code scrolls user to this scroll marker when they are nagivating through since the grid is growing and shrinking when structs are selected
-        location.href = '#delroyScrollMonster';
+        //dont do anything first time since firstTime is on whole page refresh and we don't want to mess with scroll position
+        if (data.Dataset.firstTime) {
+            data.Dataset.firstTime = false;
+        }
+        else {
+            //change scroll position to scroll marker (top of delroy grid)  when they are clicking in grid since grid is growing and shrinking when structs are selected and we want it to go to top
+            //this was my hack to get this to work, all other methods to go to top of grid didn't work
+            var elmnt = document.getElementById("delroyScrollMonster");     
+            elmnt.scrollIntoView(); 
+        }
     },
 
 
