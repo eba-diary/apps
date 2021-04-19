@@ -212,6 +212,9 @@ data.Dataset = {
         table.clear();
         table.rows.add(field);       //when clicking on an item, we need to specify Fields property since all chidren of ROOT use this
         table.draw();
+
+        //this code scrolls user to this scroll marker when they are nagivating through since the grid is growing and shrinking when structs are selected
+        location.href = '#delroyScrollMonster';
     },
 
 
