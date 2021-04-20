@@ -219,10 +219,11 @@ data.Dataset = {
             data.Dataset.firstTime = false;
         }
         else {
-            //change scroll position to scroll marker (top of delroy grid)  when they are clicking in grid since grid is growing and shrinking when structs are selected and we want it to go to top
-            //this was my hack to get this to work, all other methods to go to top of grid didn't work
-            var elmnt = document.getElementById("delroyScrollMonster");     
+            //change scroll position to top of columns detail section upon grid refresh for consistency (anytime they click breadcrumb or click a struct)
+            //this is needed because of grid expanding and shrinking when structs are selected and the scrolling un changed goes sometimes to bottom of grid
+            var elmnt = document.getElementById("schemaSection");     
             elmnt.scrollIntoView(); 
+            window.scrollBy(0, -100); //adjust scrolling because scrollIntoView() is off by about 100px which is a known issue in various browsers
         }
     },
 
