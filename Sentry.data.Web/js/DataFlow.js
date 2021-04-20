@@ -226,7 +226,11 @@
     DatasetFormCancelInit: function () {
         $('#DataFlowFormContainer').show();
         $('#DatasetFormContainer').hide();
-        data.DataFlow.InitSchemaMaps("0", null);
+        $('.schemaSpinner').each(function (index) {
+            var cur = $(this);
+            cur.html('');
+        });
+        //data.DataFlow.InitSchemaMaps("0", null);
     },
 
     DatasetFormSubmitInit: function () {
@@ -292,7 +296,6 @@
     DatasetFileConfigFormCancelInit: function () {
         $('#DataFlowFormContainer').show();
         $('#DatasetFileConfigFormContainer').hide();
-        data.DataFlow.InitSchemaMaps("0");
     },
 
     PopulateSchemas(datasetId, schemaId, targetElement) {
@@ -316,7 +319,7 @@
                 scmSpinner.html('');
                 targetElement.html(subItems);
 
-                if (curVal === null || curVal === "0") {
+                if (curVal === null || curVal === "0" || ((schemaId === undefined || schemaId === null) && curVal === "-1")) {
                     targetElement.val("0");
                 }
                 else if ((schemaId !== undefined && schemaId !== null) || curVal === "-1") {
@@ -437,15 +440,15 @@
 
             });
 
-            $('[id$=_SelectedSchema]').change(function () {
-                var schemaId = $(this).val();
+            //$('[id$=_SelectedSchema]').change(function () {
+            //    var schemaId = $(this).val();
 
-                //If create new schema is selected
-                if (schemaId === "-1") {
-                    $('#DataFlowFormContainer').hide();
-                    data.DataFlow.RenderSchemaCreatePage();
-                }
-            })
+            //    //If create new schema is selected
+            //    if (schemaId === "-1") {
+            //        $('#DataFlowFormContainer').hide();
+            //        data.DataFlow.RenderSchemaCreatePage();
+            //    }
+            //})
         });
     }
 }
