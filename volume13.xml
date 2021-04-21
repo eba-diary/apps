@@ -438,7 +438,7 @@
           <date when="1906-02-25">Sunday - Feb. 25.</date>
           <placeName ref="#Quinquagesima">Quinquagesima</placeName>
         </dateline>
-        <p><choice><sic>Mr. Corelly</sic><corr><persName ref="#Curelly_Mr">Mr. Curelly</persName></choice>came to lunch. <persName
+        <p><choice><sic>Mr. Corelly</sic><corr><persName ref="#Curelly_Mr">Mr. Curelly</persName></corr></choice>came to lunch. <persName
             ref="#Hunt_Mrs">Mrs. Hunt</persName> and <persName ref="#von_Bissing_Baron">Baron v.
             Bissing</persName> to tea - <personGrp ref="#Naville">M. and Mme. Naville</personGrp>
           and <persName ref="#Sayce_Archibald">Mr. Sayce</persName> to dine. I was very tired and
