@@ -29,7 +29,7 @@ namespace Sentry.data.Goldeneye
         {
             //ENSURE that we are ONLY doing PersonalLines right now, if they create a TDM Notification or some other Notication we do not want to do the ADAttack
             if( ( (BusinessAreaType)e.Notification.ParentObject == BusinessAreaType.PersonalLines)  && 
-                e.Notification.MessageSeverity == data.Core.GlobalEnums.NotificationSeverity.Critical
+                e.Notification.MessageSeverity == data.Core.GlobalEnums.NotificationSeverity.Critical                 
             )
             {
                 ObsidianAdService o = new ObsidianAdService();
@@ -194,8 +194,12 @@ namespace Sentry.data.Goldeneye
                                 ).ToList()
                             );
 
-                            //Call ADAttack for BUSINESSAREA events ONLY to determine if we should email anyone in the CriticalNotificationsADGroup
-                            ADAttack(subsThatMatch, _event);
+                            //Call ADAttack for INSTANT BUSINESSAREA EVENTS ONLY to determine if we should email anyone in the CriticalNotificationsADGroup
+                            if(interval == "Instant")
+                            {
+                                ADAttack(subsThatMatch, _event);
+                            }
+                            
                         }
 
                         
