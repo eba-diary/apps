@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core;
+using Sentry.Web.CachedObsidianUserProvider;
 using System;
 
 namespace Sentry.data.Infrastructure
@@ -9,17 +10,13 @@ namespace Sentry.data.Infrastructure
     /// <remarks></remarks>
     public class ExtendedUserInfoProvider : IExtendedUserInfoProvider
     {
-        private Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider _obsidianUserProvider;
+        private IObsidianUserProvider _obsidianUserProvider;
         private IAssociateInfoProvider _associateInfoProvider;
 
-        public ExtendedUserInfoProvider(IAssociateInfoProvider associateInfoProvider)
+        public ExtendedUserInfoProvider(IAssociateInfoProvider associateInfoProvider, IObsidianUserProvider obsidianService)
         {
             _associateInfoProvider = associateInfoProvider;
-            _obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();
-            //if you need to set credentials for accessing obsidian (e.g. a cross-domain call) then set them here.
-            //_obsidianUserProvider.Credentials = new Net.NetworkCredential(
-            //    Sentry.Configuration.Config.GetHostSetting("CrossDomainUserID"),
-            //    Sentry.Configuration.Config.GetHostSetting("CrossDomainUserPassword"));
+            _obsidianUserProvider = obsidianService;
         }
 
         public IExtendedUserInfo GetByUserId(string userId)

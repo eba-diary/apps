@@ -8,6 +8,8 @@ using Sentry.data.Infrastructure.Mappings.Primary;
 using System.Net.Http;
 using Sentry.data.Core.Interfaces.SAIDRestClient;
 using Sentry.Messaging.Common;
+using System.Net;
+using System.Net;
 
 namespace Sentry.data.Infrastructure
 {
@@ -99,9 +101,16 @@ namespace Sentry.data.Infrastructure
             registry.For<IMessageHandler<string>>().Add<DfsEventService>();
             registry.For<IMessageHandler<string>>().Add<SnowflakeEventService>();
 
+            //Wire up Obsidian provider
             Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();
             obsidianUserProvider.CacheTimeoutSeconds = int.Parse(Sentry.Configuration.Config.GetHostSetting("ObsidianUserCacheTimeoutMinutes")) * 60;
+            //Provide user\pass for possibility of basic auth if necessary
+            obsidianUserProvider.Credentials = new System.Net.NetworkCredential(
+                Sentry.Configuration.Config.GetHostSetting("ServiceAccountID"),
+                Sentry.Configuration.Config.GetHostSetting("ServiceAccountPassword")
+                );
             registry.For<Sentry.Web.CachedObsidianUserProvider.IObsidianUserProvider>().Singleton().Use(obsidianUserProvider);
+
             registry.For<IAssociateInfoProvider>().Singleton().Use<AssociateInfoProvider>();
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
             registry.For<ISASService>().Singleton().Use<SASServiceProvider>();
