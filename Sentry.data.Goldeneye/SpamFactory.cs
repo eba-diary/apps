@@ -65,6 +65,20 @@ namespace Sentry.data.Goldeneye
             }
         }
 
+        private static void LogAttack(string severity, string message )
+        {
+            Console.WriteLine(message);
+
+            if(severity.ToUpper() == "FATAL")
+            {
+                Logger.Fatal(message);
+            }
+            else
+            {
+                Logger.Info(message);
+            }
+
+        }
 
         public static void Run(string interval)
         {
@@ -73,11 +87,7 @@ namespace Sentry.data.Goldeneye
                 IContainer container;
                 IDatasetContext _datasetContext;
                 IAssociateInfoProvider _associateInfoProvider;
-
                 INotificationService _notificationService;
-
-
-                
 
                 using (container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
                 {
@@ -88,7 +98,7 @@ namespace Sentry.data.Goldeneye
 
                     List<Event> events;
                     
-                    Console.WriteLine("Running " + interval);
+                    LogAttack("INFO","Starting Spam Factry RUN " + interval);
 
                     switch (interval)
                     {
@@ -109,7 +119,7 @@ namespace Sentry.data.Goldeneye
                             events = _datasetContext.EventsSince(DateTime.Now.AddYears(-20), false);
                             break;
                     }
-                    
+
                     List<UserEvent> userEvents = new List<UserEvent>();
                     foreach (Event _event in events)
                     {
@@ -125,25 +135,29 @@ namespace Sentry.data.Goldeneye
                         if (_event.UserWhoStartedEvent != null && int.TryParse(_event.UserWhoStartedEvent.Trim(), out n) && !_event.IsProcessed)
 #endif
                         {
-                            Console.WriteLine("UserWhoStartedEvent : " + _event.UserWhoStartedEvent);
+                            LogAttack("INFO","SpamFactory EventID: " + _event.EventID + " Author:" + _event.UserWhoStartedEvent.Trim() );
                             var user = _associateInfoProvider.GetAssociateInfo(_event.UserWhoStartedEvent.Trim());
                             authorProcessed = true;
 
-                            UserEvent ue;
-                            //attach Event to existing UserEvent if it already exists
-                            if (userEvents.Any(x => x.email == user.WorkEmailAddress))
+                            if(user != null)
                             {
-                                ue = userEvents.FirstOrDefault(x => x.email == user.WorkEmailAddress);
-                                ue.events.Add(_event);
+                                UserEvent ue;
+                                //attach Event to existing UserEvent if it already exists
+                                if (userEvents.Any(x => x.email == user.WorkEmailAddress))
+                                {
+                                    ue = userEvents.FirstOrDefault(x => x.email == user.WorkEmailAddress);
+                                    ue.events.Add(_event);
+                                }
+                                else
+                                {
+                                    ue = new UserEvent();
+                                    ue.events = new List<Event>();
+                                    ue.events.Add(_event);
+                                    ue.email = user.WorkEmailAddress;
+                                    userEvents.Add(ue);
+                                }
                             }
-                            else
-                            {
-                                ue = new UserEvent();
-                                ue.events = new List<Event>();
-                                ue.events.Add(_event);
-                                ue.email = user.WorkEmailAddress;
-                                userEvents.Add(ue);
-                            }
+                            
                         }
 
 
@@ -191,37 +205,42 @@ namespace Sentry.data.Goldeneye
 #if (DEBUG)
                          if (ds.SentryOwnerName == "082698" || ds.SentryOwnerName == "072984" || ds.SentryOwnerName == "072186")
 #endif
-                            Console.WriteLine("ds.SentryOwnerName : " + ds.SentryOwnerName);
+                            LogAttack("INFO","SpamFactory: Subscription Processing:  EventID: " + _event.EventID + " Subscriber:" + ds.SentryOwnerName );
                             var user = _associateInfoProvider.GetAssociateInfo(ds.SentryOwnerName);
 
-                            //UserEvent for Subscribers OR AuthorSubscribers who didn't process yet
-                            if
-                            (   _event.UserWhoStartedEvent.Trim() != ds.SentryOwnerName.Trim()
-                                || (_event.UserWhoStartedEvent.Trim() == ds.SentryOwnerName.Trim() && !authorProcessed) 
-                            )
+                            if (user != null)
                             {
-                                UserEvent ue;
-                                //attach Event to existing UserEvent if a personal already has one, essentially there is an ARRAY of events
-                                if (userEvents.Any(x => x.email == user.WorkEmailAddress))
+                                LogAttack("INFO", "SpamFactory: Subscription Processing:  WorkEmailAddress:" + user.WorkEmailAddress);
+
+                                //UserEvent for Subscribers OR AuthorSubscribers who didn't process yet
+                                if
+                                (   _event.UserWhoStartedEvent.Trim() != ds.SentryOwnerName.Trim()
+                                    || (_event.UserWhoStartedEvent.Trim() == ds.SentryOwnerName.Trim() && !authorProcessed)
+                                )
                                 {
-                                    ue = userEvents.FirstOrDefault(x => x.email == user.WorkEmailAddress);
-                                    ue.events.Add(_event);
-                                }
-                                else
-                                {
-                                    try
+                                    UserEvent ue;
+                                    //attach Event to existing UserEvent if a personal already has one, essentially there is an ARRAY of events
+                                    if (userEvents.Any(x => x.email == user.WorkEmailAddress))
                                     {
-                                        ue = new UserEvent();
-                                        ue.events = new List<Event>();
+                                        ue = userEvents.FirstOrDefault(x => x.email == user.WorkEmailAddress);
                                         ue.events.Add(_event);
-                                        ue.email = user.WorkEmailAddress;
                                     }
-                                    catch (Exception ex)
+                                    else
                                     {
-                                        Logger.Error("Error creating UserEvent", ex);
-                                        throw;
-                                    }                                   
-                                    userEvents.Add(ue);
+                                        try
+                                        {
+                                            ue = new UserEvent();
+                                            ue.events = new List<Event>();
+                                            ue.events.Add(_event);
+                                            ue.email = user.WorkEmailAddress;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            LogAttack("FATAL", "Spam Factory: Error processing Subscribers for event.  " + ex.InnerException);
+                                            throw;
+                                        }
+                                        userEvents.Add(ue);
+                                    }
                                 }
                             }
 #if (DEBUG)
@@ -243,9 +262,9 @@ namespace Sentry.data.Goldeneye
                     //STEP 4: SEND UserEvent EMAILS
                     foreach (UserEvent ue in userEvents)
                     {
-                        Logger.Debug($"{ue.email} is being sent {ue.events.Count} events.");
-                        es.SendEmail(ue.email, interval," Events", ue.events);
-                        Console.WriteLine(ue.email + " is being sent " + ue.events.Count + " events.");
+                        LogAttack("INFO", $"Preparing to send {ue.email}  {ue.events.Count} events.");
+                        es.SendEmail(ue.email, interval, " Events", ue.events);
+                        LogAttack("INFO", ue.email + " is being sent " + ue.events.Count + " events.");
                     }
 
                     //Committing event changes to database
