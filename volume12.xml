@@ -186,10 +186,10 @@
           with us several times - and we spent the day with him at the <name type="hotel"
             ref="#Mona_House">Mona House</name>, where he was staying. He is quite settled in a
           pleasant appartment - and looks better and happier than he did. We had tea one afternoon
-          with <persName ref="#Packett_Mrs">Mrs. Packett</persName>, in her nice little home. I
-          liked her husband - and she seemed quieter and less gushing than the <persName
-            ref="#Packett_Mrs">Miss Kirkbride</persName> we met a year ago on the steamer coming out
-          here.</p>
+          with <persName ref="#Peckitt_Amelia">Mrs. <choice><sic>Packett</sic><corr>Peckitt</corr>
+          </choice></persName>, in her nice little home. I liked her husband - and she seemed
+          quieter and less gushing than the <persName ref="#Peckitt_Amelia">Miss Kirkbride
+          </persName> we met a year ago on the steamer coming outhere.</p>
       </div>
       <div xml:id="EBA-1904-12-17" type="entry">
         <dateline>
@@ -729,14 +729,13 @@
       </div>
 
 <!-- Hannah Burrows -->
-<!-- Who are the Picketts/Pecketts/Packetts -->
       <div xml:id="EBA-1905-02-02" type="entry">
         <dateline>
           <date when="1905-02-02">Thursday, Feb. 2d.</date>
         </dateline>
-        <p>Two very quiet days - <personGrp ref="#Picketts">the Picketts</personGrp> from <placeName
-            ref="#Cairo">Cairo</placeName>, who are here in their R.R. car, dined with us.<pb n="72"
-          /></p>
+        <p>Two very quiet days - <persName ref="#Peckitt_Reginald #Peckitt_Amelia">the <choice>
+          <sic>Picketts</sic><corr>Peckitts</corr></choice></persName> from <placeName ref="#Cairo">
+          Cairo</placeName>, who are here in their R.R. car, dined with us.<pb n="72"/></p>
       </div>
       <pb n="72"/>
       <div xml:id="EBA-1905-02-03" type="entry">
@@ -1467,10 +1466,11 @@
           <date when="1905-03-30">Wednesday, Mar. 30th.</date>
         </dateline>
         <p><persName ref="#Hardy_Jean">Jean</persName> and <persName ref="#Wilson_Alice"
-            >Alice</persName> dined in town with <personGrp ref="#Peckett">the Pecketts</personGrp>
-          this evening and <persName ref="#Lindon_Smith_Joseph">Joe Smith</persName> and <persName
+            >Alice</persName> dined in town with <persName ref="#Peckitt_Reginald #Peckitt_Amelia">
+            the <choice><sic>Pecketts</sic><corr>Peckitts</corr></choice></persName>
+            this evening and <persName ref="#Lindon_Smith_Joseph">Joe Smith</persName> and <persName
             ref="#Lindon_Smith_Corinna">wife</persName> dined with us and we all went in to the
-          concert at <name type="hotel" ref="#Shepheards_Hotel">Shepheards</name>.</p>
+            concert at <name type="hotel" ref="#Shepheards_Hotel">Shepheards</name>.</p>
       </div>
       <div xml:id="EBA-1905-03-31" type="entry">
         <dateline>
