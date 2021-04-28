@@ -222,19 +222,20 @@ data.Config = {
         });
 
         $("#IncludedInSAS").click(function () {
-            if ($('#ConfigId').val() != "0" && $(this).is(':unchecked')) {
+            if ($('#ConfigId').val() !== "0" && $(this).is(':unchecked')) {
                 Sentry.ShowModalAlert("\"Add to SAS\" option has been unchecked.  <p>This will remove all associated SAS libraries for this schema, if saved.</p>");
             }
         });
 
         $("#CreateCurrentView").click(function () {
-            if ($('#ConfigId').val() != "0" && $(this).is(':unchecked') && $("#IncludedInSAS").is(':checked')) {
+            if ($('#ConfigId').val() !== "0" && $(this).is(':unchecked') && $("#IncludedInSAS").is(':checked')) {
                 Sentry.ShowModalAlert("\"Current View\" option has been unchecked.  <p>This will remove the current view SAS library associated with this schema, if saved.</p>");
             }
         });
     },
 
-    CreateFormSubmitInit: function () {
+    CreateFormSubmitInit: function (e) {
+        e.preventDefault();
         $.ajax({
             url: "/Config/DatasetFileConfigForm",
             method: "POST",
@@ -276,43 +277,57 @@ data.Config = {
     EditInit: function () {
         $("#EditConfigForm").validateBootstrap(true);
 
-        data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text(), $('#ConfigId').val() !== "0");
+        data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
 
         $("#FileExtensionID").change(function () {
-            data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text(), $('#ConfigId').val() !== "0");
+            data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
         });
     },
 
-    SetFileExtensionProperites: function (extension, editMode) {
+    SetFileExtensionProperites: function (extension) {
+        //Determine which container to find the delimiter field within
+        // and set delimiterelement appropriately
+        if ($("#DatasetFormContainer").css('display') == 'none') {
+            var delimiterelement = $("#DatasetFileConfigFormContainer").find('#Delimiter');
+        }
+        else {
+            var delimiterelement = $("#DatasetFormContainer").find('#Delimiter');
+        }
+
+        var editMode = false;
+        if ($('#ConfigId').val() !== undefined && $('#ConfigId').val() !== "0") {
+            editMode = true;
+        }
+
         switch (extension) {
             case "CSV":
                 $('.delimiter').show();
                 $('.delimiterDescription').hide();
-                $('#Delimiter').prop("readonly", "readonly");
                 $('#HasHeader').prop("readonly", false);
                 $('#HasHeader').prop("disabled", false);
                 if (!editMode) {
-                    $('#Delimiter').text(',');
-                    $('#Delimiter').val(',');
+                    delimiterelement.text(',');
+                    delimiterelement.val(',');
                 }
+                delimiterelement.prop("readonly", "readonly");
                 break;
             case "DELIMITED":
             case "ANY":
                 $('.delimiter').show();
                 $('.delimiterDescription').show();
                 if (!editMode) {
-                    $('#Delimiter').val('');
+                    delimiterelement.val('');
                 }
-                $('#Delimiter').prop("readonly", "");
+                delimiterelement.prop("readonly", "");
                 $('#HasHeader').prop("readonly", false);
                 $('#HasHeader').prop("disabled", false);
                 break;
             default:
                 $('.delimiter').hide();
                 if (!editMode) {
-                    $('#Delimiter').val('');
+                    delimiterelement.val('');
                 }
-                $('#Delimiter').prop("readonly", "readonly");
+                delimiterelement.prop("readonly", "readonly");
                 $('#HasHeader').prop("readonly", true);
                 $('#HasHeader').prop("disabled", true);
                 break;
