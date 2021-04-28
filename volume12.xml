@@ -4,7 +4,7 @@
       <titleStmt>
         <title>Diary of Mrs. Emma B. Andrews. Volume 12 1904-1905</title>
         <author>
-          <persName ref="#Andrews_Emma_B">Emma B. Andrews </persName>
+          <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
         </author>
         <editor>
           <persName ref="SK">Sarah Ketchley </persName>
@@ -848,7 +848,7 @@
           ages gone by - for the things <persName ref="#Davis_Theodore_M">Theo</persName> found in
           the corridor and brought home, had no doubt been dropped by the thieves. <persName
             ref="#Weigall_Arthur">Weigall</persName> remained behind, to sleep with the guards at
-          the tomb, and <persName ref="#Lindon_Smith_Joseph #Lindon_Smith Corinna">Mr. and Mrs.
+          the tomb, and <persName ref="#Lindon_Smith_Joseph #Lindon_Smith_Corinna">Mr. and Mrs.
             Smith</persName> also went over to stay with him. <persName ref="#Davis_Theodore_M"
             >Theo</persName> wrote a note to <persName ref="#Maspero_Gaston">M. Maspero</persName>
           and <persName ref="#Sayce_Archibald">Mr. Sayce</persName> who arrived on <name type="boat"
@@ -1018,7 +1018,7 @@
           <date when="1905-02-18">Saturday, Feb. 18.</date>
         </dateline>
         <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName
-            ref="#Hardy_Jean, #Wilson_Alice">the girls</persName> went to the <placeName
+            ref="#Hardy_Jean #Wilson_Alice">the girls</persName> went to the <placeName
             ref="#Valley_of_the_Kings">Valley</placeName> again - <persName ref="#Weigall_Arthur"
             >Weigall</persName> came back with them and had tea. He still sleeps at the tomb.
             <persName ref="#Naville_Edouard, #Naville_Mme">M. and Mme. Naville</persName> to tea.
@@ -1484,10 +1484,9 @@
       <div xml:id="EBA-1905-04-01" type="entry">
         <dateline>
           <date when="1905-04-01">Friday, April 1st</date>. </dateline>
-        <!--Look up ottoman bank-->
         <p>A last visit to the <placeName ref="#Boulaq_Museum">Museum</placeName> this morning and
           drove in town all of us at 3:30 to make some visits - in spite of the threatening skies.
-          We stopped at the <placeName ref="#">Ottoman Bank</placeName> a moment as we supposed -
+          We stopped at the <placeName ref="#Ottoman_Bank">Ottoman Bank</placeName> a moment as we supposed -
           and a heavy rain began as <persName ref="#Davis_Theodore_M">Theodore</persName> went in -
           in a moment or two it had so increased that we sat there in the closed carriage nearly an
           hour before <persName ref="#Davis_Theodore_M">Theo</persName> could come out. I never saw
@@ -1525,14 +1524,14 @@
             >San Marco</placeName>. It is undergoing extensive repairs - some say that it will be
           necessary to renew the foundations - a large part of the nave is shut off. In the
           afternoon to <placeName ref="#Palazzo_Capello">Palazzo Capella</placeName> to see the
-            <personGrp ref="#Benson">Bensons</personGrp>. Found him very ill and suffering though he
+            <persName ref="#Benson_Mr #Benson_Mrs">Bensons</persName>. Found him very ill and suffering though he
           was sitting in his chair - very sad.</p>
       </div>
       <div xml:id="EBA-1905-04-08" type="entry">
         <dateline>
           <date when="1905-04-08">Saturday, April 8th</date>. </dateline>
-        <p>I went again this morning and stayed a long time with the <personGrp ref="#Benson"
-            >Bensons</personGrp>. Before coming home went into the garden - full of spring beauty
+        <p>I went again this morning and stayed a long time with the <persName ref="#Benson_Mr #Benson_Mrs"
+            >Bensons</persName>. Before coming home went into the garden - full of spring beauty
           and growth. It is sad to see the riant beauty of a garden, when those who cared for it,
           and loved it, are gone from it never to return.</p>
       </div>
@@ -1555,7 +1554,7 @@
       <div xml:id="EBA-1905-04-10" type="entry">
         <dateline>
           <date when="1905-04-10">Monday, April 10th</date>. </dateline>
-        <p>To the <personGrp ref="#Benson">Bensons</personGrp> this afternoon, and found him better.
+        <p>To the <persName ref="#Benson_Mr #Benson_Mrs">Bensons</persName> this afternoon, and found him better.
           I went into his room, found him sitting up in bed, and looking brighter. It is sad that
           great hall and those great rooms with all their pretty things, and those two old people
           fading out of life!</p>
@@ -1563,11 +1562,12 @@
       <div xml:id="EBA-1905-04-11" type="entry">
         <dateline>
           <date when="1905-04-11">Tuesday, April 11th</date>. </dateline>
+        <!--not sure if i tagged the right johnsons will come back to this-->
         <p>At the <placeName ref="#Gallerie_dell_Accademia">Academia</placeName> and <placeName
             ref="#San_Marco">St. Marco</placeName> again. <persName ref="#Buttles_Jeanette"
             >Nettie</persName>, <persName ref="#Newberry_Percy">Newberry</persName>, <persName
-            ref="#Davis_Theodore_M">Theodore</persName> and I went to have tea with the <personGrp
-            ref="#Johnson">Johnsons</personGrp>. Their rambling, beautiful old place is in better
+            ref="#Davis_Theodore_M">Theodore</persName> and I went to have tea with the <persName
+            ref="#Johnson_Mr #Johnson_Cecile_Davis_de_Lagarde">Johnsons</persName>. Their rambling, beautiful old place is in better
           order than it was last year - and in spite of the rain yesterday and that of last night,
           we walked about the garden, which was a fairy land of blossoming trees. <persName
             ref="#Buttles_Jeanette">Nettie</persName> and I stopped at the <placeName
@@ -1578,7 +1578,7 @@
         <dateline>
           <date when="1905-04-12">Wednesday, April 12th</date>. </dateline>
         <p>Home this morning - <persName ref="#Newberry_Percy">Mr. Newberry</persName> and I went to
-          say goodbye to the <personGrp ref="#Benson">Bensons</personGrp>. Found him sitting up and
+          say goodbye to the <persName ref="#Benson_Mr #Benson_Mrs">Bensons</persName>. Found him sitting up and
           quite bright. <persName ref="#Hohenloke_Prince">Prince Hohenloke</persName> came in and we
           left him there. <persName ref="#Nash_Paul">Mr. Nash</persName> dined with us.</p>
       </div>
@@ -1587,8 +1587,8 @@
           <date when="1905-04-13">Thursday, April 13th</date>. </dateline>
         <p><persName ref="#Hardy_Jean">Jean</persName>, <persName ref="#Newberry_Percy">Mr.
             Newberry</persName>, <persName ref="#Wilson_Alice">Alice</persName> and I went to
-            <placeName ref="#San_Marco">San Marco</placeName> this morning. <personGrp
-            ref="#Johnston">Mr. and Mrs. Johnstone</personGrp> arrived just after breakfast to see
+            <placeName ref="#San_Marco">San Marco</placeName> this morning. <persName
+            ref="#Johnston_Mr #Johnston_Mrs">Mr. and Mrs. Johnstone</persName> arrived just after breakfast to see
           the shawabti and photographs of the tomb. And we were all off at noon for <placeName
             ref="#Milan">Milan</placeName>. <persName ref="#Nash_Paul">Mr. Nash</persName> came to
           say goodbye.<pb n="94"/></p>
@@ -1703,12 +1703,13 @@
       <div xml:id="EBA-1905-04-22" type="entry">
         <dateline>
           <date when="1905-04-22">Saturday, April 22d</date>. </dateline>
+        <!--Hagermeyers?? who specifically are they?-->
         <p>A pleasant day - <persName ref="#Buttles_Jeanette">Nettie</persName> took <persName
             ref="#Hardy_Jean">Jean</persName> to the <placeName ref="#Duomo_di_Firenze"
             >Duomo</placeName> this morning to see the ridiculous ceremony of the "scoppic" -while
             <persName ref="#Buttles_Mary">Mary</persName> and I had a charming ride and visit in the
             <placeName ref="#Parco_delle_Cascine">Cascine</placeName>. They all lunched here, and we
-          went to tea with the <personGrp ref="#Hagermeyer">Hagemeyers</personGrp>, in their new
+          went to tea with the <persName ref="#Hagermeyer">Hagemeyers</persName>, in their new
           appartment and saw the new baby. <persName ref="#Buttles_Mary">Mary</persName> came back
           to dinner. In the evening I went to <persName ref="#Bend_Mrs">Mrs. Bend's</persName>
           sitting room, just above ours, to see her and <persName ref="#Bend_Beatrice"
@@ -1744,17 +1745,18 @@
         <p><persName ref="#Hardy_Jean">Jean</persName> and I with <persName ref="#Amelie"
             >Amelie</persName> drove up to the <placeName ref="#Giardino_delle_Rose">Rose
             Garden</placeName> - and came home laden with roses - most of which I carried up to the
-            <placeName ref="#Villino">Villino</placeName> where we stayed all day. The <personGrp
-            ref="#Bend">Bends</personGrp> and <persName ref="#Whiting_Pauline">Miss
+            <placeName ref="#Villino">Villino</placeName> where we stayed all day. The <persName
+            ref="#Bend_Mr Bend_Mrs Bend_Beatrice Bend_Amy">Bends</persName> and <persName ref="#Whiting_Pauline">Miss
             Whiting</persName> again in the evening. They go off to-morrow to <placeName
             ref="#Ravenna">Ravenna</placeName> and <placeName ref="#Venice">Venice</placeName>.</p>
       </div>
       <div xml:id="EBA-1905-04-27" type="entry">
         <dateline>
           <date when="1905-04-27">Thursday, April 27th</date>. </dateline>
+        <!--guessed and added Mrs. Newman to the Newmans tag. wasn't on the list tho-->
         <p>At home this morning - <persName ref="#Buttles_Lizzie">Lizzie</persName> and <persName
             ref="#Buttles_Jeanette">Nettie</persName> came to lunch, and we went for tea to the
-            <personGrp ref="#Newman">Newmans</personGrp> - a charming visit to a perfectly charming
+            <persName ref="#Newman_Mr #Newman_Mrs">Newmans</persName> - a charming visit to a perfectly charming
           and artistic home - stayed disgracefully late.</p>
       </div>
       <div xml:id="EBA-1905-04-28" type="entry">
@@ -1896,7 +1898,6 @@
       <div xml:id="EBA-1905-05-18" type="entry">
         <dateline>
           <date when="1905-05-18">Thursday, May 18th</date>. </dateline>
-        <!--the girls mentioned-->
         <!--how to ref a play?-->
         <!--col. watson?-->
         <p>Our journey over from <placeName ref="#Paris">Paris</placeName> the other day was a
@@ -1928,7 +1929,7 @@
             ref="#Shaw_George_Bernard">Bernard Shaw</persName>'s plays - John Bulls other Island".
           It was admirably done, and very amusing. Wednesday <persName ref="#Hardy_Jean"
             >Jean</persName> was all right again - we were driving all the morning - very bright
-          weather, but cold, gusty winds.<persName ref="#Newberry_Percy"> Mr. Newberry</persName>
+          weather, but cold, gusty winds.<persName ref="#Newberry_Percy">Mr. Newberry</persName>
           came to lunch, and after <persName ref="#Rathbone_Mr">Mr. Rathbone</persName>, bringing me
           most lovely roses. In, all the afternoon. Today we have been shopping and driving, lunched
           with <persName ref="#Farrer_William_Sir">Sir WIlliam Farrer</persName> - he looking so
@@ -1956,7 +1957,6 @@
       <div xml:id="EBA-1905-05-20" type="entry">
         <dateline>
           <date when="1905-05-20">Saturday, May. 20</date>. </dateline>
-        <!--the girls-->
         <!--the park?-->
         <p>A cold rainy day. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName
             ref="#Johnson_Cecile_Davis_de_Lagarde">C&#233;cile</persName> went to the <placeName
@@ -1974,7 +1974,6 @@
       <div xml:id="EBA-1905-05-21" type="entry">
         <dateline>
           <date when="1905-05-21">Sunday, 4th After Easter</date>. </dateline>
-        <!--the girls twice-->
         <!--R. catholic-->
         <p>I went to the <orgName ref="#First_Church_of_Christian_Science">First Church of Christian
             Science</orgName> this morning in <placeName ref="#Sloane_Terrace"><choice>
@@ -1998,8 +1997,8 @@
         <dateline>
           <date when="1905-05-22">Monday, May 22nd</date>. </dateline>
         <p>Shopping and <placeName ref="#National_Gallery">National Gallery</placeName> this morning
-          - driving in afternoon, and dined with the <personGrp ref="#Rathbone"
-            >Rathbones</personGrp> this evening - and are just home - 1:30 A.M. Every one else is
+          - driving in afternoon, and dined with the <persName ref="#Rathbone_Mr #Rathbone_Mrs #Rathbone_Elena"
+            >Rathbones</persName> this evening - and are just home - 1:30 A.M. Every one else is
           gone to bed - where I ought to be. A charming dinner - I sat between <persName
             ref="#Rathbone_Mr">Mr. Rathbone</persName> and <persName ref="#Landon_Perceval">Percival
             Landon</persName>-- who was the special correspondent of the "Times" with the young
@@ -2025,8 +2024,8 @@
           we went down to <persName ref="#Sargent_John_Singer">Sargents</persName>
           <placeName ref="#John_Sargents_Studio">Studio</placeName> and had tea with him and were so
           interested in him and his belongings. A sincere,<pb n="105"/> simple, and unaffected man -
-          with no aim at artistic fittings in his studio. <personGrp ref="#Rathbone">Mr. and Mrs.
-            Rathbone</personGrp> were there. This evening we have had an entrancing evening at
+          with no aim at artistic fittings in his studio. <persName ref="#Rathbone_Mr Rathbone_Mrs">Mr. and Mrs.
+            Rathbone</persName> were there. This evening we have had an entrancing evening at
             <placeName ref="#Theater_Royal_Drury_Lane">Drury Lane Theatre</placeName> - <persName
             ref="#Irving_Henry">Irving</persName> as <persName ref="">Shylock</persName>, and the
           captivating <persName ref="">Mrs. Mathewson</persName> as Portia. A wonderful performance
@@ -2043,7 +2042,7 @@
             <placeName ref="#National_Gallery">Nat. Gallery</placeName>, <persName
             ref="#Rathbone_Mr">Mr. Rathbone</persName> and <persName ref="#Newberry_Percy"
             >Newberry</persName> to lunch and to tea as well - and this evening we had a rational,
-          charming dinner at the <personGrp ref="#Farrer">Farrer boys</personGrp> house.</p>
+          charming dinner at the <placeName ref="#Ingleborough_Estate">Farrer boys house</placeName>.</p>
       </div>
       <div xml:id="EBA-1905-05-25" type="entry">
         <dateline>
@@ -2054,7 +2053,6 @@
       <div xml:id="EBA-1905-05-26" type="entry">
         <dateline>
           <date when="1905-05-26">Friday, May 26</date>. </dateline>
-        <!--Queens mentions, i am assuming it is Queens hall -->
         <p>We went out to <placeName ref="#Oxford">Oxford</placeName> today, taking <persName ref="#Rathbone_Mr">Mr. Rathbone</persName> with us, and lunched at <placeName ref="#Queens_Hall">Queens</placeName> with <persName ref="#Sayce_Archibald">Mr. Sayce</persName>. We saw <placeName ref="#Magdalen_College">Magdalene</placeName>, <placeName ref="#Christ_College">Christ</placeName>, <placeName ref="#New_College">New <pb n="106"/> College</placeName> and <placeName ref="#St_Johns_College">St. Johns</placeName> - and went down to the river in the afternoon to see the races. It was such a pretty sight - the day was so warm - the country so lovely - the Thorns all in bloom as well as the chestnuts. We went to the <placeName ref="#Balliol_Barge">Baliel barge</placeName> to see the boats - and had tea there - then back to <placeName ref="#Magdalen_College">Magdalen</placeName> to hear the Service of Song, but were just one minute and a half too late, as we found the door of the chapel obdurately closed; so we went back to the <placeName ref="#Randolph_Hotel">Randolph</placeName> and stayed until it was train time. We had a saloon carriage going and coming, and had dinner baskets for coming home - as we were not due until 9 o'clock. <persName ref="#Rhys_John_Sir">Principal Rhys</persName> and his <persName ref="#Rhys_Elspeth_Hughes_Davies">wife</placeName>, and a nice fellow <persName ref="#Hodgson_Richard">Mr. Hodgson</persName> were at the lunch.</p>
       </div>
       <div xml:id="EBA-1905-05-27" type="entry">
