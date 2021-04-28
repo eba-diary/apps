@@ -274,6 +274,7 @@
     <Build Include="Views\vw_WeeklyDatasetCheck.sql" />
     <Build Include="Views\vw_MonthlyDatasetCheck.sql" />
     <Build Include="Views\vw_DailyDatasetCheck.sql" />
+    <Build Include="Tables\ADTDatasetClassification.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
