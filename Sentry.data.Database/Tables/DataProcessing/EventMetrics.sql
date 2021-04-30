@@ -13,5 +13,14 @@
 	[MachineName] [varchar](250) NULL,
 	[StatusCode] [char](1) NULL,
 	[MetricsData] [varchar](max) NULL,
-	[CreatedDTM] [datetime] NULL
+	[CreatedDTM] [datetime] NULL, 
+    CONSTRAINT [PK_EventMetrics] PRIMARY KEY NONCLUSTERED ([EventMetricsId])
 );
+
+GO
+
+CREATE CLUSTERED INDEX [PK_EventMetrics__DataFlowStepId_EventMetricsId] ON [dbo].[EventMetrics] ([DataFlowStepId], [EventMetricsId])
+
+GO
+
+CREATE NONCLUSTERED INDEX [IDX_EventMetrics__Partition] ON [dbo].[EventMetrics] ([Partition])
