@@ -23,4 +23,4 @@ CREATE CLUSTERED INDEX [PK_EventMetrics__DataFlowStepId_EventMetricsId] ON [dbo]
 
 GO
 
-CREATE NONCLUSTERED INDEX [IDX_EventMetrics__Partition] ON [dbo].[EventMetrics] ([Partition])
+CREATE NONCLUSTERED INDEX [IX_EventMetrics__Offset] ON [dbo].[EventMetrics] ([Offset])
