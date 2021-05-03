@@ -109,10 +109,10 @@
             <placeName ref="#Vesuvius">Vesuvius</placeName> was covered with snow - something I had
           never seen before - we landed about 11 o'clock - and were soon in our old rooms here,
           where <persName ref="#Wilson_Alice">Alice</persName> was waiting for us. We found on the
-          table of our sitting room, some lovely orchids with the card of kind <personGrp
-            ref="#Hanser">Mr. and Mrs. Hanser</personGrp>. The <personGrp ref="#McKeever">McKeever
-            girls</personGrp> came to lunch with us - and then went back to the boat, bound for
-            <placeName ref="#Genoa">Genoa</placeName> and <placeName ref="#St_Moritz">St.
+          table of our sitting room, some lovely orchids with the card of kind <persName
+          ref="#Hanser_Mr #Hanser_Mrs">Mr. and Mrs. Hanser</persName>. The <personGrp ref="#McKeever">
+          McKeever girls</personGrp> came to lunch with us - and then went back to the boat, bound
+          for <placeName ref="#Genoa">Genoa</placeName> and <placeName ref="#St_Moritz">St.
             Moritz</placeName>. The <personGrp ref="Longfellow">Longfellows</personGrp>, and
             <persName ref="#Hale_Miss">Miss Hale</persName> are<pb n="55"/> here - and the
             <personGrp ref="#Kissel">Kissels</personGrp> - and the 2 boys <persName
@@ -132,11 +132,11 @@
           and <persName ref="#Ream_Robert_Clarke">Ream</persName> and <persName ref="#Smith_Harold"
             >Smith</persName> to <placeName ref="#Pompeii">Pompeii</placeName> one day at <placeName
             ref="#Naples">Naples</placeName> - and one of the pleasantest things I did was visiting
-            <personGrp ref="#Hanser">Mr. and Mrs. Hanser</personGrp> at their charming villa at
-            <placeName ref="#Posillipo">Posillipo</placeName>. They are such kind nice people. One
-          cold, windy afternoon we drove up to the <placeName ref="#Vomero">Vomero</placeName>, and
-          after much searching found the <placeName ref="#">Sprenger-M&#252;ller</placeName> place
-          which for 3 years I have been trying to discover.But he was not at home, greatly to my
+            <persName ref="#Hanser_Mr #Hanser_Mrs">Mr. and Mrs. Hanser</persName> at their charming
+          villa at <placeName ref="#Posillipo">Posillipo</placeName>. They are such kind nice people.
+          One cold, windy afternoon we drove up to the <placeName ref="#Vomero">Vomero</placeName>,
+          and after much searching found the <placeName ref="#">Sprenger-M&#252;ller</placeName>
+          place which for 3 years I have been trying to discover.But he was not at home, greatly to my
           regret - though <persName ref="#Hanser_Mrs">Mrs. Hanser</persName> told me that as he was
           quite deaf, I would have found him difficult. I wanted to see his garden and talk to him -
           for he is a noted hybridigia and floriculturist. We had to spend the night and most of the
@@ -1319,7 +1319,7 @@
           forests, and the fertile fields is charming beyond description. But it was not coming home
           - the donkeys in my chair were miserable, tired to death poor things by the hard service
           of the winter - and the donkey boys vociferous and unpleasant, and I was glad to reach the
-          comfort of the shaded deck, tea, and <persName ref="#Billy">Billy</persName>'s
+          comfort of the shaded deck, tea, and <name type="animal" ref="#Billy">Billy</name>'s
           affectionate greetings.</p>
       </div>
       <div xml:id="EBA-1905-03-17" type="entry">
@@ -1405,11 +1405,12 @@
             ref="#Cairo">Cairo</placeName>, and so it was very interesting. It took us about an hour
           and a half - so that we didn't have any time for the <placeName
             ref="#Al_Qanāţir_al_Khayrīyah">Barrage</placeName>, and very little time for that
-          beautiful garden - the best in Egypt. The whole thing was very un-Egyptian - the two
-          barrages, one over the <placeName ref="#Dumyāţ_Far'">Damietta</placeName>, the other over
-          the <placeName ref="#Rashī_Far'">Rosetta</placeName> branch - with their long line of
-          arches and towers - with the land between made into this park-like garden. The whole
-          effect was rather Venetian. Home by 7 o'clock - having had tea on the way back.</p>
+          beautiful garden - the best in <placeName ref="Egypt">Egypt</placeName>. The whole thing
+          was very un-Egyptian - the two barrages, one over the <placeName ref="#Dumyāţ_Far'">
+          Damietta</placeName>, the other over the <placeName ref="#Rashī_Far'">Rosetta</placeName>
+          branch - with their long line of arches and towers - with the land between made into this
+          park-like garden. The whole effect was rather Venetian. Home by 7 o'clock - having had
+          tea on the way back.</p>
       </div>
       <div xml:id="EBA-1905-03-25" type="entry">
         <dateline>
@@ -1419,7 +1420,7 @@
             </choice> 25.</date>
         </dateline>
         <p>At <placeName ref="#Boulaq_Museum">the Museum</placeName> this morning - <persName
-            ref="#Davis_Theodore_M">Theo</persName> showed <persName ref="#Burn_Mrs.">Mrs.
+            ref="#Davis_Theodore_M">Theo</persName> showed <persName ref="#Burn_Mrs">Mrs.
             Burn</persName> about - as she was not able to be with her mother and father, <persName
             ref="#Forbes-Leith_Admiral #Forbes-Leith_Mrs">Admiral and Mrs. Forbes Leith</persName>
           the other day, when they saw the things. She went from there to the train, as they all
@@ -1918,8 +1919,8 @@
           In the afternoon we all went to the wonderful <placeName ref="#Wallace_Collection">Wallace
             Collection</placeName>, and came home really tired. <persName ref="#Newberry_Percy">Mr.
             Newberry</persName> dined with us and we had a nice evening. We find <persName
-            ref="#Carter_Howard">Mr. Carter</persName> has gone out to <persName ref="#Egypt"
-            >Egypt</persName>, and <persName ref="#Newberry_Percy">Newberry</persName> goes himself
+            ref="#Carter_Howard">Mr. Carter</persName> has gone out to <placeName ref="#Egypt"
+            >Egypt</placeName>, and <persName ref="#Newberry_Percy">Newberry</persName> goes himself
           in June. Tuesday we spent the whole of the morning at the <placeName
             ref="#South_Kensington_Museum">South Kensington Museum</placeName> - and came home more
           dead than alive. Poor <persName ref="#Hardy_Jean">Jean</persName> had such a headache that
@@ -1932,11 +1933,11 @@
           weather, but cold, gusty winds.<persName ref="#Newberry_Percy">Mr. Newberry</persName>
           came to lunch, and after <persName ref="#Rathbone_Mr">Mr. Rathbone</persName>, bringing me
           most lovely roses. In, all the afternoon. Today we have been shopping and driving, lunched
-          with <persName ref="#Farrer_William_Sir">Sir WIlliam Farrer</persName> - he looking so
+          with <persName ref="#Farrer_William_Sir">Sir William Farrer</persName> - he looking so
           well - and so bright<pb n="103"/> and charming - but grown quite deaf. <persName
             ref="#Watson_Colonel">Col. Watson</persName> was there. <persName ref="#Farrer_Gaspard"
             >Gaspard Farrer</persName> dined with us - also <persName ref="#Cary_Elwes_Gervase">Mr.
-            Cary-Elwes</persName> and <persName ref="#Cary-Elwes_Winifred_Lady">Lady
+            Cary-Elwes</persName> and <persName ref="#Cary_Elwes_Winifred_Lady">Lady
             Winifred</persName> - who took <persName ref="#Hardy_Jean">Jean</persName> and <persName
             ref="#Johnson_Cecile_Davis_de_Lagarde">C&#233;cile</persName> on to a concert at a
           private house.</p>
@@ -2008,7 +2009,7 @@
           piano, and makes most novel and unheard of harmonies. <persName
             ref="#de_Trafford_Agnes_Mary_Pia_Fielding_Lady">Lady Agnes de Trafford</persName> came
           in during the evening, and about 11:30 <persName ref="#Cary_Elwes_Winifred_Lady">Lady
-            Winifred</persName> and <persName ref="#Elwes_Cary_Gervase">Mr. Cary Elwes</persName>
+            Winifred</persName> and <persName ref="#Cary_Elwes_Gervase">Mr. Cary Elwes</persName>
           arrived, and he sang two or three delightful songs. <persName ref="#Davis_Theodore_M"
             >Theodore</persName> was quite scandalized with our late hours.</p>
       </div>
