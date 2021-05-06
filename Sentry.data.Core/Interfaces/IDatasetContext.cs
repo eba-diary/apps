@@ -54,7 +54,7 @@ namespace Sentry.data.Core
         IQueryable<Schema> Schema { get; }
         IQueryable<FileSchema> FileSchema { get; }
         IQueryable<SchemaRevision> SchemaRevision { get; }
-        IQueryable<BaseField> BaseFields { get; set; }
+        IQueryable<BaseField> BaseFields { get; }
         IQueryable<DataFlow> DataFlow { get; }
         IQueryable<DataFlowStep> DataFlowStep { get; }
         IQueryable<S3DropAction> S3DropAction { get; }
