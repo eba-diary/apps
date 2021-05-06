@@ -472,9 +472,9 @@ namespace Sentry.data.Core
 
         public List<BaseFieldDto> GetBaseFieldDtoBySchemaRevision(int revisionId)
         {
-            SchemaRevision revision = _datasetContext.SchemaRevision.FirstOrDefault(w => w.SchemaRevision_Id == revisionId);
-
-            return revision.Fields.Where(w => w.ParentField == null).OrderBy(o => o.OrdinalPosition).ToList().ToDto();
+            List<BaseField> fileList = _datasetContext.BaseFields.Where(w => w.ParentSchemaRevision.SchemaRevision_Id == revisionId && w.ParentField == null).Fetch(f => f.ChildFields).OrderBy(o => o.OrdinalPosition).ToList();
+            List<BaseFieldDto> dtoList = fileList.ToDto();
+            return dtoList;
         }
 
         public SchemaRevisionDto GetLatestSchemaRevisionDtoBySchema(int schemaId)
