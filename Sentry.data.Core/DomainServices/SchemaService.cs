@@ -472,8 +472,12 @@ namespace Sentry.data.Core
 
         public List<BaseFieldDto> GetBaseFieldDtoBySchemaRevision(int revisionId)
         {
-            List<BaseField> fileList = _datasetContext.BaseFields.Where(w => w.ParentSchemaRevision.SchemaRevision_Id == revisionId && w.ParentField == null).Fetch(f => f.ChildFields).OrderBy(o => o.OrdinalPosition).ToList();
-            List<BaseFieldDto> dtoList = fileList.ToDto();
+            //Perform fetch of children is needed to prevent n+1 when sending to ToDto()
+            List<BaseField> fileList = _datasetContext.BaseFields.Where(w => w.ParentSchemaRevision.SchemaRevision_Id == revisionId).Fetch(f => f.ChildFields).OrderBy(o => o.OrdinalPosition).ToList();
+
+            //ToDto() assumes only root level columns are in the initial list, therefore, we filter on where ParentField == null.
+            // This does not produce any n+1 scenario since the child fields have been loaded into memory already, therefore, .net does not need to go back to database
+            List<BaseFieldDto> dtoList = fileList.Where(w => w.ParentField == null).ToList().ToDto();
             return dtoList;
         }
 
