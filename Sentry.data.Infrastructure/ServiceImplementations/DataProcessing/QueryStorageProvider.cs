@@ -98,7 +98,7 @@ namespace Sentry.data.Infrastructure
 
                     FileSchema schema = datasetContext.GetById<FileSchema>(stepEvent.SchemaId);
 
-                    IsRegisterSuccessful = schemaSerivce.RegisterRawFile(schema, targetKey, versionKey, stepEvent);
+                    schemaSerivce.RegisterRawFile(schema, targetKey, versionKey, stepEvent);
                 }
 
                 /***************************************
