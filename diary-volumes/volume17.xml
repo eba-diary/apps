@@ -6,7 +6,7 @@
    <teiHeader>
       <fileDesc>
          <titleStmt>
-            <title>Diary of Mrs. Emma B. Andrews. Volume 17 1912-1913</title>
+            <title>Diary of Mrs. Emma B. Andrews. Volume 17 1912-1913</title>  
             <author>
                <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
             </author>
@@ -19,13 +19,23 @@
                <persName ref="#EF">Emma Fritzberg</persName>
             </respStmt>
             <respStmt>
+               <resp>Historical Markup Tool development</resp>
+               <persName ref="#AH">Audrey Holmes</persName>
+            </respStmt>
+            <respStmt>
                <resp>transcription</resp>
-               <!-- add this information SLK -->
-               <persName>name name</persName>
+               <persName ref="#SJ">Sarah Johnson</persName>
+               <persName ref="#CC">Chelsea Cooper</persName>
+               <persName ref="#AF">Ariella Fish</persName>
+               <persName ref="#JG">Janice Garr</persName>
+               <persName ref="#MR">Megan Rowland</persName>
+               <persName ref="#AS">Allison Skinner</persName>
+               <persName ref="#TC">Tessa Carter</persName>
             </respStmt>
             <respStmt>
                <resp>proofreading and tagging</resp>
                <persName ref="#EF">Emma Fritzberg</persName>
+               <persName ref="#SLK">Sarah Ketchley</persName>
             </respStmt>
          </titleStmt>
          <publicationStmt>
@@ -44,13 +54,13 @@
          </publicationStmt>
          <sourceDesc>
             <p><orgName ref="#American_Philosophical_Society">American Philosophical
-                  Society</orgName>,<placeName ref="#Philadelphia">Philadelphia</placeName></p>
+               Society</orgName>,<placeName ref="#Philadelphia">Philadelphia</placeName></p>
          </sourceDesc>
       </fileDesc>
       <encodingDesc>
          <projectDesc>
             <p>Established in 2010, the goals of the <orgName ref="#EBA_Diary_Project">Emma B.
-                  Andrews Diary Project</orgName> include the transcription and digitization of a
+               Andrews Diary Project</orgName> include the transcription and digitization of a
                wide range of primary historical material from the 'Golden Age' of Egyptian
                archaeology at the end of the 19th and beginning of the 20th centuries. A founding
                partner of <orgName ref="#Newbook_Digital_Texts">Newbook Digital Texts</orgName>
@@ -65,7 +75,7 @@
                detailed journals of these voyages along the <placeName ref="#Nile">Nile</placeName>,
                including his important yet under-reported excavations of over 20 significant tombs
                in the <placeName ref="#Valley_of_the_Kings">Valley of the Kings</placeName>.
-                  <persName ref="#Andrews_Emma_B">Emma</persName> provides a vital commentary on the
+               <persName ref="#Andrews_Emma_B">Emma</persName> provides a vital commentary on the
                archaeology and pioneering Egyptologists of the time, painting a revealing picture of
                the lives of the colonial gentry and the cultural and scientific literati in at the
                dawn of the twentieth century. Analysis of the content of her diaries, along with a
@@ -82,7 +92,7 @@
             </normalization>
          </editorialDecl>
       </encodingDesc>
-      <revisionDesc>
+      <revisionDesc> <!-- update this with major revision list-->
          <list>
             <item>
                <date when="2021-05-08">8 May 2021</date> Last checked by SLK. Updated header, fixed
