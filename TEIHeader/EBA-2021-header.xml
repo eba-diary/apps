@@ -19,6 +19,10 @@
                <persName ref="#EF">Emma Fritzberg</persName>
             </respStmt>
             <respStmt>
+               <resp>Historical Markup Tool development</resp>
+               <persName ref="#AH">Audrey Holmes</persName>
+            </respStmt>
+            <respStmt>
                <resp>transcription</resp>
                <persName>name name</persName> <!-- replace with correct names -->
             </respStmt>
