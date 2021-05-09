@@ -15,6 +15,10 @@
                <persName ref="#SLK">Sarah L. Ketchley</persName>
             </respStmt>
             <respStmt>
+               <resp>TEIPublisher development</resp>
+               <persName ref="#EF">Emma Fritzberg</persName>
+            </respStmt>
+            <respStmt>
                <resp>transcription</resp>
                <!-- add this information SLK -->
                <persName>name name</persName>
