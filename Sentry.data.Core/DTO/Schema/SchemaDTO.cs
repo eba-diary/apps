@@ -18,5 +18,6 @@ namespace Sentry.data.Core
         public virtual bool CLA1580_StructureHive { get; set; }
         public virtual bool CLA2472_EMRSend { get; set; }
         public virtual bool CLA1286_KafkaFlag { get; set; }
+        public virtual bool CLA3014_LoadDataToSnowflake { get; set; }
     }
 }

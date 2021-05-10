@@ -64,6 +64,7 @@ namespace Sentry.data.Web
             this.CLA1580_StructureHive = (dto.Schema != null) ? dto.Schema.CLA1580_StructureHive : false;
             this.CLA2472_EMRSend = (dto.Schema != null) ? dto.Schema.CLA2472_EMRSend : false;
             this.CLA1286_KafkaFlag = (dto.Schema != null) ? dto.Schema.CLA1286_KafkaFlag : false;
+            this.CLA3014_LoadDataToSnowflake = (dto.Schema != null) ? dto.Schema.CLA3014_LoadDataToSnowflake : false;
             this.ObjectStatus = dto.ObjectStatus;
             //this.CLA24 = (dto.Schema != null) ? dto.Schema.CLA1580_StructureHive : false;
         }
@@ -162,6 +163,7 @@ namespace Sentry.data.Web
         public bool CLA1580_StructureHive { get; set; }
         public bool CLA2472_EMRSend { get; set; }
         public bool CLA1286_KafkaFlag { get; set; }
+        public bool CLA3014_LoadDataToSnowflake { get; set; }
         public IList<RetrieverJob> RetrieverJobs { get; set; }
         public AssociatedDataFlowModel DataFlowJobs { get; set; }
         public IList<AssociatedDataFlowModel> ExternalDataFlowJobs { get; set; }
