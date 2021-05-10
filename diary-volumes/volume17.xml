@@ -74,7 +74,7 @@
                to <placeName ref="#Egypt">Egypt</placeName> with him between 1889 and 1913, she kept
                detailed journals of these voyages along the <placeName ref="#Nile">Nile</placeName>,
                including his important yet under-reported excavations of over 20 significant tombs
-               in the <placeName ref="#Valley_of_the_Kings">Valley of the Kings</placeName>.
+               in the <placeName ref="#Bībān al-Mulūk">Valley of the Kings</placeName>.
                <persName ref="#Andrews_Emma_B">Emma</persName> provides a vital commentary on the
                archaeology and pioneering Egyptologists of the time, painting a revealing picture of
                the lives of the colonial gentry and the cultural and scientific literati in at the
@@ -84,11 +84,11 @@
          </projectDesc>
          <editorialDecl>
             <correction>
-               <p>Misspellings which are misreadings of original handwritten diary are corrected
+               <p>Obvious misspellings (eg place names and people's names) which are misreadings of original handwritten diary are corrected
                   with choice, sic and corr.</p>
             </correction>
             <normalization>
-               <p>Original spelling and typography is retained.</p>
+               <p>Original spelling and typography is otherwise retained.</p>
             </normalization>
          </editorialDecl>
       </encodingDesc>
