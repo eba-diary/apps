@@ -397,6 +397,12 @@ namespace Sentry.data.Core
                 chgDetected = true;
             }
 
+            if (schema.CLA3014_LoadDataToSnowflake != dto.CLA3014_LoadDataToSnowflake)
+            {
+                schema.CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake;
+                chgDetected = true;
+            }            
+
 
             if (chgDetected)
             {
@@ -726,6 +732,7 @@ namespace Sentry.data.Core
                 CLA1580_StructureHive = dto.CLA1580_StructureHive,
                 CLA2472_EMRSend = dto.CLA2472_EMRSend,
                 CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag,
+                CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake,
                 ObjectStatus = dto.ObjectStatus
             };
             _datasetContext.Add(schema);
@@ -765,7 +772,8 @@ namespace Sentry.data.Core
                 CLA1396_NewEtlColumns = scm.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = scm.CLA1580_StructureHive,
                 CLA2472_EMRSend = scm.CLA2472_EMRSend,
-                CLA1286_KafkaFlag = scm.CLA1286_KafkaFlag
+                CLA1286_KafkaFlag = scm.CLA1286_KafkaFlag,
+                CLA3014_LoadDataToSnowflake = scm.CLA3014_LoadDataToSnowflake
             };
 
         }
