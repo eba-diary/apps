@@ -617,23 +617,24 @@ namespace Sentry.data.Core
             return dicRows;
         }
 
-        public bool RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent)
+        public void RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent)
         {
             if (objectKey == null)
             {
                 Logger.Debug($"schemaservice-registerrawfile no-objectkey-input");
-                return false;
+                throw new ArgumentException("schemaservice-registerrawfile no-objectkey-input");
             }
 
             if (schema == null)
             {
                 Logger.Debug($"schemaservice-registerrawfile no-schema-input");
-                return false;
+                throw new ArgumentException("schemaservice-registerrawfile no-schema-input");
             }
 
             if (stepEvent == null)
             {
                 Logger.Debug($"schemaservice-registerrawfile no-stepevent-input");
+                throw new ArgumentException("schemaservice-registerrawfile no-stepevent-input");
             }
 
             try
@@ -666,11 +667,8 @@ namespace Sentry.data.Core
             catch(Exception ex)
             {
                 Logger.Error($"schemaservice-registerrawfile-failed", ex);
-
-                return false;
-            }           
-
-            return true;
+                throw;
+            }
         }
 
         private void MapToDatasetFile(DataFlowStepEvent stepEvent, string fileKey, string fileVersionId, DatasetFile file)
