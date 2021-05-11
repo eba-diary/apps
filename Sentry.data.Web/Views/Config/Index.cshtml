@@ -193,7 +193,7 @@
                                 </div>
                             }
                             <div class="col-md-12 configDetailRow">
-                                @if (item.FileExtension.Name.Trim() == "ANY" || item.FileExtension.Name.Trim() == "DELIMITED")
+                                @if (item.FileExtension.Name.Trim() == "ANY" || item.FileExtension.Name.Trim() == "DELIMITED" || item.FileExtension.Name.Trim() == "FIXEDWIDTH")
                                 {<div class="col-md-12">This configuration will allow <b>all</b> file extensions.</div>}
                                 else
                                 {<div class="col-md-12">This configuration will only allow files with <b>.@item.FileExtension.Name.ToLower()</b> extension</div>}

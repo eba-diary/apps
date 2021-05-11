@@ -12,6 +12,7 @@ data.Dataset = {
     delroyFieldArray: [],
     delroySnowflakeViewsArray: [],
     delroyStructTrackerArray: [],
+    firstTime: true,
 
 
     delroyInit: function () {
@@ -212,6 +213,18 @@ data.Dataset = {
         table.clear();
         table.rows.add(field);       //when clicking on an item, we need to specify Fields property since all chidren of ROOT use this
         table.draw();
+
+        //dont do anything first time since firstTime is on whole page refresh and we don't want to mess with scroll position
+        if (data.Dataset.firstTime) {
+            data.Dataset.firstTime = false;
+        }
+        else {
+            //change scroll position to top of columns detail section upon grid refresh for consistency (anytime they click breadcrumb or click a struct)
+            //this is needed because of grid expanding and shrinking when structs are selected and the scrolling un changed goes sometimes to bottom of grid
+            var elmnt = document.getElementById("schemaSection");     
+            elmnt.scrollIntoView(); 
+            window.scrollBy(0, -100); //adjust scrolling because scrollIntoView() is off by about 100px which is a known issue in various browsers
+        }
     },
 
 
