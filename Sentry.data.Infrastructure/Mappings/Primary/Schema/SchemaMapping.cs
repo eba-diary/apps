@@ -30,6 +30,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property(x => x.CLA1580_StructureHive, m => m.Column("CLA1580_StructureHive"));
             Property(x => x.CLA2472_EMRSend, m => m.Column("CLA2472_EMRSend"));
             Property(x => x.CLA1286_KafkaFlag, m => m.Column("CLA1286_KafkaFlag"));
+            Property(x => x.CLA3014_LoadDataToSnowflake, m => m.Column("CLA3014_LoadDataToSnowflake"));
             this.Bag((x) => x.Revisions, (m) =>
             {
                 m.Inverse(true);
