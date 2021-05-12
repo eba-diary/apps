@@ -556,7 +556,7 @@
             ref="#Buchanan_Carrie">Miss B</persName>. had always refrained from talking to her of
           her religion - so she said "why do you want to be a Christian?" "Because all the good,
           kind people I know are Christians". She has become they tell me a joy in the house - what
-          a transformation for a little savage 3 years ago! <persName ref="">Mrs. Perkins</persName>
+          a transformation for a little savage 3 years ago! <persName ref="#Perkins_Mrs">Mrs. Perkins</persName>
           and <persName ref="#Hale_Miss">Miss Hale</persName> to lunch.</p>
       </div>
       <div xml:id="EBA-1904-01-18" type="entry">
@@ -589,7 +589,7 @@
             ref="#Medinet_Habu">Medinet Abu</placeName> - <persName ref="#Wilson_Alice"
             >Alice</persName> and I to see <persName ref="#Buchanan_Carrie">Miss Buchanan</persName>
           and afterwards to the <name type="hotel" ref="#Luxor_Hotel">Luxor Hotel</name> for tea
-          with the <persName ref="">Misses Collins</persName> - Nice, simple Scotch bodies they are,
+          with the <persName ref="#Collins_Frances">Misses Collins</persName> - Nice, simple Scotch bodies they are,
           I like them.</p>
       </div>
       <div xml:id="EBA-1904-01-21" type="entry">
@@ -1598,16 +1598,16 @@
         <dateline>
           <name type="hotel" ref="#Hotel_Cavour">Hotel Cavour</name> - <placeName ref="#Milan"
             >Milan</placeName>. <date when="1905-04-16">Palm Sunday, April 16th</date>. </dateline>
-        <!--how to tag opera??-->
+        <!--how to tag opera - Don Pasquale??-->
         <!--Motalli??-->
         <p>We had a perfectly charming ride over here on Thursday afternoon. The country so green
           and smiling - all the people working in their vineyards and fields - and above all the
           snowy peaks of the <placeName ref="#Alps">Alps</placeName>, and great masses of dark blue
           and white clouds about them. It was nice being in <placeName ref="#Milan"
-            >Milan</placeName> again, and at this best of hotels, where we are so at home. We are in
+          >Milan</placeName> again, and at this best of hotels, where we are so at home. We are in
           our old rooms; and found the pretty table ready in our sitting room, with the best dinner
           we have had in many a month. The next morning we all went to the <placeName ref="#Brera"
-            >Brera</placeName>, and after lunch <persName ref="#Newberry_Percy">Newberry</persName>
+          >Brera</placeName>, and after lunch <persName ref="#Newberry_Percy">Newberry</persName>
           went off and <persName ref="#Cigala_Enrique_Martini_di">Cigala</persName> arrived from
             <placeName ref="#Turin">Turin</placeName>. Yesterday morning we spent at the <placeName
             ref="#Museo_Poldi_Pezzoli">Paldo-Pezzoli</placeName>. It was good to see our old
@@ -1628,7 +1628,7 @@
           station in a pouring rain, reaching home with thankful hearts in time for tea. The first
           night of our arrival we went to "<placeName ref="#Teatro_alla_Scala">La Scala</placeName>"
           to hear<pb n="95"/>
-          <persName ref="#">Don Pasquale</persName> given. We had one of the best loges in the house
+          Don Pasquale given. We had one of the best loges in the house
           - the orchestra was immense - the scenery wonderful - but what a performance to call
           musical - and how strange to discover that so many people live who can take Italian Opera
           seriously! <persName ref="#Davis_Theodore_M">Theo</persName> and I went to the back of the
@@ -2018,7 +2018,7 @@
           <date when="1905-05-23">Tuesday, May 23</date>.
         </dateline>
         <!--Mrs. Mathewson actress-->
-        <!--tag play characters??-->
+        <!--tag play characters?? Or tag the play - The Merchant of Venice? -->
         <p><persName ref="#Cary_Elwes_Winifred_Lady">Lady Winnie</persName> came to take <persName
             ref="#Hardy_Jean #Wilson_Alice">the girls</persName> to the <placeName
             ref="#National_Portrait_Gallery">National Portrait Gallery</placeName>. In the afternoon
@@ -2028,8 +2028,8 @@
           with no aim at artistic fittings in his studio. <persName ref="#Rathbone_Mr Rathbone_Mrs">Mr. and Mrs.
             Rathbone</persName> were there. This evening we have had an entrancing evening at
             <placeName ref="#Theater_Royal_Drury_Lane">Drury Lane Theatre</placeName> - <persName
-            ref="#Irving_Henry">Irving</persName> as <persName ref="">Shylock</persName>, and the
-          captivating <persName ref="">Mrs. Mathewson</persName> as Portia. A wonderful performance
+            ref="#Irving_Henry">Irving</persName> as Shylock, and the
+          captivating <persName ref="#Mathewson_Mrs">Mrs. Mathewson</persName> as Portia. A wonderful performance
           - the setting so fine and perfect - <persName ref="#Irving_Henry">Irving</persName> looks
           very old - and received a real ovation. The theatre was bitterly cold - all the men wore
           overcoats - and the women wraps - and we wished for hot water bottles and blankets.</p>
