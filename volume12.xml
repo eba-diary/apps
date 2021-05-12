@@ -773,7 +773,7 @@
         </dateline>
         <p>A very windy day - <persName ref="#Davis_Theodore_M">Theo</persName> and <persName
             ref="#Hardy_Jean #Wilson_Alice">the girls</persName> in spite of it, went over to the
-            <placeName ref="#Valley_of_the_Kings">Valley</placeName>, where when <persName
+            <placeName ref="#Bībān al-Mulūk">Valley</placeName>, where when <persName
             ref="#Davis_Theodore_M">Theodore</persName> appeared the workmen greeted him with a
           cheer, and he knew it meant some sign of promise - and the men had found the lintel of a
           door to a tomb. They said they might clear it to the entrance in a few days. Very
@@ -787,14 +787,15 @@
             type="hotel" ref="#Luxor_Hotel">Luxor</name> this noon, with a most beautiful statuette
           in silver he had bought of <persName ref="#Mohassib_Mohammed">Mohassib</persName>. In<pb
             n="73"/> style and treatment it suggests that Egyptian statuette in bronze and silver,
-          the Lady Tak&#251;shit, now in <placeName ref="#Athens">Athens</placeName> and shown in
-          the "Struggle of Nations" by <persName ref="#Maspero_Gaston">Maspero</persName>. <persName
-            ref="#Smith_Harold">Smith</persName> and <persName ref="#Ream_Robert_Clarke"
-            >Ream</persName> went with <persName ref="#Davis_Theodore_M">Theo</persName> and
-            <persName ref="#Weigall_Arthur">Weigall</persName>, who had lunched here, to the
-            <placeName ref="#Valley_of_the_Kings">Valley</placeName>, and the two first dined with
-          us. <persName ref="#Lindon_Smith_Joseph #Lindon_Smith_Corinna">Mr. and Mrs. Joe
-            Smith</persName> came in during the evening.</p>
+          the <objectName type="statuette" ref="Statuette_of_a_Woman">Lady Tak&#251;shit
+          </objectName>, now in <placeName ref="#Athens">Athens</placeName> and shown in
+          the <bibl><title>"Struggle of Nations"</title> by <author><persName ref="#Maspero_Gaston">
+          Maspero</persName></author></bibl>. <persName ref="#Smith_Harold">Smith</persName> and
+          <persName ref="#Ream_Robert_Clarke">Ream</persName> went with <persName ref=
+          "#Davis_Theodore_M">Theo</persName> and <persName ref="#Weigall_Arthur">Weigall</persName>
+          , who had lunched here, to the <placeName ref="#Bībān al-Mulūk">Valley</placeName>,
+          and the two first dined with us. <persName ref="#Lindon_Smith_Joseph
+          #Lindon_Smith_Corinna">Mr. and Mrs. Joe Smith</persName> came in during the evening.</p>
       </div>
       <div xml:id="EBA-1905-02-10" type="entry">
         <dateline>
@@ -808,7 +809,7 @@
           <date when="1905-02-11">Saturday, Feb. 11th.</date>
         </dateline>
         <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Weigall_Arthur">Mr.
-            Weigall</persName> went over to the <placeName ref="#Valley_of_the_Kings"
+            Weigall</persName> went over to the <placeName ref="#Bībān al-Mulūk"
             >Valley</placeName> today; several steps leading to the door of the tomb uncovered.
             <persName ref="#Weigall_Arthur">Weigall</persName> came in for tea - after which
             <persName ref="#Davis_Theodore_M">Theo</persName> went over to the <name type="boat"
@@ -836,7 +837,7 @@
           from the <placeName ref="#Red_Sea">Red Sea</placeName> to <name type="hotel"
             ref="#Luxor_Hotel">Luxor</name>. <persName ref="#Davis_Theodore_M">Theo</persName> and
             <persName ref="#Weigall_Arthur">Weigall</persName> rode over to the <placeName
-            ref="#Valley_of_the_Kings">Valley of the Kings</placeName> this afternoon - when
+            ref="#Bībān al-Mulūk">Valley of the Kings</placeName> this afternoon - when
             <persName ref="#Davis_Theodore_M">Theo</persName> got home he brought with him two or
           three queer parcels - and he had an air of great elation. He first unwrapped a yoke of a
           chariot, finely decorated in gold and colour - in perfect condition, then a long baton, or
@@ -860,7 +861,7 @@
         <dateline>
           <date when="1905-02-13">Monday, Feb. 13th.</date>
         </dateline>
-        <p>We all made an early start for the <placeName ref="#Valley_of_the_Kings"
+        <p>We all made an early start for the <placeName ref="#Bībān al-Mulūk"
             >Valley</placeName> this morning. <persName ref="#Wilson_Alice">Alice</persName> has not
           been feeling very well for a few days - and was so melancholy at the idea of being left
           behind on the opening day of the tomb, that I persuaded <persName ref="#Davis_Theodore_M"
@@ -868,7 +869,7 @@
             Victorias</name> that occasionally take people over - and she and I rode over most
           comfortably. We had to<pb n="75"/> go on our donkeys across the wide sand waste - and then
           take the carriage and we had to get out for the ascent and the descent of the high canal
-          embankment. But the moment we entered the <placeName ref="#Valley_of_the_Kings"
+          embankment. But the moment we entered the <placeName ref="#Bībān al-Mulūk"
             >valley</placeName>, the going was very good. We found <persName ref="#Weigall_Arthur"
             >Weigall</persName> and <persName ref="#Smith_Mr #Smith_Mrs">the Smiths</persName>, the
           native Inspector, and <persName ref="#Maspero_Gaston">Maspero</persName> and his Secretary
@@ -892,13 +893,16 @@
           stayed a long time. The tomb was so accessible, opening by its first flight of steps on a
           level with the pathway - from which a short descending corridor leads to another short
           stairway, which gives immediate access to the tomb chamber. It lies just between No's 3
-          and 4 - the former an unfinished tomb intended for Ramses III - 4 also unfinished - the
-          tomb of <persName ref="#Rameses_XII">Ramses XII</persName>. Neither <persName
+          and 4 - the former an unfinished tomb intended for <persName ref="#Rameses_III"><choice>
+          <sic>Ramses III</sic><corr>Rameses III</corr></choice></persName> - 4 also unfinished - the
+          tomb of <persName ref="#Rameses_XII"><choice><sic>Ramses XII</sic><corr>Rameses XII
+          </corr></choice></persName>. Neither <persName
             ref="#Maspero_Gaston">M. Maspero</persName> or <persName ref="#Quibell_James"
             >Quibell</persName> thought<pb n="76"/> this site worth working, but <persName
             ref="#Davis_Theodore_M">Theo</persName> in his thorough way said he should go on
           clearing up both sides of that side valley - and it was just by this method that he found
-          the tomb of Thothmes IV and Hatshepsut. It is remarkable that this tomb, crowded in
+          the tomb of <persName ref="#Thotmes_IV">Thothmes IV</persName> and
+          <persName ref="#Hatshepsut">Hatshepsut</persName>. It is remarkable that this tomb, crowded in
           between 3 and 4 could have escaped complete spoilation. When these men at last appeared
           they told us wondrous tales, and allowed us one by one to go down - by the light of
           candles I could see a dim glitter of gold everywhere and a confusion of coffins and
@@ -926,16 +930,20 @@
             >Duchess</persName>. After they left, <persName ref="#Quibell_James">Mr.
             Quibell</persName> came very much disgruntled, to find the tomb had been opened in his
           absence. <persName ref="#Maspero_Gaston">M. Maspero</persName> discovered by the various
-          inscriptions in the tomb, that it was the burial place of Yuaa and Tuaa, the father and
-          mother of the great Queen Tyi, wife of Amenhotep III. The cartouche of this king is on
-          many of these things - and that of a daughter of his - Set-amen. All the objects so far as
+          inscriptions in the tomb, that it was the burial place of <persName ref="#Yuya"><choice>
+          <sic>Yuaa</sic><corr>Yuya</corr></choice></persName> and <persName ref="#Tjuyu"><choice>
+          <sic>Tuaa</sic><corr>Tjuyu</corr></choice></persName>, the father and mother of the great
+          <persName ref="#Tyii">Queen <choice><sic>Tyi</sic><corr>Tyii</corr></choice></persName>,
+          wife of <persName ref="#Amenhotep_III">Amenhotep III</persName>. The cartouche of this king is on
+          many of these things - and that of a daughter of his - <persName ref="#Sitamun"><choice>
+          <sic>Set-amen</sic><corr>Sitamun</corr></choice></persName>. All the objects so far as
           they have been seen, are in perfect order and good and very beautiful. </p>
       </div>
       <div xml:id="EBA-1905-02-14" type="entry">
         <dateline>
           <date when="1905-02-14">Tuesday, Feb. 14th.</date>
         </dateline>
-        <p>Another day with all the family again to the <placeName ref="#Valley_of_the_Kings"
+        <p>Another day with all the family again to the <placeName ref="#Bībān al-Mulūk"
             >Valley</placeName>. Again I had the carriage and took <persName ref="#Maspero_Louise"
             >Mme. Maspero</persName> with me. <persName ref="#Sayce_Archibald">Mr. Sayce</persName>
           and <persName ref="#Amos_Mrs">Mrs. Sheldon Amos</persName> also went over - and
@@ -980,17 +988,22 @@
         <dateline>
           <date when="1905-02-16">Thursday, Feb. 16.</date>
         </dateline>
-        <p>A warm, calm day - over to the <placeName ref="#Valley_of_the_Kings">Valley</placeName>
+        <p>A warm, calm day - over to the <placeName ref="#Bībān al-Mulūk">Valley</placeName>
           again, but I in my donkey chair. I saw the different things found in the tombs well today
-          for the first time - as they had been brought out of the tomb and placed in that of Ramses
-          XII. The most wonderful and varied collection of beautiful things in perfect condition.
-          The 2 mummies of Yuaa and Tuaa, well preserved and very impressive, despite the fact that
-          Tuaa's eyes are wide open. They had double coffins of the finest workmanship literally
+          for the first time - as they had been brought out of the tomb and placed in that of
+          <persName ref="#Rameses_XII"><choice><sic>Ramses XII</sic><corr>Rameses XII</corr></choice>
+          </persName>. The most wonderful and varied collection of beautiful things in perfect condition.
+          The 2 mummies of <persName ref="#Yuya"><choice><sic>Yuaa</sic><corr>Yuya</corr></choice>
+          </persName> and <persName ref="#Tjuyu"><choice><sic>Tuaa</sic><corr>Tjuyu</corr></choice>
+          </persName>, well preserved and very impressive, despite the fact that
+          <persName ref="#Tjuyu"><choice><sic>Tuaa</sic><corr>Tjuyu</corr></choice></persName>'s
+          eyes are wide open. They had double coffins of the finest workmanship literally
           overlaid with gold - chairs, boxes, 3 funeral couches, vases, scarabs, a great roll of
           papyrus, etc etc. extraordinarily rich - a wonderful find. At 3 o'clock <persName
             ref="#Davis_Theodore_M">Theo</persName> received a note from <persName
             ref="#Waters_Capt.">Capt. Waters</persName>, which had been sent over from the dahabya,
-          saying their Royal Highnesses would be glad to come about 5 o'clock to the boat if it
+          saying <persName ref="#Connaught_Duke #Connaught_Duchess #Margaret_Princess">their Royal
+          Highnesses</persName> would be glad to come about 5 o'clock to the boat if it
           would be convenient. So we had to drop everything, order out donkeys, and hurry home the 7
           miles. We had just time to wash our faces, and take off our hats, when they arrived, also
           in riding dress. The <persName ref="#Connaught_Duke">Duke</persName>, <persName
@@ -1019,7 +1032,7 @@
         </dateline>
         <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName
             ref="#Hardy_Jean #Wilson_Alice">the girls</persName> went to the <placeName
-            ref="#Valley_of_the_Kings">Valley</placeName> again - <persName ref="#Weigall_Arthur"
+            ref="#Bībān al-Mulūk">Valley</placeName> again - <persName ref="#Weigall_Arthur"
             >Weigall</persName> came back with them and had tea. He still sleeps at the tomb.
             <persName ref="#Naville_Edouard, #Naville_Mme">M. and Mme. Naville</persName> to tea.
             <persName ref="#Sayce_Archibald">Mr. Sayce</persName> dined with us. He starts down on
@@ -1078,7 +1091,7 @@
             ref="#Hardy_Jean #Wilson_Alice">The girls</persName> and I with <persName
             ref="#Jones_Daniel">Jones</persName> were at the Bazaar this morning - <persName
             ref="#Hardy_Jean">Jean</persName> and I went for tea to the <name type="hotel"
-            ref="#Savoy_Hotel">Savoy</name> - and had it in the garden back of the hotel. it was
+            ref="#Savoy_Hotel">Savoy</name> - and had it in the garden back of the hotel. It was
           charming - the gardens are of real extent, and wonderfully improved. So much more
             attractive<pb n="81"/> than the <name type="hotel" ref="#Cataract_Hotel">Cataract
             Hotel</name>. <persName ref="#Davis_Theodore_M">Theo</persName> has been trying to find
@@ -1126,7 +1139,7 @@
             Thursday.</date>
         </dateline>
         <p>Starting very early this morning we reached our old mooring place on the sand opposite
-          the <placeName ref="#Castle_Carter">Castle</placeName>, at 8 o'clock. <name type="hotel"
+          the <name type="historical" ref="#Castle_Carter">Castle</name>, at 8 o'clock. <name type="hotel"
             ref="#Luxor_Hotel">Luxor</name> looks quite deserted. We were a little over 5 days
           coming down. We found <persName ref="#Campbell_Dr #Campbell_Mrs">the Campbells</persName>
           here, and they came over to see us at once. <persName ref="#Weigall_Arthur">Mr.
@@ -1134,8 +1147,8 @@
           rode over to <placeName ref="#Der_el_Bahari">Der el Bahari</placeName> - and had tea with
             <persName ref="#Ayrton_Edward">Mr. Ayrton</persName> at the little stone house. I saw
           for the first time the beautiful sarcophagus found by <persName ref="#Naville_Edouard"
-            >Naville</persName> on the terrace of the <placeName ref="#Temple_of_Mentu-hotep"
-            >Mentuhotep temple</placeName> - of one of the "favourites" of the King - Kau-it - quite
+            >Naville</persName> on the terrace of the <name type="historical" ref="#Temple_of_Mentu-hotep"
+            >Mentuhotep temple</name> - of one of the "favourites" of the King - Kau-it - quite
           exquisite. <persName ref="#Ayrton_Edward">Mr. Ayrton</persName> says there were several
           graves found. I think he said 7 - three of them bearing names of which the above was one -
           the rest were nameless. <persName ref="#Wilson_Alice">Alice</persName> and I came directly
