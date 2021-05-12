@@ -542,34 +542,7 @@ data.Dataset = {
             data.Config.SetFileExtensionProperites($('#FileExtensionId option:selected').text(), $('#DatasetId').val() !== "0");
         });
 
-        //$('#Delimiter').prop("readonly", "readonly");
-        //$('#HasHeader').prop("readonly", false);
-        //$('#HasHeader').prop("disabled", false);
-
-        //$("#FileExtensionId").change(function () {
-        //    switch ($('#FileExtensionId option:selected').text()) {
-        //        case "CSV":
-        //            $('#Delimiter').text(',');
-        //            $('#Delimiter').val(',');
-        //            $('#Delimiter').prop("readonly", "readonly");
-        //            $('#HasHeader').prop("readonly", false);
-        //            $('#HasHeader').prop("disabled", false);
-        //            break;
-        //        case "DELIMITED":
-        //            $('#Delimiter').val('');
-        //            $('#Delimiter').prop("readonly", "");
-        //            $('#HasHeader').prop("readonly", false);
-        //            $('#HasHeader').prop("disabled", false);
-        //            break;
-        //        default:
-        //            $('#Delimiter').val('');
-        //            $('#Delimiter').prop("readonly", "readonly");
-        //            $('#HasHeader').prop("readonly", true);
-        //            $('#HasHeader').prop("disabled", true);
-        //            break;                 
-        //    }
-        //});
-
+        data.Config.DatasetScopeTypeInit($("#DatasetScopeTypeId"));
     },
 
     DetailInit: function () {
