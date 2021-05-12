@@ -10,6 +10,7 @@ using Sentry.data.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using static Sentry.data.Core.RetrieverJobOptions;
@@ -1746,6 +1747,16 @@ namespace Sentry.data.Web.Controllers
             ViewData["EnableJobControls"] = "false";
             ViewData["Color"] = "blue";
             return PartialView("~/Views/RetrieverJob/_RetrieverJob.cshtml", job);
+        }
+
+        [HttpGet]
+        [Route("Config/GetDataScopeTypeDescription/{id}")]
+        public JsonResult GetDataScopeTypeDescription(int id)
+        {
+            string description = _datasetContext.DatasetScopeTypes.Where(w => w.ScopeTypeId == id).Select(s => s.Description).FirstOrDefault();
+
+            Response.StatusCode = (int)HttpStatusCode.OK;
+            return Json(new { Description = description }, JsonRequestBehavior.AllowGet);
         }
     }
 }

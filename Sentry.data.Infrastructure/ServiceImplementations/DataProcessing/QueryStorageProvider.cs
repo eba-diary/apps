@@ -80,8 +80,6 @@ namespace Sentry.data.Infrastructure
                 /***************************************
                  *  Perform provider specific processing
                  ***************************************/
-                bool IsRegisterSuccessful = false;
-
 
                 string targetFileName = DataFlowHelpers.AddFlowExecutionGuidToFilename(Path.GetFileName(stepEvent.SourceKey), _flowGuid);
                 string targetKey = stepEvent.StepTargetPrefix + targetFileName;
@@ -98,7 +96,7 @@ namespace Sentry.data.Infrastructure
 
                     FileSchema schema = datasetContext.GetById<FileSchema>(stepEvent.SchemaId);
 
-                    IsRegisterSuccessful = schemaSerivce.RegisterRawFile(schema, targetKey, versionKey, stepEvent);
+                    schemaSerivce.RegisterRawFile(schema, targetKey, versionKey, stepEvent);
                 }
 
                 /***************************************
