@@ -8,7 +8,15 @@ namespace Sentry.data.Infrastructure.FeatureFlags
 {
     public class DataFeatures : IDataFeatures
     {
-        private static SqlConfiguration databaseConfig = new SqlConfiguration(Sentry.Configuration.Config.GetHostSetting("DatabaseConnectionString"));
+        private static SqlConfiguration databaseConfig =
+            new SqlConfiguration(Sentry.Configuration.Config.GetHostSetting("DatabaseConnectionString"))
+            {
+                SchemaOptions = new SqlConfiguration.SchemaDefinition()
+                {
+                    KeyColumnName = "KeyCol"
+                }
+            };
+
         public readonly static IWritableFeatureRepository databaseRepo_longCache = FeatureRepository.CreateCachedRepository(databaseConfig, TimeSpan.FromDays(1));
         private static readonly IReadableFeatureRepository configRepo = new Sentry.FeatureFlags.SentryConfig.FeatureRepository();
 

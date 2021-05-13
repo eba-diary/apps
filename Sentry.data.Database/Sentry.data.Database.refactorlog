@@ -973,4 +973,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="CLA3014_LoadDataToSnowflake" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="4f1ba296-dd54-4ef6-8f3c-26d6959c4a7a" ChangeDateTime="05/13/2021 15:29:50">
+    <Property Name="ElementName" Value="[dbo].[FeatureEntity].[Key]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FeatureEntity]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[KeyCol]" />
+  </Operation>
 </Operations>
