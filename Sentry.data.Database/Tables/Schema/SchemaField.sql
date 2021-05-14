@@ -3,7 +3,7 @@
 	[Field_Id] INT NOT NULL IDENTITY, 
     [Field_NME] VARCHAR(100) NOT NULL, 
     [IsArray] BIT NOT NULL, 
-    [OrdinalPosition] NCHAR(10) NULL, 
+    [OrdinalPosition] INT NULL, 
     [StartPosition] INT NULL, 
     [EndPosition] INT NULL, 
     [CreateDTM] DATETIME NOT NULL, 
