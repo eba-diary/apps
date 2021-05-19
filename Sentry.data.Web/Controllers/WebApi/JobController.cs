@@ -516,6 +516,14 @@ namespace Sentry.data.Web.WebApi.Controllers
                     Logger.Debug($"BadRequest from Spark (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}");
                     return BadRequest(response.Content.ReadAsStringAsync().Result);
                 }
+                else if(response.StatusCode == HttpStatusCode.BadGateway)
+                {
+                    return Content(HttpStatusCode.BadGateway, "Apache Livy API unavailable");
+                }
+                else if (response.StatusCode == HttpStatusCode.GatewayTimeout)
+                {
+                    return Content(HttpStatusCode.GatewayTimeout, "Apache Livy did not response in timely fashion");
+                }
                 else
                 {
                     Logger.Debug($"Status NotFound (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}");

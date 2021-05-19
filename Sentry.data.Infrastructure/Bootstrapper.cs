@@ -10,6 +10,9 @@ using Sentry.data.Core.Interfaces.SAIDRestClient;
 using Sentry.Messaging.Common;
 using System.Net;
 using System.Net;
+using Sentry.data.Core.Interfaces;
+using Polly.Registry;
+using Sentry.data.Infrastructure.PollyPolicies;
 
 namespace Sentry.data.Infrastructure
 {
@@ -94,6 +97,7 @@ namespace Sentry.data.Infrastructure
                 x.Type<GenericHttpsDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
             });
 
+
             //Register event handlers for MetadataProcessorService
             registry.For<IMessageHandler<string>>().Add<S3EventService>();
             registry.For<IMessageHandler<string>>().Add<HiveMetadataService>();
@@ -128,6 +132,12 @@ namespace Sentry.data.Infrastructure
                 Ctor<HttpClient>().Is(client).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("SaidAssetBaseUrl"));
 
+            PolicyRegistry pollyRegistry = new PolicyRegistry();
+            registry.For<IReadOnlyPolicyRegistry<string>>().Singleton().Use(pollyRegistry);
+            registry.For<IPolicyRegistry<string>>().Singleton().Use(pollyRegistry);
+
+            registry.For<IPollyPolicy>().Singleton().Add<ApacheLivyProviderPolicy>();
+
             //establish httpclient specific to ApacheLivyProvider
             var apacheLivyClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
             apacheLivyClient.DefaultRequestHeaders.Accept.Clear();
@@ -139,6 +149,8 @@ namespace Sentry.data.Infrastructure
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);
 
+            // Polly Policy providers
+            _container.GetAllInstances<IPollyPolicy>().ToList().ForEach(p => p.Register());
         }
 
         /// <summary>
