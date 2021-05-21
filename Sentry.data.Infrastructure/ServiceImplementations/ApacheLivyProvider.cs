@@ -1,53 +1,68 @@
-﻿using Sentry.data.Core;
-using System.Collections.Generic;
+﻿using Polly;
+using Polly.Registry;
+using Sentry.data.Core;
+using Sentry.data.Core.Interfaces;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
     public class ApacheLivyProvider : IApacheLivyProvider
     {
-        private HttpClient _httpClient;
-        private readonly string _baseUrl;
+        private readonly IAsyncPolicy _asyncProviderPolicy;
+        private readonly IHttpClientProvider _httpClient;
 
-        public ApacheLivyProvider(HttpClient httpClient)
+        public ApacheLivyProvider(IHttpClientProvider httpClientProvider, IPolicyRegistry<string> policyRegistry)
         {
-            _httpClient = httpClient;
-            _baseUrl = Sentry.Configuration.Config.GetHostSetting("ApacheLivy");
+            _httpClient = httpClientProvider;
+            _asyncProviderPolicy = policyRegistry.Get<IAsyncPolicy>(PollyPolicyKeys.ApacheLivyProviderAsyncPolicy);
         }
+
+        public string BaseUrl { get; set; } = "";
 
         public async Task<HttpResponseMessage> PostRequestAsync(string resource, HttpContent postContent)
         {
-            return await _httpClient.PostAsync( _baseUrl + $"/{resource}", postContent).ConfigureAwait(false);
+            var pollyResponse = await _asyncProviderPolicy.ExecuteAsync(async () =>
+            {
+                var x =  await _httpClient.PostAsync(BaseUrl + $"/{resource}", postContent).ConfigureAwait(false);
+
+                return x;
+
+            }).ConfigureAwait(false);
+
+             HttpResponseMessage response = pollyResponse;
+
+            return response;
         }
 
         public async Task<HttpResponseMessage> GetRequestAsync(string resource)
         {
-            return await _httpClient.GetAsync(_baseUrl + resource).ConfigureAwait(false);
+            var pollyResponse = await _asyncProviderPolicy.ExecuteAsync(async () =>
+            {
+                var x = await _httpClient.GetAsync(BaseUrl + resource).ConfigureAwait(false);
+
+                return x;
+
+            }).ConfigureAwait(false);
+
+            HttpResponseMessage response = pollyResponse;
+
+            return response;
         }
 
         public async Task<HttpResponseMessage> DeleteRequestAsync(string resource)
         {
-            return await _httpClient.DeleteAsync(_baseUrl + resource).ConfigureAwait(false);
-        }
-
-        public void AddRequestHeaders(IDictionary<string, string> headers)
-        {
-            foreach(var item in headers)
+            var pollyResponse = await _asyncProviderPolicy.ExecuteAsync(async () =>
             {
-                _httpClient.DefaultRequestHeaders.Add(item.Key, item.Value);
-            }
-        }
+                var x = await _httpClient.DeleteAsync(BaseUrl + resource).ConfigureAwait(false);
 
-        public void ClearAcceptHeader()
-        {
-            _httpClient.DefaultRequestHeaders.Accept.Clear();
-        }
+                return x;
 
-        public void AddMediaTypeAcceptHeader(string mediaType)
-        {
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
+            }).ConfigureAwait(false);
+
+            HttpResponseMessage response = pollyResponse;
+
+            return response;
         }
     }
 }
