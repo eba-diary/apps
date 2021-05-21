@@ -4,6 +4,7 @@ using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure.PollyPolicies
 {
@@ -25,7 +26,7 @@ namespace Sentry.data.Infrastructure.PollyPolicies
         {
             var asyncRetryPolicy = Policy
                 .Handle<System.Net.Http.HttpRequestException>()
-                .Or<Exception>()
+                .Or<TaskCanceledException>()
                 .WaitAndRetryAsync(
                     retryCount: 3,
                     sleepDurationProvider: retryAttempt =>
@@ -40,5 +41,10 @@ namespace Sentry.data.Infrastructure.PollyPolicies
 
             return asyncRetryPolicy;
         }
+
+        //private void FallBackMethod()
+        //{
+
+        //}
     }
 }

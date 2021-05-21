@@ -277,6 +277,7 @@
     <Compile Include="Interfaces\IDaleSearchProvider.cs" />
     <Compile Include="Interfaces\IDaleService.cs" />
     <Compile Include="Interfaces\IDataFeatures.cs" />
+    <Compile Include="Interfaces\IHttpClientProvider.cs" />
     <Compile Include="Interfaces\IPollyPolicy.cs" />
     <Compile Include="Interfaces\IRetrieverJobService.cs" />
     <Compile Include="Interfaces\IHiveOdbcProvider.cs" />

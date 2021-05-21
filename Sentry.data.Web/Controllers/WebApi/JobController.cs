@@ -638,6 +638,21 @@ namespace Sentry.data.Web.WebApi.Controllers
                 }
                 return Ok();
             }
+            catch (HttpResponseException responseEx)
+            {
+                Logger.Error("<jobcontroller-getbatchstate> livy connection failed", responseEx);
+                return Content(HttpStatusCode.BadGateway, "Failed to reach Livy");
+            }
+            catch (TimeoutException timeoutEx)
+            {
+                Logger.Error("<jobcontroller-getbatchstate> livy connection timeout", timeoutEx);
+                return Content(HttpStatusCode.GatewayTimeout, "Livy connection timeout");
+            }
+            catch (ArgumentNullException argEx)
+            {
+                Logger.Error("<jobcontroller-getbatchstate> null arguement", argEx);
+                return Content(HttpStatusCode.BadRequest, "Bad livy request");
+            }
             catch (Exception ex)
             {
                 return InternalServerError(ex);

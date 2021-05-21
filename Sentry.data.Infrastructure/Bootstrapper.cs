@@ -9,10 +9,10 @@ using System.Net.Http;
 using Sentry.data.Core.Interfaces.SAIDRestClient;
 using Sentry.Messaging.Common;
 using System.Net;
-using System.Net;
 using Sentry.data.Core.Interfaces;
 using Polly.Registry;
 using Sentry.data.Infrastructure.PollyPolicies;
+using System;
 
 namespace Sentry.data.Infrastructure
 {
@@ -143,8 +143,10 @@ namespace Sentry.data.Infrastructure
             apacheLivyClient.DefaultRequestHeaders.Accept.Clear();
             apacheLivyClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
             apacheLivyClient.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
+            var apacheHttpClientProvider = new HttpClientProvider(apacheLivyClient);
             registry.For<IApacheLivyProvider>().Singleton().Use<ApacheLivyProvider>().
-                Ctor<HttpClient>().Is(apacheLivyClient);
+                Ctor<IHttpClientProvider>().Is(apacheHttpClientProvider)
+                .SetProperty((c) => c.BaseUrl = Configuration.Config.GetHostSetting("ApacheLivy"));
 
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);
