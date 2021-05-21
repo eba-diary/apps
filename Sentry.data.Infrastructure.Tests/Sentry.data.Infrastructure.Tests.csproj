@@ -99,7 +99,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ApacheLivyProviderTests.cs" />
-    <Compile Include="BaseInfrastructureUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
