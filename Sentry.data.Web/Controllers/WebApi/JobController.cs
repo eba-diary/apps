@@ -420,7 +420,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     json.Append($", \"numExecutors\": {job.JobOptions.JavaAppOptions.NumExecutors}");
                 }
 
-                json.Append(", \"files\": [\"s3://sentry-awse-test-emrconfig-ae2/SparkTester/custom_log4j.properties\"]");
+                json.Append(", \"files\": [\"s3a://sentry-awse-test-emrconfig-ae2/SparkTester/custom_log4j.properties\"]");
 
                 // THIS HAS BRACKETS javaOptionsOverride.ConfigurationParameters  { }
                 if (javaOptionsOverride != null && javaOptionsOverride.ConfigurationParameters != null)
