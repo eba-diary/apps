@@ -232,6 +232,36 @@ data.Config = {
                 Sentry.ShowModalAlert("\"Current View\" option has been unchecked.  <p>This will remove the current view SAS library associated with this schema, if saved.</p>");
             }
         });
+
+        data.Config.DatasetScopeTypeInit($("#DatasetScopeTypeID"));
+    },
+
+    DatasetScopeTypeInit: function (element) {
+        element.change(function () {
+            var selection = $(this).val()
+            data.Config.SetDatasetScopeTypeDescription(selection);
+        })
+
+        data.Config.SetDatasetScopeTypeDescription(element.val());
+    },
+
+    SetDatasetScopeTypeDescription: function (id) {
+        if (id === undefined) {
+            $(".DatasetScopeTypeDescription span").text("");
+        }
+        else {
+            $.ajax({
+                type: "GET",
+                url: '/Config/GetDataScopeTypeDescription/' + encodeURIComponent(id),
+                contentType: 'application/json',
+                success: function (returnedData) {
+                    $(".DatasetScopeTypeDescription span").text(returnedData.Description).html();
+                },
+                error: function () {
+                    $(".DatasetScopeTypeDescription span").text("");
+                }
+            });
+        }
     },
 
     CreateFormSubmitInit: function (e) {

@@ -149,6 +149,7 @@
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_02_02" />
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Dale\Sprint_21_02_03" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_03_10" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_03_01" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -275,6 +276,7 @@
     <Build Include="Views\vw_MonthlyDatasetCheck.sql" />
     <Build Include="Views\vw_DailyDatasetCheck.sql" />
     <Build Include="Tables\ADTDatasetClassification.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_03_01\Update_DatasetScopeType_Descriptions.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

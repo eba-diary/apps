@@ -391,6 +391,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<BaseField> BaseFields
+        {
+            get
+            {
+                return Query<BaseField>();
+            }
+        }
+
         public IQueryable<DataFlow> DataFlow
         {
             get
