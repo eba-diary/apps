@@ -122,6 +122,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
             registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
+            //registry.For<RestSharp.IRestClient>().Use<RestSharp.RestClient>().Transient();
 
             //establish generic httpclient singleton to be used where needed across the application
             var client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true });

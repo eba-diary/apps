@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core;
+using Sentry.data.Core.Exceptions;
 using StructureMap;
 using System;
 using System.Collections.Generic;
@@ -393,6 +394,10 @@ namespace Sentry.data.Infrastructure
             {
                 Logger.Info($"Retriever Job Cancelled - Job:{JobId}");
                 throw;
+            }
+            catch (RetrieverJobProcessingException ex)
+            {
+                Logger.Error($"Retriever Job Failed - Job:{JobId} processing_failed", ex);
             }
             catch (Exception ex)
             {
