@@ -7,7 +7,7 @@
     <fileDesc>
       <titleStmt>
         <title>Diary of Mrs. Emma B. Andrews. Volume 12 1904-1905</title> 
-          <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
+          <author ref="#Andrews_Emma_B">Emma B. Andrews</author>
         <respStmt>
           <resp>Originally prepared by</resp>
           <persName ref="#SLK">Sarah L. Ketchley</persName>
@@ -2044,7 +2044,7 @@
       <div xml:id="EBA-1905-05-26" type="entry">
         <dateline>
           <date when="1905-05-26">Friday, May 26</date>. </dateline>
-        <p>We went out to <placeName ref="#Oxford">Oxford</placeName> today, taking <persName ref="#Rathbone_Mr">Mr. Rathbone</persName> with us, and lunched at <placeName ref="#Queens_Hall">Queens</placeName> with <persName ref="#Sayce_Archibald">Mr. Sayce</persName>. We saw <placeName ref="#Magdalen_College">Magdalene</placeName>, <placeName ref="#Christ_College">Christ</placeName>, <placeName ref="#New_College">New <pb n="106"/> College</placeName> and <placeName ref="#St_Johns_College">St. Johns</placeName> - and went down to the river in the afternoon to see the races. It was such a pretty sight - the day was so warm - the country so lovely - the Thorns all in bloom as well as the chestnuts. We went to the <placeName ref="#Balliol_Barge">Baliel barge</placeName> to see the boats - and had tea there - then back to <placeName ref="#Magdalen_College">Magdalen</placeName> to hear the Service of Song, but were just one minute and a half too late, as we found the door of the chapel obdurately closed; so we went back to the <placeName ref="#Randolph_Hotel">Randolph</placeName> and stayed until it was train time. We had a saloon carriage going and coming, and had dinner baskets for coming home - as we were not due until 9 o'clock. <persName ref="#Rhys_John_Sir">Principal Rhys</persName> and his <persName ref="#Rhys_Elspeth_Hughes_Davies">wife</placeName>, and a nice fellow <persName ref="#Hodgson_Richard">Mr. Hodgson</persName> were at the lunch.</p>
+        <p>We went out to <placeName ref="#Oxford">Oxford</placeName> today, taking <persName ref="#Rathbone_Mr">Mr. Rathbone</persName> with us, and lunched at <placeName ref="#Queens_Hall">Queens</placeName> with <persName ref="#Sayce_Archibald">Mr. Sayce</persName>. We saw <placeName ref="#Magdalen_College">Magdalene</placeName>, <placeName ref="#Christ_College">Christ</placeName>, <placeName ref="#New_College">New <pb n="106"/> College</placeName> and <placeName ref="#St_Johns_College">St. Johns</placeName> - and went down to the river in the afternoon to see the races. It was such a pretty sight - the day was so warm - the country so lovely - the Thorns all in bloom as well as the chestnuts. We went to the <placeName ref="#Balliol_Barge">Baliel barge</placeName> to see the boats - and had tea there - then back to <placeName ref="#Magdalen_College">Magdalen</placeName> to hear the Service of Song, but were just one minute and a half too late, as we found the door of the chapel obdurately closed; so we went back to the <name type="hotel" ref="#Randolph_Hotel">Randolph</name> and stayed until it was train time. We had a saloon carriage going and coming, and had dinner baskets for coming home - as we were not due until 9 o'clock. <persName ref="#Rhys_John_Sir">Principal Rhys</persName> and his <persName ref="#Rhys_Elspeth_Hughes_Davies">wife</persName>, and a nice fellow <persName ref="#Hodgson_Richard">Mr. Hodgson</persName> were at the lunch.</p>
       </div>
       <div xml:id="EBA-1905-05-27" type="entry">
         <dateline>
