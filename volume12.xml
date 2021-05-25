@@ -6,10 +6,8 @@
   <teiHeader>
     <fileDesc>
       <titleStmt>
-        <title>Diary of Mrs. Emma B. Andrews. Volume 17 1912-1913</title> <!-- replace with correct volume -->
-        <author>
+        <title>Diary of Mrs. Emma B. Andrews. Volume 12 1904-1905</title> 
           <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
-        </author>
         <respStmt>
           <resp>Originally prepared by</resp>
           <persName ref="#SLK">Sarah L. Ketchley</persName>
@@ -24,7 +22,13 @@
         </respStmt>
         <respStmt>
           <resp>transcription</resp>
-          <persName>name name</persName> <!-- replace with correct names -->
+          <persName ref="#SJ">Sarah Johnson</persName>
+          <persName ref="#CC">Chelsea Cooper</persName>
+          <persName ref="#AF">Ariella Fish</persName>
+          <persName ref="#JG">Janice Garr</persName>
+          <persName ref="#MR">Megan Rowland</persName>
+          <persName ref="#AS">Allison Skinner</persName>
+          <persName ref="#TC">Tessa Carter</persName>
         </respStmt>
         <respStmt>
           <resp>proofreading and tagging</resp>
@@ -90,8 +94,8 @@
     <revisionDesc> <!-- update this with major revision list-->
       <list>
         <item>
-          <date when="2021-05-08">8 May 2021</date> Last checked by SLK. Updated header, fixed
-          placeName and name tags.</item>
+          <date when="2021-05-25">25 May 2021</date> Last checked by SLK. Updated header, fixed
+          placeName and name tags. Ran XSLT script.</item>
       </list>
     </revisionDesc>
   </teiHeader>
