@@ -7,7 +7,9 @@
     <fileDesc>
       <titleStmt>
         <title>Diary of Mrs. Emma B. Andrews. Volume 12 1904-1905</title> 
-          <author ref="#Andrews_Emma_B">Emma B. Andrews</author>
+          <author> 
+          <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
+          </author>
         <respStmt>
           <resp>Originally prepared by</resp>
           <persName ref="#SLK">Sarah L. Ketchley</persName>
