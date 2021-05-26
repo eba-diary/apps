@@ -21,7 +21,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             {
                 m.Column("ParentSchema_Id");
                 m.ForeignKey("FK_SchemaRevision_Schema");
-                //m.Cascade(Cascade.All);
                 m.Class(typeof(FileSchema));
             });
 

@@ -12,8 +12,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Table("DatasetFile");
 
-            this.Cache((c) => c.Usage(CacheUsage.ReadWrite));
-
             this.Id((x) => x.DatasetFileId, (m) =>
             {
                 m.Column("DatasetFile_ID");
