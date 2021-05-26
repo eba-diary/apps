@@ -20,8 +20,7 @@ namespace Sentry.data.Infrastructure
     public class GoogleApiProvider : BaseHttpsProvider, IGoogleApiProvider
     {
         private readonly Lazy<IJobService> _jobService;
-        private bool _hasNext = false;
-        private string _nextVal = "0";
+        private readonly string _nextVal = "0";
         protected bool _IsTargetS3;
         protected string _targetPath;
 
@@ -220,8 +219,6 @@ namespace Sentry.data.Infrastructure
         {
             IRestResponse resp;
 
-            //JToken next = null;
-
             resp = _providerPolicy.Execute(() =>
             {
                 IRestResponse response = _client.Execute(Request);
@@ -241,18 +238,6 @@ namespace Sentry.data.Infrastructure
                 _job.JobLoggerMessage("Error", "failed_request", resp.ErrorException);
                 throw new HttpListenerException((int)resp.StatusCode, resp.Content);
             }
-
-            //JObject x = JObject.Parse(resp.Content);
-            
-            //JArray report = (JArray)x["reports"];
-            
-            //TODO: Revisit when GOOGLEAPI data source needs paging implemented
-            //next = report[0]["nextPageToken"];
-            //if (next != null)
-            //{
-            //    _hasNext = true;
-            //    _nextVal = next.ToString();
-            //}
 
             return resp;
         }

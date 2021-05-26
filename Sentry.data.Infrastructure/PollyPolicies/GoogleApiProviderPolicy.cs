@@ -5,7 +5,6 @@ using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Interfaces;
 using System;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure.PollyPolicies
 {

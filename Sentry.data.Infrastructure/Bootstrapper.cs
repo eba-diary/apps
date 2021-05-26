@@ -122,7 +122,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
             registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
-            //registry.For<RestSharp.IRestClient>().Use<RestSharp.RestClient>().Transient();
+            registry.For<RestSharp.IRestClient>().Use(() => new RestSharp.RestClient()).AlwaysUnique();
 
             //establish generic httpclient singleton to be used where needed across the application
             var client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true });
@@ -133,11 +133,14 @@ namespace Sentry.data.Infrastructure
                 Ctor<HttpClient>().Is(client).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("SaidAssetBaseUrl"));
 
+            //establish Polly Policy registry
             PolicyRegistry pollyRegistry = new PolicyRegistry();
             registry.For<IReadOnlyPolicyRegistry<string>>().Singleton().Use(pollyRegistry);
             registry.For<IPolicyRegistry<string>>().Singleton().Use(pollyRegistry);
 
+            //register polly policies
             registry.For<IPollyPolicy>().Singleton().Add<ApacheLivyProviderPolicy>();
+            registry.For<IPollyPolicy>().Singleton().Add<GoogleApiProviderPolicy>();
 
             //establish httpclient specific to ApacheLivyProvider
             var apacheLivyClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });

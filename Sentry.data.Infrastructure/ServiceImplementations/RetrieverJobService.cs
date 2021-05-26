@@ -27,7 +27,6 @@ namespace Sentry.data.Infrastructure
         private IFtpProvider _ftpProvider;
         private IDatasetContext _requestContext;
         private IJobService _jobService;
-        private string _tempFile;
         private readonly List<KeyValuePair<string, string>> _dropLocationTags = new List<KeyValuePair<string, string>>()
         {
             new KeyValuePair<string, string>("ProcessingStatus","NotStarted")
