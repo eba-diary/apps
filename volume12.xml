@@ -6,8 +6,8 @@
   <teiHeader>
     <fileDesc>
       <titleStmt>
-        <title>Diary of Mrs. Emma B. Andrews. Volume 12 1904-1905</title> 
-          <author> 
+        <title>Diary of Mrs. Emma B. Andrews. Volume 12 1904-1905</title>
+          <author>
           <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
           </author>
         <respStmt>
@@ -34,7 +34,7 @@
         </respStmt>
         <respStmt>
           <resp>proofreading and tagging</resp>
-          <persName ref="#OH">Olivia Hyre</persName> 
+          <persName ref="#OH">Olivia Hyre</persName>
           <persName ref="#HB">Hannah Burrows</persName>
           <persName ref="#MT">Molly Taylor</persName>
         </respStmt>
@@ -159,7 +159,7 @@
             ref="#Hanser_Mr #Hanser_Mrs">Mr. and Mrs. Hanser</persName>. The <persName ref="#McKeever_Misses">McKeever
             girls</persName> came to lunch with us - and then went back to the boat, bound for
             <placeName ref="#Genoa">Genoa</placeName> and <placeName ref="#St_Moritz">St.
-            Moritz</placeName>. The <persName ref="#Longfellow_Mr #Longfellow_Mrs">Longfellows</persName>, and
+            Moritz</placeName>. The <persName ref="#Longfellow_Ernest #Longfellow_Mrs">Longfellows</persName>, and
             <persName ref="#Hale_Miss">Miss Hale</persName> are<pb n="55"/> here - and the
             <persName ref="#Kissel_Mr #Kissel_Mrs">Kissels</persName> - and the 2 boys <persName
             ref="#Smith_Harold">Smith</persName> and <persName ref="#Ream_Robert_Clarke"
@@ -687,7 +687,7 @@
           surroundings, natives decline working for him - and steal almost everything he has -
           assistants leave him etc. So it was feared that the every interesting work at the
             <placeName ref="#Mentuhotep_Mortuary_Temple">Mentuhotep temple</placeName> would have to
-          stop for a time. The <persName ref="#Naville_Mme #Naville_Edouard">Navilles</persName> go
+          stop for a time. The <persName ref="#Naville_Edouard #Naville_Mme">Navilles</persName> go
           over there to stay, tomorrow, in the fine house the German Government has built there and
           I was so amused when he replied to <persName ref="#Davis_Theodore_M">Theodore's</persName>
           question of "Are you quite alone there?" "Practically yes - there is a G&#246;ttingen man
@@ -1067,7 +1067,7 @@
             ref="#Hardy_Jean #Wilson_Alice">the girls</persName> went to the <placeName
             ref="#Valley_of_the_Kings">Valley</placeName> again - <persName ref="#Weigall_Arthur"
             >Weigall</persName> came back with them and had tea. He still sleeps at the tomb.
-            <persName ref="#Naville_Edouard, #Naville_Mme">M. and Mme. Naville</persName> to tea.
+            <persName ref="#Naville_Edouard #Naville_Mme">M. and Mme. Naville</persName> to tea.
             <persName ref="#Sayce_Archibald">Mr. Sayce</persName> dined with us. He starts down on
           Monday. We start for <placeName ref="#Aswān">Asw&#226;n</placeName> tomorrow - I don't
           know for what unless to give <persName ref="#Davis_Theodore_M">Theodore</persName> a rest.
@@ -1205,7 +1205,8 @@
           today. There were several policemen - and <persName ref="#Quibell_James">Mr.
             Quibell</persName> and a force will sleep there tonight. <persName ref="#Ayrton_Edward"
             >Ayrton</persName> came to dine. I had expected <persName ref="#Buchanan_Carrie">Miss
-            Buchanan</persName> and <persName ref="#Nubaweeya">Nubaweeya</persName> to tea this
+            Buchanan</persName> and <persName ref="#Nubeewya"><choice><sic>Nubaweeya</sic>
+            <corr>Nubeewya</corr></choice></persName> to tea this
           afternoon and was so disappointed that they were<pb n="83"/> prevented. <persName
             ref="#Lacau_M">M. Lacau</persName> was here however, and <persName ref="#Insinger_Miss"
             >Miss Insinger</persName>. To tea with <persName ref="#Buchanan_Carrie">Miss
@@ -1221,7 +1222,7 @@
             >Forbes-Leiths</persName>, who are coming to dine tonight. <persName
             ref="#Davis_Theodore_M">Theo</persName> has arranged with the Sugar Co. of <placeName
             ref="#Nag_Hammadi">Nag Hamadi</placeName>, to give us a tug on the 8th. We have had a
-          charming dinner - <persName ref="#Forbes_Leith_Mrs.">Mrs. Forbes-Leith</persName> -
+          charming dinner - <persName ref="#Forbes_Leith_Mrs">Mrs. Forbes-Leith</persName> -
             <persName ref="#Burn_Colonel #Burn_Mrs">Col. and Mrs. Burn</persName> (her daughter and
           son-in-law) and <persName ref="#Tweedah_Mrs.">Mrs. Tweedah</persName>. They were delighted
           with everything here. We get off tomorrow. </p>
@@ -1281,7 +1282,7 @@
             >Balliana</placeName>, where were lying the <name type="boat" ref="#Sabiha"
             >Sabiha</name> with <persName ref="#Campbell_Dr #Campbell_Mrs">the
           Campbells</persName>, and the <name type="boat" ref="#Zenet-el-Nil">Zenet-el-Nil</name>
-          with <persName ref="#Bird_title">the Birds</persName> - we had only time to wave to them
+          with <persName ref="#Bird_Group">the Birds</persName> - we had only time to wave to them
           as we rushed by. Then came <placeName ref="#Jirjā">Girga</placeName> - and then <placeName
           ref="#Khārifat_al_Minshāh">Menshia</placeName> appeared as if by magic - then<pb n="85"/>
           we were upon <placeName ref="#Akhmīm">Akmim</placeName> - and about 5:30 pulled up at
@@ -1465,7 +1466,7 @@
             </choice> 25.</date>
         </dateline>
         <p>At <placeName ref="#Boulaq_Museum">the Museum</placeName> this morning - <persName
-            ref="#Davis_Theodore_M">Theo</persName> showed <persName ref="#Burn_Mrs.">Mrs.
+            ref="#Davis_Theodore_M">Theo</persName> showed <persName ref="#Burn_Mrs">Mrs.
             Burn</persName> about - as she was not able to be with her mother and father, <persName
             ref="#Forbes-Leith_Admiral #Forbes-Leith_Mrs">Admiral and Mrs. Forbes Leith</persName>
           the other day, when they saw the things. She went from there to the train, as they all
@@ -1483,21 +1484,21 @@
           seemed tired and dull - without his old sparkle. He sails on Thursday for 2<pb n="90"/>
           months in <placeName ref="#United_States_of_America">America</placeName>.</p>
       </div>
-      <div xml:id="EBA-1905-03-28" type="entry">
+      <div xml:id="EBA-1905-03-27" type="entry">
         <dateline>
-          <date when="1905-03-28">Monday, Mar. 28th.</date>
+          <date when="1905-03-27">Monday, Mar. <choice><sic>28th</sic><corr>27th</corr></choice></date>
         </dateline>
         <p>This has been a busy day - in town in the morning - <persName ref="#Hardy_Jean"
             >Jean</persName> and <persName ref="#Wilson_Alice">Alice</persName> to the <persName
             ref="#Lindon_Smith_Joseph #Lindon_Smith_Corinna">Lindon-Smiths</persName> to lunch.
-            <persName ref="#Newman_Mr #Newman_Mrs.">Mr. and Mrs. Newman</persName> in the afternoon
+            <persName ref="#Newman_Mr #Newman_Mrs">Mr. and Mrs. Newman</persName> in the afternoon
           came in and after that we all went to <persName ref="#Morgan_Miss">Miss
           Morgan</persName>'s garden reception - which was charming - a delightful band playing and
           many people we knew. A quiet evening - our last on the boat.</p>
       </div>
-      <div xml:id="EBA-1905-03-29" type="entry">
+      <div xml:id="EBA-1905-03-28" type="entry">
         <dateline>
-          <date when="1905-03-29">Tuesday, Mar. 29th.</date>
+          <date when="1905-03-28">Tuesday, Mar. <choice><sic>29th</sic><corr>28th</corr></choice>.</date>
         </dateline>
         <p>To <placeName ref="#Boulaq_Museum">the Museum</placeName> with <persName
             ref="#Davis_Theodore_M">Theodore</persName> - the room with the "find" is now open to
@@ -1507,9 +1508,9 @@
             Sandwith</persName> also go on it. Left the boat for the Hotel and are now up at the
             <placeName ref="#Ghezireh_Palace_Hotel">Ghezireh Palace</placeName>.</p>
       </div>
-      <div xml:id="EBA-1905-03-30" type="entry">
+      <div xml:id="EBA-1905-03-29" type="entry">
         <dateline>
-          <date when="1905-03-30">Wednesday, Mar. 30th.</date>
+          <date when="1905-03-29">Wednesday, Mar. <choice><sic>30th</sic><corr>29th</corr></choice>.</date>
         </dateline>
         <p><persName ref="#Hardy_Jean">Jean</persName> and <persName ref="#Wilson_Alice"
             >Alice</persName> dined in town with <persName ref="#Peckitt_Reginald #Peckitt_Amelia">
@@ -1518,12 +1519,13 @@
             ref="#Lindon_Smith_Corinna">wife</persName> dined with us and we all went in to the
             concert at <name type="hotel" ref="#Shepheards_Hotel">Shepheards</name>.</p>
       </div>
-      <div xml:id="EBA-1905-03-31" type="entry">
+      <div xml:id="EBA-1905-03-30" type="entry">
         <dateline>
-          <date when="1905-03-31">Thursday, Mar. 31st</date>. </dateline>
+          <date when="1905-03-30">Thursday, Mar. <choice><sic>31st</sic><corr>30th</corr></choice>.</date>
+        </dateline>
         <p><persName ref="#Wilson_Alice">Alice</persName> and I spent the morning at the Zoo. After
-          the rain of last night the gardens were lovely. <persName ref="#Lackau_Mr.">Monsieur
-            Lackau</persName> dined with us.<pb n="91"/></p>
+          the rain of last night the gardens were lovely. <persName ref="#Lacau_M">Monsieur<choice><sic>
+            Lackau</sic><corr>Lacau</corr></choice></persName> dined with us.<pb n="91"/></p>
       </div>
 
       <!-- Olivia Myhre -->
@@ -1659,7 +1661,8 @@
             ref="#Castello_Sforzesco">Castello</placeName>, which they have been much restoring
           these past 2 years. It is quite a wonderful place, as building - old fortress, castle etc.
           They are rebuilding and restoring on exactly the old lines. A store of beautiful things to
-          see, especially the recumbent figure of <persName ref="#Gaston_de_Foix">Caston le
+          see, especially the recumbent figure of <persName ref="#Gaston_de_Foix"><choice><sic>Caston
+          </sic><corr>Gaston</corr></choice> le
             Foix</persName> on his tomb by <persName ref="#Agostino_Busti">Bambaja</persName>. Today
           we went to <placeName ref="#Bergamo">Bergamo</placeName>, in spite of the threatening
           weather. We took 2 hours going, and the same time coming back, in a veritable omnibus
@@ -1862,7 +1865,7 @@
           saying we would find him in <placeName ref="#Paris">Paris</placeName> when we arrived. We
           all went to the <placeName ref="#Gallerie_dell_Accademia">Academia</placeName> this
           morning - then to the <placeName ref="#Giardino_delle_Rose">Rose garden</placeName> - and
-          brought home some lovely roses. <persName ref="#Newman_Mr #Newman_Mr">Mr. and Mrs.
+          brought home some lovely roses. <persName ref="#Newman_Mr #Newman_Mrs">Mr. and Mrs.
             Newman</persName> and <persName ref="#Buttles_Lizzie">Lizzie</persName> to lunch, and
             <persName ref="#Hardy_Jean #Wilson_Alice">the girls</persName> as well as <persName
             ref="#Smith_Harold">Harold Smith</persName> and <persName ref="#Ream_Robert_Clarke">Bob
@@ -1919,11 +1922,11 @@
           weather, but cold, gusty winds.<persName ref="#Newberry_Percy">Mr. Newberry</persName>
           came to lunch, and after <persName ref="#Rathbone_Mr">Mr. Rathbone</persName>, bringing me
           most lovely roses. In, all the afternoon. Today we have been shopping and driving, lunched
-          with <persName ref="#Farrer_William_Sir">Sir WIlliam Farrer</persName> - he looking so
+          with <persName ref="#Farrer_William_Sir">Sir William Farrer</persName> - he looking so
           well - and so bright<pb n="103"/> and charming - but grown quite deaf. <persName
             ref="#Watson_Colonel">Col. Watson</persName> was there. <persName ref="#Farrer_Gaspard"
             >Gaspard Farrer</persName> dined with us - also <persName ref="#Cary_Elwes_Gervase">Mr.
-            Cary-Elwes</persName> and <persName ref="#Cary-Elwes_Winifred_Lady">Lady
+            Cary-Elwes</persName> and <persName ref="#Cary_Elwes_Winifred_Lady">Lady
             Winifred</persName> - who took <persName ref="#Hardy_Jean">Jean</persName> and <persName
             ref="#Johnson_Cecile_Davis_de_Lagarde">C&#233;cile</persName> on to a concert at a
           private house.</p>
@@ -1987,7 +1990,7 @@
             ref="#Rathbone_Mr">Mr. Rathbone</persName> and <persName ref="#Landon_Perceval">Percival
             Landon</persName>-- who was the special correspondent of the <bibl><title>"Times"</title></bibl> with the young
           husband expedition to <placeName ref="#Tibet">Thibet</placeName>. There were also "<persName ref="#Grainger_Percy">Percy
-            Granger</persName>" a clever rising musical pianist and two lesser lights - and they
+            <choice><sic>Granger</sic><corr>Grainger</corr></choice></persName>" a clever rising musical pianist and two lesser lights - and they
           gave us some lovely music after dinner. He has the most extraordinary facility with the
           piano, and makes most novel and unheard of harmonies. <persName
             ref="#de_Trafford_Agnes_Mary_Pia_Fielding_Lady">Lady Agnes de Trafford</persName> came
