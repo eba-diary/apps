@@ -75,7 +75,7 @@ namespace Sentry.data.Web.Controllers
                     CanModifyNotifications = _notificationService.CanUserModifyNotifications()
                 };
 
-                return View("ManageNotification", vm);
+                return Redirect("/Notification/ManageNotification");
             }
 
             List<SelectListItem> AreaList = new List<SelectListItem>();
