@@ -42,7 +42,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Inverse(true);
                 m.Table("SchemaField");
                 m.Cascade(Cascade.All);
-                m.Cache(c => c.Usage(CacheUsage.ReadWrite));
                 m.Key((k) =>
                 {
                     k.Column("ParentSchemaRevision");
