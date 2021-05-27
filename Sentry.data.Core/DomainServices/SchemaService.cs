@@ -397,6 +397,12 @@ namespace Sentry.data.Core
                 chgDetected = true;
             }
 
+            if (schema.CLA3014_LoadDataToSnowflake != dto.CLA3014_LoadDataToSnowflake)
+            {
+                schema.CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake;
+                chgDetected = true;
+            }            
+
 
             if (chgDetected)
             {
@@ -472,9 +478,13 @@ namespace Sentry.data.Core
 
         public List<BaseFieldDto> GetBaseFieldDtoBySchemaRevision(int revisionId)
         {
-            SchemaRevision revision = _datasetContext.SchemaRevision.FirstOrDefault(w => w.SchemaRevision_Id == revisionId);
+            //Perform fetch of children is needed to prevent n+1 when sending to ToDto()
+            List<BaseField> fileList = _datasetContext.BaseFields.Where(w => w.ParentSchemaRevision.SchemaRevision_Id == revisionId).Fetch(f => f.ChildFields).OrderBy(o => o.OrdinalPosition).ToList();
 
-            return revision.Fields.Where(w => w.ParentField == null).OrderBy(o => o.OrdinalPosition).ToList().ToDto();
+            //ToDto() assumes only root level columns are in the initial list, therefore, we filter on where ParentField == null.
+            // This does not produce any n+1 scenario since the child fields have been loaded into memory already, therefore, .net does not need to go back to database
+            List<BaseFieldDto> dtoList = fileList.Where(w => w.ParentField == null).ToList().ToDto();
+            return dtoList;
         }
 
         public SchemaRevisionDto GetLatestSchemaRevisionDtoBySchema(int schemaId)
@@ -617,23 +627,24 @@ namespace Sentry.data.Core
             return dicRows;
         }
 
-        public bool RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent)
+        public void RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent)
         {
             if (objectKey == null)
             {
                 Logger.Debug($"schemaservice-registerrawfile no-objectkey-input");
-                return false;
+                throw new ArgumentException("schemaservice-registerrawfile no-objectkey-input");
             }
 
             if (schema == null)
             {
                 Logger.Debug($"schemaservice-registerrawfile no-schema-input");
-                return false;
+                throw new ArgumentException("schemaservice-registerrawfile no-schema-input");
             }
 
             if (stepEvent == null)
             {
                 Logger.Debug($"schemaservice-registerrawfile no-stepevent-input");
+                throw new ArgumentException("schemaservice-registerrawfile no-stepevent-input");
             }
 
             try
@@ -666,11 +677,8 @@ namespace Sentry.data.Core
             catch(Exception ex)
             {
                 Logger.Error($"schemaservice-registerrawfile-failed", ex);
-
-                return false;
-            }           
-
-            return true;
+                throw;
+            }
         }
 
         private void MapToDatasetFile(DataFlowStepEvent stepEvent, string fileKey, string fileVersionId, DatasetFile file)
@@ -728,6 +736,7 @@ namespace Sentry.data.Core
                 CLA1580_StructureHive = dto.CLA1580_StructureHive,
                 CLA2472_EMRSend = dto.CLA2472_EMRSend,
                 CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag,
+                CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake,
                 ObjectStatus = dto.ObjectStatus
             };
             _datasetContext.Add(schema);
@@ -767,7 +776,8 @@ namespace Sentry.data.Core
                 CLA1396_NewEtlColumns = scm.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = scm.CLA1580_StructureHive,
                 CLA2472_EMRSend = scm.CLA2472_EMRSend,
-                CLA1286_KafkaFlag = scm.CLA1286_KafkaFlag
+                CLA1286_KafkaFlag = scm.CLA1286_KafkaFlag,
+                CLA3014_LoadDataToSnowflake = scm.CLA3014_LoadDataToSnowflake
             };
 
         }
