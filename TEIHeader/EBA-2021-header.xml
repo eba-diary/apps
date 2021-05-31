@@ -30,6 +30,10 @@
                <resp>proofreading and tagging</resp>
                <persName ref="#XXXX">name name</persName> <!-- replace with correct names -->
             </respStmt>
+            <respStmt>
+                    <resp>biographical research and writing</resp> 
+                    <persName ref="#XX">name name</persName> <!-- replace with correct names -->
+            </respStmt>
          </titleStmt>
          <publicationStmt>
             <publisher>
