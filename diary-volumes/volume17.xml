@@ -114,6 +114,7 @@
                 <item>
                     <date when="2021-05-08">8 May 2021</date> Last checked by SLK. Updated header,
                     fixed placeName and name tags.</item>
+                    <item><date when="2021-05-30">30 May 2021</date> Last checked by SLK. Minor semantic edits, updated list of biographers.</item>
             </list>
         </revisionDesc>
     </teiHeader>
