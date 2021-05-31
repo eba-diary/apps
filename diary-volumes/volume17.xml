@@ -41,6 +41,13 @@
                     <resp>biographical research and writing</resp>
                     <persName ref="#SK">Sarah Ketchley</persName>
                     <persName ref="#JJ">Jasmine Jones</persName>
+                    <persName ref="#JC">Jasmine Choi</persName>
+                    <persName ref="#SR">Samuel Roller</persName>
+                    <persName ref="#AAD">Avery Dahl</persName>
+                    <persName ref="#AD">Avneet Dhaliwal</persName>
+                    <persName ref="#IH">Iona Hillman</persName>
+                    <persName ref="#LK">Lexi Kinzer</persName>
+                    <persName ref="#PH">Priya Hariharan</persName>
                 </respStmt>
             </titleStmt>
             <publicationStmt>
@@ -214,7 +221,7 @@
                     the voyage! Are in our pleasant old rooms, overlooking the garden &#8211; the
                     weather is perfect.</p>
             </div>
-            <div xml:id="EBA" type="entry">
+            <div xml:id="EBA-1910-11-14" type="entry">
                 <dateline>
                     <date when="1910-11-14">Monday. Nov. 14th.</date>
                 </dateline>
