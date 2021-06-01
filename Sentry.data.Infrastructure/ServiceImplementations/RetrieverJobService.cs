@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core;
+using Sentry.data.Core.Exceptions;
 using StructureMap;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,6 @@ namespace Sentry.data.Infrastructure
         private IFtpProvider _ftpProvider;
         private IDatasetContext _requestContext;
         private IJobService _jobService;
-        private string _tempFile;
         private readonly List<KeyValuePair<string, string>> _dropLocationTags = new List<KeyValuePair<string, string>>()
         {
             new KeyValuePair<string, string>("ProcessingStatus","NotStarted")
@@ -393,6 +393,10 @@ namespace Sentry.data.Infrastructure
             {
                 Logger.Info($"Retriever Job Cancelled - Job:{JobId}");
                 throw;
+            }
+            catch (RetrieverJobProcessingException ex)
+            {
+                Logger.Error($"Retriever Job Failed - Job:{JobId} processing_failed", ex);
             }
             catch (Exception ex)
             {

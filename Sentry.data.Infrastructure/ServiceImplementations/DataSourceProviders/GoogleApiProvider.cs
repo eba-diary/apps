@@ -3,9 +3,12 @@ using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
+using Polly;
+using Polly.Registry;
 using RestSharp;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
+using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,16 +19,23 @@ namespace Sentry.data.Infrastructure
 {
     public class GoogleApiProvider : BaseHttpsProvider, IGoogleApiProvider
     {
-        private IJobService _jobService;
-        private bool _hasNext = false;
-        private string _nextVal = "0";
+        private readonly Lazy<IJobService> _jobService;
+        private readonly string _nextVal = "0";
         protected bool _IsTargetS3;
         protected string _targetPath;
 
-        public GoogleApiProvider(IDatasetContext datasetContext,
-            IConfigService configService, IEncryptionService encryptionService, IJobService jobService) : base(datasetContext, configService, encryptionService)
+        public GoogleApiProvider(Lazy<IDatasetContext> datasetContext,
+            Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService, 
+            Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry,
+            IRestClient restClient) : base(datasetContext, configService, encryptionService, restClient)
         {
             _jobService = jobService;
+            _providerPolicy = policyRegistry.Get<ISyncPolicy>(PollyPolicyKeys.GoogleAPiProviderPolicy);
+        }
+
+        protected IJobService JobService
+        {
+            get { return _jobService.Value; }
         }
 
         protected override void ConfigureClient()
@@ -209,26 +219,25 @@ namespace Sentry.data.Infrastructure
         {
             IRestResponse resp;
 
-            JToken next = null;
+            resp = _providerPolicy.Execute(() =>
+            {
+                IRestResponse response = _client.Execute(Request);
 
-            resp = _client.Execute(_request);
+                if (response.ErrorException != null)
+                {
+                    const string message = "Error retrieving response";
+                    var ex = new RetrieverJobProcessingException(message, response.ErrorException);
+                    throw ex;
+                }
+
+                return response;
+            });
+
             if (resp.StatusCode != HttpStatusCode.OK)
             {
                 _job.JobLoggerMessage("Error", "failed_request", resp.ErrorException);
                 throw new HttpListenerException((int)resp.StatusCode, resp.Content);
             }
-
-            JObject x = JObject.Parse(resp.Content);
-            
-            JArray report = (JArray)x["reports"];
-            
-            //TODO: Revisit when GOOGLEAPI data source needs paging implemented
-            //next = report[0]["nextPageToken"];
-            //if (next != null)
-            //{
-            //    _hasNext = true;
-            //    _nextVal = next.ToString();
-            //}
 
             return resp;
         }
@@ -272,13 +281,13 @@ namespace Sentry.data.Infrastructure
 
                 DateTime newTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(double.Parse(expires_in.ToString()))).TotalSeconds);
 
-                bool result = _configService.UpdateandSaveOAuthToken(source, accessToken.ToString(), newTokenExp);
+                bool result = ConfigService.UpdateandSaveOAuthToken(source, accessToken.ToString(), newTokenExp);
 
                 return accessToken.ToString();
             }
             else
             {
-                return _encryptionService.DecryptString(source.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+                return EncryptionService.DecryptString(source.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
             }
         }
 
@@ -314,9 +323,9 @@ namespace Sentry.data.Infrastructure
 
             byte[] bytesToSign = Encoding.UTF8.GetBytes(stringToSign);
 
-            string x = _encryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+            string x = EncryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
 
-            byte[] keyBytes = Convert.FromBase64String(_encryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey));
+            byte[] keyBytes = Convert.FromBase64String(EncryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey));
 
             var asymmetricKeyParameter = PrivateKeyFactory.CreateKey(keyBytes);
             var rsaKeyParameter = (RsaKeyParameters)asymmetricKeyParameter;
@@ -375,7 +384,7 @@ namespace Sentry.data.Infrastructure
         protected override void FindTargetJob()
         {
             //Find appropriate drop location (S3Basic or DfsBasic)
-            _targetJob = _jobService.FindBasicJob(_job);
+            _targetJob = JobService.FindBasicJob(_job);
 
             _IsTargetS3 = _targetJob.DataSource.Is<S3Basic>();
         }

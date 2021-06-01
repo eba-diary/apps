@@ -14,8 +14,9 @@ namespace Sentry.data.Infrastructure
         protected bool _IsTargetS3;
         protected string _targetPath;
 
-        public GenericHttpsProvider(IDatasetContext datasetContext,
-            IConfigService configService, IEncryptionService encryptionService, IJobService jobService) : base(datasetContext, configService, encryptionService)
+        public GenericHttpsProvider(Lazy<IDatasetContext> datasetContext,
+            Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService, 
+            IJobService jobService, IRestClient restClient) : base(datasetContext, configService, encryptionService, restClient)
         {
             _jobService = jobService;
         }
