@@ -539,7 +539,6 @@ namespace Sentry.data.Core
         public List<Dictionary<string, object>> GetTopNRowsByConfig(int id, int rows)
         {
             DatasetFileConfig config = _datasetContext.DatasetFileConfigs.Where(w => w.ConfigId == id).FirstOrDefault();
-            _snowProvider.GetTopNRows();    //GORDON: TODO AUSTIN REMOVE
             if (config == null)
             {
                 throw new SchemaNotFoundException("Schema not found");
@@ -587,14 +586,13 @@ namespace Sentry.data.Core
 
             FileSchemaDto schemaDto = GetFileSchemaDto(id);
 
-            string hiveView = $"vw_{schemaDto.HiveTable}";
+#if (DEBUG)
+            schemaDto.SnowflakeDatabase = "DATA_QUAL";
+#endif
+            string vwVersion = "vw_" + schemaDto.SnowflakeTable;
+            bool tableExists = _snowProvider.CheckIfExists(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion);     //Does table exist
 
-            //Get connection object
-            OdbcConnection connection = _hiveOdbcProvider.GetConnection(schemaDto.HiveDatabase);
-
-            //Does table exist
-            bool tableExists = _hiveOdbcProvider.CheckViewExists(connection, hiveView);
-
+            
             //If table does not exist
             if (!tableExists)
             {
@@ -602,8 +600,8 @@ namespace Sentry.data.Core
             }
 
             //Query table for rows
-            System.Data.DataTable result = _hiveOdbcProvider.GetTopNRows(_hiveOdbcProvider.GetConnection(schemaDto.HiveDatabase), hiveView, rows);
-            
+            System.Data.DataTable result = _snowProvider.GetTopNRows(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion, rows);    //GORDON: TODO AUSTIN REMOVE
+
             List<Dictionary<string, object>> dicRows = new List<Dictionary<string, object>>();
             Dictionary<string, object> dicRow = null;
             foreach (System.Data.DataRow dr in result.Rows)
@@ -611,8 +609,7 @@ namespace Sentry.data.Core
                 dicRow = new Dictionary<string, object>();
                 foreach (System.Data.DataColumn col in result.Columns)
                 {
-                    //R
-                    string colName = col.ColumnName.Split('.')[1];
+                    string colName = col.ColumnName;
                     dicRow.Add(colName, dr[col]);
                 }
                 dicRows.Add(dicRow);

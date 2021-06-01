@@ -701,6 +701,8 @@
             }
     };
 
+
+        //DATA PREVIEW DATA TABLE SETUP
         function renderTable_v2(input, push) {
 
             //remove table DOM if needed
@@ -712,16 +714,26 @@
             var parsedColumns = [];
             var nullColumns = [];
 
-            //   Remove existing column metadata
+            //Remove existing column metadata
             $('#tableColumnIDs').empty();
             $('#tableFirstRow').empty();
             $('#datasetRowTable tbody').empty();
 
-            //Get first row to parse columns
+            //SETUP ALL COLUMNS for DATA PREVIEW
             Object.keys(input[0]).forEach(function (key)
             {
                 nullColumns.push(null);
-                parsedColumns.push({ 'title': key.trim(), 'width': "auto" });
+
+                //load up ARRAY with each column
+                //CUSTOM RENDER will wrap column data in DIV which adds a scroll bar if needed since STRUCT columns are HUGE
+                parsedColumns.push({
+                    'title': key.trim(), 'width': "auto", render: function (d)
+                    {
+                        var me = "<div style='max-height:100px; overflow-y: auto;'>" + d + "</div>"; 
+                        return me;
+                    }
+                });
+
                 $('#tableColumnIDs').append("<th>" + key.trim() + "</th>");
                 $('#tableFirstRow').append("<td></td>");
             });
@@ -732,12 +744,7 @@
                 var parsedCells = [];
 
                 for (var key of Object.keys(row)) {
-                    if (row[key] != null) {
-                        parsedCells.push(row[key].trim());
-                    }
-                    else {
-                        parsedCells.push(row[key]);
-                    }
+                    parsedCells.push(row[key]);
                 }
 
                 if (parsedCells.length >= 1) {
@@ -748,6 +755,9 @@
             if (!push) {
                 table = $('#datasetRowTable').DataTable({
                     "scrollX": true,
+                    "autoWidth": true,
+                    "scrollY": "1200px",                //set max height at 1200
+                    "scrollCollapse": true,             //if less then 1200, shrink so no white space
                     data: parsedRows,
                     columns: parsedColumns,
                 });
@@ -1007,7 +1017,8 @@
                     self.DataFlows.notifySubscribers();
 
                     //Determine last
-                    var d = new Date(result.DataLastUpdated);
+                    //var d = new Date(result.DataLastUpdated);  //TODO: uncomment when done tGORDON AUSTIN
+                    var d = new Date('2021-01-01');  //TODO: GORDON AUSTIN
                     if (d < new Date('1990-01-01')) {
                         self.DataLastUpdated('No Data Files Exist');
                     } else {
@@ -1056,12 +1067,13 @@
                             if (msg !== undefined) {
                                 var obj = JSON.parse(msg);
                                 if (obj.length > 0) {
+
+                                    //pass data returned from AJAX call to render Data Table
                                     renderTable_v2(obj, false);
 
                                     $('#dataSection').show();
                                     self.DataLoading(false);
                                     self.DataTableExists(true);
-
                                     $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
                                 }
                                 else {

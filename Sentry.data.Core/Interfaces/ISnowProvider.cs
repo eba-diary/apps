@@ -2,9 +2,8 @@
 {
     public interface ISnowProvider
     {
-        //System.Data.DataTable GetTopNRows(OdbcConnection conn, string table, int rows);
-        void GetTopNRows();
-        //System.Security.SecureString GetSecureString(string str);
+        System.Data.DataTable GetTopNRows(string db, string schema, string table, int rows);
+        bool CheckIfExists(string db, string schema, string table);
 
     }
 }
