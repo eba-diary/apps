@@ -65,6 +65,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RestServiceGenerators", "Re
 		..\..\Users\072984\Work Folders\Downloads\SAIDRestServiceGen.ps1 = ..\..\Users\072984\Work Folders\Downloads\SAIDRestServiceGen.ps1
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.Infrastructure.Tests", "Sentry.data.Infrastructure.Tests\Sentry.data.Infrastructure.Tests.csproj", "{609CB6AA-E2C5-4EA4-904E-8CB00AEBA510}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -128,6 +130,10 @@ Global
 		{D4A2E33D-D735-4A10-B0A1-D21DEE010ECD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D4A2E33D-D735-4A10-B0A1-D21DEE010ECD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4A2E33D-D735-4A10-B0A1-D21DEE010ECD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{609CB6AA-E2C5-4EA4-904E-8CB00AEBA510}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{609CB6AA-E2C5-4EA4-904E-8CB00AEBA510}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{609CB6AA-E2C5-4EA4-904E-8CB00AEBA510}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{609CB6AA-E2C5-4EA4-904E-8CB00AEBA510}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
