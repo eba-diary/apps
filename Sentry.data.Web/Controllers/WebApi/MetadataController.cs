@@ -434,8 +434,8 @@ namespace Sentry.data.Web.WebApi.Controllers
                 SchemaRevisionDto revisiondto = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
                 if (revisiondto == null)
                 {
-                    Logger.Info($"metadataapi_getlatestschemarevisiondetail_notfound revision - datasetid:{datasetId} schemaid:{schemaId}");
-                    return Content(System.Net.HttpStatusCode.NotFound, "Schema revisions not found");
+                    Logger.Warn($"metadataapi_getlatestschemarevisiondetail no revision metadata - datasetid:{datasetId} schemaid:{schemaId}");
+                    return Ok(new SchemaRevisionDetailModel());
                 }
 
                 SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
