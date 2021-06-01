@@ -10,8 +10,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         {
             this.Table("DatasetFileConfigs");
 
-            this.Cache((c) => c.Usage(CacheUsage.ReadWrite));
-
             this.Id((x) => x.ConfigId, (m) =>
             {
                 m.Column("Config_ID");
@@ -30,7 +28,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             {
                 m.Column("Dataset_ID");
                 m.ForeignKey("FK_DatasetFileConfigs_Dataset");
-                //m.Cascade(Cascade.All);
                 m.Class(typeof(Dataset));
             });
 
@@ -54,7 +51,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Inverse(true);
                 m.Table("RetrieverJob");
                 m.Cascade(Cascade.All);
-                m.Cache(c => c.Usage(CacheUsage.ReadWrite));
                 m.Key((k) =>
                 {
                     k.Column("Config_ID");
@@ -68,7 +64,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Inverse(true);
                 m.Table("DatasetFile");
                 m.Cascade(Cascade.All);
-                m.Cache(c => c.Usage(CacheUsage.ReadWrite));
                 m.Key((k) =>
                 {
                     k.Column("DatasetFileConfig_ID");
@@ -82,7 +77,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Inverse(true);
                 m.Table("DataElement");
                 m.Cascade(Cascade.All);
-                m.Cache(c => c.Usage(CacheUsage.ReadWrite));
                 m.Key((k) =>
                 {
                     k.Column("Config_ID");

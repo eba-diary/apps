@@ -47,7 +47,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             {
                 m.Column("ParentSchemaRevision");
                 m.ForeignKey("FK_SchemaField_SchemaRevision");
-                //m.Cascade(Cascade.All);
                 m.Class(typeof(SchemaRevision));
             });
         }
