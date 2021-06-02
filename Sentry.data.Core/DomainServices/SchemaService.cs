@@ -26,13 +26,12 @@ namespace Sentry.data.Core
         private readonly ISecurityService _securityService;
         private readonly IDataFeatures _featureFlags;
         private readonly IMessagePublisher _messagePublisher;
-        private readonly IHiveOdbcProvider _hiveOdbcProvider;
         private readonly ISnowProvider _snowProvider;
         private string _bucket;
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, IHiveOdbcProvider hiveOdbcProvider, ISnowProvider snowProvider)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -42,7 +41,6 @@ namespace Sentry.data.Core
             _securityService = securityService;
             _featureFlags = dataFeatures;
             _messagePublisher = messagePublisher;
-            _hiveOdbcProvider = hiveOdbcProvider;
             _snowProvider = snowProvider;
 
         }

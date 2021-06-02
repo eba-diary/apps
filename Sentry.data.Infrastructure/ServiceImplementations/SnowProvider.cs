@@ -23,10 +23,6 @@ namespace Sentry.data.Infrastructure
 
         public bool CheckIfExists(string db, string schema, string table)
         {
-            //Logger.Debug($"start method <{System.Reflection.MethodBase.GetCurrentMethod().Name}>");
-            //Stopwatch stopWatch = new Stopwatch();
-            //stopWatch.Start();
-
             string q = BuildIfExistsQuery(db,schema,table);
             System.Data.DataTable dt = ExecuteQuery(q);
             if(dt.Rows.Count >= 1)
@@ -37,9 +33,6 @@ namespace Sentry.data.Infrastructure
             {
                 return false;
             }
-
-
-            //Logger.Debug($"end method <{System.Reflection.MethodBase.GetCurrentMethod().Name}>");
         }
 
         private string BuildSelectQuery(string db, string schema, string table, int rows)
@@ -54,6 +47,11 @@ namespace Sentry.data.Infrastructure
 
         private System.Data.DataTable ExecuteQuery(string query)
         {
+            Logger.Debug($"start method <{System.Reflection.MethodBase.GetCurrentMethod().Name}>");
+            //Stopwatch stopWatch = new Stopwatch();
+            //stopWatch.Start();
+
+
             DataTable dt;
             try
             {
@@ -69,17 +67,10 @@ namespace Sentry.data.Infrastructure
                     dt = FillDataTable(reader);
 
                     if (reader != null)
+                    {
                         reader.Close();
+                    }
                 }
-            }
-            catch (AggregateException aggEx)
-            {
-                //aggEx.Handle(inner =>
-                //{
-                //    Logger.Error("Inner aggregate execution", inner);
-                //    //return true;
-                //});
-                throw;
             }
             catch (Exception ex)
             {
@@ -87,6 +78,7 @@ namespace Sentry.data.Infrastructure
                 throw;
             }
 
+            Logger.Debug($"end method <{System.Reflection.MethodBase.GetCurrentMethod().Name}>");
             return dt;
         }
 
@@ -121,15 +113,15 @@ namespace Sentry.data.Infrastructure
             }
 
             return dt;
-
-
         }
 
         private System.Security.SecureString GetSecureString(string str)
         {
             var secureStr = new System.Security.SecureString();
             if (str.Length > 0)
+            {
                 str.ToCharArray().ToList().ForEach(f => secureStr.AppendChar(f));
+            }
             return secureStr;
         }
 
