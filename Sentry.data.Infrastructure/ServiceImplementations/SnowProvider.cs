@@ -47,11 +47,7 @@ namespace Sentry.data.Infrastructure
 
         private System.Data.DataTable ExecuteQuery(string query)
         {
-            Logger.Debug($"start method <{System.Reflection.MethodBase.GetCurrentMethod().Name}>");
-            //Stopwatch stopWatch = new Stopwatch();
-            //stopWatch.Start();
-
-
+            Logger.Info("SnowProvider.ExecuteQuery() QUERY TO BE EXECUTED:" + query); 
             DataTable dt;
             try
             {
@@ -74,11 +70,11 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Error("Unable to execute snowflake reader", ex);
+                Logger.Error("SnowProvider.ExecuteQuery() failed:" + query, ex);
                 throw;
             }
 
-            Logger.Debug($"end method <{System.Reflection.MethodBase.GetCurrentMethod().Name}>");
+            Logger.Info($"End method SnowProvider.ExecuteQuery()");
             return dt;
         }
 

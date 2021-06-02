@@ -583,10 +583,14 @@ namespace Sentry.data.Core
             }
 
             FileSchemaDto schemaDto = GetFileSchemaDto(id);
+            
+            //OVERRIDE Database in lower environments where snowflake data doesn't exist
+            string snowDatabase = Config.GetHostSetting("SnowDatabaseOverride");
+            if (snowDatabase != String.Empty)
+            {
+                schemaDto.SnowflakeDatabase = snowDatabase;
+            }
 
-#if (DEBUG)
-            schemaDto.SnowflakeDatabase = "DATA_QUAL";
-#endif
             string vwVersion = "vw_" + schemaDto.SnowflakeTable;
             bool tableExists = _snowProvider.CheckIfExists(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion);     //Does table exist
 
