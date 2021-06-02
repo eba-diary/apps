@@ -54,12 +54,15 @@ namespace Sentry.data.Infrastructure
                 using (var connection = new SnowflakeDbConnection())
                 {
                     connection.ConnectionString = Config.GetHostSetting("SnowConnectionString");
+                    Logger.Info("SnowProvider.ExecuteQuery() Connection:" + connection.ConnectionString);
                     connection.Password = GetSecureString(Config.GetHostSetting("SnowPassword"));
 
                     System.Data.Common.DbCommand command = connection.CreateCommand();
                     command.CommandText = query;
                     connection.Open();
+                    Logger.Info("SnowProvider.ExecuteQuery() Connection Open Complete" + connection.ConnectionString);
                     System.Data.Common.DbDataReader reader = command.ExecuteReader();
+                    Logger.Info("SnowProvider.ExecuteQuery() Reader initialized" + connection.ConnectionString);
                     dt = FillDataTable(reader);
 
                     if (reader != null)
