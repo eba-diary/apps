@@ -600,7 +600,7 @@ namespace Sentry.data.Core
             }
 
             //Query table for rows
-            System.Data.DataTable result = _snowProvider.GetTopNRows(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion, rows);    //GORDON: TODO AUSTIN REMOVE
+            System.Data.DataTable result = _snowProvider.GetTopNRows(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion, rows);    
 
             List<Dictionary<string, object>> dicRows = new List<Dictionary<string, object>>();
             Dictionary<string, object> dicRow = null;
