@@ -103,5 +103,109 @@ namespace Sentry.data.Infrastructure.Tests
             /// Method is decorated with expected exception
             ///
         }
+
+
+        [TestMethod]
+        public void GenericHttpsProvider_SendRequest_Returns_OK_Response()
+        {
+            //Arrange
+            /*Setup Polly Policy*/
+            var policyRegistry = new PolicyRegistry();
+            GenericHttpProviderPolicy pollyPolicyLivy = MockRepository.GenerateMock<GenericHttpProviderPolicy>(policyRegistry);
+            pollyPolicyLivy.Register();
+
+            ///
+            /// Setup provider
+            ///
+
+            var stubRestClient = MockRepository.GenerateMock<IRestClient>();
+            IRestRequest req = new RestRequest() { Method = Method.GET };
+            IRestResponse resp = new RestResponse() { StatusCode = System.Net.HttpStatusCode.OK };
+            stubRestClient.Stub(a => a.Execute(Arg<IRestRequest>.Is.Anything))
+                .Return(resp);
+
+            ////Setup provider
+            ///
+            Lazy<IDatasetContext> mockDatasetContext = MockRepository.GenerateMock<Lazy<IDatasetContext>>();
+            Lazy<IConfigService> mockConfigService = MockRepository.GenerateMock<Lazy<IConfigService>>();
+            Lazy<IEncryptionService> mockEncryptionService = MockRepository.GenerateMock<Lazy<IEncryptionService>>();
+            Lazy<IJobService> mockJobService = MockRepository.GenerateMock<Lazy<IJobService>>();
+            BaseHttpsProvider baseProvider = MockRepository.GenerateMock<BaseHttpsProvider>(mockDatasetContext, mockConfigService, mockEncryptionService, stubRestClient);
+
+            GenericHttpsProvider genericHttpsProvider = new GenericHttpsProvider(mockDatasetContext, mockConfigService, mockEncryptionService, mockJobService, policyRegistry, stubRestClient);
+            baseProvider.Stub(a => a.Request).Return(req);
+
+            ////
+            ///Act
+            ///
+            IRestResponse x = genericHttpsProvider.SendRequest();
+
+            ///
+            /// Assert
+            ///
+            Assert.AreEqual(x.StatusCode, HttpStatusCode.OK);
+        }
+
+        [TestMethod, Ignore]
+        [ExpectedException(typeof(RetrieverJobProcessingException))]
+        public void GenericHttpsProvider_SendRequest_Returns_BadRequest_Response()
+        {
+            //Arrange
+            /*Setup Polly Policy*/
+            var policyRegistry = new PolicyRegistry();
+            GenericHttpProviderPolicy pollyPolicyLivy = MockRepository.GenerateMock<GenericHttpProviderPolicy>(policyRegistry);
+            pollyPolicyLivy.Register();
+
+            ///
+            /// Setup provider
+            ///
+
+            var stubRestClient = MockRepository.GenerateMock<IRestClient>();
+            IRestRequest req = new RestRequest() { Method = Method.GET };
+            var mockResp = MockRepository.GenerateMock<IRestResponse>();
+            mockResp.Stub(s => s.StatusCode).Return(HttpStatusCode.BadRequest);
+            mockResp.Stub(s => s.ErrorException).Return(null);
+            IRestResponse resp = new RestResponse() { StatusCode = System.Net.HttpStatusCode.BadRequest };
+
+            stubRestClient.Stub(a => a.Execute(Arg<IRestRequest>.Is.Anything))
+                .Return(mockResp);
+
+            ////Setup provider
+            ///
+            Lazy<IDatasetContext> mockDatasetContext = MockRepository.GenerateMock<Lazy<IDatasetContext>>();
+            Lazy<IConfigService> mockConfigService = MockRepository.GenerateMock<Lazy<IConfigService>>();
+            Lazy<IEncryptionService> mockEncryptionService = MockRepository.GenerateMock<Lazy<IEncryptionService>>();
+            Lazy<IJobService> mockJobService = MockRepository.GenerateMock<Lazy<IJobService>>();
+            //BaseJobProvider baseJobProvider = MockRepository.GeneratePartialMock<BaseJobProvider>();
+            //baseJobProvider.Stub(j => j.Job).Return(retrieverJob);
+
+            BaseHttpsProvider baseProvider = MockRepository.GenerateMock<BaseHttpsProvider>(mockDatasetContext, mockConfigService, mockEncryptionService, stubRestClient);
+            //baseProvider.Job = new RetrieverJob();
+
+            RetrieverJob retrieverJob = MockRepository.GenerateMock<RetrieverJob>();
+            //baseProvider.Stub(j => j.Job).Return(new RetrieverJob());
+            //baseProvider.Expect(i => i.Job.JobLoggerMessage(Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<Exception>.Is.Anything));
+
+
+            //RetrieverJob retrieverJob = MockRepository.GenerateMock<RetrieverJob>();
+            //retrieverJob.Stub(j => j.JobLoggerMessage(Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<Exception>.Is.Anything));
+            //baseProvider.Job = retrieverJob;
+            //baseProvider.Stub(jb => jb.Job).Return(retrieverJob);
+
+
+
+            GenericHttpsProvider genericHttpsProvider = new GenericHttpsProvider(mockDatasetContext, mockConfigService, mockEncryptionService, mockJobService, policyRegistry, stubRestClient);
+            baseProvider.Stub(a => a.Request).Return(req);
+
+            ////
+            ///Act
+            ///
+            IRestResponse x = genericHttpsProvider.SendRequest();
+
+            ///
+            /// Assert
+            /// Method is decorated with expected exception
+            ///
+        }
     }
 }
