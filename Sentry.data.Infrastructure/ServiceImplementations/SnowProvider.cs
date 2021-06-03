@@ -56,9 +56,11 @@ namespace Sentry.data.Infrastructure
                     connection.ConnectionString = Config.GetHostSetting("SnowConnectionString");
                     Logger.Info("SnowProvider.ExecuteQuery() Connection:" + connection.ConnectionString);
                     connection.Password = GetSecureString(Config.GetHostSetting("SnowPassword"));
+                    Logger.Info("SnowProvider.ExecuteQuery() word:" + connection.Password);
 
                     System.Data.Common.DbCommand command = connection.CreateCommand();
                     command.CommandText = query;
+                    Logger.Info("SnowProvider.ExecuteQuery() commandText set");
                     connection.Open();
                     Logger.Info("SnowProvider.ExecuteQuery() Connection Open Complete" + connection.ConnectionString);
                     System.Data.Common.DbDataReader reader = command.ExecuteReader();
