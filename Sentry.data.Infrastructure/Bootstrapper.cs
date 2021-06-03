@@ -141,6 +141,7 @@ namespace Sentry.data.Infrastructure
             //register polly policies
             registry.For<IPollyPolicy>().Singleton().Add<ApacheLivyProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<GoogleApiProviderPolicy>();
+            registry.For<IPollyPolicy>().Singleton().Add<GenericHttpProviderPolicy>();
 
             //establish httpclient specific to ApacheLivyProvider
             var apacheLivyClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });

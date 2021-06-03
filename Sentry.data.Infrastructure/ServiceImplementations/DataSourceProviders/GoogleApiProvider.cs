@@ -236,7 +236,7 @@ namespace Sentry.data.Infrastructure
             if (resp.StatusCode != HttpStatusCode.OK)
             {
                 _job.JobLoggerMessage("Error", "failed_request", resp.ErrorException);
-                throw new HttpListenerException((int)resp.StatusCode, resp.Content);
+                throw new RetrieverJobProcessingException($"Failed processing https request - response:{resp.Content}");
             }
 
             return resp;
