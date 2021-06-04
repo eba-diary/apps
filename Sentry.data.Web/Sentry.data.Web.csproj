@@ -335,6 +335,8 @@
     <AdditionalFiles Include="..\.sonarlint\data_data.sentry.com\CSharp\SonarLint.xml">
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
+    <Compile Include="WebProxy\SentryProxy.cs" />
+    <Compile Include="WebProxy\Win32Api.cs" />
     <Content Include="Content\business-intelligence.css" />
     <Content Include="Content\checkbox.css" />
     <Content Include="Content\business-area.css" />
