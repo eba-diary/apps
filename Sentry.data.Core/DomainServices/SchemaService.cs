@@ -584,7 +584,7 @@ namespace Sentry.data.Core
 
             FileSchemaDto schemaDto = GetFileSchemaDto(id);
             
-            //OVERRIDE Database in lower environments where snowflake data doesn't exist
+            //OVERRIDE Database in lower environments where snowflake data doesn't exist to always hit qual
             string snowDatabase = Config.GetHostSetting("SnowDatabaseOverride");
             if (snowDatabase != String.Empty)
             {

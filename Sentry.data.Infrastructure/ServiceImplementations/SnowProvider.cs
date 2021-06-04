@@ -3,7 +3,6 @@ using Sentry.Configuration;
 using Sentry.data.Core;
 using Snowflake.Data.Client;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
@@ -47,22 +46,21 @@ namespace Sentry.data.Infrastructure
 
         private System.Data.DataTable ExecuteQuery(string query)
         {
-            Logger.Info("SnowProvider.ExecuteQuery() QUERY TO BE EXECUTED:" + query); 
             DataTable dt;
+            string connectionString = Config.GetHostSetting("SnowConnectionString");
+            Logger.Info("START:  SnowProvider.ExecuteQuery() ConnectionString:" + connectionString + " Query:" + query);
+
             try
             {
                 using (var connection = new SnowflakeDbConnection())
                 {
-                    connection.ConnectionString = Config.GetHostSetting("SnowConnectionString");
-                    Logger.Info("SnowProvider.ExecuteQuery() Connection:" + connection.ConnectionString);
+                    connection.ConnectionString = connectionString;
                     connection.Password = GetSecureString(Config.GetHostSetting("SnowPassword"));
+
                     System.Data.Common.DbCommand command = connection.CreateCommand();
                     command.CommandText = query;
-                    Logger.Info("SnowProvider.ExecuteQuery() commandText set");
                     connection.Open();
-                    Logger.Info("SnowProvider.ExecuteQuery() Connection Open Complete" + connection.ConnectionString);
                     System.Data.Common.DbDataReader reader = command.ExecuteReader();
-                    Logger.Info("SnowProvider.ExecuteQuery() Reader initialized" + connection.ConnectionString);
                     dt = FillDataTable(reader);
 
                     if (reader != null)
@@ -73,39 +71,37 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Error("SnowProvider.ExecuteQuery() failed:" + query, ex);
+                Logger.Error("SnowProvider.ExecuteQuery() failed.  ConnectionString:" + connectionString + " Query:" + query, ex);
                 throw;
             }
 
-            Logger.Info($"End method SnowProvider.ExecuteQuery()");
+            Logger.Info($"END: SnowProvider.ExecuteQuery()");
             return dt;
         }
 
         private DataTable FillDataTable(System.Data.Common.DbDataReader dr)
         {
-            DataTable dtSchema = dr.GetSchemaTable();
+            DataTable schema = dr.GetSchemaTable();
             DataTable dt = new DataTable();
-            List<DataColumn> listCols = new List<DataColumn>();
-            if (dtSchema != null)
+
+            if (schema != null)
             {
-                foreach (DataRow drow in dtSchema.Rows)
+                foreach (DataRow r in schema.Rows)
                 {
-                    string columnName = System.Convert.ToString(drow["ColumnName"]);
-                    DataColumn column = new DataColumn(columnName, (Type)(drow["DataType"]));
-                    column.AllowDBNull = (bool)drow["AllowDBNull"];
-                    listCols.Add(column);
+                    string columnName = System.Convert.ToString(r["ColumnName"]);
+                    DataColumn column = new DataColumn(columnName, (Type)(r["DataType"]));
+                    column.AllowDBNull = (bool)r["AllowDBNull"];
                     dt.Columns.Add(column);
                 }
-
             }
 
-            // Read rows from DataReader and populate the DataTable 
+            // Read rows from DataReader and populate the DataTable  with rows
             while (dr.Read())
             {
                 DataRow dataRow = dt.NewRow();
-                for (int i = 0; i < listCols.Count; i++)
+                for (int i = 0; i < dt.Columns.Count; i++)
                 {
-                    dataRow[((DataColumn)listCols[i])] = dr[i];
+                    dataRow[(dt.Columns[i])] = dr[i];
                 }
 
                 dt.Rows.Add(dataRow);
@@ -123,11 +119,5 @@ namespace Sentry.data.Infrastructure
             }
             return secureStr;
         }
-
-
-
-
-
-
     }
 }
