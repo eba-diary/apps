@@ -270,6 +270,7 @@
     <Compile Include="Mappings\Subscriptions\StatusTypeMapping.cs" />
     <Compile Include="PollyPolicies\ApacheLivyProviderPolicy.cs" />
     <Compile Include="PollyPolicies\GenericHttpProviderPolicy.cs" />
+    <Compile Include="PollyPolicies\FtpProviderPolicy.cs" />
     <Compile Include="PollyPolicies\GoogleApiProviderPolicy.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
