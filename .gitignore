@@ -1,2 +1,4 @@
 #Ignore Python Virtual Environment
 .env
+
+.DS_Store
