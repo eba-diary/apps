@@ -26,12 +26,12 @@ namespace Sentry.data.Core
         private readonly ISecurityService _securityService;
         private readonly IDataFeatures _featureFlags;
         private readonly IMessagePublisher _messagePublisher;
-        private readonly IHiveOdbcProvider _hiveOdbcProvider;
+        private readonly ISnowProvider _snowProvider;
         private string _bucket;
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, IHiveOdbcProvider hiveOdbcProvider)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -41,7 +41,8 @@ namespace Sentry.data.Core
             _securityService = securityService;
             _featureFlags = dataFeatures;
             _messagePublisher = messagePublisher;
-            _hiveOdbcProvider = hiveOdbcProvider;
+            _snowProvider = snowProvider;
+
         }
 
         private string RootBucket
@@ -556,7 +557,7 @@ namespace Sentry.data.Core
             {
                 throw new SchemaNotFoundException("Column metadata not added");
             }
-
+            
             return GetTopNRowsBySchema(config.Schema.SchemaId, rows);
         }
         public List<Dictionary<string, object>> GetTopNRowsBySchema(int id, int rows)
@@ -592,15 +593,18 @@ namespace Sentry.data.Core
             }
 
             FileSchemaDto schemaDto = GetFileSchemaDto(id);
+            
+            //OVERRIDE Database in lower environments where snowflake data doesn't exist to always hit qual
+            string snowDatabase = Config.GetHostSetting("SnowDatabaseOverride");
+            if (snowDatabase != String.Empty)
+            {
+                schemaDto.SnowflakeDatabase = snowDatabase;
+            }
 
-            string hiveView = $"vw_{schemaDto.HiveTable}";
+            string vwVersion = "vw_" + schemaDto.SnowflakeTable;
+            bool tableExists = _snowProvider.CheckIfExists(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion);     //Does table exist
 
-            //Get connection object
-            OdbcConnection connection = _hiveOdbcProvider.GetConnection(schemaDto.HiveDatabase);
-
-            //Does table exist
-            bool tableExists = _hiveOdbcProvider.CheckViewExists(connection, hiveView);
-
+            
             //If table does not exist
             if (!tableExists)
             {
@@ -608,7 +612,7 @@ namespace Sentry.data.Core
             }
 
             //Query table for rows
-            System.Data.DataTable result = _hiveOdbcProvider.GetTopNRows(_hiveOdbcProvider.GetConnection(schemaDto.HiveDatabase), hiveView, rows);
+            System.Data.DataTable result = _snowProvider.GetTopNRows(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion, rows);    
 
             List<Dictionary<string, object>> dicRows = new List<Dictionary<string, object>>();
             Dictionary<string, object> dicRow = null;
@@ -617,8 +621,7 @@ namespace Sentry.data.Core
                 dicRow = new Dictionary<string, object>();
                 foreach (System.Data.DataColumn col in result.Columns)
                 {
-                    //R
-                    string colName = col.ColumnName.Split('.')[1];
+                    string colName = col.ColumnName;
                     dicRow.Add(colName, dr[col]);
                 }
                 dicRows.Add(dicRow);
