@@ -737,7 +737,8 @@ namespace Sentry.data.Core
                 CLA2472_EMRSend = dto.CLA2472_EMRSend,
                 CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag,
                 CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake,
-                ObjectStatus = dto.ObjectStatus
+                ObjectStatus = dto.ObjectStatus,
+                SchemaRootPath = dto.SchemaRootPath
             };
             _datasetContext.Add(schema);
             return schema;

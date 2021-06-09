@@ -76,11 +76,11 @@
                     </div>
                 </div>
             }
-            
+
             <div class="form-group DatasetScopeTypeDescription">
                 <label class="control-label col-md-2"></label>
                 <div class="col-md-10">
-                    <span class="text-muted">                         
+                    <span class="text-muted">
                     </span>
                 </div>
             </div>
@@ -103,6 +103,16 @@
                     <div class="col-md-4">
                         @Html.DropDownListFor(model => model.FileExtensionID,
                    new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
+                    </div>
+                </div>
+            }
+
+            @if (Model.SchemaRootPath != null)
+            {
+                <div class="form-group schemaRootPath">
+                    @Html.LabelFor((model) => model.SchemaRootPath, new { @class = "control-label col-md-2 optional" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor((model) => model.SchemaRootPath, new { @class = "form-control edit-dataset-row" })
                     </div>
                 </div>
             }
@@ -191,19 +201,19 @@
                         @Html.Label("Kafka Flag", new { @class = "control-label col-md-6 optional text-muted", @style = "text-align: left" })
                     </div>
                 </div>
-    }
+            }
 
-    <hr />
-    <div class="form-group">
-        <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
-    </div>
-    <div class="form-group">
-        <div>
-            <input type="submit" value="Save" class="btn btn-primary" />
-            <a class="btn btn-warning" href="/Config/Dataset/@Model.DatasetId">Cancel</a>
+            <hr />
+            <div class="form-group">
+                <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
+            </div>
+            <div class="form-group">
+                <div>
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                    <a class="btn btn-warning" href="/Config/Dataset/@Model.DatasetId">Cancel</a>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
         }
         }
 
