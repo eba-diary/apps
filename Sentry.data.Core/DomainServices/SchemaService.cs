@@ -163,7 +163,10 @@ namespace Sentry.data.Core
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             Logger.Info($"startmethod <{m.ReflectedType.Name.ToString()}>");
+
             Dataset parentDataset = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaDto.SchemaId).ParentDataset;
+
+            //Check user access to modify schema, of not throw exception
             IApplicationUser user = _userService.GetCurrentUser();
             UserSecurity us = _securityService.GetUserSecurity(parentDataset, user);
 
@@ -172,7 +175,7 @@ namespace Sentry.data.Core
                 throw new SchemaUnauthorizedAccessException();
             }
             
-            //var SendSASNotification = false;
+
             string SASNotificationType = null;
             string CurrentViewNotificationType = null;
             JObject whatPropertiesChanged;
@@ -401,7 +404,13 @@ namespace Sentry.data.Core
             {
                 schema.CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake;
                 chgDetected = true;
-            }            
+            }
+            
+            if (schema.SchemaRootPath != dto.SchemaRootPath)
+            {
+                schema.SchemaRootPath = dto.SchemaRootPath;
+                chgDetected = true;
+            }
 
 
             if (chgDetected)
@@ -778,7 +787,8 @@ namespace Sentry.data.Core
                 CLA1580_StructureHive = scm.CLA1580_StructureHive,
                 CLA2472_EMRSend = scm.CLA2472_EMRSend,
                 CLA1286_KafkaFlag = scm.CLA1286_KafkaFlag,
-                CLA3014_LoadDataToSnowflake = scm.CLA3014_LoadDataToSnowflake
+                CLA3014_LoadDataToSnowflake = scm.CLA3014_LoadDataToSnowflake,
+                SchemaRootPath = scm.SchemaRootPath
             };
 
         }
