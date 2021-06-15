@@ -14,7 +14,8 @@
 		  (10,	'ClaimIQ'),
 		  (11,	'Fixed Width'),
 		  (12,	'Producer S3 Drop'),
-		  (13,	'XML')
+		  (13,	'XML'),
+		  (14,	'JSONFlattening')
         )
         AS Source ([ID], [Name])
         ON Target.[ID] = Source.[ID]   
