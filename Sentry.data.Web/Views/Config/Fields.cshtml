@@ -833,7 +833,19 @@
                         }
                         else {
                             $('#buttonSpinner').hide();
-                            var modal = Sentry.ShowModalAlert(returnedData.Message, function () { })
+
+                            //loop through all errors and create a somewhat friendly message
+                            var len = returnedData.Errors.length;
+                            var message = '';
+                            for (let i = 0; i < len; i++) {
+
+                                var e = returnedData.Errors[i];
+                                message = message + 'field:' + e.Id + '  ' + e.Description;
+
+                            }
+
+                            //show modal with error message
+                            Sentry.ShowModalAlert(returnedData.Message + message, function () { })
                         }
                     },
                     error: function (error) {

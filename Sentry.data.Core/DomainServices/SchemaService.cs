@@ -16,6 +16,13 @@ using System.Reflection;
 
 namespace Sentry.data.Core
 {
+
+    public class Clone 
+    {
+        public string Name;
+        public int OrginalPosition;
+    }
+
     public class SchemaService : ISchemaService
     {
         public readonly IDataFlowService _dataFlowService;
@@ -1097,10 +1104,53 @@ namespace Sentry.data.Core
             Logger.Debug($"schemaservice end method <{mBase.Name.ToLower()}>");
         }
 
+        //look at fieldDtoList and returns a list of duplicates at that level only
+        //this function DOES NOT drill into children since method that calls it will call this for every level that exists 
+        private List<Clone> CloneWars(List<BaseFieldDto> fieldDtoList)
+        {
+            List<Clone> cloneList = new List<Clone>();
+
+            //STEP 1:  Find duplicates at the current level passed in
+            var clones = fieldDtoList.GroupBy(x => x.Name).Where(x => x.Count() > 1)
+              .Select(y => y.Key);
+
+            //grab all clones details in prep to build a Clone 
+            var results = 
+                   from f in fieldDtoList
+                    join c in clones on f.Name equals c
+                    select new { f.Name, f.OrdinalPosition };               
+
+            //add to cloneList from results which makes hardended Clone
+            cloneList.AddRange
+            (
+                //this code essentially builds a new clone
+                (from r in results
+                 select new Clone()
+                 {
+                     Name = r.Name,
+                     OrginalPosition = r.OrdinalPosition
+                 }).ToList()
+
+             );
+            return cloneList;
+        }
+
         private ValidationResults Validate(FileSchema scm, List<BaseFieldDto> fieldDtoList)
         {
             ValidationResults results = new ValidationResults();
-            foreach(BaseFieldDto fieldDto in fieldDtoList)
+
+            //STEP 1:  Look for clones (duplicates) and add to results
+            List<Clone> clones = new List<Clone>();
+            clones.AddRange(CloneWars(fieldDtoList));
+
+            foreach(Clone c in clones)
+            {
+                results.Add(c.OrginalPosition.ToString(), $"({c.Name}) cannot be duplicated.  ");
+            }
+
+            
+            //STEP 2:   go through all fields and look for validation errors
+            foreach (BaseFieldDto fieldDto in fieldDtoList)
             {
                 //Field name cannot be blank
                 if (string.IsNullOrWhiteSpace(fieldDto.Name))
@@ -1160,6 +1210,7 @@ namespace Sentry.data.Core
 
                 results.MergeInResults(ValidateFieldtoFileSchema(scm, fieldDto));
 
+                //recursively call validate again to validate all child fields of parent
                 if (fieldDto.ChildFields.Any())
                 {
                     results.MergeInResults(Validate(scm, fieldDto.ChildFields));
