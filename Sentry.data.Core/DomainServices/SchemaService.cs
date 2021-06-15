@@ -19,8 +19,9 @@ namespace Sentry.data.Core
 
     public class Clone 
     {
-        public string Name;
-        public int OrginalPosition;
+        public string Name { get; set; }
+        public int OrdinalPosition { get; set; }
+
     }
 
     public class SchemaService : ISchemaService
@@ -1128,7 +1129,7 @@ namespace Sentry.data.Core
                  select new Clone()
                  {
                      Name = r.Name,
-                     OrginalPosition = r.OrdinalPosition
+                     OrdinalPosition = r.OrdinalPosition
                  }).ToList()
 
              );
@@ -1145,7 +1146,7 @@ namespace Sentry.data.Core
 
             foreach(Clone c in clones)
             {
-                results.Add(c.OrginalPosition.ToString(), $"({c.Name}) cannot be duplicated.  ");
+                results.Add(c.OrdinalPosition.ToString(), $"({c.Name}) cannot be duplicated.  ");
             }
 
             
