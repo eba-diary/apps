@@ -16,14 +16,6 @@ using System.Reflection;
 
 namespace Sentry.data.Core
 {
-
-    public class Clone 
-    {
-        public string Name { get; set; }
-        public int OrdinalPosition { get; set; }
-
-    }
-
     public class SchemaService : ISchemaService
     {
         public readonly IDataFlowService _dataFlowService;
@@ -1107,33 +1099,30 @@ namespace Sentry.data.Core
 
         //look at fieldDtoList and returns a list of duplicates at that level only
         //this function DOES NOT drill into children since method that calls it will call this for every level that exists 
-        private List<Clone> CloneWars(List<BaseFieldDto> fieldDtoList)
+        private ValidationResults CloneWars(List<BaseFieldDto> fieldDtoList)
         {
-            List<Clone> cloneList = new List<Clone>();
+            ValidationResults results = new ValidationResults();
 
             //STEP 1:  Find duplicates at the current level passed in
             var clones = fieldDtoList.GroupBy(x => x.Name).Where(x => x.Count() > 1)
               .Select(y => y.Key);
 
-            //grab all clones details in prep to build a Clone 
-            var results = 
+            //STEP 2:  IF ANY CLONES EXIST: Grab all clones that match distinct name list
+            //this step is here because i need ALL duplicates and ordinal position to send error message
+            if (clones.Any())
+            {
+                var cloneDetails =
                    from f in fieldDtoList
-                    join c in clones on f.Name equals c
-                    select new { f.Name, f.OrdinalPosition };               
+                   join c in clones on f.Name equals c
+                   select new { f.Name, f.OrdinalPosition };
 
-            //add to cloneList from results which makes hardended Clone
-            cloneList.AddRange
-            (
-                //this code essentially builds a new clone
-                (from r in results
-                 select new Clone()
-                 {
-                     Name = r.Name,
-                     OrdinalPosition = r.OrdinalPosition
-                 }).ToList()
-
-             );
-            return cloneList;
+                //ADD ALL CLONE ERRORS to ValidationResults class, ValidationResults is what gets returned from Validate() and is used to display errors
+                //NOTE: this code uses linq ToList() extension method on my cloneDetails IEnumerable to essentially go through each cloneDetail and call results.Add()
+                //we are adding each errors to ValidationResults, this way I don't need to create a seperate hardened list but can add to the existing ValidationResults
+                cloneDetails.ToList().ForEach(x => results.Add(x.OrdinalPosition.ToString(), $"({x.Name}) cannot be duplicated.  "));
+            }
+            
+            return results;
         }
 
         private ValidationResults Validate(FileSchema scm, List<BaseFieldDto> fieldDtoList)
@@ -1141,15 +1130,9 @@ namespace Sentry.data.Core
             ValidationResults results = new ValidationResults();
 
             //STEP 1:  Look for clones (duplicates) and add to results
-            List<Clone> clones = new List<Clone>();
-            clones.AddRange(CloneWars(fieldDtoList));
+            results.MergeInResults(CloneWars(fieldDtoList));
 
-            foreach(Clone c in clones)
-            {
-                results.Add(c.OrdinalPosition.ToString(), $"({c.Name}) cannot be duplicated.  ");
-            }
 
-            
             //STEP 2:   go through all fields and look for validation errors
             foreach (BaseFieldDto fieldDto in fieldDtoList)
             {
