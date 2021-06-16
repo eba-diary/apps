@@ -171,7 +171,7 @@
           <date when="1904-12-09">Dec. 9, 1904. Cairo. <name type="hotel" ref="#Shepheards_Hotel">Shepheards Hotel</name></date>. </dateline>
         <p>We left <placeName ref="#Naples">Naples</placeName> on <date when="1904-11-03">Saturday,
             the 3d</date> and made the weary, weary journey of 9 hours from there to <placeName
-            ref="Brindisi">Brindisi</placeName> - <persName ref="Hale_Miss">Miss Hale</persName>,
+            ref="Brindisi">Brindisi</placeName> - <persName ref="#Hale_Miss">Miss Hale</persName>,
             <persName ref="#Perkins_Mrs">Mrs. Perkins</persName>, and <persName ref="#Morgan_Miss"
             >Miss Morgan</persName> were along. <persName ref="#Davis_Theodore_M"
             >Theodore</persName> took <persName ref="#Hardy_Jean #Wilson_Alice">the girls</persName>
@@ -351,8 +351,8 @@
           wind came, so that we sailed for 2 hours. The river is full of birds - passed thousands of
           ducks today. They are clever enough to lift just before danger approaches - I believe they
           recognize a dahabya - the only dangerous craft for them, as the natives in their boats
-          never molest them. The little, tidy unoccupied dahabya <name type="boat" ref="#Bijou"
-            >"Bijou"</name> still keeps with us,</p>
+          never molest them. The little, tidy unoccupied dahabya "<name type="boat" ref="#Bijou"
+            >Bijou</name>" still keeps with us,</p>
       </div>
       <div xml:id="EBA-1904-12-27" type="entry">
         <dateline>
@@ -472,7 +472,7 @@
           sailed calmly through the dam at <placeName ref="#Assiout">Asyut</placeName>, and stopped
           for our mail. I did not go off the boat. <persName ref="#Davis_Theodore_M">Theo</persName>
           and <persName ref="#Hardy_Jean #Wilson_Alice">the girls</persName> went for a walk, and
-          met the <persName ref="Fraser_Mr Fraser_Mrs">Frasers</persName> - their boats are being repaired, and
+          met the <persName ref="#Fraser_Mr #Fraser_Mrs">Frasers</persName> - their boats are being repaired, and
           they are now living on a rented one. An exquisite little moon has dawned upon us!</p>
       </div>
       <div xml:id="EBA-1904-01-08" type="entry">
@@ -647,7 +647,7 @@
             ref="#Miller_Capt #Miller_Mrs">Millers</persName> went along, but did not lunch with us.
           A lot of people over there, so we went up to the <persName ref="#ThotmesIV">Thothmes
             IV</persName> plateau, and had our lunch there. A splendid vantage ground - but a cool
-          wind was blowing - neither I or <persName ref="Quibell_Mrs">Mrs. Quibell</persName> went
+          wind was blowing - neither I or <persName ref="#Quibell_Mrs">Mrs. Quibell</persName> went
           down into any of the <placeName ref="#Valley_of_the_Kings">Tombs</placeName> - and I came
           home early. I was in my chair and the donkeys were not very good. And the detestable Sugar
           people have spoiled every thing on this side. Those lovely rides we used to have through
@@ -789,7 +789,7 @@
           <date when="1905-02-03">Friday, Feb. 3d.</date>
         </dateline>
         <p>We were at home all day, until in the afternoon we visited the <name type="boat"
-            ref="#Agiz">Agiz</name>, who arrived today - then to the <name type="hotel"
+            ref="#Agiz">Agiz</name>, who arrived today - then to the <name type="boat"
             ref="#Sabiha">Sabiha</name> to see <persName ref="#Campbell_Dr #Campbell_Mrs">the
             Campbells</persName>. They have an interesting and rather pretty little boat - built in
           the Hareem style - it was built and belongs to the <persName ref="#Abbas_II"
@@ -797,7 +797,7 @@
             Maspero</persName> after we got home - and <persName ref="#Smith_Harold"
             >Smith</persName> and <persName ref="#Ream_Robert_Clarke">Ream</persName> came for
           bridge in the evening. <persName ref="#Maspero_Gaston">Maspero</persName>'s dined with us
-          and the <persName ref="Theodant_Abbe">Abb&#233; Th&#232;odant</persName>.</p>
+          and the <persName ref="#Theodant_Abbe">Abb&#233; Th&#232;odant</persName>.</p>
       </div>
       <div xml:id="EBA-1905-02-05" type="entry">
         <dateline>
@@ -897,8 +897,8 @@
           the tomb, and <persName ref="#Lindon_Smith_Joseph #Lindon_Smith_Corinna">Mr. and Mrs.
             Smith</persName> also went over to stay with him. <persName ref="#Davis_Theodore_M"
             >Theo</persName> wrote a note to <persName ref="#Maspero_Gaston">M. Maspero</persName>
-          and <persName ref="#Sayce_Archibald">Mr. Sayce</persName> who arrived on <name type="boat"
-            ref="#Istar">the Istar</name> yesterday, to come and see the things. They all came over
+          and <persName ref="#Sayce_Archibald">Mr. Sayce</persName> who arrived on the <name type="boat"
+            ref="#Istar">Istar</name> yesterday, to come and see the things. They all came over
           in the evening. <persName ref="#Amos_Mrs.">Mrs. Sheldon Amos</persName>, who is staying
           with <persName ref="#Sayce_Archibald">Mr. Sayce</persName>, also came. </p>
       </div>
@@ -986,7 +986,7 @@
             >Mme. Maspero</persName> with me. <persName ref="#Sayce_Archibald">Mr. Sayce</persName>
           and <persName ref="#Sheldon_Amos_Mrs.">Mrs. Sheldon Amos</persName> also went over - and
           we had an open lunch table at the Thothmes plateau - all of these, with the <persName
-            ref="Theodant_Abbe">Abb&#233; Th&#232;odant</persName>, <persName ref="#Weigall_Arthur"
+            ref="#Theodant_Abbe">Abb&#233; Th&#232;odant</persName>, <persName ref="#Weigall_Arthur"
             >Weigall</persName>, <persName ref="#Smith_Harold">Smith</persName> and <persName
             ref="#Ayrton_Edward">Ayrton</persName>. After we got home, <persName ref="#Watson_Capt."
             >Capt. Watson</persName> of the <persName ref="#Connaught_Duke">Duke</persName>'s party
@@ -1048,7 +1048,7 @@
           themselves, and parted most fraternally from <persName ref="#Davis_Theodore_M"
             >Theodore</persName> - Gen. Sir <persName ref="#Maxwell_John_Sir">John
             Maxwell</persName> was also with them. <persName ref="#Maspero_Gaston #Maspero_Louise"
-            >M. and Mme. Maspero</persName>, the <persName ref="Theodant_Abbe">Abb&#233;</persName>,
+            >M. and Mme. Maspero</persName>, the <persName ref="#Theodant_Abbe">Abb&#233;</persName>,
           called to say goodbye as they start down the river tomorrow. <persName
             ref="#Sayce_Archibald">Mr. Sayce</persName> and <persName ref="#Sheldon_Amos_Mrs.">Mrs.
             Amos</persName> also called.</p>
@@ -1366,7 +1366,7 @@
           forests, and the fertile fields is charming beyond description. But it was not coming home
           - the donkeys in my chair were miserable, tired to death poor things by the hard service
           of the winter - and the donkey boys vociferous and unpleasant, and I was glad to reach the
-          comfort of the shaded deck, tea, and <persName ref="#Billy">Billy</persName>'s
+          comfort of the shaded deck, tea, and <name type="animal" ref="#Billy">Billy</name>'s
           affectionate greetings.</p>
       </div>
       <div xml:id="EBA-1905-03-17" type="entry">
@@ -1432,7 +1432,7 @@
           <date when="1905-03-23">Thursday, Mar. 23rd.</date>
         </dateline>
         <p>A really, cold day, with high wind - went to the <name type="hotel"
-            ref="#Continental_Hotel">Continental Hotel</name> this afternoon to hear <persName
+            ref="#Grand_Continental_Hotel">Continental Hotel</name> this afternoon to hear <persName
             ref="#Maspero_Gaston">M. Maspero</persName>, on "the Find" - a lecture for the benefit
           of the <orgName ref="#YMCA">Y.M.C.A.</orgName> of <placeName ref="#Cairo"
             >Cairo</placeName> - a crowded hall. Everyone showed much interest. It was difficult to
@@ -1443,7 +1443,7 @@
           <date when="1905-03-24">Friday, March 24th.</date>
         </dateline>
         <p>At home and busy all the morning - <persName ref="#Davis_Theodore_M">Theo</persName>
-          engaged the <name type="boat" ref="Nitseris">Nitseris</name> the other day to take us to
+          engaged the <name type="boat" ref="#Nitseris">Nitseris</name> the other day to take us to
           the <placeName ref="#Al_Qanāţir_al_Khayrīyah">Barrage</placeName> this afternoon. We asked
             <persName ref="#Watson_Mr #Watson_Mrs">Mr. and Mrs. Watson</persName>, and the
             <persName ref="#Hooper_Mary_J #Hooper_Josephine_G #Hooper_Mabel">Hooper
@@ -1503,7 +1503,7 @@
         <p>To <placeName ref="#Boulaq_Museum">the Museum</placeName> with <persName
             ref="#Davis_Theodore_M">Theodore</persName> - the room with the "find" is now open to
           the public. <persName ref="#Campbell_Dr #Campbell_Mrs">Dr. and Mrs. Campbell</persName>
-          were there. They leave tomorrow on <name type="boat" ref="#Roumanie">the Roumanie</name>.
+          were there. They leave tomorrow on the <name type="boat" ref="#Roumanie">Roumanie</name>.
             <persName ref="#Morgan_Miss">Miss Morgan</persName> and <persName ref="#Sandwith_Dr">Dr.
             Sandwith</persName> also go on it. Left the boat for the Hotel and are now up at the
             <placeName ref="#Ghezireh_Palace_Hotel">Ghezireh Palace</placeName>.</p>
@@ -1589,7 +1589,7 @@
         <p>To the <placeName ref="#Basilica_di_Santa_Maria_Gloriosa_dei_Frari">Frari</placeName>
           this morning which we found filled with scaffolding - were able to see the great <persName
             ref="#Mantegna_Andrea">Mantegna</persName>. Then I went to the <placeName
-            ref="#Pallazo_Capello">Pallazo di Capello</placeName>. Poor <persName ref="Benson_Mr"
+            ref="#Pallazo_Capello">Pallazo di Capello</placeName>. Poor <persName ref="#Benson_Mr"
             >Mr. Benson</persName> apparently very low - did not see him as he was in bed under the
           influence of opiates. Sat some time with <persName ref="#Benson_Mrs">Mrs.
             Benson</persName>. Cold weather and high winds. <persName ref="#Newberry_Percy">Mr.
@@ -1796,14 +1796,14 @@
       <div xml:id="EBA-1905-04-28" type="entry">
         <dateline>
           <date when="1905-04-28">Friday, April 28th</date>. </dateline>
-        <p><persName ref="#Hardy_Jean">Jean</persName> and I drove out to <persName
-            ref="#Villa_I_Tatti">I Tatti</persName> this morning to lunch - the day was warm and
+        <p><persName ref="#Hardy_Jean">Jean</persName> and I drove out to <name type="historical"
+            ref="#Villa_I_Tatti">I Tatti</name> this morning to lunch - the day was warm and
           wholly charming - and the world most beautiful. <persName ref="#Berenson_Bernard"
             >Berensen</persName> looks better than he has done for 3 years. His nice sister
             <persName ref="#Abbott_Senda_Berenson">Senda</persName> was there, looking ill and worn.
           We sat out under the cypresses and had coffee and talked, until it was time to drive home.
           In the evening we dined at the <placeName ref="#Villino">Villino</placeName>. <persName
-            ref="#Cust_Mr">Mr. Cust</persName> and <persName ref="Burton_Harry">Mr.
+            ref="#Cust_Mr">Mr. Cust</persName> and <persName ref="#Burton_Harry">Mr.
             Burton</persName> were there - and a beautiful little dinner. <persName
             ref="#Buttles_Mary">Mary</persName> able to be up - but looking a bit tired.</p>
       </div>
