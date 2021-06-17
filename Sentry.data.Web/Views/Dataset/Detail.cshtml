@@ -338,12 +338,6 @@
 
                         <div class="row" data-bind="visible: SchemaRows().length > 0">
                             <div class="col-lg-12">
-                                <h5 class="@color">Hive</h5>
-                                <!-- ko foreach: FullyQualifiedHiveViews() -->
-                                <p><span class="hideOverflow" data-bind="text: $data"></span></p>
-                                <!-- /ko -->
-                            </div>
-                            <div class="col-lg-12">
                                 <h5 class="@color">Snowflake</h5>
                                 <!-- ko foreach: FullyQualifiedSnowflakeViews() -->
                                 <p><span class="hideOverflow" data-bind="text: $data"></span></p>
@@ -852,8 +846,6 @@
             self.CronJobs = ko.observableArray();
             self.Views = ko.observable();
             self.Downloads = ko.observable();
-            self.HiveDatabase = ko.observable();
-            self.FullyQualifiedHiveViews = ko.observableArray();
             self.FullyQualifiedSnowflakeViews = ko.observableArray();
             self.RenderDataFlows = ko.computed(function () {
                 if (self.DataFlows == undefined || self.DataFlows().length == 0) {
@@ -974,14 +966,6 @@
                     self.Downloads(result.Downloads);
                     self.Views(result.Views);
                     self.Description(result.Description);
-                    self.HiveDatabase(result.HiveDatabase);
-                    //Remove all FullyQualifiedHiveViews before adding new list
-                    self.FullyQualifiedHiveViews.removeAll();
-                    $.each(result.HiveViews, function (i, val) {
-                        var fullyqualifiedname = result.HiveDatabase + '.' + val;
-                        self.FullyQualifiedHiveViews.push(fullyqualifiedname);
-                    });
-
                     self.FullyQualifiedSnowflakeViews.removeAll();
                     $.each(result.SnowflakeViews, function (i, val) {
                         self.FullyQualifiedSnowflakeViews.push(val);
