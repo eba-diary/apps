@@ -183,34 +183,34 @@ namespace Sentry.data.Infrastructure
 
             Lineage l = new Lineage();
 
-            try
-            {
-                var dofDescription = Query<DataObjectField>()
-                     //.Where(a => a.DataObject.DataElement.DataElement_NME == "SERA PL.dm1")
-                     .Where(b => DataObject_NME == b.DataObject.DataObject_NME)
-                     .Where(c => DataObjectField_NME == c.DataObjectField_NME);
+            //try
+            //{
+            //    var dofDescription = Query<DataObjectField>()
+            //         //.Where(a => a.DataObject.DataElement.DataElement_NME == "SERA PL.dm1")
+            //         .Where(b => DataObject_NME == b.DataObject.DataObject_NME)
+            //         .Where(c => DataObjectField_NME == c.DataObjectField_NME);
 
-                l.DataObjectField_DSC = dofDescription.FirstOrDefault().DataObjectField_DSC;
-            }
-            catch
-            {
-                //There was no description.
-                //Return a null Lineage Object
-            }
+            //    l.DataObjectField_DSC = dofDescription.FirstOrDefault().DataObjectField_DSC;
+            //}
+            //catch
+            //{
+            //    //There was no description.
+            //    //Return a null Lineage Object
+            //}
 
-            try
-            {
-                var doDescription = Query<DataObject>()
-                     //.Where(a => a.DataElement.DataElement_NME == "SERA PL.dm1")
-                     .Where(b => DataObject_NME == b.DataObject_NME);
+            //try
+            //{
+            //    var doDescription = Query<DataObject>()
+            //         //.Where(a => a.DataElement.DataElement_NME == "SERA PL.dm1")
+            //         .Where(b => DataObject_NME == b.DataObject_NME);
 
-                l.DataObject_DSC = doDescription.FirstOrDefault().DataObject_DSC;
-            }
-            catch
-            {
-                //There was no description.
-                //Return a null Lineage Object
-            }
+            //    l.DataObject_DSC = doDescription.FirstOrDefault().DataObject_DSC;
+            //}
+            //catch
+            //{
+            //    //There was no description.
+            //    //Return a null Lineage Object
+            //}
             return l;
         }
 

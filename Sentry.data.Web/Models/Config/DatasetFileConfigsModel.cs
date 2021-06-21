@@ -168,7 +168,6 @@ namespace Sentry.data.Web
         public AssociatedDataFlowModel DataFlowJobs { get; set; }
         public IList<AssociatedDataFlowModel> ExternalDataFlowJobs { get; set; }
 
-        //public IList<DataElement> Schemas { get; set; }  
         public FileSchema Schema { get; set; }
 
         public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }
