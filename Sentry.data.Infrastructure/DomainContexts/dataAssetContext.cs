@@ -186,7 +186,7 @@ namespace Sentry.data.Infrastructure
             try
             {
                 var dofDescription = Query<DataObjectField>()
-                     .Where(a => a.DataObject.DataElement.DataElement_NME == "SERA PL.dm1")
+                     //.Where(a => a.DataObject.DataElement.DataElement_NME == "SERA PL.dm1")
                      .Where(b => DataObject_NME == b.DataObject.DataObject_NME)
                      .Where(c => DataObjectField_NME == c.DataObjectField_NME);
 
@@ -201,7 +201,7 @@ namespace Sentry.data.Infrastructure
             try
             {
                 var doDescription = Query<DataObject>()
-                     .Where(a => a.DataElement.DataElement_NME == "SERA PL.dm1")
+                     //.Where(a => a.DataElement.DataElement_NME == "SERA PL.dm1")
                      .Where(b => DataObject_NME == b.DataObject_NME);
 
                 l.DataObject_DSC = doDescription.FirstOrDefault().DataObject_DSC;

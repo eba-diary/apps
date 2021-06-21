@@ -68,26 +68,28 @@ namespace Sentry.data.Core
             }
         }
 
-        public SchemaApiDTO GetSchemaApiDTO(int id)
-        {
-            DataElement de = _datasetContext.GetById<DataElement>(id);
-            SchemaApiDTO dto = new SchemaApiDTO();
-            MapToDto(de, dto);
-            return dto;
-        }
+        //GORDON: ask jered about this one
+        //public SchemaApiDTO GetSchemaApiDTO(int id)
+        //{
+        //    DataElement de = _datasetContext.GetById<DataElement>(id);
+        //    SchemaApiDTO dto = new SchemaApiDTO();
+        //    MapToDto(de, dto);
+        //    return dto;
+        //}
 
-        public SchemaDetaiApilDTO GetSchemaDetailDTO(int id)
-        {
-            DataElement de = _datasetContext.GetById<DataElement>(id);
-            SchemaDetaiApilDTO dto = new SchemaDetaiApilDTO();
-            MaptToDetailDto(de, dto);
-            return dto;
-        }
+        //GORDON: ask jered about this one
+        //public SchemaDetaiApilDTO GetSchemaDetailDTO(int id)
+        //{
+        //    DataElement de = _datasetContext.GetById<DataElement>(id);
+        //    SchemaDetaiApilDTO dto = new SchemaDetaiApilDTO();
+        //    MaptToDetailDto(de, dto);
+        //    return dto;
+        //}
 
-        public IList<ColumnDTO> GetColumnDTO(int id)
-        {
-            return MapToDto(_datasetContext.GetById<DataElement>(id).DataObjects);
-        }
+        //public IList<ColumnDTO> GetColumnDTO(int id)
+        //{
+        //    return MapToDto(_datasetContext.GetById<DataElement>(id).DataObjects);
+        //}
 
         public List<string> Validate(FileSchemaDto dto)
         {
@@ -311,20 +313,20 @@ namespace Sentry.data.Core
             dfc.Description = dto.Description;
             dfc.FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
 
-            DataElement de = _datasetContext.DataElements.Where(w => w.DatasetFileConfig.ConfigId == dfc.ConfigId && w.DataElement_NME == dfc.Schemas.FirstOrDefault().DataElement_NME).FirstOrDefault();
-            UpdateDataElement(dto, de);
+            //DataElement de = _datasetContext.DataElements.Where(w => w.DatasetFileConfig.ConfigId == dfc.ConfigId && w.DataElement_NME == dfc.Schemas.FirstOrDefault().DataElement_NME).FirstOrDefault();
+            //UpdateDataElement(dto, de);
         }
 
-        private void UpdateDataElement(DatasetFileConfigDto dto, DataElement de)
-        {
+        //private void UpdateDataElement(DatasetFileConfigDto dto, DataElement de)
+        //{
             
-            de.CreateCurrentView = dto.Schemas.FirstOrDefault().CreateCurrentView;            
-            de.SasLibrary = (dto.IsInSAS) ? dto.GenerateSASLibaryName(_datasetContext) : null;
-            de.FileFormat = _datasetContext.GetById<FileExtension>(dto.FileExtensionId).Name.Trim();
-            de.Delimiter = dto.Schemas.FirstOrDefault().Delimiter;
-            de.HasHeader = dto.HasHeader;
-            de.IsInSAS = dto.IsInSAS;
-        }
+        //    de.CreateCurrentView = dto.Schemas.FirstOrDefault().CreateCurrentView;            
+        //    de.SasLibrary = (dto.IsInSAS) ? dto.GenerateSASLibaryName(_datasetContext) : null;
+        //    de.FileFormat = _datasetContext.GetById<FileExtension>(dto.FileExtensionId).Name.Trim();
+        //    de.Delimiter = dto.Schemas.FirstOrDefault().Delimiter;
+        //    de.HasHeader = dto.HasHeader;
+        //    de.IsInSAS = dto.IsInSAS;
+        //}
 
         public DatasetFileConfigDto GetDatasetFileConfigDto(int configId)
         {
@@ -392,8 +394,8 @@ namespace Sentry.data.Core
 
         private DatasetFileConfig CreateDatasetFileConfig(DatasetFileConfigDto dto)
         {
-            List<DataElement> deList = new List<DataElement>();
-            DataElement de = CreateNewDataElement(dto.Schemas[0]);
+            //List<DataElement> deList = new List<DataElement>();
+            //DataElement de = CreateNewDataElement(dto.Schemas[0]);
 
             DatasetFileConfig dfc = new DatasetFileConfig()
             {
@@ -403,52 +405,52 @@ namespace Sentry.data.Core
                 ParentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId),
                 FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId),
                 DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
-                Schemas = deList,
+                //Schemas = deList,
                 ObjectStatus = dto.ObjectStatus
             };
             dfc.IsSchemaTracked = true;
             dfc.Schema = _datasetContext.GetById<FileSchema>(dto.SchemaId);
 
-            de.DatasetFileConfig = dfc;
-            deList.Add(de);
-            dfc.Schemas = deList;
+            //de.DatasetFileConfig = dfc;
+            //deList.Add(de);
+            //dfc.Schemas = deList;
 
             return dfc;
         }
 
-        private DataElement CreateNewDataElement(DataElementDto dto)
-        {
-            Dataset ds = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
-            string storageCode = _datasetContext.GetNextStorageCDE().ToString();
+        //private DataElement CreateNewDataElement(DataElementDto dto)
+        //{
+        //    Dataset ds = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
+        //    string storageCode = _datasetContext.GetNextStorageCDE().ToString();
 
-            DataElement de = new DataElement()
-            {
-                DataElementCreate_DTM = DateTime.Now,
-                DataElementChange_DTM = DateTime.Now,
-                DataElement_CDE = "F",
-                DataElement_DSC = GlobalConstants.DataElementDescription.DATA_FILE,
-                DataElement_NME = dto.DataElementName,
-                LastUpdt_DTM = DateTime.Now,
-                SchemaIsPrimary = true,
-                SchemaDescription = dto.SchemaDescription,
-                SchemaName = dto.SchemaName,
-                SchemaRevision = 1,
-                SchemaIsForceMatch = false,
-                Delimiter = dto.Delimiter,
-                HasHeader = dto.HasHeader,
-                FileFormat = _datasetContext.GetById<FileExtension>(dto.FileExtensionId).Name.Trim(),
-                StorageCode = storageCode,
-                HiveDatabase = GenerateHiveDatabaseName(ds.DatasetCategories.First()),
-                HiveTable = ds.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.SchemaName.Replace(" ", "").ToUpper(),
-                HiveTableStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
-                HiveLocation = RootBucket + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
-                CreateCurrentView = dto.CreateCurrentView,
-                IsInSAS = dto.IsInSAS,
-                SasLibrary = (dto.IsInSAS) ? dto.GenerateSASLibary(_datasetContext) : null
-            };
+        //    DataElement de = new DataElement()
+        //    {
+        //        DataElementCreate_DTM = DateTime.Now,
+        //        DataElementChange_DTM = DateTime.Now,
+        //        DataElement_CDE = "F",
+        //        DataElement_DSC = GlobalConstants.DataElementDescription.DATA_FILE,
+        //        DataElement_NME = dto.DataElementName,
+        //        LastUpdt_DTM = DateTime.Now,
+        //        SchemaIsPrimary = true,
+        //        SchemaDescription = dto.SchemaDescription,
+        //        SchemaName = dto.SchemaName,
+        //        SchemaRevision = 1,
+        //        SchemaIsForceMatch = false,
+        //        Delimiter = dto.Delimiter,
+        //        HasHeader = dto.HasHeader,
+        //        FileFormat = _datasetContext.GetById<FileExtension>(dto.FileExtensionId).Name.Trim(),
+        //        StorageCode = storageCode,
+        //        HiveDatabase = GenerateHiveDatabaseName(ds.DatasetCategories.First()),
+        //        HiveTable = ds.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.SchemaName.Replace(" ", "").ToUpper(),
+        //        HiveTableStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
+        //        HiveLocation = RootBucket + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
+        //        CreateCurrentView = dto.CreateCurrentView,
+        //        IsInSAS = dto.IsInSAS,
+        //        SasLibrary = (dto.IsInSAS) ? dto.GenerateSASLibary(_datasetContext) : null
+        //    };
 
-            return de;
-        }
+        //    return de;
+        //}
 
         public bool UpdateandSaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime)
         {
@@ -803,18 +805,18 @@ namespace Sentry.data.Core
             scm.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
         }
 
-        private void MapToDto(DataElement de, SchemaApiDTO dto)
-        {
-            dto.SchemaID = de.DataElement_ID;
-            dto.Format = de.FileFormat;
-            dto.Delimiter = de.Delimiter;
-            dto.Header = de.HasHeader.ToString();
-            dto.HiveDatabase = de.HiveDatabase;
-            dto.HiveTable = de.HiveTable;
-            dto.HiveStatus = de.HiveTableStatus;
-            dto.HiveLocation = de.HiveLocation;
-            dto.CurrentView = de.CreateCurrentView;
-        }
+        //private void MapToDto(DataElement de, SchemaApiDTO dto)
+        //{
+        //    dto.SchemaID = de.DataElement_ID;
+        //    dto.Format = de.FileFormat;
+        //    dto.Delimiter = de.Delimiter;
+        //    dto.Header = de.HasHeader.ToString();
+        //    dto.HiveDatabase = de.HiveDatabase;
+        //    dto.HiveTable = de.HiveTable;
+        //    dto.HiveStatus = de.HiveTableStatus;
+        //    dto.HiveLocation = de.HiveLocation;
+        //    dto.CurrentView = de.CreateCurrentView;
+        //}
 
         private void MapToDto(DataSource dsrc, DataSourceDto dto)
         {
@@ -858,39 +860,39 @@ namespace Sentry.data.Core
             }
         }
 
-        private void MaptToDetailDto(DataElement de, SchemaDetaiApilDTO dto)
-        {
-            MapToDto(de, dto);
+        //private void MaptToDetailDto(DataElement de, SchemaDetaiApilDTO dto)
+        //{
+        //    MapToDto(de, dto);
 
-            List<SchemaRow> rows = new List<SchemaRow>();
-            DataObject dobj = de.DataObjects.FirstOrDefault();
-            IList<DataObjectField> dofs = (dobj != null) ? dobj.DataObjectFields : null;
+        //    List<SchemaRow> rows = new List<SchemaRow>();
+        //    DataObject dobj = de.DataObjects.FirstOrDefault();
+        //    IList<DataObjectField> dofs = (dobj != null) ? dobj.DataObjectFields : null;
 
-            if (dofs != null)
-            {
-                foreach (DataObjectField b in dofs)
-                {
-                    SchemaRow r = new SchemaRow()
-                    {
-                        Name = b.DataObjectField_NME,
-                        DataObjectField_ID = b.DataObjectField_ID,
-                        Description = b.DataObjectField_DSC,
-                        LastUpdated = b.LastUpdt_DTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds
-                    };
+        //    if (dofs != null)
+        //    {
+        //        foreach (DataObjectField b in dofs)
+        //        {
+        //            SchemaRow r = new SchemaRow()
+        //            {
+        //                Name = b.DataObjectField_NME,
+        //                DataObjectField_ID = b.DataObjectField_ID,
+        //                Description = b.DataObjectField_DSC,
+        //                LastUpdated = b.LastUpdt_DTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds
+        //            };
 
-                    r.DataType = (!String.IsNullOrEmpty(b.DataType)) ? b.DataType.ToUpper() : "VARCHAR";
-                    if (b.Precision != null) { r.Precision = b.Precision ?? null; }
-                    if (b.Scale != null) { r.Scale = b.Scale ?? null; }
-                    if (b.Nullable != null) { r.Nullable = b.Nullable ?? null; }
-                    if (b.Length != null) { r.Length = b.Length; }
-                    r.Position = (b.OrdinalPosition != null) ? Int32.Parse(b.OrdinalPosition) : -1;
-                    if (b.FieldFormat != null) { r.Format = b.FieldFormat ?? null; }
-                    rows.Add(r);
-                }
-            }
+        //            r.DataType = (!String.IsNullOrEmpty(b.DataType)) ? b.DataType.ToUpper() : "VARCHAR";
+        //            if (b.Precision != null) { r.Precision = b.Precision ?? null; }
+        //            if (b.Scale != null) { r.Scale = b.Scale ?? null; }
+        //            if (b.Nullable != null) { r.Nullable = b.Nullable ?? null; }
+        //            if (b.Length != null) { r.Length = b.Length; }
+        //            r.Position = (b.OrdinalPosition != null) ? Int32.Parse(b.OrdinalPosition) : -1;
+        //            if (b.FieldFormat != null) { r.Format = b.FieldFormat ?? null; }
+        //            rows.Add(r);
+        //        }
+        //    }
 
-            dto.Rows = rows;
-        }
+        //    dto.Rows = rows;
+        //}
         private IList<ColumnDTO> MapToDto(IList<DataObject> objects)
         {
             IList<ColumnDTO> dtoList = new List<ColumnDTO>();

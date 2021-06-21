@@ -185,13 +185,13 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public IQueryable<DataElement> DataElements
-        {
-            get
-            {
-                return Query<DataElement>();
-            }
-        }
+        //public IQueryable<DataElement> DataElements
+        //{
+        //    get
+        //    {
+        //        return Query<DataElement>();
+        //    }
+        //}
 
         public IQueryable<DataElementDetail> DataElementDetails
         {

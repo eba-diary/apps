@@ -20,11 +20,11 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Id(x => x.DataObject_ID, m => m.Generator(Generators.Identity));
 
 
-            this.ManyToOne(x => x.DataElement, m =>
-            {
-                m.Column("DataElement_ID");
-                m.Class(typeof(DataElement));
-            });
+            //this.ManyToOne(x => x.DataElement, m =>
+            //{
+            //    m.Column("DataElement_ID");
+            //    m.Class(typeof(DataElement));
+            //});
 
 
             this.Property(x => x.DataTag_ID);

@@ -39,7 +39,7 @@ namespace Sentry.data.Core
             //datasetFileConfigs
             var configs = datasetContext.DatasetFileConfigs.Where(x=> query.Any(y=> x.ParentDataset.DatasetId == y.DatasetId));
             configs.Fetch(x=> x.DatasetScopeType).ToFuture();
-            configs.FetchMany(x => x.Schemas).ToFuture();
+            //configs.FetchMany(x => x.Schemas).ToFuture();
             configs.Fetch(x => x.Schema).ToFuture();
             query.FetchMany(d => d.DatasetFileConfigs).ToFuture();            
 

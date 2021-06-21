@@ -19,6 +19,6 @@ namespace Sentry.data.Core
         public virtual string DataAssetOwner_NME { get; set; }
         public virtual DateTime LastUpdt_DTM { get; set; }
 
-        public virtual IList<DataElement> DataElements { get; set; }
+        //public virtual IList<DataElement> DataElements { get; set; }
     }
 }

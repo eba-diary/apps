@@ -25,11 +25,11 @@ namespace Sentry.data.Core
             /* Retrieve Config(s) and Schema(s) */
 
             var configs = datasetContext.DatasetFileConfigs.Where(x => query.Any(y => x.ConfigId == y.DatasetConfig.ConfigId));
-            var schemas = datasetContext.DataElements.Where(x => configs.Any(y => x.DatasetFileConfig.ConfigId == y.ConfigId));
+            //var schemas = datasetContext.DataElements.Where(x => configs.Any(y => x.DatasetFileConfig.ConfigId == y.ConfigId));
             var dataflows = datasetContext.DataFlow.Where(x => query.Any(y => x.Id == y.DataFlow.Id));
-            schemas.FetchMany(x => x.DataElementDetails).ToFuture();
-            schemas.FetchMany(x => x.DataObjects).ToFuture();
-            query.Fetch(x => x.DatasetConfig).ThenFetchMany(x => x.Schemas).ToFuture();
+            //schemas.FetchMany(x => x.DataElementDetails).ToFuture();
+            //schemas.FetchMany(x => x.DataObjects).ToFuture();
+            //query.Fetch(x => x.DatasetConfig).ThenFetchMany(x => x.Schemas).ToFuture();
             query.Fetch(x => x.DataFlow).ToFuture();
 
             var jobs = query.Fetch(f => f.DatasetConfig).ThenFetch(x => x.ParentDataset).Fetch(f => f.DataSource).ToFuture();

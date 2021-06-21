@@ -20,7 +20,7 @@ namespace Sentry.data.Core
 
         public virtual int DataObject_ID { get; set; }
 
-        public virtual DataElement DataElement { get; set; }
+        //public virtual DataElement DataElement { get; set; }
 
         public virtual int DataElement_ID { get; set; }
         public virtual int DataTag_ID { get; set; }

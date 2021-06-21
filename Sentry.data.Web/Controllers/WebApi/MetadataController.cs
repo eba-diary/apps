@@ -680,29 +680,30 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// </summary>
         /// <param name="SchemaID"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("schemas/{SchemaID}/columns")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaDetailModel))]
-        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
-        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
-        public async Task<IHttpActionResult> GetColumnSchemaInformationForSchema(int SchemaID)
-        {
-            DatasetFileConfig dfc = _dsContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == SchemaID).FirstOrDefault();
+        //[HttpGet]
+        //[Route("schemas/{SchemaID}/columns")]
+        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaDetailModel))]
+        //[SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        //[SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
+        //public async Task<IHttpActionResult> GetColumnSchemaInformationForSchema(int SchemaID)
+        //{
+        //    DatasetFileConfig dfc = _dsContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == SchemaID).FirstOrDefault();
 
-            if (dfc != null)
-            {
-                ValidateViewPermissionsForDataset(dfc.ParentDataset.DatasetId);
-            }
-            else
-            {
-                throw new HttpResponseException(System.Net.HttpStatusCode.InternalServerError);
-            }
+        //    if (dfc != null)
+        //    {
+        //        ValidateViewPermissionsForDataset(dfc.ParentDataset.DatasetId);
+        //    }
+        //    else
+        //    {
+        //        throw new HttpResponseException(System.Net.HttpStatusCode.InternalServerError);
+        //    }
 
-            SchemaDetaiApilDTO dto = _configService.GetSchemaDetailDTO(SchemaID);
-            SchemaDetailModel sdm = new SchemaDetailModel(dto);
+            
+        //    SchemaDetaiApilDTO dto = _configService.GetSchemaDetailDTO(SchemaID);
+        //    SchemaDetailModel sdm = new SchemaDetailModel(dto);
 
-            return Ok(sdm);
-        }
+        //    return Ok(sdm);
+        //}
         #endregion
 
         #region Messaging Endpoints

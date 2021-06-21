@@ -14,7 +14,7 @@ namespace Sentry.data.Core
         }
 
         public virtual int DataElementDetail_ID { get; set; }
-        public virtual DataElement DataElement { get; set; }
+        //public virtual DataElement DataElement { get; set; }
         public virtual DateTime DataElementDetailCreate_DTM { get; set; }
         public virtual DateTime DataElementDetailChange_DTM { get; set; }
         public virtual string DataElementDetailType_CDE { get; set; }

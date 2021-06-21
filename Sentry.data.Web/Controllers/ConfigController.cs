@@ -1476,44 +1476,44 @@ namespace Sentry.data.Web.Controllers
 
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
 
-            DataElement maxSchemaRevision = dfc.Schemas.OrderByDescending(o => o.SchemaRevision).FirstOrDefault();
+            //DataElement maxSchemaRevision = dfc.Schemas.OrderByDescending(o => o.SchemaRevision).FirstOrDefault();
             //Get raw file storage code
-            string storageCode = dfc.GetStorageCode();
+            //string storageCode = dfc.GetStorageCode();
 
             try
             {
                 if (ModelState.IsValid)
                 {
-                    DataElement de = new DataElement()
-                    {
-                        DataElementCreate_DTM = DateTime.Now,
-                        DataElementChange_DTM = DateTime.Now,
-                        LastUpdt_DTM = DateTime.Now,
-                        DataElement_CDE = "F",
-                        DataElementCode_DSC = GlobalConstants.DataElementDescription.DATA_FILE,
-                        DataElement_NME = csm.Name,
-                        DataElement_DSC = csm.Description,
-                        DatasetFileConfig = dfc,
-                        Delimiter = csm.Delimiter,
-                        HasHeader = csm.HasHeader,
-                        SchemaName = csm.Name,
-                        SchemaDescription = csm.Description,
-                        SchemaIsForceMatch = csm.IsForceMatch,
-                        SchemaIsPrimary = true,
-                        SchemaRevision = (maxSchemaRevision == null) ? 0 : maxSchemaRevision.SchemaRevision + 1,
-                        StorageCode = storageCode,
-                        HiveDatabase = "Default",
-                        HiveTable = dfc.ParentDataset.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfc.Name.Replace(" ", "").ToUpper(),
-                        HiveTableStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
-                        HiveLocation = RootBucket + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
-                    };
+                    //DataElement de = new DataElement()
+                    //{
+                    //    DataElementCreate_DTM = DateTime.Now,
+                    //    DataElementChange_DTM = DateTime.Now,
+                    //    LastUpdt_DTM = DateTime.Now,
+                    //    DataElement_CDE = "F",
+                    //    DataElementCode_DSC = GlobalConstants.DataElementDescription.DATA_FILE,
+                    //    DataElement_NME = csm.Name,
+                    //    DataElement_DSC = csm.Description,
+                    //    DatasetFileConfig = dfc,
+                    //    Delimiter = csm.Delimiter,
+                    //    HasHeader = csm.HasHeader,
+                    //    SchemaName = csm.Name,
+                    //    SchemaDescription = csm.Description,
+                    //    SchemaIsForceMatch = csm.IsForceMatch,
+                    //    SchemaIsPrimary = true,
+                    //    SchemaRevision = (maxSchemaRevision == null) ? 0 : maxSchemaRevision.SchemaRevision + 1,
+                    //    StorageCode = storageCode,
+                    //    HiveDatabase = "Default",
+                    //    HiveTable = dfc.ParentDataset.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfc.Name.Replace(" ", "").ToUpper(),
+                    //    HiveTableStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
+                    //    HiveLocation = RootBucket + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
+                    //};
 
-                    dfc.Schemas.Add(de);
+                    //dfc.Schemas.Add(de);
 
-                    if (maxSchemaRevision != null)
-                    {
-                        maxSchemaRevision.SchemaIsPrimary = false;
-                    }
+                    //if (maxSchemaRevision != null)
+                    //{
+                    //    maxSchemaRevision.SchemaIsPrimary = false;
+                    //}
 
                     _datasetContext.SaveChanges();
 
