@@ -8,7 +8,7 @@ namespace Sentry.data.Web
     {
 
         private static string proxyConfigScript = Sentry.Configuration.Config.GetHostSetting("WebProxyConfigFile");
-        private static string[] bypassList = Sentry.Configuration.Config.GetHostSetting("WebProxyBypassList").Split(',');
+        private static string[] useWebProxyList = Sentry.Configuration.Config.GetHostSetting("WebProxyUseList").Split(',');
         private static string webProxyUrl = Sentry.Configuration.Config.GetHostSetting("WebProxyUrl");
 
         public ICredentials Credentials
@@ -36,10 +36,15 @@ namespace Sentry.data.Web
             return new Uri(webProxyUrl);
         }
 
+        /*this method is called everytime a URL is hit in the WEB app to determine if the SentryProxy should be bypassed for a given URL
+         * todate the only thing to use the proxy is the snowflake integration
+         * everything else should NOT use proxy
+         */
         public bool IsBypassed(Uri host)
         {
-            if (bypassList.Any(x => !String.IsNullOrEmpty(x) && host.AbsoluteUri.ToLower().Contains(x.ToLower())))
-                return true;
+            //check passed in host against list, if the host is in the list, then they DO NOT get to bypass and therefore return false meaning:  "NO, you can't bypass the proxy"
+            if (useWebProxyList.Any(x => !String.IsNullOrEmpty(x) && host.AbsoluteUri.ToLower().Contains(x.ToLower())))
+                return false;
 
             if (!String.IsNullOrEmpty(proxyConfigScript))
             {
@@ -47,7 +52,7 @@ namespace Sentry.data.Web
                 return (proxyToUse == null);
             }
 
-            return false;
+            return true;
         }
 
         public static string GetProxyForUrlUsingPac(string DestinationUrl, string PacUri)
