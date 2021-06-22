@@ -103,12 +103,22 @@
                     new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
                     </div>
                 }
-
                 <div class="schemaRootPathPanel">
-                    @Html.LabelFor((model) => model.SchemaRootPath, new { @class = "control-label col-md-2 optional" })
-                    <div class="col-md-4">
-                        @Html.TextBoxFor(model => model.SchemaRootPath, new { @class = "form-control edit-dataset-row" })
-                    </div>
+                    @if (Model.Security.ShowAdminControls)
+                    {
+                        @Html.LabelFor((model) => model.SchemaRootPath, new { @class = "control-label col-md-2 optional" })
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(model => model.SchemaRootPath, new { @class = "form-control edit-dataset-row" })
+                        </div>
+                    }
+                    else
+                    {
+                        @Html.HiddenFor(model => model.SchemaRootPath)
+                        @Html.LabelFor((model) => model.SchemaRootPath, new { @class = "control-label col-md-2 optional" })
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(model => model.SchemaRootPath, new { @disabled = "disabled", @readonly = "readonly", @class = "form-control edit-dataset-row" })
+                        </div>
+                    }
 
                     <div class="col-md-5 col-md-offset-6">
                         <span class="text-muted">Specify schema root element path (<a href="@Sentry.data.Core.GlobalConstants.DocumentationLinks.SCHEMA_ROOT_PATH_USAGE" target="_blank">usage documentation</a>)</span>
