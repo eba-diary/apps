@@ -26,12 +26,12 @@ namespace Sentry.data.Core
         private readonly ISecurityService _securityService;
         private readonly IDataFeatures _featureFlags;
         private readonly IMessagePublisher _messagePublisher;
-        private readonly IHiveOdbcProvider _hiveOdbcProvider;
+        private readonly ISnowProvider _snowProvider;
         private string _bucket;
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, IHiveOdbcProvider hiveOdbcProvider)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -41,7 +41,8 @@ namespace Sentry.data.Core
             _securityService = securityService;
             _featureFlags = dataFeatures;
             _messagePublisher = messagePublisher;
-            _hiveOdbcProvider = hiveOdbcProvider;
+            _snowProvider = snowProvider;
+
         }
 
         private string RootBucket
@@ -556,7 +557,7 @@ namespace Sentry.data.Core
             {
                 throw new SchemaNotFoundException("Column metadata not added");
             }
-
+            
             return GetTopNRowsBySchema(config.Schema.SchemaId, rows);
         }
         public List<Dictionary<string, object>> GetTopNRowsBySchema(int id, int rows)
@@ -592,15 +593,18 @@ namespace Sentry.data.Core
             }
 
             FileSchemaDto schemaDto = GetFileSchemaDto(id);
+            
+            //OVERRIDE Database in lower environments where snowflake data doesn't exist to always hit qual
+            string snowDatabase = Config.GetHostSetting("SnowDatabaseOverride");
+            if (snowDatabase != String.Empty)
+            {
+                schemaDto.SnowflakeDatabase = snowDatabase;
+            }
 
-            string hiveView = $"vw_{schemaDto.HiveTable}";
+            string vwVersion = "vw_" + schemaDto.SnowflakeTable;
+            bool tableExists = _snowProvider.CheckIfExists(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion);     //Does table exist
 
-            //Get connection object
-            OdbcConnection connection = _hiveOdbcProvider.GetConnection(schemaDto.HiveDatabase);
-
-            //Does table exist
-            bool tableExists = _hiveOdbcProvider.CheckViewExists(connection, hiveView);
-
+            
             //If table does not exist
             if (!tableExists)
             {
@@ -608,7 +612,7 @@ namespace Sentry.data.Core
             }
 
             //Query table for rows
-            System.Data.DataTable result = _hiveOdbcProvider.GetTopNRows(_hiveOdbcProvider.GetConnection(schemaDto.HiveDatabase), hiveView, rows);
+            System.Data.DataTable result = _snowProvider.GetTopNRows(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion, rows);    
 
             List<Dictionary<string, object>> dicRows = new List<Dictionary<string, object>>();
             Dictionary<string, object> dicRow = null;
@@ -617,8 +621,7 @@ namespace Sentry.data.Core
                 dicRow = new Dictionary<string, object>();
                 foreach (System.Data.DataColumn col in result.Columns)
                 {
-                    //R
-                    string colName = col.ColumnName.Split('.')[1];
+                    string colName = col.ColumnName;
                     dicRow.Add(colName, dr[col]);
                 }
                 dicRows.Add(dicRow);
@@ -1097,10 +1100,44 @@ namespace Sentry.data.Core
             Logger.Debug($"schemaservice end method <{mBase.Name.ToLower()}>");
         }
 
+        //look at fieldDtoList and returns a list of duplicates at that level only
+        //this function DOES NOT drill into children since method that calls it will call this for every level that exists 
+        private ValidationResults CloneWars(List<BaseFieldDto> fieldDtoList)
+        {
+            ValidationResults results = new ValidationResults();
+
+            //STEP 1:  Find duplicates at the current level passed in
+            var clones = fieldDtoList.GroupBy(x => x.Name).Where(x => x.Count() > 1)
+              .Select(y => y.Key);
+
+            //STEP 2:  IF ANY CLONES EXIST: Grab all clones that match distinct name list
+            //this step is here because i need ALL duplicates and ordinal position to send error message
+            if (clones.Any())
+            {
+                var cloneDetails =
+                   from f in fieldDtoList
+                   join c in clones on f.Name equals c
+                   select new { f.Name, f.OrdinalPosition };
+
+                //ADD ALL CLONE ERRORS to ValidationResults class, ValidationResults is what gets returned from Validate() and is used to display errors
+                //NOTE: this code uses linq ToList() extension method on my cloneDetails IEnumerable to essentially go through each cloneDetail and call results.Add()
+                //we are adding each errors to ValidationResults, this way I don't need to create a seperate hardened list but can add to the existing ValidationResults
+                cloneDetails.ToList().ForEach(x => results.Add(x.OrdinalPosition.ToString(), $"({x.Name}) cannot be duplicated.  "));
+            }
+            
+            return results;
+        }
+
         private ValidationResults Validate(FileSchema scm, List<BaseFieldDto> fieldDtoList)
         {
             ValidationResults results = new ValidationResults();
-            foreach(BaseFieldDto fieldDto in fieldDtoList)
+
+            //STEP 1:  Look for clones (duplicates) and add to results
+            results.MergeInResults(CloneWars(fieldDtoList));
+
+
+            //STEP 2:   go through all fields and look for validation errors
+            foreach (BaseFieldDto fieldDto in fieldDtoList)
             {
                 //Field name cannot be blank
                 if (string.IsNullOrWhiteSpace(fieldDto.Name))
@@ -1160,6 +1197,7 @@ namespace Sentry.data.Core
 
                 results.MergeInResults(ValidateFieldtoFileSchema(scm, fieldDto));
 
+                //recursively call validate again to validate all child fields of parent
                 if (fieldDto.ChildFields.Any())
                 {
                     results.MergeInResults(Validate(scm, fieldDto.ChildFields));

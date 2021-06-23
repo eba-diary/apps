@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
+﻿using Polly;
+using Polly.Registry;
 using Sentry.data.Core;
-using System.Net;
-using Newtonsoft.Json.Linq;
+using Sentry.data.Core.Exceptions;
+using System;
+using System.Collections.Generic;
 using System.IO;
-using WinSCP;
+using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Sentry.data.Infrastructure
 {
@@ -18,6 +17,12 @@ namespace Sentry.data.Infrastructure
 
         private Stream _streamResult;
         private NetworkCredential _creds;
+        private readonly ISyncPolicy _providerPolicy;
+
+        public FtpProvider(IReadOnlyPolicyRegistry<string> registry)
+        {
+            _providerPolicy = registry.Get<ISyncPolicy>(PollyPolicyKeys.FtpProviderPolicy);
+        }
         
         public void SetCredentials(NetworkCredential creds)
         {
@@ -49,7 +54,23 @@ namespace Sentry.data.Infrastructure
             }
             FtpWebRequest request = CreateDwnldRequest(url, _creds);
             request.Method = WebRequestMethods.Ftp.DownloadFile;
-            _streamResult = request.GetResponse().GetResponseStream();
+
+            WebResponse response = null;
+
+            //Use Polly to perform retry logic
+            _providerPolicy.Execute(() =>
+            {
+                response = request.GetResponse();
+            });
+
+            if (response == null)
+            {
+                throw new RetrieverJobProcessingException($"No Response returned - url:{url}");
+            }
+
+            _streamResult = response.GetResponseStream();
+
+
             return _streamResult;
         }
 
@@ -68,7 +89,19 @@ namespace Sentry.data.Infrastructure
 
             FtpWebRequest request = CreateDwnldRequest(url, _creds);
             request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
-            FtpWebResponse response = (FtpWebResponse)request.GetResponse();
+
+            FtpWebResponse response = null;
+
+            //Use Polly to perform retry logic
+            _providerPolicy.Execute(() =>
+            {
+                response = (FtpWebResponse)request.GetResponse();
+            });
+
+            if (response == null)
+            {
+                throw new RetrieverJobProcessingException($"No Response returned - url:{url}");
+            }
 
             Stream responseStream = response.GetResponseStream();
 
