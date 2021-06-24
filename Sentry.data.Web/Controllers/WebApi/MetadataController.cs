@@ -737,6 +737,11 @@ namespace Sentry.data.Web.WebApi.Controllers
                 _dataFlowService.PublishMessage(message.Key, message.Message);
                 return Ok();
             }
+            catch (KafkaProducerException ex)
+            {
+                Logger.Error($"jobcontroller-publishmessage failure", ex);
+                return Content(System.Net.HttpStatusCode.BadGateway, "Unable to produce messages to kafka");
+            }
             catch (Exception ex)
             {
                 Logger.Error($"jobcontroller-publishmessage failure", ex);
@@ -770,7 +775,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 }
                 else
                 {
-                    Logger.Debug($"jobcontroller-publishmessage message:{message.ToString()}");
+                    Logger.Debug($"jobcontroller-publishmessage message:{message}");
 
                     kMsg = JsonConvert.DeserializeObject<KafkaMessage>(message);
                 }
@@ -778,9 +783,14 @@ namespace Sentry.data.Web.WebApi.Controllers
                 _dataFlowService.PublishMessage(kMsg.Key, kMsg.Message);
                 return Ok();
             }
+            catch (KafkaProducerException ex)
+            {
+                Logger.Error($"jobcontroller-publishmessageasstring failure", ex);
+                return Content(System.Net.HttpStatusCode.BadGateway, "Unable to produce messages to kafka");
+            }
             catch (Exception ex)
             {
-                Logger.Error($"jobcontroller-publishmessage failure", ex);
+                Logger.Error($"jobcontroller-publishmessageasstring failure", ex);
                 return InternalServerError();
             }
         }

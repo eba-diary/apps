@@ -147,15 +147,21 @@ namespace Sentry.data.Core
                                         
                     return revision.SchemaRevision_Id;
                 }
-
-                return 0;
+            }
+            catch (AggregateException agEx)
+            {
+                var flatArgExs = agEx.Flatten().InnerExceptions;
+                foreach(var ex in flatArgExs)
+                {
+                    Logger.Error("Failed generating consumption layer event", ex);
+                }
             }
             catch (Exception ex)
             {
                 Logger.Error("Failed to add revision", ex);
-
-                return 0;
             }
+
+            return 0;
         }
 
 
@@ -254,6 +260,12 @@ namespace Sentry.data.Core
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="schema"></param>
+        /// <param name="propertyDeltaList"></param>
+        /// <exception cref="AggregateException">Thows exception when event could not be published</exception>
         private void GenerateConsumptionLayerCreateEvent(FileSchema schema, JObject propertyDeltaList)
         {
             //SchemaRevision latestRevision = null;
@@ -284,8 +296,10 @@ namespace Sentry.data.Core
                 generateEvent = true;
             }
 
+            //We want to attempt to send both events even if first fails, then report back any failures.
             if (generateEvent)
             {
+                var exceptionList = new List<Exception>();
                 HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
                 {
                     SchemaID = latestRevision.SchemaId,
@@ -296,9 +310,19 @@ namespace Sentry.data.Core
                     ChangeIND = propertyDeltaList.ToString(Formatting.None)
                 };
 
-                Logger.Debug($"<generateconsumptionlayercreateevent> sending {hiveCreate.EventType.ToLower()} event...");
-                _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
-                Logger.Debug($"<generateconsumptionlayercreateevent> sent {hiveCreate.EventType.ToLower()} event");
+                try
+                {
+                    Logger.Debug($"<generateconsumptionlayercreateevent> sending {hiveCreate.EventType.ToLower()} event...");
+
+                    _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
+
+                    Logger.Debug($"<generateconsumptionlayercreateevent> sent {hiveCreate.EventType.ToLower()} event");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"<generateconsumptionlayercreateevent> failed sending event: {JsonConvert.SerializeObject(hiveCreate)}");
+                    exceptionList.Add(ex);
+                }
 
 
                 SnowTableCreateModel snowModel = new SnowTableCreateModel()
@@ -310,9 +334,22 @@ namespace Sentry.data.Core
                     ChangeIND = propertyDeltaList.ToString(Formatting.None)
                 };
 
-                Logger.Debug($"<generateconsumptionlayercreateevent> sending {snowModel.EventType.ToLower()} event...");
-                _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
-                Logger.Debug($"<generateconsumptionlayercreateevent> sent {snowModel.EventType.ToLower()} event");
+                try
+                {
+                    Logger.Debug($"<generateconsumptionlayercreateevent> sending {snowModel.EventType.ToLower()} event...");
+                    _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+                    Logger.Debug($"<generateconsumptionlayercreateevent> sent {snowModel.EventType.ToLower()} event");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"<generateconsumptionlayercreateevent> failed sending event: {snowModel}");
+                    exceptionList.Add(ex);
+                }
+
+                if (exceptionList.Any())
+                {
+                    throw new AggregateException("Failed sending consumption layer event", exceptionList);
+                }
             }     
         }
 
