@@ -1399,7 +1399,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (ValidationException vEx)
             {
-                return Json(new { Success = false, Message = "Failed schema validation", Errors = vEx.ValidationResults.GetAll() }, JsonRequestBehavior.AllowGet);
+                return Json(new { Success = false, Message = "Failed schema validation.  ", Errors = vEx.ValidationResults.GetAll() }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {

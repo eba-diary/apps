@@ -1,5 +1,4 @@
-﻿using Sentry.Common.Logging;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using StructureMap;
 using System;
@@ -8,7 +7,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
