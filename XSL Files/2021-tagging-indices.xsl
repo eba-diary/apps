@@ -58,27 +58,27 @@
                     </xsl:for-each>
                 </ul>
                 <h2>Boats, Hotels</h2>
-                <ul> 
+                <ul>
                     <xsl:for-each select="distinct-values(//name/@ref)">
-                        <xsl:sort/>  
+                        <xsl:sort/> 
                         <li>
-                            <b>  
-                                <xsl:value-of select="."/>  
-                            </b>  
-                            <xsl:text>:</xsl:text> 
-                                <xsl:variable name="nametobechecked" select="."/>  
-                            <ul> 
+                            <b> 
+                                <xsl:value-of select="."/> 
+                            </b> 
+                            <xsl:text>:</xsl:text>
+                                <xsl:variable name="nametobechecked" select="."/> 
+                            <ul>
                                 <xsl:for-each
                                     select="distinct-values($sarah//name[@ref = $nametobechecked][@ref = $nametobechecked])">
-                                    <li>  
-                                        <xsl:text>“</xsl:text>  
-                                        <xsl:value-of select="."/> 
-                                        <xsl:text>”</xsl:text>  
-                                    </li>  
-                                </xsl:for-each>  
-                            </ul> 
-                        </li>  
-                    </xsl:for-each>  
+                                    <li> 
+                                        <xsl:text>“</xsl:text> 
+                                        <xsl:value-of select="."/>
+                                        <xsl:text>”</xsl:text> 
+                                    </li> 
+                                </xsl:for-each> 
+                            </ul>
+                        </li> 
+                    </xsl:for-each> 
                 </ul>
                 <h2>Places</h2>
                 <ul>
