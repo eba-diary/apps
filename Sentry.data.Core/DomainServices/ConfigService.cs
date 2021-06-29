@@ -1247,6 +1247,7 @@ namespace Sentry.data.Core
             dto.DeleteIssuer = dfc.DeleteIssuer;
             dto.DeleteIssueDTM = dfc.DeleteIssueDTM;
             dto.ObjectStatus = dfc.ObjectStatus;
+            dto.SchemaRootPath = dfc.Schema?.SchemaRootPath;
         }
 
         public Tuple<List<RetrieverJob>, List<DataFlowStepDto>> GetDataFlowDropLocationJobs(DatasetFileConfig config)

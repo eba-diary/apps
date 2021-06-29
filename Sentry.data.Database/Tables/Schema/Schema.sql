@@ -31,5 +31,6 @@
     [SnowflakeStatus] VARCHAR(250) NULL, 
     [ObjectStatus] INT NOT NULL DEFAULT 1, 
     [CLA3014_LoadDataToSnowflake] BIT NOT NULL DEFAULT 0, 
+    [SchemaRootPath] VARCHAR(250) NULL, 
     CONSTRAINT [FK_Schema_FileExtension] FOREIGN KEY ([FileExtension_Id]) REFERENCES [FileExtension]([Extension_Id]) 
 )

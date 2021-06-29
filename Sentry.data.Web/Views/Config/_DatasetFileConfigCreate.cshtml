@@ -95,28 +95,44 @@
 
                 <div class="form-group">
                     @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
+                    <div class="col-md-2">
                         @Html.DropDownListFor(model => model.FileExtensionID, Model.ExtensionList, new { @class = "form-control edit-dataset-row" })
+                    </div>
+
+                    <div class="schemaRootPathPanel">
+                        @Html.LabelFor((model) => model.SchemaRootPath, new { @class = "control-label col-md-2 optional" })
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(model => model.SchemaRootPath, new { @class = "form-control edit-dataset-row" })
+                        </div>
+
+                        <div class="col-md-5 col-md-offset-6">
+                            <span class="text-muted">Specify schema root element path (<a href="@Sentry.data.Core.GlobalConstants.DocumentationLinks.SCHEMA_ROOT_PATH_USAGE" target="_blank">usage documentation</a>)</span>
+                        </div>
+                    </div>
+                    <div class="delimiterPanel">
+                        @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
+                        <div class="col-md-4">
+                            @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
+                        </div>
+
+                        <div class="col-md-5 col-md-offset-6">
+                            <span class="text-muted">
+                                <em id="fileTypeInfo"></em>The character or set of characters used to delimit a file.
+                                <br />Common delimiters include; tab (\t), pipe (|), tilda (~).
+                                <br />Note: If your file is comma (,) delimited please choose the CSV file extension option. 
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-group delimiter">
-                    @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
-                    <div class="col-md-10">
-                        @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
-                    </div>
+                @*<div class="form-group delimiter">
+                    
                 </div>
 
                 <div class="form-group fieldDescription delimiter delimiterDescription">
                     <label class="control-label col-md-2"></label>
-                    <div class="col-md-10">
-                        <span class="text-muted">
-                            <em id="fileTypeInfo"></em>The character or set of characters used to delimit a file.  Common delimiters include; tab (\t), pipe (|), tilda (~).
-                            <br />
-                            Note: If your file is comma (,) delimited please choose the CSV file extension option. 
-                        </span>
-                    </div>
-                </div>
+                    
+                </div>*@
 
                 <div class="form-group">
                     @Html.LabelFor(model => model.HasHeader, new { @class = "control-label col-md-2 optional" })
@@ -185,7 +201,7 @@
                             @Html.Label("Kafka Flag", new { @class = "control-label col-md-6 optional text-muted", @style = "text-align: left" })
                         </div>
                     </div>
-                    }
+                }
 
             </div>
             <hr />

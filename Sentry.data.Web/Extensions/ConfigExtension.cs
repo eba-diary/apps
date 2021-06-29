@@ -103,7 +103,8 @@ namespace Sentry.data.Web
                 HasHeader = model.HasHeader,
                 Delimiter = model.Delimiter,
                 CreateCurrentView = model.CreateCurrentView,
-                ObjectStatus = model.ObjectStatus
+                ObjectStatus = model.ObjectStatus,
+                SchemaRootPath = model.SchemaRootPath
             };
         }
 
@@ -127,7 +128,8 @@ namespace Sentry.data.Web
                 CLA2472_EMRSend = model.CLA2472_EMRSend,
                 CLA1286_KafkaFlag = model.CLA1286_KafkaFlag,
                 CLA3014_LoadDataToSnowflake = model.CLA3014_LoadDataToSnowflake,
-                ObjectStatus = model.ObjectStatus
+                ObjectStatus = model.ObjectStatus,
+                SchemaRootPath = model.SchemaRootPath
             };
         }
 
@@ -212,7 +214,8 @@ namespace Sentry.data.Web
                 SnowflakeSchema = schemaDto.SnowflakeSchema,
                 SnowflakeTable = schemaDto.SnowflakeTable,
                 SnowflakeStatus = schemaDto.SnowflakeStatus,
-                ObjectStatus = schemaDto.ObjectStatus.GetDescription().ToUpper()
+                ObjectStatus = schemaDto.ObjectStatus.GetDescription().ToUpper(),
+                SchemaRootPath = schemaDto.SchemaRootPath?.Split(',')
             };
         }
 
@@ -252,6 +255,7 @@ namespace Sentry.data.Web
             model.CLA3014_LoadDataToSnowflake = (config.Schema != null) ? config.Schema.CLA3014_LoadDataToSnowflake : false;
             model.DeleteInd = config.Schema.DeleteInd;
             model.ObjectStatus = config.ObjectStatus;
+            model.SchemaRootPath = config.Schema?.SchemaRootPath;
         }
     }
 }

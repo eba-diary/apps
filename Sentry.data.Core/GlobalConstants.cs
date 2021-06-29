@@ -335,5 +335,10 @@
             public const string GUID_CULTURE = "en-US";
             public const string GUID_FORMAT = "yyyyMMddHHmmssfff";
         }
+
+        public static class DocumentationLinks
+        {
+            public const string SCHEMA_ROOT_PATH_USAGE = "https://confluence.sentry.com/display/CLA/Schema+Root+Path+Option";
+        }
     }
 }
