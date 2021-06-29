@@ -3,7 +3,8 @@ using System.Runtime.Serialization;
 
 namespace Sentry.data.Core.Exceptions
 {
-    public class KafkaProducerException : Exception, ISerializable
+    [Serializable]
+    public class KafkaProducerException : Exception
     {
         public KafkaProducerException() { }
         public KafkaProducerException(string message) : base(message) { }
