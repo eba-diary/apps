@@ -1,0 +1,209 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Diary of Mrs. Emma B. Andrews. Volume 19 1912-1913</title>
+        <author>
+          <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
+        </author>
+        <editor>
+          <persName ref="#SK">Sarah Ketchley</persName>
+        </editor>
+      </titleStmt>
+      <publicationStmt>
+        <publisher>
+          <orgName ref="#Emma_B_Andrews_Diary_Project">Emma B. Andrews Diary Project</orgName>
+        </publisher>
+        <address>
+          <addrLine>University of Washington, Seattle, WA</addrLine>
+        </address>
+        <availability>
+          <licence target="https://creativecommons.org/licenses/by-nc-sa/4.0/">his work is licensed under a Creative Commons Attribution-NonCommercial Share-Alike 4.0 International License.</licence>
+        </availability>
+        <date>2021-04-13</date>
+      </publicationStmt>
+      <sourceDesc>
+        <p><name ref="#American_Philosophical_Society_Philadelphia">American Philosophical Society, Philadelphia</name></p>
+      </sourceDesc>
+      <encodingStmt>
+        <projectDesc>
+          <p>Established in 2010, the goals of the <orgName ref="#EBA_Diary_Project">Emma B. Andrews Diary Project</orgName> include the transcription and digitization of a wide range of primary historical material from the 'Golden Age' of Egyptian archaeology at the end of the 19th and beginning of the 20th centuries. A founding partner of <orgName ref="#Newbook_Digital_Texts">Newbook Digital Texts</orgName> (www.newbookdigitaltexts.org), the <orgName ref="#EBA_Diary_Project">EBA Diary Project</orgName> offers undergraduate and graduate digital humanities education and internships at the <orgName ref="#University_of_Washington">University of Washington</orgName>. <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName> is best remembered for her association with the millionaire lawyer turned archaeologist/art and antiquities collector, <persName ref="#Davis_Theodore_M">Theodore M. Davis</persName>. Traveling to <placeName ref="#Egypt">Egypt</placeName> with him between 1889 and 1912, she kept detailed journals of these voyages along the <placeName ref="#Nile">Nile</placeName>, including his important yet under-reported excavations of over 20 significant tombs in the <placeName ref="#Valley_of_the_Kings">Valley of the Kings</placeName>. <persName ref="#Andrews_Emma_B">Emma</persName> provides a vital commentary on the archaeology and pioneering Egyptologists of the time, painting a revealing picture of the lives of the colonial gentry and the cultural and scientific literati in at the dawn of the twentieth century. Analysis of the content of her diaries, along with a broad range of additional primary source material, will afford scholars information about important historical resources for the first time.</p>
+        </projectDesc>
+      </encodingStmt>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <pb n="105"/>
+            <div xml:id="EBA-1912-11-21" type="entry">
+                <dateline>
+                    <date when="1912-11-21">Nov. 21. 1912.</date>
+                </dateline>
+                <p>After a hurried and tiring week spent in <placeName ref="#New_York">New York</placeName> at that perfect hotel, the <name type="hotel" ref="#St_Denis_Hotel"><choice><sic>St. Dennis</sic><corr>St. Denis</name></corr></choice>, we sailed on <date when="1912-11-16">Saturday the 16</date>, for <placeName ref="#Egypt">Egypt</placeName> via <placeName ref="#Naples">Naples</placeName> on that ship well known to us, the "<name type="boat" ref="#SS_Berlin">Berlin</name>", on which we have crossed for two years. Only, this time I was not upstairs in the Captain's room as usual. We have <persName ref="#Newberry_Mary">Mary Newberry</persName> and her daughter, <persName ref="#Newberry_Doris">Doris</persName>, with us, making their first acquaintance with these southern waters. But we are unfortunate - for our second day out was bad - the wind and sea increasing in violence, and for 24 hours it was terrific - it is now better, but the rain and mist continue, and we have only caught a glimpse of the <placeName ref="#Azores">Azores</placeName> - which we are now passing.</p>
+            </div>
+            <div xml:id="EBA-1912-11-24" type="entry">
+                <dateline>
+                    <date when="1912-11-24">Sunday. Nov. 24th.</date>
+                </dateline>
+                <p>We dropped our anchor about 2 o'clock at <placeName ref="#Gibraltar">Gibraltar</placeName>. Most of the passengers went ashore, <persName ref="#Jones_Harold">Jones</persName> guiding <persName ref="#Newberry_Mary">Mary</persName> and <persName ref="#Newberry_Doris">Doris</persName>. They were duly impressed and charmed. We were soon off - it growing wilder as we got well into the <placeName ref="#Mediterranean_Sea">Mediterranean</placeName>.</p> 
+            </div>
+            <div xml:id="EBA-1912-11-26" type="entry">
+                <dateline>
+                    <date when="1912-11-26">Tuesday. Nov. 26th.</date>
+                </dateline>
+                <p>Reached <placeName ref="#Algiers">Algiers</placeName> after dark - many went ashore - mild and lovely.</p>
+            </div>
+            <pb n="106"/>
+            <div xml:id="EBA-1912-11-27" type="entry">
+                <dateline>
+                    <date when="1912-11-27"><choice><sic>Wednesday. Oct. 27th.</sic><corr>Wednesday. Nov. 27th.</corr></choice></date>
+                </dateline>
+                <p>Arrived at noon today - found <persName ref="#Burton_Harry">Harry</persName> waiting for us. The pleasant old appartment at the <name type="hotel" ref="#Grand_Hotel">Grand Hotel</name> - a tea at <name type="hotel" ref="#Bertolinis_Palace_Hotel">Bertolini</name>'s - and off in the <choice><sic>Prinz Heinrick</sic><corr><name type="boat" ref="#SS_Prinz_Heinrich">Prinz Heinrich</name></corr></choice> for <placeName ref="#Egypt">Egypt</placeName> on Friday - a very smooth passage over a summer sea, and <placeName ref="#Egypt">Egypt</placeName> at last, and once again. How glad we were for <persName ref="#Davis_Theodore_M">Theodore</persName>'s sake - and he was so happy to find himself once more here!</p>
+            </div>
+            <div xml:id="EBA-1912-12-11" type="entry">
+                <dateline>
+                    <name type="boat" ref="#Beduin">Dahabya Beduin</name>.
+                    <date when="1912-12-11">Dec. 11th.</date>
+                </dateline> 
+                <p>We are now established on our boat - waiting for our tug - which should arrive in the morning. How pleasant it is! after a whole month from home spent in hotels and steamers! It has been a busy week in <placeName ref="#Cairo">Cairo</placeName> - <persName ref="#Newberry_Mary">Mary</persName> and <persName ref="#Newberry_Doris">Doris</persName> have been sightseeing and motoring about. I have been once to the <placeName ref="#Boulaq_Museum">Museum</placeName> making a visit to Sir <persName ref="#Maspero_Gaston">Gaston Maspero</persName> with <persName ref="#Davis_Theodore_M">Theo</persName>. We spoke of the magnificent cover to the so-called Tyii' coffin which has never been shown to the public and is kept entirely apart in a private room. A man capable of repairing it has been found, and has agreed to do the whole thing and to finish it within 5 months. The gold work, as well as the exquisite inlay - it will be a grand addition to <persName ref="#Davis_Theodore_M">Theodore</persName>'s exhibit at the <placeName ref="#Boulaq_Museum">Museum</placeName>. We had quite a little tea party on <date when="1912-12-08">Sunday</date> afternoon, on the boat. <persName ref="#Sayce_Archibald">Mr. Sayce</persName>, <persName ref="#Artin_Pasha">Artin Pasha</persName>, <persName ref="#Bey_Claudius">Claudius Bey</persName> and the young <persName ref="#Leavitt_Mr #Leavitt_Mrs">Leavitts</persName>. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> is on his way to <placeName ref="#India">India</placeName>. We gave a morning to the <placeName ref="#Giza_Zoo">zoo</placeName> - and generally a lot of sight seeing.</p>
+            </div>
+            <pb n="107"/>
+            <div xml:id="EBA-1912-12-21" type="entry">
+                <dateline>
+                    <date when="1912-12-21">Saturday. Dec. 21</date>
+                </dateline>     
+                <p>We arrived about noon today - after a pleasant and successful voyage of 10 days - one day of showers - clearing with most beautiful rainbow. We have several fine new sailors - young men - making a fine crew - of course our tug was a good strong one, making a fast voyage. We find several friends here - <persName ref="#Whymper_Charles">Mr. Whymper</persName>, <persName ref="#Villamarina_Contessa_di">Contessa Villamarina</persName>, <persName ref="#Pier_Mr #Pier_Mrs">Mr. and Mrs. Pier</persName> and their 2 heavenly little girls - <persName ref="#Buchanan_Miss">Miss Buchanan</persName> fortunately for 2 days. She is now at the head of the <orgName ref="#American_College_for_Girls">American College for girls</orgName> in <placeName ref="#Cairo">Cairo</placeName>. On the <date when="1912-12-25">24th</date> the <name type="boat" ref="#Serapis">Serapis</name> arrived with <persName ref="#Tuck_Edward #Stell_Julia">Mr. and Mrs. Tuck</persName> of <placeName ref="#Paris">Paris</placeName>, <persName ref="#Curley_Major">Major Curley</persName> of <placeName ref="#Newport">Newport</placeName>, <persName ref="#Nelson_Miss">Miss Nelson</persName> and <persName ref="#Morgan_Miss">Miss Morgan</persName>, niece of <persName ref="#Tuck_Edward">Mr. Tuck</persName>. They and <persName ref="#Nicol_Erskine">Mr. Nicol</persName> were here to tea on <date when="1912-12-25">Christmas day</date>, and <persName ref="#Burton_Harry">Harry Burton</persName> and <persName ref="#Crane_Lancelot">Mr. Crane</persName> to lunch.</p>
+            </div>
+            <div xml:id="EBA-1912-12-27" type="entry">
+                <dateline>
+                    <date when="1912-12-27">Friday. Dec. 27th.</date>
+                </dateline>
+                <p>We all - four of us, and <persName ref="#Jones_Harold">Jones</persName> went over to the <placeName ref="#Valley_of_the_Kings">Valley</placeName>, and stayed 3 days - and had a jolly visit. <persName ref="#James_Arthur #James_Arthur_Mrs">Mr. and Mrs. Arthur James</persName> of <placeName ref="#Newport">Newport</placeName> who sailed from there on their yacht, the "<name type="boat" ref="#Aloha">Aloha</name>" just before we left, arrived on the "<name type="boat" ref="#Hyksos">Hyksos</name>" came to tea. They were so pleased with our boat. They are going to join their yacht again at <placeName ref="#Mombasa">Mombasa</placeName> for the return home.</p>
+            </div>
+            <div xml:id="EBA-1913-01-01" type="entry">
+                <dateline>
+                    <date when="1913-01-01">Wednesday. Jan. 1st.</date>
+                </dateline>
+                <p><persName ref="#Whymper_Charles">Mr. Whymper</persName> came to breakfast and brought us all the news of <placeName ref="#Luxor">Luxor</placeName></p>
+            </div>
+            <pb n="108"/>
+            <div xml:id="EBA-1912-01-02" type="entry">
+                <dateline>
+                    <date when="1912-01-02">Thursday. Jan. 2nd.</date>
+                </dateline>
+                <p><persName ref="#Villamarina_Contessa_di">Contessa Villamarina</persName> and <persName ref="#Tremaine_Mr">Mr. Tremaine</persName> came to tea - <persName ref="#von_Bissing_Baron #von_Bissing_Baroness">Baron and Baroness v. Bissing</persName> are lying in their boat, just behind us - and <persName ref="#Newberry_Mary">Mary</persName> and I went to tea with them last evening.
+                </p>
+            </div>
+            <div xml:id="EBA-1913-01-03" type="entry">
+                <dateline>
+                    <date when="1913-01-03">Saturday. Jan. 3rd.</date>
+                </dateline>
+                <p><persName ref="#Newberry_Mary">Mary</persName>, <persName ref="#Newberry_Doris">Doris</persName> and I crossed over and paid a visit to <persName ref="#Nicol_Erskine">Mr. Nicol</persName>. He has the very best picture I ever saw of his - the wonderful mountain range opposite <placeName ref="#Luxor">Luxor</placeName> - the finest view in all <placeName ref="#Egypt">Egypt</placeName> I think. He says he painted it for me - but <persName ref="#Pier_Mr #Pier_Mrs">Mr. and Mrs. Pier</persName> who were <choice><sic>her</sic><corr>here</corr></choice> to lunch, say that they are to have it.</p>
+            </div>
+            <div xml:id="EBA-1913-01-06" type="entry">
+                <dateline>
+                    <date when="1913-01-06">Monday. Jan. 6th.</date>
+                </dateline>
+                <p>The <persName ref="#von_Bissing_Baron #von_Bissing_Baroness">v. Bissings</persName> were here to tea - and <persName ref="#Nicol_Erskine">Mr. Nicol</persName> dined with us.</p>
+            </div>
+            <div xml:id="EBA-1913-01-07" type="entry">
+                <dateline>
+                    <date when="1913-01-07">Tuesday. Jan. 7th.</date>
+                </dateline>
+                <p>We have all been over to see <persName ref="#Burton_Harry">Harry</persName>'s diggings at <placeName ref="#Medinet_Habu">Medinet Habu</placeName>.</p>
+            </div>
+            <div xml:id="EBA-1913-01-12" type="entry">
+                <dateline>
+                    <date when="1913-01-12">Sunday. Jan. 12th.</date>
+                </dateline>
+                <p>We have had <persName ref="#von_Bissing_Baron #von_Bissing_Baroness">Baron and Baroness v. Bissing</persName> to lunch, <persName ref="#Ferroir_Miss">Miss Ferroir</persName> to tea and <persName ref="#Downie_Miss">Miss Downie</persName> and the <persName ref="#Pier_Mr #Pier_Mrs">Piers</persName> to lunch this week. We have paid a visit to the <persName ref="#Fahnestock_Gibson #Fahnestock_Mrs"><choice><sic>Fahnstocks</sic><corr>Fahnestocks</corr></choice></persName>, who are lying near. The weather is at last clear and warm.</p>
+            </div>
+            <pb n="109"/>
+            <div xml:id="EBA-1912-01-19" type="entry">
+                <dateline>
+                    <date when="1912-01-19">Sunday. Jan. 19.</date>
+                </dateline>
+                <p>We have had among other visitors this week, the <persName ref="#Hardy_Mr #Hardy_Mrs">Hardys</persName> to tea,  <persName ref="#Maspero_Gaston">Sir Gaston</persName> and <persName ref="#Maspero_Louise">Lady Maspero</persName>, and  <persName ref="#Sprague_Carleton #Sprague_Mrs"><choice><sic>Mr. and Mrs. Carlstone Sprague</sic><corr>Mr. and Mrs. Carleton Sprague</corr></choice></persName> sent by <persName ref="#Metcalf_Mrs">Mrs. Metcalf</persName>, and <persName ref= "#Marquand_Allan"><choice><sic>Mr. Allen Marquand</sic><corr>Mr. Allan Marquand</corr></choice></persName>, windy and cold.</p>
+            </div>
+            <div xml:id="EBA-1913-01-26" type="entry">
+                <dateline>
+                    <date when="1913-01-26">Sunday. Jan. 26.</date>
+                </dateline>
+                <p>It has been warm and charming most of the week. We have had the <persName ref="#Contardone_Contessa">Contessa</persName> and <persName ref="#Tremaine_Mr">Mr. Tremaine</persName>, <persName ref="#Gardiner_Alan"><choice><sic>Mr. Alan Gardner</sic><corr>Mr. Alan Gardiner</corr></choice></persName>, <persName ref="#Longyear_Mr #Longyear_Mrs">Mr. and Mrs. Longyear</persName> and son on their homeward bound voyage from <placeName ref="#India">India</placeName>, <persName ref="#Fahnestock_Gibson"><choice><sic>Mr. Fahnstock</sic><corr>Mr. Fahnestock</corr></choice></persName> to tea, <persName ref="#Tremaine_Mr">Mr. Tremaine</persName> to lunch, and <persName ref="#Whymper_Charles">Mr. Whymper</persName> to breakfast this week, to say nothing of a charming little white baby donkey, which one of the sailors brought on the lower deck, to amuse the <persName ref="#Pier_Mr #Pier_Mrs">Pier</persName> children. We have had some warm days.</p>
+            </div>
+            <div xml:id="EBA-1913-02-02" type="entry">
+                <dateline>
+                    <date when="1913-02-02">Sunday. Feb. 2nd.</date>
+                </dateline>
+                <p>Various visits from friends - we have lunched with the <persName ref="#Fahnestock_Gibson #Fahnestock_Mrs"><choice><sic>Fahnstocks</sic><corr>Fahnestocks</corr></choice></persName> and <persName ref="#Maspero_Gaston #Maspero_Louise">Masperos</persName> - visits to the diggings etc - cold and windy.</p>
+            </div>
+            <div xml:id="EBA-1913-02-09" type="entry">
+                <dateline>
+                    <date when="1913-02-09">Sunday. Feb 9th.</date>
+                </dateline>
+                <p>It has been very warm - various visitors - among them the <persName ref="#Longyear_Mr #Longyear_Mrs">Longyears</persName> back from the South as far as <placeName ref="#Khartoum">Khartoum</placeName>. <persName ref="#Whymper_Charles">Mr. Whymper</persName> to breakfast this morning.</p>
+            </div>
+            <div xml:id="EBA-1913-02-16" type="entry">
+                <dateline>
+                    <date when="1913-02-16">Sunday. Feb. 16th.</date>
+                </dateline>    
+                <p>We dressed the ship on <date when="1913-02-12">Wednesday</date> - <persName ref="#Lincoln_Abraham">Lincoln</persName>'s birthday - the <pb n="110"/>usual routine - this week - we have had light rain on one day and cold stormy weather since. <persName ref="#Contardone_Contessa">Contessa</persName> here for luncheon.</p>
+            </div>
+            <div xml:id="EBA-1913-02-23" type="entry">
+                <dateline>
+                    <date when="1913-02-23">Sunday. Feb. 23rd.</date>
+                </dateline>
+                <p>Very warm. <persName ref="#Whymper_Charles">Mr. Whymper</persName> to breakfast - the <persName ref="#Pier_Mr #Pier_Mrs">Piers</persName> to lunch. <persName ref="#Aylener_Mrs">Mrs. Aylener</persName> and <persName ref="#Morehouse_Mrs">Morehouse</persName> to tea. We have had <persName ref="#Hardy_Mr #Hardy_Mrs">Mr. and Mrs. Hardy</persName> to tea - <persName ref="#Nelson_Aldrich">Senator Aldrich</persName> also. <persName ref="#Newberry_Mary">Mary N.</persName> and I have been over to the <name type="hotel" ref="#Winter_Palace">Winter Palace</name> for tea - we looked very smart on Washington's birthday with all our flags.</p>
+            </div>
+            <div xml:id="EBA-1913-03-02" type="entry">
+                <dateline>
+                    <date when="1913-03-02">Sunday. March 2nd.</date>
+                </dateline>
+                <p>On <date when="1913-02-24">Monday</date> <persName ref="#Newberry_Mary">Mary</persName> and I went to tea with the <persName ref="#Contardone_Contessa">Contessa</persName> in the gardens of the <name type="hotel" ref="#Luxor_Hotel">Luxor Hotel</name> - met <persName ref="#Baring_Lady">Lady Baring</persName>, <persName ref="#Murray_Miss">Miss Murray</persName>, and <persName ref="#Pappenheim_Contessa">Contessa Pappenheim</persName> and daughter <!--tag daughter?-->. Charming people all - yesterday we left for <placeName ref="#Aswan">Asw&#226;n</placeName>.</p>
+            </div>
+            <div xml:id="EBA-1913-03-09" type="entry">
+                <dateline>
+                    <date when="1913-03-09">Sunday. March 9th.</date>
+                </dateline>
+                <p>This is our record for the week - very high wind from the time we left <placeName ref="#Luxor">Luxor</placeName>. Stopped at <placeName ref="#Idfu">Edfou</placeName> - <placeName ref="#Kawm_Umbū">Kom Ombo</placeName> - where we were held some time by furious wind - after leaving we passed the most wonderful mass of flamingoes - absolutely dense masses of them - attending a mile or two - very remarkable - reached <placeName ref="#Aswan">Aswan</placeName> the <date when="1913-03-04">4th</date>. The wind horridly bad. <persName ref="#Newberry_Mary">Mary</persName> and <persName ref="#Newberry_Doris">Doris</persName> went to <placeName ref="Barrage_Aswan">Barrage</placeName> - the next day we moved down opposite <placeName ref="#Grenfell_Tomb">Grenfell</placeName>'s tomb, and the girls visited them. The <date when="1913-03-07">7th</date> we left <placeName ref="#Aswan">Aswan</placeName>, the terrific wind still holding - so that we were tied up some time <pb n="111"/>below <placeName ref="#Kawm_Umbū">Kom Ombo<</placeName> - the next day we struck upon 3 sand banks, or rather our tug did - and reached here this morning.</p>
+            </div>
+            <div xml:id="EBA-1913-03-16" type="entry">
+                <dateline>
+                    <date when="1913-03-16">Sunday. Mar. 16th.</date>
+                </dateline>
+                <p>We spent the days <date when="1913-03-10">Monday</date> and <date when="1913-03-11">Tuesday</date> in <placeName ref="#Luxor">Luxor</placeName> - <persName ref="#Newberry_Doris">Doris</persName> and I went over to the town - and <persName ref="#Crispell_Mrs">Mrs. Crispell</persName> and her niece came from the <name type="boat" ref="#Mayflower">Mayflower</name> to tea - I was so pleased with her. <persName ref="#Crane_Lancelot">Mr. Crane</persName> and <persName ref="#Burton_Harry">Harry</persName> came to tea, and we left <placeName ref="#Luxor">Luxor</placeName> the <date when="1913-03-12">12th</date> at noon - having had a nice visit from <persName ref="#Mohassib_Mohammed">Old Hagg Mahassib</persName> - <placeName ref="#Naj_Hammadi">Nag Hamadi</placeName> the <date when="1913-03-13">13</date> - <placeName ref="#Balyana_Al">Balliana</placeName> the <date when="1913-03-14">14</date> - where we stopped for <persName ref="#Newberry_Mary">Mary</persName>, <persName ref="#Newberry_Doris">Doris</persName>, <persName ref="#Amelie">Amelie</persName>, <persName ref="#Jones_Daniel">Jones</persName> and <persName ref="#Hassein">Hassein</persName> to visit <placeName ref="#Abydos">Abydos</placeName> - very cold and terrific wind - very severe in the night and rough today. We passed the <placeName ref="#Arabia_Peninsula">Arabia</placeName> stuck at 8:30 A.M. Cold, constant wind.</p>
+            </div>
+            <div xml:id="EBA-1913-04-02" type="entry">
+                <dateline>
+                    <date when="1913-04-02">Wednesday. April 2nd.</date>
+                </dateline>
+                <p>We left the boat very reluctantly several days ago, that charming little home, and came to the <name type="hotel" ref="#Ghizereh_Palace_Hotel">Ghizereh Palace Hotel</name> - and into our old rooms. Hotel almost empty. The new bridge is finished, and trains are running over it. A very fine and long one - and a great convenience - but it spoils the garden somewhat. <placeName ref="#Cairo">Cairo</placeName> is fast changing and improving but losing its unique interesting eastern features. <persName ref="#Graham_Mrs">Mrs. Graham</persName> called with <persName ref="#Watson_Major">Major Watson</persName> and asked us to tea on <date when="1913-03-28">Friday</date> and very pleasant it was, as always. <persName ref="#Tremaine_Mr">Mr. Tremaine</persName> and <persName ref="#Carter_Howard">Mr. Carter</persName> called.</p>
+            </div>
+            <pb n="112"/>
+            <div xml:id="EBA-1912-04-06" type="entry">
+                <dateline>
+                    <date when="1912-04-06">Sunday. April 6th.</date>
+                </dateline>
+                <p>Home all day - <persName ref="#von_Bissing_Baron">Baron v. Bissing</persName> called and stopped for tea. <persName ref="#Villamarina_Contessa_di">Contessa Villamarina</persName> and <persName ref="#Johannis_Mlle">Mlle Johannis</persName> too.</p>
+            </div>
+            <div xml:id="EBA-1913-04-07" type="entry">
+                <dateline>
+                    <date when="1913-04-07">Monday. April 7th.</date>
+                </dateline>
+                <p><persName ref="#Rathbone_Elena">Elena Rathbone</persName> and her friend <persName ref="#Cholanley_Miss">Miss Cholanley</persName> just back from <placeName ref="#India">India</placeName> came to tea, as well as <persName ref="#Anthony_Mr">Mr. Anthony</persName> and <persName ref="#Lythgoe_Albert">Mr. Lythgoe</persName>.</p>
+            </div>
+            <div xml:id="EBA-1913-04-12" type="entry">
+                <dateline>
+                    <date when="1913-04-12">Saturday. April 12th.</date>
+                </dateline>
+                <p>Arrived in <placeName ref="#Naples">Naples</placeName> at 7:30 this morning, landed in the hideous confusion characteristic of the N.G.L. steamers <!--The North German Lloyd Line tag?-->- rain and cold winds.</p>
+            </div>
+            <div xml:id="EBA-1913-04-16" type="entry">
+                <dateline>
+                    <date when="1913-04-16">Wednesday. April 16th.</date>
+                </dateline>
+                <p>Came to <placeName ref="#Florence">Florence</placeName> - a long days journey - very cold. <placeName ref="#Vesuvius">Vesuvius</placeName> and the mountains all this way up, covered with snow. We came to the <name type="hotel" ref="#Hotel_Royal_Grande_Bretagne">Grande Bretagne</name> and to our old appartment - we have had a little fire every day. <persName ref="#Davis_Theodore_M">Theo</persName> has been almost every day motoring, with <persName ref="#Constantini_David"><choice><sic>David Costantini</sic><corr>David Constantini</corr></choice></persName> and <persName ref="#Burton_Harry">Harry Burton</persName>, and some one or two of the girls. The season is very backward - the roses just beginning to show. Have made some pleasant visits - <persName ref="#Davis_Theodore_M">Theo</persName> has made excursions to <placeName ref="#Faenza">Faenza</placeName>, <placeName ref="#Settignano">Settignano</placeName> - <placeName ref="#Volterra">Volterra</placeName> and enjoyed it keenly. He has loved going to the <placeName ref="#Villino">Villino</placeName> and hearing <persName ref="#Buttles_Jeanette">Nettie</persName> sing - and to drive to the <placeName ref="#Parco_delle_Cascine">Cascine</placeName> for a walk along the little river, with its lovely entourage of blue mountains and green meadows and magnificent trees. Above all I have enjoyed the companion- <pb n="113"/> ship of the two dear nieces, <persName ref="#Buttles_Jeanette">Nettie</persName> and <persName ref="#Newberry_Mary">Mary</persName>. We go tomorrow at 5 P.M. via the <placeName ref="#Mount_Cenis">Mt. Cenie</placeName> pass to <placeName ref="#London">London</placeName>. 1912-1913 6</p>
+      </div>
+    </body>
+  </text>
+</TEI>
