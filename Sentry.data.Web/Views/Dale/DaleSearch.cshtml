@@ -13,7 +13,6 @@
 
          @*MAIN LEFT PORTION OF SCREEN*@
          <div class="col-xs-2">
-
          </div>
 
          @*MAIN MIDDLE PORTION OF SCREEN*@
@@ -22,8 +21,8 @@
              @*nested row within column so we can have another nested set of columns to make up search cluster and save button*@
              <div class="row" style="display:flex;">
 
-                 @*NESTED SEARCH CLUSTER A:  Search Bar and Title *@
-                 <div class="col-lg-6">
+                 @*BASIC NESTED SEARCH CLUSTER A:  Search Bar and Title *@
+                 <div class="col-lg-6 dale-basic-search">
 
                      <div class="pull-right" style="display:inline-block;">
 
@@ -63,8 +62,8 @@
 
                  </div>
 
-                 @*NESTED SEARCH CLUSTER B:  Radio Buttons and Sensitive*@
-                 <div class="col-lg-4" style="display:flex;">
+                 @*BASIC NESTED SEARCH CLUSTER B:  Radio Buttons and Sensitive*@
+                 <div class="col-lg-3 dale-basic-search" style="display:flex;">
 
                      @*NOTE! the flex style basically pushes the radio button and sensitive controls to the button of the screen levereging the flex-end tag that sits on the actual control*@
                      <span id="radioMadness" style="display:flex; align-items:flex-end;">
@@ -72,17 +71,17 @@
                          <span style="text-align: left; font-family: KievitSlabWeb W03,Lucida Sans,serif;width:250px;">
 
                              <label style="text-align:left; width:100px;">
-                                 <input type="radio" name="Destiny" id="DestinyTableRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Object   @(Model.Destiny == DaleDestiny.Object ? "checked=\"checked\"" : "")>
+                                 <input type="radio" name="Destiny" id="DestinyTableRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Object @(Model.Destiny == DaleDestiny.Object ? "checked=\"checked\"" : "")>
                                  Table/View
                              </label>
 
-                            <label style="text-align:left; width:75px;">
-                                <input type="radio" name="Destiny" id="DestinyColumnRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Column   @(Model.Destiny == DaleDestiny.Column ? "checked=\"checked\"" : "")   >
-                                @Sentry.data.Core.GlobalEnums.DaleDestiny.Column
-                            </label>
+                             <label style="text-align:left; width:75px;">
+                                 <input type="radio" name="Destiny" id="DestinyColumnRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.Column @(Model.Destiny == DaleDestiny.Column ? "checked=\"checked\"" : "")>
+                                 @Sentry.data.Core.GlobalEnums.DaleDestiny.Column
+                             </label>
 
                              <label style="text-align:left; width:50px;">
-                                 <input type="radio" name="Destiny" id="DestinySaidRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.SAID      @(Model.Destiny == DaleDestiny.SAID ? "checked=\"checked\"" : "")>
+                                 <input type="radio" name="Destiny" id="DestinySaidRadio" value=@Sentry.data.Core.GlobalEnums.DaleDestiny.SAID @(Model.Destiny == DaleDestiny.SAID ? "checked=\"checked\"" : "")>
                                  @Sentry.data.Core.GlobalEnums.DaleDestiny.SAID
                              </label>
 
@@ -104,22 +103,78 @@
                              <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500; pointer-events:none;">Show Sensitive Columns</a>
                          </span>
                      }
-
                  </div>
 
-             </div>
+                 @*ADVANCED NESTED SEARCH CLUSTER A:  Search Bar and Title *@
+                 <div class="col-lg-6 dale-advanced-search">
 
+                     <div class="pull-right" style="display:inline-block;">
+
+                         @*DATA INVENTORY TITLE STUFF*@
+                         <div id="icon-container" style="display:inline-block;">
+                             <div style="float:left;">
+                                 <img style="height:50px;" src='~/Images/Dale/DataInventoryIcon.png' alt="DataInventory Image" />
+                             </div>
+
+                             <div style="float:left;">
+                                 <h1 class="htCenter datasetHeader">Data Inventory</h1>
+                             </div>
+
+                             <div style="float:left; margin-left: 2px;">
+                                 <a target="_blank" rel="noopener noreferrer" href="https://confluence.sentry.com/display/CLA/Data+Inventory">
+                                     <em class="glyphicon glyphicon-info-sign" style="color:#003da5;"></em>
+                                 </a>
+                             </div>
+                         </div>
+
+
+                         @*ADVANCED SEARCH BUTTON AND CRITERIA STUFF*@
+                         <div id="daleCriteriaContainer" class="xpull-right" style="display: table; width: 35px;">
+
+                             <span id="daleSearchClick" class="input-group-addon clickable" style="width: 50px;height:30px;" onclick="$(function() {$('#daleSearchCriteria').focus();});">
+                                 <em class="glyphicon glyphicon-search"></em>
+                             </span>
+
+                             <span id="daleSearchClickSpinner" class="input-group-addon" style="width: 50px;height:30px; display:none;" disabled onclick="$(function() {$('#daleSearchCriteria').focus();}); ">
+                                 <em class="fa fa-circle-o-notch fa-spin"></em>
+                             </span>
+
+                             
+                            <input type="text" id="daleAsset" name="searchAsset" class="form-control" style="width:300px; margin-left:10px;" placeholder="Asset" />
+                            <input type="text" id="daleServer" name="searchServer" class="form-control" style="width:300px; margin-left:10px;" placeholder="Server" />
+                            <input type="text" id="daleTableView" name="searchTableView" class="form-control" style="width:300px; margin-left:10px;" placeholder="Table/View" />
+                            <input type="text" id="daleType" name="searchType" class="form-control" style="width:300px; margin-left:10px;" placeholder="Type" />
+                            <input type="text" id="daleColumn" name="searchColumn" class="form-control" style="width:300px; margin-left:10px;" placeholder="Column" />
+                            <input type="text" id="daleSoruceType" name="searchSourceType" class="form-control" style="width:300px; margin-left:10px;" placeholder="Source Type" />
+                         </div>
+                     </div>
+                 </div>
+
+                 @*ADVANCED NESTED SEARCH CLUSTER B:  Radio Buttons and Sensitive*@
+             <div class="col-lg-3 dale-advanced-search" style="display:flex;">
+             </div>
+             </div>
          </div>
 
 
+        
+         <div id="btnDaleSearchOption" class="btn-group pull-right" role="group" aria-label="..." style="margin-right: 100px;">
+             <button type="button" value="BASIC" class="btn btn-default">Basic</button>
+             <button type="button" value="ADVANCED" class="btn btn-default">Advanced</button>
+         </div>
+
+
+
+
+
          @*MAIN RIGHT PORTION OF SCREEN*@
-         <div class="col-xs-2">
+         <div class="col-xs-offset-10">
              <button type="button" class="pull-right" id="btnSaveMe" style="width:200px; height:70px; background-color:#00a3e0; border-color:#00a3e0;color:ghostwhite;font-size: xx-large;margin-right: 100px;margin-top: 18px; display:none;">Save</button>
          </div>
 
 
      </div>
-  </div>
+     </div>
 
 @*result row here obeys container-fluid from layout so it can grow to max width*@
 <div class="dale-result-row">

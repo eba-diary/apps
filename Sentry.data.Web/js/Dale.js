@@ -6,6 +6,7 @@
     init: function ()
     {
         localStorage.clear();                                                           // Clear all items in our array
+        data.Dale.showSearchType('BASIC');                                              //display basic search type by default
 
         //init GRID based on User Security
         $.ajax({                                                                        
@@ -60,7 +61,51 @@
             });
            
         });
+
+
+        //BASIC OR ADVANCED SEARCH OPTION onClick event capture
+        $("#btnDaleSearchOption button").on('click', function (e) {
+
+            var thisBtn = $(this);
+            thisBtn.addClass('active').siblings().removeClass('active');
+            var btnValue = thisBtn.val();
+
+            if (btnValue == 'BASIC') {
+                data.Dale.showSearchType('BASIC');
+            }
+            else {
+                data.Dale.showSearchType('ADVANCED');
+            }
+
+
+            
+        });
+
     },
+
+
+    //SHOW SEARCH TYPE (BASIC or ADVANCED SEARCH)
+    showSearchType: function (searchType) {
+        if (searchType == 'BASIC') {
+
+            $('.dale-basic-search').show();
+            $('.dale-advanced-search').hide();
+
+            $('#btnDaleSearchOption.btn-group > .btn').removeClass('active')    // Remove any existing active classes
+            $('#btnDaleSearchOption.btn-group > .btn').eq(0).addClass('active') // Add the class to the nth element
+
+        }
+        else {
+
+            $('.dale-basic-search').hide();
+            $('.dale-advanced-search').show();
+
+            $('#btnDaleSearchOption.btn-group > .btn').removeClass('active')    // Remove any existing active classes
+            $('#btnDaleSearchOption.btn-group > .btn').eq(1).addClass('active') // Add the class to the nth element
+
+        }
+    },
+
 
     createMasterList: function (sensitiveList, verifiedList) {
 
