@@ -125,9 +125,13 @@ namespace Sentry.data.Web
             {
                 return DaleDestiny.Server;
             }
-            else 
+            else if (destiny.ToUpper() == DaleDestiny.Database.GetDescription().ToUpper())
             {
                 return DaleDestiny.Database;
+            }
+            else
+            {
+                return DaleDestiny.Advanced;
             }
         }
 

@@ -66,23 +66,23 @@
         //BASIC OR ADVANCED SEARCH OPTION onClick event capture
         $("#btnDaleSearchOption button").on('click', function (e) {
 
-            var thisBtn = $(this);
-            thisBtn.addClass('active').siblings().removeClass('active');
-            var btnValue = thisBtn.val();
+            var thisBtn = $(this);                                                  //get specific part of group button that was clicked
 
-            if (btnValue == 'BASIC') {
-                data.Dale.showSearchType('BASIC');
-            }
-            else {
-                data.Dale.showSearchType('ADVANCED');
-            }
+            thisBtn.addClass('active').siblings().removeClass('active');            //add active to current part of group clicked and remove active from everything else
+            var btnValue = thisBtn.val();                                           //figure out which one was clicked
 
-
-            
+            data.Dale.showSearchType(btnValue);                                     //display correct UI (BASIC or ADVANCED)
         });
 
     },
 
+    getSearchType: function () {
+
+        var thisBtn = $('#btnDaleSearchOption button');
+        var btnValue = thisBtn.val();
+        return btnValue;
+
+    },
 
     //SHOW SEARCH TYPE (BASIC or ADVANCED SEARCH)
     showSearchType: function (searchType) {
@@ -431,11 +431,22 @@
         }
     },
 
-    //figure out which radio button was selected
+    //figure out if BASIC OR ADVANCED and based ON that
     getDaleDestiny: function ()
     {
-        var daleDestinyTableRadio = $('input[name="Destiny"]:checked').val();
-        return daleDestinyTableRadio;
+        var daleDestiny = '';
+
+        if (data.Dale.getSearchType() == 'BASIC') {
+
+            //figure out which radio button was selected
+            daleDestiny = $('input[name="Destiny"]:checked').val();
+            
+        }
+        else {
+            daleDestiny = 'ADVANCED';
+        }
+
+        return daleDestiny;
     },
 
     //disable all controls user can hit during search

@@ -128,6 +128,22 @@ namespace Sentry.data.Infrastructure
             {
                 qWhereStatement = "WHERE IsSensitive_FLG = 1 ";
             }
+            else if(dto.Destiny == DaleDestiny.Advanced)
+            {
+             //   (Asset_CDE = 'test' or Asset_CDE IS NULL)
+	            //AND Server_NME = 'sentry.us-east-2.aws.snowflakecomputing.com'
+
+             //   AND Database_NME = 'DATA_PROD'
+
+             //   AND Base_NME = 'VW_FATALITYANALYSISREPORTINGSYSTEM_ACCIDENT'--table / view
+
+             //   AND Type_DSC = 'view'
+
+             //   AND Column_NME = 'weather'
+
+             //   AND Source_NME = 'SNFC'
+
+            }
             else 
             {
                 if (dto.Destiny == DaleDestiny.Object)
