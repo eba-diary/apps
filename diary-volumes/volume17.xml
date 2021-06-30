@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<?xml-model  href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://ebeshero.github.io/MRMValidate.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml"
+	schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <TEI xmlns="http://www.tei-c.org/ns/1.0">
     <teiHeader>
         <fileDesc>
@@ -11,9 +10,45 @@
                 <author>
                     <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
                 </author>
-                <editor>
-                    <persName ref="SK">Sarah Ketchley</persName>
-                </editor>
+                <respStmt>
+                    <resp>Originally prepared by</resp>
+                    <persName ref="#SLK">Sarah L. Ketchley</persName>
+                </respStmt>
+                <respStmt>
+                    <resp>TEIPublisher development</resp>
+                    <persName ref="#EF">Emma Fritzberg</persName>
+                </respStmt>
+                <respStmt>
+                    <resp>Historical Markup Tool development</resp>
+                    <persName ref="#AH">Audrey Holmes</persName>
+                </respStmt>
+                <respStmt>
+                    <resp>transcription</resp>
+                    <persName ref="#SJ">Sarah Johnson</persName>
+                    <persName ref="#CC">Chelsea Cooper</persName>
+                    <persName ref="#AF">Ariella Fish</persName>
+                    <persName ref="#JG">Janice Garr</persName>
+                    <persName ref="#MR">Megan Rowland</persName>
+                    <persName ref="#AS">Allison Skinner</persName>
+                    <persName ref="#TC">Tessa Carter</persName>
+                </respStmt>
+                <respStmt>
+                    <resp>proofreading and tagging</resp>
+                    <persName ref="#EF">Emma Fritzberg</persName>
+                    <persName ref="#SLK">Sarah Ketchley</persName>
+                </respStmt>
+                <respStmt>
+                    <resp>biographical research and writing</resp>
+                    <persName ref="#SK">Sarah Ketchley</persName>
+                    <persName ref="#JJ">Jasmine Jones</persName>
+                    <persName ref="#JC">Jasmine Choi</persName>
+                    <persName ref="#SR">Samuel Roller</persName>
+                    <persName ref="#AAD">Avery Dahl</persName>
+                    <persName ref="#AD">Avneet Dhaliwal</persName>
+                    <persName ref="#IH">Iona Hillman</persName>
+                    <persName ref="#LK">Lexi Kinzer</persName>
+                    <persName ref="#PH">Priya Hariharan</persName>
+                </respStmt>
             </titleStmt>
             <publicationStmt>
                 <publisher>
@@ -23,19 +58,65 @@
                     <addrLine>University of Washington, Seattle, WA</addrLine>
                 </address>
                 <availability>
-                    <licence target="https://creativecommons.org/licenses/by-nc/4.0/">This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</licence>
+                    <licence target="https://creativecommons.org/licenses/by-nc/4.0/">This work is
+                        licensed under a Creative Commons Attribution-NonCommercial 4.0
+                        International License.</licence>
                 </availability>
                 <date>08-2020</date>
             </publicationStmt>
             <sourceDesc>
-                <p><orgName ref="#American_Philosophical_Society_Philadelphia">American Philosophical Society, Philadelphia</orgName></p>
+                <p><orgName ref="#American_Philosophical_Society">American Philosophical
+                        Society</orgName>,<placeName ref="#Philadelphia"
+                    >Philadelphia</placeName></p>
             </sourceDesc>
-            <encodingStmt>
-                <projectDesc>
-                    <p>Established in 2010, the goals of the <orgName ref="#EBA_Diary_Project">Emma B. Andrews Diary Project</orgName> include the transcription and digitization of a wide range of primary historical material from the 'Golden Age' of Egyptian archaeology at the end of the 19th and beginning of the 20th centuries. A founding partner of <orgName ref="#Newbook_Digital_Texts">Newbook Digital Texts</orgName> (www.newbookdigitaltexts.org), the <orgName ref="#EBA_Diary_Project">EBA Diary Project</orgName> offers undergraduate and graduate digital humanities education and internships at the <orgName ref="#University_of_Washington">University of Washington.</orgName> <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName> is best remembered for her association with the millionaire lawyer turned archaeologist/art and antiquities collector, <persName ref="#Davis_Theodore_M">Theodore M. Davis</persName>. Traveling to <placeName ref="#Egypt">Egypt</placeName> with him between 1889 and 1912, she kept detailed journals of these voyages along the <placeName ref="#Nile">Nile,</placeName> including his important yet under-reported excavations of over 20 significant tombs in the <placeName ref="#Valley_of_the_Kings">Valley of the Kings</placeName>. <persName ref="#Andrews_Emma_B">Emma</persName> provides a vital commentary on the archaeology and pioneering Egyptologists of the time, painting a revealing picture of the lives of the colonial gentry and the cultural and scientific literati in at the dawn of the twentieth century. Analysis of the content of her diaries, along with a broad range of additional primary source material, will afford scholars information about important historical resources for the first time.</p>
-                </projectDesc>
-            </encodingStmt>
         </fileDesc>
+        <encodingDesc>
+            <projectDesc>
+                <p>Established in 2010, the goals of the <orgName ref="#EBA_Diary_Project">Emma B.
+                        Andrews Diary Project</orgName> include the transcription and digitization
+                    of a wide range of primary historical material from the 'Golden Age' of Egyptian
+                    archaeology at the end of the 19th and beginning of the 20th centuries. A
+                    founding partner of <orgName ref="#Newbook_Digital_Texts">Newbook Digital
+                        Texts</orgName> (www.newbookdigitaltexts.org), the <orgName
+                        ref="#EBA_Diary_Project">EBA Diary Project</orgName> offers undergraduate
+                    and graduate digital humanities education and internships at the <orgName
+                        ref="#University_of_Washington">University of Washington</orgName>.
+                        <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName> is best
+                    remembered for her association with the millionaire lawyer turned
+                    archaeologist/art and antiquities collector, <persName ref="#Davis_Theodore_M"
+                        >Theodore M. Davis</persName>. Traveling to <placeName ref="#Egypt"
+                        >Egypt</placeName> with him between 1889 and 1913, she kept detailed
+                    journals of these voyages along the <placeName ref="#Nile">Nile</placeName>,
+                    including his important yet under-reported excavations of over 20 significant
+                    tombs in the <placeName ref="#Bībān al-Mulūk">Valley of the Kings</placeName>.
+                        <persName ref="#Andrews_Emma_B">Emma</persName> provides a vital commentary
+                    on the archaeology and pioneering Egyptologists of the time, painting a
+                    revealing picture of the lives of the colonial gentry and the cultural and
+                    scientific literati in at the dawn of the twentieth century. Analysis of the
+                    content of her diaries, along with a broad range of additional primary source
+                    material, will afford scholars information about important historical resources
+                    for the first time.</p>
+            </projectDesc>
+            <editorialDecl>
+                <correction>
+                    <p>Obvious misspellings (eg place names and people's names) which are
+                        misreadings of original handwritten diary are corrected with choice, sic and
+                        corr.</p>
+                </correction>
+                <normalization>
+                    <p>Original spelling and typography is otherwise retained.</p>
+                </normalization>
+            </editorialDecl>
+        </encodingDesc>
+        <revisionDesc>
+            <!-- update this with major revision list-->
+            <list>
+                <item>
+                    <date when="2021-05-08">8 May 2021</date> Last checked by SLK. Updated header,
+                    fixed placeName and name tags.</item>
+                    <item><date when="2021-05-30">30 May 2021</date> Last checked by SLK. Minor semantic edits, updated list of biographers.</item>
+            </list>
+        </revisionDesc>
     </teiHeader>
     <text>
         <body>
@@ -43,217 +124,523 @@
             <div xml:id="EBA-1910-10-25" type="entry">
                 <dateline>
                     <date when="1910-10-25">October 25, 1910</date>
-                    <name type="boat" ref="#SS_Kronprinz_Wilhelm">SS. Kronprinz Wilhelm</name>.
-                </dateline>
-                <p>Sailed this a.m. from <placeName ref="#New_York">New York</placeName> at ten o'clock for <placeName ref="#Cherbourg">Cherbourg</placeName> and <placeName ref="#Paris">Paris</placeName>. It seems an absurd route to take to <placeName ref="#Cairo">Cairo</placeName> &#8211; but the service of the Mediterranean steamers is so disorganized because of the cholera in so many infected ports, and the necessity of quarantine, that we cancelled our engagements for <placeName ref="#Naples">Naples</placeName>. We will take the <name type="boat" ref="#SS_Schleswig">Schleswig</name> at <placeName ref="#Marseilles">Marseilles</placeName>, instead of <placeName ref="#Naples">Naples</placeName>.</p>
+                    <name type="boat" ref="#SS_Kronprinz_Wilhelm">SS. Kronprinz Wilhelm</name>. </dateline>
+                <p>Sailed this a.m. from <placeName ref="#New_York">New York</placeName> at ten
+                    o'clock for <placeName ref="#Cherbourg">Cherbourg</placeName> and <placeName
+                        ref="#Paris">Paris</placeName>. It seems an absurd route to take to
+                        <placeName ref="#Cairo">Cairo</placeName> &#8211; but the service of the
+                    Mediterranean steamers is so disorganized because of the cholera in so many
+                    infected ports, and the necessity of quarantine, that we cancelled our
+                    engagements for <placeName ref="#Naples">Naples</placeName>. We will take the
+                        <name type="boat" ref="#SS_Schleswig">Schleswig</name> at <placeName
+                        ref="#Marseilles">Marseilles</placeName>, instead of <placeName
+                        ref="#Naples">Naples</placeName>.</p>
             </div>
             <div xml:id="EBA-1910-10-30" type="entry">
                 <dateline>
                     <date when="1910-10-30">Sunday, Oct. 30.</date>
                 </dateline>
-                <p>We have had an uneventful stupid voyage, and are due at <placeName ref="#Cherbourg">Cherbourg</placeName> tomorrow. We have had rain, cold winds, and rough seas. Very pleasant rooms.</p>
+                <p>We have had an uneventful stupid voyage, and are due at <placeName
+                        ref="#Cherbourg">Cherbourg</placeName> tomorrow. We have had rain, cold
+                    winds, and rough seas. Very pleasant rooms.</p>
             </div>
             <div xml:id="EBA-1910-10-31" type="entry">
-                <dateline><placeName ref="#Paris">Paris</placeName> &#8211; <date when="1910-10-31">Oct. 31.</date> <placeName type="hotel" ref="#Westminster_Hotel">Westminster Hotel</placeName>.</dateline>
-                <p>We made <placeName ref="#Plymouth">Plymouth</placeName> at 7 o'clock this morning &#8211; I got up and looked out at the interesting coast &#8211; reached <placeName ref="#Cherbourg">Cherbourg</placeName> at 1 p.m. and were off at 3. We felt some little trepidation at committing ourselves to a French railway &#8211; there has been such a history of accidents in <placeName ref="#France">France</placeName>! But we knew that this line had been thoroughly repaired &#8211; as was shown by the piles of the old sleepers all along the road &#8211; in the most astounding state of decay &#8211; utter rottenness &#8211; they gave damning evidence of neglect. I had never seen the <placeName ref="#Brittany">Brittany</placeName> country before. How charming those wide reaching fields were, in the late afternoon light &#8211; so softly green &#8211; and the characteristic, mostly <pb n="73"/>pollarded trees in their tints of bronze and olive green and russet pink, made a picture, or rather a succession of them that looked as if they might have been painted by <persName ref="#Troyon_Constant">Troyon</persName> or <persName ref="#Corot_Jean_Baptiste_Camille">Corot</persName>. It was a blissful afternoon &#8211; and we so enjoyed it. Arrived in <placeName ref="#Paris">Paris</placeName> at 10 &#8211; and found <persName ref="#Rathbone_Mr">Mr. Rathbone</persName> waiting for us. They are at the <name type="hotel" ref="#Hotel_Bedford">Bedford</name>.</p>
+                <dateline><placeName ref="#Paris">Paris</placeName> &#8211; <date when="1910-10-31"
+                        >Oct. 31.</date>
+                    <name type="hotel" ref="#Hotel_Westminster">Westminster Hotel</name>.</dateline>
+                <p>We made <placeName ref="#Plymouth">Plymouth</placeName> at 7 o'clock this morning
+                    &#8211; I got up and looked out at the interesting coast &#8211; reached
+                        <placeName ref="#Cherbourg">Cherbourg</placeName> at 1 p.m. and were off at
+                    3. We felt some little trepidation at committing ourselves to a French railway
+                    &#8211; there has been such a history of accidents in <placeName ref="#France"
+                        >France</placeName>! But we knew that this line had been thoroughly repaired
+                    &#8211; as was shown by the piles of the old sleepers all along the road &#8211;
+                    in the most astounding state of decay &#8211; utter rottenness &#8211; they gave
+                    damning evidence of neglect. I had never seen the <placeName ref="#Brittany"
+                        >Brittany</placeName> country before. How charming those wide reaching
+                    fields were, in the late afternoon light &#8211; so softly green &#8211; and the
+                    characteristic, mostly <pb n="73"/>pollarded trees in their tints of bronze and
+                    olive green and russet pink, made a picture, or rather a succession of them that
+                    looked as if they might have been painted by <persName ref="#Troyon_Constant"
+                        >Troyon</persName> or <persName ref="#Corot_Jean_Baptiste_Camille"
+                        >Corot</persName>. It was a blissful afternoon &#8211; and we so enjoyed it.
+                    Arrived in <placeName ref="#Paris">Paris</placeName> at 10 &#8211; and found
+                        <persName ref="#Rathbone_William_Gair">Mr. Rathbone</persName> waiting for us. They
+                    are at the <name type="hotel" ref="#Hotel_Bedford">Bedford</name>.</p>
             </div>
             <div xml:id="EBA-1910-11-01" type="entry">
                 <dateline>
                     <date when="1910-11-01">Tuesday. Nov. 1st.</date>
                 </dateline>
-                <p>It has poured with rain all day &#8211; have not been out of the house. It is <date when="1910-11-01">All Saints Day</date>, and every magasin and museum is closed. <persName ref="#Rathbone_Mr #Rathbone_Mrs">Mr. and Mrs. Rathbone</persName> and <persName ref="#Rathbone_Elena">El&#232;na</persName> came to lunch, and are to turn up at the <placeName ref="#Gare_de_Lyon">Gare de Lyon</placeName> at 10. <persName ref="#Parsons_John #Parsons_Florence_Van_Corltandt">Mr. and Mrs. John E. Parsons</persName> are in this hotel, and we went to their rooms to have tea with them. We quite enjoyed our little dinner up in our sitting room. Hotels are crowded here &#8211; the manager told us there were more than 200 people in <placeName ref="#Paris">Paris</placeName> waiting for a chance to cross the <placeName ref="#Mediterranean_Sea">Mediterranean</placeName>.</p>
+                <p>It has poured with rain all day &#8211; have not been out of the house. It is
+                        <date when="1910-11-01">All Saints Day</date>, and every magasin and museum
+                    is closed. <persName ref="#Rathbone_William_Gair #Rathbone_Blanche">Mr. and Mrs.
+                        Rathbone</persName> and <persName ref="#Rathbone_Elena"
+                        >El&#232;na</persName> came to lunch, and are to turn up at the <placeName
+                        ref="#Gare_de_Lyon">Gare de Lyon</placeName> at 10. <persName
+                        ref="#Parsons_John #Parsons_Florence_Van_Corltandt">Mr. and Mrs. John E.
+                        Parsons</persName> are in this hotel, and we went to their rooms to have tea
+                    with them. We quite enjoyed our little dinner up in our sitting room. Hotels are
+                    crowded here &#8211; the manager told us there were more than 200 people in
+                        <placeName ref="#Paris">Paris</placeName> waiting for a chance to cross the
+                        <placeName ref="#Mediterranean_Sea">Mediterranean</placeName>.</p>
             </div>
             <div xml:id="EBA-1910-11-02" type="entry">
                 <dateline>
-                    <name type="boat" ref="#SS_Schleswig">N. G. Lloyd SS. Schleswig</name>.
-                    <date when="1910-11-02">Wednesday. Nov. 2nd.</date>
+                    <name type="boat" ref="#SS_Schleswig">N. G. Lloyd SS. Schleswig</name>. <date
+                        when="1910-11-02">Wednesday. Nov. 2nd.</date>
                 </dateline>
-                <p>We had a rough night on our funny Wagon-Lit &#8211; and jolted through it with what patience we could &#8211; feeling as if we were travelling in a card-board box &#8211; arrived by 9 o'clock &#8211; found our old rooms ready for us &#8211; did not get off until nearly 5 o'clock &#8211; there being so many passengers and such piles of luggage.</p>
+                <p>We had a rough night on our funny Wagon-Lit &#8211; and jolted through it with
+                    what patience we could &#8211; feeling as if we were travelling in a card-board
+                    box &#8211; arrived by 9 o'clock &#8211; found our old rooms ready for us
+                    &#8211; did not get off until nearly 5 o'clock &#8211; there being so many
+                    passengers and such piles of luggage.</p>
             </div>
             <pb n="74"/>
             <div xml:id="EBA-1910-11-04" type="entry">
                 <dateline>
                     <date when="1910-11-04">Friday. Nov. 4th.</date>
                 </dateline>
-                <p>Passed the straits at 1.30 &#8211; a lovely day &#8211; warm and calm. The dreadful ravages on either hand, were a piteous contrast to the beauty of the day.</p>
+                <p>Passed the straits at 1.30 &#8211; a lovely day &#8211; warm and calm. The
+                    dreadful ravages on either hand, were a piteous contrast to the beauty of the
+                    day.</p>
             </div>
             <div xml:id="EBA-1910-11-06" type="entry">
                 <dateline>
                     <date when="1910-11-06">Sunday. Nov. 6th.</date>
                 </dateline>
-                <p>Due at <placeName ref="#Alexandria">Alexandria</placeName> tomorrow at 6am &#8211; a warm, lovely passage. I have been writing letters busily.</p>
+                <p>Due at <placeName ref="#Alexandria">Alexandria</placeName> tomorrow at 6am
+                    &#8211; a warm, lovely passage. I have been writing letters busily.</p>
             </div>
             <div xml:id="EBA-1910-11-07" type="entry">
                 <dateline>
                     <date when="1910-11-07">Monday. Nov. 7th.</date>
-                    <name type="hotel" ref="#Shepheards_Hotel">Shepheards Hotel</name>.
-                </dateline>
-                <p>Arrived at 12:30 and were soon eating lunch on the 13th day out from <placeName ref="#New_York">New York</placeName>! Surprising when one reflects that our steamers to <placeName ref="#Naples">Naples</placeName> always take 13 days for the voyage! Are in our pleasant old rooms, overlooking the garden &#8211; the weather is perfect.</p>
+                    <name type="hotel" ref="#Shepheards_Hotel">Shepheards Hotel</name>. </dateline>
+                <p>Arrived at 12:30 and were soon eating lunch on the 13th day out from <placeName
+                        ref="#New_York">New York</placeName>! Surprising when one reflects that our
+                    steamers to <placeName ref="#Naples">Naples</placeName> always take 13 days for
+                    the voyage! Are in our pleasant old rooms, overlooking the garden &#8211; the
+                    weather is perfect.</p>
             </div>
-            <div xml:id="EBA" type="entry">
+            <div xml:id="EBA-1910-11-14" type="entry">
                 <dateline>
                     <date when="1910-11-14">Monday. Nov. 14th.</date>
                 </dateline>
-                <p>Rather a busy week, settling ourselves and things on the boat, seeing sights &#8211;visiting and receiving friends &#8211; consulting <persName ref="#Draper_Mr">Mr. Draper</persName> about the little mooring garden.  Lunched one day with the <personGrp ref="#Gorst">Gorsts</personGrp>, and another day went to a reception there. <persName ref="#Trefusis_Walter">Capt. Trefusis</persName>, and <persName ref="#Carter_Bonham_Mr">Mr. Carter Bonham</persName>, <persName ref="#Rathbone_Elena">El&#232;na</persName>'s friend, dined with us one night, and <personGrp ref="#Lovatt_Mr ">Mr. Lovatt and son</personGrp> &#8211; another night &#8211; and <personGrp ref="#Lovatt">Mr. Lovatt and son</personGrp> and <persName ref="#Gay_Walter">Mr. Walter Gay</persName> came to tea on our first afternoon on the boat. We had tea with the <persName ref="#Gay_Walter_Mr #Gay_Mrs">Gays</persName> one afternoon &#8211; <persName ref="#Gay_Mrs">Mrs. Gay</persName> very attractive.</p>
+                <p>Rather a busy week, settling ourselves and things on the boat, seeing sights
+                    &#8211;visiting and receiving friends &#8211; consulting <persName
+                        ref="#Draper_Mr">Mr. Draper</persName> about the little mooring garden.
+                    Lunched one day with the <persName ref="#Gorst_Group">Gorsts</persName>, and
+                    another day went to a reception there. <persName ref="#Trefusis_Walter">Capt.
+                        Trefusis</persName>, and <persName ref="#Carter_Bonham_Edgar"><choice><sic>Mr. Carter
+                        Bonham</sic><corr>Mr. Bonham Carter</corr></choice></persName>, <persName ref="#Rathbone_Elena">El&#232;na</persName>'s
+                    friend, dined with us one night, and <persName ref="#Lovatt_Mr #Lovatt_Master"
+                        >Mr. Lovatt and son</persName> &#8211; another night &#8211; and <persName
+                        ref="#Lovatt_Mr #Lovatt_Master">Mr. Lovatt and son</persName> and <persName
+                        ref="#Gay_Walter">Mr. Walter Gay</persName> came to tea on our first
+                    afternoon on the boat. We had tea with the <persName
+                        ref="#Gay_Walter_Mr #Gay_Matilda">Gays</persName> one afternoon &#8211;
+                        <persName ref="#Gay_Matilda">Mrs. Gay</persName> very attractive.</p>
             </div>
-            <pb n="75" />
+            <pb n="75"/>
             <div xml:id="EBA-1910-11-21" type="entry">
                 <dateline>
                     <date when="1910-11-21">Monday. Nov. 21st.</date>
                 </dateline>
-                <p>We came on board to stay on <date when="1910-11-16">the 16th</date> and sailed the next day at 10 a.m. passed the <placeName ref="#Ghizeh">Ghizeh</placeName> bridge about 10.20. We have a good strong tug. Tied up at 5 P.M. We find a tremendously big, wide river, with very strong current and made 35 miles the first day, 42 the second, 51 the third, 39 the fourth, 47 the 5th, 37 the 6th, 51 the seventh, 43 the eighth, 38 the ninth, 50-&#189; the tenth &#8211; arrived at <placeName ref="#Luxor">Luxor</placeName> the <date when="1910-11-27">27th</date>. We tied up much in our usual place &#8211; to a mite of a sand bank, opposite the castle.</p>
+                <p>We came on board to stay on <date when="1910-11-16">the 16th</date> and sailed
+                    the next day at 10 a.m. passed the <placeName ref="#Ghizeh">Ghizeh</placeName>
+                    bridge about 10.20. We have a good strong tug. Tied up at 5 P.M. We find a
+                    tremendously big, wide river, with very strong current and made 35 miles the
+                    first day, 42 the second, 51 the third, 39 the fourth, 47 the 5th, 37 the 6th,
+                    51 the seventh, 43 the eighth, 38 the ninth, 50-&#189; the tenth &#8211; arrived
+                    at <placeName ref="#Luxor">Luxor</placeName> the <date when="1910-11-27"
+                        >27th</date>. We tied up much in our usual place &#8211; to a mite of a sand
+                    bank, opposite the castle.</p>
             </div>
             <div xml:id="EBA-1910-12-04" type="entry">
                 <dateline>
                     <date when="1910-12-04">Second Sunday in Advent. Dec. 4th.</date>
                 </dateline>
-                <p>A pleasant two weeks we have had &#8211; fine, good weather. <persName ref="#Rathbone_Elena">El&#232;na</persName> busy and enchanted. We have been over to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> for lunch. The <personGrp ref="#Buckley">Buckley family</personGrp> here for tea one afternoon. <persName ref="#Carter_Howard">Mr. Carter</persName> and <persName ref="#Weigall_Arthur">Mr. Weigall</persName> for lunch. <persName ref="#Nicol_Erskine">Mr. Nicol</persName> also for lunch. <persName ref="#Davis_Theodore_M">Theo</persName> several times to the <placeName ref="#Valley_of_the_Kings">Valley</placeName>.</p>
+                <p>A pleasant two weeks we have had &#8211; fine, good weather. <persName
+                        ref="#Rathbone_Elena">El&#232;na</persName> busy and enchanted. We have been
+                    over to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> for lunch. The
+                        <persName ref="#Buckley_Mr #Buckley_Mrs">Buckley family</persName> here for
+                    tea one afternoon. <persName ref="#Carter_Howard">Mr. Carter</persName> and
+                        <persName ref="#Weigall_Arthur">Mr. Weigall</persName> for lunch. <persName
+                        ref="#Nicol_Erskine">Mr. Nicol</persName> also for lunch. <persName
+                        ref="#Davis_Theodore_M">Theo</persName> several times to the <placeName
+                        ref="#Bībān al-Mulūk">Valley</placeName>.</p>
             </div>
-            <div xml:id="EBA" type="entry">
+            <div xml:id="EBA-1910-12-11" type="entry">
                 <dateline>
                     <date when="1910-12-11">Third Sunday in Advent. Dec. 11th.</date>
                 </dateline>
-                <p>A rather busy week. <persName ref="#Weigall_Arthur">Mr. Weigall</persName> and his sister <persName ref="#Butler_Mrs">Mrs. Butler</persName> to tea one day. <persName ref="#Nicol_Erskine">Mr. Nicol</persName> to dine &#8211; <persName ref="#Butler_Mrs">Mrs. Butler</persName> and <persName ref="#Weigall_Arthur">Mr. Weigall</persName> to dine. <persName ref="#Davis_Theodore_M">Theo</persName> has established <persName ref="#Burton_Harry">Harry Burton</persName> in his new concession the <placeName ref="#Valley_of_the_Kings">"Priest Kings" Valley</placeName>. <persName ref="#Maspero_Gaston">M. Maspero</persName> was anxious <persName ref="#Davis_Theodore_M">Theo</persName> should clear this but <persName ref="#Davis_Theodore_M">Theo</persName> does not look for much of a result. <persName ref="#Jones_Harold">Harold Jones</persName> is so poorly, so weak, quite incapable of work, even painting. But his brother <persName ref="#Jones_Cyril">Cyril</persName> keeps a certain supervision of the men. This afternoon <persName ref="#Rathbone_Elena">El&#232;na</persName>, <persName ref="#Davis_Theodore_M">Theo</persName> and I rode over to see <persName ref="#Carter_Howard">Mr. Carter</persName> and see some of <persName ref="#Nicol_Erskine">Mr. Nicol</persName>'s paintings &#8211; <pb n="76"/> very lovely they were. <persName ref="#Davis_Theodore_M">Theo</persName> bought one.</p>
+                <p>A rather busy week. <persName ref="#Weigall_Arthur">Mr. Weigall</persName> and
+                    his sister <persName ref="#Rutter_Geanie">Mrs. Rutter</persName> to tea one day.
+                        <persName ref="#Nicol_Erskine">Mr. Nicol</persName> to dine &#8211;
+                        <persName ref="#Rutter_Geanie">Mrs. Rutter</persName> and <persName
+                        ref="#Weigall_Arthur">Mr. Weigall</persName> to dine. <persName
+                        ref="#Davis_Theodore_M">Theo</persName> has established <persName
+                        ref="#Burton_Harry">Harry Burton</persName> in his new concession the
+                        <placeName ref="#Bībān al-Mulūk">"Priest Kings" Valley</placeName>.
+                        <persName ref="#Maspero_Gaston">M. Maspero</persName> was anxious <persName
+                        ref="#Davis_Theodore_M">Theo</persName> should clear this but <persName
+                        ref="#Davis_Theodore_M">Theo</persName> does not look for much of a result.
+                        <persName ref="#Jones_Harold">Harold Jones</persName> is so poorly, so weak,
+                    quite incapable of work, even painting. But his brother <persName
+                        ref="#Jones_Cyril">Cyril</persName> keeps a certain supervision of the men.
+                    This afternoon <persName ref="#Rathbone_Elena">El&#232;na</persName>, <persName
+                        ref="#Davis_Theodore_M">Theo</persName> and I rode over to see <persName
+                        ref="#Carter_Howard">Mr. Carter</persName> and see some of <persName
+                        ref="#Nicol_Erskine">Mr. Nicol</persName>'s paintings &#8211; <pb n="76"/>
+                    very lovely they were. <persName ref="#Davis_Theodore_M">Theo</persName> bought
+                    one.</p>
             </div>
             <div xml:id="EBA-1910-12-18" type="entry">
                 <dateline>
                     <date when="1910-12-18">Fourth Sunday in Advent. Dec. 18th.</date>
                 </dateline>
-                <p><persName ref="#Jones_Harold">Harold Jones</persName> and <persName ref="#Jones_Cyril">Cyril</persName> came over and spent 3 days at the <placeName>Winter Palace</placeName>, lunched twice with me. I gave tea at the <placeName>Palace</placeName> on day, and asked a few of <persName ref="#Jones_Harold">Harold</persName>'s friends &#8211; the poor fellow looked very tired when it was over. <persName ref="#Mumm_von_Schwarzenstein_Alfons">Baron v. Mumm</persName> called one afternoon &#8211; he is on his way back to <placeName ref="#China">China</placeName> &#8211; he is the German minister of <placeName ref="#China">China.</placeName> <personGrp ref="#Fahnstock">Mr. And Mrs. Gibson Fahnstock</personGrp> came to tea on Wednesday. We had for tea <persName ref="#Kelly_Miss">Miss Kelly</persName> and her brother, <persName ref="#Whitaker_Mr">Mr. Whitaker</persName> and <persName ref="#Whymper_Charles">Mr. Whymper</persName> were here for tea. The <personGrp ref="#Kelly">Kellys</personGrp> played and sang.</p>
+                <p><persName ref="#Jones_Harold">Harold Jones</persName> and <persName
+                        ref="#Jones_Cyril">Cyril</persName> came over and spent 3 days at the
+                        <placeName>Winter Palace</placeName>, lunched twice with me. I gave tea at
+                    the <placeName>Palace</placeName> on day, and asked a few of <persName
+                        ref="#Jones_Harold">Harold</persName>'s friends &#8211; the poor fellow
+                    looked very tired when it was over. <persName
+                        ref="#Mumm_von_Schwarzenstein_Alfons">Baron v. Mumm</persName> called one
+                    afternoon &#8211; he is on his way back to <placeName ref="#China"
+                        >China</placeName> &#8211; he is the German minister of <placeName
+                        ref="#China">China.</placeName>
+                    <persName ref="#Fahnestock_Gibson #Fahnestock_Mrs">Mr. And Mrs. Gibson
+                        Fahnstock</persName> came to tea on Wednesday. We had for tea <persName
+                        ref="#Kelly_Miss">Miss Kelly</persName> and her brother, <persName
+                        ref="#Whitaker_Mr">Mr. Whitaker</persName> and <persName
+                        ref="#Whymper_Charles">Mr. Whymper</persName> were here for tea. The
+                        <persName ref="#Kelly_Mr #Kelly_Miss">Kellys</persName> played and sang.</p>
             </div>
             <div xml:id="EBA-1910-12-25" type="entry">
                 <dateline>
                     <date when="1910-12-25">Christmas Day &#8211; Dec. 25th.</date>
                 </dateline>
-                <p>We had the usual gifts for the sailors this morning &#8211; <persName ref="#Burton_Harry">Harry Burton</persName> came this evening to stay until Wednesday morning. Tuesday being market day, it is the one holiday in the week for workmen. <persName ref="#Davis_Theodore_M">Theo</persName> spent 3 days in the <placeName ref="#Valley_of_the_Kings">Valley</placeName> this week. <persName ref="#Crane_Lancelot">Mr. Crane</persName>, who is busy painting the <placeName ref="#Tomb_of_Horemheb">Horemheb tomb</placeName>, lunched with us today. <persName ref="#Trefusis_Walter">Capt. Walter Trefusis</persName> dined with us today.</p>
+                <p>We had the usual gifts for the sailors this morning &#8211; <persName
+                        ref="#Burton_Harry">Harry Burton</persName> came this evening to stay until
+                    Wednesday morning. Tuesday being market day, it is the one holiday in the week
+                    for workmen. <persName ref="#Davis_Theodore_M">Theo</persName> spent 3 days in
+                    the <placeName ref="#Bībān al-Mulūk">Valley</placeName> this week. <persName
+                        ref="#Crane_Lancelot">Mr. Crane</persName>, who is busy painting the <name
+                        type="historical" ref="#Tomb_of_Horemheb"><persName type="historical"
+                            ref="#Horemheb">Horemheb</persName>tomb</name>, lunched with us today.
+                        <persName ref="#Trefusis_Walter">Capt. Walter Trefusis</persName> dined with
+                    us today.</p>
             </div>
             <div xml:id="EBA-1910-12-31" type="entry">
                 <dateline>
                     <date when="1910-12-31">Saturday. Dec. 31st.</date>
                 </dateline>
-                <p>We have had a cold week. <persName ref="#Davis_Theodore_M">Theo</persName> spent his usual 3 days in the <placeName ref="#Valley_of_the_Kings">Valley</placeName> &#8211; nothing has yet been found. We have seen a good deal of <persName ref="#Whitaker_Mr">Mr. Whitaker</persName> and his party. They are on the old <name type="boat" ref="#Cleopatra">Cleopatra</name> &#8211; but he has done a great deal to it and put about a great many pretty things, and <pb n="77"/> it looks very attractive. <personGrp ref="#Newberry">Mr. and Mrs. Newberry</personGrp> are with him, and they are to excavate somewhere near <placeName ref="#Akhmim">Akmim.</placeName></p>
+                <p>We have had a cold week. <persName ref="#Davis_Theodore_M">Theo</persName> spent
+                    his usual 3 days in the <placeName ref="#Bībān al-Mulūk">Valley</placeName>
+                    &#8211; nothing has yet been found. We have seen a good deal of <persName
+                        ref="#Whitaker_Mr">Mr. Whitaker</persName> and his party. They are on the
+                    old <name type="boat" ref="#Cleopatra">Cleopatra</name> &#8211; but he has done
+                    a great deal to it and put about a great many pretty things, and <pb n="77"/> it
+                    looks very attractive. <persName ref="#Newberry_Percy #Newberry_Mrs">Mr. and
+                        Mrs. Newberry</persName> are with him, and they are to excavate somewhere
+                    near <placeName ref="#Akhmim">Akmim.</placeName></p>
             </div>
             <div xml:id="EBA-1911-01-07" type="entry">
                 <dateline>
                     <date when="1911-01-07">Saturday Jan. 7. 1911</date>
                 </dateline>
-                <p>The <name type="boat" ref="#Miriam">"Miriam"</name> with the <personGrp ref="#Maspero">Masperos</personGrp> arrived on <date when="1911-01-03">the 3rd</date>. <persName ref="#Davis_Theodore_M">Theo</persName> and I called on them the next morning. <persName ref="#Maspero_Mme">Madame Maspero</persName> has been very ill on the way up with a bronchial attack. They are to stay 3 weeks. <persName ref="#McCormick_Mrs">Mrs. McCormick</persName> and <persName ref="#Scott_Miss">Miss Scott</persName> dined here tonight.</p>
+                <p>The <name type="boat" ref="#Miriam">"Miriam"</name> with the <persName
+                        ref="#Maspero_Gaston #Maspero_Louise">Masperos</persName> arrived on <date
+                        when="1911-01-03">the 3rd</date>. <persName ref="#Davis_Theodore_M"
+                        >Theo</persName> and I called on them the next morning. <persName
+                        ref="#Maspero_Mme">Madame Maspero</persName> has been very ill on the way up
+                    with a bronchial attack. They are to stay 3 weeks. <persName
+                        ref="#McCormick_Mrs">Mrs. McCormick</persName> and <persName
+                        ref="#Scott_Miss">Miss Scott</persName> dined here tonight.</p>
             </div>
             <div xml:id="EBA-1911-01-14" type="entry">
                 <dateline>
                     <date when="1911-01-14">Saturday. Jan. 14.</date>
                 </dateline>
-                <p><personGrp ref="#Buckley">Mr. and Mrs. Buckley</personGrp> to lunch on Sunday, a warm fine day. <persName ref="#Carter_Howard">Mr. Carter</persName> to tea one day. <persName ref="#Burton_Harry">Harry</persName> as usual here for 2 days. <persName ref="#Davis_Theodore_M">Theo</persName> as usual in the <placeName ref="#Valley_of_the_Kings">Valley</placeName> 3 days. Many visitors.</p>
+                <p><persName ref="#Buckley_Mr #Buckley_Mrs">Mr. and Mrs. Buckley</persName> to lunch
+                    on Sunday, a warm fine day. <persName ref="#Carter_Howard">Mr. Carter</persName>
+                    to tea one day. <persName ref="#Burton_Harry">Harry</persName> as usual here for
+                    2 days. <persName ref="#Davis_Theodore_M">Theo</persName> as usual in the
+                        <placeName ref="#Bībān al-Mulūk">Valley</placeName> 3 days. Many
+                    visitors.</p>
             </div>
             <div xml:id="EBA-1911-01-21" type="entry">
                 <dateline>
                     <date when="1911-01-21">Saturday. Jan. 21.</date>
                 </dateline>
-                <p>The usual weekly story &#8211; visitors, visits, teas and dinners. <persName ref="#Gorst_Lady">Lady Gorst</persName> and <persName ref="#Gorst_Miss">Miss Gorst</persName> here for tea one afternoon.</p>
+                <p>The usual weekly story &#8211; visitors, visits, teas and dinners. <persName
+                        ref="#Gorst_Lady">Lady Gorst</persName> and <persName ref="#Gorst_Miss">Miss
+                        Gorst</persName> here for tea one afternoon.</p>
             </div>
             <div xml:id="EBA-1911-01-28" type="entry">
                 <dateline>
                     <date when="1911-01-28">Saturday. Jan. 28th.</date>
                 </dateline>
-                <p>A rather cold stormy week, with a little rain. <persName ref="#Hunter_Mrs">Mrs. Hunter</persName> of <placeName ref="#London">London</placeName> dined on Monday &#8211; <personGrp ref="#Warner">Mrs. and Miss Warner</personGrp> of <placeName ref="#Boston">Boston</placeName> and <persName ref="#Webb_Miss">Miss Webb</persName>, a <personGrp ref="#Guadalmina">Marquise Guadalmina and her son</personGrp>, Spaniards, here to tea on Wednesday. <persName ref="#Davis_Theodore_M">Theo</persName> and I at <persName ref="#Mohassib_Mohammed">Mohassib</persName>'s' one morning &#8211; met <persName ref="#Cassatt_Mary_S">Miss Cassatt</persName>, the artist who lives in <placeName ref="#Paris">Paris</placeName>. <personGrp ref="#Kelekian">Mr. and Mrs. Kelekian</personGrp> came with her afterwards for tea. <persName ref="#Nicol_Erskine">Mr. Nicol</persName> dined on Friday. Cold and stormy.</p>
+                <p>A rather cold stormy week, with a little rain. <persName ref="#Hunter_Mrs">Mrs.
+                        Hunter</persName> of <placeName ref="#London">London</placeName> dined on
+                    Monday &#8211; <persName ref="#Warner_Mrs #Warner_Miss">Mrs. and Miss
+                        Warner</persName> of <placeName ref="#Boston">Boston</placeName> and
+                        <persName ref="#Webb_Miss">Miss Webb</persName>, a <persName
+                        ref="#Guadalmina_Marquesa #Guadalmina_son_of">Marquise Guadalmina and her
+                        son</persName>, Spaniards, here to tea on Wednesday. <persName
+                        ref="#Davis_Theodore_M">Theo</persName> and I at <persName
+                        ref="#Mohassib_Mohammed">Mohassib</persName>'s' one morning &#8211; met
+                        <persName ref="#Cassatt_Mary_S">Miss Cassatt</persName>, the artist who
+                    lives in <placeName ref="#Paris">Paris</placeName>. <persName
+                        ref="#Kelekian_Mr #Kelekian_Mrs">Mr. and Mrs. Kelekian</persName> came with
+                    her afterwards for tea. <persName ref="#Nicol_Erskine">Mr. Nicol</persName>
+                    dined on Friday. Cold and stormy.</p>
             </div>
             <pb n="78"/>
             <div xml:id="EBA-1911-02-04" type="entry">
                 <dateline>
                     <date when="1911-02-04">Saturday. Feb. 4th</date>
                 </dateline>
-                <p>Among our visitors this week was the <persName ref="#Peabody_Endicott">Rev. Endicott Peabody</persName>, Head Master of the famous school for boys at <placeName ref="#Groton">Groton, Mass.</placeName> introduced by cable from <persName ref="#Fairfield_Osborn_Henry">Mr. Fairfield Osborn</persName>. A very interesting man. <personGrp ref='#Newberry'>Mr. and Mrs. Newberry</personGrp> dined on Tuesday. <personGrp ref="#Fahnstock">Mr. and Mrs. Fahnstock</personGrp> to lunch on Wednesday. <persName ref="#Davis_Theodore_M">Theo</persName> as usual in the Valley 3 days.</p>
+                <p>Among our visitors this week was the <persName ref="#Peabody_Endicott">Rev.
+                        Endicott Peabody</persName>, Head Master of the famous school for boys at
+                        <placeName ref="#Groton">Groton, Mass.</placeName> introduced by cable from
+                        <persName ref="#Fairfield_Osborn_Henry">Mr. Fairfield Osborn</persName>. A
+                    very interesting man. <persName ref="#Newberry_Percy #Newberry_Mrs">Mr. and Mrs.
+                        Newberry</persName> dined on Tuesday. <persName
+                        ref="#Fahnestock_Gibson #Fahnestock_Mrs">Mr. and Mrs. Fahnstock</persName>
+                    to lunch on Wednesday. <persName ref="#Davis_Theodore_M">Theo</persName> as
+                    usual in the <placeName ref="#Bībān al-Mulūk">Valley</placeName> 3 days.</p>
             </div>
             <div xml:id="EBA-1911-02-11" type="entry">
                 <dateline>
                     <date when="1911-02-11">Saturday. Feb. 11.</date>
                 </dateline>
-                <p>Among our visitors this week were <personGrp ref="#Alexander">Mr. and Mrs. Charles B. Alexander</personGrp> of 4 West 58 St. <placeName ref="#New_York">New York</placeName> on the <name type="boat" ref="#Serapis">Serapis</name> with <personGrp ref="#Alexander">their 3 girls</personGrp>; <personGrp ref="#Hobhouse">Mr. and Mrs. Henry Hobhouse</personGrp> of <placeName ref="#England">England</placeName> introduced by <persName ref="#Farrer_Gaspard">Gaspard Farrer</persName>; <personGrp ref="#Williams">Mr. and Mrs. Williams</personGrp> and <personGrp ref="#Langley">Mr. and Mrs. Langley</personGrp> P.W.D. people of <placeName ref="#Cairo">Cairo</placeName>; <personGrp ref="#Foster">Mr. and Mrs. <sic>Gerard</sic> Foster</personGrp> of <placeName ref="#Lenox">Lenox</placeName>, <persName ref="#Ives_Miss">Miss Ives</persName> and <persName ref="#Alexander_Mrs">Mrs. Alexander</persName> of <placeName ref="#New_York">New York</placeName> whose daughter lately married young <persName  ref="Roosevelt_Theodore_Jr">Theodore Roosevelt</persName>; <personGrp ref="#Collander_Livingston">Mr. and Mrs. John Collander Livingston</personGrp> on the <name type="boat" ref="#Scarab">"Scarab"</name>. It has been bitterly cold lately &#8211; and constant high winds &#8211; we have been covered with sand &#8211; as the wind has been from the west. <persName ref="#Davis_Theodore_M">Theo</persName> came home from the <placeName ref="#Valley_of_the_Kings">Valley</placeName>, after 4 days there.</p>
+                <p>Among our visitors this week were <persName
+                        ref="#Alexander_Charles #Alexander_Harriet_Mrs">Mr. and Mrs. Charles B.
+                        Alexander</persName> of 4 West 58 St. <placeName ref="#New_York">New
+                        York</placeName> on the <name type="boat" ref="#Serapis">Serapis</name> with
+                        <persName ref="#Alexander_Harriet_Jr #Alexander_Jeanette #Alexander_Marie">their 3 girls</persName>; <persName
+                        ref="#Hobhouse_Henry #Hobhouse_Mrs">Mr. and Mrs. Henry Hobhouse</persName>
+                    of <placeName ref="#England">England</placeName> introduced by <persName
+                        ref="#Farrer_Gaspard">Gaspard Farrer</persName>; <persName
+                        ref="#Williams_Mr #Williams_Mrs">Mr. and Mrs. Williams</persName> and
+                        <persName ref="#Langley_Mr #Langley_Mrs">Mr. and Mrs. Langley</persName>
+                    P.W.D. people of <placeName ref="#Cairo">Cairo</placeName>; <persName
+                        ref="#Foster_Giraud #Foster_Mrs">Mr. and Mrs.
+                                <choice><sic>Gerard</sic><corr>Giraud</corr></choice>
+                        Foster</persName> of <placeName ref="#Lenox">Lenox</placeName>, <persName
+                        ref="#Ives_Miss">Miss Ives</persName> and <persName ref="#Alexander_Grace_Mrs"
+                        >Mrs. Alexander</persName> of <placeName ref="#New_York">New
+                        York</placeName> whose daughter lately married young <persName
+                        ref="Roosevelt_Theodore_Jr">Theodore Roosevelt</persName>; <persName
+                        ref="#Collander_Livingston_John #Collander_Livingston_Mrs">Mr. and Mrs. John
+                        Collander Livingston</persName> on the <name type="boat" ref="#Scarab"
+                        >"Scarab"</name>. It has been bitterly cold lately &#8211; and constant high
+                    winds &#8211; we have been covered with sand &#8211; as the wind has been from
+                    the west. <persName ref="#Davis_Theodore_M">Theo</persName> came home from the
+                        <placeName ref="#Bībān al-Mulūk">Valley</placeName>, after 4 days there.</p>
             </div>
             <div xml:id="EBA-1911-02-13" type="entry">
                 <dateline>
                     <date when="1911-02-13">Sunday. Feb. 13th.</date>
                 </dateline>
-                <p>Another bitterly cold day &#8211; <persName ref="#Whymper_Charles">Mr. Whymper</persName> to breakfast &#8211; so delightfully amusing. I had a quiet morning. <personGrp ref="#Foster">Mr. and Mrs. <sic>Girard</sic> Foster</personGrp>, and <persName ref="#Graham_Mrs">Mrs. Graham</persName>, who is up from <placeName ref="#Cairo">Cairo</placeName>, for a few days, came to tea.</p>
+                <p>Another bitterly cold day &#8211; <persName ref="#Whymper_Charles">Mr.
+                        Whymper</persName> to breakfast &#8211; so delightfully amusing. I had a
+                    quiet morning. <persName ref="#Foster_Giraud #Foster_Mrs">Mr. and Mrs.
+                                <choice><sic>Girard</sic><corr>Giraud</corr></choice>
+                        Foster</persName>, and <persName ref="#Graham_Mrs">Mrs. Graham</persName>,
+                    who is up from <placeName ref="#Cairo">Cairo</placeName>, for a few days, came
+                    to tea.</p>
             </div>
             <pb n="79"/>
             <div xml:id="EBA-1911-02-19" type="entry">
                 <dateline>
                     <date when="1911-02-19">Sunday. Feb. 19th.</date>
                 </dateline>
-                <p>A rather monotonous week of constant visitors. Amongst the most pleasant were <personGrp ref="#Collander_Livingston">Mr. and Mrs. John Collander Livingston</personGrp>, and daughter sent by <persName ref="#Hamilton_Fish_Webster_Mrs">Mrs. Hamilton Fish Webster</persName>. Delightful people. Our neighbors <personGrp ref="#Auchincloss">Mr. and Mrs. Auchincloss</personGrp> and <persName ref="#Jennings_Miss">Miss Jennings</persName>, <personGrp ref="#Naville">M. and Mme. Naville</personGrp> and <persName ref="#Rodier_M">M. Rodier</persName> to dine. <personGrp ref="#Cherry">Mrs. and Miss Cherry</personGrp>, sisters of <persName ref="#Cust_Mr">Mr. Cust</persName>, <personGrp ref="#Maspero">M. and Mme. Maspero</personGrp> and others. <persName ref="#Davis_Theodore_M">Theo</persName> and I had a charming afternoon with <persName ref="#Carter_Howard">Mr. Carter</persName> in his new house &#8211; so well built and arranged and pretty &#8211; it looked like the abode of an artist and a scholar. He is just opening a large tomb or cachette for <persName ref="#Carnarvon_Lord">Lord Carnarvon</persName> &#8211; and when we had tea, he went back at once to his work. The <personGrp ref="#Hobhouse">Hon. Henry and Mrs. Hobhouse</personGrp> (from <persName ref="#Farrer_Gaspard">G. Farrer</persName>) dined with us this evening. <persName ref="#Davis_Theodore_M">Theo</persName> is to give them lunch in the <placeName ref="#Valley_of_the_Kings">Valley</placeName> tomorrow.</p>
+                <p>A rather monotonous week of constant visitors. Amongst the most pleasant were
+                        <persName ref="#Collander_Livingston_John #Collander_Livingston_Mrs">Mr. and
+                        Mrs. John Collander Livingston</persName>, and daughter sent by <persName
+                        ref="#Hamilton_Fish_Webster_Mrs">Mrs. Hamilton Fish Webster</persName>.
+                    Delightful people. Our neighbors <persName
+                        ref="#Auchincloss_Hugh_D #Auchincloss_Emma_Brewster_Jennings">Mr. and Mrs. Auchincloss</persName>
+                    and <persName ref="#Jennings_Miss">Miss Jennings</persName>, <persName
+                        ref="#Naville_Edouard #Naville_Marguerite">M. and Mme. Naville</persName>
+                    and <persName ref="#Rodier_M">M. Rodier</persName> to dine. <persName
+                        ref="#Wherry_Albinia #Wherry_Beatrix">Mrs. and Miss Wherry</persName>, sisters of
+                        <persName ref="#Cust_Robert_Henry_Hobart">Mr. Cust</persName>, <persName
+                        ref="#Maspero_Gaston #Maspero_Louise">M. and Mme. Maspero</persName> and
+                    others. <persName ref="#Davis_Theodore_M">Theo</persName> and I had a charming
+                    afternoon with <persName ref="#Carter_Howard">Mr. Carter</persName> in his new
+                    house &#8211; so well built and arranged and pretty &#8211; it looked like the
+                    abode of an artist and a scholar. He is just opening a large tomb or cachette
+                    for <persName ref="#Carnarvon_Lord">Lord Carnarvon</persName> &#8211; and when
+                    we had tea, he went back at once to his work. The <persName
+                        ref="#Hobhouse_Henry #Hobhouse_Mrs">Hon. Henry and Mrs. Hobhouse</persName>
+                    (from <persName ref="#Farrer_Gaspard">G. Farrer</persName>) dined with us this
+                    evening. <persName ref="#Davis_Theodore_M">Theo</persName> is to give them lunch
+                    in the <placeName ref="#Bībān al-Mulūk">Valley</placeName> tomorrow.</p>
             </div>
             <div xml:id="EBA-1911-02-26" type="entry">
                 <dateline>
                     <date when="1911-02-26">Sunday. Feb. 26th.</date>
                 </dateline>
-                <p>We telegraphed for tug some days ago &#8211; but have no satisfactory answers &#8211; the boat has been in proper trim for going down for some time. Such continued cold weather and such gales &#8211; we have no deck life at all. Telegram from <persName ref="Morgan_John_Pierpoint">Mr. J.P. Morgan</persName> begging <persName ref="#Davis_Theodore_M">Theo</persName> to wait here until he comes. Crowds of visitors. <persName ref="#Layard_Lady">Lady Layard</persName>, and the Countess here to tea today. I have been to <placeName ref="#Karnak">Karnak</placeName> several times &#8211; <persName ref="#Nicol_Erskine">Nicol</persName> here twice to dine.</p>
+                <p>We telegraphed for tug some days ago &#8211; but have no satisfactory answers
+                    &#8211; the boat has been in proper trim for going down for some time. Such
+                    continued cold weather and such gales &#8211; we have no deck life at all.
+                    Telegram from <persName ref="Morgan_John_Pierpoint">Mr. J.P. Morgan</persName>
+                    begging <persName ref="#Davis_Theodore_M">Theo</persName> to wait here until he
+                    comes. Crowds of visitors. <persName ref="#Layard_Lady">Lady Layard</persName>,
+                    and the Countess here to tea today. I have been to <placeName ref="#Karnak"
+                        >Karnak</placeName> several times &#8211; <persName ref="#Nicol_Erskine"
+                        >Nicol</persName> here twice to dine.</p>
             </div>
             <div xml:id="EBA-1911-03-01" type="entry">
                 <dateline>
                     <date when="1911-03-01">Mar. 1. Ash Wednesday.</date>
                 </dateline>
-                <p><persName ref="Morgan_John_Pierpoint">Mr. Morgan</persName> with his sister arrived on the <name type="boat" ref="#Khonsu">Khonsu</name> &#8211; on Monday, <pb n="80"/> and lunched in the <placeName ref="#Valley_of_the_Kings">Valley</placeName> with <persName ref="#Davis_Theodore_M">Theo</persName>. I did not go out. Had tea on the <name type="boat" ref="#Sudan">Sudan</name> with <persName ref="#Auchincloss_Mrs">Mrs. Auchincloss</persName> and <persName ref="#Jennings_Miss">Miss Jennings</persName>. Over to say goodbye to <persName ref="#Contardone_Contessa">Contessa Contardone</persName> who was ill in bed with bad cold.</p>
+                <p><persName ref="Morgan_John_Pierpoint">Mr. Morgan</persName> with his sister
+                    arrived on the <name type="boat" ref="#Khonsu">Khonsu</name> &#8211; on Monday,
+                        <pb n="80"/> and lunched in the <placeName ref="#Bībān al-Mulūk"
+                        >Valley</placeName> with <persName ref="#Davis_Theodore_M">Theo</persName>.
+                    I did not go out. Had tea on the <name type="boat" ref="#Sudan">Sudan</name>
+                    with <persName ref="#Auchincloss_Emma_Brewster_Jennings">Mrs. Auchincloss</persName> and <persName
+                        ref="#Jennings_Miss">Miss Jennings</persName>. Over to say goodbye to
+                        <persName ref="#Contardone_Contessa">Contessa Contardone</persName> who was
+                    ill in bed with bad cold.</p>
             </div>
             <div xml:id="EBA-1911-03-03" type="entry">
                 <dateline>
                     <date when="1911-03-03">Friday. Mar. 3rd.</date>
                 </dateline>
-                <p><persName ref="#Rathbone_Elena">El&#232;na</persName> arrived from <placeName ref="#Khartoum">Khartoum</placeName> last evening. <personGrp ref="#Newberry">Mr. and Mrs. Newberry</personGrp> and <persName ref="#Johnson_Mr">Mr. Johnson</persName> (P&#232;re) <persName ref="#Whymper_Charles">Mr. Whymper</persName> were here for tea. <persName ref="#Nicol_Erskine">Mr. Nicol</persName> to dine. We started 10 minutes to 11 o'clock &#8211; and at 6 p.m. were at <placeName ref="#Keneh">Keneh</placeName>, where we waited for <persName ref="#Burton_Harry">Harry</persName> and <persName ref="#Rathbone_Elena">El&#232;na</persName> to visit <placeName ref="#Dendera">Dendera</placeName> &#8211; then we moved on 2-3 miles for the night &#8211; making altogether 50 miles.</p>
+                <p><persName ref="#Rathbone_Elena">El&#232;na</persName> arrived from <placeName
+                        ref="#Khartoum">Khartoum</placeName> last evening. <persName
+                        ref="#Newberry_Percy #Newberry_Mrs">Mr. and Mrs. Newberry</persName> and
+                        <persName ref="#Johnson_Mr">Mr. Johnson</persName> (P&#232;re) <persName
+                        ref="#Whymper_Charles">Mr. Whymper</persName> were here for tea. <persName
+                        ref="#Nicol_Erskine">Mr. Nicol</persName> to dine. We started 10 minutes to
+                    11 o'clock &#8211; and at 6 p.m. were at <placeName ref="#Keneh"
+                        >Keneh</placeName>, where we waited for <persName ref="#Burton_Harry"
+                        >Harry</persName> and <persName ref="#Rathbone_Elena">El&#232;na</persName>
+                    to visit <placeName ref="#Dendera">Dendera</placeName> &#8211; then we moved on
+                    2-3 miles for the night &#8211; making altogether 50 miles.</p>
             </div>
             <div xml:id="EBA-1911-03-04" type="entry">
                 <dateline>
                     <date when="1911-03-04">Saturday. Mar. 4th.</date>
                 </dateline>
-                <p>40 miles. Sailed at 7 A.M. &#8211; reached <placeName ref="#Nagh_Hamadi">Nagh Hamadi</placeName> at 12:15, passed the bridge and then waited until 3:30, waiting for the tug to cool &#8211; and reached <placeName ref="#Al_Balyana">Balliana</placeName> at 5:30 where we wait until tomorrow &#8211; to give <persName ref="#Rathbone_Elena">El&#232;na Rathbone</persName> a chance to see <placeName ref="#Abydos">Abydos</placeName> &#8211; and we promised the <personGrp ref="#Naville">Navilles</personGrp> to lunch with them. It has been a fine, warm day &#8211; and our brilliant young moon, and the resplendent Venus, make the nights too beautiful to sleep.</p>
+                <p>40 miles. Sailed at 7 A.M. &#8211; reached <placeName ref="#Nagh_Hamadi">Nagh
+                        Hamadi</placeName> at 12:15, passed the bridge and then waited until 3:30,
+                    waiting for the tug to cool &#8211; and reached <placeName ref="#Al_Balyana"
+                        >Balliana</placeName> at 5:30 where we wait until tomorrow &#8211; to give
+                        <persName ref="#Rathbone_Elena">El&#232;na Rathbone</persName> a chance to
+                    see <placeName ref="#Abydos">Abydos</placeName> &#8211; and we promised the
+                        <persName ref="#Naville_Edouard #Naville_Marguerite">Navilles</persName> to
+                    lunch with them. It has been a fine, warm day &#8211; and our brilliant young
+                    moon, and the resplendent Venus, make the nights too beautiful to sleep.</p>
             </div>
             <div xml:id="EBA-1911-03-06" type="entry">
                 <dateline>
                     <date when="1911-03-06">Monday. Mar. 6th.</date>
                 </dateline>
-                <p>Started about 10 for <placeName ref="#Abydos">Abydos</placeName> &#8211; fearing a hot day &#8211; had 2 carriages &#8211; we found a cold north wind blowing, and we really suffered with cold. It was a market day, and the people were streaming along the dusty road &#8211; men, women carrying babies, camels, donkeys, sheep and <pb n="81"/> goats &#8211; making the air thick with dust. It is such a pity that one must always see <placeName ref="#Abydos">Abydos</placeName> in the glare of mid-day! <persName ref="#Naville_Mme">Mme. Naville</persName> came up from their little house in its nest in the sandy desert, to see us &#8211; and we all went back with her &#8211; I sitting on a man's saddle on a wretched donkey,&#8211; the cold wind almost blowing my clothes off &#8211; and my eyes blinded. But the little house was cheerful and comfortable and the lunch very good, and <personGrp ref="#Naville">M. and Mme. Naville</personGrp> very nice as they always are. <persName ref="#Whitmore_Mr">Mr. Whitmore</persName> and <persName ref="#Dixon_Mr">Mr. Dixon</persName>, young men working with the <personGrp ref="#Naville">Navilles</personGrp>. The ride home was away from the wind, and the fields so green and fragrant with their blossoming crops, and the birds singing everywhere. The people were in their straw houses, which they build for watching their crops &#8211; and it was very pastoral. Found a huge mail waiting for us. We steamed down to <placeName ref="#Girga">Girga</placeName>, 8 miles, and are here for the night.</p>
+                <p>Started about 10 for <placeName ref="#Abydos">Abydos</placeName> &#8211; fearing
+                    a hot day &#8211; had 2 carriages &#8211; we found a cold north wind blowing,
+                    and we really suffered with cold. It was a market day, and the people were
+                    streaming along the dusty road &#8211; men, women carrying babies, camels,
+                    donkeys, sheep and <pb n="81"/> goats &#8211; making the air thick with dust. It
+                    is such a pity that one must always see <placeName ref="#Abydos"
+                        >Abydos</placeName> in the glare of mid-day! <persName ref="#Naville_Mme"
+                        >Mme. Naville</persName> came up from their little house in its nest in the
+                    sandy desert, to see us &#8211; and we all went back with her &#8211; I sitting
+                    on a man's saddle on a wretched donkey,&#8211; the cold wind almost blowing my
+                    clothes off &#8211; and my eyes blinded. But the little house was cheerful and
+                    comfortable and the lunch very good, and <persName
+                        ref="#Naville_Edouard #Naville_Marguerite">M. and Mme. Naville</persName>
+                    very nice as they always are. <persName ref="#Whitmore_Mr">Mr.
+                        Whitmore</persName> and <persName ref="#Dixon_James">Mr. Dixon</persName>,
+                    young men working with the <persName ref="#Naville_Edouard #Naville_Marguerite"
+                        >Navilles</persName>. The ride home was away from the wind, and the fields
+                    so green and fragrant with their blossoming crops, and the birds singing
+                    everywhere. The people were in their straw houses, which they build for watching
+                    their crops &#8211; and it was very pastoral. Found a huge mail waiting for us.
+                    We steamed down to <placeName ref="#Girga">Girga</placeName>, 8 miles, and are
+                    here for the night.</p>
             </div>
             <div xml:id="EBA-1911-03-07" type="entry">
                 <dateline>
                     <date when="1911-03-07">Tuesday. Mar. 7th.</date>
                 </dateline>
-                <p>Started at 6 A.M. and went on until 6 P.M. - 5 miles from <placeName ref="#Assiut">Assiut</placeName> &#8211; making 87 miles.</p>
+                <p>Started at 6 A.M. and went on until 6 P.M. - 5 miles from <placeName ref="#Asyut"
+                        >Assiut</placeName> &#8211; making 87 miles.</p>
             </div>
             <div xml:id="EBA-1911-03-08" type="entry">
                 <dateline>
                     <date when="1911-03-08">Wednesday. Mar. 8th.</date>
                 </dateline>
-                <p>52 miles. Arrived at <placeName ref="#Assiut">Assiut</placeName> early, and waited for various things &#8211; 4 hours &#8211; then on to 7 miles of <placeName ref="#Hadj_Kandul">Hadj Kandul</placeName>.</p>
+                <p>52 miles. Arrived at <placeName ref="#Asyut">Assiut</placeName> early, and waited
+                    for various things &#8211; 4 hours &#8211; then on to 7 miles of <placeName
+                        ref="#Hadj_Kandul">Hadj Kandul</placeName>.</p>
             </div>
             <div xml:id="EBA-1911-03-09" type="entry">
                 <dateline>
                     <date when="1911-03-09">Thursday. March 9th.</date>
                 </dateline>
-                <p>Started at 7 o'clock &#8211; stopped at <placeName ref="#Hadj_Kandul">Hadj Kandul</placeName> for an hour <pb n="82"/>so that <persName ref="#Rathbone_Elena">El&#232;na</persName> should see the <persName ref="#Akhenaten">Khuenaton</persName> pavement, then on, until <placeName ref="#Beni_Hasan">Beni Hassan</placeName> was reached, which <persName ref="#Rathbone_Elena">El&#232;na</persName> and <persName ref="#Burton_Harry">Harry</persName> visited. The day hot &#8211; wind and clouds of dust. 43 miles.</p>
+                <p>Started at 7 o'clock &#8211; stopped at <placeName ref="#Hadj_Kandul">Hadj
+                        Kandul</placeName> for an hour <pb n="82"/>so that <persName
+                        ref="#Rathbone_Elena">El&#232;na</persName> should see the <persName
+                        type="historical" ref="#Akhenaten">Khuenaton</persName> pavement, then on,
+                    until <placeName ref="#Bani_Hasan">Beni Hassan</placeName> was reached, which
+                        <persName ref="#Rathbone_Elena">El&#232;na</persName> and <persName
+                        ref="#Burton_Harry">Harry</persName> visited. The day hot &#8211; wind and
+                    clouds of dust. 43 miles.</p>
             </div>
-            <div xml:id="EBA-1911-03-09" type="entry">
+            <div xml:id="EBA-1911-03-10" type="entry">
                 <dateline>
                     <date when="1911-03-09">Friday, March 10th.</date>
                 </dateline>
-                <p>53 miles. Started at 7 o'clock &#8211; spent 2 hours at <placeName ref="#Minia">Minia</placeName> &#8211; tied up at 6 o'clock at <placeName ref="#Maghagha">Maghaga</placeName>.</p>
+                <p>53 miles. Started at 7 o'clock &#8211; spent 2 hours at <placeName ref="#Minia"
+                        >Minia</placeName> &#8211; tied up at 6 o'clock at <placeName
+                        ref="#Maghagha">Maghaga</placeName>.</p>
             </div>
             <div xml:id="EBA-1911-03-11" type="entry">
                 <dateline>
                     <date when="1911-03-11">Saturday. Mar. 11th.</date>
                 </dateline>
-                <p>87 miles. An early start at 6 o'clock &#8211; and reached <placeName ref="#Bedreschein">Bedreschein</placeName> at 7 o'clock. The river has been rather good. The tug has been on the sand once or twice for a short time, but the dahabya has not once touched it &#8211; a strong wind all day and cold.</p>
+                <p>87 miles. An early start at 6 o'clock &#8211; and reached <placeName
+                        ref="#Al_Badrashayn">Bedreschein</placeName> at 7 o'clock. The river has
+                    been rather good. The tug has been on the sand once or twice for a short time,
+                    but the dahabya has not once touched it &#8211; a strong wind all day and
+                    cold.</p>
             </div>
             <div xml:id="EBA-1911-03-12" type="entry">
                 <dateline>
                     <date when="1911-03-12">Second Sunday in Lent. March 12th.</date>
                 </dateline>
-                <p>Started at 7 o'clock &#8211; and made the bridge at 9 o'clock and waited an hour to pass. Came to our landing at 11.30 &#8211; and found the mooring garden looking very pretty. We arrived the 10th day from <placeName ref="#Luxor">Luxor</placeName>. Found telegram telling of <persName ref="#Jones_Harold">Harold Jones</persName>' peaceful end on <date when="1911-03-09">Thursday, the 9th</date>.</p>
+                <p>Started at 7 o'clock &#8211; and made the bridge at 9 o'clock and waited an hour
+                    to pass. Came to our landing at 11.30 &#8211; and found the mooring garden
+                    looking very pretty. We arrived the 10th day from <placeName ref="#Luxor"
+                        >Luxor</placeName>. Found telegram telling of <persName ref="#Jones_Harold"
+                        >Harold Jones</persName>' peaceful end on <date when="1911-03-09">Thursday,
+                        the 9th</date>.</p>
             </div>
-            <div xml:id="EBA-1911-03-12" type="entry">
+            <div xml:id="EBA-1911-03-13" type="entry">
                 <dateline>
                     <date when="1911-03-12">March 13th. Monday.</date>
                 </dateline>
-                <p><persName ref="#Draper_Mr">Mr. Draper</persName> to lunch yesterday. At home all day &#8211; rather warm today. <persName ref="#Rathbone_Elena">El&#232;na</persName> and I drove into town this morning &#8211; saw a number <pb n="83"/>of friends &#8211; met <persName ref="#Newberry_Percy_E">Mr. Newberry</persName> at <persName ref="#Deimer_Michael_Z">Deimer</persName>'s, and he went with us to <persName ref="#Kelekian_Dikran">Kolekian</persName>'s and to <persName ref="#Kassera">Kassera</persName>'s &#8211; there <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Burton_Harry">Harry</persName> joined us, and we went to <persName ref="#Nachman">Nachman</persName>'s. <persName ref="#Rathbone_Elena">El&#232;na</persName> and <persName ref="#Burton_Harry">Harry</persName> went after lunch to the <placeName type="hotel" ref="#Mena_House">Mena House</placeName>, and <persName ref="#Davis_Theodore_M">Theo</persName> and I went for a drive &#8211; and finding ourselves, in spite of warm wraps, freezing in the cold wind, we came home.</p>
+                <p><persName ref="#Draper_Mr">Mr. Draper</persName> to lunch yesterday. At home all
+                    day &#8211; rather warm today. <persName ref="#Rathbone_Elena"
+                        >El&#232;na</persName> and I drove into town this morning &#8211; saw a
+                    number <pb n="83"/>of friends &#8211; met <persName ref="#Newberry_Percy_E">Mr.
+                        Newberry</persName> at <persName ref="#Deimer_Michael_Z"
+                    >Deimer</persName>'s, and he went with us to <persName ref="#Kelekian_Dikran"
+                        >Kolekian</persName>'s and to <persName ref="#Kassera">Kassera</persName>'s
+                    &#8211; there <persName ref="#Davis_Theodore_M">Theo</persName> and <persName
+                        ref="#Burton_Harry">Harry</persName> joined us, and we went to <persName
+                        ref="#Nachman">Nachman</persName>'s. <persName ref="#Rathbone_Elena"
+                        >El&#232;na</persName> and <persName ref="#Burton_Harry">Harry</persName>
+                    went after lunch to the <name type="hotel" ref="#Mena_House">Mena House</name>,
+                    and <persName ref="#Davis_Theodore_M">Theo</persName> and I went for a drive
+                    &#8211; and finding ourselves, in spite of warm wraps, freezing in the cold
+                    wind, we came home.</p>
             </div>
             <div xml:id="EBA-1911-03-14" type="entry">
                 <dateline>
@@ -265,44 +652,103 @@
                 <dateline>
                     <date when="1911-03-15">Wednesday. March 15th.</date>
                 </dateline>
-                <p><persName ref="#Rathbone_Elena">El&#232;na</persName> and <persName ref="#Burton_Harry">Harry</persName> made an early start for <placeName ref="#Sakkara">Sakkara</placeName> &#8211; going by train to the <placeName type="hotel" ref="#Mena_House">Mena House</placeName>, and taking donkeys for <placeName ref="#Sakkara">Sakkara</placeName> They came back at 7 P.M. after a joyful day. <persName ref="#Winlock_Herbert">Mr. Winlock</persName> appeared this morning at 10 &#8211; and made quite a visit &#8211; then he, <persName ref="#Davis_Theodore_M">Theo</persName> and I went to town, and to <persName ref="#Kyticas_N_D">Kyticas</persName>'s to see a lovely Greek statuette which <persName ref="#Davis_Theodore_M">Theo</persName> thinks of buying. <personGrp ref="#Newberry">Mr. and Mrs. Newberry</personGrp> and <persName ref="#Johnson_Mr">Mr. Johnson</persName> came to lunch, and we had such a pleasant visit. I went at 5 o'clock over to the <name type="boat" ref="Cleopatra">Cleopatra</name> to tea with the <personGrp ref="#Whittaker">Whittakers</personGrp> &#8211; <persName ref="#Layard_Lady">Lady Layard</persName>, and the 2 ladies staying with them, <persName ref="#Johnson_Mr">Mr. Johnson</persName> and <persName ref="#Trefusis_Walter">Capt. Trefusis</persName> there. Coming home, I overtook <persName ref="#Davis_Theodore_M">Theo</persName> walking, and as the cold, cold wind had much moderated, and he got into the carriage, we drove around the island.</p>
+                <p><persName ref="#Rathbone_Elena">El&#232;na</persName> and <persName
+                        ref="#Burton_Harry">Harry</persName> made an early start for <placeName
+                        ref="#Sakkara">Sakkara</placeName> &#8211; going by train to the <placeName
+                        type="hotel" ref="#Mena_House_Hotel">Mena House</placeName>, and taking
+                    donkeys for <placeName ref="#Sakkara">Sakkara</placeName> They came back at 7
+                    P.M. after a joyful day. <persName ref="#Winlock_Herbert">Mr. Winlock</persName>
+                    appeared this morning at 10 &#8211; and made quite a visit &#8211; then he,
+                        <persName ref="#Davis_Theodore_M">Theo</persName> and I went to town, and to
+                        <persName ref="#Kyticas_N_D">Kyticas</persName>'s to see a lovely Greek
+                    statuette which <persName ref="#Davis_Theodore_M">Theo</persName> thinks of
+                    buying. <persName ref="#Newberry_Percy #Newberry_Mrs">Mr. and Mrs.
+                        Newberry</persName> and <persName ref="#Johnson_Mr">Mr. Johnson</persName>
+                    came to lunch, and we had such a pleasant visit. I went at 5 o'clock over to the
+                        <name type="boat" ref="Cleopatra">Cleopatra</name> to tea with the <persName
+                        ref="#Whittaker_Mr #Whittaker_Mrs">Whittakers</persName> &#8211; <persName
+                        ref="#Layard_Lady">Lady Layard</persName>, and the 2 ladies staying with
+                    them, <persName ref="#Johnson_Mr">Mr. Johnson</persName> and <persName
+                        ref="#Trefusis_Walter">Capt. Trefusis</persName> there. Coming home, I
+                    overtook <persName ref="#Davis_Theodore_M">Theo</persName> walking, and as the
+                    cold, cold wind had much moderated, and he got into the carriage, we drove
+                    around the island.</p>
             </div>
             <div xml:id="EBA-1911-03-16" type="entry">
                 <dateline>
                     <date when="1911-03-16">Thursday. March 16th.</date>
                 </dateline>
-                <p>In town this morning &#8211; met <persName ref="#Pasha_Artin">Artin Pasha</persName>, and <persName ref="#Sayce_Archibald">Mr. Sayce</persName> at <persName ref="#Kyticas_N_D">Kyticas</persName>'s &#8211; then went to the <placeName ref="#Boulaq_Museum">Museum</placeName> &#8211; <persName ref="#Daressy_M">M. Daressy</persName> took us into his <pb n="84"/>working room, to show how he was succeeding with the restoring of the beautiful coffin found in <placeName ref="#Tomb_of_Queen_Tiye">Queen Tiyi's tomb</placeName> &#8211; a long and very difficult task it is.</p>
+                <p>In town this morning &#8211; met <persName ref="#Pasha_Artin">Artin
+                        Pasha</persName>, and <persName ref="#Sayce_Archibald">Mr. Sayce</persName>
+                    at <persName ref="#Kyticas_N_D">Kyticas</persName>'s &#8211; then went to the
+                        <orgName ref="#Boulaq_Museum">Museum</orgName> &#8211; <persName
+                        ref="#Daressy_Georges">M. Daressy</persName> took us into his <pb n="84"/>working
+                    room, to show how he was succeeding with the restoring of the beautiful coffin
+                    found in <name type="historical" ref="#Tomb_of_Queen_Tiye">Queen <persName
+                            type="historical" ref="#Tiye">Tiyi</persName>'s tomb</name> &#8211; a
+                    long and very difficult task it is.</p>
             </div>
             <div xml:id="EBA-1911-03-17" type="entry">
                 <dateline>
                     <date when="1911-03-17">Friday. Mar. 17.</date>
                 </dateline>
-                <p>The morning was so very hot, that we did nothing but drive until 12 o'clock &#8211; when I left <persName ref="#Davis_Theodore_M">Theo</persName> at the boat, and I went to the <placeName type="hotel" ref="#Semeraines_Hotel">Semeraine's Hotel</placeName> to see <persName ref="#Duvar_Mrs">Mrs. Duvar</persName> &#8211; she was not at home. I left a note for her. In the afternoon, <persName ref="#Rathbone_Elena">El&#232;na</persName> went with <persName ref="#Bonham_Carter_Mr">Mr. Bonham-Carter</persName> to polo &#8211; <persName ref="#Burton_Harry">Harry</persName> and <persName ref="#Whymper_Charles">Mr. Whymper</persName> to the Zoo, where <persName ref="#Davis_Theodore_M">Theo</persName> and I soon followed them &#8211; and had a lovely visit. Just as we came away, we met <persName ref="#Pasha_Artin">Artin Pasha</persName>, and <persName ref="#Sayce_Archibald">Mr. Sayce</persName>, who said they had just been to the boat hoping to find us, so they came back all of them for tea, and a long visit, and much pleasant talk.</p>
+                <p>The morning was so very hot, that we did nothing but drive until 12 o'clock
+                    &#8211; when I left <persName ref="#Davis_Theodore_M">Theo</persName> at the
+                    boat, and I went to the <name type="hotel" ref="#Semiramis_Hotel"
+                                ><choice><sic>Semeraine's Hotel</sic><corr>Semiramis
+                            Hotel</corr></choice></name> to see <persName ref="#Duvar_Mrs">Mrs.
+                        Duvar</persName> &#8211; she was not at home. I left a note for her. In the
+                    afternoon, <persName ref="#Rathbone_Elena">El&#232;na</persName> went with
+                        <persName ref="#Bonham_Carter_Edgar">Mr. Bonham-Carter</persName> to polo
+                    &#8211; <persName ref="#Burton_Harry">Harry</persName> and <persName
+                        ref="#Whymper_Charles">Mr. Whymper</persName> to the <orgName
+                        ref="#Giza_Zoo">Zoo</orgName>, where <persName ref="#Davis_Theodore_M"
+                        >Theo</persName> and I soon followed them &#8211; and had a lovely visit.
+                    Just as we came away, we met <persName ref="#Pasha_Artin">Artin
+                    Pasha</persName>, and <persName ref="#Sayce_Archibald">Mr. Sayce</persName>, who
+                    said they had just been to the boat hoping to find us, so they came back all of
+                    them for tea, and a long visit, and much pleasant talk.</p>
             </div>
             <div xml:id="EBA-1911-03-18" type="entry">
                 <dateline>
                     <date when="1911-03-18">Saturday. Mar. 18th.</date>
-                </dateline> 
-                <p>In the house all day &#8211; a severe gale began about 7 o'clock &#8211; and grew in violence &#8211; making a great knocking about of the boats along the shore &#8211; a small yawl disappeared just behind us &#8211; and a gyassa was wrecked near the bridge. <placeName ref="#Cairo">Cairo</placeName> could not be seen across the river, in the clouds of dust. In doors all day.</p>
+                </dateline>
+                <p>In the house all day &#8211; a severe gale began about 7 o'clock &#8211; and grew
+                    in violence &#8211; making a great knocking about of the boats along the shore
+                    &#8211; a small yawl disappeared just behind us &#8211; and a gyassa was wrecked
+                    near the bridge. <placeName ref="#Cairo">Cairo</placeName> could not be seen
+                    across the river, in the clouds of dust. In doors all day.</p>
             </div>
             <div xml:id="EBA-1911-03-19" type="entry">
                 <dateline>
                     <date when="1911-03-19">Sunday. Mar. 19th.</date>
                 </dateline>
-                <p>The weather quite perfect today. I have not been out. <persName ref="#Bonham_Carter_Mr">Mr. Bonham-Carter</persName> came in this afternoon &#8211; and <persName ref="#Trefusis_Walter">Capt. Trefusis</persName> &#8211; looking <pb n="85"/>so well, and announcing his engagement to <persName ref="#Graham_Margery">Miss Margery Graham</persName> &#8211; the marriage to take place in May. She is a daughter of <persName ref="#Graham_John">Sir John Graham</persName> and a niece of <persName ref="#Northampton_Lord">Lord Northampton.</persName></p>
+                <p>The weather quite perfect today. I have not been out. <persName
+                        ref="#Bonham_Carter_Edgar">Mr. Bonham-Carter</persName> came in this afternoon
+                    &#8211; and <persName ref="#Trefusis_Walter_Capt">Capt. Trefusis</persName> &#8211;
+                    looking <pb n="85"/>so well, and announcing his engagement to <persName
+                        ref="#Graham_Marjorie_Miss">Miss Margery Graham</persName> &#8211; the marriage to
+                    take place in May. She is a daughter of <persName ref="#Graham_John_Sir">Sir John
+                        Graham</persName> and a niece of <persName ref="#Northampton_Lord">Lord
+                        Northampton</persName>.</p>
             </div>
             <div xml:id="EBA-1911-03-20" type="entry">
                 <dateline>
                     <date when="1911-03-20">Monday. Mar. 20th.</date>
                 </dateline>
-                <p>In the house all day, except for a short visit to town. <persName ref="#Duvar_Mrs">Mrs. Duvar</persName> came for a visit at 12 o'clock &#8211; and <persName ref="#Coater_Miss">Miss Coater</persName> for lunch. Since then I have been busy packing. The day has been decidedly cool.</p>
+                <p>In the house all day, except for a short visit to town. <persName
+                        ref="#Duvar_Mrs">Mrs. Duvar</persName> came for a visit at 12 o'clock
+                    &#8211; and <persName ref="#Coater_Miss">Miss Coater</persName> for lunch. Since
+                    then I have been busy packing. The day has been decidedly cool.</p>
             </div>
             <div xml:id="EBA-1911-03-23" type="entry">
                 <dateline>
                     <date when="1911-03-23">Thursday. Mar. 23rd</date>
-                    <placeName type="hotel" ref="#Ghezireh_Palace_Hotel">Ghezireh Palace Hotel</placeName>
+                    <name type="hotel" ref="#Ghezireh_Palace_Hotel">Ghezireh Palace Hotel</name>
                 </dateline>
-                <p>We came here this afternoon to our old rooms. It was sad to leave the dahabya &#8211; but the garden and lawns and trees are so lovely here, and our big windows let in so much of it to us &#8211; that it is quite lovely.</p>
+                <p>We came here this afternoon to our old rooms. It was sad to leave the dahabya
+                    &#8211; but the garden and lawns and trees are so lovely here, and our big
+                    windows let in so much of it to us &#8211; that it is quite lovely.</p>
             </div>
         </body>
     </text>
