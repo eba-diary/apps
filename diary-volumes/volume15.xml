@@ -2,7 +2,7 @@
   <teiHeader>
     <fileDesc>
       <titleStmt>
-        <title>Diary of Mrs. Emma B. Andrews. Volume 16 1908-1909</title>
+        <title>Diary of Mrs. Emma B. Andrews. Volume 15 1907-1908</title>
         <author>
           <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
         </author>
@@ -209,7 +209,7 @@
       </div>
       <div xml:id="EBA-1908-02-04" type = "entry">
         <dateline><date when="1908-02-04">Feb. 4th. Tuesday.</date></dateline>
-        <p>A quiet day. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> arrived on the <orgName>Istar</orgName> and is lying near - came to see us. <persName ref="#Loret_M">M. Loret</persName> and <persName ref="#Le_Grand_Joachim_Abbot">M. Le Grand</persName> came to tea and to see the find. <persName ref="#Ayrton_Edward">Ayrton</persName> lunched and dined with us.</p>
+        <p>A quiet day. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> arrived on the <orgName>Istar</orgName> and is lying near - came to see us. <persName ref="#Loret_M">M. Loret</persName> and <persName ref="#Le_Grand_M">M. Le Grand</persName> came to tea and to see the find. <persName ref="#Ayrton_Edward">Ayrton</persName> lunched and dined with us.</p>
       </div>
       <div xml:id="EBA-1908-02-05" type = "entry">
         <dateline><date when="1908-02-05">Feb. 5th. Wednesday.</date></dateline>
