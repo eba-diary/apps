@@ -2,11 +2,13 @@
 {
 
     sensitive: false,                                                                   //declare a property within the data.Dale that essentially represents a global var that all functions can use within data.Dale to set whether sensitive or not
+    currentSearchType: 'BASIC',
 
     init: function ()
     {
         localStorage.clear();                                                           // Clear all items in our array
-        data.Dale.showSearchType('BASIC');                                              //display basic search type by default
+        data.Dale.currentSearchType = 'BASIC';
+        data.Dale.showSearchType(data.Dale.currentSearchType);                          //display basic search type by default
 
         //init GRID based on User Security
         $.ajax({                                                                        
@@ -69,20 +71,12 @@
             var thisBtn = $(this);                                                  //get specific part of group button that was clicked
 
             thisBtn.addClass('active').siblings().removeClass('active');            //add active to current part of group clicked and remove active from everything else
-            var btnValue = thisBtn.val();                                           //figure out which one was clicked
-
-            data.Dale.showSearchType(btnValue);                                     //display correct UI (BASIC or ADVANCED)
+            data.Dale.currentSearchType = thisBtn.val();                            //figure out which one was clicked
+            data.Dale.showSearchType(data.Dale.currentSearchType);                  //display correct UI (BASIC or ADVANCED)
         });
 
     },
 
-    getSearchType: function () {
-
-        var thisBtn = $('#btnDaleSearchOption button');
-        var btnValue = thisBtn.val();
-        return btnValue;
-
-    },
 
     //SHOW SEARCH TYPE (BASIC or ADVANCED SEARCH)
     showSearchType: function (searchType) {
@@ -146,6 +140,23 @@
         return sensitiveList;
     },
 
+    //TODO: use this to pass to GetSearchResultsClient GET ADVANCED SEARCH INFO
+    getAdvancedSearchCriteria: function () {
+
+        //create new obj to represent advanced search info
+        var o = new Object();
+        o.Asset = $('#daleAsset').val();
+        o.Server = $('#daleServer').val();
+        o.Database = $('#daleDatabase').val();
+        o.Object = $('#daleObject').val();
+        o.ObjectType = $('#daleObjectType').val();
+        o.Column = $('#daleColumn').val();
+        o.SourceType = $('#daleSourceType').val();
+
+        return o;
+    },
+
+    //CREATE DATATABLE
     dataTablCreate: function (obj) {
 
         //init DataTable
@@ -154,12 +165,20 @@
             //client side setup
             pageLength: 100,
 
+            //ON table creation or refresh this AJAX code is called to fill grid
             ajax: {
                 url: "/Dale/GetSearchResultsClient/",
                 type: "GET",
                 data: function (d) {
                     d.searchCriteria = $('#daleSearchCriteria').val();
                     d.destination = data.Dale.getDaleDestiny();
+                    d.asset = $('#daleAsset').val();
+                    d.server = $('#daleServer').val();
+                    d.database = $('#daleDatabase').val();
+                    d.daleObject = $('#daleObject').val();
+                    d.objectType = $('#daleObjectType').val();
+                    d.column = $('#daleColumn').val();
+                    d.sourceType = $('#daleSourceType').val();
                     d.sensitive = data.Dale.sensitive;
                 }
             },
@@ -436,7 +455,7 @@
     {
         var daleDestiny = '';
 
-        if (data.Dale.getSearchType() == 'BASIC') {
+        if (data.Dale.currentSearchType == 'BASIC') {
 
             //figure out which radio button was selected
             daleDestiny = $('input[name="Destiny"]:checked').val();
