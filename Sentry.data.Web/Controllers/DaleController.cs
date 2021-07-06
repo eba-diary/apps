@@ -31,7 +31,7 @@ namespace Sentry.data.Web.Controllers
                 DaleSearchModel searchModel = new DaleSearchModel();
                 searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
                 searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
-                searchModel.DaleAdvancedCriteria = new DaleAdvancedCriteria() { };
+                searchModel.DaleAdvancedCriteria = new DaleAdvancedCriteriaModel() { };
 
                 
                 if(String.IsNullOrEmpty(search))
@@ -135,7 +135,7 @@ namespace Sentry.data.Web.Controllers
             searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
             searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
 
-            searchModel.DaleAdvancedCriteria = new DaleAdvancedCriteria()
+            searchModel.DaleAdvancedCriteria = new DaleAdvancedCriteriaModel()
             {
                 Asset = asset,
                 Server = server,
@@ -201,13 +201,13 @@ namespace Sentry.data.Web.Controllers
 
             //validate that if advanced search is happening at least something is filled in
             if (model.Destiny == DaleDestiny.Advanced
-                                    && String.IsNullOrWhiteSpace(model.DaleAdvancedCriteria.Asset)
-                                     && String.IsNullOrWhiteSpace(model.DaleAdvancedCriteria.Server)
-                                     && String.IsNullOrWhiteSpace(model.DaleAdvancedCriteria.Database)
-                                     && String.IsNullOrWhiteSpace(model.DaleAdvancedCriteria.Object)
-                                     && String.IsNullOrWhiteSpace(model.DaleAdvancedCriteria.ObjectType)
-                                     && String.IsNullOrWhiteSpace(model.DaleAdvancedCriteria.Column)
-                                     && String.IsNullOrWhiteSpace(model.DaleAdvancedCriteria.SourceType)
+                                    && (model.DaleAdvancedCriteria.AssetIsEmpty)
+                                     && (model.DaleAdvancedCriteria.ServerIsEmpty)
+                                     && (model.DaleAdvancedCriteria.DatabaseIsEmpty)
+                                     && (model.DaleAdvancedCriteria.ObjectIsEmpty)
+                                     && (model.DaleAdvancedCriteria.ObjectTypeIsEmpty)
+                                     && (model.DaleAdvancedCriteria.ColumnIsEmpty)
+                                     && (model.DaleAdvancedCriteria.SourceTypeIsEmpty)
                 )
             {
                 return false;

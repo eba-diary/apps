@@ -7,6 +7,9 @@ namespace Sentry.data.Web
 {
     public static class DaleExtensions
     {
+
+
+
         public static DaleSearchDto ToDto(this DaleSearchModel model)
         {
             if (model == null)
@@ -18,7 +21,40 @@ namespace Sentry.data.Web
             {
                 Criteria = model.Criteria,
                 Destiny = model.Destiny,
-                Sensitive = model.Sensitive
+                Sensitive = model.Sensitive,
+                AdvancedCriteria = model.DaleAdvancedCriteria.ToDto()
+            };
+        }
+
+        public static DaleAdvancedCriteriaDto ToDto(this DaleAdvancedCriteriaModel model)
+        {
+            if (model == null)
+            {
+                return new DaleAdvancedCriteriaDto();
+            }
+
+            return new DaleAdvancedCriteriaDto()
+            {
+                Asset = model.Asset,
+                AssetIsEmpty = model.AssetIsEmpty,
+                
+                Server = model.Server,
+                ServerIsEmpty = model.ServerIsEmpty,
+
+                Database = model.Database,
+                DatabaseIsEmpty = model.DatabaseIsEmpty,
+
+                Object = model.Object,
+                ObjectIsEmpty = model.ObjectIsEmpty,
+
+                ObjectType = model.ObjectType,
+                ObjectTypeIsEmpty = model.ObjectTypeIsEmpty,
+
+                Column = model.Column,
+                ColumnIsEmpty = model.ColumnIsEmpty,
+
+                SourceType = model.SourceType,
+                SourceTypeIsEmpty = model.SourceTypeIsEmpty
             };
         }
 
@@ -149,6 +185,8 @@ namespace Sentry.data.Web
                 IsOwnerVerified = model.IsOwnerVerified
             };
         }
+
+       
 
         public static List<DaleSensitiveDto> ToDto(this List<DaleSensitiveModel> models)
         {

@@ -29,14 +29,13 @@ namespace Sentry.data.Infrastructure
             {
                 Stopwatch stopWatch = new Stopwatch();
                 stopWatch.Start();
-               
-                string q = BuildAQuery(dto);
-                SqlCommand command = new SqlCommand(q, connection);
-                command.CommandTimeout = 0;
 
-                command.Parameters.AddWithValue("@Criteria", System.Data.SqlDbType.VarChar);
-                command.Parameters["@Criteria"].Value = "%" + dto.Criteria + "%";
-                
+                SqlCommand command = new SqlCommand();
+                command.Connection = connection;
+                command.CommandTimeout = 0;
+                string q = BuildAQuery(dto, ref command);
+                command.CommandText = q;
+
                 try
                 {
                     connection.Open();
@@ -68,6 +67,136 @@ namespace Sentry.data.Infrastructure
 
             return daleResult;
         }
+
+        
+
+        private string BuildAQuery(DaleSearchDto dto, ref SqlCommand command)
+        {
+            string q = String.Empty;
+            string qSelect = "SELECT Asset_CDE, Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM,Prod_Typ,BaseColumn_ID,IsSensitive_FLG,IsOwnerVerified_FLG,Source_NME ";
+            string qFrom = (dto.Sensitive == DaleSensitive.SensitiveOnly)? "FROM ColumnSensitivityCurrent_v " : "FROM Column_v ";
+            string qWhereStatement = BuildAWhere(dto, ref command);
+
+            q = qSelect + qFrom + qWhereStatement;
+
+            return q;
+        }
+
+        private string BuildAWhere(DaleSearchDto dto, ref SqlCommand command)
+        {
+            string qWhereColumn = String.Empty;
+            string qWhereStatement = String.Empty;
+
+            //ADVANCED QUERY
+            if (dto.Destiny == DaleDestiny.Advanced)
+            {
+                qWhereStatement = AddAllAdvancedParams(dto.AdvancedCriteria, ref command);
+            }
+            else //EVERY OTHER KIND OF QUERY
+            {
+                if (dto.Sensitive == DaleSensitive.SensitiveOnly)
+                {
+                    qWhereStatement = "WHERE IsSensitive_FLG = 1 ";
+                }
+                else
+                {
+                    if (dto.Destiny == DaleDestiny.Object)
+                    {
+                        qWhereColumn = "Base_NME";
+                    }
+                    else if (dto.Destiny == DaleDestiny.Column)
+                    {
+                        qWhereColumn = "Column_NME";
+                    }
+                    else if (dto.Destiny == DaleDestiny.SAID)
+                    {
+                        qWhereColumn = "Asset_CDE";
+                    }
+
+                    qWhereStatement += "WHERE " + qWhereColumn + " LIKE @Criteria ";
+
+                    //ONLY apply logic here if they dont want to see any sensitive information
+                    if (dto.Sensitive == DaleSensitive.SensitiveNone)
+                    {
+                        qWhereStatement += " AND IsSensitive_FLG = 0 ";
+                    }
+
+                    qWhereStatement += " AND Expiration_DTM IS NULL";
+                }
+
+                command.Parameters.AddWithValue("@Criteria", System.Data.SqlDbType.VarChar);
+                command.Parameters["@Criteria"].Value = "%" + dto.Criteria + "%";
+
+            }
+
+
+            return qWhereStatement;
+        }
+
+
+        private string AddAllAdvancedParams(DaleAdvancedCriteriaDto advanced, ref SqlCommand command)
+        {
+            string qWhereStatement = String.Empty;
+
+            if(!advanced.AssetIsEmpty)
+            {
+                qWhereStatement = AddSingleAdvancedParam(qWhereStatement, "Asset_CDE", advanced.Asset, ref command);
+            }
+
+            if (!advanced.ServerIsEmpty)
+            {
+                qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Server_NME", advanced.Server, ref command);
+            }
+
+            if (!advanced.DatabaseIsEmpty)
+            {
+                qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Database_NME", advanced.Database, ref command);
+            }
+
+            if (!advanced.ObjectIsEmpty)
+            {
+                qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Base_NME", advanced.Object, ref command);
+            }
+
+            if (!advanced.ObjectTypeIsEmpty)
+            {
+                qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Type_DSC", advanced.ObjectType, ref command);
+            }
+
+            if (!advanced.ColumnIsEmpty)
+            {
+                qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Column_NME", advanced.Column, ref command);
+            }
+
+            if (!advanced.SourceTypeIsEmpty)
+            {
+                qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Source_NME", advanced.SourceType, ref command);
+            }
+
+            if (!String.IsNullOrWhiteSpace(qWhereStatement))
+            {
+                qWhereStatement = " WHERE " + qWhereStatement + " AND Expiration_DTM IS NULL";
+            }
+
+            return qWhereStatement;
+
+        }
+
+        private string AddSingleAdvancedParam(string currentWhereStatement, string name, string value, ref SqlCommand command)
+        {
+            string fullParamName = "@AdvancedCriteria" + name;
+            string singleWhere = " " + name + " = " + fullParamName + " ";
+            if (!String.IsNullOrWhiteSpace(currentWhereStatement))
+            {
+                singleWhere = " AND " + singleWhere;
+            }
+
+            command.Parameters.AddWithValue(fullParamName, System.Data.SqlDbType.VarChar);
+            command.Parameters[fullParamName].Value = value;
+
+            return singleWhere;
+        }
+
 
         public bool SaveSensitive(string sensitiveBlob)
         {
@@ -104,73 +233,6 @@ namespace Sentry.data.Infrastructure
             }
 
             return success;
-        }
-
-        private string BuildAQuery(DaleSearchDto dto)
-        {
-            string q = String.Empty;
-            string qSelect = "SELECT Asset_CDE, Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM,Prod_Typ,BaseColumn_ID,IsSensitive_FLG,IsOwnerVerified_FLG,Source_NME ";
-            string qFrom = (dto.Sensitive == DaleSensitive.SensitiveOnly)? "FROM ColumnSensitivityCurrent_v " : "FROM Column_v ";
-            string qWhereStatement = BuildAWhere(dto);
-
-            q = qSelect + qFrom + qWhereStatement;
-
-            return q;
-        }
-
-        private string BuildAWhere(DaleSearchDto dto)
-        {
-            string qWhereColumn = String.Empty;
-            string qWhereStatement = String.Empty;
-
-            //set variable portion of WHERE STATEMENT
-            if(dto.Sensitive == DaleSensitive.SensitiveOnly)
-            {
-                qWhereStatement = "WHERE IsSensitive_FLG = 1 ";
-            }
-            else if(dto.Destiny == DaleDestiny.Advanced)
-            {
-             //   (Asset_CDE = 'test' or Asset_CDE IS NULL)
-	            //AND Server_NME = 'sentry.us-east-2.aws.snowflakecomputing.com'
-
-             //   AND Database_NME = 'DATA_PROD'
-
-             //   AND Base_NME = 'VW_FATALITYANALYSISREPORTINGSYSTEM_ACCIDENT'--table / view
-
-             //   AND Type_DSC = 'view'
-
-             //   AND Column_NME = 'weather'
-
-             //   AND Source_NME = 'SNFC'
-
-            }
-            else 
-            {
-                if (dto.Destiny == DaleDestiny.Object)
-                {
-                    qWhereColumn = "Base_NME";
-                }
-                else if (dto.Destiny == DaleDestiny.Column)
-                {
-                    qWhereColumn = "Column_NME";
-                }
-                else if (dto.Destiny == DaleDestiny.SAID)
-                {
-                    qWhereColumn = "Asset_CDE";
-                }
-
-                qWhereStatement += "WHERE " + qWhereColumn + " LIKE @Criteria ";
-
-                //ONLY apply logic here if they dont want to see any sensitive information
-                if (dto.Sensitive == DaleSensitive.SensitiveNone)
-                {
-                    qWhereStatement += " AND IsSensitive_FLG = 0 ";
-                }
-
-                qWhereStatement += " AND Expiration_DTM IS NULL";
-            }
-
-            return qWhereStatement;
         }
 
         private DaleResultRowDto CreateDaleResultRow(SqlDataReader reader)
