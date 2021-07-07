@@ -471,13 +471,23 @@
     //disable all controls user can hit during search
     disableDale: function ()
     {
-        $('#daleSearchClick').hide();
-        $('#daleSearchClickSpinner').show();
-        $('#daleContainer').hide();
 
-        $('#sensitiveSearchLink').addClass("dale-disable-stuff");
-        $('#daleCriteriaContainer').addClass("dale-disable-stuff");
-        $('#radioMadness').addClass("dale-disable-stuff");
+        if (data.Dale.currentSearchType == 'BASIC') {
+            $('#daleSearchClickBasic').hide();
+            $('#daleSearchClickSpinnerBasic').show();
+            
+
+            $('#sensitiveSearchLink').addClass("dale-disable-stuff");
+            $('#daleCriteriaContainer').addClass("dale-disable-stuff");
+            $('#radioMadness').addClass("dale-disable-stuff");
+        }
+        else {
+
+            $('#daleSearchClickAdvanced').hide();
+            $('#daleSearchClickSpinnerAdvanced').show();
+        }
+
+        $('#daleContainer').hide();
     },
 
     //enable all controls user can hit during search
@@ -486,13 +496,25 @@
         //everytime a new search happens, we want to redraw the grid so column contents is redrawn to fit properly
         $("#daleResultsTable").DataTable().columns.adjust().draw();
 
-        $('#daleSearchClick').show();
-        $('#daleSearchClickSpinner').hide();
-        $('#daleContainer').show();
 
-        $('#sensitiveSearchLink').removeClass("dale-disable-stuff");
-        $('#daleCriteriaContainer').removeClass("dale-disable-stuff");
-        $('#radioMadness').removeClass("dale-disable-stuff");
+        if (data.Dale.currentSearchType == 'BASIC') {
+            $('#daleSearchClickBasic').show();
+            $('#daleSearchClickSpinnerBasic').hide();
+            
+
+            $('#sensitiveSearchLink').removeClass("dale-disable-stuff");
+            $('#daleCriteriaContainer').removeClass("dale-disable-stuff");
+            $('#radioMadness').removeClass("dale-disable-stuff");
+
+        }
+        else {
+            $('#daleSearchClickAdvanced').show();
+            $('#daleSearchClickSpinnerAdvanced').hide();
+
+        }
+
+        $('#daleContainer').show();
+       
     },
 
     //SEARCH CLICK EVENTS
