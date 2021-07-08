@@ -6,7 +6,7 @@
   <teiHeader>
     <fileDesc>
       <titleStmt>
-        <title>Diary of Mrs. Emma B. Andrews. Volume 17 1912-1913</title> <!-- replace with correct volume -->
+        <title>Diary of Mrs. Emma B. Andrews. Volume 3 1894-1895</title> <!-- replace with correct volume -->
         <author>
           <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
         </author>
@@ -34,10 +34,18 @@
           <persName ref="#BL">Benjamin Lewis</persName>
           <persName ref="#SB">Selma El-Badawi</persName>
         </respStmt>
-        <respStmt>
-          <resp>biographical research and writing</resp> 
-          <persName ref="#XX">name name</persName> <!-- replace with correct names -->
-        </respStmt>
+         <respStmt>
+                    <resp>biographical research and writing</resp>
+                    <persName ref="#SK">Sarah Ketchley</persName>
+                    <persName ref="#JJ">Jasmine Jones</persName>
+                    <persName ref="#JC">Jasmine Choi</persName>
+                    <persName ref="#SR">Samuel Roller</persName>
+                    <persName ref="#AAD">Avery Dahl</persName>
+                    <persName ref="#AD">Avneet Dhaliwal</persName>
+                    <persName ref="#IH">Iona Hillman</persName>
+                    <persName ref="#LK">Lexi Kinzer</persName>
+                    <persName ref="#PH">Priya Hariharan</persName>
+                </respStmt>
       </titleStmt>
       <publicationStmt>
         <publisher>
