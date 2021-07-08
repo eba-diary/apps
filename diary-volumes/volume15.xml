@@ -131,7 +131,7 @@
         <dateline>
           <date when="1907-12-03">Tuesday, Dec. 3rd.</date>
         </dateline>
-        <p>I have had a busy day settling - while <persName>Theo</persName> and <persName>Carrie</persName> went to <placeName>Sakkarah.</placeName> A lovely day. The <persName>Ramesis</persName> was lying by us all day - with a handful of passengers - but went off at 6 o'clock. The carpenter and painter have been here all day repairing damages. Wednesday, Dec. 4. 41 miles. We get away from <persName>Bedraschein</persName> at 7 o'clock this morning - and have had a lovely day - river like glass, both of our sails out much of the time. The river is enormously broad about here. When I went on deck about 4 o'clock, I found a scene of ravishing beauty - the broad smooth river, the distant cliffs and Mts. and desert, with the heliotrope shadows, and the soft brilliant sun. It was too entrancing. We had tea on deck - and are now lying opposite <placeName>Wasta</placeName>.</p>
+        <p>I have had a busy day settling - while <persName>Theo</persName> and <persName>Carrie</persName> went to <placeName>Sakkarah.</placeName> A lovely day. The <persName>Ramesis</persName> was lying by us all day - with a handful of passengers - but went off at 6 o'clock. The carpenter and painter have been here all day repairing damages. Wednesday, Dec. 4. 41 miles. We get away from <persName>Bedraschein</persName> at 7 o'clock this morning - and have had a lovely day - river like glass, both of our sails out much of the time. The river is enormously broad about here. When I went on deck about 4 o'clock, I found a scene of ravishing beauty - the broad smooth river, the distant cliffs and Mts. and desert, with the heliotrope shadows, and the soft brilliant sun. It was too entrancing. We had tea on deck - and are now lying opposite <placeName>Wasta</placeName>.</p></div>
         <div xml:id="EBA-1907-12-05" type="entry">
         <dateline>
           <date when="1907-12-05">Thursday, Dec. 5th.</date><measure type="distance">29 miles</measure>
@@ -419,7 +419,7 @@
       <div xml:id="EBA-1908-03-04" type="entry">
         <dateline><placeName ref="#Quinquagesima">Quinquagesima</placeName> - <date when="1908-03-04">March 4th.</date>.</dateline>
         <p>Ash Wednesday. All the family at <placeName ref="#Karnac">Karnac</placeName> this afternoon.</p>
-      <div>
+      </div>
       <div xml:id="EBA-1908-03-05" type="entry">
         <dateline><placeName ref="#Quinquagesima">Quinquagesima</placeName> - <date when="1908-03-05">March 5th.</date>.</dateline>
         <p>Thursday. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Jones_Harold">Harold</persName> at the <placeName ref="#Valley_of_the_Kings">Valley</placeName> today. I went over to <name type="hotel" ref="#Hotel_Luxor">Luxor</name> to say goodbye to <persName ref="#Buchanan_Carrie">Miss Buchanan</persName>.</p>
