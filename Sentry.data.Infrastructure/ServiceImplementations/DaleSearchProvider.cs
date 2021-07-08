@@ -129,46 +129,46 @@ namespace Sentry.data.Infrastructure
 
             }
 
-
             return qWhereStatement;
         }
 
-
+        //CREATE dynamic SQL WHERE STATEMENT AND ADD PARMS to SqlCommand
+        //NOTE!! only add params if they are used
         private string AddAllAdvancedParams(DaleAdvancedCriteriaDto advanced, ref SqlCommand command)
         {
             string qWhereStatement = String.Empty;
 
-            if(!advanced.AssetIsEmpty)
+            if(advanced.AssetIsValid)
             {
                 qWhereStatement = AddSingleAdvancedParam(qWhereStatement, "Asset_CDE", advanced.Asset, ref command);
             }
 
-            if (!advanced.ServerIsEmpty)
+            if (advanced.ServerIsValid)
             {
                 qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Server_NME", advanced.Server, ref command);
             }
 
-            if (!advanced.DatabaseIsEmpty)
+            if (advanced.DatabaseIsValid)
             {
                 qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Database_NME", advanced.Database, ref command);
             }
 
-            if (!advanced.ObjectIsEmpty)
+            if (advanced.ObjectIsValid)
             {
                 qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Base_NME", advanced.Object, ref command);
             }
 
-            if (!advanced.ObjectTypeIsEmpty)
+            if (advanced.ObjectTypeIsValid)
             {
                 qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Type_DSC", advanced.ObjectType, ref command);
             }
 
-            if (!advanced.ColumnIsEmpty)
+            if (advanced.ColumnIsValid)
             {
                 qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Column_NME", advanced.Column, ref command);
             }
 
-            if (!advanced.SourceTypeIsEmpty)
+            if (advanced.SourceTypeIsValid)
             {
                 qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Source_NME", advanced.SourceType, ref command);
             }
@@ -182,17 +182,19 @@ namespace Sentry.data.Infrastructure
 
         }
 
+        //Add a single param to the dynamic sql statement and add the PARAM to SqlCommand
+        //the calling function here ONLY CALLS this if its valid
         private string AddSingleAdvancedParam(string currentWhereStatement, string name, string value, ref SqlCommand command)
         {
             string fullParamName = "@AdvancedCriteria" + name;
-            string singleWhere = " " + name + " = " + fullParamName + " ";
+            string singleWhere = " " + name + " LIKE " + fullParamName + " ";
             if (!String.IsNullOrWhiteSpace(currentWhereStatement))
             {
                 singleWhere = " AND " + singleWhere;
             }
 
             command.Parameters.AddWithValue(fullParamName, System.Data.SqlDbType.VarChar);
-            command.Parameters[fullParamName].Value = value;
+            command.Parameters[fullParamName].Value = "%" + value + "%";
 
             return singleWhere;
         }

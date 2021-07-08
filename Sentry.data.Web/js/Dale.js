@@ -66,7 +66,7 @@
 
 
         //BASIC OR ADVANCED SEARCH OPTION onClick event capture
-        $("#btnDaleSearchOption button").on('click', function (e) {
+        $("#btnDaleSearchOption button").on('click', function () {
 
             var thisBtn = $(this);                                                  //get specific part of group button that was clicked
 
@@ -80,13 +80,13 @@
 
     //SHOW SEARCH TYPE (BASIC or ADVANCED SEARCH)
     showSearchType: function (searchType) {
-        if (searchType == 'BASIC') {
+        if (searchType === 'BASIC') {
 
             $('.dale-basic-search').show();
             $('.dale-advanced-search').hide();
 
-            $('#btnDaleSearchOption.btn-group > .btn').removeClass('active')    // Remove any existing active classes
-            $('#btnDaleSearchOption.btn-group > .btn').eq(0).addClass('active') // Add the class to the nth element
+            $('#btnDaleSearchOption.btn-group > .btn').removeClass('active');    // Remove any existing active classes
+            $('#btnDaleSearchOption.btn-group > .btn').eq(0).addClass('active'); // Add the class to the nth element
 
         }
         else {
@@ -94,8 +94,8 @@
             $('.dale-basic-search').hide();
             $('.dale-advanced-search').show();
 
-            $('#btnDaleSearchOption.btn-group > .btn').removeClass('active')    // Remove any existing active classes
-            $('#btnDaleSearchOption.btn-group > .btn').eq(1).addClass('active') // Add the class to the nth element
+            $('#btnDaleSearchOption.btn-group > .btn').removeClass('active');    // Remove any existing active classes
+            $('#btnDaleSearchOption.btn-group > .btn').eq(1).addClass('active'); // Add the class to the nth element
 
         }
     },
@@ -138,22 +138,6 @@
         }
 
         return sensitiveList;
-    },
-
-    //TODO: use this to pass to GetSearchResultsClient GET ADVANCED SEARCH INFO
-    getAdvancedSearchCriteria: function () {
-
-        //create new obj to represent advanced search info
-        var o = new Object();
-        o.Asset = $('#daleAsset').val();
-        o.Server = $('#daleServer').val();
-        o.Database = $('#daleDatabase').val();
-        o.Object = $('#daleObject').val();
-        o.ObjectType = $('#daleObjectType').val();
-        o.Column = $('#daleColumn').val();
-        o.SourceType = $('#daleSourceType').val();
-
-        return o;
     },
 
     //CREATE DATATABLE
@@ -321,9 +305,6 @@
         data.Dale.setupClickAttackGrid();                                                                           //SETUP GRID CLICK EVENTS
     },
 
-
-
-
     //edit storage array since user is changing data
     editArray: function (rowIndex, rowData, columnIndex, columnValue) {
 
@@ -450,16 +431,15 @@
         }
     },
 
-    //figure out if BASIC OR ADVANCED and based ON that
+    //figure out if BASIC OR ADVANCED Destiny
     getDaleDestiny: function ()
     {
         var daleDestiny = '';
 
-        if (data.Dale.currentSearchType == 'BASIC') {
+        if (data.Dale.currentSearchType === 'BASIC') {
 
-            //figure out which radio button was selected
+            //figure out which radio button was selected for BASIC SEARCH
             daleDestiny = $('input[name="Destiny"]:checked').val();
-            
         }
         else {
             daleDestiny = 'ADVANCED';
@@ -472,14 +452,14 @@
     disableDale: function ()
     {
 
-        if (data.Dale.currentSearchType == 'BASIC') {
+        if (data.Dale.currentSearchType === 'BASIC') {
             $('#daleSearchClickBasic').hide();
             $('#daleSearchClickSpinnerBasic').show();
             
-
             $('#sensitiveSearchLink').addClass("dale-disable-stuff");
             $('#daleCriteriaContainer').addClass("dale-disable-stuff");
             $('#radioMadness').addClass("dale-disable-stuff");
+            
         }
         else {
 
@@ -487,6 +467,7 @@
             $('#daleSearchClickSpinnerAdvanced').show();
         }
 
+        $('#btnDaleSearchOption').addClass("dale-disable-stuff");
         $('#daleContainer').hide();
     },
 
@@ -497,22 +478,22 @@
         $("#daleResultsTable").DataTable().columns.adjust().draw();
 
 
-        if (data.Dale.currentSearchType == 'BASIC') {
+        if (data.Dale.currentSearchType === 'BASIC') {
             $('#daleSearchClickBasic').show();
             $('#daleSearchClickSpinnerBasic').hide();
             
-
             $('#sensitiveSearchLink').removeClass("dale-disable-stuff");
             $('#daleCriteriaContainer').removeClass("dale-disable-stuff");
             $('#radioMadness').removeClass("dale-disable-stuff");
+            
 
         }
-        else {
+        else {  //ADVANCED
             $('#daleSearchClickAdvanced').show();
             $('#daleSearchClickSpinnerAdvanced').hide();
-
         }
 
+        $('#btnDaleSearchOption').removeClass("dale-disable-stuff");
         $('#daleContainer').show();
        
     },
@@ -530,9 +511,8 @@
             daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
         });
 
-        //ENTER BUTTON EVENT
-        var input = document.getElementById("daleSearchCriteria");
-        input.addEventListener("keyup", function (event) {
+        //ENTER EVENTS for all text boxes used for BASIC or ADVANCED input
+        var daleSearchTimeFunction = function (event) {                                 //create function that will be called/attached to input elements when they hit enter from the input box
             if (event.keyCode === 13) {
                 event.preventDefault();
                 data.Dale.interruptedSaveCheck();                                       //if they do another search, reset everything in grid back to original state
@@ -540,7 +520,11 @@
                 data.Dale.disableDale();
                 daleResultsTable.ajax.reload(function () { data.Dale.enableDale(); });  //call reload but use a callback function which actually gets executed when complete! otherwise long queries will show nothing in the grid
             }
-        });
+        };
+        var clickElements = document.getElementsByClassName("daleSearchInput");         //get array of elements tagged with this class which are all the criteria inputs
+        for (var i = 0; i < clickElements.length; i++) {                                //loop through all events, add listeners that call a function when keyup happens
+            clickElements[i].addEventListener('keyup', daleSearchTimeFunction, false);  //add keyup listener and when that happens the daleSearchTimeFunction will be called
+        }
 
         //SENSITIVE SEARCH CLICK EVENT
         $("#sensitiveSearchLink").on('click', function () {

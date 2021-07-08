@@ -20,13 +20,10 @@
 
              @*nested row within column so we can have another nested set of columns to make up search cluster and save button*@
              <div class="row" style="display:flex;">
-
-                 @*BASIC NESTED SEARCH CLUSTER A:  Search Bar and Title *@
-                 <div class="col-lg-6 dale-basic-search">
-
+                 <div class="col-lg-6 ">
                      <div class="pull-right" style="display:inline-block;">
 
-                         @*DATA INVENTORY TITLE STUFF*@
+                         @*SHARED:  TITLE STUFF*@
                          <div id="icon-container" style="display:inline-block;">
                              <div style="float:left;">
                                  <img style="height:50px;" src='~/Images/Dale/DataInventoryIcon.png' alt="DataInventory Image" />
@@ -41,10 +38,17 @@
                                      <em class="glyphicon glyphicon-info-sign" style="color:#003da5;"></em>
                                  </a>
                              </div>
+
+
+                             <div id="btnDaleSearchOption" class="btn-group pull-right" role="group" aria-label="..." style="margin-left: 155px;">
+                                 <button type="button" value="BASIC" class="btn btn-default">Basic</button>
+                                 <button type="button" value="ADVANCED" class="btn btn-default">Advanced</button>
+                             </div>
+
                          </div>
 
-                         @*SEARCH BUTTON AND CRITERIA STUFF*@
-                         <div id="daleCriteriaContainer" class="xpull-right" style="display: table; width: 300px;">
+                         @*BASIC ZONE 1:  SEARCH BUTTON AND CRITERIA STUFF*@
+                         <div id="daleCriteriaContainer" class="dale-basic-search" style="display: table; width: 300px;">
 
                              <span id="daleSearchClickBasic" class="input-group-addon clickable" style="width: 50px;height:30px;" onclick="$(function() {$('#daleSearchCriteria').focus();});">
                                  <em class="glyphicon glyphicon-search"></em>
@@ -54,15 +58,43 @@
                                  <em class="fa fa-circle-o-notch fa-spin"></em>
                              </span>
 
-                             <input type="text" id="daleSearchCriteria" name="searchPhrase" class="form-control" style="width:500px" value="@Model.Criteria" />
+                             <input type="text" id="daleSearchCriteria" name="searchPhrase" class="form-control daleSearchInput" style="width:492px" value="@Model.Criteria" />
 
                          </div>
 
-                     </div>
 
+                         @*ADVANCED ZONE 1: SEARCH BUTTON AND CRITERIA INPUT*@
+                         <div class="dale-advanced-search" style="display:flex;">
+
+                             <div class="pull-right" style="display:flex; align-items:flex-end;">
+
+                                 @*ADVANCED SEARCH BUTTON AND CRITERIA STUFF*@
+                                 <div id="daleCriteriaContainer" class="xpull-right" style="display: table; width: 35px;">
+
+                                     <span id="daleSearchClickAdvanced" class="input-group-addon clickable" style="width: 50px;height:30px;" onclick="$(function() {$('#daleSearchCriteria').focus();});">
+                                         <em class="glyphicon glyphicon-search"></em>
+                                     </span>
+
+                                     <span id="daleSearchClickSpinnerAdvanced" class="input-group-addon" style="width: 50px;height:30px; display:none;" disabled onclick="$(function() {$('#daleSearchCriteria').focus();}); ">
+                                         <em class="fa fa-circle-o-notch fa-spin"></em>
+                                     </span>
+
+
+                                     <input type="text" id="daleAsset" name="searchAsset" class="form-control daleSearchInput" style="width:492px; " placeholder="Asset" />
+                                     <input type="text" id="daleServer" name="searchServer" class="form-control daleSearchInput" style="width:492px; " placeholder="Server" />
+                                     <input type="text" id="daleDatabase" name="searchDatabase" class="form-control daleSearchInput" style="width:492px; " placeholder="Database" />
+                                     <input type="text" id="daleObject" name="searchObject" class="form-control daleSearchInput" style="width:492px; " placeholder="Table/View" />
+                                     <input type="text" id="daleObjectType" name="searchObjectType" class="form-control daleSearchInput" style="width:492px; " placeholder="Type" />
+                                     <input type="text" id="daleColumn" name="searchColumn" class="form-control daleSearchInput" style="width:492px; " placeholder="Column" />
+                                     <input type="text" id="daleSourceType" name="searchSourceType" class="form-control daleSearchInput" style="width:492px; " placeholder="Source Type" />
+                                 </div>
+                             </div>
+                         </div>
+
+                     </div>
                  </div>
 
-                 @*BASIC NESTED SEARCH CLUSTER B:  Radio Buttons and Sensitive*@
+                 @*BASIC ZONE 2:  Radio Buttons and Sensitive*@
                  <div class="col-lg-3 dale-basic-search" style="display:flex;">
 
                      @*NOTE! the flex style basically pushes the radio button and sensitive controls to the button of the screen levereging the flex-end tag that sits on the actual control*@
@@ -104,68 +136,8 @@
                          </span>
                      }
                  </div>
-
-                 @*ADVANCED NESTED SEARCH CLUSTER A:  Search Bar and Title *@
-                 <div class="col-lg-6 dale-advanced-search">
-
-                     <div class="pull-right" style="display:inline-block;">
-
-                         @*DATA INVENTORY TITLE STUFF*@
-                         <div id="icon-container" style="display:inline-block;">
-                             <div style="float:left;">
-                                 <img style="height:50px;" src='~/Images/Dale/DataInventoryIcon.png' alt="DataInventory Image" />
-                             </div>
-
-                             <div style="float:left;">
-                                 <h1 class="htCenter datasetHeader">Data Inventory</h1>
-                             </div>
-
-                             <div style="float:left; margin-left: 2px;">
-                                 <a target="_blank" rel="noopener noreferrer" href="https://confluence.sentry.com/display/CLA/Data+Inventory">
-                                     <em class="glyphicon glyphicon-info-sign" style="color:#003da5;"></em>
-                                 </a>
-                             </div>
-                         </div>
-
-
-                         @*ADVANCED SEARCH BUTTON AND CRITERIA STUFF*@
-                         <div id="daleCriteriaContainer" class="xpull-right" style="display: table; width: 35px;">
-
-                             <span id="daleSearchClickAdvanced" class="input-group-addon clickable" style="width: 50px;height:30px;" onclick="$(function() {$('#daleSearchCriteria').focus();});">
-                                 <em class="glyphicon glyphicon-search"></em>
-                             </span>
-
-                             <span id="daleSearchClickSpinnerAdvanced" class="input-group-addon" style="width: 50px;height:30px; display:none;" disabled onclick="$(function() {$('#daleSearchCriteria').focus();}); ">
-                                 <em class="fa fa-circle-o-notch fa-spin"></em>
-                             </span>
-
-                             
-                            <input type="text" id="daleAsset" name="searchAsset" class="form-control" style="width:300px; margin-left:10px;" placeholder="Asset" />
-                            <input type="text" id="daleServer" name="searchServer" class="form-control" style="width:300px; margin-left:10px;" placeholder="Server" />
-                            <input type="text" id="daleDatabase" name="searchDatabase" class="form-control" style="width:300px; margin-left:10px;" placeholder="Database" />
-                             <input type="text" id="daleObject" name="searchObject" class="form-control" style="width:300px; margin-left:10px;" placeholder="Table/View" />
-                            <input type="text" id="daleObjectType" name="searchObjectType" class="form-control" style="width:300px; margin-left:10px;" placeholder="Type" />
-                            <input type="text" id="daleColumn" name="searchColumn" class="form-control" style="width:300px; margin-left:10px;" placeholder="Column" />
-                            <input type="text" id="daleSourceType" name="searchSourceType" class="form-control" style="width:300px; margin-left:10px;" placeholder="Source Type" />
-                         </div>
-                     </div>
-                 </div>
-
-                 @*ADVANCED NESTED SEARCH CLUSTER B:  Radio Buttons and Sensitive*@
-             <div class="col-lg-3 dale-advanced-search" style="display:flex;">
-             </div>
              </div>
          </div>
-
-
-        
-         <div id="btnDaleSearchOption" class="btn-group pull-right" role="group" aria-label="..." style="margin-right: 100px;">
-             <button type="button" value="BASIC" class="btn btn-default">Basic</button>
-             <button type="button" value="ADVANCED" class="btn btn-default">Advanced</button>
-         </div>
-
-
-
 
 
          @*MAIN RIGHT PORTION OF SCREEN*@

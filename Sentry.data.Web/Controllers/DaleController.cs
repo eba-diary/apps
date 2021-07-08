@@ -201,13 +201,13 @@ namespace Sentry.data.Web.Controllers
 
             //validate that if advanced search is happening at least something is filled in
             if (model.Destiny == DaleDestiny.Advanced
-                                    && (model.DaleAdvancedCriteria.AssetIsEmpty)
-                                     && (model.DaleAdvancedCriteria.ServerIsEmpty)
-                                     && (model.DaleAdvancedCriteria.DatabaseIsEmpty)
-                                     && (model.DaleAdvancedCriteria.ObjectIsEmpty)
-                                     && (model.DaleAdvancedCriteria.ObjectTypeIsEmpty)
-                                     && (model.DaleAdvancedCriteria.ColumnIsEmpty)
-                                     && (model.DaleAdvancedCriteria.SourceTypeIsEmpty)
+                                    && (!model.DaleAdvancedCriteria.AssetIsValid)
+                                     && (!model.DaleAdvancedCriteria.ServerIsValid)
+                                     && (!model.DaleAdvancedCriteria.DatabaseIsValid)
+                                     && (!model.DaleAdvancedCriteria.ObjectIsValid)
+                                     && (!model.DaleAdvancedCriteria.ObjectTypeIsValid)
+                                     && (!model.DaleAdvancedCriteria.ColumnIsValid)
+                                     && (!model.DaleAdvancedCriteria.SourceTypeIsValid)
                 )
             {
                 return false;

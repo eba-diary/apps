@@ -2,49 +2,51 @@
 
 namespace Sentry.data.Web
 {
+    //NOTE!!!!  these READ ONLY properties determine if param is valid based on if empty or not
+    //Its really the models responsiblity to determine if the param is valid or not, we could change this in future pending different changes and backend will not change
     public class DaleAdvancedCriteriaModel
     {
         public string Asset { get; set; }
-        public bool AssetIsEmpty
+        public bool AssetIsValid                                    
         {
-            get { return String.IsNullOrWhiteSpace(Asset); }
+            get { return !String.IsNullOrWhiteSpace(Asset); }
         }
 
         public string Server { get; set; }
-        public bool ServerIsEmpty
+        public bool ServerIsValid
         {
-            get { return String.IsNullOrWhiteSpace(Server); }
+            get { return !String.IsNullOrWhiteSpace(Server); }
         }
 
 
         public string Database { get; set; }
-        public bool DatabaseIsEmpty
+        public bool DatabaseIsValid
         {
-            get { return String.IsNullOrWhiteSpace(Database); }
+            get { return !String.IsNullOrWhiteSpace(Database); }
         }
 
         public string Object { get; set; }
-        public bool ObjectIsEmpty
+        public bool ObjectIsValid
         {
-            get { return String.IsNullOrWhiteSpace(Object); }
+            get { return !String.IsNullOrWhiteSpace(Object); }
         }
 
         public string ObjectType { get; set; }
-        public bool ObjectTypeIsEmpty
+        public bool ObjectTypeIsValid
         {
-            get { return String.IsNullOrWhiteSpace(ObjectType); }
+            get { return !String.IsNullOrWhiteSpace(ObjectType); }
         }
         public string Column { get; set; }
-        public bool ColumnIsEmpty
+        public bool ColumnIsValid
         {
-            get { return String.IsNullOrWhiteSpace(Column); }
+            get { return !String.IsNullOrWhiteSpace(Column); }
         }
 
 
         public string SourceType { get; set; }
-        public bool SourceTypeIsEmpty
+        public bool SourceTypeIsValid
         {
-            get { return String.IsNullOrWhiteSpace(SourceType); }
+            get { return !String.IsNullOrWhiteSpace(SourceType); }
         }
     }
 }
