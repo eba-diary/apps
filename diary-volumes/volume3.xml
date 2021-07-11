@@ -358,7 +358,7 @@
         <dateline>
           <date when="1895-03-04">Monday. March 4.</date>
         </dateline>
-        <p>We have made a splendid run of 64 miles today &#8211; and are now lying about 4 miles from <placeName>Assiout</placeName> &#8211; have passed <name>Tahtah</name> &#8211; <placeName>Gaou</placeName> and Aboutig. The morning was exquisite &#8211; I went on deck immediately after breakfast &#8211; and was there most of the day. Nothing could be more lovely than that morning effects &#8211; the cliffs a pink yellow, with heliotrope shadows sleeping in their hollows. &#8211; the water, silverly pink, reflecting every object.</p>
+        <p>We have made a splendid run of 64 miles today &#8211; and are now lying about 4 miles from <placeName ref="#Asyut">Assiout</placeName> &#8211; have passed <placeName ref="#Tahta">Tahtah</placeName> &#8211; <placeName>Gaou</placeName><!-- new tag? --> and <placeName ref="#Abu_Tij">Aboutig</placeName>. The morning was exquisite &#8211; I went on deck immediately after breakfast &#8211; and was there most of the day. Nothing could be more lovely than that morning effects &#8211; the cliffs a pink yellow, with heliotrope shadows sleeping in their hollows. &#8211; the water, silverly pink, reflecting every object.</p>
       </div>
       <div xml:id="EBA-1895-03-05" type="entry">
         <dateline>
