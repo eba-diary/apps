@@ -8,29 +8,54 @@ INDEX = {} #create a Python dictionary for the indices
 
 ## TABLES ##
 
-### author - Our Author Table will record the author or believed author of a journal entry. We will want to use author_id as a Foreign Key in other tables.
+### author - Our Author Table will record the author or believed author of a journal entry. We will use author_id as a Foreign Key from the Journal.
 
 TABLES['author'] = ("""CREATE TABLE IF NOT EXISTS author (
-                                    id INT PRIMARY KEY, 
-                                    author_id int NOT NULL,
-                                    given_name text NOT NULL,
-                                    middle_name text NULL,
-                                    family_name text NOT NULL
+                                    id INT PRIMARY KEY NOT NULL, 
+                                    author_id INT NOT NULL,
+                                    given_name TEXT NOT NULL,
+                                    middle_name TEXT NULL,
+                                    family_name TEXT NOT NULL,
+                                    CONSTRAINT fk_author
+                                        FOREIGN KEY (author_id)
+                                        REFERENCES diary(author_id)
+                                        ON DELETE CASCADE
                                     );""")
 
 INDEX['author_author_id'] = (
-    "CREATE INDEX IF NOT EXISTS author_author_id ON author (author_id)"
+    "CREATE INDEX IF NOT EXISTS author_author_id ON author (author_id);"
 )
 
+# diary - an author writes a diary. We will use `diary` to hold meta-data about the diary.
 
-# I commented this out for now, but will return to it to complete it later.
+TABLES['diary'] = ("""CREATE TABLE IF NOT EXISTS diary (
+                                    id INT PRIMARY KEY NOT NULL,
+                                    author_id INT NOT NULL,
+                                    image TEXT NULL,
+                                    url TEXT NULL,
+                                    iiif_manifest TEXT NULL,
+                                    entry_id INT NOT NULL,
+                                    date_first INT NULL,
+                                    date_last INT NULL,
+                                    CONSTRAINT fk_diary
+                                        FOREIGN KEY (entry_id)
+                                        REFERENCES diary(entry_id)
+                                        ON DELETE CASCADE 
+                            );""")
 
-# TABLES['journal_volume'] = ("""CREATE TABLE IF NOT EXISTS journal (
-#                                     id INT PRIMARY KEY,
-#                                     author_id ,
-#                                     volume_id,
-#                                     volume_
-#                             );""")
+INDEX['diary_author_id'] = (
+    "CREATE INDEX IF NOT EXISTS diary_author_id ON diary (author_id);"
+)
+INDEX['diary_entry_id'] = (
+    "CREATE INDEX IF NOT EXISTS diary_entry_id ON diary (entry_id);"
+)
+
+TABLES['diary_entry'] = ("""CREATE TABLE IF NOT EXISTS diary_entry (
+                                    id INT PRIMARY KEY NOT NULL,
+                                    entry_id INT NOT NULL,
+                                    entry_txt TEXT NOT NULL,
+                                    entry_tei TEXT NOT NULL
+                            );""")
 
 
 ## Create Database
@@ -41,10 +66,11 @@ cur = con.cursor() #create a connection with the database.
 for t in TABLES:
     tableSQL = TABLES[t]
     cur.execute(tableSQL)
-    for i in INDEX:
-        indexSQL = INDEX[i]
-        cur.execute(indexSQL)
-
-    # We use con.commit to send to have SQL process our statements
     con.commit()
-    con.close() # We close the connection with the database
+
+for i in INDEX:
+    indexSQL = INDEX[i]
+    cur.execute(indexSQL)
+    con.commit()
+
+con.close()
