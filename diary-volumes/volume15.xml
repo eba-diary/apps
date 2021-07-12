@@ -142,107 +142,107 @@
       </div>
       <div xml:id="EBA-1907-12-06" type="entry">
          <dateline><date when="1907-12-06">Friday, Dec. 6th</date>. <measure type="distance">25 miles</measure>.</dateline>
-         <p>Our tug, <name type="boat" ref="#Anubis_boat">Anubis</name> by name, went on the sand soon after nine this morning, and got off at 10:25. The river is so very broad here, that it is difficult to find the channel. The gyassas seemed to be having as much trouble as we had. Such a wonderful sunset - the sky, crimson pink with one long narrow cloud near the horizon, above which shone <persName>Venus,</persName> quite resplendent, and the new moon, the veriest silver thread of a little crescent, just below the cloud.</p>
+         <p>Our tug, <name type="boat" ref="#Anubis_boat">Anubis</name> by name, went on the sand soon after nine this morning, and got off at 10:25. The river is so very broad here, that it is difficult to find the channel. The gyassas seemed to be having as much trouble as we had. Such a wonderful sunset - the sky, crimson pink with one long narrow cloud near the horizon, above which shone <name type="event" ref="#Venus">Venus</name>, quite resplendent, and the <name type="event" ref="#Moon_New">new moon</name>, the veriest silver thread of a little crescent, just below the cloud.</p>
       </div>
       <div xml:id="EBA-1907-12-07" type="entry">
          <dateline><date when="1907-12-07">Saturday, Dec. 7</date>. <measure type="distance">44 miles</measure>.</dateline>
-          <p>Made an early start - and tied up at 5:30 within 3 miles of <placeName>Minia.</placeName> Lovely day, and perfect evening. Second Sunday in <name type="event" ref="#Advent">Advent</name></p>
+          <p>Made an early start - and tied up at 5:30 within <measure type="distance">3 miles</measure> of <placeName ref="#Al_Minya">Minia</placeName>. Lovely day, and perfect evening.</p>
       </div>
       <div xml:id="EBA-1907-12-08" type="entry">
-         <dateline><date when="1907-12-08">Dec. 8th</date>. <measure type="distance">28-1/2 miles</measure>. </dateline>
-          <p>A very heavy fog on the river this morning delayed our starting until 9:25 - spent about 2 hours at <placeName>Minia</placeName> waiting for mail and express parcels - a good sailing day - tied up at <placeName>Redah</placeName> about 6 o'clock.</p>
+         <dateline>Second Sunday in <name type="event" ref="#Advent">Advent</name>.<date when="1907-12-08">Dec. 8th</date>. <measure type="distance">28-1/2 miles</measure>.</dateline>
+          <p>A very heavy fog on the river this morning delayed our starting until 9:25 - spent about 2 hours at <placeName ref="#Al_Minya">Minia</placeName> waiting for mail and express parcels - a good sailing day - tied up at <placeName>Redah</placeName> <!--having trouble finding Getty name--> about 6 o'clock.</p>
       </div>
       <div xml:id="EBA-1907-12-09" type="entry">
-         <dateline><date when="1907-12-09">Monday. Dec. 9th</date>. <measure type="distance">41-1/2 miles</measure>. </dateline>
-         <p>Started at 6 o'clock - a cloudy day - and cold wind. Passed <persName>Mellawi, Hadji Kandel,</persName> and the <persName>Gebel Abu Feda</persName> and pulled up opposite <persName>Menfalout</persName> at 6 o'clock. We missed our channel this afternoon and had to go back to find it. It was a wonderful sight passing the <persName>Gebel.</persName> In all the years I have been on the <orgName>Nile,</orgName> I have not see such a transcendently beautiful sunset - and the colour reflected from the rocks made a great effect.</p>
+         <dateline><date when="1907-12-09">Monday. Dec. 9th</date>. <measure type="distance">41-1/2 miles</measure>.</dateline>
+         <p>Started at 6 o'clock - a cloudy day - and cold wind. Passed <placeName ref="#Mallawi">Mellawi</placeName>, Hadji Kandel <!--what is this?-->, and the <placeName ref="#Abu_Fudah_Jabal">Gebel Abu Feda</placeName> and pulled up opposite <placeName ref="#Manfalût">Menfalout</placeName> at 6 o'clock. We missed our channel this afternoon and had to go back to find it. It was a wonderful sight passing the <placeName ref="#Abu_Fudah_Jabal">Gebel</placeName>. In all the years I have been on the <placeName ref="#Nile">Nile</placeName>, I have not <choice><sic>see</sic><corr>seen</corr></choice> such a transcendently beautiful sunset - and the colour reflected from the rocks made a great effect.</p>
       </div>
       <div xml:id="EBA-1907-12-10" type="entry">
          <dateline><date when="1907-12-10">Tuesday, Dec. 10</date>. <placeName ref="#Asyut">Asyut</placeName>. <measure type="distance">8 miles</measure>.</dateline>
-         <p>Arrived at 1 o'clock having had the tug one hour on the sand. <persName>Theo</persName> dismissed the tug at 2 o'clock and we sailed at 3:30 - quite a good wind until 6 p.m. at which hour we tied up for the night, 8 miles above <placeName>Asyut.</placeName> It seemed very good to get rid of the tug. They are only tolerable to make speed, and this one couldn't do it. Last year the <name>Thothmes</name> took us in 10 days to <persName>Luxor.</persName> This year the <persName>Anubis</persName> took 9 days to go to Asy&#251;t.</p>
+         <p>Arrived at 1 o'clock having had the tug one hour on the sand. <persName ref="#Davis_Theodore_M">Theo</persName> dismissed the tug at 2 o'clock and we sailed at 3:30 - quite a good wind until 6 p.m. at which hour we tied up for the night, <measure type="distance">8 miles</measure> above <placeName ref="#Asyut">Asyut</placeName>. It seemed very good to get rid of the tug. They are only tolerable to make speed, and this one couldn't do it. Last year the <name type="boat" ref="#Thotmes_tug">Thothmes</name> <!--sic or anything?--> took us in 10 days to <placeName ref="#Luxor">Luxor</placeName>. This year the <name type="boat" ref="#Anubis_boat">Anubis</name> took 9 days to go to <placeName ref="#Asyut">Asy&#251;t</placeName>.</p>
       </div>
       <div xml:id="EBA-1907-12-11" type="entry">
          <dateline><date when="1907-12-11">Wednesday, Dec. 11th</date>. <measure type="distance">19 miles</measure>.</dateline>
-         <p>We had no wind until noon - but a very good one until 5:40 when we tied up and with the towing we did before noon we made our 19 miles - lovely and warm.</p>
+         <p>We had no wind until noon - but a very good one until 5:40 when we tied up and with the towing we did before noon we made our <measure type="distance">19 miles</measure> - lovely and warm.</p>
       </div>
       <div xml:id="EBA-1907-12-12" type="entry">
          <dateline><date when="1907-12-12">Thursday, Dec. 12</date>.<placeName ref="#Sohag">Sohag</placeName>. <measure type="distance">41-1/2 miles</measure>.</dateline>
-         <p>Started at 7 - the wind freshened finely at 8 o'clock and we came splendidly on until within a mile of the <placeName>Sohag</placeName> about 7 o'clock we struck the sand sharply - and were there 3/4 of an hour. Earlier in the afternoon we came near having a serious experience, - just as we approached the landing stage at <placeName>Tahta</placeName> which was crowded with gyassas and people, the wind shifted, and at that moment a gyassas, crowded with people, pushed out before our prow. We could give her no room - in spite of the yells and cries of our men she came on - and disaster seemed certain for if we had struck her we would have capsized here and gone over her. It is impossible to say why this kind of thing occurs so often - it is one of the greatest dangers on the <placeName ref="Nile">Nile</placeName>. A delightful day.</p>
+         <p>Started at 7 - the wind freshened finely at 8 o'clock and we came splendidly on until within a mile of the <placeName ref="#Sohag">Sohag</placeName> about 7 o'clock we struck the sand sharply - and were there 3/4 of an hour. Earlier in the afternoon we came near having a serious experience, - just as we approached the landing stage at <placeName ref="#Tahta">Tahta</placeName> which was crowded with gyassas and people, the wind shifted, and at that moment a gyassas, crowded with people, pushed out before our prow. We could give her no room - in spite of the yells and cries of our men she came on - and disaster seemed certain for if we had struck her we would have capsized here and gone over her. It is impossible to say why this kind of thing occurs so often - it is one of the greatest dangers on the <placeName ref="#Nile">Nile</placeName>. A delightful day.</p>
       </div>
       <div xml:id="EBA-1907-12-13" type="entry">
          <dateline><date when="1907-12-13">Friday, Dec. 13</date>. <measure type="distance">28-1/2 miles</measure></dateline>. 
-         <p>We waited at <placeName>Sohgg</placeName> this morning until 9:30 for mail and provisions. Stopped within 4 miles of <placeName>Balliana</placeName> at 6 P.M. A good wind, a heavenly day. The nights too, with the young moon and the resplendent <orgName>Venus,</orgName> are wonderful.</p>
+         <p>We waited at <placeName>Sohgg</placeName> <!--sic?--> this morning until 9:30 for mail and provisions. Stopped within <measure type="distance">4 miles</measure> of <placeName ref="#Balyana_Al">Balliana</placeName> at 6 P.M. A good wind, a heavenly day. The nights too, with the <name type="event" ref="#Moon_Young">young moon</name> and the resplendent <name type="event" ref="#Venus">Venus</name>, are wonderful.</p>
       </div>
       <div xml:id="EBA-1907-12-14" type="entry">
          <dateline><date when="1907-12-14">Saturday, Dec. 14</date>. <measure type="distance">8-1/2 miles</measure>.</dateline> 
-         <p>A perfectly calm morning - but tracking and polling we made <persName>Balliana</persName> at 4:30 - no mail, so we were off at once, and with a light wind went on until 6 P.M.</p>
+         <p>A perfectly calm morning - but tracking and polling we made <placeName ref="#Balyana_Al">Balliana</placeName> at 4:30 - no mail, so we were off at once, and with a light wind went on until 6 P.M.</p>
       </div>
       <div xml:id="EBA-1907-12-15" type="entry">
          <dateline><date when="1907-12-15">Sunday - Third in <name type="event" ref="#Advent">Advent</name>. Dec. 15</date>. <measure type="distance">6 miles</measure>.</dateline>
-         <p>A perfectly windless day - bright and hot. Our men have worked like <name>Trojans</name> every minute of the day - polling and tracking, we think we have made 6 miles.</p>
+         <p>A perfectly windless day - bright and hot. Our men have worked like <orgName ref="#Trojan">Trojans</orgName> every minute of the day - polling and tracking, we think we have made <measure type="distance">6 miles</measure>.</p>
       </div>
       <div xml:id="EBA-1907-12-16" type="entry">
          <dateline><date when="1907-12-16">Monday, Dec. 16</date>.</dateline>
-         <p>A repetition of yesterday - clear, hot, windless day. The men have been polling, tracking, pulling to anchor in the burning sun all day. <persName>Theo</persName> thinks we have made about 12 miles. We are now at <placeName>Nagh Hamadi,</placeName> waiting to pass the bridge tomorrow.</p>
+         <p>A repetition of yesterday - clear, hot, windless day. The men have been polling, tracking, pulling to anchor in the burning sun all day. <persName ref="#Davis_Theodore_M">Theo</persName> thinks we have made about <measure type="distance">12 miles</measure>. We are now at <placeName ref="#Naj_Hammadi ">Nagh Hamadi</placeName>, waiting to pass the bridge tomorrow.</p>
       </div>
       <div xml:id="EBA-1907-12-17" type="entry">
          <dateline><date when="1907-12-17">Tuesday, Dec. 17</date>. <measure type="distance">30 miles</measure>.</dateline>
-         <p><persName>Keneh.</persName>We got quietly through the bridge at 8 o'clock this morning. Found the <orgName>Istar</orgName> lying there, closed, and with flags down. Her men said that Mr. <persName>Sayce</persName> had gone to <placeName>Cairo</placeName> to see his dentist. We have had a splendid day and fine wind, and are now lying at <placeName>Dendera,</placeName> as <persName>Theo</persName> wants <persName>Carrie</persName> to see it tomorrow.</p>
+         <p><placeName ref="#Keneh">Keneh</persName>. We got quietly through the bridge at 8 o'clock this morning. Found the <name type="boat" ref="#Istar">Istar</name> lying there, closed, and with flags down. Her men said that <persName ref="#Sayce_Archibald">Mr. Sayce</persName> had gone to <placeName ref="#Cairo">Cairo</placeName> to see his dentist. We have had a splendid day and fine wind, and are now lying at <placeName ref="#Dandarah">Dendera</placeName>, as <persName ref="#Davis_Theodore_M">Theo</persName> wants <persName ref="#Ransom_Williams_Caroline">Carrie</persName> to see it tomorrow.</p>
       </div>
       <div xml:id="EBA-1907-12-18" type="entry">
          <dateline><date when="1907-12-18">Wednesday, Dec. 18</date>. <measure type="distance">18 miles</measure>.</dateline> 
-         <p>We got off as soon as <persName>T.</persName> and <persName>C.</persName> came back from the <orgName>Temple,</orgName> about 11 o'clock - and with good wind came to within 4 miles of <placeName>Nagadah.</placeName></p>
+         <p>We got off as soon as <persName ref="#Davis_Theodore_M">T.</persName> and <persName ref="#Ransom_Williams_Caroline">C.</persName> came back from the <placeName ref="#Temple_of_Dendera">Temple</placeName> <!--change to <name type=historical> once indices are updated-->, about 11 o'clock - and with good wind came to within <measure type="distance">4 miles</measure> of <placeName ref="#Naqādah">Nagadah</placeName>.</p>
       </div>
       <div xml:id="EBA-1907-12-19" type="entry">
          <dateline><date when="1907-12-19">Thursday, Dec. 19</date>. <measure type="distance">21 miles</measure>.</dateline>
-         <p>Started early, 6 o'clock, hoping to make <placeName>Luxor</placeName> tonight, but are tied up 4 miles below it. Very contrary and shifting wind - and cold - pulled to the anchor for hours. Beautiful night.</p>
+         <p>Started early, 6 o'clock, hoping to make <placeName ref="#Luxor">Luxor</placeName> tonight, but are tied up <measure type="distance">4 miles</measure> below it. Very contrary and shifting wind - and cold - pulled to the anchor for hours. Beautiful night.</p>
       </div>
       <div xml:id="EBA-1907-12-20" type="entry">
          <dateline><date when="1907-12-20">Friday, Dec. 20</date>.</dateline>
-         <p><persName>Luxer</persName> at last, arriving at 10:30 this morning. Came to our usual mooring place opposite the Castle - and soon the men were busy settling us. A huge mail waiting for us. <persName>Theo</persName> and <persName>Carrie</persName> went to <placeName>Karnac</placeName> this afternoon.</p> 
+         <p><placeName ref="#Luxor"><choice><sic>Luxer</sic><corr>Luxor</corr></choice></placeName> at last, arriving at 10:30 this morning. Came to our usual mooring place opposite the Castle <!--how to tag Castle in Luxor as historical?--> - and soon the men were busy settling us. A huge mail waiting for us. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Ransom_Williams_Caroline">Carrie</persName> went to <placeName ref="#Karnak">Karnac</placeName> this afternoon.</p> 
       </div>
       <div xml:id="EBA-1907-12-21" type="entry">  
          <dateline><date when="1907-12-21">Saturday, Dec. 21</date>.</dateline>
-         <p>I was at home all day. <persName>Theo</persName> and <persName>Carrie</persName> went to the <placeName>Valley</placeName> to look at the pit tomb <persName>Ayrton</persName> wrote about. They opened it - it proved only a pit with large vases - some sealed - some more or less broken. They report our little house finished, but too damp to live in at present - though <persName>Ayrton</persName> is living in one room. The <orgName>Miriam,</orgName> with tug <orgName>Thothmes</orgName> got in about 5 P.M. I received a note from <persName>Madame Maspero.</persName> They leave early tomorrow morning - bound for <placeName>Asw&#226;n,</placeName> and <placeName>Halfa.</placeName> One of the most wonderful moon rises this evening.</p> 
+         <p>I was at home all day. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Ransom_Williams_Caroline">Carrie</persName> went to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> to look at the pit tomb <!--tag the pit tomb?--> <persName ref="#Ayrton_Edward">Ayrton</persName> wrote about. They opened it - it proved only a pit with large vases - some sealed - some more or less broken. They report our <name type="historical" ref="#Valley_House">little house</name> finished, but too damp to live in at present - though <persName ref="#Ayrton_Edward">Ayrton</persName> is living in one room. The <name type="boat" ref="#Miriam">Miriam</name>, with tug <name type="boat" ref="#Thotmes_tug">Thothmes</name> <!--sic?--> got in about 5 P.M. I received a note from <persName ref="#Maspero_Louise">Madame Maspero</persName>. They leave early tomorrow morning - bound for <placeName ref="#Aswan">Asw&#226;n</placeName>, and <placeName ref="#Halfa">Halfa</placeName>. One of the most wonderful moon rises this evening.</p> 
       </div>
       <div xml:id="EBA-1907-12-22" type="entry">
-         <dateline><date when="1907-12-22">Fourth Sunday in <name type="event" ref="#Advent">Advent</name>. Dec. 22nd</date>.</dateline>
-         <p>Theor and <persName>Carri</persName> again to the <placeName>Valley</placeName> - but <persName>Carrie</persName> this time on a donkey - an exquisite day. I have had a beautiful quiet Sunday. This morning I was amused watching the loading of 2 camels with all our furnishings for our house in the <placeName>Valley.</placeName> One of the camels had the most delicious young camel with her - about a month old I should think, a lovely creature - so affectionate to its mother and so full of life and pranks.</p>
+         <dateline>Fourth Sunday in <name type="event" ref="#Advent">Advent</name>. <date when="1907-12-22">Dec. 22nd</date>.</dateline>
+         <p><persName ref="#Davis_Theodore_M"><choice><sic>Theor</sic><corr>Theo</corr></choice></persName> and <persName ref="#Ransom_Williams_Caroline"><choice><sic>Carri</sic><corr>Carrie</corr></choice></persName> again to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> - but <persName ref="#Ransom_Williams_Caroline">Carrie</persName> this time on a donkey - an exquisite day. I have had a beautiful quiet Sunday. This morning I was amused watching the loading of 2 camels with all our furnishings for our <name type="historical" ref="#Valley_House">house</name> in the <placeName ref="#Bībān al-Mulūk">Valley</placeName>. One of the camels had the most delicious young camel with her - about a month old I should think, a lovely creature - so affectionate to its mother and so full of life and pranks.</p>
       </div>
       <div xml:id="EBA-1907-12-23" type="entry">  
          <dateline><date when="1907-12-23">Monday, Dec. 23rd</date>.</dateline>
-         <p>All went over to the town this morning - <persName>Carrie</persName> and I to see <persName>Miss Buchanan</persName> - then to <persName>Mrs. Weigalls</persName> and saw the new baby - and I delivered the cup I brought over for <persName>Corinna Smith.</persName> Then I went to see poor <persName>Mrs. Murch</persName> - who is most sad - but very brave. Then we encountered <persName>Theo</persName> on our way home - and stopped at the <placeName>Winter Palace</placeName> to see the Iddings. Mr. <persName>Iddings,</persName> the girl, <persName>Carrie</persName> and <persName>Theo</persName> went to <placeName>Karnak</placeName> at 4 o'clock and <persName>Mrs. Iddings</persName> came over and had tea with me.</p> 
+         <p>All went over to the town this morning - <persName ref="#Ransom_Williams_Caroline">Carrie</persName> and I to see <persName ref="#Buchanan_Carrie">Miss Buchanan</persName> - then to <persName ref="#Weigall_Hortense">Mrs. Weigalls</persName> <!--sic?--> and saw the new <persName ref="#Weigall_Alured">baby</persName> - and I delivered the cup I brought over for <persName ref="#Lindon_Smith_Corinna">Corinna Smith</persName>. Then I went to see poor <persName ref="#Murch_Mrs">Mrs. Murch</persName> - who is most sad - but very brave. Then we encountered <persName ref="#Davis_Theodore_M">Theo</persName> on our way home - and stopped at the <name type="hotel" ref="#Winter_Palace">Winter Palace</name> to see the <persName ref="#Iddings_Mr #Iddings_Mrs #Iddings_Elizabeth">Iddings</persName>. <persName ref="#Iddings_Mr">Mr. Iddings</persName>, <persName ref="#Iddings_Elizabeth">the girl</persName>, <persName ref="#Ransom_Williams_Caroline">Carrie</persName> and <persName ref="#Davis_Theodore_M">Theo</persName> went to <placeName ref="#Karnak">Karnak</placeName> at 4 o'clock and <persName ref="#Iddings_Mrs">Mrs. Iddings</persName> came over and had tea with me.</p> 
       </div>
       <div xml:id="EBA-1907-12-24" type="entry">  
          <dateline><date when="1907-12-24">Tuesday, Dec. 24</date>.</dateline>
-          <p>I have been busy all day in the boat, first getting my pots of bulbs into order - then the Christmas presents for the men - in which <persName>Jones</persName> and <persName>Carrie</persName> helped - and so did not go out - the morning lovely, but cold high winds this afternoon. <persName>Theo</persName> and <persName>Carrie</persName> went at 3 o'clock to <placeName>Medinet Habu.</placeName></p>
+          <p>I have been busy all day in the boat, first getting my pots of bulbs into order - then the <name type="event" ref="#Christmas">Christmas</name> presents for the men - in which <persName ref="#Jones_Daniel">Jones</persName> and <persName ref="#Ransom_Williams_Caroline">Carrie</persName> helped - and so did not go out - the morning lovely, but cold high winds this afternoon. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Ransom_Williams_Caroline">Carrie</persName> went at 3 o'clock to <placeName ref="#Medinet_Habu">Medinet Habu</placeName>.</p>
      </div>
       <div xml:id="EBA-1907-12-25" type="entry">    
          <dateline><date when="1907-12-25">Dec. 25. Wednesday.</date><name type="event" ref="#Christmas">Christmas</name>.</dateline>
-         <p> A beautiful winters day - the distribution of presents to the men went off successfully. Mr. <persName>Ayrton</persName> came over to spend the night, and Mr. and Mrs. Iddings came to dine - and we had a concert from the men, which amused the <orgName>Iddings</orgName> very much.</p> 
+         <p> A beautiful winters day - the distribution of presents to the men went off successfully. <persName ref="#Ayrton_Edward">Mr. Ayrton</persName> came over to spend the night, and <persName ref="#Iddings_Mr #Iddings_Mrs">Mr. and Mrs. Iddings</persName> came to dine - and we had a concert from the men, which amused the <persName ref="#Iddings_Mr #Iddings_Mrs">Iddings</persName> very much.</p> 
      </div>
       <div xml:id="EBA-1907-12-26" type="entry">    
          <dateline><date when="1907-12-26">Thursday, Dec. 26</date>.</dateline>
-         <p><persName>Carrie</persName> and I went over to the <placeName>Winter Palace</placeName> to lunch with the Iddings. They had such pleasant rooms - and the whole house looked very attractive. <persName>Carrie</persName> and <persName>Theo</persName> to <persName>Der el Bahari</persName> in the afternoon.</p>
+         <p><persName ref="#Ransom_Williams_Caroline">Carrie</persName> and I went over to the <name type="hotel" ref="#Winter_Palace">Winter Palace</name> to lunch with the <persName ref="#Iddings_Mr #Iddings_Mrs">Iddings</persName> <!--include elizabeth, or iddings grp tag instead?-->. They had such pleasant rooms - and the whole house looked very attractive. <persName ref="#Ransom_Williams_Caroline">Carrie</persName> and <persName ref="#Davis_Theodore_M">Theo</persName> to <placeName ref="#Der_el_Bahari">Der el Bahari</placeName> in the afternoon.</p>
      </div>
       <div xml:id="EBA-1907-12-27" type="entry">    
          <dateline><date when="1907-12-27">Friday, Dec. 27</date>.</dateline>
-         <p><persName>Theo</persName> and <persName>Carrie</persName> went over to the <placeName>Valley</placeName> for lunch, and had Mr. and <persName>Mrs. Iddings</persName> and their girls to lunch in the little house. They were delighted. Mr. <persName>Sayce</persName> called in the afternoon.</p> 
+         <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Ransom_Williams_Caroline">Carrie</persName> went over to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> for lunch, and had <persName ref="#Iddings_Mr #Iddings_Mrs">Mr. and Mrs. Iddings</persName> and their <persName ref="#Iddings_Elizabeth"><choice><sic>girls</sic><corr>girl</corr></choice></persName> to lunch in the <name type="historical" ref="#Valley_House">little house</name>. They were delighted. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> called in the afternoon.</p> 
       </div>
       <div xml:id="EBA-1907-12-28" type="entry">   
          <dateline><date when="1907-12-28">Saturday, Dec. 28</date>.</dateline>
-         <p>A quiet day, mostly at home. <persName>Theo</persName> and <persName>Carrie</persName> at the <placeName>Weigalls</placeName> for tea, and afterwards met the <name>Iddings</name> at <placeName>Karnae.</placeName></p>
+         <p>A quiet day, mostly at home. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Ransom_Williams_Caroline">Carrie</persName> at the <persName ref="#Weigall_Arthur #Weigall_Hortense">Weigalls</persName> for tea, and afterwards met the <persName ref="#Iddings_Mr #Iddings_Mrs">Iddings</persName> at <placeName ref="#Karnak"><choice><sic>Karnae</sic><corr>Karnac</corr></choice></placeName>.</p>
      </div>
       <div xml:id="EBA-1907-12-29" type="entry">    
          <dateline><date when="1907-12-29">Sunday, Dec. 29</date>.</dateline>
-         <p>The <name>Iddings</name> came over this morning to say good-bye - were very nice and friendly. Mr. <persName>Sayce</persName> at dinner.</p> 
+         <p>The <persName ref="#Iddings_Mr #Iddings_Mrs">Iddings</persName> came over this morning to say good-bye - were very nice and friendly. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> at dinner.</p> 
      </div>
       <div xml:id="EBA-1907-12-30" type="entry">    
          <dateline><date when="1907-12-30">Monday, Dec. 30</date>.</dateline> 
-         <p>Over in <placeName>Luxor</placeName> this morning - <persName>Theo</persName> and <persName>Mr. Sayce</persName> at shops.</p>
+         <p>Over in <placeName ref="#Luxor">Luxor</placeName> this morning - <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Sayce_Archibald">Mr. Sayce</persName> at shops.</p>
       </div>
       <div xml:id="EBA-1907-12-31" type="entry">   
          <dateline><date when="1907-12-31">Tuesday, Dec. 31</date>.</dateline>
-         <p>At last a windless day. The <persName>Misses Collins</persName> came to tea - such a pleasant visit.</p>
+         <p>At last a windless day. The <persName ref="#Collins_Frances">Misses Collins</persName> <!--and sisters tags?--> came to tea - such a pleasant visit.</p>
       </div>
       <!-- Molly Taylor's Code -->
       <div xml:id="EBA-1908-01-01" type = "entry">
@@ -403,7 +403,7 @@
       </div>
       <div xml:id="EBA-1908-02-05" type = "entry">
         <dateline><date when="1908-02-05">Feb. 5th. Wednesday.</date></dateline>
-        <p><persName ref="#Sayce_Archibald">Mr. Sayce</persName> and <persName ref="#Davis_Theodore_M">Theo</persName> went to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> and lunched at the little house. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> also dined with us.</p>
+        <p><persName ref="#Sayce_Archibald">Mr. Sayce</persName> and <persName ref="#Davis_Theodore_M">Theo</persName> went to the <placeName ref="#Valley_of_the_Kings">Valley</placeName> and lunched at the <name type="historical" ref="#Valley_House">little house</name>. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> also dined with us.</p>
       </div>
       <div xml:id="EBA-1908-02-06" type = "entry">
         <dateline><date when="1908-02-06">Feb. 6th. Thursday.</date></dateline>
