@@ -30,3 +30,8 @@ body {
   stroke: #999;
   stroke-opacity: 0.6;
 }
+
+#which-node {
+  text-align: center;
+  font-size: 40;
+}

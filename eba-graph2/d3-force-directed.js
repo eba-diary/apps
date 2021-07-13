@@ -1,3 +1,8 @@
+//EBA Network Analysis Group
+//Vincent Wilson
+//JS file processes csv data and creates force directed graph
+
+
 let width = window.screen.width,
     height = window.screen.height,
     nodes, links, oldNodes, links_and_nodes_by_time, // data
@@ -15,8 +20,8 @@ const randomData = () => {
 
   //parse out the large object created in processData()
   //_.random(0, 100) -- sometimes these datasets are undefined
-  links = links_and_nodes_by_time[Object.keys(links_and_nodes_by_time)[100]][0]
-  nodes = links_and_nodes_by_time[Object.keys(links_and_nodes_by_time)[100]][1]
+  links = links_and_nodes_by_time[Object.keys(links_and_nodes_by_time)[_.random(0,50)]][0]
+  nodes = links_and_nodes_by_time[Object.keys(links_and_nodes_by_time)[_.random(0,50)]][1]
 
   console.log(nodes)
   console.log(links)
@@ -97,19 +102,27 @@ function update() {
 //format nodes
 function enterNodes(n) {
   var g = n.enter().append("g")
-    .attr("class", "node");
+    .attr("class", "node")
+    .call(force.drag);
+
+
 
   g.append("circle")
     .attr("cx", 0)
     .attr("cy", 0)
-    .attr("r", function(d) {return d.weight}) //d.weight
-    .call(force.drag)
+    .attr("r", function(d) {return d.weight})
     .on('click', function(d, i) {
-      alert("node " + d.key + " clicked")
-    });
+      document.getElementById('which-node').innerHTML = "Selected Node: " + d.key
+    })
+    .on('mouseover', function(d, i){
+      d3.select(this).style("fill", 'magenta')
+    })
+    .on('mouseout', function(d, i){
+      d3.select(this).style("fill", 'black')
+    })
 
   g.append("text")
-    .attr("x", function(d) {return d.weight + 5}) //d.weight + 5
+    .attr("x", function(d) {return d.weight + 5}) //offset text
     .attr("dy", ".35em")
     .text(function(d) {return d.key});
 }
