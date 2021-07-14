@@ -7,6 +7,9 @@ namespace Sentry.data.Web
 {
     public static class DaleExtensions
     {
+
+
+
         public static DaleSearchDto ToDto(this DaleSearchModel model)
         {
             if (model == null)
@@ -18,7 +21,40 @@ namespace Sentry.data.Web
             {
                 Criteria = model.Criteria,
                 Destiny = model.Destiny,
-                Sensitive = model.Sensitive
+                Sensitive = model.Sensitive,
+                AdvancedCriteria = model.DaleAdvancedCriteria.ToDto()
+            };
+        }
+
+        public static DaleAdvancedCriteriaDto ToDto(this DaleAdvancedCriteriaModel model)
+        {
+            if (model == null)
+            {
+                return new DaleAdvancedCriteriaDto();
+            }
+
+            return new DaleAdvancedCriteriaDto()
+            {
+                Asset = model.Asset,
+                AssetIsValid = model.AssetIsValid,
+                
+                Server = model.Server,
+                ServerIsValid = model.ServerIsValid,
+
+                Database = model.Database,
+                DatabaseIsValid = model.DatabaseIsValid,
+
+                Object = model.Object,
+                ObjectIsValid = model.ObjectIsValid,
+
+                ObjectType = model.ObjectType,
+                ObjectTypeIsValid = model.ObjectTypeIsValid,
+
+                Column = model.Column,
+                ColumnIsValid = model.ColumnIsValid,
+
+                SourceType = model.SourceType,
+                SourceTypeIsValid = model.SourceTypeIsValid
             };
         }
 
@@ -125,9 +161,13 @@ namespace Sentry.data.Web
             {
                 return DaleDestiny.Server;
             }
-            else 
+            else if (destiny.ToUpper() == DaleDestiny.Database.GetDescription().ToUpper())
             {
                 return DaleDestiny.Database;
+            }
+            else
+            {
+                return DaleDestiny.Advanced;
             }
         }
 
@@ -145,6 +185,8 @@ namespace Sentry.data.Web
                 IsOwnerVerified = model.IsOwnerVerified
             };
         }
+
+       
 
         public static List<DaleSensitiveDto> ToDto(this List<DaleSensitiveModel> models)
         {

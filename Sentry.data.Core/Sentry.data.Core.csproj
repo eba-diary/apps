@@ -116,6 +116,7 @@
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
+    <Compile Include="DTO\Dale\DaleAdvancedCriteriaDto.cs" />
     <Compile Include="DTO\Dale\DaleCategoryResultDto.cs" />
     <Compile Include="DTO\Dale\DaleCategoryDto.cs" />
     <Compile Include="DTO\Dale\DaleContainSensitiveResultDto.cs" />
