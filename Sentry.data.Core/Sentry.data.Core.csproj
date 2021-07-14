@@ -149,6 +149,7 @@
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\FixedWidthAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleApiAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\JsonFlatteningAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ProducerS3DropAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\SchemaMapAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressGzipAction.cs" />
@@ -220,6 +221,7 @@
     <Compile Include="Exceptions\HiveQueryException.cs" />
     <Compile Include="Exceptions\HiveTableViewNotFoundException.cs" />
     <Compile Include="Exceptions\JobNotFoundException.cs" />
+    <Compile Include="Exceptions\KafkaProducerException.cs" />
     <Compile Include="Exceptions\RetrieverJobProcessingException.cs" />
     <Compile Include="Exceptions\SASNotificationNotSentException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
@@ -263,6 +265,7 @@
     <Compile Include="Interfaces\DataProcessing\IDataStepService.cs" />
     <Compile Include="Interfaces\DataProcessing\IFixedWidthProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IGoogleApiActionProvider.cs" />
+    <Compile Include="Interfaces\DataProcessing\IJsonFlatteningAction.cs" />
     <Compile Include="Interfaces\DataProcessing\IProducerS3DropProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IQueryStorageProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IRawStorageProvider.cs" />
