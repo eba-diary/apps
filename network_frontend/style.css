@@ -1,0 +1,37 @@
+body {
+  font-family: Helvetica;
+}
+
+.update {
+  color: #888888;
+  position:absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px 10px;
+  margin: 10px;
+  cursor: pointer;
+  border: 1px solid #999999;
+  border-radius: 3px;
+}
+
+.node {
+  fill: #000000;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  fill: #888888;
+  stroke: none;
+  font-size: .6em;
+}
+
+
+.link {
+  stroke: #999;
+  stroke-opacity: 0.6;
+}
+
+#which-node {
+  text-align: center;
+  font-size: 40;
+}
