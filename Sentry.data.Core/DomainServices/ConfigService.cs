@@ -105,6 +105,11 @@ namespace Sentry.data.Core
                 errors.Add("File Extension Delimited is missing it's delimiter.");
             }
 
+            if (dto.Name.ToUpper() == "DEFAULT" || String.IsNullOrWhiteSpace(dto.Name))
+            {
+                errors.Add("Configuration Name cannot be equal to default or empty.");
+            }
+
             return errors;
         }
 
