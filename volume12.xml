@@ -165,7 +165,6 @@
             ref="#Smith_Harold">Smith</persName> and <persName ref="#Ream_Robert_Clarke"
             >Ream</persName>.</p>
       </div>
-      <!-- What is Sprenger-Müller? -->
       <div xml:id="EBA-1904-12-09" type="entry">
         <dateline>
           <date when="1904-12-09">Dec. 9, 1904. Cairo. <name type="hotel" ref="#Shepheards_Hotel">Shepheards Hotel</name></date>. </dateline>
@@ -181,8 +180,8 @@
             <persName ref="#Hanser_Mr #Hanser_Mrs">Mr. and Mrs. Hanser</persName> at their charming villa at
             <placeName ref="#Posillipo">Posillipo</placeName>. They are such kind nice people. One
           cold, windy afternoon we drove up to the <placeName ref="#Vomero">Vomero</placeName>, and
-          after much searching found the <placeName ref="#">Sprenger-M&#252;ller</placeName> place
-          which for 3 years I have been trying to discover.But he was not at home, greatly to my
+          after much searching found the <persName ref="#Sprenger-Muller_Mr">Sprenger-M&#252;ller</persName> place
+          which for 3 years I have been trying to discover. But he was not at home, greatly to my
           regret - though <persName ref="#Hanser_Mrs">Mrs. Hanser</persName> told me that as he was
           quite deaf, I would have found him difficult. I wanted to see his garden and talk to him -
           for he is a noted hybridigia and floriculturist. We had to spend the night and most of the
@@ -405,7 +404,7 @@
           favourable wind - a light wind beginning early, grew into a steady, fine sailing wind -
           and we began leaving the miles behind us in a good old fashioned manner. We soon passed
             <placeName ref="#Fashen">Fashen</placeName>, then <placeName ref="#Maghaghah"
-            >Maghaghah</placeName>, <placeName ref="#">Matar</placeName>, and <placeName ref="#Kolosna"
+            >Maghaghah</placeName>, <placeName ref="#Bani_Mazar">Matar</placeName>, and <placeName ref="#Kolosna"
             >Kolosna</placeName>, and are now lying at <placeName ref="#Dayr_Samalut"
             >Samalut</placeName>, almost opposite the <placeName>Gebel et Teu</placeName> - with its
           Coptic convent. Late in the afternoon we caught sight of the <name type="boat" ref="#Agiz"
