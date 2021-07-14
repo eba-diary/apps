@@ -6,10 +6,9 @@ Emma B. Andrews was a 20th century figure involved with the archaeological study
 
 ## Modeling the Database
 
-## Diagram of Relations
-
+![Diagram of Emma B. Andrews SQLite3 Database](EBA.png)
 ## SQLite3 Implementation
 
-For development and testing, we will use a SQLite3 database. This prevents the immediate need for server access. We will have to simplify some data fields, but the above model is programmatically available. See the python script, `emma_sqlite.py` in this directory.
+For development and testing, we will use a SQLite3 database. This prevents the immediate need for server access. We will have to simplify some data fields, but the above model is programmatically available. Navigate to the directory, `sql_db`, in your terminal. Use the command `make` to run `makefile`. The database is torn down and recreated.
 
 ## SQL (MariaDB or PostgreSQL)
