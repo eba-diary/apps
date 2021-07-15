@@ -168,7 +168,6 @@ namespace Sentry.data.Infrastructure
         private static void LogSettings()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"UseConfluent: {KafkaHelper.UseConfluent()}");
             sb.AppendLine($"Brokers: {KafkaHelper.GetKafkaBrokers()}");
             sb.AppendLine($"UseSASL: {KafkaHelper.UseSASL()}");
             sb.AppendLine($"KerberosServiceName: {KafkaHelper.GetKerberosServiceName()}");

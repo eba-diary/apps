@@ -75,7 +75,7 @@ namespace Sentry.Messaging.Common
             _consumer.OnPartitionsRevoked += _consumer_OnPartitionsRevoked;
             //_consumer.OnStatistics += _consumer_OnStatistics;
             _consumer.OnLog += _consumer_OnLog;
-            _consumer.Subscribe(_settings.TopicName);
+            _consumer.Subscribe(_settings.TopicName.Split(','));
 
             //_statTracker.StartPolling();
 
