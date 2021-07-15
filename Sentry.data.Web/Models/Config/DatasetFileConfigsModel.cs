@@ -66,6 +66,7 @@ namespace Sentry.data.Web
             this.CLA1286_KafkaFlag = (dto.Schema != null) ? dto.Schema.CLA1286_KafkaFlag : false;
             this.CLA3014_LoadDataToSnowflake = (dto.Schema != null) ? dto.Schema.CLA3014_LoadDataToSnowflake : false;
             this.ObjectStatus = dto.ObjectStatus;
+            this.SchemaRootPath = dto.SchemaRootPath;
             //this.CLA24 = (dto.Schema != null) ? dto.Schema.CLA1580_StructureHive : false;
         }
 
@@ -156,6 +157,8 @@ namespace Sentry.data.Web
         public int DatasetId { get; set; }
         public DatasetScopeType ScopeType { get; set; }
         public FileExtension FileExtension { get; set; }
+        [DisplayName("Schema Root Path")]
+        public string SchemaRootPath { get; set; }
         public string RawStorageId { get; set; }
         public int SchemaId { get; set; }
         public int OldSchemaId { get; set; }

@@ -36,5 +36,6 @@ namespace Sentry.data.Core
         public string DeleteIssuer { get; set; }
         public DateTime? DeleteIssueDTM { get; set; }
         public ObjectStatusEnum ObjectStatus { get; set; }
+        public string SchemaRootPath { get; set; }
     }
 }

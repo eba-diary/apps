@@ -467,29 +467,29 @@ namespace Sentry.data.Core
         }
 
         public bool Delete(int id, bool logicalDelete = true, bool parentDriven = false)
-        {
-            try
+        {            
+            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
+
+            //Do not proceed with dataset file configuration is already marked for deletion
+            //TODO: CLA-2765 - Remove deleteInd filter after testing completed
+            if (logicalDelete && (dfc.DeleteInd || 
+                dfc.ObjectStatus == GlobalEnums.ObjectStatusEnum.Pending_Delete || 
+                dfc.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted))
             {
-                DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
+                throw new DatasetFileConfigDeletedException("Already marked for deletion");
+            }
 
-                //Do not proceed with dataset file configuration is already marked for deletion
-                //TODO: CLA-2765 - Remove deleteInd filter after testing completed
-                if (logicalDelete && (dfc.DeleteInd || 
-                    dfc.ObjectStatus == GlobalEnums.ObjectStatusEnum.Pending_Delete || 
-                    dfc.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted))
-                {
-                    throw new DatasetFileConfigDeletedException("Already marked for deletion");
-                }
+            FileSchema scm = _datasetContext.GetById<FileSchema>(dfc.Schema.SchemaId);
 
-                FileSchema scm = _datasetContext.GetById<FileSchema>(dfc.Schema.SchemaId);
-
-                if (logicalDelete)
+            if (logicalDelete)
+            {
+                try
                 {
                     Logger.Info($"configservice-delete-logical - configid:{id} configname:{dfc.Name}");
 
                     /*  
-                     *  Legacy processing platform jobs where associated directly to datasetfileconfig object
-                     *  Disable all associated RetrieverJobs
+                        *  Legacy processing platform jobs where associated directly to datasetfileconfig object
+                        *  Disable all associated RetrieverJobs
                     */
                     foreach (var job in dfc.RetrieverJobs)
                     {
@@ -497,13 +497,13 @@ namespace Sentry.data.Core
                     }
 
                     /*
-                     *  Mark all dataflows, for deletion, associated with schema on new processing platform
-                     */
+                        *  Mark all dataflows, for deletion, associated with schema on new processing platform
+                        */
                     //Disable all retriever jobs, associated with schema flow
                     _dataFlowService.DeleteFlowsByFileSchema(scm, logicalDelete);
 
                     /*  Mark objects for delete to ensure they are not displaed in UI
-                     *  WallEService, long running task within Goldeneye service, will perform delete after determined amount of time
+                        *  WallEService, long running task within Goldeneye service, will perform delete after determined amount of time
                     */
                     /* Mark dataset file config object for delete */
                     MarkForDelete(dfc);
@@ -512,58 +512,70 @@ namespace Sentry.data.Core
                     MarkForDelete(scm);
 
                     _datasetContext.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"configservice-delete-logical-failed - configid:{id}", ex);
+                    return false;
+                }
 
+                //We do not want to fail the delete due to events not being sent
+                try
+                {
                     GenerateConsumptionLayerDeleteEvent(dfc);
                 }
-                else
+                catch (AggregateException agEx)
                 {
-                    Logger.Info($"configservice-delete-physical - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                    try
+                    var flatArgExs = agEx.Flatten().InnerExceptions;
+                    foreach (var ex in flatArgExs)
                     {
-                        //Ensure all associated RetrieverJobs are disabled
-                        //TODO: CLA-2765 - Revist adding ObjectStatus to RetrieverJobs
-                        //TODO: CLA-2765 - Revist moving Parquet files to glacier storage tier
-                        //TODO: CLA-2765 - Revist moving raw data files to glacier storage tier
-                        //TODO: CLA-2765 - Do Datasetfile records need an objectstatus?
-
-                        ////Delete associated dataflows\steps
-                        //Logger.Info($"configservice-delete-dataflowmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                        //_dataFlowService.DeleteByFileSchema(scm);
-
-
-                        //Mark DatasetFileConfig record deleted
-                        dfc.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
-                        dfc.Schema.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
-
-                        /*
-                         *  Mark all dataflows, for deletion, associated with schema on new processing platform
-                         */
-                        //Disable all retriever jobs, associated with schema flow
-                        _dataFlowService.DeleteFlowsByFileSchema(scm, logicalDelete);
-
-                        //Logger.Info($"configservice-delete-configmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                        //if (!parentDriven)
-                        //{
-                        //    _datasetContext.Remove(dfc);
-                        //}
-
-                        _datasetContext.SaveChanges();
-
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error($"configservice-delete-permanant-failed - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}", ex);
-                        return false;
+                        Logger.Error("Failed generating consumption layer event", ex);
                     }
                 }
-
-                return true;
             }
-            catch (Exception ex)
+            else
             {
-                Logger.Error($"configservice-delete-failed - configid:{id}", ex);
-                return false;
+                Logger.Info($"configservice-delete-physical - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
+                try
+                {
+                    //Ensure all associated RetrieverJobs are disabled
+                    //TODO: CLA-2765 - Revist adding ObjectStatus to RetrieverJobs
+                    //TODO: CLA-2765 - Revist moving Parquet files to glacier storage tier
+                    //TODO: CLA-2765 - Revist moving raw data files to glacier storage tier
+                    //TODO: CLA-2765 - Do Datasetfile records need an objectstatus?
+
+                    ////Delete associated dataflows\steps
+                    //Logger.Info($"configservice-delete-dataflowmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
+                    //_dataFlowService.DeleteByFileSchema(scm);
+
+
+                    //Mark DatasetFileConfig record deleted
+                    dfc.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
+                    dfc.Schema.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
+
+                    /*
+                        *  Mark all dataflows, for deletion, associated with schema on new processing platform
+                        */
+                    //Disable all retriever jobs, associated with schema flow
+                    _dataFlowService.DeleteFlowsByFileSchema(scm, logicalDelete);
+
+                    //Logger.Info($"configservice-delete-configmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
+                    //if (!parentDriven)
+                    //{
+                    //    _datasetContext.Remove(dfc);
+                    //}
+
+                    _datasetContext.SaveChanges();
+
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"configservice-delete-permanant-failed - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}", ex);
+                    return false;
+                }
             }
+
+            return true;
         }
 
         public UserSecurity GetUserSecurityForConfig(int id)
@@ -647,8 +659,15 @@ namespace Sentry.data.Core
         }
 
         #region PrivateMethods
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <exception cref="AggregateException"></exception>
         private void GenerateConsumptionLayerDeleteEvent(DatasetFileConfig config)
         {
+            var exceptionList = new List<Exception>();
+
             //Send message to delete hive table\views
             HiveTableDeleteModel hiveDelete = new HiveTableDeleteModel()
             {
@@ -656,7 +675,18 @@ namespace Sentry.data.Core
                 DatasetID = config.ParentDataset.DatasetId,
                 InitiatorID = _userService.GetCurrentUser().AssociateId
             };
-            _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveDelete));
+
+            try
+            {
+                Logger.Debug($"<generateconsumptionlayerdeleteevent> sending {hiveDelete.EventType.ToLower()} event...");
+                _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveDelete));
+                Logger.Debug($"<generateconsumptionlayerdeleteevent> sent {hiveDelete.EventType.ToLower()} event");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"<generateconsumptionlayerdeleteevent> failed sending event: {JsonConvert.SerializeObject(hiveDelete)}");
+                exceptionList.Add(ex);
+            }
 
             //Send message to delete snowflake table\views
             SnowTableDeleteModel snowDelete = new SnowTableDeleteModel()
@@ -665,7 +695,24 @@ namespace Sentry.data.Core
                 DatasetID = config.ParentDataset.DatasetId,
                 InitiatorID = _userService.GetCurrentUser().AssociateId
             };
-            _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(snowDelete));
+
+            try
+            {
+                Logger.Debug($"<generateconsumptionlayerdeleteevent> sending {snowDelete.EventType.ToLower()} event...");
+                _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(snowDelete));
+                Logger.Debug($"<generateconsumptionlayerdeleteevent> sent {snowDelete.EventType.ToLower()} event");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"<generateconsumptionlayerdeleteevent> failed sending event: {JsonConvert.SerializeObject(snowDelete)}");
+                exceptionList.Add(ex);
+            }
+
+
+            if (exceptionList.Any())
+            {
+                throw new AggregateException("Failed sending consumption layer event", exceptionList);
+            }
         }
 
 
@@ -673,8 +720,11 @@ namespace Sentry.data.Core
         /// Generate the necessary consumption layer create events
         /// </summary>
         /// <param name="configList"></param>
+        /// <exception cref="AggregateException">Thows exception when event could not be published</exception>
         private void GenerateSchemaCreateEvent(List<DatasetFileConfig> configList)
         {
+            var exceptionList = new List<Exception>();
+
             //Refresh consumption layer
             foreach (DatasetFileConfig config in configList.Where(w => w.Schema.Revisions.Any() && !w.DeleteInd))
             {
@@ -687,7 +737,17 @@ namespace Sentry.data.Core
                     InitiatorID = _userService.GetCurrentUser().AssociateId
                 };
 
-                _messagePublisher.PublishDSCEvent(hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel));
+                try
+                {
+                    Logger.Debug($"<generateschemacreateevent> sending {hiveModel.EventType.ToLower()} event...");
+                    _messagePublisher.PublishDSCEvent(hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel));
+                    Logger.Debug($"<generateschemacreateevent> sent {hiveModel.EventType.ToLower()} event");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"<generateschemacreateevent> failed sending event: {JsonConvert.SerializeObject(hiveModel)}");
+                    exceptionList.Add(ex);
+                }                
 
                 //Always generate snowflake table create event
                 SnowTableCreateModel snowModel = new SnowTableCreateModel()
@@ -698,7 +758,22 @@ namespace Sentry.data.Core
                     InitiatorID = _userService.GetCurrentUser().AssociateId
                 };
 
-                _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+                try
+                {
+                    Logger.Debug($"<generateschemacreateevent> sending {snowModel.EventType.ToLower()} event...");
+                    _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+                    Logger.Debug($"<generateschemacreateevent> sent {snowModel.EventType.ToLower()} event");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"<generateschemacreateevent> failed sending event: {JsonConvert.SerializeObject(snowModel)}");
+                    exceptionList.Add(ex);
+                }
+            }
+
+            if (exceptionList.Any())
+            {
+                throw new AggregateException("Failed sending consumption layer event", exceptionList);
             }
         }
         private string GenerateHiveDatabaseName(Category cat)
@@ -1027,6 +1102,7 @@ namespace Sentry.data.Core
             dto.DeleteIssuer = dfc.DeleteIssuer;
             dto.DeleteIssueDTM = dfc.DeleteIssueDTM;
             dto.ObjectStatus = dfc.ObjectStatus;
+            dto.SchemaRootPath = dfc.Schema?.SchemaRootPath;
         }
 
         public Tuple<List<RetrieverJob>, List<DataFlowStepDto>> GetDataFlowDropLocationJobs(DatasetFileConfig config)
