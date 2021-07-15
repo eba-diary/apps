@@ -27,8 +27,6 @@ namespace Sentry.data.Core
         public virtual IList<DatasetFile> DatasetFiles { get; set; }
         public virtual IList<RetrieverJob> RetrieverJobs { get; set; }
         public virtual FileExtension FileExtension { get; set; }
-        public virtual IList<DataElement> Schemas { get; set; }
-
 
         /* ITrackableSchema implementation */
         public virtual bool IsSchemaTracked { get; set; }

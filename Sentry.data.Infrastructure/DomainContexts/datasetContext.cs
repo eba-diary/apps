@@ -185,30 +185,6 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public IQueryable<DataElement> DataElements
-        {
-            get
-            {
-                return Query<DataElement>();
-            }
-        }
-
-        public IQueryable<DataElementDetail> DataElementDetails
-        {
-            get
-            {
-                return Query<DataElementDetail>();
-            }
-        }
-
-        public IQueryable<DataObject> DataObjects
-        {
-            get
-            {
-                return Query<DataObject>().Cacheable();
-            }
-        }
-
         public IQueryable<FileExtension> FileExtensions
         {
             get

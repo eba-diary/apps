@@ -147,42 +147,5 @@ namespace Sentry.data.Web.Helpers
 
             return hiveColumns;
         }
-
-        public String CompareSchemas(List<HiveColumn> hiveColumns, IList<DataObjectField> dataObjectFields)
-        {
-            String output = "";
-            foreach (DataObjectField b in dataObjectFields)
-            {
-                String hiveDataType = SQLServerDataTypeToHive(b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP").DataObjectFieldDetailType_VAL);
-
-                HiveColumn found = hiveColumns.FirstOrDefault(x => x.name.ToLower() == b.DataObjectField_NME.ToLower());
-                found.found = true;
-
-                //Check for the Name of the field in the file.
-                if (found != null)
-                {
-                    if (found.datatype.ToUpper() == hiveDataType.ToUpper())
-                    {
-
-                    }
-                    else
-                    {
-                        //Columns Data Type is Wrong
-                        output += "(Wrong Data Type)(Column = " + found.name + ") : Found - " + found.datatype.ToUpper() + " ~ Expected - " + hiveDataType.ToUpper() + " \n ";
-                    }
-                }
-                else
-                {
-                    output += "(Missing Column): " + b.DataObjectField_NME + " \n ";
-                }
-            }
-
-            foreach (HiveColumn hc in hiveColumns.Where(x => x.found == false))
-            {
-                //Column does not exist.
-                output += "(New Column) : " + hc.name + " \n ";
-            }
-            return output;
-        }
     }
 }
