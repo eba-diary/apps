@@ -22,5 +22,6 @@
         public virtual string SnowflakeDatabase { get; set; }
         public virtual string SnowflakeSchema { get; set; }
         public virtual string SnowflakeStatus { get; set; }
+        public virtual string SchemaRootPath { get; set; }
     }
 }

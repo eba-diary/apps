@@ -22,5 +22,6 @@
         public string SnowflakeTable { get; set; }
         public string SnowflakeSchema { get; set; }
         public string SnowflakeStatus { get; set; }
+        public string SchemaRootPath { get; set; }
     }
 }
