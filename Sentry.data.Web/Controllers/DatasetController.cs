@@ -155,9 +155,6 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetModel cdm = new DatasetModel()
             {
-                //these are defaluted for now and disbled on UI but will change to open field.
-                ConfigFileName = "Default",
-                ConfigFileDesc = "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
                 UploadUserId = SharedContext.CurrentUser.AssociateId,
                 ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };

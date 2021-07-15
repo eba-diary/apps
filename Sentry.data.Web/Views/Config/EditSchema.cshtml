@@ -32,7 +32,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.TextBoxFor(model => model.Name, new { @value = "", @class = "form-control edit-dataset-row" })
+                @Html.TextBoxFor(model => model.Name, new { @readonly = true, @value = "", @class = "form-control edit-dataset-row" })
                 @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
             </div>
         </div>
