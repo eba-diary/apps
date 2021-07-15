@@ -628,81 +628,9 @@ namespace Sentry.data.Web.WebApi.Controllers
 
         #region Schema_Endpoints
         
-        ///// <summary>
-        ///// Gets schema information
-        ///// </summary>
-        ///// <param name="schemaId"></param>
-        ///// <returns></returns>
-        //[HttpGet]
-        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        //[Route("schema/{schemaId}")]
-        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaInfoModel))]
-        //public async Task<IHttpActionResult> GetSchemaInfo(int schemaId)
-        //{
-        //    try
-        //    {
-        //        SchemaDto dto = _schemaService.GetFileSchemaDto(schemaId);
-        //        SchemaInfoModel model = dto.ToModel();
-        //        return Ok(model);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.ToString());
-        //    }
-        //}
+       
 
-        ///// <summary>
-        ///// Get list all revisions for schema
-        ///// </summary>
-        ///// <param name="schemaId"></param>
-        ///// <returns></returns>
-        //[HttpGet]
-
-        //[Route("schema/{schemaId}/revisions")]
-        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaInfoModel>))]
-        //public async Task<IHttpActionResult> GetSchemaRevisions(int schemaId)
-        //{
-        //    try
-        //    {
-        //        List<SchemaRevisionDto> revisionsList = _schemaService.GetSchemaRevisionDtoBySchema(schemaId);
-        //        List<SchemaRevisionModel> modelList = revisionsList.ToModel();
-        //        return Ok(modelList);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.ToString());
-        //    }
-        //}
-
-
-        /// <summary>
-        /// ges column schema metadate form schema
-        /// </summary>
-        /// <param name="SchemaID"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("schemas/{SchemaID}/columns")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaDetailModel))]
-        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
-        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
-        public async Task<IHttpActionResult> GetColumnSchemaInformationForSchema(int SchemaID)
-        {
-            DatasetFileConfig dfc = _dsContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == SchemaID).FirstOrDefault();
-
-            if (dfc != null)
-            {
-                ValidateViewPermissionsForDataset(dfc.ParentDataset.DatasetId);
-            }
-            else
-            {
-                throw new HttpResponseException(System.Net.HttpStatusCode.InternalServerError);
-            }
-
-            SchemaDetaiApilDTO dto = _configService.GetSchemaDetailDTO(SchemaID);
-            SchemaDetailModel sdm = new SchemaDetailModel(dto);
-
-            return Ok(sdm);
-        }
+        
         #endregion
 
         #region Messaging Endpoints
