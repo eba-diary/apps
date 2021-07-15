@@ -6,9 +6,6 @@ namespace Sentry.data.Core
 {
     public interface IConfigService
     {
-        SchemaApiDTO GetSchemaApiDTO(int id);
-        SchemaDetaiApilDTO GetSchemaDetailDTO(int id);
-        IList<ColumnDTO> GetColumnDTO(int id);
         List<string> Validate(FileSchemaDto dto);
         List<string> Validate(DataSourceDto dto);
         List<string> Validate(DatasetFileConfigDto dto);

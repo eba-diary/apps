@@ -381,12 +381,6 @@
     <Compile Include="Entities\Livy\QueryableDataset.cs" />
     <Compile Include="Entities\Goldeneye\RequestHeader.cs" />
     <Compile Include="Entities\MessageFormats\HiveMetadataEvent.cs" />
-    <Compile Include="Entities\Metadata\DataElement.cs" />
-    <Compile Include="Entities\Metadata\DataElementDetail.cs" />
-    <Compile Include="Entities\Metadata\DataObject.cs" />
-    <Compile Include="Entities\Metadata\DataObjectDetail.cs" />
-    <Compile Include="Entities\Metadata\DataObjectField.cs" />
-    <Compile Include="Entities\Metadata\DataObjectFieldDetail.cs" />
     <Compile Include="Entities\Metadata\HiveTable.cs" />
     <Compile Include="Entities\Metadata\Lineage.cs" />
     <Compile Include="Entities\Goldeneye\LoaderRequest.cs" />

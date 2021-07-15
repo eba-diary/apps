@@ -87,11 +87,6 @@ namespace Sentry.data.Core.Tests
                 RetrieverJobs = new List<RetrieverJob>(),                
             };
 
-            List<DataElement> deList = new List<DataElement>();
-            deList.Add(MockDataElement(dfc));
-
-            dfc.Schemas = deList;
-
             return dfc;
         }
 
@@ -122,31 +117,6 @@ namespace Sentry.data.Core.Tests
             };
 
             return dto;
-        }
-
-        public static DataElement MockDataElement(DatasetFileConfig dfc = null)
-        {
-            DatasetFileConfig dsfc = dfc != null ? dfc : MockDataFileConfig();
-
-            DataElement de = new DataElement()
-            {
-                DataElementCreate_DTM = DateTime.Now,
-                DataElementChange_DTM = DateTime.Now,
-                DataElement_CDE = "F",
-                DataElement_DSC = GlobalConstants.DataElementDescription.DATA_FILE,
-                DataElement_NME = dsfc.Name,
-                LastUpdt_DTM = DateTime.Now,
-                SchemaIsPrimary = true,
-                SchemaDescription = dsfc.Description,
-                SchemaName = dsfc.Name,
-                SchemaRevision = 1,
-                SchemaIsForceMatch = false,
-                FileFormat = MockFileExtensions()[0].Name.ToUpper(),
-                StorageCode = "1000123",
-                DatasetFileConfig = dsfc
-            };
-
-            return de;
         }
 
         public static List<DatasetScopeType> MockScopeTypes()
@@ -455,24 +425,5 @@ namespace Sentry.data.Core.Tests
 
             return e;
         }        
-
-        //public static List<Schema> MockSchemas(DatasetFileConfig dfc = null)
-        //{
-        //    Schema schema = new Schema()
-        //    {
-        //        Schema_NME = "Mock Schema",
-        //        Schema_ID = 11000,
-        //        Schema_DSC = "Mock Schema",
-        //        Created_DTM = DateTime.Now,
-        //        DatasetFileConfig = dfc
-        //    };
-
-        //    var schemas = new List<Schema>();
-
-        //    schemas.Add(schema);
-
-        //    return schemas;
-           
-        //}
     }
 }
