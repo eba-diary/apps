@@ -1107,7 +1107,7 @@ namespace Sentry.data.Core
             ValidationResults results = new ValidationResults();
 
             //STEP 1:  Find duplicates at the current level passed in
-            var clones = fieldDtoList.GroupBy(x => x.Name).Where(x => x.Count() > 1)
+            var clones = fieldDtoList.Where(w => w.DeleteInd == false).GroupBy(x => x.Name).Where(x => x.Count() > 1)
               .Select(y => y.Key);
 
             //STEP 2:  IF ANY CLONES EXIST: Grab all clones that match distinct name list
@@ -1124,7 +1124,7 @@ namespace Sentry.data.Core
                 //we are adding each errors to ValidationResults, this way I don't need to create a seperate hardened list but can add to the existing ValidationResults
                 cloneDetails.ToList().ForEach(x => results.Add(x.OrdinalPosition.ToString(), $"({x.Name}) cannot be duplicated.  "));
             }
-            
+
             return results;
         }
 
