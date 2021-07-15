@@ -8,6 +8,7 @@ using System.IO;
 using System.Text;
 using Sentry.data.Infrastructure.Helpers;
 using System.Threading.Tasks;
+using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Infrastructure
 {
@@ -130,7 +131,8 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Error("Kafka Producer failed to send message", ex);
+                Logger.Error($"kafkamessageproducer_publish_failure - topic:{topic}:::key:{key}:::value:{value}", ex);
+                throw new KafkaProducerException("Failed to publish message", ex);
             }            
         }
 
@@ -150,7 +152,8 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Error("Kafka Producer failed to send message", ex);
+                Logger.Error($"kafkamessageproducer_publish_failure - topic:{topic}:::key:{key}:::value:{value}", ex);
+                throw new KafkaProducerException("Failed to publish message", ex);
             }
         }
 

@@ -215,8 +215,11 @@ data.Config = {
 
         $("[id^='CancelDatasetFileConfigForm']").off('click').on('click', PageCancelFunction);
 
-        data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
+        //determine current file extension selection for initialzation of page
+        var currentFileExtension = $('#FileExtensionID option:selected').text();
 
+        //Call SetFileExtensionProperites method on initialization, then call on change of FileExtensionId
+        data.Config.SetFileExtensionProperites(currentFileExtension);
         $("#FileExtensionID").change(function () {
             data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
         });
@@ -317,11 +320,19 @@ data.Config = {
     SetFileExtensionProperites: function (extension) {
         //Determine which container to find the delimiter field within
         // and set delimiterelement appropriately
-        if ($("#DatasetFormContainer").css('display') == 'none') {
-            var delimiterelement = $("#DatasetFileConfigFormContainer").find('#Delimiter');
+        var delimiterelement;
+
+        if ($("#DatasetFormContainer").css('display') === undefined) {
+            //User is on the Edit.cshtml page, so look for the delimiter element
+            delimiterelement = $('#Delimiter');
+        }
+        else if ($("#DatasetFormContainer").css('display') === 'none') {
+            //User is on the _DatasetFileConfigCreate.cshtml page and creating a schema
+            delimiterelement = $("#DatasetFileConfigFormContainer").find('#Delimiter');
         }
         else {
-            var delimiterelement = $("#DatasetFormContainer").find('#Delimiter');
+            //User is on the _DatasetFileConfigCreate.cshtml page and creating a dataset
+            delimiterelement = $("#DatasetFormContainer").find('#Delimiter');
         }
 
         var editMode = false;
@@ -331,8 +342,7 @@ data.Config = {
 
         switch (extension) {
             case "CSV":
-                $('.delimiter').show();
-                $('.delimiterDescription').hide();
+                $('.delimiterPanel').show();
                 $('#HasHeader').prop("readonly", false);
                 $('#HasHeader').prop("disabled", false);
                 if (!editMode) {
@@ -343,8 +353,7 @@ data.Config = {
                 break;
             case "DELIMITED":
             case "ANY":
-                $('.delimiter').show();
-                $('.delimiterDescription').show();
+                $('.delimiterPanel').show();
                 if (!editMode) {
                     delimiterelement.val('');
                 }
@@ -353,13 +362,27 @@ data.Config = {
                 $('#HasHeader').prop("disabled", false);
                 break;
             default:
-                $('.delimiter').hide();
+                $('.delimiterPanel').hide();
                 if (!editMode) {
                     delimiterelement.val('');
                 }
                 delimiterelement.prop("readonly", "readonly");
                 $('#HasHeader').prop("readonly", true);
                 $('#HasHeader').prop("disabled", true);
+                break;
+        }
+
+        data.Config.setSchemaRootPathPanel(extension);
+    },
+
+    setSchemaRootPathPanel: function (extension) {
+        switch (extension) {
+            case "XML":
+            case "JSON":
+                $('.schemaRootPathPanel').show();
+                break;
+            default:
+                $('.schemaRootPathPanel').hide();
                 break;
         }
     },

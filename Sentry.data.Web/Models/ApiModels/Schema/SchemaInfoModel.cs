@@ -31,5 +31,6 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public string SnowflakeTable { get; set; }
         public string SnowflakeStatus { get; set; }
         public string ObjectStatus { get; set; }
+        public string[] SchemaRootPath { get; set; }
     }
 }

@@ -838,6 +838,9 @@ namespace Sentry.data.Core
                 case DataActionType.XML:
                     action = _datasetContext.XMLAction.FirstOrDefault();
                     break;
+                case DataActionType.JsonFlattening:
+                    action = _datasetContext.JsonFlatteningAction.FirstOrDefault();
+                    break;
                 case DataActionType.SchemaLoad:
                     action = _datasetContext.SchemaLoadAction.FirstOrDefault();
                     DataFlowStep schemaLoadStep = MapToDataFlowStep(df, action, actionType);
@@ -1006,6 +1009,10 @@ namespace Sentry.data.Core
             else if (scm.Extension.Name.ToUpper() == "XML")
             {
                 AddDataFlowStep(dto, df, DataActionType.XML);
+            }
+            else if (scm.Extension.Name.ToUpper() == "JSON" && !String.IsNullOrWhiteSpace(scm.SchemaRootPath))
+            {
+                AddDataFlowStep(dto, df, DataActionType.JsonFlattening);
             }
         }
 
