@@ -2,8 +2,12 @@
 {
     public static class KafkaHelper
     {
-        public static string GetDSCEventTopic()
+        public static string Get_Producer_Topic_For_DSCEvents()
         {  
+            return Configuration.Config.GetHostSetting("DSCEventTopic_Confluent");
+        }
+        public static string Get_Consumer_Topic_List_For_DSCEvents()
+        {
             return Configuration.Config.GetHostSetting("Consumer_Event_Topic_List");
         }
 

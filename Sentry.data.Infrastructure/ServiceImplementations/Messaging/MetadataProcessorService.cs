@@ -43,7 +43,7 @@ namespace Sentry.data.Infrastructure
             //domain context needed to retrieve config
             KafkaSettings settings = new KafkaSettings(groupId,
                                             KafkaHelper.GetKafkaBrokers(),
-                                            KafkaHelper.GetDSCEventTopic(),
+                                            KafkaHelper.Get_Consumer_Topic_List_For_DSCEvents(),
                                             Configuration.Config.GetHostSetting("EnvironmentName").ToUpper(),
                                             (Configuration.Config.GetHostSetting("KafkaDebugLogging").ToLower() == "true") ? true : false,
                                             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, KafkaHelper.GetCertPath()), 
