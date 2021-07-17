@@ -19,10 +19,10 @@ body {
   stroke-width: 1.5px;
 }
 
+
 .node text {
   fill: #888888;
   stroke: none;
-  font-size: .6em;
 }
 
 .link {

@@ -16,12 +16,15 @@ let svg = d3.select("body")
   .attr("viewBox", [-width/2, -height/2, width, height])
 
 //link and node "list" within SVG
+
 let link = svg.append("g")
         .attr("class", "link")
-      .selectAll("line");
+      .selectAll("line")
+//let node_parent = svg.append("g")
 let node = svg.append("g")
         .attr("class", "node")
       .selectAll("circle")
+
 
 //handles every simulation "tick" (updates nodes and links)
 const ticked = () => {
@@ -34,6 +37,7 @@ const ticked = () => {
       .attr("y2", d => d.target.y);
 }
 
+
 //force simulation and parameters
 let simulation = d3.forceSimulation()
   .force("link", d3.forceLink())
@@ -44,38 +48,53 @@ let simulation = d3.forceSimulation()
 
 //recieve and run data called once when page loads
 const recieveData = (links_and_nodes_by_time) => {
+
+  let slider = document.getElementById("date-slider")
+  let sliderDiv = document.getElementById("sliderAmount")
+
+  slider.addEventListener('input', function() {
+    sliderDiv.innerHTML = slider.value
+    update(slider.value)
+  })
+
+
   data = links_and_nodes_by_time
   links = data[Object.keys(data)[0]][0]
   nodes = data[Object.keys(data)[0]][1]
-  simulation.nodes(nodes)
-  simulation.force("link").links(links)
   render()
 }
 
 //called on page load and when user updates
 const render = () => {
+  simulation.nodes(nodes)
+  simulation.force("link").links(links)
+  simulation.alpha(0.3).restart();
+
   node = node
     .data(nodes)
-    .join(enter => enter.append("circle")
-          .attr("r", 5)
-          .call(drag(simulation))
-          .call(node => node.append("title").text(d => d.key)))
+    .join(enter => enter.append("circle").attr("r",5)
+      .call(node => node.append("text").text(d => d.key))
+    )
+    .on('mouseover', function(d, i){
+      d3.select(this).style("fill", 'magenta')
+    })
+    .on('mouseout', function(d, i){
+      d3.select(this).style("fill", 'black')
+    })
+    .call(drag(simulation))
 
   link = link
         .data(links)
         .join("line")
+
 }
 
 //called onclick()
-function update() {
-  date_counter = date_counter + 1
+function update(date_index) {
   oldNodes = nodes
-  links = data[Object.keys(data)[date_counter]][0]
-  nodes = data[Object.keys(data)[date_counter]][1]
+  links = data[Object.keys(data)[date_index]][0]
+  nodes = data[Object.keys(data)[date_index]][1]
   maintainNodePositions()
-  simulation.nodes(nodes)
-  simulation.force("link").links(links)
-  simulation.alpha(0.3).restart();
   render()
 }
 

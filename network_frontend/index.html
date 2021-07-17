@@ -16,7 +16,8 @@ Static HTML page that renders D3 Graph
 <body>
   <script src="process-data.js"></script>
   <script src="d3-force-directed.js"></script>
-  <div class="update" onclick="update()">update</div>
   <div id="which-node">Selected Node: __</div>
   <div id="render-here"></div>
+  <input type="range" min="0" max="45" value="0" id="date-slider">
+  <div id="sliderAmount"></div>
 </body>
