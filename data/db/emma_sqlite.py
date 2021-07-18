@@ -1,12 +1,9 @@
 import sqlite3
 
 ## Declare Database Variables
-# We can call the database EBA for Emma B. Andrews. We might want to consider another name if we add more journals written by authors other than Emma. For now, we can use EBA.
 DB_NAME = 'EBA.db'
-TABLES = {} #create a Python dictionary for the tables
-INDEX = {} #create a Python dictionary for the indices
-
-## TABLES ##
+TABLES = {}
+INDEX = {}
 
 TABLES['author'] = ("""CREATE TABLE IF NOT EXISTS author (
                             id INT NOT NULL, 
@@ -143,7 +140,7 @@ TABLES['people'] = ("""CREATE TABLE IF NOT EXISTS people (
 con = sqlite3.connect(DB_NAME)
 cur = con.cursor() #create a connection with the database.
 
-# Now we want to iterate over the dictionary to create each table for the database
+# Create Tables and Indices
 for t in TABLES:
     tableSQL = TABLES[t]
     cur.execute(tableSQL)
