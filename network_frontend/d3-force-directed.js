@@ -79,6 +79,15 @@ const enterNodes = (n) => {
     .attr("cx", 0)
     .attr("cy", 0)
     .attr("r", function(d) {return _.random(3,10)})
+    .on('click', function(d, i) {
+      document.getElementById('which-node').innerHTML = "Selected Node: " + d.key
+    })
+    .on('mouseover', function(d, i){
+      d3.select(this).style("fill", 'magenta')
+    })
+    .on('mouseout', function(d, i){
+      d3.select(this).style("fill", 'black')
+    })
 
   g.append("text")
     .attr("x", function(d) {return 10}) //offset text
