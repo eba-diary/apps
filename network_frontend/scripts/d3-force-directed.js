@@ -3,8 +3,8 @@
 //renders and updates force directed graph
 
 //global vars
-let width = window.screen.width,
-    height = window.screen.height,
+let width = window.screen.width - 400,
+    height = window.screen.height - 400,
     nodes, links, oldNodes, data
 
 //keeps track of data index
@@ -34,13 +34,9 @@ const render = (update) => {
     .data(nodes, function(d) {return d.key})
 
   enterLinks(l)
-  exitLinks(l)
-  //only exit nodes and links on update
-  //TODO: figure out what "exiting" actually does
   if(update) exitLinks(l)
   enterNodes(n)
   if(update) exitNodes(n)
-  exitNodes(n)
 
   link = svg.selectAll(".link")
   node = svg.selectAll(".node")
@@ -78,9 +74,9 @@ const enterNodes = (n) => {
   g.append("circle")
     .attr("cx", 0)
     .attr("cy", 0)
-    .attr("r", function(d) {return _.random(3,10)})
-    .on('click', function(d, i) {
-      document.getElementById('which-node').innerHTML = "Selected Node: " + d.key
+    .attr("r", function(d) {return _.random(3,7)})
+    .on('click', (event,datum) => {
+      openNav(datum)
     })
     .on('mouseover', function(d, i){
       d3.select(this).style("fill", 'magenta')
@@ -88,6 +84,7 @@ const enterNodes = (n) => {
     .on('mouseout', function(d, i){
       d3.select(this).style("fill", 'black')
     })
+
 
   g.append("text")
     .attr("x", function(d) {return 10}) //offset text
@@ -125,8 +122,6 @@ function update(date_index) {
   nodes = data[Object.keys(data)[date_index]][1]
   maintainNodePositions()
   render(true)
-  exitLinks()
-  exitNodes()
 }
 
 //keeps existing nodes in the same place that they were

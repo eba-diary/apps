@@ -7,17 +7,30 @@ Static HTML page that renders D3 Graph
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/sidebar.css">
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="http://underscorejs.org/underscore-min.js"></script>
   <script src="dependencies/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
-  <script src="process-data.js"></script>
-  <script src="d3-force-directed.js"></script>
-  <div id="which-node">Selected Node: __</div>
-  <div id="render-here"></div>
-  <input type="range" min="0" max="45" value="0" id="date-slider">
-  <div id="sliderAmount"></div>
+  <script src="scripts/process-data.js"></script>
+  <script src="scripts/d3-force-directed.js"></script>
+  <script src="scripts/sidebar.js"></script>
+  <div id="slider-components">
+    <div id="sliderAmount">0</div>
+    <input type="range" min="0" max="45" value="0" id="date-slider">
+  </div>
+  <div id="node-info-sidebar" class="sidebar">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+  <div id="node-info">
+    <h3>
+      Name: <span id="node-name"></span>
+    </h3>
+    <div>
+      Connections: <span id="node-connections"></span>
+    </div>
+  </div>
+</div>
 </body>
