@@ -11,3 +11,4 @@ make_db:
 	@ echo 'EBA.db is recreated'
 
 # Populate database
+# populate_db:
