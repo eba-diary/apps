@@ -15,40 +15,87 @@ let svg = d3.select("body")
   .append("svg")
   .attr("viewBox", [-width/2, -height/2, width, height])
 
-//link and node "list" within SVG
-
-let link = svg.append("g")
-        .attr("class", "link")
-      .selectAll("line")
-//let node_parent = svg.append("g")
-let node = svg.append("g")
-        .attr("class", "node")
-      .selectAll("circle")
-
-
-//handles every simulation "tick" (updates nodes and links)
-const ticked = () => {
-  node.attr("cx", d => d.x)
-        .attr("cy", d => d.y);
-
-  link.attr("x1", d => d.source.x)
-      .attr("y1", d => d.source.y)
-      .attr("x2", d => d.target.x)
-      .attr("y2", d => d.target.y);
-}
-
-
 //force simulation and parameters
 let simulation = d3.forceSimulation()
   .force("link", d3.forceLink())
-  .force("charge", d3.forceManyBody().strength(-100))
+  .force("charge", d3.forceManyBody().strength(-300))
   .force("x", d3.forceX())
   .force("y", d3.forceY())
-  .on("tick", ticked)
+
+//called on page load and when user updates
+const render = (update) => {
+  simulation.nodes(nodes)
+  simulation.force("link").links(links)
+  simulation.alpha(0.3).restart();
+
+  let l = svg.selectAll(".link")
+    .data(links, function(d) {return d.source + "," + d.target})
+  let n = svg.selectAll(".node")
+    .data(nodes, function(d) {return d.key})
+
+  enterLinks(l)
+  exitLinks(l)
+  //only exit nodes and links on update
+  //TODO: figure out what "exiting" actually does
+  if(update) exitLinks(l)
+  enterNodes(n)
+  if(update) exitNodes(n)
+  exitNodes(n)
+
+  link = svg.selectAll(".link")
+  node = svg.selectAll(".node")
+
+
+  //handles every simulation "tick" (updates nodes and links)
+  simulation.on("tick", function() {
+    node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+    link.attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+  })
+}
+
+//format and add links
+const enterLinks = (l) => {
+  l.enter().insert("line", ".node")
+    .attr("class", "link")
+    .style("stroke-width", function(d) { return 2 })
+}
+
+//remove links when done
+const exitLinks = (l) => {
+  l.exit().remove()
+}
+
+//format and add nodes
+const enterNodes = (n) => {
+  var g = n.enter().append("g")
+    .attr("class", "node")
+    .call(drag(simulation))
+
+  g.append("circle")
+    .attr("cx", 0)
+    .attr("cy", 0)
+    .attr("r", function(d) {return _.random(3,10)})
+
+  g.append("text")
+    .attr("x", function(d) {return 10}) //offset text
+    .attr("dy", ".35em")
+    .text(function(d) {return d.key})
+}
+
+//remove nodes when done
+const exitNodes = (n) => {
+  n.exit().remove()
+}
+
 
 //recieve and run data called once when page loads
 const recieveData = (links_and_nodes_by_time) => {
 
+  //updates date index depending on slider input
   let slider = document.getElementById("date-slider")
   let sliderDiv = document.getElementById("sliderAmount")
 
@@ -56,37 +103,10 @@ const recieveData = (links_and_nodes_by_time) => {
     sliderDiv.innerHTML = slider.value
     update(slider.value)
   })
-
-
   data = links_and_nodes_by_time
   links = data[Object.keys(data)[0]][0]
   nodes = data[Object.keys(data)[0]][1]
-  render()
-}
-
-//called on page load and when user updates
-const render = () => {
-  simulation.nodes(nodes)
-  simulation.force("link").links(links)
-  simulation.alpha(0.3).restart();
-
-  node = node
-    .data(nodes)
-    .join(enter => enter.append("circle").attr("r",5)
-      .call(node => node.append("text").text(d => d.key))
-    )
-    .on('mouseover', function(d, i){
-      d3.select(this).style("fill", 'magenta')
-    })
-    .on('mouseout', function(d, i){
-      d3.select(this).style("fill", 'black')
-    })
-    .call(drag(simulation))
-
-  link = link
-        .data(links)
-        .join("line")
-
+  render(false)
 }
 
 //called onclick()
@@ -95,10 +115,12 @@ function update(date_index) {
   links = data[Object.keys(data)[date_index]][0]
   nodes = data[Object.keys(data)[date_index]][1]
   maintainNodePositions()
-  render()
+  render(true)
+  exitLinks()
+  exitNodes()
 }
 
-//keeps existing nodes in the same place they should be
+//keeps existing nodes in the same place that they were
 function maintainNodePositions() {
   var kv = {}
   _.each(oldNodes, function(d) {
