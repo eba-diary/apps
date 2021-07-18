@@ -18,7 +18,7 @@ let svg = d3.select("body")
 //force simulation and parameters
 let simulation = d3.forceSimulation()
   .force("link", d3.forceLink())
-  .force("charge", d3.forceManyBody().strength(-300))
+  .force("charge", d3.forceManyBody().strength(-200))
   .force("x", d3.forceX())
   .force("y", d3.forceY())
 
@@ -79,10 +79,10 @@ const enterNodes = (n) => {
       openNav(datum)
     })
     .on('mouseover', function(d, i){
-      d3.select(this).style("fill", 'magenta')
+      d3.select(this).style("stroke", '#87ceeb')
     })
     .on('mouseout', function(d, i){
-      d3.select(this).style("fill", 'black')
+      d3.select(this).style("stroke", 'none')
     })
 
 
