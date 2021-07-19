@@ -19,8 +19,9 @@ Static HTML page that renders D3 Graph
   <script src="scripts/d3-force-directed.js"></script>
   <script src="scripts/sidebar.js"></script>
   <div id="slider-components">
-    <div id="sliderAmount">0</div>
-    <input type="range" min="0" max="45" value="0" id="date-slider">
+    <div id="slider-amount"></div>
+    <!--TODO: Set slider max programatically-->
+    <input type="range" min="0" max="42" value="0" id="date-slider">
   </div>
   <div id="node-info-sidebar" class="sidebar">
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
@@ -28,9 +29,9 @@ Static HTML page that renders D3 Graph
     <h3>
       Name: <span id="node-name"></span>
     </h3>
-    <div>
-      Connections: <span id="node-connections"></span>
-    </div>
+    <h6>
+      Entry: <span id="entry"></span>
+    </h6>
   </div>
 </div>
 </body>
