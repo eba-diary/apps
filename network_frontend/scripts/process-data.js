@@ -64,12 +64,12 @@ const processData = (raw) => {
     if(!obj[date]) {
       adjusted_sentiment = (sentiment - min_score)/(max_score-min_score)
       color = getColor(adjusted_sentiment)
-      console.log(adjusted_sentiment+":"+color)
       bare_nodes = new Array(emma)
       obj[date] = [[],[{
         key: emma,
-        weight: 10,
+        date: date,
         entry: entry,
+        weight: 10,
         sentiment: adjusted_sentiment,
         color: color
       }]]
@@ -77,7 +77,7 @@ const processData = (raw) => {
 
     //add node if not already in bare_nodes
     if(!(bare_nodes.includes(target)) && target != "None") {
-      obj[date][1].push({key: target, weight: 5, entry:  entry})
+      obj[date][1].push({key: target, date: date, entry:  entry, weight: 5})
       bare_nodes.push(target)
     }
 

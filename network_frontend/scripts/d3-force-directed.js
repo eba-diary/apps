@@ -83,7 +83,7 @@ const enterNodes = (n) => {
     .on('click', (event,datum) => {
       openNav(datum)
     })
-    /* TODO: highlight the most recently clicked node
+    /* TODO: HIGHLIGHT the most recently clicked node
     .on('mouseover', function(d, i){
       d3.select(this).style("stroke", '#87ceeb')
     })
