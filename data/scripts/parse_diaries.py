@@ -4,16 +4,77 @@ import csv
 from bs4 import BeautifulSoup
 import lxml
 import re
-from afinn import Afinn
 import argparse
 import sys
+import os
+from afinn import Afinn
+from config import volumes
 
+def get_loc(diary):
+    """
+    Return path to diary volume
+    :return: volume formatted according to database.ini
+    """
+    if diary.isdigit():
+        return "volume_" + str(diary)
+    else:
+        num = ''.join([c for c in diary if c.isdigit()])
+        return "volume_" + str(num)
 
 def process_diary(args):
     """
     Here we preprocess a journal to a csv output 
     """
-    pass
+    diary = args.volume_num
+    # Sanitize the diary
+    diary = get_loc(diary)
+
+    afinn = Afinn(language='en')
+
+    diary_volumes = volumes()
+    
+    diary_path = diary_volumes[diary]
+    
+    journal_id = 17
+    entry_id = 1
+
+    with open(diary_path) as xml:
+        soup = BeautifulSoup(xml, 'lxml-xml')
+        with open('temp.csv', 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(["journal_id", "entry_id", "date", "TEI_name", "emma_name", "relation", "entry", "XML", "entry_sentiment"])
+            for i in soup.find_all("div", {"type": "entry"}):
+                txt_string = str(i)
+                xml = "".join(line.strip() for line in txt_string.split("\n"))
+                
+                #Extract the Date for the Graph Model
+                match = re.search('EBA-([0-9-–]+)', i.attrs['xml:id'])
+                date = match.group(1) if match else None
+
+                #Clean the Entry and Prepare for Post-Processing
+                remove_newlines = re.sub("\n+", " ", i.text.strip())
+                plain_text = re.sub(" +", " ", remove_newlines)
+
+                #Extract all the PersName and Score Entry in which PersName appears
+                people = i.find_all('persName')
+                if not people:
+                    afinn_scr = afinn.score(plain_text)
+                    writer.writerow([journal_id, entry_id, date, "None", "None", "None", plain_text, xml, afinn_scr])
+                    entry_id += 1
+                else:
+                    for p in people:
+                        names_unclean = re.sub("\n+", "  ", p.text.strip())
+                        emma_name = re.sub(" +", " ", names_unclean)
+                        if ' ' in p['ref']:
+                            more_than_one = p['ref'].split(' ')
+                            for ind in more_than_one:                    
+                                afinn_scr = afinn.score(plain_text)
+                                writer.writerow([journal_id, entry_id, date, ind, emma_name, "", plain_text, xml, afinn_scr])
+                        else:
+                            afinn_scr = afinn.score(plain_text)
+                            writer.writerow([journal_id, entry_id,date, p['ref'], emma_name, "", plain_text, xml, afinn_scr])
+                    entry_id += 1
+        
 
 
 def main(argv):
