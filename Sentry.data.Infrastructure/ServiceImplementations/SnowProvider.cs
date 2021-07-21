@@ -48,7 +48,7 @@ namespace Sentry.data.Infrastructure
         {
             DataTable dt;
             string connectionString = Config.GetHostSetting("SnowConnectionString");
-            Logger.Info("START:  SnowProvider.ExecuteQuery() ConnectionString:" + connectionString + " Query:" + query);
+            Logger.Info("START STEP 1:  SnowProvider.ExecuteQuery() ConnectionString:" + connectionString + " Query:" + query);
 
             try
             {
@@ -59,8 +59,14 @@ namespace Sentry.data.Infrastructure
 
                     System.Data.Common.DbCommand command = connection.CreateCommand();
                     command.CommandText = query;
+                    command.CommandTimeout = 1800;
+
                     connection.Open();
+                    Logger.Info("COMPLETE STEP 2:  SnowProvider.ExecuteQuery.ConnectionOpen()");
+
                     System.Data.Common.DbDataReader reader = command.ExecuteReader();
+                    Logger.Info("COMPLETE STEP 3:  SnowProvider.ExecuteQuery.command.ExecuteReader()");
+
                     dt = FillDataTable(reader);
 
                     if (reader != null)
@@ -75,12 +81,13 @@ namespace Sentry.data.Infrastructure
                 throw;
             }
 
-            Logger.Info($"END: SnowProvider.ExecuteQuery()");
+            Logger.Info($"END  STEP 6: SnowProvider.ExecuteQuery()");
             return dt;
         }
 
         private DataTable FillDataTable(System.Data.Common.DbDataReader dr)
         {
+            Logger.Info("START  STEP 4:  SnowProvider.FillDataTable()");
             DataTable schema = dr.GetSchemaTable();
             DataTable dt = new DataTable();
 
@@ -106,6 +113,8 @@ namespace Sentry.data.Infrastructure
 
                 dt.Rows.Add(dataRow);
             }
+
+            Logger.Info("END  STEP 5:  SnowProvider.FillDataTable()");
 
             return dt;
         }
