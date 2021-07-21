@@ -71,18 +71,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 });
             }, map => map.OneToMany(a => a.Class(typeof(DatasetFile))));
 
-            this.Bag(x => x.Schemas, (m) =>
-            {
-                m.Lazy(CollectionLazy.NoLazy);
-                m.Inverse(true);
-                m.Table("DataElement");
-                m.Cascade(Cascade.All);
-                m.Key((k) =>
-                {
-                    k.Column("Config_ID");
-                });
-            }, map => map.OneToMany(a => a.Class(typeof(DataElement))));
-
             this.Property((x) => x.IsSchemaTracked, (m) => m.Column("IsSchemaTracked"));
             this.ManyToOne(x => x.Schema, m =>
             {

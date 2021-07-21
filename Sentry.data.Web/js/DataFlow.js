@@ -259,7 +259,6 @@
                 var hrUrl = $('#HrempServiceUrl').val()
                 //init the form passing the submit function specific for DataFlow page
                 data.Dataset.FormInit(hrUrl, hrEnv, data.DataFlow.DatasetFormSubmitInit, data.DataFlow.DatasetFormCancelInit);
-                alert('finished error catch')
             }
         });
     },
@@ -288,7 +287,6 @@
                 $('#DatasetFileConfigFormContent').replaceWith(obj.responseText);
                 //init the form passing the submit function specific for DataFlow page
                 data.Config.CreateFormSubmitInit(data.DataFlow.DatasetFileConfigFormSubmitInit, data.DataFlow.DatasetFileConfigFormCancelInit);
-                alert('finished error catch')
             }
         });
     },

@@ -240,14 +240,12 @@ namespace Sentry.data.Web
             model.ScopeType = config.DatasetScopeType;
             model.FileExtensionID = config.Schema.Extension.Id;
             model.FileExtension = config.Schema.Extension;
-            model.Schemas = config.Schemas;
             model.Schema = config.Schema ?? null;
             model.RawStorageId = config.Schema.StorageCode;
             model.Delimiter = config.Schema?.Delimiter;
             model.SchemaId = (config.Schema != null) ? config.Schema.SchemaId : 0;
             model.CreateCurrentView = (config.Schema != null) ? config.Schema.CreateCurrentView : false;
             model.HasHeader = (config.Schema != null) ? config.Schema.HasHeader : false;
-            model.OldSchemaId = (model.Schemas.Any()) ? model.Schemas.FirstOrDefault().DataElement_ID : 0;
             model.CLA1396_NewEtlColumns = (config.Schema != null) ? config.Schema.CLA1396_NewEtlColumns : false;
             model.CLA1580_StructureHive = (config.Schema != null) ? config.Schema.CLA1580_StructureHive : false;
             model.CLA2472_EMRSend = (config.Schema != null) ? config.Schema.CLA2472_EMRSend : false;

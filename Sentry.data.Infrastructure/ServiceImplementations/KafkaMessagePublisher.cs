@@ -124,7 +124,7 @@ namespace Sentry.data.Infrastructure
                     Producer p = Producer;
                 }
 
-                Logger.Info($"Publishing message - Topic:{KafkaHelper.GetDSCEventTopic()} Key:{key} Message:{value}");
+                Logger.Info($"Publishing message - Topic:{KafkaHelper.Get_Producer_Topic_For_DSCEvents()} Key:{key} Message:{value}");
 
                 _producer_str_str.ProduceAsync(topic, key, value, new ProducerDeliveryHandler());
 
@@ -145,7 +145,7 @@ namespace Sentry.data.Infrastructure
                     Producer p = Producer;
                 }
 
-                Logger.Info($"Publishing message - Topic:{KafkaHelper.GetDSCEventTopic()} Key:{key} Message:{value}");
+                Logger.Info($"Publishing message - Topic:{KafkaHelper.Get_Producer_Topic_For_DSCEvents()} Key:{key} Message:{value}");
 
                 await Task.Factory.StartNew(() => _producer_str_str.ProduceAsync(topic, key, value, new ProducerDeliveryHandler())).ConfigureAwait(false);
 
@@ -159,19 +159,18 @@ namespace Sentry.data.Infrastructure
 
         public void PublishDSCEvent(string key, string value)
         {
-            Publish(KafkaHelper.GetDSCEventTopic(), key, value);
+            Publish(KafkaHelper.Get_Producer_Topic_For_DSCEvents(), key, value);
         }
 
         public async Task PublishDSCEventAsync(string key, string value)
         {
-             await PublishAsync(KafkaHelper.GetDSCEventTopic(), key, value).ConfigureAwait(false);
+             await PublishAsync(KafkaHelper.Get_Producer_Topic_For_DSCEvents(), key, value).ConfigureAwait(false);
         }
         #endregion
         
         private static void LogSettings()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"UseConfluent: {KafkaHelper.UseConfluent()}");
             sb.AppendLine($"Brokers: {KafkaHelper.GetKafkaBrokers()}");
             sb.AppendLine($"UseSASL: {KafkaHelper.UseSASL()}");
             sb.AppendLine($"KerberosServiceName: {KafkaHelper.GetKerberosServiceName()}");

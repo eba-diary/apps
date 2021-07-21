@@ -16,5 +16,7 @@ namespace Sentry.data.Web
 
         public DaleResultModel DaleResultModel { get; set; }
 
-}
+        public DaleAdvancedCriteriaModel DaleAdvancedCriteria { get; set; }
+
+    }
 }

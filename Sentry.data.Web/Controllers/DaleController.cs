@@ -31,6 +31,8 @@ namespace Sentry.data.Web.Controllers
                 DaleSearchModel searchModel = new DaleSearchModel();
                 searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
                 searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
+                searchModel.DaleAdvancedCriteria = new DaleAdvancedCriteriaModel() { };
+
                 
                 if(String.IsNullOrEmpty(search))
                 {
@@ -115,13 +117,37 @@ namespace Sentry.data.Web.Controllers
         //}
 
         //use for ClientSide DataTable processing
-        public JsonResult GetSearchResultsClient(string searchCriteria, string destination, bool sensitive=false)
+        public JsonResult GetSearchResultsClient(string searchCriteria, 
+                                                string destination,
+                                                string asset,
+                                                string server,
+                                                string database,
+                                                string daleObject,
+                                                string objectType,
+                                                string column,
+                                                string sourceType,
+                                                bool sensitive=false
+         )
         {
             DaleSearchModel searchModel = new DaleSearchModel();
             searchModel.Criteria = searchCriteria;
             searchModel.Destiny = destination.ToDaleDestiny();
             searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
             searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
+
+            searchModel.DaleAdvancedCriteria = new DaleAdvancedCriteriaModel()
+            {
+                Asset = asset,
+                Server = server,
+                Database = database,
+                Object = daleObject,
+                ObjectType = objectType,
+                Column = column,
+                SourceType = sourceType
+            };
+
+
+
 
             if (sensitive && searchModel.CanDaleSensitiveView)
             {
@@ -162,16 +188,31 @@ namespace Sentry.data.Web.Controllers
             }
 
             //validate for white space only, null, empty string in criteria
-            if (String.IsNullOrWhiteSpace(model.Criteria))
+            if (model.Destiny != DaleDestiny.Advanced && String.IsNullOrWhiteSpace(model.Criteria))
             {
                 return false;
             }
 
             //validate to ensure valid destination
-            if ((model.Destiny != DaleDestiny.Object) && (model.Destiny != DaleDestiny.Column) && (model.Destiny != DaleDestiny.SAID))
+            if ((model.Destiny != DaleDestiny.Object) && (model.Destiny != DaleDestiny.Column) && (model.Destiny != DaleDestiny.SAID) && (model.Destiny != DaleDestiny.Advanced))
             {
                 return false;
             }
+
+            //validate that if advanced search is happening at least something is filled in
+            if (model.Destiny == DaleDestiny.Advanced
+                                    && (!model.DaleAdvancedCriteria.AssetIsValid)
+                                     && (!model.DaleAdvancedCriteria.ServerIsValid)
+                                     && (!model.DaleAdvancedCriteria.DatabaseIsValid)
+                                     && (!model.DaleAdvancedCriteria.ObjectIsValid)
+                                     && (!model.DaleAdvancedCriteria.ObjectTypeIsValid)
+                                     && (!model.DaleAdvancedCriteria.ColumnIsValid)
+                                     && (!model.DaleAdvancedCriteria.SourceTypeIsValid)
+                )
+            {
+                return false;
+            }
+
 
             return true;
         }
