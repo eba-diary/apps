@@ -80,7 +80,7 @@ namespace Sentry.data.Web
                 SaidKeyCode = model.SAIDAssetKeyCode,
                 CreatedBy = model.CreatedBy,
                 CreateDTM = model.CreatedDTM,
-                IngestionType = model.IngestionType,
+                IngestionType = model.IngestionTypeSelection,
                 IsCompressed = model.IsCompressed,
                 IsPreProcessingRequired = model.IsPreProcessingRequired,
                 PreProcessingOptions = model.PreprocessingOptions.Select(s => (DataFlowPreProcessingTypes)Enum.ToObject(typeof(DataFlowPreProcessingTypes), s)).ToList(),

@@ -145,7 +145,7 @@ namespace Sentry.data.Web.Helpers
 
         }
 
-        internal static IEnumerable<SelectListItem> BuildPreProcessingOptionsDropdown(List<int> preProcessingOptionSelections)
+        public static IEnumerable<SelectListItem> BuildPreProcessingOptionsDropdown(List<int> preProcessingOptionSelections)
         {
             List<SelectListItem> items = new List<SelectListItem>();
 
@@ -165,6 +165,29 @@ namespace Sentry.data.Web.Helpers
                     }).ToList());
             }
             return items;
+        }
+
+        public static IEnumerable<SelectListItem> BuildIngestionTypeDropdown(int ingestionTypeSelection)
+        {
+            List<SelectListItem> items = Enum.GetValues(typeof(IngestionType)).Cast<IngestionType>().Select(v =>
+                  new SelectListItem
+                  {
+                      Selected = (((int)(object)v).ToString() == ingestionTypeSelection.ToString()),
+                      Text = v.GetDescription(),
+                      Value = ((int)(object)v).ToString()
+                  }).ToList();
+
+            if (ingestionTypeSelection == 0)
+            {
+                items.Add(new SelectListItem
+                {
+                    Selected = true,
+                    Text = "Select Ingestion Type",
+                    Value = "0"
+                });
+            } 
+
+            return items.OrderBy(o => o.Value);
         }
 
         public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)

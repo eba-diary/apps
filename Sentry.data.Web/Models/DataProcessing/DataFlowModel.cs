@@ -53,6 +53,7 @@ namespace Sentry.data.Web
         public DateTime CreatedDTM { get; set; }
         public int DataFlowId { get; set; }
         public ObjectStatusEnum ObjectStatus { get; set; }
+        public int IngestionTypeSelection { get; set; }
 
 
 
@@ -60,6 +61,7 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> PreProcessingRequiredDropdown { get; set; }
         public IEnumerable<SelectListItem> PreProcessingOptionsDropdown { get; set; }
         public IEnumerable<SelectListItem> SAIDAssetDropDown { get; set; }
+        public IEnumerable<SelectListItem> IngestionTypeDropDown { get; set; }
         [DisplayName("Pre Processing Options")]
         public List<int> PreprocessingOptions { get; set; }
 

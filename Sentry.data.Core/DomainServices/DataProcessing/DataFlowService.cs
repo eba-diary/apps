@@ -531,10 +531,10 @@ namespace Sentry.data.Core
 
             switch (dto.IngestionType)
             {
-                case GlobalEnums.IngestionType.User_Push:
+                case (int)GlobalEnums.IngestionType.User_Push:
                     MapDataFlowStepsForPush(dto, df);
                     break;
-                case GlobalEnums.IngestionType.DSC_Pull:
+                case (int)GlobalEnums.IngestionType.DSC_Pull:
                     MapDataFlowStepsForPull(dto, df);
                     break;
                 default:
@@ -557,7 +557,8 @@ namespace Sentry.data.Core
                 SaidKeyCode = dto.SaidKeyCode,
                 ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
                 DeleteIssuer = dto.DeleteIssuer,
-                DeleteIssueDTM = DateTime.MaxValue
+                DeleteIssueDTM = DateTime.MaxValue,
+                IngestionType = dto.IngestionType
             };
 
             _datasetContext.Add(df);

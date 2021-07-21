@@ -26,6 +26,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.ObjectStatus, m => m.Column("ObjectStatus"));
             this.Property(x => x.DeleteIssuer, m => m.Column("DeleteIssuer"));
             this.Property(x => x.DeleteIssueDTM, m => m.Column("DeleteIssueDTM"));
+            this.Property(x => x.IngestionType, m => m.Column("IngestionType"));
 
             this.Bag(x => x.Steps, (m) =>
             {

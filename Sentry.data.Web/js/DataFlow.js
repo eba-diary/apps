@@ -108,7 +108,7 @@
     },
 
     InitIngestionType() {
-        var selection = $("[id$=IngestionType]").val();
+        var selection = $("[id$=IngestionTypeSelection]").val();
 
         if (selection === "2") {
             $('.namePanel').show();
@@ -145,7 +145,7 @@
             $('.formSubmitButtons').show();
         }            
 
-        $("[id$=IngestionType]").on('change', function () {
+        $("[id$=IngestionTypeSelection]").on('change', function () {
             var ingestionSelection = $(this).val();
             //if changing to Pull
             if (ingestionSelection === "2") {
@@ -188,7 +188,7 @@
 
     CancelIngestionSelection: function (e, item) {
         //from https://stackoverflow.com/a/28324400
-        var ingestionSelectBox = document.querySelector("[id$=IngestionType]");
+        var ingestionSelectBox = document.querySelector("[id$=IngestionTypeSelection]");
         switch (e) {
             case "1":
                 ingestionSelectBox.value = "2";
