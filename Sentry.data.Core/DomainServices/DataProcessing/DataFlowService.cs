@@ -559,7 +559,8 @@ namespace Sentry.data.Core
                 DeleteIssuer = dto.DeleteIssuer,
                 DeleteIssueDTM = DateTime.MaxValue,
                 IngestionType = dto.IngestionType,
-                IsDecompressionRequired = dto.IsCompressed
+                IsDecompressionRequired = dto.IsCompressed,
+                CompressionType = dto.CompressionType
             };
 
             _datasetContext.Add(df);
@@ -709,6 +710,7 @@ namespace Sentry.data.Core
             dto.DeleteIssueDTM = df.DeleteIssueDTM;
             dto.IngestionType = df.IngestionType;
             dto.IsCompressed = df.IsDecompressionRequired;
+            dto.CompressionType = df.CompressionType;
 
             List<SchemaMapDto> scmMapDtoList = new List<SchemaMapDto>();
             foreach (DataFlowStep step in df.Steps.Where(w => w.SchemaMappings != null && w.SchemaMappings.Any()))

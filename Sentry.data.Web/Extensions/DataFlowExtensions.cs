@@ -85,7 +85,7 @@ namespace Sentry.data.Web
                 IsPreProcessingRequired = model.IsPreProcessingRequired,
                 PreProcessingOptions = model.PreprocessingOptions.Select(s => (DataFlowPreProcessingTypes)Enum.ToObject(typeof(DataFlowPreProcessingTypes), s)).ToList(),
                 ObjectStatus = model.ObjectStatus
-            };            
+            };
 
             if (model.SchemaMaps != null)
             {
@@ -97,9 +97,15 @@ namespace Sentry.data.Web
                 dto.RetrieverJob = model.RetrieverJob.ToDto();
             }
 
-            if (model.CompressionJob != null)
+            if (model.IsCompressed)
             {
-                dto.CompressionJob = model.CompressionJob.First().ToDto();
+                CompressionJobDto cDto = model.CompressionJob.First().ToDto();
+                dto.CompressionJob = cDto;
+                dto.CompressionType = (int)cDto.CompressionType;
+            }
+            else
+            {
+                dto.CompressionType = null;
             }
 
             dto.DFQuestionnaire = JsonConvert.SerializeObject(dto);

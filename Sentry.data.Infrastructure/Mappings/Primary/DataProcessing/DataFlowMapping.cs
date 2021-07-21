@@ -28,6 +28,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.DeleteIssueDTM, m => m.Column("DeleteIssueDTM"));
             this.Property(x => x.IngestionType, m => m.Column("IngestionType"));
             this.Property(x => x.IsDecompressionRequired, m => m.Column("IsDecompressionRequired"));
+            this.Property(x => x.CompressionType, m => m.Column("CompressionType"));
 
             this.Bag(x => x.Steps, (m) =>
             {

@@ -325,6 +325,7 @@
     <None Include="Scripts\Post-Deploy\StaticData\ObjectStatus.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_03_06\CLA_2946_Initialize_DataFlow_IngestionType_Column.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_03_06\CLA_2946_Initialize_DataFlow_IsDecompressionRequired_Column.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_03_06\CLA_2946_Initialize_DataFlow_CompressionType_Column.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Sentry.data.Database.refactorlog" />
