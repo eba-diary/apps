@@ -12,6 +12,7 @@
     [DeleteIssuer] VARCHAR(10) NULL, 
     [DeleteIssueDTM] DATETIME NOT NULL, 
     [IngestionType] INT NULL, 
+    [IsDecompressionRequired] BIT NOT NULL, 
     CONSTRAINT [PK_DataFlow] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC

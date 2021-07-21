@@ -31,6 +31,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual ObjectStatusEnum ObjectStatus { get; set; }
         public virtual string DeleteIssuer { get; set; }
         public virtual DateTime DeleteIssueDTM { get; set; }
+        public virtual bool IsDecompressionRequired { get; set; }
 
         public virtual ValidationResults ValidateForDelete()
         {
@@ -54,33 +55,6 @@ namespace Sentry.data.Core.Entities.DataProcessing
             public const string nameMustBeUnique = "nameMustBeUnique";
             public const string stepsContainsAtLeastOneSchemaMap = "stepsContainsAtLeastOneSchemaMap";
             public const string saidAssetIsBlank = "saidAssetIsBlank";
-        }
-
-        private void LogMessage(string msg, Log_Level level,  Exception ex = null)
-        {
-            switch (level)
-            {
-                case Log_Level.Info:
-                    Logger.Info(msg);
-                    break;
-                case Log_Level.Warning:
-                    Logger.Warn(msg);
-                    break;
-                case Log_Level.Debug:
-                    Logger.Debug(msg);
-                    break;
-                default:
-                case Log_Level.Error:
-                    if (ex == null)
-                    {
-                        Logger.Error(msg);
-                    }
-                    else
-                    {
-                        Logger.Error(msg, ex);
-                    }
-                    break;
-            }
         }
     }
 }

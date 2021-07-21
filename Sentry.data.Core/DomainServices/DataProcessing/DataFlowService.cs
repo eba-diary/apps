@@ -558,7 +558,8 @@ namespace Sentry.data.Core
                 ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
                 DeleteIssuer = dto.DeleteIssuer,
                 DeleteIssueDTM = DateTime.MaxValue,
-                IngestionType = dto.IngestionType
+                IngestionType = dto.IngestionType,
+                IsDecompressionRequired = dto.IsCompressed
             };
 
             _datasetContext.Add(df);
@@ -706,6 +707,8 @@ namespace Sentry.data.Core
             dto.ObjectStatus = df.ObjectStatus;
             dto.DeleteIssuer = df.DeleteIssuer;
             dto.DeleteIssueDTM = df.DeleteIssueDTM;
+            dto.IngestionType = df.IngestionType;
+            dto.IsCompressed = df.IsDecompressionRequired;
 
             List<SchemaMapDto> scmMapDtoList = new List<SchemaMapDto>();
             foreach (DataFlowStep step in df.Steps.Where(w => w.SchemaMappings != null && w.SchemaMappings.Any()))

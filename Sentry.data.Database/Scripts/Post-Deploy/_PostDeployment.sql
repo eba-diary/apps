@@ -49,6 +49,8 @@ BEGIN TRY
 
   --insert one off script files here
   :r ..\Post-Deploy\SupportingScripts\Sprint_21_03_06\CLA_2946_Initialize_DataFlow_IngestionType_Column.sql
+  :r ..\Post-Deploy\SupportingScripts\Sprint_21_03_06\CLA_2946_Initialize_DataFlow_IsDecompressionRequired_Column.sql
+
 
   --insert into the verision table so these scripts do not run again.
   INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
