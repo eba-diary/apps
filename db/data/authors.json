@@ -1,0 +1,14 @@
+{
+    "authors":[
+        {
+            "family_name": "Andrews",
+            "middle_name": "B.",
+            "given_name": "Emma"
+        },
+        {
+            "family_name": "Testing",
+            "middle_name": "this",
+            "given_name": "data"
+        }
+    ]
+}

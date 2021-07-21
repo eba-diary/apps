@@ -6,8 +6,8 @@ TABLES = {}
 INDEX = {}
 
 TABLES['author'] = ("""CREATE TABLE IF NOT EXISTS author (
-                            id INT NOT NULL, 
-                            author_id INT PRIMARY KEY,
+                            id INTEGER NOT NULL,
+                            author_id INTEGER PRIMARY KEY AUTOINCREMENT,
                             given_name TEXT NOT NULL,
                             middle_name TEXT NULL,
                             family_name TEXT NOT NULL
@@ -18,14 +18,14 @@ INDEX['author_author_id'] = (
 )
 
 TABLES['diary'] = ("""CREATE TABLE IF NOT EXISTS diary (
-                            id INT NOT NULL,
-                            author_id INT NOT NULL,
-                            volume_id INT PRIMARY KEY NOT NULL,
+                            id INTEGER NOT NULL,
+                            author_id INTEGER NOT NULL,
+                            volume_id INTEGER PRIMARY KEY NOT NULL,
                             image TEXT NULL,
                             url TEXT NULL,
                             iiif_manifest TEXT NULL,
-                            date_first INT NULL,
-                            date_last INT NULL,
+                            date_first INTEGER NULL,
+                            date_last INTEGER NULL,
                             CONSTRAINT fk_diary
                                 FOREIGN KEY (author_id)
                                 REFERENCES author (author_id)
@@ -40,8 +40,8 @@ INDEX['diary_entry_id'] = (
 )
 
 TABLES['editor'] = ("""CREATE TABLE IF NOT EXISTS editor (
-                            id INT NOT NULL,
-                            editor_id PRIMARY KEY NOT NULL,
+                            id INTEGER NOT NULL,
+                            editor_id INTEGER PRIMARY KEY NOT NULL,
                             given_name TEXT,
                             family_name TEXT,
                             birth INT,
@@ -53,14 +53,14 @@ INDEX['editor_editor_id'] = (
 )
 
 TABLES['diary_entry'] = ("""CREATE TABLE IF NOT EXISTS diary_entry (
-                                id INT NOT NULL,
+                                id INTEGER NOT NULL,
                                 diary_entry_id PRIMARY KEY NOT NULL,
-                                editor_id INT NULL,
-                                volume_id INT NOT NULL,
-                                entry_date INT NOT NULL,
+                                editor_id INTEGER NULL,
+                                volume_id INTEGER NOT NULL,
+                                entry_date INTEGER NOT NULL,
                                 entry_txt TEXT NOT NULL,
                                 entry_tei TEXT NOT NULL,
-                                entry_setiment INT,
+                                entry_setiment INTEGER,
                                 CONSTRAINT fk_volume_id
                                     FOREIGN KEY (volume_id)
                                     REFERENCES diary (volume_id)
@@ -72,11 +72,11 @@ TABLES['diary_entry'] = ("""CREATE TABLE IF NOT EXISTS diary_entry (
                         );""")
 
 TABLES['sentences'] = ("""CREATE TABLE IF NOT EXISTS sentences (
-                            id INT NOT NULL,
-                            sent_id INT PRIMARY KEY NOT NULL,
-                            entry_id INT NOT NULL,
+                            id INTEGER NOT NULL,
+                            sent_id INTEGER PRIMARY KEY NOT NULL,
+                            entry_id INTEGER NOT NULL,
                             sent_text TEXT,
-                            sent_sentiment INT,
+                            sent_sentiment INTEGER,
                             CONSTRAINT fk_entry_id
                                 FOREIGN KEY (entry_id)
                                 REFERENCES diary_entry (entry_id)
@@ -88,9 +88,9 @@ INDEX['sentences'] = (
 )
 
 TABLES['tokens'] = ("""CREATE TABLE IF NOT EXISTS tokens (
-                            id INT NOT NULL,
-                            lemma_id INT PRIMARY KEY NOT NULL,
-                            sent_id INT NOT NULL,
+                            id INTEGER NOT NULL,
+                            lemma_id INTEGER PRIMARY KEY NOT NULL,
+                            sent_id INTEGER NOT NULL,
                             token TEXT,
                             lemma TEXT,
                             POS TEXT,
@@ -106,13 +106,13 @@ INDEX['tokens'] = (
 )
 
 TABLES['biography'] = ("""CREATE TABLE IF NOT EXISTS biography (
-                            id INT NOT NULL,
-                            bio_id INT PRIMARY KEY NOT NULL,
-                            person_id INT NOT NULL,
+                            id INTEGER NOT NULL,
+                            bio_id INTEGER PRIMARY KEY NOT NULL,
+                            person_id INTEGER NOT NULL,
                             biography TEXT NOT NULL,
                             image TEXT NULL,
-                            birth INT NULL,
-                            death INT NULL
+                            birth INTEGER NULL,
+                            death INTEGER NULL
                         );""")
 
 INDEX['biography'] = (
@@ -120,9 +120,9 @@ INDEX['biography'] = (
 )
 
 TABLES['people'] = ("""CREATE TABLE IF NOT EXISTS people (
-                            id INT PRIMARY KEY NOT NULL,
-                            person_id INT NULL,
-                            lemma_id INT NOT NULL,
+                            id INTEGER PRIMARY KEY NOT NULL,
+                            person_id INTEGER NULL,
+                            lemma_id INTEGER NOT NULL,
                             social_struct TEXT,
                             CONSTRAINT fk_person_id
                                 FOREIGN KEY (person_id)

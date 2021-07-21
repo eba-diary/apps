@@ -1,4 +1,4 @@
-default: remove_db make_db
+default: remove_db make_db populate_db
 
 remove_db:
 	@ echo 'Moving EBA.db to bin ...'
@@ -10,5 +10,7 @@ make_db:
 	@ python3 emma_sqlite.py
 	@ echo 'EBA.db is recreated'
 
-# Populate database
-# populate_db:
+populate_db:
+	@ echo 'Processing authors.json ...'
+	@ python3 authors.py
+	@ echo 'Authors were added to EBA.db'
