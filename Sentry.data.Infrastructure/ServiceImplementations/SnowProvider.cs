@@ -91,6 +91,7 @@ namespace Sentry.data.Infrastructure
             DataTable schema = dr.GetSchemaTable();
             DataTable dt = new DataTable();
 
+            Logger.Info("START  STEP 4.5:  SnowProvider.FillDataTable() BUILD COLUMNS");
             if (schema != null)
             {
                 foreach (DataRow r in schema.Rows)
@@ -102,6 +103,7 @@ namespace Sentry.data.Infrastructure
                 }
             }
 
+            Logger.Info("START  STEP 4.6:  SnowProvider.FillDataTable() BUILD ROWS");
             // Read rows from DataReader and populate the DataTable  with rows
             while (dr.Read())
             {
