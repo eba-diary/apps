@@ -62,10 +62,10 @@ namespace Sentry.data.Infrastructure
                     command.CommandTimeout = 1800;
 
                     connection.Open();
-                    Logger.Info("COMPLETE STEP 2:  SnowProvider.ExecuteQuery.ConnectionOpen()");
+                    Logger.Info("COMPLETE STEP 2:  SnowProvider.ExecuteQuery.ConnectionOpen()" + " Query:" + query);
 
                     System.Data.Common.DbDataReader reader = command.ExecuteReader();
-                    Logger.Info("COMPLETE STEP 3:  SnowProvider.ExecuteQuery.command.ExecuteReader()");
+                    Logger.Info("COMPLETE STEP 3:  SnowProvider.ExecuteQuery.command.ExecuteReader()" + " Query:" + query);
 
                     dt = FillDataTable(reader);
 
@@ -81,7 +81,7 @@ namespace Sentry.data.Infrastructure
                 throw;
             }
 
-            Logger.Info($"END  STEP 6: SnowProvider.ExecuteQuery()");
+            Logger.Info($"END  STEP 6: SnowProvider.ExecuteQuery()" + " Query:" + query);
             return dt;
         }
 
