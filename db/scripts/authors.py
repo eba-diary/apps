@@ -1,6 +1,6 @@
 import json
 import sqlite3
-import os
+
 
 # authors.json contains authors
 authors = '../data/authors.json'

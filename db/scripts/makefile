@@ -14,3 +14,4 @@ populate_db:
 	@ echo 'Processing authors.json ...'
 	@ python3 authors.py
 	@ echo 'Authors were added to EBA.db'
+	

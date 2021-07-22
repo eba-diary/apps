@@ -20,7 +20,7 @@ INDEX['author_author_id'] = (
 TABLES['diary'] = ("""CREATE TABLE IF NOT EXISTS diary (
                             id INTEGER NOT NULL,
                             author_id INTEGER NOT NULL,
-                            volume_id INTEGER PRIMARY KEY NOT NULL,
+                            volume_id INTEGER PRIMARY KEY AUTOINCREMENT,
                             image TEXT NULL,
                             url TEXT NULL,
                             iiif_manifest TEXT NULL,
@@ -41,7 +41,7 @@ INDEX['diary_entry_id'] = (
 
 TABLES['editor'] = ("""CREATE TABLE IF NOT EXISTS editor (
                             id INTEGER NOT NULL,
-                            editor_id INTEGER PRIMARY KEY NOT NULL,
+                            editor_id INTEGER PRIMARY KEY AUTOINCREMENT,
                             given_name TEXT,
                             family_name TEXT,
                             birth INT,
@@ -54,7 +54,7 @@ INDEX['editor_editor_id'] = (
 
 TABLES['diary_entry'] = ("""CREATE TABLE IF NOT EXISTS diary_entry (
                                 id INTEGER NOT NULL,
-                                diary_entry_id PRIMARY KEY NOT NULL,
+                                diary_entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
                                 editor_id INTEGER NULL,
                                 volume_id INTEGER NOT NULL,
                                 entry_date INTEGER NOT NULL,
@@ -73,7 +73,7 @@ TABLES['diary_entry'] = ("""CREATE TABLE IF NOT EXISTS diary_entry (
 
 TABLES['sentences'] = ("""CREATE TABLE IF NOT EXISTS sentences (
                             id INTEGER NOT NULL,
-                            sent_id INTEGER PRIMARY KEY NOT NULL,
+                            sent_id INTEGER PRIMARY KEY AUTOINCREMENT,
                             entry_id INTEGER NOT NULL,
                             sent_text TEXT,
                             sent_sentiment INTEGER,
