@@ -46,7 +46,7 @@ namespace Sentry.data.Infrastructure
 
         private System.Data.DataTable ExecuteQuery(string query)
         {
-            DataTable dt;
+            DataTable dt2 = new DataTable();
             string connectionString = Config.GetHostSetting("SnowConnectionString");
             Logger.Info("START STEP 1:  SnowProvider.ExecuteQuery() ConnectionString:" + connectionString + " Query:" + query);
 
@@ -67,7 +67,41 @@ namespace Sentry.data.Infrastructure
                     System.Data.Common.DbDataReader reader = command.ExecuteReader();
                     Logger.Info("COMPLETE STEP 3:  SnowProvider.ExecuteQuery.command.ExecuteReader()" + " Query:" + query);
 
-                    dt = FillDataTable(reader);
+                    //dt = FillDataTable(reader);
+
+                    Logger.Info("START  STEP 4:  SnowProvider.FillDataTable()");
+                    DataTable schema = reader.GetSchemaTable();
+
+
+
+                    Logger.Info("START  STEP 4.5:  SnowProvider.FillDataTable() BUILD COLUMNS");
+                    if (schema != null)
+                    {
+                        foreach (DataRow r in schema.Rows)
+                        {
+                            string columnName = System.Convert.ToString(r["ColumnName"]);
+                            DataColumn column = new DataColumn(columnName, (Type)(r["DataType"]));
+                            column.AllowDBNull = (bool)r["AllowDBNull"];
+                            dt2.Columns.Add(column);
+                        }
+                    }
+
+                    Logger.Info("START  STEP 4.6:  SnowProvider.FillDataTable() BUILD ROWS");
+                    // Read rows from DataReader and populate the DataTable  with rows
+                    while (reader.Read())
+                    {
+                        DataRow dataRow = dt2.NewRow();
+                        for (int i = 0; i < dt2.Columns.Count; i++)
+                        {
+                            dataRow[(dt2.Columns[i])] = reader[i];
+                        }
+
+                        dt2.Rows.Add(dataRow);
+                    }
+                    Logger.Info("END  STEP 5:  SnowProvider.FillDataTable()");
+
+
+
 
                     if (reader != null)
                     {
@@ -82,14 +116,14 @@ namespace Sentry.data.Infrastructure
             }
 
             Logger.Info($"END  STEP 6: SnowProvider.ExecuteQuery()" + " Query:" + query);
-            return dt;
+            return dt2;
         }
 
-        private DataTable FillDataTable(System.Data.Common.DbDataReader dr)
+        private DataTable FillDataTable(System.Data.Common.DbDataReader reader)
         {
             Logger.Info("START  STEP 4:  SnowProvider.FillDataTable()");
-            DataTable schema = dr.GetSchemaTable();
-            DataTable dt = new DataTable();
+            DataTable schema = reader.GetSchemaTable();
+            DataTable dt2 = new DataTable();
 
             Logger.Info("START  STEP 4.5:  SnowProvider.FillDataTable() BUILD COLUMNS");
             if (schema != null)
@@ -99,26 +133,26 @@ namespace Sentry.data.Infrastructure
                     string columnName = System.Convert.ToString(r["ColumnName"]);
                     DataColumn column = new DataColumn(columnName, (Type)(r["DataType"]));
                     column.AllowDBNull = (bool)r["AllowDBNull"];
-                    dt.Columns.Add(column);
+                    dt2.Columns.Add(column);
                 }
             }
 
             Logger.Info("START  STEP 4.6:  SnowProvider.FillDataTable() BUILD ROWS");
             // Read rows from DataReader and populate the DataTable  with rows
-            while (dr.Read())
+            while (reader.Read())
             {
-                DataRow dataRow = dt.NewRow();
-                for (int i = 0; i < dt.Columns.Count; i++)
+                DataRow dataRow = dt2.NewRow();
+                for (int i = 0; i < dt2.Columns.Count; i++)
                 {
-                    dataRow[(dt.Columns[i])] = dr[i];
+                    dataRow[(dt2.Columns[i])] = reader[i];
                 }
 
-                dt.Rows.Add(dataRow);
+                dt2.Rows.Add(dataRow);
             }
 
             Logger.Info("END  STEP 5:  SnowProvider.FillDataTable()");
 
-            return dt;
+            return dt2;
         }
 
         private System.Security.SecureString GetSecureString(string str)
