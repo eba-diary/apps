@@ -36,12 +36,13 @@ namespace Sentry.data.Infrastructure
 
         private string BuildSelectQuery(string db, string schema, string table, int rows)
         {
-            string selectMe = "SELECT DATE_PARTITION,ID,LEGACYID,EXTERNALCALLID,REPORTTYPE,CALLSOURCE,STARTED,CNVT_STARTED,COMPLETED,CNVT_COMPLETED,INITIALSOURCECODE,STARTEDBYUSERID,STARTEDBYUSERNAME,STARTEDBYUSERLOCATION,COMPLETEDBYUSERID,COMPLETEDBYUSERNAME,COMPLETEDBYUSERLOCATION,CREATED,CNVT_CREATED,LASTUPDATED,CNVT_LASTUPDATED,LASTUPDATEDBYUSERID,ISRECORDDELETED,CURRENTPAGEID,CLAIMNUMBER,ISESCALATED,DATESUBMITTED,CNVT_DATESUBMITTED,MESSAGEMETADATA,FNOLINFO,RAPIDFAXINFORMATIONCATEGORY,PERSONREPORTINGEXTERNAL,FACTSOFLOSS,WCFACTSOFLOSS,ACCTSEARCHMAIN,POLICYSEARCH,JOBCLASSCODECATEGORY,ACCTLOCATION,DUPLICATECLAIMSEARCHCATEGORY,PERSONREPORTING,RISKLOCATION,LOSSLOCATION,TRANSPORTATIONCATEGORY,INSUREDVEHICLECATEGORY,ESTIMATESUMMARY,INSUREDVEHICLEOWNERCATEGORY,INSUREDDRIVERCATEGORY,INSUREDVEHICLEPASSENGERSUMMARY,OTHERVEHICLESUMMARY,OTHERTHIRDPARTYSUMMARY,POLICEANDFIRE,CSCCLAIMCAT,HIDDENESCCATEGORY,COMMENTSREMARKS,SUBROGATIONLOOKUPRESULTS,ETL_FILE_NAME,ETL_FILE_NAME_ONLY,ETL_LOAD_DATE,CNVT_ETL_LOAD_DATE,ETL_LOAD_DTM,CNVT_ETL_LOAD_DTM,ETL_ORIG_LOAD_DATE,CNVT_ETL_ORIG_LOAD_DATE,ETL_ORIG_LOAD_DTM,CNVT_ETL_ORIG_LOAD_DTM,KAFKA_PARTITION,CNVT_KAFKA_PARTITION,KAFKA_OFFSET,CNVT_KAFKA_OFFSET,KAFKA_TIMESTAMP,CNVT_KAFKA_TIMESTAMP ";
-            rows = 10;
-            string fromMe = " FROM " + db + "." + schema + "." + table + " LIMIT " + rows.ToString();
-            return selectMe + fromMe;
+            //TODO: GORDON DELETE COMMENTS once working
+            //string selectMe = "SELECT DATE_PARTITION,ID,LEGACYID,EXTERNALCALLID,REPORTTYPE,CALLSOURCE,STARTED,CNVT_STARTED,COMPLETED,CNVT_COMPLETED,INITIALSOURCECODE,STARTEDBYUSERID,STARTEDBYUSERNAME,STARTEDBYUSERLOCATION,COMPLETEDBYUSERID,COMPLETEDBYUSERNAME,COMPLETEDBYUSERLOCATION,CREATED,CNVT_CREATED,LASTUPDATED,CNVT_LASTUPDATED,LASTUPDATEDBYUSERID,ISRECORDDELETED,CURRENTPAGEID,CLAIMNUMBER,ISESCALATED,DATESUBMITTED,CNVT_DATESUBMITTED,MESSAGEMETADATA,FNOLINFO,RAPIDFAXINFORMATIONCATEGORY,PERSONREPORTINGEXTERNAL,FACTSOFLOSS,WCFACTSOFLOSS,ACCTSEARCHMAIN,POLICYSEARCH,JOBCLASSCODECATEGORY,ACCTLOCATION,DUPLICATECLAIMSEARCHCATEGORY,PERSONREPORTING,RISKLOCATION,LOSSLOCATION,TRANSPORTATIONCATEGORY,INSUREDVEHICLECATEGORY,ESTIMATESUMMARY,INSUREDVEHICLEOWNERCATEGORY,INSUREDDRIVERCATEGORY,INSUREDVEHICLEPASSENGERSUMMARY,OTHERVEHICLESUMMARY,OTHERTHIRDPARTYSUMMARY,POLICEANDFIRE,CSCCLAIMCAT,HIDDENESCCATEGORY,COMMENTSREMARKS,SUBROGATIONLOOKUPRESULTS,ETL_FILE_NAME,ETL_FILE_NAME_ONLY,ETL_LOAD_DATE,CNVT_ETL_LOAD_DATE,ETL_LOAD_DTM,CNVT_ETL_LOAD_DTM,ETL_ORIG_LOAD_DATE,CNVT_ETL_ORIG_LOAD_DATE,ETL_ORIG_LOAD_DTM,CNVT_ETL_ORIG_LOAD_DTM,KAFKA_PARTITION,CNVT_KAFKA_PARTITION,KAFKA_OFFSET,CNVT_KAFKA_OFFSET,KAFKA_TIMESTAMP,CNVT_KAFKA_TIMESTAMP ";
+            //rows = 10;
+            //string fromMe = " FROM " + db + "." + schema + "." + table + " LIMIT " + rows.ToString();
+            //return selectMe + fromMe;
             
-            //return "SELECT * FROM " + db + "." + schema + "." + table + " LIMIT " + rows.ToString();
+            return "SELECT * FROM " + db + "." + schema + "." + table + " LIMIT " + rows.ToString();
         }
 
         private string BuildIfExistsQuery(string db, string schema, string table)
@@ -72,26 +73,7 @@ namespace Sentry.data.Infrastructure
                     System.Data.Common.DbDataReader reader = command.ExecuteReader();
                     Logger.Info("COMPLETE STEP 3:  SnowProvider.ExecuteQuery.command.ExecuteReader()" + " Query:" + query);
 
-                    //dt = FillDataTable(reader);
-
-                    Logger.Info("STEP 4:  SnowProvider.ExecuteQuery() GetSchemaTable");
-                    DataTable schema = reader.GetSchemaTable();
-                    
-
-                    Logger.Info("START  STEP 4.5:  SnowProvider.FillDataTable() BUILD COLUMNS");
-                    if (schema != null)
-                    {
-                        foreach (DataRow r in schema.Rows)
-                        {
-                            string columnName = System.Convert.ToString(r["ColumnName"]);
-                            DataColumn column = new DataColumn(columnName, (Type)(r["DataType"]));
-                            column.AllowDBNull = (bool)r["AllowDBNull"];
-                            dt.Columns.Add(column);
-                        }
-                    }
-                    Logger.Info("STEP 4:  SnowProvider.ExecuteQuery() dt.Load START");
-                    dt.Load(reader);
-                    Logger.Info("STEP 5:  SnowProvider.ExecuteQuery() dt.Load END");
+                    dt = FillDataTable(reader);
 
                     if (reader != null)
                     {
@@ -111,9 +93,9 @@ namespace Sentry.data.Infrastructure
 
         private DataTable FillDataTable(System.Data.Common.DbDataReader reader)
         {
-            Logger.Info("START  STEP 4:  SnowProvider.FillDataTable()");
+            DataTable dt = new DataTable();
+            Logger.Info("STEP 4 START:  SnowProvider.FillDataTable()");
             DataTable schema = reader.GetSchemaTable();
-            DataTable dt2 = new DataTable();
 
             Logger.Info("START  STEP 4.5:  SnowProvider.FillDataTable() BUILD COLUMNS");
             if (schema != null)
@@ -123,26 +105,15 @@ namespace Sentry.data.Infrastructure
                     string columnName = System.Convert.ToString(r["ColumnName"]);
                     DataColumn column = new DataColumn(columnName, (Type)(r["DataType"]));
                     column.AllowDBNull = (bool)r["AllowDBNull"];
-                    dt2.Columns.Add(column);
+                    dt.Columns.Add(column);
                 }
             }
 
-            Logger.Info("START  STEP 4.6:  SnowProvider.FillDataTable() BUILD ROWS");
-            // Read rows from DataReader and populate the DataTable  with rows
-            while (reader.Read())
-            {
-                DataRow dataRow = dt2.NewRow();
-                for (int i = 0; i < dt2.Columns.Count; i++)
-                {
-                    dataRow[(dt2.Columns[i])] = reader[i];
-                }
+            Logger.Info("STEP 4.6:  SnowProvider.ExecuteQuery() dt.Load START");
+            dt.Load(reader);
 
-                dt2.Rows.Add(dataRow);
-            }
-
-            Logger.Info("END  STEP 5:  SnowProvider.FillDataTable()");
-
-            return dt2;
+            Logger.Info("STEP 4.7 END:  SnowProvider.FillDataTable()");
+            return dt;
         }
 
         private System.Security.SecureString GetSecureString(string str)
