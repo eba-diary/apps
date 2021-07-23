@@ -39,6 +39,8 @@ namespace Sentry.data.Web
         public bool IsCompressed { get; set; }
 
         public bool IsPreProcessingRequired { get; set; }
+        [DisplayName("Pre Processing Options")]
+        public int PreProcessingSelection { get; set; }
         /// <summary>
         /// Target
         /// </summary>
@@ -109,7 +111,7 @@ namespace Sentry.data.Web
                 }
             }
 
-            if (IsPreProcessingRequired && PreprocessingOptions.Count == 1 && PreprocessingOptions.First() == 0)
+            if (IsPreProcessingRequired && PreProcessingSelection == 0)
             {
                 results.Add("PreprocessingOptions", "Pre Processing selection is required");
             }

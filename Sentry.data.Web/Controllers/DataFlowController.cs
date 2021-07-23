@@ -77,7 +77,7 @@ namespace Sentry.data.Web.Controllers
             DataFlowModel model = new DataFlowModel();
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
-            model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreprocessingOptions);
+            model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
             model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);
 
             CreateDropDownSetup(model.RetrieverJob);
@@ -140,7 +140,7 @@ namespace Sentry.data.Web.Controllers
 
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
-            model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreprocessingOptions);
+            model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
             model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);
             if (model.RetrieverJob != null)
             {

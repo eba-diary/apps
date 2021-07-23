@@ -89,8 +89,8 @@
             <div class="form-group col-md-12 preProcessingJobPanel" style="display:none;">
                 @* PreProcessing Options *@
                 <div class="form-group">
-                    @Html.LabelFor((model) => model.PreprocessingOptions, new { @class = "control-label col-md-5" })
-                    <div class="col-md-4">
+                    @Html.LabelFor((model) => model.PreProcessingSelection, new { @class = "control-label col-md-5" })
+                    @*<div class="col-md-4">
                         <select id="PreprocessingOptions" name="PreprocessingOptions" class="form-control edit-dataset-row" style="width:100%">
                             @foreach (var item in Model.PreProcessingOptionsDropdown)
                             {
@@ -98,6 +98,12 @@
                             }
                         </select>
                         @Html.ValidationMessageFor((model) => model.PreprocessingOptions, "", new { @class = "text-danger" })
+                    </div>*@
+                    <div class="col-md-4">
+                        @Html.DropDownListFor(
+                            x => x.PreProcessingSelection,
+                            Model.PreProcessingOptionsDropdown,
+                            new { @class = "selectpicker" })
                     </div>
                 </div>
             </div>

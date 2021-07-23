@@ -560,7 +560,9 @@ namespace Sentry.data.Core
                 DeleteIssueDTM = DateTime.MaxValue,
                 IngestionType = dto.IngestionType,
                 IsDecompressionRequired = dto.IsCompressed,
-                CompressionType = dto.CompressionType
+                CompressionType = dto.CompressionType,
+                IsPreProcessingRequired = dto.IsPreProcessingRequired,
+                PreProcessingOption = (int)dto.PreProcessingOption
             };
 
             _datasetContext.Add(df);
@@ -599,19 +601,16 @@ namespace Sentry.data.Core
 
             if (dto.IsPreProcessingRequired)
             {
-                foreach (DataFlowPreProcessingTypes item in dto.PreProcessingOptions)
+                switch (dto.PreProcessingOption)
                 {
-                    switch (item)
-                    {
-                        case DataFlowPreProcessingTypes.googleapi:
-                            AddDataFlowStep(dto, df, DataActionType.GoogleApi);
-                            break;
-                        case DataFlowPreProcessingTypes.claimiq:
-                            AddDataFlowStep(dto, df, DataActionType.ClaimIq);
-                            break;
-                        default:
-                            break;
-                    }
+                    case (int)DataFlowPreProcessingTypes.googleapi:
+                        AddDataFlowStep(dto, df, DataActionType.GoogleApi);
+                        break;
+                    case (int)DataFlowPreProcessingTypes.claimiq:
+                        AddDataFlowStep(dto, df, DataActionType.ClaimIq);
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -647,20 +646,17 @@ namespace Sentry.data.Core
             }
 
             if (dto.IsPreProcessingRequired)
-            {
-                foreach (DataFlowPreProcessingTypes item in dto.PreProcessingOptions)
+            {                
+                switch (dto.PreProcessingOption)
                 {
-                    switch (item)
-                    {
-                        case DataFlowPreProcessingTypes.googleapi:
-                            AddDataFlowStep(dto, df, DataActionType.GoogleApi);
-                            break;
-                        case DataFlowPreProcessingTypes.claimiq:
-                            AddDataFlowStep(dto, df, DataActionType.ClaimIq);
-                            break;
-                        default:
-                            break;
-                    }
+                    case (int)DataFlowPreProcessingTypes.googleapi:
+                        AddDataFlowStep(dto, df, DataActionType.GoogleApi);
+                        break;
+                    case (int)DataFlowPreProcessingTypes.claimiq:
+                        AddDataFlowStep(dto, df, DataActionType.ClaimIq);
+                        break;
+                    default:
+                        break;
                 }
             }
 
