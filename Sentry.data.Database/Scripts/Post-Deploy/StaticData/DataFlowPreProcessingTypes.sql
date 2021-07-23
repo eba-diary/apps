@@ -5,7 +5,7 @@
           (1,	'googleapi', 'Google API'),
 		  (2,	'claimiq', 'Claim IQ')
         )
-        AS Source ([ID])
+        AS Source ([ID], [Name], [Description])
         ON Target.[ID] = Source.[ID]   
         -- update matched rows    
         WHEN MATCHED THEN 

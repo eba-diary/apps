@@ -5,7 +5,7 @@
           (0,	'ZIP', null),
 		  (1,	'GZIP', null)
         )
-        AS Source ([ID])
+        AS Source ([ID], [Name], [Description])
         ON Target.[ID] = Source.[ID]   
         -- update matched rows    
         WHEN MATCHED THEN 
