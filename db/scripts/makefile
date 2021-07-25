@@ -1,4 +1,4 @@
-default: remove_db make_db populate_db
+default: remove_db make_db populate_db get_biographies
 
 remove_db:
 	@ echo 'Moving EBA.db to bin ...'
@@ -17,3 +17,6 @@ populate_db:
 	@ echo 'Processing diaries.json ...'
 	@ python3 diary.py
 	@ echo 'Diaries were added to EBA.db'
+
+get_biographies:
+	@ echo 'Fetching biographies from gsheets ...'

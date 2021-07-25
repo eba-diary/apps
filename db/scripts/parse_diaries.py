@@ -79,14 +79,14 @@ def process_diary(args):
 
 def main(argv):
     """
-    Preprocess the diaries by selected volume
+    Preprocess the diaries by selected volume. Enter a volume number for
+    a valid argument.
+
     :volume_num: volumes 1–19
     """
     parser = argparse.ArgumentParser()
-
     parser.add_argument('volume_num', help='Enter a volume number: 1–19')
     args = parser.parse_args()
-
     process_diary(args)
 
 

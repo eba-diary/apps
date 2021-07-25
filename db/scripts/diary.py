@@ -2,10 +2,13 @@ import json
 import sqlite3
 from queries import author
 
+# Static Files
 diaries = '../data/diaries.json'
 DB_NAME = 'EBA.db'
 
+# Specify the Author
 author = author("Andrews")
+# Get db author_id for foreign key
 author_id = author[0][0]
 volume_id = 1
 
