@@ -107,10 +107,13 @@ INDEX['tokens'] = (
 
 TABLES['biography'] = ("""CREATE TABLE IF NOT EXISTS biography (
                             id INTEGER NOT NULL,
-                            bio_id INTEGER PRIMARY KEY NOT NULL,
+                            bio_id INTEGER PRIMARY KEY AUTOINCREMENT,
                             person_id INTEGER NOT NULL,
-                            biography TEXT NOT NULL,
+                            persName TEXT NULL,
+                            biography TEXT NULL,
                             image TEXT NULL,
+                            occupation TEXT NULL,
+                            birth_place TEXT NULL,
                             birth INTEGER NULL,
                             death INTEGER NULL
                         );""")
