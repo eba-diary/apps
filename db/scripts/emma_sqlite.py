@@ -114,6 +114,7 @@ TABLES['biography'] = ("""CREATE TABLE IF NOT EXISTS biography (
                             image TEXT NULL,
                             occupation TEXT NULL,
                             birth_place TEXT NULL,
+                            death_place TEXT NULL,
                             birth INTEGER NULL,
                             death INTEGER NULL
                         );""")
