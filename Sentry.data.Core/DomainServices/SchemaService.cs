@@ -648,9 +648,9 @@ namespace Sentry.data.Core
             }
 
             string vwVersion = "vw_" + schemaDto.SnowflakeTable;
-            bool tableExists = _snowProvider.CheckIfExists(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion);     //Does table exist
+            //bool tableExists = _snowProvider.CheckIfExists(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion);     //Does table exist
+            bool tableExists = true;     //TODO:  GORDON REMOVE HARDCODE
 
-            
             //If table does not exist
             if (!tableExists)
             {
