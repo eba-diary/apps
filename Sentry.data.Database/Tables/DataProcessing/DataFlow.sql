@@ -15,7 +15,7 @@
     [IsDecompressionRequired] BIT NOT NULL, 
     [CompressionType] INT NULL, 
     [IsPreProcessingRequired] BIT NOT NULL, 
-    [PreProcessingOptions] INT NULL, 
+    [PreProcessingOption] INT NULL, 
     CONSTRAINT [PK_DataFlow] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
