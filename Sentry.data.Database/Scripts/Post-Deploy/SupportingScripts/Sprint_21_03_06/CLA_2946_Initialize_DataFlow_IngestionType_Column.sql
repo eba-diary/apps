@@ -16,7 +16,7 @@ where
 
 /*select * into #DataFlowTest from Dataflow*/
 
-IF OBJECT_ID('tempdb..#results') IS NOT NULL DROP TABLE #results
+IF OBJECT_ID('tempdb..#PushPullresults') IS NOT NULL DROP TABLE #PushPullresults
 select
 CASE
 	WHEN x.DF_ID is not null THEN 'PULL'
@@ -27,26 +27,26 @@ CASE
 	ELSE 1
 END as 'Push_Pull_Id',
 DF.Id as 'DF_Id'
-into #results
+into #PushPullresults
 from DataFlow DF
 left join #PullDataFlows x on
 	DF.Id = x.DF_ID
 order by DF.Id desc
 
-DECLARE @ExpectedCount int = (select count(*) from DataFlow)
-DECLARE @ActualCount int = (Select count(*) from #results)
+DECLARE @PushPull_ExpectedCount int = (select count(*) from DataFlow)
+DECLARE @PushPull_ActualCount int = (Select count(*) from #PushPullresults)
 
-if (@ExpectedCount = @ActualCount)
+if (@PushPull_ExpectedCount = @PushPull_ActualCount)
 BEGIN
-	PRINT 'Updating ' + CAST(@ExpectedCount as varchar(max)) + ' records'
+	PRINT 'Updating ' + CAST(@PushPull_ExpectedCount as varchar(max)) + ' records'
 	Update DataFlow
 	set IngestionType = Push_Pull_Id
-	from #results
+	from #PushPullresults
 	where id = DF_Id
 END
 ELSE
 BEGIN
-	PRINT 'Update did not execute since ExpectedCount (' + CAST(@ExpectedCount as varchar(max)) + ') did not match ActualCount (' + CAST(@ActualCount as varchar(max)) + ')'
+	PRINT 'Update did not execute since ExpectedCount (' + CAST(@PushPull_ExpectedCount as varchar(max)) + ') did not match ActualCount (' + CAST(@PushPull_ActualCount as varchar(max)) + ')'
 END
 
 

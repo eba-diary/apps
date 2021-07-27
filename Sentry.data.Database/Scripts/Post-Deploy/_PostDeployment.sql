@@ -69,8 +69,8 @@ BEGIN CATCH
   
     RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState ); 
   
-    ROLLBACK TRAN 
-    RETURN
+    ROLLBACK TRAN; 
+    RETURN;
 END CATCH 
 
 COMMIT TRAN
