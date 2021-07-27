@@ -40,7 +40,7 @@ BEGIN
 	Update DataFlow
 	set IsPreProcessingRequired = New_Value_PreProcessingRequired,
 		PreProcessingOption = New_Value_PreProcessingOption
-	from #Updates
+	from #PreProcessingRequired_Updates
 	where id = DF_Id
 END
 ELSE
