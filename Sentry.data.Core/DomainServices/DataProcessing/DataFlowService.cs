@@ -956,6 +956,8 @@ namespace Sentry.data.Core
 
         private DataFlow MapToDataFlow(FileSchema scm)
         {
+            // This method maps Schema flow for given dataset schema
+            //   The assumption is these dataflows are always of type DSC Push
             DataFlow df = new DataFlow
             {
                 Id = 0,
@@ -964,7 +966,8 @@ namespace Sentry.data.Core
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
                 FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE(),
                 DeleteIssueDTM = DateTime.MaxValue,
-                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
+                ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
+                IngestionType = (int)GlobalEnums.IngestionType.User_Push
             };
 
             _datasetContext.Add(df);
