@@ -165,7 +165,7 @@
           <date when="1903-12-22">Tuesday, Dec. 22</date>.
           <meaure type="distance">13 miles</measure>.
         </dateline>
-          <p>A day of little wind - tracking and polling, - the river like glass much of time - a thick mist this morning which did not entirely disappear all day - and is thick again this evening. The warmest day we have had - are about <measure ="distance">4-4-1/2 miles</measure> above <placeName>Beni Hassan</placeName>.</p>
+          <p>A day of little wind - tracking and polling, - the river like glass much of time - a thick mist this morning which did not entirely disappear all day - and is thick again this evening. The warmest day we have had - are about <measure ="distance">4-4-1/2 miles</measure> above <placeName ref="">Beni Hassan</placeName>.</p>
       </div>
       <div xml:id="EBA-1903-12-23">
         <datline>
@@ -239,7 +239,7 @@
           <date when="1904-01-02">Saturday, Jan. 2</date>. <placeName ref="#Luxor">Luxor</placeName>. 
           <measure type="distance">24-1/2 miles</measure>.
         </dateline>
-          <p>We have worked today with all kinds of winds, creeping into <placeName>Luxor</placeName> as usual, and about 5:30 tying up opposite the town - it being too dark to select a permanent place. Just 21 days from <placeName ref="#Cairo">Cairo</placeName>.</p> 
+          <p>We have worked today with all kinds of winds, creeping into <placeName ref="#Luxor">Luxor</placeName> as usual, and about 5:30 tying up opposite the town - it being too dark to select a permanent place. Just 21 days from <placeName ref="#Cairo">Cairo</placeName>.</p> 
       <div xml:id="EBA-1904-01-03">
         <dateline>
           <date when="1904-01-03">Jan. 3d.</date> 2d Sunday after <name type="event" ref="Christmas">Xmas</name>.
@@ -314,7 +314,7 @@
         <dateline>
           <date when="1904-01-22">Thursday, Jan. 21st</date>.
         </dateline>
-          <p>We all rode into <placeName>Luxor</placeName> this morning - made visits - shopped etc. <persName ref="#Hardy_Jean">Jean</persName> and I went to see <persName>Miss Buchanan.</persName> Went to <placeName>Yussef Hassans</placeName> garden - where Mr. <persName>Newberry</persName> is going to entertain the Royal party at an <orgName>Arab</orgName> dinner tonight. The Princess and her children are coming here tomorrow - in a perfectly informal way to see the boat. Friday, Jan. 22d. The Royal party departed suddenly for <persName>Asw&#226;n</persName> this morning - as the young Prince grew so much worse. He has the same unusual disease that his <orgName>[illegible],</orgName> for whom he was named, the Duke of <placeName>Albany,</placeName> suffered from - a weakness of the blood vessels. This poor boy, when Mr. <persName>Newberry</persName> says, is very bright and sweet, has been in bed for days, suffering much.</p>
+          <p>We all rode into <placeName ref="#Luxor">Luxor</placeName> this morning - made visits - shopped etc. <persName ref="#Hardy_Jean">Jean</persName> and I went to see <persName>Miss Buchanan.</persName> Went to <placeName>Yussef Hassans</placeName> garden - where Mr. <persName>Newberry</persName> is going to entertain the Royal party at an <orgName>Arab</orgName> dinner tonight. The Princess and her children are coming here tomorrow - in a perfectly informal way to see the boat. Friday, Jan. 22d. The Royal party departed suddenly for <persName>Asw&#226;n</persName> this morning - as the young Prince grew so much worse. He has the same unusual disease that his <orgName>[illegible],</orgName> for whom he was named, the Duke of <placeName>Albany,</placeName> suffered from - a weakness of the blood vessels. This poor boy, when Mr. <persName>Newberry</persName> says, is very bright and sweet, has been in bed for days, suffering much.</p>
       </div>
       <div xml:id="EBA-1904-01-25">
         <dateline>
@@ -373,7 +373,7 @@
         <dateline>
           <date when="1904-02-06">Saturday, Feb. 6</date>.
         </dateline>
-          <p>A warm day - <persName ref="#Davis_Theodore_M">Theo</persName> still confined to boat - <persName>Carter</persName> and <persName>Newberry</persName> to lunch. The <persName>Stimson</persName> girls came over at 4 - and went with <persName>Robert</persName> to <persName>Der el-Bahari.</persName> <persName>Carter</persName> came back late in the afternoon and said that a staircase had been found leading down from the chamber.</p>
+          <p>A warm day - <persName ref="#Davis_Theodore_M">Theo</persName> still confined to boat - <persName>Carter</persName> and <persName>Newberry</persName> to lunch. The <persName>Stimson</persName> girls came over at 4 - and went with <persName>Robert</persName> to <persName>Der el-Bahari</persName>. <persName>Carter</persName> came back late in the afternoon and said that a staircase had been found leading down from the chamber.</p>
       </div>
       <div xml:id="EBA-1904-02-09">
         <dateline>
@@ -404,7 +404,7 @@
           <name type="event" ref="#Quinquagesima">Quinquagesima</name> </date when="1904-03-14">Sunday, Feb. 14</date>.
           <measure ="distance">4 miles</measure>.
         </dateline>
-          <p><persName>Bob Tytus</persName> came on board about 7 this morning en route for <persName>Luxor.</persName> I did not see him. It has been cold and windy - a white atmosphere, filled with sand! not a bit agreeable.</p> 
+          <p><persName>Bob Tytus</persName> came on board about 7 this morning en route for <placeName ref="#Luxor">Luxor</placeName>. I did not see him. It has been cold and windy - a white atmosphere, filled with sand! not a bit agreeable.</p> 
       </div>
       <div xml:id="EBA-1904-03-14">
         <dateline>
@@ -476,7 +476,7 @@
           <date when="1904-02-25">Thursday, Feb. 25</date>.
           <measure type="distance">31-1/2 miles</measure>.
         </dateline>
-          <p>Began rowing at 6:30 and now at 8 P.M. are lying within <measure type="distance">3 miles</measure> of Luxor. We have passed along one of the most beautiful stretches of the river today.</p>
+          <p>Began rowing at 6:30 and now at 8 P.M. are lying within <measure type="distance">3 miles</measure> of <placeName ref="#Luxor">Luxor</placeName>. We have passed along one of the most beautiful stretches of the river today.</p>
       </div>
       <div xml:id="EBA-1904-02-26">
         <dateline>
@@ -488,7 +488,7 @@
         <dateline>
           <date when="1904-02-27">Saturday, Feb. 27</date>.
         </dateline>
-          <p>Mr. <persName>Newberry</persName> turned up again this morning - and came over from <placeName>Luxor</placeName> with <persName ref="#Davis_Theodore_M">Theo</persName> for lunch. He is very full of a desert journey he is going to make with the Royal party. They all come down from <persName>Asw&#226;n</persName> except the young Prince and his doctor, who stays there, on Monday, and go off their donkeys immediately, for an hour and a half to <placeName>Medimut</placeName> where their caravan is encamped. They go to <placeName>Kosseir</placeName> on the <placeName>Red Sea,</placeName> and will be gone in 14 days. <persName>Mahommed Salah</persName> is their dragoman. He was here last night in great glee, telling us about it. He has the whole charge of it and is well accustomed to these expeditions. He has 45 camels, as well as donkeys and a number of tents. I should so like such a journey! <persName ref="#Davis_Theodore_M">Theo</persName> and <persName>Robert</persName> went to <placeName>Karnak</placeName> this afternoon and <persName ref="#Hardy_Jean">Jean</persName> and I went to have tea with <persName>Newberry</persName> at the <placeName>Luxor</placeName> Hotel. <persName>Carter</persName> arrived from <placeName>Asw&#226;n</placeName> in time to join us.</p>
+          <p>Mr. <persName>Newberry</persName> turned up again this morning - and came over from <placeName ref="#Luxor">Luxor</placeName> with <persName ref="#Davis_Theodore_M">Theo</persName> for lunch. He is very full of a desert journey he is going to make with the Royal party. They all come down from <persName>Asw&#226;n</persName> except the young Prince and his doctor, who stays there, on Monday, and go off their donkeys immediately, for an hour and a half to <placeName>Medimut</placeName> where their caravan is encamped. They go to <placeName>Kosseir</placeName> on the <placeName>Red Sea,</placeName> and will be gone in 14 days. <persName>Mahommed Salah</persName> is their dragoman. He was here last night in great glee, telling us about it. He has the whole charge of it and is well accustomed to these expeditions. He has 45 camels, as well as donkeys and a number of tents. I should so like such a journey! <persName ref="#Davis_Theodore_M">Theo</persName> and <persName>Robert</persName> went to <placeName>Karnak</placeName> this afternoon and <persName ref="#Hardy_Jean">Jean</persName> and I went to have tea with <persName>Newberry</persName> at the <placeName>Luxor Hotel</placeName>. <persName>Carter</persName> arrived from <placeName>Asw&#226;n</placeName> in time to join us.</p>
       </div>
       <div xml:id="EBA-1904-02-28">
         <dateline>
@@ -630,14 +630,14 @@
       </div>
       <div xml:id="EBA-1904-">
         <dateline>
-          Fifth Sunday in <placeName>Lent,</placeName> <date when="1904-">March 20.</date>
+          Fifth Sunday in <name type="event" ref="#Lent">Lent</name>, <date when="1904-">March 20</date>.
           <measure type="distance">83-1/2 miles</measure>.
         </dateline>
           <p>A very uncomfortable day of heat - a good south wind too all the way - until late in the afternoon. These last few days of heat and haze have seemed very like a mild <orgName>Khamseen</orgName> - and are rather oppressive - and such singular colouring - and no sunshine. A pallid atmosphere - and desert, rocks and river a sepia brown - with the trees and crops a vivid green, almost lurid green. At one sport, a mass of white and mauve poppies standing in a row amongst the green bearded wheat, was really too lovely. We are lying opposite Benisoef.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-03-21">
         <dateline>
-          <date when="1904-">Monday, March 21</date>.
+          <date when="1904-1904-03-21">Monday, March 21</date>.
           <measure type="distance">58 miles</measure>. 
         </dateline>
           <p>Bedrasheyn. The wind blew hard and cool all day - we drew here a little after 2 o'clock - and sent the tug "Anubis" on to <<placeName ref="#Cairo">Cairo</placeName>. It was the best tug and the best Captain we have ever had. <persName>Theron,</persName> the <persName>Baron</persName> and <persName ref="#Hardy_Jean">Jean</persName> took donkeys and rode as far as the <orgName>Ramesis</orgName> colussus.</p>
@@ -646,20 +646,20 @@
         <dateline>
           <name>Bedrasheyn</name> - <date when="1904-">Tuesday, Mar. 22</date>. 
         </dateline>
-          <p>All went off to <placeName>Sakkara</placeName> for the day - I in my chair with two excellent donkeys. It was a dark cool day, with high wind - just such a day as last year when we were here - but that was at the beginning of the winter - and now this richly cultivated country is brilliantly green with crops - the wheat in full head. We lunched as usual at <placeName>Mariettes</placeName> house on the terrace, which was dismally cold, and we were covered with sand. Unfortunately Mr. <persName>Weigall</persName> who is working there had elected to go to <placeName ref="#Cairo">Cairo</placeName> for the day, so we missed him. <persName>v. Bissing</persName> is publishing some of the <placeName>Sakkara</placeName> tombs and <persName>Weigall</persName> is doing the photographing - he has been here all winter, and the work will take yet 5 years to complete it. After lunch we went to the tomb of <orgName>Ka-gem-na,</orgName> which I had never seen before. <persName>V. Bissing</persName> has had this lighted from above, as <placeName>Ti's</placeName> tomb is lighted, and the very charming decoration can be well seen. This tomb was discovered in 1893. Then we went to the street of <persName>Tombs,</persName> discovered by <persName>Loret</persName> in 1899 - and found it very interesting. The others went down to <persName>Meri's</persName> tomb, but I started home. <persName>V. Bissing</persName> took the 8:40 train to <placeName ref="#Cairo">Cairo</placeName>.</p>
+          <p>All went off to <placeName>Sakkara</placeName> for the day - I in my chair with two excellent donkeys. It was a dark cool day, with high wind - just such a day as last year when we were here - but that was at the beginning of the winter - and now this richly cultivated country is brilliantly green with crops - the wheat in full head. We lunched as usual at <placeName>Mariettes</placeName> house on the terrace, which was dismally cold, and we were covered with sand. Unfortunately <persName>Mr. Weigall</persName> who is working there had elected to go to <placeName ref="#Cairo">Cairo</placeName> for the day, so we missed him. <persName>v. Bissing</persName> is publishing some of the <placeName>Sakkara</placeName> tombs and <persName>Weigall</persName> is doing the photographing - he has been here all winter, and the work will take yet 5 years to complete it. After lunch we went to the tomb of <orgName>Ka-gem-na,</orgName> which I had never seen before. <persName>V. Bissing</persName> has had this lighted from above, as <placeName>Ti's</placeName> tomb is lighted, and the very charming decoration can be well seen. This tomb was discovered in 1893. Then we went to the street of <persName>Tombs,</persName> discovered by <persName>Loret</persName> in 1899 - and found it very interesting. The others went down to <persName>Meri's</persName> tomb, but I started home. <persName>V. Bissing</persName> took the 8:40 train to <placeName ref="#Cairo">Cairo</placeName>.</p>
       </div>
       <div xml:id="EBA-1904-">
         <dateline>
           <date when="1904-">Wednesday, Mar. 23</date>.
           <measure type="distance">6 miles</measure>. 
         </dateline>
-          <p>We started early, and got about opposite <persName>Tura,</persName> when we were obliged to anchor in mid stream and there we lay until 6 o'clock P.M. The wind blowing a gale all day. We had 2 anchors out and the waves were really big.</p>
+          <p>We started early, and got about opposite <persName>Tura</persName>, when we were obliged to anchor in mid stream and there we lay until 6 o'clock P.M. The wind blowing a gale all day. We had 2 anchors out and the waves were really big.</p>
       </div>
       <div xml:id="EBA-1904-">
         <dateline>
           <date when="1904-">Thursday, Mar. 24th</date>. 
         </dateline>
-          <p>We found a gentle south wind this morning, which brought us easily down to <placeName ref="#Cairo">Cairo</placeName> at 8 o'clock - and had to wait until 11:30 for the opening of the bridge. So we landed and went to the Museum - met <persName>Mrs. Metcalfe</persName> in the <placeName>Gold Room</placeName> - and promised to dine with her tomorrow at Shepheards. <persName>Saw Newberry</persName> for a few moments. Got through the bridge with much excitement, and with a large audience - as the wind was strong and from the side. Came to the <placeName>Ghezireh Palace</placeName> Landing.</p>
+          <p>We found a gentle south wind this morning, which brought us easily down to <placeName ref="#Cairo">Cairo</placeName> at 8 o'clock - and had to wait until 11:30 for the opening of the bridge. So we landed and went to the Museum - met <persName>Mrs. Metcalfe</persName> in the <placeName>Gold Room</placeName> - and promised to dine with her tomorrow at Shepheards. Saw <persName>Newberry</persName> for a few moments. Got through the bridge with much excitement, and with a large audience - as the wind was strong and from the side. Came to the <placeName>Ghezireh Palace</placeName> Landing.</p>
       </div>
       <div xml:id="EBA-1904-">
         <dateline>
