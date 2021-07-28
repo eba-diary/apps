@@ -39,6 +39,8 @@ namespace Sentry.data.Web
         public bool IsCompressed { get; set; }
 
         public bool IsPreProcessingRequired { get; set; }
+        [DisplayName("Pre Processing Options")]
+        public int PreProcessingSelection { get; set; }
         /// <summary>
         /// Target
         /// </summary>
@@ -53,6 +55,7 @@ namespace Sentry.data.Web
         public DateTime CreatedDTM { get; set; }
         public int DataFlowId { get; set; }
         public ObjectStatusEnum ObjectStatus { get; set; }
+        public int IngestionTypeSelection { get; set; }
 
 
 
@@ -60,6 +63,7 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> PreProcessingRequiredDropdown { get; set; }
         public IEnumerable<SelectListItem> PreProcessingOptionsDropdown { get; set; }
         public IEnumerable<SelectListItem> SAIDAssetDropDown { get; set; }
+        public IEnumerable<SelectListItem> IngestionTypeDropDown { get; set; }
         [DisplayName("Pre Processing Options")]
         public List<int> PreprocessingOptions { get; set; }
 
@@ -107,7 +111,7 @@ namespace Sentry.data.Web
                 }
             }
 
-            if (IsPreProcessingRequired && PreprocessingOptions.Count == 1 && PreprocessingOptions.First() == 0)
+            if (IsPreProcessingRequired && PreProcessingSelection == 0)
             {
                 results.Add("PreprocessingOptions", "Pre Processing selection is required");
             }

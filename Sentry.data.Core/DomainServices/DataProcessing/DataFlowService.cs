@@ -531,10 +531,10 @@ namespace Sentry.data.Core
 
             switch (dto.IngestionType)
             {
-                case GlobalEnums.IngestionType.User_Push:
+                case (int)GlobalEnums.IngestionType.User_Push:
                     MapDataFlowStepsForPush(dto, df);
                     break;
-                case GlobalEnums.IngestionType.DSC_Pull:
+                case (int)GlobalEnums.IngestionType.DSC_Pull:
                     MapDataFlowStepsForPull(dto, df);
                     break;
                 default:
@@ -557,7 +557,12 @@ namespace Sentry.data.Core
                 SaidKeyCode = dto.SaidKeyCode,
                 ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
                 DeleteIssuer = dto.DeleteIssuer,
-                DeleteIssueDTM = DateTime.MaxValue
+                DeleteIssueDTM = DateTime.MaxValue,
+                IngestionType = dto.IngestionType,
+                IsDecompressionRequired = dto.IsCompressed,
+                CompressionType = dto.CompressionType,
+                IsPreProcessingRequired = dto.IsPreProcessingRequired,
+                PreProcessingOption = (int)dto.PreProcessingOption
             };
 
             _datasetContext.Add(df);
@@ -596,19 +601,16 @@ namespace Sentry.data.Core
 
             if (dto.IsPreProcessingRequired)
             {
-                foreach (DataFlowPreProcessingTypes item in dto.PreProcessingOptions)
+                switch (dto.PreProcessingOption)
                 {
-                    switch (item)
-                    {
-                        case DataFlowPreProcessingTypes.googleapi:
-                            AddDataFlowStep(dto, df, DataActionType.GoogleApi);
-                            break;
-                        case DataFlowPreProcessingTypes.claimiq:
-                            AddDataFlowStep(dto, df, DataActionType.ClaimIq);
-                            break;
-                        default:
-                            break;
-                    }
+                    case (int)DataFlowPreProcessingTypes.googleapi:
+                        AddDataFlowStep(dto, df, DataActionType.GoogleApi);
+                        break;
+                    case (int)DataFlowPreProcessingTypes.claimiq:
+                        AddDataFlowStep(dto, df, DataActionType.ClaimIq);
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -644,20 +646,17 @@ namespace Sentry.data.Core
             }
 
             if (dto.IsPreProcessingRequired)
-            {
-                foreach (DataFlowPreProcessingTypes item in dto.PreProcessingOptions)
+            {                
+                switch (dto.PreProcessingOption)
                 {
-                    switch (item)
-                    {
-                        case DataFlowPreProcessingTypes.googleapi:
-                            AddDataFlowStep(dto, df, DataActionType.GoogleApi);
-                            break;
-                        case DataFlowPreProcessingTypes.claimiq:
-                            AddDataFlowStep(dto, df, DataActionType.ClaimIq);
-                            break;
-                        default:
-                            break;
-                    }
+                    case (int)DataFlowPreProcessingTypes.googleapi:
+                        AddDataFlowStep(dto, df, DataActionType.GoogleApi);
+                        break;
+                    case (int)DataFlowPreProcessingTypes.claimiq:
+                        AddDataFlowStep(dto, df, DataActionType.ClaimIq);
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -705,6 +704,9 @@ namespace Sentry.data.Core
             dto.ObjectStatus = df.ObjectStatus;
             dto.DeleteIssuer = df.DeleteIssuer;
             dto.DeleteIssueDTM = df.DeleteIssueDTM;
+            dto.IngestionType = df.IngestionType;
+            dto.IsCompressed = df.IsDecompressionRequired;
+            dto.CompressionType = df.CompressionType;
 
             List<SchemaMapDto> scmMapDtoList = new List<SchemaMapDto>();
             foreach (DataFlowStep step in df.Steps.Where(w => w.SchemaMappings != null && w.SchemaMappings.Any()))
@@ -954,6 +956,8 @@ namespace Sentry.data.Core
 
         private DataFlow MapToDataFlow(FileSchema scm)
         {
+            // This method maps Schema flow for given dataset schema
+            //   The assumption is these dataflows are always of type DSC Push
             DataFlow df = new DataFlow
             {
                 Id = 0,
@@ -962,7 +966,8 @@ namespace Sentry.data.Core
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
                 FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE(),
                 DeleteIssueDTM = DateTime.MaxValue,
-                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
+                ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
+                IngestionType = (int)GlobalEnums.IngestionType.User_Push
             };
 
             _datasetContext.Add(df);

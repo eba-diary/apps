@@ -11,6 +11,11 @@
     [ObjectStatus] INT NOT NULL DEFAULT 1, 
     [DeleteIssuer] VARCHAR(10) NULL, 
     [DeleteIssueDTM] DATETIME NOT NULL, 
+    [IngestionType] INT NULL, 
+    [IsDecompressionRequired] BIT NOT NULL, 
+    [CompressionType] INT NULL, 
+    [IsPreProcessingRequired] BIT NOT NULL, 
+    [PreProcessingOption] INT NULL, 
     CONSTRAINT [PK_DataFlow] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
