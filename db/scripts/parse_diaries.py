@@ -40,7 +40,7 @@ def process_diary(args):
 
     with open(diary_path) as xml:
         soup = BeautifulSoup(xml, 'lxml-xml')
-        with open('../data/temp.csv', 'w', newline='') as f:
+        with open(os.path.join('../data', diary + '.csv'), 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(["journal_id", "entry_id", "date", "TEI_name", "emma_name", "relation", "entry", "XML", "entry_sentiment"])
             for i in soup.find_all("div", {"type": "entry"}):
