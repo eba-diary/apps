@@ -757,10 +757,12 @@
         <p>I have been very busy all day with Paul's Rose Catalogue - getting up my rose list for
           this year. There are such complex questions about Rose growing at the Reef. Just before
           the night fell I noticed a strange looking dahabya pulling up at the bank opposite us -
-          quite new to me, - the <name type="boat" ref="#Sahabiha">"Sahabiha"</name> flying the
+          quite new to me, - the "<name type="boat" ref="#Sabiha"><choice><sic>Sahabiha</sic>
+          <corr>Sabiha</corr></choice></name>" flying the
           Stars and Stripes - and soon after the lamps were lighted, who should appear but <persName
             ref="#Campbell_Dr #Campbell_Mrs">Dr. and Mrs. Campbell</persName>! We were so glad to
-          see them - and they have the <name type="boat" ref="#Sahabiha">Sahabiha</name> - it is a
+          see them - and they have the <name type="boat" ref="#Sabiha"><choice><sic>Sahabiha</sic>
+          <corr>Sabiha</corr></choice></name> - it is a
           boat built for the <persName ref="#Abbas_II">Khedives</persName> mother, and of course on
           the hareem lines. They too, took a month for coming up.</p>
       </div>
