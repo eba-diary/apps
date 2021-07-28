@@ -99,7 +99,7 @@ namespace Sentry.data.Core
             // push data too, then throw an unauthorized exception.
             if (datasetsWithNoPermissions.Length > 0)
             {
-                throw new DatasetUnauthorizedAccessException($"No permissions to push data to {datasetsWithNoPermissions.ToString()}");
+                throw new DatasetUnauthorizedAccessException($"No permissions to push data to {datasetsWithNoPermissions}");
             }
 
             try
@@ -110,7 +110,7 @@ namespace Sentry.data.Core
 
                 return df.Id;
             }
-            catch (ValidationException vEx)
+            catch (ValidationException)
             {
                 //throw validation errors for controller to handle
                 _datasetContext.Clear();
@@ -553,7 +553,7 @@ namespace Sentry.data.Core
                 CreatedDTM = DateTime.Now,
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
                 Questionnaire = dto.DFQuestionnaire,
-                FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE(),
+                FlowStorageCode = (string.IsNullOrEmpty(dto.FlowStorageCode)) ? _datasetContext.GetNextDataFlowStorageCDE() : dto.FlowStorageCode,
                 SaidKeyCode = dto.SaidKeyCode,
                 ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
                 DeleteIssuer = dto.DeleteIssuer,

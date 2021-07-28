@@ -8,7 +8,7 @@
     {
         @Html.AntiForgeryToken()
 
-
+        @Html.HiddenFor(x => x.StorageCode);
 
         <div id="dataflow-home-wrapper" class="col-md-12 col-lg-12">
             <div class="dataflow-home-photo bg-photo-dataflow ic">
