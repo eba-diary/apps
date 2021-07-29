@@ -22,14 +22,6 @@ namespace Sentry.data.Web
 
         [System.ComponentModel.DataAnnotations.Required]
         public string Name { get; set; }
-        /// <summary>
-        /// How is data getting into DSC (Push or Pull)
-        /// </summary>
-        /// 
-        [DisplayName("How will data be ingested into DSC?")]
-        public IngestionType IngestionType { get; set; }
-
-        public string SelectedIngestionType { get; set; }
 
         /// <summary>
         /// Is the incoming data compressed?
@@ -56,6 +48,11 @@ namespace Sentry.data.Web
         public int DataFlowId { get; set; }
         public ObjectStatusEnum ObjectStatus { get; set; }
         public string StorageCode { get; set; }
+        /// <summary>
+        /// How is data getting into DSC (Push or Pull)
+        /// </summary>
+        /// 
+        [DisplayName("How will data be ingested into DSC?")]
         public int IngestionTypeSelection { get; set; }
 
 
@@ -65,8 +62,6 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> PreProcessingOptionsDropdown { get; set; }
         public IEnumerable<SelectListItem> SAIDAssetDropDown { get; set; }
         public IEnumerable<SelectListItem> IngestionTypeDropDown { get; set; }
-        [DisplayName("Pre Processing Options")]
-        public List<int> PreprocessingOptions { get; set; }
 
         public ValidationException Validate()
         {
@@ -82,11 +77,11 @@ namespace Sentry.data.Web
             }
 
             #region RetrieverJob validations
-            if (IngestionType == IngestionType.DSC_Pull && (RetrieverJob == null))
+            if (IngestionTypeSelection == (int)IngestionType.DSC_Pull && RetrieverJob == null)
             {
                 results.Add(string.Empty, "Pull type data flows required retriever job configuration");
             }
-            if(IngestionType == IngestionType.DSC_Pull && RetrieverJob != null)
+            if(IngestionTypeSelection == (int)IngestionType.DSC_Pull && RetrieverJob != null)
             {
                 foreach (ValidationResult result in RetrieverJob.Validate().ValidationResults.GetAll())
                 {

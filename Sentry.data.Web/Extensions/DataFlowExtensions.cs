@@ -62,11 +62,11 @@ namespace Sentry.data.Web
             List<DFModel> modelList = new List<DFModel>();
             foreach (Core.DataFlowDto dto in dtoList)
             {
-                modelList.Add(dto.ToModel());
+                modelList.Add(dto.ToDFModel());
             }
             return modelList;
         }
-        public static DFModel ToModel(this Core.DataFlowDto dto)
+        public static DFModel ToDFModel(this Core.DataFlowDto dto)
         {
             return new DFModel(dto) { };
         }
@@ -160,7 +160,7 @@ namespace Sentry.data.Web
                 DatasetFileConfig = 0, //jobs for the data flow are linked via data flow id not datasetfileconfig
                 FileNameExclusionList = null,
                 FileSchema = 0,
-                FtpPatrn = model.FtpPattern,
+                FtpPattern = model.FtpPattern,
                 HttpRequestBody = model.HttpRequestBody,
                 JobId = 0,
                 RelativeUri = model.RelativeUri,
@@ -189,7 +189,7 @@ namespace Sentry.data.Web
                 JobModel jobModel = new JobModel()
                 {
                     CreateCurrentFile = dto.RetrieverJob.CreateCurrentFile,
-                    FtpPattern = dto.RetrieverJob.FtpPatrn,
+                    FtpPattern = dto.RetrieverJob.FtpPattern?? FtpPattern.NoPattern,
                     HttpRequestBody = dto.RetrieverJob.HttpRequestBody,
                     IsRegexSearch = true,
                     OverwriteDataFile = false,
@@ -213,6 +213,18 @@ namespace Sentry.data.Web
                 TargetPrefix = dto.TargetPrefix,
                 RootAwsUrl = $"https://{AwsRegion.ToLower()}.amazonaws.com/{dto.TriggerBucket}/"
             };
+            return model;
+        }
+
+        public static SchemaMapModel ToModel(this SchemaMapDto dto)
+        {
+            SchemaMapModel model = new SchemaMapModel();
+
+            model.Id = dto.Id;
+            model.SearchCriteria = dto.SearchCriteria;
+            model.SelectedDataset = dto.DatasetId;
+            model.SelectedSchema = dto.SchemaId;
+
             return model;
         }
 

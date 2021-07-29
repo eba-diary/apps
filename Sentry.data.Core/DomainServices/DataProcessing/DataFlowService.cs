@@ -40,6 +40,14 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
+        public DataFlowDto GetDataFlowDto(int id)
+        {
+            DataFlow df = _datasetContext.GetById<DataFlow>(id);
+            DataFlowDto dto = new DataFlowDto();
+            MapToDto(df, dto);
+            return dto;
+        }
+
         public DataFlowDetailDto GetDataFlowDetailDto(int id)
         {
             DataFlow df = _datasetContext.GetById<DataFlow>(id);
@@ -54,6 +62,13 @@ namespace Sentry.data.Core
             List<DataFlowStepDto> dtoList = new List<DataFlowStepDto>();
             MapToDtoList(dfsList, dtoList);
             return dtoList;
+        }
+
+        public RetrieverJobDto GetAssociatedRetrieverJobDto(int id)
+        {
+            RetrieverJob job = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == id).First();
+            RetrieverJobDto dto = job.ToDto();
+            return dto;
         }
 
         public int CreateandSaveDataFlow(DataFlowDto dto)
@@ -707,6 +722,8 @@ namespace Sentry.data.Core
             dto.IngestionType = df.IngestionType;
             dto.IsCompressed = df.IsDecompressionRequired;
             dto.CompressionType = df.CompressionType;
+            dto.IsPreProcessingRequired = df.IsPreProcessingRequired;
+            dto.PreProcessingOption = df.PreProcessingOption;
 
             List<SchemaMapDto> scmMapDtoList = new List<SchemaMapDto>();
             foreach (DataFlowStep step in df.Steps.Where(w => w.SchemaMappings != null && w.SchemaMappings.Any()))
@@ -716,6 +733,7 @@ namespace Sentry.data.Core
                     scmMapDtoList.Add(map.ToDto());
                 }
             }
+            dto.SchemaMap = scmMapDtoList;
         }
 
         private List<int> GetMappedFileSchema(int dataflowId)

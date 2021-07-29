@@ -514,6 +514,20 @@ namespace Sentry.data.Web.Helpers
             return compressionList;
         }
 
+        public static IEnumerable<SelectListItem> BuildCompressionTypesDropdown(string selectedType)
+        {
+            if (string.IsNullOrEmpty(selectedType))
+            {
+                //Setting selectedType to bogus value to not repeat list building logic
+                selectedType = "NoSelection";
+            }
+            
+                IEnumerable<SelectListItem> list = Enum.GetValues(typeof(CompressionTypes)).Cast<CompressionTypes>().Select(v
+                => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString(), Selected = (v.ToString() == selectedType) }).ToList();
+            
+            return list;
+        }
+
         public static IEnumerable<SelectListItem> BuildPreProcessingDropdown(bool isPreProcessingRequired)
         {
             List<SelectListItem> preProcessingRequired = new List<SelectListItem>

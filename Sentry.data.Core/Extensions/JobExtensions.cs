@@ -51,5 +51,29 @@ namespace Sentry.data.Core
 
             return tree.ToList();
         }
+
+        public static RetrieverJobDto ToDto(this RetrieverJob job)
+        {
+            RetrieverJobDto dto = new RetrieverJobDto();
+
+            dto.JobId = job.Id;
+            dto.Schedule = job.Schedule;
+            dto.ReadableSchedule = job.ReadableSchedule;
+            dto.RelativeUri = job.RelativeUri;
+            dto.HttpRequestBody = job.JobOptions?.HttpOptions?.Body;
+            dto.SearchCriteria = job.JobOptions?.SearchCriteria;
+            dto.TargetFileName = job.JobOptions?.TargetFileName;
+            dto.CreateCurrentFile = job.JobOptions?.CreateCurrentFile ?? false;
+            dto.DataSourceId = job.DataSource.Id;
+            dto.DataSourceType = job.DataSource.SourceType;
+            //FileSchema = job.FileSchema?.SchemaId?? 0,
+            dto.DatasetFileConfig = job.DatasetConfig?.ConfigId?? 0;
+            dto.DataFlow = job.DataFlow.Id;
+            dto.RequestMethod = job.JobOptions?.HttpOptions?.RequestMethod ?? null;
+            dto.RequestDataFormat = job.JobOptions?.HttpOptions?.RequestDataFormat ?? null;
+            dto.FtpPattern = job.JobOptions?.FtpPattern ?? null;
+
+            return dto;
+        }
     }
 }

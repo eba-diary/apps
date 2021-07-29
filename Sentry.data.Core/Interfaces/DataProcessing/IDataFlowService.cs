@@ -75,5 +75,12 @@ namespace Sentry.data.Core
         ValidationException Validate(DataFlowDto dfDto);
         List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId);
         void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true);
+
+        /// <summary>
+        /// Retrieve retrieverjobdto associated with pull type dataflow
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        RetrieverJobDto GetAssociatedRetrieverJobDto(int id);
     }
 }

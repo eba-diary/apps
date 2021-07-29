@@ -8,6 +8,7 @@
     {
         @Html.AntiForgeryToken()
 
+        @Html.HiddenFor(x => x.DataFlowId);
         @Html.HiddenFor(x => x.StorageCode);
 
         <div id="dataflow-home-wrapper" class="col-md-12 col-lg-12">
@@ -91,14 +92,14 @@
                 <div class="form-group">
                     @Html.LabelFor((model) => model.PreProcessingSelection, new { @class = "control-label col-md-5" })
                     @*<div class="col-md-4">
-                        <select id="PreprocessingOptions" name="PreprocessingOptions" class="form-control edit-dataset-row" style="width:100%">
-                            @foreach (var item in Model.PreProcessingOptionsDropdown)
-                            {
-                                <option selected="@item.Selected" value="@item.Value">@item.Text</option>
-                            }
-                        </select>
-                        @Html.ValidationMessageFor((model) => model.PreprocessingOptions, "", new { @class = "text-danger" })
-                    </div>*@
+                            <select id="PreprocessingOptions" name="PreprocessingOptions" class="form-control edit-dataset-row" style="width:100%">
+                                @foreach (var item in Model.PreProcessingOptionsDropdown)
+                                {
+                                    <option selected="@item.Selected" value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                            @Html.ValidationMessageFor((model) => model.PreprocessingOptions, "", new { @class = "text-danger" })
+                        </div>*@
                     <div class="col-md-4">
                         @Html.DropDownListFor(
                             x => x.PreProcessingSelection,
@@ -122,7 +123,10 @@
         <br />
         <div class="form-group formSubmitButtons" style="display: none;">
             <div>
-                <input type="submit" value="Submit" class="btn btn-primary waves-effect waves-light" />
+                @if (Model.DataFlowId == 0)
+                {
+                    <input type="submit" value="Submit" class="btn btn-primary waves-effect waves-light" />
+                }
                 <a id="CancelButton" class="btn btn-warning  waves-effect waves-light" href="">Cancel</a>
             </div>
         </div>

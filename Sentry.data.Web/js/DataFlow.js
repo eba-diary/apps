@@ -17,6 +17,14 @@
             placeholder: "Select Options"
         });
 
+        //init preprocessing panel
+        if ($("#IsCompressed").val() === "true") {
+            $(".compressionJobPanel").show();
+        }
+        else {
+            $(".compressionJobPanel").hide();
+        }
+
         $("#IsCompressed").change(function () {
             if ($(this).val() === "true") {
                 $('.compressionJobPanel').show();

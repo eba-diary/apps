@@ -316,15 +316,15 @@ namespace Sentry.data.Core
             jobOptions.OverwriteDataFile = false;
             jobOptions.SearchCriteria = dto.SearchCriteria;
             jobOptions.CreateCurrentFile = dto.CreateCurrentFile;
-            jobOptions.FtpPattern = dto.FtpPatrn;
+            jobOptions.FtpPattern = dto.FtpPattern?? FtpPattern.NoPattern;
             jobOptions.TargetFileName = dto.TargetFileName;
         }
 
         private void MaptToHttpsOptions(RetrieverJobDto dto, HttpsOptions httpOptions)
         {
             httpOptions.Body = dto.HttpRequestBody;
-            httpOptions.RequestMethod = dto.RequestMethod;
-            httpOptions.RequestDataFormat = dto.RequestDataFormat;
+            httpOptions.RequestMethod = dto.RequestMethod?? HttpMethods.none;
+            httpOptions.RequestDataFormat = dto.RequestDataFormat?? HttpDataFormat.none;
         }
 
         private void MapToRetrieverJob(RetrieverJobDto dto, RetrieverJob job)

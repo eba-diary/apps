@@ -11,6 +11,7 @@ using System.Web.Mvc;
 using Sentry.data.Core.Interfaces;
 using System.Threading.Tasks;
 using Sentry.data.Core.Entities;
+using Newtonsoft.Json;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -91,6 +92,35 @@ namespace Sentry.data.Web.Controllers
 
             return View("DataFlowForm", model);
             
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ViewResult> Edit(int id)
+        {
+            UserSecurity us = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
+
+            if (!us.CanCreateDataFlow)
+            {
+                return View("Forbidden");
+            }
+
+            DataFlowDetailDto dto = _dataFlowService.GetDataFlowDetailDto(id);
+            DataFlowModel model = ToDataFlowModel(dto);
+
+            model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+            model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
+            model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
+            model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);
+            model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
+            CreateDropDownSetup(model.RetrieverJob);
+
+            return View("DataFlowForm", model);
+
         }
 
         [HttpPost]
@@ -182,12 +212,110 @@ namespace Sentry.data.Web.Controllers
         [Route("DataFlow/NewCompressionJob/")]
         public PartialViewResult NewCompressionJob()
         {
-            CompressionModel model = new CompressionModel();
+            CompressionModel model = ToCompressionModel(null);
 
-            CreateDropDownList(model);
+            //CompressionModel model = new CompressionModel();
+
+            //CreateDropDownList(model);
 
             return PartialView("_CompressionJob", model);
 
+        }
+
+        public PartialViewResult NewRetrieverJob(JobModel model)
+        {
+            CreateDropDownSetup(model);
+
+            return PartialView("_RetrieverJob", model);
+        }
+
+        public PartialViewResult _SchemaMapDetail(int dataflowId)
+        {
+            List<SchemaMapDetailDto> dtoList = _dataFlowService.GetMappedSchemaByDataFlow(dataflowId);
+            List<SchemaMapDetailModel> modelList = dtoList.ToDetailModelList();
+            return PartialView("~/Views/Dataflow/_SchemaMapDetail.cshtml", modelList);
+        }
+
+        public DataFlowModel ToDataFlowModel(DataFlowDetailDto dto)
+        {
+            DataFlowModel model = new DataFlowModel()
+            {
+                DataFlowId = dto.Id,
+                Name = dto.Name,
+                IngestionTypeSelection = dto.IngestionType,
+                IsCompressed = dto.IsCompressed,
+                IsPreProcessingRequired = dto.IsPreProcessingRequired,
+                PreProcessingSelection = (dto.PreProcessingOption.HasValue) ? (int)dto.PreProcessingOption : 0,
+                SAIDAssetKeyCode = dto.SaidKeyCode,
+                CreatedBy = dto.CreatedBy,
+                CreatedDTM = dto.CreateDTM,
+                ObjectStatus = dto.ObjectStatus,
+                StorageCode = dto.FlowStorageCode
+            };
+
+            if (dto.SchemaMap.Any())
+            {
+                List<SchemaMapModel> schemaMapModelList = new List<SchemaMapModel>();
+                foreach (SchemaMapDto map in dto.SchemaMap)
+                {
+                    schemaMapModelList.Add(map.ToModel());
+                }
+                model.SchemaMaps = schemaMapModelList;
+            }
+
+            if (dto.IsCompressed)
+            {
+                List<CompressionModel> modelList = new List<CompressionModel>()
+                {
+                    ToCompressionModel(dto)
+                };
+                model.CompressionJob = modelList;
+            }
+
+            if (dto.IngestionType == (int)IngestionType.DSC_Pull)
+            {
+                RetrieverJobDto jobDto = _dataFlowService.GetAssociatedRetrieverJobDto(dto.Id);
+                model.RetrieverJob = ToJobModel(jobDto);
+            }
+
+            return model;
+        }
+
+        private JobModel ToJobModel(RetrieverJobDto dto)
+        {
+            JobModel model = new JobModel()
+            {
+                Schedule = dto.Schedule,
+                SchedulePicker = dto.SchedulePicker.ToString(),
+                RelativeUri = dto.RelativeUri,
+                HttpRequestBody = dto.HttpRequestBody,
+                SearchCriteria = dto.SearchCriteria,
+                TargetFileName = dto.TargetFileName,
+                CreateCurrentFile = dto.CreateCurrentFile,
+                SelectedDataSource = dto.DataSourceId.ToString(),
+                SelectedSourceType = dto.DataSourceType,
+                SelectedRequestMethod = dto.RequestMethod ?? Core.HttpMethods.none,
+                SelectedRequestDataFormat = dto.RequestDataFormat ?? Core.HttpDataFormat.none,
+                FtpPattern = dto.FtpPattern ?? Core.FtpPattern.NoPattern
+            };
+
+            model.SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(dto.ReadableSchedule);
+            model.SchedulePicker = model.SchedulePickerDropdown.Where(w => w.Selected).Select(s => Int32.Parse(s.Value)).FirstOrDefault().ToString();
+
+            return model;
+        }
+         
+        public CompressionModel ToCompressionModel(DataFlowDto dto)
+        {
+            CompressionModel model = new CompressionModel();
+            if(dto != null)
+            {
+                //model.CompressionType = ((CompressionTypes)dto.CompressionType).ToString();
+                model.CompressionType = (dto.CompressionType.HasValue) ? dto.CompressionType.ToString() : "0";
+            }
+            model.CompressionTypesDropdown = Utility.BuildCompressionTypesDropdown(model.CompressionType);
+
+            return model;
         }
 
         private void SetSchemaModelLists(SchemaMapModel model)
@@ -210,12 +338,12 @@ namespace Sentry.data.Web.Controllers
                 };
 
                 dsList.AddRange(group.OrderBy(o => o.DatasetName).Select(m => new SelectListItem()
-                    {
-                        Text = m.DatasetName,
-                        Value = m.DatasetId.ToString(),
-                        Group = curGroup,
-                        Selected = (m.DatasetId == model.SelectedDataset)
-                    }
+                {
+                    Text = m.DatasetName,
+                    Value = m.DatasetId.ToString(),
+                    Group = curGroup,
+                    Selected = (m.DatasetId == model.SelectedDataset)
+                }
                 ));
             }
 
@@ -242,20 +370,6 @@ namespace Sentry.data.Web.Controllers
 
                 model.AllSchemas = scmList;
             }
-        }
-
-        public PartialViewResult NewRetrieverJob(JobModel model)
-        {
-            CreateDropDownSetup(model);
-
-            return PartialView("_RetrieverJob", model);
-        }
-
-        public PartialViewResult _SchemaMapDetail(int dataflowId)
-        {
-            List<SchemaMapDetailDto> dtoList = _dataFlowService.GetMappedSchemaByDataFlow(dataflowId);
-            List<SchemaMapDetailModel> modelList = dtoList.ToDetailModelList();
-            return PartialView("~/Views/Dataflow/_SchemaMapDetail.cshtml", modelList);
         }
 
         private void CreateDropDownSetup(JobModel model)
@@ -317,6 +431,8 @@ namespace Sentry.data.Web.Controllers
             model.CompressionTypesDropdown = Enum.GetValues(typeof(CompressionTypes)).Cast<CompressionTypes>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
         }
+
+        
 
         private async Task<List<SelectListItem>> BuildSAIDAssetDropDown(string keyCode)
         {
