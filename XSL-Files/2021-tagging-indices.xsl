@@ -59,7 +59,7 @@
                 </ul>
                 <h2>Boats, Hotels, Historical Buildings, Animals, Plants</h2>
                 <ul>
-                    <xsl:for-each select="distinct-values(//name/@type @ref)">
+                    <xsl:for-each select="distinct-values(//name//@ref)">
                         <xsl:sort/> 
                         <li>
                             <b> 
