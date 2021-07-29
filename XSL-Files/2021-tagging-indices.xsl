@@ -57,9 +57,9 @@
                         </li>
                     </xsl:for-each>
                 </ul>
-                <h2>Boats, Hotels</h2>
+                <h2>Boats, Hotels, Historical Buildings, Animals, Plants</h2>
                 <ul>
-                    <xsl:for-each select="distinct-values(//name/@ref)">
+                    <xsl:for-each select="distinct-values(//name//@ref)">
                         <xsl:sort/> 
                         <li>
                             <b> 
@@ -69,7 +69,7 @@
                                 <xsl:variable name="nametobechecked" select="."/> 
                             <ul>
                                 <xsl:for-each
-                                    select="distinct-values($sarah//name[@ref = $nametobechecked][@ref = $nametobechecked])">
+                                    select="distinct-values($sarah//name[@type = $nametobechecked][@ref = $nametobechecked])">
                                     <li> 
                                         <xsl:text>“</xsl:text> 
                                         <xsl:value-of select="."/>
