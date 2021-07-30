@@ -1001,7 +1001,7 @@
                     self.DataFlows.notifySubscribers();
 
                     //Determine last
-                    var d = new Date(result.DataLastUpdated);     
+                    var d = new Date(result.DataLastUpdated);
                     if (d < new Date('1990-01-01')) {
                         self.DataLastUpdated('No Data Files Exist');
                     } else {
