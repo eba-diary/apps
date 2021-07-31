@@ -40,9 +40,9 @@ def process_diary(args):
 
     with open(diary_path) as xml:
         soup = BeautifulSoup(xml, 'lxml-xml')
-        with open(os.path.join('../data', diary + '_people' + '.csv'), 'w', newline='') as f:
+        with open(os.path.join('../data/networks', diary + '_people' + '.csv'), 'w', newline='') as f:
             ppl = csv.writer(f)
-            with open(os.path.join('../data', diary + '_entry' + '.csv'), 'w', newline='') as e:
+            with open(os.path.join('../data/volumes', diary + '_entry' + '.csv'), 'w', newline='') as e:
                 entry = csv.writer(e)
                 # create headers for entry csv
                 entry.writerow(["journal_id", "entry_id", "date", "entry", "XML", "sentiment"])

@@ -53,14 +53,14 @@ INDEX['editor_editor_id'] = (
 )
 
 TABLES['diary_entry'] = ("""CREATE TABLE IF NOT EXISTS diary_entry (
-                                id INTEGER NOT NULL,
-                                diary_entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                diary_entry_id INTEGER,
                                 editor_id INTEGER NULL,
                                 volume_id INTEGER NOT NULL,
                                 entry_date INTEGER NOT NULL,
                                 entry_txt TEXT NOT NULL,
                                 entry_tei TEXT NOT NULL,
-                                entry_setiment INTEGER,
+                                entry_sentiment INTEGER,
                                 CONSTRAINT fk_volume_id
                                     FOREIGN KEY (volume_id)
                                     REFERENCES diary (volume_id)
