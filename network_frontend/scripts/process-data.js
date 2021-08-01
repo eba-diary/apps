@@ -21,6 +21,7 @@ const handleCommas = (last_three) => {
   return [entry, xml, score]
 }
 
+//convert 0 to 1 value to hsl color
 const getColor = (value) => {
     //value from 0 to 1
     var hue=(value*120).toString(10);
