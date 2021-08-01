@@ -1,3 +1,6 @@
 #Ignore Python Virtual Environment
 .env
+env
 .DS_Store
+
+db/data/biographies.json
