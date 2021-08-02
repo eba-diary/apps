@@ -18,6 +18,7 @@ Static HTML page that renders D3 Graph
   <script src="scripts/process-data.js"></script>
   <script src="scripts/d3-force-directed.js"></script>
   <script src="scripts/sidebar.js"></script>
+  <script src="scripts/request.js"></script>
   <div id="slider-components">
     <div id="slider-amount"></div>
     <!--TODO: Set slider max programatically-->
@@ -26,14 +27,13 @@ Static HTML page that renders D3 Graph
   <div id="node-info-sidebar" class="sidebar">
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
   <div id="node-info">
-    <h3>
-      Name: <span id="node-name"></span>
-    </h3>
-    <h5>
-      Date: <span id="node-date"></span>
-    </h5>
-    Entry:
+    <div style="font-size:20px">Name: <span id="node-name"></span></div>
+    <div>Date: <span id="node-date"></span></div>
+    <br/>
+    <b>Entry:</b>
     <div id="node-entry"></div>
+    <br/>
+    <b>Entry Author:</b><div id="entry-author"></div>
   </div>
 </div>
 </body>
