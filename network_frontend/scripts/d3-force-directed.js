@@ -18,7 +18,7 @@ let svg = d3.select("body")
 //force simulation and parameters
 let simulation = d3.forceSimulation()
   .force("link", d3.forceLink())
-  .force("charge", d3.forceManyBody().strength(-190))
+  .force("charge", d3.forceManyBody().strength(-150))
   .force("x", d3.forceX())
   .force("y", d3.forceY())
 
@@ -28,8 +28,9 @@ const render = (update) => {
   //TODO: why does this work and exitNodes doesn't?
   d3.selectAll(".node").remove();
   simulation.nodes(nodes)
-  simulation.force("link").links(links).distance(250)
-  simulation.alpha(0.3).restart();
+  simulation.force("link").links(links).distance(200)
+  simulation.alpha(0.3).restart()
+  simulation.velocityDecay(0.9)
 
   let l = svg.selectAll(".link")
     .data(links, function(d) {return d.source + "," + d.target})
@@ -39,7 +40,7 @@ const render = (update) => {
   enterLinks(l)
   if(update) exitLinks(l)
   enterNodes(n)
-  //if(update) exitNodes(n) -- why does this not re-render color?
+  //if(update) exitNodes(n) --doesn't update color for some reason
 
   link = svg.selectAll(".link")
   node = svg.selectAll(".node")
@@ -126,7 +127,7 @@ const recieveData = (links_and_nodes_by_time) => {
   render(false)
 }
 
-//called onclick()
+//called on slider update
 function update(date_index) {
   oldNodes = nodes
   links = data[dates[date_index]][0]
@@ -146,10 +147,14 @@ function maintainNodePositions() {
   _.each(nodes, function(d) {
     if (kv[d.key]) {
       // if the node already exists, maintain current position
-      d.x = kv[d.key].x
-      d.y = kv[d.key].y
+        d.x = kv[d.key].x
+        d.y = kv[d.key].y
     }
   })
+  //set emma's position to be fixed at 0,0
+  emma = nodes[0]
+  emma.fx = 0
+  emma.fy = 0
 }
 
 //handles drag events
