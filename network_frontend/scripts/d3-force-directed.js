@@ -81,8 +81,8 @@ const enterNodes = (n) => {
     .attr("r", (d) => {return d.weight})
     .attr("fill", (d) => {return d.color})
     .attr("stroke", '#000000')
-    .on('click', (event,datum) => {
-      authorRequest(datum)
+    .on('click', (e,d) => {
+      getEntry(d.key, document.getElementById("slider-amount").innerHTML)
     })
     /* TODO: HIGHLIGHT the most recently clicked node
     .on('mouseover', function(d, i){

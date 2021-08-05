@@ -24,7 +24,7 @@ def index():
 def author(family_name):
     """
     Query EBA database for specific author
-    :return: author_id, family name
+    :return: author_id, given_name, middle_name, family_name
     """
     sql_author = """
             SELECT author_id, given_name, middle_name, family_name FROM author WHERE family_name = :family_name;
@@ -40,4 +40,22 @@ def author(family_name):
 
     return json_results
 
-print(author("Andrews"))
+@app.route('/entries/{entry_date}', methods=['GET'],cors=True)
+def entry(entry_date):
+    """
+    Query EBA database for entry by date
+    :return: entry_txt
+    """
+    sql_entry = """
+            SELECT entry_date, entry_txt FROM diary_entry WHERE entry_date = :entry_date;
+    """
+    cur = conn_db()
+    cur.execute(sql_entry, {"entry_date": entry_date})
+    results = cur.fetchall()[0]
+    json_results = json.dumps({
+    'entry_date': results[0],
+    'entry_txt': results[1]})
+
+    return json_results
+
+print(entry("1910-10-25"))

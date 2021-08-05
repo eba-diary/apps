@@ -77,8 +77,10 @@ const processData = (raw) => {
     }
 
     //add node if not already in bare_nodes
+    //this will need to be done for sources later on
+    //there might be connections that don't contain Emma
     if(!(bare_nodes.includes(target)) && target != "None") {
-      obj[date][1].push({key: target, date: date, entry:  entry, weight: 5})
+      obj[date][1].push({key: target, weight: 5})
       bare_nodes.push(target)
     }
 
