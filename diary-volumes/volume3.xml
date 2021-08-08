@@ -328,7 +328,7 @@
         <dateline>
           <date when="1895-02-27">Wednesday. Feb. 27.</date>
         </dateline>
-        <p>Started in a dead calm at 7 am and have made <measure type="distance">42 miles</measure> &#8211; passing <placeName ref="Dishna">Dishneh, Kaar</placeName> as <persName ref="#Gebel_Sheik_Said">Said</persName> <!--Kasr e'Sayd-->, <persName>Karshout</persName><!-- who? Izzy: these are place names-->, and <!-- and I? Izzy: look at the journal entries on Dropbox-->are now lying about 4 miles below <placeName>Farshout</placeName><!-- where? --> &#8211; the <name type="boat" ref="#Isis">Isis</name> behind us. Very hot all day &#8211; it has been impossible to do anything. Thermometer in shade on deck has been up to 94 &#8211; the night very warm and still &#8211; the little new moon, and Venus perfectly reflected in the glassy water. We find the only way to keep tolerably comfortable is to close the windows in the morning early, as soon as the servants have finished cleaning, shutters, blinds and all &#8211; and possibly the canvass<!-- add sic?--> over them &#8211; and I am pleased to find how cool the boat can be kept &#8211; but the heat is very trying &#8211; and I almost feel as if I were again living in <placeName ref="#Ohio">Ohio</placeName>, during the summer.</p>
+        <p>Started in a dead calm at 7 am and have made <measure type="distance">42 miles</measure> &#8211; passing <placeName ref="Dishna">Dishneh, Kaar</placeName> as <placeName ref="#Al_Qasr_wa_as_Sayyad">Said</placeName>, <persName>Karshout</persName>, and <!-- Confused on how to tag here, missing text-->are now lying about 4 miles below <placeName ref="#Farshūţ">Farshout</placeName> &#8211; the <name type="boat" ref="#Isis">Isis</name> behind us. Very hot all day &#8211; it has been impossible to do anything. Thermometer in shade on deck has been up to 94 &#8211; the night very warm and still &#8211; the little new moon, and Venus perfectly reflected in the glassy water. We find the only way to keep tolerably comfortable is to close the windows in the morning early, as soon as the servants have finished cleaning, shutters, blinds and all &#8211; and possibly the canvass<!-- add sic?--> over them &#8211; and I am pleased to find how cool the boat can be kept &#8211; but the heat is very trying &#8211; and I almost feel as if I were again living in <placeName ref="#Ohio">Ohio</placeName>, during the summer.</p>
       </div>
       <div xml:id="EBA-1895-02-28" type="entry">
         <dateline>
@@ -352,13 +352,13 @@
         <dateline>
           <date when="1895-03-03">Sunday. March 3. First Sunday in Lent.</date>
         </dateline>
-        <p>A cold north wind blowing all day &#8211; most refreshing &#8211; it grew so strong that we made only 3 miles &#8211; stopping all day at <placeName>Sohag.</placeName></p>
+        <p>A cold north wind blowing all day &#8211; most refreshing &#8211; it grew so strong that we made only 3 miles &#8211; stopping all day at <placeName ref="#Sohag">Sohag.</placeName></p>
       </div>
       <div xml:id="EBA-1895-03-04" type="entry">
         <dateline>
           <date when="1895-03-04">Monday. March 4.</date>
         </dateline>
-        <p>We have made a splendid run of 64 miles today &#8211; and are now lying about 4 miles from <placeName ref="#Asyut">Assiout</placeName> &#8211; have passed <placeName ref="#Tahta">Tahtah</placeName> &#8211; <placeName>Gaou</placeName><!-- new tag? --> and <placeName ref="#Abu_Tij">Aboutig</placeName>. The morning was exquisite &#8211; I went on deck immediately after breakfast &#8211; and was there most of the day. Nothing could be more lovely than that morning effects &#8211; the cliffs a pink yellow, with heliotrope shadows sleeping in their hollows. &#8211; the water, silverly pink, reflecting every object.</p>
+        <p>We have made a splendid run of 64 miles today &#8211; and are now lying about 4 miles from <placeName ref="#Asyut">Assiout</placeName> &#8211; have passed <placeName ref="#Tahta">Tahtah</placeName> &#8211; <placeName>Gaou</placeName><!-- ? --> and <placeName ref="#Abu_Tij">Aboutig</placeName>. The morning was exquisite &#8211; I went on deck immediately after breakfast &#8211; and was there most of the day. Nothing could be more lovely than that morning effects &#8211; the cliffs a pink yellow, with heliotrope shadows sleeping in their hollows. &#8211; the water, silverly pink, reflecting every object.</p>
       </div>
       <div xml:id="EBA-1895-03-05" type="entry">
         <dateline>
