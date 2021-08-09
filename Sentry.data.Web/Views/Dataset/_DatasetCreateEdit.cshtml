@@ -63,10 +63,8 @@
                 </div>
 
 
-
-
                 @************************************************************************************************************************************
-                DatasetName
+                 DatasetName
                 *************************************************************************************************************************************@
                 <div class="form-group">
                     @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -92,6 +90,31 @@
                         <span style="color: #003da5;font-size: larger;font-weight: bold;">
                             <em>If this Dataset will be added to SAS, please review the <a target="_blank" href="https://confluence.sentry.com/display/CLA/SAS+Character+Limitation">SAS Character Limitations</a> before naming this Dataset.</em>
                         </span>
+                    </div>
+                </div>
+
+
+                @************************************************************************************************************************************
+                SAID ASSET
+                *************************************************************************************************************************************@
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.SAIDAssetKeyCode, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @if (Model.DatasetId == 0)
+                        {
+                            <div class="dropdown-container">
+                                @Html.DropDownListFor(x => x.SAIDAssetKeyCode, Model.SAIDAssetDropDown, new { @class = "form-control edit-dataset-row" })
+                                @Html.ValidationMessageFor((model) => model.SAIDAssetKeyCode, "", new { @class = "text-danger" })
+                            </div>
+
+                        }
+                        else
+                        {
+                            <div class="textReadOnly">
+                                @Html.HiddenFor(model => model.SAIDAssetKeyCode)
+                                <a target="_blank" rel="noopener noreferrer" href="https://said.sentry.com/ViewAsset.aspx?ID=@Model.SAIDAssetKeyCode">@Model.SAIDAssetKeyCode</a>
+                            </div>
+                        }
                     </div>
                 </div>
 

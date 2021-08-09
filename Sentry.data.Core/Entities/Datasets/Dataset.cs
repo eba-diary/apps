@@ -20,6 +20,8 @@ namespace Sentry.data.Core
 
         public virtual string DatasetName { get; set; }
 
+        public virtual string SAIDAssetKeyCode { get; set; }
+
         public virtual string DatasetDesc { get; set; }
 
         public virtual string DatasetInformation { get; set; }
@@ -102,6 +104,10 @@ namespace Sentry.data.Core
             if (DatasetCategories == null || DatasetCategories.Count == 0)
             {
                 vr.Add(GlobalConstants.ValidationErrors.CATEGORY_IS_BLANK, "The Dataset Category is required");
+            }
+            if (string.IsNullOrWhiteSpace(SAIDAssetKeyCode))
+            {
+                vr.Add(GlobalConstants.ValidationErrors.SAID_ASSET_KEY_IS_BLANK, "The SAID Asset is required");
             }
             if (string.IsNullOrWhiteSpace(DatasetName))
             {

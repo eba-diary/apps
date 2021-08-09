@@ -2,6 +2,8 @@
 using System.ComponentModel.DataAnnotations;
 using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
+using System.Collections.Generic;
+using System.Web.Mvc;
 
 namespace Sentry.data.Web
 {
@@ -20,6 +22,7 @@ namespace Sentry.data.Web
             FileExtensionId = dto.FileExtensionId;
             DatasetInformation = dto.DatasetInformation;
             DataClassification = dto.DataClassification;
+            SAIDAssetKeyCode = dto.SAIDAssetKeyCode;
         }
 
 
@@ -61,6 +64,11 @@ namespace Sentry.data.Web
         public bool CreateCurrentView { get; set; }
 
         public ObjectStatusEnum ObjectStatus { get; set; }
+
+        [DisplayName("SAID Asset")]
+        public string SAIDAssetKeyCode { get; set; }
+
+        public IEnumerable<SelectListItem> SAIDAssetDropDown { get; set; }
     }
 
 
