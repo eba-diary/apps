@@ -1,7 +1,7 @@
 ﻿@model DatasetModel
 
 @* This partial view it intended to be used in multiple places.  Therefore,
-    it requires the calling page to wire up an ajax call to 
+    it requires the calling page to wire up an ajax call to
     post this form to the controller.  The data portion of the ajax call will
     be $('#DatasetForm').serialize().*@
 @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "DatasetForm" }))
@@ -64,8 +64,8 @@
 
 
                 @************************************************************************************************************************************
-                 DatasetName
-                *************************************************************************************************************************************@
+         DatasetName
+        *************************************************************************************************************************************@
                 <div class="form-group">
                     @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
@@ -96,14 +96,15 @@
 
                 @************************************************************************************************************************************
                 SAID ASSET
+                NOTE: Remember to add selectpicker-filtering class to drop down picker which Dataset.js manipulates to add a filer box
                 *************************************************************************************************************************************@
-                <div class="form-group">
+                        <div class="form-group">
                     @Html.LabelFor((model) => model.SAIDAssetKeyCode, new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
                         @if (Model.DatasetId == 0)
                         {
                             <div class="dropdown-container">
-                                @Html.DropDownListFor(x => x.SAIDAssetKeyCode, Model.SAIDAssetDropDown, new { @class = "form-control edit-dataset-row" })
+                                @Html.DropDownListFor(x => x.SAIDAssetKeyCode, Model.SAIDAssetDropDown, new { @class = "form-control edit-dataset-row selectpicker-filtering" })
                                 @Html.ValidationMessageFor((model) => model.SAIDAssetKeyCode, "", new { @class = "text-danger" })
                             </div>
 
@@ -117,7 +118,6 @@
                         }
                     </div>
                 </div>
-
 
 
                 @*Description*@
@@ -342,15 +342,15 @@
 
             @*This is being kept for a shell which might be used later.*@
             @*<div id="columnPanel" class="form-horizontal">
-                <br /><h4>Column Metadata</h4><br />
-                <div class="form-group">
-                    <label for="DatasetFileUpload" class="control-label col-md-2">Example File</label>
-                    <div class="col-md-10">
-                        <input type="file" class="edit-dataset-row file-load" id="DatasetFileUpload" />
+                    <br /><h4>Column Metadata</h4><br />
+                    <div class="form-group">
+                        <label for="DatasetFileUpload" class="control-label col-md-2">Example File</label>
+                        <div class="col-md-10">
+                            <input type="file" class="edit-dataset-row file-load" id="DatasetFileUpload" />
+                        </div>
                     </div>
-                </div>
-                <button type="button" class="btn btn-primary" id="btnUploadFile" data-id="0">Upload Example Data File</button>
-            </div>*@
+                    <button type="button" class="btn btn-primary" id="btnUploadFile" data-id="0">Upload Example Data File</button>
+                </div>*@
 
 
         </div>
