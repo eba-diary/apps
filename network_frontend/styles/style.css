@@ -20,3 +20,7 @@ body {
 #slider-components {
   text-align: center;
 }
+
+#date-slider {
+  width: 80%;
+}

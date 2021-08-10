@@ -58,4 +58,27 @@ def entry(entry_date):
 
     return json_results
 
-print(entry("1910-10-25"))
+@app.route('/diary_entries', methods=['GET'],cors=True)
+def diary_entries():
+    """
+    Query EBA database for all sentiments
+    :return: [entry_sentiment]
+    """
+    sql_sentiments = """
+            SELECT entry_date, entry_txt, entry_tei, entry_sentiment FROM diary_entry
+    """
+    cur = conn_db()
+    cur.execute(sql_sentiments)
+    results = cur.fetchall()
+
+    json_results = {}
+    for i in range(len(results)):
+        record = results[i]
+        json_results[record[0]] = {
+        "entry_txt" : record[1],
+        "entry_tei" : record[2],
+        "entry_sentiment" : record[3]}
+
+    return json.dumps(json_results)
+
+print(diary_entries())
