@@ -84,9 +84,41 @@ namespace Sentry.data.Core
                 errors.Add("File Extension Delimited is missing it's delimiter.");
             }
 
-            if (dto.Name.ToUpper() == "DEFAULT" || String.IsNullOrWhiteSpace(dto.Name))
+            if (dto.Name == null)
             {
-                errors.Add("Configuration Name cannot be equal to default or empty.");
+                errors.Add("Configuration Name is required.");
+            }
+            else
+            {
+                if (String.IsNullOrWhiteSpace(dto.Name))
+                {
+                    errors.Add("Configuration Name is required.");
+                }
+                else if (dto.Name.ToUpper() == "DEFAULT")
+                {
+                    errors.Add("Configuration Name cannot be named default.");
+                }
+                else if (dto.Name.Length > 100)
+                {
+                    errors.Add("Configuration Name number of characters cannot be greater than 100.");
+                }
+            }
+
+
+            if (dto.Description == null)
+            {
+                errors.Add("Configuration Description is required.");
+            }
+            else
+            {
+                if (String.IsNullOrWhiteSpace(dto.Description))
+                {
+                    errors.Add("Configuration Description is required..");
+                }
+                else if (dto.Description.Length > 2000)
+                {
+                    errors.Add("Configuration Description number of characters cannot be greater than 100.");
+                }
             }
 
             return errors;
