@@ -22,5 +22,17 @@ body {
 }
 
 #date-slider {
-  width: 80%;
+  width: 50%;
+}
+
+placeName {
+  color: #D96C06;
+}
+
+persName {
+  color: #2292A4;
+}
+
+date {
+  color: #7B2D26;
 }

@@ -7,7 +7,7 @@ const openNav = (node) => {
   document.getElementById("node-info-sidebar").style.width = "300px";
   document.getElementById("node-name").innerHTML = node.key
   document.getElementById("node-date").innerHTML = node.date
-  document.getElementById("node-entry").innerHTML = node.entry
+  document.getElementById("node-entry").innerHTML = node.tei
 }
 
 /* Set the width of the sidebar to 0 and the left margin of the page content to 0 */

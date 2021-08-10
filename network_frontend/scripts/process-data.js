@@ -36,6 +36,7 @@ const processData = (raw, entries_json) => {
     date = line[2]
     target = line[4]
     entry = entries_json[date].entry_txt
+    tei = entries_json[date].entry_tei
     sentiment = entries_json[date].entry_sentiment
 
     //create new entry whenever a new time is found
@@ -47,6 +48,7 @@ const processData = (raw, entries_json) => {
         key: emma,
         date: date,
         entry: entry,
+        tei: tei,
         sentiment: adjusted_sentiment,
         color: color,
         weight: 10
@@ -57,7 +59,7 @@ const processData = (raw, entries_json) => {
     //this will need to be done for sources later on
     //there might be connections that don't contain Emma
     if(!(bare_nodes.includes(target)) && target != "None") {
-      obj[date][1].push({key: target, date: date, entry: entry, weight: 5})
+      obj[date][1].push({key: target, date: date, entry: entry, tei: tei, weight: 5})
       bare_nodes.push(target)
     }
 
