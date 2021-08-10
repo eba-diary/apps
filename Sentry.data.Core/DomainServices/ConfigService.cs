@@ -72,8 +72,10 @@ namespace Sentry.data.Core
         {
             List<string> errors = new List<string>();
 
+            //NOTE: if you have more then 2 times where validation errors are found the _datasetContext.FileExtensions.FirstOrDefault(x => x.Id == dto.FileExtensionId).Name will be null
+            //and when currentFileExtension is evaluated it will blow up because its null, will add an item to address this because this has been a hidden bug for a long time probably
             var currentFileExtension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Id == dto.FileExtensionId).Name.ToLower();
-
+            
             if (currentFileExtension == "csv" && dto.Delimiter != ",")
             {
                 errors.Add("File Extension CSV and it's delimiter do not match.");

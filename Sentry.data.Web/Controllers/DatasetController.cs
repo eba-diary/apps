@@ -110,7 +110,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet()]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> Edit(int id)
         {
             // TODO: CLA-2765 - Add filtering to ensure EDIT only occurs for ACTIVE object status
             UserSecurity us = _datasetService.GetUserSecurityForDataset(id);
@@ -119,6 +119,7 @@ namespace Sentry.data.Web.Controllers
                 DatasetDto dto = _datasetService.GetDatasetDto(id);
                 DatasetModel model = new DatasetModel(dto);
                 Utility.SetupLists(_datasetContext, model);
+                model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Edit Page", id);
                 
@@ -208,7 +209,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
-        public ActionResult DatasetForm(DatasetModel model)
+        public async Task<ActionResult> DatasetForm(DatasetModel model)
         {
             DatasetDto dto = model.ToDto();
 
@@ -244,9 +245,9 @@ namespace Sentry.data.Web.Controllers
             }
 
             Utility.SetupLists(_datasetContext, model);
+            model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
 
             return PartialView("_DatasetCreateEdit", model);
-            //return View(model);
         }
 
 

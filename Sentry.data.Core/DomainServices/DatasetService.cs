@@ -404,6 +404,11 @@ namespace Sentry.data.Core
             {
                 errors.Add("Dataset Scope is required");
             }
+
+            if (String.IsNullOrWhiteSpace(dto.SAIDAssetKeyCode))
+            {
+                errors.Add("SAID Asset is required.");
+            }
             return errors;
         }
 

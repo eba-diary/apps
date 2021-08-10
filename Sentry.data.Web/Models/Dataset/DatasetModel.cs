@@ -65,6 +65,7 @@ namespace Sentry.data.Web
 
         public ObjectStatusEnum ObjectStatus { get; set; }
 
+        [Required]
         [DisplayName("SAID Asset")]
         public string SAIDAssetKeyCode { get; set; }
 
