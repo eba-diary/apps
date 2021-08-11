@@ -24,7 +24,7 @@
 
 /* When you mouse over the navigation links, change their color */
 .sidebar a:hover {
-  color: #7B2D26;
+  color: red;
 }
 
 /* Position and style the close button (top right corner) */
@@ -52,11 +52,25 @@
 
 #node-info {
   margin-left: 15px;
-  margin-left: 15px;
+}
+
+#node-entry, #node-person-bio {
+  margin-right: 25px;
+}
+
+#node-person-bio {
+    margin-bottom: 80px;
 }
 
 #birth-death-info {
-  font-size: 10px;
+}
+
+placeName {
+  color: #8AB9B5;
+}
+
+persName {
+  color: #0EB1D2;
 }
 
 /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */

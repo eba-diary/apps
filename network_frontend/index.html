@@ -14,7 +14,9 @@ Static HTML page that renders D3 Graph
   <script src="dependencies/jquery-3.6.0.min.js"></script>
 </head>
 
-<body>
+<body style="background-color:black">
+      <div id="page-title">Social Network Visualization of the Emma B. Andrews Diaries</div>
+  <div id="render-here"></div>
   <script src="scripts/index.js"></script>
   <script src="scripts/requests.js"></script>
   <script src="scripts/process-data.js"></script>
@@ -29,6 +31,7 @@ Static HTML page that renders D3 Graph
   <div id="node-info-sidebar" class="sidebar">
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
   <div id="node-info">
+    <br/>
     <div style="font-size:20px">Name: <persName><span id="node-name"></span></persName></div>
     <div>Date: <span id="node-date"></span></div>
     <br/>
@@ -40,6 +43,7 @@ Static HTML page that renders D3 Graph
     <div id="birth-death-info">
       <span id="node-person-birth-date"></span> (<span id="node-person-birth-place"></span>) - <span id="node-person-death-date"></span> (<span id="node-person-death-place"></span>)
     </div>
+    <br />
     <div id="node-person-bio"></div>
   </div>
 </div>

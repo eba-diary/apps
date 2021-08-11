@@ -4,14 +4,14 @@
 
 //global vars
 let width = window.screen.width - 400,
-    height = window.screen.height - 400,
+    height = window.screen.height - 425,
     nodes, links, oldNodes, data, dates
 
 //keeps track of data index
 let date_counter = 0
 
 //force simulation and svg where graph is rendered
-let svg = d3.select("body")
+let svg = d3.select("#render-here")
   .append("svg")
   .attr("viewBox", [-width/2, -height/2, width, height])
 
@@ -28,7 +28,7 @@ const render = (update) => {
   //TODO: why does this work and exitNodes doesn't?
   d3.selectAll(".node").remove();
   simulation.nodes(nodes)
-  simulation.force("link").links(links).distance(200)
+  simulation.force("link").links(links).distance(250)
   simulation.alpha(0.3).restart()
   simulation.velocityDecay(0.9)
 
@@ -80,7 +80,7 @@ const enterNodes = (n) => {
     .attr("cy", 0)
     .attr("r", (d) => {return d.weight})
     .attr("fill", (d) => {return d.color})
-    .attr("stroke", '#000000')
+    .attr("stroke", 'white')
     .on('click', (e,d) => {
       getBio(d)
     })

@@ -21,6 +21,8 @@ const getBio = (node) => {
   const url = "https://l4acfene95.execute-api.us-west-2.amazonaws.com/api/bios/" + node.tei_target
   xmlHttp.onreadystatechange = () => {
     if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+      //closeNav()
+      //setTimeout(function(){openNav(node, JSON.parse(xmlHttp.responseText))}, 600)
       openNav(node, JSON.parse(xmlHttp.responseText))
     }
   }
