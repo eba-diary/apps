@@ -34,6 +34,10 @@ const processData = (raw, entries_json) => {
   let bare_nodes = new Array(emma) //this array keeps track of unique node keys
   links_and_nodes_by_date = cleaned_data.reduce((obj,line, index) => {
     date = line[2]
+    //need to remove # from target
+    //a # in the url tells the browser to go to a specific place on the page
+    //#Person_Name can't work as an API Param
+    tei_target = line[3].replace('#', '')
     target = line[4]
     entry = entries_json[date].entry_txt
     tei = entries_json[date].entry_tei
@@ -59,7 +63,7 @@ const processData = (raw, entries_json) => {
     //this will need to be done for sources later on
     //there might be connections that don't contain Emma
     if(!(bare_nodes.includes(target)) && target != "None") {
-      obj[date][1].push({key: target, date: date, entry: entry, tei: tei, weight: 5})
+      obj[date][1].push({key: target, tei_target: tei_target, date: date, entry: entry, tei: tei, weight: 5})
       bare_nodes.push(target)
     }
 

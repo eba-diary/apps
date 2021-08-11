@@ -82,7 +82,7 @@ const enterNodes = (n) => {
     .attr("fill", (d) => {return d.color})
     .attr("stroke", '#000000')
     .on('click', (e,d) => {
-      openNav(d)
+      getBio(d)
     })
     /* TODO: HIGHLIGHT the most recently clicked node
     .on('mouseover', function(d, i){

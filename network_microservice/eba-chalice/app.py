@@ -20,26 +20,6 @@ def conn_db():
 def index():
     return {'hello': 'world'}
 
-@app.route('/authors/{family_name}', methods=['GET'],cors=True)
-def author(family_name):
-    """
-    Query EBA database for specific author
-    :return: author_id, given_name, middle_name, family_name
-    """
-    sql_author = """
-            SELECT author_id, given_name, middle_name, family_name FROM author WHERE family_name = :family_name;
-    """
-    cur = conn_db()
-    cur.execute(sql_author, {"family_name": family_name})
-    results = cur.fetchall()[0]
-    json_results = json.dumps({
-    'author_id': results[0],
-    'given_name': results[1],
-    'middle_name': results[2],
-    'family_name': results[3]})
-
-    return json_results
-
 @app.route('/entries/{entry_date}', methods=['GET'],cors=True)
 def entry(entry_date):
     """
@@ -61,7 +41,7 @@ def entry(entry_date):
 @app.route('/diary_entries', methods=['GET'],cors=True)
 def diary_entries():
     """
-    Query EBA database for all sentiments
+    Query EBA database for all diary entries
     :return: [entry_sentiment]
     """
     sql_sentiments = """
@@ -81,4 +61,26 @@ def diary_entries():
 
     return json.dumps(json_results)
 
-print(diary_entries())
+@app.route('/bios/{persName}', methods=['GET'],cors=True)
+def bio(persName):
+    persName = "#" + persName
+    """
+    Query EBA database for bio by persName
+    :return: [entry_sentiment]
+    """
+    sql_bio = """
+            SELECT biography, birth_place, death_place, birth, death FROM biography WHERE persName = :persName;
+    """
+    cur = conn_db()
+    cur.execute(sql_bio, {"persName": persName})
+    results = cur.fetchall()[0]
+    json_results = json.dumps({
+    'biography': results[0],
+    'birth_place': results[1],
+    'death_place': results[2],
+    'birth': str(results[3]),
+    'death': str(results[4])})
+
+    return json_results
+
+print(bio("Acland_Lady"))
