@@ -19,7 +19,7 @@ populate_db:
 	@ echo 'Diaries were added to EBA.db'
 	@ echo 'Processing entries ...'
 	@ python3 entries.py
-	@ echo 'Entries were added to EBA.db'
+	@ echo 'Entries were added to EBA.db'	
 
 get_biographies:
 	@ echo 'Fetching biographies from gsheets ...'

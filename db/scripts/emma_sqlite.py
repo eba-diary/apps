@@ -111,8 +111,6 @@ TABLES['biography'] = ("""CREATE TABLE IF NOT EXISTS biography (
                             person_id INTEGER NOT NULL,
                             persName TEXT NULL,
                             biography TEXT NULL,
-                            image TEXT NULL,
-                            occupation TEXT NULL,
                             birth_place TEXT NULL,
                             death_place TEXT NULL,
                             birth INTEGER NULL,
@@ -125,6 +123,7 @@ INDEX['biography'] = (
 
 TABLES['people'] = ("""CREATE TABLE IF NOT EXISTS people (
                             id INTEGER PRIMARY KEY NOT NULL,
+                            journal_id INT,
                             person_id INTEGER NULL,
                             lemma_id INTEGER NOT NULL,
                             social_struct TEXT,
