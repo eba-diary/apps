@@ -307,9 +307,8 @@
       </div>
       <div xml:id="EBA-1908-01-16" type = "entry">
         <dateline><date when="1908-01-16">Jan. 16th. Thursday</date>.</dateline>
-        <p><persName ref="#Humphreys_Mr">Mr. Humphreys</persName> called and <persName ref="#Buchanan_Miss">Miss Buchanan</persName> and friend. Cloudy cold day - strong S. W. wind. <persName ref="#Ransom_Williams_Caroline">Carrie</persName> and I went over to the <placeName ref="#Luxor">Luxor</placeName>, to see the two old <persName ref="Collins_Miss">Miss Collins</persName> - so sad.</p>
+        <p><persName ref="#Humphreys_Mr">Mr. Humphreys</persName> called and <persName ref="#Buchanan_Miss">Miss Buchanan</persName> and friend. Cloudy cold day - strong S. W. wind. <persName ref="#Ransom_Williams_Caroline">Carrie</persName> and I went over to the <name type="hotel" ref="#Luxor_Hotel">Luxor</name>, to see the two old <persName ref="Collins_Miss">Miss Collins</persName> - so sad.</p>
       </div>
-      <!--why does she say "the Luxor?" is this a church or funeral home situation for a viewing?-->
       <!-- COLLINSES: AGAIN, 2 PEOPLE REFERENCED AT ONCE. ALSO, DIDN'T SHE TALK ABOUT FRANCES' DEATH ON JAN 13TH? -->
       <div xml:id="EBA-1908-01-17" type = "entry">
         <dateline><date when="1908-01-17">Jan. 17th. Friday</date>.</dateline>
@@ -332,29 +331,29 @@
       </div>
       <div xml:id="EBA-1908-01-21" type = "entry">
         <dateline><date when="1908-01-21">Jan. 21. Tuesday</date>.</dateline>
-        <p>The 2 <persName>Miss McKewus</persName> called today. <persName ref="#Ayrton_Edward">Ayrton</persName> to tea. A note from <persName ref="#Cavendish_Louisa_Duchess">"Louisa" Duchess of Devonshire</persName> tells <persName ref="#Davis_Theodore_M">Theo</persName> that they are going to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> on <date>Thursday</date>, and will be happy to accept <persName ref="#Davis_Theodore_M"><choice><sic>Mr. Davin</sic><corr>Mr. Davis</corr></choice></persName>'s invitation to lunch!</p>
+        <p>The 2 <persName>Miss McKewus</persName> <!--who?--> called today. <persName ref="#Ayrton_Edward">Ayrton</persName> to tea. A note from <persName ref="#Cavendish_Louisa_Duchess">"Louisa" Duchess of Devonshire</persName> tells <persName ref="#Davis_Theodore_M">Theo</persName> that they are going to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> on <date when="1908-01-23">Thursday</date>, and will be happy to accept <persName ref="#Davis_Theodore_M"><choice><sic>Mr. Davin</sic><corr>Mr. Davis</corr></choice></persName>'s invitation to lunch!</p>
       </div>
       <div xml:id="EBA-1908-01-22" type = "entry">
         <dateline><date when="1908-01-22">Jan. 22. Wednesday</date>.</dateline>
-        <p><persName ref="#Davis_Theodore_M">Theo</persName> again to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> to meet <persName ref="#Maspero_Gaston">M. Maspero</persName>, <persName ref="#Nicol_Erskine">Erskine</persName> and <persName>Weigall</persName>, and entered the new tomb. This was uncovered a few days since, but was shallow, and contained only some remains of workmens houses, and a number of large vases - filled with broken potsherds and small objects - the most important being a head about 7 in. high, which crowned the head of a mummied bird.</p>
-        <p><persName>Major Watson</persName>, and <persName>Mrs. Graham</persName>, an English woman came to tea and were shown the find, when <persName ref="#Davis_Theodore_M">Theo</persName> was in the <placeName ref="#Bībān al-Mulūk">valley</placeName> this A.M. they opened a jar found in the gold tomb. It contained a broken vase, which was beautifully enamelled and bearing the cartouche of <persName>Sety II.</persName> This can be restored - also an alabaster vase, broken, with cartouche of <orgName>Rameses II,</orgName> of very good work. A lovely warm day. <persName ref="#Nicol_Erskine">Mr. Erskine</persName> dined with us.</p>
+        <p><persName ref="#Davis_Theodore_M">Theo</persName> again to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> to meet <persName ref="#Maspero_Gaston">M. Maspero</persName>, <persName ref="#Nicol_Erskine">Erskine</persName> and <persName ref="#Weigall_Arthur">Weigall</persName>, and entered the new tomb <!--possible to tag?-->. This was uncovered a few days since, but was shallow, and contained only some remains of workmens houses, and a number of large vases - filled with broken potsherds and small objects - the most important being a head about <measure type="inches">7 in</measure>. high, which crowned the head of a mummied bird.</p> <!--check paragraph format of entry-->
+        <p><persName ref="#Watson_Major">Major Watson</persName>, and <persName ref="#Graham_Mrs">Mrs. Graham</persName>, an <orgname ref="#English">English</orgname> woman came to tea and were shown the find, when <persName ref="#Davis_Theodore_M">Theo</persName> was in the <placeName ref="#Bībān al-Mulūk">valley</placeName> this A.M. they opened a jar found in the gold tomb. It contained a broken vase, which was beautifully enamelled and bearing the cartouche of <persName ref="#Seti_II">Sety II</persName>. This can be restored - also an alabaster vase, broken, with cartouche of <persName ref="#Rameses_II">Rameses II</persName>, of very good work. A lovely warm day. <persName ref="#Nicol_Erskine">Mr. Erskine</persName> dined with us.</p>
       </div>
       <!-- MISS-TRANSLATION/TYPO? Erakine might be Erskine. Also, the EBA Indices page says "Erksine", but everything in Jan/Feb 1907 says "Erskine" -->
       <div xml:id="EBA-1908-01-23" type = "entry">
-        <dateline><date when="1908-01-23">Jan. 23rd. Thursday.</date></dateline>
+        <dateline><date when="1908-01-23">Jan. 23rd. Thursday</date>.</dateline>
         <p><persName ref="#Davis_Theodore_M">Theo</persName> over in the <placeName ref="#Bībān al-Mulūk">Valley</placeName> all day, having the <placeName>Devonshire</placeName> party to lunch. <persName ref="#Ransom_Williams_Caroline">Carrie</persName> and I considerately stayed at home. Quite warm.</p>
       </div>
       <div xml:id="EBA-1908-01-24" type = "entry">
-        <dateline><date when="1908-01-24">Jan. 24. Friday.</date></dateline>
+        <dateline><date when="1908-01-24">Jan. 24. Friday</date>.</dateline>
         <p>A quiet day for all at home. This afternoon <persName ref="#Nicol_Erskine">Mr. Erskine</persName> came to say goodbye. <persName ref="#Maspero_Gaston #Maspero_Louise">M. and Madame Maspero</persName> with their sons came to see the find.</p>
       </div>
       <div xml:id="EBA-1908-01-25" type = "entry">
-        <dateline><date when="1908-01-25">Jan. 25. Saturday.</date></dateline>
+        <dateline><date when="1908-01-25">Jan. 25. Saturday</date>.</dateline>
         <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Ransom_Williams_Caroline">Carrie</persName> went to  <placeName ref="#Karnak">Karnac</placeName> this P.M.</p>
       </div>
       <div xml:id="EBA-1908-01-26" type = "entry">
-        <dateline><date when="1908-01-26">Jan. 26. 	Third Sunday after Epiphany.</date></dateline>
-        <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Ransom_Williams_Caroline">Carrie</persName> went to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> - in a very cold wind storm - the dust quite frightful. <persName>Mr. Carter</persName> lunched with me and <persName ref="#Jones_Harold">Harold Jones,</persName> who arrived this morning. <persName ref="#Lythgoe_Albert">Mr. Lythgoe</persName> in <placeName ref="#Luxor">Luxor.</placeName></p>
+        <dateline><date when="1908-01-26">Jan. 26. 	Third Sunday after <name type="event" ref="#Epiphany">Epiphany</name>.</date></dateline>
+        <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Ransom_Williams_Caroline">Carrie</persName> went to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> - in a very cold wind storm - the dust quite frightful. <persName ref="#Carter_Howard">Mr. Carter</persName> lunched with me and <persName ref="#Jones_Harold">Harold Jones</persName>, who arrived this morning. <persName ref="#Lythgoe_Albert">Mr. Lythgoe</persName> in <placeName ref="#Luxor">Luxor</placeName><!--aug4-->.</p>
       </div>
       <div xml:id="EBA-1908-01-27" type = "entry">
         <dateline><date when="1908-01-27">Jan. 27. Monday.</date></dateline>

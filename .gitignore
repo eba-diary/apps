@@ -1,6 +1,7 @@
 #Ignore Python Virtual Environment
 .env
 env
+venv
 .DS_Store
-
+network_microservice/eba-chalice/__pycache__
 db/data/biographies.json

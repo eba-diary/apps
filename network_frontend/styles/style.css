@@ -1,0 +1,22 @@
+body {
+  font-family: Helvetica;
+}
+
+.node {
+  fill: #000000;
+  stroke-width: 3px;
+}
+
+.node text {
+  fill: #a9a9a9;
+  stroke: none;
+}
+
+.link {
+  stroke: #e0e0e0;
+  stroke-opacity: 0.6;
+}
+
+#slider-components {
+  text-align: center;
+}
