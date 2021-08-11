@@ -46,9 +46,9 @@ namespace Sentry.data.Infrastructure
 
         private System.Data.DataTable ExecuteQuery(string query)
         {
-            DataTable dt;
+            DataTable dt = new DataTable();
             string connectionString = Config.GetHostSetting("SnowConnectionString");
-            Logger.Info("START:  SnowProvider.ExecuteQuery() ConnectionString:" + connectionString + " Query:" + query);
+            Logger.Info("START STEP 1:  SnowProvider.ExecuteQuery() ConnectionString:" + connectionString + " Query:" + query);
 
             try
             {
@@ -59,8 +59,14 @@ namespace Sentry.data.Infrastructure
 
                     System.Data.Common.DbCommand command = connection.CreateCommand();
                     command.CommandText = query;
+                    command.CommandTimeout = 0;
+
                     connection.Open();
+                    Logger.Info("COMPLETE STEP 2:  SnowProvider.ExecuteQuery.ConnectionOpen()" + " Query:" + query);
+
                     System.Data.Common.DbDataReader reader = command.ExecuteReader();
+                    Logger.Info("COMPLETE STEP 3:  SnowProvider.ExecuteQuery.command.ExecuteReader()" + " Query:" + query);
+
                     dt = FillDataTable(reader);
 
                     if (reader != null)
@@ -75,15 +81,17 @@ namespace Sentry.data.Infrastructure
                 throw;
             }
 
-            Logger.Info($"END: SnowProvider.ExecuteQuery()");
+            Logger.Info($"END  STEP 6: SnowProvider.ExecuteQuery()" + " Query:" + query);
             return dt;
         }
 
-        private DataTable FillDataTable(System.Data.Common.DbDataReader dr)
+        private DataTable FillDataTable(System.Data.Common.DbDataReader reader)
         {
-            DataTable schema = dr.GetSchemaTable();
             DataTable dt = new DataTable();
+            Logger.Info("STEP 4 START:  SnowProvider.FillDataTable()");
+            DataTable schema = reader.GetSchemaTable();
 
+            Logger.Info("START  STEP 4.5:  SnowProvider.FillDataTable() BUILD COLUMNS");
             if (schema != null)
             {
                 foreach (DataRow r in schema.Rows)
@@ -95,18 +103,10 @@ namespace Sentry.data.Infrastructure
                 }
             }
 
-            // Read rows from DataReader and populate the DataTable  with rows
-            while (dr.Read())
-            {
-                DataRow dataRow = dt.NewRow();
-                for (int i = 0; i < dt.Columns.Count; i++)
-                {
-                    dataRow[(dt.Columns[i])] = dr[i];
-                }
+            Logger.Info("STEP 4.6:  SnowProvider.ExecuteQuery() dt.Load START");
+            dt.Load(reader);
 
-                dt.Rows.Add(dataRow);
-            }
-
+            Logger.Info("STEP 4.7 END:  SnowProvider.FillDataTable()");
             return dt;
         }
 
