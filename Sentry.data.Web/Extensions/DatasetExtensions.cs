@@ -39,8 +39,8 @@ namespace Sentry.data.Web
                 HasHeader = model.HasHeader,
                 IsInSAS = model.IncludeInSas,
                 CreateCurrentView = model.CreateCurrentView,
-                ObjectStatus = model.ObjectStatus
-
+                ObjectStatus = model.ObjectStatus,
+                SAIDAssetKeyCode = model.SAIDAssetKeyCode
             };
         }
 
@@ -66,7 +66,8 @@ namespace Sentry.data.Web
                 PrimaryContactName = dto.PrimaryContactName,
                 PrimarContactEmail = dto.PrimaryContactEmail,
                 PrimaryOwnerName = dto.PrimaryOwnerName,
-                ObjectStatus = dto.ObjectStatus.GetDescription().ToUpper()
+                ObjectStatus = dto.ObjectStatus.GetDescription().ToUpper(),
+                SAIDAssetKeyCode = dto.SAIDAssetKeyCode
             };
         }
     }

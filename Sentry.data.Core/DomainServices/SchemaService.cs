@@ -649,8 +649,6 @@ namespace Sentry.data.Core
 
             string vwVersion = "vw_" + schemaDto.SnowflakeTable;
             bool tableExists = _snowProvider.CheckIfExists(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion);     //Does table exist
-
-            
             //If table does not exist
             if (!tableExists)
             {
