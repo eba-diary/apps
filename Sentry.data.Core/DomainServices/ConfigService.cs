@@ -271,17 +271,21 @@ namespace Sentry.data.Core
             {
                 DatasetFileConfig dfc = CreateDatasetFileConfig(dto);
 
-                DataSource basicSource = _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_DROP_LOCATION));
+                // TODO - CLA-2372 - REMOVE COMMENTED CODE - Removing DFSBasic, DfsCustom, S3Basic references
+                //DataSource basicSource = _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_DROP_LOCATION));
 
-                RetrieverJob rj = JobService.InstantiateJobsForCreation(dfc, basicSource);
+                // TODO - CLA-2372 - REMOVE COMMENTED CODE - Removing DFSBasic, DfsCustom, S3Basic references
+                //RetrieverJob rj = JobService.InstantiateJobsForCreation(dfc, basicSource);
 
-                List<RetrieverJob> jobList = new List<RetrieverJob>
-                {
-                    rj,
-                    JobService.InstantiateJobsForCreation(dfc, _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_S3_DROP_LOCATION)))
-                };
+                // TODO - CLA-2372 - REMOVE COMMENTED CODE - Removing DFSBasic, DfsCustom, S3Basic references
+                //List<RetrieverJob> jobList = new List<RetrieverJob>
+                //{
+                //    rj,
+                //    JobService.InstantiateJobsForCreation(dfc, _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_S3_DROP_LOCATION)))
+                //};
 
-                dfc.RetrieverJobs = jobList;
+                // TODO - CLA-2372 - REMOVE COMMENTED CODE - Removing DFSBasic, DfsCustom, S3Basic references
+                //dfc.RetrieverJobs = jobList;
 
                 Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
                 List<DatasetFileConfig> dfcList = (parent.DatasetFileConfigs == null) ? new List<DatasetFileConfig>() : parent.DatasetFileConfigs.ToList();
@@ -292,8 +296,8 @@ namespace Sentry.data.Core
                 //_datasetContext.Merge(parent);
                 _datasetContext.SaveChanges();
 
-
-                JobService.CreateDropLocation(rj);
+                // TODO - CLA-2372 - REMOVE COMMENTED CODE - Removing DFSBasic, DfsCustom, S3Basic references
+                //JobService.CreateDropLocation(rj);
 
                 return true;
             }

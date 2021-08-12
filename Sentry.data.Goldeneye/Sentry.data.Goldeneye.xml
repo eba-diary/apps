@@ -49,13 +49,6 @@
             </summary>
             <param name="t">The main thread task</param>
         </member>
-        <member name="M:Sentry.data.Goldeneye.Core.WatcherTaskRestart(System.Threading.Tasks.Task,System.Int32)">
-            <summary>
-            An exception occurred on the main task; log it and shut down the service with an error exit code
-            </summary>
-            <param name="t">The main thread task</param>
-            <param name="jobId"></param>
-        </member>
         <member name="M:Sentry.data.Goldeneye.Program.Main(System.String[])">
             <summary>
             The entry point into the Windows Service.  You can also run this program
@@ -70,36 +63,6 @@
             <summary>
             Initialize the HangFire Scheuler server
             </summary>
-        </member>
-        <member name="P:Sentry.data.Goldeneye.Watch.WatchedDir">
-            <summary>
-            Directory that is to be watched
-            </summary>
-        </member>
-        <member name="M:Sentry.data.Goldeneye.Watch.Run(System.String,System.Threading.CancellationToken)">
-            <summary>
-            
-            </summary>
-            <param name="path"></param>
-            <param name="token"></param>
-        </member>
-        <member name="M:Sentry.data.Goldeneye.Watch.OnStart(System.Int32,System.Uri,System.Threading.CancellationToken,System.Int32)">
-            <summary>
-            This method is called when the Windows Process is started in Core and Program.cs
-            First it creates a file watcher, gives it a directory from app.config, then assigns it events to watch.
-            The last thing it does is grabs all the files that currently in the directory and adds them to the file list.
-            The Service will do the rest on it's periodic run.
-            </summary>
-            <param name="jobId"></param>
-            <param name="watchPath"></param>
-            <param name="token"></param>
-            <param name="iterationLimit"></param>
-        </member>
-        <member name="M:Sentry.data.Goldeneye.Watch.GetCountStart">
-            <summary>
-            Returns start datetime of file counter
-            </summary>
-            <returns></returns>
         </member>
         <member name="T:SentryWindowsServiceTemplateCSharp.Resources">
             <summary>
