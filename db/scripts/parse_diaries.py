@@ -75,9 +75,11 @@ def process_diary(args):
                             emma_name = re.sub(" +", " ", names_unclean)
                             if ' ' in p['ref']:
                                 more_than_one = p['ref'].split(' ')
-                                for ind in more_than_one:                    
+                                for ind in more_than_one:
+                                    ind = re.sub("#", '', ind)
                                     ppl.writerow([journal_id, entry_id, date, ind, emma_name, "undef"])
                             else:
+                                p['ref'] = re.sub("#", '', p['ref'])
                                 ppl.writerow([journal_id, entry_id,date, p['ref'], emma_name, "undef"])
                         entry_id += 1
         
