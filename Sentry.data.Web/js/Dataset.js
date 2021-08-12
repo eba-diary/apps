@@ -605,7 +605,6 @@ data.Dataset = {
         var Id = $('#datasetConfigList').val();
         data.Dataset.DatasetFileTableInit(Id);
         data.Dataset.DatasetBundingFileTableInit(Id);
-        data.Dataset.DatasetFileConfigsTableInit(Id);
 
         localStorage.setItem("listOfFilesToBundle", JSON.stringify([]));
 
@@ -1349,48 +1348,6 @@ data.Dataset = {
             '</table>';
 
         return table;
-    },
-
-    DatasetFileConfigsTableInit: function (Id) {
-        $('#datasetFileConfigsTable tbody').on('click', 'td.details-control', function () {
-            var tr = $(this).closest('tr');
-            var row = table.row(tr);
-
-            if (row.child.isShown()) {
-                // This row is already open - close it
-                row.child.hide();
-                tr.removeClass('shown');
-            }
-            else {
-                // Open this row
-                row.child(data.Dataset.formatDatasetFileConfigDetails(row.data())).show();
-                tr.addClass('shown');
-            }
-        });
-
-        $("#datasetFileConfigsTable").DataTable({
-            autoWidth: true,
-            serverSide: true,
-            processing: true,
-            searching: false,
-            paging: true,
-            ajax: {
-                url: "/Dataset/GetDatasetFileConfigInfoForGrid/?Id=" + Id,
-                type: "POST"
-            },
-            columns: [
-                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
-                { data: "EditHref", className: "editConfig", width: "20px" },
-                { data: "ConfigFileName", className: "configFileName" },
-                { data: "SearchCriteria", className: "searchCriteria" },
-                { data: "TargetFileName", className: "targetFileName" },
-                { data: "IsRegexSearch", className: "isRegexSearch", render: function (data, type, row) { return data === true ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>'; } },
-                { data: "OverwriteDatasetFile", type: "date", className: "overwriteDatsetFile", render: function (data, type, row) { return data === true ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>'; } },
-                { data: "FileType", className: "fileType" },
-                { data: "DatasetScopeTypeID", className: "DatasetScopeTypeID" }
-            ],
-            order: [1, 'asc']
-        });
     },
 
     formatDatasetFileConfigDetails: function (d) {
