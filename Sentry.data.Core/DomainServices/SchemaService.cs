@@ -26,12 +26,12 @@ namespace Sentry.data.Core
         private readonly ISecurityService _securityService;
         private readonly IDataFeatures _featureFlags;
         private readonly IMessagePublisher _messagePublisher;
-        private readonly IHiveOdbcProvider _hiveOdbcProvider;
+        private readonly ISnowProvider _snowProvider;
         private string _bucket;
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, IHiveOdbcProvider hiveOdbcProvider)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -41,7 +41,8 @@ namespace Sentry.data.Core
             _securityService = securityService;
             _featureFlags = dataFeatures;
             _messagePublisher = messagePublisher;
-            _hiveOdbcProvider = hiveOdbcProvider;
+            _snowProvider = snowProvider;
+
         }
 
         private string RootBucket
@@ -62,8 +63,6 @@ namespace Sentry.data.Core
             try
             {
                 newSchema = CreateSchema(schemaDto);
-
-                //_dataFlowService.CreateandSaveDataFlow(MapToDataFlowDto(newSchema));
 
                 _dataFlowService.CreateDataFlowForSchema(newSchema);
 
@@ -149,15 +148,21 @@ namespace Sentry.data.Core
                                         
                     return revision.SchemaRevision_Id;
                 }
-
-                return 0;
+            }
+            catch (AggregateException agEx)
+            {
+                var flatArgExs = agEx.Flatten().InnerExceptions;
+                foreach(var ex in flatArgExs)
+                {
+                    Logger.Error("Failed generating consumption layer event", ex);
+                }
             }
             catch (Exception ex)
             {
                 Logger.Error("Failed to add revision", ex);
-
-                return 0;
             }
+
+            return 0;
         }
 
 
@@ -165,7 +170,10 @@ namespace Sentry.data.Core
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             Logger.Info($"startmethod <{m.ReflectedType.Name.ToString()}>");
+
             Dataset parentDataset = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaDto.SchemaId).ParentDataset;
+
+            //Check user access to modify schema, of not throw exception
             IApplicationUser user = _userService.GetCurrentUser();
             UserSecurity us = _securityService.GetUserSecurity(parentDataset, user);
 
@@ -174,7 +182,7 @@ namespace Sentry.data.Core
                 throw new SchemaUnauthorizedAccessException();
             }
             
-            //var SendSASNotification = false;
+
             string SASNotificationType = null;
             string CurrentViewNotificationType = null;
             JObject whatPropertiesChanged;
@@ -200,8 +208,7 @@ namespace Sentry.data.Core
             var exceptions = new List<Exception>();
 
             /* Trigger email only if IsInSAS has changed, otherwise, let consumption layer event processing drive the email to SAS Admins */
-            if (whatPropertiesChanged.ContainsKey("isinsas") &&
-                (!whatPropertiesChanged.ContainsKey("createcurrentview") && !whatPropertiesChanged.ContainsKey("cla2429_snowflakecreatetable")))
+            if (whatPropertiesChanged.ContainsKey("isinsas"))
             {
 
                 CurrentViewNotificationType = (schemaDto.CreateCurrentView) ? "ADD" : "REMOVE";
@@ -212,17 +219,6 @@ namespace Sentry.data.Core
                     Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sending sas notification email for hive...");
                     SasNotification(schema, SASNotificationType, CurrentViewNotificationType, _userService.GetCurrentUser(), "HIVE");
                     Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sent sas notification email for hive");
-                }
-                catch (Exception ex)
-                {
-                    exceptions.Add(ex);
-                }
-
-                try
-                {
-                    Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sending sas notification email for snowflake...");
-                    SasNotification(schema, SASNotificationType, CurrentViewNotificationType, _userService.GetCurrentUser(), "SNOWFLAKE");
-                    Logger.Info($"<{m.ReflectedType.Name.ToLower()}> sent sas notification email for snowflake...");
                 }
                 catch (Exception ex)
                 {
@@ -268,6 +264,12 @@ namespace Sentry.data.Core
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="schema"></param>
+        /// <param name="propertyDeltaList"></param>
+        /// <exception cref="AggregateException">Thows exception when event could not be published</exception>
         private void GenerateConsumptionLayerCreateEvent(FileSchema schema, JObject propertyDeltaList)
         {
             //SchemaRevision latestRevision = null;
@@ -298,8 +300,10 @@ namespace Sentry.data.Core
                 generateEvent = true;
             }
 
+            //We want to attempt to send both events even if first fails, then report back any failures.
             if (generateEvent)
             {
+                var exceptionList = new List<Exception>();
                 HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
                 {
                     SchemaID = latestRevision.SchemaId,
@@ -310,9 +314,19 @@ namespace Sentry.data.Core
                     ChangeIND = propertyDeltaList.ToString(Formatting.None)
                 };
 
-                Logger.Debug($"<generateconsumptionlayercreateevent> sending {hiveCreate.EventType.ToLower()} event...");
-                _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
-                Logger.Debug($"<generateconsumptionlayercreateevent> sent {hiveCreate.EventType.ToLower()} event");
+                try
+                {
+                    Logger.Debug($"<generateconsumptionlayercreateevent> sending {hiveCreate.EventType.ToLower()} event...");
+
+                    _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
+
+                    Logger.Debug($"<generateconsumptionlayercreateevent> sent {hiveCreate.EventType.ToLower()} event");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"<generateconsumptionlayercreateevent> failed sending event: {JsonConvert.SerializeObject(hiveCreate)}");
+                    exceptionList.Add(ex);
+                }
 
 
                 SnowTableCreateModel snowModel = new SnowTableCreateModel()
@@ -324,31 +338,23 @@ namespace Sentry.data.Core
                     ChangeIND = propertyDeltaList.ToString(Formatting.None)
                 };
 
-                Logger.Debug($"<generateconsumptionlayercreateevent> sending {snowModel.EventType.ToLower()} event...");
-                _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
-                Logger.Debug($"<generateconsumptionlayercreateevent> sent {snowModel.EventType.ToLower()} event");
+                try
+                {
+                    Logger.Debug($"<generateconsumptionlayercreateevent> sending {snowModel.EventType.ToLower()} event...");
+                    _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+                    Logger.Debug($"<generateconsumptionlayercreateevent> sent {snowModel.EventType.ToLower()} event");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"<generateconsumptionlayercreateevent> failed sending event: {snowModel}");
+                    exceptionList.Add(ex);
+                }
+
+                if (exceptionList.Any())
+                {
+                    throw new AggregateException("Failed sending consumption layer event", exceptionList);
+                }
             }     
-        }
-
-        private void GenerateConsumptionLayerDeleteEvent(FileSchema schema, JObject propertyDeltaList)
-        {
-            //Do nothing if there is no revision associated with schema 
-            if (!_datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schema.SchemaId).Any()) { return; }
-
-            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
-
-
-
-
-
-            SnowTableDeleteModel snowModel = new SnowTableDeleteModel()
-            {
-                DatasetID = ds.DatasetId,
-                SchemaID = schema.SchemaId,
-                InitiatorID = _userService.GetCurrentUser().AssociateId
-            };
-
-            _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
         }
 
         /// <summary>
@@ -432,6 +438,18 @@ namespace Sentry.data.Core
                 chgDetected = true;
             }
 
+            if (schema.CLA3014_LoadDataToSnowflake != dto.CLA3014_LoadDataToSnowflake)
+            {
+                schema.CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake;
+                chgDetected = true;
+            }
+            
+            if (schema.SchemaRootPath != dto.SchemaRootPath)
+            {
+                schema.SchemaRootPath = dto.SchemaRootPath;
+                chgDetected = true;
+            }
+
 
             if (chgDetected)
             {
@@ -441,10 +459,7 @@ namespace Sentry.data.Core
 
             whatPropertiesChanged += "}";
 
-            return JObject.Parse(whatPropertiesChanged);
-            //return Newtonsoft.Json.JsonConvert.DeserializeObject<object>(whatPropertiesChanged);
-
-            //return whatPropertiesChanged;           
+            return JObject.Parse(whatPropertiesChanged);          
         }
 
         public UserSecurity GetUserSecurityForSchema(int schemaId)
@@ -510,9 +525,13 @@ namespace Sentry.data.Core
 
         public List<BaseFieldDto> GetBaseFieldDtoBySchemaRevision(int revisionId)
         {
-            SchemaRevision revision = _datasetContext.SchemaRevision.FirstOrDefault(w => w.SchemaRevision_Id == revisionId);
+            //Perform fetch of children is needed to prevent n+1 when sending to ToDto()
+            List<BaseField> fileList = _datasetContext.BaseFields.Where(w => w.ParentSchemaRevision.SchemaRevision_Id == revisionId).Fetch(f => f.ChildFields).OrderBy(o => o.OrdinalPosition).ToList();
 
-            return revision.Fields.Where(w => w.ParentField == null).OrderBy(o => o.OrdinalPosition).ToList().ToDto();
+            //ToDto() assumes only root level columns are in the initial list, therefore, we filter on where ParentField == null.
+            // This does not produce any n+1 scenario since the child fields have been loaded into memory already, therefore, .net does not need to go back to database
+            List<BaseFieldDto> dtoList = fileList.Where(w => w.ParentField == null).ToList().ToDto();
+            return dtoList;
         }
 
         public SchemaRevisionDto GetLatestSchemaRevisionDtoBySchema(int schemaId)
@@ -584,7 +603,7 @@ namespace Sentry.data.Core
             {
                 throw new SchemaNotFoundException("Column metadata not added");
             }
-
+            
             return GetTopNRowsBySchema(config.Schema.SchemaId, rows);
         }
         public List<Dictionary<string, object>> GetTopNRowsBySchema(int id, int rows)
@@ -620,15 +639,16 @@ namespace Sentry.data.Core
             }
 
             FileSchemaDto schemaDto = GetFileSchemaDto(id);
+            
+            //OVERRIDE Database in lower environments where snowflake data doesn't exist to always hit qual
+            string snowDatabase = Config.GetHostSetting("SnowDatabaseOverride");
+            if (snowDatabase != String.Empty)
+            {
+                schemaDto.SnowflakeDatabase = snowDatabase;
+            }
 
-            string hiveView = $"vw_{schemaDto.HiveTable}";
-
-            //Get connection object
-            OdbcConnection connection = _hiveOdbcProvider.GetConnection(schemaDto.HiveDatabase);
-
-            //Does table exist
-            bool tableExists = _hiveOdbcProvider.CheckViewExists(connection, hiveView);
-
+            string vwVersion = "vw_" + schemaDto.SnowflakeTable;
+            bool tableExists = _snowProvider.CheckIfExists(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion);     //Does table exist
             //If table does not exist
             if (!tableExists)
             {
@@ -636,7 +656,7 @@ namespace Sentry.data.Core
             }
 
             //Query table for rows
-            System.Data.DataTable result = _hiveOdbcProvider.GetTopNRows(_hiveOdbcProvider.GetConnection(schemaDto.HiveDatabase), hiveView, rows);
+            System.Data.DataTable result = _snowProvider.GetTopNRows(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion, rows);    
 
             List<Dictionary<string, object>> dicRows = new List<Dictionary<string, object>>();
             Dictionary<string, object> dicRow = null;
@@ -645,8 +665,7 @@ namespace Sentry.data.Core
                 dicRow = new Dictionary<string, object>();
                 foreach (System.Data.DataColumn col in result.Columns)
                 {
-                    //R
-                    string colName = col.ColumnName.Split('.')[1];
+                    string colName = col.ColumnName;
                     dicRow.Add(colName, dr[col]);
                 }
                 dicRows.Add(dicRow);
@@ -655,23 +674,24 @@ namespace Sentry.data.Core
             return dicRows;
         }
 
-        public bool RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent)
+        public void RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent)
         {
             if (objectKey == null)
             {
                 Logger.Debug($"schemaservice-registerrawfile no-objectkey-input");
-                return false;
+                throw new ArgumentException("schemaservice-registerrawfile no-objectkey-input");
             }
 
             if (schema == null)
             {
                 Logger.Debug($"schemaservice-registerrawfile no-schema-input");
-                return false;
+                throw new ArgumentException("schemaservice-registerrawfile no-schema-input");
             }
 
             if (stepEvent == null)
             {
                 Logger.Debug($"schemaservice-registerrawfile no-stepevent-input");
+                throw new ArgumentException("schemaservice-registerrawfile no-stepevent-input");
             }
 
             try
@@ -704,11 +724,8 @@ namespace Sentry.data.Core
             catch(Exception ex)
             {
                 Logger.Error($"schemaservice-registerrawfile-failed", ex);
-
-                return false;
-            }           
-
-            return true;
+                throw;
+            }
         }
 
         private void MapToDatasetFile(DataFlowStepEvent stepEvent, string fileKey, string fileVersionId, DatasetFile file)
@@ -766,7 +783,9 @@ namespace Sentry.data.Core
                 CLA1580_StructureHive = dto.CLA1580_StructureHive,
                 CLA2472_EMRSend = dto.CLA2472_EMRSend,
                 CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag,
-                ObjectStatus = dto.ObjectStatus
+                CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake,
+                ObjectStatus = dto.ObjectStatus,
+                SchemaRootPath = dto.SchemaRootPath
             };
             _datasetContext.Add(schema);
             return schema;
@@ -805,7 +824,9 @@ namespace Sentry.data.Core
                 CLA1396_NewEtlColumns = scm.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = scm.CLA1580_StructureHive,
                 CLA2472_EMRSend = scm.CLA2472_EMRSend,
-                CLA1286_KafkaFlag = scm.CLA1286_KafkaFlag
+                CLA1286_KafkaFlag = scm.CLA1286_KafkaFlag,
+                CLA3014_LoadDataToSnowflake = scm.CLA3014_LoadDataToSnowflake,
+                SchemaRootPath = scm.SchemaRootPath
             };
 
         }
@@ -845,26 +866,10 @@ namespace Sentry.data.Core
                     sasNotificationType = "ADD";
                     currentViewNotficationType = "ADD";
                 }
-                else if (rev.ParentSchema.IsInSAS && changeIndicator.ContainsKey("cla2429_snowflakecreatetable") && changeIndicator.GetValue("cla2429_snowflakecreatetable").ToString().ToLower() == "true" )
-                {
-                    sasNotificationType = "ADD";
-                    if (rev.ParentSchema.CreateCurrentView)
-                    {
-                        currentViewNotficationType = "ADD";
-                    }
-                }
                 else if (rev.ParentSchema.IsInSAS && changeIndicator.ContainsKey("revision") && changeIndicator.GetValue("revision").ToString().ToLower() == "added")
                 {
                     sasNotificationType = "UPDATE";
                 }
-
-                //string sasNotificationType = (
-                //    //changeIndicator.ToLower().Contains("revision:add") ||                                   /* triggered by updated to schema columns */
-                //    isInSAS ||                                   /* triggered by schema configuration change to isinsas property */
-                //    currentView && rev.ParentSchema.IsInSAS)     /* triggered by schema configuration change to currentview property*/
-                //    ? "ADD" 
-                //    : "UPDATE";
-
                 
                 SasNotification(rev.ParentSchema, sasNotificationType, currentViewNotficationType, user, externalSystemIndictator);
 
@@ -906,7 +911,6 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                int scmId = (schema != null) ? schema.SchemaId : 0;
                 Logger.Error($"<sasdeletenotification> Failed sending SAS delete notification - schemaId:{schemaId}", ex);
 
                 return false;
@@ -971,12 +975,7 @@ namespace Sentry.data.Core
             string libraryName = schema.SasLibrary;
             string viewName;
 
-            if (systemIndicator.ToUpper() == "SNOWFLAKE")
-            {
-                libraryName += "_SNFC";
-                viewName = $"{schema.SnowflakeDatabase}.{schema.SnowflakeSchema}.vw_{schema.SnowflakeTable}";
-            }
-            else if (systemIndicator.ToUpper() == "HIVE")
+            if (systemIndicator.ToUpper() == "HIVE")
             {
                 viewName = $"vw_{schema.HiveTable}";
             }
@@ -994,7 +993,7 @@ namespace Sentry.data.Core
                     bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be <strong style=\"color:#008000;\">ADDED</strong> to {libraryName}:</p>");
                     bodySb.AppendLine($"<p>- {viewName}</p>");
                     //Include current view if checked
-                    if (systemIndicator != "SNOWFLAKE" && (currentViewNotificationType == "ADD" || schema.CreateCurrentView))
+                    if (currentViewNotificationType == "ADD" || schema.CreateCurrentView)
                     {
                         bodySb.AppendLine($"<p>- {viewName}_cur</p>");
                     }
@@ -1006,7 +1005,7 @@ namespace Sentry.data.Core
                     bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be <strong style=\"color:#FF0000;\">REMOVED</strong> from {libraryName}:</p>");
                     bodySb.AppendLine($"<p>- {viewName}</p>");
                     //if current view is being updated to unchecked or is currently checked, ensure it is removed from SAS
-                    if (systemIndicator != "SNOWFLAKE" && (currentViewNotificationType.ToUpper() == "REMOVE" || schema.CreateCurrentView))
+                    if (currentViewNotificationType.ToUpper() == "REMOVE" || schema.CreateCurrentView)
                     {
                         bodySb.AppendLine($"<p>- {viewName}_cur</p>");
                     }
@@ -1017,7 +1016,7 @@ namespace Sentry.data.Core
                     subject = $"Library Refresh Request from {libraryName}";
                     bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be updated in {libraryName}:</p>");
                     bodySb.AppendLine($"<p>- {viewName}</p>");
-                    if (systemIndicator != "SNOWFLAKE" && schema.CreateCurrentView)
+                    if (schema.CreateCurrentView)
                     {
                         bodySb.AppendLine($"<p>- {viewName}_cur</p>");
                     }
@@ -1147,10 +1146,44 @@ namespace Sentry.data.Core
             Logger.Debug($"schemaservice end method <{mBase.Name.ToLower()}>");
         }
 
+        //look at fieldDtoList and returns a list of duplicates at that level only
+        //this function DOES NOT drill into children since method that calls it will call this for every level that exists 
+        private ValidationResults CloneWars(List<BaseFieldDto> fieldDtoList)
+        {
+            ValidationResults results = new ValidationResults();
+
+            //STEP 1:  Find duplicates at the current level passed in
+            var clones = fieldDtoList.Where(w => w.DeleteInd == false).GroupBy(x => x.Name).Where(x => x.Count() > 1)
+              .Select(y => y.Key);
+
+            //STEP 2:  IF ANY CLONES EXIST: Grab all clones that match distinct name list
+            //this step is here because i need ALL duplicates and ordinal position to send error message
+            if (clones.Any())
+            {
+                var cloneDetails =
+                   from f in fieldDtoList
+                   join c in clones on f.Name equals c
+                   select new { f.Name, f.OrdinalPosition };
+
+                //ADD ALL CLONE ERRORS to ValidationResults class, ValidationResults is what gets returned from Validate() and is used to display errors
+                //NOTE: this code uses linq ToList() extension method on my cloneDetails IEnumerable to essentially go through each cloneDetail and call results.Add()
+                //we are adding each errors to ValidationResults, this way I don't need to create a seperate hardened list but can add to the existing ValidationResults
+                cloneDetails.ToList().ForEach(x => results.Add(x.OrdinalPosition.ToString(), $"({x.Name}) cannot be duplicated.  "));
+            }
+
+            return results;
+        }
+
         private ValidationResults Validate(FileSchema scm, List<BaseFieldDto> fieldDtoList)
         {
             ValidationResults results = new ValidationResults();
-            foreach(BaseFieldDto fieldDto in fieldDtoList)
+
+            //STEP 1:  Look for clones (duplicates) and add to results
+            results.MergeInResults(CloneWars(fieldDtoList));
+
+
+            //STEP 2:   go through all fields and look for validation errors
+            foreach (BaseFieldDto fieldDto in fieldDtoList)
             {
                 //Field name cannot be blank
                 if (string.IsNullOrWhiteSpace(fieldDto.Name))
@@ -1210,6 +1243,7 @@ namespace Sentry.data.Core
 
                 results.MergeInResults(ValidateFieldtoFileSchema(scm, fieldDto));
 
+                //recursively call validate again to validate all child fields of parent
                 if (fieldDto.ChildFields.Any())
                 {
                     results.MergeInResults(Validate(scm, fieldDto.ChildFields));

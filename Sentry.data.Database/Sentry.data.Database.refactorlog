@@ -959,4 +959,25 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="ObjectStatus_Id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="be7b0e57-6822-4c39-8255-92e845895e5c" ChangeDateTime="04/28/2021 19:55:16">
+    <Property Name="ElementName" Value="[dbo].[ADTDatasetClassification].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ADTDatasetClassification]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Category_NME" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="dcaa0242-09ef-4e9d-ad18-73309cf7131b" ChangeDateTime="05/07/2021 19:28:26">
+    <Property Name="ElementName" Value="[dbo].[Schema].[CLA3014_SnowLoad]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Schema]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CLA3014_LoadDataToSnowflake" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4f1ba296-dd54-4ef6-8f3c-26d6959c4a7a" ChangeDateTime="05/13/2021 15:29:50">
+    <Property Name="ElementName" Value="[dbo].[FeatureEntity].[Key]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FeatureEntity]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[KeyCol]" />
+  </Operation>
 </Operations>

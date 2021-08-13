@@ -52,7 +52,7 @@ namespace ConsumerTesting
             //domain context needed to retrieve config
             KafkaSettings settings = new KafkaSettings(groupId,
                                             KafkaHelper.GetKafkaBrokers(),
-                                            KafkaHelper.GetDSCEventTopic(),
+                                            KafkaHelper.Get_Consumer_Topic_List_For_DSCEvents(),
                                             Config.GetHostSetting("EnvironmentName").ToUpper(),
                                             bool.Parse(Config.GetHostSetting("KafkaDebugLogging")),
                                             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, KafkaHelper.GetCertPath()),

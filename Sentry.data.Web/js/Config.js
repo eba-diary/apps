@@ -215,26 +215,60 @@ data.Config = {
 
         $("[id^='CancelDatasetFileConfigForm']").off('click').on('click', PageCancelFunction);
 
-        data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
+        //determine current file extension selection for initialzation of page
+        var currentFileExtension = $('#FileExtensionID option:selected').text();
 
+        //Call SetFileExtensionProperites method on initialization, then call on change of FileExtensionId
+        data.Config.SetFileExtensionProperites(currentFileExtension);
         $("#FileExtensionID").change(function () {
             data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
         });
 
         $("#IncludedInSAS").click(function () {
-            if ($('#ConfigId').val() != "0" && $(this).is(':unchecked')) {
+            if ($('#ConfigId').val() !== "0" && $(this).is(':unchecked')) {
                 Sentry.ShowModalAlert("\"Add to SAS\" option has been unchecked.  <p>This will remove all associated SAS libraries for this schema, if saved.</p>");
             }
         });
 
         $("#CreateCurrentView").click(function () {
-            if ($('#ConfigId').val() != "0" && $(this).is(':unchecked') && $("#IncludedInSAS").is(':checked')) {
+            if ($('#ConfigId').val() !== "0" && $(this).is(':unchecked') && $("#IncludedInSAS").is(':checked')) {
                 Sentry.ShowModalAlert("\"Current View\" option has been unchecked.  <p>This will remove the current view SAS library associated with this schema, if saved.</p>");
             }
         });
+
+        data.Config.DatasetScopeTypeInit($("#DatasetScopeTypeID"));
     },
 
-    CreateFormSubmitInit: function () {
+    DatasetScopeTypeInit: function (element) {
+        element.change(function () {
+            var selection = $(this).val()
+            data.Config.SetDatasetScopeTypeDescription(selection);
+        })
+
+        data.Config.SetDatasetScopeTypeDescription(element.val());
+    },
+
+    SetDatasetScopeTypeDescription: function (id) {
+        if (id === undefined) {
+            $(".DatasetScopeTypeDescription span").text("");
+        }
+        else {
+            $.ajax({
+                type: "GET",
+                url: '/Config/GetDataScopeTypeDescription/' + encodeURIComponent(id),
+                contentType: 'application/json',
+                success: function (returnedData) {
+                    $(".DatasetScopeTypeDescription span").text(returnedData.Description).html();
+                },
+                error: function () {
+                    $(".DatasetScopeTypeDescription span").text("");
+                }
+            });
+        }
+    },
+
+    CreateFormSubmitInit: function (e) {
+        e.preventDefault();
         $.ajax({
             url: "/Config/DatasetFileConfigForm",
             method: "POST",
@@ -276,45 +310,79 @@ data.Config = {
     EditInit: function () {
         $("#EditConfigForm").validateBootstrap(true);
 
-        data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text(), $('#ConfigId').val() !== "0");
+        data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
 
         $("#FileExtensionID").change(function () {
-            data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text(), $('#ConfigId').val() !== "0");
+            data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
         });
     },
 
-    SetFileExtensionProperites: function (extension, editMode) {
+    SetFileExtensionProperites: function (extension) {
+        //Determine which container to find the delimiter field within
+        // and set delimiterelement appropriately
+        var delimiterelement;
+
+        if ($("#DatasetFormContainer").css('display') === undefined) {
+            //User is on the Edit.cshtml page, so look for the delimiter element
+            delimiterelement = $('#Delimiter');
+        }
+        else if ($("#DatasetFormContainer").css('display') === 'none') {
+            //User is on the _DatasetFileConfigCreate.cshtml page and creating a schema
+            delimiterelement = $("#DatasetFileConfigFormContainer").find('#Delimiter');
+        }
+        else {
+            //User is on the _DatasetFileConfigCreate.cshtml page and creating a dataset
+            delimiterelement = $("#DatasetFormContainer").find('#Delimiter');
+        }
+
+        var editMode = false;
+        if ($('#ConfigId').val() !== undefined && $('#ConfigId').val() !== "0") {
+            editMode = true;
+        }
+
         switch (extension) {
             case "CSV":
-                $('.delimiter').show();
-                $('.delimiterDescription').hide();
-                $('#Delimiter').prop("readonly", "readonly");
+                $('.delimiterPanel').show();
                 $('#HasHeader').prop("readonly", false);
                 $('#HasHeader').prop("disabled", false);
                 if (!editMode) {
-                    $('#Delimiter').text(',');
-                    $('#Delimiter').val(',');
+                    delimiterelement.text(',');
+                    delimiterelement.val(',');
                 }
+                delimiterelement.prop("readonly", "readonly");
                 break;
             case "DELIMITED":
             case "ANY":
-                $('.delimiter').show();
-                $('.delimiterDescription').show();
+                $('.delimiterPanel').show();
                 if (!editMode) {
-                    $('#Delimiter').val('');
+                    delimiterelement.val('');
                 }
-                $('#Delimiter').prop("readonly", "");
+                delimiterelement.prop("readonly", "");
                 $('#HasHeader').prop("readonly", false);
                 $('#HasHeader').prop("disabled", false);
                 break;
             default:
-                $('.delimiter').hide();
+                $('.delimiterPanel').hide();
                 if (!editMode) {
-                    $('#Delimiter').val('');
+                    delimiterelement.val('');
                 }
-                $('#Delimiter').prop("readonly", "readonly");
+                delimiterelement.prop("readonly", "readonly");
                 $('#HasHeader').prop("readonly", true);
                 $('#HasHeader').prop("disabled", true);
+                break;
+        }
+
+        data.Config.setSchemaRootPathPanel(extension);
+    },
+
+    setSchemaRootPathPanel: function (extension) {
+        switch (extension) {
+            case "XML":
+            case "JSON":
+                $('.schemaRootPathPanel').show();
+                break;
+            default:
+                $('.schemaRootPathPanel').hide();
                 break;
         }
     },

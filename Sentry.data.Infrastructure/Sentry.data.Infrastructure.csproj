@@ -68,8 +68,8 @@
     <Reference Include="Iesi.Collections, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <HintPath>..\packages\Iesi.Collections.4.0.4\lib\net461\Iesi.Collections.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.3.0.0\lib\net45\Microsoft.Owin.dll</HintPath>
@@ -97,6 +97,9 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Polly, Version=7.0.0.0, Culture=neutral, PublicKeyToken=c8a3ffc3f8f825cc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Polly.7.2.2\lib\net472\Polly.dll</HintPath>
     </Reference>
     <Reference Include="RestSharp, Version=106.6.9.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
       <HintPath>..\packages\RestSharp.106.6.9\lib\net452\RestSharp.dll</HintPath>
@@ -129,6 +132,9 @@
     <Reference Include="Sentry.Web, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Web.5.0.2\lib\net40\Sentry.Web.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Snowflake.Data">
+      <HintPath>..\Lib\Snowflake.Data.dll</HintPath>
     </Reference>
     <Reference Include="StackExchange.Profiling.NHibernate, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MiniProfiler.NHibernate.2.1.0.2\lib\NET40\StackExchange.Profiling.NHibernate.dll</HintPath>
@@ -185,13 +191,7 @@
     <Compile Include="Helpers\ParsingHelpers.cs" />
     <Compile Include="Helpers\KafkaHelper.cs" />
     <Compile Include="Interfaces\IDataFlowStepProvider.cs" />
-    <Compile Include="Mappings\Metadata\DataElementDetailMapping.cs" />
-    <Compile Include="Mappings\Metadata\DataElementMapping.cs" />
     <Compile Include="Mappings\Metadata\DataLineageMapping.cs" />
-    <Compile Include="Mappings\Metadata\DataObjectDetailMapping.cs" />
-    <Compile Include="Mappings\Metadata\DataObjectFieldDetailMapping.cs" />
-    <Compile Include="Mappings\Metadata\DataObjectFieldMapping.cs" />
-    <Compile Include="Mappings\Metadata\DataObjectMapping.cs" />
     <Compile Include="Mappings\Metadata\HiveTableMapping.cs" />
     <Compile Include="Mappings\Metadata\LivyCreationMapping.cs" />
     <Compile Include="Mappings\Metadata\MetadataAssetMapping.cs" />
@@ -200,6 +200,7 @@
     <Compile Include="Mappings\Primary\DataProcessing\Actions\ClaimIQActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\FixedWidthActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleApiActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\JsonFlatteningActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\ProducerS3DropActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\SchemaMapActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\UncompressGzipActionMapping.cs" />
@@ -265,6 +266,10 @@
     <Compile Include="Mappings\Primary\RTSourceTypesMapping.cs" />
     <Compile Include="Mappings\Primary\RTAPIEndpointsMapping.cs" />
     <Compile Include="Mappings\Subscriptions\StatusTypeMapping.cs" />
+    <Compile Include="PollyPolicies\ApacheLivyProviderPolicy.cs" />
+    <Compile Include="PollyPolicies\GenericHttpProviderPolicy.cs" />
+    <Compile Include="PollyPolicies\FtpProviderPolicy.cs" />
+    <Compile Include="PollyPolicies\GoogleApiProviderPolicy.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -293,6 +298,7 @@
     <Compile Include="ServiceImplementations\DataSourceProviders\GenericHttpsDataFlowProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\GoogleAPIDataFlowProvider.cs" />
     <Compile Include="ServiceImplementations\HiveOdbcProvider.cs" />
+    <Compile Include="ServiceImplementations\HttpClientProvider.cs" />
     <Compile Include="ServiceImplementations\Messaging\DataStepProcessorService.cs" />
     <Compile Include="ServiceImplementations\Messaging\DfsEventService.cs" />
     <Compile Include="ServiceImplementations\Messaging\Events\DfsEvent.cs" />
@@ -304,6 +310,7 @@
     <Compile Include="ServiceImplementations\MetadataProcessorService.cs" />
     <Compile Include="ServiceImplementations\SAIDRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDService.cs" />
+    <Compile Include="ServiceImplementations\SnowProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\BaseTicketProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\CherwellProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\CherwellService.cs" />

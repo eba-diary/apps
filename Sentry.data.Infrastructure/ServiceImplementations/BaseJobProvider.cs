@@ -1,6 +1,4 @@
-﻿
-using RestSharp;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 
 namespace Sentry.data.Infrastructure
 {

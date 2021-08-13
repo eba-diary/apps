@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Polly;
 using RestSharp;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
@@ -16,20 +17,48 @@ namespace Sentry.data.Infrastructure
         protected IRestClient _client;
         protected IRestRequest _request;
         protected Uri _uri;
-        protected IDatasetContext _dsContext;
-        protected IConfigService _configService;
-        protected IEncryptionService _encryptionService;
+        private readonly Lazy<IDatasetContext> _dsContext;
+        protected Lazy<IConfigService> _configService;
+        private readonly Lazy<IEncryptionService> _encryptionService;
         protected RetrieverJob _targetJob;
         protected DataFlowStep _targetStep;
+        protected IAsyncPolicy _providerPolicyAsync;
+        protected ISyncPolicy _providerPolicy;
         #endregion
 
-        protected BaseHttpsProvider(IDatasetContext datasetContext, 
-            IConfigService configService, IEncryptionService encryptionService)
+        protected BaseHttpsProvider(Lazy<IDatasetContext> datasetContext, 
+            Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService,
+            IRestClient restClient)
         {
             _dsContext = datasetContext;
             _configService = configService;
             _encryptionService = encryptionService;
+            _client = restClient;
         }
+
+        protected IDatasetContext DatasetContext
+        {
+            get { return _dsContext.Value; }
+        }
+        protected IEncryptionService EncryptionService
+        {
+            get { return _encryptionService.Value; }
+        }
+        protected IConfigService ConfigService
+        {
+            get { return _configService.Value; }
+        }
+        
+        public virtual IRestRequest Request
+        {
+            get { return _request; }
+        }
+
+        //public virtual RetrieverJob Job
+        //{
+        //    get { return _job; }
+        //    set { _job = value; }
+        //}
 
         protected abstract void ConfigureClient();
         protected abstract void ConfigureRequest();
@@ -117,7 +146,7 @@ namespace Sentry.data.Infrastructure
         #region TokenAuthSpecific
         protected void ConfigureTokenAuth(IRestRequest req, RetrieverJob job)
         {
-            req.AddHeader(((HTTPSSource)job.DataSource).AuthenticationHeaderName, _encryptionService.DecryptString(((HTTPSSource)job.DataSource).AuthenticationTokenValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)job.DataSource).IVKey));
+            req.AddHeader(((HTTPSSource)job.DataSource).AuthenticationHeaderName, EncryptionService.DecryptString(((HTTPSSource)job.DataSource).AuthenticationTokenValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)job.DataSource).IVKey));
         }
         #endregion
 
@@ -143,7 +172,7 @@ namespace Sentry.data.Infrastructure
             Dictionary<string, object> claims = new Dictionary<string, object>();
             List<OAuthClaim> sourceClaims;
 
-            sourceClaims = _dsContext.OAuthClaims.Where(w => w.DataSourceId == source).ToList();
+            sourceClaims = DatasetContext.OAuthClaims.Where(w => w.DataSourceId == source).ToList();
 
             foreach (OAuthClaim claim in sourceClaims)
             {

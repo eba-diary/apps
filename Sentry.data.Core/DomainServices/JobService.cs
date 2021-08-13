@@ -241,7 +241,12 @@ namespace Sentry.data.Core
         public List<RetrieverJob> GetDfsRetrieverJobs()
         {
             List<RetrieverJob> jobs;
-            jobs = _datasetContext.RetrieverJob.Where(x => x.IsEnabled).ToList();
+            jobs = _datasetContext.RetrieverJob.Where(x => x.IsEnabled).FetchAllConfiguration(_datasetContext).ToList();
+
+            //var dataflows = _datasetContext.DataFlow.Where(df => jobQueryable.Any(a => df.Id == a.DataFlow.Id));
+
+            //var tree = jobQueryable.FetchAllConfiguration()
+
             return jobs.Where(x => x.DataSource.Is<DfsBasic>() || x.DataSource.Is<DfsDataFlowBasic>()).ToList();
         }
 

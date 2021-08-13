@@ -1,13 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Sentry.Common.Logging;
-using StructureMap;
 
 namespace Sentry.data.Infrastructure
 {
@@ -100,6 +99,18 @@ namespace Sentry.data.Infrastructure
                         ftpstream.CopyTo(filestream);
                     }
                 }
+            }
+            catch(RetrieverJobProcessingException ex)
+            {
+                _job.JobLoggerMessage("Error", "", ex);
+                _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
+
+                //Cleanup temp file if exists
+                if (File.Exists(tempFile))
+                {
+                    File.Delete(tempFile);
+                }
+                throw;
             }
             catch (Exception ex)
             {

@@ -1,4 +1,6 @@
-﻿using Sentry.data.Core;
+﻿using Polly.Registry;
+using RestSharp;
+using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using System;
 
@@ -8,8 +10,9 @@ namespace Sentry.data.Infrastructure
     {
         private readonly IDataFlowService _dataFlowService;
 
-        public GenericHttpsDataFlowProvider(IDatasetContext datasetContext, IConfigService configService,
-                IEncryptionService encryptionService, IJobService jobService, IDataFlowService dataFlowService) : base(datasetContext, configService, encryptionService, jobService)
+        public GenericHttpsDataFlowProvider(Lazy<IDatasetContext> datasetContext, Lazy<IConfigService> configService,
+                Lazy<IEncryptionService> encryptionService, Lazy<IJobService> jobService, IDataFlowService dataFlowService,
+                IRestClient restClient, IReadOnlyPolicyRegistry<string> policyRegistry) : base(datasetContext, configService, encryptionService, jobService, policyRegistry, restClient)
         {
             _dataFlowService = dataFlowService;
         }

@@ -185,30 +185,6 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public IQueryable<DataElement> DataElements
-        {
-            get
-            {
-                return Query<DataElement>();
-            }
-        }
-
-        public IQueryable<DataElementDetail> DataElementDetails
-        {
-            get
-            {
-                return Query<DataElementDetail>();
-            }
-        }
-
-        public IQueryable<DataObject> DataObjects
-        {
-            get
-            {
-                return Query<DataObject>().Cacheable();
-            }
-        }
-
         public IQueryable<FileExtension> FileExtensions
         {
             get
@@ -391,6 +367,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<BaseField> BaseFields
+        {
+            get
+            {
+                return Query<BaseField>();
+            }
+        }
+
         public IQueryable<DataFlow> DataFlow
         {
             get
@@ -516,6 +500,14 @@ namespace Sentry.data.Infrastructure
             get
             {
                 return Query<XMLAction>();
+            }
+        }
+
+        public IQueryable<JsonFlatteningAction> JsonFlatteningAction
+        {
+            get
+            {
+                return Query<JsonFlatteningAction>();
             }
         }
 

@@ -1,6 +1,9 @@
 ﻿using Hangfire;
+using Polly;
+using Polly.Registry;
 using RestSharp;
 using Sentry.data.Core;
+using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,14 +13,20 @@ namespace Sentry.data.Infrastructure
 {
     public class GenericHttpsProvider : BaseHttpsProvider
     {
-        private readonly IJobService _jobService;
+        private readonly Lazy<IJobService> _jobService;
         protected bool _IsTargetS3;
         protected string _targetPath;
 
-        public GenericHttpsProvider(IDatasetContext datasetContext,
-            IConfigService configService, IEncryptionService encryptionService, IJobService jobService) : base(datasetContext, configService, encryptionService)
+        public GenericHttpsProvider(Lazy<IDatasetContext> datasetContext,
+            Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService,
+            Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry, IRestClient restClient) : base(datasetContext, configService, encryptionService, restClient)
         {
             _jobService = jobService;
+            _providerPolicy = policyRegistry.Get<ISyncPolicy>(PollyPolicyKeys.GenericHttpProviderPolicy);
+        }
+        protected IJobService JobService
+        {
+            get { return _jobService.Value; }
         }
 
         public override void Execute(RetrieverJob job)
@@ -168,11 +177,24 @@ namespace Sentry.data.Infrastructure
         {
             IRestResponse resp;
 
-            resp = _client.Execute(_request);
+            resp = _providerPolicy.Execute(() =>
+            {
+                IRestResponse response = _client.Execute(Request);
+
+                if (response.ErrorException != null)
+                {
+                    const string message = "Error retrieving response";
+                    var ex = new RetrieverJobProcessingException(message, response.ErrorException);
+                    throw ex;
+                }
+
+                return response;
+            });
+
             if (resp.StatusCode != HttpStatusCode.OK)
             {
                 _job.JobLoggerMessage("Error", "failed_request", resp.ErrorException);
-                throw new HttpListenerException((int)resp.StatusCode, resp.Content);
+                throw new RetrieverJobProcessingException($"Failed processing https request - response:{resp.Content}");
             }
 
             return resp;
@@ -251,7 +273,7 @@ namespace Sentry.data.Infrastructure
         protected override void FindTargetJob()
         {
             //Find appropriate drop location (S3Basic or DfsBasic)
-            _targetJob = _jobService.FindBasicJob(this._job);
+            _targetJob = JobService.FindBasicJob(this._job);
 
             _IsTargetS3 = _targetJob.DataSource.Is<S3Basic>();
         }

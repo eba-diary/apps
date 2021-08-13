@@ -44,9 +44,8 @@
     <Reference Include="Hangfire.SqlServer, Version=1.7.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Hangfire.SqlServer.1.7.6\lib\net45\Hangfire.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.3.0.0\lib\net45\Microsoft.Owin.dll</HintPath>
@@ -90,6 +89,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net" />
@@ -116,6 +116,7 @@
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
+    <Compile Include="DTO\Dale\DaleAdvancedCriteriaDto.cs" />
     <Compile Include="DTO\Dale\DaleCategoryResultDto.cs" />
     <Compile Include="DTO\Dale\DaleCategoryDto.cs" />
     <Compile Include="DTO\Dale\DaleContainSensitiveResultDto.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\FixedWidthAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleApiAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\JsonFlatteningAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ProducerS3DropAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\SchemaMapAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressGzipAction.cs" />
@@ -220,6 +222,8 @@
     <Compile Include="Exceptions\HiveQueryException.cs" />
     <Compile Include="Exceptions\HiveTableViewNotFoundException.cs" />
     <Compile Include="Exceptions\JobNotFoundException.cs" />
+    <Compile Include="Exceptions\KafkaProducerException.cs" />
+    <Compile Include="Exceptions\RetrieverJobProcessingException.cs" />
     <Compile Include="Exceptions\SASNotificationNotSentException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaConversionException.cs" />
@@ -262,6 +266,7 @@
     <Compile Include="Interfaces\DataProcessing\IDataStepService.cs" />
     <Compile Include="Interfaces\DataProcessing\IFixedWidthProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IGoogleApiActionProvider.cs" />
+    <Compile Include="Interfaces\DataProcessing\IJsonFlatteningAction.cs" />
     <Compile Include="Interfaces\DataProcessing\IProducerS3DropProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IQueryStorageProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IRawStorageProvider.cs" />
@@ -277,12 +282,15 @@
     <Compile Include="Interfaces\IDaleSearchProvider.cs" />
     <Compile Include="Interfaces\IDaleService.cs" />
     <Compile Include="Interfaces\IDataFeatures.cs" />
+    <Compile Include="Interfaces\IHttpClientProvider.cs" />
+    <Compile Include="Interfaces\IPollyPolicy.cs" />
     <Compile Include="Interfaces\IRetrieverJobService.cs" />
     <Compile Include="Interfaces\IHiveOdbcProvider.cs" />
     <Compile Include="Interfaces\ISAIDRestClient.cs" />
     <Compile Include="Interfaces\ISAIDService.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
+    <Compile Include="Interfaces\ISnowProvider.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />
     <Compile Include="Interfaces\IBaseTicketProvider.cs" />
     <Compile Include="Interfaces\ICherwellProvider.cs" />
@@ -373,12 +381,6 @@
     <Compile Include="Entities\Livy\QueryableDataset.cs" />
     <Compile Include="Entities\Goldeneye\RequestHeader.cs" />
     <Compile Include="Entities\MessageFormats\HiveMetadataEvent.cs" />
-    <Compile Include="Entities\Metadata\DataElement.cs" />
-    <Compile Include="Entities\Metadata\DataElementDetail.cs" />
-    <Compile Include="Entities\Metadata\DataObject.cs" />
-    <Compile Include="Entities\Metadata\DataObjectDetail.cs" />
-    <Compile Include="Entities\Metadata\DataObjectField.cs" />
-    <Compile Include="Entities\Metadata\DataObjectFieldDetail.cs" />
     <Compile Include="Entities\Metadata\HiveTable.cs" />
     <Compile Include="Entities\Metadata\Lineage.cs" />
     <Compile Include="Entities\Goldeneye\LoaderRequest.cs" />
@@ -470,6 +472,7 @@
     <Compile Include="Interfaces\Retriever\IRetrieverJob.cs" />
     <Compile Include="Interfaces\IJobService.cs" />
     <Compile Include="DTO\TagGroupDto.cs" />
+    <Compile Include="PollyPolicyKeys.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entities\User\ApplicationUser.cs" />
     <Compile Include="Entities\User\ImpersonatedApplicationUser.cs" />

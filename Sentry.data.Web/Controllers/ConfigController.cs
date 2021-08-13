@@ -10,6 +10,7 @@ using Sentry.data.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using static Sentry.data.Core.RetrieverJobOptions;
@@ -1399,7 +1400,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (ValidationException vEx)
             {
-                return Json(new { Success = false, Message = "Failed schema validation", Errors = vEx.ValidationResults.GetAll() }, JsonRequestBehavior.AllowGet);
+                return Json(new { Success = false, Message = "Failed schema validation.  ", Errors = vEx.ValidationResults.GetAll() }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
@@ -1476,44 +1477,12 @@ namespace Sentry.data.Web.Controllers
 
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
 
-            DataElement maxSchemaRevision = dfc.Schemas.OrderByDescending(o => o.SchemaRevision).FirstOrDefault();
-            //Get raw file storage code
-            string storageCode = dfc.GetStorageCode();
 
             try
             {
                 if (ModelState.IsValid)
                 {
-                    DataElement de = new DataElement()
-                    {
-                        DataElementCreate_DTM = DateTime.Now,
-                        DataElementChange_DTM = DateTime.Now,
-                        LastUpdt_DTM = DateTime.Now,
-                        DataElement_CDE = "F",
-                        DataElementCode_DSC = GlobalConstants.DataElementDescription.DATA_FILE,
-                        DataElement_NME = csm.Name,
-                        DataElement_DSC = csm.Description,
-                        DatasetFileConfig = dfc,
-                        Delimiter = csm.Delimiter,
-                        HasHeader = csm.HasHeader,
-                        SchemaName = csm.Name,
-                        SchemaDescription = csm.Description,
-                        SchemaIsForceMatch = csm.IsForceMatch,
-                        SchemaIsPrimary = true,
-                        SchemaRevision = (maxSchemaRevision == null) ? 0 : maxSchemaRevision.SchemaRevision + 1,
-                        StorageCode = storageCode,
-                        HiveDatabase = "Default",
-                        HiveTable = dfc.ParentDataset.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfc.Name.Replace(" ", "").ToUpper(),
-                        HiveTableStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
-                        HiveLocation = RootBucket + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
-                    };
-
-                    dfc.Schemas.Add(de);
-
-                    if (maxSchemaRevision != null)
-                    {
-                        maxSchemaRevision.SchemaIsPrimary = false;
-                    }
+                    
 
                     _datasetContext.SaveChanges();
 
@@ -1747,6 +1716,16 @@ namespace Sentry.data.Web.Controllers
             ViewData["EnableJobControls"] = "false";
             ViewData["Color"] = "blue";
             return PartialView("~/Views/RetrieverJob/_RetrieverJob.cshtml", job);
+        }
+
+        [HttpGet]
+        [Route("Config/GetDataScopeTypeDescription/{id}")]
+        public JsonResult GetDataScopeTypeDescription(int id)
+        {
+            string description = _datasetContext.DatasetScopeTypes.Where(w => w.ScopeTypeId == id).Select(s => s.Description).FirstOrDefault();
+
+            Response.StatusCode = (int)HttpStatusCode.OK;
+            return Json(new { Description = description }, JsonRequestBehavior.AllowGet);
         }
     }
 }

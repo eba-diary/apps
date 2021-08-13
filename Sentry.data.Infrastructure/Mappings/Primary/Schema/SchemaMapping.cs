@@ -30,12 +30,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property(x => x.CLA1580_StructureHive, m => m.Column("CLA1580_StructureHive"));
             Property(x => x.CLA2472_EMRSend, m => m.Column("CLA2472_EMRSend"));
             Property(x => x.CLA1286_KafkaFlag, m => m.Column("CLA1286_KafkaFlag"));
+            Property(x => x.CLA3014_LoadDataToSnowflake, m => m.Column("CLA3014_LoadDataToSnowflake"));
             this.Bag((x) => x.Revisions, (m) =>
             {
                 m.Inverse(true);
                 m.Table("SchemaRevision");
                 m.Cascade(Cascade.All);
-                m.Cache(c => c.Usage(CacheUsage.ReadWrite));
                 m.Key((k) =>
                 {
                     k.Column("ParentSchema_Id");
@@ -70,6 +70,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 Property(x => x.SnowflakeDatabase, m => m.Column("SnowflakeDatabase"));
                 Property(x => x.SnowflakeSchema, m => m.Column("SnowflakeSchema"));
                 Property(x => x.SnowflakeStatus, m => m.Column("SnowflakeStatus"));
+                Property(x => x.SchemaRootPath, m => m.Column("SchemaRootPath"));
             }
         }
     }

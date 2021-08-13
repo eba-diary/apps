@@ -27,9 +27,6 @@ namespace Sentry.data.Core
         IQueryable<EventType> EventTypes { get; }
         IQueryable<Event> Events { get; }
         IQueryable<Status> EventStatus { get; }
-        IQueryable<DataElement> DataElements { get; }
-        IQueryable<DataElementDetail> DataElementDetails { get; }
-        IQueryable<DataObject> DataObjects { get; }
         IQueryable<DatasetFile> DatasetFile { get; }
         IQueryable<FileExtension> FileExtensions { get; }
         IQueryable<Category> Categories { get; }
@@ -54,6 +51,7 @@ namespace Sentry.data.Core
         IQueryable<Schema> Schema { get; }
         IQueryable<FileSchema> FileSchema { get; }
         IQueryable<SchemaRevision> SchemaRevision { get; }
+        IQueryable<BaseField> BaseFields { get; }
         IQueryable<DataFlow> DataFlow { get; }
         IQueryable<DataFlowStep> DataFlowStep { get; }
         IQueryable<S3DropAction> S3DropAction { get; }
@@ -68,6 +66,7 @@ namespace Sentry.data.Core
         IQueryable<GoogleApiAction> GoogleApiAction { get; }
         IQueryable<FixedWidthAction> FixedWidthAction { get; }
         IQueryable<XMLAction> XMLAction { get; }
+        IQueryable<JsonFlatteningAction> JsonFlatteningAction { get; }
         IQueryable<SchemaMap> SchemaMap { get; }
         IQueryable<ClaimIQAction> ClaimIQAction { get; }
         /** Datasets **/

@@ -78,7 +78,15 @@ namespace Sentry.data.Core
         /// <exception cref="HiveQueryException">Thrown when odbc driver throws an error</exception>
         /// <returns></returns>
         List<Dictionary<string, object>> GetTopNRowsBySchema(int id, int rows);
-        bool RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent);
+        /// <summary>
+        /// Register file with dataset\schema based on dataflowstep event
+        /// </summary>
+        /// <param name="schema"></param>
+        /// <param name="objectKey"></param>
+        /// <param name="versionId"></param>
+        /// <param name="stepEvent"></param>
+        /// <exception cref="ArgumentException"></exception>
+        void RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent);
         bool SasAddOrUpdateNotification(int schemaId, int revisionId, string initiatorId, JObject changeIndicator, string externalSystemIndictator);
         bool SasDeleteNotification(int schemaId, string initiatorId, string externalSystemIndictator);
         /// <summary>

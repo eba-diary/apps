@@ -16,7 +16,7 @@
                 @if (Model.Security.CanUploadToDataset)
                 {
                     <strong class="alertHeading">Info: </strong>
-                    <span>This dataset has no files attached to it yet.  Please click the flashing upload button to upload your first file.</span>
+                    <span>This dataset has no files attached to it yet.   Please send files to one of the drop locations listed under DataFlows.</span>
                 }
                 else
                 {
@@ -337,12 +337,6 @@
                         </div>
 
                         <div class="row" data-bind="visible: SchemaRows().length > 0">
-                            <div class="col-lg-12">
-                                <h5 class="@color">Hive</h5>
-                                <!-- ko foreach: FullyQualifiedHiveViews() -->
-                                <p><span class="hideOverflow" data-bind="text: $data"></span></p>
-                                <!-- /ko -->
-                            </div>
                             <div class="col-lg-12">
                                 <h5 class="@color">Snowflake</h5>
                                 <!-- ko foreach: FullyQualifiedSnowflakeViews() -->
@@ -701,6 +695,8 @@
             }
     };
 
+
+        //DATA PREVIEW DATA TABLE SETUP
         function renderTable_v2(input, push) {
 
             //remove table DOM if needed
@@ -712,16 +708,26 @@
             var parsedColumns = [];
             var nullColumns = [];
 
-            //   Remove existing column metadata
+            //Remove existing column metadata
             $('#tableColumnIDs').empty();
             $('#tableFirstRow').empty();
             $('#datasetRowTable tbody').empty();
 
-            //Get first row to parse columns
+            //SETUP ALL COLUMNS for DATA PREVIEW
             Object.keys(input[0]).forEach(function (key)
             {
                 nullColumns.push(null);
-                parsedColumns.push({ 'title': key.trim(), 'width': "auto" });
+
+                //load up ARRAY with each column
+                //CUSTOM RENDER will wrap column data in DIV which adds a scroll bar if needed since STRUCT columns are HUGE
+                parsedColumns.push({
+                    'title': key.trim(), 'width': "auto", render: function (d)
+                    {
+                        var me = "<div style='max-height:100px; overflow-y: auto;'>" + d + "</div>"; 
+                        return me;
+                    }
+                });
+
                 $('#tableColumnIDs').append("<th>" + key.trim() + "</th>");
                 $('#tableFirstRow').append("<td></td>");
             });
@@ -732,12 +738,7 @@
                 var parsedCells = [];
 
                 for (var key of Object.keys(row)) {
-                    if (row[key] != null) {
-                        parsedCells.push(row[key].trim());
-                    }
-                    else {
-                        parsedCells.push(row[key]);
-                    }
+                    parsedCells.push(row[key]);
                 }
 
                 if (parsedCells.length >= 1) {
@@ -748,6 +749,9 @@
             if (!push) {
                 table = $('#datasetRowTable').DataTable({
                     "scrollX": true,
+                    "autoWidth": true,
+                    "scrollY": "1200px",                //set max height at 1200
+                    "scrollCollapse": true,             //if less then 1200, shrink so no white space
                     data: parsedRows,
                     columns: parsedColumns,
                 });
@@ -852,8 +856,6 @@
             self.CronJobs = ko.observableArray();
             self.Views = ko.observable();
             self.Downloads = ko.observable();
-            self.HiveDatabase = ko.observable();
-            self.FullyQualifiedHiveViews = ko.observableArray();
             self.FullyQualifiedSnowflakeViews = ko.observableArray();
             self.RenderDataFlows = ko.computed(function () {
                 if (self.DataFlows == undefined || self.DataFlows().length == 0) {
@@ -974,14 +976,6 @@
                     self.Downloads(result.Downloads);
                     self.Views(result.Views);
                     self.Description(result.Description);
-                    self.HiveDatabase(result.HiveDatabase);
-                    //Remove all FullyQualifiedHiveViews before adding new list
-                    self.FullyQualifiedHiveViews.removeAll();
-                    $.each(result.HiveViews, function (i, val) {
-                        var fullyqualifiedname = result.HiveDatabase + '.' + val;
-                        self.FullyQualifiedHiveViews.push(fullyqualifiedname);
-                    });
-
                     self.FullyQualifiedSnowflakeViews.removeAll();
                     $.each(result.SnowflakeViews, function (i, val) {
                         self.FullyQualifiedSnowflakeViews.push(val);
@@ -1056,12 +1050,13 @@
                             if (msg !== undefined) {
                                 var obj = JSON.parse(msg);
                                 if (obj.length > 0) {
+
+                                    //pass data returned from AJAX call to render Data Table
                                     renderTable_v2(obj, false);
 
                                     $('#dataSection').show();
                                     self.DataLoading(false);
                                     self.DataTableExists(true);
-
                                     $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
                                 }
                                 else {

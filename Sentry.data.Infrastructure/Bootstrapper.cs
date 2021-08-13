@@ -8,6 +8,11 @@ using Sentry.data.Infrastructure.Mappings.Primary;
 using System.Net.Http;
 using Sentry.data.Core.Interfaces.SAIDRestClient;
 using Sentry.Messaging.Common;
+using System.Net;
+using Sentry.data.Core.Interfaces;
+using Polly.Registry;
+using Sentry.data.Infrastructure.PollyPolicies;
+using System;
 
 namespace Sentry.data.Infrastructure
 {
@@ -92,6 +97,7 @@ namespace Sentry.data.Infrastructure
                 x.Type<GenericHttpsDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
             });
 
+
             //Register event handlers for MetadataProcessorService
             registry.For<IMessageHandler<string>>().Add<S3EventService>();
             registry.For<IMessageHandler<string>>().Add<HiveMetadataService>();
@@ -99,9 +105,16 @@ namespace Sentry.data.Infrastructure
             registry.For<IMessageHandler<string>>().Add<DfsEventService>();
             registry.For<IMessageHandler<string>>().Add<SnowflakeEventService>();
 
+            //Wire up Obsidian provider
             Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();
             obsidianUserProvider.CacheTimeoutSeconds = int.Parse(Sentry.Configuration.Config.GetHostSetting("ObsidianUserCacheTimeoutMinutes")) * 60;
+            //Provide user\pass for possibility of basic auth if necessary
+            obsidianUserProvider.Credentials = new System.Net.NetworkCredential(
+                Sentry.Configuration.Config.GetHostSetting("ServiceAccountID"),
+                Sentry.Configuration.Config.GetHostSetting("ServiceAccountPassword")
+                );
             registry.For<Sentry.Web.CachedObsidianUserProvider.IObsidianUserProvider>().Singleton().Use(obsidianUserProvider);
+
             registry.For<IAssociateInfoProvider>().Singleton().Use<AssociateInfoProvider>();
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
             registry.For<ISASService>().Singleton().Use<SASServiceProvider>();
@@ -109,6 +122,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
             registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
+            registry.For<RestSharp.IRestClient>().Use(() => new RestSharp.RestClient()).AlwaysUnique();
 
             //establish generic httpclient singleton to be used where needed across the application
             var client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true });
@@ -119,17 +133,33 @@ namespace Sentry.data.Infrastructure
                 Ctor<HttpClient>().Is(client).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("SaidAssetBaseUrl"));
 
+            //establish Polly Policy registry
+            PolicyRegistry pollyRegistry = new PolicyRegistry();
+            registry.For<IReadOnlyPolicyRegistry<string>>().Singleton().Use(pollyRegistry);
+            registry.For<IPolicyRegistry<string>>().Singleton().Use(pollyRegistry);
+
+            //register polly policies
+            registry.For<IPollyPolicy>().Singleton().Add<ApacheLivyProviderPolicy>();
+            registry.For<IPollyPolicy>().Singleton().Add<GoogleApiProviderPolicy>();
+            registry.For<IPollyPolicy>().Singleton().Add<GenericHttpProviderPolicy>();
+            registry.For<IPollyPolicy>().Singleton().Add<FtpProviderPolicy>();
+
+
             //establish httpclient specific to ApacheLivyProvider
             var apacheLivyClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
             apacheLivyClient.DefaultRequestHeaders.Accept.Clear();
             apacheLivyClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
             apacheLivyClient.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
+            var apacheHttpClientProvider = new HttpClientProvider(apacheLivyClient);
             registry.For<IApacheLivyProvider>().Singleton().Use<ApacheLivyProvider>().
-                Ctor<HttpClient>().Is(apacheLivyClient);
+                Ctor<IHttpClientProvider>().Is(apacheHttpClientProvider)
+                .SetProperty((c) => c.BaseUrl = Configuration.Config.GetHostSetting("ApacheLivy"));
 
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);
 
+            // Polly Policy providers
+            _container.GetAllInstances<IPollyPolicy>().ToList().ForEach(p => p.Register());
         }
 
         /// <summary>

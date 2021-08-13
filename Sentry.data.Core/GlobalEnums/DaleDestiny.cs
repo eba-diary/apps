@@ -17,6 +17,9 @@ namespace Sentry.data.Core.GlobalEnums
         Server = 3,
 
         [Description("Database")]
-        Database = 4
+        Database = 4,
+
+        [Description("Advanced")]
+        Advanced = 5
     }
 }
