@@ -1150,6 +1150,7 @@ namespace Sentry.data.Infrastructure
 
         public bool DisableJob(int JobId)
         {
+            //TODO: CLA-2888 - Add ObjectStatus disable logic
             RetrieverJob job = null;
 
             try
@@ -1188,6 +1189,7 @@ namespace Sentry.data.Infrastructure
 
         public void EnableJob(int JobId)
         {
+            //TODO: CLA-2888 - Add ObjectStatus enable logic
             RetrieverJob job = null;
 
             try

@@ -185,6 +185,7 @@ namespace Sentry.data.Core
 
         public void DisableJob(int id)
         {
+            //TODO: CLA-2888 - add ObjectStatus disabled logic
             string methodName = MethodBase.GetCurrentMethod().Name.ToLower();
             Logger.Debug($"Start method <{methodName}>");
             try
@@ -279,7 +280,8 @@ namespace Sentry.data.Core
                 Modified = DateTime.Now,
                 IsGeneric = true,
                 JobOptions = rjo,
-                JobGuid = g
+                JobGuid = g,
+                ObjectStatus = GlobalEnums.ObjectStatusEnum.Active
             };
 
             if (dataSource.Is<S3Basic>())
@@ -335,6 +337,7 @@ namespace Sentry.data.Core
             job.RelativeUri = dto.RelativeUri;
             job.Schedule = dto.Schedule;
             job.TimeZone = "Central Standard Time";
+            job.ObjectStatus = dto.ObjectStatus;
         }
 
         private void DeleteJobFromScheduler(RetrieverJob job)
