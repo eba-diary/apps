@@ -72,8 +72,10 @@ namespace Sentry.data.Core
         {
             List<string> errors = new List<string>();
 
+            //NOTE: if you have more then 2 times where validation errors are found the _datasetContext.FileExtensions.FirstOrDefault(x => x.Id == dto.FileExtensionId).Name will be null
+            //and when currentFileExtension is evaluated it will blow up because its null, will add an item to address this because this has been a hidden bug for a long time probably
             var currentFileExtension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Id == dto.FileExtensionId).Name.ToLower();
-
+            
             if (currentFileExtension == "csv" && dto.Delimiter != ",")
             {
                 errors.Add("File Extension CSV and it's delimiter do not match.");
@@ -84,9 +86,41 @@ namespace Sentry.data.Core
                 errors.Add("File Extension Delimited is missing it's delimiter.");
             }
 
-            if (dto.Name.ToUpper() == "DEFAULT" || String.IsNullOrWhiteSpace(dto.Name))
+            if (dto.Name == null)
             {
-                errors.Add("Configuration Name cannot be equal to default or empty.");
+                errors.Add("Configuration Name is required.");
+            }
+            else
+            {
+                if (String.IsNullOrWhiteSpace(dto.Name))
+                {
+                    errors.Add("Configuration Name is required.");
+                }
+                else if (dto.Name.ToUpper() == "DEFAULT")
+                {
+                    errors.Add("Configuration Name cannot be named default.");
+                }
+                else if (dto.Name.Length > 100)
+                {
+                    errors.Add("Configuration Name number of characters cannot be greater than 100.");
+                }
+            }
+
+
+            if (dto.Description == null)
+            {
+                errors.Add("Configuration Description is required.");
+            }
+            else
+            {
+                if (String.IsNullOrWhiteSpace(dto.Description))
+                {
+                    errors.Add("Configuration Description is required..");
+                }
+                else if (dto.Description.Length > 2000)
+                {
+                    errors.Add("Configuration Description number of characters cannot be greater than 100.");
+                }
             }
 
             return errors;

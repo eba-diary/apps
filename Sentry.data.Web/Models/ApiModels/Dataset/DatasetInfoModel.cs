@@ -11,5 +11,6 @@
         public string PrimaryOwnerName { get; set; }
         public string Category { get; set; }
         public string ObjectStatus { get; set; }
+        public virtual string SAIDAssetKeyCode { get; set; }
     }
 }

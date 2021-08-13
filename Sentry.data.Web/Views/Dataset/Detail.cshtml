@@ -254,9 +254,13 @@
                         <hr />
 
                         <div class="row">
-                            <div class="col-lg-12">
+                            <div class="col-lg-6">
                                 <h5 class="@color">Data Classification</h5>
                                 <p>@Model.DataClassificationDescription</p>
+                            </div>
+                            <div class="col-lg-6">
+                                <h5 class="@color">SAID Asset</h5>
+                                <a target="_blank" rel="noopener noreferrer" href="https://said.sentry.com/ViewAsset.aspx?ID=@Model.SAIDAssetKeyCode">@Model.SAIDAssetKeyCode</a>
                             </div>
                         </div>
                         <hr />
@@ -1001,7 +1005,7 @@
                     self.DataFlows.notifySubscribers();
 
                     //Determine last
-                    var d = new Date(result.DataLastUpdated);     
+                    var d = new Date(result.DataLastUpdated);
                     if (d < new Date('1990-01-01')) {
                         self.DataLastUpdated('No Data Files Exist');
                     } else {
