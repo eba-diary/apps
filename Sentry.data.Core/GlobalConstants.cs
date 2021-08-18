@@ -26,6 +26,7 @@
             //Report specific validation errors
             public const string LOCATION_IS_BLANK = "locationIsBlank";
             public const string LOCATION_IS_INVALID = "locationIsInvalid";
+            public const string SAID_ASSET_KEY_IS_BLANK = "SAIDAssetIsBlank";
         }
 
 

@@ -51,30 +51,6 @@ namespace Sentry.data.Web.Controllers
             _featureFlags = dataFeatures;
         }
 
-        private string RootBucket
-        {
-            get
-            {
-                if (_bucket == null)
-                {
-                    _bucket = Config.GetHostSetting("AWS2_0RootBucket");
-                }
-                return _bucket;
-            }
-        }
-
-        private string AwsRegion
-        {
-            get
-            {
-                if (_awsRegion == null)
-                {
-                    _awsRegion = Config.GetHostSetting("AWS2_0Region");
-                }
-                return _awsRegion;
-            }
-        }
-
         [HttpGet]
         [Route("Config/Dataset/{id}")]
         public ActionResult Index(int id)
@@ -93,10 +69,11 @@ namespace Sentry.data.Web.Controllers
                 {
                     DatasetFileConfigsModel model = new DatasetFileConfigsModel(config, true, false);
 
-                    model.RetrieverJobs = config.RetrieverJobs;
+                    //Add DataFlow RetrieverJobs to Model
                     Tuple<DataFlowDetailDto, List<RetrieverJob>> jobs2 = _configService.GetDataFlowForSchema(config);
                     model.DataFlowJobs = (jobs2.Item1 != null) ? jobs2.ToModel() : null;
 
+                    //Add External RetrieverJobs associated with DataFlows to Model
                     model.ExternalDataFlowJobs = _configService.GetExternalDataFlowsBySchema(config).ToModel();
                     configModelList.Add(model);
                 }

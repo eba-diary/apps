@@ -22,6 +22,7 @@
     [DeleteIssuer] VARCHAR(10) NULL, 
     [DeleteIssueDTM] DATETIME NOT NULL, 
     [ObjectStatus] INT NOT NULL DEFAULT 1, 
+    [SaidKeyCode] VARCHAR(10) NULL, 
     PRIMARY KEY CLUSTERED 
 (
 	[Dataset_ID] ASC

@@ -124,32 +124,6 @@ namespace Sentry.data.Web
             return extensions.Distinct().ToList();
         }
 
-        [DisplayName("Creation Frequency")]
-        public List<string> DistinctFrequencies()
-        {
-            List<string> frequencies = new List<string>();
-
-            foreach (var item in this.DatasetFileConfigs)
-            {
-                if (item.RetrieverJobs != null)
-                {
-                    if (item.RetrieverJobs.Count == 1)
-                    {
-                        frequencies.Add(item.RetrieverJobs.First().ReadableSchedule);
-                    }
-                    else
-                    {
-                        foreach (var job in item.RetrieverJobs.Where(x => !x.IsGeneric))
-                        {
-                            frequencies.Add(job.ReadableSchedule);
-                        }
-                    }
-                }
-            }
-
-            return frequencies.Distinct().ToList();
-        }
-
 
         public int DatasetId { get; set; }
 
