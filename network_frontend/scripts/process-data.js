@@ -10,7 +10,7 @@ const getColor = (value) => {
     return ["hsl(",hue,",100%,70%)"].join("");
 }
 
-const processData = (raw, entries_json) => {
+const processData = (raw) => {
   let max_score = Number.MIN_SAFE_INTEGER
   let min_score = Number.MAX_SAFE_INTEGER
   let cleaned_data = raw
@@ -75,6 +75,15 @@ const processData = (raw, entries_json) => {
 
     return obj
   }, {})
+
+
+  //this loop is needed because the diary_entries api call is giving as pure JSON
+  //we need a list not by date for the fuse search
+  //this should be made more elegant
+  window.search_list = new Array()
+  for(date in entries_json) {
+    search_list.push(entries_json[date])
+  }
 
   //pass data and render the first data
   console.log(links_and_nodes_by_date)

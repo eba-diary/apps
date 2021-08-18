@@ -5,10 +5,10 @@
   position: fixed; /* Stay in place */
   z-index: 1; /* Stay on top */
   top: 0;
-  left: 0;
   background-color: #ededed;
   overflow-x: hidden; /* Disable horizontal scroll */
-  padding-top: 60px; /* Place content 60px from the top */
+  padding-top: 30px; /* Place content 60px from the top */
+  margin-top: 50px;
   transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
 }
 
@@ -31,10 +31,14 @@
 .sidebar .closebtn {
   position: absolute;
   top: 0;
-  right: 25px;
   font-size: 36px;
-  margin-left: 50px;
 }
+
+#close-node-info {
+    right: 25px;
+}
+
+
 
 /* The button used to open the sidebar */
 .openbtn {
@@ -48,6 +52,14 @@
 
 .openbtn:hover {
   background-color: #444;
+}
+
+#node-info-sidebar {
+  left: 0;
+}
+
+#search-info-sidebar {
+  right: 0;
 }
 
 #node-info {

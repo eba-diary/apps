@@ -7,21 +7,25 @@ Static HTML page that renders D3 Graph
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="styles/style.css">
   <link rel="stylesheet" href="styles/sidebar.css">
+  <link rel="stylesheet" href="styles/searchbar.css">
   <script src="dependencies/d3.min.js"></script>
   <script src="dependencies/underscore-min.js"></script>
   <script src="dependencies/jquery-3.6.0.min.js"></script>
+  <script src="dependencies/fuse.js"></script>
 </head>
 
 <body style="background-color:black">
-      <div id="page-title">Social Network Visualization of the Emma B. Andrews Diaries</div>
+  <div class="topnav">
+    <a class="active">Emma B. Andrews Network Visualization</a>
+    <form id="search" class="search">
+      <button type="submit"><i class="fa fa-search"></i></button>
+      <input type="text" id="token" placeholder="Search...">
+    </form>
+  </div>
   <div id="render-here"></div>
-  <script src="scripts/index.js"></script>
-  <script src="scripts/requests.js"></script>
-  <script src="scripts/process-data.js"></script>
-  <script src="scripts/d3-force-directed.js"></script>
-  <script src="scripts/sidebar.js"></script>
   <div id="slider-components">
     <div id="slider-amount"></div>
     <!--TODO: Set slider max programatically-->
@@ -29,22 +33,30 @@ Static HTML page that renders D3 Graph
   </div>
   <div id="error-msg"></div>
   <div id="node-info-sidebar" class="sidebar">
-  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-  <div id="node-info">
-    <br/>
-    <div style="font-size:20px">Name: <persName><span id="node-name"></span></persName></div>
-    <div>Date: <span id="node-date"></span></div>
-    <br/>
-    <b>Entry:</b>
-    <div id="node-entry"></div>
-    <br/>
-    <b>Biography:</b>
-    <br/>
-    <div id="birth-death-info">
-      <span id="node-person-birth-date"></span> (<span id="node-person-birth-place"></span>) - <span id="node-person-death-date"></span> (<span id="node-person-death-place"></span>)
+    <a href="javascript:void(0)" class="closebtn" id="close-node-info" onclick="closeNodeInfo()">&times;</a>
+    <div id="node-info">
+      <br/>
+      <div style="font-size:20px">Name: <persName><span id="node-name"></span></persName></div>
+      <div>Date: <span id="node-date"></span></div>
+      <br/>
+      <b>Entry:</b>
+      <div id="node-entry"></div>
+      <br/>
+      <b>Biography:</b>
+      <br/>
+      <div id="birth-death-info">
+        <span id="node-person-birth-date"></span> (<span id="node-person-birth-place"></span>) - <span id="node-person-death-date"></span> (<span id="node-person-death-place"></span>)
+      </div>
+      <br />
+      <div id="node-person-bio"></div>
     </div>
-    <br />
-    <div id="node-person-bio"></div>
   </div>
-</div>
+  <div id="search-info-sidebar" class="sidebar">
+    <a href="javascript:void(0)" id="close-search-info" class="closebtn" onclick="closeSearchInfo()">&times;</a>
+  </div>
+  <script src="scripts/index.js"></script>
+  <script src="scripts/requests.js"></script>
+  <script src="scripts/process-data.js"></script>
+  <script src="scripts/d3-force-directed.js"></script>
+  <script src="scripts/sidebar.js"></script>
 </body>

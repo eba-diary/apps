@@ -4,7 +4,7 @@
 
 //global vars
 let width = window.screen.width - 400,
-    height = window.screen.height - 425,
+    height = window.screen.height - 450,
     nodes, links, oldNodes, data, dates
 
 //keeps track of data index
@@ -122,6 +122,44 @@ const recieveData = (links_and_nodes_by_time) => {
   slider.addEventListener('input', function() {
     slider_amount_div.innerHTML = update(slider.value)
   })
+
+  //move this to its own file
+  let search = document.getElementById("search");
+  let token = document.getElementById("token")
+  search.addEventListener('submit', function() {
+    event.preventDefault();
+
+    const options = {
+      includeScore: true,
+      includeMatches: true,
+      ignoreLocation: true,
+      minMatchCharLength: token.value.length,
+      keys: ['entry_txt']
+    }
+    const fuse = new Fuse(search_list, options)
+    const results = fuse.search(token.value)
+
+    search_results = new Array()
+    for(result in results) {
+      close_span = "</span>"
+      open_span = "<span class=\"snippet\">"
+      span_length = close_span.length + open_span.length
+      entry = results[result].item.entry_txt
+      start = results[result].matches[0].indices[0][0]
+      end = results[result].matches[0].indices[0][1]+1
+
+      head = Math.floor(start/3)
+      distance_to_end = entry.length - 1 - end - span_length
+      tail = end + span_length + Math.floor(distance_to_end/3)
+
+      let first_span = [entry.slice(0, end), close_span, entry.slice(end)].join('');
+      let second_span = [first_span.slice(0, start), open_span, first_span.slice(start)].join('');
+      let snippet =  "..." + second_span.substring(head,tail) + "..."
+      let date = dates[results[result].refIndex]
+      search_results.push({date: date, snippet: snippet})
+    }
+    openSearchInfo(search_results)
+  });
 
 
   render(false)
