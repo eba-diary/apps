@@ -21,18 +21,28 @@ const closeNodeInfo = () => {
 }
 
 const openSearchInfo = (search_results) => {
-  let search_view = document.getElementById("search-info-sidebar")
-  search_view.style.width = "260px";
-  for(result in search_results){
-        let result_div = document.createElement("div")
-        let date = document.createElement("div")
-        let snippet = document.createElement("div")
-        date.innerHTML = search_results[result].date
-        snippet.innerHTML = search_results[result].snippet
-        result_div.appendChild(date)
-        result_div.appendChild(snippet)
-        search_view.appendChild(result_div)
-    }
+  document.getElementById("search-info-sidebar").style.width = "260px";
+  let search_view = document.getElementById("search-view")
+  search_view.innerHTML = ""
+  if(search_results.length < 1) {
+    let result_div = document.createElement("div")
+    result_div.innerHTML = "Sorry, we couldn't find any results"
+    search_view.appendChild(result_div)
+  } else {
+    for(result in search_results){
+          let result_div = document.createElement("div")
+          let date = document.createElement("div")
+          let snippet = document.createElement("div")
+          let space = document.createElement("br")
+          date.innerHTML = search_results[result].date
+          snippet.innerHTML = search_results[result].snippet
+          result_div.appendChild(date)
+          result_div.appendChild(snippet)
+          result_div.appendChild(space)
+          search_view.appendChild(result_div)
+      }
+  }
+
 }
 
 const closeSearchInfo = () => {

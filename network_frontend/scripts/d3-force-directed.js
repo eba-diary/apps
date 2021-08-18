@@ -142,7 +142,7 @@ const recieveData = (links_and_nodes_by_time) => {
     search_results = new Array()
     for(result in results) {
       close_span = "</span>"
-      open_span = "<span class=\"snippet\">"
+      open_span = "<span class=\"token\">"
       span_length = close_span.length + open_span.length
       entry = results[result].item.entry_txt
       start = results[result].matches[0].indices[0][0]
