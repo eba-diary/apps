@@ -31,5 +31,7 @@ namespace Sentry.data.Core
         public string CompressionType { get; set; }
         public List<string> FileNameExclusionList { get; set; }
         public ObjectStatusEnum ObjectStatus { get; set; }
+        public string DeleteIssuer { get; set; }
+        public DateTime DeleteIssueDTM { get; set; }
     }
 }

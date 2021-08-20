@@ -110,6 +110,9 @@ namespace Sentry.data.Core
         public virtual FileSchema FileSchema { get; set; }
         public virtual DataFlow DataFlow { get; set; }
         public virtual ObjectStatusEnum ObjectStatus { get; set; }
+        public virtual string DeleteIssuer { get; set; }
+        public virtual DateTime DeleteIssueDTM { get; set; }
+
 
         public virtual Uri GetUri()
         {
