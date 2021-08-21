@@ -1,0 +1,103 @@
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?><?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml"
+	schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="people">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Title</title>
+            </titleStmt>
+            <publicationStmt>
+                <p>Publication Information</p>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Information about the source</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <particDesc>
+                <listPerson>
+                    <person xml:id="Troyon_Constant">
+                        <persName>Constant Troyon</persName>
+                        <note>Constant Troyon (August 28, 1810 – February 21, 1865) was a French painter of the Barbizon school.<graphic class="graphic" url="https://images.metmuseum.org/CRDImages/dp/original/DP808407.jpg" source="Metropolitan Museum of Art"/>
+                            <p>Watercolor on paper landscape painted by Troyon.</p>
+                        </note>
+                    </person>
+                    <person xml:id="Corot_Jean_Baptiste_Camille">
+                        <persName>Jean-Baptiste-Camille Corot</persName>
+                        <note>Jean-Baptiste-Camille Corot (July 16, 1796 - February 22, 1875) was a French landscape and portrait painter as well as a printmaker in etching.<graphic class="graphic" url="https://fryemuseum.org/images/exhibition_images/Corot---Monte-Cavo-460.jpg"/>
+                        </note>
+                    </person>
+                    <person xml:id="Parsons_John">
+                        <persName>Mr. John E. Parsons</persName>
+                        <note>John Edward Parsons was a lawyer in New York City. He was president of the New York City Bar Association from 1900 to 1901.</note>
+                    </person>
+                    <person xml:id="Parsons_Florence_Van_Corltandt">
+                        <persName>Mrs. Florence Van Corltandt Parsons</persName>
+                        <note>Florence Van Corltandt (née Field) Bishop was the widow of David Wolfe Bishop when she married John E. Parsons. Florence was the daughter of Benjamin Hazard Field, a merchant philanthropist, and the mother of David Wolfe Bishop Jr. and Cortlandt F. Bishop, the pioneer aviator.</note>
+                    </person>
+                    <person xml:id="Alexander_Harriet_Mrs">
+						<persName>Mrs. Harriet Alexander</persName>
+						<note>Harriet Valentine "Hattie" Crocker was the daughter of a railroad magnate and wife to a wealthy financier and attorney, Charles Beatty Alexander. Mrs. Alexander was a leading figure in San Francisco society and then New York City. She was the epitome of America’s 19th-century social elite, holding philanthropic events and lavish parties.<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Alexander_Harriet_Mrs.jpg"/>
+                        </note>
+					</person>
+					<person xml:id="Burton_Harry">
+						<persName>Harry Burton</persName>
+						<note>Harry Burton was born in Lincolnshire, England in 1879 to a family of 11 children. Italian Renaissance scholar, Robert Cust became his benefactor, providing Burton with an education, training and an apprenticeship. He became a talented photographer of Florentine paintings. While in Italy, Burton met Theodore Davis who hired him to photograph and later direct Davis' excavations in the Valley of the Kings until 1914 when Davis stopped work. Burton was then employed by the Metropolitan Museum of Art in New York as a photographer for the museum's """"Egyptian Expedition."""" Burton worked for the MET until his death in 1940. Harry Burton captured more than 7,500 excavation photographs in and around the Valley of the Kings throughout his career working in Egypt during the early 20th century. His photographs of sites such as Thebes, Deir el-Bahri, and Wadi Natrun brought him great regard as one of the foremost archaeological photographers of his time. He is most famous for his documentation of Howard Carter’s discovery of the tomb of Pharaoh Tutankhamen, 1922-1933. Most of his work was done between 1911-1936. Burton appears frequently in the Emma B. Andrews diaries, since she was in close contact with him from 1903-1913.<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Burton_Harry.png"/>
+                        </note>
+					</person>
+					<person xml:id="Carter_Howard">
+						<persName>Howard Carter</persName>
+						<note>Egyptologist, artist and archaeologist, Carter is most famous for his discovery of the tomb of Tutankhanun in 1922 while working for Lord Carnarvon. Prior to this, he was employed as one of Theodore Davis's archaeologists.<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Carter_Howard.jpeg"/>
+                        </note>
+					</person>
+					<person xml:id="Gay_Matilda">
+						<persName>Mrs. Matilda Gay</persName>
+						<note>Matilda Travers married Walter Gay in 1889. She was the daughter of William Travers, a Wall Street investor and co-founder of the Saratoga Race Course.<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Gay_Matilda.png"/>
+                        </note>
+					</person>
+					<person xml:id="Gay_Walter_Mr">
+						<persName>Mr. Walter Gay</persName>
+						<note>Walter Gay was an American painter most well-known for his still lifes and interior scenes. In 1876, he moved to France with his wife where he studied under the French painter Leon Bonnat. Gay recieved numerous awards in the US and in France including a gold medal in the Paris Salon (1885), Associate Academician in the National Academy of Design (1904), and Commander of the Legion of Honor (1927).
+						<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Gay_Walter.png"/>
+                        </note>
+					</person>
+					<person xml:id="Jones_Cyril">
+						<persName>Cyril Jones</persName>
+						<note>Cyril Jones was the brother of the excavator, Ernest Harold Jones. He was a student at the Queen Elizabeth Grammar School between 1905 and 1909 and joined Harold on his return to Egypt. Due to Harold's worsening condition of tuberculosis, Cyril served as an assistant to Harold in his work in excavation, supervising, and letter writing. Later in Cyril's life, he became a farmer in South Africa.<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Jones_Cyril.jpg"/>
+                        </note>
+					</person>
+					<person xml:id="Jones_Harold">
+					    <persName>Harold Jones</persName>
+					    <note>Ernest Harold Jones was an artist and excavator most known for his vibrant watercolor paintings of antiquities. He worked at sites in Upper Egypt and the Valley and the Kings, and most notably worked with Lord Carnarvon, Theodore M. Davis, and Professor J. Garstang.<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Jones_Harold.jpg"/>
+                        </note>
+					</person>
+					<person xml:id="Rathbone_Elena">
+					    <persName>Elena Rathbone</persName>
+					    <note>Coming from a long line of Rathbones, Elena Rathbone was the daughter of William Gair Rathbone VII and Blanche Luling. She was a supporter of District Nursing, and she served several positions until becoming vice-president in 1956 for the Queen's Institute for District Nursing. She married Bruce Richmond in 1913. <graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Rathbone-Elena.jpg"/>
+                        </note>
+					</person>
+					<person xml:id="Rathbone_William_Gair">
+					    <persName>Mr. William Rathbone</persName>
+<note>Son to William Rathbone VI and Lucretia Rathbone, married to Blanche Rathbone (née Luling) and father to Elena Rathbone, William Gair Rathbone VII worked within his family business, the Rathbone Brothers. Continuing his father's legacy, he also served as Honorary Secretary of the Queen Victoria's Jubilee Institute for Nurses.<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Rathbone_William_Gair.png"/>
+                        </note>
+                    </person>
+                    <person xml:id="Rathbone_Blanche">
+                        <persName>Mrs. Blanche Rathbone</persName>
+                        <note>Blanche Rathbone (née Luling) married William Gair Rathbone VII, and was mother to Elena Rathbone.<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Rathbone_Blanche.jpg"/>
+                        </note>
+                    </person>
+                    <person xml:id="Weigall_Arthur">
+                        <persName>Arthur Weigall</persName>
+                        <note>Arthur Weigall became an Egyptologist after studying the subject for several years before working under Flinders Petrie and Friedrich Wilhelm von Bissing. At 25, he assumed the position as Inspector of Antiquities for Upper Egypt and wrote several books and biographies about the tombs that he helped recover. Weigall eventually became a set-designer in London as well as a journalist for Daily Mail, where he covered the opening of Tutankhamun's tomb.<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Weigall_Arthur.jpeg"/>
+                        </note>
+                    </person>
+                    <person xml:id="Davis_Theodore_M">
+						<persName>Theodore M. Davis</persName>
+						<note>A successful American lawyer, Davis began sponsoring excavations in the Valley of the Kings under the Egyptian Antiquities Service in 1902. His sponsorship led to some of the most important archaeological discoveries in Egyptology (e.g. KV45, tomb of Queen TIye; KV47, tomb of Horemheb; KV55, the Amarna cache; and KV54, Tutankhamen's embalming cache).</note>
+					</person>
+                </listPerson>
+            </particDesc>
+            <settingDesc/>
+        </profileDesc>
+    </teiHeader>
+</TEI>
