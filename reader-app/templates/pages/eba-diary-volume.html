@@ -1,0 +1,237 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes"/>
+        <link rel="shortcut icon" type="image/x-icon" href="resources/images/favicon.ico"/>
+        <link rel="shortcut icon" type="image/png" href="resources/images/favicon-16.png" sizes="16x16"/>
+        <link rel="shortcut icon" type="image/png" href="resources/images/favicon-24.png" sizes="24x24"/>
+        <link rel="shortcut icon" type="image/png" href="resources/images/favicon-32.png" sizes="32x32"/>
+        <link rel="shortcut icon" type="image/png" href="resources/images/favicon-64.png" sizes="64x64"/>
+        <title data-template="config:app-title"/>
+        <meta name="description" content="EBA Diary Volume"/>
+        <link rel="stylesheet" type="text/css" href="resources/fonts/font.css"/>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald&amp;display=swap"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com"/>
+        <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&amp;family=Source+Serif+Pro:wght@300;400&amp;display=swap" rel="stylesheet"/>
+        <link rel="stylesheet" href="resources/css/theme.css"/>
+        <script type="module" src="pb-components-bundle.js" data-template="pages:load-components"/>
+        <script>
+            window.addEventListener('DOMContentLoaded', () =&gt; {
+                // wait for the transcription to be loaded, then search the loaded HTML for
+                // names
+                pbEvents.subscribe('pb-update', 'transcription', (ev) =&gt; {
+                    // the HTML content to be displayed is passed in ev.detail.root
+                    const root = ev.detail.root;
+                    root.querySelectorAll('.tei-persName, .tei-placeName').forEach((name) =&gt; {
+                        // disable the popover behaviour
+                        name.command('disable', true);
+                        // register click listener on each name
+                        name.addEventListener('click', (ev) =&gt; {
+                            console.log(`name clicked: ${name.querySelector('span').innerHTML }`);
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                            // get the alternate content of each name ...
+                            const tmpl = name.querySelector('template');
+                            // ... and copy it into the drawer
+                            const nameNode = tmpl ? tmpl.content.querySelector(".tei-person1") || tmpl.content.querySelector(".tei-place1") : null;
+                            const detailsNode = tmpl ? tmpl.content.querySelector(".tei-person2") || tmpl.content.querySelector(".tei-place2") : null;
+                            /*nameNodes.forEach((nn) =&gt; {
+                                const drawerContent = document.getElementById('drawer-content');
+                                drawerContent.innerHTML = '';
+                                let nameHeading = document.createElement("h3");
+                                nameHeading.innerText = nn.textContent;
+                                drawerContent.appendChild(nameHeading);
+                            })*/
+                            const title = document.getElementById('info-title');
+                            title.innerText = nameNode ? nameNode.textContent : "Check back soon!";
+                            const div = document.getElementById('info-content');
+                            if (detailsNode) {
+                                div.innerHTML = '';
+                                div.appendChild(detailsNode.cloneNode(true));
+                            } else {
+                                div.innerHTML = '<a href="http://www.emmabandrews.org/project/about">Our research team</a> is still gathering information.';
+                            }
+                            // finally display the drawer
+                            document.getElementById('info-drawer').opened = true;
+                        });
+                    });
+                });
+            });
+        </script>
+        <style>
+            font-family: 'Source Code Pro', monospace;
+
+            #project-desc {
+                font-family:'Source Serif Pro', serif;
+                padding-left: 24px;
+                font-size: 16px;
+                font-weight: 200;
+                margin: 32px 0 16px;
+                max-width: 85%;
+            }
+            
+            #source-desc {
+                font-family:'Source Serif Pro', serif;
+                padding-left: 24px;
+                font-size: 16px;
+                font-weight: bold;
+                margin: 16px 0;
+                max-width: 85%;
+            }
+
+            .volume-title {
+                font-family:'Source Serif Pro', serif;
+                padding-left: 24px;
+                font-weight: 200;
+                font-size: 14px;
+                margin: 6px 0;
+            }
+
+            .volume-title-current {
+                font-family:'Source Serif Pro', serif;
+                padding-left: 24px;
+                font-weight: bold;
+                font-size: 14px;
+                margin: 8px 0;
+            }
+            #info-drawer {
+                top: 64px;
+                height: 100%;
+                max-width: 20%;
+                background-color: #CFD8D7;
+            }
+            #page-view-toggle {
+                margin: auto 0;
+            }
+            #metadata-desktop {
+                float: left;
+                height: var(--pb-view-height);
+                width: 22%;
+                position: fixed;
+                overflow: scroll;
+            }
+            .tei-title3 {
+                margin-block-end: 0.75em;
+            }
+            .content-body {
+                position: relative;
+                display: flex;
+                justify-content: center;
+                margin-top: 35px;
+            }
+            .content-body pb-navigation {
+                position: fixed;
+                bottom: 45%;
+                --paper-fab-background: #35424b;
+                color: white;
+            }
+            .content-body pb-navigation[direction=backward] {
+                left: 20px;
+            }
+            .content-body pb-navigation[direction=forward] {
+                right: 20px;
+            }
+            .tei-graphic {
+                margin-top: 20px;
+                width: 100%;
+            }
+            
+            @media (min-width: 769px) {
+                .toolbar pb-navigation {
+                    display: none;
+                }
+            }
+            @media (max-width: 769px) {
+                /*.content-body pb-navigation {
+                    display: none;
+                }*/
+                .content-body {
+                    max-width: 100%;
+                }
+                #info-drawer {
+                    max-width: 40%;
+                }
+                #metadata-desktop {
+                    display: none;
+                }
+                #metadata-drawer {
+                    top: 64px;
+                    height: 100%;
+                    max-width: 40%;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <pb-page data-template="pages:pb-page" unresolved="unresolved">
+            <pb-document id="document1" data-template="pages:pb-document"/>
+            <app-drawer-layout force-narrow="force-narrow">
+                <app-drawer data-template="templates:include" data-template-path="templates/drawer.html"/>
+                <app-header-layout>
+                    <app-header slot="header" reveals="reveals" fixed="fixed" effects="waterfall">
+                        <app-toolbar data-template="templates:include" data-template-path="templates/menu.html"/>
+                        <app-toolbar data-template="templates:include" data-template-path="templates/toolbar.html"/>
+                    </app-header>
+                    <pb-drawer id="info-drawer" emit="info" subscribe="info" position="right">
+                        <div id="drawer-content">
+                            <h3 id="info-title"/>
+                            <div id="info-content"/>
+                        </div>
+                    </pb-drawer>
+                    <pb-drawer id="metadata-drawer" toggle="tocToggle" class="tocDrawer" emit="toc" subscribe="transcription" position="left">
+                        <div id="metadata-mobile">
+                            <img class="graphic" style="width:90%;max-width:250px;height:90%;max-height:250px;padding:14px;" src="http://www.emmabandrews.org/project/files/fullsize/1ad90e29098cc3f6a9ec74a92a4418cb.jpg"/>
+                            <p id="source-desc">Emma's diaries are sourced from the <orgName ref="#American_Philosophical_Society_Philadelphia">American Philosophical Society</orgName> in Philadelphia.</p>
+                            <p class="volume-title">Volume 1</p>
+                            <p class="volume-title">Volume 2</p>
+                            <p class="volume-title">Volume 3</p>
+                            <p class="volume-title">Volume 4</p>
+                            <p class="volume-title">Volume 5</p>
+                            <p class="volume-title">Volume 6</p>
+                            <p class="volume-title">Volume 7</p>
+                            <p class="volume-title">Volume 8</p>
+                            <p class="volume-title">Volume 9</p>
+                            <p class="volume-title">Volume 10</p>
+                            <p class="volume-title">Volume 11</p>
+                            <p class="volume-title">Volume 12</p>
+                            <p class="volume-title">Volume 13</p>
+                            <p class="volume-title">Volume 14</p>
+                            <p class="volume-title">Volume 15</p>
+                            <p class="volume-title">Volume 16</p>
+                            <p class="volume-title-current">Volume 17</p>
+                            <p class="volume-title">Volume 18</p>
+                            <p class="volume-title">Volume 19</p>
+                        </div>
+                    </pb-drawer>
+                    <div id="metadata-desktop">
+                        <img class="graphic" style="width:90%;max-width:250px;height:90%;max-height:250px;padding:14px;" src="http://www.emmabandrews.org/project/files/fullsize/1ad90e29098cc3f6a9ec74a92a4418cb.jpg"/>
+                        <p id="source-desc">Emma's diaries are sourced from the <orgName ref="#American_Philosophical_Society_Philadelphia">American Philosophical Society</orgName> in Philadelphia.</p>
+                        <p class="volume-title">Volume 1</p>
+                        <p class="volume-title">Volume 2</p>
+                        <p class="volume-title">Volume 3</p>
+                        <p class="volume-title">Volume 4</p>
+                        <p class="volume-title">Volume 5</p>
+                        <p class="volume-title">Volume 6</p>
+                        <p class="volume-title">Volume 7</p>
+                        <p class="volume-title">Volume 8</p>
+                        <p class="volume-title">Volume 9</p>
+                        <p class="volume-title">Volume 10</p>
+                        <p class="volume-title">Volume 11</p>
+                        <p class="volume-title">Volume 12</p>
+                        <p class="volume-title">Volume 13</p>
+                        <p class="volume-title">Volume 14</p>
+                        <p class="volume-title">Volume 15</p>
+                        <p class="volume-title">Volume 16</p>
+                        <p class="volume-title-current">Volume 17</p>
+                        <p class="volume-title">Volume 18</p>
+                        <p class="volume-title">Volume 19</p>
+                    </div>
+                    <main class="content-body">
+                        <pb-view id="view1" src="document1" column-separator=".tei-cb" append-footnotes="append-footnotes" subscribe="transcription" emit="transcription" view="single"/>
+                    </main>
+                </app-header-layout>
+            </app-drawer-layout>
+        </pb-page>
+        <div class="splash"/>
+    </body>
+</html>
