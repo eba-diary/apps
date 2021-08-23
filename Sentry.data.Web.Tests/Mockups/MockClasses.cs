@@ -268,7 +268,7 @@ namespace Sentry.data.Web.Tests
                 IsGeneric = true,
 
                 JobOptions = rjo,
-                ObjectStatus = ObjectStatusEnum.Active;
+                ObjectStatus = ObjectStatusEnum.Active
             };
 
             if (rj.DataSource.Is<DfsBasic>())
