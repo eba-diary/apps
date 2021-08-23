@@ -720,7 +720,7 @@
           <date when="1904-1904-03-21">Monday, March 21</date>.
           <measure type="distance">58 miles</measure>. 
         </dateline>
-          <p><placeName ref="">Bedrasheyn</placeName>. The wind blew hard and cool all day - we drew here a little after 2 o'clock - and sent the tug "Anubis" on to <<placeName ref="#Cairo">Cairo</placeName>. It was the best tug and the best Captain we have ever had. <persName>Theron,</persName> the <persName>Baron</persName> and <persName ref="#Hardy_Jean">Jean</persName> took donkeys and rode as far as the <orgName>Ramesis</orgName> colussus.</p>
+          <p><placeName ref="">Bedrasheyn</placeName>. The wind blew hard and cool all day - we drew here a little after 2 o'clock - and sent the tug "Anubis" on to <<placeName ref="#Cairo">Cairo</placeName>. It was the best tug and the best Captain we have ever had. <persName>Theron</persName>, the <persName>Baron</persName> and <persName ref="#Hardy_Jean">Jean</persName> took donkeys and rode as far as the <orgName>Ramesis</orgName> colussus.</p>
       </div>
       <div xml:id="EBA-1904-">
         <dateline>
