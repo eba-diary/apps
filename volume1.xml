@@ -353,13 +353,12 @@
           passed <placeName ref="#Al_Badrashayn">Bedrashyn</placeName> where one of <orgName
             ref="#Thomas_Cook">Cook</orgName>'s boats was lying on its way up the <placeName
             ref="#Nile">Nile</placeName>, with dozens of white helmetted tourists just returned from
-            <placeName ref="#Memphis">Memphis</placeName> and <name type="historical" ref="#Ṣaqqâra"
-            >Sakkarah</name>. Then all the <name type="historical" ref="#Pyramids">Pyramids</name>
+            <placeName ref="#Memphis">Memphis</placeName> and <placeName ref="#Ṣaqqâra"
+            >Sakkarah</placeName>. Then all the <name type="historical" ref="#Pyramids">Pyramids</name>
           began to unfold themselves to our delighted eyes - first those of <pb n="9"/>
-          <placeName ref="#Giza">Ghizeh</placeName> - then the <name type="historical"
-            ref="#Ṣaqqâra">Sakkarah</name> group with its stepped pyramid - the blunted outline of
+          <placeName ref="#Giza">Ghizeh</placeName> - then the <placeName ref="#Ṣaqqâra">Sakkarah</placeName> group with its stepped pyramid - the blunted outline of
             <placeName ref="#Abu_Sir">Aboesir</placeName>, then <name type="historical"
-            ref="#Dahshūr">Dashoor</name> with its strange curving side, then <placeName
+            ref="#Dahshūr_pyramid">Dashoor</name> with its strange curving side, then <placeName
             ref="#Meidum">Meydoum</placeName> with its three shelved pyramid. A lovely sunset
           finished the bright day, so full of novelty and pleasure - and the young moon about 5 days
           old made the night, when it had descended, brilliant.</p>
@@ -549,7 +548,7 @@
           a most delicious morning until about 11 o'clock the wind grew very strong bringing the
           sand with it, and again we had to sail under the small felucca sail. We passed <placeName
             ref="#Gebel_et_Sayr">Gebel-et-Sayr</placeName> (the mountain of birds) with its lovely
-          palm groves, and <placeName ref="#Coptic_Convent">Coptic Convent</placeName>, and desolate
+          palm groves, and <name type="historical" ref="#Coptic_Convent">Coptic Convent</name>, and desolate
           frowning cliffs - and two wretched fellows ran along the bank, clamouring for baksheesh,
           and shouting that they were Christians like ourselves, and dropping their fluttering rags,
           plunged into the water and swam to the boat, and were starting to climb up, when <persName
@@ -567,8 +566,7 @@
           were making ready to sail, we did not stop. The wind continued high, and all the rest of
           the afternoon the five boats were streaming along the great bends of the river here, more
           or less together, forming a pretty spectacle. This evening we are all lying one behind
-          another about <measure quantity="4" unit="mile">4 miles</measure> from <name
-            type="historical" ref="#Bani_Hasan">Beni Hassan</name>. I have been on Page 18: deck for
+          another about <measure quantity="4" unit="mile">4 miles</measure> from <placeName ref="#Bani_Hasan">Beni Hassan</placeName>. I have been on Page 18: deck for
           a few minutes - a radiant moon in a cloudless sky is shining down on this strange scene -
           the stars are brilliant - Orion striding right across the heaven above us. Crouched around
           a fire of corn stalks on the bank, is our guard sent from the town, of four men - for this
@@ -850,7 +848,7 @@
           them. They bore evident marks of running water, and were worn into great rounded bastions
           and buttresses and clustered pillars - and over all, cropping out over the limestone
           strata is a curious looking stalactite formation. We brought up at <placeName
-            ref="#Balliana">Balliana</placeName> for the night, having made <measure quantity="56"
+            ref="#Balyana_Al">Balliana</placeName> for the night, having made <measure quantity="56"
             unit="mile">56 miles</measure> since morning! This is the place from which <placeName
             ref="#Abydos">Abydos</placeName> is visited - but we defer this until we come down.</p>
       </div>
@@ -858,7 +856,7 @@
         <dateline>
           <date when="1890-01-07">Tuesday - Jan. 7th</date>
         </dateline>
-        <p>We put off from <placeName ref="#Balliana">Ballianeh</placeName> very early yesterday
+        <p>We put off from <placeName ref="#Balyana_Al">Ballianeh</placeName> very early yesterday
           morning in a fine wind - but it grew lighter and lighter until about 1 o'clock we were
           left "a painted ship" upon the water. Then we wished we had <pb n="30"/> given the day to
             <placeName ref="#Abydos">Abydos</placeName>. The wind not only gave out for a time, but
@@ -1933,8 +1931,8 @@
           over and over with curiosity - and <persName ref="#Davis_Theodore_M">Theodore</persName>
           gave the man <measure type="currency">2 piastres</measure>, which must have seemed a
           fortune to them. <persName ref="#Jacoub">Jacoub</persName> was sent to the <name
-            type="boat" ref="#Nubia">Nubia</name> for <placeName ref="#Buttles_Mary"
-            >Mary</placeName>'s camera. When the woman saw it, her face changed, and a look of fear
+            type="boat" ref="#Nubia">Nubia</name> for <persName ref="#Buttles_Mary"
+            >Mary</persName>'s camera. When the woman saw it, her face changed, and a look of fear
           came over it, and she began to mutter to herself as the camera was pointed to them. As we
           were walking on - the man pointing to a tent a short distance off, said to <persName
             ref="#Salah_Mohammed">M.S.</persName> that we must not go there, as there was a man ill
@@ -2171,7 +2169,7 @@
           then struck into a little bridle path, leading through the pleasant rye and barley fields
           - though warm, it was most delightful with the great yellow mountains in front of us, with
           their pinkish shadows sleeping in the hollows - while - could it be true! the great <name
-            type="historical" ref="#Colossi">Colossi</name> of the plains defining themselves in the
+            type="historical" ref="#Colossi_of_Memnon">Colossi</name> of the plains defining themselves in the
           distance, and growing bigger and bigger! Every one must I think, have the same feeling on
           first beholding these giants. Are they only melancholy monuments of the glory of a past
           gigantic art - or do they wait expectantly oblivious of this <pb n="83"/>little present,
@@ -2241,7 +2239,7 @@
           embankment, and then the sharp turn at the mud village, filled with troops of little bare
           bronze children, and then the long ride through the rich barley fields - for the
             <placeName ref="#Thebes">Theban</placeName> crops are especially rich - we pass the
-            <name type="historical" ref="#Colossi">Colossi</name>, and turn to the right, and riding
+            <name type="historical" ref="#Colossi_of_Memnon">Colossi</name>, and turn to the right, and riding
           along the desert edge of this great necropolis, we took our way through and up the path of
           a mountain torrent which seemed a very valley of desolation - not a living thing - not the
           faintest trace of vegetable life, or a blade of grass - the sandstone cliffs towering
@@ -2312,8 +2310,8 @@
             <!--need to find?--><placeName>Bab-el-Moulak</placeName>.</p>
         <p>On coming out of the tomb of <persName ref="#Seti_I" type="historical">Seti
             1st</persName>, we went to that of <persName ref="#Rameses_III" type="historical"
-            >Ramesis 3d</persName> or <placeName ref="#Bruns_Tomb">Brun's Tomb</placeName> as it is
-          often called, or the <placeName ref="#Bruns_Tomb">Tomb of the Harpists</placeName>, from
+            >Ramesis 3d</persName> or <name type="historical" ref="#Bruns_Tomb">Brun's Tomb</name> as it is
+          often called, or the <name type="historical" ref="#Bruns_Tomb">Tomb of the Harpists</name>, from
           the admirable paintings so well known of two men playing harps. The finish and execution
           of this tomb is far inferior to that of <persName ref="#Seti_I" type="historical">Seti
             Ist</persName>. Here as at <placeName ref="#Philae">Philae</placeName> are numerous
@@ -2836,7 +2834,7 @@
           our dangerous position when the wind lulled, an hour before daylight. The men have worked
           like good fellows at their oars today, and we have made <measure type="distance">24
             miles</measure>, and are lying near <placeName ref="#Rhoda">Rhoda</placeName> - hoping
-          to reach <name type="historical" ref="#Bani_Hasan">Beni Hassan</name> tomorrow in time to
+          to reach <placeName ref="#Bani_Hasan">Beni Hassan</placeName> tomorrow in time to
           do the tombs and be off again before night, <pb n="107"/> for no one wishes to stay a
           night near that town of ill repute.</p>
       </div>
@@ -2848,15 +2846,13 @@
             <sic>it</sic>
             <corr>it is</corr>
           </choice> necessary to fire off a rifle now and then as a warning to the neighborhood -
-          for several nights now, we have had three or four men on guard. We awakened to a calm
-          lovely day, though a very warm one. The men rowed vigourously, and brought us to <name
-            type="historical" ref="#Bani_Hasan">Beni Hassan</name> soon after eleven o'clock. Lunch
+          for several nights now, we have had three or four men on guard. We awakened to a calm 
+          lovely day, though a very warm one. The men rowed vigourously, and brought us to <placeName ref="#Bani_Hasan">Beni Hassan</placeName> soon after eleven o'clock. Lunch
           was hurried, donkeys commanded by stentorian lungs from the dahabeah, and by 12 o'clock we
           were in the felucca for the opposite shore, where donkeys, two soldiers with their rifles,
           and a vociferating crowd of the most villainous looking Arabs I ever saw, were waiting for
-          us. The whole neighborhood of <name type="historical" ref="#Bani_Hasan">Beni Hassan</name>
-          has had a most evil reputation for years - and some years ago the old village of <name
-            type="historical" ref="#Bani_Hasan">Beni Hassan</name> was destroyed by order of the
+          us. The whole neighborhood of <placeName ref="#Bani_Hasan">Beni Hassan</placeName>
+          has had a most evil reputation for years - and some years ago the old village of <placeName ref="#Bani_Hasan">Beni Hassan</placeName> was destroyed by order of the
           Government because of the thieving and turbulent character of its people - and from what
           we heard and saw of the inhabitants of the present village, the same heroic remedy should
           be resorted to, in regard to them. Certainly a more wicked and howling cortige than we
@@ -2873,13 +2869,13 @@
           looked, with its frame of desert on either side! Arrived at the tombs, another shrieking
           scrimmage went on, while we waited indignant until the various guides settled some
           difficulty among themselves.</p>
-        <p>These <name type="historical" ref="#Bani_Hasan">Beni Hassan</name> tombs of the 12th
+        <p>These <placeName ref="#Bani_Hasan">Beni Hassan</placeName> tombs of the 12th
           dynasty, marking one of the finest periods of art in <placeName ref="#Egypt"
             >Egypt</placeName>, are so well known - every ordinary student of art is familiar with
           their graceful and elegant columns, prototypes of the Grecian Doric order of centuries
           later. The paintings too, are wonderfully rich in variety, and form with the tomb of
-            <persName ref="#Tyii" type="historical">Ti</persName> at <name type="historical"
-            ref="#Ṣaqqâra">Sakkarah</name> the richest sources of all our knowledge of Egyptian life
+            <persName ref="#Tyii" type="historical">Ti</persName> at <placeName
+            ref="#Ṣaqqâra">Sakkarah</placeName> the richest sources of all our knowledge of Egyptian life
           and manners of the earlier dynasties. But alas! how disappointing the actual sight of
           them! Such is the ruin caused, not by time, but by the ruthless hands of travellers from
           earliest times to our own. It is impossible to make out many of the figures, only
@@ -2996,7 +2992,7 @@
             type="distance">12 miles</measure> of <placeName ref="#Cairo">Cairo</placeName>. We have
           packed and settled a great many things and have spent most of the day on deck in spite of
           the heat. The <name type="historical" ref="#Meidum_Pyramid">Meydoum pyramid</name>
-          appeared early this morning - then <name type="historical" ref="#Dahshūr">Dashour</name>
+          appeared early this morning - then <name type="historical" ref="#Dahshūr_pyramid">Dashour</name>
           and finally the well know outlines of <placeName ref="#Giza">Gizeh</placeName> - and I
           began to realize that the delicious <placeName ref="#Nile">Nile</placeName> life was over.
           It made us very uncomfortable to see the men sitting in the intense sunlight hour after
@@ -3013,7 +3009,7 @@
           two or three times <persName ref="#Rais_Achmed">R&#228;is Achmed</persName> took a pull
           himself. About 5 o'clock a fine south wind came up - both sails were hoisted - the tired
           men put away their oars - the hatches went down, and we were glad to see them resting. We
-          had hoped to stop at <name type="historical" ref="#Ṣaqqâra">Sakkarah</name> for a day -
+          had hoped to stop at <placeName ref="#Ṣaqqâra">Sakkarah</placeName> for a day -
           but we are too much behind time. I have told <persName ref="#Salah_Mohammed"
             >M.S.</persName> some days ago, that when we got into <placeName ref="#Cairo"
             >Cairo</placeName> I should give the men a good dinner - with the idea of which they are
@@ -3513,7 +3509,7 @@
           from <placeName ref="#Naples">Naples</placeName> was delightful - through superb mountain
           scenery - the railway following very nearly the course of the ancient <placeName
             ref="#Via_Appia">Via Appia.</placeName> First, farewell glimpses of Mr. <placeName
-            ref="#Vesuvius">Vesuvius</placeName> and <placeName ref="#Ischia">Ischia,</placeName>
+            ref="#Vesuvius">Vesuvius</placeName> and <placeName ref="#Ischia">Ischia</placeName>,
           and that incomparable coast - then through the plain of the important river <placeName
             ref="#Volturno">Volturno</placeName> with the grand mountains sweeping up from it on
           either <pb n="132"/> hand in splendid majesty - their heights crowned here and there with
@@ -3546,7 +3542,7 @@
           documents of kings, popes, etc. bulls, letters etc. There now remain in this convent 30
           monks who share the charge of the library and archives, and educate theological students.
           After taking possession of our rooms, we drove <pb n="133"/> to the bankers for letters,
-          and then over to <name type="historical" ref="#St_Peters_Basilica">St. Peters</name>.
+          and then over to <name type="historical" ref="#S_Peters_Basilica">St. Peters</name>.
             <placeName ref="#Rome">Rome</placeName> is changing fast. Within the two years since we
           have been here, whole quarters have been destroyed - streets have been made - bridges
           built - and square after square of handsome new houses. Old <placeName ref="#Rome"
@@ -3564,7 +3560,7 @@
           a stones toss of the <name type="historical" ref="#Castel_Sant_Angelo">S. Angelo</name>!
           and it is said a bridge of the same kind is to be thrown across the Forum! What a sense of
           satisfied delight one feels, when the heavy curtain of <name type="historical"
-            ref="#S_Pietro">S. Pietro</name> falls behind one, and one confronts all the colossal
+            ref="#S_Peters_Basilica">S. Pietro</name> falls behind one, and one confronts all the colossal
           magnificence of this unequalled church! Far away in the vast expanse rises the great
           bronze baldachine, with its circle of twinkling lights before it, and pigmies of human
           beings come and go, and arrange themselves in groups over that vast tesselated pavement -
@@ -3596,7 +3592,7 @@
             ref="#Basilica_San_Lorenzo_Lucina">church of S. Lorenzo in Lucina</name> to see his
           crucifiction - but all the pounding and ringing that we could do, did not open the church
           to us - so quite disgusted, we climbed again into the carriage, and drove to <name
-            type="historical" ref="#Saint_Peters_Basilica">St. Peters</name>.</p>
+            type="historical" ref="#S_Peters_Basilica">St. Peters</name>.</p>
       </div>
       <div xml:id="EBA-1890-03-23" type="entry">
         <dateline>
@@ -3648,7 +3644,7 @@
           and <persName ref="#Gwynne_Maria">Maria Gwynne</persName>, who told me that she and
             <persName ref="#Glockren_Marie">Marie Glockren</persName> were here at the <name
             type="hotel" ref="#Eden_Hotel">Eden Hotel</name> - so I arranged to visit them at 5
-          o'clock - and after an afternoon at <name type="historical" ref="#Saint_Peters_Basilica"
+          o'clock - and after an afternoon at <name type="historical" ref="#S_Peters_Basilica"
             >St. Peters</name> with the most exquisite sacred music I <pb n="136"/>ever listened to,
           given by the <orgName>Papal choir</orgName> in the <name type="historical"
             ref="#Sistine_Chapel">Sistine Chapel</name>, I drove to the <name type="hotel"
@@ -3696,7 +3692,7 @@
             ref="#Apostolic_Palace">Vatican Palace</name> soaring above and around. It is such
           utterly inaccessible ground, that my interest and curiosity are always fired. Driving back
           to the city it was funny to see the almost uninterrupted line of carriages setting towards
-            <name type="historical" ref="#Saint_Peters_Basilica">St. Peters</name>, filled with
+            <name type="historical" ref="#S_Peters_Basilica">St. Peters</name>, filled with
           tourists and red <bibl><author><persName ref="#Baedeker_Karl"
               >Baddekers</persName></author></bibl>. I spent an hour and a half hunting photographs,
           and buying some trifles, and then went back for <persName ref="#Davis_Theodore_M"
@@ -3749,7 +3745,7 @@
             type="historical" ref="#S_Prassede">S. Prassodo,</name> and then to <name
             type="historical" ref="#S_Pudenziana">S. Pudenziana</name>, all of which, <persName
             ref="#Knagenhjelm_Eleanor">Nellie</persName> and I saw most thoroughly two winters ago.
-          In the afternoon we went over to <name type="historical" ref="#Saint_Peters_Basilica">St.
+          In the afternoon we went over to <name type="historical" ref="#S_Peters_Basilica">St.
             Peters</name> to hear the low mass - the music most solemn and beautiful - no organ - I
           walked all about the great church, and took farewell views of all my favorite points, and
           drove home regretfully. I have never been in <placeName ref="#Rome">Rome</placeName> when
@@ -3792,38 +3788,38 @@
           bumping and knocking from side to side, and making the strangest noises. When we came
           away, I preferred to climb down those stony staircases, rather than trust myself to it
           again. We spent two and a half hours in these incomparable galleries, before we emerged
-          more dead than alive. In the afternoon we drove to <placeName ref="#San_Miniato">S.
-            Miniato</placeName>, which always delights me. I like to sit down on the parapet at the
+          more dead than alive. In the afternoon we drove to <name type="historical" ref="#San_Miniato">S.
+            Miniato</name>, which always delights me. I like to sit down on the parapet at the
           edge of the terrace, and look at the church, rich and lovely, with its inlaid marbles
           tones and yellowed by age. It is of the Pisan Florentine style, not unlike <name
-            type="historical" ref="#Saint_Maria_Novella">S. Maria Novella</name>, and the hideous
+            type="historical" ref="#S_Maria_Novella">S. Maria Novella</name>, and the hideous
           and fantastic Italian cemetery which surrounds it cannot detract from its charm. Next to
           it, and apparently part of it is the old machicolated <name type="historical"
-            ref="#Palazzo_Mozzi">Mozzi Palace</name>. <placeName ref="#San_Miniato">S.
-            Miniato</placeName> is one of my favorite spots in <placeName ref="#Florence"
+            ref="#Palazzo_Mozzi">Mozzi Palace</name>. <name type="historical" ref="#San_Miniato">S.
+            Miniato</name> is one of my favorite spots in <placeName ref="#Florence"
             >Florence</placeName>, and when I am tired of looking at the church I can turn and look
           at the fortifications built by <persName ref="#Michelangelo" type="historical">Michael
             Angelo</persName>, through the gateway of which we approach the church - and to the
           noble <pb n="140"/> view of the lovely city, spread out far below us - the
             <!--River--><placeName>Arno</placeName> glistening in silver curves away in the
           distance, and, surrounded by that grand sweep of hills and mountains, <placeName
-            ref="#Florence">Florence</placeName>, with the great <placeName ref="#Brunelleschi_dome"
-            >dome of Brunelleschi</placeName>, and <placeName ref="#Giotto_Campanile">Giotto's
-            Tower</placeName>, and the more graceful campanile of the <name ref="#Palazzo_Vecchio"
+            ref="#Florence">Florence</placeName>, with the great <name type="historical" ref="#Brunelleschi_dome"
+            >dome of Brunelleschi</name>, and <name type="historical" ref="#Giotto_Campanile">Giotto's
+            Tower</name>, and the more graceful campanile of the <name ref="#Palazzo_Vecchio"
             type="historical">Palazzo Vecchio</name>, towering over the other domes and lesser
           campaniles and stately palaces and picturesque bridges. Its beauty is all its own, - and
           it looks so small - even in glorious days when , intellectually and artistically, it ruled
           the world, and of the fierce dissensions and cruel wars and brutal turmoils, that surged
           about within its very walls for centuries - of which the great palaces, more like
           fortifications than palaces, are now the only witnesses.</p>
-        <p>The cemetery here at <placeName ref="#San_Miniato">S. Miniato</placeName> seems to
+        <p>The cemetery here at <name type="historical" ref="#San_Miniato">S. Miniato</name> seems to
           overflow into the church, and little railings and photographs and artificial flowers and
           mimic trees surround the tomb stones here as well as outside, and make a kind of
-            <placeName ref="#Camposanto_Monumentale_di_Pisa">Campo Santo</placeName> of the whole
+            <name type="historical" ref="#Camposanto_Monumentale_di_Pisa">Campo Santo</name> of the whole
           place. The interior arrangement is peculiar - and the pavement and marble work of the
-          choir, is of the 13th century and very beautiful and curious. From <placeName
-            ref="#San_Miniato">S. Miniato</placeName> we drove to <placeName ref="#Santa_Croce">S.
-            Croce</placeName>, where a service was going on, with some solemn and delicious music -
+          choir, is of the 13th century and very beautiful and curious. From <name type="historical"
+            ref="#San_Miniato">S. Miniato</name> we drove to <name type="historical" ref="#Santa_Croce">S.
+            Croce</name>, where a service was going on, with some solemn and delicious music -
           the church in a half twilight, with the twinkling lights of the altars, with its simple
           and noble proportions, was more impressive than I have ever seen it - and the tombs of
             <placeName ref="#Italy">Italy</placeName>'s mighty dead - <persName
@@ -3836,8 +3832,8 @@
         <dateline>
           <date when="1890-04-03">Thursday. April 3d.</date>
         </dateline>
-        <p><pb n="141"/>We started off this morning to the <orgName ref="#Palazzo_Pitti">Pitti
-            galleries</orgName>, across the river, and spent two hours or more in that stately
+        <p><pb n="141"/>We started off this morning to the <name type="historical" ref="#Palazzo_Pitti">Pitti
+            galleries</name>, across the river, and spent two hours or more in that stately
           palace - looking at the finest pictures any gallery in the world contains - then walked
           through the interminable galleries and corridors lending to the <orgName
             ref="#Uffizi_Gallery">uffizi</orgName>, which, with the exception of the engravings has
@@ -3853,10 +3849,10 @@
         <dateline>
           <date when="1890-04-04">Friday. April 4th.</date>
         </dateline>
-        <p>Drove to the <placeName ref="#Medici_Chapel">Medici Chapel of S. Lorenzo</placeName> and
+        <p>Drove to the <name type="historical" ref="#Medici_Chapel">Medici Chapel of S. Lorenzo</name> and
           spent almost an hour there with the mighty creations of <persName ref="#Michelangelo"
             type="historical">Michael Angelo</persName> - never have they seemed to wonderful to me.
-          Then we went to <placeName ref="#San_Marco">S. Marco</placeName>, to the cloisters and
+          Then we went to <name type="historical" ref="#San_Marco">S. Marco</name>, to the cloisters and
           monastery and home in time for lunch. In the afternoon we went to the <orgName
             ref="#Gallerie_dell_Accademia">Accademia</orgName> to see the old painting and
             <objectName type="sculpture" ref="#David">David</objectName>, and <persName
@@ -3870,8 +3866,8 @@
           <date when="1890-04-05">Saturday. April 5th.</date>
         </dateline>
         <p><pb n="142"/>I drove <persName ref="#Davis_Theodore_M">Theodore</persName> and <persName
-            ref="#Buttles_Mary">Mary</persName> over to the <placeName ref="#Palazzo_Pitti"
-            >Pitti</placeName> this morning, but did not venture in myself. I went to some shops,
+            ref="#Buttles_Mary">Mary</persName> over to the <name type="historical" ref="#Palazzo_Pitti"
+            >Pitti</name> this morning, but did not venture in myself. I went to some shops,
           and to the interesting chruch of Or <persName ref="#Michael">San Michele</persName> - a
           little service was going on, and I sat down on one of the empty benches, and read my book,
           and examined the details of the wonderful shrine of <persName ref="#Orcagna"
@@ -3907,11 +3903,11 @@
           <date when="1890-04-07">Monday, April 7th.</date>
         </dateline>
         <p>A visit to the <orgName ref="#Museo_Nazionale_del_Bargello">Bargello</orgName> this
-          morning, and then to lunch with the <!--Who?-->><name>Morgan Morgans</name> in their
+          morning, and then to lunch with the <!--Who?--><name>Morgan Morgans</name> in their
           charming house in <placeName ref="#Giardino_Torrigianni">Giardino Torrigianni</placeName>
           - after which, <persName ref="#Buttles_Mary">Mary</persName> and I went to <name
-            type="historical" ref="#Saint_Maria_Novella">S. Maria Novella</name>, and tried to get
-          into <placeName ref="#Badia_Fiorentina">La Badia</placeName> to see the cloisters, but
+            type="historical" ref="#S_Maria_Novella">S. Maria Novella</name>, and tried to get
+          into <name type="historical" ref="#Badia_Fiorentina">La Badia</name> to see the cloisters, but
           failed, as the church was closed. Then we looked at photographs at
             <!--Cant find--><placeName>Brogi's</placeName> - and in the evening, the <persName
             ref="#Renssaelaer_Van ">Van Renssaelaer</persName> party came in and visited us.</p>
@@ -3921,13 +3917,12 @@
           <placeName ref="#Milan">Milan</placeName> - <name type="#hotel" ref="#Hotel_Cavour">Hotel
             Cavour</name>. <date when="1890-04-08">April 8th.</date>
         </dateline>
-        <p> This morning after breakfast we drove to the <placeName ref="#Badia_Fiorentina"
-            >Badia</placeName>, with the same ill success as on yesterday - then to <placeName
-            ref="#Santa_Croce">S. Croce</placeName> for a last visit, then left <persName
+        <p> This morning after breakfast we drove to the <name type="historical" ref="#Badia_Fiorentina"
+            >Badia</name>, with the same ill success as on yesterday - then to <name type="historical"
+            ref="#Santa_Croce">S. Croce</name> for a last visit, then left <persName
             ref="#Buttles_Mary">Mary</persName> at the <orgName ref="#Uffizi_Gallery"
             >Uffizi</orgName> for an hour and a half, sending back the carriage for her - while I
-          went home and did some last packing - and we were off by half past 2 o'clock in a
-          <!--accented e-->coup&#223; by ourselves for <placeName ref="#Milan">Milan</placeName>,
+          went home and did some last packing - and we were off by half past 2 o'clock in a coup&#223; by ourselves for <placeName ref="#Milan">Milan</placeName>,
           which we reached this evening by 10.30. We breakfast early tomorrow, and leave in the 9:40
           train for <placeName ref="#Luzern">Lucerne</placeName>.</p>
       </div>
