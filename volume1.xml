@@ -1673,9 +1673,8 @@
           crowd. The <orgName ref="#Busharin_Bedouins">Busharin Bedouins</orgName> are the most
           barbarous looking men you see - and such splendid looking fellows from <placeName
             ref="#Khartoum">Khartoum</placeName>, with their fine bearing - and their regular
-          features - and their bronze skins. They look as if they <pb n="63"/> might all be
-            <!--Not sure who Ben Hurs and Abdallahs is referring to--><persName>Ben Hurs</persName>
-          - and <persName>Abdallahs!</persName> I came away with some very pretty Nubian baskets -
+          features - and their bronze skins. They look as if they <pb n="63"/> might all be <persName type="fictional" ref="#Judah_Ben-Hur">Ben Hurs</persName>
+          - and <orgName ref="#Abdallabi_Tribe">Abdallahs</orgName>! I came away with some very pretty Nubian baskets -
           and was rowed down to the trysting place. I saw <persName ref="#Hughes_Frederick_Sir">Sir
             Frederick</persName> and <persName ref="#Hughes_Lady">Lady Hughes</persName> entering
           the <orgName ref="#Thomas_Cook">Cook</orgName>'s steamer "<name type="boat" ref="#Amasis"
@@ -2307,7 +2306,7 @@
           lying along the mountains here, separated by no great intervals, so that one can easily be
           seen from the other, are the <name type="historical" ref="#mastaba">Mastabas</name>, or
           mortuary chapels of their kings, buried beyond and above them in the valley of the
-            <!--need to find?--><placeName>Bab-el-Moulak</placeName>.</p>
+          <placeName ref="#Bībān_al-Mulūk">Bab-el-Moulak</placeName>.</p>
         <p>On coming out of the tomb of <persName ref="#Seti_I" type="historical">Seti
             1st</persName>, we went to that of <persName ref="#Rameses_III" type="historical"
             >Ramesis 3d</persName> or <name type="historical" ref="#Bruns_Tomb">Brun's Tomb</name> as it is
@@ -2846,7 +2845,7 @@
             <sic>it</sic>
             <corr>it is</corr>
           </choice> necessary to fire off a rifle now and then as a warning to the neighborhood -
-          for several nights now, we have had three or four men on guard. We awakened to a calm 
+          for several nights now, we have had three or four men on guard. We awakened to a calm
           lovely day, though a very warm one. The men rowed vigourously, and brought us to <placeName ref="#Bani_Hasan">Beni Hassan</placeName> soon after eleven o'clock. Lunch
           was hurried, donkeys commanded by stentorian lungs from the dahabeah, and by 12 o'clock we
           were in the felucca for the opposite shore, where donkeys, two soldiers with their rifles,
@@ -3084,8 +3083,8 @@
             type="hotel" ref="#Mena_House_Hotel">Mena Hotel</name> at the Pyramids has to be
           resigned - as no rooms can be had there for weeks - so in place of staying in <placeName
             ref="#Egypt">Egypt</placeName> for 10 days longer, we sail next Monday for <placeName
-            ref="#Brindisi">Brindisi</placeName> in one of the Austrian Lloyd boats - being afraid
-          to trust the Italian Rabitino line to <placeName ref="#Naples">Naples</placeName>. We are
+            ref="#Brindisi">Brindisi</placeName> in one of the Austrian <orgName ref="#Lloyd">Lloyd</orgName> boats - being afraid
+          to trust the Italian  <orgName ref="#Rabitino">Rabitino</orgName> line to <placeName ref="#Naples">Naples</placeName>. We are
           rushing now - dozens of things to be done - and no time to do them in.</p>
       </div>
       <div xml:id="EBA-1890-03-02" type="entry">
@@ -3146,7 +3145,7 @@
             ref="#Buttles_Mary">Mary</persName> and I feel so happy and independent without
             <persName ref="#Georgette">Georgette</persName> - we have a big gloomy room, lighted by
           2 candles, with 2 little beds in it, and we fell like school girls off for a lark! We sail
-          in the <!--What tag? Possibly a port?-->Enterpe tomorrow at 9 o'clock and I do trust the
+          in the <name type="boat" ref="#Enterpe">Enterpe</name> tomorrow at 9 o'clock and I do trust the
           voyage will be a good one. I do not like to think of the dreadful one we made two years
           ago from this port - "I have such fear, I know no hope"!</p>
       </div>
@@ -3197,7 +3196,7 @@
         <dateline>
           <date when="1890-03-09">Sunday. March 9th.</date>
         </dateline>
-        <p><pb n="120"/> Spent the morning in the <!--What is this?-->Musee - the building was very
+        <p><pb n="120"/> Spent the morning in the <name type="historical" ref="#National_Archeological_Musuem_Naples">Musee </name>- the building was very
           cold, and we were glad to get out into the genial air. We went through the Pompeian rooms
           - they were filled with the usual Sunday crowd of peasants and small people - and although
           they were odorous, and not to be approached too nearly, I was much interested in their
@@ -3235,7 +3234,7 @@
         </dateline>
         <p><persName ref="#Buttles_Mary">Mary</persName> was not well this morning, so that no
           excursions could be arranged. <persName ref="#Davis_Theodore_M">Theodore</persName> and I
-          went again to the Museum, and in the afternoon had a drive.</p>
+          went again to the <name type="historical" ref="#National_Archeological_Musuem_Naples">Museum</name>, and in the afternoon had a drive.</p>
       </div>
       <div xml:id="EBA-1890-03-12" type="entry">
         <dateline>
@@ -3276,7 +3275,7 @@
           prim walks and allies. In the afternoon still having poor <persName ref="#Buttles_Mary"
             >Mary</persName> in the house, we drove to the heights of <placeName ref="#Capodimonte"
             >Capodimonte</placeName>, where I had never before been - we were too late for the
-          <!--Museo means museum in italy-->Museo, for which I was sorry for I wanted to see the
+          <name type="historical" ref="#Museo_di_Capodimonte">Museo</name>, for which I was sorry for I wanted to see the
           collection of the old porcelain of <placeName ref="#Capodimonte">Capdimonte</placeName>;
           the drive about the extensive park was lovely.</p>
       </div>
@@ -3314,7 +3313,7 @@
         </dateline>
         <p>The rain was pouring all the morning - we improved the time writing letters. In the
           afternoon the rain stopped, and we had a <pb n="124"/> charming drive to the
-          <!--Its a monastery of San Francesco del Deserto, but not named-->Deserto a monastery
+          <!--Its a monastery of San Francesco del Deserto--><name type="historical" ref="">Deserto</name> a monastery
           commanding a magnificent view. After dinner we went down to the ball room, made in the
           rock under the hotel, to see some men and women in their picturesque costumes dance.</p>
       </div>
@@ -3536,9 +3535,9 @@
           ancient <name type="historical" ref="#Temple_of_Apollo">temple of Apollo</name>. The
           priceless library must well be worth a visit. It now contains 10,000 volumes, including
           many rare additions, and specimens of early printing. Among the numerous and valuable
-          <!--What is this?-->MS preserved in the archives, are the commentary of <persName
+          <!--manuscript-->MS preserved in the archives, are the commentary of <persName
             ref="#Origen_of_Alexandria" type="historical">Origen</persName> on the epistle to the
-          Romans, dating from the 6th century - splendidly illuminated <!--What is this?-->MSS,
+          Romans, dating from the 6th century - splendidly illuminated <!--manuscript-->MSS,
           documents of kings, popes, etc. bulls, letters etc. There now remain in this convent 30
           monks who share the charge of the library and archives, and educate theological students.
           After taking possession of our rooms, we drove <pb n="133"/> to the bankers for letters,
@@ -3801,7 +3800,7 @@
           at the fortifications built by <persName ref="#Michelangelo" type="historical">Michael
             Angelo</persName>, through the gateway of which we approach the church - and to the
           noble <pb n="140"/> view of the lovely city, spread out far below us - the
-            <!--River--><placeName>Arno</placeName> glistening in silver curves away in the
+            <!--River--><placeName ref="#Arno">Arno</placeName> glistening in silver curves away in the
           distance, and, surrounded by that grand sweep of hills and mountains, <placeName
             ref="#Florence">Florence</placeName>, with the great <name type="historical" ref="#Brunelleschi_dome"
             >dome of Brunelleschi</name>, and <name type="historical" ref="#Giotto_Campanile">Giotto's
