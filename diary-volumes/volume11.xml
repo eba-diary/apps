@@ -423,7 +423,7 @@
         <dateline>
           <name type="event" ref="#Septuagesima">Septuagesima</name> <date when="1904-01-31">Sunday, Jan. 31</date>.
         </dateline>
-          <p><persName ref="#Hardy_Jean">Jean<persName>, <persName ref="#Trefusis_Robert">Robert</persName> and <persName ref="#Davis_Theodore_M">Theo</persName> went to <placeName>Karnak</placeName> this afternoon, <persName ref="#Carter_Howard">Carter</persName> and <persName ref="#Newberry_Percy">Newberry</persName> to lunch. Mr. and <persName>Mrs. Fraser,</persName> of the <name>"Strange Hathor"</name> dined with us. The accounts from the tomb are that some fragments of pots have been found in the big chamber which was reached a few days since.</p>
+          <p><persName ref="#Hardy_Jean">Jean<persName>, <persName ref="#Trefusis_Robert">Robert</persName> and <persName ref="#Davis_Theodore_M">Theo</persName> went to <placeName ref="#Karnak">Karnak</placeName> this afternoon, <persName ref="#Carter_Howard">Carter</persName> and <persName ref="#Newberry_Percy">Newberry</persName> to lunch. Mr. and <persName>Mrs. Fraser,</persName> of the <name>"Strange Hathor"</name> dined with us. The accounts from the tomb are that some fragments of pots have been found in the big chamber which was reached a few days since.</p>
       </div>
       <div xml:id="EBA-1904-02-01">
         <dateline>
@@ -498,7 +498,7 @@
           <date when="1904-02-16">Tuesday, Feb. 16</date>. 
           <measure type="distance">23-1/2 miles</measure>.
         </dateline>
-          <p>Again a fine wind that brought us to <placeName ref="#Idfu">Edfu</placeName> at one o'clock. <persName ref="#Hardy_Jean">Jean</persName> and <persName ref="#Trefusis_Robert">Robert</persName>, under convoy of <persName>Jones,</persName> spend 2 hours at the temple. Started again, and sailed until 7. The day has been warm and beautiful.</p>
+          <p>Again a fine wind that brought us to <placeName ref="#Idfu">Edfu</placeName> at one o'clock. <persName ref="#Hardy_Jean">Jean</persName> and <persName ref="#Trefusis_Robert">Robert</persName>, under convoy of <persName ref="#Jones_Daniel">Jones</persName>, spend 2 hours at the temple. Started again, and sailed until 7. The day has been warm and beautiful.</p>
       </div>
       <div xml:id="EBA-1904-02-17">
         <dateline>
@@ -568,50 +568,50 @@
         <dateline>
           <date when="1904-02-27">Saturday, Feb. 27</date>.
         </dateline>
-          <p><persName ref="#Newberry_Percy">Mr. Newberry</persName> turned up again this morning - and came over from <placeName ref="#Luxor">Luxor</placeName> with <persName ref="#Davis_Theodore_M">Theo</persName> for lunch. He is very full of a desert journey he is going to make with the Royal party. They all come down from <placeName ref="#Aswan">Asw&#226;n</placeName> except the young <persName ref="#Prince_Leopold">Prince and his doctor, who stays there, on <date when="1904-02-21">Monday</date>, and go off their donkeys immediately, for an hour and a half to <placeName>Medimut</placeName> where their caravan is encamped. They go to <placeName>Kosseir</placeName> on the <placeName>Red Sea,</placeName> and will be gone in 14 days. <persName>Mahommed Salah</persName> is their dragoman. He was here last night in great glee, telling us about it. He has the whole charge of it and is well accustomed to these expeditions. He has 45 camels, as well as donkeys and a number of tents. I should so like such a journey! <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Trefusis_Robert">Robert</persName> went to <placeName>Karnak</placeName> this afternoon and <persName ref="#Hardy_Jean">Jean</persName> and I went to have tea with <persName ref="#Newberry_Percy">Newberry</persName> at the <placeName>Luxor Hotel</placeName>. <persName ref="#Carter_Howard">Carter</persName> arrived from <placeName>Asw&#226;n</placeName> in time to join us.</p>
+          <p><persName ref="#Newberry_Percy">Mr. Newberry</persName> turned up again this morning - and came over from <placeName ref="#Luxor">Luxor</placeName> with <persName ref="#Davis_Theodore_M">Theo</persName> for lunch. He is very full of a desert journey he is going to make with the Royal party. They all come down from <placeName ref="#Aswan">Asw&#226;n</placeName> except the young <persName ref="#Prince_Leopold">Prince</persName> and his doctor, who stays there, on <date when="1904-02-21">Monday</date>, and go off their donkeys immediately, for an hour and a half to <placeName ref="#Medamud">Medimut</placeName> <!--EBI--> where their caravan is encamped. They go to <placeName>Kosseir</placeName> on the <placeName ref="#Red_Sea">Red Sea</placeName>, and will be gone in 14 days. <persName ref="#Salah_Mohammed">Mahommed Salah</persName> is their dragoman. He was here last night in great glee, telling us about it. He has the whole charge of it and is well accustomed to these expeditions. He has 45 camels, as well as donkeys and a number of tents. I should so like such a journey! <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Trefusis_Robert">Robert</persName> went to <placeName ref="#Karnak">Karnak</placeName> this afternoon and <persName ref="#Hardy_Jean">Jean</persName> and I went to have tea with <persName ref="#Newberry_Percy">Newberry</persName> at the <placeName ref="#Luxor_Hotel">Luxor Hotel</placeName>. <persName ref="#Carter_Howard">Carter</persName> arrived from <placeName ref="#Aswan">Asw&#226;n</placeName> in time to join us.</p>
       </div>
       <div xml:id="EBA-1904-02-28">
         <dateline>
-          Second Sunday in <name type="event" ref="#Event">Lent</name>, <date when="1904-02-28">Feb. 28</date>.
+          Second Sunday in <name type="event" ref="#Lent">Lent</name>, <date when="1904-02-28">Feb. 28</date>.
         </dateline>
-          <p><persName ref="#Carter_Howard">Mr. Carter</persName> and <persName ref="#Newberry_Percy">Newberry</persName> and <persName>Mr. Blue</persName> the head engineer of the <orgName>Asw&#226;n Barrage,</orgName> and the <orgName>Asy&#251;t</orgName> dam, came to lunch. They had been over to the tombs of the kings and <persName ref="#Carter_Howard">Carter</persName> had been down in the tomb - and reported that the sarcophagus of <placeName>Hatshepsut</placeName> and of <orgName>Thotmes</orgName> I had been found in the chamber.</p>
+          <p><persName ref="#Carter_Howard">Mr. Carter</persName> and <persName ref="#Newberry_Percy">Newberry</persName> and <persName ref="Blue_Mr">Mr. Blue</persName><!--EBI--> the head engineer of the <orgName>Asw&#226;n Barrage</orgName>, and the <orgName>Asy&#251;t dam</orgName> <!--orgName, placeName, historical?-->, came to lunch. They had been over to the <name type="historical" ref="#Bībān al-Mulūk">tombs of the kings</name> and <persName ref="#Carter_Howard">Carter</persName> had been down in the tomb - and reported that the sarcophagus of <persName ref="#Hatshepsut">Hatshepsut</persName> and of <persName ref="#Thotmes_I">Thotmes I</persName> had been found in the chamber.</p>
       </div>
       <div xml:id="EBA-1904-02-29">
         <dateline>
           <date when="1904-02-29">Monday, Feb. 29</date>.
         </dateline>
-          <p>A warm, calm day. Mr. and <persName>Mrs. Murch</persName> and <persName>Jimmie</persName> came to tea with us - and stayed until it was quite dark. They report as we had been told that there is a case of measles in <persName ref="#Buchanan_Carrie">Miss Buchanan</persName>'s school, in fact her assistant has them - and they have been and are in quarantine. <persName>Bob Tytus</persName> and <persName ref="#Davis_Theodore_M">Theo</persName> went over to <persName>Carters</persName> to see the fragments found in the tomb. Mr. and <persName>Mrs. Chamberlain</persName> came up in a private steamer two days ago, and <persName>Carter</persName> has been constantly busy with them.</p>
+          <p>A warm, calm day. <persName ref="#Murch_Chauncey #Murch_Mrs">Mr. and Mrs. Murch</persName> and <persName ref="#Jimmie">Jimmie</persName> <!--their child?-->came to tea with us - and stayed until it was quite dark. They report as we had been told that there is a case of measles in <persName ref="#Buchanan_Carrie">Miss Buchanan</persName>'s school, in fact her assistant has them - and they have been and are in quarantine. <persName ref="#Tytus_Bob">Bob Tytus</persName> and <persName ref="#Davis_Theodore_M">Theo</persName> went over to <persName ref="##Carter_Howard #Carter_Mrs">Carters</persName> to see the fragments found in the tomb. Mr. and <persName>Mrs. Chamberlain</persName> came up in a private steamer two days ago, and <persName ref="#Carter_Howard">Carter</persName> has been constantly busy with them.</p>
       </div>
       <div xml:id="EBA-1904-03-01">
         <dateline>
           <date when="1904-03-01">Tuesday, March 1st</date>.
         </dateline>
-          <p><persName ref="#Davis_Theodore_M">Theo</persName> went over early this afternoon to <persName>Biban Mouluk</persName> by appointment to meet Mr. and <persName>Mrs. Chamberlain</persName> and visit the <placeName>Tombs</placeName> with them. In fact he took over tea for them - and <persName>Jones</persName> and the camel with an elaborate tea went over. The day has been very warm - they came back late in the splendour of the full moon. <persName ref="#Carter_Howard">Mr. Carter</persName> came to dinner and remained the night.</p>
+          <p><persName ref="#Davis_Theodore_M">Theo</persName> went over early this afternoon to <placeName ref="#Bībān al-Mulūk">Biban Mouluk</placeName> by appointment to meet <persName ref="#Chamberlain_Mr #Chamerlain_Mrs">Mr. and Mrs. Chamberlain</persName> and visit the <placeName>Tombs</placeName> with them. In fact he took over tea for them - and <persName ref="#Jones_Daniel">Jones</persName> and the camel with an elaborate tea went over. The day has been very warm - they came back late in the splendour of the full moon. <persName ref="#Carter_Howard">Mr. Carter</persName> came to dinner and remained the night.</p>
       </div>
       <div xml:id="EBA-1904-03-02">
         <dateline>
           <date when="1904-03-02">Wednesday, Mar. 2d</date>.
         </dateline>
-          <p>A howling wind and sandstorm has been upon us all day - our canvas on one side down - and boat dismal. Sir <persName>William Preece,</persName> the eminent electrician and his daughters came to lunch, and stayed most of the afternoon and <persName ref="#Carter_Howard">Mr. Carter</persName> for dinner and all night.</p>
+          <p>A howling wind and sandstorm has been upon us all day - our canvas on one side down - and boat dismal. <persName ref="#Preece_William_Henry_Sir">Sir William Preece</persName>, the eminent electrician and his daughters came to lunch, and stayed most of the afternoon and <persName ref="#Carter_Howard">Mr. Carter</persName> for dinner and all night.</p>
       </div>
       <div xml:id="EBA-1904-03-03">
         <dateline>
           <date when="1904-03-03">Thursday, Mar. 3d</date>.
         </dateline>
-          <p>Went over to <persName>Carters</persName> all of us for tea, and had such a pleasant visit.</p>
+          <p>Went over to <persName ref="#Carter_Howard #Carter_Mrs">Carters</persName> all of us for tea, and had such a pleasant visit.</p>
       </div>
       <div xml:id="EBA-1904-03-04">
         <dateline>
           <date when="1904-03-04">Friday, Mar. 4th</date>.
         </dateline>
-          <p>A very busy day - <persName ref="#Davis_Theodore_M">Theo</persName>, <persName ref="#Hardy_Jean">Jean</persName> and I went over early to <placeName>Karnak</placeName> to see the wonderful things <name>Monsieur Le Grain</name> has been finding lately. There is a "hole" one might say, perhaps 50 feet square, or more, which he discovered this year - it lies just at the corner formed by the pylon of <placeName>Amenhotep,</placeName> and the wall on which the story of <name>Pentaur</name> is written. Here he has found and been taking out all winter the most wonderful things. He showed me today a little exquisite status in basalt - seated about a foot high, which he had taken out that morning, and which he told me was the 97th statue, big and little which he had taken out. It is more or less filled by infiltration, with water, and in this hundred or more <orgName>Arabs</orgName> and boys were grubbing - and hauling up stones with tackle etc. Some splendid great stones with exquisitely wrought hieroglyphs and inscriptions of <persName>Amenhotep</persName> I have been taken out almost unbroken - and laid together, having probably formed a chapel of that king. It is supposed that in some dangerous emergency, all these things were concealed in this "cache" for they were not carelessly put there - and have come out almost unharmed. The most beautiful thing I ever saw of its kind in <orgName>Egyptian</orgName> art, had been taken up to his own house - <name>Le Grain's</name> - a kneeling figure about 4 ft. high, in purest alabaster, and leaning with both hands on a stela. Its beauty, finish and modeling were almost Greek. It represents <persName>Ramses</persName> III. <name>Le Grain</name> has certainly had a wonderful success. Then we galloped madly back to town, for the donkeys are so fresh, and stopped at the <placeName>Murches</placeName> for a farewell visit, and a pleasant one. Then to the <placeName>Luxor Hotel</placeName> to ask the <persName>Misses Collins</persName> to tea this afternoon - and Mrs. and <persName>Miss Coats</persName> - and home a little late for lunch. They all came and we had a pleasant afternoon. After they went, Mr. <persName>Livermore</persName> of <placeName>Boston</placeName> called - then came <persName ref="#Carter_Howard">Mr. Carter</persName> - with latest news of the tomb - and finally said goodbye until he comes down to us at <placeName ref="#Cairo">Cairo</placeName>, and stays until we leave. This is the sketch of the burial chamber as it now is - tomorrow they begin to work on No. 5 - <persName ref="#Carter_Howard">Mr. Carter</persName> thinks it may take until May to clear it entirely - and to get up the sarcophagi and other things. He reports these and a fine canopic box to be made of crystalline red sandstone, beautifully polished and inscribed. [diagram of sarcophagus: page 32 of pdf] 	A.B. lid and sarcophagus of the <orgName>Queen.</orgName> <name>C.D.</name> lid and sarcophagus of <placeName>Thotmes</placeName> I. 	E. Canopic box of the Queen (lid missing) Chamber 4 now cleared and the men are starting on the small side chamber 5</p> 		Feb. 4, 1904. 
+          <p>A very busy day - <persName ref="#Davis_Theodore_M">Theo</persName>, <persName ref="#Hardy_Jean">Jean</persName> and I went over early to <placeName ref="#Karnak">Karnak</placeName> to see the wonderful things <persName ref="#Legrain_M">Monsieur Le Grain</persName> has been finding lately. There is a "hole" one might say, perhaps 50 feet square, or more, which he discovered this year - it lies just at the corner formed by the <name type="historical" ref="Pylon_10">pylon of <persName type="historical" ref="Amenhotep_III">Amenhotep</placeName></name> , and the wall on which the <bibl type="poem" ref="#Pentaur">story of Pentaur</bibl> is written. Here he has found and been taking out all winter the most wonderful things. He showed me today a little exquisite statue in basalt - seated about a foot high, which he had taken out that morning, and which he told me was the 97th statue, big and little which he had taken out. It is more or less filled by infiltration, with water, and in this hundred or more <orgName ref="#Arab">Arabs</orgName> and boys were grubbing - and hauling up stones with tackle etc. Some splendid great stones with exquisitely wrought hieroglyphs and inscriptions of <persName ref="#Amenhotep_II">Amenhotep</persName> I have been taken out almost unbroken - and laid together, having probably formed a chapel of that king. It is supposed that in some dangerous emergency, all these things were concealed in this "cache" for they were not carelessly put there - and have come out almost unharmed. The most beautiful thing I ever saw of its kind in <orgName ref="#Egyptian">Egyptian</orgName> art, had been taken up to his own house - <persName ref="#Legrain_M">Le Grain</name>'s - a kneeling figure about 4 ft. high, in purest alabaster, and leaning with both hands on a stela. Its beauty, finish and modeling were almost <orgName ref="Greek">Greek</orgName>. It represents <persName type="historical" ref="">Ramses III</persName>. <persName ref="Legrain_M">Le Grain</name> has certainly had a wonderful success. Then we galloped madly back to town, for the donkeys are so fresh, and stopped at the <placeName>Murches</placeName> for a farewell visit, and a pleasant one. Then to the <name type="hotel" ref="#Luxor_Hotel" >Luxor Hotel</name> to ask the <persName ref="#Collins_Frances">Misses Collins</persName> to tea this afternoon - and <persName ref="#Coats_Mrs #Coats_Miss">Mrs. and Miss Coats</persName> - and home a little late for lunch. They all came and we had a pleasant afternoon. After they went, <persName ref="Livermore_Mr">Mr. Livermore</persName> <!--EBI-->of <placeName ref="#Boston">Boston</placeName> called - then came <persName ref="#Carter_Howard">Mr. Carter</persName> - with latest news of the tomb - and finally said goodbye until he comes down to us at <placeName ref="#Cairo">Cairo</placeName>, and stays until we leave. This is the sketch of the burial chamber as it now is - tomorrow they begin to work on No. 5 - <persName ref="#Carter_Howard">Mr. Carter</persName> thinks it may take until May to clear it entirely - and to get up the sarcophagi and other things. He reports these and a fine canopic box to be made of crystalline red sandstone, beautifully polished and inscribed. <!--[diagram of sarcophagus: page 32 of pdf]--> 	A.B. lid and sarcophagus of the Queen. C.D. lid and sarcophagus of <persName type="historical" ref="#Thotmes_I">Thotmes I</persName>. 	E. Canopic box of the Queen (lid missing) Chamber 4 now cleared and the men are starting on the small side chamber 5</p> 		Feb. 4, 1904. 
       </div>
       <div xml:id="EBA-1904-03-05">
         <dateline>
           <date when="1904-03-05">Saturday, Mar. 5</date>.
           <measure type="distance">36-1/2 miles</measure>.
         </dateline>
-          <p>We got off at 9 o'clock in almost a calm - which lasted most of the day. We had the usual sad company of people to say goodbye - and many fluttering farewells from the <orgName>Scarab</orgName> as we passed, and from the <placeName>Murchs</placeName> as we floated past. Sailed until after dark - a thing I always think very foolish, as we often come to grief - as this evening when we struck the sand, and had hard work to get off.</p>
+          <p>We got off at 9 o'clock in almost a calm - which lasted most of the day. We had the usual sad company of people to say goodbye - and many fluttering farewells from the <name type="boat" ref="#Scarab">Scarab</name> as we passed, and from the <persName ref="#Murch_Chauncey #Murch_Mrs">Murchs</persName> as we floated past. Sailed until after dark - a thing I always think very foolish, as we often come to grief - as this evening when we struck the sand, and had hard work to get off.</p>
       </div>
       <div xml:id="EBA-1904-03-06">
         <dateline>
@@ -625,7 +625,7 @@
           <date when="1904-03-07">Monday, Mar. 7th</date>.
           <measure type="distance">3 miles</measure>.
         </dateline>
-          <p>We made about <measure type="distance">3 miles</measure> this morning when we were driven to the bank - a low pleasant one covered with the ripening barley - and beyond fields of lovely great poppies in every shade of colour. I took a walk with <persName>Jones</persName> and one of the sailors this morning through the fields, and along the banks of a canal. <persName ref="#Davis_Theodore_M">Theodore</persName> and <persName ref="#Hardy_Jean">Jean</persName> went to <placeName>Denderah</placeName> this afternoon - a ride of about <measure type="distance">4 miles</measure>. The wind has been strong all day - but the air delicious and life-giving. The air is still full of dust however, though today the sun shone warmly. <persName>Keneh</persName> lies just in front of us - but the mountains are not yet visible through the dust clouded atmosphere.</p>
+          <p>We made about <measure type="distance">3 miles</measure> this morning when we were driven to the bank - a low pleasant one covered with the ripening barley - and beyond fields of lovely great poppies in every shade of colour. I took a walk with <persName ref="#Jones_Daniel">Jones</persName> and one of the sailors this morning through the fields, and along the banks of a canal. <persName ref="#Davis_Theodore_M">Theodore</persName> and <persName ref="#Hardy_Jean">Jean</persName> went to <placeName ref="#Dandarah">Denderah</placeName> this afternoon - a ride of about <measure type="distance">4 miles</measure>. The wind has been strong all day - but the air delicious and life-giving. The air is still full of dust however, though today the sun shone warmly. <persName ref="#Keneh">Keneh</persName> lies just in front of us - but the mountains are not yet visible through the dust clouded atmosphere.</p>
       </div>
       <div xml:id="EBA-1904-03-08">
         <dateline>
@@ -636,28 +636,28 @@
       </div>
       <div xml:id="EBA-1904-03-09">
         <dateline>
-          <date when="1904-03-09">Wednesday, Mar. 9th.</date> <measure type="distace">13 miles.</measure>
+          <date when="1904-03-09">Wednesday, Mar. 9th.</date> <measure type="distace">13 miles</measure>.
         </dateline>
-          <p>Are about <measure type="distance">2-3 miles</measure> above <orgName>Kasr es Said.</orgName></p>
+          <p>Are about <measure type="distance">2-3 miles</measure> above <placeName ref="#Kasr_es_Said">Kasr es Said</placeName> <!--research more-->.</p>
       </div>
       <div xml:id="EBA-1904-03-10">
         <dateline>
-          <date when="1904-03-10">Thursday, Mar. 10.</date> 	<measure type="distance">one mile</measure> 	
-          <p>The gale continues - we made one mile during a slight intermission this morning.</p>
+          <date when="1904-03-10">Thursday, Mar. 10.</date> <measure type="distance">one mile</measure>
+          <p>The gale continues - we made <measure type="distance">one mile</measure> during a slight intermission this morning.</p>
         </dateline>
       </div>
       <div xml:id="EBA-1904-03-11">
         <dateline>
-          <date when="1904-03-11">Friday, Mar. 11.</date> <measure type="distance">1/2 miles</measure> 
+          <date when="1904-03-11">Friday, Mar. 11</date>. <measure type="distance">1/2 miles</measure> 
         </dateline>
-          <p>The wind has not changed except to veer to the south-west - it increases in force almost every afternoon about 4 o'clock. The big mountain mass of <name>Gebel et-Tarif</name> has been in sight for 3 days. We are lying at a very high bank, which partly protects us from the wind. It has so increased in violence since 6 o'clock that extra stakes and cables have been put out. All the deck furniture is massed together - and the heavy rugs which are always piled at night on the divans, are tied down with ropes. The men could have no awning over them tonight. These days of inaction are always very trying to them. We hope to make the <placeName>Nagh Hamadi</placeName> bridge tomorrow!</p>
+          <p>The wind has not changed except to veer to the south-west - it increases in force almost every afternoon about 4 o'clock. The big mountain mass of <placeName ref="Gebel_el_Tarif">Gebel el-Tarif</placeName><!--EBI--> has been in sight for 3 days. We are lying at a very high bank, which partly protects us from the wind. It has so increased in violence since 6 o'clock that extra stakes and cables have been put out. All the deck furniture is massed together - and the heavy rugs which are always piled at night on the divans, are tied down with ropes. The men could have no awning over them tonight. These days of inaction are always very trying to them. We hope to make the <placeName ref="#Naj_Hammadi ">Nagh Hamadi</placeName> bridge tomorrow!</p>
       </div>
       <div xml:id="EBA-1904-03-12">
         <dateline>
           <date when="1904-03-12">Saturday, Mar. 12</date>.
           <measure type="distance">5-1/2 miles</measure>.
         </dateline>
-          <p>We could not venture leaving our last nights berth until after 6 this morning - when we managed to get across the river - and strike a strong current near shore, the men walked along holding the poles against the side of the boat, thus keeping her off from the shore to which the east wind constantly drove her - then they pulled to anchor across the river, and towed us opposite and beyond <persName>Hu</persName> - and tonight we can see some of the <orgName>Nagh Hamadi</orgName> electric lights and hope to pass the bridge tomorrow at 8:30 when it opens for an hour. Two dahabeas we do not know appeared this morning, and are near us waiting also for the bridge - a strong east wind still.</p>
+          <p>We could not venture leaving our last nights berth until after 6 this morning - when we managed to get across the river - and strike a strong current near shore, the men walked along holding the poles against the side of the boat, thus keeping her off from the shore to which the east wind constantly drove her - then they pulled to anchor across the river, and towed us opposite and beyond <placeName ref="#Hu">Hu</placeName> - and tonight we can see some of the <placeName ref="#Naj_Hammadi">Nagh Hamadi</placeName> electric lights and hope to pass the bridge tomorrow at 8:30 when it opens for an hour. Two dahabeas we do not know appeared this morning, and are near us waiting also for the bridge - a strong east wind still.</p>
       </div>
       <div xml:id="EBA-1904-03-13">
         <dateline>
@@ -671,56 +671,56 @@
           <date when="1904-03-14">Monday, Mar. 14</date>. 
           <measure type="distance">19 miles</measure>. 
         </dateline>
-          <p>A rather better day - we drew up a mile above <placeName>Girga</placeName> about 6 - we will stop to see Mr. and <persName>Mrs. Lythgoe</persName> at their camp just below <placeName>Girga,</placeName> tomorrow.</p>
+          <p>A rather better day - we drew up <measure type="distance">a mile</meausre> above <placeName ref="#Jirjā">Girga</placeName> about 6 - we will stop to see <persName ref="#Lythgoe_Albert #Lythgoe_Mrs">Mr. and Mrs. Lythgoe</persName> at their camp just below <placeName ref="#Jirjā">Girga</placeName>, tomorrow.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-03-15">
         <dateline>
-          <date when="1904-">Tuesday, Mar. 15.</date>
+          <date when="1904-03-15">Tuesday, Mar. 15.</date>
           <measure type="distance">24-1/2 miles</measure>. 
         </dateline>
-          <p>We drew up opposite the camp before breakfast, and intended walking up to it, as soon as we had finished it. But before it was ready, a man arrived with a note from <persName>Lythgoe</persName> saying they had been in quarantine on that side for 10 days - on account of 50 fatal cases of bubonic plague in a village <measure type="distance">two miles</measure> from them! that the quarantine that day had been lifted - and that he would come down and talk to us from the bank. When he appeared we of course made him come in. It seems that he had written and telegraphed to us at <placeName>Nagh Hamadi</placeName> and <placeName>Balliana</placeName> - <persName>Mrs. L.</persName> had gone to <placeName ref="#Cairo">Cairo</placeName> a week before under strong protest. It was such a hot morning and already so late, that we decided not to go up to the camp - though I was very anxious to see the fine <orgName>Coptic</orgName> things lately found. Sohag.</p>
+          <p>We drew up opposite the camp before breakfast, and intended walking up to it, as soon as we had finished it. But before it was ready, a man arrived with a note from <persName ref="#Lythgoe_Albert">Lythgoe</persName> saying they had been in quarantine on that side for 10 days - on account of 50 fatal cases of bubonic plague in a village <measure type="distance">two miles</measure> from them! that the quarantine that day had been lifted - and that he would come down and talk to us from the bank. When he appeared we of course made him come in. It seems that he had written and telegraphed to us at <placeName ref="#Naj_Hammadi ">Nagh Hamadi</placeName> and <placeName ref="#Balyana_Al">Balliana</placeName> - <persName ref="#Lythgoe_Mrs">Mrs. L.</persName> had gone to <placeName ref="#Cairo">Cairo</placeName> a week before under strong protest. It was such a hot morning and already so late, that we decided not to go up to the camp - though I was very anxious to see the fine <orgName ref="#Coptic">Coptic</orgName> things lately found. <placeName ref="Sohag">Sohag</placeName>.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-03-16">
         <dateline>
-          <date when="1904-">Wednesday, Mar. 16.</date>
+          <date when="1904-03-16">Wednesday, Mar. 16.</date>
           50 miles. 
         </dateline>
-          <p>A warm, khamseeny day - with light south wind, before which with the current we came along finely - it is delightful sailing this way. We have been on deck under the awnings most of the day - near <placeName>Aboutig.</placeName></p>
+          <p>A warm, khamseeny day - with light south wind, before which with the current we came along finely - it is delightful sailing this way. We have been on deck under the awnings most of the day - near <placeName ref="#Abu_Tij">Aboutig</placeName>.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-03-17">
         <dateline>
-          <date when="1904-">Thursday, Mar. 17.</date>
+          <date when="1904-03-17">Thursday, Mar. 17.</date>
           <measure type="distance">8 miles</measure>. 
         </dateline>
-          <p>Strong head winds today, for a change. It is comforting to think that a tug starts up today from <placeName ref="#Cairo">Cairo</placeName> to meet us! <persName>Else,</persName> we would not be able to reach <placeName ref="#Cairo">Cairo</placeName> on the 26th. <measure type="distance">11 miles</measure> above Asy&#251;t.</p>
+          <p>Strong head winds today, for a change. It is comforting to think that a tug starts up today from <placeName ref="#Cairo">Cairo</placeName> to meet us! Else, we would not be able to reach <placeName ref="#Cairo">Cairo</placeName> on the <date when="1904-03-26">26th</date>. <measure type="distance">11 miles</measure> above <placeName ref="#Asyut">Asy&#251;t</placeName>.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-03-18">
         <dateline>
-          <date when="1904-">Friday, Mar. 18.</date>
-          40 miles. 
+          <date when="1904-03-18">Friday, Mar. 18</date>.
+          <measure type="distance">40 miles</meausre>. 
         </dateline>
-          <p>Another good day of light <placeName>S.</placeName> wind. Reached <placeName>Asy&#251;t</placeName> at 8:30 - passed the bridge without trouble, but with the usual excitement in the lock. Very hot today - we are lying opposite the beginning of the great mountain chain of <persName>Abu Feda</persName> and the <placeName>Ramses III</placeName> is just across from us. Her electric lights look strangely, against those dim great cliffs.</p>
+          <p>Another good day of light S. wind. Reached <placeName ref="A#syut">Asy&#251;t</placeName> at 8:30 - passed the bridge without trouble, but with the usual excitement in the lock. Very hot today - we are lying opposite the beginning of the great mountain chain of <placeName ref="#Abu_Fudah_Jabal">Abu Feda</placeName> and the <persName type="historical" ref="#Ramses_II">Ramses III</placeName> is just across from us. Her electric lights look strangely, against those dim great cliffs.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-03-19">
         <dateline>
-          <date when="1904-">Saturday, Mar. 19.</date>
+          <date when="1904-03-19">Saturday, Mar. 19</date>.
           <measure type="distance">52-1/2 miles</measure>, 	15 by sail-	38-1/2 by tug. 
         </dateline>
-          <p>Light south wind today - about 12 our tug put in its unexpected appearance. We were not looking for it until day after tomorrow. The Capt. and sailors knew nothing of it having been ordered, and their astonishment was great when she pulled up. The men gladly put away their oars this hot day. At 3 we reached <persName>Beni-Hassan</persName> - and <persName ref="#Hardy_Jean">Jean</persName> had the courage to go to the tombs with <persName>Jones.</persName> They did not stay long, it was so hot - and came back with Mr. <persName>Garstang</persName> and to our amazement, with <persName>Baron v. Bissing</persName> - who had come up to decide upon the division of this years spoils with <persName>Mr. Garstang.</persName> The <persName>Baron</persName> had his bag and valise, and we gladly brought him along with us. For a week past, we have been going through such beautiful country - such rich crops - barley ripening - wheat high and green - blossoming crops - and everywhere the larks singing among them. There is a tiny little crescent of a moon made her appearance last night. Opposite <placeName ref="#Al_Minya">Minia</placeName>.</p>
+          <p>Light south wind today - about 12 our tug put in its unexpected appearance. We were not looking for it until day after tomorrow. The Capt. and sailors knew nothing of it having been ordered, and their astonishment was great when she pulled up. The men gladly put away their oars this hot day. At 3 we reached <name type="historical" ref="#Bani_Hasan">Beni-Hassan</name> - and <persName ref="#Hardy_Jean">Jean</persName> had the courage to go to the tombs with <persName ref="#Jones_Daniel">Jones</persName>. They did not stay long, it was so hot - and came back with <persName ref="#Garstang_John">Mr. Garstang</persName> and to our amazement, with <persName ref="#von_Bissing_Baron">Baron v. Bissing</persName> - who had come up to decide upon the division of this years spoils with <persName ref="#Garstang_John">Mr. Garstang.</persName> The <persName ref="#von_Bissing_Baron">Baron</persName> had his bag and valise, and we gladly brought him along with us. For a week past, we have been going through such beautiful country - such rich crops - barley ripening - wheat high and green - blossoming crops - and everywhere the larks singing among them. There is a tiny little crescent of a moon made her appearance last night. Opposite <placeName ref="#Al_Minya">Minia</placeName>.</p>
       </div>
       <div xml:id="EBA-1904-">
         <dateline>
           Fifth Sunday in <name type="event" ref="#Lent">Lent</name>, <date when="1904-">March 20</date>.
           <measure type="distance">83-1/2 miles</measure>.
         </dateline>
-          <p>A very uncomfortable day of heat - a good south wind too all the way - until late in the afternoon. These last few days of heat and haze have seemed very like a mild <orgName>Khamseen</orgName> - and are rather oppressive - and such singular colouring - and no sunshine. A pallid atmosphere - and desert, rocks and river a sepia brown - with the trees and crops a vivid green, almost lurid green. At one sport, a mass of white and mauve poppies standing in a row amongst the green bearded wheat, was really too lovely. We are lying opposite Benisoef.</p>
+          <p>A very uncomfortable day of heat - a good south wind too all the way - until late in the afternoon. These last few days of heat and haze have seemed very like a mild Khamseen - and are rather oppressive - and such singular colouring - and no sunshine. A pallid atmosphere - and desert, rocks and river a sepia brown - with the trees and crops a vivid green, almost lurid green. At one sport, a mass of white and mauve poppies standing in a row amongst the green bearded wheat, was really too lovely. We are lying opposite <placeName ref="#Benisoef">Benisoef<placeName>.</p>
       </div>
       <div xml:id="EBA-1904-03-21">
         <dateline>
           <date when="1904-1904-03-21">Monday, March 21</date>.
           <measure type="distance">58 miles</measure>. 
         </dateline>
-          <p>Bedrasheyn. The wind blew hard and cool all day - we drew here a little after 2 o'clock - and sent the tug "Anubis" on to <<placeName ref="#Cairo">Cairo</placeName>. It was the best tug and the best Captain we have ever had. <persName>Theron,</persName> the <persName>Baron</persName> and <persName ref="#Hardy_Jean">Jean</persName> took donkeys and rode as far as the <orgName>Ramesis</orgName> colussus.</p>
+          <p><placeName ref="">Bedrasheyn</placeName>. The wind blew hard and cool all day - we drew here a little after 2 o'clock - and sent the tug "Anubis" on to <<placeName ref="#Cairo">Cairo</placeName>. It was the best tug and the best Captain we have ever had. <persName>Theron,</persName> the <persName>Baron</persName> and <persName ref="#Hardy_Jean">Jean</persName> took donkeys and rode as far as the <orgName>Ramesis</orgName> colussus.</p>
       </div>
       <div xml:id="EBA-1904-">
         <dateline>
@@ -781,13 +781,13 @@
         <dateline>
           <date when="1904-">Thursday, Mar. 31</date>. 
         </dateline>
-          <p><persName ref="#Hardy_Jean">Jean</persName> and I with <persName ref="#Davis_Theodore_M">Theodore</persName> went over to town - we left him doing dozens of things, while we went down to the bazaar to buy <persName>Mrs. Kane's</persName> scarf. In the afternoon we went over again with <persName ref="#Carter_Howard">Carter</persName>. Saw the <persName>Newmans</persName> at <placeName>Shepheards,</placeName> and took tea with them - and had a view of <persName>Ms. N's</persName> paintings of <placeName>Abu Simbal.</placeName> Dr. <persName>Sandwith</persName> dined with us, and was most pleasant all the evening.</p>
+          <p><persName ref="#Hardy_Jean">Jean</persName> and I with <persName ref="#Davis_Theodore_M">Theodore</persName> went over to town - we left him doing dozens of things, while we went down to the bazaar to buy <persName>Mrs. Kane's</persName> scarf. In the afternoon we went over again with <persName ref="#Carter_Howard">Carter</persName>. Saw the <persName>Newmans</persName> at <placeName>Shepheards,</placeName> and took tea with them - and had a view of <persName>Ms. N's</persName> paintings of <placeName>Abu Simbal</placeName>. <persName>Dr. Sandwith</persName> dined with us, and was most pleasant all the evening.</p>
       </div>
       <div xml:id="EBA-1904-">
         <dateline>
           <date when="1904-">Friday, April 1st</date>. 
         </dateline>
-          <p><persName ref="#Hardy_Jean">Jean</persName>, <persName ref="#Carter_Howard">Carter</persName> and I went to the <placeName>Zoo</placeName> this morning - on reaching home found <persName>Baron v. Bissing</persName> and<persName ref="#Weigall_Arthur">Mr. Weigall</persName> who stayed to lunch with us. A man from the bazaar brought over some things for us to look at and I bought enough peridotes for a necklace - which I will have mounted some day. <persName>Lady Oppenheim</persName> and another <orgName>English</orgName> lady came up to the sitting room and played bridge with <persName ref="#Davis_Theodore_M">Theo</persName> and Carter. When we got upstairs, <persName ref="#Hardy_Jean">Jean</persName> and I, I found <persName ref="#Davis_Theodore_M">Theo</persName> looking awfully bored. <persName>Lady Oppenheim,</persName> a handsome, quite elderly woman, with white hair, beautifully dressed, very decolet&#232;, smoking cigarettes, with her glasses on her nose, intent upon her game, did not seem to me a lovely example of old age.</p>
+          <p><persName ref="#Hardy_Jean">Jean</persName>, <persName ref="#Carter_Howard">Carter</persName> and I went to the <placeName>Zoo</placeName> this morning - on reaching home found <persName>Baron v. Bissing</persName> and<persName ref="#Weigall_Arthur">Mr. Weigall</persName> who stayed to lunch with us. A man from the bazaar brought over some things for us to look at and I bought enough peridotes for a necklace - which I will have mounted some day. <persName>Lady Oppenheim</persName> and another <orgName>English</orgName> lady came up to the sitting room and played bridge with <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Carter_Howard">Carter</persName>. When we got upstairs, <persName ref="#Hardy_Jean">Jean</persName> and I, I found <persName ref="#Davis_Theodore_M">Theo</persName> looking awfully bored. <persName>Lady Oppenheim,</persName> a handsome, quite elderly woman, with white hair, beautifully dressed, very decolet&#232;, smoking cigarettes, with her glasses on her nose, intent upon her game, did not seem to me a lovely example of old age.</p>
       </div>
       <div xml:id="EBA-1904-">
         <dateline>
@@ -872,7 +872,7 @@
           <date when="1904-">Wednesday, April 20</date>. 
           <name type="hotel" ref="#">Hotel Grande Bretagne</name>, <placeName ref="#Florence">Florence<placeName>.
         </dateline>
-          <p>Breakfasted at 7 o'clock - all of us - <persName ref="#Davis_Theodore_M">Theo</persName>, Alice</persName> and <persName>Jones</persName> left immediately after - we had an hour and a half. The day was cold and threatening so we played bridge until it was time to start. A cold, tiring, rainy day, had to change cars at <placeName>Bologna</placeName> - found <persName>Nettie</persName> waiting for us, and brought her to the hotel to dine with us. So nice to have her again. Are in our old pleasant rooms. Mr. and <persName>Mrs. Havens</persName> came in this evening for awhile.</p>
+          <p>Breakfasted at 7 o'clock - all of us - <persName ref="#Davis_Theodore_M">Theo</persName>, Alice</persName> and <persName ref="#Jones_Daniel">Jones</persName> left immediately after - we had an hour and a half. The day was cold and threatening so we played bridge until it was time to start. A cold, tiring, rainy day, had to change cars at <placeName>Bologna</placeName> - found <persName>Nettie</persName> waiting for us, and brought her to the hotel to dine with us. So nice to have her again. Are in our old pleasant rooms. Mr. and <persName>Mrs. Havens</persName> came in this evening for awhile.</p>
       </div>
       <div xml:id="EBA-1904-">
         <dateline>
