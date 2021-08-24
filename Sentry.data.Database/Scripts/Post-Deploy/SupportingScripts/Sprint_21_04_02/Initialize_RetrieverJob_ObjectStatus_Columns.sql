@@ -4,6 +4,24 @@ select
 into #NewRetrieverJob
 from RetrieverJob
 
+IF COL_LENGTH('dbo.RetrieverJob', 'ObjectStatus') IS NULL
+BEGIN
+    Alter table #NewRetrieverJob
+	Add ObjectStatus INT NULL
+END
+
+IF COL_LENGTH('dbo.RetrieverJob', 'DeleteIssuer') IS NULL
+BEGIN
+    Alter table #NewRetrieverJob
+	Add DeleteIssuer VARCHAR(10) NULL
+END
+
+IF COL_LENGTH('dbo.RetrieverJob', 'DeleteIssueDTM') IS NULL
+BEGIN
+    Alter table #NewRetrieverJob
+	Add DeleteIssueDTM datetime NULL
+END
+
 
 /* All retriever jobs associated with dataflow */
 IF OBJECT_ID('tempdb..#JobsAssoicatedWithDataflows') IS NOT NULL DROP TABLE #JobsAssoicatedWithDataflows
@@ -227,7 +245,7 @@ END
 ****************************************************************************/
 If (@ExecuteScript = 'TRUE')
 BEGIN
-	Update RetreiverJob
+	Update RetrieverJob
 	SET ObjectStatus = x.ObjectStatus, DeleteIssuer = x.DeleteIssuer, DeleteIssueDTM = x.DeleteIssueDTM, ModifiedDTM = x.Modified_DTM
 	from #NewRetrieverJob x
 	where Job_Id = x.Job_ID
