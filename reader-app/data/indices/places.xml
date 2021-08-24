@@ -1,0 +1,49 @@
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?><?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml"
+	schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="places">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Title</title>
+            </titleStmt>
+            <publicationStmt>
+                <p>Publication Information</p>
+            </publicationStmt>
+            <sourceDesc>
+                <p>Information about the source</p>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <particDesc>
+            </particDesc>
+            <settingDesc>
+                <listPlace>
+                    <place xml:id="Cairo">
+                        <placeName>Cairo</placeName>
+                        <note>Cairo, Arabic Al-Qāhirah (“The Victorious”), city, capital of Egypt, and one of the largest cities in Africa. Cairo has stood for more than 1,000 years on the same site on the banks of the Nile, primarily on the eastern shore, some 500 miles (800 km) downstream from the Aswān High Dam.</note>
+                    </place>
+                    <place xml:id="Cherbourg">
+                        <placeName>Cherbourg</placeName>
+                        <note>Cherbourg-en-Cotentin, naval station, fortified town, and seaport in Manche département, Normandy région, northwestern France. </note>
+                    </place>
+                    <place xml:id="Marseilles">
+                        <placeName>Marseilles</placeName>
+                        <note>Marseille, also spelled Marseilles, ancient Massilia, or Massalia, city, capital of Bouches-du-Rhône département, southern France. Located west of the French Riviera, Marseille is one of the major ports of the Mediterranean Sea.</note>
+                    </place>
+                    <place xml:id="Naples">
+                        <placeName>Naples</placeName>
+                        <note>Naples, Italian Napoli, ancient (Latin) Neapolis (“New Town”), city, capital of Naples provincia, Campania regione, southern Italy. It lies on the west coast of the Italian peninsula, 120 miles (190 km) southeast of Rome.</note>
+                    </place>
+                    <place xml:id="New_York">
+                        <placeName>New York</placeName>
+                        <note>New York City, officially the City of New York, historically New Amsterdam, the Mayor, Alderman, and Commonality of the City of New York, and New Orange, byname the Big Apple, city and port located at the mouth of the Hudson River, southeastern New York state, northeastern U.S. It is the largest and most influential American metropolis.</note>
+                    </place>
+                    <place xml:id="Paris">
+                        <placeName>Paris</placeName>
+                        <note>Paris, city and capital of France, situated in the north-central part of the country. People were living on the site of the present-day city, located along the Seine River some 233 miles (375 km) upstream from the river’s mouth on the English Channel (La Manche), by about 7600 BCE. The modern city has spread from the island (the Île de la Cité) and far beyond both banks of the Seine.</note>
+                    </place>
+                </listPlace>
+            </settingDesc>
+        </profileDesc>
+    </teiHeader>
+</TEI>

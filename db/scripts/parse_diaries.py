@@ -13,7 +13,7 @@ from config import volumes
 def get_loc(diary):
     """
     Return path to diary volume
-    :return: volume formatted according to database.ini
+    :return: volume formatted according to location as specified in database.ini
     """
     if diary.isdigit():
         return "volume_" + str(diary)
@@ -23,16 +23,15 @@ def get_loc(diary):
 
 def process_diary(args):
     """
-    Here we preprocess a journal to a csv output 
+    Here we preprocess a journal to a csv output
     """
     diary = args.volume_num
     # Sanitize the diary
     diary = get_loc(diary)
+    print(f'Processing {diary}…')
 
     afinn = Afinn(language='en')
-
     diary_volumes = volumes()
-    
     diary_path = diary_volumes[diary]
     
     journal_id = 17
@@ -41,14 +40,17 @@ def process_diary(args):
     with open(diary_path) as xml:
         soup = BeautifulSoup(xml, 'lxml-xml')
         with open(os.path.join('../data/networks', diary + '_people' + '.csv'), 'w', newline='') as f:
+            print('Creating CSV file for networks …')
             ppl = csv.writer(f)
             with open(os.path.join('../data/volumes', diary + '_entry' + '.csv'), 'w', newline='') as e:
+                print('Creating CSV file for diary entries …')
                 entry = csv.writer(e)
                 # create headers for entry csv
                 entry.writerow(["journal_id", "entry_id", "date", "entry", "XML", "sentiment"])
                 # create headers for people csv
                 ppl.writerow(["journal_id", "entry_id", "date", "TEI_name", "emma_name", "relation"])
                 
+                print('Processing each entry …')
                 for i in soup.find_all("div", {"type": "entry"}):
                     txt_string = str(i)
                     xml = "".join(line.strip() for line in txt_string.split("\n"))
@@ -75,12 +77,14 @@ def process_diary(args):
                             emma_name = re.sub(" +", " ", names_unclean)
                             if ' ' in p['ref']:
                                 more_than_one = p['ref'].split(' ')
-                                for ind in more_than_one:                    
+                                for ind in more_than_one:
+                                    ind = re.sub("#", '', ind)
                                     ppl.writerow([journal_id, entry_id, date, ind, emma_name, "undef"])
                             else:
+                                p['ref'] = re.sub("#", '', p['ref'])
                                 ppl.writerow([journal_id, entry_id,date, p['ref'], emma_name, "undef"])
                         entry_id += 1
-        
+                print(f'{diary} is processed.')
 
 
 def main(argv):
