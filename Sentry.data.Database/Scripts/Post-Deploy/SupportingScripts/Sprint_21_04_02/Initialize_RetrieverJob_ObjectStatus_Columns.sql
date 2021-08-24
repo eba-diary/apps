@@ -28,7 +28,7 @@ END
 
 /* All retriever jobs associated with dataflow */
 IF OBJECT_ID('tempdb..#JobsAssoicatedWithDataflows') IS NOT NULL DROP TABLE #JobsAssoicatedWithDataflows
-GO
+
 select Job_id as 'Identified_Job_Id', DataFlow_ID into #JobsAssoicatedWithDataflows from #NewRetrieverJob where DataFlow_ID is not null
 
 
@@ -37,7 +37,7 @@ select Job_id as 'Identified_Job_Id', DataFlow_ID into #JobsAssoicatedWithDatafl
 	Update identified retrieverjob records with appropriate objectstatus metadata
 ****************************************************************************/
 IF OBJECT_ID('tempdb..#IdentifiedJobs_NonACTIVE') IS NOT NULL DROP TABLE #IdentifiedJobs_NonACTIVE
-GO
+
 select
 DF.Id,
 DF.DeleteIssueDTM as 'DF_DeleteIssueDTM',
@@ -73,7 +73,7 @@ where Job_ID = x.J_ID
 	Update identified retrieverjob records with appropriate objectstatus metadata
 ****************************************************************************/
 IF OBJECT_ID('tempdb..#IdentifiedDFJobs_ACTIVE') IS NOT NULL DROP TABLE #IdentifiedDFJobs_ACTIVE
-GO
+
 select
 DF.Id,
 DF.DeleteIssueDTM as 'DF_DeleteIssueDTM',
@@ -111,7 +111,7 @@ where Job_ID = x.J_ID
 ****************************************************************************/
 
 IF OBJECT_ID('tempdb..#JobsAssoicatedWithSchema') IS NOT NULL DROP TABLE #JobsAssoicatedWithSchema
-GO
+
 select 
 DFC.Config_ID,
 DFC.Schema_Id,
@@ -154,7 +154,7 @@ where Job_Id = x.J_ID
 ****************************************************************************/
 
 IF OBJECT_ID('tempdb..#legacyprocessingplatformjobs') IS NOT NULL DROP TABLE #legacyprocessingplatformjobs
-GO
+
 select 
 RJ.Job_ID as 'J_ID',
 DSrc.SourceType_IND,
@@ -189,7 +189,7 @@ where Job_ID = x.J_ID
 ****************************************************************************/
 
 IF OBJECT_ID('tempdb..#Legacy_nonbasic_external_retrieverjobs') IS NOT NULL DROP TABLE #Legacy_nonbasic_external_retrieverjobs
-GO
+
 Select 
 RJ.Job_ID as 'J_ID',
 DSrc.SourceType_IND,
