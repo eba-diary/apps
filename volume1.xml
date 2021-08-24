@@ -124,7 +124,7 @@
         <p><pb n="1"/> Sailed from <placeName ref="#New_York">New York</placeName>, <date
             when="1889-11-16">Saturday November 16<hi rend="superscript">th</hi></date> on <name
             type="boat" ref="#SS_Bourgogne">S.S. Bourgogne</name>, and arrived at <placeName
-            ref="#Havre">Havre</placeName>
+            ref="#Arrondissement_du_Havre">Havre</placeName>
           <date when="1889-11-24">Nov. 24<hi rend="superscript">th</hi></date> at noon. A dull and
           uneventful voyage - and a most disagreeable landing in a heavy storm of wind and rain, in
           a tug, with no protection but that our umbrellas and wraps gave us. Came to our old
@@ -357,7 +357,7 @@
             >Sakkarah</placeName>. Then all the <name type="historical" ref="#Pyramids">Pyramids</name>
           began to unfold themselves to our delighted eyes - first those of <pb n="9"/>
           <placeName ref="#Giza">Ghizeh</placeName> - then the <placeName ref="#Ṣaqqâra">Sakkarah</placeName> group with its stepped pyramid - the blunted outline of
-            <placeName ref="#Abu_Sir">Aboesir</placeName>, then <name type="historical"
+            <name type="historical" ref="#Abu_Sir">Aboesir</name>, then <name type="historical"
             ref="#Dahshūr_pyramid">Dashoor</name> with its strange curving side, then <placeName
             ref="#Meidum">Meydoum</placeName> with its three shelved pyramid. A lovely sunset
           finished the bright day, so full of novelty and pleasure - and the young moon about 5 days
@@ -2206,7 +2206,7 @@
           by <persName ref="#Salah_Mohammed">M.S.</persName> and one of the men, that I thought my
           arms would be dislocated! Them we mounted again and rode through the old grove pits, and
           along the strip of desert land between the mountains and the cultivated plain to the
-          temple of <placeName ref="#Goornah">Goornah</placeName>, built by <persName ref="#Seti_I"
+          <name type="historical" ref="#Temple_of_Goornah">temple of Goornah</name>, built by <persName ref="#Seti_I"
             type="historical">Seti Ist</persName> to the memory of his father <persName
             ref="#Rameses_I" type="historical">Ramesses Ist</persName>. Here the sculptures are most
           delicate and beautiful, and show the perfection of that culminating period of art. In one
@@ -2300,13 +2300,13 @@
           years since, and conveyed to the <orgName ref="#Boulaq_Museum">Boulak museum</orgName>,
           and now lie open to the gaze of the tourist of the 19th century! It is thought now that
           the temples known as <placeName ref="#Medinet_Habu">Medinet Abou</placeName>, <name
-            type="historical" ref="#Ramesseum">the Ramesseum</name>, <placeName ref="#Goornah"
-            >Temple of Goornah</placeName>, <placeName ref="#Der_el_Bahari"
-            >Deir-el-Bahari</placeName> etc., which stand along this great stretch of desert land,
+            type="historical" ref="#Ramesseum">the Ramesseum</name>, <name type="historical" ref="#Temple_of_Goornah"
+            >Temple of Goornah</name>, <name type="historical" ref="#Der_el_Bahari"
+            >Deir-el-Bahari</name> etc., which stand along this great stretch of desert land,
           lying along the mountains here, separated by no great intervals, so that one can easily be
           seen from the other, are the <name type="historical" ref="#mastaba">Mastabas</name>, or
           mortuary chapels of their kings, buried beyond and above them in the valley of the
-          <placeName ref="#Bībān_al-Mulūk">Bab-el-Moulak</placeName>.</p>
+          <placeName ref="#Bībān al-Mulūk">Bab-el-Moulak</placeName>.</p>
         <p>On coming out of the tomb of <persName ref="#Seti_I" type="historical">Seti
             1st</persName>, we went to that of <persName ref="#Rameses_III" type="historical"
             >Ramesis 3d</persName> or <name type="historical" ref="#Bruns_Tomb">Brun's Tomb</name> as it is
@@ -2494,8 +2494,8 @@
           princes, with hieroglyphs and scrolls on the base - reminding me of the wooden statuettes
           I had seen in the <orgName ref="#Boulaq_Museum">Boulak</orgName> two years ago. The price
           he demanded was enormous, and <persName ref="#Davis_Theodore_M">Theodore</persName> would
-          not give it. He swore he had found it three days before at <placeName ref="#El_Assassif"
-            >El Assassif</placeName>, a certain part of the necropolis. We were then taken to a tomb
+          not give it. He swore he had found it three days before at <name type="historical" ref="#El_Assassif"
+            >El Assassif</name>, a certain part of the necropolis. We were then taken to a tomb
           lately excavated near the <name type="historical" ref="#Ramesseum">Ramesseum</name> - the
           paintings were brilliantly fresh, though they were two thousand or more years old - but
           very crude. There were two chambers - and the heat in them was intense. Our guide said he
@@ -2623,7 +2623,7 @@
           What a delicious morning it was, and what a charming ride, through that soft air, fragrant
           with the blossoming crops. At one time the rain fell smartly, and we had to put up our
           umbrellas. All along the narrow path through the fields, men, women, children, buffaloes,
-          camels etc. were hurrying to the market at the town of <placeName ref="#Arabet_Abydos"
+          camels etc. were hurrying to the market at the town of <placeName ref="#Al_Araba_al_Madfunah"
             >Arabat</placeName>, which is built over the mounds of old <placeName ref="#Abydos"
             >Abydos</placeName>, they made pretty pictures streaming along one after the other - and
           we were obliged to turn out of our way sometimes to avoid the camels. Just at the edge of
@@ -3479,8 +3479,7 @@
           made it seem very wild and impressive. Our driver did not spare his horses, and to the
           music of his constant cracking of his whip, an accomplishment dear to the heart of an
           Italian coachman, and the cheerful caracolling of the irrepressible small boy atop of our
-          luggage behind the carriage, we sped on and were at <placeName ref="#Cava_de_Tirreni">La
-            Cava</placeName> in time for lunch at 11:30. We fell in with the <persName
+          luggage behind the carriage, we sped on and were at <placeName ref="#Cava_de_Tirreni">La Cava</placeName> in time for lunch at 11:30. We fell in with the <persName
             ref="#Kidder_Charles_Mr #Kidder_Mrs">Kidders</persName> again, and were off in the same
           compartment for <placeName ref="#Naples">Naples</placeName> by 2:30. I shall always
           remember the Italian <pb n="131"/> boy aforesaid - handsome as a picture - with his blue
@@ -3903,7 +3902,7 @@
         </dateline>
         <p>A visit to the <orgName ref="#Museo_Nazionale_del_Bargello">Bargello</orgName> this
           morning, and then to lunch with the <!--Who?--><name>Morgan Morgans</name> in their
-          charming house in <placeName ref="#Giardino_Torrigianni">Giardino Torrigianni</placeName>
+          charming house in <name type="historical" ref="#Giardino_Torrigianni">Giardino Torrigianni</name>
           - after which, <persName ref="#Buttles_Mary">Mary</persName> and I went to <name
             type="historical" ref="#S_Maria_Novella">S. Maria Novella</name>, and tried to get
           into <name type="historical" ref="#Badia_Fiorentina">La Badia</name> to see the cloisters, but
