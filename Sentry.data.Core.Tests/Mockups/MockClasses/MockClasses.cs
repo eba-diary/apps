@@ -280,6 +280,7 @@ namespace Sentry.data.Core.Tests
                 Created = DateTime.Now,
                 Modified = DateTime.Now,
                 IsGeneric = true,
+                ObjectStatus = ObjectStatusEnum.Active,
 
                 JobOptions = rjo
             };
