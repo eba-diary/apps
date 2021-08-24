@@ -25,6 +25,24 @@
         }
     },
     "paths": {
+    	"/modules/git-sync.xql": {
+            "post": {
+                "summary": "Sync with GitHub",
+                "operationId": "sync:git-sync",
+                "responses": {
+                    "200": {
+                        "description": "Test",
+                        "content": {
+                            "text/html": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     },
     "security": [
         {
