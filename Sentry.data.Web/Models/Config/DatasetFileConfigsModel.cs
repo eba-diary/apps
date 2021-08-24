@@ -18,29 +18,15 @@ namespace Sentry.data.Web
         {
             this.ToModel(dsfc);
 
-            try
+            if (renderingForPopup)
             {
-
-
-                if (renderingForTable)
+                SearchCriteria = new List<string>();
+                IsRegexSearch = new List<bool>();
+                foreach (var job in dsfc.RetrieverJobs)
                 {
-                    this.RetrieverJobs = dsfc.RetrieverJobs.ToList();
+                    SearchCriteria.Add(job.JobOptions.SearchCriteria);
+                    IsRegexSearch.Add(job.JobOptions.IsRegexSearch);
                 }
-
-                if (renderingForPopup)
-                {
-                    SearchCriteria = new List<string>();
-                    IsRegexSearch = new List<bool>();
-                    foreach (var job in dsfc.RetrieverJobs)
-                    {
-                        SearchCriteria.Add(job.JobOptions.SearchCriteria);
-                        IsRegexSearch.Add(job.JobOptions.IsRegexSearch);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw;
             }
         }
         public DatasetFileConfigsModel(DatasetFileConfigDto dto)
@@ -74,28 +60,15 @@ namespace Sentry.data.Web
         {
             this.ToModel(dsfc);
 
-            try
+            if (renderingForPopup)
             {
-
-                if (renderingForTable)
+                SearchCriteria = new List<string>();
+                IsRegexSearch = new List<bool>();
+                foreach (var job in dsfc.RetrieverJobs)
                 {
-                    this.RetrieverJobs = dsfc.RetrieverJobs.ToList();
+                    SearchCriteria.Add(job.JobOptions.SearchCriteria);
+                    IsRegexSearch.Add(job.JobOptions.IsRegexSearch);
                 }
-
-                if (renderingForPopup)
-                {
-                    SearchCriteria = new List<string>();
-                    IsRegexSearch = new List<bool>();
-                    foreach (var job in dsfc.RetrieverJobs)
-                    {
-                        SearchCriteria.Add(job.JobOptions.SearchCriteria);
-                        IsRegexSearch.Add(job.JobOptions.IsRegexSearch);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw;
             }
         }
 
@@ -167,7 +140,6 @@ namespace Sentry.data.Web
         public bool CLA2472_EMRSend { get; set; }
         public bool CLA1286_KafkaFlag { get; set; }
         public bool CLA3014_LoadDataToSnowflake { get; set; }
-        public IList<RetrieverJob> RetrieverJobs { get; set; }
         public AssociatedDataFlowModel DataFlowJobs { get; set; }
         public IList<AssociatedDataFlowModel> ExternalDataFlowJobs { get; set; }
 

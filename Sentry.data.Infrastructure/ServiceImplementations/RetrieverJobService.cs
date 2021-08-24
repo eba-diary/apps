@@ -1378,6 +1378,7 @@ namespace Sentry.data.Infrastructure
             return ntAccount.ToString().Replace(@"SHOESD01\", "");
         }
 
+        // TODO - CLA-2372 - REMOVE COMMENTED CODE - Removing DFSBasic, DfsCustom, S3Basic references
         private void SubmitLoaderRequest(string filepath)
         {
             string processingFile = null;

@@ -18,5 +18,6 @@ namespace Sentry.data.Core
         public DataClassificationType DataClassification { get; set; }
         public bool IsInSAS { get; set; }
         public bool CreateCurrentView { get; set; }
+        public string SAIDAssetKeyCode { get; set; }
     }
 }

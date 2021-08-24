@@ -6,12 +6,9 @@ using Sentry.data.Infrastructure;
 using StructureMap;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Sentry.FeatureFlags;
 
 namespace Sentry.data.Goldeneye
 {
@@ -226,39 +223,6 @@ namespace Sentry.data.Goldeneye
                 Job.JobLoggerMessage("Info", "Job update detected, performing RemoveIfExists from Hangfire");
             }
 
-
-            //This will ensure directory monitors are not started when 
-            if (!_dataFeatures.Remove_DfsWatchers_CLA_2346.GetValue())
-            {
-
-                /**************************************
-                 *  DFS Directory Monitors                          
-                ***************************************/
-                //Get all active watch retriever jobs 
-                List<RetrieverJob> rtJobList = _requestContext.RetrieverJob.Where(w => (w.DataSource is DfsBasic || w.DataSource is DfsCustom || w.DataSource is DfsDataFlowBasic) && w.Schedule == "Instant" && w.IsEnabled).FetchAllConfiguration(_requestContext).ToList();
-
-                //If initial start of GOLDENEYE, init all jobs else only new jobs
-                List<RetrieverJob> initJobList = (firstRun) ? rtJobList : rtJobList.Where(s => !currentTasks.Any(ct => ct.JobId == s.Id)).ToList();
-
-                //Initilize filewatcher jobs
-                foreach (RetrieverJob rJob in initJobList)
-                {
-                    try
-                    {
-                        var jobId = rJob.Id;
-                        Uri path = rJob.GetUri();
-
-                        Task t = InitializeFileWatcherTask(jobId, path);
-
-                        currentTasks.Add(new RunningTask(t, GenerateWatcherName(rJob), jobId, path));
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error($"Initializing retrieverjob jobId:{rJob.Id}", ex);
-                    }
-                }
-            }
-
             _config.LastRunMinute = DateTime.Now;
         }
 
@@ -270,48 +234,6 @@ namespace Sentry.data.Goldeneye
                 if (rt.Task.IsFaulted)
                 {
                     Console.WriteLine(rt.Name + " faulted.");
-                }
-            }
-
-
-
-            ////Dataset Loader
-            //How many loader tasks can be started
-            var availableLoaderTasks = Int32.Parse(Config.GetHostSetting("activeLoaderTaskThrottle")) - currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute") && !x.Task.IsCompleted).ToList().Count;
-            foreach (var a in Directory.GetFiles(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"), "*", SearchOption.AllDirectories).Where(w => !IsFileLocked(w)))
-            {
-                if (availableLoaderTasks > 0)
-                {
-                    //Disregard any request files picked up via Dataset Loader
-                    //This will need to change when Reading requests from SDP
-                    if (!Path.GetFileName(a).StartsWith(Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
-                    {
-                        Console.WriteLine("Found : " + a);
-                        Logger.Info("Found : " + a);
-
-                        //Add Processing Prefix to file name so it is not picked up by another DatasetLoader task
-                        var orginalPath = Path.GetFullPath(a).Replace(Path.GetFileName(a), "");
-                        var origFileName = Path.GetFileName(a);
-                        var processingFile = orginalPath + Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix") + origFileName;
-
-
-                        //Rename file to indicate request has been sent for processing
-                        File.Move(a, processingFile);
-
-                        //Create a new one.
-
-                        currentTasks.Add(new RunningTask(
-                            Task.Factory.StartNew(() => DatasetLoader.Run(processingFile), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
-                            $"DatasetLoader : Minute : {Path.GetFileNameWithoutExtension(a)}"));
-
-                        //Remove one available loader task
-                        availableLoaderTasks--;
-                    }
-                }
-                else
-                {
-                    //Max number of loader tasks has been reached.
-                    break;
                 }
             }
 
@@ -442,81 +364,6 @@ namespace Sentry.data.Goldeneye
         {
             Logger.Fatal("Exception occurred on main Windows Service Task. Stopping Service immediately.", t.Exception);
             Environment.Exit(10001);
-        }
-
-        /// <summary>
-        /// An exception occurred on the main task; log it and shut down the service with an error exit code
-        /// </summary>
-        /// <param name="t">The main thread task</param>
-        /// <param name="jobId"></param>
-        private void WatcherTaskRestart(Task t, int jobId)
-        {
-            //If service is shutting down, we do not want to restart the task
-            if (!_token.IsCancellationRequested)
-            {
-                //Find associated RunningTask object
-                RunningTask curTask = currentTasks.FirstOrDefault(w => w.JobId == jobId);
-
-                if (curTask == null)
-                {
-                    Logger.Debug($"core-watchertaskrestart no-associated-runningtask-entry - JobId:{jobId}");
-                }
-                else
-                {
-                    Logger.Debug($"core-watchertaskrestart restart - JobId:{jobId} Path:{curTask.WatchPath}");
-
-                    //Create new task
-                    Task newTask = InitializeFileWatcherTask(curTask.JobId, curTask.WatchPath);
-
-                    //Associate new task with RunningTask object for furture tracking
-                    curTask.Task = newTask;
-                }
-
-                Logger.Debug($"core-watchertaskrestart disposing-completed-task - JobId:{jobId}");
-                t.Dispose();
-                Logger.Debug($"core-watchertaskrestart disposing-completed-task-success - JobId:{jobId}");
-            }
-        }
-
-        private bool IsFileLocked(string filePath)
-        {
-            try
-            {
-                using (File.Open(filePath, FileMode.Open)) { }
-            }
-            catch (IOException e)
-            {
-                var errorCode = Marshal.GetHRForException(e) & ((1 << 16) - 1);
-
-                return errorCode == 32 || errorCode == 33;
-            }
-            catch(UnauthorizedAccessException e)
-            { 
-                return false;
-            }
-            catch(Exception e)
-            {
-                Logger.Error("File Locked Test Try/Catch Failed", e);
-            }
-
-            return false;
-        }
-
-        private string GenerateWatcherName(RetrieverJob job)
-        {
-            return (job.DataFlow != null) ? $"Watch_{job.Id}_df_{job.DataFlow.Id}" : $"Watch_{job.Id}_config_{job.DatasetConfig.ConfigId}";
-        }
-
-        private Task InitializeFileWatcherTask(int jobId, Uri path)
-        {
-            Logger.Info($"core-initializefilewatcher start - JobId:{jobId} Path:{path}");
-            Task newTask = Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, path, _token, Int32.Parse(Config.GetHostSetting("FileWatcherIterationLimit"))),
-                                                    TaskCreationOptions.LongRunning).
-                            ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted).
-                            ContinueWith(task => WatcherTaskRestart(task, jobId), TaskContinuationOptions.OnlyOnCanceled);
-
-            Logger.Info($"core-initializefilewatcher end - JobId:{jobId} Path:{path}");
-            return newTask;
         }
     }
 }
