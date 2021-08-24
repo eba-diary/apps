@@ -99,7 +99,7 @@ where DF_ObjStat.ObjectStatus_CDE = 'ACTIVE' and RJ.ObjectStatus is null and RJ.
 /*   select * from #IdentifiedDFJobs_ACTIVE    */
 
 Update #NewRetrieverJob
-SET ObjectStatus = 1
+SET ObjectStatus = 1, DeleteIssueDTM = '9999-12-31 23:59:59.000'
 from #IdentifiedDFJobs_ACTIVE x
 where Job_ID = x.J_ID
 
@@ -223,7 +223,7 @@ where Job_ID = x.J_ID
 Select Job_ID as 'J_ID' into #JavaAppJobs from #NewRetrieverJob N_RJ left join DataSource DSrc on N_RJ.DataSource_ID = DSrc.DataSource_Id  where DSrc.SourceType_IND IN ('JavaApp')
 
 update #NewRetrieverJob 
-SET ObjectStatus = 1 /* ACTIVE */
+SET ObjectStatus = 1 /* ACTIVE */, DeleteIssueDTM = '9999-12-31 23:59:59.000'
 from #JavaAppJobs x
 where Job_ID = x.J_ID
 
@@ -267,7 +267,12 @@ BEGIN
 	Update RetrieverJob
 	SET ObjectStatus = x.new_Ostat, DeleteIssuer = x.new_deleteIssuer, DeleteIssueDTM = x.new_deleteIssueDTM, Modified_DTM = x.new_ModifiedDTM
 	from #Updated_Records x
-	where Job_ID = x.J_Id	
+	where Job_ID = x.J_Id
+
+	Update RetrieverJob
+	SET DeleteIssueDTM = '9999-12-31 23:59:59.000'
+	where DeleteIssueDTM is null	
+
 END
 else
 BEGIN
