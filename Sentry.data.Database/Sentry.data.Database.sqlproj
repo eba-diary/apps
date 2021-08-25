@@ -206,12 +206,6 @@
     <Build Include="Tables\RetrieverJobs\JobHistory.sql" />
     <Build Include="Tables\Metadata\BusinessTermDescriptions.sql" />
     <Build Include="Tables\Metadata\DataAssetHealth.sql" />
-    <Build Include="Tables\Metadata\DataElement.sql" />
-    <Build Include="Tables\Metadata\DataElementDetail.sql" />
-    <Build Include="Tables\Metadata\DataObject.sql" />
-    <Build Include="Tables\Metadata\DataObjectDetail.sql" />
-    <Build Include="Tables\Metadata\DataObjectField.sql" />
-    <Build Include="Tables\Metadata\DataObjectFieldDetail.sql" />
     <Build Include="Tables\Metadata\LineageLoad.sql" />
     <Build Include="Tables\Metadata\STG_LineageLoad.sql" />
     <Build Include="Tables\Metadata\vw_DataLineage.sql" />
@@ -343,6 +337,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_20_02_05\INSERT_SECURITY_BUSINESS_AREA.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_03_06\DELETE_DATA_ELEMENT_TABLES.sql" />
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent />
