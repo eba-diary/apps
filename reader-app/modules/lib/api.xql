@@ -14,7 +14,7 @@ import module namespace dts="http://teipublisher.com/api/dts" at "api/dts.xql";
 import module namespace iapi="http://teipublisher.com/api/info" at "api/info.xql";
 import module namespace vapi="http://teipublisher.com/api/view" at "api/view.xql";
 import module namespace custom="http://teipublisher.com/api/custom" at "../custom-api.xql";
-import module namespace sync="git-sync" at "../git-sync.xql";
+import module namespace githubxq="http://exist-db.org/lib/githubxq" at "../git-sync.xql";
 
 let $lookup := function($name as xs:string, $arity as xs:integer) {
     try {

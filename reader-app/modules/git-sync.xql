@@ -26,24 +26,23 @@ declare namespace tei = "http://www.tei-c.org/ns/1.0";
 
 declare option exist:serialize "method=xml media-type=text/xml indent=yes";
 
-
 (: Access git-api configuration file :)
 declare variable $githubxq:git-config := if(doc('../access-config.xml')) then doc('../access-config.xml') else <response status="fail"><message>Load config.xml file please.</message></response>;
 
 (: Private key for authentication :)
-declare variable $private-key := if($git-config//private-key-variable != '') then
-                                    environment-variable($git-config//private-key-variable/text())
-                              else $git-config//private-key/text();
+declare variable $githubxq:private-key := if($githubxq:git-config//private-key-variable != '') then
+                                    environment-variable($githubxq:git-config//private-key-variable/text())
+                              else $githubxq:git-config//private-key/text();
 
-declare variable $gitToken := if($git-config//gitToken-variable != '') then 
-                                    environment-variable($git-config//gitToken-variable/text())
-                              else $git-config//gitToken/text();
+declare variable $githubxq:gitToken := if($githubxq:git-config//gitToken-variable != '') then 
+                                    environment-variable($githubxq:git-config//gitToken-variable/text())
+                              else $githubxq:git-config//gitToken/text();
 
 (: eXist db collection location :)
-declare variable $exist-collection := $git-config//exist-collection/text();
+declare variable $githubxq:exist-collection := $githubxq:git-config//exist-collection/text();
 
 (: Github repository :)
-declare variable $repo-name := $git-config//repo-name/text();
+declare variable $githubxq:repo-name := $githubxq:git-config//repo-name/text();
 
 (:~
  : Recursively creates new collections if necessary
@@ -64,8 +63,8 @@ let $url := concat($contents-url,'/',$file-name)
 let $raw-url := concat(replace(replace($contents-url,'https://api.github.com/repos/','https://raw.githubusercontent.com/'),'/contents','/master'),$file-name)            
 return 
         http:send-request(<http:request http-version="1.1" href="{xs:anyURI($raw-url)}" method="get">
-                            {if($gitToken != '') then
-                                <http:header name="Authorization" value="{concat('token ',$gitToken)}"/>
+                            {if($githubxq:gitToken != '') then
+                                <http:header name="Authorization" value="{concat('token ',$githubxq:gitToken)}"/>
                             else() }
                             <http:header name="Connection" value="close"/>
                         </http:request>)[2]
@@ -82,8 +81,8 @@ declare function githubxq:do-update($commits as xs:string*, $contents-url as xs:
     let $file-data := 
         if(contains($file-name,'.xar')) then ()
         else githubxq:get-file-data($file,$contents-url)
-    let $resource-path := substring-before(replace($file,$repo-name,''),$file-name)
-    let $exist-collection-url := xs:anyURI(replace(concat($exist-collection,'/',$resource-path),'/$',''))        
+    let $resource-path := substring-before(replace($file,$githubxq:repo-name,''),$file-name)
+    let $exist-collection-url := xs:anyURI(replace(concat($githubxq:exist-collection,'/',$resource-path),'/$',''))        
     return 
         try {
              if(contains($file-name,'.xar')) then ()
@@ -116,8 +115,8 @@ declare function githubxq:do-add($commits as xs:string*, $contents-url as xs:str
     let $file-data := 
         if(contains($file-name,'.xar')) then ()
         else githubxq:get-file-data($file,$contents-url)
-    let $resource-path := substring-before(replace($file,$repo-name,''),$file-name)
-    let $exist-collection-url := xs:anyURI(replace(concat($exist-collection,'/',$resource-path),'/$',''))
+    let $resource-path := substring-before(replace($file,$githubxq:repo-name,''),$file-name)
+    let $exist-collection-url := xs:anyURI(replace(concat($githubxq:exist-collection,'/',$resource-path),'/$',''))
     return
         try {
              if(contains($file-name,'.xar')) then ()
@@ -146,8 +145,8 @@ declare function githubxq:do-add($commits as xs:string*, $contents-url as xs:str
 declare function githubxq:do-delete($commits as xs:string*, $contents-url as xs:string?){
     for $file in $commits
     let $file-name := tokenize($file,'/')[last()]
-    let $resource-path := substring-before(replace($file,$repo-name,''),$file-name)
-    let $exist-collection-url := xs:anyURI(replace(concat($exist-collection,'/',$resource-path),'/$',''))
+    let $resource-path := substring-before(replace($file,$githubxq:repo-name,''),$file-name)
+    let $exist-collection-url := xs:anyURI(replace(concat($githubxq:exist-collection,'/',$resource-path),'/$',''))
     return
         if(contains($file-name,'.xar')) then ()
         else 
@@ -195,7 +194,7 @@ declare function githubxq:execute-webhook($post-data){
 if(not(empty($post-data))) then 
     let $payload := util:base64-decode($post-data)
     let $json-data := parse-json($payload)
-    let $branch := if($git-config//github-branch/text() != '') then $git-config//github-branch/text() else 'refs/heads/master'
+    let $branch := if($githubxq:git-config//github-branch/text() != '') then $githubxq:git-config//github-branch/text() else 'refs/heads/master'
     return
         if($json-data?ref[. = $branch]) then 
              try {
@@ -205,7 +204,7 @@ if(not(empty($post-data))) then
                         let $expected-result := <expected-result>{request:get-header('X-Hub-Signature')}</expected-result>
                         let $actual-result :=
                             <actual-result>
-                                {crypto:hmac($payload, string($private-key), "HMAC-SHA-1", "hex")}
+                                {crypto:hmac($payload, string($githubxq:private-key), "HMAC-SHA-1", "hex")}
                             </actual-result>
                         let $condition := contains(normalize-space($expected-result/text()),normalize-space($actual-result/text()))                	
                         return
@@ -229,7 +228,9 @@ else
             </response>)   
 };
 
-declare function sync:git-sync(){
+declare function githubxq:git-sync(){
     let $post-data := request:get-data()
     return githubxq:execute-webhook($post-data)
 };
+
+return
