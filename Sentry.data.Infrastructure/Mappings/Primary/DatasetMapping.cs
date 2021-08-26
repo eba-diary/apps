@@ -36,6 +36,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.DeleteInd, (m) => m.Column("DeleteInd"));
             this.Property((x) => x.DeleteIssuer, (m) => m.Column("DeleteIssuer"));
             this.Property((x) => x.DeleteIssueDTM, (m) => m.Column("DeleteIssueDTM"));
+            this.Property((x) => x.SAIDAssetKeyCode, (m) => m.Column("SaidKeyCode"));
+
             Property(x => x.Metadata, m =>
             {
                 m.Column("Metadata");

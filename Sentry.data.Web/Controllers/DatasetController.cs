@@ -22,6 +22,8 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.SessionState;
+using Sentry.data.Core.Interfaces;
+using Sentry.data.Core.Entities;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -39,6 +41,7 @@ namespace Sentry.data.Web.Controllers
         private readonly IEventService _eventService;
         private readonly IConfigService _configService;
         private readonly IDataFeatures _featureFlags;
+        private readonly ISAIDService _saidService;
 
         public DatasetController(
             IDatasetContext dsCtxt,
@@ -50,7 +53,8 @@ namespace Sentry.data.Web.Controllers
             IDatasetService datasetService,
             IEventService eventService,
             IConfigService configService,
-            IDataFeatures featureFlags)
+            IDataFeatures featureFlags, 
+            ISAIDService saidService)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
@@ -62,6 +66,7 @@ namespace Sentry.data.Web.Controllers
             _eventService = eventService;
             _configService = configService;
             _featureFlags = featureFlags;
+            _saidService = saidService;
         }
 
         public ActionResult Index()
@@ -78,12 +83,12 @@ namespace Sentry.data.Web.Controllers
             return View(hm);
         }
 
-
+       
         #region Dataset Modification
 
         [HttpGet]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
             DatasetModel cdm = new DatasetModel()
             {
@@ -94,6 +99,7 @@ namespace Sentry.data.Web.Controllers
             };
 
             Utility.SetupLists(_datasetContext, cdm);
+            cdm.SAIDAssetDropDown = await BuildSAIDAssetDropDown(cdm.SAIDAssetKeyCode).ConfigureAwait(false);
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Creation Page", cdm.DatasetId);
 
@@ -104,7 +110,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet()]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> Edit(int id)
         {
             // TODO: CLA-2765 - Add filtering to ensure EDIT only occurs for ACTIVE object status
             UserSecurity us = _datasetService.GetUserSecurityForDataset(id);
@@ -113,6 +119,7 @@ namespace Sentry.data.Web.Controllers
                 DatasetDto dto = _datasetService.GetDatasetDto(id);
                 DatasetModel model = new DatasetModel(dto);
                 Utility.SetupLists(_datasetContext, model);
+                model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Edit Page", id);
                 
@@ -151,7 +158,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
-        public PartialViewResult _DatasetCreateEdit()
+        public async Task<PartialViewResult> _DatasetCreateEdit()
         {
             DatasetModel cdm = new DatasetModel()
             {
@@ -160,6 +167,7 @@ namespace Sentry.data.Web.Controllers
             };
 
             Utility.SetupLists(_datasetContext, cdm);
+            cdm.SAIDAssetDropDown = await BuildSAIDAssetDropDown(cdm.SAIDAssetKeyCode).ConfigureAwait(false);
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Creation Page", cdm.DatasetId);
 
@@ -168,9 +176,40 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_DatasetCreateEdit", cdm);
         }
 
+
+        private async Task<List<SelectListItem>> BuildSAIDAssetDropDown(string keyCode)
+        {
+            List<SelectListItem> output = new List<SelectListItem>();
+            List<SAIDAsset> assetList = await _saidService.GetAllAssets().ConfigureAwait(false);
+            
+            if (String.IsNullOrWhiteSpace(keyCode) || !assetList.Any(a => a.SaidKeyCode == keyCode))
+            {
+                output.Add(new SelectListItem
+                {
+                    Value = "None",
+                    Text = "Select Asset",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
+
+            //Filtering out assets not assigned a SaidKeyCode
+            foreach (SAIDAsset asset in assetList.Where(w => !String.IsNullOrWhiteSpace(w.SaidKeyCode)).OrderBy(o => o.Name))
+            {
+                output.Add(new SelectListItem
+                {
+                    Value = asset.SaidKeyCode,
+                    Text = $"{asset.Name} ({asset.SaidKeyCode})",
+                    Selected = (!String.IsNullOrWhiteSpace(keyCode) && asset.SaidKeyCode == keyCode)
+                });
+            }
+
+            return output;
+        }
+
         [HttpPost]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
-        public ActionResult DatasetForm(DatasetModel model)
+        public async Task<ActionResult> DatasetForm(DatasetModel model)
         {
             DatasetDto dto = model.ToDto();
 
@@ -206,9 +245,9 @@ namespace Sentry.data.Web.Controllers
             }
 
             Utility.SetupLists(_datasetContext, model);
+            model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
 
             return PartialView("_DatasetCreateEdit", model);
-            //return View(model);
         }
 
 
@@ -1097,7 +1136,7 @@ namespace Sentry.data.Web.Controllers
         //Set initial alias of query:
         //RULE: find the nearest ARRAY STRUCT and make that the initial ALIAS followed by all non ARRAY STRUCTS
         //Then the GenerateSnow() will append all STRUCTS it digs through
-        //e.g. gary_flatten.value:element:austin:lily  gary here is an array struct
+        //e.g. gary_flatten.value:austin:lily  gary here is an array struct
         private string DelroyAliasMonster(List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
             StringBuilder alias = new StringBuilder();
@@ -1115,7 +1154,7 @@ namespace Sentry.data.Web.Controllers
                 if (closestArray != null)
                 {
                     bool parentFound = false;
-                    alias.Append(closestArray.Name + "_flatten.value:element:");
+                    alias.Append(closestArray.Name + "_flatten.value:");
 
                     //start at top and work through each struct until you hit the closest parent, then after you start appending all structs
                     foreach (var s in structTracker)
@@ -1186,12 +1225,12 @@ namespace Sentry.data.Web.Controllers
                     currentFlatten = s.Name + "_flatten";
                     if (first)
                     {
-                        flattenStatement.Append(",LATERAL FLATTEN(" + s.Name + ":list) " + currentFlatten);
+                        flattenStatement.Append(",LATERAL FLATTEN(" + s.Name + ") " + currentFlatten);
                         first = false;
                     }
                     else
                     {
-                        flattenStatement.Append(",LATERAL FLATTEN(" + parentFlatten + ".value:element:" + s.Name + ":list) " + currentFlatten);
+                        flattenStatement.Append(",LATERAL FLATTEN(" + parentFlatten + ".value:" + s.Name + ") " + currentFlatten);
                     }
                     parentFlatten = currentFlatten;
                     flattenStatement.Append(Environment.NewLine);

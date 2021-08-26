@@ -387,12 +387,12 @@ namespace Sentry.data.Core
 
             if (String.IsNullOrWhiteSpace(dto.PrimaryOwnerId))
             {
-                errors.Add("Owner is requried.");
+                errors.Add("Owner is required.");
             }
 
             if (String.IsNullOrWhiteSpace(dto.PrimaryContactId))
             {
-                errors.Add("Contact is requried.");
+                errors.Add("Contact is required.");
             }
 
             if (dto.DatasetCategoryIds.Count == 1 && dto.DatasetCategoryIds[0].Equals(0))
@@ -405,6 +405,10 @@ namespace Sentry.data.Core
                 errors.Add("Dataset Scope is required");
             }
 
+            if (String.IsNullOrWhiteSpace(dto.SAIDAssetKeyCode))
+            {
+                errors.Add("SAID Asset is required.");
+            }
             return errors;
         }
 
@@ -448,7 +452,8 @@ namespace Sentry.data.Core
                 DatasetFileConfigs = null,
                 DeleteInd = false,
                 DeleteIssueDTM = DateTime.MaxValue,
-                ObjectStatus = GlobalEnums.ObjectStatusEnum.Active
+                ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
+                SAIDAssetKeyCode = dto.SAIDAssetKeyCode
             };
 
             switch (dto.DataClassification)
@@ -518,6 +523,7 @@ namespace Sentry.data.Core
             dto.CategoryName = ds.DatasetCategories.First().Name;
             dto.MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/Dataset/Detail/" + ds.DatasetId;
             dto.CategoryNames = ds.DatasetCategories.Select(s => s.Name).ToList();
+            dto.SAIDAssetKeyCode = ds.SAIDAssetKeyCode;
         }
 
 
@@ -542,6 +548,7 @@ namespace Sentry.data.Core
             dto.CategoryColor = ds.DatasetCategories.First().Color;
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
             dto.GroupAccessCount = _securityService.GetGroupAccessCount(ds);
+            dto.SAIDAssetKeyCode = ds.SAIDAssetKeyCode;
             if (ds.DatasetFiles.Any())
             {
                 dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
