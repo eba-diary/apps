@@ -30,7 +30,7 @@ declare function api:git-sync($request as map(*)) {
         githubxq:execute-webhook($data,
             '/db/apps/emmabandrews', 
             'https://github.com/eba-diary/apps',
-            'master',
+            'main',
             '3fcdcd5197c99aeb1963698e4fb32e9d4da9897c',
             '')
 };
