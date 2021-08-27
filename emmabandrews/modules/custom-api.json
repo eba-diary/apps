@@ -25,7 +25,7 @@
         }
     },
     "paths": {
-    	"/modules/git-sync.xql": {
+    	"/modules/git-sync": {
             "post": {
                 "summary": "Sync with GitHub",
                 "operationId": "custom:git-sync",

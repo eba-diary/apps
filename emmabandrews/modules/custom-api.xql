@@ -24,7 +24,10 @@ declare function api:lookup($name as xs:string, $arity as xs:integer) {
     }
 };
 
-(: from github :)
+(: Access git-api configuration file :) 
+declare variable $git-config := if(doc('../access-config.xml')) then doc('../access-config.xml') else <response status="fail"><message>Missing access-config file in eXist-db.</message></response>;
+
+declare variable $private-key := $git-config//private-key/text();
 
 declare function api:git-sync($request as map(*)) {
     let $data := request:get-data()
@@ -33,6 +36,6 @@ declare function api:git-sync($request as map(*)) {
             '/db/apps', 
             'https://github.com/eba-diary/apps',
             'main',
-            '3fcdcd5197c99aeb1963698e4fb32e9d4da9897c',
+            string($private-key),
             '')
 };
