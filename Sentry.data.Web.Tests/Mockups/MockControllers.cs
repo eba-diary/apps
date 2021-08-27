@@ -107,7 +107,7 @@ namespace Sentry.data.Web.Tests
 
             var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, 
                 mockAssociateService, mockObsidianService, mockDatasetService, mockEventService, mockConfigService,
-                mockFeatureFlag);
+                mockFeatureFlag,null);
             dsc.SharedContext = mockSharedContextModel;
 
             return dsc;

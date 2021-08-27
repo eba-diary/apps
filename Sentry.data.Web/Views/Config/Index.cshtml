@@ -272,7 +272,8 @@
                         </div>
                     }
 
-                    @if (!Model.DisplayDataflowMetadata)
+                    @*// TODO - CLA-2372 - REMOVE COMMENTED CODE - Removing DFSBasic, DfsCustom, S3Basic references*@
+                    @*@if (!Model.DisplayDataflowMetadata)
                     {
                         <h4 class="@color">Dataset Retrieval Jobs</h4>
                         <hr />
@@ -283,7 +284,7 @@
                         }
 
                         <a class="btn btn-success" href="/Config/@item.ConfigId/Job/Create">Add Job</a>
-                    }
+                    }*@
 
 
                     @if (Model.DisplayDataflowMetadata || Model.Security.ShowAdminControls)
@@ -399,8 +400,9 @@
                                     </div>
                                 </div>
                             }
+                            @* // TODO - CLA-2372 - REMOVE COMMENTED CODE - Removing DFSBasic, DfsCustom, S3Basic references *@
                             @* Legacy Data Processing Platform Metadata *@
-                            <div class="retJob">
+                            @*<div class="retJob">
                                 <div class="jobHeader categoryBanner-gray">
                                     <h6>Legacy Processing Platform Jobs</h6>
                                     <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
@@ -416,7 +418,7 @@
 
                                     <a class="btn btn-success" href="/Config/@item.ConfigId/Job/Create">Add Job</a>
                                 </div>
-                            </div>
+                            </div>*@
                         </div>
                     }
                 </div>

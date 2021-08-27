@@ -246,7 +246,8 @@ namespace Sentry.data.Core
 
             //var tree = jobQueryable.FetchAllConfiguration()
 
-            return jobs.Where(x => x.DataSource.Is<DfsBasic>() || x.DataSource.Is<DfsDataFlowBasic>()).ToList();
+
+            return jobs.Where(x => x.DataSource.Is<DfsDataFlowBasic>()).ToList();
         }
 
 
