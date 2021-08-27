@@ -27,11 +27,11 @@
     "paths": {
     	"/modules/git-sync": {
             "post": {
-                "summary": "Sync with GitHub",
+                "summary": "Sync from GitHub",
                 "operationId": "custom:git-sync",
                 "responses": {
                     "200": {
-                        "description": "Successfully synced"
+                        "description": "Success!"
                     }
                 }
             }
