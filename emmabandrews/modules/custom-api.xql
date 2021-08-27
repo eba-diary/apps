@@ -24,6 +24,8 @@ declare function api:lookup($name as xs:string, $arity as xs:integer) {
     }
 };
 
+(: from github :)
+
 declare function api:git-sync($request as map(*)) {
     let $data := request:get-data()
     return
