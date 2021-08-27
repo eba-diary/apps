@@ -28,7 +28,7 @@ declare function api:git-sync($request as map(*)) {
     let $data := request:get-data()
     return
         githubxq:execute-webhook($data,
-            '/db/apps/emmabandrews', 
+            '/db/apps', 
             'https://github.com/eba-diary/apps',
             'main',
             '3fcdcd5197c99aeb1963698e4fb32e9d4da9897c',
