@@ -11,7 +11,7 @@ module namespace api="http://teipublisher.com/api/custom";
 (: Add your own module imports here :)
 import module namespace rutil="http://exist-db.org/xquery/router/util";
 import module namespace app="teipublisher.com/app" at "app.xql";
-import module namespace githubxq="http://exist-db.org/lib/githubxq" at "git-sync.xql";
+import module namespace githubxq="http://exist-db.org/lib/githubxq";
 
 (:~
  : Keep this. This function does the actual lookup in the imported modules.
@@ -22,4 +22,15 @@ declare function api:lookup($name as xs:string, $arity as xs:integer) {
     } catch * {
         ()
     }
+};
+
+declare function api:git-sync($request as map(*)) {
+    let $data := request:get-data()
+    return
+        githubxq:execute-webhook($data,
+            '/db/apps/emmabandrews', 
+            'https://github.com/eba-diary/apps',
+            'master',
+            '3fcdcd5197c99aeb1963698e4fb32e9d4da9897c',
+            '')
 };

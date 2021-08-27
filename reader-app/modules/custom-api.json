@@ -28,17 +28,10 @@
     	"/modules/git-sync.xql": {
             "post": {
                 "summary": "Sync with GitHub",
-                "operationId": "githubxq:git-sync",
+                "operationId": "custom:git-sync",
                 "responses": {
                     "200": {
-                        "description": "Test",
-                        "content": {
-                            "text/html": {
-                                "schema": {
-                                    "type": "string"
-                                }
-                            }
-                        }
+                        "description": "Success"
                     }
                 }
             }
