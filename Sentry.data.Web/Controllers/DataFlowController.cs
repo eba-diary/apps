@@ -1,17 +1,16 @@
 ﻿using Sentry.Core;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Interfaces;
 using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Mvc;
-using Sentry.data.Core.Interfaces;
 using System.Threading.Tasks;
-using Sentry.data.Core.Entities;
-using Newtonsoft.Json;
+using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -23,15 +22,17 @@ namespace Sentry.data.Web.Controllers
         private readonly IConfigService _configService;
         private readonly ISecurityService _securityService;
         private readonly ISAIDService _saidService;
+        private readonly ISchemaService _schemaService;
 
         public DataFlowController(IDataFlowService dataFlowService, IDatasetService datasetService, IConfigService configService,
-            ISecurityService securityService, ISAIDService saidService)
+            ISecurityService securityService, ISAIDService saidService, ISchemaService schemaService)
         {
             _dataFlowService = dataFlowService;
             _datasetService = datasetService;
             _configService = configService;
             _securityService = securityService;
             _saidService = saidService;
+            _schemaService = schemaService;
         }
 
         // GET: DataFlow
@@ -85,7 +86,17 @@ namespace Sentry.data.Web.Controllers
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
             SchemaMapModel schemaModel = new SchemaMapModel
             {
-                SelectedDataset = 0
+                SelectedDataset = 0,
+                AllDatasets = BuildDatasetDropDown(0),
+                AllSchemas = new List<SelectListItem>() {
+                    new SelectListItem
+                    {
+                        Value = "0",
+                        Text = "Select Dataset First",
+                        Selected = true,
+                        Disabled = true
+                    } 
+                }
             };
             model.SchemaMaps.Add(schemaModel);
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
@@ -201,7 +212,17 @@ namespace Sentry.data.Web.Controllers
             DataFlowModel dfModel = new DataFlowModel();
             SchemaMapModel schemaModel = new SchemaMapModel
             {
-                SelectedDataset = 0
+                SelectedDataset = 0,
+                AllDatasets = BuildDatasetDropDown(0),
+                AllSchemas = new List<SelectListItem>() {
+                    new SelectListItem
+                    {
+                        Value = "0",
+                        Text = "Select Dataset First",
+                        Selected = true,
+                        Disabled = true
+                    }
+                }
             };
             dfModel.SchemaMaps.Add(schemaModel);
 
@@ -258,7 +279,10 @@ namespace Sentry.data.Web.Controllers
                 List<SchemaMapModel> schemaMapModelList = new List<SchemaMapModel>();
                 foreach (SchemaMapDto map in dto.SchemaMap)
                 {
-                    schemaMapModelList.Add(map.ToModel());
+                    SchemaMapModel scmModel = map.ToModel();
+                    scmModel.AllDatasets = BuildDatasetDropDown(map.DatasetId);
+                    scmModel.AllSchemas = BuildSchemaDropDown(map.SchemaId);
+                    schemaMapModelList.Add(scmModel);
                 }
                 model.SchemaMaps = schemaMapModelList;
             }
@@ -426,12 +450,6 @@ namespace Sentry.data.Web.Controllers
             model.SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(((RetrieverJobScheduleTypes)pickerval).GetDescription());
         }
 
-        private void CreateDropDownList(CompressionModel model)
-        {
-            model.CompressionTypesDropdown = Enum.GetValues(typeof(CompressionTypes)).Cast<CompressionTypes>().Select(v
-                => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-        }
-
         
 
         private async Task<List<SelectListItem>> BuildSAIDAssetDropDown(string keyCode)
@@ -464,6 +482,76 @@ namespace Sentry.data.Web.Controllers
             }
 
             return output;
+        }
+
+        private List<SelectListItem> BuildDatasetDropDown(int datasetSelection)
+        {
+            List<SelectListItem> datasetList = new List<SelectListItem>
+            {
+                new SelectListItem
+                {
+                    Value = "-1",
+                    Text = "Create Dataset",
+                    Selected = false,
+                    Disabled = false
+                },
+
+                new SelectListItem
+                {
+                    Value = "0",
+                    Text = "Select Dataset",
+                    Selected = (datasetSelection == 0),
+                    Disabled = true
+                }
+            };
+
+            foreach (KeyValuePair<int, string> item in _datasetService.GetDatasetList())
+            {
+                datasetList.Add(new SelectListItem
+                {
+                    Value = item.Key.ToString(),
+                    Text = item.Value,
+                    Selected = (datasetSelection == item.Key),
+                    Disabled = false
+                });
+            }
+
+            return datasetList;
+        }
+
+        private List<SelectListItem> BuildSchemaDropDown(int schemaSelection)
+        {
+            List<SelectListItem> schemaList = new List<SelectListItem>
+            {
+                new SelectListItem
+                {
+                    Value = "-1",
+                    Text = "Create Dataset",
+                    Selected = false,
+                    Disabled = false
+                },
+
+                new SelectListItem
+                {
+                    Value = "0",
+                    Text = "Select Schema",
+                    Selected = (schemaSelection == 0),
+                    Disabled = true
+                }
+            };
+
+            foreach (KeyValuePair<int, string> item in _schemaService.GetSchemaList())
+            {
+                schemaList.Add(new SelectListItem
+                {
+                    Value = item.Key.ToString(),
+                    Text = item.Value,
+                    Selected = (schemaSelection == item.Key),
+                    Disabled = false
+                });
+            }
+
+            return schemaList;
         }
 
         private List<SelectListItem> DataSourcesByType(string sourceType, string selectedId)

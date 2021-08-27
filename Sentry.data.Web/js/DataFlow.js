@@ -358,80 +358,14 @@
     },
 
     InitSchemaMaps(datasetId, schemaId) {
-        $('.datasetSpinner').each(function (index) {
-            var cur = $(this);
-            Sentry.InjectSpinner(cur, 30);
-        });
-        $('.schemaSpinner').each(function (index) {
-            var cur = $(this);
-            Sentry.InjectSpinner(cur, 30);
-        });
-
-        $.getJSON("/api/v2/metadata/dataset", function (result) {
-            var newSubItems;
-            var groupName;
-            var datasetCount = result.length;
-            var sortedResult = result.sort(
-                firstBy("Category")
-                    .thenBy("Name")
-            );
-
-            newSubItems += "<option value='-1'>Create Dataset</option>";
-            newSubItems += "<option value='0'>Select Dataset</option>";
-
-            $.each(sortedResult, function (index, item) {
-                //initial pass inializes group and sets first group element
-                if (groupName === null) {
-                    newSubItems += "<optgroup label='" + item.Category + "'>";
-                    groupName = item.Category;
-                }
-
-                //Close previous group and start new group if groupName changes
-                if (groupName !== null && groupName !== item.Category) {
-                    newSubItems += "</optgroup>";
-                    newSubItems += "<optgroup label='" + item.Category + "'>";
-                    groupName = item.Category;
-                }
-
-                //Add option item
-                newSubItems += "<option value='" + item.Id + "'>" + item.Name + "</option>";
-
-                //close out group after last interation
-                if (index === (datasetCount - 1)) {
-                    newSubItems += "</optgroup>";
-                }
-            });
-
-            $('[id$=__SelectedDataset]').each(function (index) {
-                var cur = $(this);
-                var dsSpinner = cur.parent().find('.datasetSpinner');                
-                var curVal = cur.val();
-
-                dsSpinner.html('');
-                cur.html(newSubItems);
-
-                if (curVal === null || curVal === undefined) {
-                    var curRow = cur.parent().parent();
-                    $(this).val(0);
-                    data.DataFlow.PopulateSchemas("0", schemaId, curRow.find("[id$=__SelectedSchema]"));
-                }
-                else if (curVal == "-1") {
-                    var curRow = cur.parent().parent();
-                    $(this).val(datasetId);
-                    data.DataFlow.PopulateSchemas(datasetId, schemaId, curRow.find("[id$=__SelectedSchema]"));
-                }
-                else {
-                    cur.val(curVal);
-                    var curRow = cur.parent().parent();
-                    data.DataFlow.PopulateSchemas(curVal, schemaId, curRow.find("[id$=__SelectedSchema]"));
-                }
-            });
+        
 
 
             $('[id$=__SelectedDataset]').change(function () {
                 var curRow = $(this).parent().parent();
                 var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
                 var datasetId = $(this).val();
+                schemaSelectionDropDown.val("0");
 
                 Sentry.InjectSpinner(curRow.find('.schemaSpinner'), 30);
 
@@ -445,16 +379,5 @@
                 }
 
             });
-
-            //$('[id$=_SelectedSchema]').change(function () {
-            //    var schemaId = $(this).val();
-
-            //    //If create new schema is selected
-            //    if (schemaId === "-1") {
-            //        $('#DataFlowFormContainer').hide();
-            //        data.DataFlow.RenderSchemaCreatePage();
-            //    }
-            //})
-        });
     }
 }
