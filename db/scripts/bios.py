@@ -1,5 +1,6 @@
 import gspread
 import pandas as pd
+import re
 from oauth2client.service_account import ServiceAccountCredentials
 import sqlite3
 
@@ -17,7 +18,7 @@ records_data = sheet_persName.get_all_records()
 # persName=@REF TAG TEI, biography=XML, occupation=OCCUPATION, birth_place=BIRTHPLACE, death_place=PLACE OF DEATH, birth=DATE OF BIRTH, death=DATE OF DEATH
 bios = pd.DataFrame.from_dict(records_data)
 bios.drop(["Complete SK",
-            "Alt_Name",
+            "Display_Name",
             "Variants",
             "AUTHORITY_FILE",
             "RESEARCH",
@@ -37,6 +38,7 @@ with sqlite3.connect(DB_NAME) as db:
     cur = db.cursor()
     bioIdx = 1
     for row in bios.iterrows():
-        persName, biography, birth_place, death_place, birth, death = row[1][1], str(row[1][6]), str(row[1][3]), str(row[1][5]), str(row[1][2]), str(row[1][4])
+        persName = re.sub("#", '', row[1][1])
+        biography, birth_place, death_place, birth, death = str(row[1][6]), str(row[1][3]), str(row[1][5]), str(row[1][2]), str(row[1][4])
         cur.execute("INSERT INTO biography (id, persName, person_id, biography, birth_place, death_place, birth, death) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (bioIdx, persName, bioIdx, biography, birth_place, death_place, birth, death))
         bioIdx += 1

@@ -30,12 +30,15 @@ def process_diary(args):
     diary = get_loc(diary)
     print(f'Processing {diary}…')
 
-    afinn = Afinn(language='en')
+    _, journal_id = diary.split("_")
+    entry_id = 1
+
     diary_volumes = volumes()
     diary_path = diary_volumes[diary]
-    
-    journal_id = 17
-    entry_id = 1
+
+
+
+    afinn = Afinn(language='en')
 
     with open(diary_path) as xml:
         soup = BeautifulSoup(xml, 'lxml-xml')

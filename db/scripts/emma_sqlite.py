@@ -60,7 +60,8 @@ TABLES['diary_entry'] = ("""CREATE TABLE IF NOT EXISTS diary_entry (
                                 entry_date INTEGER NOT NULL,
                                 entry_txt TEXT NOT NULL,
                                 entry_tei TEXT NOT NULL,
-                                entry_sentiment INTEGER,
+                                entry_afinn INTEGER,
+                                entry_niavebayes INTEGER,
                                 CONSTRAINT fk_volume_id
                                     FOREIGN KEY (volume_id)
                                     REFERENCES diary (volume_id)
@@ -73,8 +74,8 @@ TABLES['diary_entry'] = ("""CREATE TABLE IF NOT EXISTS diary_entry (
 
 TABLES['sentences'] = ("""CREATE TABLE IF NOT EXISTS sentences (
                             id INTEGER NOT NULL,
-                            sent_id INTEGER PRIMARY KEY AUTOINCREMENT,
                             entry_id INTEGER NOT NULL,
+                            sent_id INTEGER PRIMARY KEY AUTOINCREMENT,
                             sent_text TEXT,
                             sent_sentiment INTEGER,
                             CONSTRAINT fk_entry_id
@@ -124,12 +125,17 @@ INDEX['biography'] = (
 TABLES['people'] = ("""CREATE TABLE IF NOT EXISTS people (
                             id INTEGER PRIMARY KEY NOT NULL,
                             journal_id INT,
+                            diary_entry_id INT,
                             person_id INTEGER NULL,
-                            lemma_id INTEGER NOT NULL,
+                            lemma_id INTEGER NULL,
                             social_struct TEXT,
                             CONSTRAINT fk_person_id
                                 FOREIGN KEY (person_id)
                                 REFERENCES biography (person_id)
+                                ON DELETE CASCADE,
+                            CONSTRAINT fk_diary_entry
+                                FOREIGN KEY (diary_entry_id)
+                                REFERENCES diary_entry (diary_entry_id)
                                 ON DELETE CASCADE,
                             CONSTRAINT fk_lemma_id
                                 FOREIGN KEY (lemma_id)
