@@ -13,189 +13,122 @@ journal_id,entry_id,date,TEI_name,emma_name,relation
 17,6,1910-11-04,None,None,None
 17,7,1910-11-06,None,None,None
 17,8,1910-11-07,None,None,None
-17,9,1910-11-14,Draper_Mr,Mr. Draper,undef
-17,9,1910-11-14,Gorst_Group,Gorsts,undef
-17,9,1910-11-14,Trefusis_Walter,Capt. Trefusis,undef
-17,9,1910-11-14,Carter_Bonham_Edgar,Mr. Carter BonhamMr. Bonham Carter,undef
-17,9,1910-11-14,Rathbone_Elena,Elèna,undef
-17,9,1910-11-14,Lovatt_Mr,Mr. Lovatt and son,undef
-17,9,1910-11-14,Lovatt_Master,Mr. Lovatt and son,undef
-17,9,1910-11-14,Lovatt_Mr,Mr. Lovatt and son,undef
-17,9,1910-11-14,Lovatt_Master,Mr. Lovatt and son,undef
-17,9,1910-11-14,Gay_Walter,Mr. Walter Gay,undef
-17,9,1910-11-14,Gay_Walter_Mr,Gays,undef
-17,9,1910-11-14,Gay_Matilda,Gays,undef
-17,9,1910-11-14,Gay_Matilda,Mrs. Gay,undef
+17,9,,Draper_Mr,Mr. Draper,undef
+17,9,,Trefusis_Walter,Capt. Trefusis,undef
+17,9,,Carter_Bonham_Mr,Mr. Carter Bonham,undef
+17,9,,Rathbone_Elena,Elèna,undef
+17,9,,Gay_Walter_Mr,Mr. Walter Gay,undef
+17,9,,Gay_Matilda,Mrs. Gay,undef
 17,10,1910-11-21,None,None,None
 17,11,1910-12-04,Rathbone_Elena,Elèna,undef
-17,11,1910-12-04,Buckley_Mr,Buckley family,undef
-17,11,1910-12-04,Buckley_Mrs,Buckley family,undef
 17,11,1910-12-04,Carter_Howard,Mr. Carter,undef
 17,11,1910-12-04,Weigall_Arthur,Mr. Weigall,undef
 17,11,1910-12-04,Nicol_Erskine,Mr. Nicol,undef
 17,11,1910-12-04,Davis_Theodore_M,Theo,undef
-17,12,1910-12-11,Weigall_Arthur,Mr. Weigall,undef
-17,12,1910-12-11,Rutter_Geanie,Mrs. Rutter,undef
-17,12,1910-12-11,Nicol_Erskine,Mr. Nicol,undef
-17,12,1910-12-11,Rutter_Geanie,Mrs. Rutter,undef
-17,12,1910-12-11,Weigall_Arthur,Mr. Weigall,undef
-17,12,1910-12-11,Davis_Theodore_M,Theo,undef
-17,12,1910-12-11,Burton_Harry,Harry Burton,undef
-17,12,1910-12-11,Maspero_Gaston,M. Maspero,undef
-17,12,1910-12-11,Davis_Theodore_M,Theo,undef
-17,12,1910-12-11,Davis_Theodore_M,Theo,undef
-17,12,1910-12-11,Jones_Harold,Harold Jones,undef
-17,12,1910-12-11,Jones_Cyril,Cyril,undef
-17,12,1910-12-11,Rathbone_Elena,Elèna,undef
-17,12,1910-12-11,Davis_Theodore_M,Theo,undef
-17,12,1910-12-11,Carter_Howard,Mr. Carter,undef
-17,12,1910-12-11,Nicol_Erskine,Mr. Nicol,undef
-17,12,1910-12-11,Davis_Theodore_M,Theo,undef
+17,12,,Weigall_Arthur,Mr. Weigall,undef
+17,12,,Butler_Mrs,Mrs. Butler,undef
+17,12,,Nicol_Erskine,Mr. Nicol,undef
+17,12,,Butler_Mrs,Mrs. Butler,undef
+17,12,,Weigall_Arthur,Mr. Weigall,undef
+17,12,,Davis_Theodore_M,Theo,undef
+17,12,,Burton_Harry,Harry Burton,undef
+17,12,,Maspero_Gaston,M. Maspero,undef
+17,12,,Davis_Theodore_M,Theo,undef
+17,12,,Davis_Theodore_M,Theo,undef
+17,12,,Jones_Harold,Harold Jones,undef
+17,12,,Jones_Cyril,Cyril,undef
+17,12,,Rathbone_Elena,Elèna,undef
+17,12,,Davis_Theodore_M,Theo,undef
+17,12,,Carter_Howard,Mr. Carter,undef
+17,12,,Nicol_Erskine,Mr. Nicol,undef
+17,12,,Davis_Theodore_M,Theo,undef
 17,13,1910-12-18,Jones_Harold,Harold Jones,undef
 17,13,1910-12-18,Jones_Cyril,Cyril,undef
 17,13,1910-12-18,Jones_Harold,Harold,undef
 17,13,1910-12-18,Mumm_von_Schwarzenstein_Alfons,Baron v. Mumm,undef
-17,13,1910-12-18,Fahnestock_Gibson,Mr. And Mrs. Gibson Fahnstock,undef
-17,13,1910-12-18,Fahnestock_Mrs,Mr. And Mrs. Gibson Fahnstock,undef
 17,13,1910-12-18,Kelly_Miss,Miss Kelly,undef
 17,13,1910-12-18,Whitaker_Mr,Mr. Whitaker,undef
 17,13,1910-12-18,Whymper_Charles,Mr. Whymper,undef
-17,13,1910-12-18,Kelly_Mr,Kellys,undef
-17,13,1910-12-18,Kelly_Miss,Kellys,undef
 17,14,1910-12-25,Burton_Harry,Harry Burton,undef
 17,14,1910-12-25,Davis_Theodore_M,Theo,undef
 17,14,1910-12-25,Crane_Lancelot,Mr. Crane,undef
-17,14,1910-12-25,Horemheb,Horemheb,undef
 17,14,1910-12-25,Trefusis_Walter,Capt. Walter Trefusis,undef
 17,15,1910-12-31,Davis_Theodore_M,Theo,undef
 17,15,1910-12-31,Whitaker_Mr,Mr. Whitaker,undef
-17,15,1910-12-31,Newberry_Percy,Mr. and Mrs. Newberry,undef
-17,15,1910-12-31,Newberry_Mrs,Mr. and Mrs. Newberry,undef
-17,16,1911-01-07,Maspero_Gaston,Masperos,undef
-17,16,1911-01-07,Maspero_Louise,Masperos,undef
 17,16,1911-01-07,Davis_Theodore_M,Theo,undef
 17,16,1911-01-07,Maspero_Mme,Madame Maspero,undef
 17,16,1911-01-07,McCormick_Mrs,Mrs. McCormick,undef
 17,16,1911-01-07,Scott_Miss,Miss Scott,undef
-17,17,1911-01-14,Buckley_Mr,Mr. and Mrs. Buckley,undef
-17,17,1911-01-14,Buckley_Mrs,Mr. and Mrs. Buckley,undef
 17,17,1911-01-14,Carter_Howard,Mr. Carter,undef
 17,17,1911-01-14,Burton_Harry,Harry,undef
 17,17,1911-01-14,Davis_Theodore_M,Theo,undef
 17,18,1911-01-21,Gorst_Lady,Lady Gorst,undef
 17,18,1911-01-21,Gorst_Miss,Miss Gorst,undef
 17,19,1911-01-28,Hunter_Mrs,Mrs. Hunter,undef
-17,19,1911-01-28,Warner_Mrs,Mrs. and Miss Warner,undef
-17,19,1911-01-28,Warner_Miss,Mrs. and Miss Warner,undef
 17,19,1911-01-28,Webb_Miss,Miss Webb,undef
-17,19,1911-01-28,Guadalmina_Marquesa,Marquise Guadalmina and her son,undef
-17,19,1911-01-28,Guadalmina_son_of,Marquise Guadalmina and her son,undef
 17,19,1911-01-28,Davis_Theodore_M,Theo,undef
 17,19,1911-01-28,Mohassib_Mohammed,Mohassib,undef
 17,19,1911-01-28,Cassatt_Mary_S,Miss Cassatt,undef
-17,19,1911-01-28,Kelekian_Mr,Mr. and Mrs. Kelekian,undef
-17,19,1911-01-28,Kelekian_Mrs,Mr. and Mrs. Kelekian,undef
 17,19,1911-01-28,Nicol_Erskine,Mr. Nicol,undef
 17,20,1911-02-04,Peabody_Endicott,Rev. Endicott Peabody,undef
 17,20,1911-02-04,Fairfield_Osborn_Henry,Mr. Fairfield Osborn,undef
-17,20,1911-02-04,Newberry_Percy,Mr. and Mrs. Newberry,undef
-17,20,1911-02-04,Newberry_Mrs,Mr. and Mrs. Newberry,undef
-17,20,1911-02-04,Fahnestock_Gibson,Mr. and Mrs. Fahnstock,undef
-17,20,1911-02-04,Fahnestock_Mrs,Mr. and Mrs. Fahnstock,undef
 17,20,1911-02-04,Davis_Theodore_M,Theo,undef
-17,21,1911-02-11,Alexander_Charles,Mr. and Mrs. Charles B. Alexander,undef
-17,21,1911-02-11,Alexander_Harriet_Mrs,Mr. and Mrs. Charles B. Alexander,undef
-17,21,1911-02-11,Alexander_Harriet_Jr,their 3 girls,undef
-17,21,1911-02-11,Alexander_Jeanette,their 3 girls,undef
-17,21,1911-02-11,Alexander_Marie,their 3 girls,undef
-17,21,1911-02-11,Hobhouse_Henry,Mr. and Mrs. Henry Hobhouse,undef
-17,21,1911-02-11,Hobhouse_Mrs,Mr. and Mrs. Henry Hobhouse,undef
 17,21,1911-02-11,Farrer_Gaspard,Gaspard Farrer,undef
-17,21,1911-02-11,Williams_Mr,Mr. and Mrs. Williams,undef
-17,21,1911-02-11,Williams_Mrs,Mr. and Mrs. Williams,undef
-17,21,1911-02-11,Langley_Mr,Mr. and Mrs. Langley,undef
-17,21,1911-02-11,Langley_Mrs,Mr. and Mrs. Langley,undef
-17,21,1911-02-11,Foster_Giraud,Mr. and Mrs. GerardGiraud Foster,undef
-17,21,1911-02-11,Foster_Mrs,Mr. and Mrs. GerardGiraud Foster,undef
 17,21,1911-02-11,Ives_Miss,Miss Ives,undef
-17,21,1911-02-11,Alexander_Grace_Mrs,Mrs. Alexander,undef
+17,21,1911-02-11,Alexander_Harriet_Mrs,Mrs. Alexander,undef
 17,21,1911-02-11,Roosevelt_Theodore_Jr,Theodore Roosevelt,undef
-17,21,1911-02-11,Collander_Livingston_John,Mr. and Mrs. John Collander Livingston,undef
-17,21,1911-02-11,Collander_Livingston_Mrs,Mr. and Mrs. John Collander Livingston,undef
 17,21,1911-02-11,Davis_Theodore_M,Theo,undef
 17,22,1911-02-13,Whymper_Charles,Mr. Whymper,undef
-17,22,1911-02-13,Foster_Giraud,Mr. and Mrs. GirardGiraud Foster,undef
-17,22,1911-02-13,Foster_Mrs,Mr. and Mrs. GirardGiraud Foster,undef
 17,22,1911-02-13,Graham_Mrs,Mrs. Graham,undef
-17,23,1911-02-19,Collander_Livingston_John,Mr. and Mrs. John Collander Livingston,undef
-17,23,1911-02-19,Collander_Livingston_Mrs,Mr. and Mrs. John Collander Livingston,undef
-17,23,1911-02-19,Webster_Lina_Post,Mrs. Hamilton Fish Webster,undef
-17,23,1911-02-19,Auchincloss_Hugh_D,Mr. and Mrs. Auchincloss,undef
-17,23,1911-02-19,Auchincloss_Emma_Brewster_Jennings,Mr. and Mrs. Auchincloss,undef
-17,23,1911-02-19,Jennings_Annie_Burr,Miss Jennings,undef
-17,23,1911-02-19,Naville_Edouard,M. and Mme. Naville,undef
-17,23,1911-02-19,Naville_Marguerite,M. and Mme. Naville,undef
+17,23,1911-02-19,Hamilton_Fish_Webster_Mrs,Mrs. Hamilton Fish Webster,undef
+17,23,1911-02-19,Jennings_Miss,Miss Jennings,undef
 17,23,1911-02-19,Rodier_M,M. Rodier,undef
-17,23,1911-02-19,Wherry_Albinia,Mrs. and Miss Wherry,undef
-17,23,1911-02-19,Wherry_Beatrix,Mrs. and Miss Wherry,undef
-17,23,1911-02-19,Cust_Robert_Henry_Hobart,Mr. Cust,undef
-17,23,1911-02-19,Maspero_Gaston,M. and Mme. Maspero,undef
-17,23,1911-02-19,Maspero_Louise,M. and Mme. Maspero,undef
+17,23,1911-02-19,Cust_Mr,Mr. Cust,undef
 17,23,1911-02-19,Davis_Theodore_M,Theo,undef
 17,23,1911-02-19,Carter_Howard,Mr. Carter,undef
 17,23,1911-02-19,Carnarvon_Lord,Lord Carnarvon,undef
-17,23,1911-02-19,Hobhouse_Henry,Hon. Henry and Mrs. Hobhouse,undef
-17,23,1911-02-19,Hobhouse_Mrs,Hon. Henry and Mrs. Hobhouse,undef
 17,23,1911-02-19,Farrer_Gaspard,G. Farrer,undef
 17,23,1911-02-19,Davis_Theodore_M,Theo,undef
-17,24,1911-02-26,Morgan_John_Pierpont,Mr. J.P. Morgan,undef
+17,24,1911-02-26,Morgan_John_Pierpoint,Mr. J.P. Morgan,undef
 17,24,1911-02-26,Davis_Theodore_M,Theo,undef
 17,24,1911-02-26,Layard_Lady,Lady Layard,undef
 17,24,1911-02-26,Nicol_Erskine,Nicol,undef
-17,25,1911-03-01,Morgan_John_Pierpont,Mr. Morgan,undef
+17,25,1911-03-01,Morgan_John_Pierpoint,Mr. Morgan,undef
 17,25,1911-03-01,Davis_Theodore_M,Theo,undef
-17,25,1911-03-01,Auchincloss_Emma_Brewster_Jennings,Mrs. Auchincloss,undef
-17,25,1911-03-01,Jennings_Annie_Burr,Miss Jennings,undef
+17,25,1911-03-01,Auchincloss_Mrs,Mrs. Auchincloss,undef
+17,25,1911-03-01,Jennings_Miss,Miss Jennings,undef
 17,25,1911-03-01,Contardone_Contessa,Contessa Contardone,undef
 17,26,1911-03-03,Rathbone_Elena,Elèna,undef
-17,26,1911-03-03,Newberry_Percy,Mr. and Mrs. Newberry,undef
-17,26,1911-03-03,Newberry_Mrs,Mr. and Mrs. Newberry,undef
 17,26,1911-03-03,Johnson_Mr,Mr. Johnson,undef
 17,26,1911-03-03,Whymper_Charles,Mr. Whymper,undef
 17,26,1911-03-03,Nicol_Erskine,Mr. Nicol,undef
 17,26,1911-03-03,Burton_Harry,Harry,undef
 17,26,1911-03-03,Rathbone_Elena,Elèna,undef
 17,27,1911-03-04,Rathbone_Elena,Elèna Rathbone,undef
-17,27,1911-03-04,Naville_Edouard,Navilles,undef
-17,27,1911-03-04,Naville_Marguerite,Navilles,undef
 17,28,1911-03-06,Naville_Mme,Mme. Naville,undef
-17,28,1911-03-06,Naville_Edouard,M. and Mme. Naville,undef
-17,28,1911-03-06,Naville_Marguerite,M. and Mme. Naville,undef
 17,28,1911-03-06,Whitmore_Mr,Mr. Whitmore,undef
-17,28,1911-03-06,Dixon_James,Mr. Dixon,undef
-17,28,1911-03-06,Naville_Edouard,Navilles,undef
-17,28,1911-03-06,Naville_Marguerite,Navilles,undef
+17,28,1911-03-06,Dixon_Mr,Mr. Dixon,undef
 17,29,1911-03-07,None,None,None
 17,30,1911-03-08,None,None,None
 17,31,1911-03-09,Rathbone_Elena,Elèna,undef
 17,31,1911-03-09,Akhenaten,Khuenaton,undef
 17,31,1911-03-09,Rathbone_Elena,Elèna,undef
 17,31,1911-03-09,Burton_Harry,Harry,undef
-17,32,1911-03-10,None,None,None
+17,32,1911-03-09,None,None,None
 17,33,1911-03-11,None,None,None
 17,34,1911-03-12,Jones_Harold,Harold Jones,undef
-17,35,1911-03-13,Draper_Mr,Mr. Draper,undef
-17,35,1911-03-13,Rathbone_Elena,Elèna,undef
-17,35,1911-03-13,Newberry_Percy_E,Mr. Newberry,undef
-17,35,1911-03-13,Deimer_Michael_Z,Deimer,undef
-17,35,1911-03-13,Kelekian_Dikran,Kolekian,undef
-17,35,1911-03-13,Kassera,Kassera,undef
-17,35,1911-03-13,Davis_Theodore_M,Theo,undef
-17,35,1911-03-13,Burton_Harry,Harry,undef
-17,35,1911-03-13,Nahman_Maurice,NachmanNahman,undef
-17,35,1911-03-13,Rathbone_Elena,Elèna,undef
-17,35,1911-03-13,Burton_Harry,Harry,undef
-17,35,1911-03-13,Davis_Theodore_M,Theo,undef
+17,35,1911-03-12,Draper_Mr,Mr. Draper,undef
+17,35,1911-03-12,Rathbone_Elena,Elèna,undef
+17,35,1911-03-12,Newberry_Percy_E,Mr. Newberry,undef
+17,35,1911-03-12,Deimer_Michael_Z,Deimer,undef
+17,35,1911-03-12,Kelekian_Dikran,Kolekian,undef
+17,35,1911-03-12,Kassera,Kassera,undef
+17,35,1911-03-12,Davis_Theodore_M,Theo,undef
+17,35,1911-03-12,Burton_Harry,Harry,undef
+17,35,1911-03-12,Nachman,Nachman,undef
+17,35,1911-03-12,Rathbone_Elena,Elèna,undef
+17,35,1911-03-12,Burton_Harry,Harry,undef
+17,35,1911-03-12,Davis_Theodore_M,Theo,undef
 17,36,1911-03-14,None,None,None
 17,37,1911-03-15,Rathbone_Elena,Elèna,undef
 17,37,1911-03-15,Burton_Harry,Harry,undef
@@ -203,11 +136,7 @@ journal_id,entry_id,date,TEI_name,emma_name,relation
 17,37,1911-03-15,Davis_Theodore_M,Theo,undef
 17,37,1911-03-15,Kyticas_N_D,Kyticas,undef
 17,37,1911-03-15,Davis_Theodore_M,Theo,undef
-17,37,1911-03-15,Newberry_Percy,Mr. and Mrs. Newberry,undef
-17,37,1911-03-15,Newberry_Mrs,Mr. and Mrs. Newberry,undef
 17,37,1911-03-15,Johnson_Mr,Mr. Johnson,undef
-17,37,1911-03-15,Whittaker_Mr,Whittakers,undef
-17,37,1911-03-15,Whittaker_Mrs,Whittakers,undef
 17,37,1911-03-15,Layard_Lady,Lady Layard,undef
 17,37,1911-03-15,Johnson_Mr,Mr. Johnson,undef
 17,37,1911-03-15,Trefusis_Walter,Capt. Trefusis,undef
@@ -215,23 +144,22 @@ journal_id,entry_id,date,TEI_name,emma_name,relation
 17,38,1911-03-16,Pasha_Artin,Artin Pasha,undef
 17,38,1911-03-16,Sayce_Archibald,Mr. Sayce,undef
 17,38,1911-03-16,Kyticas_N_D,Kyticas,undef
-17,38,1911-03-16,Daressy_Georges,M. Daressy,undef
-17,38,1911-03-16,Tiye,Tiyi,undef
+17,38,1911-03-16,Daressy_M,M. Daressy,undef
 17,39,1911-03-17,Davis_Theodore_M,Theo,undef
 17,39,1911-03-17,Duvar_Mrs,Mrs. Duvar,undef
 17,39,1911-03-17,Rathbone_Elena,Elèna,undef
-17,39,1911-03-17,Bonham_Carter_Edgar,Mr. Bonham-Carter,undef
+17,39,1911-03-17,Bonham_Carter_Mr,Mr. Bonham-Carter,undef
 17,39,1911-03-17,Burton_Harry,Harry,undef
 17,39,1911-03-17,Whymper_Charles,Mr. Whymper,undef
 17,39,1911-03-17,Davis_Theodore_M,Theo,undef
 17,39,1911-03-17,Pasha_Artin,Artin Pasha,undef
 17,39,1911-03-17,Sayce_Archibald,Mr. Sayce,undef
 17,40,1911-03-18,None,None,None
-17,41,1911-03-19,Bonham_Carter_Edgar,Mr. Bonham-Carter,undef
-17,41,1911-03-19,Trefusis_Walter_Capt,Capt. Trefusis,undef
-17,41,1911-03-19,Graham_Marjorie_Miss,Miss Margery Graham,undef
-17,41,1911-03-19,Graham_John_Sir,Sir John Graham,undef
-17,41,1911-03-19,Northampton_Lord,Lord Northampton,undef
+17,41,1911-03-19,Bonham_Carter_Mr,Mr. Bonham-Carter,undef
+17,41,1911-03-19,Trefusis_Walter,Capt. Trefusis,undef
+17,41,1911-03-19,Graham_Margery,Miss Margery Graham,undef
+17,41,1911-03-19,Graham_John,Sir John Graham,undef
+17,41,1911-03-19,Northampton_Lord,Lord Northampton.,undef
 17,42,1911-03-20,Duvar_Mrs,Mrs. Duvar,undef
 17,42,1911-03-20,Coater_Miss,Miss Coater,undef
 17,43,1911-03-23,None,None,None

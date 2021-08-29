@@ -1,6 +1,6 @@
 from configparser import ConfigParser
 
-def volumes(filename='database.ini', section='volumes'):
+def volumes(filename='static.ini', section='volumes'):
     """
     Return os path to diary volume
     :volume: a specific volume from EBA collection
