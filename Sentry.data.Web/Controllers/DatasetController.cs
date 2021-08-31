@@ -1182,7 +1182,7 @@ namespace Sentry.data.Web.Controllers
         //Set initial alias of query:
         //RULE: find the nearest ARRAY STRUCT and make that the initial ALIAS followed by all non ARRAY STRUCTS
         //Then the GenerateSnow() will append all STRUCTS it digs through
-        //e.g. gary_flatten.value:element:austin:lily  gary here is an array struct
+        //e.g. gary_flatten.value:austin:lily  gary here is an array struct
         private string DelroyAliasMonster(List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
             StringBuilder alias = new StringBuilder();
@@ -1200,7 +1200,7 @@ namespace Sentry.data.Web.Controllers
                 if (closestArray != null)
                 {
                     bool parentFound = false;
-                    alias.Append(closestArray.Name + "_flatten.value:element:");
+                    alias.Append(closestArray.Name + "_flatten.value:");
 
                     //start at top and work through each struct until you hit the closest parent, then after you start appending all structs
                     foreach (var s in structTracker)
@@ -1271,12 +1271,12 @@ namespace Sentry.data.Web.Controllers
                     currentFlatten = s.Name + "_flatten";
                     if (first)
                     {
-                        flattenStatement.Append(",LATERAL FLATTEN(" + s.Name + ":list) " + currentFlatten);
+                        flattenStatement.Append(",LATERAL FLATTEN(" + s.Name + ") " + currentFlatten);
                         first = false;
                     }
                     else
                     {
-                        flattenStatement.Append(",LATERAL FLATTEN(" + parentFlatten + ".value:element:" + s.Name + ":list) " + currentFlatten);
+                        flattenStatement.Append(",LATERAL FLATTEN(" + parentFlatten + ".value:" + s.Name + ") " + currentFlatten);
                     }
                     parentFlatten = currentFlatten;
                     flattenStatement.Append(Environment.NewLine);

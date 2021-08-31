@@ -273,18 +273,6 @@ namespace Sentry.data.Core
             {
                 DatasetFileConfig dfc = CreateDatasetFileConfig(dto);
 
-                DataSource basicSource = _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_DROP_LOCATION));
-
-                RetrieverJob rj = JobService.InstantiateJobsForCreation(dfc, basicSource);
-
-                List<RetrieverJob> jobList = new List<RetrieverJob>
-                {
-                    rj,
-                    JobService.InstantiateJobsForCreation(dfc, _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_S3_DROP_LOCATION)))
-                };
-
-                dfc.RetrieverJobs = jobList;
-
                 Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
                 List<DatasetFileConfig> dfcList = (parent.DatasetFileConfigs == null) ? new List<DatasetFileConfig>() : parent.DatasetFileConfigs.ToList();
                 dfcList.Add(dfc);
@@ -293,9 +281,6 @@ namespace Sentry.data.Core
 
                 //_datasetContext.Merge(parent);
                 _datasetContext.SaveChanges();
-
-
-                JobService.CreateDropLocation(rj);
 
                 return true;
             }
