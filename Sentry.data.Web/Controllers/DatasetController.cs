@@ -168,12 +168,58 @@ namespace Sentry.data.Web.Controllers
 
             Utility.SetupLists(_datasetContext, cdm);
             cdm.SAIDAssetDropDown = await BuildSAIDAssetDropDown(cdm.SAIDAssetKeyCode).ConfigureAwait(false);
-
+            
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Creation Page", cdm.DatasetId);
-
             ViewData["Title"] = "Create Dataset";
-
             return PartialView("_DatasetCreateEdit", cdm);
+        }
+
+        [HttpPost]
+        //GET OWNER OF SAID ASSET
+        public async Task<ActionResult> GetOwner(string assetKeyCode)
+        {
+            DatasetModel cdm = new DatasetModel();
+
+            //GORDON
+            //CALL SAID SERVICE TO RETURN ASSET
+            SAIDAsset asset = await _saidService.GetAssetByKeyCode(assetKeyCode).ConfigureAwait(false);
+            
+            if (asset != null && asset.Roles != null && asset.Roles.Count > 0)
+            {
+                //LOCATE OWNER IN ASSET
+                FindOwnerInAsset(asset, ref cdm);
+                return Json(new { success = true, primaryOwnerName = cdm.PrimaryOwnerName, primaryOwnerId = cdm.PrimaryOwnerId });
+            }
+            else
+            {
+                return Json(new { success = false, primaryOwnerName = String.Empty, primaryOwnerId = String.Empty });
+            }
+        }
+
+        private void FindOwnerInAsset(SAIDAsset asset, ref DatasetModel model)
+        {
+            string owner = String.Empty;
+
+            //FIRST try for Information Owner
+            SAIDRole role = asset.Roles.Where(w => w.Role == "Information Owner").FirstOrDefault();
+
+            //SECOND try for Custodian
+            if (role == null)
+            {
+                role = asset.Roles.Where(w => w.Role == "Custodian - Production").FirstOrDefault();
+            }
+
+            //THIRD take anything
+            if (role == null)
+            {
+                role = asset.Roles.FirstOrDefault();
+            }
+
+            if (role != null)
+            {
+                model.PrimaryOwnerId = role.AssociateId;
+                model.PrimaryOwnerName = role.Name;
+            }
         }
 
 
