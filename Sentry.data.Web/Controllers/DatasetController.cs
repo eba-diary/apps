@@ -180,7 +180,6 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetModel cdm = new DatasetModel();
 
-            //GORDON
             //CALL SAID SERVICE TO RETURN ASSET
             SAIDAsset asset = await _saidService.GetAssetByKeyCode(assetKeyCode).ConfigureAwait(false);
             
@@ -198,15 +197,13 @@ namespace Sentry.data.Web.Controllers
 
         private void FindOwnerInAsset(SAIDAsset asset, ref DatasetModel model)
         {
-            string owner = String.Empty;
-
             //FIRST try for Information Owner
-            SAIDRole role = asset.Roles.Where(w => w.Role == "Information Owner").FirstOrDefault();
+            SAIDRole role = asset.Roles.FirstOrDefault(w => w.Role == "Information Owner");
 
             //SECOND try for Custodian
             if (role == null)
             {
-                role = asset.Roles.Where(w => w.Role == "Custodian - Production").FirstOrDefault();
+                role = asset.Roles.FirstOrDefault(w => w.Role == "Custodian - Production");
             }
 
             //THIRD take anything

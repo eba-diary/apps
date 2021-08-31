@@ -460,8 +460,7 @@ data.Dataset = {
          });
 
 
-        //GORDON
-        //saidAsset onChange
+        //saidAsset onChange needs to update #PrimaryOwnerName and #PrimaryOwnerId based on saidAsset picked
         $("#saidAsset").change(function () {
 
             //GET SAID ASSET FROM DROPDOWN
@@ -477,7 +476,6 @@ data.Dataset = {
                 success: function (r) {
                     $("#PrimaryOwnerName").val(r.primaryOwnerName);
                     $("#PrimaryOwnerId").val(r.primaryOwnerId);
-
                 },
                 failure: function () {
                     data.Dale.makeToast("error", "Error retrieving SAID Primary Owner.");
@@ -501,14 +499,7 @@ data.Dataset = {
         //Set Secure HREmp service URL for associate picker
         $.assocSetup({ url: hrEmpUrl });
         var permissionFilter = "DatasetModify,DatasetManagement," + hrEmpEnv;
-        //$("#PrimaryOwnerName").assocAutocomplete({
-        //    associateSelected: function (associate) {
-        //        $('#PrimaryOwnerId').val(associate.Id);
-        //    },
-        //    filterPermission: permissionFilter ,
-        //    minLength: 0,
-        //    maxResults:10
-        //});
+     
         $("#PrimaryContactName").assocAutocomplete({
             associateSelected: function (associate) {
                 $('#PrimaryContactId').val(associate.Id);
