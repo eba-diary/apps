@@ -517,7 +517,7 @@ namespace Sentry.data.Core
                     */
                     foreach (var job in dfc.RetrieverJobs)
                     {
-                        _jobService.DisableJob(job.Id);
+                        _jobService.DeleteJob(job.Id);
                     }
 
                     /*

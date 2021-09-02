@@ -12,11 +12,13 @@ namespace Sentry.data.Core
 {
     public class JobService : IJobService
     {
-        private IDatasetContext _datasetContext;
+        private readonly IDatasetContext _datasetContext;
+        private readonly IUserService _userService;
 
-        public JobService(IDatasetContext datasetContext)
+        public JobService(IDatasetContext datasetContext, IUserService userService)
         {
             _datasetContext = datasetContext;
+            _userService = userService;
         }
 
         public JobHistory GetLastExecution(RetrieverJob job)
@@ -145,6 +147,8 @@ namespace Sentry.data.Core
             RetrieverJob job = new RetrieverJob();
             MapToRetrieverJob(dto, job);
             job.JobOptions = rjo;
+            job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Active;
+            job.DeleteIssueDTM = DateTime.MaxValue;
 
             _datasetContext.Add(job);
 
@@ -193,10 +197,11 @@ namespace Sentry.data.Core
 
                 if (job != null)
                 {
-                    Logger.Debug($"disabling job - jobid:{job.Id.ToString()}:::datasource:{job.DataSource.Name}");
+                    Logger.Debug($"disabling job - jobid:{job.Id}:::datasource:{job.DataSource.Name}");
 
                     job.IsEnabled = false;
                     job.Modified = DateTime.Now;
+                    job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Disabled;
 
                     _datasetContext.SaveChanges();
                 }
@@ -213,21 +218,75 @@ namespace Sentry.data.Core
             Logger.Debug($"End method <{methodName}>");
         }
 
-        public void DeleteJob(int id)
+        public void EnableJob(int id)
+        {
+            string methodName = MethodBase.GetCurrentMethod().Name.ToLower();
+            Logger.Debug($"Start method <{methodName}>");
+            try
+            {
+                RetrieverJob job = _datasetContext.GetById<RetrieverJob>(id);
+
+                if (job == null)
+                {
+                    Logger.Debug($"job not found - jobid:{id}");
+                    return;
+                }
+
+                if (job.ObjectStatus != GlobalEnums.ObjectStatusEnum.Disabled)
+                {
+                    Logger.Debug($"{methodName} - job has status of DELETED, will not be enabled - jobid:{id}");
+                    throw new InvalidOperationException("Cannot enable DELETED job");
+                }
+
+                Logger.Debug($"enabling job - jobid:{id}:::datasource:{job.DataSource.Name}");
+
+                job.IsEnabled = true;
+                job.Modified = DateTime.Now;
+                job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Active;
+
+                _datasetContext.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"{methodName} - failed to enable job - jobid:{id}", ex);
+                throw;
+            }
+
+            Logger.Debug($"End method <{methodName}>");
+        }
+
+        public void DeleteJob(List<int> idList, bool logicalDelete = true)
+        {
+            foreach (int jobId in idList)
+            {
+                DeleteJob(jobId, logicalDelete);
+            }
+        }
+
+        public void DeleteJob(int id, bool logicalDelete = true)
         {
             try
             {
-                //Find associated retrieverjobs
+                //Get RetrieverJob
                 RetrieverJob job = _datasetContext.GetById<RetrieverJob>(id);
 
-                DeleteJobFromScheduler(job);
+                if (logicalDelete)
+                {
+                    DeleteJobFromScheduler(job);
 
-                DeleteDFSDropLocation(job);
+                    job.IsEnabled = false;
+                    job.Modified = DateTime.Now;
+                    job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
+                    job.DeleteIssueDTM = DateTime.Now;
+                    job.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
+                }
+                else
+                {
+                    DeleteDFSDropLocation(job);
 
-                _datasetContext.Remove(job);
-
-                //_datasetContext.SaveChanges();
-
+                    job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
+                }
             }
             catch (Exception ex)
             {
@@ -240,7 +299,7 @@ namespace Sentry.data.Core
         public List<RetrieverJob> GetDfsRetrieverJobs()
         {
             List<RetrieverJob> jobs;
-            jobs = _datasetContext.RetrieverJob.Where(x => x.IsEnabled).FetchAllConfiguration(_datasetContext).ToList();
+            jobs = _datasetContext.RetrieverJob.WhereActive().FetchAllConfiguration(_datasetContext).ToList();
 
             //var dataflows = _datasetContext.DataFlow.Where(df => jobQueryable.Any(a => df.Id == a.DataFlow.Id));
 
@@ -285,7 +344,9 @@ namespace Sentry.data.Core
                 Modified = DateTime.Now,
                 IsGeneric = true,
                 JobOptions = rjo,
-                JobGuid = g
+                JobGuid = g,
+                ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
+                DeleteIssueDTM = DateTime.MaxValue
             };
 
             if (dataSource.Is<S3Basic>())
@@ -341,6 +402,9 @@ namespace Sentry.data.Core
             job.RelativeUri = dto.RelativeUri;
             job.Schedule = dto.Schedule;
             job.TimeZone = "Central Standard Time";
+            job.ObjectStatus = dto.ObjectStatus;
+            job.DeleteIssueDTM = dto.DeleteIssueDTM;
+            job.DeleteIssuer = dto.DeleteIssuer;
         }
 
         private void DeleteJobFromScheduler(RetrieverJob job)

@@ -310,7 +310,14 @@
             var curVal = targetElement.val();
             $.getJSON("/api/v2/metadata/dataset/" + datasetId + "/schema", function (result) {
                 var subItems;
-                var sortedResults = result.sort(
+
+                //Filter for only ACTIVE schema
+                var activeSchema = result.filter(function (item) {
+                    return item.ObjectStatus === "ACTIVE";
+                });
+
+                //Make list sorted by schema name
+                var sortedResults = activeSchema.sort(
                     firstBy("Name")
                 );
 
@@ -318,6 +325,7 @@
                 subItems += "<option value='-1'>Create Schema</option>";
                 subItems += "<option value='0'>Select Schema</option>";
 
+                // Add ACTIVE schema values
                 $.each(sortedResults, function (index, item) {
                     subItems += "<option value='" + item.SchemaId + "'>" + item.Name + "</option>";
                 });

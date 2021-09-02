@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,5 +31,8 @@ namespace Sentry.data.Core
         public string CompressionType { get; set; }
         public List<string> FileNameExclusionList { get; set; }
         public string ReadableSchedule { get; set; }
+        public ObjectStatusEnum ObjectStatus { get; set; }
+        public string DeleteIssuer { get; set; }
+        public DateTime DeleteIssueDTM { get; set; }
     }
 }
