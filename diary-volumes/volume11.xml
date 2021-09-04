@@ -793,25 +793,25 @@
         <dateline>
           <date when="1904-04-02">April 2d. Saturday<date>. 
         </dateline>
-          <p>In town this morning for various last things. <persName ref="#Billy">Billy</persName> was up at the hotel all the morning helping us pack - to the destruction of a favorite basket of mine, which he seized, and destroyed before I could get it from him. This afternoon we again went into town to make some parting visits - among them one to the <name>Tytus's</name> in their temporary appartment. <persName ref="#von_Bissing_Baron">Baron v. Bissing</persName>, <persName ref="#Weigall_Arthur">Mr. Weigall</persName> and <persName ref="#Carter_Howard">Carter</persName> dined with us - a very pleasant evening.</p>
+          <p>In town this morning for various last things. <persName ref="#Billy">Billy</persName> was up at the hotel all the morning helping us pack - to the destruction of a favorite basket of mine, which he seized, and destroyed before I could get it from him. This afternoon we again went into town to make some parting visits - among them one to the <persName ref="#Tytus_Bob #Tytus_Mrs">Tytus</persName>'s in their temporary appartment. <persName ref="#von_Bissing_Baron">Baron v. Bissing</persName>, <persName ref="#Weigall_Arthur">Mr. Weigall</persName> and <persName ref="#Carter_Howard">Carter</persName> dined with us - a very pleasant evening.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-03">
         <dateline>
-          <date when="1904-">April 3d. Sunday</date>, <name type="event" ref="#Easter">Easter.
+          <date when="1904-04-03">April 3d. Sunday</date>, <name type="event" ref="#Easter">Easter.
         </dateline>
-          <p>Port Said, SS. Isis. We left <placeName ref="#Cairo">Cairo</placeName> this morning at 11:30 - a charming day. All the men were at the station to see us off - dear little <persName>Billy</persName> with them. A very comfortable journey to <placeName>Port Said</placeName> - and we are most comfortably settled in this fine little boat, and hope to have a good crossing. But the <orgName>Indian</orgName> ship bringing the mail is telegraphed almost a day late, and we will have to wait many hours for her.</p>
+          <p><placeName ref="#Port_Said">Port Said</placeName>, <name type="boat" ref="#Isis">SS. Isis</name>. We left <placeName ref="#Cairo">Cairo</placeName> this morning at 11:30 - a charming day. All the men were at the station to see us off - dear little <persName>Billy</persName> with them. A very comfortable journey to <placeName ref="#Port_Said">Port Said</placeName> - and we are most comfortably settled in this fine little boat, and hope to have a good crossing. But the <orgName ref="#Indian">Indian</orgName> ship bringing the mail is telegraphed almost a day late, and we will have to wait many hours for her.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-08">
         <dateline>
-          <placeName type="#Venice">Venice</placeName> - <name type="hotel" ref="#">Hotel Britannia</name>. <date when="1904-">Friday, April 8th</date>. 
+          <placeName type="#Venice">Venice</placeName> - <name type="hotel" ref="#Hotel_Britannia">Hotel Britannia</name>. <date when="1904-04-08">Friday, April 8th</date>. 
         </dateline>
-          <p>Arrived this afternoon at 4:30 having spent last night in our old quarters at the <placeName>Hotel Breen</placeName>. The crossing was very fair, and we had a very pleasant company - especially Sir <persName>William Preece</persName> and his daughters. We went out immediately after our arrival in our gondolas to <placeName>Salvadore's</placeName> - found little that we wanted - then went to <placeName>San Marco's</placeName> - walked about the piazza and exterior - and had tea at <placeName>Florians</placeName> - then went into that exquisite wonderful church where a service was going on, and loitered about - walked back to the hotel.</p>
+          <p>Arrived this afternoon at 4:30 having spent last night in our old quarters at the <name type="hotel" ref="#Hotel_Britannia">Hotel Breen</name><!--??-->. The crossing was very fair, and we had a very pleasant company - especially <persName ref="#Preece_William_Henry_Sir">Sir William Preece</persName> and his daughters. We went out immediately after our arrival in our gondolas to <name type="historical" ref="#Salvadores">Salvadore</placeName>'s - found little that we wanted - then went to <name type="historical" ref="#San_Marco">San Marco</placeName>'s - walked about the piazza and exterior - and had tea at <placeName>Florians</placeName> - then went into that exquisite wonderful church where a service was going on, and loitered about - walked back to the hotel.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-09">
         <dateline>
-          <date when="1904-">Saturday, April 9th</date>.
+          <date when="1904-04-09">Saturday, April 9th</date>.
         </dateline>
-          <p>A rather cold day, spent the morning at the <placeName>Academia</placeName> and the afternoon between <placeName>Berozzi's</placeName> and the <placeName>Bensons</placeName> - found them about as usual. Though Mr. <persName>B.</persName> looked old and tired. <persName>Mrs. B.</persName> as crippled and suffering, but as vivacious and charming as ever. Met the daughter <persName>Miss Fletcher</persName> for the first time - an attractive, clever woman. Had tea at home - we are in the same rooms we have occupied for 4 years, each spring.</p>
+          <p>A rather cold day, spent the morning at the <placeName>Academia</placeName> and the afternoon between <placeName>Berozzi</placeName>'s and the <placeName>Bensons</placeName> - found them about as usual. Though Mr. <persName>B.</persName> looked old and tired. <persName>Mrs. B.</persName> as crippled and suffering, but as vivacious and charming as ever. Met the daughter <persName>Miss Fletcher</persName> for the first time - an attractive, clever woman. Had tea at home - we are in the same rooms we have occupied for 4 years, each spring.</p>
       </div>
       <div xml:id="EBA-1904-">
         <dateline>
