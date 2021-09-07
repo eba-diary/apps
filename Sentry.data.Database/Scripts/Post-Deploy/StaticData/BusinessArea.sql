@@ -2,7 +2,12 @@
 	BEGIN TRY 
 		
 		MERGE	INTO BusinessArea						AS TARGET 
-		USING	( VALUES	(1, 'Personal Lines', 'PL','079012','070557',1,'619c7006-68ca-4d58-ae6a-acabb562dc19')	)	AS SOURCE ( [BusinessArea_Id], [Name_DSC], [AbbreviatedName_DSC], [PrimaryOwner_ID], [PrimaryContact_ID], [IsSecured_IND], [Security_ID] )  
+		USING	( VALUES	(1, 'Personal Lines', 'PL','079012','070557',1,'619c7006-68ca-4d58-ae6a-acabb562dc19')	,
+							(2, 'Data.sentry.com', 'DSC','072186','072186',1,'D564ADC6-DAAB-48A4-90D4-F76CC0CE2249')
+		
+		
+		
+				)	AS SOURCE ( [BusinessArea_Id], [Name_DSC], [AbbreviatedName_DSC], [PrimaryOwner_ID], [PrimaryContact_ID], [IsSecured_IND], [Security_ID] )  
 					ON	TARGET.[BusinessArea_Id]		= SOURCE.[BusinessArea_Id]
 		
 		WHEN	MATCHED 
