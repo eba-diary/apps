@@ -221,6 +221,7 @@ namespace Sentry.data.Core
 
         public List<BusinessArea> GetBusinessAreasForUserSecurity()
         {
+            //GORDON: TODO: add security here on Object_id = 2
             List<BusinessArea> baList = _domainContext.BusinessAreas.ToList();
 
             return baList;
