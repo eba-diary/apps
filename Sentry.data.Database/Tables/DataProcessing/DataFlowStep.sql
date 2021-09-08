@@ -9,6 +9,8 @@
     [TargetPrefix] VARCHAR(1000) NULL, 
     [SourceDependencyPrefix] VARCHAR(1000) NULL, 
     [SourceDependencyBucket] VARCHAR(1000) NULL, 
+    [TriggerBucket] VARCHAR(1000) NULL, 
+    [TargetBucket] VARCHAR(1000) NULL, 
     CONSTRAINT [PK_DataFlowStep] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
@@ -22,3 +24,22 @@ GO
 
 
 CREATE NONCLUSTERED INDEX [IX_DataFlowStep_TriggerKey] ON [dbo].[DataFlowStep] ([TriggerKey])
+
+GO
+EXEC sp_addextendedproperty @name = N'MS_Description',
+    @value = N'Holds bucket name where triggerfile will be landed',
+    @level0type = N'SCHEMA',
+    @level0name = N'dbo',
+    @level1type = N'TABLE',
+    @level1name = N'DataFlowStep',
+    @level2type = N'COLUMN',
+    @level2name = N'TriggerBucket'
+GO
+EXEC sp_addextendedproperty @name = N'MS_Description',
+    @value = N'Holds bucket name where step will store data, if step stores long term data (i.e. Raw, Parquet)',
+    @level0type = N'SCHEMA',
+    @level0name = N'dbo',
+    @level1type = N'TABLE',
+    @level1name = N'DataFlowStep',
+    @level2type = N'COLUMN',
+    @level2name = N'TargetBucket'

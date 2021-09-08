@@ -179,6 +179,7 @@ namespace Sentry.data.Goldeneye
 
         private void RunMinutelyProcessing(bool firstRun)
         {
+            //TODO: CLA-2888 - Add ObjectStatus filtering logic
             //Reload and modifed\new jobs
             List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled && (w.Created > _config.LastRunMinute.AddSeconds(-5) || w.Modified > _config.LastRunMinute.AddSeconds(-5))).ToList();
 
@@ -211,6 +212,7 @@ namespace Sentry.data.Goldeneye
                 Logger.Info($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
             }
 
+            //TODO: CLA-2888 - Add ObjectStatus filtering logic
             //Remove disabled jobs, non-instant jobs
             List<RetrieverJob> DisabledJobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled && (w.Created > _config.LastRunMinute.AddSeconds(-5) || w.Modified > _config.LastRunMinute.AddSeconds(-5))).ToList();
 

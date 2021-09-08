@@ -29,8 +29,28 @@ namespace Sentry.data.Core
         RetrieverJob InstantiateJobsForCreation(DataFlow df, DataSource dataSource);
         RetrieverJob CreateAndSaveRetrieverJob(RetrieverJobDto dto);
         void CreateDropLocation(RetrieverJob job);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">Retriever job identifier</param>
+        void EnableJob(int id);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">Retriever job identifier</param>
         void DisableJob(int id);
-        void DeleteJob(int id);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="idList">List of RetrieverJob identifiers</param>
+        /// <param name="logicalDelete">Perform soft or hard delete</param>
+        void DeleteJob(List<int> idList, bool logicalDelete = true);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">RetrieverJob identifier</param>
+        /// <param name="logicalDelete">Perform soft or hard delete</param>
+        void DeleteJob(int id, bool logicalDelete = true);
         List<RetrieverJob> GetDfsRetrieverJobs();
     }
 }
