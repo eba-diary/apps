@@ -20,6 +20,8 @@ namespace Sentry.data.Web
             ObjectStatus = dto.ObjectStatus;
             DeleteIssuer = dto.DeleteIssuer;
             DeleteIssueDTM = dto.DeleteIssueDTM;
+            NamedEnvironment = dto.NamedEnvironment;
+            NamedEnvironmentType = dto.NamedEnvironmentType;
         }
 
         public int Id { get; set; }
@@ -36,5 +38,7 @@ namespace Sentry.data.Web
         public ObjectStatusEnum ObjectStatus { get; set; }
         public string DeleteIssuer { get; set; }
         public DateTime DeleteIssueDTM { get; set; }
+        public string NamedEnvironment { get; set; }
+        public NamedEnvironmentType NamedEnvironmentType { get; set; }
     }
 }

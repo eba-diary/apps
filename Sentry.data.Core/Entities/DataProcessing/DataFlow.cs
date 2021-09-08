@@ -31,6 +31,9 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual string DeleteIssuer { get; set; }
         public virtual DateTime DeleteIssueDTM { get; set; }
 
+        public virtual string NamedEnvironment { get; set; }
+        public virtual NamedEnvironmentType NamedEnvironmentType { get; set; }
+
         public virtual ValidationResults ValidateForDelete()
         {
             return new ValidationResults();
@@ -53,6 +56,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
             public const string nameMustBeUnique = "nameMustBeUnique";
             public const string stepsContainsAtLeastOneSchemaMap = "stepsContainsAtLeastOneSchemaMap";
             public const string saidAssetIsBlank = "saidAssetIsBlank";
+            public const string namedEnvironmentInvalid = "namedEnvironmentInvalid";
+            public const string namedEnvironmentTypeInvalid = "namedEnvironmentTypeInvalid";
         }
 
         private void LogMessage(string msg, Log_Level level,  Exception ex = null)

@@ -60,6 +60,12 @@
             });
         });
 
+        //When the SAID asset changes, reload the named environments dropdown
+        $("#SAIDAssetKeyCode").on('change', function () {
+            Sentry.InjectSpinner($("#namedEnvironmentSpinner"), 30);
+            data.DataFlow.PopulateNamedEnvironments();
+        });
+
         $(document).ready(function () {
             $('.selectpicker').selectpicker({
                 liveSearch: false,
@@ -447,6 +453,19 @@
             //        data.DataFlow.RenderSchemaCreatePage();
             //    }
             //})
+        });
+    },
+
+    PopulateNamedEnvironments() {
+        var assetKeyCode = $("#SAIDAssetKeyCode").val();
+        var selectedEnvironment = $("#NamedEnvironment").val();
+        $.get("/DataFlow/NamedEnvironment?assetKeyCode=" + assetKeyCode + "&namedEnvironment=" + selectedEnvironment, function (result) {
+            $('#NamedEnvironmentPartial').html(result);
+            //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
+            $("select#NamedEnvironment").change(function () {
+                Sentry.InjectSpinner($("#namedEnvironmentTypeSpinner"), 30);
+                data.DataFlow.PopulateNamedEnvironments();
+            });
         });
     }
 }

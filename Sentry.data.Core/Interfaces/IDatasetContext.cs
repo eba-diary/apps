@@ -56,6 +56,7 @@ namespace Sentry.data.Core
         IQueryable<DataFlowStep> DataFlowStep { get; }
         IQueryable<S3DropAction> S3DropAction { get; }
         IQueryable<ProducerS3DropAction> ProducerS3DropAction { get; }
+        IQueryable<ProducerS3Drop_v2Action> ProducerS3Drop_v2Action { get; }
         IQueryable<SchemaLoadAction> SchemaLoadAction { get; }
         IQueryable<RawStorageAction> RawStorageAction { get; }
         IQueryable<QueryStorageAction> QueryStorageAction { get; }

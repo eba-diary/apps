@@ -72,8 +72,15 @@ namespace Sentry.data.Core
         /// <returns></returns>
         List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId);
         void DeleteByFileSchema(FileSchema scm);
-        ValidationException Validate(DataFlowDto dfDto);
+        Task<ValidationException> Validate(DataFlowDto dfDto);
         List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId);
         void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true);
+
+        /// <summary>
+        /// Given a SAID asset key code, get all the named environments from Quartermaster
+        /// </summary>
+        /// <param name="saidAssetKeyCode">The four-character key code for an asset</param>
+        /// <returns>A list of NamedEnvironmentDto objects</returns>
+        Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsAsync(string saidAssetKeyCode);
     }
 }

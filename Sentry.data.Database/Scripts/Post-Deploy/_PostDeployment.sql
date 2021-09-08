@@ -19,7 +19,9 @@ All new files added for staic data or scripts should have it's properties update
 :r ..\Post-Deploy\StaticData\BusinessUnit.sql
 :r ..\Post-Deploy\StaticData\DatasetFunction.sql
 :r ..\Post-Deploy\StaticData\DataSourceType.sql
+:r ..\Post-Deploy\StaticData\DatasetScopeTypes.sql
 :r ..\Post-Deploy\StaticData\AuthenticationType.sql
+:r ..\Post-Deploy\StaticData\Security.sql
 :r ..\Post-Deploy\StaticData\DataAsset.sql
 :r ..\Post-Deploy\StaticData\BusinessArea.sql
 :r ..\Post-Deploy\StaticData\BusinessAreaTile.sql
@@ -28,6 +30,8 @@ All new files added for staic data or scripts should have it's properties update
 :r ..\Post-Deploy\StaticData\DataActionTypes.sql
 :r ..\Post-Deploy\StaticData\DataAction.sql
 :r ..\Post-Deploy\StaticData\ObjectStatus.sql
+:r ..\Post-Deploy\StaticData\StatusType.sql
+:r ..\Post-Deploy\StaticData\FileExtension.sql
 
 
 --Now only run these scripts if the versioning allows us.
@@ -69,3 +73,31 @@ END CATCH
 
 COMMIT TRAN
 
+
+SET @ScriptVersion = '2021.08.31.01_PostDeploy'
+
+BEGIN TRAN 
+IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion) 
+BEGIN TRY 
+
+  --insert one off script files here
+  :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_03\HistoryFix_Populate_DataFlow_NamedEnvironments.sql
+
+  --insert into the verision table so these scripts do not run again.
+  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
+
+END TRY 
+
+BEGIN CATCH 
+    SELECT 
+        @ErrorMessage = ERROR_MESSAGE(), 
+        @ErrorSeverity = ERROR_SEVERITY(), 
+        @ErrorState = ERROR_STATE(); 
+  
+    RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState ); 
+  
+    ROLLBACK TRAN 
+    RETURN
+END CATCH 
+
+COMMIT TRAN
