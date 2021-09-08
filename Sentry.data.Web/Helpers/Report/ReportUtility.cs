@@ -298,7 +298,8 @@ namespace Sentry.data.Web.Helpers
                 Modified = DateTime.Now,
                 IsGeneric = true,
 
-                JobOptions = rjo
+                JobOptions = rjo,
+                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };
 
             if(dataSource.Is<S3Basic>())

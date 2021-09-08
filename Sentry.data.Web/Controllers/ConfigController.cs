@@ -452,7 +452,8 @@ namespace Sentry.data.Web.Controllers
                         Created = DateTime.Now,
                         Modified = DateTime.Now,
                         IsGeneric = false,
-                        JobOptions = rjo
+                        JobOptions = rjo,
+                        ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
                     };
 
                     rj.DataSource.CalcRelativeUri(rj);
