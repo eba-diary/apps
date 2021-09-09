@@ -11,8 +11,10 @@
     [ObjectStatus] INT NOT NULL DEFAULT 1, 
     [DeleteIssuer] VARCHAR(10) NULL, 
     [DeleteIssueDTM] DATETIME NOT NULL, 
-    [NamedEnvironment] VARCHAR(25) NULL , 
-    [NamedEnvironmentType] VARCHAR(25) NULL , 
+    [UserDropLocationBucket] VARCHAR(1000) NULL, 
+    [UserDropLocationPrefix] VARCHAR(1000) NULL, 
+    [NamedEnvironment] VARCHAR(25) NULL, 
+    [NamedEnvironmentType] VARCHAR(25) NULL, 
     CONSTRAINT [PK_DataFlow] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
@@ -21,7 +23,25 @@
 
 GO
 EXEC sp_addextendedproperty @name = N'MS_Description',
-    @value = N'The Quartermaster Named Environment associated with this Data Flow.',
+    @value = N'User supplied bucket to override source bucket for drop location',
+    @level0type = N'SCHEMA',
+    @level0name = N'dbo',
+    @level1type = N'TABLE',
+    @level1name = N'DataFlow',
+    @level2type = N'COLUMN',
+    @level2name = 'UserDropLocationBucket'
+GO
+EXEC sp_addextendedproperty @name = N'MS_Description',
+    @value = N'User supplied prefix to override source prefix for drop location',
+    @level0type = N'SCHEMA',
+    @level0name = N'dbo',
+    @level1type = N'TABLE',
+    @level1name = N'DataFlow',
+    @level2type = N'COLUMN',
+    @level2name = 'UserDropLocationPrefix'
+GO
+EXEC sp_addextendedproperty @name = N'MS_Description',
+    @value = N'The Quartermaster Named Environment that this Data Flow is for',
     @level0type = N'SCHEMA',
     @level0name = N'dbo',
     @level1type = N'TABLE',
@@ -30,7 +50,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level2name = N'NamedEnvironment'
 GO
 EXEC sp_addextendedproperty @name = N'MS_Description',
-    @value = N'The classification (prod or non-prod) of the Quartermaster Named Environment associated with this Data Flow.',
+    @value = N'The Quartermaster Named Environment Type (prod or nonprod) that this Data Flow is for',
     @level0type = N'SCHEMA',
     @level0name = N'dbo',
     @level1type = N'TABLE',
