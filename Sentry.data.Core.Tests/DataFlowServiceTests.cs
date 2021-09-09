@@ -30,7 +30,7 @@ namespace Sentry.data.Core.Tests
             var namedEnvironmentList = new NamedEnvironment[0];
             quartermasterClient.Setup(f => f.NamedEnvironmentsGet2Async(It.IsAny<string>(), It.IsAny<ShowDeleted11>()).Result).Returns(namedEnvironmentList);
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, quartermasterClient.Object);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, quartermasterClient.Object, null);
             var dataFlow = new DataFlowDto() { Name = "Foo" };
 
             // Act
@@ -57,7 +57,7 @@ namespace Sentry.data.Core.Tests
             var namedEnvironmentList = new[] { new NamedEnvironment() { Name = "TEST", Environmenttype = "NonProd" } };
             quartermasterClient.Setup(f => f.NamedEnvironmentsGet2Async(It.IsAny<string>(), It.IsAny<ShowDeleted11>()).Result).Returns(namedEnvironmentList);
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, quartermasterClient.Object);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, quartermasterClient.Object, null);
             var dataFlow = new DataFlowDto() { Name = "Bar", NamedEnvironment="PROD", NamedEnvironmentType = GlobalEnums.NamedEnvironmentType.Prod };
 
             // Act
@@ -84,7 +84,7 @@ namespace Sentry.data.Core.Tests
             var namedEnvironmentList = new[] { new NamedEnvironment() { Name = "TEST", Environmenttype = "NonProd" } };
             quartermasterClient.Setup(f => f.NamedEnvironmentsGet2Async(It.IsAny<string>(), It.IsAny<ShowDeleted11>()).Result).Returns(namedEnvironmentList);
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, quartermasterClient.Object);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, quartermasterClient.Object, null);
             var dataFlow = new DataFlowDto() { Name = "Bar", NamedEnvironment = "TEST", NamedEnvironmentType = GlobalEnums.NamedEnvironmentType.Prod };
 
             // Act
@@ -110,7 +110,7 @@ namespace Sentry.data.Core.Tests
             var namedEnvironmentList = new[] { new NamedEnvironment() { Name = "TEST", Environmenttype = "NonProd" } };
             quartermasterClient.Setup(f => f.NamedEnvironmentsGet2Async(It.IsAny<string>(), It.IsAny<ShowDeleted11>()).Result).Returns(namedEnvironmentList);
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, quartermasterClient.Object);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, quartermasterClient.Object, null);
             var dataFlow = new DataFlowDto() { Name = "Bar", NamedEnvironment = "TEST", NamedEnvironmentType = GlobalEnums.NamedEnvironmentType.NonProd };
 
             // Act
