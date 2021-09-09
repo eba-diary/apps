@@ -562,7 +562,7 @@ namespace Sentry.data.Core
                 throw new ArgumentNullException(nameof(saidAssetKeyCode), "SAID Asset Key Code was missing.");
             }
 
-            //the guts of the method have to be wrapped in a local function for propery async handling
+            //the guts of the method have to be wrapped in a local function for proper async handling
             //see https://confluence.sentry.com/questions/224368523
             async Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsInternalAsync()
             {
@@ -716,7 +716,14 @@ namespace Sentry.data.Core
             _jobService.CreateAndSaveRetrieverJob(dto.RetrieverJob);
 
             //Generate ingestion steps (get file to raw location)
-            AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop_v2);
+            if (_dataFeatures.CLA3240_UseDropLocationV2.GetValue())
+            {
+                AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop_v2);
+            }
+            else
+            {
+                AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop);
+            }
 
             AddDataFlowStep(dto, df, DataActionType.RawStorage);
 
