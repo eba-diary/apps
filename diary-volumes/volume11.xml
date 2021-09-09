@@ -726,7 +726,7 @@
         <dateline>
           <placeName ref="#Al_Badrashayn">Bedrasheyn</placeName> - <date when="1904-03-22">Tuesday, Mar. 22</date>. 
         </dateline>
-          <p>All went off to <placeName ref="#Ṣaqqâra">Sakkara</placeName> for the day - I in my chair with two excellent donkeys. It was a dark cool day, with high wind - just such a day as last year when we were here - but that was at the beginning of the winter - and now this richly cultivated country is brilliantly green with crops - the wheat in full head. We lunched as usual at Mariettes house on the terrace, which was dismally cold, and we were covered with sand. Unfortunately <persName ref="#Weigall_Arthur">Mr. Weigall</persName> who is working there had elected to go to <placeName ref="#Cairo">Cairo</placeName> for the day, so we missed him. <persName ref="#von_Bissing_Baron">v. Bissing</persName> is publishing some of the <name type="historical" ref="Ṣaqqâra_Tombs">Sakkara tombs</name><!--EBI--> and <persName ref="#Weigall_Arthur">Weigall</persName> is doing the photographing - he has been here all winter, and the work will take yet 5 years to complete it. After lunch we went to the tomb of <orgName>Ka-gem-na</orgName><!--tomb of kagemni?-->, which I had never seen before. <persName ref="von_Bissing_Baron">V. Bissing</persName> has had this lighted from above, as <placeName><perName>Ti</persName>'s tomb</placeName> is lighted, and the very charming decoration can be well seen. This tomb was discovered in 1893. Then we went to the <name type="historical" ref="">street of Tombs</name>, discovered by <persName ref="#Loret_M">Loret</persName> in 1899 - and found it very interesting. The others went down to <placeName><persName>Meri</persName>'s tomb</placeName><!--Memi's tomb? =tomb of kagemni-->, but I started home. <persName ref="von_Bissing_Baron">V. Bissing</persName> took the 8:40 train to <placeName ref="#Cairo">Cairo</placeName>.</p>
+          <p>All went off to <placeName ref="#Ṣaqqâra">Sakkara</placeName> for the day - I in my chair with two excellent donkeys. It was a dark cool day, with high wind - just such a day as last year when we were here - but that was at the beginning of the winter - and now this richly cultivated country is brilliantly green with crops - the wheat in full head. We lunched as usual at Mariettes house on the terrace, which was dismally cold, and we were covered with sand. Unfortunately <persName ref="#Weigall_Arthur">Mr. Weigall</persName> who is working there had elected to go to <placeName ref="#Cairo">Cairo</placeName> for the day, so we missed him. <persName ref="#von_Bissing_Baron">v. Bissing</persName> is publishing some of the <name type="historical" ref="Ṣaqqâra_Tombs">Sakkara tombs</name><!--EBI--> and <persName ref="#Weigall_Arthur">Weigall</persName> is doing the photographing - he has been here all winter, and the work will take yet 5 years to complete it. After lunch we went to the tomb of <orgName>Ka-gem-na</orgName><!--tomb of kagemni?-->, which I had never seen before. <persName ref="von_Bissing_Baron">V. Bissing</persName> has had this lighted from above, as <placeName><perName>Ti</persName>'s tomb</placeName> is lighted, and the very charming decoration can be well seen. This tomb was discovered in 1893. Then we went to the <name type="historical" ref="">street of Tombs</name>, discovered by <persName ref="#Loret_M">Loret</persName> in 1899 - and found it very interesting. The others went down to <choice><sic><placeName><persName>Meri</persName></sic><corr>Meni</corr></choice>'s tomb</placeName><!--Memi's tomb? =tomb of kagemni-->, but I started home. <persName ref="von_Bissing_Baron">V. Bissing</persName> took the 8:40 train to <placeName ref="#Cairo">Cairo</placeName>.</p>
       </div>
       <div xml:id="EBA-1904-03-23">
         <dateline>
@@ -799,7 +799,7 @@
         <dateline>
           <date when="1904-04-03">April 3d. Sunday</date>, <name type="event" ref="#Easter">Easter.
         </dateline>
-          <p><placeName ref="#Port_Said">Port Said</placeName>, <name type="boat" ref="#Isis">SS. Isis</name>. We left <placeName ref="#Cairo">Cairo</placeName> this morning at 11:30 - a charming day. All the men were at the station to see us off - dear little <persName>Billy</persName> with them. A very comfortable journey to <placeName ref="#Port_Said">Port Said</placeName> - and we are most comfortably settled in this fine little boat, and hope to have a good crossing. But the <orgName ref="#Indian">Indian</orgName> ship bringing the mail is telegraphed almost a day late, and we will have to wait many hours for her.</p>
+          <p><placeName ref="#Port_Said">Port Said</placeName>, <name type="boat" ref="#Isis">SS. Isis</name>. We left <placeName ref="#Cairo">Cairo</placeName> this morning at 11:30 - a charming day. All the men were at the station to see us off - dear little <persName ref="#Billy">Billy</persName> with them. A very comfortable journey to <placeName ref="#Port_Said">Port Said</placeName> - and we are most comfortably settled in this fine little boat, and hope to have a good crossing. But the <orgName ref="#Indian">Indian</orgName> ship bringing the mail is telegraphed almost a day late, and we will have to wait many hours for her.</p>
       </div>
       <div xml:id="EBA-1904-04-08">
         <dateline>
@@ -811,140 +811,140 @@
         <dateline>
           <date when="1904-04-09">Saturday, April 9th</date>.
         </dateline>
-          <p>A rather cold day, spent the morning at the <placeName>Academia</placeName> and the afternoon between <placeName>Berozzi</placeName>'s and the <placeName>Bensons</placeName> - found them about as usual. Though Mr. <persName>B.</persName> looked old and tired. <persName>Mrs. B.</persName> as crippled and suffering, but as vivacious and charming as ever. Met the daughter <persName>Miss Fletcher</persName> for the first time - an attractive, clever woman. Had tea at home - we are in the same rooms we have occupied for 4 years, each spring.</p>
+          <p>A rather cold day, spent the morning at the <orgName ref="">Academia</orgName> and the afternoon between <placeName>Berozzi</placeName>'s and the <persName ref="#Benson_Mr">Benson</persName>'s - found them about as usual. Though <persName ref="#Benson_Mr">Mr. B.</persName> looked old and tired. <persName ref="Benson_Mrs">Mrs. B.</persName> as crippled and suffering, but as vivacious and charming as ever. Met the daughter <persName ref="#Fletcher_Julia">Miss Fletcher</persName> for the first time - an attractive, clever woman. Had tea at home - we are in the same rooms we have occupied for 4 years, each spring.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-10">
         <dateline>
-          First Sunday after <name type="event" ref="#Easter">Easter. <date when="1904-">April 10th</date>. 
+          First Sunday after <name type="event" ref="#Easter">Easter. <date when="1904-04-10">April 10th</date>. 
         </dateline>
-          <p><<persName ref="#Hardy_Jean">Jean</persName> and I spent our morning at <placeName>St. Marks</placeName> and this afternoon we all went to the <placeName>Bensons</placeName> for tea, as <persName>Miss Fletcher</persName> had begged us yesterday to do. Several pleasant people were there - and among them Mrs. <persName>Humphery Ward</persName> who interested me so much. A fine delicate face - and simple unaffected manner with no consciousness of being a remarkable woman. I talked with her some time. She was especially interested in the <orgName>Oxyrinthus</orgName> finds of <name>Grenfell</name> and <persName>Hunt</persName> in <placeName ref="#Egypt">Egypt</placeName> - and asked me many questions about it.</p>
+          <p><persName ref="#Hardy_Jean">Jean</persName> and I spent our morning at <name type="historical" ref="#St_Marks_Campanile">St. Marks</name> and this afternoon we all went to the <placeName ref="#Benson_Mr">Benson</placeName>s for tea, as <persName ref="#Fletcher_Julia">Miss Fletcher</persName> had begged us yesterday to do. Several pleasant people were there - and among them <persName ref="Ward_Mrs">Mrs. Humphery Ward</persName><!--EBI--> who interested me so much. A fine delicate face - and simple unaffected manner with no consciousness of being a remarkable woman. I talked with her some time. She was especially interested in the <choice><sci><bibl type="manuscript" ref="#Oxyrhynchus">Oxyrinthus</orgName></sic><corr>Oxyrhynchus</corr></choice> finds of <persName ref="#Grenfell_Bernard">Grenfell</persName> and <persName ref="#Hunt_Arthur">Hunt</persName> in <placeName ref="#Egypt">Egypt</placeName> - and asked me many questions about it.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-11">
         <dateline>
-          <date when="1904-">Monday, April 11th</date>.
+          <date when="1904-04-11">Monday, April 11th</date>.
         </dateline>
-          <p>Home this morning - the afternoon spent in various antiquity shops - had tea at <placeName>Florians</placeName> - and then went in to <placeName>St. Marks.</placeName> <persName>Alice Wilson</persName> arrived from <placeName>Florence</placeName> this evening. Met the <persName>Stokes</persName> and talked a long time with them - and having seen Mrs. <persName>Taylor</persName> and <placeName>Florence</placeName> this morning, Mrs. <persName>Taylor</persName> came this evening to say goodbye. A visit too from Mr. <persName>Benson.</persName></p>
+          <p>Home this morning - the afternoon spent in various antiquity shops - had tea at <placeName ref="#Caffe_Florian">Florians</placeName> - and then went in to <name type="historical" ref="#St_Marks_Campanile">St. Marks</name>. <persName ref="#Wilson_Alice">Alice Wilson</persName> arrived from <placeName ref="#Florence">Florence</placeName> this evening. Met the <persName ref="#Stokes_James">Stokes</persName> and talked a long time with them - and having seen <persName ref="#Taylor_Mrs">Mrs. Taylor</persName> and <placeName ref="#Taylor_Florence">Florence</placeName> this morning, <persName ref="#Taylor_Mrs">Mrs. Taylor</persName> came this evening to say goodbye. A visit too from <persName ref="#Benson_Mr">Mr. Benson</persName>.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-12">
         <dateline>
-          <date when="1904-">Tuesday, April 12th</date>.
+          <date when="1904-04-12">Tuesday, April 12th</date>.
         </dateline>
-          <p>This morning was spent at <placeName>Dorigo's</placeName> and at the <placeName>Museo Civico</placeName> - the afternoon in making a delightful visit to Mr. and Mrs. <persName>John Humphreys Johnson,</persName> who had asked us to see their garden - away out beyond the church of <placeName>Madonna San Orto</placeName> quite on the outer edge of <placeName>Venice</placeName> - looking across the lagoon over to <placeName>Burano</placeName> and the snow clad <placeName>Alps</placeName> beyond - a charming quite, far away spot. They have bought a larger property here, extending along the canal or <placeName>Rio di S. Alvin.</placeName> Three large gardens are included in it - and 3 houses - the <name>Palace Minelli</name> in which they live is one of them, and is interesting in the extreme. They received us in one of the gardens - and we walked about the whole place, until we came to the court of their own palace. They have had the place for a year. They have no children - he is an artist - she is a rampant gardener - and they are hugely enjoying their new toy - renovating, changing and improving - with great care preserving all original features - we had tea there. <persName>Crafin Ross, Alice's</persName> friend with whom she has been traveling, came to dine.</p>
+          <p>This morning was spent at <placeName ref="#Dorigo">Dorigo</placeName>'s<!--EBI--> and at the <orgName ref="#Venice">Museo Civico</orgName><!--EBI--> - the afternoon in making a delightful visit to <persName ref="#Humphreys_Johnson_John #Humphreys_Johnson_Mrs">Mr. and Mrs. John Humphreys Johnson</persName><!--EBI-->, who had asked us to see their garden - away out beyond the church of <name type="historical" ref="#Madonna_dell_Orto">Madonna San Orto</placeName><!--EBI--> quite on the outer edge of <placeName ref="#Venice">Venice</placeName> - looking across the lagoon over to <placeName ref="#Burano">Burano</placeName> and the snow clad <placeName ref="#Alps">Alps</placeName> beyond - a charming quite, far away spot. They have bought a larger property here, extending along the canal or <placeName ref="">Rio di S. Alvin</placeName>. Three large gardens are included in it - and 3 houses - the <name type="historical" ref="">Palace Minelli</name> in which they live is one of them, and is interesting in the extreme. They received us in one of the gardens - and we walked about the whole place, until we came to the court of their own palace. They have had the place for a year. They have no children - he is an artist - she is a rampant gardener - and they are hugely enjoying their new toy - renovating, changing and improving - with great care preserving all original features - we had tea there. <persName ref="">Crafin Ross</persName>, <persName ref="Wilson_Alice">Alice</persName>'s friend with whom she has been traveling, came to dine.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-13">
         <dateline>
-          <date when="1904-">Wednesday, April 13</date>.
+          <date when="1904-04-13">Wednesday, April 13</date>.
         </dateline>
-          <p>Home this morning - and in the afternoon to see Mrs. <persName>Benson</persName> and <persName>Mrs. Brown.</persName> The <persName>Hearstmans</persName> arrived today at this hotel.</p>
+          <p>Home this morning - and in the afternoon to see <persName>Mrs. Benson</persName> and <persName>Mrs. Brown</persName>. The <persName>Hearstman</persName>s arrived today at this hotel.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-14">
         <dateline>
-          <date when="1904-">Thursday, April 14</date>.
+          <date when="1904-04-14">Thursday, April 14</date>.
         </dateline>
-          <p>To the <placeName>Academia</placeName> this morning - the <orgName>Miss Hearstmans</orgName> with us. In the afternoon to <persName>S. Giovanni</persName> e <persName>Paolo</persName> - and then to <placeName>Florians</placeName> to tea. <persName>Hearstmans</persName> to dinner. Mr. and <persName>Mrs. Brown</persName> called.</p>
+          <p>To the <orgName>Academia</orgName> this morning - the <orgName>Miss Hearstmans</orgName> with us. In the afternoon to <name type="historical" ref="">S. Giovanni e Paolo</name> - and then to <placeName>Florians</placeName> to tea. <persName>Hearstman</persName>s to dinner. <persName> Mr. and Mrs. Brown</persName> called.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-15">
         <dateline>
-          <date when="1904-">Friday, April 15</date>.
+          <date when="1904-04-15">Friday, April 15</date>.
         </dateline>
-          <p>The morning at <placeName>Doges Palace</placeName> - <placeName>Hearstmans</placeName> with us - afterwards to the <name>Treasury</name> of <persName>S. Marko</persName> - and in the afternoon we took the steam launch of this hotel and went out to <persName>Torcello,</persName> just as we did last year, the <persName>Hearstmans</persName> with us - they came to dine - <persName>Torcello</persName> was very lovely - though the day was dark and threatening.</p>
+          <p>The morning at <name type="hsitorical" ref="">Doges Palace</placeName> - <persName>Hearstman</persName>s with us - afterwards to the <orgName>Treasury of S. Marko</orgName> - and in the afternoon we took the steam launch of this hotel and went out to <placeName>Torcello</placeName>, just as we did last year, the <persName>Hearstman</persName>s with us - they came to dine - <placeName>Torcello</placeName> was very lovely - though the day was dark and threatening.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-16">
         <dateline>
-          <date when="1904-">Saturday, April 16</date>.
+          <date when="1904-04-16">Saturday, April 16</date>.
         </dateline>
           <p>Visiting churches, shops etc. all day. <persName>David Costantini</persName> came this evening.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-17">
         <dateline>
-          Second Sunday after <name type="event" ref="#Easter">Easter. <date when="1904-">April 17</date>.
+          Second Sunday after <name type="event" ref="#Easter">Easter. <date when="1904-04-17">April 17</date>.
         </dateline>
-          <p>Went, all of us to <placeName>San Zacharia,</placeName> <persName>S. Marcia della Formosa.</persName> I went at 4 o'clock to say goodbye to <persName>Mrs. Benson.</persName> Several pleasant people there - among them Prince <persName>Hohenloke, Mr. Pearsall Smith</persName> etc.</p>
+          <p>Went, all of us to <placeName>San Zacharia</placeName>, <persName>S. Marcia della Formosa</persName>. I went at 4 o'clock to say goodbye to <persName>Mrs. Benson</persName>. Several pleasant people there - among them <persName>Prince Hohenloke</persName>, <persName>Mr. Pearsall Smith</persName> etc.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-18">
         <dateline>
-          <date when="1904-">Monday, April 18</date>. 
+          <date when="1904-04-18">Monday, April 18</date>. 
         </dateline>
-          <p><persName ref="#Hardy_Jean">Jean</persName> and I spent the morning at <placeName>Mrs. Browns</placeName> - in the afternoon <persName>Alice</persName> and I went to <placeName>St. Marks</placeName> and spent an hour there - the rest then joined us and we had tea at <placeName>Florians</placeName> - we get away tomorrow, <persName ref="#Davis_Theodore_M">Theo</persName> and <persName>Alice</persName> to <persName>Dresden, <persName ref="#Hardy_Jean">Jean</persName> and I to Florence.</p>
+          <p><persName ref="#Hardy_Jean">Jean</persName> and I spent the morning at <placeName>Mrs. Brown</placeName>'s - in the afternoon <persName>Alice</persName> and I went to <name type="historical" ref="">St. Marks</placeName> and spent an hour there - the rest then joined us and we had tea at <placeName>Florians</placeName> - we get away tomorrow, <persName ref="#Davis_Theodore_M">Theo</persName> and <persName>Alice</persName> to <placeName>Dresden</placeName>, <persName ref="#Hardy_Jean">Jean</persName> and I to <placeName>Florence</placeName>.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-20">
         <dateline>
-          <date when="1904-">Wednesday, April 20</date>. 
+          <date when="1904-04-20">Wednesday, April 20</date>. 
           <name type="hotel" ref="#">Hotel Grande Bretagne</name>, <placeName ref="#Florence">Florence<placeName>.
         </dateline>
-          <p>Breakfasted at 7 o'clock - all of us - <persName ref="#Davis_Theodore_M">Theo</persName>, Alice</persName> and <persName ref="#Jones_Daniel">Jones</persName> left immediately after - we had an hour and a half. The day was cold and threatening so we played bridge until it was time to start. A cold, tiring, rainy day, had to change cars at <placeName>Bologna</placeName> - found <persName>Nettie</persName> waiting for us, and brought her to the hotel to dine with us. So nice to have her again. Are in our old pleasant rooms. Mr. and <persName>Mrs. Havens</persName> came in this evening for awhile.</p>
+          <p>Breakfasted at 7 o'clock - all of us - <persName ref="#Davis_Theodore_M">Theo</persName>, <persName>Alice</persName> and <persName ref="#Jones_Daniel">Jones</persName> left immediately after - we had an hour and a half. The day was cold and threatening so we played bridge until it was time to start. A cold, tiring, rainy day, had to change cars at <placeName>Bologna</placeName> - found <persName>Nettie</persName> waiting for us, and brought her to the hotel to dine with us. So nice to have her again. Are in our old pleasant rooms. <persName>Mr. and Mrs. Havens</persName> came in this evening for awhile.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-21">
         <dateline>
-          <date when="1904-">Thursday, April 21</date>.
+          <date when="1904-04-21">Thursday, April 21</date>.
         </dateline>
-          <p>A dark, raining day - we went early to see my dear people at the <placeName>Villino,</placeName> and found them so happy to see us; we stayed to lunch, and until it was time to go to tea at <placeName>Costantini's,</placeName> which we had promised him yesterday we would do. <persName>Nettie</persName> went with us - and we had a very nice tea, with <persName>Pa Costantini</persName> present. They showed us the so-called <persName>Raphael</persName> portrait, a charming picture, but hardly the work of that great master. It might be by <persName>Guilio Romano.</persName> The picture has been signed, but the signature has been mostly obliterated. I never knew it to rain harder than it has most of the afternoon. Kept <persName>Nettie</persName> for dinner. Such a sad thing has occurred here this morning. <persName>Cecily Northcote,</persName> the young <orgName>English</orgName> girl who was staying with the <persName>Websters</persName> two summers ago in <placeName>Newport</placeName> and whom we know, a cousin of <persName>Farrers</persName> as well as the <orgName>Websters</orgName> - died with typhoid fever at the <placeName>Hotel de la Ville.</placeName> She came to <placeName>Italy</placeName> with <persName>Mr.</persName> and <persName>Mrs. Hamilton Fish Webster</persName> two months ago - they arrived from <placeName>Rome</placeName> 10 days ago, quite ailing, and today the whole thing was over for the poor young thing. She was only 18!</p>
+          <p>A dark, raining day - we went early to see my dear people at the <placeName>Villino</placeName>, and found them so happy to see us; we stayed to lunch, and until it was time to go to tea at <placeName>Costantini</placeName>'s, which we had promised him yesterday we would do. <persName>Nettie</persName> went with us - and we had a very nice tea, with <persName>Pa Costantini</persName> present. They showed us the so-called <persName name type="historical" ref="">Raphael</persName> portrait, a charming picture, but hardly the work of that great master. It might be by <persName>Guilio Romano</persName>. The picture has been signed, but the signature has been mostly obliterated. I never knew it to rain harder than it has most of the afternoon. Kept <persName>Nettie</persName> for dinner. Such a sad thing has occurred here this morning. <persName>Cecily Northcote</persName>, the young <orgName>English</orgName> girl who was staying with the <persName>Websters</persName> two summers ago in <placeName>Newport</placeName> and whom we know, a cousin of <persName>Farrers</persName> as well as the <orgName>Websters</orgName> - died with typhoid fever at the <placeName>Hotel de la Ville</placeName>. She came to <placeName>Italy</placeName> with <persName>Mr. and Mrs. Hamilton Fish Webster</persName> two months ago - they arrived from <placeName>Rome</placeName> 10 days ago, quite ailing, and today the whole thing was over for the poor young thing. She was only 18!</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-22">
         <dateline>
-          <date when="1904-">Friday, April 22</date>. 
+          <date when="1904-04-22">Friday, April 22</date>. 
         </dateline>
-          <p><persName>Nettie</persName> took <persName ref="#Hardy_Jean">Jean</persName> this morning to the <placeName>Uffizi</placeName> to begin her art education - and <persName ref="#Hardy_Jean">Jean</persName> came home in raptures. <persName>Mary</persName> and I drove in the <orgName>Cascine,</orgName> and took a walk along the sweet avenue near the river. The girls were here to lunch - Mrs. and <persName>Mr. Hagermeyer</persName> called in the afternoon - and this evening Mr. and <persName>Mrs. Haven</persName> came to say goodbye.</p>
+          <p><persName>Nettie</persName> took <persName ref="#Hardy_Jean">Jean</persName> this morning to the <placeName>Uffizi</placeName> to begin her art education - and <persName ref="#Hardy_Jean">Jean</persName> came home in raptures. <persName>Mary</persName> and I drove in the <orgName>Cascine</orgName>, and took a walk along the sweet avenue near the river. The girls were here to lunch - <persName>Mrs. and Mr. Hagermeyer</persName> called in the afternoon - and this evening <persName>Mr. and Mrs. Haven</persName> came to say goodbye.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-23">
         <dateline>
-          <date when="1904-">Saturday, April 23</date>. 
+          <date when="1904-04-23">Saturday, April 23</date>. 
         </dateline>
-          <p>A letter from <persName ref="#Davis_Theodore_M">Theo</persName> from <name>Munich,</name> reports charming weather. One from <persName>McWilliams</persName> reporting most discouraging conditions of the garde. We all went to the <placeName>Pitti</placeName> this morning - crowds of extraordinary <orgName>Germans</orgName> - a delightful morning - were to go with the <persName>Hagermeyers</persName> to see the game of <persName>Pallom</persName> played at the <placeName>Cascine,</placeName> but the weather was too bad, so we went to the <placeName>Villino</placeName> for tea instead - with <persName>Mrs. H.</persName> and <persName>Miss Johnstone.</persName></p>
+          <p>A letter from <persName ref="#Davis_Theodore_M">Theo</persName> from <name>Munich</name>, reports charming weather. One from <persName>McWilliams</persName> reporting most discouraging conditions of the garde. We all went to the <placeName>Pitti</placeName> this morning - crowds of extraordinary <orgName>Germans</orgName> - a delightful morning - were to go with the <persName>Hagermeyers</persName> to see the game of Pallom played at the <placeName>Cascine</placeName>, but the weather was too bad, so we went to the <placeName>Villino</placeName> for tea instead - with <persName>Mrs. H.</persName> and <persName>Miss Johnstone</persName>.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-24">
         <dateline>
-          3d Sunday after <name type="event" ref="#event">Easter</name> - <date when="1904-">April 24</date>. 
+          3d Sunday after <name type="event" ref="#event">Easter</name> - <date when="1904-04-24">April 24</date>. 
         </dateline>
-          <p><persName>Nettie</persName> and <persName ref="#Hardy_Jean">Jean</persName> went to the <placeName>Academia</placeName> this morning - <persName>Mary</persName> and I to the <orgName>Cascine</orgName> - and had a good walk. The girls to lunch, a heavy thunder storm this afternoon - went early to the <placeName>Villino</placeName> and had tea - and stayed late. Am a little disturbed at <placeName>Lizie's</placeName> appearance - she looks ill. A lovely sight from my window last night just before going to bed. The rain had stopped, but the moon was breaking through the clouds, and reflected in the river; and made me think of the old song the words by <persName>Longfellow</persName> I think, which I used to sing hundreds of years ago, called "the <persName>Bridge",</persName> - the last lines of which run something like this. "And forever and forever, 	As long as the river flows, 	As long as life hath passions 	As long as life hath woes, 	The moon and her broken reflection, 	And the shadows shall appear - 	Like the image of love in heaven and its wavering image here.</p>
+          <p><persName>Nettie</persName> and <persName ref="#Hardy_Jean">Jean</persName> went to the <placeName>Academia</placeName> this morning - <persName>Mary</persName> and I to the <orgName>Cascine</orgName> - and had a good walk. The girls to lunch, a heavy thunder storm this afternoon - went early to the <placeName>Villino</placeName> and had tea - and stayed late. Am a little disturbed at <placeName>Lizie</placeName>'s appearance - she looks ill. A lovely sight from my window last night just before going to bed. The rain had stopped, but the moon was breaking through the clouds, and reflected in the river; and made me think of the old song the words by <persName>Longfellow</persName> I think, which I used to sing hundreds of years ago, called <lg type="song" ref="#The_Bridge">"the Bridge"</lg><!--EBI-->, - the last lines of which run something like this. <l>“And forever and forever,</l> <l>As long as the river flows, </l><l>As long as life hath passions</l><l>As long as life hath woes,</l> <l>The moon and her broken reflection,</l><l>And the shadows shall appear - </l><l>Like the image of love in heaven</l><l>and its wavering image here.</l> 
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-25">
         <dateline>
-          <date when="1904-">Monday, April 25</date>. 
+          <date when="1904-04-25">Monday, April 25</date>. 
         </dateline>
           <p>I thought best that <persName>Nettie</persName> and <persName ref="#Hardy_Jean">Jean</persName> should have a rest today so we shopped and drove about, <persName>Nettie</persName> came to lunch, and we all, <persName>Lizzie</persName> and <persName>Mary</persName> included, went by invitation to Mrs. <persName>Newmans</persName> to tea - and had an enchanting visit. Their appartment at the top of an old palace in a quiet odd little piazza on the other side off the river, is filled with a wealth of lovely and choice things collected in a 30 years sojourn in <placeName>Italy</placeName> and Japan. I am always interested in these two people - so happily and quietly contented with themselves and each other - so busy, in a quiet way - and so surrounded by some if not most of the best things of life. It has poured with rain all the afternoon.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-26">
         <dateline>
-          <date when="1904-">Tuesday, April 26</date>. 
+          <date when="1904-04-26">Tuesday, April 26</date>. 
         </dateline>
-          <p><persName>Mary</persName> came down, and went with us to <placeName>St. Croce</placeName> this morning. I never tire of this grand church - one of the most impressive I know. They are carefully washing off much of the whitewash from pillars and walls, seeking for frescoes. We afterwards drove and walked in the <placeName>Cascine,</placeName> and this afternoon went to <orgName>Lizzie's.</orgName> She was not well last night - and felt poorly today.</p>
+          <p><persName>Mary</persName> came down, and went with us to <placeName>St. Croce</placeName> this morning. I never tire of this grand church - one of the most impressive I know. They are carefully washing off much of the whitewash from pillars and walls, seeking for frescoes. We afterwards drove and walked in the <placeName>Cascine</placeName>, and this afternoon went to <persName>Lizzie</persName>'s. She was not well last night - and felt poorly today.</p>
       </div>
-      <div xml:id="EBA-1904-"> 
+      <div xml:id="EBA-1904-04-27"> 
         <dateline>
-          <date when="1904-">Wednesday, April 27</date>.
+          <date when="1904-04-27">Wednesday, April 27</date>.
         </dateline> 
-          <p>A charming, pleasant day. The girls came early and we had almost the whole morning at the <persName>S. Maria Novella,</persName> and <persName>S. Lorenzo</persName> and the two <orgName>Sacristies.</orgName> <persName>Nettie</persName> lunched with us - we went to the <placeName>Villino</placeName> for tea, and <persName>Nettie</persName> sang gloriously for us. Soon after lunch <persName>Gio.</persName> <persName>Placci</persName> called and made a long pleasant visit - soon after he left <placeName>Pearsall-Smith</placeName> came. This evening we have had the most glorious roses sent us - and are almost smothered in them.</p>
+          <p>A charming, pleasant day. The girls came early and we had almost the whole morning at the <name type="historical" ref="#">S. Maria Novella</persName>, and <name type="historical" ref="#">S. Lorenzo</persName> and the two <orgName>Sacristies</orgName>, <persName>Nettie</persName> lunched with us - we went to the <placeName>Villino</placeName> for tea, and <persName>Nettie</persName> sang gloriously for us. Soon after lunch <persName>Gio. Placci</persName> called and made a long pleasant visit - soon after he left <placeName>Pearsall-Smith</placeName> came. This evening we have had the most glorious roses sent us - and are almost smothered in them.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-29">
         <dateline>
-          <date when="1904-">Friday, April 29</date>. 
+          <date when="1904-04-29">Friday, April 29</date>. 
         </dateline>
-          <p>Yesterday was spent at home and tea with Mrs. <persName>Hagermeyer</persName> and with Lizzie. This morning a drive to the <placeName>Cortosa,</placeName> which we had all to ourselves, and in the afternoon we did the <placeName>Duomo</placeName> and <persName>Baptistery,</persName> had tea at the tea <persName>Room,</persName> and a turn in the <placeName>Cascine</placeName> - <persName>Nettie</persName> dined with us.</p>
+          <p>Yesterday was spent at home and tea with <persName>Mrs. Hagermeyer</persName> and with <persName>Lizzie</persName>. This morning a drive to the <placeName>Cortosa</placeName>, which we had all to ourselves, and in the afternoon we did the <placeName>Duomo</placeName> and <persName>Baptistery</persName>, had tea at the tea Room, and a turn in the <placeName>Cascine</placeName> - <persName>Nettie</persName> dined with us.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-04-30">
         <dateline>
-          <date when="1904-">Saturday, April 30</date>. 
+          <date when="1904-04-30">Saturday, April 30</date>. 
         </dateline>
-          <p>To the <persName>Cobbs</persName> this morning - to see the pretty leather work. Left <persName>Nettie</persName> and <persName ref="#Hardy_Jean">Jean</persName> at <persName>S. Marco,</persName> and <persName>Mary</persName> and I drove up to the <placeName>Rose Garden</placeName> near <placeName>S. Miniato.</placeName> Such miles of splendid roses! Mr. and <persName>Mrs. Newman</persName> to lunch - pleasant. <persName ref="#Hardy_Jean">Jean</persName> and I then went out to <persName>Lettignano</persName> to have tea with the <orgName>Berensons.</orgName> We had been asked to lunch, but could only make it to tea. They were very amusing and interesting about their <orgName>American</orgName> visit.</p>
+          <p>To the <persName>Cobbs</persName> this morning - to see the pretty leather work. Left <persName>Nettie</persName> and <persName ref="#Hardy_Jean">Jean</persName> at <persName>S. Marco</persName>, and <persName>Mary</persName> and I drove up to the Rose Garden< near <placeName>S. Miniato.</placeName> Such miles of splendid roses! <persName>Mr. and Mrs. Newman</persName> to lunch - pleasant. <persName ref="#Hardy_Jean">Jean</persName> and I then went out to <persName>Lettignano</persName> to have tea with the <persName>Berensons</persName>. We had been asked to lunch, but could only make it to tea. They were very amusing and interesting about their <orgName>American</orgName> visit.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-05-01">
         <dateline>
-          Fourth Sunday after <name type="event" ref="#Easter">Easter</name>. <date when="1904-">May 1st</date>. 
+          Fourth Sunday after <name type="event" ref="#Easter">Easter</name>. <date when="1904-05-01">May 1st</date>. 
         </dateline>
-          <p><persName ref="#Hardy_Jean">Jean</persName>, Nettie</persName> and I went to the church of <placeName>Santisseina Annunziata,</placeName> and heard a splendid high mass. A great congregation. Then to the <placeName>Villino</placeName> for the day, which was a very pleasant one. Mrs. Tribe came in to tea. <persName ref="#Hardy_Jean">Jean</persName> and I drove in the <orgName>Cascine,</orgName> it was so very warm - but there was too great a crowd to make it pleasant.</p>
+          <p><persName ref="#Hardy_Jean">Jean</persName>, <persName>Nettie</persName> and I went to the church of <placeName>Santisseina Annunziata</placeName>, and heard a splendid high mass. A great congregation. Then to the <placeName>Villino</placeName> for the day, which was a very pleasant one. <persName>Mrs. Tribe</persName> came in to tea. <persName ref="#Hardy_Jean">Jean</persName> and I drove in the <orgName>Cascine</orgName>, it was so very warm - but there was too great a crowd to make it pleasant.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-05-02">
         <dateline>
-          <date when="1904-">Monday, May 2d</date>. 
+          <date when="1904-05-02">Monday, May 2d</date>. 
         </dateline>
           <p>A warm day - <persName ref="#Hardy_Jean">Jean</persName> taking a day of rest - so <persName>Nettie</persName> and I went to the <placeName>Uffizzi</placeName> - the girls lunched here, and <persName>Lizzie</persName> came to tea. The weather most lovely.</p>
       </div>
-      <div xml:id="EBA-1904-">
+      <div xml:id="EBA-1904-05-03">
         <dateline>
-          <date when="1904-">Tuesday, May 3d</date>.
+          <date when="1904-05-03">Tuesday, May 3d</date>.
         </dateline>
-          <p>I sent <persName>Mary</persName> and <persName ref="#Hardy_Jean">Jean</persName> to drive in the <placeName>Cascine</placeName> this morning - and I stayed at home. <persName>Mary</persName> to lunch. At 4 o'clock we drove out to Mrs. <persName>Gregory Smiths</persName> - at the <placeName>Villa Bella Riposa.</placeName> They bought this beautiful villa 3 years ago - it has an enchanting garden - with fine view. A charming afternoon, and some pleasant people. I was so interested in some things Mrs. <persName>Smith</persName> told us - about the house. After they had bought it, they were told of a remarkable thing by the people of whom they bought it - to which they did not give much attention at first, until they heard from a church dignitary (Mrs. <persName>Smith</persName> is <persName>Catholic)</persName> that it actually had occurred, and the whole story, trial and punishment was to be found in the Florentine Archives. One of the daughters of the house loved a man the family did not with her to marry - she became a nun - but excaped from the Convent and joined the man. She was afterwards found and with her child was taken home - the <persName>Cardinal</persName> came from <placeName>Florence</placeName> and presided at the trial, which took place in the great hall at which all of the family were present. She was walled up between the what is now drawing room and library - and found there by the people of whom the <name>Smiths</name> bought the house. She was bricked up to the shoulders, and her baby laid at her feet - when the <persName>Smiths</persName> had the drawing room redecorated, the place in the wall from which she was taken, could be seen - a ghastly history! At another part of the house we were shown a little stone staircase which led to the next floor, where it had been solidly walled up - it led below to a passage which they explored as far as the gate of the <orgName>Villa.</orgName> Along the terrace and in the garden I noticed some terra-cotta jars 3 ft. or more high, of a very peculiar shape. There were 50 of them found in a wall of great thickness which Mr. <persName>Smith</persName> was obliged to take down in his repairs. Altogether it is a most interesting house - but I don't think I would care for so many associations with the past in a house I lived in; so many human experiences, and such gruesome ones, would be intolerable to me. Better a clean present and a new house. A chapel and a sacristy form part of the house - from which the ancient dead however, have been removed.</p>
+          <p>I sent <persName>Mary</persName> and <persName ref="#Hardy_Jean">Jean</persName> to drive in the <placeName>Cascine</placeName> this morning - and I stayed at home. <persName>Mary</persName> to lunch. At 4 o'clock we drove out to <persName>Mrs. Gregory Smiths</persName> - at the <placeName>Villa Bella Riposa</placeName>. They bought this beautiful villa 3 years ago - it has an enchanting garden - with fine view. A charming afternoon, and some pleasant people. I was so interested in some things <persName>Mrs. Smith</persName> told us - about the house. After they had bought it, they were told of a remarkable thing by the people of whom they bought it - to which they did not give much attention at first, until they heard from a church dignitary (<persName>Mrs. Smith</persName> is <orgName>Catholic</orgName>) that it actually had occurred, and the whole story, trial and punishment was to be found in the Florentine Archives. One of the daughters of the house loved a man the family did not with her to marry - she became a nun - but excaped from the Convent and joined the man. She was afterwards found and with her child was taken home - the Cardinal came from <placeName>Florence</placeName> and presided at the trial, which took place in the great hall at which all of the family were present. She was walled up between the what is now drawing room and library - and found there by the people of whom the <name>Smiths</name> bought the house. She was bricked up to the shoulders, and her baby laid at her feet - when the <persName>Smiths</persName> had the drawing room redecorated, the place in the wall from which she was taken, could be seen - a ghastly history! At another part of the house we were shown a little stone staircase which led to the next floor, where it had been solidly walled up - it led below to a passage which they explored as far as the gate of the <orgName>Villa</orgName>. Along the terrace and in the garden I noticed some terra-cotta jars 3 ft. or more high, of a very peculiar shape. There were 50 of them found in a wall of great thickness which <persName>Mr. Smith</persName> was obliged to take down in his repairs. Altogether it is a most interesting house - but I don't think I would care for so many associations with the past in a house I lived in; so many human experiences, and such gruesome ones, would be intolerable to me. Better a clean present and a new house. A chapel and a sacristy form part of the house - from which the ancient dead however, have been removed.</p>
       </div>
     </body>
   </text>
