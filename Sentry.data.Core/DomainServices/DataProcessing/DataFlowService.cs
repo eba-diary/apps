@@ -21,10 +21,11 @@ namespace Sentry.data.Core
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly ISecurityService _securityService;
         private readonly IClient _quartermasterClient;
+        private readonly IDataFeatures _dataFeatures;
 
         public DataFlowService(IDatasetContext datasetContext, IMessagePublisher messagePublisher,
             UserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider,
-            ISecurityService securityService, IClient quartermasterClient)
+            ISecurityService securityService, IClient quartermasterClient, IDataFeatures dataFeatures)
         {
             _datasetContext = datasetContext;
             _messagePublisher = messagePublisher;
@@ -33,6 +34,7 @@ namespace Sentry.data.Core
             _s3ServiceProvider = s3ServiceProvider;
             _securityService = securityService;
             _quartermasterClient = quartermasterClient;
+            _dataFeatures = dataFeatures;
         }
 
         public List<DataFlowDto> ListDataFlows()
@@ -515,7 +517,7 @@ namespace Sentry.data.Core
                 {
                     results.Add(DataFlow.ValidationErrors.namedEnvironmentInvalid, $"Named Environment provided (\"{dfDto.NamedEnvironment}\") doesn't match a Quartermaster Named Environment");
                 }
-                else if(namedEnvironmentList.First(e => e.Name == dfDto.NamedEnvironment).Environmenttype != dfDto.NamedEnvironmentType.ToString())
+                else if (namedEnvironmentList.First(e => e.Name == dfDto.NamedEnvironment).Environmenttype != dfDto.NamedEnvironmentType.ToString())
                 {
                     var quarterMasterNamedEnvironmentType = namedEnvironmentList.First(e => e.Name == dfDto.NamedEnvironment).Environmenttype;
                     results.Add(DataFlow.ValidationErrors.namedEnvironmentTypeInvalid, $"Named Environment Type provided (\"{dfDto.NamedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType}\")");
@@ -636,7 +638,14 @@ namespace Sentry.data.Core
             _datasetContext.Add(dfsDataFlowBasic);
 
             //Generate ingestion steps (get file to raw location)
-            AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop_v2);
+            if (_dataFeatures.CLA3240_UseDropLocationV2.GetValue())
+            {
+                AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop_v2);
+            }
+            else
+            {
+                AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop);
+            }
 
             AddDataFlowStep(dto, df, DataActionType.RawStorage);
 

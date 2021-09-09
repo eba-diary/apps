@@ -34,11 +34,12 @@ BEGIN TRAN
 		WHEN NOT MATCHED BY TARGET THEN 
 			-- insert new rows 
 			INSERT (Security_ID, SecurableEntity_NME, Created_DTM, Enabled_DTM, Removed_DTM, UpdatedBy_ID, CreatedBy_ID)
-			VALUES (Security_ID, SecurableEntity_NME, Created_DTM, Enabled_DTM, Removed_DTM, UpdatedBy_ID, CreatedBy_ID)
-					  
-		WHEN NOT MATCHED BY SOURCE THEN 
+			VALUES (Security_ID, SecurableEntity_NME, Created_DTM, Enabled_DTM, Removed_DTM, UpdatedBy_ID, CreatedBy_ID);
+		
+		--Unlike most reference data, we DON'T want to delete extra rows - as they are legitimate
+		--WHEN NOT MATCHED BY SOURCE THEN 
 			-- delete rows that are in the target but not the source 
-			DELETE;
+			--DELETE;
 
 
 	END TRY 

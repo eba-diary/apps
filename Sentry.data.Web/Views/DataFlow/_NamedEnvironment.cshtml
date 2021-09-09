@@ -27,6 +27,7 @@
             @if (Model.NamedEnvironmentDropDown.Any())
             {
                 @Html.DropDownListFor(x => x.NamedEnvironmentType, Model.NamedEnvironmentTypeDropDown, new { @class = "form-control", @disabled = "true" })
+                @Html.HiddenFor(x => x.NamedEnvironmentType)
             }
             else
             {

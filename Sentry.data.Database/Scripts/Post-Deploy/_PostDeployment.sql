@@ -19,6 +19,7 @@ All new files added for staic data or scripts should have it's properties update
 :r ..\Post-Deploy\StaticData\BusinessUnit.sql
 :r ..\Post-Deploy\StaticData\DatasetFunction.sql
 :r ..\Post-Deploy\StaticData\DataSourceType.sql
+:r ..\Post-Deploy\StaticData\DataSource.sql
 :r ..\Post-Deploy\StaticData\DatasetScopeTypes.sql
 :r ..\Post-Deploy\StaticData\AuthenticationType.sql
 :r ..\Post-Deploy\StaticData\Security.sql
@@ -32,6 +33,28 @@ All new files added for staic data or scripts should have it's properties update
 :r ..\Post-Deploy\StaticData\ObjectStatus.sql
 :r ..\Post-Deploy\StaticData\StatusType.sql
 :r ..\Post-Deploy\StaticData\FileExtension.sql
+:r ..\Post-Deploy\StaticData\FeatureEntity.sql
+
+
+--Create Sequences in Database if they don't exist
+--These should be defined in the Dacpac, but there are problems with Sequences in Dacpacs
+--See https://stackoverflow.com/questions/34019442/dacpac-and-sql-sequence
+IF NOT EXISTS(SELECT * FROM sys.sequences WHERE name='seq_DataFlowStorageCDE')
+BEGIN
+    SELECT 'Creating Sequence seq_DataFlowStorageCDE...'
+    CREATE SEQUENCE [dbo].[seq_DataFlowStorageCDE]
+        AS BIGINT
+        START WITH 1
+        INCREMENT BY 1
+END;
+IF NOT EXISTS(SELECT * FROM sys.sequences WHERE name='seq_StorageCDE')
+BEGIN
+    SELECT 'Creating Sequence seq_StorageCDE...'
+    CREATE SEQUENCE [dbo].[seq_StorageCDE]
+        AS BIGINT
+        START WITH 1000501
+        INCREMENT BY 1
+END;
 
 
 --Now only run these scripts if the versioning allows us.

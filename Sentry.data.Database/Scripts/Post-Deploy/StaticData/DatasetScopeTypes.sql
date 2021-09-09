@@ -1,30 +1,27 @@
 ﻿
 BEGIN TRAN 
 	BEGIN TRY 
-		
-		SET IDENTITY_INSERT DatasetScopeTypes ON
 
 		MERGE INTO DatasetScopeTypes AS Target 
 		USING (VALUES 
-									('1','Point-in-Time','A copy of data at a given point in time.  Data consumption will focus on the latest file that has been uploaded.  Data may be repeated across files.',1),
-									('2','Appending','New data arrives in each file.  The new file can be appended to previous files for the full data picture.  Data will not be repeated across files.',1),
-									('3','Floating-Window','Datafile contains data over a defined period of time.  As new data is added, oldest data is dropped off.  Data is repeated across files.',1)
+									('Point-in-Time','A copy of data at a given point in time.  Data consumption will focus on the latest file that has been uploaded.  Data may be repeated across files.',1),
+									('Appending','New data arrives in each file.  The new file can be appended to previous files for the full data picture.  Data will not be repeated across files.',1),
+									('Floating-Window','Datafile contains data over a defined period of time.  As new data is added, oldest data is dropped off.  Data is repeated across files.',1)
 								)
-								AS Source (ScopeType_ID, [Name], Type_DSC, IsEnabled_IND) 
+								AS Source ([Name], Type_DSC, IsEnabled_IND) 
 
-		ON Target.ScopeType_ID = Source.ScopeType_ID
+		ON Target.[Name] = Source.[Name]
 		WHEN MATCHED THEN 
 			-- update matched rows 
 			UPDATE SET 
-				[Name] = Source.[Name],  
 				Type_DSC = Source.Type_DSC,
 				IsEnabled_IND = Source.IsEnabled_IND
 
 
 		WHEN NOT MATCHED BY TARGET THEN 
 			-- insert new rows 
-			INSERT (ScopeType_ID, [Name], Type_DSC, IsEnabled_IND)
-			VALUES (ScopeType_ID, [Name], Type_DSC, IsEnabled_IND)
+			INSERT ([Name], Type_DSC, IsEnabled_IND)
+			VALUES ([Name], Type_DSC, IsEnabled_IND)
 					  
 		WHEN NOT MATCHED BY SOURCE THEN 
 			-- delete rows that are in the target but not the source 
@@ -50,7 +47,5 @@ BEGIN TRAN
 		ROLLBACK TRAN 
 		RETURN
 	END CATCH 
-  
-	SET IDENTITY_INSERT DatasetScopeTypes OFF
 
 COMMIT TRAN

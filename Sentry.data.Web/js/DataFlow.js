@@ -66,6 +66,9 @@
             data.DataFlow.PopulateNamedEnvironments();
         });
 
+        //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
+        data.DataFlow.InitNamedEnvironmentEvents();
+
         $(document).ready(function () {
             $('.selectpicker').selectpicker({
                 liveSearch: false,
@@ -456,16 +459,20 @@
         });
     },
 
+    InitNamedEnvironmentEvents() {
+        //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
+        $("select#NamedEnvironment").change(function () {
+            Sentry.InjectSpinner($("#namedEnvironmentTypeSpinner"), 30);
+            data.DataFlow.PopulateNamedEnvironments();
+        });
+    },
+
     PopulateNamedEnvironments() {
         var assetKeyCode = $("#SAIDAssetKeyCode").val();
         var selectedEnvironment = $("#NamedEnvironment").val();
         $.get("/DataFlow/NamedEnvironment?assetKeyCode=" + assetKeyCode + "&namedEnvironment=" + selectedEnvironment, function (result) {
             $('#NamedEnvironmentPartial').html(result);
-            //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
-            $("select#NamedEnvironment").change(function () {
-                Sentry.InjectSpinner($("#namedEnvironmentTypeSpinner"), 30);
-                data.DataFlow.PopulateNamedEnvironments();
-            });
+            data.DataFlow.InitNamedEnvironmentEvents();
         });
     }
 }

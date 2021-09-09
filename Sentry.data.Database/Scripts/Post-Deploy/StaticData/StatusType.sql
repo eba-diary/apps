@@ -2,18 +2,16 @@
 BEGIN TRAN 
 	BEGIN TRY 
 		
-		SET IDENTITY_INSERT StatusType ON
-
 		MERGE INTO StatusType AS Target 
 		USING (VALUES 
-									('1','Started'),
-									('2','In Progress'),
-									('3','Success'),
-									('4','Error')
+									('Started'),
+									('In Progress'),
+									('Success'),
+									('Error')
 								)
-								AS Source (Status_ID, [Description]) 
+								AS Source ([Description]) 
 
-		ON Target.Status_ID = Source.Status_ID
+		ON Target.[Description] = Source.[Description]
 		WHEN MATCHED THEN 
 			-- update matched rows 
 			UPDATE SET 
@@ -22,8 +20,8 @@ BEGIN TRAN
 
 		WHEN NOT MATCHED BY TARGET THEN 
 			-- insert new rows 
-			INSERT (Status_ID, [Description])
-			VALUES (Status_ID, [Description])
+			INSERT ([Description])
+			VALUES ([Description])
 					  
 		WHEN NOT MATCHED BY SOURCE THEN 
 			-- delete rows that are in the target but not the source 
@@ -49,7 +47,5 @@ BEGIN TRAN
 		ROLLBACK TRAN 
 		RETURN
 	END CATCH 
-  
-	SET IDENTITY_INSERT StatusType OFF
 
 COMMIT TRAN
