@@ -405,7 +405,7 @@ namespace Sentry.data.Core
                         DataFlow producerFlow = _datasetContext.DataFlow.FirstOrDefault(w => w.Id == dataFlowId);
                         Logger.Debug($"marking {producerFlow.Name} producer flow as deleted");
                         producerFlow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
-                    }                    
+                    }
                 }
                 else
                 {
@@ -421,7 +421,7 @@ namespace Sentry.data.Core
                 {
                     RetrieverJob job = _datasetContext.GetById<RetrieverJob>(jobId);
                     job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
-                    job.IsEnabled = false;                    
+                    job.IsEnabled = false;
                 }
             }
 
@@ -881,8 +881,8 @@ namespace Sentry.data.Core
                 df.Steps = new List<DataFlowStep>();
             }
 
-            SetTriggerPrefix(step);
-            SetTargetPrefix(step);
+            SetTrigger(step);
+            SetTarget(step);
             SetSourceDependency(step, df.Steps.OrderByDescending(o => o.ExeuctionOrder).Take(1).FirstOrDefault());
 
             //Set exeuction order
@@ -992,27 +992,38 @@ namespace Sentry.data.Core
             return step;
         }
 
-        private void SetTriggerPrefix(DataFlowStep step)
+        private void SetTrigger(DataFlowStep step)
         {
             if (step.DataAction_Type_Id == DataActionType.S3Drop)
             {
                 step.TriggerKey = $"droplocation/{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                SetTriggerBucketForS3DropLocation(step);
             }
             else if (step.DataAction_Type_Id == DataActionType.ProducerS3Drop)
             {
                 step.TriggerKey = $"droplocation/data/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/";
+                SetTriggerBucketForS3DropLocation(step);
             }
             else if (step.DataAction_Type_Id == DataActionType.ProducerS3Drop_v2)
             {
                 step.TriggerKey = $"{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/";
+                SetTriggerBucketForS3DropLocation(step);
             }
             else
             {
                 step.TriggerKey = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                step.TriggerBucket = step.Action.TargetStorageBucket;
             }
         }
 
-        private void SetTargetPrefix(DataFlowStep step)
+        private void SetTriggerBucketForS3DropLocation(DataFlowStep step)
+        {
+            step.TriggerBucket = !string.IsNullOrWhiteSpace(step.DataFlow.UserDropLocationBucket)
+                ? step.DataFlow.UserDropLocationBucket
+                : step.Action.TargetStorageBucket;
+        }
+
+        private void SetTarget(DataFlowStep step)
         {
             switch (step.DataAction_Type_Id)
             {
@@ -1023,10 +1034,12 @@ namespace Sentry.data.Core
                 case DataActionType.ConvertParquet:
                     string schemaStorageCode = GetSchemaStorageCodeForDataFlow(step.DataFlow.Id);
                     step.TargetPrefix = step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{schemaStorageCode}/";
+                    step.TargetBucket = step.Action.TargetStorageBucket;
                     break;
                 //These sent output a step specific location along with down stream dependent steps
                 case DataActionType.RawStorage:
                     step.TargetPrefix = step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                    step.TargetBucket = step.Action.TargetStorageBucket;
                     break;
                 //These only send output to down stream dependent steps
                 case DataActionType.SchemaLoad:
@@ -1038,6 +1051,7 @@ namespace Sentry.data.Core
                 case DataActionType.ProducerS3Drop_v2:
                 case DataActionType.FixedWidth:
                     step.TargetPrefix = null;
+                    step.TargetBucket = null;
                     break;
                 default:
                     break;
@@ -1047,7 +1061,7 @@ namespace Sentry.data.Core
         private void SetSourceDependency(DataFlowStep step, DataFlowStep previousStep)
         {
             step.SourceDependencyPrefix = previousStep?.TriggerKey;
-            step.SourceDependencyBucket = previousStep?.Action.TargetStorageBucket;
+            step.SourceDependencyBucket = previousStep?.TriggerBucket;
         }
 
         #region SchemaFlowMappings

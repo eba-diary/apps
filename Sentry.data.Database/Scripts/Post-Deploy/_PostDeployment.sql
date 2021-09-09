@@ -105,6 +105,7 @@ BEGIN TRY
 
   --insert one off script files here
   :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_03\HistoryFix_Populate_DataFlow_NamedEnvironments.sql
+  :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_03\HistoryFix_Populate_DataFlowStep_TriggerBucketTargetBucket.sql
 
   --insert into the verision table so these scripts do not run again.
   INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 

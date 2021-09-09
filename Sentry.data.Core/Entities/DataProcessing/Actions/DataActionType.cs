@@ -33,7 +33,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
         XML = 13,
         [Description("JSONFlattening")]
         JsonFlattening = 14,
-        [Description("Producer S3 Drop v2")]
+        [Description("Producer S3 Drop")]
         ProducerS3Drop_v2 = 15
     }
 }

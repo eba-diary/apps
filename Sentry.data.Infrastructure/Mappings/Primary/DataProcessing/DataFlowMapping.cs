@@ -28,6 +28,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.ObjectStatus, m => m.Column("ObjectStatus"));
             this.Property(x => x.DeleteIssuer, m => m.Column("DeleteIssuer"));
             this.Property(x => x.DeleteIssueDTM, m => m.Column("DeleteIssueDTM"));
+            this.Property(x => x.UserDropLocationBucket);
+            this.Property(x => x.UserDropLocationPrefix);
             this.Property(x => x.NamedEnvironment);
             this.Property(x => x.NamedEnvironmentType, attr => attr.Type<EnumStringType<NamedEnvironmentType>>());
 

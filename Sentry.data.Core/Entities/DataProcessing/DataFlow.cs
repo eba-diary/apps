@@ -31,6 +31,9 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual string DeleteIssuer { get; set; }
         public virtual DateTime DeleteIssueDTM { get; set; }
 
+        public virtual string UserDropLocationBucket { get; set; }
+        public virtual string UserDropLocationPrefix { get; set; }
+
         public virtual string NamedEnvironment { get; set; }
         public virtual NamedEnvironmentType NamedEnvironmentType { get; set; }
 

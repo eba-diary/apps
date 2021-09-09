@@ -20,6 +20,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual string TargetPrefix { get; set; }
         public virtual string SourceDependencyPrefix { get; set; }
         public virtual string SourceDependencyBucket { get; set; }
+        public virtual string TriggerBucket { get; set; }
+        public virtual string TargetBucket { get; set; }
         public virtual IList<SchemaMap> SchemaMappings { get; set; }
         public virtual IList<EventMetric> Executions { get; set; }
 
