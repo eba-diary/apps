@@ -16,7 +16,6 @@ namespace Sentry.data.Core
     public class DataFlowService : IDataFlowService
     {
         private readonly IDatasetContext _datasetContext;
-        private readonly IMessagePublisher _messagePublisher;
         private readonly IUserService _userService;
         private readonly IJobService _jobService;
         private readonly IS3ServiceProvider _s3ServiceProvider;
@@ -24,12 +23,11 @@ namespace Sentry.data.Core
         private readonly IClient _quartermasterClient;
         private readonly IDataFeatures _dataFeatures;
 
-        public DataFlowService(IDatasetContext datasetContext, IMessagePublisher messagePublisher,
+        public DataFlowService(IDatasetContext datasetContext, 
             IUserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider,
             ISecurityService securityService, IClient quartermasterClient, IDataFeatures dataFeatures)
         {
             _datasetContext = datasetContext;
-            _messagePublisher = messagePublisher;
             _userService = userService;
             _jobService = jobService;
             _s3ServiceProvider = s3ServiceProvider;
@@ -136,11 +134,6 @@ namespace Sentry.data.Core
             MapDataFlowStepsForFileSchema(scm, df);
 
             _jobService.CreateDropLocation(_datasetContext.RetrieverJob.FirstOrDefault(w => w.DataFlow == df));
-        }
-
-        public void PublishMessage(string key, string message)
-        {
-            _messagePublisher.PublishDSCEvent(key, message);
         }
 
         public IQueryable<DataSourceType> GetDataSourceTypes()

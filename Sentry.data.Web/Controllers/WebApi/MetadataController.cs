@@ -31,12 +31,12 @@ namespace Sentry.data.Web.WebApi.Controllers
         private readonly IDatasetService _datasetService;
         private readonly ISchemaService _schemaService;
         private readonly ISecurityService _securityService;
-        private readonly IDataFlowService _dataFlowService;
+        private readonly IMessagePublisher _messagePublisher;
 
         public MetadataController(IDatasetContext dsContext, UserService userService,
                                 IConfigService configService, IDatasetService datasetService,
                                 ISchemaService schemaService, ISecurityService securityService,
-                                IDataFlowService dataFlowService)
+                                IMessagePublisher messagePublisher)
         {
             _dsContext = dsContext;
             _userService = userService;
@@ -44,7 +44,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             _datasetService = datasetService;
             _schemaService = schemaService;
             _securityService = securityService;
-            _dataFlowService = dataFlowService;
+            _messagePublisher = messagePublisher;
         }
 
         #region Classes
@@ -663,7 +663,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     Logger.Debug($"jobcontroller-publishmessage message:{ JsonConvert.SerializeObject(message) }");
                 }
 
-                _dataFlowService.PublishMessage(message.Key, message.Message);
+                _messagePublisher.PublishDSCEvent(message.Key, message.Message);
                 return Ok();
             }
             catch (KafkaProducerException ex)
@@ -710,7 +710,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     kMsg = JsonConvert.DeserializeObject<KafkaMessage>(message);
                 }
 
-                _dataFlowService.PublishMessage(kMsg.Key, kMsg.Message);
+                _messagePublisher.PublishDSCEvent(kMsg.Key, kMsg.Message);
                 return Ok();
             }
             catch (KafkaProducerException ex)

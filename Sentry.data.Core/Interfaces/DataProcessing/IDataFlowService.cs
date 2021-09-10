@@ -15,13 +15,6 @@ namespace Sentry.data.Core
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
         int CreateandSaveDataFlow(DataFlowDto dto);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="message"></param>
-        /// <exception cref="Sentry.data.Core.Exceptions.KafkaProducerException"></exception>
-        void PublishMessage(string key, string message);
         IQueryable<DataSourceType> GetDataSourceTypes();
         IQueryable<DataSource> GetDataSources();
         string GetDataFlowNameForFileSchema(FileSchema scm);

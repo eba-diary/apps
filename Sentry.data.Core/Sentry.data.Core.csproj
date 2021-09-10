@@ -270,7 +270,6 @@
     <Compile Include="Interfaces\DataProcessing\IFixedWidthProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IGoogleApiActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IJsonFlatteningAction.cs" />
-    <Compile Include="Interfaces\DataProcessing\IProducerS3Drop_v2Provider.cs" />
     <Compile Include="Interfaces\DataProcessing\IProducerS3DropProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IQueryStorageProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IRawStorageProvider.cs" />
