@@ -158,7 +158,6 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
             {
                 case DataActionType.S3Drop:
                 case DataActionType.ProducerS3Drop:
-                case DataActionType.ProducerS3Drop_v2:
                     _provider = S3DropProvider;
                     break;
                 case DataActionType.RawStorage:

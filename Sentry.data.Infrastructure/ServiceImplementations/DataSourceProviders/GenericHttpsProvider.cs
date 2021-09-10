@@ -110,7 +110,7 @@ namespace Sentry.data.Infrastructure
                     //  as targets.
                     if (_targetStep != null)
                     {
-                        versionId = s3Service.UploadDataFile(tempFile, _targetStep.Action.TargetStorageBucket, targetkey);
+                        versionId = s3Service.UploadDataFile(tempFile, _targetStep.TargetBucket, targetkey);
                     }
                     else
                     {

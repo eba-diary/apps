@@ -152,7 +152,6 @@
     <Compile Include="Entities\DataProcessing\Actions\FixedWidthAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleApiAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\JsonFlatteningAction.cs" />
-    <Compile Include="Entities\DataProcessing\Actions\ProducerS3Drop_v2Action.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ProducerS3DropAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\SchemaMapAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressGzipAction.cs" />
@@ -235,6 +234,7 @@
     <Compile Include="Extensions\DatasetFileConfigExtensions.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DataSourceQueryExtensions.cs" />
+    <Compile Include="Extensions\ProducerS3DropActionQueryExtensions.cs" />
     <Compile Include="Extensions\SchemaExtensions.cs" />
     <Compile Include="Factories\Fields\DateFieldDtoFactory.cs" />
     <Compile Include="Factories\Fields\DecimalFieldDtoFactory.cs" />

@@ -44,7 +44,7 @@ namespace Sentry.data.Infrastructure
                 {
                     IDatasetContext _dsContext = Container.GetInstance<IDatasetContext>();
 
-                    targetS3DropStep = _dsContext.DataFlowStep.Where(w => w.DataFlow == job.DataFlow && (w.DataAction_Type_Id == DataActionType.S3Drop || w.DataAction_Type_Id == DataActionType.ProducerS3Drop || w.DataAction_Type_Id == DataActionType.ProducerS3Drop_v2)).FirstOrDefault();
+                    targetS3DropStep = _dsContext.DataFlowStep.Where(w => w.DataFlow == job.DataFlow && (w.DataAction_Type_Id == DataActionType.S3Drop || w.DataAction_Type_Id == DataActionType.ProducerS3Drop)).FirstOrDefault();
 
                     //find target s3 drop location
                     string targetPrefix = targetS3DropStep.TriggerKey;
@@ -59,7 +59,7 @@ namespace Sentry.data.Infrastructure
                     try
                     {
                         //https://docs.microsoft.com/en-us/dotnet/standard/parallel-programming/how-to-handle-exceptions-in-parallel-loops
-                        ProcessFilesInParallel(files, targetS3DropStep.Action.TargetStorageBucket, targetPrefix);
+                        ProcessFilesInParallel(files, targetS3DropStep.TargetBucket, targetPrefix);
                     }
                     catch (AggregateException ae)
                     {

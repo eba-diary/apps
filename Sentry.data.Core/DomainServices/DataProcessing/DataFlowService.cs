@@ -1,6 +1,7 @@
 ﻿using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Interfaces.QuartermasterRestClient;
 using System;
@@ -167,7 +168,7 @@ namespace Sentry.data.Core
 
             string schemaFlowName = GenerateDataFlowNameForFileSchema(scm);
             DataFlow flow = _datasetContext.DataFlow.Where(w => w.Name == schemaFlowName).FirstOrDefault();
-            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow == flow && (w.DataAction_Type_Id == DataActionType.S3Drop || w.DataAction_Type_Id == DataActionType.ProducerS3Drop || w.DataAction_Type_Id == DataActionType.ProducerS3Drop_v2)).FirstOrDefault();
+            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow == flow && (w.DataAction_Type_Id == DataActionType.S3Drop || w.DataAction_Type_Id == DataActionType.ProducerS3Drop)).FirstOrDefault();
             if (step == null)
             {
                 throw new DataFlowStepNotFound();
@@ -236,7 +237,7 @@ namespace Sentry.data.Core
              *   - Current step trigger key equals to dependent step SourceDependencyPrefix
              *   - Current step bucket equals to dependent step SourceDependencyBucket
              ****************************************************/
-            steps = _datasetContext.DataFlowStep.Where(w => w.SourceDependencyPrefix == step.TriggerKey && w.SourceDependencyBucket == step.Action.TargetStorageBucket).ToList();
+            steps = _datasetContext.DataFlowStep.Where(w => w.SourceDependencyPrefix == step.TriggerKey && w.SourceDependencyBucket == step.TriggerBucket).ToList();
 
             return steps;
         }
@@ -660,14 +661,7 @@ namespace Sentry.data.Core
             _datasetContext.Add(dfsDataFlowBasic);
 
             //Generate ingestion steps (get file to raw location)
-            if (_dataFeatures.CLA3240_UseDropLocationV2.GetValue())
-            {
-                AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop_v2);
-            }
-            else
-            {
-                AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop);
-            }
+            AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop);
 
             AddDataFlowStep(dto, df, DataActionType.RawStorage);
 
@@ -716,14 +710,7 @@ namespace Sentry.data.Core
             _jobService.CreateAndSaveRetrieverJob(dto.RetrieverJob);
 
             //Generate ingestion steps (get file to raw location)
-            if (_dataFeatures.CLA3240_UseDropLocationV2.GetValue())
-            {
-                AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop_v2);
-            }
-            else
-            {
-                AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop);
-            }
+            AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop);
 
             AddDataFlowStep(dto, df, DataActionType.RawStorage);
 
@@ -854,7 +841,7 @@ namespace Sentry.data.Core
             dto.ActionName = step.Action.Name;
             dto.ActionDescription = step.Action.Description;
             dto.TriggerKey = step.TriggerKey;
-            dto.TriggerBucket = step.Action.TargetStorageBucket;
+            dto.TriggerBucket = step.TriggerBucket;
             dto.TargetPrefix = step.TargetPrefix;
             dto.DataFlowId = step.DataFlow.Id;
         }
@@ -908,10 +895,9 @@ namespace Sentry.data.Core
                     action = _datasetContext.S3DropAction.FirstOrDefault();
                     break;
                 case DataActionType.ProducerS3Drop:
-                    action = _datasetContext.ProducerS3DropAction.FirstOrDefault();
-                    break;
-                case DataActionType.ProducerS3Drop_v2:
-                    action = _datasetContext.ProducerS3Drop_v2Action.FirstOrDefault();
+                    action = _dataFeatures.CLA3240_UseDropLocationV2.GetValue()
+                        ? _datasetContext.ProducerS3DropAction.GetDlstDropLocation()
+                        : _datasetContext.ProducerS3DropAction.GetDataDropLocation();
                     break;
                 case DataActionType.RawStorage:
                     action = _datasetContext.RawStorageAction.FirstOrDefault();
@@ -1008,12 +994,9 @@ namespace Sentry.data.Core
             }
             else if (step.DataAction_Type_Id == DataActionType.ProducerS3Drop)
             {
-                step.TriggerKey = $"droplocation/data/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/";
-                SetTriggerBucketForS3DropLocation(step);
-            }
-            else if (step.DataAction_Type_Id == DataActionType.ProducerS3Drop_v2)
-            {
-                step.TriggerKey = $"{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/";
+                step.TriggerKey = _dataFeatures.CLA3240_UseDropLocationV2.GetValue()
+                    ? $"{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/"
+                    : $"droplocation/data/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/";
                 SetTriggerBucketForS3DropLocation(step);
             }
             else
@@ -1025,9 +1008,9 @@ namespace Sentry.data.Core
 
         private void SetTriggerBucketForS3DropLocation(DataFlowStep step)
         {
-            step.TriggerBucket = !string.IsNullOrWhiteSpace(step.DataFlow.UserDropLocationBucket)
-                ? step.DataFlow.UserDropLocationBucket
-                : step.Action.TargetStorageBucket;
+            step.TriggerBucket = string.IsNullOrWhiteSpace(step.DataFlow.UserDropLocationBucket)
+                ? step.Action.TargetStorageBucket
+                : step.DataFlow.UserDropLocationBucket;
         }
 
         private void SetTarget(DataFlowStep step)
@@ -1055,7 +1038,6 @@ namespace Sentry.data.Core
                 case DataActionType.SchemaMap:
                 case DataActionType.S3Drop:
                 case DataActionType.ProducerS3Drop:
-                case DataActionType.ProducerS3Drop_v2:
                 case DataActionType.FixedWidth:
                     step.TargetPrefix = null;
                     step.TargetBucket = null;

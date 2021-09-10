@@ -201,7 +201,6 @@
     <Compile Include="Mappings\Primary\DataProcessing\Actions\FixedWidthActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleApiActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\JsonFlatteningActionMapping.cs" />
-    <Compile Include="Mappings\Primary\DataProcessing\Actions\ProducerS3Drop_v2ActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\ProducerS3DropActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\SchemaMapActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\UncompressGzipActionMapping.cs" />

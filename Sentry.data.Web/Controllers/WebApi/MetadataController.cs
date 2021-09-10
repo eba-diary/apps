@@ -856,7 +856,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                         });                        
                     }
 
-                    rjList.Add(item.Item1.steps.Where(w => w.DataActionType == Core.Entities.DataProcessing.DataActionType.S3Drop || w.DataActionType == Core.Entities.DataProcessing.DataActionType.ProducerS3Drop || w.DataActionType == Core.Entities.DataProcessing.DataActionType.ProducerS3Drop_v2).Select(s => new DropLocation() { Name = s.ActionName, JobId = s.Id, IsEnabled = true, Location = $"{s.TriggerBucket}/{s.TriggerKey}" }).FirstOrDefault());
+                    rjList.Add(item.Item1.steps.Where(w => w.DataActionType == Core.Entities.DataProcessing.DataActionType.S3Drop || w.DataActionType == Core.Entities.DataProcessing.DataActionType.ProducerS3Drop).Select(s => new DropLocation() { Name = s.ActionName, JobId = s.Id, IsEnabled = true, Location = $"{s.TriggerBucket}/{s.TriggerKey}" }).FirstOrDefault());
 
                     df.RetrieverJobs = rjList;
                     m.DataFlows.Add(df);

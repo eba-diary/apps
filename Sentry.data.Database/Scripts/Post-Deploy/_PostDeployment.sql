@@ -17,11 +17,11 @@ All new files added for staic data or scripts should have it's properties update
 :r ..\Post-Deploy\StaticData\EventType.sql
 :r ..\Post-Deploy\StaticData\Permission.sql
 :r ..\Post-Deploy\StaticData\BusinessUnit.sql
+:r ..\Post-Deploy\StaticData\AuthenticationType.sql
 :r ..\Post-Deploy\StaticData\DatasetFunction.sql
 :r ..\Post-Deploy\StaticData\DataSourceType.sql
 :r ..\Post-Deploy\StaticData\DataSource.sql
 :r ..\Post-Deploy\StaticData\DatasetScopeTypes.sql
-:r ..\Post-Deploy\StaticData\AuthenticationType.sql
 :r ..\Post-Deploy\StaticData\Security.sql
 :r ..\Post-Deploy\StaticData\DataAsset.sql
 :r ..\Post-Deploy\StaticData\BusinessArea.sql

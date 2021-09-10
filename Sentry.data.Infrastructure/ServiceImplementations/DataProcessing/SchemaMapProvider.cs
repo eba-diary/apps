@@ -193,7 +193,7 @@ namespace Sentry.data.Infrastructure
                         s3DropStep = DatasetContext.DataFlowStep.Where(w => w.DataFlow == flow && w.DataAction_Type_Id == DataActionType.RawStorage).FirstOrDefault();
 
                         targetSchemaS3DropPrefix = s3DropStep.TriggerKey;
-                        targetSchemaS3Bucket = s3DropStep.Action.TargetStorageBucket;
+                        targetSchemaS3Bucket = s3DropStep.TriggerBucket;
 
                         step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug);
 
@@ -208,7 +208,7 @@ namespace Sentry.data.Infrastructure
                             ActionGuid = step.Action.ActionGuid.ToString(),
                             SourceBucket = keyBucket,
                             SourceKey = objectKey,
-                            StepTargetBucket = step.Action.TargetStorageBucket,
+                            StepTargetBucket = step.TargetBucket,
                             //add run instance (separated by dash) if not null
                             StepTargetPrefix = targetSchemaS3DropPrefix + $"{flowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
                             DownstreamTargets = new List<DataFlowStepEventTarget>() { new DataFlowStepEventTarget() { BucketName = targetSchemaS3Bucket, ObjectKey = targetSchemaS3DropPrefix + $"{flowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/" } },
