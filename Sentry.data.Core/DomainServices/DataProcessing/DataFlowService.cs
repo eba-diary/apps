@@ -167,7 +167,7 @@ namespace Sentry.data.Core
 
             string schemaFlowName = GenerateDataFlowNameForFileSchema(scm);
             DataFlow flow = _datasetContext.DataFlow.Where(w => w.Name == schemaFlowName).FirstOrDefault();
-            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow == flow && (w.DataAction_Type_Id == DataActionType.S3Drop || w.DataAction_Type_Id == DataActionType.ProducerS3Drop)).FirstOrDefault();
+            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow == flow && (w.DataAction_Type_Id == DataActionType.S3Drop || w.DataAction_Type_Id == DataActionType.ProducerS3Drop || w.DataAction_Type_Id == DataActionType.ProducerS3Drop_v2)).FirstOrDefault();
             if (step == null)
             {
                 throw new DataFlowStepNotFound();

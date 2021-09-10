@@ -44,7 +44,7 @@ namespace Sentry.data.Infrastructure
                 {
                     IDatasetContext _dsContext = Container.GetInstance<IDatasetContext>();
 
-                    targetS3DropStep = _dsContext.DataFlowStep.Where(w => w.DataFlow == job.DataFlow && (w.DataAction_Type_Id == DataActionType.S3Drop || w.DataAction_Type_Id == DataActionType.ProducerS3Drop)).FirstOrDefault();
+                    targetS3DropStep = _dsContext.DataFlowStep.Where(w => w.DataFlow == job.DataFlow && (w.DataAction_Type_Id == DataActionType.S3Drop || w.DataAction_Type_Id == DataActionType.ProducerS3Drop || w.DataAction_Type_Id == DataActionType.ProducerS3Drop_v2)).FirstOrDefault();
 
                     //find target s3 drop location
                     string targetPrefix = targetS3DropStep.TriggerKey;
