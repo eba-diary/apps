@@ -221,10 +221,19 @@ namespace Sentry.data.Core
 
         public List<BusinessArea> GetBusinessAreasForUserSecurity()
         {
-            //GORDON: TODO: add security here on Object_id = 2
             List<BusinessArea> baList = _domainContext.BusinessAreas.ToList();
+            IApplicationUser user = _userService.GetCurrentUser();
+            List<BusinessArea> baWithPermission = new List<BusinessArea>();
+            foreach (var ba in baList)
+            {
+                UserSecurity security = _securityService.GetUserSecurity(ba, user);
+                if (security != null && security.CanModifyNotifications)
+                {
+                    baWithPermission.Add(ba);
+                }
+            }
 
-            return baList;
+            return baWithPermission;
         }
 
         public List<Permission> GetPermissionsForAccessRequest()
