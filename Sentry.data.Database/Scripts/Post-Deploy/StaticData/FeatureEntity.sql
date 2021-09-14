@@ -6,7 +6,8 @@ BEGIN TRAN
 		USING (VALUES 
 									('CLA2671_RefactoredDataFlows','0000315,0000314',NULL,'Dataflows used for dark lauch testing of refactored events end to end'),
 									('CLA2671_RefactorEventsToJava','sentry-data-nrdev-dataset-ae2||temp-file/uncompresszip/',NULL,'Dataflows used for dark lauch testing of refactored events end to end'),
-									('CLA3240_UseDropLocationV2','False','CLA3240_UseDropLocationV2','If true, uses the ProducerS3Drop_v2 Data Action Type when creating new Data Flows.  If false, uses the original ProducerS3Drop Data Action Type.')
+									('CLA3240_UseDropLocationV2','False','CLA3240_UseDropLocationV2','If true, uses the ProducerS3Drop_v2 Data Action Type when creating new Data Flows.  If false, uses the original ProducerS3Drop Data Action Type.'),
+									('CLA3241_DisableDfsDropLocation','False','CLA3241_DisableDfsDropLocation','If true, DSC will no longer create the DFS drop location. If false, DSC will continue to create the DFS drop location.')
 								)
 								AS Source (KeyCol, [Value], [Name], [Description]) 
 

@@ -13,6 +13,7 @@ namespace Sentry.data.Core
         IFeatureFlag<string> CLA2671_RefactorEventsToJava { get; }
         IFeatureFlag<string> CLA2671_RefactoredDataFlows { get; }
         IFeatureFlag<bool> CLA3240_UseDropLocationV2 { get; }
+        IFeatureFlag<bool> CLA3241_DisableDfsDropLocation { get; }
 
     }
 }
