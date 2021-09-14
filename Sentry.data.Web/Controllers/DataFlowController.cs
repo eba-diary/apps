@@ -23,9 +23,10 @@ namespace Sentry.data.Web.Controllers
         private readonly ISecurityService _securityService;
         private readonly ISAIDService _saidService;
         private readonly ISchemaService _schemaService;
+        private readonly Lazy<IDataFeatures> _dataFeatures;
 
         public DataFlowController(IDataFlowService dataFlowService, IDatasetService datasetService, IConfigService configService,
-            ISecurityService securityService, ISAIDService saidService, ISchemaService schemaService)
+            ISecurityService securityService, ISAIDService saidService, ISchemaService schemaService, Lazy<IDataFeatures> dataFeatures)
         {
             _dataFlowService = dataFlowService;
             _datasetService = datasetService;
@@ -33,7 +34,14 @@ namespace Sentry.data.Web.Controllers
             _securityService = securityService;
             _saidService = saidService;
             _schemaService = schemaService;
+            _dataFeatures = dataFeatures;
         }
+
+        public IDataFeatures DataFeatures
+        {
+            get { return _dataFeatures.Value; }
+        }
+
 
         // GET: DataFlow
         [HttpGet]
@@ -115,7 +123,8 @@ namespace Sentry.data.Web.Controllers
         {
             UserSecurity us = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
 
-            if (!us.CanCreateDataFlow)
+            //Feature flag will only evaluate true for Admins
+            if (!DataFeatures.CLA1656_DataFlowEdit_ViewEditPage.GetValue(SharedContext.CurrentUser.AssociateId) && !us.CanCreateDataFlow)
             {
                 return View("Forbidden");
             }
@@ -137,6 +146,8 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> DataFlowForm(DataFlowModel model)
         {
+            UserSecurity us = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);            
+
             AddCoreValidationExceptionsToModel(model.Validate());
 
             DataFlowDto dfDto = model.ToDto();
@@ -149,6 +160,10 @@ namespace Sentry.data.Web.Controllers
                 {
                     int newFlowId = 0;
 
+                    /************************************************
+                     * Incoming Post does not have dataflow Id 
+                     *    therefore, user created a new dataflow 
+                     ************************************************/
                     if (dfDto.Id == 0)
                     {
                         newFlowId = _dataFlowService.CreateandSaveDataFlow(dfDto);
@@ -156,6 +171,23 @@ namespace Sentry.data.Web.Controllers
                         {
                             return RedirectToAction("Detail", "DataFlow", new { id = newFlowId });
                         }
+                    }
+                    /************************************************
+                     *  Incoming Post has a non-zero dataflow Id, 
+                     *      therefore, user updated an existing
+                     *      dataflow
+                    ************************************************/
+                    else
+                    {
+                        //Feature flag will only evaluate true for Admins
+                        if (!DataFeatures.CLA1656_DataFlowEdit_ViewEditPage.GetValue(SharedContext.CurrentUser.AssociateId) || !us.CanCreateDataFlow)
+                        {
+                            return View("Forbidden");
+                        }
+
+                        newFlowId = _dataFlowService.UpdateandSaveDataFlow(dfDto);
+
+                        return RedirectToAction("Detail", "DataFlow", new { id = newFlowId });
                     }
 
                     return RedirectToAction("Index");
@@ -179,7 +211,13 @@ namespace Sentry.data.Web.Controllers
                 AddCoreValidationExceptionsToModel(ex);
             }
 
-            model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+
+            /*
+             *  At this point, something has failed 
+             * 
+             */
+
+                    model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
             model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);

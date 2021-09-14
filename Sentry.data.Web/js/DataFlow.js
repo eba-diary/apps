@@ -10,7 +10,6 @@
     DataFlowFormInit: function () {
 
         data.DataFlow.InitIngestionType();
-        //data.DataFlow.InitCompressionCheckbox();
 
 
         $("#PreprocessingOptions").select2({

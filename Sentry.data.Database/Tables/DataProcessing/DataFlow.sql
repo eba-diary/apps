@@ -16,9 +16,9 @@
     [NamedEnvironment] VARCHAR(25) NULL, 
     [NamedEnvironmentType] VARCHAR(25) NULL, 
     [IngestionType] INT NULL, 
-    [IsDecompressionRequired] BIT NOT NULL, 
+    [IsDecompressionRequired] BIT NULL, 
     [CompressionType] INT NULL, 
-    [IsPreProcessingRequired] BIT NOT NULL, 
+    [IsPreProcessingRequired] BIT NULL, 
     [PreProcessingOption] INT NULL, 
     CONSTRAINT [PK_DataFlow] PRIMARY KEY CLUSTERED 
 (

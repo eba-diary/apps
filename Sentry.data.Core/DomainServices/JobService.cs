@@ -273,8 +273,10 @@ namespace Sentry.data.Core
 
                 if (logicalDelete)
                 {
+                    //Remove job from HangFire scheduler
                     DeleteJobFromScheduler(job);
 
+                    //Mark job for deletion
                     job.IsEnabled = false;
                     job.Modified = DateTime.Now;
                     job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
@@ -283,9 +285,15 @@ namespace Sentry.data.Core
                 }
                 else
                 {
+                    //Remove job from HangFire scheduler
+                    DeleteJobFromScheduler(job);
+
+                    //Remove any associated DFS drop location
                     DeleteDFSDropLocation(job);
 
+                    //Mark job as deleted
                     job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
+                    job.IsEnabled = false;
                 }
             }
             catch (Exception ex)

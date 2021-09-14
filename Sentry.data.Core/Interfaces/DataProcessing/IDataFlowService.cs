@@ -71,7 +71,6 @@ namespace Sentry.data.Core
         /// <exception cref="ArgumentNullException"
         /// <returns></returns>
         List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId);
-        void DeleteByFileSchema(FileSchema scm);
         ValidationException Validate(DataFlowDto dfDto);
         List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId);
         void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true);
@@ -82,5 +81,6 @@ namespace Sentry.data.Core
         /// <param name="id"></param>
         /// <returns></returns>
         RetrieverJobDto GetAssociatedRetrieverJobDto(int id);
+        int UpdateandSaveDataFlow(DataFlowDto dfDto);
     }
 }

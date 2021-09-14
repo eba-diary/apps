@@ -40,7 +40,7 @@ namespace Sentry.data.Core
             return new SchemaMapDto()
             {
                 Id = scmMap.Id,
-                DatasetId = scmMap.Dataset.DatasetId,
+                DatasetId = (scmMap.Dataset != null) ? scmMap.Dataset.DatasetId : 0,
                 SchemaId = scmMap.MappedSchema.SchemaId,
                 SearchCriteria = scmMap.SearchCriteria,
                 StepId = scmMap.DataFlowStepId.Id

@@ -179,6 +179,7 @@
     <Compile Include="AppSettings\HostSettingsWrapper.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Exceptions\S3ServiceProviderException.cs" />
+    <Compile Include="FeatureFlags\AdminUserBaseConditionalStrategy.cs" />
     <Compile Include="FeatureFlags\DataFeatures.cs" />
     <Compile Include="DomainContexts\datasetContext.cs" />
     <Compile Include="DomainContexts\dataAssetContext.cs" />
