@@ -20,11 +20,9 @@ BEGIN TRAN
 		WHEN NOT MATCHED BY TARGET THEN 
 			-- insert new rows 
 			INSERT (KeyCol, [Value], [Name], [Description])
-			VALUES (KeyCol, [Value], [Name], [Description])
-					  
-		WHEN NOT MATCHED BY SOURCE THEN 
-			-- delete rows that are in the target but not the source 
-			DELETE;
+			VALUES (KeyCol, [Value], [Name], [Description]);
+
+		--never delete FeatureEntity rows, since the Java team manages them via scripts
 
 
 	END TRY 
