@@ -169,6 +169,8 @@ namespace Sentry.data.Core
             DataFlow df = MapToDataFlow(scm);
 
             MapDataFlowStepsForFileSchema(scm, df);
+
+            _jobService.CreateDropLocation(_datasetContext.RetrieverJob.FirstOrDefault(w => w.DataFlow == df));
         }
 
         public void PublishMessage(string key, string message)
@@ -568,7 +570,11 @@ namespace Sentry.data.Core
         private void MapDataFlowStepsForPush(DataFlowDto dto, DataFlow df)
         {
             //This type of dataflow does not need to worry about retrieving data from external sources
-            // Data will be pushed by user to S3
+            // Data will be pushed by user to S3 and\or DFS drop locations
+            //Add default DFS drop location for data flow
+            List<DataSource> srcList = _datasetContext.DataSources.ToList();
+            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
+            _datasetContext.Add(dfsDataFlowBasic);
 
             //Generate ingestion steps (get file to raw location)
             AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop);
@@ -608,6 +614,7 @@ namespace Sentry.data.Core
             //Generate Schema Map step to send files to schema specific data flow
             AddDataFlowStep(dto, df, DataActionType.SchemaMap);
 
+            _jobService.CreateDropLocation(dfsDataFlowBasic);
         }
 
         private void MapDataFlowStepsForPull(DataFlowDto dto, DataFlow df)
@@ -976,6 +983,11 @@ namespace Sentry.data.Core
         private void MapDataFlowStepsForFileSchema(FileSchema scm, DataFlow df)
         {
             DataFlowDto dto = MapToDto(scm);
+
+            //Add default DFS drop location for data flow
+            List<DataSource> srcList = _datasetContext.DataSources.ToList();
+            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
+            _datasetContext.Add(dfsDataFlowBasic);
 
             //Generate ingestion steps (get file to raw location)
             AddDataFlowStep(dto, df, DataActionType.S3Drop);
