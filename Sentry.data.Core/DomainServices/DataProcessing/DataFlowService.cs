@@ -18,11 +18,12 @@ namespace Sentry.data.Core
         private readonly IJobService _jobService;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly ISecurityService _securityService;
+        private readonly IDataFeatures _dataFeatures;
 
 
         public DataFlowService(IDatasetContext datasetContext, IMessagePublisher messagePublisher, 
             IUserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider,
-            ISecurityService securityService)
+            ISecurityService securityService, IDataFeatures dataFeatures)
         {
             _datasetContext = datasetContext;
             _messagePublisher = messagePublisher;
@@ -30,6 +31,7 @@ namespace Sentry.data.Core
             _jobService = jobService;
             _s3ServiceProvider = s3ServiceProvider;
             _securityService = securityService;
+            _dataFeatures = dataFeatures;
         }
 
         public List<DataFlowDto> ListDataFlows()
@@ -575,7 +577,9 @@ namespace Sentry.data.Core
                 CreatedDTM = DateTime.Now,
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
                 Questionnaire = dto.DFQuestionnaire,
-                FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE(),
+                FlowStorageCode = (!_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) 
+                                    ? _datasetContext.GetNextDataFlowStorageCDE() 
+                                    : _datasetContext.FileSchema.Where(x => x.SchemaId == dto.SchemaMap.First().SchemaId).Select(s => s.StorageCode).FirstOrDefault(),
                 SaidKeyCode = dto.SaidKeyCode,
                 ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
                 DeleteIssuer = dto.DeleteIssuer,
@@ -634,8 +638,28 @@ namespace Sentry.data.Core
                 }
             }
 
-            //Generate Schema Map step to send files to schema specific data flow
-            AddDataFlowStep(dto, df, DataActionType.SchemaMap);
+            //Feature flag = false, add schema map step
+            //Feature flag = true, do no add schema map step
+            if (!_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
+            {
+                //Generate Schema Map step to send files to schema specific data flow
+                AddDataFlowStep(dto, df, DataActionType.SchemaMap);
+            }
+            else
+            {
+
+                FileSchema scm = _datasetContext.GetById<FileSchema>(dto.SchemaMap.First().SchemaId);
+
+                //Generate preprocessing for file types (i.e. fixedwidth, csv, json, etc...)
+                MapPreProcessingSteps(scm, dto, df);
+
+                //Generate DSC registering step
+                AddDataFlowStep(dto, df, DataActionType.SchemaLoad);
+                AddDataFlowStep(dto, df, DataActionType.QueryStorage);
+
+                ////Generate consumption layer steps
+                AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
+            }
 
             _jobService.CreateDropLocation(dfsDataFlowBasic);
         }
