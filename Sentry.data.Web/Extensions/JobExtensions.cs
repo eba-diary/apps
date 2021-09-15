@@ -37,13 +37,22 @@ namespace Sentry.data.Web.Extensions
 
             foreach (Core.RetrieverJob dto in dtoList)
             {
-                DfsMonitorModel model = new DfsMonitorModel()
+                try
                 {
-                    JobId = dto.Id,
-                    MonitorTarget = dto.DataSource.CalcRelativeUri(dto).LocalPath
-                };
+                    DfsMonitorModel model = new DfsMonitorModel()
+                    {
+                        JobId = dto.Id,
+                        MonitorTarget = dto.DataSource.CalcRelativeUri(dto).LocalPath
+                    };
+
+                    modelList.Add(model);
+                }
+                catch (Exception ex)
+                {
+                    Sentry.Common.Logging.Logger.Error($"<jobextensions-tomodel> - failed creating model (retrieverjobid:{dto.Id}");
+                    throw;
+                }
                 
-                modelList.Add(model);
             }
 
             return (modelList);
