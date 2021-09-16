@@ -59,7 +59,7 @@ namespace Sentry.data.Infrastructure
                     try
                     {
                         //https://docs.microsoft.com/en-us/dotnet/standard/parallel-programming/how-to-handle-exceptions-in-parallel-loops
-                        ProcessFilesInParallel(files, targetS3DropStep.Action.TargetStorageBucket, targetPrefix);
+                        ProcessFilesInParallel(files, targetS3DropStep.TargetBucket, targetPrefix);
                     }
                     catch (AggregateException ae)
                     {

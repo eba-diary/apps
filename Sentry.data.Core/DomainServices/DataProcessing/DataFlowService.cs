@@ -1,35 +1,38 @@
 ﻿using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.Interfaces.QuartermasterRestClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
     public class DataFlowService : IDataFlowService
     {
         private readonly IDatasetContext _datasetContext;
-        private readonly IMessagePublisher _messagePublisher;
         private readonly IUserService _userService;
         private readonly IJobService _jobService;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly ISecurityService _securityService;
+        private readonly IClient _quartermasterClient;
         private readonly IDataFeatures _dataFeatures;
 
-        public DataFlowService(IDatasetContext datasetContext, IMessagePublisher messagePublisher,
+        public DataFlowService(IDatasetContext datasetContext, 
             IUserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider,
-            ISecurityService securityService, IDataFeatures dataFeatures)
+            ISecurityService securityService, IClient quartermasterClient, IDataFeatures dataFeatures)
         {
             _datasetContext = datasetContext;
-            _messagePublisher = messagePublisher;
             _userService = userService;
             _jobService = jobService;
             _s3ServiceProvider = s3ServiceProvider;
             _securityService = securityService;
+            _quartermasterClient = quartermasterClient;
             _dataFeatures = dataFeatures;
         }
 
@@ -136,11 +139,6 @@ namespace Sentry.data.Core
             }
         }
 
-        public void PublishMessage(string key, string message)
-        {
-            _messagePublisher.PublishDSCEvent(key, message);
-        }
-
         public IQueryable<DataSourceType> GetDataSourceTypes()
         {
             return _datasetContext.DataSourceTypes;
@@ -235,7 +233,7 @@ namespace Sentry.data.Core
              *   - Current step trigger key equals to dependent step SourceDependencyPrefix
              *   - Current step bucket equals to dependent step SourceDependencyBucket
              ****************************************************/
-            steps = _datasetContext.DataFlowStep.Where(w => w.SourceDependencyPrefix == step.TriggerKey && w.SourceDependencyBucket == step.Action.TargetStorageBucket).ToList();
+            steps = _datasetContext.DataFlowStep.Where(w => w.SourceDependencyPrefix == step.TriggerKey && w.SourceDependencyBucket == step.TriggerBucket).ToList();
 
             return steps;
         }
@@ -522,14 +520,70 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
-        public ValidationException Validate(DataFlowDto dfDto)
+        public async Task<ValidationException> Validate(DataFlowDto dfDto)
         {
             ValidationResults results = new ValidationResults();
             if (_datasetContext.DataFlow.Any(w => w.Name == dfDto.Name))
             {
                 results.Add(DataFlow.ValidationErrors.nameMustBeUnique, "Dataflow name is already used");
             }
+
+            //if the asset is managed in Quartermaster, then the named environment and named environment type must be valid according to Quartermaster
+            var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(dfDto.SaidKeyCode, ShowDeleted11.False).ConfigureAwait(false)).ToList();
+            if (namedEnvironmentList.Any())
+            {
+                if (!namedEnvironmentList.Any(e => e.Name == dfDto.NamedEnvironment))
+                {
+                    results.Add(DataFlow.ValidationErrors.namedEnvironmentInvalid, $"Named Environment provided (\"{dfDto.NamedEnvironment}\") doesn't match a Quartermaster Named Environment");
+                }
+                else if (namedEnvironmentList.First(e => e.Name == dfDto.NamedEnvironment).Environmenttype != dfDto.NamedEnvironmentType.ToString())
+                {
+                    var quarterMasterNamedEnvironmentType = namedEnvironmentList.First(e => e.Name == dfDto.NamedEnvironment).Environmenttype;
+                    results.Add(DataFlow.ValidationErrors.namedEnvironmentTypeInvalid, $"Named Environment Type provided (\"{dfDto.NamedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType}\")");
+                }
+            }
+
             return new ValidationException(results);
+        }
+
+        /// <summary>
+        /// Given a SAID asset key code, get all the named environments from Quartermaster
+        /// </summary>
+        /// <param name="saidAssetKeyCode">The four-character key code for an asset</param>
+        /// <returns>A list of NamedEnvironmentDto objects</returns>
+        public Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsAsync(string saidAssetKeyCode)
+        {
+            //validate parameters
+            if (string.IsNullOrWhiteSpace(saidAssetKeyCode))
+            {
+                throw new ArgumentNullException(nameof(saidAssetKeyCode), "SAID Asset Key Code was missing.");
+            }
+
+            //the guts of the method have to be wrapped in a local function for proper async handling
+            //see https://confluence.sentry.com/questions/224368523
+            async Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsInternalAsync()
+            {
+                //call Quartermaster to get list of named environments for this asset
+                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted11.False).ConfigureAwait(false)).ToList();
+                namedEnvironmentList = namedEnvironmentList.OrderBy(n => n.Name).ToList();
+
+                //grab a config setting to see if we need to filter the named environments by a certain named environment type
+                //if the config setting for "QuartermasterNamedEnvironmentTypeFilter" is blank, no filter will be applied
+                var environmentTypeFilter = Configuration.Config.GetHostSetting("QuartermasterNamedEnvironmentTypeFilter");
+                Func<NamedEnvironment, bool> filter = env => true;
+                if (!string.IsNullOrWhiteSpace(environmentTypeFilter))
+                {
+                    filter = env => env.Environmenttype == environmentTypeFilter;
+                }
+
+                //map the output from Quartermaster to our Dto
+                return namedEnvironmentList.Where(filter).Select(env => new NamedEnvironmentDto
+                {
+                    NamedEnvironment = env.Name,
+                    NamedEnvironmentType = (GlobalEnums.NamedEnvironmentType)Enum.Parse(typeof(GlobalEnums.NamedEnvironmentType), env.Environmenttype)
+                }).ToList();
+            }
+            return GetNamedEnvironmentsInternalAsync();
         }
 
         #region Private Methods
@@ -583,7 +637,9 @@ namespace Sentry.data.Core
                 SaidKeyCode = dto.SaidKeyCode,
                 ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
                 DeleteIssuer = dto.DeleteIssuer,
-                DeleteIssueDTM = DateTime.MaxValue
+                DeleteIssueDTM = DateTime.MaxValue,
+                NamedEnvironment = dto.NamedEnvironment,
+                NamedEnvironmentType = dto.NamedEnvironmentType
             };
 
             _datasetContext.Add(df);
@@ -784,7 +840,7 @@ namespace Sentry.data.Core
             dto.ActionName = step.Action.Name;
             dto.ActionDescription = step.Action.Description;
             dto.TriggerKey = step.TriggerKey;
-            dto.TriggerBucket = step.Action.TargetStorageBucket;
+            dto.TriggerBucket = step.TriggerBucket;
             dto.TargetPrefix = step.TargetPrefix;
             dto.DataFlowId = step.DataFlow.Id;
         }
@@ -818,8 +874,8 @@ namespace Sentry.data.Core
                 df.Steps = new List<DataFlowStep>();
             }
 
-            SetTriggerPrefix(step);
-            SetTargetPrefix(step);
+            SetTrigger(step);
+            SetTarget(step);
             SetSourceDependency(step, df.Steps.OrderByDescending(o => o.ExeuctionOrder).Take(1).FirstOrDefault());
 
             //Set exeuction order
@@ -838,7 +894,9 @@ namespace Sentry.data.Core
                     action = _datasetContext.S3DropAction.FirstOrDefault();
                     break;
                 case DataActionType.ProducerS3Drop:
-                    action = _datasetContext.ProducerS3DropAction.FirstOrDefault();
+                    action = _dataFeatures.CLA3240_UseDropLocationV2.GetValue()
+                        ? _datasetContext.ProducerS3DropAction.GetDlstDropLocation()
+                        : _datasetContext.ProducerS3DropAction.GetDataDropLocation();
                     break;
                 case DataActionType.RawStorage:
                     action = _datasetContext.RawStorageAction.FirstOrDefault();
@@ -926,23 +984,35 @@ namespace Sentry.data.Core
             return step;
         }
 
-        private void SetTriggerPrefix(DataFlowStep step)
+        private void SetTrigger(DataFlowStep step)
         {
             if (step.DataAction_Type_Id == DataActionType.S3Drop)
             {
                 step.TriggerKey = $"droplocation/{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                SetTriggerBucketForS3DropLocation(step);
             }
             else if (step.DataAction_Type_Id == DataActionType.ProducerS3Drop)
             {
-                step.TriggerKey = $"droplocation/data/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/";
+                step.TriggerKey = _dataFeatures.CLA3240_UseDropLocationV2.GetValue()
+                    ? $"{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/"
+                    : $"droplocation/data/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/";
+                SetTriggerBucketForS3DropLocation(step);
             }
             else
             {
                 step.TriggerKey = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                step.TriggerBucket = step.Action.TargetStorageBucket;
             }
         }
 
-        private void SetTargetPrefix(DataFlowStep step)
+        private void SetTriggerBucketForS3DropLocation(DataFlowStep step)
+        {
+            step.TriggerBucket = string.IsNullOrWhiteSpace(step.DataFlow.UserDropLocationBucket)
+                ? step.Action.TargetStorageBucket
+                : step.DataFlow.UserDropLocationBucket;
+        }
+
+        private void SetTarget(DataFlowStep step)
         {
             switch (step.DataAction_Type_Id)
             {
@@ -953,10 +1023,12 @@ namespace Sentry.data.Core
                 case DataActionType.ConvertParquet:
                     string schemaStorageCode = GetSchemaStorageCodeForDataFlow(step.DataFlow.Id);
                     step.TargetPrefix = step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{schemaStorageCode}/";
+                    step.TargetBucket = step.Action.TargetStorageBucket;
                     break;
                 //These sent output a step specific location along with down stream dependent steps
                 case DataActionType.RawStorage:
                     step.TargetPrefix = step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                    step.TargetBucket = step.Action.TargetStorageBucket;
                     break;
                 //These only send output to down stream dependent steps
                 case DataActionType.SchemaLoad:
@@ -967,6 +1039,7 @@ namespace Sentry.data.Core
                 case DataActionType.ProducerS3Drop:
                 case DataActionType.FixedWidth:
                     step.TargetPrefix = null;
+                    step.TargetBucket = null;
                     break;
                 default:
                     break;
@@ -976,7 +1049,7 @@ namespace Sentry.data.Core
         private void SetSourceDependency(DataFlowStep step, DataFlowStep previousStep)
         {
             step.SourceDependencyPrefix = previousStep?.TriggerKey;
-            step.SourceDependencyBucket = previousStep?.Action.TargetStorageBucket;
+            step.SourceDependencyBucket = previousStep?.TriggerBucket;
         }
 
         #region SchemaFlowMappings

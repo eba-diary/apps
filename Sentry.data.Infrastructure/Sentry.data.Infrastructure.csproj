@@ -308,6 +308,7 @@
     <Compile Include="ServiceImplementations\Messaging\S3EventService.cs" />
     <Compile Include="ServiceImplementations\Messaging\SnowflakeEventService.cs" />
     <Compile Include="ServiceImplementations\MetadataProcessorService.cs" />
+    <Compile Include="ServiceImplementations\QuartermasterRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDService.cs" />
     <Compile Include="ServiceImplementations\SnowProvider.cs" />
@@ -380,6 +381,10 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="RestServiceGenerators\DownloadNSwag.bat" />
+    <None Include="RestServiceGenerators\DownloadNSwag.ps1" />
+    <None Include="RestServiceGenerators\QuartermasterRestServiceGen.bat" />
+    <None Include="RestServiceGenerators\QuartermasterRestServiceGen.ps1" />
     <None Include="RestServiceGenerators\SAIDRestServiceGen.bat" />
     <None Include="RestServiceGenerators\SAIDRestServiceGen.ps1" />
     <None Include="Sentry.data.Infrastructure.ruleset" />

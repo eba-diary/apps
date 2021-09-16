@@ -66,7 +66,7 @@ namespace Sentry.data.Infrastructure
 
                 DataFlowStepEventTarget target = new DataFlowStepEventTarget
                 {
-                    BucketName = dStep.Action.TargetStorageBucket,
+                    BucketName = dStep.TriggerBucket,
                     ObjectKey = dStep.TriggerKey + $"{((storageCode == null) ? string.Empty : storageCode + "/")}{DataFlowHelpers.GenerateGuid(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid)}/"                    
                 };
 
