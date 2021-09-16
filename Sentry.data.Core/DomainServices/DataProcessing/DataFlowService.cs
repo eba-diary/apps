@@ -1,35 +1,39 @@
 ﻿using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.Interfaces.QuartermasterRestClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
     public class DataFlowService : IDataFlowService
     {
         private readonly IDatasetContext _datasetContext;
-        private readonly IMessagePublisher _messagePublisher;
         private readonly IUserService _userService;
         private readonly IJobService _jobService;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly ISecurityService _securityService;
+        private readonly IClient _quartermasterClient;
+        private readonly IDataFeatures _dataFeatures;
 
-
-        public DataFlowService(IDatasetContext datasetContext, IMessagePublisher messagePublisher, 
+        public DataFlowService(IDatasetContext datasetContext, 
             IUserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider,
-            ISecurityService securityService)
+            ISecurityService securityService, IClient quartermasterClient, IDataFeatures dataFeatures)
         {
             _datasetContext = datasetContext;
-            _messagePublisher = messagePublisher;
             _userService = userService;
             _jobService = jobService;
             _s3ServiceProvider = s3ServiceProvider;
             _securityService = securityService;
+            _quartermasterClient = quartermasterClient;
+            _dataFeatures = dataFeatures;
         }
 
         public List<DataFlowDto> ListDataFlows()
@@ -83,7 +87,7 @@ namespace Sentry.data.Core
 
             //Verify user has permissions to push data to each schema mapped to dataflow
             StringBuilder datasetsWithNoPermissions = new StringBuilder();
-            foreach(SchemaMapDto scmMap in dto.SchemaMap)
+            foreach (SchemaMapDto scmMap in dto.SchemaMap)
             {
                 Dataset ds = _datasetContext.GetById<Dataset>(scmMap.DatasetId);
                 bool IsDatasetDetected = datasetsWithNoPermissions.ToString().Split(',').Any(a => a == ds.DatasetName);
@@ -106,7 +110,7 @@ namespace Sentry.data.Core
                     else
                     {
                         datasetsWithNoPermissions.Append($"{ds.DatasetName}");
-                    }                    
+                    }
                 }
             }
 
@@ -170,12 +174,10 @@ namespace Sentry.data.Core
 
             MapDataFlowStepsForFileSchema(scm, df);
 
-            _jobService.CreateDropLocation(_datasetContext.RetrieverJob.FirstOrDefault(w => w.DataFlow == df));
-        }
-
-        public void PublishMessage(string key, string message)
-        {
-            _messagePublisher.PublishDSCEvent(key, message);
+            if (!_dataFeatures.CLA3241_DisableDfsDropLocation.GetValue())
+            {
+                _jobService.CreateDropLocation(_datasetContext.RetrieverJob.FirstOrDefault(w => w.DataFlow == df));
+            }
         }
 
         public IQueryable<DataSourceType> GetDataSourceTypes()
@@ -196,7 +198,7 @@ namespace Sentry.data.Core
 
         public DataFlowStepDto GetS3DropStepForFileSchema(FileSchema scm)
         {
-            if(scm == null)
+            if (scm == null)
             {
                 throw new ArgumentNullException("scm", "FileSchema is required");
             }
@@ -211,7 +213,7 @@ namespace Sentry.data.Core
             DataFlowStepDto stepDto = new DataFlowStepDto();
             MapToDto(step, stepDto);
 
-            
+
 
             return stepDto;
         }
@@ -272,7 +274,7 @@ namespace Sentry.data.Core
              *   - Current step trigger key equals to dependent step SourceDependencyPrefix
              *   - Current step bucket equals to dependent step SourceDependencyBucket
              ****************************************************/
-            steps = _datasetContext.DataFlowStep.Where(w => w.SourceDependencyPrefix == step.TriggerKey && w.SourceDependencyBucket == step.Action.TargetStorageBucket).ToList();
+            steps = _datasetContext.DataFlowStep.Where(w => w.SourceDependencyPrefix == step.TriggerKey && w.SourceDependencyBucket == step.TriggerBucket).ToList();
 
             return steps;
         }
@@ -441,8 +443,8 @@ namespace Sentry.data.Core
             List<int> producerFlowIdList = new List<int>();
 
             /* Get producer flow Ids which map to schema */
-            List<Tuple<int, int>> producerSchemaMapIds = _datasetContext.SchemaMap.Where(w => w.MappedSchema.SchemaId == schemaId && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaMap).Select(s => new Tuple<int, int>( s.DataFlowStepId.Id, s.DataFlowStepId.DataFlow.Id)).ToList();
-   
+            List<Tuple<int, int>> producerSchemaMapIds = _datasetContext.SchemaMap.Where(w => w.MappedSchema.SchemaId == schemaId && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaMap).Select(s => new Tuple<int, int>(s.DataFlowStepId.Id, s.DataFlowStepId.DataFlow.Id)).ToList();
+
             foreach (Tuple<int, int> item in producerSchemaMapIds)
             {
                 /*  Add producer dataflow id to list if the
@@ -461,7 +463,7 @@ namespace Sentry.data.Core
                 }
             }
 
-            return producerFlowIdList;            
+            return producerFlowIdList;
         }
 
         public void Delete(int dataFlowId)
@@ -502,7 +504,7 @@ namespace Sentry.data.Core
         {
             List<SchemaMap> schemaMapList = _datasetContext.DataFlowStep.Where(w => w.DataFlow.Id == dataflowId).SelectMany(s => s.SchemaMappings).ToList();
             List<SchemaMapDetailDto> dtoList = new List<SchemaMapDetailDto>();
-            foreach(SchemaMap map in schemaMapList)
+            foreach (SchemaMap map in schemaMapList)
             {
                 SchemaMapDetailDto dto = new SchemaMapDetailDto();
                 MapToDetailDto(map, dto);
@@ -511,20 +513,76 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
-        public ValidationException Validate(DataFlowDto dfDto)
+        public async Task<ValidationException> Validate(DataFlowDto dfDto)
         {
             ValidationResults results = new ValidationResults();
             if (dfDto.Id == 0 &&_datasetContext.DataFlow.Any(w => w.Name == dfDto.Name))
             {
                 results.Add(DataFlow.ValidationErrors.nameMustBeUnique, "Dataflow name is already used");
             }
+
+            //if the asset is managed in Quartermaster, then the named environment and named environment type must be valid according to Quartermaster
+            var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(dfDto.SaidKeyCode, ShowDeleted11.False).ConfigureAwait(false)).ToList();
+            if (namedEnvironmentList.Any())
+            {
+                if (!namedEnvironmentList.Any(e => e.Name == dfDto.NamedEnvironment))
+                {
+                    results.Add(DataFlow.ValidationErrors.namedEnvironmentInvalid, $"Named Environment provided (\"{dfDto.NamedEnvironment}\") doesn't match a Quartermaster Named Environment");
+                }
+                else if (namedEnvironmentList.First(e => e.Name == dfDto.NamedEnvironment).Environmenttype != dfDto.NamedEnvironmentType.ToString())
+                {
+                    var quarterMasterNamedEnvironmentType = namedEnvironmentList.First(e => e.Name == dfDto.NamedEnvironment).Environmenttype;
+                    results.Add(DataFlow.ValidationErrors.namedEnvironmentTypeInvalid, $"Named Environment Type provided (\"{dfDto.NamedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType}\")");
+                }
+            }
+
             return new ValidationException(results);
         }
 
-        #region Private Methods        
+        /// <summary>
+        /// Given a SAID asset key code, get all the named environments from Quartermaster
+        /// </summary>
+        /// <param name="saidAssetKeyCode">The four-character key code for an asset</param>
+        /// <returns>A list of NamedEnvironmentDto objects</returns>
+        public Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsAsync(string saidAssetKeyCode)
+        {
+            //validate parameters
+            if (string.IsNullOrWhiteSpace(saidAssetKeyCode))
+            {
+                throw new ArgumentNullException(nameof(saidAssetKeyCode), "SAID Asset Key Code was missing.");
+            }
 
+            //the guts of the method have to be wrapped in a local function for proper async handling
+            //see https://confluence.sentry.com/questions/224368523
+            async Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsInternalAsync()
+            {
+                //call Quartermaster to get list of named environments for this asset
+                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted11.False).ConfigureAwait(false)).ToList();
+                namedEnvironmentList = namedEnvironmentList.OrderBy(n => n.Name).ToList();
+
+                //grab a config setting to see if we need to filter the named environments by a certain named environment type
+                //if the config setting for "QuartermasterNamedEnvironmentTypeFilter" is blank, no filter will be applied
+                var environmentTypeFilter = Configuration.Config.GetHostSetting("QuartermasterNamedEnvironmentTypeFilter");
+                Func<NamedEnvironment, bool> filter = env => true;
+                if (!string.IsNullOrWhiteSpace(environmentTypeFilter))
+                {
+                    filter = env => env.Environmenttype == environmentTypeFilter;
+                }
+
+                //map the output from Quartermaster to our Dto
+                return namedEnvironmentList.Where(filter).Select(env => new NamedEnvironmentDto
+                {
+                    NamedEnvironment = env.Name,
+                    NamedEnvironmentType = (GlobalEnums.NamedEnvironmentType)Enum.Parse(typeof(GlobalEnums.NamedEnvironmentType), env.Environmenttype)
+                }).ToList();
+            }
+            return GetNamedEnvironmentsInternalAsync();
+        }
+
+        #region Private Methods
+        
         private DataFlow CreateDataFlow(DataFlowDto dto)
-        {           
+        {
             DataFlow df = MapToDataFlow(dto);
 
             switch (dto.IngestionType)
@@ -559,7 +617,9 @@ namespace Sentry.data.Core
                 IsDecompressionRequired = dto.IsCompressed,
                 CompressionType = dto.CompressionType,
                 IsPreProcessingRequired = dto.IsPreProcessingRequired,
-                PreProcessingOption = (int)dto.PreProcessingOption
+                PreProcessingOption = (int)dto.PreProcessingOption,
+                NamedEnvironment = dto.NamedEnvironment,
+                NamedEnvironmentType = dto.NamedEnvironmentType
             };
 
             _datasetContext.Add(df);
@@ -571,10 +631,15 @@ namespace Sentry.data.Core
         {
             //This type of dataflow does not need to worry about retrieving data from external sources
             // Data will be pushed by user to S3 and\or DFS drop locations
-            //Add default DFS drop location for data flow
-            List<DataSource> srcList = _datasetContext.DataSources.ToList();
-            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
-            _datasetContext.Add(dfsDataFlowBasic);
+
+            if (!_dataFeatures.CLA3241_DisableDfsDropLocation.GetValue())
+            {
+                //Add default DFS drop location for data flow
+                List<DataSource> srcList = _datasetContext.DataSources.ToList();
+                RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
+                _datasetContext.Add(dfsDataFlowBasic);
+                _jobService.CreateDropLocation(dfsDataFlowBasic);
+            }
 
             //Generate ingestion steps (get file to raw location)
             AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop);
@@ -613,8 +678,6 @@ namespace Sentry.data.Core
 
             //Generate Schema Map step to send files to schema specific data flow
             AddDataFlowStep(dto, df, DataActionType.SchemaMap);
-
-            _jobService.CreateDropLocation(dfsDataFlowBasic);
         }
 
         private void MapDataFlowStepsForPull(DataFlowDto dto, DataFlow df)
@@ -664,7 +727,7 @@ namespace Sentry.data.Core
 
         private SchemaMap MapToSchemaMap(SchemaMapDto dto, DataFlowStep step)
         {
-            SchemaMap map =  new SchemaMap()
+            SchemaMap map = new SchemaMap()
             {
                 DataFlowStepId = step,
                 MappedSchema = _datasetContext.FileSchema.Where(w => w.SchemaId == dto.SchemaId).FirstOrDefault(),
@@ -710,7 +773,7 @@ namespace Sentry.data.Core
             List<SchemaMapDto> scmMapDtoList = new List<SchemaMapDto>();
             foreach (DataFlowStep step in df.Steps.Where(w => w.SchemaMappings != null && w.SchemaMappings.Any()))
             {
-                foreach(SchemaMap map in step.SchemaMappings)
+                foreach (SchemaMap map in step.SchemaMappings)
                 {
                     scmMapDtoList.Add(map.ToDto());
                 }
@@ -757,7 +820,7 @@ namespace Sentry.data.Core
             dto.ActionName = step.Action.Name;
             dto.ActionDescription = step.Action.Description;
             dto.TriggerKey = step.TriggerKey;
-            dto.TriggerBucket = step.Action.TargetStorageBucket;
+            dto.TriggerBucket = step.TriggerBucket;
             dto.TargetPrefix = step.TargetPrefix;
             dto.DataFlowId = step.DataFlow.Id;
         }
@@ -784,15 +847,15 @@ namespace Sentry.data.Core
 
         private void AddDataFlowStep(DataFlowDto dto, DataFlow df, DataActionType actionType)
         {
-            DataFlowStep step = CreateDataFlowStep(actionType, dto, df);            
+            DataFlowStep step = CreateDataFlowStep(actionType, dto, df);
 
             if (df.Steps == null)
             {
                 df.Steps = new List<DataFlowStep>();
             }
 
-            SetTriggerPrefix(step);
-            SetTargetPrefix(step);
+            SetTrigger(step);
+            SetTarget(step);
             SetSourceDependency(step, df.Steps.OrderByDescending(o => o.ExeuctionOrder).Take(1).FirstOrDefault());
 
             //Set exeuction order
@@ -806,12 +869,14 @@ namespace Sentry.data.Core
         {
             BaseAction action;
             switch (actionType)
-            {                
+            {
                 case DataActionType.S3Drop:
                     action = _datasetContext.S3DropAction.FirstOrDefault();
                     break;
                 case DataActionType.ProducerS3Drop:
-                    action = _datasetContext.ProducerS3DropAction.FirstOrDefault();
+                    action = _dataFeatures.CLA3240_UseDropLocationV2.GetValue()
+                        ? _datasetContext.ProducerS3DropAction.GetDlstDropLocation()
+                        : _datasetContext.ProducerS3DropAction.GetDataDropLocation();
                     break;
                 case DataActionType.RawStorage:
                     action = _datasetContext.RawStorageAction.FirstOrDefault();
@@ -899,23 +964,35 @@ namespace Sentry.data.Core
             return step;
         }
 
-        private void SetTriggerPrefix(DataFlowStep step)
+        private void SetTrigger(DataFlowStep step)
         {
-            if(step.DataAction_Type_Id == DataActionType.S3Drop)
+            if (step.DataAction_Type_Id == DataActionType.S3Drop)
             {
                 step.TriggerKey = $"droplocation/{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                SetTriggerBucketForS3DropLocation(step);
             }
             else if (step.DataAction_Type_Id == DataActionType.ProducerS3Drop)
             {
-                step.TriggerKey = $"droplocation/data/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/";
+                step.TriggerKey = _dataFeatures.CLA3240_UseDropLocationV2.GetValue()
+                    ? $"{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/"
+                    : $"droplocation/data/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/";
+                SetTriggerBucketForS3DropLocation(step);
             }
             else
             {
                 step.TriggerKey = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
-            }            
+                step.TriggerBucket = step.Action.TargetStorageBucket;
+            }
         }
 
-        private void SetTargetPrefix(DataFlowStep step)
+        private void SetTriggerBucketForS3DropLocation(DataFlowStep step)
+        {
+            step.TriggerBucket = string.IsNullOrWhiteSpace(step.DataFlow.UserDropLocationBucket)
+                ? step.Action.TargetStorageBucket
+                : step.DataFlow.UserDropLocationBucket;
+        }
+
+        private void SetTarget(DataFlowStep step)
         {
             switch (step.DataAction_Type_Id)
             {
@@ -926,10 +1003,12 @@ namespace Sentry.data.Core
                 case DataActionType.ConvertParquet:
                     string schemaStorageCode = GetSchemaStorageCodeForDataFlow(step.DataFlow.Id);
                     step.TargetPrefix = step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{schemaStorageCode}/";
+                    step.TargetBucket = step.Action.TargetStorageBucket;
                     break;
                 //These sent output a step specific location along with down stream dependent steps
                 case DataActionType.RawStorage:
                     step.TargetPrefix = step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                    step.TargetBucket = step.Action.TargetStorageBucket;
                     break;
                 //These only send output to down stream dependent steps
                 case DataActionType.SchemaLoad:
@@ -940,6 +1019,7 @@ namespace Sentry.data.Core
                 case DataActionType.ProducerS3Drop:
                 case DataActionType.FixedWidth:
                     step.TargetPrefix = null;
+                    step.TargetBucket = null;
                     break;
                 default:
                     break;
@@ -949,7 +1029,7 @@ namespace Sentry.data.Core
         private void SetSourceDependency(DataFlowStep step, DataFlowStep previousStep)
         {
             step.SourceDependencyPrefix = previousStep?.TriggerKey;
-            step.SourceDependencyBucket = previousStep?.Action.TargetStorageBucket;
+            step.SourceDependencyBucket = previousStep?.TriggerBucket;
         }
 
         #region SchemaFlowMappings
@@ -984,10 +1064,13 @@ namespace Sentry.data.Core
         {
             DataFlowDto dto = MapToDto(scm);
 
-            //Add default DFS drop location for data flow
-            List<DataSource> srcList = _datasetContext.DataSources.ToList();
-            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
-            _datasetContext.Add(dfsDataFlowBasic);
+            if (!_dataFeatures.CLA3241_DisableDfsDropLocation.GetValue())
+            {
+                //Add default DFS drop location for data flow
+                List<DataSource> srcList = _datasetContext.DataSources.ToList();
+                RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
+                _datasetContext.Add(dfsDataFlowBasic);
+            }
 
             //Generate ingestion steps (get file to raw location)
             AddDataFlowStep(dto, df, DataActionType.S3Drop);

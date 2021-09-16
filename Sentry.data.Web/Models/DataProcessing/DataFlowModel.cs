@@ -37,6 +37,9 @@ namespace Sentry.data.Web
         /// Target
         /// </summary>
         public int SchemaId { get; set; }
+
+        [DisplayName("SAID Asset")]
+        [System.ComponentModel.DataAnnotations.Required]
         public string SAIDAssetKeyCode { get; set; }
 
         [DisplayName("Where should this data be loaded?")]
@@ -55,13 +58,27 @@ namespace Sentry.data.Web
         [DisplayName("How will data be ingested into DSC?")]
         public int IngestionTypeSelection { get; set; }
 
+        /// <summary>
+        /// Named Environment naming conventions from https://confluence.sentry.com/x/eQNvAQ
+        /// </summary>
+        [DisplayName("Named Environment")]
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.RegularExpression("^[A-Z0-9]{1,10}$", ErrorMessage = "Named environment must be alphanumeric, all caps, and less than 10 characters")]
+        public string NamedEnvironment { get; set; }
 
+        [DisplayName("Named Environment Type")]
+        [System.ComponentModel.DataAnnotations.Required]
+        public NamedEnvironmentType NamedEnvironmentType { get; set; }
 
         public IEnumerable<SelectListItem> CompressionDropdown { get; set; }
         public IEnumerable<SelectListItem> PreProcessingRequiredDropdown { get; set; }
         public IEnumerable<SelectListItem> PreProcessingOptionsDropdown { get; set; }
         public IEnumerable<SelectListItem> SAIDAssetDropDown { get; set; }
         public IEnumerable<SelectListItem> IngestionTypeDropDown { get; set; }
+        public IEnumerable<SelectListItem> NamedEnvironmentDropDown { get; set; }
+        public IEnumerable<SelectListItem> NamedEnvironmentTypeDropDown { get; set; }
+        [DisplayName("Pre Processing Options")]
+        public List<int> PreprocessingOptions { get; set; }
 
         public ValidationException Validate()
         {

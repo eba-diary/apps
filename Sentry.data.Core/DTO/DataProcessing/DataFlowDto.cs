@@ -30,5 +30,7 @@ namespace Sentry.data.Core
         public ObjectStatusEnum ObjectStatus { get; set; }
         public string DeleteIssuer { get; set; }
         public DateTime DeleteIssueDTM { get; set; }
+        public string NamedEnvironment { get; set; }
+        public NamedEnvironmentType NamedEnvironmentType { get; set; }
     }
 }

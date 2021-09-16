@@ -37,6 +37,12 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual bool IsPreProcessingRequired { get; set; }
         public virtual int? PreProcessingOption { get; set; }
 
+        public virtual string UserDropLocationBucket { get; set; }
+        public virtual string UserDropLocationPrefix { get; set; }
+
+        public virtual string NamedEnvironment { get; set; }
+        public virtual NamedEnvironmentType NamedEnvironmentType { get; set; }
+
         public virtual ValidationResults ValidateForDelete()
         {
             return new ValidationResults();
@@ -59,6 +65,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
             public const string nameMustBeUnique = "nameMustBeUnique";
             public const string stepsContainsAtLeastOneSchemaMap = "stepsContainsAtLeastOneSchemaMap";
             public const string saidAssetIsBlank = "saidAssetIsBlank";
+            public const string namedEnvironmentInvalid = "namedEnvironmentInvalid";
+            public const string namedEnvironmentTypeInvalid = "namedEnvironmentTypeInvalid";
         }
     }
 }

@@ -85,7 +85,9 @@ namespace Sentry.data.Web
                 IsPreProcessingRequired = model.IsPreProcessingRequired,
                 PreProcessingOption = model.PreProcessingSelection,
                 ObjectStatus = model.ObjectStatus,
-                FlowStorageCode = model.StorageCode
+                FlowStorageCode = model.StorageCode,
+                NamedEnvironment = model.NamedEnvironment,
+                NamedEnvironmentType = model.NamedEnvironmentType
             };
 
             if (model.SchemaMaps != null)

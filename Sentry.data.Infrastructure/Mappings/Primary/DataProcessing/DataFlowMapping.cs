@@ -1,6 +1,8 @@
 ﻿using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
+using NHibernate.Type;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
 {
@@ -32,6 +34,10 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.IsPreProcessingRequired, m => m.Column("IsPreProcessingRequired"));
             this.Property(x => x.PreProcessingOption, m => m.Column("PreProcessingOption"));
             
+            this.Property(x => x.UserDropLocationBucket);
+            this.Property(x => x.UserDropLocationPrefix);
+            this.Property(x => x.NamedEnvironment);
+            this.Property(x => x.NamedEnvironmentType, attr => attr.Type<EnumStringType<NamedEnvironmentType>>());
 
             this.Bag(x => x.Steps, (m) =>
             {

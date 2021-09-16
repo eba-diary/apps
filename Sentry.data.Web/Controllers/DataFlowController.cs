@@ -139,6 +139,11 @@ namespace Sentry.data.Web.Controllers
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
             CreateDropDownSetup(model.RetrieverJob);
 
+            var namedEnvironments = await BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment).ConfigureAwait(false);
+            model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
+            model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
+            model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType),namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+
             return View("DataFlowForm", model);
 
         }
@@ -152,7 +157,7 @@ namespace Sentry.data.Web.Controllers
 
             DataFlowDto dfDto = model.ToDto();
 
-            AddCoreValidationExceptionsToModel(_dataFlowService.Validate(dfDto));
+            AddCoreValidationExceptionsToModel(await _dataFlowService.Validate(dfDto).ConfigureAwait(true));
 
             try
             {
@@ -224,7 +229,7 @@ namespace Sentry.data.Web.Controllers
             if (model.RetrieverJob != null)
             {
                 CreateDropDownSetup(model.RetrieverJob);
-            }  
+            }
             if (model.SchemaMaps != null && model.SchemaMaps.Count > 0)
             {
                 foreach (SchemaMapModel mapModel in model.SchemaMaps)
@@ -233,6 +238,12 @@ namespace Sentry.data.Web.Controllers
                 }
             }
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
+
+            var namedEnvironments = await BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment).ConfigureAwait(false);
+            model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
+            model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList; 
+            model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+
             return View("DataFlowForm", model);
         }
 
@@ -246,7 +257,7 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         [Route("DataFlow/NewSchemaMap/")]
         public PartialViewResult _AjaxMakeSchemaMap()
-        {            
+        {
             DataFlowModel dfModel = new DataFlowModel();
             SchemaMapModel schemaModel = new SchemaMapModel
             {
@@ -434,6 +445,25 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
+        
+        [HttpGet]
+        [Route("DataFlow/NamedEnvironment")]
+        public async Task<PartialViewResult> _NamedEnvironment(string assetKeyCode, string namedEnvironment)
+        {
+            DataFlowModel model = new DataFlowModel()
+            {
+                SAIDAssetKeyCode = assetKeyCode,
+                NamedEnvironment = namedEnvironment
+            };
+
+            var namedEnvironments = await BuildNamedEnvironmentDropDowns(assetKeyCode, namedEnvironment).ConfigureAwait(false);
+            model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
+            model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
+            model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+
+            return PartialView(model);
+        }
+
         private void CreateDropDownSetup(JobModel model)
         {
             var temp = _dataFlowService.GetDataSourceTypes()
@@ -478,7 +508,8 @@ namespace Sentry.data.Web.Controllers
 
             int s;
             int pickerval;
-            if (int.TryParse(model.SchedulePicker, out s)){
+            if (int.TryParse(model.SchedulePicker, out s))
+            {
                 pickerval = s;
             }
             else
@@ -497,7 +528,7 @@ namespace Sentry.data.Web.Controllers
             //SAIDAsset asset = await _saidService.GetAssetByKeyCode("DATA").ConfigureAwait(false);
             List<SAIDAsset> assetList = await _saidService.GetAllAssets().ConfigureAwait(false);
 
-            if(String.IsNullOrWhiteSpace(keyCode) || !assetList.Any(a => a.SaidKeyCode == keyCode))
+            if (string.IsNullOrWhiteSpace(keyCode) || !assetList.Any(a => a.SaidKeyCode == keyCode))
             {
                 output.Add(new SelectListItem
                 {
@@ -509,13 +540,13 @@ namespace Sentry.data.Web.Controllers
             }
 
             //Filtering out assets not assigned a SaidKeyCode
-            foreach (SAIDAsset asset in assetList.Where(w => !String.IsNullOrWhiteSpace(w.SaidKeyCode)).OrderBy(o => o.Name))
+            foreach (SAIDAsset asset in assetList.Where(w => !string.IsNullOrWhiteSpace(w.SaidKeyCode)).OrderBy(o => o.Name))
             {
                 output.Add(new SelectListItem
                 {
                     Value = asset.SaidKeyCode,
                     Text = $"{asset.Name} ({asset.SaidKeyCode})",
-                    Selected = (!String.IsNullOrWhiteSpace(keyCode) && asset.SaidKeyCode == keyCode)
+                    Selected = (!string.IsNullOrWhiteSpace(keyCode) && asset.SaidKeyCode == keyCode)
                 });
             }
 
@@ -592,6 +623,72 @@ namespace Sentry.data.Web.Controllers
             return schemaList;
         }
 
+        private async Task<(List<SelectListItem> namedEnvironmentList, List<SelectListItem> namedEnvironmentTypeList)> BuildNamedEnvironmentDropDowns(string keyCode, string namedEnvironment)
+        {
+            //if no keyCode has been selected yet, skip the call to Quartermaster
+            List<NamedEnvironmentDto> qNamedEnvironmentList = new List<NamedEnvironmentDto>();
+            if (!string.IsNullOrWhiteSpace(keyCode))
+            {
+                qNamedEnvironmentList = await _dataFlowService.GetNamedEnvironmentsAsync(keyCode).ConfigureAwait(true);
+            }
+
+            List<SelectListItem> namedEnvironmentList = BuildNamedEnvironmentDropDown(namedEnvironment, qNamedEnvironmentList);
+
+            List<SelectListItem> namedEnvironmentTypeList = BuildNamedEnvironmentTypeDropDown(namedEnvironment, qNamedEnvironmentList);
+
+            return (namedEnvironmentList, namedEnvironmentTypeList);
+        }
+
+        private static List<SelectListItem> BuildNamedEnvironmentDropDown(string namedEnvironment, List<NamedEnvironmentDto> qNamedEnvironmentList)
+        {
+            //convert the list of Quartermaster environments into SelectListItems
+            return qNamedEnvironmentList.Select(env => new SelectListItem()
+            {
+                Value = env.NamedEnvironment,
+                Text = env.NamedEnvironment,
+                Selected = (!string.IsNullOrWhiteSpace(namedEnvironment) && env.NamedEnvironment == namedEnvironment)
+            }).ToList();
+        }
+
+        private static List<SelectListItem> BuildNamedEnvironmentTypeDropDown(string namedEnvironment, List<NamedEnvironmentDto> qNamedEnvironmentList)
+        {
+            //figure out the correct NamedEnvironmentType for the selected NamedEnvironment
+            string namedEnvironmentType = NamedEnvironmentType.NonProd.ToString();
+
+            //if an Environment Type filter is configured, create the filter and default to that environment type
+            var environmentTypeFilter = Configuration.Config.GetHostSetting("QuartermasterNamedEnvironmentTypeFilter");
+            Func<string, bool> filter = envType => true;
+            if (!string.IsNullOrWhiteSpace(environmentTypeFilter))
+            {
+                filter = envType => envType == environmentTypeFilter;
+                namedEnvironmentType = environmentTypeFilter;
+            }
+
+            //if there are named environments, select the correct namedEnvironmentType for the chosen environment
+            //(the DataFlowService will already have filtered them down to only the appropriate namedEnvironmentTypes)
+            if (qNamedEnvironmentList.Any())
+            {
+                if (string.IsNullOrWhiteSpace(namedEnvironment))
+                {
+                    namedEnvironmentType = qNamedEnvironmentList.First().NamedEnvironmentType.ToString();
+                }
+                else if (qNamedEnvironmentList.Any(e => e.NamedEnvironment == namedEnvironment))
+                {
+                    namedEnvironmentType = qNamedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType.ToString();
+                }
+            }
+
+            //convert the list of named environment types into SelectListLitems
+            var namedEnvironmentTypeList = Enum.GetNames(typeof(NamedEnvironmentType)).Where(filter).Select(env => new SelectListItem()
+            {
+                Value = env,
+                Text = env,
+                Selected = namedEnvironmentType == env
+            }).ToList();
+
+            return namedEnvironmentTypeList;
+        }
+
         private List<SelectListItem> DataSourcesByType(string sourceType, string selectedId)
         {
             List<SelectListItem> output = new List<SelectListItem>();
@@ -660,6 +757,12 @@ namespace Sentry.data.Web.Controllers
                     case DataFlow.ValidationErrors.saidAssetIsBlank:
                         ModelState.AddModelError("SAIDAssetKeyCode", vr.Description);
                         break;
+                    case DataFlow.ValidationErrors.namedEnvironmentInvalid:
+                        ModelState.AddModelError(nameof(DataFlowModel.NamedEnvironment), vr.Description);
+                        break;
+                    case DataFlow.ValidationErrors.namedEnvironmentTypeInvalid:
+                        ModelState.AddModelError(nameof(DataFlowModel.NamedEnvironmentType), vr.Description);
+                        break;
                     case "PreprocessingOptions":
                     case SchemaMap.ValidationErrors.schemamapMustContainDataset:
                     case SchemaMap.ValidationErrors.schemamapMustContainSchema:
@@ -691,7 +794,7 @@ namespace Sentry.data.Web.Controllers
                     case RetrieverJob.ValidationErrors.ftpPatternNotSelected:
                         ModelState.AddModelError("RetrieverJob.FtpPattern", vr.Description);
                         break;
-                    
+
                         break;
                     case DataFlow.ValidationErrors.stepsContainsAtLeastOneSchemaMap:
                     default:
