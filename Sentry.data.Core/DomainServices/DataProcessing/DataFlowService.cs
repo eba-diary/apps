@@ -586,6 +586,12 @@ namespace Sentry.data.Core
                 DeleteIssueDTM = DateTime.MaxValue
             };
 
+            if (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
+            {
+                df.DatasetId = dto.SchemaMap.First().DatasetId;
+                df.SchemaId = dto.SchemaMap.First().SchemaId;
+            }
+
             _datasetContext.Add(df);
 
             return df;
@@ -707,8 +713,29 @@ namespace Sentry.data.Core
                 }
             }
 
-            //Generate Schema Map step to send files to schema specific data flow
-            AddDataFlowStep(dto, df, DataActionType.SchemaMap);
+
+            //Feature flag = false, add schema map step
+            //Feature flag = true, do no add schema map step
+            if (!_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
+            {
+                //Generate Schema Map step to send files to schema specific data flow
+                AddDataFlowStep(dto, df, DataActionType.SchemaMap);
+            }
+            else
+            {
+
+                FileSchema scm = _datasetContext.GetById<FileSchema>(dto.SchemaMap.First().SchemaId);
+
+                //Generate preprocessing for file types (i.e. fixedwidth, csv, json, etc...)
+                MapPreProcessingSteps(scm, dto, df);
+
+                //Generate DSC registering step
+                AddDataFlowStep(dto, df, DataActionType.SchemaLoad);
+                AddDataFlowStep(dto, df, DataActionType.QueryStorage);
+
+                ////Generate consumption layer steps
+                AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
+            }
 
         }
 
@@ -742,11 +769,13 @@ namespace Sentry.data.Core
             dto.Id = df.Id;
             dto.FlowGuid = df.FlowGuid;
             dto.SaidKeyCode = df.SaidKeyCode;
+            dto.DatasetId = df.DatasetId;
+            dto.SchemaId = df.SchemaId;
             dto.Name = df.Name;
             dto.CreateDTM = df.CreatedDTM;
             dto.CreatedBy = df.CreatedBy;
             dto.FlowStorageCode = df.FlowStorageCode;
-            dto.MappedSchema = GetMappedFileSchema(df.Id);
+            dto.MappedSchema = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() && df.SchemaId != 0) ? new List<int>() { df.SchemaId } : GetMappedFileSchema(df.Id);
             dto.AssociatedJobs = GetExternalRetrieverJobs(df.Id);
             dto.ObjectStatus = df.ObjectStatus;
             dto.DeleteIssuer = df.DeleteIssuer;

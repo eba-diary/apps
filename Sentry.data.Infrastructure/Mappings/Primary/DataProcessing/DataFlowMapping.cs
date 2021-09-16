@@ -19,6 +19,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.Name, m => m.Column("Name"));
             this.Property(x => x.FlowGuid, m => m.Column("FlowGuid"));
             this.Property(x => x.SaidKeyCode, m => m.Column("SaidKeyCode"));
+            this.Property(x => x.DatasetId, m => m.Column("DatasetId"));
+            this.Property(x => x.SchemaId, m => m.Column("SchemaId"));
             this.Property(x => x.CreatedDTM, m => m.Column("Create_DTM"));
             this.Property(x => x.CreatedBy, m => m.Column("CreatedBy"));
             this.Property(x => x.Questionnaire, m => m.Column("Questionnaire"));

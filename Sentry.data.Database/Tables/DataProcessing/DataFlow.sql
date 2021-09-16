@@ -15,6 +15,8 @@
     [UserDropLocationPrefix] VARCHAR(1000) NULL, 
     [NamedEnvironment] VARCHAR(25) NULL, 
     [NamedEnvironmentType] VARCHAR(25) NULL, 
+    [DatasetId] INT NULL, 
+    [SchemaId] INT NULL, 
     CONSTRAINT [PK_DataFlow] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
