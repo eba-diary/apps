@@ -34,14 +34,14 @@
 			BEGIN
 				SET @DfsDropLocation = 'file:////sentry.com/appfs_nonprod/DatasetLoader/'
 				SET @CustomDfsDropLocation = 'file:////sentry.com/appfs_nonprod/'
-				SET @s3dropLocation = 'http://s3-us-east-2.amazonaws.com/sentry-data-qual-dataset-ae2\data-test/droplocation'
+				SET @s3dropLocation = 'http://s3-us-east-2.amazonaws.com/sentry-data-qual-dataset-ae2\data/droplocation'
 				SET @bucketName = 'sentry-data-qual-dataset-ae2'
 			END
 		else if @DataSourceEnv = 'PROD'
 			BEGIN
 				SET @DfsDropLocation = 'file:////sentry.com/appfs/DatasetLoader/'
 				SET @CustomDfsDropLocation = 'file:////sentry.com/appfs/'
-				SET @s3dropLocation = 'http://s3-us-east-2.amazonaws.com/sentry-data-prod-dataset-ae2\data-test/droplocation'
+				SET @s3dropLocation = 'http://s3-us-east-2.amazonaws.com/sentry-data-prod-dataset-ae2\data/droplocation'
 				SET @bucketName = 'sentry-data-prod-dataset-ae2'
 			END
 		else
