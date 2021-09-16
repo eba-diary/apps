@@ -64,7 +64,7 @@ namespace Sentry.data.Core
         /// <exception cref="ArgumentNullException"
         /// <returns></returns>
         List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId);
-        ValidationException Validate(DataFlowDto dfDto);
+        Task<ValidationException> Validate(DataFlowDto dfDto);
         List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId);
         void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true);
 

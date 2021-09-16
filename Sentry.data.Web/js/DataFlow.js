@@ -374,27 +374,24 @@
     },
 
     InitSchemaMaps(datasetId, schemaId) {
-        
 
+        $('[id$=__SelectedDataset]').change(function () {
+            var curRow = $(this).parent().parent();
+            var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
+            var datasetId = $(this).val();
+            schemaSelectionDropDown.val("0");
 
-            $('[id$=__SelectedDataset]').change(function () {
-                var curRow = $(this).parent().parent();
-                var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
-                var datasetId = $(this).val();
-                schemaSelectionDropDown.val("0");
+            Sentry.InjectSpinner(curRow.find('.schemaSpinner'), 30);
 
-                Sentry.InjectSpinner(curRow.find('.schemaSpinner'), 30);
+            //if Create New Dataset Selected
+            if (datasetId === "-1") {
+                $('#DataFlowFormContainer').hide();
+                data.DataFlow.RenderDatasetCreatePage();
+            }
+            else {
+                data.DataFlow.PopulateSchemas(datasetId, null, schemaSelectionDropDown);
+            }
 
-                //if Create New Dataset Selected
-                if (datasetId === "-1") {
-                    $('#DataFlowFormContainer').hide();
-                    data.DataFlow.RenderDatasetCreatePage();
-                }
-                else {
-                    data.DataFlow.PopulateSchemas(datasetId, null, schemaSelectionDropDown);
-                }
-
-            });
         });
     },
 

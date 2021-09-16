@@ -90,6 +90,7 @@ namespace Sentry.data.Web.Controllers
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
             model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);
 
+
             CreateDropDownSetup(model.RetrieverJob);
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
             SchemaMapModel schemaModel = new SchemaMapModel
@@ -108,6 +109,11 @@ namespace Sentry.data.Web.Controllers
             };
             model.SchemaMaps.Add(schemaModel);
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
+
+            var namedEnvironments = await BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment).ConfigureAwait(false);
+            model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
+            model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
+            model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
 
             return View("DataFlowForm", model);
             
