@@ -22,15 +22,17 @@ namespace Sentry.data.Web.Controllers
         private readonly IConfigService _configService;
         private readonly ISecurityService _securityService;
         private readonly ISAIDService _saidService;
+        private readonly IDataFeatures _dataFeatures;
 
         public DataFlowController(IDataFlowService dataFlowService, IDatasetService datasetService, IConfigService configService,
-            ISecurityService securityService, ISAIDService saidService)
+            ISecurityService securityService, ISAIDService saidService, IDataFeatures dataFeatures)
         {
             _dataFlowService = dataFlowService;
             _datasetService = datasetService;
             _configService = configService;
             _securityService = securityService;
             _saidService = saidService;
+            _dataFeatures = dataFeatures;
         }
 
         // GET: DataFlow
@@ -83,10 +85,12 @@ namespace Sentry.data.Web.Controllers
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
             SchemaMapModel schemaModel = new SchemaMapModel
             {
-                SelectedDataset = 0
+                SelectedDataset = 0,
+                CLA3332_ConsolidatedDataFlows = _dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
             };
             model.SchemaMaps.Add(schemaModel);
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
+            model.CLA3332_ConsolidatedDataFlows = _dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
 
             return View("DataFlowForm", model);
             

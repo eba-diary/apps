@@ -32,8 +32,11 @@
             @Html.ValidationMessageFor((model) => model.SelectedSchema, "", new { @class = "text-danger error-over-color" })
             <a class="small create-link" id="CreateSchema">Create New Schema</a>
         </div>
-        <div id="btnSchemaMapRemove" class="col-md-1">
-            <a class="btn btn-danger">Remove</a>
-        </div>
+        @if (!Model.CLA3332_ConsolidatedDataFlows)
+        {
+            <div id="btnSchemaMapRemove" class="col-md-1">
+                <a class="btn btn-danger">Remove</a>
+            </div>
+        }
     </div>
 

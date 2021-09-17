@@ -54,6 +54,8 @@ namespace Sentry.data.Web
         public int DataFlowId { get; set; }
         public ObjectStatusEnum ObjectStatus { get; set; }
 
+        public bool CLA3332_ConsolidatedDataFlows { get; set; }
+
 
 
         public IEnumerable<SelectListItem> CompressionDropdown { get; set; }

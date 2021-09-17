@@ -116,15 +116,12 @@
         <div class="schemaMapPanel" style="display:none;">
             <div class="form-group col-md-12">
                 <div class="col-md-5"><h4>Where Do You Want The Data to Go?</h4></div>
-                @*@Html.LabelFor(model => model.SchemaMaps, htmlAttributes: new { @class = "control-label col-md-2" })*@
-                @*<a id="btnAddSchemaMap" class="btn btn-primary">Add Schema Mapping</a>*@
                 <div id="schemaMapPanel" class="form-group col-md-12">
                     @Html.EditorForMany(m => m.SchemaMaps, x => x.Index)
-                    @*@foreach (SchemaMapModel mapModel in Model.SchemaMaps)
-                        {
-                            @Html.Partial("_SchemaMap", mapModel)
-                        }*@
+                    @if (!Model.CLA3332_ConsolidatedDataFlows)
+                    {
                     <button type="button" id="btnAddSchemaMap" class="btn btn-success"><span>Add Another Target</span></button>
+                    }
                 </div>
             </div>
         </div>
