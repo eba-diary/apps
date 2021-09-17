@@ -262,12 +262,13 @@ namespace Sentry.data.Web.Tests
 
                 DataSource = MockDataSource(dsrc, authType),
 
-                DatasetConfig = dfc != null? dfc : MockDataFileConfig(null),
+                DatasetConfig = dfc != null ? dfc : MockDataFileConfig(null),
                 Created = DateTime.Now,
                 Modified = DateTime.Now,
                 IsGeneric = true,
 
-                JobOptions = rjo
+                JobOptions = rjo,
+                ObjectStatus = ObjectStatusEnum.Active
             };
 
             if (rj.DataSource.Is<DfsBasic>())

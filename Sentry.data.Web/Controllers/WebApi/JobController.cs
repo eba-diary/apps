@@ -313,7 +313,8 @@ namespace Sentry.data.Web.WebApi.Controllers
                 Created = DateTime.Now,
                 Modified = DateTime.Now,
                 DatasetConfig = ds.DatasetFileConfigs.FirstOrDefault(),
-                IsEnabled = isEnabled
+                IsEnabled = isEnabled,
+                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };
 
             RetrieverJob newJob = _datasetContext.Merge(job);

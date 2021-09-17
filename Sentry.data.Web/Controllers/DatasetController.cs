@@ -42,6 +42,7 @@ namespace Sentry.data.Web.Controllers
         private readonly IConfigService _configService;
         private readonly IDataFeatures _featureFlags;
         private readonly ISAIDService _saidService;
+        private readonly IJobService _jobService;
 
         public DatasetController(
             IDatasetContext dsCtxt,
@@ -54,7 +55,8 @@ namespace Sentry.data.Web.Controllers
             IEventService eventService,
             IConfigService configService,
             IDataFeatures featureFlags, 
-            ISAIDService saidService)
+            ISAIDService saidService,
+            IJobService jobService)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
@@ -67,6 +69,7 @@ namespace Sentry.data.Web.Controllers
             _configService = configService;
             _featureFlags = featureFlags;
             _saidService = saidService;
+            _jobService = jobService;
         }
 
         public ActionResult Index()
@@ -989,18 +992,9 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                RetrieverJobService jobservice = new RetrieverJobService();
+                _jobService.DisableJob(id);
 
-                bool IsSuccessful = jobservice.DisableJob(id);
-
-                if (IsSuccessful)
-                {
-                    return Json(new { Success = true, Message = "Job has been marked as disabled and will be removed from the job scheduler." });
-                }
-                else
-                {
-                    return Json(new { Success = false, Message = "Failed disabling job.  If problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>." });
-                }
+                return Json(new { Success = true, Message = "Job has been marked as disabled and will be removed from the job scheduler." });
             }
             catch (Exception ex)
             {
@@ -1015,9 +1009,7 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                RetrieverJobService jobservice = new RetrieverJobService();
-
-                jobservice.EnableJob(id);
+                _jobService.EnableJob(id);
             }
             catch (Exception ex)
             {
