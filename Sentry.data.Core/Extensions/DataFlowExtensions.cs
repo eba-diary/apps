@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Helpers;
@@ -41,7 +40,7 @@ namespace Sentry.data.Core
             return new SchemaMapDto()
             {
                 Id = scmMap.Id,
-                //DatasetId = scmMap.Dataset.DatasetId,
+                DatasetId = (scmMap.Dataset != null) ? scmMap.Dataset.DatasetId : 0,
                 SchemaId = scmMap.MappedSchema.SchemaId,
                 SearchCriteria = scmMap.SearchCriteria,
                 StepId = scmMap.DataFlowStepId.Id

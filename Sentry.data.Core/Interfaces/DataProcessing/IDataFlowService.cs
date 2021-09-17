@@ -64,10 +64,17 @@ namespace Sentry.data.Core
         /// <exception cref="ArgumentNullException"
         /// <returns></returns>
         List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId);
-        void DeleteByFileSchema(FileSchema scm);
         Task<ValidationException> Validate(DataFlowDto dfDto);
         List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId);
         void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true);
+
+        /// <summary>
+        /// Retrieve retrieverjobdto associated with pull type dataflow
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        RetrieverJobDto GetAssociatedRetrieverJobDto(int id);
+        int UpdateandSaveDataFlow(DataFlowDto dfDto);
 
         /// <summary>
         /// Given a SAID asset key code, get all the named environments from Quartermaster

@@ -1,16 +1,16 @@
 ﻿using Sentry.Core;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Interfaces;
 using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Mvc;
-using Sentry.data.Core.Interfaces;
 using System.Threading.Tasks;
-using Sentry.data.Core.Entities;
+using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -22,16 +22,26 @@ namespace Sentry.data.Web.Controllers
         private readonly IConfigService _configService;
         private readonly ISecurityService _securityService;
         private readonly ISAIDService _saidService;
+        private readonly ISchemaService _schemaService;
+        private readonly Lazy<IDataFeatures> _dataFeatures;
 
         public DataFlowController(IDataFlowService dataFlowService, IDatasetService datasetService, IConfigService configService,
-            ISecurityService securityService, ISAIDService saidService)
+            ISecurityService securityService, ISAIDService saidService, ISchemaService schemaService, Lazy<IDataFeatures> dataFeatures)
         {
             _dataFlowService = dataFlowService;
             _datasetService = datasetService;
             _configService = configService;
             _securityService = securityService;
             _saidService = saidService;
+            _schemaService = schemaService;
+            _dataFeatures = dataFeatures;
         }
+
+        public IDataFeatures DataFeatures
+        {
+            get { return _dataFeatures.Value; }
+        }
+
 
         // GET: DataFlow
         [HttpGet]
@@ -77,16 +87,63 @@ namespace Sentry.data.Web.Controllers
             DataFlowModel model = new DataFlowModel();
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
-            model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreprocessingOptions);
+            model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
+            model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);
+
 
             CreateDropDownSetup(model.RetrieverJob);
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
             SchemaMapModel schemaModel = new SchemaMapModel
             {
-                SelectedDataset = 0
+                SelectedDataset = 0,
+                AllDatasets = BuildDatasetDropDown(0),
+                AllSchemas = new List<SelectListItem>() {
+                    new SelectListItem
+                    {
+                        Value = "0",
+                        Text = "Select Dataset First",
+                        Selected = true,
+                        Disabled = true
+                    } 
+                }
             };
             model.SchemaMaps.Add(schemaModel);
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
+
+            var namedEnvironments = await BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment).ConfigureAwait(false);
+            model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
+            model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
+            model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+
+            return View("DataFlowForm", model);
+            
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ViewResult> Edit(int id)
+        {
+            UserSecurity us = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
+
+            //Feature flag will only evaluate true for Admins
+            if (!DataFeatures.CLA1656_DataFlowEdit_ViewEditPage.GetValue(SharedContext.CurrentUser.AssociateId) && !us.CanCreateDataFlow)
+            {
+                return View("Forbidden");
+            }
+
+            DataFlowDetailDto dto = _dataFlowService.GetDataFlowDetailDto(id);
+            DataFlowModel model = ToDataFlowModel(dto);
+
+            model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+            model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
+            model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
+            model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);
+            model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
+            CreateDropDownSetup(model.RetrieverJob);
 
             var namedEnvironments = await BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment).ConfigureAwait(false);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
@@ -100,6 +157,8 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> DataFlowForm(DataFlowModel model)
         {
+            UserSecurity us = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);            
+
             AddCoreValidationExceptionsToModel(model.Validate());
 
             DataFlowDto dfDto = model.ToDto();
@@ -112,6 +171,10 @@ namespace Sentry.data.Web.Controllers
                 {
                     int newFlowId = 0;
 
+                    /************************************************
+                     * Incoming Post does not have dataflow Id 
+                     *    therefore, user created a new dataflow 
+                     ************************************************/
                     if (dfDto.Id == 0)
                     {
                         newFlowId = _dataFlowService.CreateandSaveDataFlow(dfDto);
@@ -119,6 +182,23 @@ namespace Sentry.data.Web.Controllers
                         {
                             return RedirectToAction("Detail", "DataFlow", new { id = newFlowId });
                         }
+                    }
+                    /************************************************
+                     *  Incoming Post has a non-zero dataflow Id, 
+                     *      therefore, user updated an existing
+                     *      dataflow
+                    ************************************************/
+                    else
+                    {
+                        //Feature flag will only evaluate true for Admins
+                        if (!DataFeatures.CLA1656_DataFlowEdit_ViewEditPage.GetValue(SharedContext.CurrentUser.AssociateId) || !us.CanCreateDataFlow)
+                        {
+                            return View("Forbidden");
+                        }
+
+                        newFlowId = _dataFlowService.UpdateandSaveDataFlow(dfDto);
+
+                        return RedirectToAction("Detail", "DataFlow", new { id = newFlowId });
                     }
 
                     return RedirectToAction("Index");
@@ -142,9 +222,16 @@ namespace Sentry.data.Web.Controllers
                 AddCoreValidationExceptionsToModel(ex);
             }
 
-            model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+
+            /*
+             *  At this point, something has failed 
+             * 
+             */
+
+                    model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
-            model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreprocessingOptions);
+            model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
+            model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);
             if (model.RetrieverJob != null)
             {
                 CreateDropDownSetup(model.RetrieverJob);
@@ -180,7 +267,17 @@ namespace Sentry.data.Web.Controllers
             DataFlowModel dfModel = new DataFlowModel();
             SchemaMapModel schemaModel = new SchemaMapModel
             {
-                SelectedDataset = 0
+                SelectedDataset = 0,
+                AllDatasets = BuildDatasetDropDown(0),
+                AllSchemas = new List<SelectListItem>() {
+                    new SelectListItem
+                    {
+                        Value = "0",
+                        Text = "Select Dataset First",
+                        Selected = true,
+                        Disabled = true
+                    }
+                }
             };
             dfModel.SchemaMaps.Add(schemaModel);
 
@@ -191,12 +288,113 @@ namespace Sentry.data.Web.Controllers
         [Route("DataFlow/NewCompressionJob/")]
         public PartialViewResult NewCompressionJob()
         {
-            CompressionModel model = new CompressionModel();
+            CompressionModel model = ToCompressionModel(null);
 
-            CreateDropDownList(model);
+            //CompressionModel model = new CompressionModel();
+
+            //CreateDropDownList(model);
 
             return PartialView("_CompressionJob", model);
 
+        }
+
+        public PartialViewResult NewRetrieverJob(JobModel model)
+        {
+            CreateDropDownSetup(model);
+
+            return PartialView("_RetrieverJob", model);
+        }
+
+        public PartialViewResult _SchemaMapDetail(int dataflowId)
+        {
+            List<SchemaMapDetailDto> dtoList = _dataFlowService.GetMappedSchemaByDataFlow(dataflowId);
+            List<SchemaMapDetailModel> modelList = dtoList.ToDetailModelList();
+            return PartialView("~/Views/Dataflow/_SchemaMapDetail.cshtml", modelList);
+        }
+
+        public DataFlowModel ToDataFlowModel(DataFlowDetailDto dto)
+        {
+            DataFlowModel model = new DataFlowModel()
+            {
+                DataFlowId = dto.Id,
+                Name = dto.Name,
+                IngestionTypeSelection = dto.IngestionType,
+                IsCompressed = dto.IsCompressed,
+                IsPreProcessingRequired = dto.IsPreProcessingRequired,
+                PreProcessingSelection = (dto.PreProcessingOption.HasValue) ? (int)dto.PreProcessingOption : 0,
+                SAIDAssetKeyCode = dto.SaidKeyCode,
+                CreatedBy = dto.CreatedBy,
+                CreatedDTM = dto.CreateDTM,
+                ObjectStatus = dto.ObjectStatus,
+                StorageCode = dto.FlowStorageCode
+            };
+
+            if (dto.SchemaMap.Any())
+            {
+                List<SchemaMapModel> schemaMapModelList = new List<SchemaMapModel>();
+                foreach (SchemaMapDto map in dto.SchemaMap)
+                {
+                    SchemaMapModel scmModel = map.ToModel();
+                    scmModel.AllDatasets = BuildDatasetDropDown(map.DatasetId);
+                    scmModel.AllSchemas = BuildSchemaDropDown(map.SchemaId);
+                    schemaMapModelList.Add(scmModel);
+                }
+                model.SchemaMaps = schemaMapModelList;
+            }
+
+            if (dto.IsCompressed)
+            {
+                List<CompressionModel> modelList = new List<CompressionModel>()
+                {
+                    ToCompressionModel(dto)
+                };
+                model.CompressionJob = modelList;
+            }
+
+            if (dto.IngestionType == (int)IngestionType.DSC_Pull)
+            {
+                RetrieverJobDto jobDto = _dataFlowService.GetAssociatedRetrieverJobDto(dto.Id);
+                model.RetrieverJob = ToJobModel(jobDto);
+            }
+
+            return model;
+        }
+
+        private JobModel ToJobModel(RetrieverJobDto dto)
+        {
+            JobModel model = new JobModel()
+            {
+                Schedule = dto.Schedule,
+                SchedulePicker = dto.SchedulePicker.ToString(),
+                RelativeUri = dto.RelativeUri,
+                HttpRequestBody = dto.HttpRequestBody,
+                SearchCriteria = dto.SearchCriteria,
+                TargetFileName = dto.TargetFileName,
+                CreateCurrentFile = dto.CreateCurrentFile,
+                SelectedDataSource = dto.DataSourceId.ToString(),
+                SelectedSourceType = dto.DataSourceType,
+                SelectedRequestMethod = dto.RequestMethod ?? Core.HttpMethods.none,
+                SelectedRequestDataFormat = dto.RequestDataFormat ?? Core.HttpDataFormat.none,
+                FtpPattern = dto.FtpPattern ?? Core.FtpPattern.NoPattern
+            };
+
+            model.SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(dto.ReadableSchedule);
+            model.SchedulePicker = model.SchedulePickerDropdown.Where(w => w.Selected).Select(s => Int32.Parse(s.Value)).FirstOrDefault().ToString();
+
+            return model;
+        }
+         
+        public CompressionModel ToCompressionModel(DataFlowDto dto)
+        {
+            CompressionModel model = new CompressionModel();
+            if(dto != null)
+            {
+                //model.CompressionType = ((CompressionTypes)dto.CompressionType).ToString();
+                model.CompressionType = (dto.CompressionType.HasValue) ? dto.CompressionType.ToString() : "0";
+            }
+            model.CompressionTypesDropdown = Utility.BuildCompressionTypesDropdown(model.CompressionType);
+
+            return model;
         }
 
         private void SetSchemaModelLists(SchemaMapModel model)
@@ -253,20 +451,7 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        public PartialViewResult NewRetrieverJob(JobModel model)
-        {
-            CreateDropDownSetup(model);
-
-            return PartialView("_RetrieverJob", model);
-        }
-
-        public PartialViewResult _SchemaMapDetail(int dataflowId)
-        {
-            List<SchemaMapDetailDto> dtoList = _dataFlowService.GetMappedSchemaByDataFlow(dataflowId);
-            List<SchemaMapDetailModel> modelList = dtoList.ToDetailModelList();
-            return PartialView("~/Views/Dataflow/_SchemaMapDetail.cshtml", modelList);
-        }
-
+        
         [HttpGet]
         [Route("DataFlow/NamedEnvironment")]
         public async Task<PartialViewResult> _NamedEnvironment(string assetKeyCode, string namedEnvironment)
@@ -340,11 +525,7 @@ namespace Sentry.data.Web.Controllers
             model.SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(((RetrieverJobScheduleTypes)pickerval).GetDescription());
         }
 
-        private void CreateDropDownList(CompressionModel model)
-        {
-            model.CompressionTypesDropdown = Enum.GetValues(typeof(CompressionTypes)).Cast<CompressionTypes>().Select(v
-                => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-        }
+        
 
         private async Task<List<SelectListItem>> BuildSAIDAssetDropDown(string keyCode)
         {
@@ -376,6 +557,76 @@ namespace Sentry.data.Web.Controllers
             }
 
             return output;
+        }
+
+        private List<SelectListItem> BuildDatasetDropDown(int datasetSelection)
+        {
+            List<SelectListItem> datasetList = new List<SelectListItem>
+            {
+                new SelectListItem
+                {
+                    Value = "-1",
+                    Text = "Create Dataset",
+                    Selected = false,
+                    Disabled = false
+                },
+
+                new SelectListItem
+                {
+                    Value = "0",
+                    Text = "Select Dataset",
+                    Selected = (datasetSelection == 0),
+                    Disabled = true
+                }
+            };
+
+            foreach (KeyValuePair<int, string> item in _datasetService.GetDatasetList())
+            {
+                datasetList.Add(new SelectListItem
+                {
+                    Value = item.Key.ToString(),
+                    Text = item.Value,
+                    Selected = (datasetSelection == item.Key),
+                    Disabled = false
+                });
+            }
+
+            return datasetList;
+        }
+
+        private List<SelectListItem> BuildSchemaDropDown(int schemaSelection)
+        {
+            List<SelectListItem> schemaList = new List<SelectListItem>
+            {
+                new SelectListItem
+                {
+                    Value = "-1",
+                    Text = "Create Dataset",
+                    Selected = false,
+                    Disabled = false
+                },
+
+                new SelectListItem
+                {
+                    Value = "0",
+                    Text = "Select Schema",
+                    Selected = (schemaSelection == 0),
+                    Disabled = true
+                }
+            };
+
+            foreach (KeyValuePair<int, string> item in _schemaService.GetSchemaList())
+            {
+                schemaList.Add(new SelectListItem
+                {
+                    Value = item.Key.ToString(),
+                    Text = item.Value,
+                    Selected = (schemaSelection == item.Key),
+                    Disabled = false
+                });
+            }
+
+            return schemaList;
         }
 
         private async Task<(List<SelectListItem> namedEnvironmentList, List<SelectListItem> namedEnvironmentTypeList)> BuildNamedEnvironmentDropDowns(string keyCode, string namedEnvironment)
