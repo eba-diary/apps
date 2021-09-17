@@ -1152,7 +1152,7 @@ namespace Sentry.data.Core
         {
             
             ///Determine all SchemaMap steps which reference this schema
-            SchemaMap schemaMap = _datasetContext.SchemaMap.FirstOrDefault(w => w.MappedSchema == config.Schema && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaLoad);
+            SchemaMap schemaMap = _datasetContext.SchemaMap.FirstOrDefault(w => w.MappedSchema == config.Schema && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaLoad && w.DataFlowStepId.DataFlow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
             DataFlowDetailDto dfDto = (schemaMap != null) ? _dataFlowService.GetDataFlowDetailDto(schemaMap.DataFlowStepId.DataFlow.Id) : null;
             //DataFlowDetailDto dfDto = _dataFlowService.GetDataFlowDetailDto(schemaMap.DataFlowStepId.DataFlow.Id);
 
@@ -1172,7 +1172,7 @@ namespace Sentry.data.Core
             List<Tuple<DataFlowDetailDto, List<RetrieverJob>>> externalJobList = new List<Tuple<DataFlowDetailDto, List<RetrieverJob>>>();
             
             ///Determine all SchemaMap steps which reference this schema
-            List<SchemaMap> schemaMappings = _datasetContext.SchemaMap.Where(w => w.MappedSchema == config.Schema && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaMap).ToList();
+            List<SchemaMap> schemaMappings = _datasetContext.SchemaMap.Where(w => w.MappedSchema == config.Schema && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaMap && w.DataFlowStepId.DataFlow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).ToList();
 
             //For each dataflow, get the detaildto object and associated retrieverjobs.  Create new tuple and add to return list.
             foreach (SchemaMap item in schemaMappings)

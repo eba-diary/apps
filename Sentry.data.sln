@@ -59,12 +59,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProducerTesting", "Producer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsumerTesting", "ConsumerTesting\ConsumerTesting.csproj", "{D4A2E33D-D735-4A10-B0A1-D21DEE010ECD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RestServiceGenerators", "RestServiceGenerators", "{2A21131F-9E07-43F5-9B91-A8AE280E39BE}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\Users\072984\Work Folders\Downloads\SAIDRestServiceGen.bat = ..\..\Users\072984\Work Folders\Downloads\SAIDRestServiceGen.bat
-		..\..\Users\072984\Work Folders\Downloads\SAIDRestServiceGen.ps1 = ..\..\Users\072984\Work Folders\Downloads\SAIDRestServiceGen.ps1
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.Infrastructure.Tests", "Sentry.data.Infrastructure.Tests\Sentry.data.Infrastructure.Tests.csproj", "{609CB6AA-E2C5-4EA4-904E-8CB00AEBA510}"
 EndProject
 Global
@@ -144,7 +138,6 @@ Global
 		{7066B846-3BF7-4A09-B454-6E095C37520B} = {CAE1BAB1-0E10-48C8-9C98-64271871DDE6}
 		{EC924B4D-3015-44A1-B109-8A478962064C} = {CAE1BAB1-0E10-48C8-9C98-64271871DDE6}
 		{D4A2E33D-D735-4A10-B0A1-D21DEE010ECD} = {CAE1BAB1-0E10-48C8-9C98-64271871DDE6}
-		{2A21131F-9E07-43F5-9B91-A8AE280E39BE} = {9E622421-1970-4955-8B4D-D06A01A6457F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0D1FAF12-93B8-4B73-A66B-99806CB91657}

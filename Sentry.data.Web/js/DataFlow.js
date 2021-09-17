@@ -10,12 +10,19 @@
     DataFlowFormInit: function () {
 
         data.DataFlow.InitIngestionType();
-        //data.DataFlow.InitCompressionCheckbox();
 
 
         $("#PreprocessingOptions").select2({
             placeholder: "Select Options"
         });
+
+        //init preprocessing panel
+        if ($("#IsCompressed").val() === "true") {
+            $(".compressionJobPanel").show();
+        }
+        else {
+            $(".compressionJobPanel").hide();
+        }
 
         $("#IsCompressed").change(function () {
             if ($(this).val() === "true") {
@@ -59,6 +66,15 @@
                 data.DataFlow.InitSchemaMaps();               
             });
         });
+
+        //When the SAID asset changes, reload the named environments dropdown
+        $("#SAIDAssetKeyCode").on('change', function () {
+            Sentry.InjectSpinner($("#namedEnvironmentSpinner"), 30);
+            data.DataFlow.populateNamedEnvironments();
+        });
+
+        //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
+        data.DataFlow.initNamedEnvironmentEvents();
 
         $(document).ready(function () {
             $('.selectpicker').selectpicker({
@@ -108,7 +124,7 @@
     },
 
     InitIngestionType() {
-        var selection = $("[id$=IngestionType]").val();
+        var selection = $("[id$=IngestionTypeSelection]").val();
 
         if (selection === "2") {
             $('.namePanel').show();
@@ -145,7 +161,7 @@
             $('.formSubmitButtons').show();
         }            
 
-        $("[id$=IngestionType]").on('change', function () {
+        $("[id$=IngestionTypeSelection]").on('change', function () {
             var ingestionSelection = $(this).val();
             //if changing to Pull
             if (ingestionSelection === "2") {
@@ -188,7 +204,7 @@
 
     CancelIngestionSelection: function (e, item) {
         //from https://stackoverflow.com/a/28324400
-        var ingestionSelectBox = document.querySelector("[id$=IngestionType]");
+        var ingestionSelectBox = document.querySelector("[id$=IngestionTypeSelection]");
         switch (e) {
             case "1":
                 ingestionSelectBox.value = "2";
@@ -358,103 +374,41 @@
     },
 
     InitSchemaMaps(datasetId, schemaId) {
-        $('.datasetSpinner').each(function (index) {
-            var cur = $(this);
-            Sentry.InjectSpinner(cur, 30);
+
+        $('[id$=__SelectedDataset]').change(function () {
+            var curRow = $(this).parent().parent();
+            var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
+            var datasetId = $(this).val();
+            schemaSelectionDropDown.val("0");
+
+            Sentry.InjectSpinner(curRow.find('.schemaSpinner'), 30);
+
+            //if Create New Dataset Selected
+            if (datasetId === "-1") {
+                $('#DataFlowFormContainer').hide();
+                data.DataFlow.RenderDatasetCreatePage();
+            }
+            else {
+                data.DataFlow.PopulateSchemas(datasetId, null, schemaSelectionDropDown);
+            }
+
         });
-        $('.schemaSpinner').each(function (index) {
-            var cur = $(this);
-            Sentry.InjectSpinner(cur, 30);
+    },
+
+    initNamedEnvironmentEvents() {
+        //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
+        $("select#NamedEnvironment").change(function () {
+            Sentry.InjectSpinner($("#namedEnvironmentTypeSpinner"), 30);
+            data.DataFlow.populateNamedEnvironments();
         });
+    },
 
-        $.getJSON("/api/v2/metadata/dataset", function (result) {
-            var newSubItems;
-            var groupName;
-            var datasetCount = result.length;
-            var sortedResult = result.sort(
-                firstBy("Category")
-                    .thenBy("Name")
-            );
-
-            newSubItems += "<option value='-1'>Create Dataset</option>";
-            newSubItems += "<option value='0'>Select Dataset</option>";
-
-            $.each(sortedResult, function (index, item) {
-                //initial pass inializes group and sets first group element
-                if (groupName === null) {
-                    newSubItems += "<optgroup label='" + item.Category + "'>";
-                    groupName = item.Category;
-                }
-
-                //Close previous group and start new group if groupName changes
-                if (groupName !== null && groupName !== item.Category) {
-                    newSubItems += "</optgroup>";
-                    newSubItems += "<optgroup label='" + item.Category + "'>";
-                    groupName = item.Category;
-                }
-
-                //Add option item
-                newSubItems += "<option value='" + item.Id + "'>" + item.Name + "</option>";
-
-                //close out group after last interation
-                if (index === (datasetCount - 1)) {
-                    newSubItems += "</optgroup>";
-                }
-            });
-
-            $('[id$=__SelectedDataset]').each(function (index) {
-                var cur = $(this);
-                var dsSpinner = cur.parent().find('.datasetSpinner');                
-                var curVal = cur.val();
-
-                dsSpinner.html('');
-                cur.html(newSubItems);
-
-                if (curVal === null || curVal === undefined) {
-                    var curRow = cur.parent().parent();
-                    $(this).val(0);
-                    data.DataFlow.PopulateSchemas("0", schemaId, curRow.find("[id$=__SelectedSchema]"));
-                }
-                else if (curVal == "-1") {
-                    var curRow = cur.parent().parent();
-                    $(this).val(datasetId);
-                    data.DataFlow.PopulateSchemas(datasetId, schemaId, curRow.find("[id$=__SelectedSchema]"));
-                }
-                else {
-                    cur.val(curVal);
-                    var curRow = cur.parent().parent();
-                    data.DataFlow.PopulateSchemas(curVal, schemaId, curRow.find("[id$=__SelectedSchema]"));
-                }
-            });
-
-
-            $('[id$=__SelectedDataset]').change(function () {
-                var curRow = $(this).parent().parent();
-                var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
-                var datasetId = $(this).val();
-
-                Sentry.InjectSpinner(curRow.find('.schemaSpinner'), 30);
-
-                //if Create New Dataset Selected
-                if (datasetId === "-1") {
-                    $('#DataFlowFormContainer').hide();
-                    data.DataFlow.RenderDatasetCreatePage();
-                }
-                else {
-                    data.DataFlow.PopulateSchemas(datasetId, null, schemaSelectionDropDown);
-                }
-
-            });
-
-            //$('[id$=_SelectedSchema]').change(function () {
-            //    var schemaId = $(this).val();
-
-            //    //If create new schema is selected
-            //    if (schemaId === "-1") {
-            //        $('#DataFlowFormContainer').hide();
-            //        data.DataFlow.RenderSchemaCreatePage();
-            //    }
-            //})
+    populateNamedEnvironments() {
+        var assetKeyCode = $("#SAIDAssetKeyCode").val();
+        var selectedEnvironment = $("#NamedEnvironment").val();
+        $.get("/DataFlow/NamedEnvironment?assetKeyCode=" + assetKeyCode + "&namedEnvironment=" + selectedEnvironment, function (result) {
+            $('#NamedEnvironmentPartial').html(result);
+            data.DataFlow.initNamedEnvironmentEvents();
         });
     }
 }

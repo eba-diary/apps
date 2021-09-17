@@ -1,6 +1,8 @@
 ﻿using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
+using NHibernate.Type;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
 {
@@ -26,6 +28,16 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.ObjectStatus, m => m.Column("ObjectStatus"));
             this.Property(x => x.DeleteIssuer, m => m.Column("DeleteIssuer"));
             this.Property(x => x.DeleteIssueDTM, m => m.Column("DeleteIssueDTM"));
+            this.Property(x => x.IngestionType, m => m.Column("IngestionType"));
+            this.Property(x => x.IsDecompressionRequired, m => m.Column("IsDecompressionRequired"));
+            this.Property(x => x.CompressionType, m => m.Column("CompressionType"));
+            this.Property(x => x.IsPreProcessingRequired, m => m.Column("IsPreProcessingRequired"));
+            this.Property(x => x.PreProcessingOption, m => m.Column("PreProcessingOption"));
+            
+            this.Property(x => x.UserDropLocationBucket);
+            this.Property(x => x.UserDropLocationPrefix);
+            this.Property(x => x.NamedEnvironment);
+            this.Property(x => x.NamedEnvironmentType, attr => attr.Type<EnumStringType<NamedEnvironmentType>>());
 
             this.Bag(x => x.Steps, (m) =>
             {

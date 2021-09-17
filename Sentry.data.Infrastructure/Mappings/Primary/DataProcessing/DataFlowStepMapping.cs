@@ -23,6 +23,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.TargetPrefix, m => m.Column("TargetPrefix"));
             this.Property(x => x.SourceDependencyPrefix, m => m.Column("SourceDependencyPrefix"));
             this.Property(x => x.SourceDependencyBucket, m => m.Column("SourceDependencyBucket"));
+            this.Property(x => x.TriggerBucket);
+            this.Property(x => x.TargetBucket);
 
             this.ManyToOne(x => x.DataFlow, m =>
             {

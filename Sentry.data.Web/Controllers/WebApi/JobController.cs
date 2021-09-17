@@ -120,6 +120,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             }
             catch (Exception ex)
             {
+                Logger.Error("<jobcontroller-getdfsmonitorlist> - Failed retrieving monitor list", ex);
                 return InternalServerError(ex);
             }
         }

@@ -35,18 +35,18 @@
 
 	END TRY 
 	BEGIN CATCH 
-		DECLARE @Merge_DataSource_ErrorMessage NVARCHAR(4000); 
-		DECLARE @Merge_DataSource_ErrorSeverity INT; 
-		DECLARE @Merge_DataSource_ErrorState INT; 
+		DECLARE @Merge_DataSourceType_ErrorMessage NVARCHAR(4000); 
+		DECLARE @Merge_DataSourceType_ErrorSeverity INT; 
+		DECLARE @Merge_DataSourceType_ErrorState INT; 
   
 		SELECT 
-			@Merge_DataSource_ErrorMessage = ERROR_MESSAGE(), 
-			@Merge_DataSource_ErrorSeverity = ERROR_SEVERITY(), 
-			@Merge_DataSource_ErrorState = ERROR_STATE(); 
+			@Merge_DataSourceType_ErrorMessage = ERROR_MESSAGE(), 
+			@Merge_DataSourceType_ErrorSeverity = ERROR_SEVERITY(), 
+			@Merge_DataSourceType_ErrorState = ERROR_STATE(); 
   
-		RAISERROR (@Merge_DataSource_ErrorMessage, 
-				   @Merge_DataSource_ErrorSeverity, 
-				   @Merge_DataSource_ErrorState 
+		RAISERROR (@Merge_DataSourceType_ErrorMessage, 
+				   @Merge_DataSourceType_ErrorSeverity, 
+				   @Merge_DataSourceType_ErrorState 
 				   ); 
   
 		ROLLBACK TRAN 
