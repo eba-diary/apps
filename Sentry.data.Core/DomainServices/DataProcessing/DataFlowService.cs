@@ -104,6 +104,15 @@ namespace Sentry.data.Core
                 throw new DatasetUnauthorizedAccessException($"No permissions to push data to {datasetsWithNoPermissions.ToString()}");
             }
 
+            //Verify that the schema selected is not already connected with a different dataflow
+            if (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() &&
+                _datasetContext.DataFlow.Any(df => df.DatasetId == dto.SchemaMap.First().DatasetId &&
+                                                   df.SchemaId == dto.SchemaMap.First().SchemaId &&
+                                                   df.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active))
+            {
+                throw new SchemaInUseException($"Schema ID {dto.SchemaMap.First().SchemaId} is already associated to another DataFlow.");
+            }
+
             try
             {
                 DataFlow df = CreateDataFlow(dto);

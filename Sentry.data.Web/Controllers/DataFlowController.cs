@@ -22,10 +22,10 @@ namespace Sentry.data.Web.Controllers
         private readonly IConfigService _configService;
         private readonly ISecurityService _securityService;
         private readonly ISAIDService _saidService;
-        private readonly IDataFeatures _dataFeatures;
+        private readonly Lazy<IDataFeatures> _dataFeatures;
 
         public DataFlowController(IDataFlowService dataFlowService, IDatasetService datasetService, IConfigService configService,
-            ISecurityService securityService, ISAIDService saidService, IDataFeatures dataFeatures)
+            ISecurityService securityService, ISAIDService saidService, Lazy<IDataFeatures> dataFeatures)
         {
             _dataFlowService = dataFlowService;
             _datasetService = datasetService;
@@ -33,6 +33,11 @@ namespace Sentry.data.Web.Controllers
             _securityService = securityService;
             _saidService = saidService;
             _dataFeatures = dataFeatures;
+        }
+
+        public IDataFeatures DataFeatures
+        {
+            get { return _dataFeatures.Value; }
         }
 
         // GET: DataFlow
@@ -86,11 +91,11 @@ namespace Sentry.data.Web.Controllers
             SchemaMapModel schemaModel = new SchemaMapModel
             {
                 SelectedDataset = 0,
-                CLA3332_ConsolidatedDataFlows = _dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
+                CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
             };
             model.SchemaMaps.Add(schemaModel);
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
-            model.CLA3332_ConsolidatedDataFlows = _dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
+            model.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
 
             return View("DataFlowForm", model);
             

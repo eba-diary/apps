@@ -1,4 +1,7 @@
 ﻿data.DataFlow = {
+
+    CLA3332_ConsolidatedDataFlows: false,
+
     DataFlowFormInit: function () {
 
         data.DataFlow.InitIngestionType();
@@ -286,12 +289,19 @@
                 var subItems;
 
                 //Filter for only ACTIVE schema
-                var activeSchema = result.filter(function (item) {
+                var filter = result.filter(function (item) {
                     return item.ObjectStatus === "ACTIVE";
                 });
 
+                //If feature flag is enabled, only show schemas that don't have a DataFlow
+                if (data.DataFlow.CLA3332_ConsolidatedDataFlows) {
+                    filter = filter.filter(function (item) {
+                        return item.HasDataFlow === false;
+                    });
+                }
+
                 //Make list sorted by schema name
-                var sortedResults = activeSchema.sort(
+                var sortedResults = filter.sort(
                     firstBy("Name")
                 );
 
