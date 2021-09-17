@@ -196,7 +196,6 @@ namespace Sentry.data.Web.Controllers
 
             if (model.SelectedDataset == 0)
             {
-                dsList.Add(new SelectListItem() { Text = "Create New Dataset", Value = "-1", Selected = true });
                 dsList.Add(new SelectListItem() { Text = "Select Dataset", Value = "0", Selected = true });
             }
 
