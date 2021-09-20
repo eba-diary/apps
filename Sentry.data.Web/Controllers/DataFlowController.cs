@@ -95,17 +95,7 @@ namespace Sentry.data.Web.Controllers
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
             SchemaMapModel schemaModel = new SchemaMapModel
             {
-                SelectedDataset = 0,
-                AllDatasets = BuildDatasetDropDown(0),
-                AllSchemas = new List<SelectListItem>() {
-                    new SelectListItem
-                    {
-                        Value = "0",
-                        Text = "Select Dataset First",
-                        Selected = true,
-                        Disabled = true
-                    } 
-                }
+                SelectedDataset = 0
             };
             model.SchemaMaps.Add(schemaModel);
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
@@ -335,8 +325,6 @@ namespace Sentry.data.Web.Controllers
                 foreach (SchemaMapDto map in dto.SchemaMap)
                 {
                     SchemaMapModel scmModel = map.ToModel();
-                    scmModel.AllDatasets = BuildDatasetDropDown(map.DatasetId);
-                    scmModel.AllSchemas = BuildSchemaDropDown(map.SchemaId);
                     schemaMapModelList.Add(scmModel);
                 }
                 model.SchemaMaps = schemaMapModelList;
