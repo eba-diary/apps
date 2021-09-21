@@ -396,7 +396,7 @@ namespace Sentry.data.Core
 
             if (String.IsNullOrWhiteSpace(dto.PrimaryOwnerId))
             {
-                errors.Add("Owner is required.");
+                errors.Add("Owner is required.  Please select SAID Asset and this box will be auto-filled.");
             }
 
             if (String.IsNullOrWhiteSpace(dto.PrimaryContactId))

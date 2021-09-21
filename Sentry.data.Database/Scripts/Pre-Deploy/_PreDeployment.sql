@@ -9,6 +9,8 @@ BEGIN TRY
   --insert one off script files here
   :r ..\Pre-Deploy\SupportingScripts\Sprint_21_04_04\Add_Flag__CLA1656_DataFlowEdit_SubmitEditPage.sql
   :r ..\Pre-Deploy\SupportingScripts\Sprint_21_04_04\Add_Flag__CLA1656_DataFlowEdit_ViewEditPage.sql
+  --insert one off script files here
+  :r ..\Pre-Deploy\SupportingScripts\Sprint_21_09_08\INSERT_SECURITY_DSC_BUSINESS_AREA.sql
   
   --insert into the verision table so these scripts do not run again.
   INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 

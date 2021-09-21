@@ -15,3 +15,6 @@
     [Submission] INT NULL, 
     CONSTRAINT [FK_JobHistory_RetrieverJob] FOREIGN KEY ([Job_ID]) REFERENCES [RetrieverJob]([Job_ID])
 )
+GO
+
+create index IDX_JobHistoryNeedsValidation on JobHistory(ActiveInd) include (BatchId) with(online =on)

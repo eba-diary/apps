@@ -153,6 +153,7 @@
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_02" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_03" />
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_21_04_04" />
+    <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_21_09_08" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -353,6 +354,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_03_06\DELETE_DATA_ELEMENT_TABLES.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_21_09_08\INSERT_SECURITY_DSC_BUSINESS_AREA.sql" />
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent />
