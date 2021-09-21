@@ -15,13 +15,6 @@ namespace Sentry.data.Core
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
         int CreateandSaveDataFlow(DataFlowDto dto);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="message"></param>
-        /// <exception cref="Sentry.data.Core.Exceptions.KafkaProducerException"></exception>
-        void PublishMessage(string key, string message);
         IQueryable<DataSourceType> GetDataSourceTypes();
         IQueryable<DataSource> GetDataSources();
         string GetDataFlowNameForFileSchema(FileSchema scm);
@@ -71,9 +64,23 @@ namespace Sentry.data.Core
         /// <exception cref="ArgumentNullException"
         /// <returns></returns>
         List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId);
-        void DeleteByFileSchema(FileSchema scm);
-        ValidationException Validate(DataFlowDto dfDto);
+        Task<ValidationException> Validate(DataFlowDto dfDto);
         List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId);
         void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true);
+
+        /// <summary>
+        /// Retrieve retrieverjobdto associated with pull type dataflow
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        RetrieverJobDto GetAssociatedRetrieverJobDto(int id);
+        int UpdateandSaveDataFlow(DataFlowDto dfDto);
+
+        /// <summary>
+        /// Given a SAID asset key code, get all the named environments from Quartermaster
+        /// </summary>
+        /// <param name="saidAssetKeyCode">The four-character key code for an asset</param>
+        /// <returns>A list of NamedEnvironmentDto objects</returns>
+        Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsAsync(string saidAssetKeyCode);
     }
 }

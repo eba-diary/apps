@@ -20,6 +20,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual string TargetPrefix { get; set; }
         public virtual string SourceDependencyPrefix { get; set; }
         public virtual string SourceDependencyBucket { get; set; }
+        public virtual string TriggerBucket { get; set; }
+        public virtual string TargetBucket { get; set; }
         public virtual IList<SchemaMap> SchemaMappings { get; set; }
         public virtual IList<EventMetric> Executions { get; set; }
 
@@ -31,7 +33,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append($"stepid:{Id} actiontype:{DataAction_Type_Id.ToString()} triggerkey:{TriggerKey} targetbucket:{Action.TargetStorageBucket} targetprefix:{TargetPrefix}  FlowGuid:{DataFlow.FlowGuid}");
+            sb.Append($"stepid:{Id} actiontype:{DataAction_Type_Id.ToString()} triggerbucket:{TriggerBucket} triggerkey:{TriggerKey} targetbucket:{TargetBucket} targetprefix:{TargetPrefix}  FlowGuid:{DataFlow.FlowGuid}");
 
             return sb.ToString();
         }

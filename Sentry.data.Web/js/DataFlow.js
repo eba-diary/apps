@@ -11,6 +11,14 @@
             placeholder: "Select Options"
         });
 
+        //init preprocessing panel
+        if ($("#IsCompressed").val() === "true") {
+            $(".compressionJobPanel").show();
+        }
+        else {
+            $(".compressionJobPanel").hide();
+        }
+
         $("#IsCompressed").change(function () {
             if ($(this).val() === "true") {
                 $('.compressionJobPanel').show();
@@ -48,6 +56,15 @@
                 data.DataFlow.InitSchemaMaps();               
             });
         });
+
+        //When the SAID asset changes, reload the named environments dropdown
+        $("#SAIDAssetKeyCode").on('change', function () {
+            Sentry.InjectSpinner($("#namedEnvironmentSpinner"), 30);
+            data.DataFlow.populateNamedEnvironments();
+        });
+
+        //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
+        data.DataFlow.initNamedEnvironmentEvents();
 
         $(document).ready(function () {
             $('.selectpicker').selectpicker({
@@ -97,7 +114,7 @@
     },
 
     InitIngestionType() {
-        var selection = $("[id$=IngestionType]").val();
+        var selection = $("[id$=IngestionTypeSelection]").val();
 
         if (selection === "2") {
             $('.namePanel').show();
@@ -134,7 +151,7 @@
             $('.formSubmitButtons').show();
         }            
 
-        $("[id$=IngestionType]").on('change', function () {
+        $("[id$=IngestionTypeSelection]").on('change', function () {
             var ingestionSelection = $(this).val();
             //if changing to Pull
             if (ingestionSelection === "2") {
@@ -177,7 +194,7 @@
 
     CancelIngestionSelection: function (e, item) {
         //from https://stackoverflow.com/a/28324400
-        var ingestionSelectBox = document.querySelector("[id$=IngestionType]");
+        var ingestionSelectBox = document.querySelector("[id$=IngestionTypeSelection]");
         switch (e) {
             case "1":
                 ingestionSelectBox.value = "2";
@@ -388,7 +405,7 @@
 
             $('[id$=__SelectedDataset]').each(function (index) {
                 var cur = $(this);
-                var dsSpinner = cur.parent().find('.datasetSpinner');                
+                var dsSpinner = cur.parent().find('.datasetSpinner');
                 var curVal = cur.val();
 
                 dsSpinner.html('');
@@ -421,6 +438,23 @@
                 $('#DataFlowFormContainer').hide();
                 data.DataFlow.RenderDatasetCreatePage();
             });
+        });
+    },
+
+    initNamedEnvironmentEvents() {
+        //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
+        $("select#NamedEnvironment").change(function () {
+            Sentry.InjectSpinner($("#namedEnvironmentTypeSpinner"), 30);
+            data.DataFlow.populateNamedEnvironments();
+        });
+    },
+
+    populateNamedEnvironments() {
+        var assetKeyCode = $("#SAIDAssetKeyCode").val();
+        var selectedEnvironment = $("#NamedEnvironment").val();
+        $.get("/DataFlow/NamedEnvironment?assetKeyCode=" + assetKeyCode + "&namedEnvironment=" + selectedEnvironment, function (result) {
+            $('#NamedEnvironmentPartial').html(result);
+            data.DataFlow.initNamedEnvironmentEvents();
         });
     }
 }

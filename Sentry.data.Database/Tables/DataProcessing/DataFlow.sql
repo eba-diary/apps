@@ -15,6 +15,11 @@
     [UserDropLocationPrefix] VARCHAR(1000) NULL, 
     [NamedEnvironment] VARCHAR(25) NULL, 
     [NamedEnvironmentType] VARCHAR(25) NULL, 
+    [IngestionType] INT NULL, 
+    [IsDecompressionRequired] BIT NULL, 
+    [CompressionType] INT NULL, 
+    [IsPreProcessingRequired] BIT NULL, 
+    [PreProcessingOption] INT NULL, 
     [DatasetId] INT NULL, 
     [SchemaId] INT NULL, 
     CONSTRAINT [PK_DataFlow] PRIMARY KEY CLUSTERED 

@@ -22,14 +22,6 @@ namespace Sentry.data.Web
 
         [System.ComponentModel.DataAnnotations.Required]
         public string Name { get; set; }
-        /// <summary>
-        /// How is data getting into DSC (Push or Pull)
-        /// </summary>
-        /// 
-        [DisplayName("How will data be ingested into DSC?")]
-        public IngestionType IngestionType { get; set; }
-
-        public string SelectedIngestionType { get; set; }
 
         /// <summary>
         /// Is the incoming data compressed?
@@ -39,10 +31,15 @@ namespace Sentry.data.Web
         public bool IsCompressed { get; set; }
 
         public bool IsPreProcessingRequired { get; set; }
+        [DisplayName("Pre Processing Options")]
+        public int PreProcessingSelection { get; set; }
         /// <summary>
         /// Target
         /// </summary>
         public int SchemaId { get; set; }
+
+        [DisplayName("SAID Asset")]
+        [System.ComponentModel.DataAnnotations.Required]
         public string SAIDAssetKeyCode { get; set; }
 
         [DisplayName("Where should this data be loaded?")]
@@ -53,15 +50,36 @@ namespace Sentry.data.Web
         public DateTime CreatedDTM { get; set; }
         public int DataFlowId { get; set; }
         public ObjectStatusEnum ObjectStatus { get; set; }
-
+        public string StorageCode { get; set; }
         public bool CLA3332_ConsolidatedDataFlows { get; set; }
 
+        /// <summary>
+        /// How is data getting into DSC (Push or Pull)
+        /// </summary>
+        /// 
+        [DisplayName("How will data be ingested into DSC?")]
+        public int IngestionTypeSelection { get; set; }
 
+        /// <summary>
+        /// Named Environment naming conventions from https://confluence.sentry.com/x/eQNvAQ
+        /// </summary>
+        [DisplayName("Named Environment")]
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.RegularExpression("^[A-Z0-9]{1,10}$", ErrorMessage = "Named environment must be alphanumeric, all caps, and less than 10 characters")]
+        public string NamedEnvironment { get; set; }
+
+
+        [DisplayName("Named Environment Type")]
+        [System.ComponentModel.DataAnnotations.Required]
+        public NamedEnvironmentType NamedEnvironmentType { get; set; }
 
         public IEnumerable<SelectListItem> CompressionDropdown { get; set; }
         public IEnumerable<SelectListItem> PreProcessingRequiredDropdown { get; set; }
         public IEnumerable<SelectListItem> PreProcessingOptionsDropdown { get; set; }
         public IEnumerable<SelectListItem> SAIDAssetDropDown { get; set; }
+        public IEnumerable<SelectListItem> IngestionTypeDropDown { get; set; }
+        public IEnumerable<SelectListItem> NamedEnvironmentDropDown { get; set; }
+        public IEnumerable<SelectListItem> NamedEnvironmentTypeDropDown { get; set; }
         [DisplayName("Pre Processing Options")]
         public List<int> PreprocessingOptions { get; set; }
 
@@ -79,11 +97,11 @@ namespace Sentry.data.Web
             }
 
             #region RetrieverJob validations
-            if (IngestionType == IngestionType.DSC_Pull && (RetrieverJob == null))
+            if (IngestionTypeSelection == (int)IngestionType.DSC_Pull && RetrieverJob == null)
             {
                 results.Add(string.Empty, "Pull type data flows required retriever job configuration");
             }
-            if(IngestionType == IngestionType.DSC_Pull && RetrieverJob != null)
+            if(IngestionTypeSelection == (int)IngestionType.DSC_Pull && RetrieverJob != null)
             {
                 foreach (ValidationResult result in RetrieverJob.Validate().ValidationResults.GetAll())
                 {
@@ -109,7 +127,7 @@ namespace Sentry.data.Web
                 }
             }
 
-            if (IsPreProcessingRequired && PreprocessingOptions.Count == 1 && PreprocessingOptions.First() == 0)
+            if (IsPreProcessingRequired && PreProcessingSelection == 0)
             {
                 results.Add("PreprocessingOptions", "Pre Processing selection is required");
             }
