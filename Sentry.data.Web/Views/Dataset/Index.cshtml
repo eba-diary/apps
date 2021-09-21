@@ -6,7 +6,7 @@
     @{
         var category = Model.Categories.ToList();
         int c = category.Count();
-        string[] colors = new string[] { "blueGray", "orange", "gold", "green", "plum", "blue" };
+        string[] colors = new string[] { "blueGray", "orange", "gold", "green", "plum", "blue", "gray" };
     }
     <div class="container">
         <div id="ds-search-wrapper" class="ds-grid col-md-12">
@@ -24,7 +24,7 @@
             </div>
         </div>
         <div id="ds-tile-wrapper" class="ds-grid col-md-12">
-            @for (int i = 0; i < c; i++)
+            @for (int i = 0; i < category.Count(); i++)
             {
                 if (i % 3 == 0)
                 {
@@ -35,12 +35,21 @@
                 <div class="col-md-3 tile border_@colors[i] @color ">
                     <a class="" href="~/Search/Datasets/Index?category=@category[i].Name">
                         <img src="/Images/Category/@{@category[i].Name}.svg" class="ds-tile-image">
-                        <div class="ds-tile-header">@category[i].Name</div>
+
+                        @if (category[i].Name.ToUpper() == "HR")
+                        {
+                             <div class="ds-tile-header">Human Resources</div>
+                        }
+                        else
+                        {
+                            <div class="ds-tile-header">@category[i].Name</div>
+                        }
+
                         <div class="ds-tile-description"></div>
                     </a>
                 </div>
                 if (i % 3 == 2 || i + 1 == c)
-                {
+                        {
                     @:</div>
                 }
             }
