@@ -5,5 +5,7 @@
     [Job_Guid] UNIQUEIDENTIFIER NOT NULL, 
     [Serialized_Job_Options] NVARCHAR(MAX) NULL, 
     [Created] DATETIME NULL, 
+    [FlowExecutionGuid] VARCHAR(17) NULL, 
+    [RunInstanceGuid] VARCHAR(17) NULL, 
     CONSTRAINT [FK_Submission_RetrieverJob] FOREIGN KEY ([Job_ID]) REFERENCES [RetrieverJob]([Job_ID])
 )
