@@ -326,7 +326,7 @@ namespace Sentry.data.Core
                 DatasetFileConfigDto dto = new DatasetFileConfigDto();
                 MapToDatasetFileConfigDto(dfc, dto);
                 dto.HasDataFlow = _datasetContext.DataFlow.Any(df => df.DatasetId == dfc.ParentDataset.DatasetId && 
-                                                                     df.SchemaId == configId && 
+                                                                     df.SchemaId == dfc.Schema.SchemaId && 
                                                                      df.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
                 return dto;
             }
