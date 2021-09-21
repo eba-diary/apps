@@ -15,6 +15,8 @@ namespace Sentry.data.Web.Extensions
             model.JobGuid = dto.JobGuid.ToString();
             model.Serialized_Job_Options = dto.Serialized_Job_Options;
             model.Created_DTM = dto.Created.ToString();
+            model.FlowExecutionGuid = dto.FlowExecutionGuid;
+            model.RunInstanceGuid = dto.RunInstanceGuid;
         }
 
         public static List<SubmissionModel> ToSubmissionModel(this List<Core.Submission> dtoList)

@@ -340,9 +340,11 @@ namespace Sentry.data.Web.WebApi.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> SubmitJob(int JobId, Guid JobGuid, [FromBody] JavaOptionsOverride javaOptionsOverride)
         {
+            string methodName = MethodBase.GetCurrentMethod().Name.ToLower();
+            
             try
             {
-                Logger.Info($"Start method <>");
+                Logger.Info($"Start method <{methodName}> ");
                 if (JobId == 0)
                 {
                     return BadRequest("JobId parameter required");
@@ -353,13 +355,29 @@ namespace Sentry.data.Web.WebApi.Controllers
                     return BadRequest("JobGuid parameter required");
                 }
 
-                Logger.Info($"Start method <{MethodBase.GetCurrentMethod().Name.ToLower()}>  JobId: {JobId.ToString()} JobGuid: {JobGuid.ToString()}");
+                /*
+                 * Add flowexecutionguid context variable
+                 */
+                string flowExecutionGuid = (javaOptionsOverride != null && javaOptionsOverride.FlowExecutionGuid != null) ? javaOptionsOverride.FlowExecutionGuid : Guid.Empty.ToString();
+                Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
+
+                /*
+                 * Add runinstanceguid context variable
+                 */
+                string runInstanceGuid = (javaOptionsOverride != null && javaOptionsOverride.RunInstanceGuid != null) ? javaOptionsOverride.RunInstanceGuid : Guid.Empty.ToString();
+                Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
+                
+                Logger.Info($"Start method <{methodName}>  JobId: {JobId} JobGuid: {JobGuid}");
+
+                Logger.Info(javaOptionsOverride != null
+                    ? $"JobId: {JobId} JobGuid: {JobGuid}  JavaOptionsOverride: {JsonConvert.SerializeObject(javaOptionsOverride)}"
+                    : $"JobId: {JobId} JobGuid: {JobGuid}  JavaOptionsOverride: Not supplied");
 
                 RetrieverJob job = _datasetContext.RetrieverJob.FirstOrDefault(w => w.Id == JobId && JobGuid == w.JobGuid);
 
                 if (job == null)
                 {
-                    return Content(HttpStatusCode.NotFound, $"JobId:{JobId.ToString()} | JobGuid:{JobGuid.ToString()}");
+                    return Content(HttpStatusCode.NotFound, $"JobId:{JobId} | JobGuid:{JobGuid}");
                 }
 
                 if (!job.DataSource.Is<JavaAppSource>())
@@ -466,12 +484,6 @@ namespace Sentry.data.Web.WebApi.Controllers
 
                 HttpContent contentPost = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
 
-
-                //client.DefaultRequestHeaders.Accept.Clear();
-                //client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
-                //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));//ACCEPT header
-                //HttpResponseMessage response = await client.PostAsync(Sentry.Configuration.Config.GetHostSetting("ApacheLivy") + "/batches", contentPost).ConfigureAwait(false);
-
                 HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("batches", contentPost).ConfigureAwait(false);
 
                 string result = response.Content.ReadAsStringAsync().Result;
@@ -485,7 +497,9 @@ namespace Sentry.data.Web.WebApi.Controllers
                     JobId = job,
                     JobGuid = JobGuid,
                     Created = DateTime.Now,
-                    Serialized_Job_Options = json.ToString()
+                    Serialized_Job_Options = json.ToString(),
+                    FlowExecutionGuid = flowExecutionGuid,
+                    RunInstanceGuid = runInstanceGuid
                 };
 
                 _datasetContext.Add(sub);
@@ -770,6 +784,8 @@ namespace Sentry.data.Web.WebApi.Controllers
             public string ExecutorMemory { get; set; }
             public int? ExecutorCores { get; set; }
             public int? NumExecutors { get; set; }
+            public string FlowExecutionGuid { get; set; }
+            public string RunInstanceGuid { get; set; }
         }        
     }
 }
