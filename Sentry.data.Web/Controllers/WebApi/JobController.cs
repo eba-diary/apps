@@ -358,13 +358,13 @@ namespace Sentry.data.Web.WebApi.Controllers
                 /*
                  * Add flowexecutionguid context variable
                  */
-                string flowExecutionGuid = (javaOptionsOverride != null && javaOptionsOverride.FlowExecutionGuid != null) ? javaOptionsOverride.FlowExecutionGuid : Guid.Empty.ToString();
+                string flowExecutionGuid = (javaOptionsOverride != null && javaOptionsOverride.FlowExecutionGuid != null) ? javaOptionsOverride.FlowExecutionGuid : "00000000000000000";
                 Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
 
                 /*
                  * Add runinstanceguid context variable
                  */
-                string runInstanceGuid = (javaOptionsOverride != null && javaOptionsOverride.RunInstanceGuid != null) ? javaOptionsOverride.RunInstanceGuid : Guid.Empty.ToString();
+                string runInstanceGuid = (javaOptionsOverride != null && javaOptionsOverride.RunInstanceGuid != null) ? javaOptionsOverride.RunInstanceGuid : "00000000000000000";
                 Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
                 
                 Logger.Info($"Start method <{methodName}>  JobId: {JobId} JobGuid: {JobGuid}");
@@ -489,7 +489,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 string result = response.Content.ReadAsStringAsync().Result;
                 string postResult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
 
-                Logger.Debug($"postbatches_livyresponse statuscode:{response.StatusCode.ToString()}:::result:{postResult}");
+                Logger.Debug($"postbatches_livyresponse statuscode:{response.StatusCode}:::result:{postResult}");
 
                 //Record submission regardless if target deems it a bad request.
                 Submission sub = new Submission()
@@ -607,6 +607,22 @@ namespace Sentry.data.Web.WebApi.Controllers
                 }
 
 
+                /*
+                 * Add flowexecutionguid context variable
+                 */
+                string flowExecutionGuid = (hr.Submission != null && hr.Submission.FlowExecutionGuid != null) ? hr.Submission.FlowExecutionGuid : "00000000000000000";
+                Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
+
+                /*
+                 * Add runinstanceguid context variable
+                 */
+                string runInstanceGuid = (hr.Submission != null && hr.Submission.RunInstanceGuid != null) ? hr.Submission.RunInstanceGuid : "00000000000000000";
+                Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
+
+                Logger.Info($"<jobcontroller-getbatchstate> start-method");
+
+
+                Logger.Info($"<jobcontroller-getbatchstate> pull batch metadata: batchId:{batchId} apacheLivyUrl:/batches/{batchId}");
                 //var client = _httpClient;
                 //HttpResponseMessage response = await client.GetAsync(Sentry.Configuration.Config.GetHostSetting("ApacheLivy") + $"/batches/{batchId}").ConfigureAwait(false);
                 HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync($"/batches/{batchId}").ConfigureAwait(false);
@@ -614,7 +630,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 string result = response.Content.ReadAsStringAsync().Result;
                 string sendresult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
 
-                Logger.Debug($"getbatchstate_livyresponse statuscode:{response.StatusCode.ToString()}:::result:{sendresult}");
+                Logger.Info($"<jobcontroller-getbatchstate> getbatchstate_livyresponse batchId:{batchId} statuscode:{response.StatusCode}:::result:{sendresult}");
 
                 if (response.IsSuccessStatusCode)
                 {
