@@ -20,6 +20,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual int IngestionType { get; set; }
         public virtual string FlowStorageCode { get; set; }
         public virtual string SaidKeyCode { get; set; }
+        public virtual int DatasetId { get; set; }
+        public virtual int SchemaId { get; set; }
         public virtual string Name { get; set; }
         public virtual DateTime CreatedDTM { get; set; }
         public virtual DateTime ModifiedDTM { get; set; }

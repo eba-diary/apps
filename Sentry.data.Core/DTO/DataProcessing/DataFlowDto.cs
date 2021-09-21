@@ -9,6 +9,8 @@ namespace Sentry.data.Core
         public int Id { get; set; }
         public Guid FlowGuid { get; set; }
         public string SaidKeyCode { get; set; }
+        public int DatasetId { get; set; }
+        public int SchemaId { get; set; }
         public string Name { get; set; }
         public DateTime CreateDTM { get; set; }
         public string CreatedBy { get; set; }

@@ -95,10 +95,12 @@ namespace Sentry.data.Web.Controllers
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
             SchemaMapModel schemaModel = new SchemaMapModel
             {
-                SelectedDataset = 0
+                SelectedDataset = 0,
+                CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
             };
             model.SchemaMaps.Add(schemaModel);
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
+            model.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
 
             var namedEnvironments = await BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment).ConfigureAwait(false);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
@@ -231,9 +233,11 @@ namespace Sentry.data.Web.Controllers
                 foreach (SchemaMapModel mapModel in model.SchemaMaps)
                 {
                     SetSchemaModelLists(mapModel);
+                    mapModel.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
                 }
             }
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
+            model.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
 
             var namedEnvironments = await BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment).ConfigureAwait(false);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
@@ -393,7 +397,6 @@ namespace Sentry.data.Web.Controllers
 
             if (model.SelectedDataset == 0)
             {
-                dsList.Add(new SelectListItem() { Text = "Create New Dataset", Value = "-1", Selected = true });
                 dsList.Add(new SelectListItem() { Text = "Select Dataset", Value = "0", Selected = true });
             }
 

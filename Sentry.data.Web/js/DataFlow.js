@@ -1,11 +1,6 @@
 ﻿data.DataFlow = {
-    DataFlow_DatasetSubmitInit: function () {
 
-        SubmitFunciton = function () {
-
-        }
-
-    },
+    CLA3332_ConsolidatedDataFlows: false,
 
     DataFlowFormInit: function () {
 
@@ -49,11 +44,6 @@
         $("#IsPreProcessingRequired").change(function () {
             if ($(this).val() === "true") {
                 $('.preProcessingJobPanel').show();
-                //if ($('.compressionJobQuestion').length === 0) {
-                //    $.get("/DataFlow/NewCompressionJob", function (e) {
-                //        $("#compressionJobPanel").append(e);
-                //    });
-                //}
             }
             else {
                 $('.preProcessingJobPanel').hide();
@@ -175,12 +165,12 @@
                 //  for retriever job configuration if sourcetype has been selected.
                 //If sourcetype has not been selected, then reset the RetrieverPanel as
                 //  there are no values to loose.
-                if ($('[id$=__SelectedSourceType]').val() == null) {
+                if ($('[id$=__SelectedSourceType]')?.val() === undefined || $('[id$=__SelectedSourceType]')?.val() === null) {
                     data.DataFlow.ResetRetrieverPanel();
                 }
                 else {
                     //need to manually pass buttons in order to specify callback for OK and Cancel options
-                    Sentry.ShowModalCustom('Potential Loss of Configuration', 'You will loose configuration values within "Where Do You Want Us to Pull From" section if you continue', {
+                    Sentry.ShowModalCustom('Potential Loss of Configuration', 'You will lose configuration values within "Where Do You Want Us to Pull From" section if you continue', {
                         OK: {
                             label: "OK",
                             className: "btn-primary",
@@ -192,7 +182,7 @@
                             callback: function () { data.DataFlow.CancelIngestionSelection(ingestionSelection, $(this)); }
                         }
                     });
-                };
+                }
             }
             $('.namePanel').show();
             $('.compressionPanel').show();
@@ -246,7 +236,6 @@
             var cur = $(this);
             cur.html('');
         });
-        //data.DataFlow.InitSchemaMaps("0", null);
     },
 
     DatasetFormSubmitInit: function () {
@@ -266,8 +255,6 @@
                 else {
                     $('#DatasetFormContent').replaceWith(obj);
                 }
-            },
-            failure: function () {
             },
             error: function (obj) {
                 $('#DatasetFormContent').replaceWith(obj.responseText);
@@ -297,8 +284,6 @@
                     $('#DatasetFileConfigFormContent').replaceWith(obj);
                 }
             },
-            failure: function () {
-            },
             error: function (obj) {
                 $('#DatasetFileConfigFormContent').replaceWith(obj.responseText);
                 //init the form passing the submit function specific for DataFlow page
@@ -314,23 +299,30 @@
 
     PopulateSchemas(datasetId, schemaId, targetElement) {
         var scmSpinner = $(targetElement).parent().parent().find('.schemaSpinner');
-        if (datasetId !== null && datasetId !== "-1" && datasetId !== "0") {
+        var createSchemaLink = targetElement.parent().parent().find('#CreateSchema');
+        if (datasetId !== null && datasetId !== "0") {
             var curVal = targetElement.val();
             $.getJSON("/api/v2/metadata/dataset/" + datasetId + "/schema", function (result) {
                 var subItems;
 
                 //Filter for only ACTIVE schema
-                var activeSchema = result.filter(function (item) {
+                var filter = result.filter(function (item) {
                     return item.ObjectStatus === "ACTIVE";
                 });
 
+                //If feature flag is enabled, only show schemas that don't have a DataFlow
+                if (data.DataFlow.CLA3332_ConsolidatedDataFlows) {
+                    filter = filter.filter(function (item) {
+                        return item.HasDataFlow === false;
+                    });
+                }
+
                 //Make list sorted by schema name
-                var sortedResults = activeSchema.sort(
+                var sortedResults = filter.sort(
                     firstBy("Name")
                 );
 
                 // Add initial value
-                subItems += "<option value='-1'>Create Schema</option>";
                 subItems += "<option value='0'>Select Schema</option>";
 
                 // Add ACTIVE schema values
@@ -341,35 +333,29 @@
                 scmSpinner.html('');
                 targetElement.html(subItems);
 
-                if (curVal === null || curVal === "0" || ((schemaId === undefined || schemaId === null) && curVal === "-1")) {
+                if (curVal === null || curVal === "0") {
                     targetElement.val("0");
-                }
-                else if ((schemaId !== undefined && schemaId !== null) || curVal === "-1") {
-                    targetElement.val(schemaId)
                 }
                 else {
                     $(targetElement).val(curVal);
                 }
             });
+            createSchemaLink.show();
         }
         else {
-            var subItems;
-            subItems += "<option value='0'>Select Dataset First</option>";
+            var options;
+            options += "<option value='0'>Select Dataset First</option>";
             scmSpinner.html('');
-            targetElement.html(subItems);
+            targetElement.html(options);
+            createSchemaLink.hide();
         }
 
-        $('[id$=__SelectedSchema]').change(function () {
-            var schemaId = $(this).val();
+        $('#CreateSchema').click(function () {
             var curRow = $(this).parent().parent();
             var datasetSelectionDropDown = curRow.find("[id$=__SelectedDataset]");
-            var datasetId = datasetSelectionDropDown.val();
-
-            //if Create New Dataset Selected
-            if (schemaId === "-1") {
-                $('#DataFlowFormContainer').hide();
-                data.DataFlow.RenderSchemaCreatePage(datasetId);
-            }
+            var createSchemaDatasetId = datasetSelectionDropDown.val();
+            $('#DataFlowFormContainer').hide();
+            data.DataFlow.RenderSchemaCreatePage(createSchemaDatasetId);
         });
     },
 
@@ -392,7 +378,6 @@
                     .thenBy("Name")
             );
 
-            newSubItems += "<option value='-1'>Create Dataset</option>";
             newSubItems += "<option value='0'>Select Dataset</option>";
 
             $.each(sortedResult, function (index, item) {
@@ -426,19 +411,13 @@
                 dsSpinner.html('');
                 cur.html(newSubItems);
 
+                var curRow = cur.parent().parent();
                 if (curVal === null || curVal === undefined) {
-                    var curRow = cur.parent().parent();
                     $(this).val(0);
                     data.DataFlow.PopulateSchemas("0", schemaId, curRow.find("[id$=__SelectedSchema]"));
                 }
-                else if (curVal == "-1") {
-                    var curRow = cur.parent().parent();
-                    $(this).val(datasetId);
-                    data.DataFlow.PopulateSchemas(datasetId, schemaId, curRow.find("[id$=__SelectedSchema]"));
-                }
                 else {
                     cur.val(curVal);
-                    var curRow = cur.parent().parent();
                     data.DataFlow.PopulateSchemas(curVal, schemaId, curRow.find("[id$=__SelectedSchema]"));
                 }
             });
@@ -447,30 +426,18 @@
             $('[id$=__SelectedDataset]').change(function () {
                 var curRow = $(this).parent().parent();
                 var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
-                var datasetId = $(this).val();
+                var datasetChangeDatasetId = $(this).val();
+                schemaSelectionDropDown.val("0");
 
                 Sentry.InjectSpinner(curRow.find('.schemaSpinner'), 30);
-
-                //if Create New Dataset Selected
-                if (datasetId === "-1") {
-                    $('#DataFlowFormContainer').hide();
-                    data.DataFlow.RenderDatasetCreatePage();
-                }
-                else {
-                    data.DataFlow.PopulateSchemas(datasetId, null, schemaSelectionDropDown);
-                }
+                data.DataFlow.PopulateSchemas(datasetChangeDatasetId, null, schemaSelectionDropDown);
 
             });
 
-            //$('[id$=_SelectedSchema]').change(function () {
-            //    var schemaId = $(this).val();
-
-            //    //If create new schema is selected
-            //    if (schemaId === "-1") {
-            //        $('#DataFlowFormContainer').hide();
-            //        data.DataFlow.RenderSchemaCreatePage();
-            //    }
-            //})
+            $('#CreateDataset').click(function () {
+                $('#DataFlowFormContainer').hide();
+                data.DataFlow.RenderDatasetCreatePage();
+            });
         });
     },
 

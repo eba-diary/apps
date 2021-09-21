@@ -16,6 +16,7 @@ namespace Sentry.data.Core
         IFeatureFlagRequiringContext<bool, string> CLA1656_DataFlowEdit_SubmitEditPage { get; }
         IFeatureFlag<bool> CLA3240_UseDropLocationV2 { get; }
         IFeatureFlag<bool> CLA3241_DisableDfsDropLocation { get; }
+        IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; }
 
     }
 }

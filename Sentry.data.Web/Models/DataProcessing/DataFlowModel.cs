@@ -51,6 +51,8 @@ namespace Sentry.data.Web
         public int DataFlowId { get; set; }
         public ObjectStatusEnum ObjectStatus { get; set; }
         public string StorageCode { get; set; }
+        public bool CLA3332_ConsolidatedDataFlows { get; set; }
+
         /// <summary>
         /// How is data getting into DSC (Push or Pull)
         /// </summary>
@@ -65,6 +67,7 @@ namespace Sentry.data.Web
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.RegularExpression("^[A-Z0-9]{1,10}$", ErrorMessage = "Named environment must be alphanumeric, all caps, and less than 10 characters")]
         public string NamedEnvironment { get; set; }
+
 
         [DisplayName("Named Environment Type")]
         [System.ComponentModel.DataAnnotations.Required]

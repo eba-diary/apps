@@ -22,7 +22,7 @@ namespace Sentry.data.Core
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
         private readonly ISecurityService _securityService;
-        private readonly IDataFeatures _featureFlags;
+        private readonly IDataFeatures _dataFeatures;
         private readonly IMessagePublisher _messagePublisher;
         private readonly ISnowProvider _snowProvider;
         private string _bucket;
@@ -37,7 +37,7 @@ namespace Sentry.data.Core
             _dataFlowService = dataFlowService;
             _jobService = jobService;
             _securityService = securityService;
-            _featureFlags = dataFeatures;
+            _dataFeatures = dataFeatures;
             _messagePublisher = messagePublisher;
             _snowProvider = snowProvider;
 
@@ -62,7 +62,10 @@ namespace Sentry.data.Core
             {
                 newSchema = CreateSchema(schemaDto);
 
-                _dataFlowService.CreateDataFlowForSchema(newSchema);
+                if (!_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
+                {
+                    _dataFlowService.CreateDataFlowForSchema(newSchema);
+                }
 
                 _datasetContext.SaveChanges();
             }

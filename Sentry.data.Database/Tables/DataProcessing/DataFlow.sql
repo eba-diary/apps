@@ -20,6 +20,8 @@
     [CompressionType] INT NULL, 
     [IsPreProcessingRequired] BIT NULL, 
     [PreProcessingOption] INT NULL, 
+    [DatasetId] INT NULL, 
+    [SchemaId] INT NULL, 
     CONSTRAINT [PK_DataFlow] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
