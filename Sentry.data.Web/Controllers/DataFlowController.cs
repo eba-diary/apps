@@ -122,7 +122,7 @@ namespace Sentry.data.Web.Controllers
             UserSecurity us = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
 
             //Feature flag will only evaluate true for Admins
-            if (!DataFeatures.CLA1656_DataFlowEdit_ViewEditPage.GetValue(SharedContext.CurrentUser.AssociateId) && !us.CanCreateDataFlow)
+            if (!DataFeatures.CLA1656_DataFlowEdit_ViewEditPage.GetValue(SharedContext.CurrentUser.AssociateId) || !us.CanCreateDataFlow)
             {
                 return View("Forbidden");
             }
@@ -183,7 +183,7 @@ namespace Sentry.data.Web.Controllers
                     else
                     {
                         //Feature flag will only evaluate true for Admins
-                        if (!DataFeatures.CLA1656_DataFlowEdit_ViewEditPage.GetValue(SharedContext.CurrentUser.AssociateId) || !us.CanCreateDataFlow)
+                        if (!DataFeatures.CLA1656_DataFlowEdit_SubmitEditPage.GetValue(SharedContext.CurrentUser.AssociateId) || !us.CanCreateDataFlow)
                         {
                             return View("Forbidden");
                         }
