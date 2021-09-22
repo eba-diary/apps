@@ -15,7 +15,7 @@
 									(10, 'Corporate', NULL, 'green', 'RPT', NULL),
 									(11, 'IT', NULL, 'plum', 'RPT', NULL),
 									(12, 'Life and Annuities', NULL, 'blue', 'RPT', 'LA'),
-									(13, 'HR', NULL, 'gray', 'DS', NULL)
+									(13, 'Human Resources', NULL, 'gray', 'DS', 'HR')
 								)
 								AS Source ([Id], [Name], ParentCategory, Color, Object_TYP, AbbreviatedName) 
 

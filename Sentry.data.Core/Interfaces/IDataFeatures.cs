@@ -12,6 +12,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> Expose_Dataflow_Metadata_CLA_2146 { get; }
         IFeatureFlag<string> CLA2671_RefactorEventsToJava { get; }
         IFeatureFlag<string> CLA2671_RefactoredDataFlows { get; }
-
+        IFeatureFlag<bool> Expose_HR_Category_CLA_3329 { get; }
     }
 }

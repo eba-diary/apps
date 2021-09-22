@@ -35,5 +35,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         */
         public IFeatureFlag<string> CLA2671_RefactorEventsToJava { get; } = new StringFeatureFlag("CLA2671_RefactorEventsToJava", databaseRepo_longCache);
         public IFeatureFlag<string> CLA2671_RefactoredDataFlows { get; } = new StringFeatureFlag("CLA2671_RefactoredDataFlows", databaseRepo_longCache);
+
+        public IFeatureFlag<bool> Expose_HR_Category_CLA_3329 { get; } = new BooleanFeatureFlag("Expose_HR_CLA_XXXX", databaseRepo_longCache);
     }
 }

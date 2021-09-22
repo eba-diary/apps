@@ -34,18 +34,18 @@
 
                 <div class="col-md-3 tile border_@colors[i] @color ">
                     <a class="" href="~/Search/Datasets/Index?category=@category[i].Name">
-                        <img src="/Images/Category/@{@category[i].Name}.svg" class="ds-tile-image">
 
-                        @if (category[i].Name.ToUpper() == "HR")
+                        @if (String.IsNullOrWhiteSpace(category[i].AbbreviatedName))
                         {
-                             <div class="ds-tile-header">Human Resources</div>
+                            <img src = "/Images/Category/@{@category[i].Name}.svg" class="ds-tile-image">
                         }
                         else
                         {
-                            <div class="ds-tile-header">@category[i].Name</div>
+                            <img src="/Images/Category/@{@category[i].AbbreviatedName}.svg" class="ds-tile-image">
                         }
-
+                        <div class="ds-tile-header">@category[i].Name</div>
                         <div class="ds-tile-description"></div>
+
                     </a>
                 </div>
                 if (i % 3 == 2 || i + 1 == c)
