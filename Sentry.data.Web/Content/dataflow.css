@@ -81,3 +81,13 @@
 .dropdown-container {
     position: relative;
 }
+
+.create-link {
+    color: white;
+}
+a.create-link:hover,
+a.create-link:focus {
+    color: white;
+    text-decoration: underline;
+    cursor: pointer;
+}

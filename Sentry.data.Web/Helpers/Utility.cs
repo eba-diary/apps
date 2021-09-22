@@ -145,11 +145,11 @@ namespace Sentry.data.Web.Helpers
 
         }
 
-        internal static IEnumerable<SelectListItem> BuildPreProcessingOptionsDropdown(List<int> preProcessingOptionSelections)
+        public static IEnumerable<SelectListItem> BuildPreProcessingOptionsDropdown(int preProcessingOptionSelections)
         {
             List<SelectListItem> items = new List<SelectListItem>();
 
-            if (preProcessingOptionSelections == null || !preProcessingOptionSelections.Any() || preProcessingOptionSelections.Contains(0))
+            if (preProcessingOptionSelections == 0)
             {
                 items.Add(new SelectListItem { Text = "Select Option", Value = "0", Selected = true});
                 items.AddRange(Enum.GetValues(typeof(DataFlowPreProcessingTypes)).Cast<DataFlowPreProcessingTypes>().Select(v => new SelectListItem { Text = v.GetDescription(), Value = ((int)v).ToString() }).ToList());
@@ -159,12 +159,35 @@ namespace Sentry.data.Web.Helpers
                 items.AddRange(Enum.GetValues(typeof(DataFlowPreProcessingTypes)).Cast<DataFlowPreProcessingTypes>().Select(v =>
                     new SelectListItem
                     {
-                        Selected = (preProcessingOptionSelections.Contains((int)v)),
+                        Selected = ((int)v == preProcessingOptionSelections),
                         Text = v.GetDescription(),
                         Value = v.ToString()
                     }).ToList());
             }
             return items;
+        }
+
+        public static IEnumerable<SelectListItem> BuildIngestionTypeDropdown(int ingestionTypeSelection)
+        {
+            List<SelectListItem> items = Enum.GetValues(typeof(IngestionType)).Cast<IngestionType>().Select(v =>
+                  new SelectListItem
+                  {
+                      Selected = (((int)(object)v).ToString() == ingestionTypeSelection.ToString()),
+                      Text = v.GetDescription(),
+                      Value = ((int)(object)v).ToString()
+                  }).ToList();
+
+            if (ingestionTypeSelection == 0)
+            {
+                items.Add(new SelectListItem
+                {
+                    Selected = true,
+                    Text = "Select Ingestion Type",
+                    Value = "0"
+                });
+            } 
+
+            return items.OrderBy(o => o.Value);
         }
 
         public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
@@ -490,6 +513,20 @@ namespace Sentry.data.Web.Helpers
             };
 
             return compressionList;
+        }
+
+        public static IEnumerable<SelectListItem> BuildCompressionTypesDropdown(string selectedType)
+        {
+            if (string.IsNullOrEmpty(selectedType))
+            {
+                //Setting selectedType to bogus value to not repeat list building logic
+                selectedType = "NoSelection";
+            }
+            
+                IEnumerable<SelectListItem> list = Enum.GetValues(typeof(CompressionTypes)).Cast<CompressionTypes>().Select(v
+                => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString(), Selected = (v.ToString() == selectedType) }).ToList();
+            
+            return list;
         }
 
         public static IEnumerable<SelectListItem> BuildPreProcessingDropdown(bool isPreProcessingRequired)

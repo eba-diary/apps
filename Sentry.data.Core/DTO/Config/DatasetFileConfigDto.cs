@@ -37,5 +37,6 @@ namespace Sentry.data.Core
         public DateTime? DeleteIssueDTM { get; set; }
         public ObjectStatusEnum ObjectStatus { get; set; }
         public string SchemaRootPath { get; set; }
+        public bool HasDataFlow { get; set; }
     }
 }

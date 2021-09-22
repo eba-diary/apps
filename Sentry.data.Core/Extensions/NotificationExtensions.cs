@@ -48,9 +48,8 @@ namespace Sentry.data.Core
                     case GlobalConstants.Notifications.BUSINESSAREA_TYPE:
                         BusinessArea ba = domainContext.GetById<BusinessArea>(notification.ParentObject);
                         model.ObjectName = ba.Name;
-                        //UserSecurity us = _securityService.GetUserSecurity(notification.ParentObject, user);
-                        //model.CanEdit = us.CanModifyNotifications;
-                        model.CanEdit = true;
+                        UserSecurity us2 = securityService.GetUserSecurity(ba, user);
+                        model.CanEdit = us2.CanModifyNotifications;
                         break;
                     default:
                         break;

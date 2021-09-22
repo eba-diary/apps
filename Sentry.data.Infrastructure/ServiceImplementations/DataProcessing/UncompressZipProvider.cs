@@ -162,7 +162,7 @@ namespace Sentry.data.Infrastructure
                     ActionGuid = step.Action.ActionGuid.ToString(),
                     SourceBucket = keyBucket,
                     SourceKey = objectKey,
-                    StepTargetBucket = step.Action.TargetStorageBucket,
+                    StepTargetBucket = step.TargetBucket,
                     StepTargetPrefix = (step.TargetPrefix == null) ? null : step.TargetPrefix + $"{flowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
                     EventType = GlobalConstants.DataFlowStepEvent.UNCOMPRESS_ZIP_START,
                     FileSize = s3Event.s3.Object.size.ToString(),

@@ -10,6 +10,7 @@ namespace Sentry.data.Core
         DatasetDto GetDatasetDto(int id);
         List<DatasetDto> GetAllDatasetDto();
         DatasetDetailDto GetDatesetDetailDto(int id);
+        IDictionary<int, string> GetDatasetList();
         void UpdateAndSaveDataset(DatasetDto dto);
         UserSecurity GetUserSecurityForDataset(int datasetId);
         UserSecurity GetUserSecurityForConfig(int configId);

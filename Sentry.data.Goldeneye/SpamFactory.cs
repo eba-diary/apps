@@ -181,7 +181,7 @@ namespace Sentry.data.Goldeneye
                                 ).ToList()
                             );
                         }
-                        else if (_event.EventType.Group == EventTypeGroup.BusinessArea.GetDescription() && _event.Notification != null)     //BUSINESSAREA
+                        else if (_event.EventType.Group == EventTypeGroup.BusinessArea.GetDescription() && _event.Notification != null && _event.Notification.ParentObject != (int) BusinessAreaType.DSC)     //ONLY PROCESS BUSINESSAREA EXCLUDING BusinessAreaType=DSC
                         {
                             subsThatMatch.AddRange
                             (

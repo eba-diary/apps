@@ -1,35 +1,39 @@
 ﻿using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.Interfaces.QuartermasterRestClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
     public class DataFlowService : IDataFlowService
     {
         private readonly IDatasetContext _datasetContext;
-        private readonly IMessagePublisher _messagePublisher;
         private readonly IUserService _userService;
         private readonly IJobService _jobService;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly ISecurityService _securityService;
+        private readonly IClient _quartermasterClient;
+        private readonly IDataFeatures _dataFeatures;
 
-
-        public DataFlowService(IDatasetContext datasetContext, IMessagePublisher messagePublisher, 
+        public DataFlowService(IDatasetContext datasetContext, 
             IUserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider,
-            ISecurityService securityService)
+            ISecurityService securityService, IClient quartermasterClient, IDataFeatures dataFeatures)
         {
             _datasetContext = datasetContext;
-            _messagePublisher = messagePublisher;
             _userService = userService;
             _jobService = jobService;
             _s3ServiceProvider = s3ServiceProvider;
             _securityService = securityService;
+            _quartermasterClient = quartermasterClient;
+            _dataFeatures = dataFeatures;
         }
 
         public List<DataFlowDto> ListDataFlows()
@@ -38,6 +42,14 @@ namespace Sentry.data.Core
             List<DataFlowDto> dtoList = new List<DataFlowDto>();
             MapToDtoList(dfList, dtoList);
             return dtoList;
+        }
+
+        public DataFlowDto GetDataFlowDto(int id)
+        {
+            DataFlow df = _datasetContext.GetById<DataFlow>(id);
+            DataFlowDto dto = new DataFlowDto();
+            MapToDto(df, dto);
+            return dto;
         }
 
         public DataFlowDetailDto GetDataFlowDetailDto(int id)
@@ -56,6 +68,13 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
+        public RetrieverJobDto GetAssociatedRetrieverJobDto(int id)
+        {
+            RetrieverJob job = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == id).First();
+            RetrieverJobDto dto = job.ToDto();
+            return dto;
+        }
+
         public int CreateandSaveDataFlow(DataFlowDto dto)
         {
             //Verify user has permissions to create Dataflow
@@ -68,7 +87,7 @@ namespace Sentry.data.Core
 
             //Verify user has permissions to push data to each schema mapped to dataflow
             StringBuilder datasetsWithNoPermissions = new StringBuilder();
-            foreach(SchemaMapDto scmMap in dto.SchemaMap)
+            foreach (SchemaMapDto scmMap in dto.SchemaMap)
             {
                 Dataset ds = _datasetContext.GetById<Dataset>(scmMap.DatasetId);
                 bool IsDatasetDetected = datasetsWithNoPermissions.ToString().Split(',').Any(a => a == ds.DatasetName);
@@ -91,7 +110,7 @@ namespace Sentry.data.Core
                     else
                     {
                         datasetsWithNoPermissions.Append($"{ds.DatasetName}");
-                    }                    
+                    }
                 }
             }
 
@@ -99,7 +118,16 @@ namespace Sentry.data.Core
             // push data too, then throw an unauthorized exception.
             if (datasetsWithNoPermissions.Length > 0)
             {
-                throw new DatasetUnauthorizedAccessException($"No permissions to push data to {datasetsWithNoPermissions.ToString()}");
+                throw new DatasetUnauthorizedAccessException($"No permissions to push data to {datasetsWithNoPermissions}");
+            }
+
+            //Verify that the schema selected is not already connected with a different dataflow
+            if (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() &&
+                _datasetContext.DataFlow.Any(df => df.DatasetId == dto.SchemaMap.First().DatasetId &&
+                                                   df.SchemaId == dto.SchemaMap.First().SchemaId &&
+                                                   df.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active))
+            {
+                throw new SchemaInUseException($"Schema ID {dto.SchemaMap.First().SchemaId} is already associated to another DataFlow.");
             }
 
             try
@@ -110,7 +138,7 @@ namespace Sentry.data.Core
 
                 return df.Id;
             }
-            catch (ValidationException vEx)
+            catch (ValidationException)
             {
                 //throw validation errors for controller to handle
                 _datasetContext.Clear();
@@ -123,18 +151,42 @@ namespace Sentry.data.Core
             }
         }
 
+        public int UpdateandSaveDataFlow(DataFlowDto dfDto)
+        {
+            /*
+             *  Create new Dataflow
+             *  - The incoming dto will have flowstoragecode and will
+             *     be used by new dataflow as well  
+            */
+
+            DataFlow newDataFlow = CreateDataFlow(dfDto);
+
+            /*
+             *  Logically delete the existing dataflow
+             *    This will take care of deleting any existing 
+             *    retriever jobs and removing them from hangfire
+             *  WallEService will eventually set the objects
+             *    to a deleted status after a set period of time    
+             */
+
+            //Delete existing dataflow
+            MarkDataFlowForDeletionById(dfDto.Id);
+            //Delete(dfDto.Id);
+
+            _datasetContext.SaveChanges();
+
+            return newDataFlow.Id;
+        }
         public void CreateDataFlowForSchema(FileSchema scm)
         {
             DataFlow df = MapToDataFlow(scm);
 
             MapDataFlowStepsForFileSchema(scm, df);
 
-            _jobService.CreateDropLocation(_datasetContext.RetrieverJob.FirstOrDefault(w => w.DataFlow == df));
-        }
-
-        public void PublishMessage(string key, string message)
-        {
-            _messagePublisher.PublishDSCEvent(key, message);
+            if (!_dataFeatures.CLA3241_DisableDfsDropLocation.GetValue())
+            {
+                _jobService.CreateDropLocation(_datasetContext.RetrieverJob.FirstOrDefault(w => w.DataFlow == df));
+            }
         }
 
         public IQueryable<DataSourceType> GetDataSourceTypes()
@@ -155,7 +207,7 @@ namespace Sentry.data.Core
 
         public DataFlowStepDto GetS3DropStepForFileSchema(FileSchema scm)
         {
-            if(scm == null)
+            if (scm == null)
             {
                 throw new ArgumentNullException("scm", "FileSchema is required");
             }
@@ -170,7 +222,7 @@ namespace Sentry.data.Core
             DataFlowStepDto stepDto = new DataFlowStepDto();
             MapToDto(step, stepDto);
 
-            
+
 
             return stepDto;
         }
@@ -231,7 +283,7 @@ namespace Sentry.data.Core
              *   - Current step trigger key equals to dependent step SourceDependencyPrefix
              *   - Current step bucket equals to dependent step SourceDependencyBucket
              ****************************************************/
-            steps = _datasetContext.DataFlowStep.Where(w => w.SourceDependencyPrefix == step.TriggerKey && w.SourceDependencyBucket == step.Action.TargetStorageBucket).ToList();
+            steps = _datasetContext.DataFlowStep.Where(w => w.SourceDependencyPrefix == step.TriggerKey && w.SourceDependencyBucket == step.TriggerBucket).ToList();
 
             return steps;
         }
@@ -249,58 +301,58 @@ namespace Sentry.data.Core
 
         }
 
-        public void DeleteByFileSchema(FileSchema scm)
-        {
-            //Find schema specific dataflow
-            DataFlow schemaSpecificFlow = _datasetContext.DataFlow.Where(w => w.Name == GenerateDataFlowNameForFileSchema(scm)).FirstOrDefault();
+        //public void DeleteByFileSchema(FileSchema scm)
+        //{
+        //    //Find schema specific dataflow
+        //    DataFlow schemaSpecificFlow = _datasetContext.DataFlow.Where(w => w.Name == GenerateDataFlowNameForFileSchema(scm)).FirstOrDefault();
 
-            //Find all SchemaMappings associated with FileSchema
-            List<SchemaMap> schemaMappings = _datasetContext.SchemaMap.Where(w => w.MappedSchema == scm).ToList();
+        //    //Find all SchemaMappings associated with FileSchema
+        //    List<SchemaMap> schemaMappings = _datasetContext.SchemaMap.Where(w => w.MappedSchema == scm).ToList();
 
-            foreach (SchemaMap map in schemaMappings)
-            {
-                //ScheamMap step associated with SchemaMapping
-                DataFlowStep mapStep = map.DataFlowStepId;
+        //    foreach (SchemaMap map in schemaMappings)
+        //    {
+        //        //ScheamMap step associated with SchemaMapping
+        //        DataFlowStep mapStep = map.DataFlowStepId;
 
-                //Find non-SchemaSpecific DataFlow associated with SchemaMap step, then return all SchemaMap steps associated with DataFlow
-                List<DataFlowStep> associatedMapSteps =  _datasetContext.GetById<DataFlow>(mapStep.DataFlow.Id).Steps.Where(w => w.DataAction_Type_Id == DataActionType.SchemaMap).ToList();
+        //        //Find non-SchemaSpecific DataFlow associated with SchemaMap step, then return all SchemaMap steps associated with DataFlow
+        //        List<DataFlowStep> associatedMapSteps =  _datasetContext.GetById<DataFlow>(mapStep.DataFlow.Id).Steps.Where(w => w.DataAction_Type_Id == DataActionType.SchemaMap).ToList();
 
-                //if non-SchemaSpecific flow only contains 1 SchemaMap step, issue delete of DataFlow
-                // if count greater than 1 and all other SchemaMaps reference same FileSchema, issue delete of DataFlow
-                // if count greater than 1 and any other SchemaMaps reference differnt FileSchema, only delete SchemaMap step
+        //        //if non-SchemaSpecific flow only contains 1 SchemaMap step, issue delete of DataFlow
+        //        // if count greater than 1 and all other SchemaMaps reference same FileSchema, issue delete of DataFlow
+        //        // if count greater than 1 and any other SchemaMaps reference differnt FileSchema, only delete SchemaMap step
 
-                //There are no non-SchemaSpecific dataflows mapped to this schema,
-                //  Therefore, delete schema specific dataflow
-                if (associatedMapSteps.Count == 0)
-                {                    
-                    Delete(mapStep.DataFlow.Id);
-                }
-                else if (associatedMapSteps.Count >= 1)
-                {
-                    int nonMatchingFileSchemas = 0;
-                    foreach (DataFlowStep step in associatedMapSteps)
-                    {
-                        if (scm.SchemaId != _datasetContext.SchemaMap.Where(w => w.DataFlowStepId == step).Select(s => s.MappedSchema).FirstOrDefault().SchemaId)
-                        {
-                            nonMatchingFileSchemas++;
-                        }
-                    }
+        //        //There are no non-SchemaSpecific dataflows mapped to this schema,
+        //        //  Therefore, delete schema specific dataflow
+        //        if (associatedMapSteps.Count == 0)
+        //        {                    
+        //            Delete(mapStep.DataFlow.Id);
+        //        }
+        //        else if (associatedMapSteps.Count >= 1)
+        //        {
+        //            int nonMatchingFileSchemas = 0;
+        //            foreach (DataFlowStep step in associatedMapSteps)
+        //            {
+        //                if (scm.SchemaId != _datasetContext.SchemaMap.Where(w => w.DataFlowStepId == step).Select(s => s.MappedSchema).FirstOrDefault().SchemaId)
+        //                {
+        //                    nonMatchingFileSchemas++;
+        //                }
+        //            }
 
-                    if (nonMatchingFileSchemas == 0)
-                    {
-                        Delete(mapStep.DataFlow.Id);
-                    }
-                    else
-                    {
-                        _datasetContext.Remove(map);
-                    }
-                }
-            }
+        //            if (nonMatchingFileSchemas == 0)
+        //            {
+        //                Delete(mapStep.DataFlow.Id);
+        //            }
+        //            else
+        //            {
+        //                _datasetContext.Remove(map);
+        //            }
+        //        }
+        //    }
 
-            // Issue Delete of Schema-Specific data flow
-            Delete(schemaSpecificFlow.Id);
+        //    // Issue Delete of Schema-Specific data flow
+        //    Delete(schemaSpecificFlow.Id);
 
-        }
+        //}
 
         public void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true)
         {
@@ -333,96 +385,35 @@ namespace Sentry.data.Core
             }
 
             Logger.Debug($"schema flow name: {schemaFlow.Name}");
-
-            /* Get any Retriever Jobs associated with schema flow */
-            List<int> schemaFlowJobList = _datasetContext.RetrieverJob.Where(w => w.DataFlow == schemaFlow).Select(s => s.Id).ToList();
-
+ 
             /* Get associated producer flow(s) */
             List<int> producerDataflowIdList = GetProducerFlowsToBeDeletedBySchemaId(scm.SchemaId);
 
-            List<int> producerFlowJobList = (!producerDataflowIdList.Any()) ? new List<int>() : _datasetContext.RetrieverJob.Where(w => producerDataflowIdList.Contains(w.DataFlow.Id)).Select(s => s.Id).ToList();
-
-
             if (logicalDelete)
             {
+                /* Mark schema dataflow for deletion */
+                MarkDataFlowForDeletionById(schemaFlow.Id);
 
-                /* Mark dataflow for deletion */
-                MarkDataFlowForDeletion(schemaFlow);
-
-                if (schemaFlowJobList.Any())
-                {
-                    Logger.Debug($"{methodName} - detected jobs for schema dataflow - count:{schemaFlowJobList.Count}:::jobids:{("[{0}]", string.Join(", ", schemaFlowJobList.Select(e => e.ToString()).ToArray()))}");
-
-                    _jobService.DeleteJob(schemaFlowJobList);
-                }
-                else
-                {
-                    Logger.Debug($"no jobs detected for schema dataflow");
-                }
-
-                if (producerDataflowIdList.Any())
-                {
-                    Logger.Debug($"{methodName} - detected producer flows associated with  - count:{producerDataflowIdList.Count}:::jobids:{("[{0}]", string.Join(", ", producerDataflowIdList.Select(e => e.ToString()).ToArray()))}");
-
-                    /* Mark Dataflow for deletion */
-                    MarkDataFlowForDeletionById(producerDataflowIdList);
-                }
-                else
-                {
-                    Logger.Debug($"no producer dataflows detected");
-                }
-
-                /* Disable all retrieverJobs associated with producer flow */
-                if (producerFlowJobList.Any())
-                {
-                    Logger.Debug($"{methodName} - detected jobs for produer dataflow - count:{producerFlowJobList.Count}:::jobids:{("[{0}]", string.Join(", ", producerFlowJobList.Select(e => e.ToString()).ToArray()))}");
-
-                    _jobService.DeleteJob(producerFlowJobList);
-                }
-                else
-                {
-                    Logger.Debug($"no jobs detected for producer dataflow");
-                }
+                /* Mark asscoiated producer dataflows for deletion */
+                MarkDataFlowForDeletionById(producerDataflowIdList);
             }
             else
             {
-                // Mark Schema flow as deleted
-                schemaFlow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
+                Delete(schemaFlow.Id);
 
-                //Mark Data Producer flows as deleted
-                if (producerDataflowIdList.Any())
+                foreach (int flowId in producerDataflowIdList)
                 {
-                    Logger.Debug($"detected {producerDataflowIdList.Count} producer flows for delete");
-
-                    /* Mark Dataflow for deletion */
-                    foreach (int dataFlowId in producerDataflowIdList)
-                    {
-                        DataFlow producerFlow = _datasetContext.DataFlow.FirstOrDefault(w => w.Id == dataFlowId);
-                        Logger.Debug($"marking {producerFlow.Name} producer flow as deleted");
-                        producerFlow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
-                    }                    
-                }
-                else
-                {
-                    Logger.Debug($"detected 0 producer flows for delete");
-                }
-
-                //Mark associated retrieverJobs as Deleted
-                List<int> retrieverJobDeleteList = new List<int>();
-                retrieverJobDeleteList.AddRange(schemaFlowJobList);
-                retrieverJobDeleteList.AddRange(producerFlowJobList);
-
-                foreach (int jobId in retrieverJobDeleteList)
-                {
-                    RetrieverJob job = _datasetContext.GetById<RetrieverJob>(jobId);
-                    job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
-                    job.IsEnabled = false;                    
+                    Delete(flowId);
                 }
             }
 
             Logger.Debug($"End method <{methodName}>");
         }
 
+        /// <summary>
+        /// Marks dataflows, along with associated retriever jobs, as Pending Delete
+        /// </summary>
+        /// <param name="idList"></param>
         private void MarkDataFlowForDeletionById(List<int> idList)
         {
             foreach (int id in idList)
@@ -431,17 +422,29 @@ namespace Sentry.data.Core
             }
         }
 
+        /// <summary>
+        /// Marks dataflow, along with associated retriever jobs, as Pending Delete
+        /// </summary>
+        /// <param name="id">DataFlow Id</param>
         private void MarkDataFlowForDeletionById(int id)
         {
-            DataFlow dataFlow = _datasetContext.GetById<DataFlow>(id);
-            MarkDataFlowForDeletion(dataFlow);
-        }
+            string methodName = MethodBase.GetCurrentMethod().Name.ToLower();
+            Logger.Debug($"Start method <{methodName}>");
 
-        private void MarkDataFlowForDeletion(DataFlow flow)
-        {
-            flow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
-            flow.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
-            flow.DeleteIssueDTM = DateTime.Now;
+            //Get DataFlow and mark for deletion
+            DataFlow dataFlow = _datasetContext.GetById<DataFlow>(id);
+            dataFlow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
+            dataFlow.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
+            dataFlow.DeleteIssueDTM = DateTime.Now;
+
+            //Get associated retrieverjobs and mark for deletion
+            List<int> jobList = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == id).Select(s => s.Id).ToList();
+            if (jobList.Any())
+            {
+                _jobService.DeleteJob(jobList);
+            }
+
+            Logger.Debug($"End method <{methodName}>");
         }
 
         private List<int> GetProducerFlowsToBeDeletedBySchemaId(int schemaId)
@@ -449,8 +452,8 @@ namespace Sentry.data.Core
             List<int> producerFlowIdList = new List<int>();
 
             /* Get producer flow Ids which map to schema */
-            List<Tuple<int, int>> producerSchemaMapIds = _datasetContext.SchemaMap.Where(w => w.MappedSchema.SchemaId == schemaId && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaMap).Select(s => new Tuple<int, int>( s.DataFlowStepId.Id, s.DataFlowStepId.DataFlow.Id)).ToList();
-   
+            List<Tuple<int, int>> producerSchemaMapIds = _datasetContext.SchemaMap.Where(w => w.MappedSchema.SchemaId == schemaId && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaMap).Select(s => new Tuple<int, int>(s.DataFlowStepId.Id, s.DataFlowStepId.DataFlow.Id)).ToList();
+
             foreach (Tuple<int, int> item in producerSchemaMapIds)
             {
                 /*  Add producer dataflow id to list if the
@@ -469,11 +472,14 @@ namespace Sentry.data.Core
                 }
             }
 
-            return producerFlowIdList;            
+            return producerFlowIdList;
         }
 
         public void Delete(int dataFlowId)
         {
+            string methodName = MethodBase.GetCurrentMethod().Name.ToLower();
+            Logger.Debug($"Start method <{methodName}>");
+
             Logger.Info($"dataflowservice-delete-start - dataflowid:{dataFlowId}");
 
             //Find DataFlow
@@ -481,35 +487,33 @@ namespace Sentry.data.Core
 
             if (flow == null)
             {
-                Logger.Debug($"dataflowservice-delete DataFlow not found - dataflowid:{dataFlowId.ToString()}");
+                Logger.Debug($"dataflowservice-delete DataFlow not found - dataflowid:{dataFlowId}");
+                throw new DataFlowNotFound();
             }
             else
             {
-                //Find associated RetrieverJobs
-                List<RetrieverJob> jobs = _datasetContext.RetrieverJob.Where(w => w.DataFlow == flow).ToList();
+                //Mark dataflow deleted
+                flow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
 
+                //Find associated retriever job
+                List<int> jobList = _datasetContext.RetrieverJob.Where(w => w.DataFlow == flow).Select(s => s.Id).ToList();
+
+                //Mark retriever jobs deleted
                 Logger.Info($"dataflowservice-delete-deleteretrieverjobs - dataflowid:{flow.Id}");
-                foreach (RetrieverJob job in jobs)
+                foreach (int job in jobList)
                 {
-                    _jobService.DeleteJob(job.Id);
+                    _jobService.DeleteJob(job, false);
                 }
-
-                //Remove long-term storage files                
-                DeleteLongTermFiles(flow);
-
-                Logger.Info($"dataflowservice-delete-deletedataflow - dataflowid:{flow.Id}");
-                _datasetContext.Remove(flow);
-                _datasetContext.SaveChanges();
             }
 
-            Logger.Info($"dataflowservice-delete-end - dataflowid:{dataFlowId}");
+            Logger.Debug($"End method <{methodName}>");
         }
 
         public List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId)
         {
             List<SchemaMap> schemaMapList = _datasetContext.DataFlowStep.Where(w => w.DataFlow.Id == dataflowId).SelectMany(s => s.SchemaMappings).ToList();
             List<SchemaMapDetailDto> dtoList = new List<SchemaMapDetailDto>();
-            foreach(SchemaMap map in schemaMapList)
+            foreach (SchemaMap map in schemaMapList)
             {
                 SchemaMapDetailDto dto = new SchemaMapDetailDto();
                 MapToDetailDto(map, dto);
@@ -518,45 +522,84 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
-        public ValidationException Validate(DataFlowDto dfDto)
+        public async Task<ValidationException> Validate(DataFlowDto dfDto)
         {
             ValidationResults results = new ValidationResults();
-            if (_datasetContext.DataFlow.Any(w => w.Name == dfDto.Name))
+            if (dfDto.Id == 0 &&_datasetContext.DataFlow.Any(w => w.Name == dfDto.Name))
             {
                 results.Add(DataFlow.ValidationErrors.nameMustBeUnique, "Dataflow name is already used");
             }
+
+            //if the asset is managed in Quartermaster, then the named environment and named environment type must be valid according to Quartermaster
+            var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(dfDto.SaidKeyCode, ShowDeleted11.False).ConfigureAwait(false)).ToList();
+            if (namedEnvironmentList.Any())
+            {
+                if (!namedEnvironmentList.Any(e => e.Name == dfDto.NamedEnvironment))
+                {
+                    results.Add(DataFlow.ValidationErrors.namedEnvironmentInvalid, $"Named Environment provided (\"{dfDto.NamedEnvironment}\") doesn't match a Quartermaster Named Environment");
+                }
+                else if (namedEnvironmentList.First(e => e.Name == dfDto.NamedEnvironment).Environmenttype != dfDto.NamedEnvironmentType.ToString())
+                {
+                    var quarterMasterNamedEnvironmentType = namedEnvironmentList.First(e => e.Name == dfDto.NamedEnvironment).Environmenttype;
+                    results.Add(DataFlow.ValidationErrors.namedEnvironmentTypeInvalid, $"Named Environment Type provided (\"{dfDto.NamedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType}\")");
+                }
+            }
+
             return new ValidationException(results);
         }
 
-        #region Private Methods
-        private void DeleteLongTermFiles(DataFlow flow)
+        /// <summary>
+        /// Given a SAID asset key code, get all the named environments from Quartermaster
+        /// </summary>
+        /// <param name="saidAssetKeyCode">The four-character key code for an asset</param>
+        /// <returns>A list of NamedEnvironmentDto objects</returns>
+        public Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsAsync(string saidAssetKeyCode)
         {
-            Logger.Info($"dataflowservice-deleteLongtermfiles - dataflowid:{flow.Id}");
-            foreach (DataFlowStep step in flow.Steps)
+            //validate parameters
+            if (string.IsNullOrWhiteSpace(saidAssetKeyCode))
             {
-                if (step.DataAction_Type_Id == DataActionType.S3Drop)
-                {
-                    Logger.Info($"dataflowservice-deleteLongtermfiles-delete - dataflowid:{flow.Id} stepid:{step.Id} prefix:{step.TriggerKey}");
-                    _s3ServiceProvider.DeleteS3Prefix(step.TriggerKey);
-                }
-                else if (step.DataAction_Type_Id == DataActionType.RawStorage)
-                {
-                    Logger.Info($"dataflowservice-deleteLongtermfiles-delete - dataflowid:{flow.Id} stepid:{step.Id} prefix:{step.TargetPrefix}");
-                    _s3ServiceProvider.DeleteS3Prefix(step.TargetPrefix);                    
-                }
+                throw new ArgumentNullException(nameof(saidAssetKeyCode), "SAID Asset Key Code was missing.");
             }
+
+            //the guts of the method have to be wrapped in a local function for proper async handling
+            //see https://confluence.sentry.com/questions/224368523
+            async Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsInternalAsync()
+            {
+                //call Quartermaster to get list of named environments for this asset
+                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted11.False).ConfigureAwait(false)).ToList();
+                namedEnvironmentList = namedEnvironmentList.OrderBy(n => n.Name).ToList();
+
+                //grab a config setting to see if we need to filter the named environments by a certain named environment type
+                //if the config setting for "QuartermasterNamedEnvironmentTypeFilter" is blank, no filter will be applied
+                var environmentTypeFilter = Configuration.Config.GetHostSetting("QuartermasterNamedEnvironmentTypeFilter");
+                Func<NamedEnvironment, bool> filter = env => true;
+                if (!string.IsNullOrWhiteSpace(environmentTypeFilter))
+                {
+                    filter = env => env.Environmenttype == environmentTypeFilter;
+                }
+
+                //map the output from Quartermaster to our Dto
+                return namedEnvironmentList.Where(filter).Select(env => new NamedEnvironmentDto
+                {
+                    NamedEnvironment = env.Name,
+                    NamedEnvironmentType = (GlobalEnums.NamedEnvironmentType)Enum.Parse(typeof(GlobalEnums.NamedEnvironmentType), env.Environmenttype)
+                }).ToList();
+            }
+            return GetNamedEnvironmentsInternalAsync();
         }
 
+        #region Private Methods
+        
         private DataFlow CreateDataFlow(DataFlowDto dto)
-        {           
+        {
             DataFlow df = MapToDataFlow(dto);
 
             switch (dto.IngestionType)
             {
-                case GlobalEnums.IngestionType.User_Push:
+                case (int)GlobalEnums.IngestionType.User_Push:
                     MapDataFlowStepsForPush(dto, df);
                     break;
-                case GlobalEnums.IngestionType.DSC_Pull:
+                case (int)GlobalEnums.IngestionType.DSC_Pull:
                     MapDataFlowStepsForPull(dto, df);
                     break;
                 default:
@@ -570,17 +613,31 @@ namespace Sentry.data.Core
         {
             DataFlow df = new DataFlow
             {
-                Id = dto.Id,
                 Name = dto.Name,
                 CreatedDTM = DateTime.Now,
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
                 Questionnaire = dto.DFQuestionnaire,
-                FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE(),
+                FlowStorageCode = (!_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) 
+                                    ? _datasetContext.GetNextDataFlowStorageCDE() 
+                                    : _datasetContext.FileSchema.Where(x => x.SchemaId == dto.SchemaMap.First().SchemaId).Select(s => s.StorageCode).FirstOrDefault(),
                 SaidKeyCode = dto.SaidKeyCode,
                 ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
                 DeleteIssuer = dto.DeleteIssuer,
-                DeleteIssueDTM = DateTime.MaxValue
+                DeleteIssueDTM = DateTime.MaxValue,
+                IngestionType = dto.IngestionType,
+                IsDecompressionRequired = dto.IsCompressed,
+                CompressionType = dto.CompressionType,
+                IsPreProcessingRequired = dto.IsPreProcessingRequired,
+                PreProcessingOption = (int)dto.PreProcessingOption,
+                NamedEnvironment = dto.NamedEnvironment,
+                NamedEnvironmentType = dto.NamedEnvironmentType
             };
+
+            if (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
+            {
+                df.DatasetId = dto.SchemaMap.First().DatasetId;
+                df.SchemaId = dto.SchemaMap.First().SchemaId;
+            }
 
             _datasetContext.Add(df);
 
@@ -591,10 +648,15 @@ namespace Sentry.data.Core
         {
             //This type of dataflow does not need to worry about retrieving data from external sources
             // Data will be pushed by user to S3 and\or DFS drop locations
-            //Add default DFS drop location for data flow
-            List<DataSource> srcList = _datasetContext.DataSources.ToList();
-            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
-            _datasetContext.Add(dfsDataFlowBasic);
+
+            if (!_dataFeatures.CLA3241_DisableDfsDropLocation.GetValue())
+            {
+                //Add default DFS drop location for data flow
+                List<DataSource> srcList = _datasetContext.DataSources.ToList();
+                RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
+                _datasetContext.Add(dfsDataFlowBasic);
+                _jobService.CreateDropLocation(dfsDataFlowBasic);
+            }
 
             //Generate ingestion steps (get file to raw location)
             AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop);
@@ -618,26 +680,41 @@ namespace Sentry.data.Core
 
             if (dto.IsPreProcessingRequired)
             {
-                foreach (DataFlowPreProcessingTypes item in dto.PreProcessingOptions)
+                switch (dto.PreProcessingOption)
                 {
-                    switch (item)
-                    {
-                        case DataFlowPreProcessingTypes.googleapi:
-                            AddDataFlowStep(dto, df, DataActionType.GoogleApi);
-                            break;
-                        case DataFlowPreProcessingTypes.claimiq:
-                            AddDataFlowStep(dto, df, DataActionType.ClaimIq);
-                            break;
-                        default:
-                            break;
-                    }
+                    case (int)DataFlowPreProcessingTypes.googleapi:
+                        AddDataFlowStep(dto, df, DataActionType.GoogleApi);
+                        break;
+                    case (int)DataFlowPreProcessingTypes.claimiq:
+                        AddDataFlowStep(dto, df, DataActionType.ClaimIq);
+                        break;
+                    default:
+                        break;
                 }
             }
 
-            //Generate Schema Map step to send files to schema specific data flow
-            AddDataFlowStep(dto, df, DataActionType.SchemaMap);
+            //Feature flag = false, add schema map step
+            //Feature flag = true, do no add schema map step
+            if (!_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
+            {
+                //Generate Schema Map step to send files to schema specific data flow
+                AddDataFlowStep(dto, df, DataActionType.SchemaMap);
+            }
+            else
+            {
 
-            _jobService.CreateDropLocation(dfsDataFlowBasic);
+                FileSchema scm = _datasetContext.GetById<FileSchema>(dto.SchemaMap.First().SchemaId);
+
+                //Generate preprocessing for file types (i.e. fixedwidth, csv, json, etc...)
+                MapPreProcessingSteps(scm, dto, df);
+
+                //Generate DSC registering step
+                AddDataFlowStep(dto, df, DataActionType.SchemaLoad);
+                AddDataFlowStep(dto, df, DataActionType.QueryStorage);
+
+                ////Generate consumption layer steps
+                AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
+            }
         }
 
         private void MapDataFlowStepsForPull(DataFlowDto dto, DataFlow df)
@@ -666,31 +743,49 @@ namespace Sentry.data.Core
             }
 
             if (dto.IsPreProcessingRequired)
-            {
-                foreach (DataFlowPreProcessingTypes item in dto.PreProcessingOptions)
+            {                
+                switch (dto.PreProcessingOption)
                 {
-                    switch (item)
-                    {
-                        case DataFlowPreProcessingTypes.googleapi:
-                            AddDataFlowStep(dto, df, DataActionType.GoogleApi);
-                            break;
-                        case DataFlowPreProcessingTypes.claimiq:
-                            AddDataFlowStep(dto, df, DataActionType.ClaimIq);
-                            break;
-                        default:
-                            break;
-                    }
+                    case (int)DataFlowPreProcessingTypes.googleapi:
+                        AddDataFlowStep(dto, df, DataActionType.GoogleApi);
+                        break;
+                    case (int)DataFlowPreProcessingTypes.claimiq:
+                        AddDataFlowStep(dto, df, DataActionType.ClaimIq);
+                        break;
+                    default:
+                        break;
                 }
             }
 
-            //Generate Schema Map step to send files to schema specific data flow
-            AddDataFlowStep(dto, df, DataActionType.SchemaMap);
+
+            //Feature flag = false, add schema map step
+            //Feature flag = true, do no add schema map step
+            if (!_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
+            {
+                //Generate Schema Map step to send files to schema specific data flow
+                AddDataFlowStep(dto, df, DataActionType.SchemaMap);
+            }
+            else
+            {
+
+                FileSchema scm = _datasetContext.GetById<FileSchema>(dto.SchemaMap.First().SchemaId);
+
+                //Generate preprocessing for file types (i.e. fixedwidth, csv, json, etc...)
+                MapPreProcessingSteps(scm, dto, df);
+
+                //Generate DSC registering step
+                AddDataFlowStep(dto, df, DataActionType.SchemaLoad);
+                AddDataFlowStep(dto, df, DataActionType.QueryStorage);
+
+                ////Generate consumption layer steps
+                AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
+            }
 
         }
 
         private SchemaMap MapToSchemaMap(SchemaMapDto dto, DataFlowStep step)
         {
-            SchemaMap map =  new SchemaMap()
+            SchemaMap map = new SchemaMap()
             {
                 DataFlowStepId = step,
                 MappedSchema = _datasetContext.FileSchema.Where(w => w.SchemaId == dto.SchemaId).FirstOrDefault(),
@@ -718,24 +813,32 @@ namespace Sentry.data.Core
             dto.Id = df.Id;
             dto.FlowGuid = df.FlowGuid;
             dto.SaidKeyCode = df.SaidKeyCode;
+            dto.DatasetId = df.DatasetId;
+            dto.SchemaId = df.SchemaId;
             dto.Name = df.Name;
             dto.CreateDTM = df.CreatedDTM;
             dto.CreatedBy = df.CreatedBy;
             dto.FlowStorageCode = df.FlowStorageCode;
-            dto.MappedSchema = GetMappedFileSchema(df.Id);
+            dto.MappedSchema = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() && df.SchemaId != 0) ? new List<int>() { df.SchemaId } : GetMappedFileSchema(df.Id);
             dto.AssociatedJobs = GetExternalRetrieverJobs(df.Id);
             dto.ObjectStatus = df.ObjectStatus;
             dto.DeleteIssuer = df.DeleteIssuer;
             dto.DeleteIssueDTM = df.DeleteIssueDTM;
+            dto.IngestionType = df.IngestionType;
+            dto.IsCompressed = df.IsDecompressionRequired;
+            dto.CompressionType = df.CompressionType;
+            dto.IsPreProcessingRequired = df.IsPreProcessingRequired;
+            dto.PreProcessingOption = df.PreProcessingOption;
 
             List<SchemaMapDto> scmMapDtoList = new List<SchemaMapDto>();
             foreach (DataFlowStep step in df.Steps.Where(w => w.SchemaMappings != null && w.SchemaMappings.Any()))
             {
-                foreach(SchemaMap map in step.SchemaMappings)
+                foreach (SchemaMap map in step.SchemaMappings)
                 {
                     scmMapDtoList.Add(map.ToDto());
                 }
             }
+            dto.SchemaMap = scmMapDtoList;
         }
 
         private List<int> GetMappedFileSchema(int dataflowId)
@@ -777,7 +880,7 @@ namespace Sentry.data.Core
             dto.ActionName = step.Action.Name;
             dto.ActionDescription = step.Action.Description;
             dto.TriggerKey = step.TriggerKey;
-            dto.TriggerBucket = step.Action.TargetStorageBucket;
+            dto.TriggerBucket = step.TriggerBucket;
             dto.TargetPrefix = step.TargetPrefix;
             dto.DataFlowId = step.DataFlow.Id;
         }
@@ -804,15 +907,15 @@ namespace Sentry.data.Core
 
         private void AddDataFlowStep(DataFlowDto dto, DataFlow df, DataActionType actionType)
         {
-            DataFlowStep step = CreateDataFlowStep(actionType, dto, df);            
+            DataFlowStep step = CreateDataFlowStep(actionType, dto, df);
 
             if (df.Steps == null)
             {
                 df.Steps = new List<DataFlowStep>();
             }
 
-            SetTriggerPrefix(step);
-            SetTargetPrefix(step);
+            SetTrigger(step);
+            SetTarget(step);
             SetSourceDependency(step, df.Steps.OrderByDescending(o => o.ExeuctionOrder).Take(1).FirstOrDefault());
 
             //Set exeuction order
@@ -826,12 +929,14 @@ namespace Sentry.data.Core
         {
             BaseAction action;
             switch (actionType)
-            {                
+            {
                 case DataActionType.S3Drop:
                     action = _datasetContext.S3DropAction.FirstOrDefault();
                     break;
                 case DataActionType.ProducerS3Drop:
-                    action = _datasetContext.ProducerS3DropAction.FirstOrDefault();
+                    action = _dataFeatures.CLA3240_UseDropLocationV2.GetValue()
+                        ? _datasetContext.ProducerS3DropAction.GetDlstDropLocation()
+                        : _datasetContext.ProducerS3DropAction.GetDataDropLocation();
                     break;
                 case DataActionType.RawStorage:
                     action = _datasetContext.RawStorageAction.FirstOrDefault();
@@ -919,23 +1024,35 @@ namespace Sentry.data.Core
             return step;
         }
 
-        private void SetTriggerPrefix(DataFlowStep step)
+        private void SetTrigger(DataFlowStep step)
         {
-            if(step.DataAction_Type_Id == DataActionType.S3Drop)
+            if (step.DataAction_Type_Id == DataActionType.S3Drop)
             {
                 step.TriggerKey = $"droplocation/{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                SetTriggerBucketForS3DropLocation(step);
             }
             else if (step.DataAction_Type_Id == DataActionType.ProducerS3Drop)
             {
-                step.TriggerKey = $"droplocation/data/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/";
+                step.TriggerKey = _dataFeatures.CLA3240_UseDropLocationV2.GetValue()
+                    ? $"{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/"
+                    : $"droplocation/data/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/";
+                SetTriggerBucketForS3DropLocation(step);
             }
             else
             {
                 step.TriggerKey = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
-            }            
+                step.TriggerBucket = step.Action.TargetStorageBucket;
+            }
         }
 
-        private void SetTargetPrefix(DataFlowStep step)
+        private void SetTriggerBucketForS3DropLocation(DataFlowStep step)
+        {
+            step.TriggerBucket = string.IsNullOrWhiteSpace(step.DataFlow.UserDropLocationBucket)
+                ? step.Action.TargetStorageBucket
+                : step.DataFlow.UserDropLocationBucket;
+        }
+
+        private void SetTarget(DataFlowStep step)
         {
             switch (step.DataAction_Type_Id)
             {
@@ -946,10 +1063,12 @@ namespace Sentry.data.Core
                 case DataActionType.ConvertParquet:
                     string schemaStorageCode = GetSchemaStorageCodeForDataFlow(step.DataFlow.Id);
                     step.TargetPrefix = step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{schemaStorageCode}/";
+                    step.TargetBucket = step.Action.TargetStorageBucket;
                     break;
                 //These sent output a step specific location along with down stream dependent steps
                 case DataActionType.RawStorage:
                     step.TargetPrefix = step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                    step.TargetBucket = step.Action.TargetStorageBucket;
                     break;
                 //These only send output to down stream dependent steps
                 case DataActionType.SchemaLoad:
@@ -960,6 +1079,7 @@ namespace Sentry.data.Core
                 case DataActionType.ProducerS3Drop:
                 case DataActionType.FixedWidth:
                     step.TargetPrefix = null;
+                    step.TargetBucket = null;
                     break;
                 default:
                     break;
@@ -969,13 +1089,15 @@ namespace Sentry.data.Core
         private void SetSourceDependency(DataFlowStep step, DataFlowStep previousStep)
         {
             step.SourceDependencyPrefix = previousStep?.TriggerKey;
-            step.SourceDependencyBucket = previousStep?.Action.TargetStorageBucket;
+            step.SourceDependencyBucket = previousStep?.TriggerBucket;
         }
 
         #region SchemaFlowMappings
 
         private DataFlow MapToDataFlow(FileSchema scm)
         {
+            // This method maps Schema flow for given dataset schema
+            //   The assumption is these dataflows are always of type DSC Push
             DataFlow df = new DataFlow
             {
                 Id = 0,
@@ -984,7 +1106,8 @@ namespace Sentry.data.Core
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
                 FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE(),
                 DeleteIssueDTM = DateTime.MaxValue,
-                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
+                ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
+                IngestionType = (int)GlobalEnums.IngestionType.User_Push
             };
 
             _datasetContext.Add(df);
@@ -1001,10 +1124,13 @@ namespace Sentry.data.Core
         {
             DataFlowDto dto = MapToDto(scm);
 
-            //Add default DFS drop location for data flow
-            List<DataSource> srcList = _datasetContext.DataSources.ToList();
-            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
-            _datasetContext.Add(dfsDataFlowBasic);
+            if (!_dataFeatures.CLA3241_DisableDfsDropLocation.GetValue())
+            {
+                //Add default DFS drop location for data flow
+                List<DataSource> srcList = _datasetContext.DataSources.ToList();
+                RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
+                _datasetContext.Add(dfsDataFlowBasic);
+            }
 
             //Generate ingestion steps (get file to raw location)
             AddDataFlowStep(dto, df, DataActionType.S3Drop);

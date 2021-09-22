@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
 
     //If new compression types are added, the appropriate logic needs to be added to the exension method
 
+    // The following static script needs to be updated when adjustements are made to the CompressionTypes enum
+    //   Sentry.data.Database\Scripts\Post-Deploy\StaticData\DataFlowCompressionTypes.sql
     public enum CompressionTypes
     {
         ZIP = 0,

@@ -179,7 +179,7 @@ namespace Sentry.data.Infrastructure
                         ActionGuid = step.Action.ActionGuid.ToString(),
                         SourceBucket = keyBucket,
                         SourceKey = objectKey,
-                        StepTargetBucket = step.Action.TargetStorageBucket,
+                        StepTargetBucket = step.TargetBucket,
                         //<targetstorageprefix>/<dataflowid>/<storagecode>/<flow execution guid>[-<run instance guid>]/
                         StepTargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.FlowStorageCode}/{item.MappedSchema.StorageCode}/{DataFlowHelpers.GenerateGuid(flowExecutionGuid, runInstanceGuid)}/",
                         EventType = GlobalConstants.DataFlowStepEvent.SCHEMA_LOAD_START,
