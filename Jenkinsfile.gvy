@@ -27,7 +27,7 @@ pipeline {
                 dir('TestResults') { deleteDir() }
  
                 // Restore Nuget packages
-                dotNetNuGetRestore()
+                dotNetNuGetRestore solutionFile: 'Sentry.data.sln'
  
                 // Begin the Sonar Scanner, using defaults (version: 1.0, language: cs)
                 dotNetBeginSonarScanner key: "DATA:Data.Sentry.Com", name: 'Data.Sentry.Com', version: "${currentBuild.displayName}", other: '/d:sonar.exclusions=**/Scripts/**,**/Content/**,**/App_Themes/**'
@@ -40,7 +40,7 @@ pipeline {
             steps {
                 // Use defaults (MSBuild_2017, configuration: Release, platform: Any CPU, generateProjectSpecificOutputFolder: false)
                 // You can repeat the following line if you have multiple solution files to build
-                dotNetBuild 'Sentry.data.sln', generateProjectSpecificOutputFolder: 'True', tool: 'MSBuild_2017'
+                dotNetBuild 'Sentry.data.sln', generateProjectSpecificOutputFolder: 'True'
             }
         }
  
@@ -67,6 +67,7 @@ pipeline {
                 // This takes everything in a particular subfolder of your build output, zips it up, and archives it into Jenkins. 
                 dotNetArchiveArtifact 'Sentry.data.Web.zip', dir: 'Sentry.data.Web\\_PublishedWebsites\\Sentry.data.Web'
 				dotNetArchiveArtifact 'Sentry.data.Goldeneye.zip', dir: 'Sentry.data.Goldeneye'
+                dotNetArchiveArtifact 'Sentry.data.Database.zip', dir: 'Sentry.data.Database'
  
                 // Record this build into Quartermaster.  The artifact name should match the filename produced in the dotNetArchiveArtifact step above.
                 recordArtifactToQuartermaster requiresConfigTransformation: true, appType: 'Web', applicationName: 'DATA', saidAssetKey: 'DATA', artifactName: 'Sentry.data.Web.zip'
