@@ -42,7 +42,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             });
 
             Property(x => x.FlowExecutionGuid);
-            Property(x => x.RunInstanceGuid, m => { m.Column("RunInstanceGuid"); });
+            Property(x => x.RunInstanceGuid);
 
             this.ManyToOne(x => x.JobId, m =>
             {
