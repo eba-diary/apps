@@ -18,7 +18,8 @@ namespace Sentry.data.Infrastructure.FeatureFlags
                     KeyColumnName = "KeyCol"
                 }
             };
-        public readonly static IReadableFeatureRepository databaseRepo_longCache = FeatureRepository.CreateCachedRepository(databaseConfig, TimeSpan.FromDays(1));
+
+        public readonly static IWritableFeatureRepository databaseRepo_longCache = FeatureRepository.CreateCachedRepository(databaseConfig, TimeSpan.FromMinutes(5));
         private static readonly IReadableFeatureRepository configRepo = new Sentry.FeatureFlags.SentryConfig.FeatureRepository();
 
         public DataFeatures(ISecurityService securityService, UserService userService)
@@ -34,7 +35,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
                                                                                                         databaseRepo_longCache,
                                                                                                         new AdminUserBaseConditionalStrategy(_securityService, _userService, databaseRepo_longCache));
         }
-
 
         /* 
             Configuration file feature flags
