@@ -42,9 +42,16 @@ namespace Sentry.data.Infrastructure
     
     public class DatasetContext : NHWritableDomainContext, IDatasetContext
     {
-        public DatasetContext(ISession session) : base(session)
+
+
+        private readonly Lazy<IDataFeatures> _dataFeatures;
+        private readonly Lazy<UserService> _userService;
+
+        public DatasetContext(ISession session, Lazy<IDataFeatures> dataFeatures, Lazy<UserService> userService) : base(session)
         {
             NHQueryableExtensionProvider.RegisterQueryableExtensionsProvider<DatasetContext>();
+            _dataFeatures = dataFeatures;
+            _userService = userService;
         }
 
 
@@ -197,7 +204,16 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                return Query<Category>().Cacheable();  //QueryCacheRegion.MediumTerm
+                if (_dataFeatures.Value.CLA3329_Expose_HR_Category.GetValue() || _userService.Value.GetCurrentUser().IsAdmin)
+                {
+                    //admin or featureFlag is true so return ALL Categories
+                    return Query<Category>().Cacheable();  
+                }
+                else
+                {
+                    //feature flag is OFF and NOT admin:  return anything with abbreviated name not HR or has empty abbreviated name since some do not have abbreviated name filled
+                    return Query<Category>().Cacheable().Where(w => w.AbbreviatedName != "HR" || w.AbbreviatedName == null || w.AbbreviatedName == String.Empty);   
+                }
             }
         }
 
