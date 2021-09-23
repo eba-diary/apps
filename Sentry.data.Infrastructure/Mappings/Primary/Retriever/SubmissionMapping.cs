@@ -41,7 +41,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.NotNullable(true);
             });
 
-            Property(x => x.FlowExecutionGuid, m => { m.Column("FlowExecutionGuid"); });
+            Property(x => x.FlowExecutionGuid);
             Property(x => x.RunInstanceGuid, m => { m.Column("RunInstanceGuid"); });
 
             this.ManyToOne(x => x.JobId, m =>
