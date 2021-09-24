@@ -81,7 +81,8 @@ namespace Sentry.data.Infrastructure
 
             //Repeat the following line once per database / domain context
             registry.For<IDataAssetContext>().Use(() => new DataAssetContext(_defaultSessionFactory.OpenSession()));
-            registry.For<IDatasetContext>().Use(() => new DatasetContext(_defaultSessionFactory.OpenSession()));
+            registry.For<IDatasetContext>().Use((x) => new DatasetContext(_defaultSessionFactory.OpenSession(), x.GetInstance<Lazy<IDataFeatures>>(), x.GetInstance<Lazy<UserService>>() ));
+
             registry.For<IDataFeedContext>().Use(() => new DataFeedProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IMetadataRepositoryProvider>().Use(() => new MetadataRepositoryProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IODCFileProvider>().Use(() => new ODCFileProvider(_defaultSessionFactory.OpenSession()));
