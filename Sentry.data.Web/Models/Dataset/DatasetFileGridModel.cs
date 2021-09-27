@@ -16,6 +16,8 @@ namespace Sentry.data.Web
         {
             this.Id = f.DatasetFileId;
             this.Name = f.FileName;
+            this.FlowExecutionGuid = f.FlowExecutionGuid;
+            this.RunInstanceGuid = f.RunInstanceGuid;
 
 
             //Used to differentiate between service and user accounts, user accounts will parse into a numeric value
@@ -34,6 +36,8 @@ namespace Sentry.data.Web
         }
         public int Id { get; set; }
         public string Name { get; set; }
+        public string FlowExecutionGuid { get; set; }
+        public string RunInstanceGuid { get; set; }
         public string UploadUserName { get; set; }
         public DateTime ModifiedDtm { get; set; }
         public DateTime CreateDtm { get; set; }
