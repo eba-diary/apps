@@ -1,13 +1,8 @@
-﻿CREATE TABLE [HangFire].[JobQueue] (
+﻿CREATE TABLE [HangFire7].[JobQueue] (
     [Id]        INT           IDENTITY (1, 1) NOT NULL,
-    [JobId]     INT           NOT NULL,
+    [JobId]     BIGINT        NOT NULL,
     [Queue]     NVARCHAR (50) NOT NULL,
     [FetchedAt] DATETIME      NULL,
-    CONSTRAINT [PK_HangFire_JobQueue] PRIMARY KEY CLUSTERED ([Id] ASC)
+    CONSTRAINT [PK_HangFire_JobQueue] PRIMARY KEY CLUSTERED ([Queue] ASC, [Id] ASC)
 );
-
-
-GO
-CREATE NONCLUSTERED INDEX [IX_HangFire_JobQueue_QueueAndFetchedAt]
-    ON [HangFire].[JobQueue]([Queue] ASC, [FetchedAt] ASC);
 

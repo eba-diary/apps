@@ -33,6 +33,7 @@
 									(24, 'Deleted Dataset', 1,0,@GroupDATASET),
 									(25, 'Downloaded Report', 1,0,@GroupDATASET),
 									(26, 'Sync Schema', 1,0,@GroupDATASET),
+									(37, 'Deleted Dataset Schema', 1,0,@GroupDATASET),
 									
 									(27, 'Critical Notification'		,1	,1	,@GroupBUSINESSAREA),
 									(28, 'Warning Notification'			,2	,1	,@GroupBUSINESSAREA),

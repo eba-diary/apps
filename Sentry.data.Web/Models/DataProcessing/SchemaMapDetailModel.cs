@@ -6,7 +6,7 @@
         {
             DatasetName = dto.DatasetName;
             SchemaName = dto.SchemaName;
-            DatasetDetailUrl = $"{Configuration.Config.GetHostSetting("SentryDataBaseUrl")}/Dataset/Detail/{dto.DatasetId}";
+            DatasetDetailUrl = $"/Dataset/Detail/{dto.DatasetId}";
         }
         public string DatasetName { get; set; }
         public string SchemaName { get; set; }
