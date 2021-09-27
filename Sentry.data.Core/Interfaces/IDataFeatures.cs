@@ -17,6 +17,7 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA3240_UseDropLocationV2 { get; }
         IFeatureFlag<bool> CLA3241_DisableDfsDropLocation { get; }
         IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; }
+        IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime { get; }
 
     }
 }
