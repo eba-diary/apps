@@ -927,7 +927,6 @@ namespace Sentry.data.Core
 
         private DataFlowStep CreateDataFlowStep(DataActionType actionType, DataFlowDto dto, DataFlow df)
         {
-            //GORDON 
             int selectedDatasetId = 0;
             bool isHumanResources = false;
             
@@ -941,14 +940,12 @@ namespace Sentry.data.Core
                 selectedDatasetId = dto.DatasetId;
             }
 
-            //STEP #2 Take DatasetId and figure out Category
+            //STEP #2 Take DatasetId and figure out if Category = HR
             Dataset ds = _datasetContext.GetById<Dataset>(selectedDatasetId);
-            Category c = ds.DatasetCategories.Where(w => w.AbbreviatedName == "HR").FirstOrDefault();
-            if(c != null)
+            if(ds.DatasetCategories.Any(w => w.AbbreviatedName == "HR"))
             {
                 isHumanResources = true;
             }
-
 
             //STEP #3 Look at ActionType and return correct BaseAction
             BaseAction action;

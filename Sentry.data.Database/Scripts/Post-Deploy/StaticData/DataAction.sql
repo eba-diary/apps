@@ -95,7 +95,6 @@
 									(14, '6F45A391-56DB-4C3E-9A03-AFD4B794AAF3', 'JSON Flattening', 'jsonflattening/', @Bucket, 'JsonFlattening', 0, 'Flattens incoming JSON based on specified Schema Root Path property on schema'),
 									(15, '224D7E9E-A3F6-4CBA-9E1A-B30B6C8B8F93', 'Producer S3 Drop', 'producers3drop/', @ProducerS3DropBucketv2, 'ProducerS3Drop', 0, 'DLST S3 drop location exposed to data producers for sending data to DSC data processing platform'),
 									
-									--GORDON 
 									--HR DataAction 
 									(16, 'E1CC7647-469F-45EC-8FE2-7E1835B69686', 'HR Raw Storage', 'raw/', @HRBucket, 'RawStorage', 0, 'HR Sends copy of unaltered incoming file to long term storage location'),
 									(17, '4C4C2F06-1259-45D3-BF11-CDA105AB7B4E', 'HR Query Storage', 'rawquery/', @HRBucket, 'QueryStorage', 1, 'HR Sends copy of raw file to long term storage accessed via Query Tool'),

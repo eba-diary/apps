@@ -23,7 +23,6 @@ namespace Sentry.data.Core
 
         
         /****************************************************************************************************
-        GORDON
         HR RELATED ACTIONS
         *****************************************************************************************************/
         public static RawStorageAction GetHrRawStorage(this IQueryable<RawStorageAction> query)
