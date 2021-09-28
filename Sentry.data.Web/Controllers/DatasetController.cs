@@ -409,7 +409,7 @@ namespace Sentry.data.Web.Controllers
         public PartialViewResult EditDatasetFile(int id)
         {
             DatasetFile df = _datasetContext.GetById<DatasetFile>(id);
-            DatasetFileGridModel item = new DatasetFileGridModel(df, _associateInfoProvider);
+            DatasetFileGridModel item = new DatasetFileGridModel(df, _associateInfoProvider, _featureFlags);
 
             return PartialView("EditDataFile", item);
 
@@ -513,7 +513,7 @@ namespace Sentry.data.Web.Controllers
             //Query the Dataset for the following information:
             foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDatasetFileConfig(Id, x => !x.IsBundled).ToList())
             {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider)
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider, _featureFlags)
                 {
                     CanViewFullDataset = us.CanViewFullDataset,
                     CanEditDataset = us.CanEditDataset,
@@ -541,7 +541,7 @@ namespace Sentry.data.Web.Controllers
 
             foreach (DatasetFile df in bundledList)
             {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider)
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider, _featureFlags)
                 {
                     CanViewFullDataset = us.CanViewFullDataset,
                     CanEditDataset = us.CanEditDataset,
@@ -569,7 +569,7 @@ namespace Sentry.data.Web.Controllers
                                                                                                     Fetch(x => x.DatasetFileConfig).ToList();
             foreach (DatasetFile dfversion in datasetFiles)
             {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion, _associateInfoProvider)
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion, _associateInfoProvider, _featureFlags)
                 {
                     CanViewFullDataset = us.CanViewFullDataset,
                     CanEditDataset = us.CanEditDataset,
@@ -585,7 +585,7 @@ namespace Sentry.data.Web.Controllers
         public JsonResult GetAllDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
             IEnumerable<DatasetFileGridModel> files = _datasetContext.DatasetFile.Where(x => x.ParentDatasetFileId == null).Fetch(x => x.DatasetFileConfig).
-                Select((f) => new DatasetFileGridModel(f, _associateInfoProvider));
+                Select((f) => new DatasetFileGridModel(f, _associateInfoProvider, _featureFlags));
 
             DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
