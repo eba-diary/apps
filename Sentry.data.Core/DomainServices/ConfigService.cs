@@ -1151,13 +1151,24 @@ namespace Sentry.data.Core
             return jobTuple;
         }
 
+        /// <summary>
+        /// Finds Schema Flow metadata associated with the provided <see cref="DatasetFileConfig"/>.
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Schema Flows will stop being created as seperate flows as part of CLA-3332. However, this
+        /// code is still needed for existing data flows - until they're converted.
+        /// </remarks>
         public Tuple<DataFlowDetailDto, List<RetrieverJob>> GetDataFlowForSchema(DatasetFileConfig config)
         {
             
             ///Determine all SchemaMap steps which reference this schema
-            SchemaMap schemaMap = _datasetContext.SchemaMap.FirstOrDefault(w => w.MappedSchema == config.Schema && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaLoad && w.DataFlowStepId.DataFlow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
+            SchemaMap schemaMap = _datasetContext.SchemaMap.FirstOrDefault(w => w.MappedSchema == config.Schema 
+                                                                && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaLoad 
+                                                                && w.DataFlowStepId.DataFlow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active
+                                                                && w.DataFlowStepId.DataFlow.SchemaId == 0);
             DataFlowDetailDto dfDto = (schemaMap != null) ? _dataFlowService.GetDataFlowDetailDto(schemaMap.DataFlowStepId.DataFlow.Id) : null;
-            //DataFlowDetailDto dfDto = _dataFlowService.GetDataFlowDetailDto(schemaMap.DataFlowStepId.DataFlow.Id);
 
             List<RetrieverJob> rjList = new List<RetrieverJob>();
             if (dfDto != null)

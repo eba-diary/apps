@@ -131,3 +131,35 @@ BEGIN CATCH
 END CATCH 
 
 COMMIT TRAN
+
+SET @ScriptVersion = '2021.10.13.01_PostDeploy'
+
+BEGIN TRAN 
+IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion) 
+BEGIN TRY 
+
+  --insert one off script files here
+  :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_05\Default_DatasetId_and_SchemaId_on_DataFlow.sql
+
+  --insert into the verision table so these scripts do not run again.
+  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
+
+END TRY 
+
+BEGIN CATCH 
+    SELECT 
+        @ErrorMessage = ERROR_MESSAGE(), 
+        @ErrorSeverity = ERROR_SEVERITY(), 
+        @ErrorState = ERROR_STATE(); 
+  
+    RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState ); 
+  
+    ROLLBACK TRAN 
+    RETURN
+END CATCH 
+
+COMMIT TRAN
+
+
+
+
