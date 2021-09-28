@@ -11,7 +11,8 @@ BEGIN TRAN
 									('CLA1656_DataFlowEdit_SubmitEditPage','False','CLA1656_DataFlowEdit_SubmitEditPage','If true, administrators have ability to submit dataflow edits and all other users receive Forbidden page.  If false, all users receive Foridden page.'),
 									('CLA1656_DataFlowEdit_ViewEditPage','True','CLA1656_DataFlowEdit_ViewEditPage','If true, administrators have ability to view DataFlowEdit and all other users receive Forbidden page.  If false, all users receive Foridden page.'),
 									('CLA3332_ConsolidatedDataFlows','False','CLA3332_ConsolidatedDataFlows','If true, DSC will only create a single flow, and only allow one flow per schema. If false, DSC will create separate data producer and schema flows, and allow multiple flows per schema.'),
-									('CLA3329_Expose_HR_Category','False','CLA3329_Expose_HR_Category','If true, show new HR category and mow jereds lawn.')
+									('CLA3329_Expose_HR_Category','False','CLA3329_Expose_HR_Category','If true, show new HR category and mow jereds lawn.'),
+									('CLA3048_StandardizeOnUTCTime','False','CLA3048_StandardizeOnUTCTime','Flag for selecting UTC time')
 								)
 								AS Source (KeyCol, [Value], [Name], [Description]) 
 

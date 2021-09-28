@@ -1115,8 +1115,8 @@ data.Dataset = {
                 { data: "ActionLinks", className: "downloadFile", width: "100px", searchable: false, orderable: false },
                 { data: "Name", className: "Name" },
                 { data: "UploadUserName", className: "UploadUserName" },
-                { data: "CreateDTM", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
-                { data: "ModifiedDTM", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
+                { data: "CreateDtm", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
+                { data: "ModifiedDtm", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "ConfigFileName", className: "ConfigFileName" }
             ],
             language: {
@@ -1261,7 +1261,7 @@ data.Dataset = {
             '</tr>' +
             '<tr>' +
             '<td><b>S3 Location</b>:</td>' +
-            '<td>' + d.s3Key + '</td>' +
+            '<td>' + d.S3Key + '</td>' +
             '</tr>' +
             '<tr>' +
             '<td><b>Version ID</b>: </td>' +
@@ -1270,6 +1270,14 @@ data.Dataset = {
             '<tr>' +
             '<td><b>ConfigFileDesc</b>: </td>' +
             '<td>' + d.ConfigFileDesc + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td><b>FlowExecutionGuid</b>: </td>' +
+            '<td>' + d.FlowExecutionGuid + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td><b>RunInstanceGuid</b>: </td>' +
+            '<td>' + d.RunInstanceGuid + '</td>' +
             '</tr>' +
             '</table>';
 
@@ -1373,7 +1381,7 @@ data.Dataset = {
             '</tr>' +
             '<tr>' +
             '<td><b>S3 Location</b>:</td>' +
-            '<td>' + d.s3Key + '</td>' +
+            '<td>' + d.S3Key + '</td>' +
             '</tr>' +
             '<tr>' +
             '<td><b>Version ID</b>: </td>' +
@@ -1532,7 +1540,7 @@ data.Dataset = {
             '</tr>' +
             '<tr>' +
             '<td><b>S3 Location</b>:</td>' +
-            '<td>' + d.s3Key + '</td>' +
+            '<td>' + d.S3Key + '</td>' +
             '</tr>' +
             '<tr>' +
             '<td><b>Version ID</b>: </td>' +
@@ -1541,6 +1549,14 @@ data.Dataset = {
             '<tr>' +
             '<td><b>ConfigFileDesc</b>: </td>' +
             '<td>' + d.ConfigFileDesc + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td><b>FlowExecutionGuid</b>: </td>' +
+            '<td>' + d.FlowExecutionGuid + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td><b>RunInstanceGuid</b>: </td>' +
+            '<td>' + d.RunInstanceGuid + '</td>' +
             '</tr>' +
             '</table>';
 
