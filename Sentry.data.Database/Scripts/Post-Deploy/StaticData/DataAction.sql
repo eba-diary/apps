@@ -2,48 +2,78 @@
 	BEGIN TRY
 		DECLARE @ENV VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
 		DECLARE	@Bucket VARCHAR(255), @ProducerS3DropBucket VARCHAR(255), @ProducerS3DropBucketv2 VARCHAR(255)
-		if @ENV = 'NRTEST'
-			BEGIN
-				SET @Bucket = 'sentry-data-nrtest-dataset-ae2'
-				SET @ProducerS3DropBucket = 'sentry-data-nrtest-droplocation-ae2'
-				SET @ProducerS3DropBucketv2 = 'sentry-dlst-nrtest-droplocation-ae2'
-			END
-		else if @ENV = 'NRDEV'
-			BEGIN
-				SET @Bucket = 'sentry-data-nrdev-dataset-ae2'
-				SET @ProducerS3DropBucket = 'sentry-data-nrdev-droplocation-ae2'
-				SET @ProducerS3DropBucketv2 = 'sentry-dlst-nrdev-droplocation-ae2'
-			END
-		else if @ENV = 'DEV'
-			BEGIN
-				SET @Bucket = 'sentry-data-dev-dataset-ae2'
-				SET @ProducerS3DropBucket = 'sentry-data-dev-droplocation-ae2'
-				SET @ProducerS3DropBucketv2 = 'sentry-dlst-dev-droplocation-ae2'
-			END
-		else if @ENV = 'TEST'
-			BEGIN
-				SET @Bucket = 'sentry-data-test-dataset-ae2'
-				SET @ProducerS3DropBucket = 'sentry-data-test-droplocation-ae2'
-				SET @ProducerS3DropBucketv2 = 'sentry-dlst-test-droplocation-ae2'
-			END
-		else if @ENV = 'QUAL'
-			BEGIN
-				SET @Bucket = 'sentry-data-qual-dataset-ae2'
-				SET @ProducerS3DropBucket = 'sentry-data-qual-droplocation-ae2'
-				SET @ProducerS3DropBucketv2 = 'sentry-dlst-qual-droplocation-ae2'
-			END
-		else if @ENV = 'PROD'
-			BEGIN
-				SET @Bucket = 'sentry-data-prod-dataset-ae2'
-				SET @ProducerS3DropBucket = 'sentry-data-prod-droplocation-ae2'
-				SET @ProducerS3DropBucketv2 = 'sentry-dlst-prod-droplocation-ae2'
-			END
-		else
-			BEGIN
-				SET @Bucket = 'sentry-data-dev-dataset-ae2'
-				SET @ProducerS3DropBucket = 'sentry-data-dev-droplocation-ae2'
-				SET @ProducerS3DropBucketv2 = 'sentry-dlst-dev-droplocation-ae2'
-			END
+		DECLARE	@HRBucket VARCHAR(255), @HRProducerS3DropBucket VARCHAR(255)
+		
+		IF @ENV = 'DEV'
+		BEGIN
+			SET @Bucket = 'sentry-data-dev-dataset-ae2'
+			SET @ProducerS3DropBucket = 'sentry-data-dev-droplocation-ae2'
+			SET @ProducerS3DropBucketv2 = 'sentry-dlst-dev-droplocation-ae2'
+
+			--HR
+			SET @HRBucket = 'sentry-dlst-dev-hrdataset-ae2'
+			SET @HRProducerS3DropBucket = 'sentry-dlst-dev-hrdroplocation-ae2'
+		END
+		ELSE IF @ENV = 'NRDEV'
+		BEGIN
+			SET @Bucket = 'sentry-data-nrdev-dataset-ae2'
+			SET @ProducerS3DropBucket = 'sentry-data-nrdev-droplocation-ae2'
+			SET @ProducerS3DropBucketv2 = 'sentry-dlst-nrdev-droplocation-ae2'
+			
+			--HR
+			SET @HRBucket = 'sentry-dlst-nrdev-hrdataset-ae2'
+			SET @HRProducerS3DropBucket = 'sentry-dlst-nrdev-hrdroplocation-ae2'
+		END
+		ELSE IF @ENV = 'TEST'
+		BEGIN
+			SET @Bucket = 'sentry-data-test-dataset-ae2'
+			SET @ProducerS3DropBucket = 'sentry-data-test-droplocation-ae2'
+			SET @ProducerS3DropBucketv2 = 'sentry-dlst-test-droplocation-ae2'
+
+			--HR
+			SET @HRBucket = 'sentry-dlst-test-hrdataset-ae2'
+			SET @HRProducerS3DropBucket = 'sentry-dlst-test-hrdroplocation-ae2'
+		END
+		ELSE IF @ENV = 'NRTEST'
+		BEGIN
+			SET @Bucket = 'sentry-data-nrtest-dataset-ae2'
+			SET @ProducerS3DropBucket = 'sentry-data-nrtest-droplocation-ae2'
+			SET @ProducerS3DropBucketv2 = 'sentry-dlst-nrtest-droplocation-ae2'
+
+			--HR
+			SET @HRBucket = 'sentry-dlst-nrtest-hrdataset-ae2'
+			SET @HRProducerS3DropBucket = 'sentry-dlst-nrtest-hrdroplocation-ae2'
+		END
+		ELSE IF @ENV = 'QUAL'
+		BEGIN
+			SET @Bucket = 'sentry-data-qual-dataset-ae2'
+			SET @ProducerS3DropBucket = 'sentry-data-qual-droplocation-ae2'
+			SET @ProducerS3DropBucketv2 = 'sentry-dlst-qual-droplocation-ae2'
+
+			--HR
+			SET @HRBucket = 'sentry-dlst-qual-hrdataset-ae2'
+			SET @HRProducerS3DropBucket = 'sentry-dlst-qual-hrdroplocation-ae2'
+		END
+		ELSE IF @ENV = 'PROD'
+		BEGIN
+			SET @Bucket = 'sentry-data-prod-dataset-ae2'
+			SET @ProducerS3DropBucket = 'sentry-data-prod-droplocation-ae2'
+			SET @ProducerS3DropBucketv2 = 'sentry-dlst-prod-droplocation-ae2'
+
+			--HR
+			SET @HRBucket = 'sentry-dlst-prod-hrdataset-ae2'
+			SET @HRProducerS3DropBucket = 'sentry-dlst-prod-hrdroplocation-ae2'
+		END
+		ELSE
+		BEGIN
+			SET @Bucket = 'sentry-data-dev-dataset-ae2'
+			SET @ProducerS3DropBucket = 'sentry-data-dev-droplocation-ae2'
+			SET @ProducerS3DropBucketv2 = 'sentry-dlst-dev-droplocation-ae2'
+
+			--HR
+			SET @HRBucket = 'sentry-dlst-dev-hrdataset-ae2'
+			SET @HRProducerS3DropBucket = 'sentry-dlst-dev-hrdroplocation-ae2'
+		END
 		
 		
 
@@ -63,7 +93,16 @@
 									(12, '7C4BAF8E-697A-477C-8471-57BF5871DA47', 'Producer S3 Drop', 'producers3drop/', @ProducerS3DropBucket, 'ProducerS3Drop', 0, 'S3 drop location exposed to data producers for sending data to DSC data processing platform'),
 									(13, '4A543410-1D8E-4132-BD92-A9A299012C85', 'XML', 'xmlpreprocessing/', @Bucket, 'XML', 0, 'Converts xml file into data processing friendly format'),
 									(14, '6F45A391-56DB-4C3E-9A03-AFD4B794AAF3', 'JSON Flattening', 'jsonflattening/', @Bucket, 'JsonFlattening', 0, 'Flattens incoming JSON based on specified Schema Root Path property on schema'),
-									(15, '224D7E9E-A3F6-4CBA-9E1A-B30B6C8B8F93', 'Producer S3 Drop', 'producers3drop/', @ProducerS3DropBucketv2, 'ProducerS3Drop', 0, 'DLST S3 drop location exposed to data producers for sending data to DSC data processing platform')
+									(15, '224D7E9E-A3F6-4CBA-9E1A-B30B6C8B8F93', 'Producer S3 Drop', 'producers3drop/', @ProducerS3DropBucketv2, 'ProducerS3Drop', 0, 'DLST S3 drop location exposed to data producers for sending data to DSC data processing platform'),
+									
+									--GORDON 
+									--HR DataAction 
+									(16, 'E1CC7647-469F-45EC-8FE2-7E1835B69686', 'HR Raw Storage', 'raw/', @HRBucket, 'RawStorage', 0, 'HR Sends copy of unaltered incoming file to long term storage location'),
+									(17, '4C4C2F06-1259-45D3-BF11-CDA105AB7B4E', 'HR Query Storage', 'rawquery/', @HRBucket, 'QueryStorage', 1, 'HR Sends copy of raw file to long term storage accessed via Query Tool'),
+									(18, '528F1378-C89D-4056-A8DE-7EC97071441D', 'HR Schema Load', 'schemaload/', @HRBucket, 'SchemaLoad', 0, 'HR Maps schema related metadata to file for processing'),
+									(19, 'A0AA6364-A943-449B-907D-DB631B35C746', 'HR ConvertToParquet', 'parquet/', @HRBucket, 'ConvertParquet', 1, 'HR Converts raw file to parquet format and stores in long term storage accessed via Hive'),
+									(20, '6CDD6D22-B79F-4A89-8806-8ACE399DF174', 'HR Producer S3 Drop', 'producers3drop/', @HRProducerS3DropBucket, 'ProducerS3Drop', 0, 'HR S3 drop location exposed to data producers for sending data to DSC data processing platform'),
+									(21, 'CDFB2967-836A-4778-83DB-2659B14F4BD7', 'HR XML', 'xmlpreprocessing/', @HRBucket, 'XML', 0, 'HR Converts xml file into data processing friendly format')
 								)
 								AS Source ([Id], [ActionGuid], [Name], [TargetStoragePrefix], [TargetStorageBucket], [ActionType], [TargetStorageSchemaAware], [Description]) 
 
