@@ -36,6 +36,9 @@ namespace Sentry.data.Core
             _dataFeatures = dataFeatures;
         }
 
+
+
+
         public List<DataFlowDto> ListDataFlows()
         {
             List<DataFlow> dfList = _datasetContext.DataFlow.ToList();
@@ -1040,7 +1043,11 @@ namespace Sentry.data.Core
             }
             else
             {
-                step.TriggerKey = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                string triggerPrefix = _dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
+                    ? $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{GetDataflowSaidAsset(step.DataFlow.Id)}/{GetDataflowNamedEnvironment(step.DataFlow.Id)}/{step.Action.TargetStoragePrefix}{step.DataFlow.FlowStorageCode}/"
+                    : $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+
+                step.TriggerKey = triggerPrefix;
                 step.TriggerBucket = step.Action.TargetStorageBucket;
             }
         }
@@ -1062,12 +1069,16 @@ namespace Sentry.data.Core
                 case DataActionType.QueryStorage:
                 case DataActionType.ConvertParquet:
                     string schemaStorageCode = GetSchemaStorageCodeForDataFlow(step.DataFlow.Id);
-                    step.TargetPrefix = step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{schemaStorageCode}/";
+                    step.TargetPrefix = _dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
+                        ? $"{GetDataflowSaidAsset(step.DataFlow.Id)}/{GetDataflowNamedEnvironment(step.DataFlow.Id)}/{step.Action.TargetStoragePrefix}{schemaStorageCode}/"
+                        : step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{schemaStorageCode}/";
                     step.TargetBucket = step.Action.TargetStorageBucket;
                     break;
                 //These sent output a step specific location along with down stream dependent steps
                 case DataActionType.RawStorage:
-                    step.TargetPrefix = step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                    step.TargetPrefix = _dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
+                        ? $"{GetDataflowSaidAsset(step.DataFlow.Id)}/{GetDataflowNamedEnvironment(step.DataFlow.Id)}/{step.Action.TargetStoragePrefix}{step.DataFlow.FlowStorageCode}/"
+                        : step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
                     step.TargetBucket = step.Action.TargetStorageBucket;
                     break;
                 //These only send output to down stream dependent steps
@@ -1091,6 +1102,35 @@ namespace Sentry.data.Core
             step.SourceDependencyPrefix = previousStep?.TriggerKey;
             step.SourceDependencyBucket = previousStep?.TriggerBucket;
         }
+
+        /// <summary>
+        /// return 
+        /// </summary>
+        private string GetDataflowSaidAsset(int dataflowId)
+        {
+            int datasetId = _datasetContext.DataFlow
+                            .Where(w => w.Id == dataflowId)
+                            .Select(s => s.DatasetId)
+                            .FirstOrDefault();
+            string saidAsset = _datasetContext.Datasets
+                            .Where(w => w.DatasetId == datasetId)
+                            .Select(s => s.SAIDAssetKeyCode)
+                            .FirstOrDefault();
+            return saidAsset;
+        }
+
+        private string GetDataflowNamedEnvironment(int dataflowId)
+        {
+            int datasetId = _datasetContext.DataFlow
+                            .Where(w => w.Id == dataflowId)
+                            .Select(s => s.DatasetId)
+                            .FirstOrDefault();
+            string namedEnvironment = _datasetContext.Datasets
+                            .Where(w => w.DatasetId == datasetId)
+                            .Select(s => s.SAIDAssetKeyCode)
+                            .FirstOrDefault();
+            return namedEnvironment;
+        } 
 
         #region SchemaFlowMappings
 
