@@ -1,4 +1,4 @@
-﻿
+﻿/*
 DECLARE @ScriptVersion AS VARCHAR(50) 
 SET @ScriptVersion = '2021.10.13_01_PreDeploy'
 
@@ -35,3 +35,4 @@ BEGIN CATCH
 END CATCH 
   
 COMMIT TRAN
+*/
