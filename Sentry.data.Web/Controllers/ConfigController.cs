@@ -1289,10 +1289,10 @@ namespace Sentry.data.Web.Controllers
                     case GlobalConstants.ValidationErrors.NAME_IS_BLANK:
                         ModelState.AddModelError("Name", vr.Description);
                         break;
-                    case GlobalConstants.ValidationErrors.CREATION_USER_NAME_IS_BLANK:
+                    case Dataset.ValidationErrors.datasetCreatedByRequired:
                         ModelState.AddModelError("CreationUserName", vr.Description);
                         break;
-                    case GlobalConstants.ValidationErrors.DATASET_DATE_IS_OLD:
+                    case Dataset.ValidationErrors.datasetDateRequired:
                         ModelState.AddModelError("DatasetDate", vr.Description);
                         break;
                     case SFtpSource.ValidationErrors.portNumberValueNonZeroValue:

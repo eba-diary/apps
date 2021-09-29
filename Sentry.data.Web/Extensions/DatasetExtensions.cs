@@ -40,7 +40,9 @@ namespace Sentry.data.Web
                 IsInSAS = model.IncludeInSas,
                 CreateCurrentView = model.CreateCurrentView,
                 ObjectStatus = model.ObjectStatus,
-                SAIDAssetKeyCode = model.SAIDAssetKeyCode
+                SAIDAssetKeyCode = model.SAIDAssetKeyCode,
+                NamedEnvironment = model.NamedEnvironment,
+                NamedEnvironmentType = model.NamedEnvironmentType
             };
         }
 

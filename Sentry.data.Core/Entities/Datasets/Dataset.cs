@@ -77,6 +77,8 @@ namespace Sentry.data.Core
             }
         }
         public virtual IList<Image> Images { get; set; }
+        public virtual string NamedEnvironment { get; set; }
+        public virtual NamedEnvironmentType NamedEnvironmentType { get; set; }
 
 
         //ISecurable Impl.
@@ -103,11 +105,11 @@ namespace Sentry.data.Core
 
             if (DatasetCategories == null || DatasetCategories.Count == 0)
             {
-                vr.Add(GlobalConstants.ValidationErrors.CATEGORY_IS_BLANK, "The Dataset Category is required");
+                vr.Add(ValidationErrors.datasetCategoryRequired, "The Dataset Category is required");
             }
             if (string.IsNullOrWhiteSpace(SAIDAssetKeyCode))
             {
-                vr.Add(GlobalConstants.ValidationErrors.SAID_ASSET_KEY_IS_BLANK, "The SAID Asset is required");
+                vr.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "The SAID Asset is required");
             }
             if (string.IsNullOrWhiteSpace(DatasetName))
             {
@@ -115,34 +117,47 @@ namespace Sentry.data.Core
             }
             if (string.IsNullOrWhiteSpace(CreationUserName))
             {
-                vr.Add(GlobalConstants.ValidationErrors.CREATION_USER_NAME_IS_BLANK, "The Dataset Creation User Name is required");
+                vr.Add(ValidationErrors.datasetCreatedByRequired, "The Dataset Creation User Name is required");
             }
             if (string.IsNullOrWhiteSpace(UploadUserName))
             {
-                vr.Add(GlobalConstants.ValidationErrors.UPLOAD_USER_NAME_IS_BLANK, "The Dataset Upload User Name is required");
+                vr.Add(ValidationErrors.datasetUploadedByRequired, "The Dataset Upload User Name is required");
             }
             if (!Regex.IsMatch(PrimaryOwnerId, "(^[0-9]{6,6}$)"))
             {
-                vr.Add(GlobalConstants.ValidationErrors.SENTRY_OWNER_IS_NOT_NUMERIC, "The Sentry Owner ID should contain owners Sentry ID");
+                vr.Add(ValidationErrors.datasetOwnerInvalid, "The Sentry Owner ID should contain owners Sentry ID");
             }
             if (DatasetDtm < new DateTime(1800, 1, 1)) // null dates are ancient; this suffices to check for null dates
             {
-                vr.Add(GlobalConstants.ValidationErrors.DATASET_DATE_IS_OLD, "The Dataset Date is required");
+                vr.Add(ValidationErrors.datasetDateRequired, "The Dataset Date is required");
             }
             if (string.IsNullOrWhiteSpace(DatasetDesc))
             {
-                vr.Add(GlobalConstants.ValidationErrors.DATASET_DESC_IS_BLANK, "The Dataset description is required");
+                vr.Add(ValidationErrors.datasetDescriptionRequired, "The Dataset description is required");
             }
 
             //Report specific checks
             if (DatasetType == GlobalConstants.DataEntityCodes.REPORT && string.IsNullOrWhiteSpace(Metadata.ReportMetadata.Location))
             {
-                vr.Add(GlobalConstants.ValidationErrors.LOCATION_IS_BLANK, "Report Location is required");
+                vr.Add(ValidationErrors.datasetLocationRequired, "Report Location is required");
             }
 
             return vr;
         }
 
-
+        public static class ValidationErrors
+        {
+            public const string datasetNameDuplicate = "datasetNameDuplicate";
+            public const string datasetDescriptionRequired = "datasetDescriptionRequired";
+            public const string datasetOwnerRequired = "datasetOwnerRequired";
+            public const string datasetOwnerInvalid = "datasetOwnerInvalid";
+            public const string datasetCreatedByRequired = "datasetCreatedByRequired";
+            public const string datasetUploadedByRequired = "datasetUploadedByRequired";
+            public const string datasetContactRequired = "datasetContactRequired";
+            public const string datasetCategoryRequired = "datasetCategoryRequired";
+            public const string datasetScopeRequired = "datasetScopeRequired";
+            public const string datasetDateRequired = "datasetDateRequired";
+            public const string datasetLocationRequired = "datasetLocationRequired";
+        }
     }
 }

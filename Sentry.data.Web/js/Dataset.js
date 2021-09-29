@@ -484,8 +484,14 @@ data.Dataset = {
                     data.Dale.makeToast("error", "Error retrieving SAID Primary Owner.");
                 }
             });
+
+            //Load the named environments for the selected asset
+            Sentry.InjectSpinner($("div#DatasetFormContent #namedEnvironmentSpinner"), 30);
+            data.Dataset.populateNamedEnvironments();
         });
 
+        //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
+        data.Dataset.initNamedEnvironmentEvents();
         
         //SubmitDatasetForm
         $("[id='SubmitDatasetForm']").click(PageSubmitFunction);
@@ -1611,9 +1617,24 @@ data.Dataset = {
         }
 
         returnLink.attr('href', returnUrl);
+    },
+
+    initNamedEnvironmentEvents() {
+        //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
+        $("div#DatasetFormContent select#NamedEnvironment").change(function () {
+            Sentry.InjectSpinner($("div#DatasetFormContent #namedEnvironmentTypeSpinner"), 30);
+            data.Dataset.populateNamedEnvironments();
+        });
+    },
+
+    populateNamedEnvironments() {
+        var assetKeyCode = $("div#DatasetFormContent #saidAsset").val();
+        var selectedEnvironment = $("div#DatasetFormContent #NamedEnvironment").val();
+        $.get("/Dataset/NamedEnvironment?assetKeyCode=" + assetKeyCode + "&namedEnvironment=" + selectedEnvironment, function (result) {
+            $('div#DatasetFormContent #NamedEnvironmentPartial').html(result);
+            data.Dataset.initNamedEnvironmentEvents();
+        });
     }
-
-
 
 
 

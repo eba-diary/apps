@@ -1,4 +1,5 @@
 ﻿using Sentry.Core;
+using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using System;
@@ -134,7 +135,7 @@ namespace Sentry.data.Web
 
             if (String.IsNullOrWhiteSpace(SAIDAssetKeyCode))
             {
-                results.Add(DataFlow.ValidationErrors.saidAssetIsBlank, "Must associate data flow with SAID asset");
+                results.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "Must associate data flow with SAID asset");
             }
 
             ValidationException ex = new ValidationException(results);            

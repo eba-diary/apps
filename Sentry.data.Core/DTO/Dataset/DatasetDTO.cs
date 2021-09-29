@@ -19,5 +19,7 @@ namespace Sentry.data.Core
         public bool IsInSAS { get; set; }
         public bool CreateCurrentView { get; set; }
         public string SAIDAssetKeyCode { get; set; }
+        public string NamedEnvironment { get; set; }
+        public NamedEnvironmentType NamedEnvironmentType { get; set; }
     }
 }

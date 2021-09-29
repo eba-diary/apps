@@ -20,19 +20,19 @@ namespace Sentry.data.Core
         private readonly IJobService _jobService;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly ISecurityService _securityService;
-        private readonly IClient _quartermasterClient;
+        private readonly IQuartermasterService _quartermasterService;
         private readonly IDataFeatures _dataFeatures;
 
         public DataFlowService(IDatasetContext datasetContext, 
             IUserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider,
-            ISecurityService securityService, IClient quartermasterClient, IDataFeatures dataFeatures)
+            ISecurityService securityService, IQuartermasterService quartermasterService, IDataFeatures dataFeatures)
         {
             _datasetContext = datasetContext;
             _userService = userService;
             _jobService = jobService;
             _s3ServiceProvider = s3ServiceProvider;
             _securityService = securityService;
-            _quartermasterClient = quartermasterClient;
+            _quartermasterService = quartermasterService;
             _dataFeatures = dataFeatures;
         }
 
@@ -530,62 +530,10 @@ namespace Sentry.data.Core
                 results.Add(DataFlow.ValidationErrors.nameMustBeUnique, "Dataflow name is already used");
             }
 
-            //if the asset is managed in Quartermaster, then the named environment and named environment type must be valid according to Quartermaster
-            var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(dfDto.SaidKeyCode, ShowDeleted11.False).ConfigureAwait(false)).ToList();
-            if (namedEnvironmentList.Any())
-            {
-                if (!namedEnvironmentList.Any(e => e.Name == dfDto.NamedEnvironment))
-                {
-                    results.Add(DataFlow.ValidationErrors.namedEnvironmentInvalid, $"Named Environment provided (\"{dfDto.NamedEnvironment}\") doesn't match a Quartermaster Named Environment");
-                }
-                else if (namedEnvironmentList.First(e => e.Name == dfDto.NamedEnvironment).Environmenttype != dfDto.NamedEnvironmentType.ToString())
-                {
-                    var quarterMasterNamedEnvironmentType = namedEnvironmentList.First(e => e.Name == dfDto.NamedEnvironment).Environmenttype;
-                    results.Add(DataFlow.ValidationErrors.namedEnvironmentTypeInvalid, $"Named Environment Type provided (\"{dfDto.NamedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType}\")");
-                }
-            }
+            //Validate the Named Environment selection using the QuartermasterService
+            results.MergeInResults(await _quartermasterService.VerifyNamedEnvironmentAsync(dfDto.SaidKeyCode, dfDto.NamedEnvironment, dfDto.NamedEnvironmentType).ConfigureAwait(false));
 
             return new ValidationException(results);
-        }
-
-        /// <summary>
-        /// Given a SAID asset key code, get all the named environments from Quartermaster
-        /// </summary>
-        /// <param name="saidAssetKeyCode">The four-character key code for an asset</param>
-        /// <returns>A list of NamedEnvironmentDto objects</returns>
-        public Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsAsync(string saidAssetKeyCode)
-        {
-            //validate parameters
-            if (string.IsNullOrWhiteSpace(saidAssetKeyCode))
-            {
-                throw new ArgumentNullException(nameof(saidAssetKeyCode), "SAID Asset Key Code was missing.");
-            }
-
-            //the guts of the method have to be wrapped in a local function for proper async handling
-            //see https://confluence.sentry.com/questions/224368523
-            async Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsInternalAsync()
-            {
-                //call Quartermaster to get list of named environments for this asset
-                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted11.False).ConfigureAwait(false)).ToList();
-                namedEnvironmentList = namedEnvironmentList.OrderBy(n => n.Name).ToList();
-
-                //grab a config setting to see if we need to filter the named environments by a certain named environment type
-                //if the config setting for "QuartermasterNamedEnvironmentTypeFilter" is blank, no filter will be applied
-                var environmentTypeFilter = Configuration.Config.GetHostSetting("QuartermasterNamedEnvironmentTypeFilter");
-                Func<NamedEnvironment, bool> filter = env => true;
-                if (!string.IsNullOrWhiteSpace(environmentTypeFilter))
-                {
-                    filter = env => env.Environmenttype == environmentTypeFilter;
-                }
-
-                //map the output from Quartermaster to our Dto
-                return namedEnvironmentList.Where(filter).Select(env => new NamedEnvironmentDto
-                {
-                    NamedEnvironment = env.Name,
-                    NamedEnvironmentType = (GlobalEnums.NamedEnvironmentType)Enum.Parse(typeof(GlobalEnums.NamedEnvironmentType), env.Environmenttype)
-                }).ToList();
-            }
-            return GetNamedEnvironmentsInternalAsync();
         }
 
         #region Private Methods
