@@ -573,6 +573,24 @@ tr.categoryBanner-orange th.sorting_desc {
     background-color: #E57200 !important;
 }
 
+
+
+.categoryBanner-gray {
+    background-color: #9E9FA1 !important;
+    color: #FFFFFF;
+}
+
+tr.categoryBanner-gray th.sorting_asc {
+    background-color: #53565A !important;
+}
+
+tr.categoryBanner-gray th.sorting_desc {
+    background-color: #53565A !important;
+}
+
+
+
+
 .categoryBanner-blueGray {
     background-color: #285780 !important;
     color: #FFFFFF;
@@ -1702,6 +1720,13 @@ tr.categoryBanner-darkgray th.sorting_desc {
     border: 1.5px solid #89ABE3;
     border-top: 6px solid #89ABE3;
 }
+
+/*keep*/
+.border_gray {
+    border: 1.5px solid #888888;
+    border-top: 6px solid #888888;
+}
+
 
 
 /* CSS for Data Asset with Status and Last Updated */

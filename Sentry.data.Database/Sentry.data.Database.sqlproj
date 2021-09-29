@@ -154,6 +154,7 @@
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_03" />
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_21_04_04" />
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_21_09_08" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_05" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -277,6 +278,7 @@
     <Build Include="Tables\HangFire\Set.sql" />
     <Build Include="Tables\HangFire\State.sql" />
     <Build Include="Tables\HangFire\Schema.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_05\Update_CLA3048_StandardizeOnUTCTime_FeatureFlag_Value.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

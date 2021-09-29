@@ -1,32 +1,32 @@
-﻿using Sentry.data.Core;
+﻿using Sentry.data.Common;
+using Sentry.data.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Sentry.data.Common;
 using System.IO;
-using Sentry.data.Infrastructure;
 
 namespace Sentry.data.Web
 {
     public class DatasetFileGridModel
     {
+
         public DatasetFileGridModel()
         {
         }
 
-        public DatasetFileGridModel(DatasetFile f, IAssociateInfoProvider associateInfoService)
+        public DatasetFileGridModel(DatasetFile f, IAssociateInfoProvider associateInfoService, IDataFeatures dataFeatures)
         {
             this.Id = f.DatasetFileId;
             this.Name = f.FileName;
+            this.FlowExecutionGuid = f.FlowExecutionGuid;
+            this.RunInstanceGuid = f.RunInstanceGuid;
+
 
             //Used to differentiate between service and user accounts, user accounts will parse into a numeric value
-            int n;
-            this.UploadUserName = int.TryParse(f.UploadUserName, out n) ? associateInfoService.GetAssociateInfo(f.UploadUserName).FullName : f.UploadUserName;
+            this.UploadUserName = int.TryParse(f.UploadUserName, out _) ? associateInfoService.GetAssociateInfo(f.UploadUserName).FullName : f.UploadUserName;
 
-            this.ModifiedDTM = f.ModifiedDTM;
-            this.CreateDTM = (f.FlowExecutionGuid != null) ? f.CreateDTM.ToLocalTime() : f.CreateDTM;
-            this.s3Key = f.FileLocation;
+            //this.ModifiedDTM = (dataFeatures.CLA3048_StandardizeOnUTCTime.GetValue()) ? f.ModifiedDTM.ToLocalTime() : f.ModifiedDTM;
+            this.ModifiedDtm = new DateTime(f.ModifiedDTM.Ticks, DateTimeKind.Utc);
+            this.CreateDtm = (dataFeatures.CLA3048_StandardizeOnUTCTime.GetValue()) ? f.CreateDTM.ToLocalTime() : f.CreateDTM;
+            this.S3Key = f.FileLocation;
             this.ConfigFileName = f.DatasetFileConfig.Name;
             this.ConfigFileDesc = f.DatasetFileConfig.Description;
             this.VersionId = f.VersionId;
@@ -36,9 +36,11 @@ namespace Sentry.data.Web
         }
         public int Id { get; set; }
         public string Name { get; set; }
+        public string FlowExecutionGuid { get; set; }
+        public string RunInstanceGuid { get; set; }
         public string UploadUserName { get; set; }
-        public DateTime ModifiedDTM { get; set; }
-        public DateTime CreateDTM { get; set; }
+        public DateTime ModifiedDtm { get; set; }
+        public DateTime CreateDtm { get; set; }
         public string ActionLinks
         {
             get
@@ -67,7 +69,7 @@ namespace Sentry.data.Web
         public string ConfigFileDesc { get; set; }
 
         //PreviewDatafileModal
-        public string s3Key { get; set; }
+        public string S3Key { get; set; }
         public string VersionId { get; set; }
         public int ParentDataSetID { get; set; }
         public Boolean IsBundled { get; set; }

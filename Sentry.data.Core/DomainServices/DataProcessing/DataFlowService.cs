@@ -899,6 +899,27 @@ namespace Sentry.data.Core
 
         private DataFlowStep CreateDataFlowStep(DataActionType actionType, DataFlowDto dto, DataFlow df)
         {
+            int selectedDatasetId = 0;
+            bool isHumanResources = false;
+            
+            //STEP #1 Figure out DatasetId
+            if (dto.DatasetId == 0)  //OLD WORLD USE BRIDGE TABLE SchemaMap to DatasetId
+            {
+                selectedDatasetId = dto.SchemaMap.Select(s => s.DatasetId).FirstOrDefault();
+            }
+            else  //NEW WORLD, just assign DatasetId directy for later use
+            {
+                selectedDatasetId = dto.DatasetId;
+            }
+
+            //STEP #2 Take DatasetId and figure out if Category = HR
+            Dataset ds = _datasetContext.GetById<Dataset>(selectedDatasetId);
+            if(ds.DatasetCategories.Any(w => w.AbbreviatedName == "HR"))
+            {
+                isHumanResources = true;
+            }
+
+            //STEP #3 Look at ActionType and return correct BaseAction
             BaseAction action;
             switch (actionType)
             {
@@ -906,18 +927,23 @@ namespace Sentry.data.Core
                     action = _datasetContext.S3DropAction.FirstOrDefault();
                     break;
                 case DataActionType.ProducerS3Drop:
-                    action = _dataFeatures.CLA3240_UseDropLocationV2.GetValue()
-                        ? _datasetContext.ProducerS3DropAction.GetDlstDropLocation()
-                        : _datasetContext.ProducerS3DropAction.GetDataDropLocation();
+                    if (isHumanResources)
+                    {
+                        action = _datasetContext.ProducerS3DropAction.GetHrDataDropLocation();               
+                    }
+                    else
+                    {
+                        action = _dataFeatures.CLA3240_UseDropLocationV2.GetValue() ? _datasetContext.ProducerS3DropAction.GetDlstDropLocation() : _datasetContext.ProducerS3DropAction.GetDataDropLocation();
+                    }
                     break;
                 case DataActionType.RawStorage:
-                    action = _datasetContext.RawStorageAction.FirstOrDefault();
+                    action = (isHumanResources)? _datasetContext.RawStorageAction.GetHrRawStorage() :_datasetContext.RawStorageAction.FirstOrDefault();
                     break;
                 case DataActionType.QueryStorage:
-                    action = _datasetContext.QueryStorageAction.FirstOrDefault();
+                    action = (isHumanResources) ? _datasetContext.QueryStorageAction.GetHrQueryStorageAction() : _datasetContext.QueryStorageAction.FirstOrDefault();
                     break;
                 case DataActionType.ConvertParquet:
-                    action = _datasetContext.ConvertToParquetAction.FirstOrDefault();
+                    action = (isHumanResources) ? _datasetContext.ConvertToParquetAction.GetHrConvertToParquetAction() : _datasetContext.ConvertToParquetAction.FirstOrDefault();
                     break;
                 case DataActionType.UncompressZip:
                     action = _datasetContext.UncompressZipAction.FirstOrDefault();
@@ -935,13 +961,15 @@ namespace Sentry.data.Core
                     action = _datasetContext.FixedWidthAction.FirstOrDefault();
                     break;
                 case DataActionType.XML:
-                    action = _datasetContext.XMLAction.FirstOrDefault();
+                    action = (isHumanResources)? _datasetContext.XMLAction.GetHrXMLAction() : _datasetContext.XMLAction.FirstOrDefault();
                     break;
                 case DataActionType.JsonFlattening:
                     action = _datasetContext.JsonFlatteningAction.FirstOrDefault();
                     break;
                 case DataActionType.SchemaLoad:
-                    action = _datasetContext.SchemaLoadAction.FirstOrDefault();
+
+                    action = (isHumanResources)? _datasetContext.SchemaLoadAction.GetHrSchemaLoadAction() : _datasetContext.SchemaLoadAction.FirstOrDefault();
+                    
                     DataFlowStep schemaLoadStep = MapToDataFlowStep(df, action, actionType);
                     List<SchemaMap> schemaMapList = new List<SchemaMap>();
                     foreach (SchemaMapDto mapDto in dto.SchemaMap.Where(w => !w.IsDeleted))
@@ -949,7 +977,9 @@ namespace Sentry.data.Core
                         schemaMapList.Add(MapToSchemaMap(mapDto, schemaLoadStep));
                     }
                     schemaLoadStep.SchemaMappings = schemaMapList;
+                    
                     return schemaLoadStep;
+
                 case DataActionType.SchemaMap:
                     action = _datasetContext.SchemaMapAction.FirstOrDefault();
                     DataFlowStep schemaMapStep = MapToDataFlowStep(df, action, actionType);
