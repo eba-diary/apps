@@ -140,6 +140,7 @@ BEGIN TRY
 
   --insert one off script files here
   :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_05\Update_CLA3048_StandardizeOnUTCTime_FeatureFlag_Value.sql
+  :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_05\HistoryFix_Populate_Dataset_NamedEnvironments.sql
 
   --insert into the verision table so these scripts do not run again.
   INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 

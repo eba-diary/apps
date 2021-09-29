@@ -106,6 +106,8 @@
     <Compile Include="ServiceImplementationTests\SchemaServiceTests.cs" />
     <Compile Include="ServiceImplementationTests\SecurityServiceTests.cs" />
     <Compile Include="DataFlowServiceTests.cs" />
+    <Compile Include="QuartermasterServiceTests.cs" />
+    <Compile Include="DatasetServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
