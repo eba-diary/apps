@@ -69,7 +69,9 @@ namespace Sentry.data.Web
                 PrimarContactEmail = dto.PrimaryContactEmail,
                 PrimaryOwnerName = dto.PrimaryOwnerName,
                 ObjectStatus = dto.ObjectStatus.GetDescription().ToUpper(),
-                SAIDAssetKeyCode = dto.SAIDAssetKeyCode
+                SAIDAssetKeyCode = dto.SAIDAssetKeyCode,
+                NamedEnvironment = dto.NamedEnvironment,
+                NamedEnvironmentType = dto.NamedEnvironmentType
             };
         }
     }
