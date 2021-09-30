@@ -10,14 +10,14 @@ pipeline {
     options {
         // Only keep 10 builds of history
         buildDiscarder(logRotator(numToKeepStr: '10'))
-        // Only allow a single instance of this build job (for a given branch) to run at a time
-        disableConcurrentBuilds()
     }
  
     stages {
         stage('Prepare') {
             // This stage should contain all your pre-build steps to prep the build environment, restore packages, prep the Sonar scanner, etc.
             steps {
+                // Only allow a single instance of this build job (for a given branch) to run at a time
+                abortConcurrentBuilds()
                 // This makes the name of the build a bit more like what you may be used to in TFS
                 script {
                     currentBuild.displayName = new Date().format( "yyyy.MM.dd" ) + "." + "${BUILD_NUMBER}"
