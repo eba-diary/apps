@@ -766,6 +766,8 @@ namespace Sentry.data.Core
         {
             string storageCode = _datasetContext.GetNextStorageCDE().ToString();
             Dataset parentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
+            bool isHumanResources = (parentDataset.DatasetCategories.Any(w => w.AbbreviatedName == "HR")) ? true : false;           //Figure out if Category == HR
+
             FileSchema schema = new FileSchema()
             {
                 Name = dto.Name,
@@ -786,8 +788,8 @@ namespace Sentry.data.Core
                 LastUpdatedDTM = DateTime.Now,
                 DeleteIssueDTM = DateTime.MaxValue,
                 CreateCurrentView = dto.CreateCurrentView,
-                SnowflakeDatabase = GenerateSnowflakeDatabaseName(),
-                SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First()),
+                SnowflakeDatabase = GenerateSnowflakeDatabaseName(isHumanResources),
+                SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources),
                 SnowflakeTable = FormateSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormateSnowflakeTableNamePart(dto.Name),
                 SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                 CLA1396_NewEtlColumns = dto.CLA1396_NewEtlColumns,
@@ -1071,16 +1073,16 @@ namespace Sentry.data.Core
             return (curEnv == "prod" || curEnv == "qual") ? dbName : $"{curEnv}_{dbName}";
         }
 
-        private string GenerateSnowflakeDatabaseName()
+        private string GenerateSnowflakeDatabaseName(bool isHumanResources)
         {
-            string curEnv = Config.GetDefaultEnvironmentName().ToUpper();
-            string dbName = "DATA_" + curEnv;
+            string dbName = (isHumanResources)? "DATA_HR_" : "DATA_";
+            dbName += Config.GetDefaultEnvironmentName().ToUpper();
             return dbName;
         }
 
-        private string GenerateSnowflakeSchema(Category cat)
+        private string GenerateSnowflakeSchema(Category cat, bool isHumanResources)
         {
-            return cat.Name.ToUpper();
+            return (isHumanResources)? "HR" : cat.Name.ToUpper();
         }
 
         private string FormateSnowflakeTableNamePart(string part)
