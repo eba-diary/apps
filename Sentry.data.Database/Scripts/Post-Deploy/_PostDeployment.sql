@@ -139,6 +139,7 @@ IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion)
 BEGIN TRY 
 
   --insert one off script files here
+  :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_05\Default_DatasetId_and_SchemaId_on_DataFlow.sql
   :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_05\Update_CLA3048_StandardizeOnUTCTime_FeatureFlag_Value.sql
   :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_05\HistoryFix_Populate_Dataset_NamedEnvironments.sql
 
@@ -160,6 +161,7 @@ BEGIN CATCH
 END CATCH 
 
 COMMIT TRAN
+
 
 
 
