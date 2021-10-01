@@ -23,9 +23,8 @@ namespace Sentry.data.Web
             //Used to differentiate between service and user accounts, user accounts will parse into a numeric value
             this.UploadUserName = int.TryParse(f.UploadUserName, out _) ? associateInfoService.GetAssociateInfo(f.UploadUserName).FullName : f.UploadUserName;
 
-            //this.ModifiedDTM = (dataFeatures.CLA3048_StandardizeOnUTCTime.GetValue()) ? f.ModifiedDTM.ToLocalTime() : f.ModifiedDTM;
-            this.ModifiedDtm = new DateTime(f.ModifiedDTM.Ticks, DateTimeKind.Utc);
-            this.CreateDtm = (dataFeatures.CLA3048_StandardizeOnUTCTime.GetValue()) ? f.CreateDTM.ToLocalTime() : f.CreateDTM;
+            this.ModifiedDtm = (dataFeatures.CLA3048_StandardizeOnUTCTime.GetValue()) ? DateTime.SpecifyKind(f.ModifiedDTM, DateTimeKind.Utc) : f.ModifiedDTM;
+            this.CreateDtm = DateTime.SpecifyKind(f.CreateDTM, DateTimeKind.Utc);
             this.S3Key = f.FileLocation;
             this.ConfigFileName = f.DatasetFileConfig.Name;
             this.ConfigFileDesc = f.DatasetFileConfig.Description;
