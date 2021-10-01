@@ -1151,13 +1151,24 @@ namespace Sentry.data.Core
             return jobTuple;
         }
 
+        /// <summary>
+        /// Finds Schema Flow metadata associated with the provided <see cref="DatasetFileConfig"/>.
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Schema Flows will stop being created as seperate flows as part of CLA-3332. However, this
+        /// code is still needed for existing data flows - until they're converted.
+        /// </remarks>
         public Tuple<DataFlowDetailDto, List<RetrieverJob>> GetDataFlowForSchema(DatasetFileConfig config)
         {
             
             ///Determine all SchemaMap steps which reference this schema
-            SchemaMap schemaMap = _datasetContext.SchemaMap.FirstOrDefault(w => w.MappedSchema == config.Schema && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaLoad && w.DataFlowStepId.DataFlow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
+            SchemaMap schemaMap = _datasetContext.SchemaMap.FirstOrDefault(w => w.MappedSchema == config.Schema 
+                                                                && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaLoad 
+                                                                && w.DataFlowStepId.DataFlow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active
+                                                                && w.DataFlowStepId.DataFlow.SchemaId == 0);
             DataFlowDetailDto dfDto = (schemaMap != null) ? _dataFlowService.GetDataFlowDetailDto(schemaMap.DataFlowStepId.DataFlow.Id) : null;
-            //DataFlowDetailDto dfDto = _dataFlowService.GetDataFlowDetailDto(schemaMap.DataFlowStepId.DataFlow.Id);
 
             List<RetrieverJob> rjList = new List<RetrieverJob>();
             if (dfDto != null)
@@ -1188,6 +1199,23 @@ namespace Sentry.data.Core
                 }
                 externalJobList.Add(new Tuple<DataFlowDetailDto, List<RetrieverJob>>(dfDto, rjList));
             }
+
+            if (_featureFlags.CLA3332_ConsolidatedDataFlows.GetValue())
+            {
+                //Get DataFlow id which populates data to schema
+                int schemaDataFlowId = _datasetContext.DataFlow.Where(w => w.SchemaId == config.Schema.SchemaId).Select(s => s.Id).FirstOrDefault();
+                if (schemaDataFlowId != 0)
+                {
+                    DataFlowDetailDto schemaFlowDto = _dataFlowService.GetDataFlowDetailDto(schemaDataFlowId);
+                    List<RetrieverJob> schemaFlowRetrieverJobList = new List<RetrieverJob>();
+                    if (schemaFlowDto != null)
+                    {
+                        schemaFlowRetrieverJobList.AddRange(_datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == schemaDataFlowId).ToList());
+                    }
+                    externalJobList.Add(new Tuple<DataFlowDetailDto, List<RetrieverJob>>(schemaFlowDto, schemaFlowRetrieverJobList));
+                }
+            }
+
             return externalJobList;
         }
 

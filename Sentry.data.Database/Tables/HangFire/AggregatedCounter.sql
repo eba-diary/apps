@@ -1,14 +1,12 @@
-﻿CREATE TABLE [HangFire].[AggregatedCounter] (
-    [Id]       INT            IDENTITY (1, 1) NOT NULL,
+﻿CREATE TABLE [HangFire7].[AggregatedCounter] (
     [Key]      NVARCHAR (100) NOT NULL,
     [Value]    BIGINT         NOT NULL,
     [ExpireAt] DATETIME       NULL,
-    CONSTRAINT [PK_HangFire_CounterAggregated] PRIMARY KEY CLUSTERED ([Id] ASC)
+    CONSTRAINT [PK_HangFire_CounterAggregated] PRIMARY KEY CLUSTERED ([Key] ASC)
 );
 
 
 GO
-CREATE UNIQUE NONCLUSTERED INDEX [UX_HangFire_CounterAggregated_Key]
-    ON [HangFire].[AggregatedCounter]([Key] ASC)
-    INCLUDE([Value]);
+CREATE NONCLUSTERED INDEX [IX_HangFire_AggregatedCounter_ExpireAt]
+    ON [HangFire7].[AggregatedCounter]([ExpireAt] ASC) WHERE ([ExpireAt] IS NOT NULL);
 

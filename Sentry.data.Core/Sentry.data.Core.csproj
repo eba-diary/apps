@@ -235,7 +235,7 @@
     <Compile Include="Extensions\DatasetFileConfigExtensions.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DataSourceQueryExtensions.cs" />
-    <Compile Include="Extensions\ProducerS3DropActionQueryExtensions.cs" />
+    <Compile Include="Extensions\DataActionQueryExtensions.cs" />
     <Compile Include="Extensions\SchemaExtensions.cs" />
     <Compile Include="Factories\Fields\DateFieldDtoFactory.cs" />
     <Compile Include="Factories\Fields\DecimalFieldDtoFactory.cs" />
