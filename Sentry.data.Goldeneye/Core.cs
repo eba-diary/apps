@@ -20,13 +20,9 @@ namespace Sentry.data.Goldeneye
 
         private CancellationTokenSource _tokenSource;
         private CancellationToken _token;
-        private IContainer _container;
-        private IDatasetContext _requestContext;
-        private ITicketMonitorService _ticketMonitorService;
         private Scheduler _backgroundJobServer;
         private List<RunningTask> currentTasks = new List<RunningTask>();
         private Configuration _config;
-        private IDataFeatures _dataFeatures;
 
         /// <summary>
         /// Start the core worker
@@ -122,50 +118,31 @@ namespace Sentry.data.Goldeneye
 
             Boolean firstRun = true;
             do
-            {
-                using (_container = Bootstrapper.Container.GetNestedContainer())
+            {             
+
+                if (firstRun)
                 {
-                    _dataFeatures = _container.GetInstance<IDataFeatures>();
+                    InitializeHangFireServer();
+                    InitializeStandardHangfireJobs();
+                    InitializeRetrieverJobsInHangFire();
+                    InitializeEventProcessor();
+                }
 
-                    //THIS IS A BANDAID.  No copyright intended.
-                    Boolean complete = false;
-                    while (!complete)
-                    {
-                        try
-                        {
-                            _requestContext = _container.GetInstance<IDatasetContext>();
-                            _ticketMonitorService = _container.GetInstance<ITicketMonitorService>();
-                            complete = true;
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Error("Cannot Get Instance of IRequestContext", ex);
-                            System.Threading.Thread.Sleep(100);
-                        }
-                    }
+                //Run All the Processes that MUST BE run once per SECOND
+                if ((DateTime.Now - _config.LastRunSecond).TotalSeconds >= 1 || firstRun)
+                {
+                    RunSecondlyProcessing();
+                }
 
-                    if (firstRun)
-                    {
-                        InitializeHangFireServer();
-                        InitializeStandardHangfireJobs();
-                        InitializeRetrieverJobsInHangFire();
-                        InitializeEventProcessor();
-                    }
-
-                    //Run All the Processes that MUST BE run once per SECOND
-                    if ((DateTime.Now - _config.LastRunSecond).TotalSeconds >= 1 || firstRun)
-                    {
-                        RunSecondlyProcessing();
-                    }
-
-                    //Run All the Processes that MUST BE run once per MINUTE
-                    if ((DateTime.Now - _config.LastRunMinute).TotalMinutes >= 1 || firstRun)
-                    {
-                        RunMinutelyProcessing(firstRun);
-                    }
+                //Run All the Processes that MUST BE run once per MINUTE
+                if ((DateTime.Now - _config.LastRunMinute).TotalMinutes >= 1 || firstRun)
+                {
+                    RunMinutelyProcessing();
                 }
 
                 firstRun = false;
+
+                Thread.Sleep(100);
 
             } while (!_token.IsCancellationRequested);
 
@@ -177,53 +154,58 @@ namespace Sentry.data.Goldeneye
             Logger.Info("Worker task stopped.");
         }
 
-        private void RunMinutelyProcessing(bool firstRun)
+        private void RunMinutelyProcessing()
         {
-            //TODO: CLA-2888 - Add ObjectStatus filtering logic
-            //Reload and modifed\new jobs
-            List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled && (w.Created > _config.LastRunMinute.AddSeconds(-5) || w.Modified > _config.LastRunMinute.AddSeconds(-5))).ToList();
-
-            foreach (RetrieverJob Job in JobList)
+            using (IContainer container = Bootstrapper.Container.GetNestedContainer())
             {
-                // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
-                RecurringJob.AddOrUpdate<RetrieverJobService>($"{Job.JobName()}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                Job.JobLoggerMessage("Info", "Job update detected, performing AddOrUpdate to Hangfire");
-            }
+                IDatasetContext requestContext = container.GetInstance<IDatasetContext>();
 
+                //TODO: CLA-2888 - Add ObjectStatus filtering logic
+                //Reload and modifed\new jobs
+                List<RetrieverJob> JobList = requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled && (w.Created > _config.LastRunMinute.AddSeconds(-5) || w.Modified > _config.LastRunMinute.AddSeconds(-5))).ToList();
 
-            if (JobList.Count > 0)
-            {
-                string jobIds = null;
-                int cnt = 0;
-                foreach (RetrieverJob a in JobList)
+                foreach (RetrieverJob Job in JobList)
                 {
-                    if (cnt > 0)
-                    {
-                        jobIds += " | " + a.Id.ToString();
-                    }
-                    else
-                    {
-                        jobIds += a.Id.ToString();
-                    }
-                    cnt++;
+                    // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
+                    RecurringJob.AddOrUpdate<RetrieverJobService>($"{Job.JobName()}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                    Job.JobLoggerMessage("Info", "Job update detected, performing AddOrUpdate to Hangfire");
                 }
 
-                Console.WriteLine($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
-                Logger.Info($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
+
+                if (JobList.Count > 0)
+                {
+                    string jobIds = null;
+                    int cnt = 0;
+                    foreach (RetrieverJob a in JobList)
+                    {
+                        if (cnt > 0)
+                        {
+                            jobIds += " | " + a.Id.ToString();
+                        }
+                        else
+                        {
+                            jobIds += a.Id.ToString();
+                        }
+                        cnt++;
+                    }
+
+                    Console.WriteLine($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
+                    Logger.Info($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
+                }
+
+                //TODO: CLA-2888 - Add ObjectStatus filtering logic
+                //Remove disabled jobs, non-instant jobs
+                List<RetrieverJob> DisabledJobList = requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled && (w.Created > _config.LastRunMinute.AddSeconds(-5) || w.Modified > _config.LastRunMinute.AddSeconds(-5))).ToList();
+
+                foreach (RetrieverJob Job in DisabledJobList)
+                {
+                    // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
+                    RecurringJob.RemoveIfExists($"{Job.JobName()}");
+                    Job.JobLoggerMessage("Info", "Job update detected, performing RemoveIfExists from Hangfire");
+                }
+
+                _config.LastRunMinute = DateTime.Now;
             }
-
-            //TODO: CLA-2888 - Add ObjectStatus filtering logic
-            //Remove disabled jobs, non-instant jobs
-            List<RetrieverJob> DisabledJobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled && (w.Created > _config.LastRunMinute.AddSeconds(-5) || w.Modified > _config.LastRunMinute.AddSeconds(-5))).ToList();
-
-            foreach (RetrieverJob Job in DisabledJobList)
-            {
-                // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
-                RecurringJob.RemoveIfExists($"{Job.JobName()}");
-                Job.JobLoggerMessage("Info", "Job update detected, performing RemoveIfExists from Hangfire");
-            }
-
-            _config.LastRunMinute = DateTime.Now;
         }
 
         private void RunSecondlyProcessing()
@@ -251,36 +233,43 @@ namespace Sentry.data.Goldeneye
 
         private void InitializeRetrieverJobsInHangFire()
         {
-            //Load all scheduled and enabled jobs into hangfire on startup to ensure all jobs are registered
-            List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled).ToList();
+            
 
-            foreach (RetrieverJob Job in JobList)
+            using (IContainer container = Bootstrapper.Container.GetNestedContainer())
             {
-                try
-                {
-                    // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
-                    RecurringJob.AddOrUpdate<RetrieverJobService>($"{Job.JobName()}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                    Job.JobLoggerMessage("Info", "Goldeneye initialization, performing AddOrUpdate to Hangfire");
-                }
-                catch (Exception ex)
-                {
-                    Job.JobLoggerMessage("Error", "Failed to AddOrUpdate job on Goldeneye initialization", ex);
-                }
-            }
+                IDatasetContext requestContext = container.GetInstance<IDatasetContext>();
 
-            //Remove all jobs that are marked as disabled
-            List<RetrieverJob> DisabledJobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled).ToList();
+                //Load all scheduled and enabled jobs into hangfire on startup to ensure all jobs are registered
+                List<RetrieverJob> JobList = requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled).ToList();
 
-            foreach (RetrieverJob Job in DisabledJobList)
-            {
-                try
+                foreach (RetrieverJob Job in JobList)
                 {
-                    RecurringJob.RemoveIfExists($"{Job.JobName()}");
-                    Job.JobLoggerMessage("Info", "Marked as disabled, performing RemoveIfExists from Hangfire");
+                    try
+                    {
+                        // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
+                        RecurringJob.AddOrUpdate<RetrieverJobService>($"{Job.JobName()}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                        Job.JobLoggerMessage("Info", "Goldeneye initialization, performing AddOrUpdate to Hangfire");
+                    }
+                    catch (Exception ex)
+                    {
+                        Job.JobLoggerMessage("Error", "Failed to AddOrUpdate job on Goldeneye initialization", ex);
+                    }
                 }
-                catch (Exception ex)
+
+                //Remove all jobs that are marked as disabled
+                List<RetrieverJob> DisabledJobList = requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled).ToList();
+
+                foreach (RetrieverJob Job in DisabledJobList)
                 {
-                    Job.JobLoggerMessage("Error", "Failed to remove disabled job on Goldeneye initialization", ex);
+                    try
+                    {
+                        RecurringJob.RemoveIfExists($"{Job.JobName()}");
+                        Job.JobLoggerMessage("Info", "Marked as disabled, performing RemoveIfExists from Hangfire");
+                    }
+                    catch (Exception ex)
+                    {
+                        Job.JobLoggerMessage("Error", "Failed to remove disabled job on Goldeneye initialization", ex);
+                    }
                 }
             }
         }
@@ -300,8 +289,8 @@ namespace Sentry.data.Goldeneye
             RecurringJob.AddOrUpdate("LivyJobStateMonitor", () => RetrieverJobService.UpdateJobStatesAsync(), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
             //Schedule the Ticket Monitor to run based on cron within configuration file.
-            RecurringJob.AddOrUpdate("HPSMTicketMonitor", () => _ticketMonitorService.CheckTicketStatus(), Config.GetHostSetting("HpsmTicketMonitorTimeInterval"), TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-
+            RecurringJob.AddOrUpdate<TicketMonitorService>("HPSMTicketMonitor", x => x.CheckTicketStatus(), Config.GetHostSetting("HpsmTicketMonitorTimeInterval"), TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            
             //Schedule WallEService every day at midnight
             RecurringJob.AddOrUpdate("WallEService", () => WallEService.Run(), "00 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
         }
