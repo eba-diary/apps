@@ -45,8 +45,10 @@ namespace Sentry.data.Core
         /// <param name="idList">List of RetrieverJob identifiers</param>
         /// <param name="logicalDelete">Perform soft or hard delete</param>
         void DeleteJob(List<int> idList, bool logicalDelete = true);
+
         /// <summary>
-        /// 
+        /// Mark retriever job objectstatus based
+        /// on logicalDelete flag: true = "Pending Delete", false = "Deleted"
         /// </summary>
         /// <param name="id">RetrieverJob identifier</param>
         /// <param name="logicalDelete">Perform soft or hard delete</param>

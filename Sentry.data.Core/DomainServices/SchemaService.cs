@@ -1,18 +1,16 @@
-﻿using Sentry.Common.Logging;
-using Sentry.data.Core.Exceptions;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Sentry.Common.Logging;
 using Sentry.Configuration;
+using Sentry.Core;
+using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
-using Sentry.Core;
-using System.Text.RegularExpressions;
-using StructureMap;
-using System.Data.Odbc;
-using Newtonsoft.Json.Linq;
 using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Sentry.data.Core
 {
@@ -24,7 +22,7 @@ namespace Sentry.data.Core
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
         private readonly ISecurityService _securityService;
-        private readonly IDataFeatures _featureFlags;
+        private readonly IDataFeatures _dataFeatures;
         private readonly IMessagePublisher _messagePublisher;
         private readonly ISnowProvider _snowProvider;
         private string _bucket;
@@ -39,7 +37,7 @@ namespace Sentry.data.Core
             _dataFlowService = dataFlowService;
             _jobService = jobService;
             _securityService = securityService;
-            _featureFlags = dataFeatures;
+            _dataFeatures = dataFeatures;
             _messagePublisher = messagePublisher;
             _snowProvider = snowProvider;
 
@@ -64,7 +62,10 @@ namespace Sentry.data.Core
             {
                 newSchema = CreateSchema(schemaDto);
 
-                _dataFlowService.CreateDataFlowForSchema(newSchema);
+                if (!_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
+                {
+                    _dataFlowService.CreateDataFlowForSchema(newSchema);
+                }
 
                 _datasetContext.SaveChanges();
             }
@@ -576,6 +577,16 @@ namespace Sentry.data.Core
         {
             List<DatasetFile> fileList = _datasetContext.DatasetFile.Where(w => w.Schema.SchemaId == schemaId).ToList();
             return fileList;
+        }
+        
+        public IDictionary<int, string> GetSchemaList()
+        {
+            IDictionary<int, string> schemaList = _datasetContext.Schema
+                .Where(w => w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active)
+                .Select(s => new { s.SchemaId, s.Name })
+                .ToDictionary(d => d.SchemaId, d => d.Name);
+
+            return schemaList;
         }
 
         public DatasetFile GetLatestDatasetFileBySchema(int schemaId)

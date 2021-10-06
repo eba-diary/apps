@@ -15,5 +15,7 @@ namespace Sentry.data.Core
         public virtual Guid JobGuid { get; set; }
         public virtual string Serialized_Job_Options { get; set; }
         public virtual DateTime Created { get; set; }
+        public virtual string FlowExecutionGuid { get; set; }
+        public virtual string RunInstanceGuid { get; set; }
     }
 }

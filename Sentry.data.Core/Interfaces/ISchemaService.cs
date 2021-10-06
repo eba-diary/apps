@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using Sentry.Core;
 using Sentry.data.Core.Exceptions;
+using System;
+using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
@@ -96,5 +93,6 @@ namespace Sentry.data.Core
         /// <param name="schemaId"></param>
         /// <exception cref="ValidationException">Thrown when metadata does not adhere to validations</exception>
         void Validate(int schemaId, List<BaseFieldDto> fieldDtoList);
+        IDictionary<int, string> GetSchemaList();
     }
 }

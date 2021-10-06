@@ -129,6 +129,7 @@
     <Compile Include="DTO\DataProcessing\DataFlowDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowStepDto.cs" />
+    <Compile Include="DTO\DataProcessing\NamedEnvironmentDto.cs" />
     <Compile Include="DTO\DataProcessing\SchemaMapDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\SchemaMapDto.cs" />
     <Compile Include="DTO\Dataset\DatasetSummaryMetadataDTO.cs" />
@@ -225,6 +226,7 @@
     <Compile Include="Exceptions\KafkaProducerException.cs" />
     <Compile Include="Exceptions\RetrieverJobProcessingException.cs" />
     <Compile Include="Exceptions\SASNotificationNotSentException.cs" />
+    <Compile Include="Exceptions\SchemaInUseException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaConversionException.cs" />
     <Compile Include="Exceptions\SchemaUnauthorizedAccessException.cs" />
@@ -233,6 +235,7 @@
     <Compile Include="Extensions\DatasetFileConfigExtensions.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DataSourceQueryExtensions.cs" />
+    <Compile Include="Extensions\ProducerS3DropActionQueryExtensions.cs" />
     <Compile Include="Extensions\SchemaExtensions.cs" />
     <Compile Include="Factories\Fields\DateFieldDtoFactory.cs" />
     <Compile Include="Factories\Fields\DecimalFieldDtoFactory.cs" />
@@ -245,6 +248,7 @@
     <Compile Include="GlobalEnums\DaleDestiny.cs" />
     <Compile Include="GlobalEnums\DaleSensitive.cs" />
     <Compile Include="GlobalEnums\DataFlowPreProcessingTypes.cs" />
+    <Compile Include="GlobalEnums\NamedEnvironmentType.cs" />
     <Compile Include="GlobalEnums\HttpDataFormat.cs" />
     <Compile Include="GlobalEnums\HTTPMethods.cs" />
     <Compile Include="GlobalEnums\IngestionType.cs" />
@@ -284,6 +288,7 @@
     <Compile Include="Interfaces\IDataFeatures.cs" />
     <Compile Include="Interfaces\IHttpClientProvider.cs" />
     <Compile Include="Interfaces\IPollyPolicy.cs" />
+    <Compile Include="Interfaces\IQuartermasterRestClient.cs" />
     <Compile Include="Interfaces\IRetrieverJobService.cs" />
     <Compile Include="Interfaces\IHiveOdbcProvider.cs" />
     <Compile Include="Interfaces\ISAIDRestClient.cs" />

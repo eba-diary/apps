@@ -1,13 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Sentry.Common.Logging;
+using Sentry.Core;
+using Sentry.data.Core.Entities.S3;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
-using System.Text;
-using Newtonsoft.Json;
-using Sentry.Common.Logging;
-using Sentry.Core;
-using Sentry.data.Core.Entities.S3;
 
 namespace Sentry.data.Core
 {
@@ -112,6 +111,16 @@ namespace Sentry.data.Core
                 dtoList.Add(dto);
             }
             return dtoList;
+        } 
+
+        public IDictionary<int, string> GetDatasetList()
+        {
+            IDictionary<int, string> datasetList = _datasetContext.Datasets
+                .Where(w => w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active)
+                .Select(s => new { s.DatasetId, s.DatasetName })
+                .ToDictionary(d => d.DatasetId, d => d.DatasetName);
+
+            return datasetList;
         }
 
         public UserSecurity GetUserSecurityForDataset(int datasetId)

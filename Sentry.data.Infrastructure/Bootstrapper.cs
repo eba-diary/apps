@@ -81,7 +81,8 @@ namespace Sentry.data.Infrastructure
 
             //Repeat the following line once per database / domain context
             registry.For<IDataAssetContext>().Use(() => new DataAssetContext(_defaultSessionFactory.OpenSession()));
-            registry.For<IDatasetContext>().Use(() => new DatasetContext(_defaultSessionFactory.OpenSession()));
+            registry.For<IDatasetContext>().Use((x) => new DatasetContext(_defaultSessionFactory.OpenSession(), x.GetInstance<Lazy<IDataFeatures>>(), x.GetInstance<Lazy<UserService>>() ));
+
             registry.For<IDataFeedContext>().Use(() => new DataFeedProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IMetadataRepositoryProvider>().Use(() => new MetadataRepositoryProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IODCFileProvider>().Use(() => new ODCFileProvider(_defaultSessionFactory.OpenSession()));
@@ -125,13 +126,19 @@ namespace Sentry.data.Infrastructure
             registry.For<RestSharp.IRestClient>().Use(() => new RestSharp.RestClient()).AlwaysUnique();
 
             //establish generic httpclient singleton to be used where needed across the application
-            var client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true });
+            var client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
             registry.For<HttpClient>().Use(client);
 
             //establish IAssetClient using generic httpClient singleton
             registry.For<IAssetClient>().Singleton().Use<SAIDRestClient.AssetClient>().
                 Ctor<HttpClient>().Is(client).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("SaidAssetBaseUrl"));
+
+            //register Quartermaster client
+            var qClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
+            registry.For<Sentry.data.Core.Interfaces.QuartermasterRestClient.IClient>().Singleton().Use<QuartermasterRestClient.Client>().
+                Ctor<HttpClient>().Is(qClient).
+                SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("QuartermasterServiceBaseUrl"));
 
             //establish Polly Policy registry
             PolicyRegistry pollyRegistry = new PolicyRegistry();

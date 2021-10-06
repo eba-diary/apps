@@ -6,7 +6,7 @@ namespace Sentry.data.Core.GlobalEnums
     {
         [Description("User Push")]
         User_Push = 1,
-        [Description("UDSC Pull")]
+        [Description("DSC Pull")]
         DSC_Pull = 2
     }
 }

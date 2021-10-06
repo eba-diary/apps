@@ -273,8 +273,10 @@ namespace Sentry.data.Core
 
                 if (logicalDelete)
                 {
+                    //Remove job from HangFire scheduler
                     DeleteJobFromScheduler(job);
 
+                    //Mark job for deletion
                     job.IsEnabled = false;
                     job.Modified = DateTime.Now;
                     job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
@@ -283,9 +285,15 @@ namespace Sentry.data.Core
                 }
                 else
                 {
+                    //Remove job from HangFire scheduler
+                    DeleteJobFromScheduler(job);
+
+                    //Remove any associated DFS drop location
                     DeleteDFSDropLocation(job);
 
+                    //Mark job as deleted
                     job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
+                    job.IsEnabled = false;
                 }
             }
             catch (Exception ex)
@@ -298,15 +306,18 @@ namespace Sentry.data.Core
 
         public List<RetrieverJob> GetDfsRetrieverJobs()
         {
-            List<RetrieverJob> jobs;
-            jobs = _datasetContext.RetrieverJob.WhereActive().FetchAllConfiguration(_datasetContext).ToList();
+            try
+            {
+                List<RetrieverJob> jobs;
+                jobs = _datasetContext.RetrieverJob.WhereActive().FetchAllConfiguration(_datasetContext).ToList();
 
-            //var dataflows = _datasetContext.DataFlow.Where(df => jobQueryable.Any(a => df.Id == a.DataFlow.Id));
-
-            //var tree = jobQueryable.FetchAllConfiguration()
-
-
-            return jobs.Where(x => x.DataSource.Is<DfsDataFlowBasic>()).ToList();
+                return jobs.Where(x => x.DataSource.Is<DfsDataFlowBasic>()).ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("<jobservice-getdfsretrieverjobs> Failed retrieving job list", ex);
+                throw;
+            }
         }
 
 
@@ -378,15 +389,15 @@ namespace Sentry.data.Core
             jobOptions.OverwriteDataFile = false;
             jobOptions.SearchCriteria = dto.SearchCriteria;
             jobOptions.CreateCurrentFile = dto.CreateCurrentFile;
-            jobOptions.FtpPattern = dto.FtpPatrn;
+            jobOptions.FtpPattern = dto.FtpPattern?? FtpPattern.NoPattern;
             jobOptions.TargetFileName = dto.TargetFileName;
         }
 
         private void MaptToHttpsOptions(RetrieverJobDto dto, HttpsOptions httpOptions)
         {
             httpOptions.Body = dto.HttpRequestBody;
-            httpOptions.RequestMethod = dto.RequestMethod;
-            httpOptions.RequestDataFormat = dto.RequestDataFormat;
+            httpOptions.RequestMethod = dto.RequestMethod?? HttpMethods.none;
+            httpOptions.RequestDataFormat = dto.RequestDataFormat?? HttpDataFormat.none;
         }
 
         private void MapToRetrieverJob(RetrieverJobDto dto, RetrieverJob job)

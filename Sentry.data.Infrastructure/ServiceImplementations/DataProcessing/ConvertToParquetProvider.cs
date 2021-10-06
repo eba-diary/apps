@@ -194,7 +194,7 @@ namespace Sentry.data.Infrastructure
                     ActionGuid = step.Action.ActionGuid.ToString(),
                     SourceBucket = keyBucket,
                     SourceKey = objectKey,
-                    StepTargetBucket = step.Action.TargetStorageBucket,
+                    StepTargetBucket = step.TargetBucket,
                     StepTargetPrefix = step.TargetPrefix + $"{flowGuidDTM.Year.ToString()}/{flowGuidDTM.Month.ToString()}/{flowGuidDTM.Day.ToString()}/",
                     EventType = GlobalConstants.DataFlowStepEvent.CONVERT_TO_PARQUET_START,
                     FileSize = s3Event.s3.Object.size.ToString(),
