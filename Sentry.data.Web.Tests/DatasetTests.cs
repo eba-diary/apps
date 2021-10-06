@@ -17,7 +17,7 @@ namespace Sentry.data.Web.Tests
             Dataset dataset1 = MockClasses.MockDataset();
             dataset1.DatasetCategories = null;
             var vr = dataset1.ValidateForSave();
-            Assert.IsTrue(vr.Contains(GlobalConstants.ValidationErrors.CATEGORY_IS_BLANK));
+            Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.datasetCategoryRequired));
         }
 
         [TestCategory("Dataset")]
@@ -28,7 +28,7 @@ namespace Sentry.data.Web.Tests
             Dataset dataset1 = MockClasses.MockDataset();
             dataset1.DatasetDesc = "";
             var vr = dataset1.ValidateForSave();
-            Assert.IsTrue(vr.Contains(GlobalConstants.ValidationErrors.DATASET_DESC_IS_BLANK));
+            Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.datasetDescriptionRequired));
         }
 
         [TestCategory("Dataset")]
@@ -48,7 +48,7 @@ namespace Sentry.data.Web.Tests
             Dataset dataset1 = MockClasses.MockDataset();
             dataset1.CreationUserName = null;
             var vr = dataset1.ValidateForSave();
-            Assert.IsTrue(vr.Contains(GlobalConstants.ValidationErrors.CREATION_USER_NAME_IS_BLANK));
+            Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.datasetCreatedByRequired));
         }
 
         [TestCategory("Dataset")]
@@ -58,7 +58,7 @@ namespace Sentry.data.Web.Tests
             Dataset dataset1 = MockClasses.MockDataset();
             dataset1.UploadUserName = null;
             var vr = dataset1.ValidateForSave();
-            Assert.IsTrue(vr.Contains(GlobalConstants.ValidationErrors.UPLOAD_USER_NAME_IS_BLANK));
+            Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.datasetUploadedByRequired));
         }
 
         [TestCategory("Dataset")]
@@ -68,7 +68,7 @@ namespace Sentry.data.Web.Tests
             Dataset dataset1 = MockClasses.MockDataset();
             dataset1.DatasetDtm = new DateTime(1799, 1, 1);
             var vr = dataset1.ValidateForSave();
-            Assert.IsTrue(vr.Contains(GlobalConstants.ValidationErrors.DATASET_DATE_IS_OLD));
+            Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.datasetDateRequired));
         }
 
         [TestMethod]

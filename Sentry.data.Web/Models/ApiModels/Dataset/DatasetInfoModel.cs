@@ -1,4 +1,8 @@
-﻿namespace Sentry.data.Web.Models.ApiModels.Dataset
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Sentry.data.Core.GlobalEnums;
+
+namespace Sentry.data.Web.Models.ApiModels.Dataset
 {
     public class DatasetInfoModel
     {
@@ -12,5 +16,8 @@
         public string Category { get; set; }
         public string ObjectStatus { get; set; }
         public virtual string SAIDAssetKeyCode { get; set; }
+        public virtual string NamedEnvironment { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public virtual NamedEnvironmentType NamedEnvironmentType { get; set; }
     }
 }

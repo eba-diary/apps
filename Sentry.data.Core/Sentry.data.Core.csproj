@@ -114,6 +114,7 @@
     <Compile Include="DomainServices\JobService.cs" />
     <Compile Include="DomainServices\MessageHandlers\DataStepProcessorHandler.cs" />
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
+    <Compile Include="DomainServices\QuartermasterService.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
     <Compile Include="DTO\Dale\DaleAdvancedCriteriaDto.cs" />
@@ -289,6 +290,7 @@
     <Compile Include="Interfaces\IHttpClientProvider.cs" />
     <Compile Include="Interfaces\IPollyPolicy.cs" />
     <Compile Include="Interfaces\IQuartermasterRestClient.cs" />
+    <Compile Include="Interfaces\IQuartermasterService.cs" />
     <Compile Include="Interfaces\IRetrieverJobService.cs" />
     <Compile Include="Interfaces\IHiveOdbcProvider.cs" />
     <Compile Include="Interfaces\ISAIDRestClient.cs" />

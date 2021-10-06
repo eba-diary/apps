@@ -279,6 +279,7 @@
     <Build Include="Tables\HangFire\State.sql" />
     <Build Include="Tables\HangFire\Schema.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_05\Update_CLA3048_StandardizeOnUTCTime_FeatureFlag_Value.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_05\HistoryFix_Populate_Dataset_NamedEnvironments.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

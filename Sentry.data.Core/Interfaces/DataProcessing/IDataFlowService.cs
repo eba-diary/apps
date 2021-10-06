@@ -75,12 +75,5 @@ namespace Sentry.data.Core
         /// <returns></returns>
         RetrieverJobDto GetAssociatedRetrieverJobDto(int id);
         int UpdateandSaveDataFlow(DataFlowDto dfDto);
-
-        /// <summary>
-        /// Given a SAID asset key code, get all the named environments from Quartermaster
-        /// </summary>
-        /// <param name="saidAssetKeyCode">The four-character key code for an asset</param>
-        /// <returns>A list of NamedEnvironmentDto objects</returns>
-        Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsAsync(string saidAssetKeyCode);
     }
 }

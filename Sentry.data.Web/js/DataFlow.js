@@ -58,8 +58,8 @@
         });
 
         //When the SAID asset changes, reload the named environments dropdown
-        $("#SAIDAssetKeyCode").on('change', function () {
-            Sentry.InjectSpinner($("#namedEnvironmentSpinner"), 30);
+        $("div#DataFlowFormContainer #SAIDAssetKeyCode").on('change', function () {
+            Sentry.InjectSpinner($("div#DataFlowFormContainer #namedEnvironmentSpinner"), 30);
             data.DataFlow.populateNamedEnvironments();
         });
 
@@ -443,17 +443,17 @@
 
     initNamedEnvironmentEvents() {
         //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
-        $("select#NamedEnvironment").change(function () {
-            Sentry.InjectSpinner($("#namedEnvironmentTypeSpinner"), 30);
+        $("div#DataFlowFormContainer select#NamedEnvironment").change(function () {
+            Sentry.InjectSpinner($("div#DataFlowFormContainer #namedEnvironmentTypeSpinner"), 30);
             data.DataFlow.populateNamedEnvironments();
         });
     },
 
     populateNamedEnvironments() {
-        var assetKeyCode = $("#SAIDAssetKeyCode").val();
-        var selectedEnvironment = $("#NamedEnvironment").val();
+        var assetKeyCode = $("div#DataFlowFormContainer #SAIDAssetKeyCode").val();
+        var selectedEnvironment = $("div#DataFlowFormContainer #NamedEnvironment").val();
         $.get("/DataFlow/NamedEnvironment?assetKeyCode=" + assetKeyCode + "&namedEnvironment=" + selectedEnvironment, function (result) {
-            $('#NamedEnvironmentPartial').html(result);
+            $('div#DataFlowFormContainer #NamedEnvironmentPartial').html(result);
             data.DataFlow.initNamedEnvironmentEvents();
         });
     }

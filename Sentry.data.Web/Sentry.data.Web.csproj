@@ -370,6 +370,7 @@
     <AdditionalFiles Include="..\.sonarlint\data_data.sentry.com\CSharp\SonarLint.xml">
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
+    <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
     <Compile Include="Models\Dale\DaleAdvancedCriteriaModel.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
     <Compile Include="WebProxy\Win32Api.cs" />
@@ -1582,6 +1583,7 @@
     <Content Include="Views\Shared\Unauthorized.cshtml" />
     <Content Include="Views\DataFlow\_SchemaMapDetail.cshtml" />
     <Content Include="Views\DataFlow\_NamedEnvironment.cshtml" />
+    <Content Include="Views\Dataset\_NamedEnvironment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

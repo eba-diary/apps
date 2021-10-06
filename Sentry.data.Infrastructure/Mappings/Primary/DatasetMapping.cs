@@ -1,7 +1,9 @@
 ﻿using NHibernate;
 using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
+using NHibernate.Type;
 using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
 {
@@ -37,6 +39,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.DeleteIssuer, (m) => m.Column("DeleteIssuer"));
             this.Property((x) => x.DeleteIssueDTM, (m) => m.Column("DeleteIssueDTM"));
             this.Property((x) => x.SAIDAssetKeyCode, (m) => m.Column("SaidKeyCode"));
+            this.Property(x => x.NamedEnvironment);
+            this.Property(x => x.NamedEnvironmentType, attr => attr.Type<EnumStringType<NamedEnvironmentType>>());
 
             Property(x => x.Metadata, m =>
             {
