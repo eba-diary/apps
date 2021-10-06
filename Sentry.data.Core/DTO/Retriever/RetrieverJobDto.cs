@@ -22,14 +22,15 @@ namespace Sentry.data.Core
         public int FileSchema { get; set; }
         public int DatasetFileConfig { get; set; }
         public int DataFlow { get; set; }
-        public HttpMethods RequestMethod { get; set; }
-        public HttpDataFormat RequestDataFormat { get; set; }
-        public FtpPattern FtpPatrn { get; set; }
+        public HttpMethods? RequestMethod { get; set; }
+        public HttpDataFormat? RequestDataFormat { get; set; }
+        public FtpPattern? FtpPattern { get; set; }
 
 
         public bool IsCompressed { get; set; }
         public string CompressionType { get; set; }
         public List<string> FileNameExclusionList { get; set; }
+        public string ReadableSchedule { get; set; }
         public ObjectStatusEnum ObjectStatus { get; set; }
         public string DeleteIssuer { get; set; }
         public DateTime DeleteIssueDTM { get; set; }

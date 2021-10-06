@@ -726,6 +726,8 @@
     <Content Include="Content\toastr.css" />
     <Content Include="Content\toastr.min.css" />
     <Content Include="Images\BusinessAreaTiles\Meeting3.jpg" />
+    <Content Include="Images\Category\hr.png" />
+    <Content Include="Images\Category\hr.svg" />
     <Content Include="Images\Dale\DataInventoryHomePage.jpg" />
     <Content Include="Images\Dale\DataInventoryIcon.png" />
     <Content Include="Images\DataFlow\ConceptTeamwork1.jpg" />
@@ -1579,6 +1581,7 @@
     <Content Include="Scripts\quill\quill.snow.min.css.map" />
     <Content Include="Views\Shared\Unauthorized.cshtml" />
     <Content Include="Views\DataFlow\_SchemaMapDetail.cshtml" />
+    <Content Include="Views\DataFlow\_NamedEnvironment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

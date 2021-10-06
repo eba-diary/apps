@@ -186,7 +186,7 @@ namespace Sentry.data.Infrastructure
                     ActionGuid = step.Action.ActionGuid.ToString(),
                     SourceBucket = keyBucket,
                     SourceKey = objectKey,
-                    StepTargetBucket = step.Action.TargetStorageBucket,
+                    StepTargetBucket = step.TargetBucket,
                     //add run instance (separated by dash) if not null
                     StepTargetPrefix = (step.TargetPrefix == null) ? null : step.TargetPrefix + $"{flowExecutionGuid}{((runInstanceGuid == null) ? string.Empty : "-" + runInstanceGuid)}/",
                     EventType = GlobalConstants.DataFlowStepEvent.S3_DROP_START,

@@ -8,13 +8,9 @@
     {
         @Html.AntiForgeryToken()
 
+        @Html.HiddenFor(x => x.DataFlowId);
+        @Html.HiddenFor(x => x.StorageCode);
 
-        @*<div class="form-group">
-                <div>
-                    <input type="submit" value="Submit" class="btn btn-primary" />
-                    <a id="CancelButton" class="btn btn-warning" href="">Cancel</a>
-                </div>
-            </div>*@
         <div id="dataflow-home-wrapper" class="col-md-12 col-lg-12">
             <div class="dataflow-home-photo bg-photo-dataflow ic">
                 <span>Do you have data that you want to use and share with others? <br /> We can help. First, you'll need to tell us about your data.</span>
@@ -27,15 +23,12 @@
         </div>
         <div class="form-group col-md-12">
             <br />
-            @*@Html.LabelFor(model => model.IngestionType, htmlAttributes: new { @class = "control-label col-md-2" })*@
-            <div class="col-md-5"><h4>How Will The Data be Sent to Us?</h4>    </div>
+            <div class="col-md-5"><h4>How will the data be sent to us?</h4>    </div>
             <div class="col-md-4" data-toggle="tooltip" data-placement="right" title="Will your process send a file to DSC (User_Push)? Or will DSC need to pick up the file from an external location (DSC_Pull)?">
-                @*@Html.EditorFor(m => m.IngestionType)*@
-                @Html.EnumDropDownListFor(
-                    x => x.IngestionType,
-                    "Select Ingestion Type",
+                @Html.DropDownListFor(
+                    x => x.IngestionTypeSelection,
+                    Model.IngestionTypeDropDown,
                     new { @class = "selectpicker" })
-                @*@Html.RadioButtonFor(model => model.IngestionType, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })*@
             </div>
         </div>
         <div class="namePanel" style="display:none;">
@@ -47,11 +40,15 @@
                             x.SAIDAssetKeyCode,
                             Model.SAIDAssetDropDown,
                             new { @class = "selectpicker-filtering" })
+                        @Html.ValidationMessageFor(model => Model.SAIDAssetKeyCode, "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>
+            <div id="NamedEnvironmentPartial">
+                @Html.Partial("_NamedEnvironment", Model)
+            </div>
             <div class="form-group col-md-12">
-                <div class="col-md-5"><h4>What Would You Like to Name This Data Flow?</h4></div>
+                <div class="col-md-5"><h4>What would you like to name this Data Flow?</h4></div>
                 <div class="col-md-4">
                     @Html.TextBoxFor((m) => m.Name, Model.Name, new { @class = "form-control edit-dataset-row" })
                     @Html.ValidationMessageFor(model => Model.Name, "", new { @class = "text-danger" })
@@ -60,9 +57,8 @@
         </div>
         <br />
         <div class="compressionPanel" style="display:none;">
-            @*@Html.HiddenFor(model => model.IsCompressed)*@
             <div class="form-group col-md-12">
-                <div class="col-md-5"><h4>Is Your Incoming Data Compressed?</h4></div>
+                <div class="col-md-5"><h4>Is Your incoming data compressed?</h4></div>
                 <div class="col-md-1" data-toggle="tooltip" data-placement="right" title="Yes, if the file ends in .zip or .gzip.">
                     @Html.DropDownListFor((m) => m.IsCompressed, Model.CompressionDropdown, new { @class = "form-control edit-dataset-row selectpicker" })
                 </div>
@@ -84,14 +80,13 @@
         <br />
         <div class="form-group col-md-12 retrieverPanel" style="display:none">
             <div id="retrieverJobPanel">
-                @*<div id="retrieverPanelSpinner"></div>*@
                 @Html.EditorFor(model => Model.RetrieverJob)
             </div>
         </div>
         <br />
         <div class="preProcessingPanel" style="display:none;">
             <div class="form-group col-md-12">
-                <div class="col-md-5"><h4>Does Your Data Require Preprocessing?</h4></div>
+                <div class="col-md-5"><h4>Does your data require Preprocessing?</h4></div>
                 <div class="col-md-1" data-toggle="tooltip" data-placement="right" title="Yes, if the file has a unique delimiter ( ex. ||, ^ ), a non-standard file encoding (ex. combine 1252 and UTF-8), or a heavily nested .json layout.">
                     @Html.DropDownListFor((m) => m.IsPreProcessingRequired, Model.PreProcessingRequiredDropdown, new { @class = "form-control edit-dataset-row selectpicker" })
                 </div>
@@ -99,15 +94,21 @@
             <div class="form-group col-md-12 preProcessingJobPanel" style="display:none;">
                 @* PreProcessing Options *@
                 <div class="form-group">
-                    @Html.LabelFor((model) => model.PreprocessingOptions, new { @class = "control-label col-md-5" })
+                    @Html.LabelFor((model) => model.PreProcessingSelection, new { @class = "control-label col-md-5" })
+                    @*<div class="col-md-4">
+                            <select id="PreprocessingOptions" name="PreprocessingOptions" class="form-control edit-dataset-row" style="width:100%">
+                                @foreach (var item in Model.PreProcessingOptionsDropdown)
+                                {
+                                    <option selected="@item.Selected" value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                            @Html.ValidationMessageFor((model) => model.PreprocessingOptions, "", new { @class = "text-danger" })
+                        </div>*@
                     <div class="col-md-4">
-                        <select id="PreprocessingOptions" name="PreprocessingOptions" class="form-control edit-dataset-row" style="width:100%">
-                            @foreach (var item in Model.PreProcessingOptionsDropdown)
-                            {
-                                <option selected="@item.Selected" value="@item.Value">@item.Text</option>
-                            }
-                        </select>
-                        @Html.ValidationMessageFor((model) => model.PreprocessingOptions, "", new { @class = "text-danger" })
+                        @Html.DropDownListFor(
+                            x => x.PreProcessingSelection,
+                            Model.PreProcessingOptionsDropdown,
+                            new { @class = "selectpicker" })
                     </div>
                 </div>
             </div>
@@ -115,49 +116,16 @@
         <br />
         <div class="schemaMapPanel" style="display:none;">
             <div class="form-group col-md-12">
-                <div class="col-md-5"><h4>Where Do You Want The Data to Go?</h4></div>
-                @*@Html.LabelFor(model => model.SchemaMaps, htmlAttributes: new { @class = "control-label col-md-2" })*@
-                @*<a id="btnAddSchemaMap" class="btn btn-primary">Add Schema Mapping</a>*@
+                <div class="col-md-5"><h4>Where do you want the data to go?</h4></div>
                 <div id="schemaMapPanel" class="form-group col-md-12">
                     @Html.EditorForMany(m => m.SchemaMaps, x => x.Index)
-                    @*@foreach (SchemaMapModel mapModel in Model.SchemaMaps)
-                        {
-                            @Html.Partial("_SchemaMap", mapModel)
-                        }*@
+                    @if (!Model.CLA3332_ConsolidatedDataFlows)
+                    {
                     <button type="button" id="btnAddSchemaMap" class="btn btn-success"><span>Add Another Target</span></button>
+                    }
                 </div>
             </div>
         </div>
-
-
-
-        @*<div class="col-lg-12">
-                <table id="schema_map" class="table table-striped table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <td>Search Criteria</td>
-                            <td>Dataset</td>
-                            <td>Schema</td>
-                        </tr>
-                    </thead>
-                    <tbody id="schemaMapRows">
-                        @for (int i = 0; i < Model.SchemaMaps.Count; i++)
-                        {
-                            <tr>
-                                <td>
-                                    @Html.EditorFor(m => m.SchemaMaps[i].SearchCriteria, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                                </td>
-                                <td>
-                                    @Html.DropDownListFor(m => m.SchemaMaps[i].SelectedDataset, Model.SchemaMaps[i].AllDatasets, new { @class = "form-control edit-dataset-row" })
-                                </td>
-                                <td>
-                                    @Html.DropDownListFor(m => m.SchemaMaps[i].SelectedSchema, Model.SchemaMaps[i].AllSchemas, new { @class = "form-control edit-dataset-row" })
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>*@
 
         <br />
         <div class="form-group formSubmitButtons" style="display: none;">
@@ -182,27 +150,32 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
     <script type="text/javascript">
         $(function () {
+            data.DataFlow.CLA3332_ConsolidatedDataFlows = @Model.CLA3332_ConsolidatedDataFlows.ToString().ToLower();
             data.DataFlow.DataFlowFormInit();
 
-            //Adding delete button logic here to ensure it is added to
-            // any additional schemaMapLineItems that are added
-            $(document).on("click", "#btnSchemaMapRemove", function () {
-                if ($('.schemaMapLineItem.active').length === 1) {
-                    Sentry.ShowModalAlert("At least one schema mapping is required");
-                }
-                else {
-                    var self = $(this);
-                    var parentContainer = self.parent(".schemaMapLineItem");
-                    var isDeleteHidden = parentContainer.find("[id$=IsDeleted]");
-                    //Set hidden value for when object is model is passed back to controller
-                    $(isDeleteHidden).val("True");
-                    //remove active class from parentcontainer to ensure not counted
-                    // when ensuring there is at least one active mapping
-                    $(parentContainer).removeClass("active");
-                    //Hide parentcontainer to ensure not displayed to user after deletion
-                    $(parentContainer).hide();
-                }
-            })
+            @if (!Model.CLA3332_ConsolidatedDataFlows) { 
+                <text>
+                //Adding delete button logic here to ensure it is added to
+                // any additional schemaMapLineItems that are added
+                $(document).on("click", "#btnSchemaMapRemove", function () {
+                    if ($('.schemaMapLineItem.active').length === 1) {
+                        Sentry.ShowModalAlert("At least one schema mapping is required");
+                    }
+                    else {
+                        var self = $(this);
+                        var parentContainer = self.parent(".schemaMapLineItem");
+                        var isDeleteHidden = parentContainer.find("[id$=IsDeleted]");
+                        //Set hidden value for when object is model is passed back to controller
+                        $(isDeleteHidden).val("True");
+                        //remove active class from parentcontainer to ensure not counted
+                        // when ensuring there is at least one active mapping
+                        $(parentContainer).removeClass("active");
+                        //Hide parentcontainer to ensure not displayed to user after deletion
+                        $(parentContainer).hide();
+                    }
+                })
+                </text>
+            }
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>

@@ -218,7 +218,7 @@ namespace Sentry.data.Infrastructure
                         ActionGuid = _step.Action.ActionGuid.ToString(),
                         SourceBucket = keyBucket,
                         SourceKey = objectKey,
-                        StepTargetBucket = _step.Action.TargetStorageBucket,
+                        StepTargetBucket = _step.TargetBucket,
                         //key structure /<storage prefix>/<storage code>/<YYYY>/<MM>/<DD>/<sourceFileName>_<FlowExecutionGuid>.<sourcefileextension>                    
                         StepTargetPrefix = _step.TargetPrefix + $"{flowGuidDTM.Year.ToString()}/{flowGuidDTM.Month.ToString()}/{flowGuidDTM.Day.ToString()}/",
                         EventType = GlobalConstants.DataFlowStepEvent.QUERY_STORAGE_START,
