@@ -29,4 +29,4 @@ CREATE INDEX [idx_SchemaField_parent] ON [dbo].[SchemaField] ([ParentField])
 
 GO
 
-CREATE INDEX [idx_ParentSchemaRevision] on [dbo].[SchemaField] ([ParentSchemaRevision])
+CREATE INDEX [idx_SchemaField_parentSchemaRevision] on [dbo].[SchemaField] ([ParentSchemaRevision])
