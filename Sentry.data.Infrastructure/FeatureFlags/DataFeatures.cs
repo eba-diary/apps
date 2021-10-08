@@ -59,5 +59,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA3241_DisableDfsDropLocation { get; } = new BooleanFeatureFlag("CLA3241_DisableDfsDropLocation", databaseRepo_longCache);
         public IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; } = new BooleanFeatureFlag("CLA3332_ConsolidatedDataFlows", databaseRepo_longCache);
         public IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime { get; } = new BooleanFeatureFlag("CLA3048_StandardizeOnUTCTime", databaseRepo_longCache);
+        public IFeatureFlag<bool> CLA3497_UniqueLivySessionName { get; } = new BooleanFeatureFlag("CLA3497_UniqueLivySessionName", databaseRepo_longCache);
     }
 }
