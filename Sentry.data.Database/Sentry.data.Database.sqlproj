@@ -154,6 +154,7 @@
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_03" />
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_21_04_04" />
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_21_09_08" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_04_06" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -339,6 +340,7 @@
     <None Include="Scripts\Post-Deploy\StaticData\FeatureEntity.sql" />
     <None Include="Scripts\Post-Deploy\StaticData\DataSource.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_03\HistoryFix_Populate_DataFlowStep_TriggerBucketTargetBucket.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_04_06\HistoryFix_Revert_ProducerS3Drop_Step_TargetBucket_Metadata.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Sentry.data.Database.refactorlog" />
