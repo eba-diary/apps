@@ -110,7 +110,10 @@ namespace Sentry.data.Infrastructure
                     //  as targets.
                     if (_targetStep != null)
                     {
-                        versionId = s3Service.UploadDataFile(tempFile, _targetStep.TargetBucket, targetkey);
+                        /******************************************************************************
+                        * Utilizing Trigger bucket since we want to trigger the targetStep identified
+                        ******************************************************************************/
+                        versionId = s3Service.UploadDataFile(tempFile, _targetStep.TriggerBucket, targetkey);
                     }
                     else
                     {
