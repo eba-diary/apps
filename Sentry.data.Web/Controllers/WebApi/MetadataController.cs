@@ -801,13 +801,14 @@ namespace Sentry.data.Web.WebApi.Controllers
                 e.Reason = "Viewed Schema for Dataset";
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
-                Metadata m = new Metadata();
+                Metadata m = new Metadata
+                {
+                    //grab DatasetId and  SchemaId to be used to fill delroy Fields grid
+                    DatasetId = config.ParentDataset.DatasetId,
+                    SchemaId = config.Schema.SchemaId,
+                    Description = config.Description
+                };
 
-                //grab DatasetId and  SchemaId to be used to fill delroy Fields grid
-                m.DatasetId = config.ParentDataset.DatasetId;
-                m.SchemaId = config.Schema.SchemaId;
-
-                m.Description = config.Description;
                 //m.DFSDropLocation = config.RetrieverJobs.Where(x => x.DataSource.Is<DfsBasic>()).Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType, JobId = x.Id }).FirstOrDefault();
 
                 //m.Views = _dsContext.Events.Where(x => x.Reason == "Viewed Schema for Dataset" && x.DataConfig == DatasetConfigID).Count();
@@ -818,19 +819,11 @@ namespace Sentry.data.Web.WebApi.Controllers
                     m.DataLastUpdated = config.DatasetFiles.Max(x => x.ModifiedDTM).Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds;
                 }
 
-                if (config.RetrieverJobs.Any(x => x.DataSource.Is<S3Basic>()))
-                {
-                    // m.S3DropLocation = config.RetrieverJobs.Where(x => x.DataSource.Is<S3Basic>()).Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType, JobId = x.Id }).FirstOrDefault();
-                }
-
-
                 if (config.RetrieverJobs.Any(x => !x.DataSource.Is<S3Basic>() && !x.DataSource.Is<DfsBasic>()))
                 {
                     m.OtherJobs = config.RetrieverJobs.Where(x => !x.DataSource.Is<S3Basic>() && !x.DataSource.Is<DfsBasic>()).OrderBy(x => x.Id)
                         .Select(x => new DropLocation() { Location = x.IsEnabled ? x.Schedule : "Disabled", Name = x.DataSource.SourceType, JobId = x.Id, IsEnabled = x.IsEnabled }).ToList();
                 }
-
-                //m.DataFlows = _configService.GetExternalDataFlowsBySchema(config).Select(s => new DataFlow() { Name = s.Item1.Name, Id = s.Item1.Id, DetailUrl = $"DataFlow/{s.Item1.Id.ToString()}/Detail" }).ToList();
 
                 foreach (var item in _configService.GetExternalDataFlowsBySchema(config).ToList())
                 {
@@ -838,7 +831,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     {
                         Name = item.Item1.Name,
                         Id = item.Item1.Id,
-                        DetailUrl = $"DataFlow/{item.Item1.Id.ToString()}/Detail",
+                        DetailUrl = $"DataFlow/{item.Item1.Id}/Detail",
                         PopulatesMultipleSchema = (item.Item1.MappedSchema.Count > 1),
                         ObjectStatus = item.Item1.ObjectStatus,
                         DeleteIssuer = item.Item1.DeleteIssuer,

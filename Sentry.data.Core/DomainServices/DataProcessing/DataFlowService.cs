@@ -20,19 +20,19 @@ namespace Sentry.data.Core
         private readonly IJobService _jobService;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly ISecurityService _securityService;
-        private readonly IClient _quartermasterClient;
+        private readonly IQuartermasterService _quartermasterService;
         private readonly IDataFeatures _dataFeatures;
 
         public DataFlowService(IDatasetContext datasetContext, 
             IUserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider,
-            ISecurityService securityService, IClient quartermasterClient, IDataFeatures dataFeatures)
+            ISecurityService securityService, IQuartermasterService quartermasterService, IDataFeatures dataFeatures)
         {
             _datasetContext = datasetContext;
             _userService = userService;
             _jobService = jobService;
             _s3ServiceProvider = s3ServiceProvider;
             _securityService = securityService;
-            _quartermasterClient = quartermasterClient;
+            _quartermasterService = quartermasterService;
             _dataFeatures = dataFeatures;
         }
 
@@ -304,65 +304,49 @@ namespace Sentry.data.Core
 
         }
 
-        //public void DeleteByFileSchema(FileSchema scm)
-        //{
-        //    //Find schema specific dataflow
-        //    DataFlow schemaSpecificFlow = _datasetContext.DataFlow.Where(w => w.Name == GenerateDataFlowNameForFileSchema(scm)).FirstOrDefault();
-
-        //    //Find all SchemaMappings associated with FileSchema
-        //    List<SchemaMap> schemaMappings = _datasetContext.SchemaMap.Where(w => w.MappedSchema == scm).ToList();
-
-        //    foreach (SchemaMap map in schemaMappings)
-        //    {
-        //        //ScheamMap step associated with SchemaMapping
-        //        DataFlowStep mapStep = map.DataFlowStepId;
-
-        //        //Find non-SchemaSpecific DataFlow associated with SchemaMap step, then return all SchemaMap steps associated with DataFlow
-        //        List<DataFlowStep> associatedMapSteps =  _datasetContext.GetById<DataFlow>(mapStep.DataFlow.Id).Steps.Where(w => w.DataAction_Type_Id == DataActionType.SchemaMap).ToList();
-
-        //        //if non-SchemaSpecific flow only contains 1 SchemaMap step, issue delete of DataFlow
-        //        // if count greater than 1 and all other SchemaMaps reference same FileSchema, issue delete of DataFlow
-        //        // if count greater than 1 and any other SchemaMaps reference differnt FileSchema, only delete SchemaMap step
-
-        //        //There are no non-SchemaSpecific dataflows mapped to this schema,
-        //        //  Therefore, delete schema specific dataflow
-        //        if (associatedMapSteps.Count == 0)
-        //        {                    
-        //            Delete(mapStep.DataFlow.Id);
-        //        }
-        //        else if (associatedMapSteps.Count >= 1)
-        //        {
-        //            int nonMatchingFileSchemas = 0;
-        //            foreach (DataFlowStep step in associatedMapSteps)
-        //            {
-        //                if (scm.SchemaId != _datasetContext.SchemaMap.Where(w => w.DataFlowStepId == step).Select(s => s.MappedSchema).FirstOrDefault().SchemaId)
-        //                {
-        //                    nonMatchingFileSchemas++;
-        //                }
-        //            }
-
-        //            if (nonMatchingFileSchemas == 0)
-        //            {
-        //                Delete(mapStep.DataFlow.Id);
-        //            }
-        //            else
-        //            {
-        //                _datasetContext.Remove(map);
-        //            }
-        //        }
-        //    }
-
-        //    // Issue Delete of Schema-Specific data flow
-        //    Delete(schemaSpecificFlow.Id);
-
-        //}
-
+        /// <summary>
+        /// Delete all data flows for a given <see cref="FileSchema"/> object.
+        /// </summary>
+        /// <param name="scm">The FileSchema object</param>
+        /// <param name="logicalDelete">True to logically delete the dataflow; false to physically delete it</param>
         public void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true)
         {
             string methodName = MethodBase.GetCurrentMethod().Name.ToLower();
             Logger.Debug($"Start method <{methodName}>");
 
+            DeleteSchemaFlowByFileSchema(scm, logicalDelete);
 
+            /* Get associated producer flow(s) */
+            List<int> producerDataflowIdList = GetProducerFlowsToBeDeletedBySchemaId(scm.SchemaId);
+
+            if (logicalDelete)
+            {
+                /* Mark associated producer dataflows for deletion */
+                MarkDataFlowForDeletionById(producerDataflowIdList);
+            }
+            else
+            {
+                foreach (int flowId in producerDataflowIdList)
+                {
+                    Delete(flowId);
+                }
+            }
+
+            Logger.Debug($"End method <{methodName}>");
+        }
+
+        /// <summary>
+        /// Finds a Schema Flow associated with the provided <see cref="FileSchema"/>, and deletes it.
+        /// The method is OK if no Schema Flow is associated/found.
+        /// </summary>
+        /// <param name="scm">The FileSchema object</param>
+        /// <param name="logicalDelete">True to logically delete the dataflow; false to physically delete it</param>
+        /// <remarks>
+        /// Schema Flows will stop being created as seperate flows as part of CLA-3332. However, this
+        /// code is still needed for existing data flows - until they're converted.
+        /// </remarks>
+        private void DeleteSchemaFlowByFileSchema(FileSchema scm, bool logicalDelete)
+        {
             /* Get Schema Flow */
             var schemaflowName = GetDataFlowNameForFileSchema(scm);
             DataFlow schemaFlow = _datasetContext.DataFlow.FirstOrDefault(w => w.Name == schemaflowName);
@@ -376,41 +360,29 @@ namespace Sentry.data.Core
                 if (mappedStep != null)
                 {
                     Logger.Debug($"detected schema flow by Id");
-                    schemaFlow = _datasetContext.DataFlowStep.FirstOrDefault(w => w.Id == mappedStep.Id).DataFlow;
+                    schemaFlow = mappedStep.DataFlowStepId.DataFlow;
                 }
                 else
                 {
                     Logger.Debug($"schema flow not detected by id");
                     Logger.Debug($"no schema flow associated with schema");
-                    Logger.Debug($"End method <{methodName}>");
-                    return;
                 }
             }
 
-            Logger.Debug($"schema flow name: {schemaFlow.Name}");
- 
-            /* Get associated producer flow(s) */
-            List<int> producerDataflowIdList = GetProducerFlowsToBeDeletedBySchemaId(scm.SchemaId);
-
-            if (logicalDelete)
+            if (schemaFlow != null)
             {
-                /* Mark schema dataflow for deletion */
-                MarkDataFlowForDeletionById(schemaFlow.Id);
+                Logger.Debug($"schema flow name: {schemaFlow.Name}");
 
-                /* Mark asscoiated producer dataflows for deletion */
-                MarkDataFlowForDeletionById(producerDataflowIdList);
-            }
-            else
-            {
-                Delete(schemaFlow.Id);
-
-                foreach (int flowId in producerDataflowIdList)
+                if (logicalDelete)
                 {
-                    Delete(flowId);
+                    /* Mark schema dataflow for deletion */
+                    MarkDataFlowForDeletionById(schemaFlow.Id);
+                }
+                else
+                {
+                    Delete(schemaFlow.Id);
                 }
             }
-
-            Logger.Debug($"End method <{methodName}>");
         }
 
         /// <summary>
@@ -533,62 +505,10 @@ namespace Sentry.data.Core
                 results.Add(DataFlow.ValidationErrors.nameMustBeUnique, "Dataflow name is already used");
             }
 
-            //if the asset is managed in Quartermaster, then the named environment and named environment type must be valid according to Quartermaster
-            var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(dfDto.SaidKeyCode, ShowDeleted11.False).ConfigureAwait(false)).ToList();
-            if (namedEnvironmentList.Any())
-            {
-                if (!namedEnvironmentList.Any(e => e.Name == dfDto.NamedEnvironment))
-                {
-                    results.Add(DataFlow.ValidationErrors.namedEnvironmentInvalid, $"Named Environment provided (\"{dfDto.NamedEnvironment}\") doesn't match a Quartermaster Named Environment");
-                }
-                else if (namedEnvironmentList.First(e => e.Name == dfDto.NamedEnvironment).Environmenttype != dfDto.NamedEnvironmentType.ToString())
-                {
-                    var quarterMasterNamedEnvironmentType = namedEnvironmentList.First(e => e.Name == dfDto.NamedEnvironment).Environmenttype;
-                    results.Add(DataFlow.ValidationErrors.namedEnvironmentTypeInvalid, $"Named Environment Type provided (\"{dfDto.NamedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType}\")");
-                }
-            }
+            //Validate the Named Environment selection using the QuartermasterService
+            results.MergeInResults(await _quartermasterService.VerifyNamedEnvironmentAsync(dfDto.SaidKeyCode, dfDto.NamedEnvironment, dfDto.NamedEnvironmentType).ConfigureAwait(false));
 
             return new ValidationException(results);
-        }
-
-        /// <summary>
-        /// Given a SAID asset key code, get all the named environments from Quartermaster
-        /// </summary>
-        /// <param name="saidAssetKeyCode">The four-character key code for an asset</param>
-        /// <returns>A list of NamedEnvironmentDto objects</returns>
-        public Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsAsync(string saidAssetKeyCode)
-        {
-            //validate parameters
-            if (string.IsNullOrWhiteSpace(saidAssetKeyCode))
-            {
-                throw new ArgumentNullException(nameof(saidAssetKeyCode), "SAID Asset Key Code was missing.");
-            }
-
-            //the guts of the method have to be wrapped in a local function for proper async handling
-            //see https://confluence.sentry.com/questions/224368523
-            async Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsInternalAsync()
-            {
-                //call Quartermaster to get list of named environments for this asset
-                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted11.False).ConfigureAwait(false)).ToList();
-                namedEnvironmentList = namedEnvironmentList.OrderBy(n => n.Name).ToList();
-
-                //grab a config setting to see if we need to filter the named environments by a certain named environment type
-                //if the config setting for "QuartermasterNamedEnvironmentTypeFilter" is blank, no filter will be applied
-                var environmentTypeFilter = Configuration.Config.GetHostSetting("QuartermasterNamedEnvironmentTypeFilter");
-                Func<NamedEnvironment, bool> filter = env => true;
-                if (!string.IsNullOrWhiteSpace(environmentTypeFilter))
-                {
-                    filter = env => env.Environmenttype == environmentTypeFilter;
-                }
-
-                //map the output from Quartermaster to our Dto
-                return namedEnvironmentList.Where(filter).Select(env => new NamedEnvironmentDto
-                {
-                    NamedEnvironment = env.Name,
-                    NamedEnvironmentType = (GlobalEnums.NamedEnvironmentType)Enum.Parse(typeof(GlobalEnums.NamedEnvironmentType), env.Environmenttype)
-                }).ToList();
-            }
-            return GetNamedEnvironmentsInternalAsync();
         }
 
         #region Private Methods
@@ -930,6 +850,27 @@ namespace Sentry.data.Core
 
         private DataFlowStep CreateDataFlowStep(DataActionType actionType, DataFlowDto dto, DataFlow df)
         {
+            int selectedDatasetId = 0;
+            bool isHumanResources = false;
+            
+            //STEP #1 Figure out DatasetId
+            if (dto.DatasetId == 0)  //OLD WORLD USE BRIDGE TABLE SchemaMap to DatasetId
+            {
+                selectedDatasetId = dto.SchemaMap.Select(s => s.DatasetId).FirstOrDefault();
+            }
+            else  //NEW WORLD, just assign DatasetId directy for later use
+            {
+                selectedDatasetId = dto.DatasetId;
+            }
+
+            //STEP #2 Take DatasetId and figure out if Category = HR
+            Dataset ds = _datasetContext.GetById<Dataset>(selectedDatasetId);
+            if(ds.DatasetCategories.Any(w => w.AbbreviatedName == "HR"))
+            {
+                isHumanResources = true;
+            }
+
+            //STEP #3 Look at ActionType and return correct BaseAction
             BaseAction action;
             switch (actionType)
             {
@@ -937,18 +878,23 @@ namespace Sentry.data.Core
                     action = _datasetContext.S3DropAction.FirstOrDefault();
                     break;
                 case DataActionType.ProducerS3Drop:
-                    action = _dataFeatures.CLA3240_UseDropLocationV2.GetValue()
-                        ? _datasetContext.ProducerS3DropAction.GetDlstDropLocation()
-                        : _datasetContext.ProducerS3DropAction.GetDataDropLocation();
+                    if (isHumanResources)
+                    {
+                        action = _datasetContext.ProducerS3DropAction.GetHrDataDropLocation();               
+                    }
+                    else
+                    {
+                        action = _dataFeatures.CLA3240_UseDropLocationV2.GetValue() ? _datasetContext.ProducerS3DropAction.GetDlstDropLocation() : _datasetContext.ProducerS3DropAction.GetDataDropLocation();
+                    }
                     break;
                 case DataActionType.RawStorage:
-                    action = _datasetContext.RawStorageAction.FirstOrDefault();
+                    action = (isHumanResources)? _datasetContext.RawStorageAction.GetHrRawStorage() :_datasetContext.RawStorageAction.FirstOrDefault();
                     break;
                 case DataActionType.QueryStorage:
-                    action = _datasetContext.QueryStorageAction.FirstOrDefault();
+                    action = (isHumanResources) ? _datasetContext.QueryStorageAction.GetHrQueryStorageAction() : _datasetContext.QueryStorageAction.FirstOrDefault();
                     break;
                 case DataActionType.ConvertParquet:
-                    action = _datasetContext.ConvertToParquetAction.FirstOrDefault();
+                    action = (isHumanResources) ? _datasetContext.ConvertToParquetAction.GetHrConvertToParquetAction() : _datasetContext.ConvertToParquetAction.FirstOrDefault();
                     break;
                 case DataActionType.UncompressZip:
                     action = _datasetContext.UncompressZipAction.FirstOrDefault();
@@ -966,13 +912,15 @@ namespace Sentry.data.Core
                     action = _datasetContext.FixedWidthAction.FirstOrDefault();
                     break;
                 case DataActionType.XML:
-                    action = _datasetContext.XMLAction.FirstOrDefault();
+                    action = (isHumanResources)? _datasetContext.XMLAction.GetHrXMLAction() : _datasetContext.XMLAction.FirstOrDefault();
                     break;
                 case DataActionType.JsonFlattening:
                     action = _datasetContext.JsonFlatteningAction.FirstOrDefault();
                     break;
                 case DataActionType.SchemaLoad:
-                    action = _datasetContext.SchemaLoadAction.FirstOrDefault();
+
+                    action = (isHumanResources)? _datasetContext.SchemaLoadAction.GetHrSchemaLoadAction() : _datasetContext.SchemaLoadAction.FirstOrDefault();
+                    
                     DataFlowStep schemaLoadStep = MapToDataFlowStep(df, action, actionType);
                     List<SchemaMap> schemaMapList = new List<SchemaMap>();
                     foreach (SchemaMapDto mapDto in dto.SchemaMap.Where(w => !w.IsDeleted))
@@ -980,7 +928,9 @@ namespace Sentry.data.Core
                         schemaMapList.Add(MapToSchemaMap(mapDto, schemaLoadStep));
                     }
                     schemaLoadStep.SchemaMappings = schemaMapList;
+                    
                     return schemaLoadStep;
+
                 case DataActionType.SchemaMap:
                     action = _datasetContext.SchemaMapAction.FirstOrDefault();
                     DataFlowStep schemaMapStep = MapToDataFlowStep(df, action, actionType);

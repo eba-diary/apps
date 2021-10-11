@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -18,11 +19,13 @@ namespace Sentry.data.Core
         private readonly IConfigService _configService;
         private readonly ISchemaService _schemaService;
         private readonly IAWSLambdaProvider _awsLambdaProvider;
+        private readonly IQuartermasterService _quartermasterService;
         private readonly ObjectCache cache = MemoryCache.Default;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
                             UserService userService, IConfigService configService, 
-                            ISchemaService schemaService, IAWSLambdaProvider awsLambdaProvider)
+                            ISchemaService schemaService, IAWSLambdaProvider awsLambdaProvider,
+                            IQuartermasterService quartermasterService)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -30,6 +33,7 @@ namespace Sentry.data.Core
             _configService = configService;
             _schemaService = schemaService;
             _awsLambdaProvider = awsLambdaProvider;
+            _quartermasterService = quartermasterService;
         }
 
 
@@ -383,42 +387,46 @@ namespace Sentry.data.Core
 
             return result;
         }
-        
-        public List<string> Validate(DatasetDto dto)
+
+        public async Task<ValidationException> Validate(DatasetDto dto)
         {
-            List<string> errors = new List<string>();
+            ValidationResults results = new ValidationResults();
             if (dto.DatasetId == 0 && _datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
                                                                          w.DatasetCategories.Any(x => dto.DatasetCategoryIds.Contains(x.Id)) &&
                                                                          w.DatasetType == GlobalConstants.DataEntityCodes.DATASET).Count() > 0)
             {
-                errors.Add("Dataset name already exists within category");
+                results.Add(Dataset.ValidationErrors.datasetNameDuplicate,"Dataset name already exists within category");
             }
 
             if (String.IsNullOrWhiteSpace(dto.PrimaryOwnerId))
             {
-                errors.Add("Owner is required.  Please select SAID Asset and this box will be auto-filled.");
+                results.Add(Dataset.ValidationErrors.datasetOwnerRequired, "Owner is required.  Please select SAID Asset and this box will be auto-filled.");
             }
 
             if (String.IsNullOrWhiteSpace(dto.PrimaryContactId))
             {
-                errors.Add("Contact is required.");
+                results.Add(Dataset.ValidationErrors.datasetContactRequired, "Contact is required.");
             }
 
             if (dto.DatasetCategoryIds.Count == 1 && dto.DatasetCategoryIds[0].Equals(0))
             {
-                errors.Add("Category is required");
+                results.Add(Dataset.ValidationErrors.datasetCategoryRequired, "Category is required");
             }
 
             if (dto.DatasetId == 0 && dto.DatasetScopeTypeId == 0)
             {
-                errors.Add("Dataset Scope is required");
+                results.Add(Dataset.ValidationErrors.datasetScopeRequired, "Dataset Scope is required");
             }
 
             if (String.IsNullOrWhiteSpace(dto.SAIDAssetKeyCode))
             {
-                errors.Add("SAID Asset is required.");
+                results.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "SAID Asset is required.");
             }
-            return errors;
+
+            //Validate the Named Environment selection using the QuartermasterService
+            results.MergeInResults(await _quartermasterService.VerifyNamedEnvironmentAsync(dto.SAIDAssetKeyCode, dto.NamedEnvironment, dto.NamedEnvironmentType).ConfigureAwait(false));
+
+            return new ValidationException(results);
         }
 
         public List<Dataset> GetDatasetMarkedDeleted()
@@ -462,7 +470,9 @@ namespace Sentry.data.Core
                 DeleteInd = false,
                 DeleteIssueDTM = DateTime.MaxValue,
                 ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
-                SAIDAssetKeyCode = dto.SAIDAssetKeyCode
+                SAIDAssetKeyCode = dto.SAIDAssetKeyCode,
+                NamedEnvironment = dto.NamedEnvironment,
+                NamedEnvironmentType = dto.NamedEnvironmentType
             };
 
             switch (dto.DataClassification)
@@ -533,6 +543,8 @@ namespace Sentry.data.Core
             dto.MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/Dataset/Detail/" + ds.DatasetId;
             dto.CategoryNames = ds.DatasetCategories.Select(s => s.Name).ToList();
             dto.SAIDAssetKeyCode = ds.SAIDAssetKeyCode;
+            dto.NamedEnvironment = ds.NamedEnvironment;
+            dto.NamedEnvironmentType = ds.NamedEnvironmentType;
         }
 
 

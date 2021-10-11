@@ -1,14 +1,8 @@
-﻿CREATE TABLE [HangFire].[JobParameter] (
-    [Id]    INT            IDENTITY (1, 1) NOT NULL,
-    [JobId] INT            NOT NULL,
+﻿CREATE TABLE [HangFire7].[JobParameter] (
+    [JobId] BIGINT         NOT NULL,
     [Name]  NVARCHAR (40)  NOT NULL,
     [Value] NVARCHAR (MAX) NULL,
-    CONSTRAINT [PK_HangFire_JobParameter] PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT [FK_HangFire_JobParameter_Job] FOREIGN KEY ([JobId]) REFERENCES [HangFire].[Job] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT [PK_HangFire_JobParameter] PRIMARY KEY CLUSTERED ([JobId] ASC, [Name] ASC),
+    CONSTRAINT [FK_HangFire_JobParameter_Job] FOREIGN KEY ([JobId]) REFERENCES [HangFire7].[Job] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
-
-GO
-CREATE NONCLUSTERED INDEX [IX_HangFire_JobParameter_JobIdAndName]
-    ON [HangFire].[JobParameter]([JobId] ASC, [Name] ASC);
 
