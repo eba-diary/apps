@@ -847,27 +847,21 @@ namespace Sentry.data.Core
 
         private DataFlowStep CreateDataFlowStep(DataActionType actionType, DataFlowDto dto, DataFlow df)
         {
-            int selectedDatasetId = 0;
             bool isHumanResources = false;
-            
-            //STEP #1 Figure out DatasetId
-            if (dto.DatasetId == 0)  //OLD WORLD USE BRIDGE TABLE SchemaMap to DatasetId
+
+            // If WORKDAY (HR category) work needs to go before CLA3332_ConsolidatedDataFlows,
+            //   then we need to determine datasetid associated with dto.SchemaMap.First().SchemaId
+            if (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
             {
-                selectedDatasetId = dto.SchemaMap.Select(s => s.DatasetId).FirstOrDefault();
-            }
-            else  //NEW WORLD, just assign DatasetId directy for later use
-            {
-                selectedDatasetId = dto.DatasetId;
+                //Take DatasetId and figure out if Category = HR
+                Dataset ds = _datasetContext.GetById<Dataset>(dto.DatasetId);
+                if (ds.DatasetCategories.Any(w => w.AbbreviatedName == "HR"))
+                {
+                    isHumanResources = true;
+                }
             }
 
-            //STEP #2 Take DatasetId and figure out if Category = HR
-            Dataset ds = _datasetContext.GetById<Dataset>(selectedDatasetId);
-            if(ds.DatasetCategories.Any(w => w.AbbreviatedName == "HR"))
-            {
-                isHumanResources = true;
-            }
-
-            //STEP #3 Look at ActionType and return correct BaseAction
+            //Look at ActionType and return correct BaseAction
             BaseAction action;
             switch (actionType)
             {
