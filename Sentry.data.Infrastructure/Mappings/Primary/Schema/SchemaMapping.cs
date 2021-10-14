@@ -71,6 +71,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 Property(x => x.SnowflakeSchema, m => m.Column("SnowflakeSchema"));
                 Property(x => x.SnowflakeStatus, m => m.Column("SnowflakeStatus"));
                 Property(x => x.SchemaRootPath, m => m.Column("SchemaRootPath"));
+                Property(x => x.ParquetStorageBucket);
+                Property(x => x.ParquetStoragePrefix);
             }
         }
     }
