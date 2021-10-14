@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Sentry.data.Core.Exceptions
 {
     [Serializable]
-    public class DataFlowStepNotImplementedException : Exception, ISerializable
+    public class DataFlowStepNotImplementedException : Exception
     {
         public DataFlowStepNotImplementedException() { }
         public DataFlowStepNotImplementedException(string message) : base(message) { }

@@ -8,7 +8,14 @@ namespace Sentry.data.Core
     public static class DataActionQueryExtensions
     {        
 
-
+        /// <summary>
+        /// Returns appropriate DataAction after evaluating various conditions
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="dataFeatures">Current feature flags</param>
+        /// <param name="isHumanResources">Is this for processing HR data</param>
+        /// <returns></returns>
         public static T GetAction<T>(this IQueryable<T> query, IDataFeatures dataFeatures, bool isHumanResources) where T : BaseAction
         {
             Logger.Info("Method <GetAction> Started");
@@ -32,37 +39,7 @@ namespace Sentry.data.Core
             return result;
         }
 
-        /// <summary>
-        /// Returns the ProducerS3DropAction based on evaluationg of input values
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="dataFeatures"></param>
-        /// <param name="isHumanResources"></param>
-        /// <returns></returns>
-        //public static T GetActionObject<T>(this IQueryable<T> query, IDataFeatures dataFeatures, bool isHumanResources = false) where T : BaseAction
-        //{
-        //    return GetAction(dataFeatures, isHumanResources, query.GetHrAction(), query.GetDlstDropLocation(), query.GetDataDropLocation());
-        //    //return isHumanResources
-        //    //    ? query.GetHrDataDropLocation()
-        //    //    : dataFeatures.CLA3240_UseDropLocationV2.GetValue() ? query.GetDlstDropLocation() : query.GetDataDropLocation();
-        //}
-
-        public static RawStorageAction GetRawStorageAction(this IQueryable<RawStorageAction> query, IDataFeatures dataFeatures, bool isHumanResources = false)
-        {
-            return isHumanResources
-                ? query.GetHrRawStorage()
-                : dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() ? query.GetDlstRawStorage() : query.GetDataRawStorage();
-        }
-
-        public static QueryStorageAction GetQueryStorageAction(this IQueryable<QueryStorageAction> query, IDataFeatures dataFeatures, bool IsHumanResources = false)
-        {
-            return IsHumanResources
-                ? query.GetHrQueryStorageAction()
-                : dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() ? query.GetDlstQueryStorage() : query.GetDataQueryStorage();
-        }
-
-
-
+        #region Private Methods
 
         private static T GetHrAction<T>(this IQueryable<T> query) where T: BaseAction
         {
@@ -274,96 +251,6 @@ namespace Sentry.data.Core
             return result;
         }
 
-        #region HR Methods
-        /****************************************************************************************************
-        HR RELATED ACTIONS
-        *****************************************************************************************************/
-        private static RawStorageAction GetHrRawStorage(this IQueryable<RawStorageAction> query)
-        {
-
-            return query.FirstOrDefault(a => a.Id == 16);
-        }
-
-        public static QueryStorageAction GetHrQueryStorageAction(this IQueryable<QueryStorageAction> query)
-        {
-            return query.FirstOrDefault(a => a.Id == 17);
-        }
-
-        public static SchemaLoadAction GetHrSchemaLoadAction(this IQueryable<SchemaLoadAction> query)
-        {
-            return query.FirstOrDefault(a => a.Id == 18);
-        }
-
-        public static ConvertToParquetAction GetHrConvertToParquetAction(this IQueryable<ConvertToParquetAction> query)
-        {
-            return query.FirstOrDefault(a => a.Id == 19);
-        }
-
-        private static ProducerS3DropAction GetHrDataDropLocation(this IQueryable<ProducerS3DropAction> query)
-        {
-
-            return query.FirstOrDefault(a => a.Id == 20);
-        }
-
-        public static XMLAction GetHrXMLAction(this IQueryable<XMLAction> query)
-        {
-            return query.FirstOrDefault(a => a.Id == 21);
-        }
         #endregion
-
-
-        #region Private Methods
-
-        /// <summary>
-        /// Returns the ProducerS3DropAction with an ID of 15, which is configured to use the sentry-dlst-*-droplocation-ae2 bucket
-        /// </summary>
-        private static ProducerS3DropAction GetDlstDropLocation(this IQueryable<ProducerS3DropAction> query)
-        {
-            return query.FirstOrDefault(a => a.Id == 15);
-        }
-
-        /// <summary>
-        /// Returns the ProducerS3DropAction with an ID of 12, which is configured to use the sentry-data-*-droplocation-ae2 bucket
-        /// </summary>
-        private static ProducerS3DropAction GetDataDropLocation(this IQueryable<ProducerS3DropAction> query)
-        {
-            return query.FirstOrDefault(a => a.Id == 12);
-        }
-
-        /// <summary>
-        /// Returns the RawStorageAction with an ID of 2, which is configured to use the sentry-data-*-dataset-ae2 bucket
-        /// </summary>
-        private static RawStorageAction GetDataRawStorage(this IQueryable<RawStorageAction> query)
-        {
-            return query.FirstOrDefault(a => a.Id == 2);
-        }
-
-        // <summary>
-        /// Returns the RawStorageAction with an ID of 22, which is configured to use the sentry-dlst-*-dataset-ae2 bucket
-        /// </summary>
-        public static RawStorageAction GetDlstRawStorage(this IQueryable<RawStorageAction> query)
-        {
-            return query.FirstOrDefault(a => a.Id == 22);
-        }
-
-        /// <summary>
-        /// Returns the QueryStorageAction with an ID of 3, which is configured to use the sentry-data-*-dataset-ae2 bucket
-        /// </summary>
-        private static QueryStorageAction GetDataQueryStorage(this IQueryable<QueryStorageAction> query)
-        {
-            return query.FirstOrDefault(a => a.Id == 3);
-        }
-
-        // <summary>
-        /// Returns the QueryStorageAction with an ID of 17, which is configured to use the sentry-dlst-*-dataset-ae2 bucket
-        /// </summary>
-        public static QueryStorageAction GetDlstQueryStorage(this IQueryable<QueryStorageAction> query)
-        {
-            return query.FirstOrDefault(a => a.Id == 17);
-        }
-
-        #endregion
-
-
     }
 }
