@@ -150,7 +150,7 @@ namespace Sentry.data.Core
             catch (Exception ex)
             {
                 Logger.Error("dataflowservice-createandsavedataflow failed to save dataflow", ex);
-                return 0;
+                throw;
             }
         }
 
@@ -875,51 +875,44 @@ namespace Sentry.data.Core
             switch (actionType)
             {
                 case DataActionType.S3Drop:
-                    action = _datasetContext.S3DropAction.FirstOrDefault();
+                    action = _datasetContext.S3DropAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.ProducerS3Drop:
-                    if (isHumanResources)
-                    {
-                        action = _datasetContext.ProducerS3DropAction.GetHrDataDropLocation();               
-                    }
-                    else
-                    {
-                        action = _dataFeatures.CLA3240_UseDropLocationV2.GetValue() ? _datasetContext.ProducerS3DropAction.GetDlstDropLocation() : _datasetContext.ProducerS3DropAction.GetDataDropLocation();
-                    }
+                    action = _datasetContext.ProducerS3DropAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.RawStorage:
-                    action = (isHumanResources)? _datasetContext.RawStorageAction.GetHrRawStorage() :_datasetContext.RawStorageAction.FirstOrDefault();
+                    action = _datasetContext.RawStorageAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.QueryStorage:
-                    action = (isHumanResources) ? _datasetContext.QueryStorageAction.GetHrQueryStorageAction() : _datasetContext.QueryStorageAction.FirstOrDefault();
+                    action = _datasetContext.QueryStorageAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.ConvertParquet:
-                    action = (isHumanResources) ? _datasetContext.ConvertToParquetAction.GetHrConvertToParquetAction() : _datasetContext.ConvertToParquetAction.FirstOrDefault();
+                    action = _datasetContext.ConvertToParquetAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.UncompressZip:
-                    action = _datasetContext.UncompressZipAction.FirstOrDefault();
+                    action = _datasetContext.UncompressZipAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.GoogleApi:
-                    action = _datasetContext.GoogleApiAction.FirstOrDefault();
+                    action = _datasetContext.GoogleApiAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.ClaimIq:
-                    action = _datasetContext.ClaimIQAction.FirstOrDefault();
+                    action = _datasetContext.ClaimIQAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.UncompressGzip:
-                    action = _datasetContext.UncompressGzipAction.FirstOrDefault();
+                    action = _datasetContext.UncompressGzipAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.FixedWidth:
-                    action = _datasetContext.FixedWidthAction.FirstOrDefault();
+                    action = _datasetContext.FixedWidthAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.XML:
-                    action = (isHumanResources)? _datasetContext.XMLAction.GetHrXMLAction() : _datasetContext.XMLAction.FirstOrDefault();
+                    action = _datasetContext.XMLAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.JsonFlattening:
-                    action = _datasetContext.JsonFlatteningAction.FirstOrDefault();
+                    action = _datasetContext.JsonFlatteningAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.SchemaLoad:
 
-                    action = (isHumanResources)? _datasetContext.SchemaLoadAction.GetHrSchemaLoadAction() : _datasetContext.SchemaLoadAction.FirstOrDefault();
+                    action = _datasetContext.SchemaLoadAction.GetAction(_dataFeatures, isHumanResources);
                     
                     DataFlowStep schemaLoadStep = MapToDataFlowStep(df, action, actionType);
                     List<SchemaMap> schemaMapList = new List<SchemaMap>();
@@ -932,7 +925,7 @@ namespace Sentry.data.Core
                     return schemaLoadStep;
 
                 case DataActionType.SchemaMap:
-                    action = _datasetContext.SchemaMapAction.FirstOrDefault();
+                    action = _datasetContext.SchemaMapAction.GetAction(_dataFeatures, isHumanResources);
                     DataFlowStep schemaMapStep = MapToDataFlowStep(df, action, actionType);
                     foreach (SchemaMapDto mapDto in dto.SchemaMap.Where(w => !w.IsDeleted))
                     {
@@ -1077,7 +1070,7 @@ namespace Sentry.data.Core
                             .FirstOrDefault();
             string namedEnvironment = _datasetContext.Datasets
                             .Where(w => w.DatasetId == datasetId)
-                            .Select(s => s.SAIDAssetKeyCode)
+                            .Select(s => s.NamedEnvironment)
                             .FirstOrDefault();
             return namedEnvironment;
         } 

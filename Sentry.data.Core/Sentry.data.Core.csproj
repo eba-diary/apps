@@ -217,6 +217,7 @@
     <Compile Include="Exceptions\AWSLambdaNotFoundException.cs" />
     <Compile Include="Exceptions\AWSLambdaRequestLimitException.cs" />
     <Compile Include="Exceptions\AWSLambdaServiceException.cs" />
+    <Compile Include="Exceptions\DataFlowStepNotImplementedException.cs" />
     <Compile Include="Exceptions\DataFlowUnauthorizedAccessException.cs" />
     <Compile Include="Exceptions\DatasetFileConfigDeletedException.cs" />
     <Compile Include="Exceptions\DatasetNotFoundException.cs" />
