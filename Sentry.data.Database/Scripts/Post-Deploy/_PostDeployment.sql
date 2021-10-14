@@ -189,3 +189,31 @@ BEGIN CATCH
 END CATCH 
 
 COMMIT TRAN
+
+SET @ScriptVersion = '2021.10.11.01_PostDeploy'
+
+BEGIN TRAN 
+IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion) 
+BEGIN TRY 
+
+  --insert one off script files here
+  :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_06\HistoryFix_Revert_ProducerS3Drop_Step_TargetBucket_Metadata.sql
+
+  --insert into the verision table so these scripts do not run again.
+  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
+
+END TRY 
+
+BEGIN CATCH 
+    SELECT 
+        @ErrorMessage = ERROR_MESSAGE(), 
+        @ErrorSeverity = ERROR_SEVERITY(), 
+        @ErrorState = ERROR_STATE(); 
+  
+    RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState ); 
+  
+    ROLLBACK TRAN 
+    RETURN
+END CATCH 
+
+COMMIT TRAN
