@@ -846,7 +846,9 @@ namespace Sentry.data.Core
                 CLA2472_EMRSend = scm.CLA2472_EMRSend,
                 CLA1286_KafkaFlag = scm.CLA1286_KafkaFlag,
                 CLA3014_LoadDataToSnowflake = scm.CLA3014_LoadDataToSnowflake,
-                SchemaRootPath = scm.SchemaRootPath
+                SchemaRootPath = scm.SchemaRootPath,
+                ParquetStorageBucket = scm.ParquetStorageBucket,
+                ParquetStoragePrefix = scm.ParquetStoragePrefix
             };
 
         }
