@@ -129,7 +129,11 @@ namespace Sentry.data.Infrastructure
             _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
 
             string targetkey = $"{s3DropStep.TriggerKey}{Path.GetFileName(absoluteUri)}";
-            var versionId = _s3ServiceProvider.UploadDataFile(tempFile, s3DropStep.TargetBucket, targetkey);
+
+            /******************************************************************************
+            * Utilizing Trigger bucket since we want to trigger the targetStep identified
+            ******************************************************************************/
+            var versionId = _s3ServiceProvider.UploadDataFile(tempFile, s3DropStep.TriggerBucket, targetkey);
 
             _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{s3DropStep.TargetBucket + "/" + targetkey} | VersionId:{versionId})");
         }
