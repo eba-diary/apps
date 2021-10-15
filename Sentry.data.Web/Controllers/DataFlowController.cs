@@ -206,6 +206,13 @@ namespace Sentry.data.Web.Controllers
                 results.Add(dsEx.Message);
                 AddCoreValidationExceptionsToModel(new ValidationException(results));
             }
+            //catch (DataFlowStepNotImplementedException stepEx)
+            //{
+            //    //User option selection not valid for dataflowstep mappings
+            //    ValidationResults results = new ValidationResults();
+            //    results.Add(stepEx.Message);
+            //    AddCoreValidationExceptionsToModel(new ValidationException(results));
+            //}
             catch (DataFlowUnauthorizedAccessException)
             {
                 //User should not get to this point via UI since navigating to Create page should give them Forbidden error
