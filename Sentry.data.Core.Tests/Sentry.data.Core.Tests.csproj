@@ -71,13 +71,16 @@
     <Reference Include="Sentry.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Core.1.1.0\lib\net452\Sentry.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Sentry.FeatureFlags, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="Sentry.FeatureFlags, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.FeatureFlags.1.0.4\lib\net452\Sentry.FeatureFlags.dll</HintPath>
+    </Reference>
     <Reference Include="StructureMap, Version=4.3.0.449, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\StructureMap.4.4.0\lib\net45\StructureMap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Net" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>

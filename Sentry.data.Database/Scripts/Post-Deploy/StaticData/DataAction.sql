@@ -1,12 +1,13 @@
 ﻿BEGIN TRAN 
 	BEGIN TRY
 		DECLARE @ENV VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
-		DECLARE	@Bucket VARCHAR(255), @ProducerS3DropBucket VARCHAR(255), @ProducerS3DropBucketv2 VARCHAR(255)
+		DECLARE	@Bucket VARCHAR(255), @Bucketv2 VARCHAR(255), @ProducerS3DropBucket VARCHAR(255), @ProducerS3DropBucketv2 VARCHAR(255)
 		DECLARE	@HRBucket VARCHAR(255), @HRProducerS3DropBucket VARCHAR(255)
 		
 		IF @ENV = 'DEV'
 		BEGIN
 			SET @Bucket = 'sentry-data-dev-dataset-ae2'
+			SET @Bucketv2 = 'sentry-dlst-dev-dataset-ae2'
 			SET @ProducerS3DropBucket = 'sentry-data-dev-droplocation-ae2'
 			SET @ProducerS3DropBucketv2 = 'sentry-dlst-dev-droplocation-ae2'
 
@@ -17,6 +18,7 @@
 		ELSE IF @ENV = 'NRDEV'
 		BEGIN
 			SET @Bucket = 'sentry-data-nrdev-dataset-ae2'
+			SET @Bucketv2 = 'sentry-dlst-nrdev-dataset-ae2'
 			SET @ProducerS3DropBucket = 'sentry-data-nrdev-droplocation-ae2'
 			SET @ProducerS3DropBucketv2 = 'sentry-dlst-nrdev-droplocation-ae2'
 			
@@ -27,6 +29,7 @@
 		ELSE IF @ENV = 'TEST'
 		BEGIN
 			SET @Bucket = 'sentry-data-test-dataset-ae2'
+			SET @Bucketv2 = 'sentry-dlst-test-dataset-ae2'
 			SET @ProducerS3DropBucket = 'sentry-data-test-droplocation-ae2'
 			SET @ProducerS3DropBucketv2 = 'sentry-dlst-test-droplocation-ae2'
 
@@ -37,6 +40,7 @@
 		ELSE IF @ENV = 'NRTEST'
 		BEGIN
 			SET @Bucket = 'sentry-data-nrtest-dataset-ae2'
+			SET @Bucketv2 = 'sentry-dlst-nrtest-dataset-ae2'
 			SET @ProducerS3DropBucket = 'sentry-data-nrtest-droplocation-ae2'
 			SET @ProducerS3DropBucketv2 = 'sentry-dlst-nrtest-droplocation-ae2'
 
@@ -47,6 +51,7 @@
 		ELSE IF @ENV = 'QUAL'
 		BEGIN
 			SET @Bucket = 'sentry-data-qual-dataset-ae2'
+			SET @Bucketv2 = 'sentry-dlst-qual-dataset-ae2'
 			SET @ProducerS3DropBucket = 'sentry-data-qual-droplocation-ae2'
 			SET @ProducerS3DropBucketv2 = 'sentry-dlst-qual-droplocation-ae2'
 
@@ -57,6 +62,7 @@
 		ELSE IF @ENV = 'PROD'
 		BEGIN
 			SET @Bucket = 'sentry-data-prod-dataset-ae2'
+			SET @Bucketv2 = 'sentry-dlst-prod-dataset-ae2'
 			SET @ProducerS3DropBucket = 'sentry-data-prod-droplocation-ae2'
 			SET @ProducerS3DropBucketv2 = 'sentry-dlst-prod-droplocation-ae2'
 
@@ -67,6 +73,7 @@
 		ELSE
 		BEGIN
 			SET @Bucket = 'sentry-data-dev-dataset-ae2'
+			SET @Bucketv2 = 'sentry-dlst-dev-dataset-ae2'
 			SET @ProducerS3DropBucket = 'sentry-data-dev-droplocation-ae2'
 			SET @ProducerS3DropBucketv2 = 'sentry-dlst-dev-droplocation-ae2'
 
@@ -101,7 +108,19 @@
 									(18, '528F1378-C89D-4056-A8DE-7EC97071441D', 'HR Schema Load', 'schemaload/', @HRBucket, 'SchemaLoad', 0, 'HR Maps schema related metadata to file for processing'),
 									(19, 'A0AA6364-A943-449B-907D-DB631B35C746', 'HR ConvertToParquet', 'parquet/', @HRBucket, 'ConvertParquet', 1, 'HR Converts raw file to parquet format and stores in long term storage accessed via Hive'),
 									(20, '6CDD6D22-B79F-4A89-8806-8ACE399DF174', 'HR Producer S3 Drop', 'producers3drop/', @HRProducerS3DropBucket, 'ProducerS3Drop', 0, 'HR S3 drop location exposed to data producers for sending data to DSC data processing platform'),
-									(21, 'CDFB2967-836A-4778-83DB-2659B14F4BD7', 'HR XML', 'xmlpreprocessing/', @HRBucket, 'XML', 0, 'HR Converts xml file into data processing friendly format')
+									(21, 'CDFB2967-836A-4778-83DB-2659B14F4BD7', 'HR XML', 'xmlpreprocessing/', @HRBucket, 'XML', 0, 'HR Converts xml file into data processing friendly format'),
+									
+									(22, '2C66A6E3-883B-416F-AC94-7A7FBD7CB845', 'Raw Storage', 'raw/', @Bucketv2, 'RawStorage', 0, 'Sends copy of unaltered incoming file to long term storage location within DLST bucket'),
+									(23, '61C96A9D-E3CB-49C9-9318-D73CC492E5B5', 'Query Storage', 'rawquery/', @Bucketv2, 'QueryStorage', 1, 'Sends copy of raw file to long term storage within DLST bucket'),
+									(24, '54E59A6C-FA33-4B9B-A035-7E818F160BC7', 'ConvertToParquet', 'parquet/', @Bucketv2, 'ConvertParquet', 1, 'Converts raw file to parquet format and stores in long term storage within DLST bucket'),
+									(25, 'FBCF60AE-D76A-4E7F-83B3-9443544F2034', 'Uncompress Zip', 'uncompresszip/', @Bucketv2, 'UncompressZip', 0, 'Uncompresses incoming zip file within DLST bucket'),
+									(26, '708120E2-9961-4559-B2D3-65B9494DD47B', 'Google Api', 'googleapipreprocessing/', @Bucketv2, 'GoogleApi', 0, 'Converts Google API JSON output to data processing friendly format within DLST bucket'),
+									(27, '9B32C12B-E721-4C7E-94EE-DCEF5B3E0269', 'ClaimIQ', 'claimiqpreprocessing/', @Bucketv2, 'ClaimIq', 0, 'Encodes and converts ClaimIQ file to data processing friendly format within DLST bucket'),
+									(28, '66352D07-2E41-4FAE-B0DA-D2B42F58B313', 'Uncompress Gzip', 'uncompressgzip/', @Bucketv2, 'UncompressGzip', 0, 'Decompresses incoming gzip file within DLST bucket'),
+									(29, '6BC1D3CE-9A7A-42E7-9649-E3D4D083B244', 'Fixed Width', 'fixedwidthpreprocessing/', @Bucketv2, 'FixedWidth', 0, 'Converts fixed width file into data processing friendly format within DLST bucket'),
+									(30, 'B9EACD9B-B2B8-4956-8ED7-60D9AE27608E', 'XML', 'xmlpreprocessing/', @Bucketv2, 'XML', 0, 'Converts xml file into data processing friendly format within DLST bucket'),
+									(31, 'AFFA0462-749E-4130-AFFF-D16747B73F26', 'JSON Flattening', 'jsonflattening/', @Bucketv2, 'JsonFlattening', 0, 'Flattens incoming JSON based on specified Schema Root Path property on schema within DLST bucket'),
+									(32, '3DE8781B-5E16-4946-A4D9-642B8B0F05FB', 'Schema Load', 'schemaload/', @Bucketv2, 'SchemaLoad', 0, 'Maps schema related metadata to file for processing within DLST bucket')
 								)
 								AS Source ([Id], [ActionGuid], [Name], [TargetStoragePrefix], [TargetStorageBucket], [ActionType], [TargetStorageSchemaAware], [Description]) 
 

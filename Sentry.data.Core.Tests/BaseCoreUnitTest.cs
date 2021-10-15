@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Rhino.Mocks;
+﻿using Rhino.Mocks;
+using Sentry.FeatureFlags;
+using Sentry.FeatureFlags.Mock;
 using StructureMap;
+using System;
 
 namespace Sentry.data.Core.Tests
 {
@@ -37,10 +35,44 @@ namespace Sentry.data.Core.Tests
 
         }
 
-
         protected void TestCleanup()
         {
             _container.Dispose();
+        }
+
+        public class MockDataFeatures : IDataFeatures
+        {
+            public IFeatureFlag<bool> Remove_Mock_Uncompress_Logic_CLA_759 => throw new NotImplementedException();
+
+            public IFeatureFlag<bool> Remove_ConvertToParquet_Logic_CLA_747 => throw new NotImplementedException();
+
+            public IFeatureFlag<bool> Remove_Mock_GoogleAPI_Logic_CLA_1679 => throw new NotImplementedException();
+
+            public IFeatureFlag<bool> Remove_ClaimIQ_mock_logic_CLA_758 => throw new NotImplementedException();
+
+            public IFeatureFlag<bool> Dale_Expose_EditOwnerVerified_CLA_1911 => throw new NotImplementedException();
+
+            public IFeatureFlag<bool> Expose_Dataflow_Metadata_CLA_2146 => throw new NotImplementedException();
+
+            public IFeatureFlag<string> CLA2671_RefactorEventsToJava => throw new NotImplementedException();
+
+            public IFeatureFlag<string> CLA2671_RefactoredDataFlows => throw new NotImplementedException();
+
+            public IFeatureFlag<bool> CLA3329_Expose_HR_Category => throw new NotImplementedException();
+
+            public IFeatureFlagRequiringContext<bool, string> CLA1656_DataFlowEdit_ViewEditPage => throw new NotImplementedException();
+
+            public IFeatureFlagRequiringContext<bool, string> CLA1656_DataFlowEdit_SubmitEditPage => throw new NotImplementedException();
+
+            public IFeatureFlag<bool> CLA3240_UseDropLocationV2 { get; } = new MockBooleanFeatureFlag(false);
+
+            public IFeatureFlag<bool> CLA3241_DisableDfsDropLocation => throw new NotImplementedException();
+
+            public IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; } = new MockBooleanFeatureFlag(false);
+
+            public IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime => throw new NotImplementedException();
+
+            public IFeatureFlag<bool> CLA3497_UniqueLivySessionName => throw new NotImplementedException();
         }
 
     }

@@ -13,7 +13,7 @@ namespace Sentry.data.Core.Tests
 {
 
     [TestClass]
-    public class SchemaServiceTests
+    public class SchemaServiceTests : BaseCoreUnitTest
     {
         #region DecimalFieldDto_JsonConstructor Tests
         #region DecimalFieldDto Precision Tests
@@ -2125,40 +2125,5 @@ namespace Sentry.data.Core.Tests
 
 
 
-    }
-
-    public class MockDataFeatures : IDataFeatures
-    {
-        public IFeatureFlag<bool> Remove_Mock_Uncompress_Logic_CLA_759 => throw new NotImplementedException();
-
-        public IFeatureFlag<bool> Remove_ConvertToParquet_Logic_CLA_747 => throw new NotImplementedException();
-
-        public IFeatureFlag<bool> Remove_Mock_GoogleAPI_Logic_CLA_1679 => throw new NotImplementedException();
-
-        public IFeatureFlag<bool> Remove_ClaimIQ_mock_logic_CLA_758 => throw new NotImplementedException();
-
-        public IFeatureFlag<bool> Dale_Expose_EditOwnerVerified_CLA_1911 => throw new NotImplementedException();
-
-        public IFeatureFlag<bool> Expose_Dataflow_Metadata_CLA_2146 => throw new NotImplementedException();
-
-        public IFeatureFlag<string> CLA2671_RefactorEventsToJava => throw new NotImplementedException();
-
-        public IFeatureFlag<string> CLA2671_RefactoredDataFlows => throw new NotImplementedException();
-
-        public IFeatureFlag<bool> CLA3329_Expose_HR_Category => throw new NotImplementedException();
-
-        public IFeatureFlagRequiringContext<bool, string> CLA1656_DataFlowEdit_ViewEditPage => throw new NotImplementedException();
-
-        public IFeatureFlagRequiringContext<bool, string> CLA1656_DataFlowEdit_SubmitEditPage => throw new NotImplementedException();
-
-        public IFeatureFlag<bool> CLA3240_UseDropLocationV2 => throw new NotImplementedException();
-
-        public IFeatureFlag<bool> CLA3241_DisableDfsDropLocation => throw new NotImplementedException();
-
-        public IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; } = new MockBooleanFeatureFlag(false);
-
-        public IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime => throw new NotImplementedException();
-
-        public IFeatureFlag<bool> CLA3497_UniqueLivySessionName => throw new NotImplementedException();
     }
 }

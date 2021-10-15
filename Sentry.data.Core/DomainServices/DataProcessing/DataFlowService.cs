@@ -36,6 +36,9 @@ namespace Sentry.data.Core
             _dataFeatures = dataFeatures;
         }
 
+
+
+
         public List<DataFlowDto> ListDataFlows()
         {
             List<DataFlow> dfList = _datasetContext.DataFlow.ToList();
@@ -147,7 +150,7 @@ namespace Sentry.data.Core
             catch (Exception ex)
             {
                 Logger.Error("dataflowservice-createandsavedataflow failed to save dataflow", ex);
-                return 0;
+                throw;
             }
         }
 
@@ -866,51 +869,44 @@ namespace Sentry.data.Core
             switch (actionType)
             {
                 case DataActionType.S3Drop:
-                    action = _datasetContext.S3DropAction.FirstOrDefault();
+                    action = _datasetContext.S3DropAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.ProducerS3Drop:
-                    if (isHumanResources)
-                    {
-                        action = _datasetContext.ProducerS3DropAction.GetHrDataDropLocation();               
-                    }
-                    else
-                    {
-                        action = _dataFeatures.CLA3240_UseDropLocationV2.GetValue() ? _datasetContext.ProducerS3DropAction.GetDlstDropLocation() : _datasetContext.ProducerS3DropAction.GetDataDropLocation();
-                    }
+                    action = _datasetContext.ProducerS3DropAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.RawStorage:
-                    action = (isHumanResources)? _datasetContext.RawStorageAction.GetHrRawStorage() :_datasetContext.RawStorageAction.FirstOrDefault();
+                    action = _datasetContext.RawStorageAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.QueryStorage:
-                    action = (isHumanResources) ? _datasetContext.QueryStorageAction.GetHrQueryStorageAction() : _datasetContext.QueryStorageAction.FirstOrDefault();
+                    action = _datasetContext.QueryStorageAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.ConvertParquet:
-                    action = (isHumanResources) ? _datasetContext.ConvertToParquetAction.GetHrConvertToParquetAction() : _datasetContext.ConvertToParquetAction.FirstOrDefault();
+                    action = _datasetContext.ConvertToParquetAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.UncompressZip:
-                    action = _datasetContext.UncompressZipAction.FirstOrDefault();
+                    action = _datasetContext.UncompressZipAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.GoogleApi:
-                    action = _datasetContext.GoogleApiAction.FirstOrDefault();
+                    action = _datasetContext.GoogleApiAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.ClaimIq:
-                    action = _datasetContext.ClaimIQAction.FirstOrDefault();
+                    action = _datasetContext.ClaimIQAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.UncompressGzip:
-                    action = _datasetContext.UncompressGzipAction.FirstOrDefault();
+                    action = _datasetContext.UncompressGzipAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.FixedWidth:
-                    action = _datasetContext.FixedWidthAction.FirstOrDefault();
+                    action = _datasetContext.FixedWidthAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.XML:
-                    action = (isHumanResources)? _datasetContext.XMLAction.GetHrXMLAction() : _datasetContext.XMLAction.FirstOrDefault();
+                    action = _datasetContext.XMLAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.JsonFlattening:
-                    action = _datasetContext.JsonFlatteningAction.FirstOrDefault();
+                    action = _datasetContext.JsonFlatteningAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.SchemaLoad:
 
-                    action = (isHumanResources)? _datasetContext.SchemaLoadAction.GetHrSchemaLoadAction() : _datasetContext.SchemaLoadAction.FirstOrDefault();
+                    action = _datasetContext.SchemaLoadAction.GetAction(_dataFeatures, isHumanResources);
                     
                     DataFlowStep schemaLoadStep = MapToDataFlowStep(df, action, actionType);
                     List<SchemaMap> schemaMapList = new List<SchemaMap>();
@@ -923,7 +919,7 @@ namespace Sentry.data.Core
                     return schemaLoadStep;
 
                 case DataActionType.SchemaMap:
-                    action = _datasetContext.SchemaMapAction.FirstOrDefault();
+                    action = _datasetContext.SchemaMapAction.GetAction(_dataFeatures, isHumanResources);
                     DataFlowStep schemaMapStep = MapToDataFlowStep(df, action, actionType);
                     foreach (SchemaMapDto mapDto in dto.SchemaMap.Where(w => !w.IsDeleted))
                     {
@@ -978,13 +974,17 @@ namespace Sentry.data.Core
             else if (step.DataAction_Type_Id == DataActionType.ProducerS3Drop)
             {
                 step.TriggerKey = _dataFeatures.CLA3240_UseDropLocationV2.GetValue()
-                    ? $"{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/"
+                    ? $"drop/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/"
                     : $"droplocation/data/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/";
                 SetTriggerBucketForS3DropLocation(step);
             }
             else
             {
-                step.TriggerKey = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                string triggerPrefix = _dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
+                    ? $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{GetDatasetSaidAsset(step.DataFlow.Id)}/{GetDatasetNamedEnvironment(step.DataFlow.Id)}/{step.Action.TargetStoragePrefix}{step.DataFlow.FlowStorageCode}/"
+                    : $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+
+                step.TriggerKey = triggerPrefix;
                 step.TriggerBucket = step.Action.TargetStorageBucket;
             }
         }
@@ -1006,12 +1006,16 @@ namespace Sentry.data.Core
                 case DataActionType.QueryStorage:
                 case DataActionType.ConvertParquet:
                     string schemaStorageCode = GetSchemaStorageCodeForDataFlow(step.DataFlow.Id);
-                    step.TargetPrefix = step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{schemaStorageCode}/";
+                    step.TargetPrefix = _dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
+                        ? $"{GetDatasetSaidAsset(step.DataFlow.Id)}/{GetDatasetNamedEnvironment(step.DataFlow.Id)}/{step.Action.TargetStoragePrefix}{schemaStorageCode}/"
+                        : step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{schemaStorageCode}/";
                     step.TargetBucket = step.Action.TargetStorageBucket;
                     break;
                 //These sent output a step specific location along with down stream dependent steps
                 case DataActionType.RawStorage:
-                    step.TargetPrefix = step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                    step.TargetPrefix = _dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
+                        ? $"{GetDatasetSaidAsset(step.DataFlow.Id)}/{GetDatasetNamedEnvironment(step.DataFlow.Id)}/{step.Action.TargetStoragePrefix}{step.DataFlow.FlowStorageCode}/"
+                        : step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
                     step.TargetBucket = step.Action.TargetStorageBucket;
                     break;
                 //These only send output to down stream dependent steps
@@ -1035,6 +1039,38 @@ namespace Sentry.data.Core
             step.SourceDependencyPrefix = previousStep?.TriggerKey;
             step.SourceDependencyBucket = previousStep?.TriggerBucket;
         }
+
+        /// <summary>
+        /// Return SAID keycode for Dataset associated with dataflow
+        /// </summary>
+        private string GetDatasetSaidAsset(int dataflowId)
+        {            
+            int datasetId = _datasetContext.DataFlow
+                            .Where(w => w.Id == dataflowId)
+                            .Select(s => s.DatasetId)
+                            .FirstOrDefault();
+            string saidAsset = _datasetContext.Datasets
+                            .Where(w => w.DatasetId == datasetId)
+                            .Select(s => s.SAIDAssetKeyCode)
+                            .FirstOrDefault();
+            return saidAsset;
+        }
+
+        /// <summary>
+        /// Return Named Environment for Dataset associated with dataflow
+        /// </summary>
+        private string GetDatasetNamedEnvironment(int dataflowId)
+        {
+            int datasetId = _datasetContext.DataFlow
+                            .Where(w => w.Id == dataflowId)
+                            .Select(s => s.DatasetId)
+                            .FirstOrDefault();
+            string namedEnvironment = _datasetContext.Datasets
+                            .Where(w => w.DatasetId == datasetId)
+                            .Select(s => s.NamedEnvironment)
+                            .FirstOrDefault();
+            return namedEnvironment;
+        } 
 
         #region SchemaFlowMappings
 
