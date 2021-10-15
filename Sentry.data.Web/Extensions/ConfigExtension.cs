@@ -216,7 +216,9 @@ namespace Sentry.data.Web
                 SnowflakeStatus = schemaDto.SnowflakeStatus,
                 ObjectStatus = schemaDto.ObjectStatus.GetDescription().ToUpper(),
                 SchemaRootPath = schemaDto.SchemaRootPath?.Split(','),
-                HasDataFlow = dto.HasDataFlow
+                HasDataFlow = dto.HasDataFlow,
+                ParquetStorageBucket = schemaDto.ParquetStorageBucket,
+                ParquetStoragePrefix = schemaDto.ParquetStoragePrefix
             };
         }
 

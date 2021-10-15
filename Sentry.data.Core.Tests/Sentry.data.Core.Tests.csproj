@@ -71,6 +71,7 @@
     <Reference Include="Sentry.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Core.1.1.0\lib\net452\Sentry.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Sentry.FeatureFlags, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="StructureMap, Version=4.3.0.449, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\StructureMap.4.4.0\lib\net45\StructureMap.dll</HintPath>
     </Reference>

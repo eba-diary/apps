@@ -67,6 +67,9 @@ DECLARE @ErrorMessage NVARCHAR(4000);
 DECLARE @ErrorSeverity INT; 
 DECLARE @ErrorState INT; 
 
+:r ..\Post-Deploy\SupportingScripts\Sprint_21_04_06\HistoryFix_Initialize_ParquetStorageBucket_on_Schema.sql
+:r ..\Post-Deploy\SupportingScripts\Sprint_21_04_06\HistoryFix_Initialize_ParquetStoragePrefix_on_Schema.sql
+
 --Now only run these scritps if the versioning allows us.
 --ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
 --SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 

@@ -23,5 +23,7 @@
         public string SnowflakeSchema { get; set; }
         public string SnowflakeStatus { get; set; }
         public string SchemaRootPath { get; set; }
+        public string ParquetStorageBucket { get; set; }
+        public string ParquetStoragePrefix { get; set; }
     }
 }

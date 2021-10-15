@@ -33,5 +33,7 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public string ObjectStatus { get; set; }
         public string[] SchemaRootPath { get; set; }
         public bool HasDataFlow { get; set; }
+        public string ParquetStorageBucket { get; set; }
+        public string ParquetStoragePrefix { get; set; }
     }
 }

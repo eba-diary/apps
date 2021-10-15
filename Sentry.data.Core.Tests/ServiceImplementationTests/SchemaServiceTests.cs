@@ -5,6 +5,9 @@ using Sentry.data.Core.Factories.Fields;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Moq;
+using Sentry.FeatureFlags;
+using Sentry.FeatureFlags.Mock;
 
 namespace Sentry.data.Core.Tests
 {
@@ -1670,6 +1673,102 @@ namespace Sentry.data.Core.Tests
         }
         #endregion
 
+        [TestMethod]
+        public void SchemaService_GenerateParquetStorageBucket_HRBucket()
+        {
+            // Arrange
+            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null);
+
+            // Act
+            var result = schemaService.GenerateParquetStorageBucket(true,"DATA","DEV");
+
+            // Assert
+            Assert.AreEqual("sentry-data-dev-hrdataset-ae2", result, false);
+        }
+
+        [TestMethod]
+        public void SchemaService_GenerateParquetStorageBucket_BaseBucket()
+        {
+            // Arrange
+            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null);
+
+            // Act
+            var result = schemaService.GenerateParquetStorageBucket(false, "DATA", "DEV");
+
+            // Assert
+            Assert.AreEqual("sentry-data-dev-dataset-ae2", result, false);
+        }
+
+        [TestMethod]
+        public void SchemaService_GenerateParquetStoragePrefix_ConsolidatedDataFlow_False()
+        {
+            // Arrange
+            var dataFeatures = new MockDataFeatures();
+            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
+
+            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null);
+
+
+            // Act
+            var result = schemaService.GenerateParquetStoragePrefix("DATA", "DEV", "123456");
+
+            // Assert
+            Assert.AreEqual($"{GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX}/DATA/123456", result, false);
+        }
+
+        [TestMethod]
+        public void SchemaService_GenerateParquetStoragePrefix_ConsolidatedDataFlow_True()
+        {
+            // Arrange
+            var dataFeatures = new MockDataFeatures();
+            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
+
+            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null);
+
+
+            // Act
+            var result = schemaService.GenerateParquetStoragePrefix("DATA", "DEV", "123456");
+
+            // Assert
+            Assert.AreEqual($"{GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX}/DATA/DEV/123456", result, false);
+        }
+
+        [TestMethod]
+        public void SchemaService_GenerateParquetStoragePrefix_Null_SAID_Keycode()
+        {
+            // Arrange
+            var dataFeatures = new MockDataFeatures();
+            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
+
+            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null);
+
+            // Assert
+            Assert.ThrowsException<ArgumentNullException>(() => schemaService.GenerateParquetStoragePrefix(null, "DEV", "123456"));
+        }
+
+        [TestMethod]
+        public void SchemaService_GenerateParquetStoragePrefix_Null_Storagecode()
+        {
+            // Arrange
+            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null);
+
+            // Assert
+            Assert.ThrowsException<ArgumentNullException>(() => schemaService.GenerateParquetStoragePrefix("DATA", "DEV", null));
+        }
+
+        [TestMethod]
+        public void SchemaService_GenerateParquetStoragePrefix_Null_NamedEnviornment()
+        {
+            // Arrange
+            var dataFeatures = new MockDataFeatures();
+            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
+
+            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null);
+
+            // Assert
+            Assert.ThrowsException<ArgumentNullException>(() => schemaService.GenerateParquetStoragePrefix("DATA", null, "123456"));
+        }
+
         #region Private Methods
         private JsonSchema BuildMockJsonSchemaWithDecimalField()
         {
@@ -2026,5 +2125,40 @@ namespace Sentry.data.Core.Tests
 
 
 
+    }
+
+    public class MockDataFeatures : IDataFeatures
+    {
+        public IFeatureFlag<bool> Remove_Mock_Uncompress_Logic_CLA_759 => throw new NotImplementedException();
+
+        public IFeatureFlag<bool> Remove_ConvertToParquet_Logic_CLA_747 => throw new NotImplementedException();
+
+        public IFeatureFlag<bool> Remove_Mock_GoogleAPI_Logic_CLA_1679 => throw new NotImplementedException();
+
+        public IFeatureFlag<bool> Remove_ClaimIQ_mock_logic_CLA_758 => throw new NotImplementedException();
+
+        public IFeatureFlag<bool> Dale_Expose_EditOwnerVerified_CLA_1911 => throw new NotImplementedException();
+
+        public IFeatureFlag<bool> Expose_Dataflow_Metadata_CLA_2146 => throw new NotImplementedException();
+
+        public IFeatureFlag<string> CLA2671_RefactorEventsToJava => throw new NotImplementedException();
+
+        public IFeatureFlag<string> CLA2671_RefactoredDataFlows => throw new NotImplementedException();
+
+        public IFeatureFlag<bool> CLA3329_Expose_HR_Category => throw new NotImplementedException();
+
+        public IFeatureFlagRequiringContext<bool, string> CLA1656_DataFlowEdit_ViewEditPage => throw new NotImplementedException();
+
+        public IFeatureFlagRequiringContext<bool, string> CLA1656_DataFlowEdit_SubmitEditPage => throw new NotImplementedException();
+
+        public IFeatureFlag<bool> CLA3240_UseDropLocationV2 => throw new NotImplementedException();
+
+        public IFeatureFlag<bool> CLA3241_DisableDfsDropLocation => throw new NotImplementedException();
+
+        public IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; } = new MockBooleanFeatureFlag(false);
+
+        public IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime => throw new NotImplementedException();
+
+        public IFeatureFlag<bool> CLA3497_UniqueLivySessionName => throw new NotImplementedException();
     }
 }
