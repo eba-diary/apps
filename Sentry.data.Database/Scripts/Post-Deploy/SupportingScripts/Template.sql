@@ -1,4 +1,4 @@
-﻿SET @ScriptVersion = 'CLA-3485 - HistoryFix_Revert_ProducerS3Drop_Step_TargetBucket_Metadata'
+﻿SET @ScriptVersion = '*** PUT JIRA ITEM / NAME OF SCRIPT HERE ***'
 
 BEGIN TRAN 
 IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion) 
@@ -8,9 +8,9 @@ BEGIN TRY
     -- BEGIN POST-DEPLOY SCRIPT --
 
 
-    UPDATE DataFlowStep 
-    SET TargetBucket = null
-    WHERE DataAction_Type_Id = 12 /* ProducerS3Drop action type */
+
+    -- *** PUT YOUR SCRIPT HERE *** --
+
 
 
     -- END POST-DEPLOY SCRIPT --
