@@ -158,6 +158,17 @@ namespace Sentry.data.Web.Controllers
 
             DataFlowDto dfDto = model.ToDto();
 
+            /*
+             * After CLA3332_ConsolidatedDataflows feature flag is true and conversion of all dataflows is compelted,
+             *   there will be no need for a list of schema maps since consolidated dataflows only supports 
+             *   a single schema.  Therefore, refactor dataset\schema selection to be directly on DataFlowModel
+             *   (https://jira.sentry.com/browse/CLA-3507).
+            */
+            if (DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()){
+                dfDto.DatasetId = model.SchemaMaps.FirstOrDefault().SelectedDataset;
+                dfDto.SchemaId = model.SchemaMaps.FirstOrDefault().SelectedSchema;
+            }
+
             AddCoreValidationExceptionsToModel(await _dataFlowService.Validate(dfDto).ConfigureAwait(true));
 
             try
@@ -206,6 +217,13 @@ namespace Sentry.data.Web.Controllers
                 results.Add(dsEx.Message);
                 AddCoreValidationExceptionsToModel(new ValidationException(results));
             }
+            //catch (DataFlowStepNotImplementedException stepEx)
+            //{
+            //    //User option selection not valid for dataflowstep mappings
+            //    ValidationResults results = new ValidationResults();
+            //    results.Add(stepEx.Message);
+            //    AddCoreValidationExceptionsToModel(new ValidationException(results));
+            //}
             catch (DataFlowUnauthorizedAccessException)
             {
                 //User should not get to this point via UI since navigating to Create page should give them Forbidden error

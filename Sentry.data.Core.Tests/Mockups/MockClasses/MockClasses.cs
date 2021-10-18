@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,9 @@ namespace Sentry.data.Core.Tests
 {
     public static class MockClasses
     {
+        const string HrDatasetBucket = "sentry-dlst-dev-hrdroplocation-ae2";
+        const string DlstDatasetBucket = "sentry-dlst-dev-droplocation-ae2";
+        const string DataDatasetBucket = "sentry-data-dev-hrdroplocation-ae2";
         public static Dataset MockDataset(IApplicationUser user = null, Boolean addConfig = false, Boolean isSecured = false)
         {
             Dataset ds = new Dataset()
@@ -45,7 +49,7 @@ namespace Sentry.data.Core.Tests
         public static List<DatasetDto> MockDatasetDto(List<Dataset> dsList)
         {
             List<DatasetDto> dtoList = new List<DatasetDto>();
-            foreach(Dataset ds in dsList)
+            foreach (Dataset ds in dsList)
             {
                 DatasetDto dto = new DatasetDto()
                 {
@@ -74,7 +78,7 @@ namespace Sentry.data.Core.Tests
         }
 
         public static DatasetFileConfig MockDataFileConfig(Dataset ds = null)
-        {            
+        {
             DatasetFileConfig dfc = new DatasetFileConfig()
             {
                 ConfigId = 2000,
@@ -84,7 +88,7 @@ namespace Sentry.data.Core.Tests
                 ParentDataset = ds != null ? ds : MockDataset(),
                 DatasetScopeType = MockScopeTypes()[0],
                 FileExtension = MockFileExtensions()[0],
-                RetrieverJobs = new List<RetrieverJob>(),                
+                RetrieverJobs = new List<RetrieverJob>(),
             };
 
             return dfc;
@@ -227,7 +231,7 @@ namespace Sentry.data.Core.Tests
                 n.Name = "Basic_Name";
                 n.Description = "Basic_Description";
                 return n;
-            }            
+            }
         }
 
         public static DatasetFile MockDataFile(Dataset ds, DatasetFileConfig dfc, IApplicationUser user)
@@ -242,7 +246,7 @@ namespace Sentry.data.Core.Tests
                 ModifiedDTM = System.DateTime.Now.AddYears(-12),
                 FileLocation = "data-dev/government/quarterly_census_of_employment_and_wages/235/2018/1/18/2014.annual.singlefile.csv",
                 DatasetFileConfig = dfc,
-                IsBundled = false         
+                IsBundled = false
             };
 
             return df;
@@ -276,7 +280,7 @@ namespace Sentry.data.Core.Tests
 
                 DataSource = MockDataSource(dsrc, authType),
 
-                DatasetConfig = dfc != null? dfc : MockDataFileConfig(null),
+                DatasetConfig = dfc != null ? dfc : MockDataFileConfig(null),
                 Created = DateTime.Now,
                 Modified = DateTime.Now,
                 IsGeneric = true,
@@ -333,7 +337,7 @@ namespace Sentry.data.Core.Tests
             an.NotificationType = GlobalConstants.Notifications.DATAASSET_TYPE;
             an.Title = "Alert Title";
 
-            if(user != null)
+            if (user != null)
             {
                 an.CreateUser = user.AssociateId;
             }
@@ -357,7 +361,7 @@ namespace Sentry.data.Core.Tests
 
             EventType et3 = new EventType();
             et3.Description = "Created File";
-            et3.Severity = 1;         
+            et3.Severity = 1;
             et3.Display = true;
             et3.Type_ID = 1;
 
@@ -397,7 +401,7 @@ namespace Sentry.data.Core.Tests
             intervals.Add(i2);
 
             return intervals;
-        }        
+        }
 
         public static List<DatasetSubscription> MockDatasetSubscriptions(Dataset ds, IApplicationUser user = null)
         {
@@ -418,13 +422,318 @@ namespace Sentry.data.Core.Tests
         {
             Event e = new Event();
             e.EventType = MockEventTypes()[0];
-            e.Status = MockEventStatuses()[0];            
+            e.Status = MockEventStatuses()[0];
             e.TimeCreated = DateTime.Now;
             e.TimeNotified = DateTime.Now;
             e.IsProcessed = false;
             e.UserWhoStartedEvent = "012345";
 
             return e;
-        }        
+        }
+
+        public static List<ProducerS3DropAction> MockProducerS3DropActions()
+        {
+            const string prefix = "producers3drop/";
+            const string name = "Producer S3 Drop";
+            var actions = new[] {new ProducerS3DropAction()
+            {
+                Id = 12,
+                Name = name,
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new ProducerS3DropAction(){
+                Id = 15,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new ProducerS3DropAction(){
+                Id = 20,
+                Name = $"HR {name}",
+                TargetStorageBucket = HrDatasetBucket,
+                TargetStoragePrefix = prefix
+            } };
+
+            return actions.ToList();
+        }
+
+        public static List<RawStorageAction> MockRawStorageActions()
+        {
+            const string prefix = "raw/";
+            const string name = "Raw Storage";
+            var actions = new[] {new RawStorageAction()
+            {
+                Id = 2,
+                Name = name,
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new RawStorageAction(){
+                Id = 22,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new RawStorageAction(){
+                Id = 16,
+                Name = $"HR {name}",
+                TargetStorageBucket = HrDatasetBucket,
+                TargetStoragePrefix = prefix
+            } };
+            return actions.ToList();
+        }
+
+        public static List<QueryStorageAction> MockQueryStorageActions()
+        {
+            const string prefix = "rawquery/";
+            const string name = "Query Storage";
+            var actions = new[] {new QueryStorageAction()
+            {
+                Id = 3,
+                Name = name,
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new QueryStorageAction(){
+                Id = 23,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new QueryStorageAction(){
+                Id = 17,
+                Name = $"HR {name}",
+                TargetStorageBucket = HrDatasetBucket,
+                TargetStoragePrefix = prefix
+            } };
+            return actions.ToList();
+        }
+
+        public static List<ConvertToParquetAction> MockConvertToParquetActions()
+        {
+            const string prefix = "parquet/";
+            const string name = "ConvertToParquet";
+            var actions = new[] {new ConvertToParquetAction()
+            {
+                Id = 6,
+                Name = name,
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new ConvertToParquetAction(){
+                Id = 24,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new ConvertToParquetAction(){
+                Id = 19,
+                Name = $"HR {name}",
+                TargetStorageBucket = HrDatasetBucket,
+                TargetStoragePrefix = prefix
+            } };
+            return actions.ToList();
+        }
+
+        public static List<UncompressZipAction> MockUncompressZipActions()
+        {
+            const string prefix = "uncompresszip/";
+            const string name = "Uncompress Zip";
+            var actions = new[] {new UncompressZipAction()
+            {
+                Id = 5,
+                Name = name,
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new UncompressZipAction(){
+                Id = 25,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            } };
+            return actions.ToList();
+        }
+
+        public static List<GoogleApiAction> MockGoogleApiActions()
+        {
+            const string prefix = "googleapipreprocessing/";
+            const string name = "Google Api";
+            var actions = new[] {new GoogleApiAction()
+            {
+                Id = 8,
+                Name = name,
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new GoogleApiAction(){
+                Id = 26,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            } };
+            return actions.ToList();
+        }
+
+        public static List<ClaimIQAction> MockClaimIQActions()
+        {
+            const string prefix = "claimiqpreprocessing/";
+            const string name = "ClaimIQ";
+            var actions = new[] {new ClaimIQAction()
+            {
+                Id = 9,
+                Name = name,
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new ClaimIQAction(){
+                Id = 27,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            } };
+            return actions.ToList();
+        }
+
+        public static List<UncompressGzipAction> MockUncompressGzipActions()
+        {
+            const string prefix = "uncompressgzip/";
+            const string name = "Uncompress Gzip";
+            var actions = new[] {new UncompressGzipAction()
+            {
+                Id = 10,
+                Name = name,
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new UncompressGzipAction(){
+                Id = 28,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            } };
+            return actions.ToList();
+        }
+
+        public static List<FixedWidthAction> MockFixedWidthActions()
+        {
+            const string prefix = "fixedwidthpreprocessing/";
+            const string name = "Fixed Width";
+            var actions = new[] {new FixedWidthAction()
+            {
+                Id = 11,
+                Name = name,
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new FixedWidthAction(){
+                Id = 29,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            } };
+            return actions.ToList();
+        }
+
+        public static List<XMLAction> MockXmlActions()
+        {
+            const string prefix = "xmlpreprocessing/";
+            const string name = "XML";
+            var actions = new[] {new XMLAction()
+            {
+                Id = 21,
+                Name = $"HR {name}",
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            },new XMLAction()
+            {
+                Id = 13,
+                Name = name,
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new XMLAction(){
+                Id = 30,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            } };
+            return actions.ToList();
+        }
+
+        public static List<JsonFlatteningAction> MockJsonFlatteningActions()
+        {
+            const string prefix = "jsonflattening/";
+            const string name = "JSON Flattening";
+            var actions = new[] {new JsonFlatteningAction()
+            {
+                Id = 14,
+                Name = name,
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new JsonFlatteningAction(){
+                Id = 31,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            } };
+            return actions.ToList();
+        }
+
+        public static List<SchemaLoadAction> MockSchemaLoadActions()
+        {
+            const string prefix = "schemaload/";
+            const string name = "Schema Load";
+            var actions = new[] {new SchemaLoadAction()
+            {
+                Id = 18,
+                Name = $"HR {name}",
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            },new SchemaLoadAction()
+            {
+                Id = 4,
+                Name = name,
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new SchemaLoadAction(){
+                Id = 32,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            } };
+            return actions.ToList();
+        }
+
+        public static List<SchemaMapAction> MockSchemaMapActions()
+        {
+            const string prefix = "schemamap/";
+            const string name = "Schema Map";
+            var actions = new[] {new SchemaMapAction()
+            {
+                Id = 7,
+                Name = name,
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            } };
+            return actions.ToList();
+        }
+
+        public static List<S3DropAction> MockS3DropActions()
+        {
+            const string prefix = "s3drop/";
+            const string name = "S3 Drop";
+            var actions = new[] {new S3DropAction()
+            {
+                Id = 1,
+                Name = name,
+                TargetStorageBucket = DataDatasetBucket,
+                TargetStoragePrefix = prefix
+            } };
+            return actions.ToList();
+        }
     }
 }

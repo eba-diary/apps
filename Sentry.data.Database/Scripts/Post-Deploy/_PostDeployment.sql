@@ -58,15 +58,13 @@ BEGIN
         INCREMENT BY 1
 END;
 
-
---Now only run these scripts if the versioning allows us.
---ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
---SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
+--Execute scripts to do history fixes / bulk updates
 DECLARE @ScriptVersion AS VARCHAR(50); 
 DECLARE @ErrorMessage NVARCHAR(4000); 
 DECLARE @ErrorSeverity INT; 
 DECLARE @ErrorState INT; 
 
 --Insert Post-Deploy SupportingScript references here
+:r ..\Post-Deploy\SupportingScripts\Sprint_21_04_06\HistoryFix_Revert_ProducerS3Drop_Step_TargetBucket_Metadata.sql
 
 
