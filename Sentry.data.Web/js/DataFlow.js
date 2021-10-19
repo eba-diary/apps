@@ -1,8 +1,13 @@
 ﻿data.DataFlow = {
 
     CLA3332_ConsolidatedDataFlows: false,
+    Orig_Dataset_Selection: 0,
+    Orig_Schema_Selection: 0,
 
     DataFlowFormInit: function (datasetId, schemaId) {
+
+        data.DataFlow.Orig_Dataset_Selection = datasetId;
+        data.DataFlow.Orig_Schema_Selection = schemaId;
 
         data.DataFlow.InitIngestionType();
 
@@ -311,9 +316,10 @@
                 });
 
                 //If feature flag is enabled, only show schemas that don't have a DataFlow
+                // or SchemaId matches the original schema selection
                 if (data.DataFlow.CLA3332_ConsolidatedDataFlows) {
                     filter = filter.filter(function (item) {
-                        return item.SchemaId === schemaId || item.HasDataFlow === false;
+                        return item.SchemaId === data.DataFlow.Orig_Schema_Selection || item.HasDataFlow === false;
                     });
                 }
 
