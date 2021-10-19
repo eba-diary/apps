@@ -72,7 +72,8 @@ namespace Sentry.data.Core
             catch (Exception ex)
             {
                 Logger.Error("schemaservice-createandsaveschema", ex);
-                return 0;
+                throw;
+                //return 0;
             }
 
             return newSchema.SchemaId;
@@ -764,7 +765,7 @@ namespace Sentry.data.Core
 
         private FileSchema CreateSchema(FileSchemaDto dto)
         {
-            string storageCode = _datasetContext.GetNextStorageCDE().ToString();
+            string storageCode = _datasetContext.GetNextStorageCDE().ToString().PadLeft(7, '0');
             Dataset parentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
             bool isHumanResources = (parentDataset.DatasetCategories.Any(w => w.AbbreviatedName == "HR")) ? true : false;           //Figure out if Category == HR
 
@@ -798,7 +799,13 @@ namespace Sentry.data.Core
                 CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag,
                 CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake,
                 ObjectStatus = dto.ObjectStatus,
-                SchemaRootPath = dto.SchemaRootPath
+                SchemaRootPath = dto.SchemaRootPath,
+                ParquetStorageBucket = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) 
+                                        ? GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DATA_LAKE_STORAGE, Config.GetDefaultEnvironmentName()) 
+                                        : GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DSC, Config.GetDefaultEnvironmentName()),
+                ParquetStoragePrefix = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
+                                        ? GenerateParquetStoragePrefix(parentDataset.SAIDAssetKeyCode, parentDataset.NamedEnvironment, storageCode)
+                                        : GenerateParquetStoragePrefix(Configuration.Config.GetHostSetting("S3DataPrefix"), null, storageCode)
             };
             _datasetContext.Add(schema);
             return schema;
@@ -839,7 +846,9 @@ namespace Sentry.data.Core
                 CLA2472_EMRSend = scm.CLA2472_EMRSend,
                 CLA1286_KafkaFlag = scm.CLA1286_KafkaFlag,
                 CLA3014_LoadDataToSnowflake = scm.CLA3014_LoadDataToSnowflake,
-                SchemaRootPath = scm.SchemaRootPath
+                SchemaRootPath = scm.SchemaRootPath,
+                ParquetStorageBucket = scm.ParquetStorageBucket,
+                ParquetStoragePrefix = scm.ParquetStoragePrefix
             };
 
         }
@@ -1083,6 +1092,53 @@ namespace Sentry.data.Core
         private string GenerateSnowflakeSchema(Category cat, bool isHumanResources)
         {
             return (isHumanResources)? "HR" : cat.Name.ToUpper();
+        }
+
+        /// <summary>
+        /// Generates appropriate bucket after evaluating various variables
+        /// </summary>
+        /// <param name="isHumanResources"></param>
+        /// <remarks> This method is only used by this class, therefore, setting to 
+        /// internal for exposure to Sentry.data.Core.Tests project for unit testing. </remarks>
+        /// <returns></returns>
+        internal string GenerateParquetStorageBucket(bool isHumanResources, string saidKeyCode, string namedEnvironment)
+        {
+            string bucket = (isHumanResources) 
+                ? GlobalConstants.AwsBuckets.HR_DATASET_BUCKET_AE2.Replace("<saidkeycode>", saidKeyCode.ToLower()).Replace("<namedenvironment>",namedEnvironment.ToLower())
+                : GlobalConstants.AwsBuckets.BASE_DATASET_BUCKET_AE2.Replace("<saidkeycode>", saidKeyCode.ToLower()).Replace("<namedenvironment>", namedEnvironment.ToLower());
+
+            return bucket;
+        }
+
+        internal string GenerateParquetStoragePrefix(string saidKeyCode, string namedEnvironment, string storageCode)
+        {
+            if (string.IsNullOrEmpty(saidKeyCode))
+            {
+                throw new ArgumentNullException("saidKeyCode", "SAID keycode is required to generate parquet storage prefix");
+            }
+            if (string.IsNullOrEmpty(storageCode))
+            {
+                throw new ArgumentNullException("storageCode", "Storage code is required to generate parquet storage prefix");
+            }
+
+            string prefix;
+
+            if (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
+            {
+                if (string.IsNullOrEmpty(namedEnvironment))
+                {
+                    throw new ArgumentNullException("namedEnvironment", "Named environment is required to generate parquet storage prefix");
+                }
+
+                prefix = $"{GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX}/{saidKeyCode.ToUpper()}/{namedEnvironment.ToUpper()}/{storageCode}";
+            }
+            else
+            {
+                prefix = $"{GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX}/{saidKeyCode.ToUpper()}/{storageCode}";
+            }
+
+
+            return prefix;
         }
 
         private string FormateSnowflakeTableNamePart(string part)

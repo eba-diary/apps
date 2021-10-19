@@ -65,6 +65,8 @@ DECLARE @ErrorSeverity INT;
 DECLARE @ErrorState INT; 
 
 --Insert Post-Deploy SupportingScript references here
+:r ..\Post-Deploy\SupportingScripts\Sprint_21_04_06\HistoryFix_Initialize_ParquetStorageBucket_on_Schema.sql
+:r ..\Post-Deploy\SupportingScripts\Sprint_21_04_06\HistoryFix_Initialize_ParquetStoragePrefix_on_Schema.sql
 :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_06\HistoryFix_Revert_ProducerS3Drop_Step_TargetBucket_Metadata.sql
 
 

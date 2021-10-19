@@ -23,5 +23,7 @@
         public virtual string SnowflakeSchema { get; set; }
         public virtual string SnowflakeStatus { get; set; }
         public virtual string SchemaRootPath { get; set; }
+        public virtual string ParquetStorageBucket { get; set; }
+        public virtual string ParquetStoragePrefix { get; set; }
     }
 }

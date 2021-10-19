@@ -12,7 +12,7 @@ using Sentry.data.Core.Exceptions;
 namespace Sentry.data.Core.Tests
 {
     [TestClass]
-    public class DataFlowServiceTests
+    public class DataFlowServiceTests : BaseCoreUnitTest
     {
         /// <summary>
         /// - Test that the DataFlowService.Validate() method correctly identifies a duplicate DataFlow name
@@ -741,41 +741,5 @@ namespace Sentry.data.Core.Tests
         }
 
         #endregion
-    }
-
-    public class MockDataFeatures : IDataFeatures
-    {
-
-        public IFeatureFlag<bool> CLA3240_UseDropLocationV2 { get; } = new MockBooleanFeatureFlag(false);
-
-        public IFeatureFlag<bool> Remove_Mock_Uncompress_Logic_CLA_759 => throw new System.NotImplementedException();
-
-        public IFeatureFlag<bool> Remove_ConvertToParquet_Logic_CLA_747 => throw new System.NotImplementedException();
-
-        public IFeatureFlag<bool> Remove_Mock_GoogleAPI_Logic_CLA_1679 => throw new System.NotImplementedException();
-
-        public IFeatureFlag<bool> Remove_ClaimIQ_mock_logic_CLA_758 => throw new System.NotImplementedException();
-
-        public IFeatureFlag<bool> Dale_Expose_EditOwnerVerified_CLA_1911 => throw new System.NotImplementedException();
-
-        public IFeatureFlag<bool> Expose_Dataflow_Metadata_CLA_2146 => throw new System.NotImplementedException();
-
-        public IFeatureFlag<string> CLA2671_RefactorEventsToJava => throw new System.NotImplementedException();
-
-        public IFeatureFlag<string> CLA2671_RefactoredDataFlows => throw new System.NotImplementedException();
-
-        public IFeatureFlag<bool> CLA3329_Expose_HR_Category => throw new System.NotImplementedException();
-
-        public IFeatureFlagRequiringContext<bool, string> CLA1656_DataFlowEdit_ViewEditPage => throw new System.NotImplementedException();
-
-        public IFeatureFlagRequiringContext<bool, string> CLA1656_DataFlowEdit_SubmitEditPage => throw new System.NotImplementedException();
-
-        public IFeatureFlag<bool> CLA3241_DisableDfsDropLocation => throw new System.NotImplementedException();
-
-        public IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; } = new MockBooleanFeatureFlag(false);
-
-        public IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime => throw new System.NotImplementedException();
-
-        public IFeatureFlag<bool> CLA3497_UniqueLivySessionName => throw new System.NotImplementedException();
     }
 }

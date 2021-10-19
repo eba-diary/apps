@@ -38,5 +38,7 @@ namespace Sentry.data.Core
         public ObjectStatusEnum ObjectStatus { get; set; }
         public string SchemaRootPath { get; set; }
         public bool HasDataFlow { get; set; }
+        public string ParquetStorageBucket { get; set; }
+        public string ParquetStoragePrefix { get; set; }
     }
 }
