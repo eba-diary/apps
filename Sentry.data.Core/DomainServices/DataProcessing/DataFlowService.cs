@@ -974,7 +974,7 @@ namespace Sentry.data.Core
             else if (step.DataAction_Type_Id == DataActionType.ProducerS3Drop)
             {
                 step.TriggerKey = _dataFeatures.CLA3240_UseDropLocationV2.GetValue()
-                    ? $"drop/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/"
+                    ? $"drop/{step.DataFlow.SaidKeyCode.ToUpper()}/{step.DataFlow.NamedEnvironment.ToUpper()}/{step.DataFlow.FlowStorageCode}/"
                     : $"droplocation/data/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/";
                 SetTriggerBucketForS3DropLocation(step);
             }
