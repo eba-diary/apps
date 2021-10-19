@@ -102,6 +102,7 @@ namespace Sentry.data.Web.Controllers
                 CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
             };
             model.SchemaMaps.Add(schemaModel);
+            
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
             model.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
 
@@ -144,6 +145,8 @@ namespace Sentry.data.Web.Controllers
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType),namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+
+            model.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
 
             return View("DataFlowForm", model);
 
@@ -341,7 +344,9 @@ namespace Sentry.data.Web.Controllers
                 CreatedBy = dto.CreatedBy,
                 CreatedDTM = dto.CreateDTM,
                 ObjectStatus = dto.ObjectStatus,
-                StorageCode = dto.FlowStorageCode
+                StorageCode = dto.FlowStorageCode,
+                SelectedDataset = dto.DatasetId,
+                SelectedSchema = dto.SchemaId
             };
 
             if (dto.SchemaMap.Any())

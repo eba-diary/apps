@@ -152,7 +152,7 @@
     <script type="text/javascript">
         $(function () {
             data.DataFlow.CLA3332_ConsolidatedDataFlows = @Model.CLA3332_ConsolidatedDataFlows.ToString().ToLower();
-            data.DataFlow.DataFlowFormInit();
+            data.DataFlow.DataFlowFormInit(@Model.SelectedDataset, @Model.SelectedSchema);
 
             @if (!Model.CLA3332_ConsolidatedDataFlows) {
                 <text>
