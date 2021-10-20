@@ -32,7 +32,7 @@ namespace Sentry.data.Infrastructure
         private FtpWebRequest CreateDwnldRequest(string url, NetworkCredential creds)
         {
             FtpWebRequest req = (FtpWebRequest)WebRequest.Create(url);
-            req.Proxy = new WebProxy(Configuration.Config.GetHostSetting("SentryWebProxyHost"), Int32.Parse(Configuration.Config.GetSetting("SentryWebProxyPort")))
+            req.Proxy = new WebProxy(Configuration.Config.GetHostSetting("WebProxyUrl"))
             {
                 Credentials = System.Net.CredentialCache.DefaultNetworkCredentials
             };

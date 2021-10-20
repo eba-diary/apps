@@ -71,6 +71,12 @@
     <Reference Include="Iesi.Collections, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <HintPath>..\packages\Iesi.Collections.4.0.4\lib\net461\Iesi.Collections.dll</HintPath>
     </Reference>
+    <Reference Include="LaunchDarkly.Logging, Version=1.0.1.0, Culture=neutral, PublicKeyToken=d9182e4b0afd33e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.Logging.1.0.1\lib\net452\LaunchDarkly.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="LaunchDarkly.Logging.Log4net, Version=1.0.1.0, Culture=neutral, PublicKeyToken=d9182e4b0afd33e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.Logging.Log4net.1.0.1\lib\net452\LaunchDarkly.Logging.Log4net.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
     </Reference>

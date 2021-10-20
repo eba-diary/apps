@@ -68,5 +68,5 @@ DECLARE @ErrorState INT;
 :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_06\HistoryFix_Initialize_ParquetStorageBucket_on_Schema.sql
 :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_06\HistoryFix_Initialize_ParquetStoragePrefix_on_Schema.sql
 :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_06\HistoryFix_Revert_ProducerS3Drop_Step_TargetBucket_Metadata.sql
-
+:r ..\Post-Deploy\SupportingScripts\Sprint_21_04_06\CLA-3398-Delete_Database_Feature_Flags_that_have_been_moved_to_LaunchDarkly.sql
 

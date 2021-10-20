@@ -70,7 +70,7 @@ namespace Sentry.data.Infrastructure
             {
                 Sentry.Common.Logging.Logger.Debug($"Feed Url: {feed.Url}");
 
-                string uri = Configuration.Config.GetHostSetting("SentryWebProxyHost");
+                string uri = Configuration.Config.GetHostSetting("WebProxyUrl");
 
                 //https://stackoverflow.com/questions/124932/xmldocument-loadurl-through-a-proxy
                 WebProxy wp = new WebProxy(uri);
