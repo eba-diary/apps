@@ -4,7 +4,9 @@
 
 data.Notification = {
 
-    Quill: null,                //declare as property for use later
+    QuillEditorTitle: null,                   //declare as property for use later
+    QuillEditorMessage: null,                //declare as property for use later
+    
 
     //NOTE: I chose to use this hardcoded NoMessageList as a hardcoded list instead of adding an ajax method or adjusting asset drop down for performance
     //since the Id's in the drop down are a hardened list of ID's that originate from the static BusinessArea/Notification scripts in DSC
@@ -28,7 +30,9 @@ data.Notification = {
     ******************************************************************************************/
     initQuill: function () {
 
-        var toolbarOptions = [
+        var toolbarOptionsTitle = [ ['link'] ];
+
+        var toolbarOptionsMessage = [
             [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
             ['link', 'image'],
             ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
@@ -42,25 +46,40 @@ data.Notification = {
             ['clean']                                         // remove formatting button
         ];
 
+        //Init Quill Editor for Title
+        data.Notification.QuillEditorTitle = new Quill('#quillEditorTitle',
+            {
+                modules: {
+                    toolbar: toolbarOptionsTitle
+                },
+                theme: 'snow'
+            });
 
-        data.Notification.Quill = new Quill('#editor',
+
+        //Init Quill Editor for Message
+        data.Notification.QuillEditorMessage = new Quill('#quillEditorMessage',
         {
             modules: {
-                toolbar: toolbarOptions
+                toolbar: toolbarOptionsMessage
             },
             theme: 'snow'
         });
 
 
-        //make ajax call to load notification message into Quill since we need to decode first
+        //make ajax call to load notification title/message into Quill editors since we need to decode first so user can see it
         $.ajax({
             url: "/Notification/GetQuillContents/",
             method: "GET",
             dataType: 'json',
             data: { notificationId: $('.notificationId').val() }, 
             success: function (obj) {
-                var messageDecoded = $("<div/>").html(obj.data).text();         //decode message since it is stored encoded
-                data.Notification.Quill.root.innerHTML = messageDecoded;        //set quill contents
+
+                var titleDecoded = $("<div/>").html(obj.title).text();                      //decode title since it is stored encoded
+                data.Notification.QuillEditorTitle.root.innerHTML = titleDecoded;           //set quill title editor contents
+
+                var messageDecoded = $("<div/>").html(obj.message).text();                  //decode message since it is stored encoded
+                data.Notification.QuillEditorMessage.root.innerHTML = messageDecoded;       //set quill message editor contents
+
             }
         });
     },
@@ -107,23 +126,30 @@ data.Notification = {
     },
 
     /******************************************************************************************
-    * Because upon save we have to extract/decode message from Quill editor for safe storage, this js function will override the normal MVC subit
-    * we will grab the notification message, encode it and use a bogus text area which is actually the model.message
-    * when submit is triggered the ModifyNotification View will pick up the bogus encoded version and save that 
+    * SUBMIT OVERRIDE METHOD
+    * Because upon save we have to extract/decode message from Quill editor for safe storage, this js function will override the normal MVC submit
+    * we will grab the notification message from QUIL, encode it and use a bogus text area which is actually the model.title and model.message
+    * when submit is triggered the ModifyNotification View will pick up the model.title and model.message which are the bogus encoded versions 
+    * these bogus DIVS are what are SAVED TO MODEL
     ******************************************************************************************/
     submitChanges: function ()
     {
-        //default message to what quill default will have as empty message
-        var message = "<p><br></p>";
+        //INIT
+        var title = data.Notification.QuillEditorTitle.root.innerHTML;      //get title 
+        var message = "<p><br></p>";                                        //default message to what quill default will have as empty message
 
-        //ONLY fill message if it should be shown
         if (data.Notification.shouldShowMessage()) {
-            message = data.Notification.Quill.root.innerHTML;           //get html of quill editor
+            message = data.Notification.QuillEditorMessage.root.innerHTML;           ////ONLY fill message if it should be shown and get html of quill editor
         }
 
-        var messageEncoded = $("<div/>").text(message).html();          //encode message to safely pass and store
-        $('.messageEncoded').val(messageEncoded);                       //set messageEncoded TextArea so normal MVC submit will use it
+        //ENCODE 
+        var quillTitleEncoded = $("<div/>").text(title).html();         //encode title to safely pass and store
+        $('.quillTitleEncoded').val(quillTitleEncoded);                 //set titleeEncoded TextArea so normal MVC submit will use it
 
+        var quillMessageEncoded = $("<div/>").text(message).html();     //encode message to safely pass and store
+        $('.quillMessageEncoded').val(quillMessageEncoded);             //set messageEncoded TextArea so normal MVC submit will use it
+
+        //SUBMIT
         $('.modifyNotificationForm').submit();                          //call submit which triggers SubmitNotification controller method
     },
 
@@ -157,11 +183,20 @@ data.Notification = {
                 type: "POST"
             },
             columns: [
-                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
+                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px"},
                 { data: null, className: "editConfig", width: "20px", render: function (data) { return data.CanEdit ? '<a href=/Notification/ModifyNotification?notificationId=' + data.NotificationId + '\>Edit</a>' : ''; } },
                 { data: "IsActive", className: "isActive", render: function (data) { return data === true ? 'Yes' : 'No'; } },
                 { data: "ObjectName", className: "parentDataAssetName" },
-                { data: "Title", className: "title" },
+
+                {
+                    data: null, className: "title", render: function (data) {
+                        var div = document.createElement('div');
+                        var itDecoded = $("<div/>").html(data.Title).text();         //decode message since it is stored encoded
+                        div.innerHTML = itDecoded.trim();
+                        return div.innerHTML;
+                    }
+                },
+
                 { data: "CreateUser", className: "displayCreateUser" },
                 { data: "StartTime", className: "startTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
                 { data: "ExpirationTime", className: "expirationTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
