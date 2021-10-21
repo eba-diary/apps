@@ -39,5 +39,14 @@ namespace Sentry.data.Web
             }
         }
 
+        //This property used by PL Popover to decode prior to display
+        public System.Web.HtmlString TitleDecoded
+        {
+            get
+            {
+                return new System.Web.HtmlString(System.Net.WebUtility.HtmlDecode(Title));
+            }
+        }
+
     }
 }
