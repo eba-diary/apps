@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Hangfire;
 
 namespace Sentry.data.Core
 {
@@ -35,6 +36,8 @@ namespace Sentry.data.Core
             _quartermasterService = quartermasterService;
             _dataFeatures = dataFeatures;
         }
+
+        //public DataFlowService() { }
 
 
 
@@ -76,6 +79,79 @@ namespace Sentry.data.Core
             RetrieverJob job = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == id).First();
             RetrieverJobDto dto = job.ToDto();
             return dto;
+        }
+
+        public void UpgradeDataFlows(int[] producerDataFlowIds)
+        {
+            Logger.Info("<DataFlowService-UpgradeDataFlows> Method Start");
+            foreach (int producerDataFlowId in producerDataFlowIds)
+            {
+                Hangfire.BackgroundJob.Enqueue<DataFlowService>(x => x.UpgradeDataFlow(producerDataFlowId));
+            }
+            Logger.Info("<DataFlowService-UpgradeDataFlows> Method End");
+        }
+
+        /// <summary>
+        /// Upgrades a producer dataflow to a single dataflow configuration (CLA-3332)
+        /// </summary>
+        /// <param name="producerDataFlowId"></param>
+        /// <remarks>
+        /// This method will be triggered by Hangfire.  
+        /// Added the AutomaticRetry attribute to ensure retries do not occur for this method.
+        /// https://docs.hangfire.io/en/latest/background-processing/dealing-with-exceptions.html
+        /// </remarks>
+        [AutomaticRetry(Attempts = 0)]
+        public void UpgradeDataFlow(int producerDataFlowId)
+        {
+            Logger.Info("<DataFlowService-UpgradeDataFlow> Method Start");
+
+            DataFlow producerDataFlow = _datasetContext.GetById<DataFlow>(producerDataFlowId);
+
+            if (producerDataFlow == null)
+            {
+                throw new DataFlowNotFound("Invalid dataflow id");
+            }
+
+            /************************************************************************************************  
+             *  Do not upgrade Producer Dataflows if the following are true:
+             *      1.) Dataflow name starts with "FileSchemaFlow"
+             *      2.) Dataflow does not contain a dataflowstep of type SchemaMap
+             *************************************************************************************************/
+            DataFlowStep schemaMapStep = producerDataFlow.Steps.FirstOrDefault(w => w.DataAction_Type_Id == DataActionType.SchemaMap);
+            if (schemaMapStep == null || producerDataFlow.Name.StartsWith("FileSchemaFlow"))
+            {
+                throw new ArgumentException("Only producer dataflows can be upgraded");
+            }
+
+            /************************************************************************************************  
+             *  Only convert dataflows which map to single schema.  Dataflows that "Fan out" to multiple schema
+             *      will need to be handled on a case by case basis
+             *************************************************************************************************/
+            if (schemaMapStep.SchemaMappings.Count > 1)
+            {
+                throw new ArgumentException("Only producer dataflows with single schema map can be upgraded");
+            }
+
+            DataFlowDto dto = GetDataFlowDto(producerDataFlowId);
+
+            /************************************************************************************************
+             *  With CLA3332_ConsolidateDataflows = True, the UpdateandSaveDataflow()
+             *    Assumes the DataFlowDto has DatasetId set.  Since this method is converting from old
+             *    to new world, we need to set DataFlowDto.DatasetId to appropriate value
+             ************************************************************************************************/
+            dto.DatasetId = schemaMapStep.SchemaMappings.First().Dataset.DatasetId;
+
+            Logger.Info("<DataFlowService-UpgradeDataFlow> Starting dataflow upgrade");
+
+            /**********************************************************************************
+             *  During conversion, we will create new dataflow and not delete existing dataflow.
+             *  This allows data producers not be tightly coupled with the conversion effort.
+             **********************************************************************************/
+            int newId = UpdateandSaveDataFlow(dto, false);
+
+            Logger.Info($"<DataFlowService-UpgradeDataFlow> Completed dataflow upgrade (original:{producerDataFlowId}:::new:{newId}");
+
+            Logger.Info("<DataFlowService-UpgradeDataFlow> Method Start");
         }
 
         public int CreateandSaveDataFlow(DataFlowDto dto)
@@ -154,7 +230,19 @@ namespace Sentry.data.Core
             }
         }
 
-        public int UpdateandSaveDataFlow(DataFlowDto dfDto)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dfDto"></param>
+        /// <param name="deleteOriginal"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// After CLA3332_ConsolidatedDataflows feature is rolled out and conversion
+        /// work is completed to single dataflow structure, the deleteOriginal option
+        /// should be removed.
+        /// </remarks>
+        public int UpdateandSaveDataFlow(DataFlowDto dfDto, bool deleteOriginal = true)
         {
             /*
              *  Create new Dataflow
@@ -174,7 +262,6 @@ namespace Sentry.data.Core
 
             //Delete existing dataflow
             MarkDataFlowForDeletionById(dfDto.Id);
-            //Delete(dfDto.Id);
 
             _datasetContext.SaveChanges();
 
@@ -752,6 +839,9 @@ namespace Sentry.data.Core
             dto.CompressionType = df.CompressionType;
             dto.IsPreProcessingRequired = df.IsPreProcessingRequired;
             dto.PreProcessingOption = df.PreProcessingOption;
+            dto.SaidKeyCode = df.SaidKeyCode;
+            dto.NamedEnvironment = df.NamedEnvironment;
+            dto.NamedEnvironmentType = df.NamedEnvironmentType;
 
             List<SchemaMapDto> scmMapDtoList = new List<SchemaMapDto>();
             foreach (DataFlowStep step in df.Steps.Where(w => w.SchemaMappings != null && w.SchemaMappings.Any()))

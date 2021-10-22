@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Rhino.Mocks;
-
+using Moq;
+using Sentry.data.Core.Entities.DataProcessing;
 
 namespace Sentry.data.Core.Tests
 {
     [TestClass]
-    public class DataFlowProviderTests : BaseCoreUnitTest
+    public class DataFlowProviderTests
     {
-        [TestInitialize]
-        public void MyTestInitialize()
-        {
-            TestInitialize();
-        }
+        //[TestInitialize]
+        //public void MyTestInitialize()
+        //{
+        //    TestInitialize();
+        //}
 
-        [TestCleanup]
-        public void MyTestCleanup()
-        {
-            TestCleanup();
-        }        
+        //[TestCleanup]
+        //public void MyTestCleanup()
+        //{
+        //    TestCleanup();
+        //}        
     }
 }

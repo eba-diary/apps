@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Sentry.FeatureFlags.Mock;
 using Sentry.FeatureFlags;
 using Sentry.data.Core.Exceptions;
+using System;
+using System.Collections.Generic;
 
 namespace Sentry.data.Core.Tests
 {
@@ -741,5 +743,121 @@ namespace Sentry.data.Core.Tests
         }
 
         #endregion
+
+        [TestMethod]
+        public void DataFlowService_UpgradeDataFlow_Invalid_DataFlow_Id()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataflow = new DataFlow()
+            {
+                Id = 1
+            };
+            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
+
+
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null);
+
+            //Act
+            Assert.ThrowsException<DataFlowNotFound>(() => dataflowService.UpgradeDataFlow(2));
+        }
+
+        [TestMethod]
+        public void DataFlowService_UpgradeDataFlow_Multiple_SchemaMappings()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataflow = new DataFlow()
+            {
+                Id = 1,
+                Name = "TestFlow"
+            };
+
+            var dataflowStep = new DataFlowStep()
+            {
+                Id = 1,
+                DataAction_Type_Id = DataActionType.SchemaMap
+            };
+
+            List<SchemaMap> schemaMappings = new List<SchemaMap>()
+            {
+                new SchemaMap()
+                {
+                    Id = 1,
+                    DataFlowStepId = dataflowStep
+                },
+                new SchemaMap()
+                {
+                    Id = 2,
+                    DataFlowStepId = dataflowStep
+                }
+            };
+
+            dataflowStep.SchemaMappings = schemaMappings;
+            dataflow.Steps = new List<DataFlowStep>() { dataflowStep };
+
+            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
+
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null);
+
+            //Act
+            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
+        }
+
+        [TestMethod]
+        public void DataFlowService_UpgradeDataFlow_FileSchemaFlow_Not_Upgraded()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataflow = new DataFlow()
+            {
+                Id = 1,
+                Name = "FileSchemaFlow_TestFlow"
+            };
+
+            var dataflowStep = new DataFlowStep()
+            {
+                Id = 1,
+                DataAction_Type_Id = DataActionType.SchemaMap
+            };
+
+            dataflow.Steps = new List<DataFlowStep>() { dataflowStep };
+
+            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
+
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null);
+
+            //Act
+            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
+        }
+
+
+
+        [TestMethod]
+        public void DataFlowService_UpgradeDataFlow_No_SchemaMap_Step_Not_Upgraded()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataflow = new DataFlow()
+            {
+                Id = 1,
+                Name = "FileSchemaFlow_TestFlow"
+            };
+
+            var dataflowStep = new DataFlowStep()
+            {
+                Id = 1,
+                DataAction_Type_Id = DataActionType.SchemaLoad
+            };
+
+            dataflow.Steps = new List<DataFlowStep>() { dataflowStep };
+
+            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
+
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null);
+
+            //Act
+            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
+        }
     }
 }
