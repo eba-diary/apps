@@ -800,12 +800,13 @@ namespace Sentry.data.Core
                 CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake,
                 ObjectStatus = dto.ObjectStatus,
                 SchemaRootPath = dto.SchemaRootPath,
-                ParquetStorageBucket = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) 
-                                        ? GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DATA_LAKE_STORAGE, Config.GetDefaultEnvironmentName()) 
+                ParquetStorageBucket = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
+                                        ? GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DATA_LAKE_STORAGE, Config.GetDefaultEnvironmentName())
                                         : GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DSC, Config.GetDefaultEnvironmentName()),
                 ParquetStoragePrefix = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
                                         ? GenerateParquetStoragePrefix(parentDataset.SAIDAssetKeyCode, parentDataset.NamedEnvironment, storageCode)
-                                        : GenerateParquetStoragePrefix(Configuration.Config.GetHostSetting("S3DataPrefix"), null, storageCode)
+                                        : GenerateParquetStoragePrefix(Configuration.Config.GetHostSetting("S3DataPrefix"), null, storageCode),
+                SnowflakeStage = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) ? GlobalConstants.SnowflakeStageNames.NEW_STAGE : GlobalConstants.SnowflakeStageNames.OLD_STAGE
             };
             _datasetContext.Add(schema);
             return schema;
@@ -848,7 +849,8 @@ namespace Sentry.data.Core
                 CLA3014_LoadDataToSnowflake = scm.CLA3014_LoadDataToSnowflake,
                 SchemaRootPath = scm.SchemaRootPath,
                 ParquetStorageBucket = scm.ParquetStorageBucket,
-                ParquetStoragePrefix = scm.ParquetStoragePrefix
+                ParquetStoragePrefix = scm.ParquetStoragePrefix,
+                SnowflakeStage = scm.SnowflakeStage
             };
 
         }

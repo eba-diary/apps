@@ -344,5 +344,11 @@
         {
             public const string SCHEMA_ROOT_PATH_USAGE = "https://confluence.sentry.com/display/CLA/Schema+Root+Path+Option";
         }
+
+        public static class SnowflakeStageNames
+        {
+            public const string OLD_STAGE = "SENTRY_DATASET";
+            public const string NEW_STAGE = "DLST_PARQUET";
+        }
     }
 }
