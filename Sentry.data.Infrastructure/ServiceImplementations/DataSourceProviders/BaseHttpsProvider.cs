@@ -105,27 +105,12 @@ namespace Sentry.data.Infrastructure
         }
 
         public abstract IRestResponse SendRequest();
-        //{
-        //    List<IRestResponse> responses = new List<IRestResponse>();
-
-        //    RestClient client = new RestClient
-        //    {
-        //        Proxy = new WebProxy(Configuration.Config.GetHostSetting("SentryWebProxyHost"))
-        //        {
-        //            Credentials = CredentialCache.DefaultNetworkCredentials
-        //        }
-        //    };
-
-        //    responses.Add(client.ExecuteAsGet(_request, "GET"));
-            
-        //    return responses;
-        //}
 
         public void CopyToStream(Stream targetStream)
         {
             RestClient client = new RestClient
             {
-                Proxy = new WebProxy(Configuration.Config.GetHostSetting("SentryWebProxyHost"), int.Parse(Configuration.Config.GetSetting("SentryWebProxyPort")))
+                Proxy = new WebProxy(Configuration.Config.GetHostSetting("WebProxyUrl"))
                 {
                     Credentials = CredentialCache.DefaultNetworkCredentials
                 }

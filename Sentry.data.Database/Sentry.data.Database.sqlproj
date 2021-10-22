@@ -281,6 +281,7 @@
     <Build Include="Tables\HangFire\Schema.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_05\Update_CLA3048_StandardizeOnUTCTime_FeatureFlag_Value.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_05\HistoryFix_Populate_Dataset_NamedEnvironments.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_06\CLA-3398-Delete_Database_Feature_Flags_that_have_been_moved_to_LaunchDarkly.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
