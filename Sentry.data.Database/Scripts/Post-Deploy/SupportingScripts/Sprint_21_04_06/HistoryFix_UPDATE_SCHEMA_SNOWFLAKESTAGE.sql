@@ -7,14 +7,11 @@ BEGIN TRY
     PRINT 'Running script "' + @ScriptVersion + '"...'
     -- BEGIN POST-DEPLOY SCRIPT --
 
-
-    --select * from [schema]
 	--Update SnowflakeStage for each schema that were created PRIOR to consolidated data flows
 	--basically anything with a NULL SnowflakeStage needs to be updated to the OLD WORLD 
 
 	UPDATE [Schema]
     SET SnowflakeStage = 'SENTRY_DATASET'
-	--select count(*) FROM [Schema]
     where SnowflakeStage IS NULL
 	
 
