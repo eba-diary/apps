@@ -53,7 +53,7 @@ namespace Sentry.data.Infrastructure
             _client = new RestClient
             {
                 BaseUrl = new Uri(baseUri),
-                Proxy = new WebProxy(Configuration.Config.GetHostSetting("SentryWebProxyHost"), int.Parse(Configuration.Config.GetHostSetting("SentryWebProxyPort")))
+                Proxy = new WebProxy(Configuration.Config.GetHostSetting("WebProxyUrl"))
                 {
                     Credentials = CredentialCache.DefaultNetworkCredentials
                 }
@@ -261,7 +261,7 @@ namespace Sentry.data.Infrastructure
             {
                var httpHandler = new System.Net.Http.HttpClientHandler()
                 {
-                    Proxy = new WebProxy(Configuration.Config.GetHostSetting("SentryWebProxyHost"), int.Parse(Configuration.Config.GetHostSetting("SentryWebProxyPort")))
+                    Proxy = new WebProxy(Configuration.Config.GetHostSetting("WebProxyUrl"))
                     {
                         Credentials = CredentialCache.DefaultNetworkCredentials
                     }
