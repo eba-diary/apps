@@ -347,8 +347,8 @@
 
         public static class SnowflakeStageNames
         {
-            public const string OLD_STAGE = "SENTRY_DATASET";
-            public const string NEW_STAGE = "DLST_PARQUET";
+            public const string DATASET_STAGE = "SENTRY_DATASET";       //OLD STAGE NAME
+            public const string PARQUET_STAGE = "DLST_PARQUET";         //NEW STAGE NAME
         }
     }
 }

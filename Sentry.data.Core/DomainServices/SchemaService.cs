@@ -806,7 +806,7 @@ namespace Sentry.data.Core
                 ParquetStoragePrefix = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
                                         ? GenerateParquetStoragePrefix(parentDataset.SAIDAssetKeyCode, parentDataset.NamedEnvironment, storageCode)
                                         : GenerateParquetStoragePrefix(Configuration.Config.GetHostSetting("S3DataPrefix"), null, storageCode),
-                SnowflakeStage = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) ? GlobalConstants.SnowflakeStageNames.NEW_STAGE : GlobalConstants.SnowflakeStageNames.OLD_STAGE
+                SnowflakeStage = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) ? GlobalConstants.SnowflakeStageNames.PARQUET_STAGE : GlobalConstants.SnowflakeStageNames.DATASET_STAGE
             };
             _datasetContext.Add(schema);
             return schema;
