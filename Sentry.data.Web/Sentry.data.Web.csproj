@@ -408,6 +408,7 @@
     </AdditionalFiles>
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
     <Compile Include="Models\Dale\DaleAdvancedCriteriaModel.cs" />
+    <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
     <Compile Include="WebProxy\Win32Api.cs" />
     <Content Include="Content\business-intelligence.css" />
