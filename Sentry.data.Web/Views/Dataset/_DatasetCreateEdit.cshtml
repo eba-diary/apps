@@ -85,15 +85,6 @@
                         }
                     </div>
                 </div>
-                <div class="form-group fieldDescription">
-                    <label class="control-label col-md-2"></label>
-                    <div class="col-md-10">
-                        <span style="color: #003da5;font-size: larger;font-weight: bold;">
-                            <em>If this Dataset will be added to SAS, please review the <a target="_blank" href="https://confluence.sentry.com/display/CLA/SAS+Character+Limitation">SAS Character Limitations</a> before naming this Dataset.</em>
-                        </span>
-                    </div>
-                </div>
-
 
                 @************************************************************************************************************************************
                 SAID ASSET
@@ -324,14 +315,6 @@
                             <div class="col-md-1">
                                 @Html.CheckBoxFor((model) => model.HasHeader, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.IncludeInSas, new { @class = "control-label col-md-2 optional" })
-                            <div class="col-md-1">
-                                @Html.CheckBoxFor(model => model.IncludeInSas, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                            </div>
-                            @Html.Label("Schema will be added to SAS after columns are defined", new { @class = "control-label col-md-4 optional text-muted", @style = "text-align: left" })
                         </div>
 
                         <div class="form-group">

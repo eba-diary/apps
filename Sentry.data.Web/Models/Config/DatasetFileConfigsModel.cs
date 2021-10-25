@@ -123,10 +123,7 @@ namespace Sentry.data.Web
         public int FileExtensionID { get; set; }
         [DisplayName("Create Current View")]
         public bool CreateCurrentView { get; set; }
-        [DisplayName("Add to SAS")]
         public bool IncludedInSAS { get; set; }
-
-
         public int DatasetId { get; set; }
         public DatasetScopeType ScopeType { get; set; }
         public FileExtension FileExtension { get; set; }
