@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace Sentry.data.Goldeneye
 {
-    internal class Scheduler : IDisposable
+    internal class Scheduler
     {
         private BackgroundJobServer _server;
 
@@ -36,11 +36,6 @@ namespace Sentry.data.Goldeneye
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings();
 
-        }
-
-        public void Dispose()
-        {
-            _server.Dispose();
         }
 
         public void Run(CancellationToken token)

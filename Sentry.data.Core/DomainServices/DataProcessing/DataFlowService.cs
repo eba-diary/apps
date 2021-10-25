@@ -23,10 +23,12 @@ namespace Sentry.data.Core
         private readonly ISecurityService _securityService;
         private readonly IQuartermasterService _quartermasterService;
         private readonly IDataFeatures _dataFeatures;
+        private readonly IBackgroundJobClient _hangfireBackgroundJobClient;
 
         public DataFlowService(IDatasetContext datasetContext, 
             IUserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider,
-            ISecurityService securityService, IQuartermasterService quartermasterService, IDataFeatures dataFeatures)
+            ISecurityService securityService, IQuartermasterService quartermasterService, 
+            IDataFeatures dataFeatures, IBackgroundJobClient backgroundJobClient)
         {
             _datasetContext = datasetContext;
             _userService = userService;
@@ -35,12 +37,8 @@ namespace Sentry.data.Core
             _securityService = securityService;
             _quartermasterService = quartermasterService;
             _dataFeatures = dataFeatures;
+            _hangfireBackgroundJobClient = backgroundJobClient;
         }
-
-        //public DataFlowService() { }
-
-
-
 
         public List<DataFlowDto> ListDataFlows()
         {
@@ -86,7 +84,7 @@ namespace Sentry.data.Core
             Logger.Info("<DataFlowService-UpgradeDataFlows> Method Start");
             foreach (int producerDataFlowId in producerDataFlowIds)
             {
-                Hangfire.BackgroundJob.Enqueue<DataFlowService>(x => x.UpgradeDataFlow(producerDataFlowId));
+                _hangfireBackgroundJobClient.Enqueue<DataFlowService>(x => x.UpgradeDataFlow(producerDataFlowId));
             }
             Logger.Info("<DataFlowService-UpgradeDataFlows> Method End");
         }

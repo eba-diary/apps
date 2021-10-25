@@ -10,6 +10,9 @@ using Sentry.FeatureFlags;
 using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
+using Hangfire;
+using Hangfire.Common;
+using Hangfire.States;
 
 namespace Sentry.data.Core.Tests
 {
@@ -32,7 +35,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, quartermasterService.Object, null);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, quartermasterService.Object, null, null);
             var dataFlow = new DataFlowDto() { Name = "Foo" };
 
             // Act
@@ -58,7 +61,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, quartermasterService.Object, null);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, quartermasterService.Object, null, null);
             var dataFlow = new DataFlowDto() { Name = "Bar", NamedEnvironment = "TEST", NamedEnvironmentType = GlobalEnums.NamedEnvironmentType.NonProd };
 
             // Act
@@ -756,7 +759,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
 
 
-            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null);
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null, null);
 
             //Act
             Assert.ThrowsException<DataFlowNotFound>(() => dataflowService.UpgradeDataFlow(2));
@@ -798,7 +801,7 @@ namespace Sentry.data.Core.Tests
 
             context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
 
-            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null);
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null, null);
 
             //Act
             Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
@@ -825,7 +828,7 @@ namespace Sentry.data.Core.Tests
 
             context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
 
-            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null);
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null, null);
 
             //Act
             Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
@@ -854,10 +857,29 @@ namespace Sentry.data.Core.Tests
 
             context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
 
-            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null);
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null, null);
 
             //Act
             Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
+        }
+
+        [TestMethod]
+        public void CheckForSpamJob_ShouldBeEnqueued()
+        {
+            // Arrange
+            var client = new Mock<IBackgroundJobClient>();
+            var dataflowService = new DataFlowService(null, null, null, null, null, null, null, client.Object);
+
+            // Act
+            dataflowService.UpgradeDataFlows(new int[] { 1, 2 });
+
+            // Assert
+            client.Verify(x => x.Create(
+                It.Is<Job>(job => job.Method.Name == "UpgradeDataFlow" && (int)job.Args[0] == 1),
+                It.IsAny<EnqueuedState>()), Times.Once);
+            client.Verify(x => x.Create(
+                It.Is<Job>(job => job.Method.Name == "UpgradeDataFlow" && (int)job.Args[0] == 2),
+                It.IsAny<EnqueuedState>()), Times.Once);
         }
     }
 }
