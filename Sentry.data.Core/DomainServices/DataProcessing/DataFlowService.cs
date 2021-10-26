@@ -81,12 +81,12 @@ namespace Sentry.data.Core
 
         public void UpgradeDataFlows(int[] producerDataFlowIds)
         {
-            Logger.Info("<DataFlowService-UpgradeDataFlows> Method Start");
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(UpgradeDataFlows)}> Method Start");
             foreach (int producerDataFlowId in producerDataFlowIds)
             {
                 _hangfireBackgroundJobClient.Enqueue<DataFlowService>(x => x.UpgradeDataFlow(producerDataFlowId));
             }
-            Logger.Info("<DataFlowService-UpgradeDataFlows> Method End");
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(UpgradeDataFlows)}> Method End");
         }
 
         /// <summary>
@@ -101,13 +101,18 @@ namespace Sentry.data.Core
         [AutomaticRetry(Attempts = 0)]
         public void UpgradeDataFlow(int producerDataFlowId)
         {
-            Logger.Info("<DataFlowService-UpgradeDataFlow> Method Start");
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(UpgradeDataFlow)}> Method Start");
 
             DataFlow producerDataFlow = _datasetContext.GetById<DataFlow>(producerDataFlowId);
 
             if (producerDataFlow == null)
             {
                 throw new DataFlowNotFound("Invalid dataflow id");
+            }
+
+            if (producerDataFlow.ObjectStatus != GlobalEnums.ObjectStatusEnum.Active)
+            {
+                throw new ArgumentException("Only active producer dataflows can be upgraded");
             }
 
             /************************************************************************************************  
@@ -139,7 +144,7 @@ namespace Sentry.data.Core
              ************************************************************************************************/
             dto.DatasetId = schemaMapStep.SchemaMappings.First().Dataset.DatasetId;
 
-            Logger.Info("<DataFlowService-UpgradeDataFlow> Starting dataflow upgrade");
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(UpgradeDataFlow)}> Starting dataflow upgrade");
 
             /**********************************************************************************
              *  During conversion, we will create new dataflow and not delete existing dataflow.
@@ -147,9 +152,13 @@ namespace Sentry.data.Core
              **********************************************************************************/
             int newId = UpdateandSaveDataFlow(dto, false);
 
-            Logger.Info($"<DataFlowService-UpgradeDataFlow> Completed dataflow upgrade (original:{producerDataFlowId}:::new:{newId}");
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(UpgradeDataFlow)}> Completed dataflow upgrade (original:{producerDataFlowId}:::new:{newId}");
 
-            Logger.Info("<DataFlowService-UpgradeDataFlow> Method Start");
+
+
+
+
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(UpgradeDataFlow)}> Method End");
         }
 
         public int CreateandSaveDataFlow(DataFlowDto dto)
@@ -242,6 +251,7 @@ namespace Sentry.data.Core
         /// </remarks>
         public int UpdateandSaveDataFlow(DataFlowDto dfDto, bool deleteOriginal = true)
         {
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(UpdateandSaveDataFlow)}> Method Start");
             /*
              *  Create new Dataflow
              *  - The incoming dto will have flowstoragecode and will
@@ -257,11 +267,15 @@ namespace Sentry.data.Core
              *  WallEService will eventually set the objects
              *    to a deleted status after a set period of time    
              */
-
-            //Delete existing dataflow
-            MarkDataFlowForDeletionById(dfDto.Id);
+            if (deleteOriginal)
+            {
+                //Delete existing dataflow
+                MarkDataFlowForDeletionById(dfDto.Id);
+            }
 
             _datasetContext.SaveChanges();
+
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(UpdateandSaveDataFlow)}> Method Start");
 
             return newDataFlow.Id;
         }
@@ -488,8 +502,7 @@ namespace Sentry.data.Core
         /// <param name="id">DataFlow Id</param>
         private void MarkDataFlowForDeletionById(int id)
         {
-            string methodName = MethodBase.GetCurrentMethod().Name.ToLower();
-            Logger.Debug($"Start method <{methodName}>");
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(MarkDataFlowForDeletionById)}> Method Start");
 
             //Get DataFlow and mark for deletion
             DataFlow dataFlow = _datasetContext.GetById<DataFlow>(id);
@@ -504,7 +517,7 @@ namespace Sentry.data.Core
                 _jobService.DeleteJob(jobList);
             }
 
-            Logger.Debug($"End method <{methodName}>");
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(MarkDataFlowForDeletionById)}> Method End");
         }
 
         private List<int> GetProducerFlowsToBeDeletedBySchemaId(int schemaId)
@@ -600,6 +613,8 @@ namespace Sentry.data.Core
         
         private DataFlow CreateDataFlow(DataFlowDto dto)
         {
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(CreateDataFlow)}> Method Start");
+
             DataFlow df = MapToDataFlow(dto);
 
             switch (dto.IngestionType)
@@ -614,11 +629,13 @@ namespace Sentry.data.Core
                     break;
             }
 
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(CreateDataFlow)}> Method End");
             return df;
         }
 
         private DataFlow MapToDataFlow(DataFlowDto dto)
         {
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(MapToDataFlow)}> Method Start");
             DataFlow df = new DataFlow
             {
                 Name = dto.Name,
@@ -649,11 +666,13 @@ namespace Sentry.data.Core
 
             _datasetContext.Add(df);
 
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(MapToDataFlow)}> Method End");
             return df;
         }
 
         private void MapDataFlowStepsForPush(DataFlowDto dto, DataFlow df)
         {
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(MapDataFlowStepsForPush)}> Method Start");
             //This type of dataflow does not need to worry about retrieving data from external sources
             // Data will be pushed by user to S3 and\or DFS drop locations
 
@@ -723,10 +742,14 @@ namespace Sentry.data.Core
                 ////Generate consumption layer steps
                 AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
             }
+
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(MapDataFlowStepsForPush)}> Method End");
         }
 
         private void MapDataFlowStepsForPull(DataFlowDto dto, DataFlow df)
         {
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(MapDataFlowStepsForPull)}> Method Start");
+
             dto.RetrieverJob.DataFlow = df.Id;
             _jobService.CreateAndSaveRetrieverJob(dto.RetrieverJob);
 
@@ -788,6 +811,8 @@ namespace Sentry.data.Core
                 ////Generate consumption layer steps
                 AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
             }
+
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(MapDataFlowStepsForPull)}> Method End");
 
         }
 

@@ -834,8 +834,6 @@ namespace Sentry.data.Core.Tests
             Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
         }
 
-
-
         [TestMethod]
         public void DataFlowService_UpgradeDataFlow_No_SchemaMap_Step_Not_Upgraded()
         {
@@ -861,6 +859,44 @@ namespace Sentry.data.Core.Tests
 
             //Act
             Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
+        }
+
+        [TestMethod]
+        public void DataFlowService_UpgradeDataFlow_Only_Active_DataFlows_Upgraded()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataflow_Deleted = new DataFlow()
+            {
+                Id = 1,
+                Name = "FileSchemaFlow_TestFlow",
+                ObjectStatus = ObjectStatusEnum.Deleted
+            };
+
+            var dataflow_PendingDelete = new DataFlow()
+            {
+                Id = 2,
+                Name = "FileSchemaFlow_PendingDelete",
+                ObjectStatus = ObjectStatusEnum.Pending_Delete
+            };
+
+            var dataflow_Disabled = new DataFlow()
+            {
+                Id = 3,
+                Name = "FileSchemaFlow_Diabled",
+                ObjectStatus = ObjectStatusEnum.Disabled
+            };
+
+            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow_Deleted);
+            context.Setup(f => f.GetById<DataFlow>(2)).Returns(dataflow_PendingDelete);
+            context.Setup(f => f.GetById<DataFlow>(3)).Returns(dataflow_Disabled);
+
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null, null);
+
+            //Act
+            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
+            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(2));
+            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(3));
         }
 
         [TestMethod]
