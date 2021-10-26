@@ -12,6 +12,7 @@
             public const string VERSION_LINEAGE = VERSION + "/lineage";
             public const string VERSION_METADATA = VERSION + "/metadata";
             public const string VERSION_QUERYTOOL = VERSION + "/queryTool";
+            public const string VERSION_DATAFLOW = VERSION + "/dataflow";
             public const string VERSION_TAG = VERSION + "/tags";
         }
 

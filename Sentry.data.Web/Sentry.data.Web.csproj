@@ -135,6 +135,9 @@
     <Reference Include="LaunchDarkly.ServerSdk, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f86add69004e6885, processorArchitecture=MSIL">
       <HintPath>..\packages\LaunchDarkly.ServerSdk.6.2.2\lib\net471\LaunchDarkly.ServerSdk.dll</HintPath>
     </Reference>
+    <Reference Include="Hangfire.StructureMap, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.StructureMap.2.0.1\lib\net452\Hangfire.StructureMap.dll</HintPath>
+    </Reference>
     <Reference Include="LazyCache, Version=0.7.1.44, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\LazyCache.0.7.1.44\lib\net45\LazyCache.dll</HintPath>
       <Private>True</Private>
@@ -267,9 +270,8 @@
     <Reference Include="Snowflake.Data, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Snowflake.Data.2.0.4\lib\net472\Snowflake.Data.dll</HintPath>
     </Reference>
-    <Reference Include="StructureMap, Version=4.3.0.449, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\StructureMap.4.4.0\lib\net45\StructureMap.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="StructureMap, Version=4.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\StructureMap.4.7.0\lib\net45\StructureMap.dll</HintPath>
     </Reference>
     <Reference Include="Swashbuckle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cd1bb07a5ac7c7bc, processorArchitecture=MSIL">
       <HintPath>..\packages\Swashbuckle.Core.5.6.0\lib\net40\Swashbuckle.Core.dll</HintPath>
@@ -406,6 +408,7 @@
     <AdditionalFiles Include="..\.sonarlint\data_data.sentry.com\CSharp\SonarLint.xml">
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
+    <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
     <Compile Include="Models\Dale\DaleAdvancedCriteriaModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
