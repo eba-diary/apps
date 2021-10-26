@@ -1250,6 +1250,10 @@
       <Link>HiveODBC.config</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\LocalFeatureFlags\LocalFeatureFlags.json">
+      <Link>LocalFeatureFlags.json</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>

@@ -4,6 +4,7 @@ using LaunchDarkly.Sdk.Server.Integrations;
 using LaunchDarkly.Sdk.Server.Interfaces;
 using System;
 using System.Net;
+using System.Net.Http;
 using Logger = Sentry.Common.Logging.Logger;
 
 namespace Sentry.data.Infrastructure.FeatureFlags
@@ -42,14 +43,13 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         {
             //configure LD to use the proxy
             configBuilder = configBuilder.Http(
-                Components.HttpConfiguration().Proxy(
-                    new System.Net.WebProxy(
-                        Address: new Uri(Configuration.Config.GetHostSetting("WebProxyUrl")),
-                        BypassOnLocal: false,
-                        BypassList: new string[] { },
-                        Credentials: new NetworkCredential(Configuration.Config.GetHostSetting("ServiceAccountID"),
-                            Configuration.Config.GetHostSetting("ServiceAccountPassword")))));
-
+                Components.HttpConfiguration()
+                    .MessageHandler(new HttpClientHandler()
+                        {
+                            Proxy = new System.Net.WebProxy(new Uri(Configuration.Config.GetHostSetting("WebProxyUrl"))) { UseDefaultCredentials = true },
+                            UseProxy = true
+                        }
+                    ));
             return new LdClient(configBuilder.Build());
         }
 
@@ -58,7 +58,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         /// </summary>
         private static LdClient BuildLdClientForFileDataSource(ref ConfigurationBuilder configBuilder)
         {
-            string localFeatureFlagsFile = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..", "LocalFeatureFlags", "LocalFeatureFlags.json");
+            string localFeatureFlagsFile = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "LocalFeatureFlags.json");
             var fileSource = new FileDataSourceBuilder().FilePaths(localFeatureFlagsFile).AutoUpdate(true);
 
             configBuilder = configBuilder
