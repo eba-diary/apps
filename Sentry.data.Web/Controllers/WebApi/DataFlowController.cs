@@ -59,6 +59,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.OK)]
         [Route("updatedataflows")]
+        [HttpPost]
         public IHttpActionResult UpdateDataFlows(int[] idList)
         {
 
