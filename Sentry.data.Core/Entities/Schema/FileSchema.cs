@@ -25,5 +25,6 @@
         public virtual string SchemaRootPath { get; set; }
         public virtual string ParquetStorageBucket { get; set; }
         public virtual string ParquetStoragePrefix { get; set; }
+        public virtual string SnowflakeStage { get; set; }
     }
 }
