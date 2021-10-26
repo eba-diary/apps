@@ -218,7 +218,8 @@ namespace Sentry.data.Web
                 SchemaRootPath = schemaDto.SchemaRootPath?.Split(','),
                 HasDataFlow = dto.HasDataFlow,
                 ParquetStorageBucket = schemaDto.ParquetStorageBucket,
-                ParquetStoragePrefix = schemaDto.ParquetStoragePrefix
+                ParquetStoragePrefix = schemaDto.ParquetStoragePrefix,
+                SnowflakeStage = schemaDto.SnowflakeStage
             };
         }
 

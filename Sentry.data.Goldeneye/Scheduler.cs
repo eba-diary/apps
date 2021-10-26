@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.SqlServer;
+using Hangfire.StructureMap;
+using Sentry.data.Infrastructure;
+using System;
 using System.Threading;
 
 namespace Sentry.data.Goldeneye
 {
-    class Scheduler
+    internal class Scheduler
     {
         private BackgroundJobServer _server;
 
@@ -28,6 +26,7 @@ namespace Sentry.data.Goldeneye
                 EnableHeavyMigrations = false // Default value: false
             };
 
+            GlobalConfiguration.Configuration.UseStructureMapActivator(Bootstrapper.Container.GetNestedContainer());
             GlobalConfiguration.Configuration
                 .UseSqlServerStorage(Configuration.Config.GetHostSetting("DatabaseConnectionString"), options)
                 .UseLog4NetLogProvider()

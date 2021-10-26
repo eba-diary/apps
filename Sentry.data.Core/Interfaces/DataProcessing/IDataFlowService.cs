@@ -42,6 +42,13 @@ namespace Sentry.data.Core
         DataFlowStep GetDataFlowStepForDataFlowByActionType(int dataFlowId, DataActionType actionType);
 
         /// <summary>
+        /// Will create an upgraded dataflow (single dataflow configuration) from existing
+        ///   producer dataflow metadata
+        /// </summary>
+        /// <param name="producerDataFlowIds"></param>
+        void UpgradeDataFlows(int[] producerDataFlowIds);
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="Id">Dataflow Id</param>
@@ -74,6 +81,6 @@ namespace Sentry.data.Core
         /// <param name="id"></param>
         /// <returns></returns>
         RetrieverJobDto GetAssociatedRetrieverJobDto(int id);
-        int UpdateandSaveDataFlow(DataFlowDto dfDto);
+        int UpdateandSaveDataFlow(DataFlowDto dfDto, bool deleteOriginal = true);
     }
 }

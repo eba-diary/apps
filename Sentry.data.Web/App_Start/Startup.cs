@@ -3,6 +3,8 @@ using Sentry.data;
 using Hangfire;
 using Sentry.Configuration;
 using Hangfire.SqlServer;
+using Hangfire.StructureMap;
+using Sentry.data.Infrastructure;
 
 namespace Sentry.data.Web
 {
