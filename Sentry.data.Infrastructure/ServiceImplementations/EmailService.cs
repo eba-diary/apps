@@ -145,8 +145,9 @@ namespace Sentry.data.Infrastructure
 
             if (group == EventTypeGroup.BusinessArea)
             {
-                string reason = "<a href=" + Configuration.Config.GetHostSetting("WebApiUrl") + "/Notification/ManageNotification>" + e.Notification.Title + "</a>";
-                reason += "<br>" + System.Net.WebUtility.HtmlDecode(e.Notification.Message);            //BA Events Message needs to be decoded because its stored as encoded HTML to show a RTF
+                //BA Events Title and Message needs to be decoded because its stored as encoded HTML to show a RTF
+                string reason = System.Net.WebUtility.HtmlDecode(e.Notification.Title);
+                reason += "<br>" + System.Net.WebUtility.HtmlDecode(e.Notification.Message);                                                                                                                    
                 body.Append(@"<td>" + reason + @"</td>");
             }
             else

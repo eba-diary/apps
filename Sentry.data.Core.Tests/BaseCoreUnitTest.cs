@@ -60,9 +60,9 @@ namespace Sentry.data.Core.Tests
 
             public IFeatureFlag<bool> CLA3329_Expose_HR_Category => throw new NotImplementedException();
 
-            public IFeatureFlagRequiringContext<bool, string> CLA1656_DataFlowEdit_ViewEditPage => throw new NotImplementedException();
+            public IFeatureFlag<bool> CLA1656_DataFlowEdit_ViewEditPage => throw new NotImplementedException();
 
-            public IFeatureFlagRequiringContext<bool, string> CLA1656_DataFlowEdit_SubmitEditPage => throw new NotImplementedException();
+            public IFeatureFlag<bool> CLA1656_DataFlowEdit_SubmitEditPage => throw new NotImplementedException();
 
             public IFeatureFlag<bool> CLA3240_UseDropLocationV2 { get; } = new MockBooleanFeatureFlag(false);
 

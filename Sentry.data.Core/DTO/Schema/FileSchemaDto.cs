@@ -25,5 +25,6 @@
         public string SchemaRootPath { get; set; }
         public string ParquetStorageBucket { get; set; }
         public string ParquetStoragePrefix { get; set; }
+        public string SnowflakeStage { get; set; }
     }
 }

@@ -1,0 +1,2 @@
+(Invoke-WebRequest -uri "https://app.launchdarkly.com/sdk/latest-all" -Headers @{Authorization="sdk-ed5ba68e-57e9-425f-b902-41734886628d"}).Content > LocalFeatureFlags.json
+write-host "LaunchDarkly TEST environment exported to LocalFeatureFlags.json"
