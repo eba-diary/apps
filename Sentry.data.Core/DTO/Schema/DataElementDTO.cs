@@ -21,7 +21,6 @@ namespace Sentry.data.Core
         public int ParentDatasetId { get; set; }
         public int FileExtensionId { get; set; }
         public int DataElementID { get; set; }
-        public bool IsInSAS { get; set; }
         public string SasLibrary { get; set; }
     }
 }

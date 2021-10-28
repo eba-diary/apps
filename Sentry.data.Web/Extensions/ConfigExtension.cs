@@ -99,7 +99,6 @@ namespace Sentry.data.Web
                 StorageCode = model.RawStorageId,
                 Schemas = deList,
                 FileExtensionId = model.FileExtensionID,
-                IsInSAS = model.IncludedInSAS,
                 HasHeader = model.HasHeader,
                 Delimiter = model.Delimiter,
                 CreateCurrentView = model.CreateCurrentView,
@@ -118,7 +117,6 @@ namespace Sentry.data.Web
                 Delimiter = model.Delimiter,
                 HasHeader = model.HasHeader,
                 CreateCurrentView = model.CreateCurrentView,
-                IsInSas = model.IncludedInSAS,
                 SasLibrary = model.SasLibrary,
                 ParentDatasetId = model.DatasetId,
                 SchemaId = model.SchemaId,
@@ -147,7 +145,6 @@ namespace Sentry.data.Web
                 FileFormatId = model.FileTypeId,
                 ParentDatasetId = model.DatasetId,
                 FileExtensionId = model.FileExtensionID,
-                IsInSAS = model.IncludedInSAS,
                 SasLibrary = model.SasLibrary
             };
         }
@@ -163,7 +160,6 @@ namespace Sentry.data.Web
                 FileType = dto.FileTypeId.ToString(),
                 Delimiter = dto.Delimiter,
                 HasHeader = dto.HasHeader,
-                IsInSAS = dto.IsInSAS,
                 CreateCurrentView = dto.CreateCurrentView,
                 IsTrackableSchema = dto.IsTrackableSchema,
                 SchemaId = (dto.Schema != null) ? dto.Schema.SchemaId : -1
@@ -193,7 +189,6 @@ namespace Sentry.data.Web
                 StorageCode = schemaDto.StorageCode,
                 Format = schemaDto.FileExtenstionName,
                 CurrentView = schemaDto.CreateCurrentView,
-                IsInSAS = schemaDto.IsInSas,
                 Delimiter = schemaDto.Delimiter,
                 HasHeader = schemaDto.HasHeader,
                 IsTrackableSchema = dto.IsTrackableSchema,

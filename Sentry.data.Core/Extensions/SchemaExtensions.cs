@@ -92,7 +92,6 @@ namespace Sentry.data.Core
                 Delimiter = dsDto.Delimiter,
                 HasHeader = dsDto.HasHeader,
                 CreateCurrentView = true,
-                IsInSAS = dsDto.IsInSAS,
                 FileExtensionId = dsDto.FileExtensionId,
                 ParentDatasetId = dsDto.DatasetId
             };

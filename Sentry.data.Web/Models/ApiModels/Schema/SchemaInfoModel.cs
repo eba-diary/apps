@@ -15,7 +15,7 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public string StorageCode { get; set; }
         public string Format { get; set; }
         public bool CurrentView { get; set; }
-        public bool IsInSAS { get; set; }
+        public bool IsInSAS { get; set; } = false;
         public string Delimiter { get; set; }
         public bool HasHeader { get; set; }
         public bool IsTrackableSchema { get; set; }

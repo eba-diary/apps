@@ -21,7 +21,6 @@ namespace Sentry.data.Core
         public virtual IList<DataElementDto> Schemas { get; set; }
         public UserSecurity Security { get; internal set; }
         public bool CreateCurrentView { get; set; }
-        public bool IsInSAS { get; set; }
         public string Delimiter { get; set; }
         public bool HasHeader { get; set; }
         public bool IsTrackableSchema { get; set; }

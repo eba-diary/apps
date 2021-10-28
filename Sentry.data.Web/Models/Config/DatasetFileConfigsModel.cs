@@ -41,7 +41,6 @@ namespace Sentry.data.Web
             this.RawStorageId = dto.StorageCode;
             this.Security = dto.Security;
             this.CreateCurrentView = dto.CreateCurrentView;
-            this.IncludedInSAS = dto.IsInSAS;
             this.Delimiter = dto.Delimiter;
             this.HasHeader = dto.HasHeader;
             this.SchemaId = dto.Schema.SchemaId;

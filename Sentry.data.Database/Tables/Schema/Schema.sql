@@ -10,7 +10,6 @@
     [Delimiter] VARCHAR(10) NULL, 
     [HasHeader] BIT NULL, 
     [CreateCurrentView] BIT NULL, 
-    [IsInSAS] BIT NULL, 
     [SASLibrary] VARCHAR(50) NULL, 
     [Description] VARCHAR(2000) NULL, 
     [HiveTable] VARCHAR(250) NULL, 
