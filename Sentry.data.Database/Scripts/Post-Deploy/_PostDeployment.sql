@@ -132,6 +132,64 @@ END CATCH
 
 COMMIT TRAN
 
+SET @ScriptVersion = '2021.10.13.01_PostDeploy'
+
+BEGIN TRAN 
+IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion) 
+BEGIN TRY 
+
+  --insert one off script files here
+  :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_05\Default_DatasetId_and_SchemaId_on_DataFlow.sql
+  :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_05\Update_CLA3048_StandardizeOnUTCTime_FeatureFlag_Value.sql
+  :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_05\HistoryFix_Populate_Dataset_NamedEnvironments.sql
+
+  --insert into the verision table so these scripts do not run again.
+  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
+
+END TRY 
+
+BEGIN CATCH 
+    SELECT 
+        @ErrorMessage = ERROR_MESSAGE(), 
+        @ErrorSeverity = ERROR_SEVERITY(), 
+        @ErrorState = ERROR_STATE(); 
+  
+    RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState ); 
+  
+    ROLLBACK TRAN 
+    RETURN
+END CATCH 
+
+COMMIT TRAN
+
+SET @ScriptVersion = '2021.10.13.02_PostDeploy'
+
+BEGIN TRAN 
+IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion) 
+BEGIN TRY 
+
+  --insert one off script files here
+  :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_05\HistoryFix_UTC_Updates_for_DatasetFile_Create_DTM.sql
+
+  --insert into the verision table so these scripts do not run again.
+  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
+
+END TRY 
+
+BEGIN CATCH 
+    SELECT 
+        @ErrorMessage = ERROR_MESSAGE(), 
+        @ErrorSeverity = ERROR_SEVERITY(), 
+        @ErrorState = ERROR_STATE(); 
+  
+    RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState ); 
+  
+    ROLLBACK TRAN 
+    RETURN
+END CATCH 
+
+COMMIT TRAN
+
 SET @ScriptVersion = '2021.10.11.01_PostDeploy'
 
 BEGIN TRAN 

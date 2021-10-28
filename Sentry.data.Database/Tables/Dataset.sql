@@ -23,9 +23,29 @@
     [DeleteIssueDTM] DATETIME NOT NULL, 
     [ObjectStatus] INT NOT NULL DEFAULT 1, 
     [SaidKeyCode] VARCHAR(10) NULL, 
+    [NamedEnvironment] VARCHAR(25) NULL, 
+    [NamedEnvironmentType] VARCHAR(25) NULL, 
     PRIMARY KEY CLUSTERED 
 (
 	[Dataset_ID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
  CONSTRAINT [FK_Dataset_Security] FOREIGN KEY ([Security_ID]) REFERENCES [Security]([Security_ID])
 ) ON [PRIMARY]
+GO
+EXEC sp_addextendedproperty @name = N'MS_Description',
+    @value = N'The Quartermaster Named Environment that this Dataset is for',
+    @level0type = N'SCHEMA',
+    @level0name = N'dbo',
+    @level1type = N'TABLE',
+    @level1name = N'Dataset',
+    @level2type = N'COLUMN',
+    @level2name = N'NamedEnvironment'
+GO
+EXEC sp_addextendedproperty @name = N'MS_Description',
+    @value = N'The Quartermaster Named Environment Type (prod or nonprod) that this Dataset is for',
+    @level0type = N'SCHEMA',
+    @level0name = N'dbo',
+    @level1type = N'TABLE',
+    @level1name = N'Dataset',
+    @level2type = N'COLUMN',
+    @level2name = N'NamedEnvironmentType'

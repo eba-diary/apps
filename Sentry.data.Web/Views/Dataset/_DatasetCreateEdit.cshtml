@@ -6,6 +6,7 @@
     be $('#DatasetForm').serialize().*@
 @using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "DatasetForm" }))
 {
+    @*This DIV tag is used to scope JQuery element selectors in Dataset.js to just this partial view*@
     <div id="DatasetFormContent">
         @Html.AntiForgeryToken()
 
@@ -117,6 +118,13 @@
                             </div>
                         }
                     </div>
+                </div>
+
+                @************************************************************************************************************************************
+                NAMED ENVIRONMENT
+                *************************************************************************************************************************************@
+                <div id="NamedEnvironmentPartial">
+                    @Html.Partial("_NamedEnvironment", Model)
                 </div>
 
 

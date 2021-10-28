@@ -6,6 +6,12 @@ data.Notification = {
 
     Quill: null,                //declare as property for use later
 
+    //NOTE: I chose to use this hardcoded NoMessageList as a hardcoded list instead of adding an ajax method or adjusting asset drop down for performance
+    //since the Id's in the drop down are a hardened list of ID's that originate from the static BusinessArea/Notification scripts in DSC
+    //There are precedents for using these ID's elsewhere in the APP which i felt gave me the green light to use this list
+    //I felt this at least calls out the NoMessageList so in the future if more IDs are added, we can simply add this to the list
+    NoMessageList: ["BA_2"],    //LIST OF ObjectIds THAT SHOULD NOT NOT SHOW MESSAGE
+
     Init: function () {
         data.Notification.NotificationTableInit();
 
@@ -59,6 +65,47 @@ data.Notification = {
         });
     },
 
+    //SETUP LISTENER for Asset Drop down and init beginning state
+    initAssetListener: function () {
+
+        //initially hide or show message
+        data.Notification.hideOrShowMessageContainer();
+
+        //setup onChange event to fire when asset drop down is changed
+        $('#ObjectId').change(function () {                                            
+            data.Notification.hideOrShowMessageContainer();
+        });
+    },
+
+    //function to HIDE OR SHOW MESSAGE
+    hideOrShowMessageContainer: function () {
+
+        if (data.Notification.shouldShowMessage()) {
+            $('#messageContainer').show();
+        }
+        else {
+            $('#messageContainer').hide();
+        }
+    },
+
+    //TELL US IF WE SHOULD SHOW MESSAGE FOR A GIVEN NOTIFICATION
+    shouldShowMessage: function () {
+
+        //Grab Value of dropdown which is ObjectId
+        var val = $("#ObjectId").val();
+
+        //Look for ObjectId in the NoMessage list
+        var sIndex = data.Notification.NoMessageList.findIndex(objectId => objectId === val);
+
+        //if they picked a Asset List that was in the "NoMessageList" that means we hide the message
+        if (sIndex >= 0) {
+            return false;       //ID Found so we hide message
+        }
+        else {
+            return true;        //ID NOT Found so we show message
+        }
+    },
+
     /******************************************************************************************
     * Because upon save we have to extract/decode message from Quill editor for safe storage, this js function will override the normal MVC subit
     * we will grab the notification message, encode it and use a bogus text area which is actually the model.message
@@ -66,7 +113,14 @@ data.Notification = {
     ******************************************************************************************/
     submitChanges: function ()
     {
-        var message = data.Notification.Quill.root.innerHTML;           //get html of quill editor
+        //default message to what quill default will have as empty message
+        var message = "<p><br></p>";
+
+        //ONLY fill message if it should be shown
+        if (data.Notification.shouldShowMessage()) {
+            message = data.Notification.Quill.root.innerHTML;           //get html of quill editor
+        }
+
         var messageEncoded = $("<div/>").text(message).html();          //encode message to safely pass and store
         $('.messageEncoded').val(messageEncoded);                       //set messageEncoded TextArea so normal MVC submit will use it
 

@@ -1,0 +1,3 @@
+﻿CREATE SCHEMA [HangFire7]
+    AUTHORIZATION [dbo];
+

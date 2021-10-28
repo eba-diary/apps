@@ -28,12 +28,15 @@ namespace Sentry.data.Web.WebApi.Controllers
         private readonly IJobService _jobService;
         private HttpClient _httpClient;
         private IApacheLivyProvider _apacheLivyProvider;
+        private readonly IDataFeatures _dataFeatures;
 
-        public JobController(IDatasetContext datasetContext, IJobService jobService, IApacheLivyProvider apacheLivyProvider)
+        public JobController(IDatasetContext datasetContext, IJobService jobService, 
+            IApacheLivyProvider apacheLivyProvider, IDataFeatures dataFeatures)
         {
             _datasetContext = datasetContext;
             _jobService = jobService;
             _apacheLivyProvider = apacheLivyProvider;
+            _dataFeatures = dataFeatures;
         }
         /// <summary>
         /// Gets all Jobs
@@ -393,7 +396,19 @@ namespace Sentry.data.Web.WebApi.Controllers
                 json.Append($"{{\"file\": \"{dsrc.Options.JarFile}\"");
                     
                 json.Append($", \"className\": \"{dsrc.Options.ClassName}\"");
-                json.Append($", \"name\": \"{dsrc.Name}\"");
+
+                if (_dataFeatures.CLA3497_UniqueLivySessionName.GetValue())
+                {
+                    Random random = new Random();
+                    string randomString = new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 6).Select(s => s[random.Next(s.Length)]).ToArray());
+                    string livySessionName = $"{dsrc.Name}_{randomString}";
+                    json.Append($", \"name\": \"{livySessionName}\"");
+                    Logger.AddContextVariable(new TextVariable("livysessionname", livySessionName));
+                }
+                else
+                {
+                    json.Append($", \"name\": \"{dsrc.Name}\"");
+                }
 
                 if (javaOptionsOverride != null && !String.IsNullOrWhiteSpace(javaOptionsOverride.DriverMemory))
                 {

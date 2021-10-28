@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Sentry.Core;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
     public interface IDatasetService
     {
-        List<string> Validate(DatasetDto dto);
+        Task<ValidationException> Validate(DatasetDto dto);
         int CreateAndSaveNewDataset(DatasetDto dto);
         bool Delete(int datasetId, bool logicalDelete = true);
         DatasetDto GetDatasetDto(int id);

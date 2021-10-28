@@ -484,8 +484,14 @@ data.Dataset = {
                     data.Dale.makeToast("error", "Error retrieving SAID Primary Owner.");
                 }
             });
+
+            //Load the named environments for the selected asset
+            Sentry.InjectSpinner($("div#DatasetFormContent #namedEnvironmentSpinner"), 30);
+            data.Dataset.populateNamedEnvironments();
         });
 
+        //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
+        data.Dataset.initNamedEnvironmentEvents();
         
         //SubmitDatasetForm
         $("[id='SubmitDatasetForm']").click(PageSubmitFunction);
@@ -1115,8 +1121,8 @@ data.Dataset = {
                 { data: "ActionLinks", className: "downloadFile", width: "100px", searchable: false, orderable: false },
                 { data: "Name", className: "Name" },
                 { data: "UploadUserName", className: "UploadUserName" },
-                { data: "CreateDTM", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
-                { data: "ModifiedDTM", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
+                { data: "CreateDtm", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
+                { data: "ModifiedDtm", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "ConfigFileName", className: "ConfigFileName" }
             ],
             language: {
@@ -1261,7 +1267,7 @@ data.Dataset = {
             '</tr>' +
             '<tr>' +
             '<td><b>S3 Location</b>:</td>' +
-            '<td>' + d.s3Key + '</td>' +
+            '<td>' + d.S3Key + '</td>' +
             '</tr>' +
             '<tr>' +
             '<td><b>Version ID</b>: </td>' +
@@ -1270,6 +1276,14 @@ data.Dataset = {
             '<tr>' +
             '<td><b>ConfigFileDesc</b>: </td>' +
             '<td>' + d.ConfigFileDesc + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td><b>FlowExecutionGuid</b>: </td>' +
+            '<td>' + d.FlowExecutionGuid + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td><b>RunInstanceGuid</b>: </td>' +
+            '<td>' + d.RunInstanceGuid + '</td>' +
             '</tr>' +
             '</table>';
 
@@ -1373,7 +1387,7 @@ data.Dataset = {
             '</tr>' +
             '<tr>' +
             '<td><b>S3 Location</b>:</td>' +
-            '<td>' + d.s3Key + '</td>' +
+            '<td>' + d.S3Key + '</td>' +
             '</tr>' +
             '<tr>' +
             '<td><b>Version ID</b>: </td>' +
@@ -1532,7 +1546,7 @@ data.Dataset = {
             '</tr>' +
             '<tr>' +
             '<td><b>S3 Location</b>:</td>' +
-            '<td>' + d.s3Key + '</td>' +
+            '<td>' + d.S3Key + '</td>' +
             '</tr>' +
             '<tr>' +
             '<td><b>Version ID</b>: </td>' +
@@ -1541,6 +1555,14 @@ data.Dataset = {
             '<tr>' +
             '<td><b>ConfigFileDesc</b>: </td>' +
             '<td>' + d.ConfigFileDesc + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td><b>FlowExecutionGuid</b>: </td>' +
+            '<td>' + d.FlowExecutionGuid + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td><b>RunInstanceGuid</b>: </td>' +
+            '<td>' + d.RunInstanceGuid + '</td>' +
             '</tr>' +
             '</table>';
 
@@ -1595,9 +1617,24 @@ data.Dataset = {
         }
 
         returnLink.attr('href', returnUrl);
+    },
+
+    initNamedEnvironmentEvents() {
+        //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
+        $("div#DatasetFormContent select#NamedEnvironment").change(function () {
+            Sentry.InjectSpinner($("div#DatasetFormContent #namedEnvironmentTypeSpinner"), 30);
+            data.Dataset.populateNamedEnvironments();
+        });
+    },
+
+    populateNamedEnvironments() {
+        var assetKeyCode = $("div#DatasetFormContent #saidAsset").val();
+        var selectedEnvironment = $("div#DatasetFormContent #NamedEnvironment").val();
+        $.get("/Dataset/NamedEnvironment?assetKeyCode=" + assetKeyCode + "&namedEnvironment=" + selectedEnvironment, function (result) {
+            $('div#DatasetFormContent #NamedEnvironmentPartial').html(result);
+            data.Dataset.initNamedEnvironmentEvents();
+        });
     }
-
-
 
 
 

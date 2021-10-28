@@ -66,9 +66,6 @@ namespace Sentry.data.Core.Entities.DataProcessing
             public const string nameContainsReservedWords = "nameContainsReservedWords";
             public const string nameMustBeUnique = "nameMustBeUnique";
             public const string stepsContainsAtLeastOneSchemaMap = "stepsContainsAtLeastOneSchemaMap";
-            public const string saidAssetIsBlank = "saidAssetIsBlank";
-            public const string namedEnvironmentInvalid = "namedEnvironmentInvalid";
-            public const string namedEnvironmentTypeInvalid = "namedEnvironmentTypeInvalid";
         }
     }
 }

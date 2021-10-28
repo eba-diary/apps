@@ -1,6 +1,6 @@
-﻿CREATE TABLE [HangFire].[Job] (
-    [Id]             INT            IDENTITY (1, 1) NOT NULL,
-    [StateId]        INT            NULL,
+﻿CREATE TABLE [HangFire7].[Job] (
+    [Id]             BIGINT         IDENTITY (1, 1) NOT NULL,
+    [StateId]        BIGINT         NULL,
     [StateName]      NVARCHAR (20)  NULL,
     [InvocationData] NVARCHAR (MAX) NOT NULL,
     [Arguments]      NVARCHAR (MAX) NOT NULL,
@@ -12,11 +12,11 @@
 
 GO
 CREATE NONCLUSTERED INDEX [IX_HangFire_Job_ExpireAt]
-    ON [HangFire].[Job]([ExpireAt] ASC)
-    INCLUDE([Id]);
+    ON [HangFire7].[Job]([ExpireAt] ASC)
+    INCLUDE([StateName]) WHERE ([ExpireAt] IS NOT NULL);
 
 
 GO
 CREATE NONCLUSTERED INDEX [IX_HangFire_Job_StateName]
-    ON [HangFire].[Job]([StateName] ASC);
+    ON [HangFire7].[Job]([StateName] ASC) WHERE ([StateName] IS NOT NULL);
 

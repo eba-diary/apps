@@ -255,12 +255,20 @@
 
                         <div class="row">
                             <div class="col-lg-6">
+                                <h5 class="@color">SAID Asset</h5>
+                                <a target="_blank" rel="noopener noreferrer" href="https://said.sentry.com/ViewAsset.aspx?ID=@Model.SAIDAssetKeyCode">@Model.SAIDAssetKeyCode</a>
+                            </div>
+                            <div class="col-lg-6">
+                                <h5 class="@color">Environment</h5>
+                                <p>@Model.NamedEnvironment</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
                                 <h5 class="@color">Data Classification</h5>
                                 <p>@Model.DataClassificationDescription</p>
                             </div>
                             <div class="col-lg-6">
-                                <h5 class="@color">SAID Asset</h5>
-                                <a target="_blank" rel="noopener noreferrer" href="https://said.sentry.com/ViewAsset.aspx?ID=@Model.SAIDAssetKeyCode">@Model.SAIDAssetKeyCode</a>
                             </div>
                         </div>
                         <hr />

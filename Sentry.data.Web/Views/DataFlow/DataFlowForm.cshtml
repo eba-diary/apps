@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "Data Flow Form";
 }
+@*This DIV tag is used to scope JQuery element selectors in DataFlow.js to just this view*@
 <div id="DataFlowFormContainer">
     @using (Html.BeginForm("DataFlowForm", "DataFlow", FormMethod.Post))
     {
@@ -121,7 +122,7 @@
                     @Html.EditorForMany(m => m.SchemaMaps, x => x.Index)
                     @if (!Model.CLA3332_ConsolidatedDataFlows)
                     {
-                    <button type="button" id="btnAddSchemaMap" class="btn btn-success"><span>Add Another Target</span></button>
+                        <button type="button" id="btnAddSchemaMap" class="btn btn-success"><span>Add Another Target</span></button>
                     }
                 </div>
             </div>
@@ -153,7 +154,7 @@
             data.DataFlow.CLA3332_ConsolidatedDataFlows = @Model.CLA3332_ConsolidatedDataFlows.ToString().ToLower();
             data.DataFlow.DataFlowFormInit();
 
-            @if (!Model.CLA3332_ConsolidatedDataFlows) { 
+            @if (!Model.CLA3332_ConsolidatedDataFlows) {
                 <text>
                 //Adding delete button logic here to ensure it is added to
                 // any additional schemaMapLineItems that are added
