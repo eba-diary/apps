@@ -15,6 +15,7 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public string StorageCode { get; set; }
         public string Format { get; set; }
         public bool CurrentView { get; set; }
+        //CLA-3306: We are removing IsInSAS from the UI and DSC model. However, the API still exposes this, so we are defaulting to false to maintain the API.
         public bool IsInSAS { get; set; } = false;
         public string Delimiter { get; set; }
         public bool HasHeader { get; set; }
