@@ -224,18 +224,6 @@ data.Config = {
             data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
         });
 
-        $("#IncludedInSAS").click(function () {
-            if ($('#ConfigId').val() !== "0" && $(this).is(':unchecked')) {
-                Sentry.ShowModalAlert("\"Add to SAS\" option has been unchecked.  <p>This will remove all associated SAS libraries for this schema, if saved.</p>");
-            }
-        });
-
-        $("#CreateCurrentView").click(function () {
-            if ($('#ConfigId').val() !== "0" && $(this).is(':unchecked') && $("#IncludedInSAS").is(':checked')) {
-                Sentry.ShowModalAlert("\"Current View\" option has been unchecked.  <p>This will remove the current view SAS library associated with this schema, if saved.</p>");
-            }
-        });
-
         data.Config.DatasetScopeTypeInit($("#DatasetScopeTypeID"));
     },
 

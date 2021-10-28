@@ -1974,7 +1974,6 @@ namespace Sentry.data.Core.Tests
                 HiveLocation = "data/1000002",
                 HiveTable = "mockschema",
                 HiveTableStatus = "Available",
-                IsInSAS = true,
                 LastUpdatedDTM = DateTime.Parse("2020-06-17 13:08:10"),
                 Name = "Mock Schema",
                 SasLibrary = "DSCQUAL_sentry",

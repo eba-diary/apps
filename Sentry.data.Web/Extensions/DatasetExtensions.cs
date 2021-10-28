@@ -37,7 +37,6 @@ namespace Sentry.data.Web
                 DataClassification = model.DataClassification,
                 IsSecured = model.IsSecured,
                 HasHeader = model.HasHeader,
-                IsInSAS = model.IncludeInSas,
                 CreateCurrentView = model.CreateCurrentView,
                 ObjectStatus = model.ObjectStatus,
                 SAIDAssetKeyCode = model.SAIDAssetKeyCode,

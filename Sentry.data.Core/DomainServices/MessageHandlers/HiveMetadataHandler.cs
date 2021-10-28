@@ -50,18 +50,6 @@ namespace Sentry.data.Core
                             case "EXISTED":
                                 de = _dsContext.FileSchema.Where(w => w.SchemaId == hiveCreatedEvent.SchemaID).FirstOrDefault();
                                 de.HiveTableStatus = ConsumptionLayerTableStatusEnum.Available.ToString();
-
-
-                                if (de.IsInSAS)
-                                {
-                                    var changeIndicator = JObject.Parse(hiveCreatedEvent.ChangeIND);
-                                    bool IsSuccessful = _schemaService.SasAddOrUpdateNotification(hiveCreatedEvent.SchemaID, hiveCreatedEvent.RevisionID, hiveCreatedEvent.InitiatorID, changeIndicator, "HIVE");
-
-                                    if (!IsSuccessful)
-                                    {
-                                        Logger.Error($"HiveMetadataHandler failed sending SAS email - revision:{hiveCreatedEvent.RevisionID}");
-                                    }                                    
-                                }
                                 break;
                             case "FAILED":
                                 de = _dsContext.GetById<FileSchema>(hiveCreatedEvent.SchemaID);
@@ -109,12 +97,7 @@ namespace Sentry.data.Core
                             case "SKIPPED":
                                 de.HiveTableStatus = ConsumptionLayerTableStatusEnum.Deleted.ToString();
 
-                                bool IsSuccessful = _schemaService.SasDeleteNotification(deleteCompletedEvent.SchemaID, deleteCompletedEvent.InitiatorID, "HIVE");
-
-                                if (!IsSuccessful)
-                                {
-                                    Logger.Error($"HiveMetadataHandler failed sending SAS delete email - schema:{deleteCompletedEvent.SchemaID}");
-                                }
+                                
                                 break;
                             case "FAILED":
                                 de.HiveTableStatus = ConsumptionLayerTableStatusEnum.DeleteFailed.ToString();

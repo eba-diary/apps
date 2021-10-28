@@ -1116,7 +1116,6 @@ namespace Sentry.data.Core
             dto.StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + dfc.GetStorageCode() + "\\";
             dto.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
             dto.CreateCurrentView = (dfc.Schema != null) ? dfc.Schema.CreateCurrentView : false;
-            dto.IsInSAS = (dfc.Schema != null) ? dfc.Schema.IsInSAS : false;
             dto.Delimiter = dfc.Schema?.Delimiter;
             dto.HasHeader = (dfc.Schema != null) ? dfc.Schema.HasHeader : false;
             dto.IsTrackableSchema = dfc.IsSchemaTracked;
