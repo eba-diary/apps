@@ -16,52 +16,41 @@
                     <h1 class="detailName detailNameLink leftFloat @Model.CategoryColor" data-ArtifactLink="@Model.ReportLink" data-LocationType="@Model.LocationType">
                         @Model.DatasetName
                     </h1>
+                    <div style="margin-top:-30px;" class="col-md-12 text-right">
 
-                    <div style="margin-top:-30px;" class="col-md-offset-9 col-md-4 col-lg-offset-10 col-lg-3">
-
-                        <div class="col-md-2 col-lg-2 ">
-                            <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Favorite">
-                                <button type="button" class="btn btn-default borderdk_gray borderdk_@Model.CategoryColor"
-                                        id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
-                                    @if (Model.IsFavorite)
-                                    {
-                                        <span class="glyphicon glyphicon-star @Model.CategoryColor" id="favoriteIcon"></span>
-                                    }
-                                    else
-                                    {
-                                        <span class="glyphicon glyphicon-star-empty @Model.CategoryColor" id="favoriteIcon"></span>
-                                    }
-                                </button>
-                            </div>
-                        </div>
+                        <button type="button" class="btn btn-default borderdk_gray borderdk_@Model.CategoryColor"
+                                id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
+                            @if (Model.IsFavorite)
+                            {
+                                <span class="glyphicon glyphicon-star @Model.CategoryColor" id="favoriteIcon"></span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-star-empty @Model.CategoryColor" id="favoriteIcon"></span>
+                            }
+                        </button>
                         @if (Model.Security.CanEditReport)
                         {
-                            <div class="col-md-2 col-lg-2">
-                                <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Edit Report">
-                                    <button type="button" class="btn btn-default btn borderdk_gray borderdk_@Model.CategoryColor"
-                                            id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Report">
-                                        <span class="glyphicon glyphicon-edit @Model.CategoryColor"></span>
-                                    </button>
-                                </div>
-                            </div>
+                            <button type="button" class="btn btn-default dataset-operation-button borderdk_gray borderdk_@Model.CategoryColor"
+                                    id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Report">
+                                <span class="glyphicon glyphicon-edit @Model.CategoryColor"></span>
+                            </button>
                         }
-                        <div class="col-md-2 col-lg-2" style="margin-left:0px;">
-                            <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
-                                <button type="button" class="btn btn-default borderdk_gray borderdk_@Model.CategoryColor dropdown" data-toggle="dropdown">
-                                    <span class="glyphicon glyphicon-menu-hamburger @Model.CategoryColor"></span>
-                                </button>
-                                <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
-                                    @if (Model.Security.CanEditReport)
-                                    {
-                                        <li>
-                                            <a id="deleteLink" href="" data-id="@Model.DatasetId">Delete Exhibit</a>
-                                        </li>
-                                    }
+                        <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
+                            <button type="button" class="btn btn-default borderdk_gray borderdk_@Model.CategoryColor dropdown" data-toggle="dropdown">
+                                <span class="glyphicon glyphicon-menu-hamburger @Model.CategoryColor"></span>
+                            </button>
+                            <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                                @if (Model.Security.CanEditReport)
+                                {
                                     <li>
-                                        <a href="@Model.MailtoLink">Share Exhibit</a>
+                                        <a id="deleteLink" href="" data-id="@Model.DatasetId">Delete Exhibit</a>
                                     </li>
-                                </ul>
-                            </div>
+                                }
+                                <li>
+                                    <a href="@Model.MailtoLink">Share Exhibit</a>
+                                </li>
+                            </ul>
                         </div>
 
                     </div>

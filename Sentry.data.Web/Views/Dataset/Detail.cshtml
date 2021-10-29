@@ -56,70 +56,62 @@
                             <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
                         }
 
+                        <div style="margin-top:-30px;" class="col-md-12 text-right">
 
-                        <div style="margin-top:-30px;" class="col-md-offset-9 col-md-4 col-lg-offset-10 col-lg-3">
+                            <button type="button" class="btn btn-default borderdk_gray borderdk_@Model.CategoryColor"
+                                    id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
+                                @if (Model.IsFavorite)
+                                {
+                                    <span class="glyphicon glyphicon-star @Model.CategoryColor" id="favoriteIcon"></span>
+                                }
+                                else
+                                {
+                                    <span class="glyphicon glyphicon-star-empty @Model.CategoryColor" id="favoriteIcon"></span>
+                                }
+                            </button>
 
-                            <div class="col-md-2 col-lg-2 ">
-                                <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Favorite">
-                                    <button type="button" class="btn btn-default borderdk_gray borderdk_@Model.CategoryColor"
-                                            id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
-                                        @if (Model.IsFavorite)
-                                        {
-                                            <span class="glyphicon glyphicon-star @Model.CategoryColor" id="favoriteIcon"></span>
-                                        }
-                                        else
-                                        {
-                                            <span class="glyphicon glyphicon-star-empty @Model.CategoryColor" id="favoriteIcon"></span>
-                                        }
-                                    </button>
-                                </div>
-                            </div>
-                            
                             @if (Model.Security.CanEditDataset)
                             {
-                                <div class="col-md-2 col-lg-2">
-                                    <button type="button"
-                                            class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color"
-                                            id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                                        <span class="glyphicon glyphicon-edit @color"></span>
-                                    </button>
-                                </div>
+                                <button type="button"
+                                        class="btn btn-default dataset-operation-button borderdk_gray borderdk_@color"
+                                        id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
+                                    <span class="glyphicon glyphicon-edit @color"></span>
+                                </button>
                             }
-                            <div class="col-md-2 col-lg-2">
-                                <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
+                            <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
 
-                                    <button type="button"
-                                            class="btn btn-default borderdk_gray borderdk_@color dropdown"
-                                            data-toggle="dropdown">
-                                        <span class="glyphicon glyphicon-menu-hamburger @color"></span>
-                                    </button>
-                                    <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
-                                        @if (Model.Security.CanManageSchema)
-                                        {
-                                            <li>
-                                                <a href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>
-                                                <a class="btn" id="btnSyncConsumptionLayers" data-id="@Model.DatasetId" style="text-align: left">Sync All Consumption Layers</a>
-                                                @if (Model.Security.CanEditDataset)
-                                                {
-                                                    <a class="btn" id="btnDeleteDataset" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured" style="text-align: left">Delete Dataset</a>
-                                                }
-                                            </li>
-                                        }
+                                <button type="button"
+                                        class="btn btn-default borderdk_gray borderdk_@color dropdown"
+                                        data-toggle="dropdown">
+                                    <span class="glyphicon glyphicon-menu-hamburger @color"></span>
+                                </button>
+                                <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                                    @if (Model.Security.CanManageSchema)
+                                    {
                                         <li>
-                                            <a href="@Model.MailtoLink">Share Dataset</a>
+                                            <a href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>
+                                            <a class="btn" id="btnSyncConsumptionLayers" data-id="@Model.DatasetId" style="text-align: left">Sync All Consumption Layers</a>
+                                            @if (Model.Security.CanEditDataset)
+                                            {
+                                                <a class="btn" id="btnDeleteDataset" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured" style="text-align: left">Delete Dataset</a>
+                                            }
                                         </li>
-                                        @if (Model.Security.CanViewFullDataset)
-                                        {
-                                            <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
-                                                <a>
-                                                    Subscribe
-                                                </a>
-                                            </li>
-                                        }
-                                    </ul>
-                                </div>
+                                    }
+                                    <li>
+                                        <a href="@Model.MailtoLink">Share Dataset</a>
+                                    </li>
+                                    @if (Model.Security.CanViewFullDataset)
+                                    {
+                                        <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
+                                            <a>
+                                                Subscribe
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
                             </div>
                         </div>
+
                     }
                 </div>
             </div>
@@ -697,7 +689,7 @@
 
                 $(".dataTables_filter").parent().addClass("text-right");
             }
-    };
+        };
 
 
         //DATA PREVIEW DATA TABLE SETUP
@@ -718,16 +710,14 @@
             $('#datasetRowTable tbody').empty();
 
             //SETUP ALL COLUMNS for DATA PREVIEW
-            Object.keys(input[0]).forEach(function (key)
-            {
+            Object.keys(input[0]).forEach(function (key) {
                 nullColumns.push(null);
 
                 //load up ARRAY with each column
                 //CUSTOM RENDER will wrap column data in DIV which adds a scroll bar if needed since STRUCT columns are HUGE
                 parsedColumns.push({
-                    'title': key.trim(), 'width': "auto", render: function (d)
-                    {
-                        var me = "<div style='max-height:100px; overflow-y: auto;'>" + d + "</div>"; 
+                    'title': key.trim(), 'width': "auto", render: function (d) {
+                        var me = "<div style='max-height:100px; overflow-y: auto;'>" + d + "</div>";
                         return me;
                     }
                 });
@@ -798,7 +788,7 @@
             this.IsEnabled = ko.observable(data.IsEnabled);
         }
 
-        function DataFlow(data){
+        function DataFlow(data) {
             var self = this;
             self.Name = ko.observable(data.Name);
             self.Id = ko.observable(data.Id);
@@ -806,10 +796,10 @@
             self.Jobs = ko.observableArray();
             self.DetailUrl = "/DataFlow/" + encodeURIComponent(self.Id()) + "/Detail";
             $.each(data.RetrieverJobs, function (i, val) {
-                        var item = new DropLocation(val);
+                var item = new DropLocation(val);
 
-                        self.Jobs().push(item);
-                    });
+                self.Jobs().push(item);
+            });
             self.DataFlowDetailRedirect = function () {
                 window.open("/DataFlow/" + encodeURIComponent(this.Id()) + "/Detail");
             }
@@ -854,7 +844,7 @@
             self.DFSDropLocation = ko.observable();
             self.S3DropLocation = ko.observable();
             self.OtherJobs = ko.observableArray();
-            self.DataFlows = ko.observableArray();            
+            self.DataFlows = ko.observableArray();
             self.DFSCronJob = ko.observable();
             self.S3CronJob = ko.observable();
             self.CronJobs = ko.observableArray();
@@ -921,7 +911,7 @@
                         return d1.toLocaleString("en-us", { month: "long" }) + ' ' + d1.getDate() + ', ' + d1.getFullYear();
                     } else {
                         return d2.toLocaleString("en-us", { month: "long" }) + ' ' + d2.getDate() + ', ' + d2.getFullYear();
-                    }                    
+                    }
                 }
                 //Only metadata date
                 else if (!isNaN(d1) && isNaN(d2)) {
@@ -964,7 +954,7 @@
             $('#dataLastUpdatedSpinner').show();
             UpdateMetadata();
 
-            
+
             function UpdateMetadata() {
 
                 if (!isNaN(getUrlParameter('configID'))) {
@@ -1020,7 +1010,7 @@
             }
 
             function UpdateColumnSchema() {
-                if ($('#datasetConfigList').val() === undefined) { return;}
+                if ($('#datasetConfigList').val() === undefined) { return; }
 
                 var schemaURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/columns";
 
