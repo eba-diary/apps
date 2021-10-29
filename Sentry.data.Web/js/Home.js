@@ -6,41 +6,29 @@ data.Home = {
     SentrySkipTotal: 0,
     AllSkipTotal: 10,
     AjaxStatus: true,
+    CLA2838_DSC_ANOUNCEMENTS: false,
 
     Init: function () {
         if (data.Home.AjaxStatus) {
             data.Home.AjaxStatus = false;
 
-            //SHOW DSC ANNOUNCEMENTS BASED ON FEATURE FLAG
-            //DELETE THIS OUTER AJAX Statement /Home/CLA2838_DSC_ANOUNCEMENTS when feature is complete
-            //ONLY SAVE what is noted below
-            //I didn't want to have the feed controller do any week until feature is fully on
-            $.ajax({
-                url: '/Home/CLA2838_DSC_ANOUNCEMENTS',
-                method: "GET",
-                dataType: 'json',
-                success: function (obj) {
+            //SHOW DSC ANNOUNCEMENTS BASED ON FEATURE FLAG DELETE THIS when feature is complete
+            if (data.Home.CLA2838_DSC_ANOUNCEMENTS == true) {
 
-                    if (obj.CLA2838_DSC_ANOUNCEMENTS == true) {
-
-                        //SAVE START
-                        $.ajax({
-                            url: '/Home/GetFeed',
-                            dataType: 'html',
-                            success: function (html) {
-                                $(".feedSpinner").hide();
-                                $("#feed").append(html);
-                                data.Home.SentrySkipTotal += 10;
-                                data.Home.AjaxStatus = true;
-                            },
-                            error: function (e) {
-                                data.Home.AjaxStatus = true;
-                            }
-                        });
-                        //SAVE END
+                $.ajax({
+                    url: '/Home/GetFeed',
+                    dataType: 'html',
+                    success: function (html) {
+                        $(".feedSpinner").hide();
+                        $("#feed").append(html);
+                        data.Home.SentrySkipTotal += 10;
+                        data.Home.AjaxStatus = true;
+                    },
+                    error: function (e) {
+                        data.Home.AjaxStatus = true;
                     }
-                }
-            });
+                });
+            }
 
             $.ajax({
                 url: '/Home/GetFavorites',
