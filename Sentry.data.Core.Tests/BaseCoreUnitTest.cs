@@ -73,6 +73,8 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime => throw new NotImplementedException();
 
             public IFeatureFlag<bool> CLA3497_UniqueLivySessionName => throw new NotImplementedException();
+
+            public IFeatureFlag<bool> CLA2838_DSC_ANOUNCEMENTS => throw new NotImplementedException();
         }
 
     }

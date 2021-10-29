@@ -76,35 +76,56 @@
 
         </div>
 
-        <div class="col-xs-12 col-sm-5 col-md-3 col-lg-3">
 
-            <h2 class="float-l">My Favorites</h2>
-            <div id="edit-favorites-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Edit Favorites"><span class="glyphicon glyphicon-pencil"></span></div>
-            <div class="border-btm-blue clearFloat"></div>
 
-            <div id="favoritePanel">
-                <div class="favoriteSpinner text-center">
-                    <span class="sentry-spinner"></span>
+        @if (Model.CLA2838_DSC_ANOUNCEMENTS)
+        {
+            @*VERSION WITH DSC ANNOUNCEMENTS*@
+            <div class="col-xs-12 col-sm-5 col-md-3 col-lg-3">
+
+                <h2 class="float-l">My Favorites</h2>
+                <div id="edit-favorites-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Edit Favorites"><span class="glyphicon glyphicon-pencil"></span></div>
+                <div class="border-btm-blue clearFloat"></div>
+
+                <div id="favoritePanel" class="favorite-add-scroll">
+                    <div class="favoriteSpinner text-center">
+                        <span class="sentry-spinner"></span>
+                    </div>
                 </div>
+
             </div>
 
+            <div class="col-xs-12 col-sm-5 col-md-3 col-lg-3">
 
-            @* commenting out feed until there's a better home for it
-                <h2 class="green">Feed</h2>
-                <div class="border-btm-green"></div>
+                <h2 class="float-l">Announcements</h2>
+                <div id="edit-favorites-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top"> </div>
+                <div class="border-btm-blue clearFloat"></div>
 
                 <div id="feed" class="feedBox">
                     <div class="feedSpinner text-center">
                         <span class="sentry-spinner"></span>
                     </div>
                 </div>
-            *@
 
-            @* is this needed??
-                <div class="feedBox clearFloat hidden" id="sentryFeed"></div>
-            *@
+            </div>
+        }
+        else
+        {
+            @*VERSION WITHOUT DSC ANNOUNCEMENTS.  NOTE! DELETE THIS ENTIRE SECTION WHEN Model.CLA2838_DSC_ANOUNCEMENTS IS TRUE*@
+            <div class="col-xs-12 col-sm-5 col-md-3 col-lg-3">
 
-        </div>
+                <h2 class="float-l">My Favorites</h2>
+                <div id="edit-favorites-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Edit Favorites"><span class="glyphicon glyphicon-pencil"></span></div>
+                <div class="border-btm-blue clearFloat"></div>
+
+                <div id="favoritePanel">
+                    <div class="favoriteSpinner text-center">
+                        <span class="sentry-spinner"></span>
+                    </div>
+                </div>
+
+            </div>
+        }
 
     </div>
 
