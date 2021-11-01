@@ -42,7 +42,8 @@ namespace Sentry.data.Web.Controllers
                 DatasetCount = dsList.Count(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET),
                 Categories = _dsContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).ToList(),
                 CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
-                DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue()
+                DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue(),
+                CLA2838_DSC_ANOUNCEMENTS = _featureFlags.CLA2838_DSC_ANOUNCEMENTS.GetValue()
             };
 
             Event e = new Event()
@@ -145,7 +146,6 @@ namespace Sentry.data.Web.Controllers
         {
             List<DataFeedItem> allDatafeedItems = cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList(), TimeSpan.FromHours(1));
             return PartialView("_Feed", allDatafeedItems.Take(10).ToList());
-            //return PartialView("_Feed", new List<DataFeedItem>());
         }
 
         public ActionResult GetMoreFeeds(int skip)

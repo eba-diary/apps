@@ -21,5 +21,7 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA3329_Expose_HR_Category { get; }
         IFeatureFlag<bool> CLA1656_DataFlowEdit_ViewEditPage { get; }
         IFeatureFlag<bool> CLA1656_DataFlowEdit_SubmitEditPage { get; }
+
+        IFeatureFlag<bool> CLA2838_DSC_ANOUNCEMENTS { get; }
     }
 }

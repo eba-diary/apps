@@ -6,25 +6,29 @@ data.Home = {
     SentrySkipTotal: 0,
     AllSkipTotal: 10,
     AjaxStatus: true,
+    CLA2838_DSC_ANOUNCEMENTS: false,
 
     Init: function () {
         if (data.Home.AjaxStatus) {
             data.Home.AjaxStatus = false;
 
-            // commenting out the piece that gets the feed until there is a better home for it
-            //$.ajax({
-            //    url: '/Home/GetFeed',
-            //    dataType: 'html',
-            //    success: function (html) {
-            //        $(".feedSpinner").hide();
-            //        $("#feed").append(html);
-            //        data.Home.SentrySkipTotal += 10;
-            //        data.Home.AjaxStatus = true;
-            //    },
-            //    error: function (e) {
-            //        data.Home.AjaxStatus = true;
-            //    }
-            //});
+            //SHOW DSC ANNOUNCEMENTS BASED ON FEATURE FLAG DELETE THIS when feature is complete
+            if (data.Home.CLA2838_DSC_ANOUNCEMENTS == true) {
+
+                $.ajax({
+                    url: '/Home/GetFeed',
+                    dataType: 'html',
+                    success: function (html) {
+                        $(".feedSpinner").hide();
+                        $("#feed").append(html);
+                        data.Home.SentrySkipTotal += 10;
+                        data.Home.AjaxStatus = true;
+                    },
+                    error: function (e) {
+                        data.Home.AjaxStatus = true;
+                    }
+                });
+            }
 
             $.ajax({
                 url: '/Home/GetFavorites',
