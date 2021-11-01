@@ -158,7 +158,6 @@ namespace Sentry.data.Web
                 Delimiter = model.Delimiter,
                 FileExtenstionName = model.FileFormat,
                 HasHeader = model.HasHeader,
-                IsInSas = model.AddToSAS,
                 CreateCurrentView = model.CurrentView,
                 Description = model.Description
             };

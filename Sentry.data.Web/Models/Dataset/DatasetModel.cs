@@ -59,9 +59,6 @@ namespace Sentry.data.Web
         [DisplayName("Data Classification")]
         public DataClassificationType DataClassification { get; set; }
 
-        [DisplayName("Add to SAS")]
-        public bool IncludeInSas { get; set; }
-
         [DisplayName("Create Current View")]
         public bool CreateCurrentView { get; set; }
 

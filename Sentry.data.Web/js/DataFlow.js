@@ -418,13 +418,13 @@
                 else {
                     var curVal = parseInt(cur.val());
                 }
-                
+
 
                 dsSpinner.html('');
                 cur.html(newSubItems);
 
                 var curRow = cur.parent().parent();
-                if (curVal === null || curVal === undefined) {
+                if (curVal === null || curVal === undefined || isNaN(curVal)) {
                     $(this).val(0);
                     data.DataFlow.PopulateSchemas(0, schemaId, curRow.find("[id$=__SelectedSchema]"));
                 }

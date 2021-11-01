@@ -11,7 +11,6 @@
         public virtual string Delimiter { get; set; }
         public virtual bool HasHeader { get; set; }
         public virtual bool CreateCurrentView { get; set; }
-        public virtual bool IsInSAS { get; set; }
         public virtual string SasLibrary { get; set; }
         public virtual string HiveTable { get; set; }
         public virtual string HiveDatabase { get; set; }

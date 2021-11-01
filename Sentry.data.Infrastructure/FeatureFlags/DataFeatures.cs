@@ -27,6 +27,9 @@ namespace Sentry.data.Infrastructure.FeatureFlags
 
 
         
+        public IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; }
+        public IFeatureFlag<bool> CLA3497_UniqueLivySessionName { get; }
+
 
 
         public DataFeatures(UserService userService)
@@ -39,6 +42,8 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA1656_DataFlowEdit_SubmitEditPage = new BooleanFeatureFlagAmbientContext("CLA1656_DataFlowEdit_SubmitEditPage", false, LdClient, () => LdUser);
             CLA3329_Expose_HR_Category = new BooleanFeatureFlagAmbientContext("CLA3329_Expose_HR_Category", false, LdClient, () => LdUser);
             CLA2838_DSC_ANOUNCEMENTS = new BooleanFeatureFlagAmbientContext("CLA2838_DSC_ANOUNCEMENTS", false, LdClient, () => LdUser);
+            CLA3332_ConsolidatedDataFlows = new BooleanFeatureFlagAmbientContext("CLA3332_ConsolidatedDataFlows", false, LdClient, () => LdUser);
+            CLA3497_UniqueLivySessionName = new BooleanFeatureFlagAmbientContext("CLA3497_UniqueLivySessionName", false, LdClient, () => LdUser);
 
         }
 
@@ -88,9 +93,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
 
         public IFeatureFlag<bool> CLA3240_UseDropLocationV2 { get; } = new BooleanFeatureFlag("CLA3240_UseDropLocationV2", databaseRepo_longCache);
         public IFeatureFlag<bool> CLA3241_DisableDfsDropLocation { get; } = new BooleanFeatureFlag("CLA3241_DisableDfsDropLocation", databaseRepo_longCache);
-        public IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; } = new BooleanFeatureFlag("CLA3332_ConsolidatedDataFlows", databaseRepo_longCache);
         public IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime { get; } = new BooleanFeatureFlag("CLA3048_StandardizeOnUTCTime", databaseRepo_longCache);
-        public IFeatureFlag<bool> CLA3497_UniqueLivySessionName { get; } = new BooleanFeatureFlag("CLA3497_UniqueLivySessionName", databaseRepo_longCache);
 
         #endregion
 

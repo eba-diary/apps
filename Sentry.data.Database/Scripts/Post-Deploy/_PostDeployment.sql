@@ -70,5 +70,7 @@ DECLARE @ErrorState INT;
 :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_06\HistoryFix_Revert_ProducerS3Drop_Step_TargetBucket_Metadata.sql
 :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_06\CLA-3398-Delete_Database_Feature_Flags_that_have_been_moved_to_LaunchDarkly.sql
 :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_06\HistoryFix_UPDATE_SCHEMA_SNOWFLAKESTAGE.sql
+:r ..\Post-Deploy\SupportingScripts\Sprint_22_01_01\Remove_CLA3332_ConsolidatedDataFlows_For_LaunchDarkly_Implementation.sql
+:r ..\Post-Deploy\SupportingScripts\Sprint_22_01_01\Remove_CLA3497_UniqueLivyNames_For_LaunchDarkly_Implementation.sql
 
 
