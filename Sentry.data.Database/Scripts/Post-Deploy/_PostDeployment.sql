@@ -217,3 +217,31 @@ BEGIN CATCH
 END CATCH 
 
 COMMIT TRAN
+
+SET @ScriptVersion = 'CLA-3556 Default Exhibit SAID ASSET'
+
+BEGIN TRAN 
+IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion) 
+BEGIN TRY 
+
+  --insert one off script files here
+  :r ..\Post-Deploy\SupportingScripts\Sprint_22_01_01\HOTFIX-CLA-3556-DEFAULT-EXHIBIT-SAID-ASSET.sql
+
+  --insert into the verision table so these scripts do not run again.
+  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
+
+END TRY 
+
+BEGIN CATCH 
+    SELECT 
+        @ErrorMessage = ERROR_MESSAGE(), 
+        @ErrorSeverity = ERROR_SEVERITY(), 
+        @ErrorState = ERROR_STATE(); 
+  
+    RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState ); 
+  
+    ROLLBACK TRAN 
+    RETURN
+END CATCH 
+
+COMMIT TRAN
