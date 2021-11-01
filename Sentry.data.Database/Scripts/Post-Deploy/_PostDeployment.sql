@@ -72,5 +72,6 @@ DECLARE @ErrorState INT;
 :r ..\Post-Deploy\SupportingScripts\Sprint_21_04_06\HistoryFix_UPDATE_SCHEMA_SNOWFLAKESTAGE.sql
 :r ..\Post-Deploy\SupportingScripts\Sprint_22_01_01\Remove_CLA3332_ConsolidatedDataFlows_For_LaunchDarkly_Implementation.sql
 :r ..\Post-Deploy\SupportingScripts\Sprint_22_01_01\Remove_CLA3497_UniqueLivyNames_For_LaunchDarkly_Implementation.sql
+:r ..\Post-Deploy\SupportingScripts\Sprint_22_01_01\HOTFIX-CLA-3556-DEFAULT-EXHIBIT-SAID-ASSET.sql
 
 
