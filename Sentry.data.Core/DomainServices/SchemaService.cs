@@ -1029,12 +1029,6 @@ namespace Sentry.data.Core
                     results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Name cannot contain special characters ({specialCharacters})");
                 }
 
-                //Field name cannot contain uppercase letters
-                if (fieldDto.Name != null && fieldDto.Name.Any(char.IsUpper))
-                {
-                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Name cannot contain uppercase letters");
-                }
-
                 //Struct has children
                 if (fieldDto.FieldType == GlobalConstants.Datatypes.STRUCT && !fieldDto.HasChildren)
                 {
