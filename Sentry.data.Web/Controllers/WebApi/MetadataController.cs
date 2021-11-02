@@ -325,18 +325,15 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, "Failed schema validation", typeof(List<string>))]
         public async Task<IHttpActionResult> AddSchemaRevision(int datasetId, int schemaId, string revisionName, [FromBody] JObject schemaStructure)
         {
-            MethodBase mBase = System.Reflection.MethodBase.GetCurrentMethod();
-            string methodName = mBase.Name.ToLower();
-
             IHttpActionResult AddSchemaRevisionFunction()
             {
-                Logger.Debug($"metadataapi start method <{methodName}>");
+                Logger.Debug($"{nameof(MetadataController)} start method <{nameof(AddSchemaRevision)}>");
                 if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
                 {
                     throw new SchemaNotFoundException();
                 }
 
-                Logger.Debug($"metadataapi_{methodName} - datasetid:{datasetId}:::schemaId:{schemaId}:::incomingjson:{schemaStructure.ToString()}");
+                Logger.Debug($"{nameof(MetadataController)}_{nameof(AddSchemaRevision)} - datasetid:{datasetId}:::schemaId:{schemaId}:::incomingjson:{schemaStructure.ToString()}");
 
                 JsonSchema schema_v3;
                 schema_v3 = deserializeJSONStringtoJsonSchema().GetAwaiter().GetResult();
@@ -345,18 +342,18 @@ namespace Sentry.data.Web.WebApi.Controllers
                 try
                 {
                     int rowCnt = 0;
-                    Logger.Debug($"metadataapi schema conversion to dsc structures starting...");
+                    Logger.Debug($"{nameof(MetadataController)} schema conversion to dsc structures starting...");
                     schema_v3.ToDto(schemarows_v2, ref rowCnt);
-                    Logger.Debug($"metadataapi schema conversion to dsc structures ended ");
+                    Logger.Debug($"{nameof(MetadataController)} schema conversion to dsc structures ended ");
 
                     if (!schemarows_v2.Any())
                     {
                         return Content(System.Net.HttpStatusCode.BadRequest, "Schema conversion resulted in 0 fields.  Schema not updated.");
                     }
 
-                    Logger.Debug($"metadataapi schema dsc validations starting...");
+                    Logger.Debug($"{nameof(MetadataController)} schema dsc validations starting...");
                     _schemaService.Validate(schemaId, schemarows_v2);
-                    Logger.Debug($"metadataapi schema dsc validations ended");
+                    Logger.Debug($"{nameof(MetadataController)} schema dsc validations ended");
                 }
                 catch (SchemaConversionException)
                 {
@@ -374,7 +371,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     return Content(System.Net.HttpStatusCode.BadRequest, "Unable to Save Revision");
                 }
 
-                Logger.Debug($"metadataapi end method <{methodName}>");
+                Logger.Debug($"{nameof(MetadataController)} end method <{nameof(AddSchemaRevision)}>");
                 return Ok(savedRevisionId);
             }
 
@@ -382,9 +379,9 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 try
                 {
-                    Logger.Debug($"metadataapi start method <{methodName}>");
+                    Logger.Debug($"{nameof(MetadataController)} start method <{nameof(deserializeJSONStringtoJsonSchema)}>");
                     JsonSchema result = await JsonSchema.FromJsonAsync(schemaStructure.ToString()).ConfigureAwait(false);
-                    Logger.Debug($"metadataapi end method <{methodName}>");
+                    Logger.Debug($"{nameof(MetadataController)} end method <{nameof(deserializeJSONStringtoJsonSchema)}>");
                     return result;
                 }
                 catch (Exception ex)
@@ -393,7 +390,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 }
             }
 
-            return ApiTryCatch("metdataapi", mBase.Name, $"datasetid:{datasetId} schemaId{schemaId}", AddSchemaRevisionFunction);
+            return ApiTryCatch(nameof(MetadataController), nameof(AddSchemaRevision), $"datasetid:{datasetId} schemaId{schemaId}", AddSchemaRevisionFunction);
         }
 
         [HttpPost]
