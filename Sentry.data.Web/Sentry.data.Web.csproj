@@ -1628,6 +1628,10 @@
     <Content Include="Views\DataFlow\_SchemaMapDetail.cshtml" />
     <Content Include="Views\DataFlow\_NamedEnvironment.cshtml" />
     <Content Include="Views\Dataset\_NamedEnvironment.cshtml" />
+    <Content Include="Views\Dataset\Details\_SchemaAbout.cshtml" />
+    <Content Include="Views\Dataset\Details\_SchemaColumns.cshtml" />
+    <Content Include="Views\Dataset\Details\_DataPreview.cshtml" />
+    <Content Include="Views\Dataset\Details\_DataFiles.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
