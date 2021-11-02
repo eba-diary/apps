@@ -15,5 +15,8 @@ namespace Sentry.data.Web
         public List<Category> Categories { get; set; }
         public Boolean CanEditDataset { get; set; }
         public Boolean DisplayDataflowMetadata { get; set; }
+        public Boolean CLA2838_DSC_ANOUNCEMENTS { get; set; }
+
+
     }
 }
