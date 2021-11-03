@@ -106,9 +106,9 @@ namespace Sentry.data.Web.Controllers
             };
 
             Utility.SetupLists(_datasetContext, cdm);
-            cdm.SAIDAssetDropDown = await BuildSAIDAssetDropDown(cdm.SAIDAssetKeyCode).ConfigureAwait(false);
+            cdm.SAIDAssetDropDown = await BuildSAIDAssetDropDown(cdm.SAIDAssetKeyCode);
             
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(cdm.SAIDAssetKeyCode, cdm.NamedEnvironment).ConfigureAwait(false);
+            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(cdm.SAIDAssetKeyCode, cdm.NamedEnvironment);
             cdm.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             cdm.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             cdm.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
@@ -131,9 +131,9 @@ namespace Sentry.data.Web.Controllers
                 DatasetDto dto = _datasetService.GetDatasetDto(id);
                 DatasetModel model = new DatasetModel(dto);
                 Utility.SetupLists(_datasetContext, model);
-                model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
+                model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
 
-                var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment).ConfigureAwait(false);
+                var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment);
                 model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
                 model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
                 model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
@@ -184,9 +184,9 @@ namespace Sentry.data.Web.Controllers
             };
 
             Utility.SetupLists(_datasetContext, cdm);
-            cdm.SAIDAssetDropDown = await BuildSAIDAssetDropDown(cdm.SAIDAssetKeyCode).ConfigureAwait(false);
+            cdm.SAIDAssetDropDown = await BuildSAIDAssetDropDown(cdm.SAIDAssetKeyCode);
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(cdm.SAIDAssetKeyCode, cdm.NamedEnvironment).ConfigureAwait(false);
+            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(cdm.SAIDAssetKeyCode, cdm.NamedEnvironment);
             cdm.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             cdm.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             cdm.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
@@ -207,7 +207,7 @@ namespace Sentry.data.Web.Controllers
                 NamedEnvironment = namedEnvironment
             };
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(assetKeyCode, namedEnvironment).ConfigureAwait(false);
+            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(assetKeyCode, namedEnvironment);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
@@ -222,7 +222,7 @@ namespace Sentry.data.Web.Controllers
             DatasetModel cdm = new DatasetModel();
 
             //CALL SAID SERVICE TO RETURN ASSET
-            SAIDAsset asset = await _saidService.GetAssetByKeyCode(assetKeyCode).ConfigureAwait(false);
+            SAIDAsset asset = await _saidService.GetAssetByKeyCode(assetKeyCode);
             
             if (asset != null && asset.Roles != null && asset.Roles.Count > 0)
             {
@@ -329,9 +329,9 @@ namespace Sentry.data.Web.Controllers
             }
 
             Utility.SetupLists(_datasetContext, model);
-            model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode).ConfigureAwait(false);
+            model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
             
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment).ConfigureAwait(false);
+            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
