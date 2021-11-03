@@ -191,8 +191,8 @@
                 },
 
                 { data: "Server", className: "Server" },
-                { data: "Database", className: "Database" },
-                { data: "Object", className: "Object" },
+                { data: "Database", className: "Database", width: "15%"},
+                { data: "Object", className: "Object", width: "15%"},
                 { data: "ObjectType", className: "ObjectType" },
                 { data: "Column", className: "ColumnMan" },
 
@@ -254,7 +254,10 @@
                 { data: "Scale", className: "Scale", visible: false },
                 { data: "IsNullable", className: "IsNullable", visible: false },
                 { data: "EffectiveDate", className: "EffectiveDate", visible: false },
-                { data: "SourceType", className: "SourceType", visible: false }
+                { data: "SourceType", className: "SourceType", visible: false },
+
+                { data: "ScanCategory", className: "ScanCategory", width: "5%", visible: false },
+                { data: "ScanType", className: "ScanType", width: "20%", visible: false }
             ],
 
             aLengthMenu: [
@@ -295,6 +298,9 @@
                 { type: "text" },
                 { type: "text" },
                 { type: "text" },
+                { type: "text" },
+                { type: "text" },
+
                 { type: "text" },
                 { type: "text" }
             ]
