@@ -256,14 +256,6 @@ namespace Sentry.data.Core
             Logger.Debug($"End method <{methodName}>");
         }
 
-        public void DeleteJob(List<int> idList, bool logicalDelete = true)
-        {
-            foreach (int jobId in idList)
-            {
-                DeleteJob(jobId, logicalDelete);
-            }
-        }
-
         /// <summary>
         /// Find retriever job associated with dataflow and set objectstatus
         /// based on logicalDeleteflag: true = "Pending Delete", false = "Deleted"
@@ -280,6 +272,14 @@ namespace Sentry.data.Core
             foreach (int job in jobList)
             {
                 DeleteJob(job, logicalDelete);
+            }
+        }
+
+        public void DeleteJob(List<int> idList, bool logicalDelete = true)
+        {
+            foreach (int jobId in idList)
+            {
+                DeleteJob(jobId, logicalDelete);
             }
         }
 
