@@ -282,26 +282,71 @@
         </div>
     </div>
 
-    <hr />
-
-    @if (Model.Security.CanPreviewDataset)
+    @if (!Model.DisplayTabSections)
     {
-        @Html.Partial("Details/_SchemaAbout", Model)
+        if (Model.Security.CanPreviewDataset)
+        {
+            @Html.Partial("Details/_SchemaAbout", Model)
+        }
+        if (Model.Security.CanPreviewDataset)
+        {
+            @Html.Partial("Details/_SchemaColumns", Model)
+        }
+        if (Model.Security.CanViewFullDataset)
+        {
+            @Html.Partial("Details/_DataPreview", Model)
+        }
+        if (Model.Security.CanViewFullDataset)
+        {
+            @Html.Partial("Details/_DataFiles", Model)
+        }
     }
-
-    @if (Model.Security.CanPreviewDataset)
+    else
     {
-        @Html.Partial("Details/_SchemaColumns", Model)
-    }
+        <div class="tabs-wrapper">
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="nav-item active">
+                    <a class="nav-link active" data-toggle="tab" href="#panelSchemaAbout" role="tab">About this Schema</a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#panelSchemaColumns" role="tab">Columns</a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#panelDataPreview" role="tab">Data Preview (Top 20 Rows)</a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#panelDataFiles" role="tab">Data Files</a>
+                </li>
+            </ul>
+        </div>
 
-    @if (Model.Security.CanViewFullDataset)
-    {
-        @Html.Partial("Details/_DataPreview", Model)
-    }
-
-    @if (Model.Security.CanViewFullDataset)
-    {
-        @Html.Partial("Details/_DataFiles", Model)
+        <!-- Tab panels -->
+        <div class="tab-content">
+            <div class="tab-pane fade in active" id="panelSchemaAbout" role="tabpanel">
+                @if (Model.Security.CanPreviewDataset)
+                {
+                    @Html.Partial("Details/_SchemaAbout", Model)
+                }
+            </div>
+            <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
+                @if (Model.Security.CanPreviewDataset)
+                {
+                    @Html.Partial("Details/_SchemaColumns", Model)
+                }
+            </div>
+            <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
+                @if (Model.Security.CanViewFullDataset)
+                {
+                    @Html.Partial("Details/_DataPreview", Model)
+                }
+            </div>
+            <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
+                @if (Model.Security.CanViewFullDataset)
+                {
+                    @Html.Partial("Details/_DataFiles", Model)
+                }
+            </div>
+        </div>
     }
 </div>
 
