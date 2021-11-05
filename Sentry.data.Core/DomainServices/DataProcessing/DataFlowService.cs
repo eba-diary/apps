@@ -640,7 +640,7 @@ namespace Sentry.data.Core
             {
                 Name = dto.Name,
                 CreatedDTM = DateTime.Now,
-                CreatedBy = _userService.GetCurrentUser().AssociateId,
+                CreatedBy = dto.CreatedBy,
                 Questionnaire = dto.DFQuestionnaire,
                 FlowStorageCode = (!_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) 
                                     ? _datasetContext.GetNextDataFlowStorageCDE() 
