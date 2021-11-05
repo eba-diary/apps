@@ -53,6 +53,15 @@ namespace Sentry.data.Core
         /// <param name="id">RetrieverJob identifier</param>
         /// <param name="logicalDelete">Perform soft or hard delete</param>
         void DeleteJob(int id, bool logicalDelete = true);
+
+        /// <summary>
+        /// Find retriever job associated with dataflow and set objectstatus
+        /// based on logicalDeleteflag: true = "Pending Delete", false = "Deleted"
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="logicalDelete"></param>
+        void DeleteJobByDataFlowId(int id, bool logicalDelete = true);
+
         List<RetrieverJob> GetDfsRetrieverJobs();
     }
 }
