@@ -336,7 +336,7 @@
       <div xml:id="EBA-1908-01-22" type = "entry">
         <dateline><date when="1908-01-22">Jan. 22. Wednesday</date>.</dateline>
         <p><persName ref="#Davis_Theodore_M">Theo</persName> again to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> to meet <persName ref="#Maspero_Gaston">M. Maspero</persName>, <persName ref="#Nicol_Erskine">Erskine</persName> and <persName ref="#Weigall_Arthur">Weigall</persName>, and entered the new tomb <!--possible to tag?-->. This was uncovered a few days since, but was shallow, and contained only some remains of workmens houses, and a number of large vases - filled with broken potsherds and small objects - the most important being a head about <measure type="inches">7 in</measure>. high, which crowned the head of a mummied bird.</p> <!--check paragraph format of entry-->
-        <p><persName ref="#Watson_Major">Major Watson</persName>, and <persName ref="#Graham_Mrs">Mrs. Graham</persName>, an <orgname ref="#English">English</orgname> woman came to tea and were shown the find, when <persName ref="#Davis_Theodore_M">Theo</persName> was in the <placeName ref="#Bībān al-Mulūk">valley</placeName> this A.M. they opened a jar found in the gold tomb. It contained a broken vase, which was beautifully enamelled and bearing the cartouche of <persName ref="#Seti_II">Sety II</persName>. This can be restored - also an alabaster vase, broken, with cartouche of <persName ref="#Rameses_II">Rameses II</persName>, of very good work. A lovely warm day. <persName ref="#Nicol_Erskine">Mr. Erskine</persName> dined with us.</p>
+        <p><persName ref="#Watson_Major">Major Watson</persName>, and <persName ref="#Graham_Mrs">Mrs. Graham</persName>, an <orgName ref="#English">English</orgName> woman came to tea and were shown the find, when <persName ref="#Davis_Theodore_M">Theo</persName> was in the <placeName ref="#Bībān al-Mulūk">valley</placeName> this A.M. they opened a jar found in the gold tomb. It contained a broken vase, which was beautifully enamelled and bearing the cartouche of <persName ref="#Seti_II">Sety II</persName>. This can be restored - also an alabaster vase, broken, with cartouche of <persName ref="#Rameses_II">Rameses II</persName>, of very good work. A lovely warm day. <persName ref="#Nicol_Erskine">Mr. Erskine</persName> dined with us.</p>
       </div>
       <!-- MISS-TRANSLATION/TYPO? Erakine might be Erskine. Also, the EBA Indices page says "Erksine", but everything in Jan/Feb 1907 says "Erskine" -->
       <div xml:id="EBA-1908-01-23" type = "entry">
@@ -361,47 +361,47 @@
       </div>
       <!-- Should Dalison's reference have "Mr" in it? Some entries (like this and Mr. Max Dalison) have their titles in their references on the EBA Indices list, but others don't. -->
       <div xml:id="EBA-1908-01-28" type = "entry">
-        <dateline><date when="1908-01-28">Jan. 28. Tuesday</date></dateline>.
+        <dateline><date when="1908-01-28">Jan. 28. Tuesday</date>.</dateline>
         <p>A quiet day - <persName ref="#Davis_Theodore_M">Theo</persName> paying some visits.</p>
       </div>
       <div xml:id="EBA-1908-01-29" type = "entry">
-        <dateline><date when="1908-01-29">Jan. 29. Wednesday</date></dateline>.
+        <dateline><date when="1908-01-29">Jan. 29. Wednesday</date>.</dateline>
         <p>Lovely and warm. Several people on boat today. <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Ransom_Williams_Caroline">Carrie</persName> to <placeName ref="#Bībān al-Mulūk">"Tombs of the Queens"</placeName> <!--tomb of the kings=tomb of the queens?--> this afternoon.</p>
       </div>
       <div xml:id="EBA-1908-01-30" type = "entry">
-        <dateline><date when="1908-01-30">Jan. 30. Thursday</date></dateline>.
-        <p>A lot of people on the boat today - among them <persName>Mr. and Mrs. Smith</persName> <!--who?--> of <placeName ref="#New_York">New York</placeName> - he is something at the <placeName ref="#Metropolitan_Museum">Met. Museum</placeName>, <sic><choice>wand</choice><corr>and</corr></sic> with them <persName>Mr. and Mrs. Patterson</persName> <!--who?--> of <placeName ref="Chicago">Chicago</placeName>. <persName ref="#Loret_M">M. Loret</persName> also called - a pleasant and charming personage. <persName ref="#Dalison_Max">Mr. Dalison</persName> dined here</p>.
+        <dateline><date when="1908-01-30">Jan. 30. Thursday</date>.</dateline>
+        <p>A lot of people on the boat today - among them <persName>Mr. and Mrs. Smith</persName> <!--who?--> of <placeName ref="#New_York">New York</placeName> - he is something at the <placeName ref="#Metropolitan_Museum">Met. Museum</placeName>, <choice><sic>wand</sic><corr>and</corr></choice> with them <persName>Mr. and Mrs. Patterson</persName> <!--who?--> of <placeName ref="Chicago">Chicago</placeName>. <persName ref="#Loret_M">M. Loret</persName> also called - a pleasant and charming personage. <persName ref="#Dalison_Max">Mr. Dalison</persName> dined here.</p>
       </div>
       <div xml:id="EBA-1908-01-31" type = "entry">
-        <dateline><date when="1908-01-31">Jan. 31. Friday</date></dateline>.
-        <p><persName ref="#Davis_Theodore_M">Theo</persName> as usual in the <placeName ref="#Bībān al-Mulūk">Valley</placeName> with <persName ref="#Lythgoe_Albert">Lythgoe</persName> and <persName>Harold</persName> <!--who?-->. <persName ref="#Villiers_Eric">Mr. Eric Villiers</persName> called this afternoon</p>.
+        <dateline><date when="1908-01-31">Jan. 31. Friday</date>.</dateline>
+        <p><persName ref="#Davis_Theodore_M">Theo</persName> as usual in the <placeName ref="#Bībān al-Mulūk">Valley</placeName> with <persName ref="#Lythgoe_Albert">Lythgoe</persName> and <persName>Harold</persName> <!--who?-->. <persName ref="#Villiers_Eric">Mr. Eric Villiers</persName> called this afternoon.</p>
       </div>
       <!-- The Smiths just arrived the day before, so is this Harold Jones or Harold Smith? -->
       <div xml:id="EBA-1908-02-01" type = "entry">
-        <dateline><date when="1908-01-01">Feb. 1. Saturday</date></dateline>.
-        <p>A day at home. <persName ref="#Cassel_Ernest">Sir Ernest Cassel</persName> and his daughter <persName ref="#Maud_Amalia">Mrs. Ashley</persName> and the <persName ref="#Di_Teano_Princess">Princess Teano</persName> of <placeName ref="#Rome">Rome</placeName> came to tea also <persName>Mr. and Mrs. Schiff</persName> <!--who?--> of New York, <persName ref="#Villiers_Eric">Mr. Villiers</persName>, <persName ref="#Weigall_Arthur">Weigall</persName> and others</p>.
+        <dateline><date when="1908-01-01">Feb. 1. Saturday</date>.</dateline>
+        <p>A day at home. <persName ref="#Cassel_Ernest">Sir Ernest Cassel</persName> and his daughter <persName ref="#Maud_Amalia">Mrs. Ashley</persName> and the <persName ref="#Di_Teano_Princess">Princess Teano</persName> of <placeName ref="#Rome">Rome</placeName> came to tea also <persName>Mr. and Mrs. Schiff</persName> <!--who?--> of New York, <persName ref="#Villiers_Eric">Mr. Villiers</persName>, <persName ref="#Weigall_Arthur">Weigall</persName> and others.</p>
       </div>
       <!-- Corrected misspelling: Cassal -> Cassel -->
       <!-- Ernest Cassel did not have a daughter named Mrs. Ashley. His daughter was Amalia Mary Maud (nee Cassel). Oddly, the EBA Indices page does mention a Mrs. Ashley Maud, but this wasn't her name either. Maybe, because her name was Prussian, she took on an English name as a kind of nickname?-->
       <div xml:id="EBA-1908-02-02" type = "entry">
-        <dateline><date when="1908-02-02">Feb. 2. 4th after <name type="event" ref="#Epiphany">Epiphany</name></date></dateline>.
-        <p>In all day. <persName ref="#Davis_Theodore_M">Theo</persName>, <persName ref="#Ransom_Williams_Caroline">Carrie</persName> and <persName>Harold</persName> visited the interesting tombs in <placeName ref="#Sheikh_Abd_el-Qurna">Sheik Abdul Gurnah</placeName>. <persName ref="#Maspero_Gaston" "#Maspero_Louise">M. and Mme. Maspero</persName> and <persName ref="#Loret_M">M. Loret</persName> dined with us. Very warm this afternoon</p>.
+        <dateline><date when="1908-02-02">Feb. 2. 4th after <name type="event" ref="#Epiphany">Epiphany</name></date>.</dateline>
+        <p>In all day. <persName ref="#Davis_Theodore_M">Theo</persName>, <persName ref="#Ransom_Williams_Caroline">Carrie</persName> and <persName ref="#Jones_Harold">Harold</persName> visited the interesting tombs in <placeName ref="#Sheikh_Abd_el-Qurna">Sheik Abdul Gurnah</placeName>. <persName ref="#Maspero_Gaston #Maspero_Louise">M. and Mme. Maspero</persName> and <persName ref="#Loret_M">M. Loret</persName> dined with us. Very warm this afternoon.</p>
       </div>
       <!-- Harold Jones or Harold Smith? -->
       <div xml:id="EBA-1908-02-03" type = "entry">
-        <dateline><date when="1908-02-03">Feb. 3rd. Monday</date></dateline>.
+        <dateline><date when="1908-02-03">Feb. 3rd. Monday</date>.</dateline>
         <p>In <placeName ref="#Luxor">Luxor</placeName> this morning. Beautiful warm day.</p>
       </div>
       <div xml:id="EBA-1908-02-04" type = "entry">
-        <dateline><date when="1908-02-04">Feb. 4th. Tuesday</date></dateline>.
-        <p>A quiet day. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> arrived on the <name type="boat" ref="#Istar">Istar</orgName> and is lying near - came to see us. <persName ref="#Loret_M">M. Loret</persName> and <persName ref="#Le_Grande_M">M. Le Grand</persName> <!--sic? Emma's spelling, indices says "LeGrain"--> came to tea and to see the find. <persName ref="#Ayrton_Edward">Ayrton</persName> lunched and dined with us.</p>
+        <dateline><date when="1908-02-04">Feb. 4th. Tuesday</date>.</dateline>
+        <p>A quiet day. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> arrived on the <name type="boat" ref="#Istar">Istar</name> and is lying near - came to see us. <persName ref="#Loret_M">M. Loret</persName> and <persName ref="#Le_Grande_M">M. Le Grand</persName> <!--sic? Emma's spelling, indices says "LeGrain"--> came to tea and to see the find. <persName ref="#Ayrton_Edward">Ayrton</persName> lunched and dined with us.</p>
       </div>
       <div xml:id="EBA-1908-02-05" type = "entry">
-        <dateline><date when="1908-02-05">Feb. 5th. Wednesday</date></dateline>.
+        <dateline><date when="1908-02-05">Feb. 5th. Wednesday</date>.</dateline>
         <p><persName ref="#Sayce_Archibald">Mr. Sayce</persName> and <persName ref="#Davis_Theodore_M">Theo</persName> went to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> and lunched at the <name type="historical" ref="#Valley_House">little house</name>. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> also dined with us.</p>
       </div>
       <div xml:id="EBA-1908-02-06" type = "entry">
-        <dateline><date when="1908-02-06">Feb. 6th. Thursday</date></dateline>.
+        <dateline><date when="1908-02-06">Feb. 6th. Thursday</date>.</dateline>
         <p><persName ref="#Nicol_Erskine">Mr. Erskine, Nicol</persName> and <persName ref="#Whymper_Charles">Mr. Whymper</persName> called. We went back with them to their boat to see <persName ref="#Nicol_Erskine">Mr. Nicol's</persName> pictures. <persName ref="#Davis_Theodore_M">Theo</persName> bought a beauty for &#163;50 <!--are we tagging currency?-->. We started for <placeName ref="#Aswan">Aswan</placeName> at 1 o'clock and having a light wind got within <measure type="distance">3 miles</measure> of <placeName ref="#Erment">Erment</placeName>, where we had to stop for the night.</p>
       </div>
       <div xml:id="EBA-1908-02-07" type = "entry">
@@ -409,7 +409,7 @@
         <p>A cold west wind blowing all day - a real gale - we towed and pulled to anchor, making <measure type="distance">1-1/2 miles</measure>!</p>
       </div>
       <div xml:id="EBA-1908-02-08" type = "entry">
-        <dateline><date when="1908-02-08">Feb. 8th. Saturday</date></dateline>.
+        <dateline><date when="1908-02-08">Feb. 8th. Saturday</date>.</dateline>
         <p><measure type="distance">30 miles</measure>. Towed from 7 A.M. to 10 o'clock. Then the gale began again and was so strong we furled the big sail and went on with the felucca sail, but struck a sand bank with such force that I was thrown off my feet - lamp overturned - ornaments etc. thrown. We then went on more slowly passing the <placeName ref="#Esneh_Bridge">Esneh bridge</placeName> and sailing until 6 o'clock.</p>
       </div>
       <div xml:id="EBA-1908-02-09" type = "entry">
