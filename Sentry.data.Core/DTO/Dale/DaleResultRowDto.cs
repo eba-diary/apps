@@ -28,9 +28,6 @@ namespace Sentry.data.Core
 
         public string SourceType { get; set; }
 
-        public string ScanCategory { get; set; }
-        public string ScanType { get; set; }
-
 
     }
 }
