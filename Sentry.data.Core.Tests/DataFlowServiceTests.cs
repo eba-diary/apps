@@ -900,7 +900,7 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void CheckForSpamJob_ShouldBeEnqueued()
+        public void CheckForUpgradeDataFlow_ShouldBeEnqueued_OnlyOnce()
         {
             // Arrange
             var client = new Mock<IBackgroundJobClient>();
@@ -916,6 +916,82 @@ namespace Sentry.data.Core.Tests
             client.Verify(x => x.Create(
                 It.Is<Job>(job => job.Method.Name == "UpgradeDataFlow" && (int)job.Args[0] == 2),
                 It.IsAny<EnqueuedState>()), Times.Once);
+        }
+        [TestMethod]
+        public void CheckForDeleteDataFlow_ShouldBeEnqueued_OnlyOnce()
+        {
+            // Arrange
+            var client = new Mock<IBackgroundJobClient>();
+
+            var userService = new Mock<IUserService>();
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.AssociateId).Returns("123456");
+
+            userService.Setup(f => f.GetCurrentUser()).Returns(user1.Object);
+
+            var dataflowService = new DataFlowService(null, userService.Object, null, null, null, null, null, client.Object);
+
+            // Act
+            dataflowService.DeleteDataFlows(new int[] { 1, 2 });
+
+            // Assert
+            client.Verify(x => x.Create(
+                It.Is<Job>(job => job.Method.Name == "Delete" && (int)job.Args[0] == 1),
+                It.IsAny<EnqueuedState>()), Times.Once);
+            client.Verify(x => x.Create(
+                It.Is<Job>(job => job.Method.Name == "Delete" && (int)job.Args[0] == 2),
+                It.IsAny<EnqueuedState>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void DataFlow_Delete_DataFlowNotFound_Is_Thrown()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataflow = new DataFlow()
+            {
+                Id = 1,
+                Name = "FileSchemaFlow_TestFlow",
+                ObjectStatus = ObjectStatusEnum.Active
+            };
+
+            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
+
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null, null);
+
+            //Assert
+            Assert.ThrowsException<DataFlowNotFound>(() => dataflowService.Delete(2, "123456", false));
+        }
+
+        [TestMethod]
+        public void DataFlow_Delete__Delete_Metadata_Set_Propertly()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataflow = new DataFlow()
+            {
+                Id = 1,
+                Name = "FileSchemaFlow_TestFlow",
+                ObjectStatus = ObjectStatusEnum.Active,
+                DeleteIssuer = null,
+                DeleteIssueDTM = DateTime.MaxValue
+            };
+            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
+
+            //We need to mock out IJobService due to call to DeleteJobByDataFlowId()
+            var jobService = new Mock<IJobService>();
+
+            var dataflowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null);
+
+            //Act
+            dataflowService.Delete(1, "123456", false);
+
+            //Assert
+            DataFlow deletedFlow = context.Object.GetById<DataFlow>(1);
+
+            Assert.AreEqual(ObjectStatusEnum.Deleted, deletedFlow.ObjectStatus);
+            Assert.AreEqual("123456", deletedFlow.DeleteIssuer);
+            Assert.AreNotEqual(DateTime.MaxValue, deletedFlow.DeleteIssueDTM);
         }
     }
 }

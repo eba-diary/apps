@@ -256,6 +256,25 @@ namespace Sentry.data.Core
             Logger.Debug($"End method <{methodName}>");
         }
 
+        /// <summary>
+        /// Find retriever job associated with dataflow and set objectstatus
+        /// based on logicalDeleteflag: true = "Pending Delete", false = "Deleted"
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="logicalDelete"></param>
+        public void DeleteJobByDataFlowId(int id, bool logicalDelete = true)
+        {
+            //Find associated retriever job
+            List<int> jobList = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == id).Select(s => s.Id).ToList();
+
+            //Mark retriever jobs deleted
+            Logger.Info($"{nameof(JobService)}-{nameof(DeleteJobByDataFlowId)}-deleteretrieverjob - dataflowid:{id}");
+            foreach (int job in jobList)
+            {
+                DeleteJob(job, logicalDelete);
+            }
+        }
+
         public void DeleteJob(List<int> idList, bool logicalDelete = true)
         {
             foreach (int jobId in idList)

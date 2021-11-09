@@ -49,6 +49,29 @@ namespace Sentry.data.Core
         void UpgradeDataFlows(int[] producerDataFlowIds);
 
         /// <summary>
+        /// Will deleted dataflow(s) associated with id list provided
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <param name="deleteIssuerId">User id of delete issuer</param>
+        void DeleteDataFlows(int[] idList);
+
+        /// <summary>
+        /// This will set ObjectStatus = Deleted for specified dataflow.  In addition,
+        ///   will find any retrieverjobs, associated with specified dataflow, and 
+        ///   set its ObjectStatus = Deleted.
+        /// </summary>
+        /// <param name="dataFlowId"></param>
+        /// <param name="commitChanges">True: method will save changes to DB, False: relies on calling method to save changes</param>
+        /// <remarks>
+        /// This method can be triggered by Hangfire.  
+        /// Added the AutomaticRetry attribute to ensure retries do not occur for this method.
+        /// https://docs.hangfire.io/en/latest/background-processing/dealing-with-exceptions.html
+        /// </remarks>
+        void Delete(int dataFlowId, string userId, bool commitChanges = false);
+
+        void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true);
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="Id">Dataflow Id</param>
@@ -73,7 +96,6 @@ namespace Sentry.data.Core
         List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId);
         Task<ValidationException> Validate(DataFlowDto dfDto);
         List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId);
-        void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true);
 
         /// <summary>
         /// Retrieve retrieverjobdto associated with pull type dataflow

@@ -1,10 +1,7 @@
 ﻿using LaunchDarkly.Logging;
 using LaunchDarkly.Sdk.Server;
 using LaunchDarkly.Sdk.Server.Integrations;
-using LaunchDarkly.Sdk.Server.Interfaces;
 using System;
-using System.Net;
-using System.Net.Http;
 using Logger = Sentry.Common.Logging.Logger;
 
 namespace Sentry.data.Infrastructure.FeatureFlags
@@ -27,7 +24,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
                 BuildLdClient(ref configBuilder);
 
             //if there's a problem initializing the LaunchDarkly client, log an error so a Spectre spy can alert on the problem - but don't stop the app from starting up
-            if (!ldClient.Initialized || ldClient.DataSourceStatusProvider.Status.State != DataSourceState.Valid)
+            if (!ldClient.Initialized)
             {
                 Logger.Error("LaunchDarkly client failed to initialize",
                              new Exception(ldClient.DataSourceStatusProvider.Status.LastError.ToString()),
@@ -41,15 +38,13 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         /// </summary>
         private static LdClient BuildLdClient(ref ConfigurationBuilder configBuilder)
         {
-            //configure LD to use the proxy
-            configBuilder = configBuilder.Http(
-                Components.HttpConfiguration()
-                    .MessageHandler(new HttpClientHandler()
-                        {
-                            Proxy = new System.Net.WebProxy(new Uri(Configuration.Config.GetHostSetting("WebProxyUrl"))) { UseDefaultCredentials = true },
-                            UseProxy = true
-                        }
-                    ));
+            //configure LD to use the proxy if necessary
+            if (Convert.ToBoolean(Configuration.Config.GetHostSetting("UseProxy")))
+            {
+                configBuilder = configBuilder.Http(
+                        Components.HttpConfiguration().Proxy(
+                            new System.Net.WebProxy(new Uri(Configuration.Config.GetHostSetting("WebProxyUrl"))) { UseDefaultCredentials = true }));
+            }
             return new LdClient(configBuilder.Build());
         }
 
@@ -58,7 +53,10 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         /// </summary>
         private static LdClient BuildLdClientForFileDataSource(ref ConfigurationBuilder configBuilder)
         {
-            string localFeatureFlagsFile = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "LocalFeatureFlags.json");
+            // combine BaseDirectory and RelativeSearchPath in order to accurately get the bin directory path for both web and console app projects
+            string localFeatureFlagsFile = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, 
+                                                                  AppDomain.CurrentDomain.RelativeSearchPath ?? "", 
+                                                                  "LocalFeatureFlags.json");
             var fileSource = new FileDataSourceBuilder().FilePaths(localFeatureFlagsFile).AutoUpdate(true);
 
             configBuilder = configBuilder
