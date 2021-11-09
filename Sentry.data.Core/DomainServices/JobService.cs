@@ -259,10 +259,12 @@ namespace Sentry.data.Core
         /// <summary>
         /// Find retriever job associated with dataflow and set objectstatus
         /// based on logicalDeleteflag: true = "Pending Delete", false = "Deleted"
+        /// If deleteIssuerId is not specified, userService will be used to pull current user Id.
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="logicalDelete"></param>
-        public void DeleteJobByDataFlowId(int id, bool logicalDelete = true)
+        /// <param name="deleteIssuerId">If not supplied, will utilize userService to pull current user</param>
+        /// <param name="logicalDelete">Perform soft or hard delete</param>
+        public void DeleteJobByDataFlowId(int id, string deleteIssuerId = null, bool logicalDelete = true)
         {
             //Find associated retriever job
             List<int> jobList = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == id).Select(s => s.Id).ToList();
@@ -271,19 +273,34 @@ namespace Sentry.data.Core
             Logger.Info($"{nameof(JobService)}-{nameof(DeleteJobByDataFlowId)}-deleteretrieverjob - dataflowid:{id}");
             foreach (int job in jobList)
             {
-                DeleteJob(job, logicalDelete);
+                DeleteJob(job, deleteIssuerId:deleteIssuerId, logicalDelete:logicalDelete);
             }
         }
-
-        public void DeleteJob(List<int> idList, bool logicalDelete = true)
+        /// <summary>
+        /// Will perform Delete fore each job id provided.
+        /// If deleteIssuerId is not specified, userService will be used to pull current user Id.
+        /// </summary>
+        /// <param name="idList">List of RetrieverJob identifiers</param>
+        /// <param name="deleteIssuerId">If not supplied, user Id will be pulled from User service</param>
+        /// <param name="logicalDelete">Perform soft or hard delete</param>
+        public void DeleteJob(List<int> idList, string deleteIssuerId = null, bool logicalDelete = true)
         {
             foreach (int jobId in idList)
             {
-                DeleteJob(jobId, logicalDelete);
+                DeleteJob(jobId, deleteIssuerId:deleteIssuerId, logicalDelete:logicalDelete);
             }
         }
-
-        public void DeleteJob(int id, bool logicalDelete = true)
+        /// <summary>
+        /// Mark retriever job objectstatus based
+        /// on logicalDelete flag: true = "Pending Delete", false = "Deleted".
+        /// If deleteIssuerId is not specified, userService will be used to pull current user Id.
+        /// </summary>
+        /// <param name="id">RetrieverJob identifier</param>
+        /// <param name="deleteIssuerId">If not supplied, will utilize userService to pull current user</param>
+        /// <param name="logicalDelete">Perform soft or hard delete</param>
+        /// <remarks>If this is being utilzie by Hangfire, ensure deleteIssuerId is supplied.  Typically if called by Hangfire it would be initiated via API, therefore, pull user id
+        /// metadata before hangfire job is queued. </remarks>
+        public void DeleteJob(int id, string deleteIssuerId = null, bool logicalDelete = true)
         {
             try
             {
@@ -300,7 +317,7 @@ namespace Sentry.data.Core
                     job.Modified = DateTime.Now;
                     job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
                     job.DeleteIssueDTM = DateTime.Now;
-                    job.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
+                    job.DeleteIssuer = deleteIssuerId?? _userService.GetCurrentUser().AssociateId;
                 }
                 else
                 {
