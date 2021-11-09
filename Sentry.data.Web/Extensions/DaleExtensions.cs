@@ -82,7 +82,10 @@ namespace Sentry.data.Web
 
                 IsOwnerVerified = dto.IsOwnerVerified,
                 AssetList = CreateAssetList(dto.Asset),
-                SourceType = dto.SourceType
+                SourceType = dto.SourceType,
+
+                ScanCategory = dto.ScanCategory,
+                ScanType = dto.ScanType
             };
         }
 
