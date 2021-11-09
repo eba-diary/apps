@@ -18,5 +18,6 @@ namespace Sentry.data.Web
 
         public DaleAdvancedCriteriaModel DaleAdvancedCriteria { get; set; }
 
+        public bool CLA3550_DATA_INVENTORY_NEW_COLUMNS { get; set; }
     }
 }
