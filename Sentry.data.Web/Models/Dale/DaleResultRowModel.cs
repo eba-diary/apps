@@ -33,9 +33,5 @@ namespace Sentry.data.Web
         public string SourceType { get; set; }
 
 
-        public string ScanCategory { get; set; }
-        public string ScanType { get; set; }
-
-
     }
 }

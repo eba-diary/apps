@@ -73,7 +73,7 @@ namespace Sentry.data.Infrastructure
         private string BuildAQuery(DaleSearchDto dto, ref SqlCommand command)
         {
             string q = String.Empty;
-            string qSelect = "SELECT Asset_CDE, Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM,Prod_Typ,BaseColumn_ID,IsSensitive_FLG,IsOwnerVerified_FLG,Source_NME,ScanList_NME,SAIDList_NME ";
+            string qSelect = "SELECT Asset_CDE, Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM,Prod_Typ,BaseColumn_ID,IsSensitive_FLG,IsOwnerVerified_FLG,Source_NME ";
             string qFrom = (dto.Sensitive == DaleSensitive.SensitiveOnly)? "FROM ColumnSensitivityCurrent_v " : "FROM Column_v ";
             string qWhereStatement = BuildAWhere(dto, ref command);
 
@@ -291,9 +291,6 @@ namespace Sentry.data.Infrastructure
             }
 
             result.SourceType = (!reader.IsDBNull(16)) ? reader.GetString(16) : String.Empty;
-
-            result.ScanCategory = (!reader.IsDBNull(17)) ? reader.GetString(17) : String.Empty;
-            result.ScanType = (!reader.IsDBNull(18)) ? reader.GetString(18) : String.Empty;
 
             return result;
         }
