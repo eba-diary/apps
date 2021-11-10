@@ -436,21 +436,29 @@ namespace Sentry.data.Infrastructure
 
         private string BuildGetCategoriesByAssetQuery()
         {
-            string q = @"SELECT ScanAction.SAIDExposure_NME, CASE WHEN BaseScanAction_SENSITIVE.ScanAction_ID IS NOT NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS IsSensitive_FLG 
-                        FROM ScanAction ScanAction
-                        LEFT JOIN
+            //NOTE: Multiple SAIDExposure_NME's can exist in the list coming back so the GROUP BYs on this essentially bring back a distinct list
+            //the use of MAX here is a trick to bring back anything that is IsSensitive_FLG = 1
+            string q = @"SELECT DALE.SAIDExposure_NME,CAST(MAX(DALE.IsSensitive_FLG) AS BIT) AS IsSensitive_FLG
+                        FROM
                         (
-                            SELECT BaseScanAction.ScanAction_ID
-                            FROM BaseScanAction BaseScanAction
-                            JOIN Column_v Column_v
-                                ON BaseScanAction.Base_ID = Column_v.BaseColumn_ID
-                            WHERE Sensitive_FLG = 1
-                                    AND Column_v.Expiration_DTM IS NULL
-                                    AND Column_v.Asset_CDE = @Criteria
-                            GROUP BY ScanAction_ID
-                        ) AS BaseScanAction_SENSITIVE
-                            ON ScanAction.ScanAction_ID = BaseScanAction_SENSITIVE.ScanAction_ID
-                        WHERE ScanAction.Active_FLG = 1";
+	                        SELECT ScanAction.SAIDExposure_NME, CASE WHEN BaseScanAction_SENSITIVE.ScanAction_ID IS NOT NULL THEN CAST(1 AS INT) ELSE CAST(0 AS INT) END AS IsSensitive_FLG 
+	                        FROM ScanAction ScanAction
+	                        LEFT JOIN
+	                        (
+		                        SELECT BaseScanAction.ScanAction_ID
+		                        FROM BaseScanAction BaseScanAction
+		                        JOIN Column_v Column_v
+			                        ON BaseScanAction.Base_ID = Column_v.BaseColumn_ID
+		                        WHERE Sensitive_FLG = 1
+				                        AND Column_v.Expiration_DTM IS NULL
+				                        AND Column_v.Asset_CDE = @Criteria
+		                        GROUP BY ScanAction_ID
+	                        ) AS BaseScanAction_SENSITIVE
+		                        ON ScanAction.ScanAction_ID = BaseScanAction_SENSITIVE.ScanAction_ID
+	                        WHERE ScanAction.Active_FLG = 1
+	                        GROUP BY  ScanAction.SAIDExposure_NME, CASE WHEN BaseScanAction_SENSITIVE.ScanAction_ID IS NOT NULL THEN CAST(1 AS INT) ELSE CAST(0 AS INT) END
+                        ) AS DALE
+                        GROUP BY DALE.SAIDExposure_NME";
 
             return q;
         }
