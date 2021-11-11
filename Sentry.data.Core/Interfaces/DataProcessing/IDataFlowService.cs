@@ -48,8 +48,10 @@ namespace Sentry.data.Core
         /// <param name="producerDataFlowIds"></param>
         void UpgradeDataFlows(int[] producerDataFlowIds);
 
-        /// <summary>
-        /// Will deleted dataflow(s) associated with id list provided
+        /// <summary> 
+        /// Will enqueue a hangfire job, for each id in idList,
+        ///   that will run on hangfire background server and peform
+        ///   the dataflow delete.
         /// </summary>
         /// <param name="idList"></param>
         /// <param name="deleteIssuerId">User id of delete issuer</param>
