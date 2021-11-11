@@ -282,7 +282,7 @@
              <persName ref="#Baltassi_Mme">Mme. Baltassi</persName> and her daughters to tea. We hope to get
              off tomorrow. I forgot to enter the strange incident of the fate of the
              <name type="boat" ref="#Cleopatra_boat">Cleopatra</name>. A few hours after we landed, the
-             <name type="boat">Messagrius</name> steamer trying to make a landing in the gale,
+             <name type="boat" ref="#Messagrius">Messagrius</name> steamer trying to make a landing in the gale,
              fell foul of the <name type="boat" ref="#Cleopatra_boat">Cleopatra</name>, and crushed into her
              broadsides, literally cutting her in half - she sank in a few moments and now lies
              in the bottom of the harbour. No lives lost.
@@ -295,15 +295,15 @@
          <p>
             <persName ref="#von_Bissing_Baron">Baron v. Bissing</persName> appeared promptly at 10 o'clock having
             sent his luggage and a box of huge books last evening so that
-            <persName>Jones</persName> had his room quite ready for him. I wanted to go to
+            <persName ref="#Jones_Daniel">Jones</persName> had his room quite ready for him. I wanted to go to
             the zoo to see the magnificent lion again, but everything was so sticky with mud
             from the rain of yesterday, that I decided to stay at home and busy myself with
             getting in order in my room - About two we started with a very light wind - and made
             more or less progress. We passed the "<name type="boat" ref="#Seven_Hathors">Seven Hathor's</name>",
-            <persName>Mr. Wilburs</persName> old boat, and soon lost sight of her. Then
-            the "Sa &#8216;fa" flying the English flag - both of which had started
+            <persName ref="#Wilbur_Mr">Mr. Wilbur</persName>'s old boat, and soon lost sight of her. Then
+            the "<name type="boat" ref="#Safa">Sa &#8216;fa</name>" flying the English flag - both of which had started
             out sometime before us. Tied up for the night near
-            <placeName>Turah</placeName> - making 6 miles.
+            <placeName ref="#Ţurá">Turah</placeName> - making 6 miles.
          </p>
       </div>
       <div xml:id="EBA-1901-12-12" type="entry">
@@ -313,7 +313,7 @@
          <p>
             A Heavy fog on the river this morning and did not get away until after 9 o'clock.
              The day has been warm and charming - we got on the sand about four o'clock and
-             although worked hard until after 7, we did not get off, until the <name>Sa &#8216;fa</name>
+             although worked hard until after 7, we did not get off, until the <name type="boat" ref="#Safa">Sa &#8216;fa</name>
              came up to us, and sent her men over to help us - when we were soon free - and
              both boats tied up for the night. The silver crescent of the new moon appeared
              tonight. This little home seems more charming than ever - its prettiness -
@@ -323,14 +323,14 @@
       </div>
       <div xml:id="EBA-1901-12-13" type="entry">
          <dateline>
-            <date when="1901-12-13">Friday, Dec. 13</date>. 36 miles. <placeName ref="">Wasta</placeName>.
+            <date when="1901-12-13">Friday, Dec. 13</date>. 36 miles. <placeName ref="#Al-Wasta">Wasta</placeName>.
          </dateline>
          <p>
             An encouraging run - we might have gone on for another hour, but that the
-             <persName>Baron</persName> had to stop for his mail. <persName>He</persName>,
-             <persName ref="#Davis_Theodore_M">Theodore</persName> and <persName ref="#Buttles_Jeanette">Nettie, Jones</persName> and 2 of our men
-             went into the town and were not home until after dark. We will not have our mail
-             until we reach <orgName>Winieh.</orgName>
+             <persName ref="#von_Bissing_Baron">Baron</persName> had to stop for his mail. He,
+             <persName ref="#Davis_Theodore_M">Theodore</persName> and <persName ref="#Buttles_Jeanette">Nettie</persName>,
+             <persName ref="#Jones_Daniel">Jones</persName> and 2 of our men went into the town and
+             were not home until after dark. We will not have our mail until we reach <placeName>Winieh</placeName>.
          </p>
       </div>
       <div xml:id="EBA-1901-12-14" type="entry">
@@ -338,7 +338,7 @@
             <date when="1901-12-14">Saturday, Dec. 14</date>.
          </dateline>
          <p>
-            Still <placeName ref="">Wasta</placeName> - a dead calm all day - but warm and pleasant.
+            Still <placeName ref="#Al-Wasta">Wasta</placeName> - a dead calm all day - but warm and pleasant.
          </p>
       </div>
       <div xml:id="EBA-1901-12-15" type="entry">
@@ -348,7 +348,8 @@
          <p>
             We have tracked, polled and pulled to an anchor most of the day - with helps from
              an occasional puff of wind, - clear and warm. We have lost sight of the
-             <name type="boat" ref="#Seven_Hathors">Seven Hathors</name> and the Sa &#8216;fa.
+             <name type="boat" ref="#Seven_Hathors">Seven Hathors</name> and the
+             <name type="boat" ref="#Safa">Sa &#8216;fa</name>.
          </p>
       </div>
       <div xml:id="EBA-1901-12-16" type="entry">
@@ -395,14 +396,14 @@
             <date when="1901-12-20">Friday Dec. 20</date>. 17 miles.
          </dateline>
          <p>
-            <persName>Jones</persName> went off to the town today before breakfast and came
+            <persName ref="#Jones_Daniel">Jones</persName> went off to the town today before breakfast and came
              back with a crammed mailbag - and a very discouraging mass of newspapers - and
              with the information that the <orgName>Istar</orgName> is just below us - and that
              he had gone on board to speak to <persName>Mr. Sayce</persName>. Soon after
              <persName>Mr. Sayce</persName> himself appeared, looking very well I thought - with
              dire tales of having broken his rudder near <placeName>Abu Girgeh</placeName>
              and having to spend days in getting it repaired. He has
-             <persName>Mr. Ward</persName> the writer on <orgName>Scarabs</orgName> and
+             <persName>Mr. Ward</persName> the writer on <name>Scarabs</name> and
              other topics with him - and <persName ref="#Davis_Theodore_M">Theodore</persName> asked them to come
              into dinner if they should find themselves near us tonight. But we have sailed them
              out of sight, and are now lying about 3 miles above
@@ -489,9 +490,9 @@
          <p>
             Such a strong wind we could not start this morning - something peculiar in the weather
              - very hazy - we have been on the look out for 2 days for <persName ref="#Tytus_Bob">Bob
-             Tytus</persName> and his new steamer "<name>The Scarab</name>". Just as we
-             were finishing lunch <persName>Jones</persName> came in and said the
-             <name>Scarab</name> was just on us. We all jumped up and rushed on deck to
+             Tytus</persName> and his new steamer "<name type="boat" ref="#Scarab">The Scarab</name>". Just as we
+             were finishing lunch <persName ref="#Jones_Daniel">Jones</persName> came in and said the
+             <name type="boat" ref="#Scarab">Scarab</name> was just on us. We all jumped up and rushed on deck to
              give a hearty salute. She pulled up just ahead of us and we went on board. Found
              <persName ref="#Newberry_Percy">Mr. Newberry</persName> with them. They left <placeName ref="#Cairo">Cairo</placeName>
              Monday afternoon. <persName ref="#Davis_Theodore_M">Theodore</persName> had seen the boat several
@@ -535,12 +536,13 @@
          <p>
             A strong cold north wind has been blowing all day &#8211; and bringing to us the smoke
              of the great dredges at the barrage, so that being on deck was nasty.
-             <persName ref="#Davis_Theodore_M">Theodore</persName> and the <persName>Baron</persName> went over soon after
+             <persName ref="#Davis_Theodore_M">Theodore</persName> and the
+             <persName ref="#von_Bissing_Baron">Baron</persName> went over soon after
              breakfast to the cemetery of <placeName>Arab el Burg</placeName> &#8211; where a
              process of rifling by the natives has gone on for 2 years &#8211; and some very
              interesting things have appeared. <persName ref="#von_Bissing_Baron">V. Bissing</persName> expects to do some
              investigation, and <persName ref="#Davis_Theodore_M">Theodore</persName> thinks he may join with him. They
-             took <persName>Jones</persName>, and a lunch basket, three sailors, and crossed the
+             took <persName ref="#Jones_Daniel">Jones</persName>, and a lunch basket, three sailors, and crossed the
              river to where their donkeys were waiting. They did not come back until 5 o'clock,
              laden with some queer treasures &#8211; and reported an interesting day &#8211; and a
              long ride &#8211; the most beautiful he had ever taken in <placeName>Egypt</placeName>
@@ -555,7 +557,7 @@
          <p>
             We have made a run of 38 miles &#8211; not leaving <placeName ref="#Asyut">Assiut</placeName> until
              11 o'clock. The <name>Istar</name> came along at 9 o'clock and pulled up ahead of us.
-             <persName ref="#Davis_Theodore_M">Theodore</persName> and the <persName>Baron</persName> paid a short visit
+             <persName ref="#Davis_Theodore_M">Theodore</persName> and the <persName ref="#von_Bissing_Baron">Baron</persName> paid a short visit
              to Mr. <persName>Sayce</persName> and then on donkeys, <persName ref="#Buttles_Jeanette">Nettie</persName>
              and I in a wretched victoria went into the town to find an antiquity merchant, who
              was not at home. We are near <placeName>Tahtah</placeName> tonight.
@@ -651,7 +653,7 @@
          </dateline>
          <p>
             Arrived shortly after noon - and coming slowly past the town, found the
-             <orgName>Scarab</orgName> lying above the <placeName>Castle</placeName>, and pulled
+             <name type="boat" ref="#Scarab">Scarab</name> lying above the <placeName>Castle</placeName>, and pulled
              up a little distance ahead of her - against a high bank to be sure, but a sloping
              one, covered with a sweet green crop of wheat - we have taken 27 days less 3 hours
              from <placeName ref="#Cairo">Cairo</placeName> - last year we took 37 days. Found a big mail
@@ -665,7 +667,7 @@
          </dateline>
          <p>
             Such a beautiful day - we started at 10 o'clock - for the other side
-             with <persName>Jones</persName> and our lunch paraphernalia. Crossed directly to
+             with <persName ref="#Jones_Daniel">Jones</persName> and our lunch paraphernalia. Crossed directly to
              opposite bank, and took the little path straight away through the pleasant fields to
              <placeName>Medinet Habou</placeName> and presently came to the place of digging on
              the site of the palace of <placeName>Amenhotep III</placeName> where <persName ref="#Tytus_Bob">Bob
@@ -736,7 +738,7 @@
              spend a few days with <persName>Mr. Somers- Clarke</persName>. Soon after lunch
              <persName ref="#Davis_Theodore_M">Theodore</persName>, <persName ref="#Buttles_Jeanette">
             Nettie</persName> and I rode over to the palace to see what was
-             going on at the diggings. <persName>Jones</persName> and the tea basket went along.
+             going on at the diggings. <persName ref="#Jones_Daniel">Jones</persName> and the tea basket went along.
              The day was charming and so was the ride.
          </p>
       </div>
@@ -772,7 +774,7 @@
          </dateline>
          <p>
             At home all day - because of the wind. <persName>Mlle. de Deak</persName>, and
-             <persName>Miss Culbord</persName> came to tea. The <persName>Baron</persName> came
+             <persName>Miss Culbord</persName> came to tea. The <persName ref="#von_Bissing_Baron">Baron</persName> came
              home this afternoon.
          </p>
       </div>
@@ -900,7 +902,7 @@
             A beautiful and busy day at home - until at 5 o'clock <persName ref="#Buttles_Jeanette">Nettie</persName>
              and I took a walk along the high path leading back in the pretty country near us. A
              superb sunset and lovely effects - met <persName>Mr. Wallace</persName>
-             coming home from his walk and we stopped at the <name>Scarab</name> for a
+             coming home from his walk and we stopped at the <name type="boat" ref="#Scarab">Scarab</name> for a
              little visit. <persName ref="#Buttles_Jeanette">Nettie</persName> dined there. Nothing more
              beautiful than <persName>Venus</persName> now and our full moon.
          </p>
@@ -1136,7 +1138,7 @@
             We started with quite a good wind at 7 o'clock this morning - and drew up at
              <placeName>El Kab</placeName> just as we were finishing lunch. Found the
              <orgName>Istar</orgName> here, on her downward journey, as well as
-             <orgName>Parker's</orgName> boat the Sa &#8216;fa.
+             <orgName>Parker's</orgName> boat the <name type="boat" ref="#Safa">Sa &#8216;fa</name>.
              <persName>Mr. Somers-Clarke</persName> came over at once, bringing some letters
              for <persName ref="#Quibell_James">Mr. Quibell</persName>, which determined him to leave us and return
              to <placeName ref="#Cairo">Cairo</placeName> the next day. So he went over to stay with
@@ -1263,7 +1265,7 @@
             We have today broken our record of last year of this date - started this morning at 7
              o'clock - the day very hot, with much light north wind. Our men have done well - and
              brought us at 6:30 to within 3 miles below <placeName>Sileilis</placeName>. I have been very little on deck
-             the heat was so intense - The <name>S.S. Scarab</name> passed us about 10 o'clock
+             the heat was so intense - The <name type="boat" ref="#Scarab">S.S. Scarab</name> passed us about 10 o'clock
              - they flew by us - and we had only a glimpse of them. The <persName>Hathor</persName>
              with a powerful tug passed us near <placeName>Kom Ombo</placeName> with
              <persName>Salah</persName> and a large <orgName>English</orgName> party. At 6:30
@@ -1285,10 +1287,10 @@
          </dateline>
          <p>
             Arrived at 10:30 this morning - a very hot day - the hottest I have ever known on the
-             <placeName ref="#Nile">Nile</placeName>. The <persName>Parkers</persName>,
+             <placeName ref="#Nile">Nile</placeName>. <persName>The Parkers</persName>,
              <persName>Mr. Sayce</persName>, and <persName>Mr. Somers-Clarke</persName> called.
              We went to tea with <persName>Mr. Sayce</persName> and then visited the
-             <persName>Parkers</persName> on the <orgName>Sa &#8216;fa</orgName> - and
+             <persName>Parkers</persName> on the <name type="boat" ref="#Safa">Sa &#8216;fa</name> - and
              <placeName>Mr. S.C.</placeName> and <persName>Sayce</persName> dined with us - a
              very pleasant evening - and after dinner we sat on deck without an awning - with no
              wraps and found the still, dry, warm air delicious - we saw nothing of
@@ -1415,10 +1417,10 @@
             A very warm morning - <persName ref="#Buttles_Jeanette">Nettie</persName> and I went over to the <name>Istar
             </name> to see Mr. <persName>Sayce</persName> - who is a prisoner with a bad foot. He
              fell down the shaft of one of his 12 dynasty tombs at <placeName>El Kab</placeName> the
-            other day, and is now in the doctor's hands. Then we stopped at the <placeName>
-            Scarab</placeName> to see <persName ref="#Tytus_Mrs">Mrs. Tytus</persName>. The wind was strong
-             and air delicous as we rowed up the river again - but as we left the <placeName>
-            Scarab</placeName>, it had increased almost to a hurricane , and looking back to where
+            other day, and is now in the doctor's hands. Then we stopped at the <name type="boat" ref="#Scarab">
+            Scarab</name> to see <persName ref="#Tytus_Mrs">Mrs. Tytus</persName>. The wind was strong
+             and air delicous as we rowed up the river again - but as we left the <name type="boat" ref="#Scarab">
+            Scarab</name>, it had increased almost to a hurricane , and looking back to where
              the <orgName>Istar</orgName> is lying opposite <placeName ref="#Luxor">Luxor</placeName>,
              with the <persName>Strange Hathor</persName> and the steamer <name type="">
             Oonas</name> with the <orgName>Schuylers</orgName> on board, we saw them smothered
@@ -1637,8 +1639,8 @@
          </dateline>
          <p>
             We made our few miles by starting out too early for the north wind. As we were trying
-             to get about one of the great turns of the river here, the <persName>
-            Scarab</persName> passed us. It was too early to see any one, as we were
+             to get about one of the great turns of the river here, the <name type="boat" ref="#Scarab">
+            Scarab</name> passed us. It was too early to see any one, as we were
              all in bed, and I fancy they were. We have had a great change of temperature - and
              it is really cold.
          </p>
@@ -1771,7 +1773,7 @@
          </dateline>
          <p>
             We reached <placeName>Benisoef</placeName> at 1 o'clock - in a towering heat
-             - everything still and burning - we pulled up and sent <persName>
+             - everything still and burning - we pulled up and sent <persName ref="#Jones_Daniel">
             Jones</persName> and a sailor in the town for <persName ref="#Quibell_Annie_Pirie">Mrs.
              Quibell</persName> and in about an hour they arrived. We were so glad to have her at
              last. Passed two steamers on the sand - river very difficult - spent all day on deck,
@@ -1783,7 +1785,7 @@
             <date when="1902-03-25">Tuesday, Mar. 25</date>. 41 miles.
          </dateline>
          <p>
-            Got to <placeName>Wasta</placeName> about 8 o'clock - a light south wind. Got
+            Got to <placeName ref="#Al-Wasta">Wasta</placeName> about 8 o'clock - a light south wind. Got
              our mail, and were off again directly. The day has been exciting - on deck all the
              time - sailing so difficult - passed the <name type="">Ramses</name> on the
              sand, just after she has passed us - and not long after we went on ourselves, where we
