@@ -776,7 +776,9 @@ namespace Sentry.data.Core
                 ParquetStoragePrefix = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
                                         ? GenerateParquetStoragePrefix(parentDataset.SAIDAssetKeyCode, parentDataset.NamedEnvironment, storageCode)
                                         : GenerateParquetStoragePrefix(Configuration.Config.GetHostSetting("S3DataPrefix"), null, storageCode),
-                SnowflakeStage = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) ? GlobalConstants.SnowflakeStageNames.PARQUET_STAGE : GlobalConstants.SnowflakeStageNames.DATASET_STAGE
+                SnowflakeStage = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) ? GlobalConstants.SnowflakeStageNames.PARQUET_STAGE : GlobalConstants.SnowflakeStageNames.DATASET_STAGE,
+                SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME
+
             };
             _datasetContext.Add(schema);
             return schema;
@@ -819,7 +821,8 @@ namespace Sentry.data.Core
                 SchemaRootPath = scm.SchemaRootPath,
                 ParquetStorageBucket = scm.ParquetStorageBucket,
                 ParquetStoragePrefix = scm.ParquetStoragePrefix,
-                SnowflakeStage = scm.SnowflakeStage
+                SnowflakeStage = scm.SnowflakeStage,
+                SnowflakeWarehouse = scm.SnowflakeWarehouse
             };
 
         }

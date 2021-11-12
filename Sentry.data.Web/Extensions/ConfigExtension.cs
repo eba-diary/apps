@@ -214,7 +214,8 @@ namespace Sentry.data.Web
                 HasDataFlow = dto.HasDataFlow,
                 ParquetStorageBucket = schemaDto.ParquetStorageBucket,
                 ParquetStoragePrefix = schemaDto.ParquetStoragePrefix,
-                SnowflakeStage = schemaDto.SnowflakeStage
+                SnowflakeStage = schemaDto.SnowflakeStage,
+                SnowflakeWarehouse = schemaDto.SnowflakeWarehouse
             };
         }
 
