@@ -28,6 +28,8 @@ namespace Sentry.data.Infrastructure.FeatureFlags
 
 
 
+        public IFeatureFlag<bool> CLA3541_Dataset_Details_Tabs { get; }
+
         public IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; }
         public IFeatureFlag<bool> CLA3497_UniqueLivySessionName { get; }
 
@@ -46,6 +48,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA3332_ConsolidatedDataFlows = new BooleanFeatureFlagAmbientContext("CLA3332_ConsolidatedDataFlows", false, LdClient, () => LdUser);
             CLA3497_UniqueLivySessionName = new BooleanFeatureFlagAmbientContext("CLA3497_UniqueLivySessionName", false, LdClient, () => LdUser);
             CLA3550_DATA_INVENTORY_NEW_COLUMNS = new BooleanFeatureFlagAmbientContext("CLA3550_DATA_INVENTORY_NEW_COLUMNS", false, LdClient, () => LdUser);
+            CLA3541_Dataset_Details_Tabs = new BooleanFeatureFlagAmbientContext("CLA3541_DatasetDetailsTabs", false, LdClient, () => LdUser);
 
         }
 
