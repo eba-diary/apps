@@ -73,6 +73,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 Property(x => x.ParquetStorageBucket);
                 Property(x => x.ParquetStoragePrefix);
                 Property(x => x.SnowflakeStage);
+                Property(x => x.SnowflakeWarehouse);
             }
         }
     }

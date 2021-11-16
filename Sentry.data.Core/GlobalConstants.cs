@@ -350,5 +350,10 @@
             public const string DATASET_STAGE = "SENTRY_DATASET";       //OLD STAGE NAME
             public const string PARQUET_STAGE = "DLST_PARQUET";         //NEW STAGE NAME
         }
+
+        public static class SnowflakeWarehouse
+        {
+            public const string WAREHOUSE_NAME = "DATA_WH";       
+        }
     }
 }

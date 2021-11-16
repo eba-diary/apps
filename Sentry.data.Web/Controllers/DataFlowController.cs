@@ -88,6 +88,7 @@ namespace Sentry.data.Web.Controllers
             }
 
             DataFlowModel model = new DataFlowModel();
+            model.CreatedBy = SharedContext.CurrentUser.AssociateId;
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);

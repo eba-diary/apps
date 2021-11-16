@@ -32,9 +32,10 @@ namespace Sentry.data.Web.Controllers
                 searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
                 searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
                 searchModel.DaleAdvancedCriteria = new DaleAdvancedCriteriaModel() { };
+                searchModel.CLA3550_DATA_INVENTORY_NEW_COLUMNS = _featureFlags.CLA3550_DATA_INVENTORY_NEW_COLUMNS.GetValue();
 
-                
-                if(String.IsNullOrEmpty(search))
+
+                if (String.IsNullOrEmpty(search))
                 {
                     searchModel.Destiny = DaleDestiny.Column;
                 }

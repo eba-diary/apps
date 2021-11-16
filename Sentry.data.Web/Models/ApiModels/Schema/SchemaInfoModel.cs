@@ -37,5 +37,6 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public string ParquetStorageBucket { get; set; }
         public string ParquetStoragePrefix { get; set; }
         public string SnowflakeStage { get; set; }
+        public string SnowflakeWarehouse { get; set; }
     }
 }
