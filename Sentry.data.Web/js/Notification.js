@@ -4,15 +4,12 @@
 
 data.Notification = {
 
-    QuillEditorTitle: null,                   //declare as property for use later
-    QuillEditorMessage: null,                //declare as property for use later
-    
+    QuillEditorTitle: null,                 //declare as property for use later
+    QuillEditorMessage: null,               //declare as property for use later
+    DSCNotificationId: "BA_2",              //DSCNotificationId to recieve special treatment
 
-    //NOTE: I chose to use this hardcoded NoMessageList as a hardcoded list instead of adding an ajax method or adjusting asset drop down for performance
-    //since the Id's in the drop down are a hardened list of ID's that originate from the static BusinessArea/Notification scripts in DSC
-    //There are precedents for using these ID's elsewhere in the APP which i felt gave me the green light to use this list
-    //I felt this at least calls out the NoMessageList so in the future if more IDs are added, we can simply add this to the list
-    NoMessageList: ["BA_2"],    //LIST OF ObjectIds THAT SHOULD NOT NOT SHOW MESSAGE
+
+
 
     Init: function () {
         data.Notification.NotificationTableInit();
@@ -88,40 +85,39 @@ data.Notification = {
     initAssetListener: function () {
 
         //initially hide or show message
-        data.Notification.hideOrShowMessageContainer();
+        data.Notification.hideOrShowDSCContainers();
 
         //setup onChange event to fire when asset drop down is changed
         $('#ObjectId').change(function () {                                            
-            data.Notification.hideOrShowMessageContainer();
+            data.Notification.hideOrShowDSCContainers();
         });
     },
 
-    //function to HIDE OR SHOW MESSAGE
-    hideOrShowMessageContainer: function () {
+    //function to HIDE OR SHOW CONTAINERS FOR DSC NOTIFICATIONS
+    hideOrShowDSCContainers: function () {
 
-        if (data.Notification.shouldShowMessage()) {
-            $('#messageContainer').show();
+        if (data.Notification.isDSCNotification()) {
+            $('#messageContainer').hide();
+            $('#notificationCategoryContainer').show();
         }
         else {
-            $('#messageContainer').hide();
+            $('#messageContainer').show();
+            $('#notificationCategoryContainer').hide();
         }
     },
 
     //TELL US IF WE SHOULD SHOW MESSAGE FOR A GIVEN NOTIFICATION
-    shouldShowMessage: function () {
+    isDSCNotification: function () {
 
         //Grab Value of dropdown which is ObjectId
         var val = $("#ObjectId").val();
 
-        //Look for ObjectId in the NoMessage list
-        var sIndex = data.Notification.NoMessageList.findIndex(objectId => objectId === val);
-
-        //if they picked a Asset List that was in the "NoMessageList" that means we hide the message
-        if (sIndex >= 0) {
-            return false;       //ID Found so we hide message
+        //if they picked a Asset List that was in the "DSCNotificationId" that means we hide the message
+        if (val == data.Notification.DSCNotificationId) {
+            return true;       //Is DSC
         }
         else {
-            return true;        //ID NOT Found so we show message
+            return false;      //Is NOT DSC
         }
     },
 
@@ -138,7 +134,7 @@ data.Notification = {
         var title = data.Notification.QuillEditorTitle.root.innerHTML;      //get title 
         var message = "<p><br></p>";                                        //default message to what quill default will have as empty message
 
-        if (data.Notification.shouldShowMessage()) {
+        if (data.Notification.isDSCNotification()) {
             message = data.Notification.QuillEditorMessage.root.innerHTML;           ////ONLY fill message if it should be shown and get html of quill editor
         }
 

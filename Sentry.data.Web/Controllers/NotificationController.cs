@@ -68,6 +68,12 @@ namespace Sentry.data.Web.Controllers
             AddCoreValidationExceptionsToModel(model.Validate());
             if (ModelState.IsValid)
             {
+                //IF NOT DSC NOTIFICATION THEN OVERRIDE TO ZERO SO IT DOESN'T SEEM LIKE A LEGIT CATEGORY WAS PICKED WHEN VIEWING IN TABLE
+                if (!IsNotificationDSC(model))
+                {
+                    model.NotificationCategory = 0;
+                }
+
                 model.NotificationId = _notificationService.SubmitNotification(model.ToCore());
 
                 ManageNotificationViewModel vm = new ManageNotificationViewModel()
@@ -91,6 +97,21 @@ namespace Sentry.data.Web.Controllers
             model.AllSeverities = default(NotificationSeverity).ToEnumSelectList();
             model.AllDataAssets = AreaList;
             return View("ModifyNotification",model);
+        }
+
+        //CHECK IF PASSED in NOTIFICATION IS DSC OR NOT
+        private bool IsNotificationDSC(NotificationModel model)
+        {
+            bool isNotificationDSC = false;
+            if(model.ObjectId != null)
+            {
+                if(model.ObjectId.Substring(0,2) == GlobalConstants.Notifications.BUSINESSAREA_TYPE  && Int32.Parse(model.ObjectId.Substring(3, 1)) == ((int)BusinessAreaType.DSC))
+                {
+                    isNotificationDSC = true;
+                }
+            }
+
+            return isNotificationDSC;
         }
 
         public JsonResult GetNotificationInfoForGrid([ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)

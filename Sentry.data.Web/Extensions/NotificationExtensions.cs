@@ -38,7 +38,9 @@ namespace Sentry.data.Web
                 ObjectName = core.ObjectName,
                 CanEdit = core.CanEdit,
                 Title = core.Title,
-                ObjectType = core.NotificationType
+                ObjectType = core.NotificationType,
+                NotificationCategory = core.NotificationCategory,
+                AllNotificationCategories = default(NotificationCategory).ToEnumSelectList()
             };
         }
 
@@ -62,7 +64,8 @@ namespace Sentry.data.Web
                 StartTime = model.StartTime,
                 ObjectId = model.ObjectId.Split('_')[1],
                 NotificationType = model.ObjectId.Split('_')[0],
-                Title = model.Title
+                Title = model.Title,
+                NotificationCategory = model.NotificationCategory
             };
         }
 

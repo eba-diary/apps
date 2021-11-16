@@ -93,6 +93,7 @@ namespace Sentry.data.Core
                 notification.NotificationType = dto.NotificationType;
                 notification.ParentObject = int.Parse(dto.ObjectId);
                 notification.Title = dto.Title;
+                notification.NotificationCategory = dto.NotificationCategory;
 
                 addNotification = false;
             }

@@ -21,7 +21,8 @@ namespace Sentry.data.Core
                 IsActive = core.StartTime <= DateTime.Now && core.ExpirationTime > DateTime.Now,
                 NotificationType = core.NotificationType,
                 ObjectId = core.NotificationType + "_" + core.ParentObject.ToString(),
-                Title = core.Title                
+                Title = core.Title,
+                NotificationCategory = core.NotificationCategory
             };
 
             return model;
@@ -77,7 +78,8 @@ namespace Sentry.data.Core
                 StartTime = model.StartTime,
                 NotificationType = model.NotificationType,
                 ParentObject = int.Parse(model.ObjectId),
-                Title = model.Title
+                Title = model.Title,
+                NotificationCategory = model.NotificationCategory
             };
         }
     }

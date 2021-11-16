@@ -23,6 +23,7 @@ namespace Sentry.data.Web
         [DisplayName("Asset")] public string ObjectId { get; set; }
         [DisplayName("Message")] public string Message { get; set; }
         [DisplayName("Title")] public string Title { get; set; }
+        [DisplayName("Category")] public NotificationCategory NotificationCategory { get; set; }
 
         public Boolean IsActive { get; set; }
         public string ObjectName { get; set; }
@@ -32,6 +33,7 @@ namespace Sentry.data.Web
 
         public IEnumerable<SelectListItem> AllDataAssets { get; set; }
         public IEnumerable<SelectListItem> AllSeverities { get; set; }
+        public IEnumerable<SelectListItem> AllNotificationCategories { get; set; }
 
 
 

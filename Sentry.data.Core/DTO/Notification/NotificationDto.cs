@@ -27,6 +27,9 @@ namespace Sentry.data.Core
 
         public List<DataAsset> AllDataAssets { get; set; } = new List<DataAsset>();
         public List<BusinessArea> AllBusinessAreas { get; set; } = new List<BusinessArea>();
+        public NotificationCategory NotificationCategory { get; set; }
+
+
 
     }
 }

@@ -254,6 +254,7 @@
     <Compile Include="GlobalEnums\HttpDataFormat.cs" />
     <Compile Include="GlobalEnums\HTTPMethods.cs" />
     <Compile Include="GlobalEnums\IngestionType.cs" />
+    <Compile Include="GlobalEnums\NotificationCategory.cs" />
     <Compile Include="GlobalEnums\OAuthClaims.cs" />
     <Compile Include="GlobalEnums\OAuthGrantType.cs" />
     <Compile Include="GlobalEnums\ObjectStatus.cs" />
