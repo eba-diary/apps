@@ -92,6 +92,10 @@
     font-weight: bold;
 }
 
+.hidden-item {
+    display: none;
+}
+
 .listDesc {
     /*padding-top: 5px;*/
     /*padding-bottom: 6px;*/

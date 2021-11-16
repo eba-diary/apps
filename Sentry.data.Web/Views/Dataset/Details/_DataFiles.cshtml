@@ -5,7 +5,12 @@
 
 <div class="row">
     <div class="col-lg-12">
-        <div data-bind="visible: ShowDataFileTable() == true" style="display: none;">
+
+        <div class="@(Model.DatasetFileCount == 0 ?"visible-item":"hidden-item")">
+            <h3 class="@color">No Data Files Available</h3>
+        </div>
+
+        <div class="@(Model.DatasetFileCount != 0 ?"visible-item":"hidden-item")">
             <div>
                 <h3 class="@color">Data Files</h3>
             </div>

@@ -3,13 +3,15 @@
     string headerColor = "categoryBanner-" + Model.CategoryColor;
 }
 
+<hr />
+
 <div class="row" id="schemaSection">
 
 
     <div class="col-lg-12">
         <section class="landing-page-section schema-preview">
 
-            <div id="columnsInThisSchema">
+            <div id="columnsInThisSchema" class="@(Model.DisplayTabSections == true ?"visible-item":"hidden-item")">
                 <h3 class="detailSection @color">Columns</h3>
             </div>
 
