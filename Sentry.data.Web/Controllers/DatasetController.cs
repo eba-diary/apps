@@ -1172,7 +1172,13 @@ namespace Sentry.data.Web.Controllers
         }
 
 
-
+        [HttpPost]
+        public void SyncMetricData()
+        {
+            //get current metrics for user if they exist
+            //add the current metrics 
+            //save 
+        }
 
 
         //CONTROLLER ACTION called from JS to return the snowflake query

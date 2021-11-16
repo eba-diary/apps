@@ -289,6 +289,7 @@
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_06\CLA-3398-Delete_Database_Feature_Flags_that_have_been_moved_to_LaunchDarkly.sql" />
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Dale\Sprint_21_11_02\HistoryFixScanAction.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_02_00_03\CLA-3465-HISTORY-FIX-SCHEMA-SnowflakeWarehouse.sql" />
+    <Build Include="Tables\DatasetDetailTabMetrics.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
