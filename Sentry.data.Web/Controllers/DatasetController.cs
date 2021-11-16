@@ -34,6 +34,7 @@ namespace Sentry.data.Web.Controllers
     {
         public readonly IAssociateInfoProvider _associateInfoProvider;
         public readonly IDatasetContext _datasetContext;
+        private DatasetDetailModel model;
         private readonly UserService _userService;
         private readonly S3ServiceProvider _s3Service;
         private readonly ISASService _sasService;
@@ -348,9 +349,9 @@ namespace Sentry.data.Web.Controllers
 
             if (dto != null)
             {
-                DatasetDetailModel model = new DatasetDetailModel(dto);
+                model = new DatasetDetailModel(dto);
                 model.DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue();
-
+                model.DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue();
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
 
                 return View(model);
@@ -358,6 +359,41 @@ namespace Sentry.data.Web.Controllers
             else
             {
                 return HttpNotFound("Invalid Dataset Id"); 
+            }
+        }
+
+        /// <summary>
+        /// Controller to deliver partial views to the tab layout.
+        /// </summary>
+        /// <param name="id">Dataset ID</param>
+        /// <param name="tab">Tab name</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Dataset/DetailTab/{id}/{tab}/")]
+        public ActionResult DetailTab(int id, string tab)
+        {
+            DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
+            if(dto != null)
+            {
+                model = new DatasetDetailModel(dto);
+                switch (tab)
+                {
+                    case ("SchemaColumns"):
+                        return PartialView("Details/_SchemaColumns", model);
+                    case ("SchemaAbout"):
+                        return PartialView("Details/_SchemaAbout", model);
+                    case ("DataPreview"):
+                        return PartialView("Details/_DataPreview", model);
+                    case ("DataFiles"):
+                        return PartialView("Details/_DataFiles", model);
+                    default:
+                        //log an error?
+                        return HttpNotFound("Invalid Tab");
+                }
+            }
+            else
+            {
+                return HttpNotFound("Invalid Dataset Id");
             }
         }
 
