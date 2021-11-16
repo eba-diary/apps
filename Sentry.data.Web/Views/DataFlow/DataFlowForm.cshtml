@@ -116,19 +116,36 @@
             </div>
         </div>
         <br />
-        <div class="schemaMapPanel" style="display:none;">
-            <div class="form-group col-md-12">
+        if (Model.CLA3332_ConsolidatedDataFlows)
+        {
+            <div class="schemaMapPanel form-group col-md-12" style="display:none;">
                 <div class="col-md-5"><h4>Where do you want the data to go?</h4></div>
-                <div id="schemaMapPanel" class="form-group col-md-12">
+                <div id="schemaMapPanel">
                     @Html.EditorForMany(m => m.SchemaMaps, x => x.Index)
-                    @if (!Model.CLA3332_ConsolidatedDataFlows)
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="schemaMapPanel" style="display:none;">
+                <div class="form-group col-md-12">
+                    <div class="col-md-5"><h4>Where do you want the data to go?</h4></div>
+                    @if (Model.CLA3332_ConsolidatedDataFlows)
                     {
-                        <button type="button" id="btnAddSchemaMap" class="btn btn-success"><span>Add Another Target</span></button>
+                        <div id="schemaMapPanel">
+                            @Html.EditorForMany(m => m.SchemaMaps, x => x.Index)
+                        </div>
+                    }
+                    else
+                    {
+                        <div id="schemaMapPanel" class="form-group col-md-12">
+                            @Html.EditorForMany(m => m.SchemaMaps, x => x.Index)
+                            <button type="button" id="btnAddSchemaMap" class="btn btn-success"><span>Add Another Target</span></button>
+                        </div>
                     }
                 </div>
             </div>
-        </div>
-
+        }
         <br />
         <div class="form-group formSubmitButtons" style="display: none;">
             <div>
