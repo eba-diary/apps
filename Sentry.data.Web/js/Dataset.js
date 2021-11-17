@@ -53,7 +53,7 @@ data.Dataset = {
             return !(self.DataFlows == undefined || self.DataFlows().length == 0);
         });
         self.ShowDataFileTable = ko.computed(function () {
-            return !(self.DataLastUpdated() === 'No Data Files Exist');
+            return self.DataLastUpdated() !== 'No Data Files Exist';
         });
 
         self.FooterRow = ko.computed(function () {
@@ -74,7 +74,7 @@ data.Dataset = {
             }
             else if (self.NoColumnsReturned()) {
                 $('#sessionSpinner').hide();
-                return "No Columns Exist";
+                return null;
             }
             else {
                 $('#sessionSpinner').show();
@@ -93,7 +93,7 @@ data.Dataset = {
                 $('#updatedSpinner').hide();
                 $('#dataPreviewSection').show();
                 if (d1 > d2) {
-                    return d1.toLocaleString("en-us", { month: "long" }) + ' ' + d1.getDate() + ', ' + d1.getFullYear();
+                    return d1.toLocaleString("en-us", { month: 'long' }) + ' ' + d1.getDate() + ', ' + d1.getFullYear();
                 } else {
                     return d2.toLocaleString("en-us", { month: "long" }) + ' ' + d2.getDate() + ', ' + d2.getFullYear();
                 }
@@ -113,7 +113,7 @@ data.Dataset = {
                 return d2.toLocaleString("en-us", { month: "long" }) + ' ' + d2.getDate() + ', ' + d2.getFullYear();
             }
             //Are both dates not populated
-            else if (self.DataLastUpdated() === 'No Data Files Exist' && self.MetadataLastDT() === 'No Columns Exist') {
+            else if (self.DataLastUpdated() === 'No Data Files Exist' && self.MetadataLastDT() === null) {
                 $('#updatedSpinner').hide();
                 $('#dataPreviewSection').hide();
                 return $('#datasetInfoLastUpdated').text();
@@ -554,7 +554,7 @@ data.Dataset = {
             schemaAjaxReq.abort()
         }
 
-        schemaAjaxReq = $.get(schemaURL, function (result) {
+        var schemaAjaxReq = $.get(schemaURL, function (result) {
             if (result.RowCount) {
                 self.vm.RowCount(result.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
             } else {
@@ -563,12 +563,10 @@ data.Dataset = {
 
             if (result.rows.length == 0) {
                 self.vm.NoColumnsReturned(true);
-                //$('#schemaSection').hide();
                 $('#schemaHR').hide();
             }
             else {
                 self.vm.NoColumnsReturned(false);
-                //$('#schemaSection').show();
                 $('#schemaHR').show();
 
                 $.each(result.rows, function (i, val) {
@@ -638,7 +636,6 @@ data.Dataset = {
 
         //Determine Column metadata
         var parsedColumns = [];
-        var nullColumns = [];
 
         //Remove existing column metadata
         $('#tableColumnIDs').empty();
@@ -647,7 +644,6 @@ data.Dataset = {
 
         //SETUP ALL COLUMNS for DATA PREVIEW
         Object.keys(input[0]).forEach(function (key) {
-            nullColumns.push(null);
 
             //load up ARRAY with each column
             //CUSTOM RENDER will wrap column data in DIV which adds a scroll bar if needed since STRUCT columns are HUGE
@@ -676,7 +672,7 @@ data.Dataset = {
         });
 
         if (!push) {
-            var table = $('#datasetRowTable').DataTable({
+            $('#datasetRowTable').DataTable({
                 "scrollX": true,
                 "autoWidth": true,
                 "scrollY": "1200px",                //set max height at 1200
@@ -685,7 +681,7 @@ data.Dataset = {
                 columns: parsedColumns,
             });
         } else {
-            table = $('#datasetRowTable').DataTable({ "scrollX": true }).rows.add(parsedRows).draw();
+            $('#datasetRowTable').DataTable({ "scrollX": true }).rows.add(parsedRows).draw();
             $($('#datasetRowTable_info').children()[2]).text($('#rowCount').text());
         }
 
