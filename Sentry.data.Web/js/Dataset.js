@@ -548,13 +548,7 @@ data.Dataset = {
             this.renderDataPreview();
         }
 
-        //logic to aboart ajax call additional call is triggered before original call finished.
-        //https://stackoverflow.com/a/4551178
-        if (schemaAjaxReq && schemaAjaxReq.readyState != 4) {
-            schemaAjaxReq.abort()
-        }
-
-        var schemaAjaxReq = $.get(schemaURL, function (result) {
+        $.get(schemaURL, function (result) {
             if (result.RowCount) {
                 self.vm.RowCount(result.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
             } else {
