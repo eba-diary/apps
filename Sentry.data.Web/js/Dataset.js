@@ -84,12 +84,13 @@ data.Dataset = {
         self.AnyLastUpdated = ko.computed(function () {
             var d1 = Date.parse(self.DataLastUpdated());
             var d2 = Date.parse(self.MetadataLastDT());
-
+            var date1;
+            var date2;
             //Not dates for both metadata and data
             if (!isNaN(d1) && !isNaN(d2)) {
 
-                var date1 = new Date(d1);
-                var date2 = new Date(d2);
+                date1 = new Date(d1);
+                date2 = new Date(d2);
                 $('#updatedSpinner').hide();
                 $('#dataPreviewSection').show();
                 if (date1 > date2) {
