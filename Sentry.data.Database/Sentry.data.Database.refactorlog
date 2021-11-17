@@ -987,46 +987,4 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[PreProcessingOption]" />
   </Operation>
-  <Operation Name="Rename Refactor" Key="00ac290d-35c3-40e2-a980-7b97eeef6f3c" ChangeDateTime="11/16/2021 18:07:10">
-    <Property Name="ElementName" Value="[dbo].[DatasetDetailTabMetrics].[Id]" />
-    <Property Name="ElementType" Value="SqlSimpleColumn" />
-    <Property Name="ParentElementName" Value="[dbo].[DatasetDetailTabMetrics]" />
-    <Property Name="ParentElementType" Value="SqlTable" />
-    <Property Name="NewName" Value="UserId" />
-  </Operation>
-  <Operation Name="Rename Refactor" Key="1abec115-b32a-475b-8a76-a840d77b5e20" ChangeDateTime="11/16/2021 18:07:55">
-    <Property Name="ElementName" Value="[dbo].[DatasetDetailTabMetrics].[AboutSchema]" />
-    <Property Name="ElementType" Value="SqlSimpleColumn" />
-    <Property Name="ParentElementName" Value="[dbo].[DatasetDetailTabMetrics]" />
-    <Property Name="ParentElementType" Value="SqlTable" />
-    <Property Name="NewName" Value="SchemaAbout" />
-  </Operation>
-  <Operation Name="Rename Refactor" Key="61261c1c-544f-4cd7-bdc6-b806b567bb47" ChangeDateTime="11/16/2021 18:08:12">
-    <Property Name="ElementName" Value="[dbo].[DatasetDetailTabMetrics].[SchemaAbout]" />
-    <Property Name="ElementType" Value="SqlSimpleColumn" />
-    <Property Name="ParentElementName" Value="[dbo].[DatasetDetailTabMetrics]" />
-    <Property Name="ParentElementType" Value="SqlTable" />
-    <Property Name="NewName" Value="SchemaAboutClicks" />
-  </Operation>
-  <Operation Name="Rename Refactor" Key="6b3d4121-5c5e-4bd0-ba42-667b193b8f30" ChangeDateTime="11/16/2021 18:08:15">
-    <Property Name="ElementName" Value="[dbo].[DatasetDetailTabMetrics].[SchemaColumns]" />
-    <Property Name="ElementType" Value="SqlSimpleColumn" />
-    <Property Name="ParentElementName" Value="[dbo].[DatasetDetailTabMetrics]" />
-    <Property Name="ParentElementType" Value="SqlTable" />
-    <Property Name="NewName" Value="SchemaColumnsClicks" />
-  </Operation>
-  <Operation Name="Rename Refactor" Key="1d93d13d-c786-4dcd-85d2-6fd8c45b1b26" ChangeDateTime="11/16/2021 18:08:18">
-    <Property Name="ElementName" Value="[dbo].[DatasetDetailTabMetrics].[DataFiles]" />
-    <Property Name="ElementType" Value="SqlSimpleColumn" />
-    <Property Name="ParentElementName" Value="[dbo].[DatasetDetailTabMetrics]" />
-    <Property Name="ParentElementType" Value="SqlTable" />
-    <Property Name="NewName" Value="DataFilesClicks" />
-  </Operation>
-  <Operation Name="Rename Refactor" Key="a9876251-327b-4797-81ca-7ca873940288" ChangeDateTime="11/16/2021 18:08:23">
-    <Property Name="ElementName" Value="[dbo].[DatasetDetailTabMetrics].[Data]" />
-    <Property Name="ElementType" Value="SqlSimpleColumn" />
-    <Property Name="ParentElementName" Value="[dbo].[DatasetDetailTabMetrics]" />
-    <Property Name="ParentElementType" Value="SqlTable" />
-    <Property Name="NewName" Value="DataPreviewClicks" />
-  </Operation>
 </Operations>
