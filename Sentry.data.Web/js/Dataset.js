@@ -6,6 +6,125 @@ data.Dataset = {
 
     DatasetFilesTable: {},
 
+    ViewModel: function () {
+        var self = this;
+
+        self.NoColumnsReturned = ko.observable();
+        self.DataLoading = ko.observable(false);
+        self.DataTableExists = ko.observable(false);
+        self.RowCount = ko.observableArray();
+        self.SchemaRows = ko.observableArray();
+        self.DataLastUpdated = ko.observable();
+        self.Description = ko.observable();
+        self.LessDescription = ko.computed(function () {
+            if (self.Description() != null && self.Description().length > 300) {
+
+                var last = self.Description().substring(0, 300).lastIndexOf(" ");
+
+                $('#schemaHasMoreDescription').show();
+                return self.Description().substring(0, last);
+            } else {
+                $('#schemaHasMoreDescription').hide();
+                return self.Description();
+            }
+        });
+        self.MoreDescription = ko.computed(function () {
+            if (self.Description() != null && self.Description().length > 300) {
+                $('#schemaHasMoreDescription').show();
+                var last = self.Description().substring(0, 300).lastIndexOf(" ");
+
+                return " " + self.Description().substring(last);
+            } else {
+                $('#schemaHasMoreDescription').hide();
+                return '';
+            }
+        });
+        self.DFSDropLocation = ko.observable();
+        self.S3DropLocation = ko.observable();
+        self.OtherJobs = ko.observableArray();
+        self.DataFlows = ko.observableArray();
+        self.DFSCronJob = ko.observable();
+        self.S3CronJob = ko.observable();
+        self.CronJobs = ko.observableArray();
+        self.Views = ko.observable();
+        self.Downloads = ko.observable();
+        self.FullyQualifiedSnowflakeViews = ko.observableArray();
+        self.RenderDataFlows = ko.computed(function () {
+            return !(self.DataFlows == undefined || self.DataFlows().length == 0);
+        });
+        self.ShowDataFileTable = ko.computed(function () {
+            return self.DataLastUpdated() !== 'No Data Files Exist';
+        });
+
+        self.FooterRow = ko.computed(function () {
+            return self.SchemaRows().length > 10;
+        });
+
+        self.MetadataLastDT = ko.computed(function () {
+            if (self.SchemaRows().length >= 1) {
+                var d = new Date("September 13, 1989 12:15:00");
+
+                ko.utils.arrayForEach(self.SchemaRows(), function (feature) {
+                    var f = new Date(feature.LastUpdated());
+                    if (f > d) { d = f }
+                });
+                d = d.toLocaleString("en-us", { month: "long" }) + ' ' + d.getDate() + ', ' + d.getFullYear();
+                $('#sessionSpinner').hide();
+                return d;
+            }
+            else if (self.NoColumnsReturned()) {
+                $('#sessionSpinner').hide();
+                return null;
+            }
+            else {
+                $('#sessionSpinner').show();
+            }
+        });
+
+        self.AnyLastUpdated = ko.computed(function () {
+            var d1 = Date.parse(self.DataLastUpdated());
+            var d2 = Date.parse(self.MetadataLastDT());
+            var date1;
+            var date2;
+            //Not dates for both metadata and data
+            if (!isNaN(d1) && !isNaN(d2)) {
+
+                date1 = new Date(d1);
+                date2 = new Date(d2);
+                $('#updatedSpinner').hide();
+                $('#dataPreviewSection').show();
+                if (date1 > date2) {
+                    return date1.toLocaleString("en-us", { month: 'long' }) + ' ' + date1.getDate() + ', ' + date1.getFullYear();
+                } else {
+                    return date2.toLocaleString("en-us", { month: "long" }) + ' ' + date2.getDate() + ', ' + date2.getFullYear();
+                }
+            }
+            //Only metadata date
+            else if (!isNaN(d1) && isNaN(d2)) {
+                $('#updatedSpinner').hide();
+                $('#dataPreviewSection').show();
+                date1 = new Date(d1);
+                return date1.toLocaleString("en-us", { month: "long" }) + ' ' + date1.getDate() + ', ' + date1.getFullYear();
+            }
+            //Only data date
+            else if (isNaN(d1) && !isNaN(d2)) {
+                $('#updatedSpinner').hide();
+                $('#dataPreviewSection').hide();
+                date2 = new Date(d2);
+                return date2.toLocaleString("en-us", { month: "long" }) + ' ' + date2.getDate() + ', ' + date2.getFullYear();
+            }
+            //Are both dates not populated
+            else if (self.DataLastUpdated() === 'No Data Files Exist' && self.MetadataLastDT() === null) {
+                $('#updatedSpinner').hide();
+                $('#dataPreviewSection').hide();
+                return $('#datasetInfoLastUpdated').text();
+            }
+            return self;
+        });
+
+
+    },
+
     //****************************************************************************************************
     //DELROY FUNCTIONS
     //****************************************************************************************************
@@ -13,7 +132,6 @@ data.Dataset = {
     delroySnowflakeViewsArray: [],
     delroyStructTrackerArray: [],
     firstTime: true,
-
 
     delroyInit: function () {
 
@@ -91,20 +209,20 @@ data.Dataset = {
                             return parent;
                         }
                         else {
-                            return d; 
+                            return d;
                         }
                     }
                 },
                 { data: "Description", className: "Description" },
                 { data: "FieldType", className: "FieldType" },
                 { data: "IsArray", className: "IsArray" },
-                { data: "Length", className: "Length", visible: false, render: function (d)         { return data.Dataset.delroyFillGridCheckForNull(d);    }   },
-                { data: "Precision", className: "Precision", visible: false, render: function (d)   { return data.Dataset.delroyFillGridCheckForNull(d);    }   },
-                { data: "Scale", className: "Scale", visible: false, render: function (d)           { return data.Dataset.delroyFillGridCheckForNull(d);    }   }
+                { data: "Length", className: "Length", visible: false, render: function (d) { return data.Dataset.delroyFillGridCheckForNull(d); } },
+                { data: "Precision", className: "Precision", visible: false, render: function (d) { return data.Dataset.delroyFillGridCheckForNull(d); } },
+                { data: "Scale", className: "Scale", visible: false, render: function (d) { return data.Dataset.delroyFillGridCheckForNull(d); } }
             ],
 
             aLengthMenu: [
-                [20, 100, 500],    
+                [20, 100, 500],
                 [20, 100, 500]
             ],
 
@@ -115,15 +233,15 @@ data.Dataset = {
 
             //buttons to show and customize text for them
             buttons:
-            [
-                { extend: 'colvis', text: 'Columns' },
-                {
-                    text: 'Snowflake Query',
-                    action: function () {
-                        data.Dataset.delroyQueryGenerator();
+                [
+                    { extend: 'colvis', text: 'Columns' },
+                    {
+                        text: 'Snowflake Query',
+                        action: function () {
+                            data.Dataset.delroyQueryGenerator();
+                        }
                     }
-                }
-            ]
+                ]
         });
 
         //add a filter in each column
@@ -143,7 +261,7 @@ data.Dataset = {
 
     },
 
-    
+
 
     //GRID CLICK EVENTS
     delroySetupClickAttack: function () {
@@ -164,7 +282,7 @@ data.Dataset = {
 
 
         //BREADCRUMBS NAV CLICK EVENT
-        $("#delroyBreadcrumb").on('click','li' ,function () {
+        $("#delroyBreadcrumb").on('click', 'li', function () {
             var myIndex = this.id;
 
             //only allow breadcrumbs use if have a valid Id)
@@ -173,7 +291,7 @@ data.Dataset = {
                 data.Dataset.delroyRefreshBreadCrumbsFromIndex(myIndex);
                 data.Dataset.delroyGridRefresh();
             }
-            
+
         });
 
 
@@ -199,7 +317,7 @@ data.Dataset = {
         if (index == 0 || field == null) {
             return field;                //index=0 means ROOT level where array of fields is actually on that level
         }
-        else {                              
+        else {
             return field.Fields;        //child of ROOT so specify array as a property of the field
         }
     },
@@ -221,9 +339,11 @@ data.Dataset = {
         else {
             //change scroll position to top of columns detail section upon grid refresh for consistency (anytime they click breadcrumb or click a struct)
             //this is needed because of grid expanding and shrinking when structs are selected and the scrolling un changed goes sometimes to bottom of grid
-            var elmnt = document.getElementById("schemaSection");     
-            elmnt.scrollIntoView(); 
-            window.scrollBy(0, -100); //adjust scrolling because scrollIntoView() is off by about 100px which is a known issue in various browsers
+            var elmnt = document.getElementById("schemaSection");
+            if (elmnt != undefined) {
+                elmnt.scrollIntoView();
+                window.scrollBy(0, -100); //adjust scrolling because scrollIntoView() is off by about 100px which is a known issue in various browsers
+            }
         }
     },
 
@@ -238,7 +358,7 @@ data.Dataset = {
 
         //add struct too tracker to hold if a query needs to be generated
         if (field.Name !== "Home" && index > 0) {
-            data.Dataset.delroyStructTrackerArray.push(field);    
+            data.Dataset.delroyStructTrackerArray.push(field);
         }
     },
 
@@ -250,7 +370,7 @@ data.Dataset = {
 
         //STEP 2: empty breadcrumb Tracker which feeds Query Generator
         var deleteStartIndex = parseInt(0);
-        data.Dataset.delroyStructTrackerArray.splice(deleteStartIndex);     
+        data.Dataset.delroyStructTrackerArray.splice(deleteStartIndex);
 
         //STEP 3: add in all breadcrumbs from start until the one they clicked on
         for (let i = 0; i < data.Dataset.delroyFieldArray.length; i++) {
@@ -355,6 +475,250 @@ data.Dataset = {
 
 
 
+    UpdateMetadata: function () {
+
+        if (!isNaN(getUrlParameter('configID'))) {
+            $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
+        }
+
+        if ($('#datasetConfigList').val() === undefined) { return; }
+
+        var metadataURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val();
+        $.get(metadataURL, function (result) {
+            //Set schema metadata
+            self.vm.Downloads(result.Downloads);
+            self.vm.Views(result.Views);
+            self.vm.Description(result.Description);
+            self.vm.FullyQualifiedSnowflakeViews.removeAll();
+            $.each(result.SnowflakeViews, function (i, val) {
+                self.vm.FullyQualifiedSnowflakeViews.push(val);
+            });
+
+
+            //Populate legacy retriever jobs
+            self.vm.OtherJobs.removeAll();
+            $.each(result.OtherJobs, function (i, val) {
+                var item = new DropLocation(val);
+
+                self.vm.OtherJobs().push(item);
+            });
+            self.vm.OtherJobs.notifySubscribers();
+
+            //Populate associated DataFlows
+            self.vm.DataFlows.removeAll();
+            $.each(result.DataFlows, function (i, val) {
+                var item = new data.Dataset.DataFlow(val);
+
+                self.vm.DataFlows().push(item);
+            });
+            self.vm.DataFlows.notifySubscribers();
+
+            //Determine last
+            var d = new Date(result.DataLastUpdated);
+            if (d < new Date('1990-01-01')) {
+                self.vm.DataLastUpdated('No Data Files Exist');
+            } else {
+                d = d.toLocaleString("en-us", { month: "long" }) + ' ' + d.getDate() + ', ' + d.getFullYear();
+                self.vm.DataLastUpdated(d);
+            }
+            $('#dataLastUpdatedSpinner').hide();
+
+            data.Dataset.UpdateColumnSchema();
+            data.Dataset.delroyReloadEverything(result.DatasetId, result.SchemaId, result.SnowflakeViews);
+        });
+    },
+
+    UpdateColumnSchema: function () {
+        if ($('#datasetConfigList').val() === undefined) { return; }
+
+        var schemaURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/columns";
+
+        //remove any children from DOM before injecting spinner
+        $("div.dataPreviewSpinner").empty();
+        //Inject spinner into DOM
+        Sentry.InjectSpinner($(".dataPreviewSpinner"));
+
+        self.vm.DataLoading(true);
+        $('#dataSection').hide();
+
+        //If no data files exist, 1.) do not query table, 2.) do not show Data Preview section
+        if (!self.vm.ShowDataFileTable()) {
+            $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+        }
+        else {
+            this.renderDataPreview();
+        }
+
+        $.get(schemaURL, function (result) {
+            if (result.RowCount) {
+                self.vm.RowCount(result.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+            } else {
+                self.vm.RowCount(0);
+            }
+
+            if (result.rows.length == 0) {
+                self.vm.NoColumnsReturned(true);
+                $('#schemaHR').hide();
+            }
+            else {
+                self.vm.NoColumnsReturned(false);
+                $('#schemaHR').show();
+
+                $.each(result.rows, function (i, val) {
+                    var item = new data.Dataset.SchemaRow(val);
+
+                    self.vm.SchemaRows().push(item);
+                });
+                self.vm.SchemaRows.notifySubscribers();
+            }
+
+        }).fail(function () {
+            self.vm.RowCount(0);
+            self.vm.SchemaRows([]);
+
+            self.vm.NoColumnsReturned(true);
+            $('#schemaHR').hide();
+        });
+    },
+
+    renderDataPreview: function () {
+        $.ajax({
+            type: "GET",
+            url: "/api/v2/querytool/dataset/" + location.pathname.split('/')[3] + "/config/" + $('#datasetConfigList').val() + "/SampleRecords",
+            data: {
+                rows: 20
+            },
+            dataType: "json",
+            success: function (msg) {
+                if (msg !== undefined) {
+                    var obj = JSON.parse(msg);
+                    if (obj.length > 0) {
+
+                        //pass data returned from AJAX call to render Data Table
+                        renderTable_v2(obj, false);
+
+                        $('#dataSection').show();
+                        self.vm.DataLoading(false);
+                        self.vm.DataTableExists(true);
+                        $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
+                    }
+                    else {
+                        $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+                        $('#dataSection').hide();
+                    }
+                }
+            },
+            error: function (error) {
+                //Schema NotFound response
+                if (error.status == 404 && error.responseText == "Schema not found") {
+                    $('#dataSection').hide();
+                }
+
+                $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+            }
+        }).fail(function () {
+            $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+        });
+    },
+
+    //DATA PREVIEW DATA TABLE SETUP
+    renderTable_v2: function (input, push) {
+
+        //remove table DOM if needed
+        if (table) {
+            table.destroy();
+        }
+
+        //Determine Column metadata
+        var parsedColumns = [];
+
+        //Remove existing column metadata
+        $('#tableColumnIDs').empty();
+        $('#tableFirstRow').empty();
+        $('#datasetRowTable tbody').empty();
+
+        //SETUP ALL COLUMNS for DATA PREVIEW
+        Object.keys(input[0]).forEach(function (key) {
+
+            //load up ARRAY with each column
+            //CUSTOM RENDER will wrap column data in DIV which adds a scroll bar if needed since STRUCT columns are HUGE
+            parsedColumns.push({
+                'title': key.trim(), 'width': "auto", render: function (d) {
+                    return "<div style='max-height:100px; overflow-y: auto;'>" + d + "</div>";
+                }
+            });
+
+            $('#tableColumnIDs').append("<th>" + key.trim() + "</th>");
+            $('#tableFirstRow').append("<td></td>");
+        });
+
+        var parsedRows = [];
+        //Data for Each Row in the Result Set
+        input.forEach(function (row) {
+            var parsedCells = [];
+
+            for (var key of Object.keys(row)) {
+                parsedCells.push(row[key]);
+            }
+
+            if (parsedCells.length >= 1) {
+                parsedRows.push(parsedCells);
+            }
+        });
+
+        if (!push) {
+            $('#datasetRowTable').DataTable({
+                "scrollX": true,
+                "autoWidth": true,
+                "scrollY": "1200px",                //set max height at 1200
+                "scrollCollapse": true,             //if less then 1200, shrink so no white space
+                data: parsedRows,
+                columns: parsedColumns,
+            });
+        } else {
+            $('#datasetRowTable').DataTable({ "scrollX": true }).rows.add(parsedRows).draw();
+            $($('#datasetRowTable_info').children()[2]).text($('#rowCount').text());
+        }
+
+        $(".dataTables_filter").parent().addClass("text-right");
+    },
+
+    SchemaRow: function (data) {
+        this.Name = ko.observable(data.Name);
+        this.Description = ko.observable(data.Description);
+        this.Type = ko.observable(data.Type);
+        this.Precision = ko.observable(data.Precision);
+        this.Scale = ko.observable(data.Scale);
+        this.LastUpdated = ko.observable(data.LastUpdated);
+    },
+
+    DropLocation: function (data) {
+        this.Name = ko.observable(data.Name);
+        this.Location = ko.observable(data.Location);
+        this.JobId = ko.observable(data.JobId);
+        this.IsEnabled = ko.observable(data.IsEnabled);
+    },
+
+    DataFlow: function (dataInput) {
+        var self = this;
+        self.Name = ko.observable(dataInput.Name);
+        self.Id = ko.observable(dataInput.Id);
+        self.DetailUrl = ko.observable(dataInput.DetailUrl);
+        self.Jobs = ko.observableArray();
+        self.DetailUrl = "/DataFlow/" + encodeURIComponent(self.Id()) + "/Detail";
+        $.each(dataInput.RetrieverJobs, function (i, val) {
+            var item = new data.Dataset.DropLocation(val);
+
+            self.Jobs().push(item);
+        });
+        self.DataFlowDetailRedirect = function () {
+            window.open("/DataFlow/" + encodeURIComponent(this.Id()) + "/Detail");
+        }
+        self.RenderJobs = ko.pureComputed(function () {
+            return ko.unwrap(self.Jobs) ? "RenderJobs" : "noRenderJobs";
+        });
+    },
+
 
 
 
@@ -441,23 +805,23 @@ data.Dataset = {
 
     //INIT _DatasetCreateEdit.cshtml
     FormInit: function (hrEmpUrl, hrEmpEnv, PageSubmitFunction, PageCancelFunction) {
-        
-        //CONFIGURE SAID ASSET PICKER on _DatasetCreateEdit.cshtml TO INCLUDE a filter box that comes up
-         $(document).ready(function () {
-                $('.selectpicker').selectpicker({
-                    liveSearch: false,
-                    showSubtext: true,
-                    size: '5',
-                    dropupAuto: false
-                });
 
-                $(".selectpicker-filtering").selectpicker({
-                    liveSearch: true,
-                    showSubtext: true,
-                    size: '5',
-                    dropupAuto: false
-                });
-         });
+        //CONFIGURE SAID ASSET PICKER on _DatasetCreateEdit.cshtml TO INCLUDE a filter box that comes up
+        $(document).ready(function () {
+            $('.selectpicker').selectpicker({
+                liveSearch: false,
+                showSubtext: true,
+                size: '5',
+                dropupAuto: false
+            });
+
+            $(".selectpicker-filtering").selectpicker({
+                liveSearch: true,
+                showSubtext: true,
+                size: '5',
+                dropupAuto: false
+            });
+        });
 
 
         //saidAsset onChange needs to update #PrimaryOwnerName and #PrimaryOwnerId based on saidAsset picked
@@ -471,7 +835,7 @@ data.Dataset = {
                 type: "POST",
                 url: "/Dataset/GetOwner",
                 traditional: true,
-                data: JSON.stringify({ assetKeyCode: assetKeyCode}),
+                data: JSON.stringify({ assetKeyCode: assetKeyCode }),
                 contentType: "application/json",
                 success: function (r) {
                     $("#PrimaryOwnerName").val(r.primaryOwnerName);
@@ -492,20 +856,18 @@ data.Dataset = {
 
         //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
         data.Dataset.initNamedEnvironmentEvents();
-        
+
         //SubmitDatasetForm
         $("[id='SubmitDatasetForm']").click(PageSubmitFunction);
 
         if ($("#DatasetId").val() !== undefined && $("#DatasetId").val() > 0) {
             $("#DatasetScopeTypeId").attr('readonly', 'readonly');
-            //$("#FileExtensionId").attr('readonly', 'readonly');
-            //$("#Delimiter").attr('readonly', 'readonly');
         }
 
         //Set Secure HREmp service URL for associate picker
         $.assocSetup({ url: hrEmpUrl });
         var permissionFilter = "DatasetModify,DatasetManagement," + hrEmpEnv;
-     
+
         $("#PrimaryContactName").assocAutocomplete({
             associateSelected: function (associate) {
                 $('#PrimaryContactId').val(associate.Id);
@@ -569,8 +931,6 @@ data.Dataset = {
             var files = fileUpload.files;
 
             if (files.length > 0) {
-
-                //console.log('File Upload Change Loop');
                 getConfigs();
             }
             else {
@@ -591,8 +951,7 @@ data.Dataset = {
 
     DetailInit: function () {
 
-        data.Dataset.delroyInit();
-
+        this.delroyInit();
 
         $("[id^='EditDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
@@ -738,7 +1097,7 @@ data.Dataset = {
             });
         });
 
-         
+
         data.Dataset.SetReturntoSearchUrl();
 
         $('#datasetConfigList').select2({ width: '85%' });
@@ -779,15 +1138,15 @@ data.Dataset = {
             var UserAccessMessage;
 
             if (dataset.attr("data-IsSecured") === "False") {
-                UserAccessMessage = "This is a public dataset, all users have access.";                
+                UserAccessMessage = "This is a public dataset, all users have access.";
             }
             else {
-                UserAccessMessage = "There are " + dataset.attr("data-grpCnt") + " active directory groups with access to this dataset.";                
+                UserAccessMessage = "There are " + dataset.attr("data-grpCnt") + " active directory groups with access to this dataset.";
             }
 
             var ConfirmMessage = "<p>Are you sure?</p><p><h3><b><font color=\"red\">THIS IS NOT A REVERSIBLE ACTION!</font></b></h3></p> </br> <p>" + UserAccessMessage + "</p>  Deleting the dataset will remove all associated schemas, data files, hive consumption layers, and metadata.  If at a later point " +
                 "this is needed, dataset and schema(s) will need to be recreated along with all files resent from source."
-            
+
 
             Sentry.ShowModalCustom("Delete Dataset", ConfirmMessage, {
                 Confirm: {
@@ -849,6 +1208,104 @@ data.Dataset = {
                 });
             });
         });
+
+        //*****************************************************************************************************
+        //CONFIG DROP DOWN CHANGE
+        //*****************************************************************************************************
+        $('#datasetConfigList').on('select2:select', function (e) {
+
+            window.history.pushState('Config Changed', 'Title', '?configID=' + $('#datasetConfigList').val());
+            Id = $('#datasetConfigList').val();
+            self.vm.NoColumnsReturned(false);
+            $('#schemaHR').show();
+            self.vm.SchemaRows.removeAll();
+
+            if (self.vm.ShowDataFileTable()) {
+                var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + $('#datasetConfigList').val();
+                $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
+            }
+
+            data.Dataset.UpdateMetadata();
+        });
+
+        $('#dataLastUpdatedSpinner').show();
+        data.Dataset.UpdateMetadata();
+
+        //Hook up handlers for tabbed sections
+
+        $('#detailTabSchemaColumns').click(function (e) {
+            e.preventDefault();
+            var id = $('#RequestAccessButton').attr("data-id");
+
+            if ($('#tabSchemaColumns').is(':empty')) {
+                $.ajax({
+                    url: '/Dataset/DetailTab/' + id + '/' + 'SchemaColumns',
+                    dataType: 'html',
+                    success: function (view) {
+                        $('#tabSchemaColumns').html(view);
+                        data.Dataset.delroyInit();
+                        data.Dataset.UpdateMetadata();
+                        $('#delroySpinner').hide();
+                    }
+                });
+            }
+        });
+
+        $('#detailTabSchemaAbout').click(function (e) {
+            e.preventDefault();
+            var id = $('#RequestAccessButton').attr("data-id");
+
+            if ($('#tabSchemaAbout').is(':empty')) {
+                $.ajax({
+                    url: '/Dataset/DetailTab/' + id + '/' + 'SchemaAbout',
+                    dataType: 'html',
+                    success: function (view) {
+                        $('#tabSchemaAbout').html(view);
+                        data.Dataset.UpdateMetadata();
+                    }
+                });
+            }
+        });
+
+        $('#detailTabDataPreview').click(function (e) {
+            e.preventDefault();
+            var id = $('#RequestAccessButton').attr("data-id");
+
+            if ($('#tabDataPreview').is(':empty')) {
+                $.ajax({
+                    url: '/Dataset/DetailTab/' + id + '/' + 'DataPreview',
+                    dataType: 'html',
+                    success: function (view) {
+                        $('#tabDataPreview').html(view);
+                        if (self.vm.ShowDataFileTable()) {
+                            this.renderDataPreview();
+                        }
+                    }
+                });
+            }
+        });
+
+        $('#detailTabDataFiles').click(function (e) {
+            e.preventDefault();
+            var id = $('#RequestAccessButton').attr("data-id");
+
+            if ($('#tabDataFiles').is(':empty')) {
+                $.ajax({
+                    url: '/Dataset/DetailTab/' + id + '/' + 'DataFiles',
+                    dataType: 'html',
+                    success: function (view) {
+                        $('#tabDataFiles').html(view);
+                        if (self.vm.ShowDataFileTable()) {
+                            var configId = $('#datasetConfigList').val();
+                            data.Dataset.DatasetFileTableInit(configId);
+                            data.Dataset.DatasetBundingFileTableInit(configId);
+                        }
+                    }
+                });
+            }
+        });
+
+
     },
 
     CancelLink: function (id) {
@@ -1635,10 +2092,6 @@ data.Dataset = {
             data.Dataset.initNamedEnvironmentEvents();
         });
     }
-
-
-
-
 
 
 

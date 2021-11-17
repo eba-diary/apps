@@ -30,6 +30,8 @@ namespace Sentry.data.Infrastructure.FeatureFlags
 
         public IFeatureFlag<bool> CLA3541_Dataset_Details_Tabs { get; }
 
+
+
         public IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; }
         public IFeatureFlag<bool> CLA3497_UniqueLivySessionName { get; }
         public IFeatureFlag<bool> CLA3240_UseDropLocationV2 { get; }
