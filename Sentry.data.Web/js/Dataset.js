@@ -88,29 +88,29 @@ data.Dataset = {
             //Not dates for both metadata and data
             if (!isNaN(d1) && !isNaN(d2)) {
 
-                d1 = new Date(d1);
-                d2 = new Date(d2);
+                var date1 = new Date(d1);
+                var date2 = new Date(d2);
                 $('#updatedSpinner').hide();
                 $('#dataPreviewSection').show();
-                if (d1 > d2) {
-                    return d1.toLocaleString("en-us", { month: 'long' }) + ' ' + d1.getDate() + ', ' + d1.getFullYear();
+                if (date1 > date2) {
+                    return date1.toLocaleString("en-us", { month: 'long' }) + ' ' + date1.getDate() + ', ' + date1.getFullYear();
                 } else {
-                    return d2.toLocaleString("en-us", { month: "long" }) + ' ' + d2.getDate() + ', ' + d2.getFullYear();
+                    return date2.toLocaleString("en-us", { month: "long" }) + ' ' + date2.getDate() + ', ' + date2.getFullYear();
                 }
             }
             //Only metadata date
             else if (!isNaN(d1) && isNaN(d2)) {
                 $('#updatedSpinner').hide();
                 $('#dataPreviewSection').show();
-                d1 = new Date(d1);
-                return d1.toLocaleString("en-us", { month: "long" }) + ' ' + d1.getDate() + ', ' + d1.getFullYear();
+                var date1 = new Date(d1);
+                return date1.toLocaleString("en-us", { month: "long" }) + ' ' + date1.getDate() + ', ' + date1.getFullYear();
             }
             //Only data date
             else if (isNaN(d1) && !isNaN(d2)) {
                 $('#updatedSpinner').hide();
                 $('#dataPreviewSection').hide();
-                d2 = new Date(d2);
-                return d2.toLocaleString("en-us", { month: "long" }) + ' ' + d2.getDate() + ', ' + d2.getFullYear();
+                var date2 = new Date(d2);
+                return date2.toLocaleString("en-us", { month: "long" }) + ' ' + date2.getDate() + ', ' + date2.getFullYear();
             }
             //Are both dates not populated
             else if (self.DataLastUpdated() === 'No Data Files Exist' && self.MetadataLastDT() === null) {
