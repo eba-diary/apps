@@ -337,7 +337,11 @@ namespace Sentry.data.Core
                      *  through Logical delete first, therefore, some of the 
                      *  values (DeleteIssuer, DeleteIssueDTM) need to be set within this else block. 
                     ************************************************/
-                    job.DeleteIssuer = (string.IsNullOrEmpty(job.DeleteIssuer) && !string.IsNullOrEmpty(deleteIssuerId)) ? deleteIssuerId : _userService.GetCurrentUser().AssociateId;
+                    if (string.IsNullOrEmpty(job.DeleteIssuer))
+                    {
+                        job.DeleteIssuer =  !string.IsNullOrEmpty(deleteIssuerId) ? deleteIssuerId: _userService.GetCurrentUser().AssociateId;
+                    }
+                    
                     //Only comparing date since the milliseconds percision are different, therefore, never evaluates true
                     //  https://stackoverflow.com/a/44324883
                     if (DateTime.MaxValue.Date == job.DeleteIssueDTM.Date)
