@@ -581,7 +581,7 @@ data.Dataset = {
     },
 
     renderDataPreview: function () {
-       $.ajax({
+        $.ajax({
             type: "GET",
             url: "/api/v2/querytool/dataset/" + location.pathname.split('/')[3] + "/config/" + $('#datasetConfigList').val() + "/SampleRecords",
             data: {
@@ -1297,7 +1297,8 @@ data.Dataset = {
                         if (self.vm.ShowDataFileTable()) {
                             var configId = $('#datasetConfigList').val();
                             data.Dataset.DatasetFileTableInit(configId);
-                            data.Dataset.DatasetBundingFileTableInit(configId);                        }
+                            data.Dataset.DatasetBundingFileTableInit(configId);
+                        }
                     }
                 });
             }
