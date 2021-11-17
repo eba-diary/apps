@@ -50,27 +50,14 @@ data.Dataset = {
         self.Downloads = ko.observable();
         self.FullyQualifiedSnowflakeViews = ko.observableArray();
         self.RenderDataFlows = ko.computed(function () {
-            if (self.DataFlows == undefined || self.DataFlows().length == 0) {
-                return false;
-            }
-            else {
-                return true;
-            }
+            return !(self.DataFlows == undefined || self.DataFlows().length == 0);
         });
         self.ShowDataFileTable = ko.computed(function () {
-            if (self.DataLastUpdated() === 'No Data Files Exist') {
-                return false;
-            } else {
-                return true;
-            }
+            return !(self.DataLastUpdated() === 'No Data Files Exist');
         });
 
         self.FooterRow = ko.computed(function () {
-            if (self.SchemaRows().length > 10) {
-                return true;
-            } else {
-                return false;
-            }
+            return self.SchemaRows().length > 10;
         });
 
         self.MetadataLastDT = ko.computed(function () {
@@ -101,8 +88,8 @@ data.Dataset = {
             //Not dates for both metadata and data
             if (!isNaN(d1) && !isNaN(d2)) {
 
-                var d1 = new Date(d1);
-                var d2 = new Date(d2);
+                d1 = new Date(d1);
+                d2 = new Date(d2);
                 $('#updatedSpinner').hide();
                 $('#dataPreviewSection').show();
                 if (d1 > d2) {
@@ -115,14 +102,14 @@ data.Dataset = {
             else if (!isNaN(d1) && isNaN(d2)) {
                 $('#updatedSpinner').hide();
                 $('#dataPreviewSection').show();
-                var d1 = new Date(d1);
+                d1 = new Date(d1);
                 return d1.toLocaleString("en-us", { month: "long" }) + ' ' + d1.getDate() + ', ' + d1.getFullYear();
             }
             //Only data date
             else if (isNaN(d1) && !isNaN(d2)) {
                 $('#updatedSpinner').hide();
                 $('#dataPreviewSection').hide();
-                var d2 = new Date(d2);
+                d2 = new Date(d2);
                 return d2.toLocaleString("en-us", { month: "long" }) + ' ' + d2.getDate() + ', ' + d2.getFullYear();
             }
             //Are both dates not populated
@@ -352,8 +339,10 @@ data.Dataset = {
             //change scroll position to top of columns detail section upon grid refresh for consistency (anytime they click breadcrumb or click a struct)
             //this is needed because of grid expanding and shrinking when structs are selected and the scrolling un changed goes sometimes to bottom of grid
             var elmnt = document.getElementById("schemaSection");
-            elmnt.scrollIntoView();
-            window.scrollBy(0, -100); //adjust scrolling because scrollIntoView() is off by about 100px which is a known issue in various browsers
+            if (elmnt != undefined) {
+                elmnt.scrollIntoView();
+                window.scrollBy(0, -100); //adjust scrolling because scrollIntoView() is off by about 100px which is a known issue in various browsers
+            }
         }
     },
 
@@ -551,54 +540,12 @@ data.Dataset = {
         self.vm.DataLoading(true);
         $('#dataSection').hide();
 
-        //logic to aboart ajax call additional call is triggered before original call finished.
-        //https://stackoverflow.com/a/4551178
-        if (dataAjaxReq && dataAjaxReq.readyState != 4) {
-            dataAjaxReq.abort()
-        }
-
         //If no data files exist, 1.) do not query table, 2.) do not show Data Preview section
         if (!self.vm.ShowDataFileTable()) {
             $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
         }
         else {
-            dataAjaxReq = $.ajax({
-                type: "GET",
-                url: "/api/v2/querytool/dataset/" + location.pathname.split('/')[3] + "/config/" + $('#datasetConfigList').val() + "/SampleRecords",
-                data: {
-                    rows: 20
-                },
-                dataType: "json",
-                success: function (msg) {
-                    if (msg !== undefined) {
-                        var obj = JSON.parse(msg);
-                        if (obj.length > 0) {
-
-                            //pass data returned from AJAX call to render Data Table
-                            renderTable_v2(obj, false);
-
-                            $('#dataSection').show();
-                            self.vm.DataLoading(false);
-                            self.vm.DataTableExists(true);
-                            $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
-                        }
-                        else {
-                            $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
-                            $('#dataSection').hide();
-                        }
-                    }
-                },
-                error: function (error) {
-                    //Schema NotFound response
-                    if (error.status == 404 && error.responseText == "Schema not found") {
-                        $('#dataSection').hide();
-                    }
-
-                    $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
-                }
-            }).fail(function () {
-                $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
-            });
+            this.renderDataPreview();
         }
 
         //logic to aboart ajax call additional call is triggered before original call finished.
@@ -631,16 +578,53 @@ data.Dataset = {
                 });
                 self.vm.SchemaRows.notifySubscribers();
             }
-            //$('#panelSpinner').hide();
 
         }).fail(function () {
             self.vm.RowCount(0);
             self.vm.SchemaRows([]);
 
             self.vm.NoColumnsReturned(true);
-            //$('#panelSpinner').hide();
-            //$('#schemaSection').hide();
             $('#schemaHR').hide();
+        });
+    },
+
+    renderDataPreview: function () {
+       $.ajax({
+            type: "GET",
+            url: "/api/v2/querytool/dataset/" + location.pathname.split('/')[3] + "/config/" + $('#datasetConfigList').val() + "/SampleRecords",
+            data: {
+                rows: 20
+            },
+            dataType: "json",
+            success: function (msg) {
+                if (msg !== undefined) {
+                    var obj = JSON.parse(msg);
+                    if (obj.length > 0) {
+
+                        //pass data returned from AJAX call to render Data Table
+                        renderTable_v2(obj, false);
+
+                        $('#dataSection').show();
+                        self.vm.DataLoading(false);
+                        self.vm.DataTableExists(true);
+                        $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
+                    }
+                    else {
+                        $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+                        $('#dataSection').hide();
+                    }
+                }
+            },
+            error: function (error) {
+                //Schema NotFound response
+                if (error.status == 404 && error.responseText == "Schema not found") {
+                    $('#dataSection').hide();
+                }
+
+                $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+            }
+        }).fail(function () {
+            $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
         });
     },
 
@@ -669,8 +653,7 @@ data.Dataset = {
             //CUSTOM RENDER will wrap column data in DIV which adds a scroll bar if needed since STRUCT columns are HUGE
             parsedColumns.push({
                 'title': key.trim(), 'width': "auto", render: function (d) {
-                    var me = "<div style='max-height:100px; overflow-y: auto;'>" + d + "</div>";
-                    return me;
+                    return "<div style='max-height:100px; overflow-y: auto;'>" + d + "</div>";
                 }
             });
 
@@ -693,7 +676,7 @@ data.Dataset = {
         });
 
         if (!push) {
-            table = $('#datasetRowTable').DataTable({
+            var table = $('#datasetRowTable').DataTable({
                 "scrollX": true,
                 "autoWidth": true,
                 "scrollY": "1200px",                //set max height at 1200
@@ -888,8 +871,6 @@ data.Dataset = {
 
         if ($("#DatasetId").val() !== undefined && $("#DatasetId").val() > 0) {
             $("#DatasetScopeTypeId").attr('readonly', 'readonly');
-            //$("#FileExtensionId").attr('readonly', 'readonly');
-            //$("#Delimiter").attr('readonly', 'readonly');
         }
 
         //Set Secure HREmp service URL for associate picker
@@ -959,8 +940,6 @@ data.Dataset = {
             var files = fileUpload.files;
 
             if (files.length > 0) {
-
-                //console.log('File Upload Change Loop');
                 getConfigs();
             }
             else {
@@ -980,6 +959,8 @@ data.Dataset = {
     },
 
     DetailInit: function () {
+
+        this.delroyInit();
 
         $("[id^='EditDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
@@ -1272,6 +1253,7 @@ data.Dataset = {
                     success: function (view) {
                         $('#tabSchemaColumns').html(view);
                         data.Dataset.delroyInit();
+                        data.Dataset.UpdateMetadata();
                         $('#delroySpinner').hide();
                     }
                 });
@@ -1305,43 +1287,7 @@ data.Dataset = {
                     success: function (view) {
                         $('#tabDataPreview').html(view);
                         if (self.vm.ShowDataFileTable()) {
-                            dataAjaxReq = $.ajax({
-                                type: "GET",
-                                url: "/api/v2/querytool/dataset/" + location.pathname.split('/')[3] + "/config/" + $('#datasetConfigList').val() + "/SampleRecords",
-                                data: {
-                                    rows: 20
-                                },
-                                dataType: "json",
-                                success: function (msg) {
-                                    if (msg !== undefined) {
-                                        var obj = JSON.parse(msg);
-                                        if (obj.length > 0) {
-
-                                            //pass data returned from AJAX call to render Data Table
-                                            renderTable_v2(obj, false);
-
-                                            $('#dataSection').show();
-                                            self.vm.DataLoading(false);
-                                            self.vm.DataTableExists(true);
-                                            $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
-                                        }
-                                        else {
-                                            $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
-                                            $('#dataSection').hide();
-                                        }
-                                    }
-                                },
-                                error: function (error) {
-                                    //Schema NotFound response
-                                    if (error.status == 404 && error.responseText == "Schema not found") {
-                                        $('#dataSection').hide();
-                                    }
-
-                                    $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
-                                }
-                            }).fail(function () {
-                                $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
-                            });
+                            this.renderDataPreview();
                         }
                     }
                 });

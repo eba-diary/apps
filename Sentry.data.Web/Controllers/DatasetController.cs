@@ -34,7 +34,6 @@ namespace Sentry.data.Web.Controllers
     {
         public readonly IAssociateInfoProvider _associateInfoProvider;
         public readonly IDatasetContext _datasetContext;
-        private DatasetDetailModel model;
         private readonly UserService _userService;
         private readonly S3ServiceProvider _s3Service;
         private readonly ISASService _sasService;
@@ -349,7 +348,7 @@ namespace Sentry.data.Web.Controllers
 
             if (dto != null)
             {
-                model = new DatasetDetailModel(dto);
+                DatasetDetailModel model = new DatasetDetailModel(dto);
                 model.DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue();
                 model.DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue();
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
@@ -375,7 +374,7 @@ namespace Sentry.data.Web.Controllers
             DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
             if(dto != null)
             {
-                model = new DatasetDetailModel(dto);
+                DatasetDetailModel model = new DatasetDetailModel(dto);
                 switch (tab)
                 {
                     case ("SchemaColumns"):
@@ -387,7 +386,6 @@ namespace Sentry.data.Web.Controllers
                     case ("DataFiles"):
                         return PartialView("Details/_DataFiles", model);
                     default:
-                        //log an error?
                         return HttpNotFound("Invalid Tab");
                 }
             }
