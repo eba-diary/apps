@@ -102,14 +102,14 @@ data.Dataset = {
             else if (!isNaN(d1) && isNaN(d2)) {
                 $('#updatedSpinner').hide();
                 $('#dataPreviewSection').show();
-                var date1 = new Date(d1);
+                date1 = new Date(d1);
                 return date1.toLocaleString("en-us", { month: "long" }) + ' ' + date1.getDate() + ', ' + date1.getFullYear();
             }
             //Only data date
             else if (isNaN(d1) && !isNaN(d2)) {
                 $('#updatedSpinner').hide();
                 $('#dataPreviewSection').hide();
-                var date2 = new Date(d2);
+                date2 = new Date(d2);
                 return date2.toLocaleString("en-us", { month: "long" }) + ' ' + date2.getDate() + ', ' + date2.getFullYear();
             }
             //Are both dates not populated
