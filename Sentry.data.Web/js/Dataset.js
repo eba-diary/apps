@@ -1276,6 +1276,11 @@ data.Dataset = {
                     }
                 });
             }
+            else {
+                $.ajax({
+                    url: '/Dataset/DetailTab/' + id + '/' + 'SchemaColumns/LogView',
+                });
+            }
         });
 
         $('#detailTabSchemaAbout').click(function (e) {
@@ -1290,6 +1295,11 @@ data.Dataset = {
                         $('#tabSchemaAbout').html(view);
                         data.Dataset.UpdateMetadata();
                     }
+                });
+            }
+            else {
+                $.ajax({
+                    url: '/Dataset/DetailTab/' + id + '/' + 'SchemaAbout/LogView',
                 });
             }
         });
@@ -1346,6 +1356,11 @@ data.Dataset = {
                     }
                 });
             }
+            else {
+                $.ajax({
+                    url: '/Dataset/DetailTab/' + id + '/' + 'DataPreview/LogView',
+                });
+            }
         });
 
         $('#detailTabDataFiles').click(function (e) {
@@ -1361,8 +1376,14 @@ data.Dataset = {
                         if (self.vm.ShowDataFileTable()) {
                             var configId = $('#datasetConfigList').val();
                             data.Dataset.DatasetFileTableInit(configId);
-                            data.Dataset.DatasetBundingFileTableInit(configId);                        }
+                            data.Dataset.DatasetBundingFileTableInit(configId);
+                        }
                     }
+                });
+            }
+            else {
+                $.ajax({
+                    url: '/Dataset/DetailTab/' + id + '/' + 'DataFiles/LogView',
                 });
             }
         });
