@@ -69,7 +69,6 @@ namespace Sentry.data.Web.Controllers
             if (ModelState.IsValid)
             {
                 model.NotificationId = _notificationService.SubmitNotification(model.ToCore());
-
                 ManageNotificationViewModel vm = new ManageNotificationViewModel()
                 {
                     CanModifyNotifications = _notificationService.CanUserModifyNotifications()

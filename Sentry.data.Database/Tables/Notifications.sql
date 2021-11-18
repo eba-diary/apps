@@ -8,5 +8,6 @@
     [Object_ID] INT NOT NULL, 
     [Severity_TYP] INT NOT NULL, 
     [NotificationType] VARCHAR(20) NOT NULL, 
-    [Title] VARCHAR(250) NULL 
+    [Title] VARCHAR(250) NULL, 
+    [NotificationCategory] INT NULL 
 )

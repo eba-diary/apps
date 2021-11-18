@@ -57,12 +57,23 @@ else
                 </span>
             </div>
         </div>
+        
+        
+        <div class="form-group" id="notificationCategoryContainer">
+            @Html.LabelFor((model) => model.NotificationCategory, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.NotificationCategory, Model.AllNotificationCategories, new { @class = "form-control edit-dataset-row" })
+            </div>
+        </div>
+        
+        
         <div class="form-group">
             @Html.LabelFor((model) => model.MessageSeverity, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.DropDownListFor(model => model.MessageSeverity, Model.AllSeverities, new { @class = "form-control edit-dataset-row" })
             </div>
         </div>
+
         <div class="form-group">
 
             @Html.LabelFor((model) => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })

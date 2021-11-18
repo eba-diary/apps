@@ -15,7 +15,11 @@ namespace Sentry.data.Core
         public virtual int ParentObject { get; set; }
         public virtual string NotificationType { get; set; }
         public virtual string Title { get; set; }
-        
+
+        //NOTE:  NotificationCategory is nullable so notifications without categories 
+        public virtual NotificationCategory? NotificationCategory { get; set; }
+
+
         public virtual string DisplayMessage
         {
             get
