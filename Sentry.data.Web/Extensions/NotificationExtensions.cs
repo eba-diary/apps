@@ -40,7 +40,7 @@ namespace Sentry.data.Web
                 CanEdit = core.CanEdit,
                 Title = core.Title,
                 ObjectType = core.NotificationType,
-                NotificationCategory = (core.NotificationCategory == null)? NotificationCategory.ReleaseNotes : (NotificationCategory)core.NotificationCategory,  
+                NotificationCategory = core.NotificationCategory,  
                 AllNotificationCategories = default(NotificationCategory).ToEnumSelectList()
             };
         }
