@@ -1455,6 +1455,7 @@
          </p>
       </div>
       <!-- Sabrina start -->
+      <!-- is lady wm. cecil a mispelling of another person? -->
       <div xml:id="EBA-1902-03-01" type="entry">
          <dateline>
             <date when="1902-03-01">Saturday, March 1st</date>.
@@ -1466,7 +1467,7 @@
              sent for <persName ref="#Nubia">Nubia</persName> to come on deck and gave her breakfast there.
              Our awnings are all down - everything ready and waiting for wind to drop -
              <persName ref="Carter_Howard">Carter</persName> went off to <placeName ref="Aswan">Aswan</placeName> to
-             inspect one of <persName>Lady Wm.</persName> Cecil's tombs.
+             inspect one of <persName>Lady Wm. Cecil's</persName> tombs.
              <persName ref="#Newberry_Percy">Newberry</persName> came to lunch. <persName ref="#Tytus_Bob">Bob</persName>
              and <persName ref="#Tytus_Mrs">Mrs. Tytus</persName> to say again goodbye! A quiet evening -
              and a nice one!
@@ -1479,8 +1480,8 @@
          <p>
             At 7 o'clock this morning when I heard the men beginning to make ready to start, I drew
              my curtain aside, I found <persName ref="#Nubia">Nubia</persName> sitting on the bank and in
-             a few moments <persName>Achmed</persName>, and <persName>
-            Said</persName>, the black dog, and all waiting sadly to see us off. The river was a
+             a few moments <persName ref="#Achmed">Achmed</persName>, and <persName ref="Said">
+             Said</persName>, the black dog, and all waiting sadly to see us off. The river was a
              mirror, but we had hardly passed the town when a light wind from the north came, and
              then grew stronger, in the face of which we have rowed and floated all day and are
              lying below <placeName>Magadah</placeName> about 2 miles - having made 24 miles. I
