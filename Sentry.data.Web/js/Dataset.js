@@ -1249,6 +1249,11 @@ data.Dataset = {
                     }
                 });
             }
+            else {
+                $.ajax({
+                    url: '/Dataset/DetailTab/' + id + '/' + 'SchemaColumns/LogView',
+                });
+            }
         });
 
         $('#detailTabSchemaAbout').click(function (e) {
@@ -1264,6 +1269,11 @@ data.Dataset = {
                         data.Dataset.UpdateMetadata();
                         ko.applyBindings(self.vm, $('#tabSchemaAbout')[0]);
                     }
+                });
+            }
+            else {
+                $.ajax({
+                    url: '/Dataset/DetailTab/' + id + '/' + 'SchemaAbout/LogView',
                 });
             }
         });
@@ -1284,6 +1294,11 @@ data.Dataset = {
                     }
                 });
             }
+            else {
+                $.ajax({
+                    url: '/Dataset/DetailTab/' + id + '/' + 'DataPreview/LogView',
+                });
+            }
         });
 
         $('#detailTabDataFiles').click(function (e) {
@@ -1302,6 +1317,11 @@ data.Dataset = {
                             data.Dataset.DatasetBundingFileTableInit(configId);
                         }
                     }
+                });
+            }
+            else {
+                $.ajax({
+                    url: '/Dataset/DetailTab/' + id + '/' + 'DataFiles/LogView',
                 });
             }
         });
