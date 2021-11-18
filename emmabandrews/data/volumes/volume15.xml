@@ -546,56 +546,56 @@
         <p><measure type="distance">51 miles</measure>. Passed the bridge at 8 A.M. and then anchored until 25 M. before 11 - allowed the tug to cool. Very hot all day. The sunset was wonderfully beautiful.</p>
       </div>
       <div xml:id="EBA-1908-03-11" type="entry">
-        <dateline><date when="1908-03-11">March 11. Wed. <placeName ref="#Asyut">Asyt.</placeName> <!--nov 12--></date>.</dateline>
-        <p>68 miles. A gale all day - tug on the sand for an hour this morning - afterwards sticking again for 3 hours - arrived in spite of all at <placeName ref="#Assiout">Asy&#251;t</placeName> at 6:30.</p>
+        <dateline><date when="1908-03-11">March 11. Wed. <placeName ref="#Asyut">Asy&#251;t</placeName> <!--nov 12--></date>.</dateline>
+        <p><measure type="distance">68 miles</measure>. A gale all day - tug on the sand for an hour this morning - afterwards sticking again for 3 hours - arrived in spite of all at <placeName ref="#Asyut">Asy&#251;t</placeName> at 6:30.</p>
       </div>
       <div xml:id="EBA-1908-03-12" type="entry">
-        <dateline><placeName ref="#Beni_Hassan">Beni Hassan</placeName> - <date when="1908-03-12">March 12.</date>.</dateline>
-        <p>Thursday. Passed the lock at 8 o'clock, early. The sand is bad in this part of the river - we have to go carefully.</p>
+        <dateline><date when="1908-03-12">March 12. Thursday. <placeName ref="#Bani_Hasan">Beni Hassan</placeName></date>.</dateline>
+        <p>Passed the lock at 8 o'clock, early. The sand is bad in this part of the river - we have to go carefully.</p>
       </div>
       <div xml:id="EBA-1908-03-13" type="entry">
-        <dateline><date when="1908-03-13">March 13.</date>.</dateline>
-        <p>Friday. 60 miles. Started at 6. Stopped at <placeName ref="#Minieh">Minia</placeName>, for mail one hour and 3 hours at <placeName ref="#Sheik_Fadl">Sheik Fadl</placeName> to cool. Rather cool out of the sun.</p>
+        <dateline><date when="1908-03-13">March 13. Friday</date>.</dateline>
+        <p><measure type="distance">60 miles</measure>. Started at 6. Stopped at <placeName ref="#Al_Minya">Minia</placeName>, for mail one hour and 3 hours at <placeName ref="#Sheik_Fadl">Sheik Fadl</placeName> to cool. Rather cool out of the sun.</p>
       </div>
       <div xml:id="EBA-1908-03-14" type="entry">
-        <dateline><placeName ref="#Bedrescheyn">Bedrescheyn</placeName> - <date when="1908-03-14">March 14.</date>.</dateline>
-        <p>Saturday. near <placeName ref="#Bedrescheyn">Bedrescheyn</placeName>. 90 miles. Started again at 6, stopping about 10 to assist a dahabya sticking in the mud, to get off. It proved to be a party from <placeName ref="#Chicago">Chicago</placeName> - <persName ref="#Smith_Mr">Mr. Smith</persName> the father of <persName ref="#Smith_Harold">Harold Smith</persName>.</p>
+        <dateline><date when="1908-03-14">March 14. Saturday. near <placeName ref="#Al_Badrashayn">Bedrescheyn</placeName></date>.</dateline>
+        <p><measure type="distance">90 miles</measure>. Started again at 6, stopping about 10 to assist a dahabya sticking in the mud, to get off. It proved to be a party from <placeName ref="#Chicago">Chicago</placeName> - <persName ref="#Smith_Mr">Mr. Smith</persName> the father of <persName ref="#Smith_Harold">Harold Smith</persName>.</p>
       </div>
       <div xml:id="EBA-1908-03-15" type="entry">
-        <dateline><date when="1908-03-15">March 15.</date>.</dateline>
-        <p>2nd Sunday in Lent. Arrived at the <placeName ref="#Ghezireh_Bridge">Ghezireh bridge</placeName> at 11 A.M. having made our 450 miles from <placeName ref="#Luxor">Luxor</placeName> in 7 days. <persName ref="#Fielding_Lord">Lord Fielding</persName> dined with us.</p>
+        <dateline><date when="1908-03-15">March 15. 2nd Sunday in <name type="event" ref="#Lent">Lent</name></date>.</dateline>
+        <p>Arrived at the <placeName ref="#Ghezireh_Bridge">Ghezireh bridge</placeName> at 11 A.M. having made our <measure type="distance">450 miles</measure> from <placeName ref="#Luxor">Luxor</placeName> in 7 days. <persName ref="#Fielding_Lord">Lord Fielding</persName> dined with us.</p>
       </div>
       <div xml:id="EBA-1908-03-16" type="entry">
-        <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-16">March 16.</date>.</dateline>
-        <p>Came to our old place at the <name type="hotel" ref="#Ghezireh_Palace_Hotel">Ghezireh Palace</name> this A.M. Spent the morning at the <orgName ref="#Boulaq_Museum">Museum</orgName> and and had tea with the <persName ref="#Iddings_Mr #Iddings_Mrs">Iddings</persName> in the afternoon. A visit from <persName ref="#Fraser_Mr #Fraser_Mrs">Mr. and Mrs. Fraser</persName> this evening.</p>
+        <dateline><date when="1908-03-16">March 16. <placeName ref="#Cairo">Cairo</placeName></date>.</dateline>
+        <p>Came to our old place at the <!--hotel, placename, historical?--> <name type="hotel" ref="#Ghezireh_Palace_Hotel">Ghezireh Palace</name> this A.M. Spent the morning at the <orgName ref="#Boulaq_Museum">Museum</orgName> and and had tea with the <persName ref="#Iddings_Mr #Iddings_Mrs">Iddings</persName> in the afternoon. A visit from <persName ref="#Fraser_Mr #Fraser_Mrs">Mr. and Mrs. Fraser</persName> this evening.</p>
       </div>
       <div xml:id="EBA-1908-03-17" type="entry">
-        <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-17">March 17th.</date>.</dateline>
-        <p>Tuesday. <persName ref="#Lyons_Capt #Lyons_Mrs">Capt. Lyons and Mrs. Lyons</persName> and <persName ref="#Iddings_Mr #Iddings_Mrs">Mr. and Mrs. Iddings</persName> came this A.M. to see the find. We took all the things to the <orgName ref="#Boulaq_Museum">Museum</orgName> this morning. A good riddance.</p>
+        <dateline><date when="1908-03-17">March 17th. Tuesday</date>.</dateline>
+        <p><persName ref="#Lyons_Capt #Lyons_Mrs">Capt. Lyons and Mrs. Lyons</persName> and <persName ref="#Iddings_Mr #Iddings_Mrs">Mr. and Mrs. Iddings</persName> came this A.M. to see the find. We took all the things to the <orgName ref="#Boulaq_Museum">Museum</orgName> this morning. A good riddance.</p>
       </div>
       <div xml:id="EBA-1908-03-18" type="entry">
-        <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-18">March 18th.</date>.</dateline>
-        <p>Wednesday. Morning at <orgName ref="#Boulaq_Museum">Museum</orgName> - afternoon driving and visiting.</p>
+        <dateline><date when="1908-03-18">March 18th. Wednesday</date>.</dateline>
+        <p>Morning at <orgName ref="#Boulaq_Museum">Museum</orgName> - afternoon driving and visiting.</p>
       </div>
       <div xml:id="EBA-1908-03-19" type="entry">
-        <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-19">March 19th.</date>.</dateline>
-        <p>Thursday. We were again at the <orgName ref="#Boulaq_Museum">Museum</orgName> this morning. Dinner at the <persName ref="#Iddings_Mr #Iddings_Mrs">Iddings</persName> where we met some pleasant people: <persName ref="#Farnell_Mr #Farnell_Miss">Mr. and Miss Farnell</persName> - <persName ref="#Skifeuton_Smythe_Major">Major Skifeuton</persName> - Smythe - <persName ref="#Beard_Sir_John">Sir John Beard</persName> and daughter, <persName ref="#Bathhurst_Lady">Lady Bathhurst</persName> and others.</p>
+        <dateline><date when="1908-03-19">March 19th. Thursday</date>.</dateline>
+        <p>We were again at the <orgName ref="#Boulaq_Museum">Museum</orgName> this morning. Dinner at the <persName ref="#Iddings_Mr #Iddings_Mrs">Iddings</persName> where we met some pleasant people: <persName ref="#Farnell_Mr #Farnell_Miss">Mr. and Miss Farnell</persName> - <persName ref="#Skifeuton_Smyth_Major">Major Skifeuton-Smythe</persName> - <persName ref="#Beard_John_Sir">Sir John Beard</persName> and daughter, <persName ref="#Bathhurst_Lady">Lady Bathhurst</persName> and others.</p>
       </div>
       <div xml:id="EBA-1908-03-20" type="entry">
-        <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-20">March 20th.</date>.</dateline>
-        <p>Friday. Driving and shopping this morning - <persName ref="#Watson_Major">Major Watson</persName> called this afternoon.</p>
+        <dateline><date when="1908-03-20">March 20th. Friday</date>.</dateline>
+        <p>Driving and shopping this morning - <persName ref="#Watson_Major">Major Watson</persName> called this afternoon.</p>
       </div>
       <div xml:id="EBA-1908-03-21" type="entry">
-        <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-21">March 21st.</date>.</dateline>
-        <p>Saturday. Lunched at the <placeName ref="#British_Embassy">British Embassy</placeName> - a charming visit - <persName ref="#Gorst_John_Eldon_Sir">Sir Eldon</persName> was particularly interesting and agreeable. <persName ref="#Gorst_Lady">Lady Gorst</persName>, very pretty, chic and pleasant. <persName ref="#Hall_Caine_Mr">Mr. Hall Caine</persName> and his wife were there among others.</p>
+        <dateline><date when="1908-03-21">March 21st. Saturday</date>.</dateline>
+        <p>Lunched at the <orgName ref="#British_Embassy">British Embassy</orgName> - a charming visit - <persName ref="#Gorst_John_Eldon_Sir">Sir Eldon</persName> was particularly interesting and agreeable. <persName ref="#Gorst_Lady">Lady Gorst</persName>, very pretty, chic and pleasant. <persName ref="#Hall_Caine_Mr">Mr. Hall Caine</persName> and <persName ref="#Hall_Caine_Mrs">his wife</persName> were there among others.</p>
       </div>
       <div xml:id="EBA-1908-03-22" type="entry">
-        <dateline><placeName ref="#Cairo">Cairo.</placeName> - <date when="1908-03-22">March 22nd.</date>.</dateline>
-        <p>3rd Sunday in Lent. We have been staying at the <name type="hotel" ref="#Ghezireh_Palace_Hotel">Ghezireh Palace Hotel</name> since Thursday. Rain all day. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> dined with us.</p>
+        <dateline><date when="1908-03-22">March 22nd. 3rd Sunday in <name type="event" ref="#Lent">Lent</name></date>.</dateline>
+        <p>We have been staying at the <name type="hotel" ref="#Ghezireh_Palace_Hotel">Ghezireh Palace Hotel</name> since Thursday. Rain all day. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> dined with us.</p>
       </div>
       <div xml:id="EBA-1908-03-23" type="entry">
-        <dateline><placeName ref="#Cairo">Cairo</placeName>. - <date when="1908-03-23">March 23rd.</date>.</dateline>
-        <p>Monday. Very busy. Our last day. Went in the afternoon to <persName ref="#Pasha_Artin_Madame">Madame Artin Pashat</persName> to tea - interesting. <persName ref="#Dalison_Max_Mr">Mr. Dalison</persName> and <persName ref="#Lindon_Smith_Joseph">Joe Smith</persName> dined with us. <persName ref="#Dalison_Max_Mr">Mr. Dalison</persName> has been with us for 2 days, and is crossing with us to <placeName ref="#Naples">Naples</placeName> where we are to spend 3 days. <persName ref="#Carter_Howard">Mr. Carter</persName> came to tea with us this afternoon.</p>
+        <dateline><date when="1908-03-23">March 23rd. Monday</date>.</dateline>
+        <p>Very busy. Our last day. Went in the afternoon to <persName ref="#Artin_Pasha_Madame">Madame Artin Pashat</persName> to tea - interesting. <persName ref="#Dalison_Max">Mr. Dalison</persName> and <persName ref="#Lindon_Smith_Joseph">Joe Smith</persName> dined with us. <persName ref="#Dalison_Max">Mr. Dalison</persName> has been with us for 2 days, and is crossing with us to <placeName ref="#Naples">Naples</placeName> where we are to spend 3 days. <persName ref="#Carter_Howard">Mr. Carter</persName> came to tea with us this afternoon.</p>
       </div>
     </body>
   </text>
