@@ -326,6 +326,7 @@
             <date when="1901-12-13">Friday, Dec. 13</date>. 36 miles. <placeName ref="#Al-Wasta">Wasta</placeName>.
          </dateline>
          <p>
+         <!-- where is winieh? cannot find it on getty or index -->
             An encouraging run - we might have gone on for another hour, but that the
              <persName ref="#von_Bissing_Baron">Baron</persName> had to stop for his mail. He,
              <persName ref="#Davis_Theodore_M">Theodore</persName> and <persName ref="#Buttles_Jeanette">Nettie</persName>,
@@ -343,7 +344,7 @@
       </div>
       <div xml:id="EBA-1901-12-15" type="entry">
          <dateline>
-            Third Sunday in Advent. <date when="1901-12-15">Dec. 15</date>. 5 miles.
+            Third Sunday in <name type="event" ref="Advent">Advent</name>. <date when="1901-12-15">Dec. 15</date>. 5 miles.
          </dateline>
          <p>
             We have tracked, polled and pulled to an anchor most of the day - with helps from
@@ -358,7 +359,7 @@
          </dateline>
          <p>
             With a light wind and much tracking we have come to within 3 miles of
-             <placeName>Benisoef</placeName>.
+             <placeName ref="#Benisoef">Benisoef</placeName>.
          </p>
       </div>
       <div xml:id="EBA-1901-12-17" type="entry">
@@ -375,14 +376,14 @@
          </dateline>
          <p>
             A light wind during the morning, freshening in the afternoon brought us to
-             <persName>Feshn</persName> about two o'clock - where we stopped to get mail for
+             <placeName ref="#Al_Fashn">Feshn</placeName> about two o'clock - where we stopped to get mail for
              <persName ref="#von_Bissing_Baron">v. Bissing</persName> and butter and yeast for ourselves. A lovely day - our new
              little moon makes it quite light enough to sail into the evening.
          </p>
       </div>
       <div xml:id="EBA-1901-12-19" type="entry">
          <dateline>
-            <date when="1901-12-19">Thursday, Dec. 19</date>. 53 miles. <placeName>Minieh</placeName>.
+            <date when="1901-12-19">Thursday, Dec. 19</date>. 53 miles. <placeName ref="#Al_Minya">Minieh</placeName>.
          </dateline>
          <p>
             We are very proud of our record today. The wind has not been strong but fair
@@ -398,16 +399,16 @@
          <p>
             <persName ref="#Jones_Daniel">Jones</persName> went off to the town today before breakfast and came
              back with a crammed mailbag - and a very discouraging mass of newspapers - and
-             with the information that the <orgName>Istar</orgName> is just below us - and that
-             he had gone on board to speak to <persName>Mr. Sayce</persName>. Soon after
-             <persName>Mr. Sayce</persName> himself appeared, looking very well I thought - with
-             dire tales of having broken his rudder near <placeName>Abu Girgeh</placeName>
+             with the information that the <name type="boat" ref="#Istar">Istar</name> is just below us - and that
+             he had gone on board to speak to <persName ref="#Sayce_Archibald">Mr. Sayce</persName>. Soon after
+             <persName ref="#Sayce_Archibald">Mr. Sayce</persName> himself appeared, looking very well I thought - with
+             dire tales of having broken his rudder near <placeName ref="#Jirjā">Abu Girgeh</placeName>
              and having to spend days in getting it repaired. He has
-             <persName>Mr. Ward</persName> the writer on <name>Scarabs</name> and
+             <persName ref="Ward_Mr">Mr. Ward</persName> the writer on Scarabs and
              other topics with him - and <persName ref="#Davis_Theodore_M">Theodore</persName> asked them to come
              into dinner if they should find themselves near us tonight. But we have sailed them
              out of sight, and are now lying about 3 miles above
-             <placeName>Beni Hassan.</placeName> The night is incomparably lovely!
+             <placeName ref="#Bani_Hasan">Beni Hassan</placeName>. The night is incomparably lovely!
          </p>
       </div>
       <div xml:id="EBA-1901-12-21" type="entry">
@@ -415,19 +416,20 @@
             <date when="1901-12-21">Saturday, Dec. 21</date>. 8-1/2 miles.
          </dateline>
          <p>
-            <persName>Rhodah</persName> - with a light wind we have worked hard to
+            <placeName ref="#Rhoda">Rhodah</placeName> - with a light wind we have worked hard to
              reach this place - we did at 6 o'clock - warm and pleasant.
          </p>
       </div>
       <div xml:id="EBA-1901-12-22" type="entry">
          <dateline>
-            <date when="1901-12-22">4th Sunday in Advent - Dec. 22</date>. Rhodah.
+            4th Sunday in <name type="event" ref="Advent">Advent</name> - <date when="1901-12-22">Dec. 22</date>.
+            <placeName ref="#Rhoda">Rhodah</placeName>.
          </dateline>
          <p>
             We are still lying here - there being no wind. We are opposite the town, and at the
-             site of the ancient <placeName>Antinopolis</placeName> and we walked this
+             site of the ancient <placeName ref="#Sheikh_Ibada">Antinopolis</placeName> and we walked this
              morning to its ruins, a short distance away, and saw the columns of
-             <orgName>Ramses's II</orgName> temple, standing deep down in the rubbish.
+             <persName ref="#Rameses_II">Ramses's II</persName> temple, standing deep down in the rubbish.
              The sun was so hot that after climbing about over the mounds of potshords
              <persName ref="#Buttles_Jeanette">Nettie</persName> and I came back to the boat.
              <persName ref="#Davis_Theodore_M">Theodore</persName> and
@@ -440,7 +442,7 @@
          </dateline>
          <p>
             Tracked and polled all the morning, and came in view of a damboah, which turned out
-             to be the "Hafiz" with the <orgName>Christian</orgName> family, under
+             to be the "<name type="boat" ref="">Hafiz</name>" with the <orgName>Christian</orgName> family, under
              <placeName>Salah's</placeName> care. We pulled up a little behind them and
              young <orgName>Christian</orgName> came over for a few moments this evening.
              We gave him all our late papers among which was <persName>President
@@ -556,9 +558,9 @@
          </dateline>
          <p>
             We have made a run of 38 miles &#8211; not leaving <placeName ref="#Asyut">Assiut</placeName> until
-             11 o'clock. The <name>Istar</name> came along at 9 o'clock and pulled up ahead of us.
+             11 o'clock. The <name type="boat" ref="#Istar">Istar</name> came along at 9 o'clock and pulled up ahead of us.
              <persName ref="#Davis_Theodore_M">Theodore</persName> and the <persName ref="#von_Bissing_Baron">Baron</persName> paid a short visit
-             to Mr. <persName>Sayce</persName> and then on donkeys, <persName ref="#Buttles_Jeanette">Nettie</persName>
+             to <persName ref="#Sayce_Archibald">Mr. Sayce</persName> and then on donkeys, <persName ref="#Buttles_Jeanette">Nettie</persName>
              and I in a wretched victoria went into the town to find an antiquity merchant, who
              was not at home. We are near <placeName>Tahtah</placeName> tonight.
          </p>
@@ -800,7 +802,7 @@
              <persName>Carter,</persName> who is Inspector of <placeName>Upper Egypt</placeName>
              has proved himself a most efficient officer - is absolutely fearless - carries no
              arms - and rides about quite unattended at all hours of the night.
-             <persName>Sayce</persName> and his friends <persName>Mr. Ward</persName> dined also
+             <persName ref="#Sayce_Archibald">Sayce</persName> and his friends <persName ref="Ward_Mr">Mr. Ward</persName> dined also
              with us. I think we were all a little tired - for directly after breakfast we had
              started over to the <orgName>Tombs of the Kings</orgName> & I in my chair - in which
              I have had so comfortable a ride, as both donkeys went so well. It proved to be
@@ -854,10 +856,10 @@
          </dateline>
          <p>
             Again cold and windy - I went with <persName>Amelie</persName> to the little church -
-             and heard a short, good sermon from Mr. <persName>Sayce.</persName> I would have
+             and heard a short, good sermon from <persName ref="#Sayce_Archibald">Mr. Sayce</persName>. I would have
              liked my fur cloak. <persName ref="#Newberry_Percy">Newberry</persName> came in the afternoon and stayed
-             to tea. Dr. <placeName>Schweinfurt</placeName> and the
-             <persName ref="#Tytus_Bob">Bob Tytus</persName> - and Mr. <persName>Wallace</persName> came in.
+             to tea. <persName>Dr. Schweinfurt</persName> and the
+             <persName ref="#Tytus_Bob">Bob Tytus</persName> - and <persName>Mr. Wallace</persName> came in.
          </p>
       </div>
       <div xml:id="EBA-1902-01-20" type="entry">
@@ -1137,13 +1139,13 @@
          <p>
             We started with quite a good wind at 7 o'clock this morning - and drew up at
              <placeName>El Kab</placeName> just as we were finishing lunch. Found the
-             <orgName>Istar</orgName> here, on her downward journey, as well as
+             <name type="boat" ref="#Istar">Istar</name> here, on her downward journey, as well as
              <orgName>Parker's</orgName> boat the <name type="boat" ref="#Safa">Sa &#8216;fa</name>.
              <persName>Mr. Somers-Clarke</persName> came over at once, bringing some letters
              for <persName ref="#Quibell_James">Mr. Quibell</persName>, which determined him to leave us and return
              to <placeName ref="#Cairo">Cairo</placeName> the next day. So he went over to stay with
              <persName>Somers-Clarke</persName> the night. So sorry to have him go
-             - <persName>Mr. Sayce</persName> also came and made us a visit - and wanted us
+             - <persName ref="#Sayce_Archibald">Mr. Sayce</persName> also came and made us a visit - and wanted us
              to stop for tea - but the wind was too good - we are about 3 miles above
              <persName>Edfou.</persName>
          </p>
@@ -1288,13 +1290,13 @@
          <p>
             Arrived at 10:30 this morning - a very hot day - the hottest I have ever known on the
              <placeName ref="#Nile">Nile</placeName>. <persName>The Parkers</persName>,
-             <persName>Mr. Sayce</persName>, and <persName>Mr. Somers-Clarke</persName> called.
-             We went to tea with <persName>Mr. Sayce</persName> and then visited the
+             <persName ref="#Sayce_Archibald">Mr. Sayce</persName>, and <persName>Mr. Somers-Clarke</persName> called.
+             We went to tea with <persName ref="#Sayce_Archibald">Mr. Sayce</persName> and then visited the
              <persName>Parkers</persName> on the <name type="boat" ref="#Safa">Sa &#8216;fa</name> - and
-             <placeName>Mr. S.C.</placeName> and <persName>Sayce</persName> dined with us - a
+             <placeName>Mr. S.C.</placeName> and <persName ref="#Sayce_Archibald">Sayce</persName> dined with us - a
              very pleasant evening - and after dinner we sat on deck without an awning - with no
              wraps and found the still, dry, warm air delicious - we saw nothing of
-             <name>El Kab</name> - the day was too hot. <persName>Mr. Sayce</persName> showed
+             <name>El Kab</name> - the day was too hot. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> showed
              us some most interesting little amulets - prehistoric he said - they certainly had the
              name of <orgName>Neb-ka-</orgName> first king of the 3d dynasty.
          </p>
@@ -1414,14 +1416,15 @@
             <date when="1902-02-27">Thursday, Feb. 27</date>.
          </dateline>
          <p>
-            A very warm morning - <persName ref="#Buttles_Jeanette">Nettie</persName> and I went over to the <name>Istar
-            </name> to see Mr. <persName>Sayce</persName> - who is a prisoner with a bad foot. He
+            A very warm morning - <persName ref="#Buttles_Jeanette">Nettie</persName> and I went
+            over to the <name type="boat" ref="#Istar">Istar</name> to
+            see <persName ref="#Sayce_Archibald">Mr. Sayce</persName> - who is a prisoner with a bad foot. He
              fell down the shaft of one of his 12 dynasty tombs at <placeName>El Kab</placeName> the
             other day, and is now in the doctor's hands. Then we stopped at the <name type="boat" ref="#Scarab">
             Scarab</name> to see <persName ref="#Tytus_Mrs">Mrs. Tytus</persName>. The wind was strong
              and air delicous as we rowed up the river again - but as we left the <name type="boat" ref="#Scarab">
             Scarab</name>, it had increased almost to a hurricane , and looking back to where
-             the <orgName>Istar</orgName> is lying opposite <placeName ref="#Luxor">Luxor</placeName>,
+             the <name type="boat" ref="#Istar">Istar</name> is lying opposite <placeName ref="#Luxor">Luxor</placeName>,
              with the <persName>Strange Hathor</persName> and the steamer <name type="">
             Oonas</name> with the <orgName>Schuylers</orgName> on board, we saw them smothered
              in dust and sand - and soon after we got home, the <persName>Oonas</persName> came
@@ -1484,7 +1487,7 @@
              was sorry to leave the splendid <placeName>Theban Mountains</placeName> and
              when at 6 o'clock I looked at them this morning, they were lovely indeed - all
              rose-coloured - the reflection extending almost across the river. The
-             <name>Istar</name> left just before us, and we have been quite close all day -
+             <name type="boat" ref="#Istar">Istar</name> left just before us, and we have been quite close all day -
              she is lying just behind us.
          </p>
       </div>
@@ -1495,8 +1498,8 @@
          <p>
             The weather has been a repetition of yesterday - the distance also - the same delicious
              cool air and hot sun, - the mountains with their etherially lovely heliotrope tints.
-             Spoke to <persName>Mr. Sayce</persName> as we happened to float near the
-             <orgName>Istar</orgName>. He is quite well again - and stopped at
+             Spoke to <persName ref="#Sayce_Archibald">Mr. Sayce</persName> as we happened to float near the
+             <name type="boat" ref="#Istar">Istar</name>. He is quite well again - and stopped at
              <placeName>Keneh</placeName> - we did not, and are now about 4 miles below it.
          </p>
       </div>
@@ -1700,9 +1703,9 @@
          </dateline>
          <p>
             The north wind got up before we did this morning, and we worked hard to make out 6 miles
-            to <placeName>Rhodah</placeName>, then we lingered until this afternoon
+            to <placeName ref="#Rhoda">Rhodah</placeName>, then we lingered until this afternoon
              when we made 6 miles more, are we think within 4-5 miles from
-             <placeName>Beni Hassan</placeName>. A cool day - and not clear.
+             <placeName ref="#Bani_Hasan">Beni Hassan</placeName>. A cool day - and not clear.
          </p>
       </div>
       <div xml:id="EBA-1902-03-19" type="entry">
@@ -1712,7 +1715,7 @@
          <p>
             From 6 o'clock until 9:30 we had 3 hours and a half of good rowing - since then the
              wind has been blowing "like the debbil" as <persName>Salah</persName> says.
-             Passed <persName>Beni Hassan</persName> late this P.M.
+             Passed <placeName ref="#Bani_Hasan">Beni Hassan</placeName> late this P.M.
          </p>
       </div>
       <div xml:id="EBA-1902-03-20" type="entry">
@@ -1772,7 +1775,7 @@
             <date when="1902-03-24">Monday, Mar. 24</date>. 22 miles.
          </dateline>
          <p>
-            We reached <placeName>Benisoef</placeName> at 1 o'clock - in a towering heat
+            We reached <placeName ref="#Benisoef">Benisoef</placeName> at 1 o'clock - in a towering heat
              - everything still and burning - we pulled up and sent <persName ref="#Jones_Daniel">
             Jones</persName> and a sailor in the town for <persName ref="#Quibell_Annie_Pirie">Mrs.
              Quibell</persName> and in about an hour they arrived. We were so glad to have her at
@@ -1855,6 +1858,7 @@
             <date when="1902-04-01">Tuesday, April 1st</date>.
          </dateline>
          <p>
+         <!-- beduin seems to be a group of nomadic people? but emma refers to it as something she's on? -->
             This is our last evening on the dear, comfortable <name type="boat" ref="#Beduin">Beduin</name>
              this year. For tomorrow we move over to the <name type="hotel" ref="#Ghezireh_Palace_Hotel">
             Ghezireh Palace Hotel</name> to stay until we go away - it has been a busy day.
@@ -1932,7 +1936,7 @@
             Quibells</persName>. <persName ref="#von_Bissing_Baron">v. Bissing</persName> came to dine
              and stayed late. This morning we went with him to see the new Museum - which looks
              like a good station more than a Museum - a hideous failure.
-             <persName>Mr. Sayce</persName> lunched with us.
+             <persName ref="#Sayce_Archibald">Mr. Sayce</persName> lunched with us.
          </p>
       </div>
       <div xml:id="EBA-1902-04-06" type="entry">
@@ -2243,10 +2247,10 @@
              <orgName>Viscontis</orgName> and <placeName>Sforzas</placeName>
              - enormously interesting - I saw for the first time the beautiful monument of
              <placeName>Caston de Foix</placeName> - and so many charming and
-             interesting sculptures - afterwards we had a drive. <persName>Mr.
+             interesting sculptures - afterwards we had a drive. <persName ref="#Sayce_Archibald">Mr.
              Sayce</persName> who came here the same day we did, called soon after breakfast - and
              came to dine. This morning it rained and was cold, and I stayed at home, with
-             <persName>Mary</persName>, who is not very well. <persName>Mr.
+             <persName>Mary</persName>, who is not very well. <persName ref="#Sayce_Archibald">Mr.
              Sayce</persName> came in to say goodbye - and sat some time - we started soon after
              for <placeName>London</placeName>. <persName>Marie Gwynne</persName>
              came to lunch - and went out with <persName ref="#Davis_Theodore_M">Theodore</persName> and
