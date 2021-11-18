@@ -629,7 +629,7 @@ namespace Sentry.data.Core
                 }
 
                 //Delete associated retriever jobs
-                _jobService.DeleteJobByDataFlowId(dataFlowId);
+                _jobService.DeleteJobByDataFlowId(dataFlowId, deleteIssuerId:userId);
 
                 if (commitChanges)
                 {

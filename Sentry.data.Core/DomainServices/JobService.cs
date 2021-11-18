@@ -330,6 +330,24 @@ namespace Sentry.data.Core
                     //Mark job as deleted
                     job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
                     job.IsEnabled = false;
+
+
+                    /************************************************
+                     * During conversion for CLA3332, performing dataflow deletes will not do 
+                     *  through Logical delete first, therefore, some of the 
+                     *  values (DeleteIssuer, DeleteIssueDTM) need to be set within this else block. 
+                    ************************************************/
+                    if (string.IsNullOrEmpty(job.DeleteIssuer))
+                    {
+                        job.DeleteIssuer =  !string.IsNullOrEmpty(deleteIssuerId) ? deleteIssuerId: _userService.GetCurrentUser().AssociateId;
+                    }
+                    
+                    //Only comparing date since the milliseconds percision are different, therefore, never evaluates true
+                    //  https://stackoverflow.com/a/44324883
+                    if (DateTime.MaxValue.Date == job.DeleteIssueDTM.Date)
+                    {
+                        job.DeleteIssueDTM = DateTime.Now;
+                    }
                 }
             }
             catch (Exception ex)
