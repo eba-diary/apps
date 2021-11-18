@@ -56,7 +56,6 @@ namespace Sentry.data.Core
             }
             else
             {
-                //int objectId = int.Parse(notificationId.Split('_')[1]);
                 model = _domainContext.Notification.FirstOrDefault(x => x.NotificationId == notificationId).ToModel();
             }
             return model;
@@ -73,7 +72,6 @@ namespace Sentry.data.Core
         public int SubmitNotification(NotificationDto dto)
         {
             Notification notification = null;
-
             bool addNotification = true;
 
             if (dto.NotificationId == 0)
@@ -93,14 +91,38 @@ namespace Sentry.data.Core
                 notification.NotificationType = dto.NotificationType;
                 notification.ParentObject = int.Parse(dto.ObjectId);
                 notification.Title = dto.Title;
-                notification.NotificationCategory = dto.NotificationCategory;
-
                 addNotification = false;
             }
+
+            //OVERRIDE NotificationCategory TO NULL IF NOT DSC NOTIFICATION
+            if (!IsNotificationDSC(dto))
+            {
+                notification.NotificationCategory = null;
+            }
+            else
+            {
+                notification.NotificationCategory = dto.NotificationCategory;
+            }
+
 
             _domainContext.SaveChanges();
             CreateEvent(addNotification, notification);
             return dto.NotificationId;
+        }
+
+        //CHECK IF PASSED in NOTIFICATION IS DSC OR NOT
+        private bool IsNotificationDSC(NotificationDto dto)
+        {
+            bool isNotificationDSC = false;
+            if (dto.NotificationType != null 
+                && dto.ObjectId != null 
+                && dto.NotificationType == GlobalConstants.Notifications.BUSINESSAREA_TYPE 
+                && int.Parse(dto.ObjectId) == (int)BusinessAreaType.DSC)
+            {
+                isNotificationDSC = true;
+            }
+
+            return isNotificationDSC;
         }
 
         public void AutoExpire(int notificationId)

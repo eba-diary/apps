@@ -9,6 +9,7 @@ namespace Sentry.data.Core
 
         public static NotificationDto ToModel(this Notification core)
         {
+            //NOTE:  MVC RAZOR engine did not like null NotificationCategory when supplying this to RAZOR drop down since NotificationCategory can be NULL in DB for anything thats not DSC
             NotificationDto model = new NotificationDto()
             {
                 CreateUser = core.CreateUser,
@@ -22,7 +23,7 @@ namespace Sentry.data.Core
                 NotificationType = core.NotificationType,
                 ObjectId = core.NotificationType + "_" + core.ParentObject.ToString(),
                 Title = core.Title,
-                NotificationCategory = core.NotificationCategory
+                NotificationCategory = (core.NotificationCategory == null)? GlobalEnums.NotificationCategory.ReleaseNotes : (Sentry.data.Core.GlobalEnums.NotificationCategory) core.NotificationCategory
             };
 
             return model;

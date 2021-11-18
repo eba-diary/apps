@@ -22,6 +22,7 @@ namespace Sentry.data.Web
                 AreaList.Add(new SelectListItem { Text = item.Name, Value = Core.GlobalConstants.Notifications.BUSINESSAREA_TYPE + "_" + item.Id });
             }
 
+            //NOTE:  MVC RAZOR engine did not like null NotificationCategory when supplying this to RAZOR drop down since NotificationCategory can be NULL in DB for anything thats not DSC
             return new NotificationModel()
             {
                 AllDataAssets = AreaList,
@@ -39,7 +40,7 @@ namespace Sentry.data.Web
                 CanEdit = core.CanEdit,
                 Title = core.Title,
                 ObjectType = core.NotificationType,
-                NotificationCategory = core.NotificationCategory,
+                NotificationCategory = (core.NotificationCategory == null)? NotificationCategory.ReleaseNotes : (NotificationCategory)core.NotificationCategory,  
                 AllNotificationCategories = default(NotificationCategory).ToEnumSelectList()
             };
         }
