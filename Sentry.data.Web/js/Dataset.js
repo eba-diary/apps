@@ -1262,6 +1262,7 @@ data.Dataset = {
                     success: function (view) {
                         $('#tabSchemaAbout').html(view);
                         data.Dataset.UpdateMetadata();
+                        ko.applyBindings(self.vm, $('#tabSchemaAbout')[0]);
                     }
                 });
             }
@@ -1306,6 +1307,11 @@ data.Dataset = {
         });
 
 
+        var tab = data.Dataset.urlParam("tab");
+        if (tab == undefined) {
+            tab = 'SchemaAbout';
+        }
+        $('#detailTab' + tab).trigger('click');
     },
 
     CancelLink: function (id) {
@@ -2091,6 +2097,16 @@ data.Dataset = {
             $('div#DatasetFormContent #NamedEnvironmentPartial').html(result);
             data.Dataset.initNamedEnvironmentEvents();
         });
+    },
+
+    urlParam(name) {
+        var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+        if (results == null) {
+            return null;
+        }
+        else {
+            return results[1] || 0;
+        }
     }
 
 
