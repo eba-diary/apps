@@ -595,7 +595,7 @@ data.Dataset = {
                     if (obj.length > 0) {
 
                         //pass data returned from AJAX call to render Data Table
-                        renderTable_v2(obj, false);
+                        data.Dataset.renderTable_v2(obj, false);
 
                         $('#dataSection').show();
                         self.vm.DataLoading(false);
@@ -1288,7 +1288,7 @@ data.Dataset = {
                     success: function (view) {
                         $('#tabDataPreview').html(view);
                         if (self.vm.ShowDataFileTable()) {
-                            this.renderDataPreview();
+                            data.Dataset.renderDataPreview();
                         }
                     }
                 });
