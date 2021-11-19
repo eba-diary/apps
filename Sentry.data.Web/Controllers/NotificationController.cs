@@ -190,11 +190,11 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        //method called by Notification.js to get notification message from DB so JS can decode it and load Quill
+        //method called by Notification.js to get notification title and message from DB so JS can decode it and load Quill
         public JsonResult GetQuillContents(int notificationId)
         {
             NotificationModel model = _notificationService.GetNotificationModelForModify(notificationId).ToWeb();
-            JsonResult result = Json(new { data = model.Message }, JsonRequestBehavior.AllowGet);
+            JsonResult result = Json(new { message = model.Message, title = model.Title }, JsonRequestBehavior.AllowGet);
             return result;
         }
 

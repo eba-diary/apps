@@ -84,8 +84,6 @@ namespace Sentry.data.Core
         /// <param name="stepEvent"></param>
         /// <exception cref="ArgumentException"></exception>
         void RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent);
-        bool SasAddOrUpdateNotification(int schemaId, int revisionId, string initiatorId, JObject changeIndicator, string externalSystemIndictator);
-        bool SasDeleteNotification(int schemaId, string initiatorId, string externalSystemIndictator);
         /// <summary>
         /// 
         /// </summary>

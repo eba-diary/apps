@@ -15,7 +15,8 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public string StorageCode { get; set; }
         public string Format { get; set; }
         public bool CurrentView { get; set; }
-        public bool IsInSAS { get; set; }
+        //CLA-3306: We are removing IsInSAS from the UI and DSC model. However, the API still exposes this, so we are defaulting to false to maintain the API.
+        public bool IsInSAS { get; set; } = false;
         public string Delimiter { get; set; }
         public bool HasHeader { get; set; }
         public bool IsTrackableSchema { get; set; }
@@ -33,5 +34,8 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public string ObjectStatus { get; set; }
         public string[] SchemaRootPath { get; set; }
         public bool HasDataFlow { get; set; }
+        public string ParquetStorageBucket { get; set; }
+        public string ParquetStoragePrefix { get; set; }
+        public string SnowflakeStage { get; set; }
     }
 }

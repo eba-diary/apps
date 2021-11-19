@@ -322,6 +322,18 @@
             }
         }
 
+        public static class AwsBuckets
+        {
+            public const string HR_DATASET_BUCKET_AE2 = "sentry-<saidkeycode>-<namedenvironment>-hrdataset-ae2";
+            public const string BASE_DATASET_BUCKET_AE2 = "sentry-<saidkeycode>-<namedenvironment>-dataset-ae2";
+        }
+
+        public static class SaidAsset
+        {
+            public const string DATA_LAKE_STORAGE = "DLST";
+            public const string DSC = "DATA";
+        }
+
         public static class DataFlowGuidConfiguration
         {
             public const string GUID_CULTURE = "en-US";
@@ -331,6 +343,12 @@
         public static class DocumentationLinks
         {
             public const string SCHEMA_ROOT_PATH_USAGE = "https://confluence.sentry.com/display/CLA/Schema+Root+Path+Option";
+        }
+
+        public static class SnowflakeStageNames
+        {
+            public const string DATASET_STAGE = "SENTRY_DATASET";       //OLD STAGE NAME
+            public const string PARQUET_STAGE = "DLST_PARQUET";         //NEW STAGE NAME
         }
     }
 }

@@ -13,6 +13,7 @@ using Sentry.data.Core.Interfaces;
 using Polly.Registry;
 using Sentry.data.Infrastructure.PollyPolicies;
 using System;
+using Hangfire;
 
 namespace Sentry.data.Infrastructure
 {
@@ -116,6 +117,7 @@ namespace Sentry.data.Infrastructure
                 );
             registry.For<Sentry.Web.CachedObsidianUserProvider.IObsidianUserProvider>().Singleton().Use(obsidianUserProvider);
 
+            registry.For<IDataFeatures>().Singleton().Use<FeatureFlags.DataFeatures>();
             registry.For<IAssociateInfoProvider>().Singleton().Use<AssociateInfoProvider>();
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
             registry.For<ISASService>().Singleton().Use<SASServiceProvider>();
@@ -124,6 +126,10 @@ namespace Sentry.data.Infrastructure
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
             registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
             registry.For<RestSharp.IRestClient>().Use(() => new RestSharp.RestClient()).AlwaysUnique();
+
+            // Choose the parameterless constructor.
+            registry.For<IBackgroundJobClient>().Singleton().Use<BackgroundJobClient>().SelectConstructor(() => new BackgroundJobClient());
+
 
             //establish generic httpclient singleton to be used where needed across the application
             var client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });

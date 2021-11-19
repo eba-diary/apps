@@ -2,8 +2,8 @@
     background-color: #fff;
     padding: 9px 15px;
     font-size: 16px;
-    min-height: 362px;
     margin-bottom: 50px;
+   
 }
 
     #favoritePanel .display-table .display-tablecell {
@@ -19,6 +19,13 @@
         #favoritePanel .display-table .display-tablecell a {
             color: #003da5;
         }
+
+
+.favorite-add-scroll {
+    overflow-y: auto;
+    max-height: 210px;
+}
+
 
 #edit-favorites-icon {
     font-size: 23px;

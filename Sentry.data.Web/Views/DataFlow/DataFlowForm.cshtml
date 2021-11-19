@@ -11,6 +11,7 @@
 
         @Html.HiddenFor(x => x.DataFlowId);
         @Html.HiddenFor(x => x.StorageCode);
+        @Html.HiddenFor(x => x.CreatedBy);
 
         <div id="dataflow-home-wrapper" class="col-md-12 col-lg-12">
             <div class="dataflow-home-photo bg-photo-dataflow ic">
@@ -152,7 +153,7 @@
     <script type="text/javascript">
         $(function () {
             data.DataFlow.CLA3332_ConsolidatedDataFlows = @Model.CLA3332_ConsolidatedDataFlows.ToString().ToLower();
-            data.DataFlow.DataFlowFormInit();
+            data.DataFlow.DataFlowFormInit(@Model.SelectedDataset, @Model.SelectedSchema);
 
             @if (!Model.CLA3332_ConsolidatedDataFlows) {
                 <text>

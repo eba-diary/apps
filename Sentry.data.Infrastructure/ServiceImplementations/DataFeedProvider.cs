@@ -70,7 +70,7 @@ namespace Sentry.data.Infrastructure
             {
                 Sentry.Common.Logging.Logger.Debug($"Feed Url: {feed.Url}");
 
-                string uri = Configuration.Config.GetHostSetting("SentryWebProxyHost");
+                string uri = Configuration.Config.GetHostSetting("WebProxyUrl");
 
                 //https://stackoverflow.com/questions/124932/xmldocument-loadurl-through-a-proxy
                 WebProxy wp = new WebProxy(uri);
@@ -107,13 +107,15 @@ namespace Sentry.data.Infrastructure
 
         public IList<DataFeedItem> SentryEvents()
         {
-            List<DataFeedItem> items = new List<DataFeedItem>();
-            var events = Query<Event>().Where(x => x.Dataset != null && x.EventType.Description == "Created Dataset").OrderByDescending(x => x.TimeCreated).Take(50);
 
+            //LAZER NOTE: none of this code is called if CLA2838_DSC_ANOUNCEMENTS is false
+            //STEP #1 CREATE BLANK LIST OF DataFeedItems
+            List<DataFeedItem> items = new List<DataFeedItem>();
+
+            //STEP #2  GRAB ALL SENTRY DATASET EVENTS
             var dsEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Dataset")).OrderByDescending(x => x.TimeCreated).Take(50);
 
-            //|| x.EventType.Description == "Created Report"
-
+            //STEP #3 CREATE DataFeedItems
             foreach (Event e in dsEvents)
             {
                 Dataset ds = Query<Dataset>().Where(y => y.DatasetId == e.Dataset).FetchMany(x=> x.DatasetCategories).FirstOrDefault();
@@ -132,13 +134,13 @@ namespace Sentry.data.Infrastructure
                 }                
             }
 
+            //STEP #3  GRAB ALL SENTRY BI EVENTS
             var rptEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Report")).OrderByDescending(x => x.TimeCreated).Take(50);
-
             foreach (Event e in rptEvents)
             {
                 Dataset ds = Query<Dataset>().FirstOrDefault(y => y.DatasetId == e.Dataset);
-                
-                if(ds != null)
+
+                if (ds != null)
                 {
                     DataFeedItem dfi = new DataFeedItem(
                     e.TimeCreated,

@@ -19,6 +19,8 @@ namespace Sentry.data.Web
             IsPreProcessingRequired = false;
             RetrieverJob = new JobModel();
             ObjectStatus = ObjectStatusEnum.Active;
+            SelectedDataset = 0;
+            SelectedSchema = 0;
         }
 
         [System.ComponentModel.DataAnnotations.Required]
@@ -73,6 +75,10 @@ namespace Sentry.data.Web
         [DisplayName("Named Environment Type")]
         [System.ComponentModel.DataAnnotations.Required]
         public NamedEnvironmentType NamedEnvironmentType { get; set; }
+        //[Range(1, int.MaxValue, ErrorMessage = "Please Select a Dataset")]
+        public int SelectedDataset { get; set; }
+        //[Range(1, int.MaxValue, ErrorMessage = "Please Select a Schema")]
+        public int SelectedSchema { get; set; }
 
         public IEnumerable<SelectListItem> CompressionDropdown { get; set; }
         public IEnumerable<SelectListItem> PreProcessingRequiredDropdown { get; set; }

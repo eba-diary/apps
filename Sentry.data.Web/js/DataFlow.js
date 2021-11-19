@@ -1,8 +1,13 @@
 ﻿data.DataFlow = {
 
     CLA3332_ConsolidatedDataFlows: false,
+    Orig_Dataset_Selection: 0,
+    Orig_Schema_Selection: 0,
 
-    DataFlowFormInit: function () {
+    DataFlowFormInit: function (datasetId, schemaId) {
+
+        data.DataFlow.Orig_Dataset_Selection = datasetId;
+        data.DataFlow.Orig_Schema_Selection = schemaId;
 
         data.DataFlow.InitIngestionType();
 
@@ -82,7 +87,7 @@
             });
         });
         
-        data.DataFlow.InitSchemaMaps();
+        data.DataFlow.InitSchemaMaps(datasetId, schemaId);
 
         data.Job.FormInit();
     },
@@ -300,9 +305,9 @@
     PopulateSchemas(datasetId, schemaId, targetElement) {
         var scmSpinner = $(targetElement).parent().parent().find('.schemaSpinner');
         var createSchemaLink = targetElement.parent().parent().find('#CreateSchema');
-        if (datasetId !== null && datasetId !== "0") {
-            var curVal = targetElement.val();
-            $.getJSON("/api/v2/metadata/dataset/" + datasetId + "/schema", function (result) {
+        if (datasetId !== null && datasetId !== 0) {
+            var curVal = schemaId;
+            $.getJSON("/api/v2/metadata/dataset/" + String(datasetId) + "/schema", function (result) {
                 var subItems;
 
                 //Filter for only ACTIVE schema
@@ -311,9 +316,10 @@
                 });
 
                 //If feature flag is enabled, only show schemas that don't have a DataFlow
+                // or SchemaId matches the original schema selection
                 if (data.DataFlow.CLA3332_ConsolidatedDataFlows) {
                     filter = filter.filter(function (item) {
-                        return item.HasDataFlow === false;
+                        return item.SchemaId === data.DataFlow.Orig_Schema_Selection || item.HasDataFlow === false;
                     });
                 }
 
@@ -406,15 +412,21 @@
             $('[id$=__SelectedDataset]').each(function (index) {
                 var cur = $(this);
                 var dsSpinner = cur.parent().find('.datasetSpinner');
-                var curVal = cur.val();
+                if (data.DataFlow.CLA3332_ConsolidatedDataFlows) {
+                    var curVal = datasetId;
+                }
+                else {
+                    var curVal = parseInt(cur.val());
+                }
+
 
                 dsSpinner.html('');
                 cur.html(newSubItems);
 
                 var curRow = cur.parent().parent();
-                if (curVal === null || curVal === undefined) {
+                if (curVal === null || curVal === undefined || isNaN(curVal)) {
                     $(this).val(0);
-                    data.DataFlow.PopulateSchemas("0", schemaId, curRow.find("[id$=__SelectedSchema]"));
+                    data.DataFlow.PopulateSchemas(0, schemaId, curRow.find("[id$=__SelectedSchema]"));
                 }
                 else {
                     cur.val(curVal);

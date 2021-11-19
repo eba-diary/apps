@@ -58,7 +58,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 });
                 Property(x => x.Delimiter, m => m.Column("Delimiter"));
                 Property(x => x.HasHeader, m => m.Column("HasHeader"));
-                Property(x => x.IsInSAS, m => m.Column("IsInSAS"));
                 Property(x => x.CreateCurrentView, m => m.Column("CreateCurrentView"));
                 Property(x => x.SasLibrary, m => m.Column("SASLibrary"));
                 Property(x => x.HiveTable, m => m.Column("HiveTable"));
@@ -71,6 +70,9 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 Property(x => x.SnowflakeSchema, m => m.Column("SnowflakeSchema"));
                 Property(x => x.SnowflakeStatus, m => m.Column("SnowflakeStatus"));
                 Property(x => x.SchemaRootPath, m => m.Column("SchemaRootPath"));
+                Property(x => x.ParquetStorageBucket);
+                Property(x => x.ParquetStoragePrefix);
+                Property(x => x.SnowflakeStage);
             }
         }
     }

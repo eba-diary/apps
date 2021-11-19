@@ -64,20 +64,31 @@ else
             </div>
         </div>
         <div class="form-group">
+
             @Html.LabelFor((model) => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+            
+            
             <div class="col-md-10">
-                @Html.TextBoxFor((model) => model.Title, new { @class = "form-control edit-dataset-row" })
+
+                <!-- Quill editor container -->
+                <div id="quillEditorTitle"> </div>
+
+                <!-- Bogus TextArea to store Title which will be the encoded version saved to DB, notification.js will copy an encoded version here upon submit button -->
+                @Html.TextAreaFor((model) => model.Title, htmlAttributes: new { @class = "quillTitleEncoded", @style = "display:none" })
+
             </div>
+        
         </div>
         
         <div class="form-group" id="messageContainer">
             @Html.LabelFor((model) => model.Message, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 <!-- Quill editor container -->
-                    <div id="editor"> </div>
+                <div id="quillEditorMessage"> </div>
            
                 <!-- Bogus TextArea which will hold encoded message too be saved to DB, notification.js will copy an encoded version here upon submit button -->
-                @Html.TextAreaFor((model) => model.Message, htmlAttributes: new { @class = "messageEncoded", @style = "display:none" })
+                @Html.TextAreaFor((model) => model.Message, htmlAttributes: new { @class = "quillMessageEncoded", @style = "display:none" })
+
             </div>
         </div>
         

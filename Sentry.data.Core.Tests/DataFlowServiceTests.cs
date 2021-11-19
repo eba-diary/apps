@@ -8,11 +8,16 @@ using System.Threading.Tasks;
 using Sentry.FeatureFlags.Mock;
 using Sentry.FeatureFlags;
 using Sentry.data.Core.Exceptions;
+using System;
+using System.Collections.Generic;
+using Hangfire;
+using Hangfire.Common;
+using Hangfire.States;
 
 namespace Sentry.data.Core.Tests
 {
     [TestClass]
-    public class DataFlowServiceTests
+    public class DataFlowServiceTests : BaseCoreUnitTest
     {
         /// <summary>
         /// - Test that the DataFlowService.Validate() method correctly identifies a duplicate DataFlow name
@@ -30,7 +35,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, quartermasterService.Object, null);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, quartermasterService.Object, null, null);
             var dataFlow = new DataFlowDto() { Name = "Foo" };
 
             // Act
@@ -56,7 +61,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, quartermasterService.Object, null);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, quartermasterService.Object, null, null);
             var dataFlow = new DataFlowDto() { Name = "Bar", NamedEnvironment = "TEST", NamedEnvironmentType = GlobalEnums.NamedEnvironmentType.NonProd };
 
             // Act
@@ -741,41 +746,176 @@ namespace Sentry.data.Core.Tests
         }
 
         #endregion
-    }
 
-    public class MockDataFeatures : IDataFeatures
-    {
+        [TestMethod]
+        public void DataFlowService_UpgradeDataFlow_Invalid_DataFlow_Id()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataflow = new DataFlow()
+            {
+                Id = 1
+            };
+            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
 
-        public IFeatureFlag<bool> CLA3240_UseDropLocationV2 { get; } = new MockBooleanFeatureFlag(false);
 
-        public IFeatureFlag<bool> Remove_Mock_Uncompress_Logic_CLA_759 => throw new System.NotImplementedException();
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null, null);
 
-        public IFeatureFlag<bool> Remove_ConvertToParquet_Logic_CLA_747 => throw new System.NotImplementedException();
+            //Act
+            Assert.ThrowsException<DataFlowNotFound>(() => dataflowService.UpgradeDataFlow(2));
+        }
 
-        public IFeatureFlag<bool> Remove_Mock_GoogleAPI_Logic_CLA_1679 => throw new System.NotImplementedException();
+        [TestMethod]
+        public void DataFlowService_UpgradeDataFlow_Multiple_SchemaMappings()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataflow = new DataFlow()
+            {
+                Id = 1,
+                Name = "TestFlow"
+            };
 
-        public IFeatureFlag<bool> Remove_ClaimIQ_mock_logic_CLA_758 => throw new System.NotImplementedException();
+            var dataflowStep = new DataFlowStep()
+            {
+                Id = 1,
+                DataAction_Type_Id = DataActionType.SchemaMap
+            };
 
-        public IFeatureFlag<bool> Dale_Expose_EditOwnerVerified_CLA_1911 => throw new System.NotImplementedException();
+            List<SchemaMap> schemaMappings = new List<SchemaMap>()
+            {
+                new SchemaMap()
+                {
+                    Id = 1,
+                    DataFlowStepId = dataflowStep
+                },
+                new SchemaMap()
+                {
+                    Id = 2,
+                    DataFlowStepId = dataflowStep
+                }
+            };
 
-        public IFeatureFlag<bool> Expose_Dataflow_Metadata_CLA_2146 => throw new System.NotImplementedException();
+            dataflowStep.SchemaMappings = schemaMappings;
+            dataflow.Steps = new List<DataFlowStep>() { dataflowStep };
 
-        public IFeatureFlag<string> CLA2671_RefactorEventsToJava => throw new System.NotImplementedException();
+            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
 
-        public IFeatureFlag<string> CLA2671_RefactoredDataFlows => throw new System.NotImplementedException();
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null, null);
 
-        public IFeatureFlag<bool> CLA3329_Expose_HR_Category => throw new System.NotImplementedException();
+            //Act
+            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
+        }
 
-        public IFeatureFlagRequiringContext<bool, string> CLA1656_DataFlowEdit_ViewEditPage => throw new System.NotImplementedException();
+        [TestMethod]
+        public void DataFlowService_UpgradeDataFlow_FileSchemaFlow_Not_Upgraded()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataflow = new DataFlow()
+            {
+                Id = 1,
+                Name = "FileSchemaFlow_TestFlow"
+            };
 
-        public IFeatureFlagRequiringContext<bool, string> CLA1656_DataFlowEdit_SubmitEditPage => throw new System.NotImplementedException();
+            var dataflowStep = new DataFlowStep()
+            {
+                Id = 1,
+                DataAction_Type_Id = DataActionType.SchemaMap
+            };
 
-        public IFeatureFlag<bool> CLA3241_DisableDfsDropLocation => throw new System.NotImplementedException();
+            dataflow.Steps = new List<DataFlowStep>() { dataflowStep };
 
-        public IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; } = new MockBooleanFeatureFlag(false);
+            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
 
-        public IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime => throw new System.NotImplementedException();
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null, null);
 
-        public IFeatureFlag<bool> CLA3497_UniqueLivySessionName => throw new System.NotImplementedException();
+            //Act
+            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
+        }
+
+        [TestMethod]
+        public void DataFlowService_UpgradeDataFlow_No_SchemaMap_Step_Not_Upgraded()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataflow = new DataFlow()
+            {
+                Id = 1,
+                Name = "FileSchemaFlow_TestFlow"
+            };
+
+            var dataflowStep = new DataFlowStep()
+            {
+                Id = 1,
+                DataAction_Type_Id = DataActionType.SchemaLoad
+            };
+
+            dataflow.Steps = new List<DataFlowStep>() { dataflowStep };
+
+            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
+
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null, null);
+
+            //Act
+            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
+        }
+
+        [TestMethod]
+        public void DataFlowService_UpgradeDataFlow_Only_Active_DataFlows_Upgraded()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataflow_Deleted = new DataFlow()
+            {
+                Id = 1,
+                Name = "FileSchemaFlow_TestFlow",
+                ObjectStatus = ObjectStatusEnum.Deleted
+            };
+
+            var dataflow_PendingDelete = new DataFlow()
+            {
+                Id = 2,
+                Name = "FileSchemaFlow_PendingDelete",
+                ObjectStatus = ObjectStatusEnum.Pending_Delete
+            };
+
+            var dataflow_Disabled = new DataFlow()
+            {
+                Id = 3,
+                Name = "FileSchemaFlow_Diabled",
+                ObjectStatus = ObjectStatusEnum.Disabled
+            };
+
+            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow_Deleted);
+            context.Setup(f => f.GetById<DataFlow>(2)).Returns(dataflow_PendingDelete);
+            context.Setup(f => f.GetById<DataFlow>(3)).Returns(dataflow_Disabled);
+
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null, null);
+
+            //Act
+            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
+            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(2));
+            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(3));
+        }
+
+        [TestMethod]
+        public void CheckForSpamJob_ShouldBeEnqueued()
+        {
+            // Arrange
+            var client = new Mock<IBackgroundJobClient>();
+            var dataflowService = new DataFlowService(null, null, null, null, null, null, null, client.Object);
+
+            // Act
+            dataflowService.UpgradeDataFlows(new int[] { 1, 2 });
+
+            // Assert
+            client.Verify(x => x.Create(
+                It.Is<Job>(job => job.Method.Name == "UpgradeDataFlow" && (int)job.Args[0] == 1),
+                It.IsAny<EnqueuedState>()), Times.Once);
+            client.Verify(x => x.Create(
+                It.Is<Job>(job => job.Method.Name == "UpgradeDataFlow" && (int)job.Args[0] == 2),
+                It.IsAny<EnqueuedState>()), Times.Once);
+        }
     }
 }

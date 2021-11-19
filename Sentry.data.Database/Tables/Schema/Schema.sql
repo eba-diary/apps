@@ -10,7 +10,6 @@
     [Delimiter] VARCHAR(10) NULL, 
     [HasHeader] BIT NULL, 
     [CreateCurrentView] BIT NULL, 
-    [IsInSAS] BIT NULL, 
     [SASLibrary] VARCHAR(50) NULL, 
     [Description] VARCHAR(2000) NULL, 
     [HiveTable] VARCHAR(250) NULL, 
@@ -32,5 +31,8 @@
     [ObjectStatus] INT NOT NULL DEFAULT 1, 
     [CLA3014_LoadDataToSnowflake] BIT NOT NULL DEFAULT 0, 
     [SchemaRootPath] VARCHAR(250) NULL, 
+    [ParquetStorageBucket] VARCHAR(250) NULL, 
+    [ParquetStoragePrefix] VARCHAR(250) NULL, 
+    [SnowflakeStage] VARCHAR(250) NULL, 
     CONSTRAINT [FK_Schema_FileExtension] FOREIGN KEY ([FileExtension_Id]) REFERENCES [FileExtension]([Extension_Id]) 
 )

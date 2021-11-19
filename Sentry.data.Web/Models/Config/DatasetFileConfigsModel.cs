@@ -41,7 +41,6 @@ namespace Sentry.data.Web
             this.RawStorageId = dto.StorageCode;
             this.Security = dto.Security;
             this.CreateCurrentView = dto.CreateCurrentView;
-            this.IncludedInSAS = dto.IsInSAS;
             this.Delimiter = dto.Delimiter;
             this.HasHeader = dto.HasHeader;
             this.SchemaId = dto.Schema.SchemaId;
@@ -123,10 +122,6 @@ namespace Sentry.data.Web
         public int FileExtensionID { get; set; }
         [DisplayName("Create Current View")]
         public bool CreateCurrentView { get; set; }
-        [DisplayName("Add to SAS")]
-        public bool IncludedInSAS { get; set; }
-
-
         public int DatasetId { get; set; }
         public DatasetScopeType ScopeType { get; set; }
         public FileExtension FileExtension { get; set; }

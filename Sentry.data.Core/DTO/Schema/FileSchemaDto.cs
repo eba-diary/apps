@@ -8,7 +8,6 @@
         public string Delimiter { get; set; }
         public bool HasHeader { get; set; }
         public bool CreateCurrentView { get; set; }
-        public bool IsInSas { get; set; }
         public string SasLibrary { get; set; }
         public string HiveTable { get; set; }
         public string HiveDatabase { get; set; }
@@ -23,5 +22,8 @@
         public string SnowflakeSchema { get; set; }
         public string SnowflakeStatus { get; set; }
         public string SchemaRootPath { get; set; }
+        public string ParquetStorageBucket { get; set; }
+        public string ParquetStoragePrefix { get; set; }
+        public string SnowflakeStage { get; set; }
     }
 }

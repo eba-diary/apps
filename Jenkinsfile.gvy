@@ -33,6 +33,12 @@ pipeline {
                 dotNetBeginSonarScanner key: "DATA:Data.Sentry.Com", name: 'Data.Sentry.Com', version: "${currentBuild.displayName}", other: '/d:sonar.exclusions=**/Scripts/**,**/Content/**,**/App_Themes/**'
             }
         }
+
+        stage('LaunchDarkly Code Ref') {
+            steps {
+                launchDarklyFindCodeRefs "DTLK"
+            }
+        }
  
         stage('Build') {
             // This stage contains all of the core steps that turn your source code into compiled artifacts.  For .NET, this typically means calls to dotNetBuild,
