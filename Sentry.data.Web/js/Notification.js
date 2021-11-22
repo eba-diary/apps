@@ -134,7 +134,7 @@ data.Notification = {
         var title = data.Notification.QuillEditorTitle.root.innerHTML;      //get title 
         var message = "<p><br></p>";                                        //default message to what quill default will have as empty message
 
-        if (data.Notification.isDSCNotification()) {
+        if (!data.Notification.isDSCNotification()) {
             message = data.Notification.QuillEditorMessage.root.innerHTML;           ////ONLY fill message if it should be shown and get html of quill editor
         }
 
