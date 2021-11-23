@@ -1237,6 +1237,8 @@ data.Dataset = {
             e.preventDefault();
             var id = $('#RequestAccessButton').attr("data-id");
 
+            window.history.pushState('Tab Changed', 'Title', '?tab=' + 'SchemaColumns');
+
             if ($('#tabSchemaColumns').is(':empty')) {
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaColumns',
@@ -1258,6 +1260,9 @@ data.Dataset = {
 
         $('#detailTabSchemaAbout').click(function (e) {
             e.preventDefault();
+
+            window.history.pushState('Tab Changed', 'Title', '?tab=' + 'SchemaAbout');
+
             var id = $('#RequestAccessButton').attr("data-id");
 
             if ($('#tabSchemaAbout').is(':empty')) {
@@ -1266,6 +1271,9 @@ data.Dataset = {
                     dataType: 'html',
                     success: function (view) {
                         $('#tabSchemaAbout').html(view);
+
+                        ko.applyBindings(self.vm, $("#tabSchemaAbout")[0]);
+
                         data.Dataset.UpdateMetadata();
                         ko.applyBindings(self.vm, $('#tabSchemaAbout')[0]);
                     }
@@ -1280,6 +1288,9 @@ data.Dataset = {
 
         $('#detailTabDataPreview').click(function (e) {
             e.preventDefault();
+
+            window.history.pushState('Tab Changed', 'Title', '?tab=' + 'DataPreview');
+
             var id = $('#RequestAccessButton').attr("data-id");
 
             if ($('#tabDataPreview').is(':empty')) {
@@ -1305,6 +1316,8 @@ data.Dataset = {
             e.preventDefault();
             var id = $('#RequestAccessButton').attr("data-id");
 
+            window.history.pushState('Tab Changed', 'Title', '?tab=' + 'DataFiles');
+
             if ($('#tabDataFiles').is(':empty')) {
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataFiles',
@@ -1326,12 +1339,11 @@ data.Dataset = {
             }
         });
 
+        var tab = data.Dataset.urlParam('tab') ?? "SchemaAbout";
 
-        var tab = data.Dataset.urlParam("tab");
-        if (tab == undefined) {
-            tab = 'SchemaAbout';
-        }
-        $('#detailTab' + tab).trigger('click');
+
+        $("#detailTab" + tab).trigger('click');
+
     },
 
     CancelLink: function (id) {
@@ -2127,8 +2139,6 @@ data.Dataset = {
         else {
             return results[1] || 0;
         }
-    }
-
-
+    },
 
 };

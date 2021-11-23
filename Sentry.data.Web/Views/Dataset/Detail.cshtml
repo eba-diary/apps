@@ -323,7 +323,10 @@
         <!-- Tab panels -->
         <div class="tab-content">
             <div class="tab-pane fade" id="panelSchemaAbout" role="tabpanel">
-                <div id="tabSchemaAbout"></div>
+                @if (Model.Security.CanPreviewDataset)
+                {
+                    <div id="tabSchemaAbout"></div>
+                }
             </div>
             <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
                 @if (Model.Security.CanPreviewDataset)
