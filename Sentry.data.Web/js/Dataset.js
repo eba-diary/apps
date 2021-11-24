@@ -498,7 +498,7 @@ data.Dataset = {
             //Populate legacy retriever jobs
             self.vm.OtherJobs.removeAll();
             $.each(result.OtherJobs, function (i, val) {
-                var item = new DropLocation(val);
+                var item = new data.Dataset.DropLocation(val);
 
                 self.vm.OtherJobs().push(item);
             });
