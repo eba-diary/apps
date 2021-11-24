@@ -1214,7 +1214,10 @@ data.Dataset = {
         //*****************************************************************************************************
         $('#datasetConfigList').on('select2:select', function (e) {
 
-            window.history.pushState('Config Changed', 'Title', '?configID=' + $('#datasetConfigList').val());
+            var url = new URL(window.location.href);
+            url.searchParams.set('configID', $('#datasetConfigList').val());
+            window.history.pushState({}, '', url);
+
             Id = $('#datasetConfigList').val();
             self.vm.NoColumnsReturned(false);
             $('#schemaHR').show();
@@ -1237,7 +1240,9 @@ data.Dataset = {
             e.preventDefault();
             var id = $('#RequestAccessButton').attr("data-id");
 
-            window.history.pushState('Tab Changed', 'Title', '?tab=' + 'SchemaColumns');
+            var url = new URL(window.location.href);
+            url.searchParams.set('tab', 'SchemaColumns');
+            window.history.pushState({}, '', url);
 
             if ($('#tabSchemaColumns').is(':empty')) {
                 $.ajax({
@@ -1261,7 +1266,9 @@ data.Dataset = {
         $('#detailTabSchemaAbout').click(function (e) {
             e.preventDefault();
 
-            window.history.pushState('Tab Changed', 'Title', '?tab=' + 'SchemaAbout');
+            var url = new URL(window.location.href);
+            url.searchParams.set('tab', 'SchemaAbout');
+            window.history.pushState({}, '', url);
 
             var id = $('#RequestAccessButton').attr("data-id");
 
@@ -1271,11 +1278,8 @@ data.Dataset = {
                     dataType: 'html',
                     success: function (view) {
                         $('#tabSchemaAbout').html(view);
-
                         ko.applyBindings(self.vm, $("#tabSchemaAbout")[0]);
-
                         data.Dataset.UpdateMetadata();
-                        ko.applyBindings(self.vm, $('#tabSchemaAbout')[0]);
                     }
                 });
             }
@@ -1289,7 +1293,9 @@ data.Dataset = {
         $('#detailTabDataPreview').click(function (e) {
             e.preventDefault();
 
-            window.history.pushState('Tab Changed', 'Title', '?tab=' + 'DataPreview');
+            var url = new URL(window.location.href);
+            url.searchParams.set('tab', 'DataPreview');
+            window.history.pushState({}, '', url);
 
             var id = $('#RequestAccessButton').attr("data-id");
 
@@ -1300,7 +1306,7 @@ data.Dataset = {
                     success: function (view) {
                         $('#tabDataPreview').html(view);
                         if (self.vm.ShowDataFileTable()) {
-                            this.renderDataPreview();
+                            data.Dataset.renderDataPreview();
                         }
                     }
                 });
@@ -1316,7 +1322,9 @@ data.Dataset = {
             e.preventDefault();
             var id = $('#RequestAccessButton').attr("data-id");
 
-            window.history.pushState('Tab Changed', 'Title', '?tab=' + 'DataFiles');
+            var url = new URL(window.location.href);
+            url.searchParams.set('tab', 'DataFiles');
+            window.history.pushState({}, '', url);
 
             if ($('#tabDataFiles').is(':empty')) {
                 $.ajax({
@@ -1339,8 +1347,10 @@ data.Dataset = {
             }
         });
 
-        var tab = data.Dataset.urlParam('tab') ?? "SchemaAbout";
 
+        var url = new URL(window.location.href);
+        var tab = url.searchParams.get('tab') ?? "SchemaAbout";
+        
 
         $("#detailTab" + tab).trigger('click');
 
@@ -2129,16 +2139,6 @@ data.Dataset = {
             $('div#DatasetFormContent #NamedEnvironmentPartial').html(result);
             data.Dataset.initNamedEnvironmentEvents();
         });
-    },
-
-    urlParam(name) {
-        var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-        if (results == null) {
-            return null;
-        }
-        else {
-            return results[1] || 0;
-        }
-    },
+    }
 
 };
