@@ -46,7 +46,7 @@ namespace Sentry.data.Web
 
             //This bundle contains all of the custom javascript for your application -
             //it automatically picks up everything in the "js" folder
-            bundles.Add(new Bundle("~/bundles/js").
+            bundles.Add(new ScriptBundle("~/bundles/js").
                         Include("~/js/_Shared.js").
                         IncludeDirectory("~/js", "*.js", true));
 

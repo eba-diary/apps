@@ -1349,9 +1349,10 @@ data.Dataset = {
 
 
         var url = new URL(window.location.href);
-        var tab = url.searchParams.get('tab') ?? "SchemaAbout";
-        
-
+        var tab = url.searchParams.get('tab');
+        if (tab == undefined) {
+            tab = 'SchemaAbout';
+        }        
         $("#detailTab" + tab).trigger('click');
 
     },
