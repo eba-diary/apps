@@ -121,6 +121,7 @@
             public const string Datasets = "Datasets";
             public const string DataAssets = "Data Assets";
             public const string Exhibits = "Exhibits";
+            public const string Notifications = "Notifications";
         }
 
         public static class BusinessObjectExhibit

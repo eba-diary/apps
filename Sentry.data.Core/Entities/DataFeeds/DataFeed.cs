@@ -16,5 +16,6 @@ namespace Sentry.data.Core
         public virtual string UrlType { get; set; }
         public virtual string Type { get; set; }
         public virtual string Name { get; set; }
+        public virtual string Category { get; set; }
     }
 }

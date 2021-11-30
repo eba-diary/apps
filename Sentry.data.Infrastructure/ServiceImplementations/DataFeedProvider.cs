@@ -112,47 +112,80 @@ namespace Sentry.data.Infrastructure
             //STEP #1 CREATE BLANK LIST OF DataFeedItems
             List<DataFeedItem> items = new List<DataFeedItem>();
 
-            //STEP #2  GRAB ALL SENTRY DATASET EVENTS
-            var dsEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Dataset")).OrderByDescending(x => x.TimeCreated).Take(50);
-
-            //STEP #3 CREATE DataFeedItems
+            //STEP #2 CREATE DATASET DataFeedItems
+            var dsEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Dataset")  && (x.TimeCreated >= DateTime.Now.AddDays(-30))).Take(50).OrderByDescending(o => o.TimeCreated);
             foreach (Event e in dsEvents)
             {
                 Dataset ds = Query<Dataset>().Where(y => y.DatasetId == e.Dataset).FetchMany(x=> x.DatasetCategories).FirstOrDefault();
 
                 if (ds != null)
                 {
+                    DataFeed feed = new DataFeed();
+                    feed.Id = ds.DatasetId;
+                    feed.Name = "Datasets";
+                    feed.Url = "/Datasets/Detail/" + e.Dataset;
+                    feed.Type = "Datasets";
+
                     DataFeedItem dfi = new DataFeedItem(
                     e.TimeCreated,
                     e.Dataset.ToString(),
                     ds.DatasetName + " - A New Dataset was Created in the " + ds.DatasetCategories.First().Name + " Category",
                     ds.DatasetName + " - A New Dataset was Created in the " + ds.DatasetCategories.First().Name + " Category",
-                    new DataFeed() { Name = "Datasets", Url = "/Datasets/Detail/" + e.Dataset, Type = "Datasets" }
+                    feed 
                     );
 
                     items.Add(dfi);
                 }                
             }
 
-            //STEP #3  GRAB ALL SENTRY BI EVENTS
-            var rptEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Report")).OrderByDescending(x => x.TimeCreated).Take(50);
+            //STEP #3  CREATE BI ITEMS
+            var rptEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Report") && (x.TimeCreated >= DateTime.Now.AddDays(-30))).Take(50).OrderByDescending(o => o.TimeCreated);
             foreach (Event e in rptEvents)
             {
                 Dataset ds = Query<Dataset>().FirstOrDefault(y => y.DatasetId == e.Dataset);
 
                 if (ds != null)
                 {
+                    DataFeed feed = new DataFeed();
+                    feed.Id = ds.DatasetId;
+                    feed.Name = "Business Intelligence";
+                    feed.Url = "/BusinessIntelligence/Detail/" + e.Dataset;
+                    feed.Type = "Exhibits";
+
                     DataFeedItem dfi = new DataFeedItem(
                     e.TimeCreated,
                     e.Dataset.ToString(),
                     ds.DatasetName + " - A New Exhibit was Created",
                     ds.DatasetName + " - A New Exhibit was Created",
-                    new DataFeed() { Name = "Business Intelligence", Url = "/BusinessIntelligence/Detail/" + e.Dataset, Type = "Exhibits" }
+                    feed
                     );
 
                     items.Add(dfi);
                 }
             }
+
+            var notifications = Query<Notification>().Where(w => w.ExpirationTime >= DateTime.Now && (BusinessAreaType)w.ParentObject == BusinessAreaType.DSC);
+            foreach (Notification n in notifications)
+            {
+                if (n != null)
+                {
+                    DataFeed feed = new DataFeed();
+                    feed.Id = n.NotificationId;
+                    feed.Name = "Notification";
+                    feed.Category = (n.NotificationCategory != null) ? n.NotificationCategory.GetDescription() : feed.Name;
+                    feed.Type = GlobalConstants.DataFeedType.Notifications;
+
+                    DataFeedItem dfi = new DataFeedItem(
+                        n.StartTime,                                                //PublishDate
+                        n.NotificationId.ToString(),                                //Id
+                        n.Title,                                                    //shortDesc
+                        "",                                                         //longDesc
+                        feed                                                        //DataFeed
+                    );
+                    items.Add(dfi);
+                }
+            }
+
             return items;
         }
 
