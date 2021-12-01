@@ -144,7 +144,7 @@ namespace Sentry.data.Web.Controllers
 
         public async Task<ActionResult> GetFeed()
         {
-            List<DataFeedItem> allDatafeedItems = cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList());
+            List<DataFeedItem> allDatafeedItems = _feedContext.GetAllFeedItems().ToList();
             return PartialView("_Feed", allDatafeedItems.Take(10).ToList());
         }
 
