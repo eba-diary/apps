@@ -624,11 +624,6 @@ data.Dataset = {
     //DATA PREVIEW DATA TABLE SETUP
     renderTable_v2: function (input, push) {
 
-        //remove table DOM if needed
-        if (table) {
-            table.destroy();
-        }
-
         //Determine Column metadata
         var parsedColumns = [];
 
@@ -1219,6 +1214,8 @@ data.Dataset = {
             self.vm.NoColumnsReturned(false);
             $('#schemaHR').show();
             self.vm.SchemaRows.removeAll();
+
+            $("#datasetRowTable").DataTable().destroy();
 
             if (self.vm.ShowDataFileTable()) {
                 var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + $('#datasetConfigList').val();
