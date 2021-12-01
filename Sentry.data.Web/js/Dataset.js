@@ -477,6 +477,8 @@ data.Dataset = {
 
     UpdateMetadata: function () {
 
+        $("#datasetRowTable").DataTable().destroy();
+
         if (!isNaN(getUrlParameter('configID'))) {
             $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
         }
@@ -1214,8 +1216,6 @@ data.Dataset = {
             self.vm.NoColumnsReturned(false);
             $('#schemaHR').show();
             self.vm.SchemaRows.removeAll();
-
-            $("#datasetRowTable").DataTable().destroy();
 
             if (self.vm.ShowDataFileTable()) {
                 var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + $('#datasetConfigList').val();
