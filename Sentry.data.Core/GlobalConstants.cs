@@ -124,6 +124,14 @@
             public const string Notifications = "Notifications";
         }
 
+
+        public static class DataFeedName
+        {
+            public const string BUSINESS_INTELLIGENCE = "Business Intelligence";
+            public const string DATASET = "Datasets";
+            public const string NOTIFICATION = "Notification";
+        }
+
         public static class BusinessObjectExhibit
         {
             public const string GET_LATEST_URL_PARAMETER = "&sInstance=Last";

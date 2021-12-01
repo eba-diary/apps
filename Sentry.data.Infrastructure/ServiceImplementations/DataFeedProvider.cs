@@ -108,7 +108,8 @@ namespace Sentry.data.Infrastructure
         public IList<DataFeedItem> SentryEvents()
         {
 
-            //LAZER NOTE: none of this code is called if CLA2838_DSC_ANOUNCEMENTS is false
+            //NOTE: none of this code is called if CLA2838_DSC_ANOUNCEMENTS is false
+            
             //STEP #1 CREATE BLANK LIST OF DataFeedItems
             List<DataFeedItem> items = new List<DataFeedItem>();
 
@@ -122,9 +123,9 @@ namespace Sentry.data.Infrastructure
                 {
                     DataFeed feed = new DataFeed();
                     feed.Id = ds.DatasetId;
-                    feed.Name = "Datasets";
+                    feed.Name = GlobalConstants.DataFeedName.DATASET;
                     feed.Url = "/Datasets/Detail/" + e.Dataset;
-                    feed.Type = "Datasets";
+                    feed.Type = GlobalConstants.DataFeedType.Datasets;
 
                     DataFeedItem dfi = new DataFeedItem(
                     e.TimeCreated,
@@ -148,9 +149,9 @@ namespace Sentry.data.Infrastructure
                 {
                     DataFeed feed = new DataFeed();
                     feed.Id = ds.DatasetId;
-                    feed.Name = "Business Intelligence";
+                    feed.Name = GlobalConstants.DataFeedName.BUSINESS_INTELLIGENCE;
                     feed.Url = "/BusinessIntelligence/Detail/" + e.Dataset;
-                    feed.Type = "Exhibits";
+                    feed.Type = GlobalConstants.DataFeedType.Exhibits;
 
                     DataFeedItem dfi = new DataFeedItem(
                     e.TimeCreated,
@@ -163,7 +164,8 @@ namespace Sentry.data.Infrastructure
                     items.Add(dfi);
                 }
             }
-
+            
+            //STEP #4  CREATE NOTIFICATION ITEMS
             var notifications = Query<Notification>().Where(w => w.ExpirationTime >= DateTime.Now && (BusinessAreaType)w.ParentObject == BusinessAreaType.DSC);
             foreach (Notification n in notifications)
             {
@@ -171,8 +173,8 @@ namespace Sentry.data.Infrastructure
                 {
                     DataFeed feed = new DataFeed();
                     feed.Id = n.NotificationId;
-                    feed.Name = "Notification";
-                    feed.Category = (n.NotificationCategory != null) ? n.NotificationCategory.GetDescription() : feed.Name;
+                    feed.Name = GlobalConstants.DataFeedName.NOTIFICATION;
+                    feed.Category = (n.NotificationCategory != null) ? n.NotificationCategory.GetDescription() : feed.Name;     
                     feed.Type = GlobalConstants.DataFeedType.Notifications;
 
                     DataFeedItem dfi = new DataFeedItem(
@@ -206,22 +208,22 @@ namespace Sentry.data.Infrastructure
                         df = new DataFeed()
                         {
                             Id = ds.DatasetId,
-                            Name = "Business Intelligence",
+                            Name = GlobalConstants.DataFeedName.BUSINESS_INTELLIGENCE,
                             Url = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.Location)) ? ds.Metadata.ReportMetadata.Location : null,
                             UrlType = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.LocationType)) ? ds.Metadata.ReportMetadata.LocationType : null,
-                            Type = "Exhibits"
-                        };
+                            Type = GlobalConstants.DataFeedType.Exhibits
+                    };
                     }
                     else
                     {
                         df = new DataFeed()
                         {
                             Id = ds.DatasetId,
-                            Name = "Datasets",
+                            Name = GlobalConstants.DataFeedName.DATASET,
                             Url = "/Datasets/Detail/" + ds.DatasetId,
                             UrlType = ds.DatasetType,
-                            Type = "Datasets"
-                        };
+                            Type = GlobalConstants.DataFeedType.Datasets
+                    };
                     }
 
                     items.Add(new FavoriteItem(
@@ -254,10 +256,10 @@ namespace Sentry.data.Infrastructure
                         df = new DataFeed()
                         {
                             Id = ds.DatasetId,
-                            Name = "Business Intelligence",
+                            Name = GlobalConstants.DataFeedName.BUSINESS_INTELLIGENCE,
                             Url = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.Location)) ? ds.Metadata.ReportMetadata.Location : null,
                             UrlType = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.LocationType)) ? ds.Metadata.ReportMetadata.LocationType : null,
-                            Type = "Exhibits"
+                            Type = GlobalConstants.DataFeedType.Exhibits
                         };
                     }
                     else
@@ -265,10 +267,10 @@ namespace Sentry.data.Infrastructure
                         df = new DataFeed()
                         {
                             Id = ds.DatasetId,
-                            Name = "Datasets",
+                            Name = GlobalConstants.DataFeedName.DATASET,
                             Url = "/Datasets/Detail/" + ds.DatasetId,
                             UrlType = ds.DatasetType,
-                            Type = "Datasets"
+                            Type = GlobalConstants.DataFeedType.Datasets
                         };
                     }
 
