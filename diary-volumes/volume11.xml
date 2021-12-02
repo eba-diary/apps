@@ -98,7 +98,11 @@
    </teiHeader>
    <text> <!-- ignore these tags, just copy/paste the header above-->
     <body>
+<<<<<<< Updated upstream
       <div xml:id="EBA-1903-11-15" type="entry">
+=======
+      <div xml:id="EBA-1903-11-15">
+>>>>>>> Stashed changes
         <dateline>
           Sunday, 23d after <name type="event" ref="#Trinity">Trinity</name>. 
           <date when="1903-11-15">Nov. 15, 1903</date>.
