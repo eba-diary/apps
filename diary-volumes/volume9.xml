@@ -633,9 +633,9 @@
          <p>
             Made an early start in order to get through the bridge,
              thinking it opened at 7:30 - but had to wait until 9 o'clock - got through in fine
-             style and brought up 14 miles below <placeName>Keneh</placeName> about 7 o'clock.
+             style and brought up 14 miles below <placeName ref="#Keneh">Keneh</placeName> about 7 o'clock.
              Second Sunday after Christmas. Jan. 5. 34 miles. A beautiful warm day - with good
-             wind - passed <persName>Keneh</persName> about noon, where the
+             wind - passed <placeName ref="#Keneh">Keneh</placeName> about noon, where the
              <persName>Zenet el Nil</persName> was lying going down - and soon overtook the
              <orgName>Gazelle</orgName> and exchanged greetings.
          </p>
@@ -1480,12 +1480,12 @@
          <p>
             At 7 o'clock this morning when I heard the men beginning to make ready to start, I drew
              my curtain aside, I found <persName ref="#Nubia">Nubia</persName> sitting on the bank and in
-             a few moments <persName ref="#Achmed">Achmed</persName>, and <persName ref="Said">
+             a few moments <persName ref="#Achmed">Achmed</persName>, and <persName ref="#Said">
              Said</persName>, the black dog, and all waiting sadly to see us off. The river was a
              mirror, but we had hardly passed the town when a light wind from the north came, and
              then grew stronger, in the face of which we have rowed and floated all day and are
-             lying below <placeName>Magadah</placeName> about 2 miles - having made 24 miles. I
-             was sorry to leave the splendid <placeName>Theban Mountains</placeName> and
+             lying below <placeName ref="#Magadah">Magadah</placeName> about 2 miles - having made 24 miles. I
+             was sorry to leave the splendid <placeName ref="#Theban_Mountains">Theban Mountains</placeName> and
              when at 6 o'clock I looked at them this morning, they were lovely indeed - all
              rose-coloured - the reflection extending almost across the river. The
              <name type="boat" ref="#Istar">Istar</name> left just before us, and we have been quite close all day -
@@ -1501,17 +1501,17 @@
              cool air and hot sun, - the mountains with their etherially lovely heliotrope tints.
              Spoke to <persName ref="#Sayce_Archibald">Mr. Sayce</persName> as we happened to float near the
              <name type="boat" ref="#Istar">Istar</name>. He is quite well again - and stopped at
-             <placeName>Keneh</placeName> - we did not, and are now about 4 miles below it.
+             <placeName ref="#Keneh">Keneh</placeName> - we did not, and are now about 4 miles below it.
          </p>
       </div>
       <div xml:id="EBA-1902-03-04" type="entry">
          <dateline>
-            <date when="1902-03-04">Tuesday, Mar. 4</date>. <placeName>Nagh Hamadi</placeName>. 34 miles.
+            <date when="1902-03-04">Tuesday, Mar. 4</date>. <placeName ref="#Naj_Hammadi">Nagh Hamadi</placeName>. 34 miles.
          </dateline>
          <p>
-            Started at 6:30 A.M. passed <persName>Dishua</persName> about 11 - day hot - light
+            Started at 6:30 A.M. passed <placeName ref="#Dishua">Dishua</placeName> about 11 - day hot - light
              north wind until 12 - when we had a little from the south - reached
-             <placeName>Nagh Hamadi</placeName> as usual too late to catch the bridge open -
+             <placeName ref="#Naj_Hammadi">Nagh Hamadi</placeName> as usual too late to catch the bridge open -
              just what we did last year. Are tied up to a very high villainously high bank - with
              the little dahabeah "Memphis" just in front of us - and later a gentleman and lady
              came to call, sending in cards of <persName>Lt. Col. Biddulph</persName>,
