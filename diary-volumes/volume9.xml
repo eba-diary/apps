@@ -1502,8 +1502,8 @@
              Said</persName>, the black dog, and all waiting sadly to see us off. The river was a
              mirror, but we had hardly passed the town when a light wind from the north came, and
              then grew stronger, in the face of which we have rowed and floated all day and are
-             lying below <placeName>Magadah</placeName> about 2 miles - having made 24 miles. I
-             was sorry to leave the splendid <placeName>Theban Mountains</placeName> and
+             lying below <placeName ref="#Magadah">Magadah</placeName> about 2 miles - having made 24 miles. I
+             was sorry to leave the splendid <placeName ref="#Theban_Mountains">Theban Mountains</placeName> and
              when at 6 o'clock I looked at them this morning, they were lovely indeed - all
              rose-coloured - the reflection extending almost across the river. The
              <name type="boat" ref="#Istar">Istar</name> left just before us, and we have been quite close all day -
@@ -1524,12 +1524,12 @@
       </div>
       <div xml:id="EBA-1902-03-04" type="entry">
          <dateline>
-            <date when="1902-03-04">Tuesday, Mar. 4</date>. <placeName>Nagh Hamadi</placeName>. 34 miles.
+            <date when="1902-03-04">Tuesday, Mar. 4</date>. <placeName ref="#Naj_Hammadi">Nagh Hamadi</placeName>. 34 miles.
          </dateline>
          <p>
-            Started at 6:30 A.M. passed <persName>Dishua</persName> about 11 - day hot - light
+            Started at 6:30 A.M. passed <placeName ref="#Dishua">Dishua</placeName> about 11 - day hot - light
              north wind until 12 - when we had a little from the south - reached
-             <placeName>Nagh Hamadi</placeName> as usual too late to catch the bridge open -
+             <placeName ref="#Naj_Hammadi">Nagh Hamadi</placeName> as usual too late to catch the bridge open -
              just what we did last year. Are tied up to a very high villainously high bank - with
              the little dahabeah "Memphis" just in front of us - and later a gentleman and lady
              came to call, sending in cards of <persName>Lt. Col. Biddulph</persName>,
