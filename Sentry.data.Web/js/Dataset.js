@@ -477,6 +477,8 @@ data.Dataset = {
 
     UpdateMetadata: function () {
 
+        $("#datasetRowTable").DataTable().destroy();
+
         if (!isNaN(getUrlParameter('configID'))) {
             $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
         }
@@ -623,11 +625,6 @@ data.Dataset = {
 
     //DATA PREVIEW DATA TABLE SETUP
     renderTable_v2: function (input, push) {
-
-        //remove table DOM if needed
-        if (table) {
-            table.destroy();
-        }
 
         //Determine Column metadata
         var parsedColumns = [];
