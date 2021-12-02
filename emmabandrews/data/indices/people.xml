@@ -1,7 +1,7 @@
 <?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?><?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml"
 	schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="people">
-    <teiHeader>
+	<teiHeader>
 		<fileDesc>
 			<titleStmt>
 				<title>Title</title>
@@ -16,7 +16,7 @@
 		<profileDesc>
 			<particDesc>
 				<listPerson>
-                    <person xml:id="Troyon_Constant">
+					<person xml:id="Troyon_Constant">
                         <persName>Constant Troyon</persName>
                         <note>Constant Troyon (August 28, 1810 – February 21, 1865) was a French painter of the Barbizon school.<graphic class="graphic" url="https://images.metmuseum.org/CRDImages/dp/original/DP808407.jpg" source="Metropolitan Museum of Art"/>
                             <p>Watercolor on paper landscape painted by Troyon.</p>
@@ -53,9 +53,6 @@
 					<person xml:id="Abdul">
 						<persName>Abdul</persName>
 					</person>
-					<person xml:id="Achmed">
-						<persName>Achmed</persName>
-					</person>
 					<person xml:id="Achmed_Prince">
 						<persName>Prince Achmed</persName>
 					</person>
@@ -79,7 +76,7 @@
 					<person xml:id="Agassig_May">
 						<persName>May Agassig</persName>
 					</person>
-					<person xml:id="Agassig, Mr.">
+					<person xml:id="Agassiz_Mr">
 						<persName>Mr. Alexander Emanuel Agassiz</persName>
 					</person>
 					<person xml:id="Agassiz_Louis_Mrs">
@@ -99,6 +96,9 @@
 					<person xml:id="Akhenaten">
 						<persName>Akhenaten</persName>
 						<note>Eighteenth Dynasty pharaoh who ruled 1351–1334 BC, husband of Nefertiti. Changed state religion from polytheisim to monothesim, worshipping the sun disk: the Aten. Established a new capital (Akhetaten) in modern Amarna. What was probably his mummy was discovered by Theodore Davis and Edward Ayrton in 1907 in tomb KV55.  <graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Akhenaten.jpg"/></note>
+					</person>
+					<person xml:id="">
+						<persName>Akmin</persName>
 					</person>
 					<person xml:id="Alderson_Miss">
 						<persName>Miss Alderson</persName>
@@ -123,44 +123,44 @@
 						<persName>Alexander The Great</persName>
 					</person>
 					<person xml:id="Alexander_Charles">
-						<persName>Alexander, Charles B., Mr</persName>
+						<persName>Charles B. Alexander</persName>
 						<note>Charles Beatty Alexander was a wealthy financier and attorney in New York, New York. For many years he was a Regent of the University of the State of New York, responsible for the general supervision of all educational activities within New York State. He was husband to Hattie Crocker, a prominent socialite.<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Alexander_Charles.jpeg"/></note>
 					</person>
 					<person xml:id="Alexander_Harriet_Mrs">
-						<persName>Alexander, Mrs</persName>
+						<persName>Mrs. Alexander</persName>
 						<note>Harriet Valentine "Hattie" Crocker was the daughter of a railroad magnate and wife to a wealthy financier and attorney, Charles Beatty Alexander. Mrs. Alexander was a leading figure in San Francisco society and then New York City. She was the epitome of America’s 19th-century social elite, holding philanthropic events and lavish parties.<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Alexander_Harriet_Mrs.jpg"/></note>
 					</person>
 					<person xml:id="Alexander_Grace_Mrs">
-						<persName>Alexander, Mrs</persName>
+						<persName>Mrs. Alexander</persName>
 						<note>Married to Henry Addison Alexander, nee Green. Mother of Eleanor Butler Alexander (1888–1960) who married Theodore Roosevelt III (1887-1944).<graphic class="graphic" url=" "/></note>
 					</person>
-					<person xml:id="Alexander_Ms">
-						<persName>Alexander, Ms</persName>
+					<person xml:id="Alexander_Miss">
+						<persName>Miss. Alexander</persName>
 					</person>
 					<person xml:id="Alexandre_Mr">
-						<persName>Alexandre, Mr</persName>
+						<persName>Mr. Alexandre</persName>
 					</person>
 					<person xml:id="Alejandre_Mrs">
-						<persName>Alexandre, Mrs</persName>
+						<persName>Mrs. Alexandre</persName>
 					</person>
 					<person xml:id="Ali">
 						<persName>Ali</persName>
 					</person>
 					<person xml:id="Alighieri_Dante ">
-						<persName>Alighieri, Dante </persName>
+						<persName>Dante Alighieri </persName>
 					</person>
 					<person xml:id="Ali_Mohammed">
-						<persName>Ali, Mohammed</persName>
+						<persName>Mohammed Ali</persName>
 					</person>
 					<person xml:id="Ali_Mohammed_Prince">
-						<persName>Ali, Mohammed, Prince</persName>
+						<persName>Prince Mohammed Ali</persName>
 					</person>
 					<person xml:id="Alston_Judge">
-						<persName>Alston, Judge</persName>
+						<persName>Judge Alston</persName>
 						<note>Vere Speke Alston was born in 1853 in England. He graduated from Cambridge in 1876 and began practing law soon thereafter. He became a judge at the Court of Appeals of the Mixed Courts in Cairo, where he met his wife, an American socialite, in the 1890s. He divided his time between Egypt and other European properties and died in France in 1931.</note>
 					</person>
 					<person xml:id="Alston_Mrs">
-						<persName>Alston, Mrs.</persName>
+						<persName>Mrs. Alston</persName>
 						<note>Anne Sophia Penn Chew was born into the wealthy Chew family, who had been a landowning family in the United States since the seventeenth century. She married Vere Alston, a judge in the courts set up after the British occupation of Egypt, in 1898, and they resided in Egypt for most of the rest of their lives. She died in France in 1931.</note>
 					</person>
 					<person xml:id="Amenhotep_II">
@@ -169,12 +169,10 @@
 					</person>
 					<person xml:id="Amenhotep_III">
 						<persName>Amenhotep III</persName>
-					</person>
-					<person xml:id="Amenhotep_III">
-						<persName>Amenophis III</persName>
+						<note>Amenhotep III was the pharaoh of Egypt from 1390-1353 BCE. The son of Thutmose IV, he was known for his diplomatic expansion and extensive building campaign. His reign marked a period of prosperity and political stability in Egypt. He married Tyii, a commoner, who was the chief queen and mother to his son, Akhenaten (Amenhotep IV).</note>
 					</person>
 					<person xml:id="Amherst_of_Hackney_Lady">
-						<persName>Amherst of Hackney, Lady</persName>
+						<persName>Lady Amherst of Hackney</persName>
 					</person>
 					<person xml:id="Amherst_of_Hackney_Lord">
 						<persName>Lord Amherst of Hackney</persName>
@@ -185,8 +183,11 @@
 					<person xml:id="Amos_Mrs">
 						<persName>Amos, Mrs.</persName>
 					</person>
+					<person xml:id="">
+						<persName>Andersen</persName>
+					</person>
 					<person xml:id="Anderson_Hendrick">
-						<persName>Anderson, Hendrick</persName>
+						<persName>Hendrick Anderson</persName>
 					</person>
 					<person xml:id="Anderson_Larz_Mrs">
 						<persName>Anderson, Larz, Mrs</persName>
@@ -198,7 +199,7 @@
 						<persName>Anderson, Mrs</persName>
 					</person>
 					<person xml:id="Andrews_Emma_B">
-						<persName>Andrews, Emma</persName>
+						<persName>Emma B. Andrews</persName>
 					</person>
 					<person xml:id="Ghio_Anita">
 						<persName>Anita</persName>
@@ -300,7 +301,8 @@
 					</person>
 					<person xml:id="Beard_John_Sir">
 						<persName>Beard, Sir, John</persName>
-						<note>John Baird was a British politician, serving as the governor-general of Australia from 1925 to 1930. He attended Eton College and graduated from Christ Church, Oxford, entering the British diplomatic service in 1894. After serving as governor-general, he moved back to Britain, becoming the chairman of the Conservative Party from 1931 to 1936. </note>
+						<note>John Baird was a British politician, serving as the governor-general of Australia from 1925 to 1930. He attended Eton College and graduated from Christ Church, Oxford, entering the British diplomatic service in 1894. After serving as governor-general, he moved back to Britain, becoming the chairman of the Conservative Party from 1931 to 1936. 
+</note>
 					</person>
 					<person xml:id="Beato_Antonio">
 						<persName>Beato, Antonio</persName>
@@ -309,7 +311,8 @@
 						<persName>Beato, Felice</persName>
 					</person>
 					<person xml:id="Beccafumi_Madame">
-						<persName>Beccafumi, Madame</persName>
+						<persName>Beccafumi, Madame
+</persName>
 					</person>
 					<person xml:id="Beckwith_Mrs">
 						<persName>Beckwith, Mrs.</persName>
@@ -363,10 +366,10 @@
 						<note>Bernard Berenson was an American art historian, critic, and collector specializing in the Renaissance.</note>
 					</person>
 					<person xml:id="Berkeley_Lord">
-						<persName>Berkeley, Lord</persName>
+						<persName>Lord Berkeley</persName>
 					</person>
 					<person xml:id="Bey_Claudius">
-						<persName>Bey, Claudius</persName>
+						<persName>Claudius Bey</persName>
 					</person>
 					<person xml:id="Auguste_Mariette">
 						<persName>Bey, Mariette</persName>
@@ -416,6 +419,10 @@
 					<person xml:id="Braun">
 						<persName>Braun</persName>
 					</person>
+					<person xml:id="">
+						<persName>Breasted, Mr. </persName>
+						<note>James Henry Breasted was born in Illinois in 1865. He was trained as a pharmacist, graduating from the Chicago College of Pharmacy in 1886. He eventually ended up in Berlin where he studied the Egyptian language under the Egyptologist Adolf Erman. After earning his PhD, he moved to Chicago and worked for the Haskell Oriental Museum and taught at the University of Chicago. He worked to compile a collection of as many hieroglyphic inscriptions and related manuscripts as he could find as well as making many trips to Egypt to expand the museum's collection more broadly, and wrote many books, including "The Dawn of Conscience" (1933), which greatly influenced Sigmund Freud. He died in 1935.</note>
+					</person>
 					<person xml:id="Breenner_Christina">
 						<persName>Breenner, Christina, Miss</persName>
 					</person>
@@ -464,7 +471,8 @@
 					</person>
 					<person xml:id="Buchanan_Carrie">
 						<persName>Buchanan, Carrie</persName>
-						<note>Carrie was the daughter of Rev. James N. and Rosanah S. (Alexander) Buchanan. After graduating from Western Seminary in Oxford, Ohio in 1892, she moved to Luxor, Egypt where she co-founded and became the principal of the American Missions Girls’ School. After becoming ill during her time in Egypt, she moved to California where she died two years later.</note>
+						<note>Carrie was the daughter of Rev. James N. and Rosanah S. (Alexander) Buchanan. After graduating from Western Seminary in Oxford, Ohio in 1892, she moved to Luxor, Egypt where she co-founded and became the principal of the American Missions Girls’ School. After becoming ill during her time in Egypt, she moved to California where she died two years later.
+</note>
 					</person>
 					<person xml:id="Buckley_Mr">
 						<persName>Buckley, Mr</persName>
@@ -498,11 +506,13 @@
 					</person>
 					<person xml:id="Burns_Mrs">
 						<persName>Burns, Mrs</persName>
-						<note>Mary Lyman Morgan was a member of the prominent Morgan family of American bankers. She married Walter Hayes Burns, a partner at her father's bank J. S. Morgan &amp; Co, in 1867. They purchased a large estate near London in 1884 and lived there for the remainder of their lives.</note>
+						<note>Mary Lyman Morgan was a member of the prominent Morgan family of American bankers. She married Walter Hayes Burns, a partner at her father's bank J S Morgan &amp; Co, in 1867. They purchased a large estate near London in 1884 and lived there for the remainder of their lives.</note>
 					</person>
 					<person xml:id="Burton_Harry">
 						<persName>Burton, Harry</persName>
-						<note>Harry Burton was born in Lincolnshire, England in 1879 to a family of 11 children. Italian Renaissance scholar, Robert Cust became his benefactor, providing Burton with an education, training and an apprenticeship. He became a talented photographer of Florentine paintings. While in Italy, Burton met Theodore Davis who hired him to photograph and later direct Davis' excavations in the Valley of the Kings until 1914 when Davis stopped work. Burton was then employed by the Metropolitan Museum of Art in New York as a photographer for the museum's "Egyptian Expedition." Burton worked for the Met until his death in 1940. Harry Burton captured more than 7,500 excavation photographs in and around the Valley of the Kings throughout his career working in Egypt during the early 20th century. His photographs of sites such as Thebes, Deir el-Bahri, and Wadi Natrun brought him great regard as one of the foremost archaeological photographers of his time. He is most famous for his documentation of Howard Carter’s discovery of the tomb of Pharaoh Tutankhamen, 1922-1933. Most of his work was done between 1911-1936. Burton appears frequently in the Emma B. Andrews diaries, since she was in close contact with him from 1903-1913.<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Burton_Harry.png"/></note>
+						<note>Harry Burton was born in Lincolnshire, England in 1879 to a family of 11 children. Italian Renaissance scholar, Robert Cust became his benefactor, providing Burton with an education, training and an apprenticeship. He became a talented photographer of Florentine paintings. While in Italy, Burton met Theodore Davis who hired him to photograph and later direct Davis' excavations in the Valley of the Kings until 1914 when Davis stopped work. Burton was then employed by the Metropolitan Museum of Art in New York as a photographer for the museum's ""Egyptian Expedition."" Burton worked for the MET until his death in 1940. Harry Burton captured more than 7,500 excavation photographs in and around the Valley of the Kings throughout his career working in Egypt during the early 20th century. His photographs of sites such as Thebes, Deir el-Bahri, and Wadi Natrun brought him great regard as one of the foremost archaeological photographers of his time. He is most famous for his documentation of Howard Carter’s discovery of the tomb of Pharaoh Tutankhamen, 1922-1933. Most of his work was done between 1911-1936.
+
+Burton appears frequently in the Emma B. Andrews diaries, since she was in close contact with him from 1903-1913.<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Burton_Harry.png"/></note>
 					</person>
 					<person xml:id="Busk_Daisy">
 						<persName>Busk, Daisy</persName>
@@ -562,17 +572,20 @@
 <graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Carnarvon_Lord.jpg"/></note>
 					</person>
 					<person xml:id="Carter_Howard">
-						<persName>Carter, Howard</persName>
+						<persName>Howard Carter</persName>
 						<note>Egyptologist, artist and archaeologist, Carter is most famous for his discovery of the tomb of Tutankhanun in 1922 while working for Lord Carnarvon. Prior to this, he was employed as one of Theodore Davis's archaeologists.
 
 <graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Carter_Howard.jpeg"/></note>
 					</person>
 					<person xml:id="Elwes_Cary_Gervase">
 						<persName>Cary-Elwes, Gervase</persName>
-						<note>A well acclaimed musician descended from a notable family. His stay in Egypt was the result of his largely unsettled lifestyle. While he and his wife visited Egypt they both performed for Emma B. Andrews and accompanied her to artistic productions.</note>
+						<note>Gervase Elwes was the husband of Lady Winefride. After graduating Christ Church, Oxford and training as a lawyer, he chose to switch careers and become a professional singer. While he and his wife visited Egypt they both performed for Emma B. Andrews and accompanied her to artistic productions. He eventually went on to record for record companies such as the Gramophone Company and the Columbia Graphophone Company.
+ </note>
 					</person>
 					<person xml:id="Elwes_Cary_Winifred_Lady">
 						<persName>Cary-Elwes, Winifred, Lady</persName>
+						<note>Lady Winefride was the daughter of Rudolph William Basil Feilding, 8th Earl of Denbigh and Lady Denbigh. She married Gervase Henry Elwes (Mr. Cary-Elwes) with whom she had 5 children. She was also the National President of the Catholic Women’s League.
+</note>
 					</person>
 					<person xml:id="Cassatt_Mary">
 						<persName>Cassatt, Mary S.</persName>
@@ -684,8 +697,14 @@
 					<person xml:id="Cook_Thomas">
 						<persName>Cook, Thomas</persName>
 					</person>
+					<person xml:id="">
+						<persName>Cookites</persName>
+					</person>
 					<person xml:id="Cooper_Mr">
 						<persName>Cooper, Mr or Mr Cowper?</persName>
+					</person>
+					<person xml:id="">
+						<persName>Corelly, Mr</persName>
 					</person>
 					<person xml:id="Corot_Jean_Baptiste_Camille ">
 						<persName>Corot, Jean-Baptiste Camille</persName>
@@ -742,6 +761,10 @@
 					</person>
 					<person xml:id="Cromer_Lord">
 						<persName>Cromer, Lord</persName>
+					</person>
+					<person xml:id="">
+						<persName>Cross, Mr</persName>
+						<note>Reverend A. W. Gross was the chaplain of the English Church in Luxor.</note>
 					</person>
 					<person xml:id="Cruttenden_Mace_Arthur">
 						<persName>Cruttenden Mace, Arthur</persName>
@@ -807,6 +830,14 @@
 					<person xml:id="de_Trafford_Agnes_Mary_Pia_Fielding_Lady">
 						<persName>de Trafford, Lady Agnes Mary Pia Fielding</persName>
 					</person>
+					<person xml:id="de_Trafford_Mary_Annette">
+						<persName>de Trafford, Miss</persName>
+						<note>Mary Annette de Trafford was the sister of Charles de Trafford. She married Samuel Sproston in 1905.</note>
+					</person>
+					<person xml:id="de_Trafford_Charles_Edmund">
+						<persName>de Trafford, Mr.</persName>
+						<note>Charles Edmund de Trafford was a first-class cricketer and was the captin of both the Marylebone Cricket Club and the Leicestershire County Cricket Club. In 1892, he married Lady Agnes Feilding with whom he had three children. He also held a political career as the High Sheriff of Leicestershire.</note>
+					</person>
 					<person xml:id="Della_Robbia_Lucca">
 						<persName>Della Robbia, Lucca</persName>
 					</person>
@@ -815,9 +846,12 @@
 					</person>
 					<person xml:id="Denbigh_Lady">
 						<persName>Denbigh, Lady</persName>
+						<note>Lady Denbigh was the wife of Rudolph William Basil Feilding, 8th Earl of Denbigh, with whom she had 9 children.</note>
 					</person>
 					<person xml:id="Feilding_Rudolph_Lord">
 						<persName>Denbigh, Lord Rudolph Feilding, of</persName>
+						<note>Rudolph Robert Basil Aloysius Augustine Feilding, 9th Earl of Denbigh, 8th Earl of Desmond, was the son of Lady Denbigh and Rudolph William Basil Feilding, 8th Earl of Denbigh. He was the Colonel commandant of the Honourable Artillery Company from 1893 to 1933 and was ranked Commander, Royal Artillery in the 2nd Mounted Division during his time in Egypt.
+</note>
 					</person>
 					<person xml:id="Dendowi">
 						<persName>Dendowi</persName>
@@ -829,6 +863,9 @@
 					<person xml:id="Dennis_Mrs">
 						<persName>Dennis, Mrs.</persName>
 						<note>Miss Ida Lee Wade married James Teackle Dennis in 1893. During her time in Egypt, she worked with her husband and other Egyptologists such as Dr. Edouard Naville as a photographer, artist, and decipherer. </note>
+					</person>
+					<person xml:id="">
+						<persName>Derenscke, Brothers</persName>
 					</person>
 					<person xml:id="Dervish_Mohammed">
 						<persName>Dervish, Mohammed</persName>
@@ -942,7 +979,16 @@
 						<persName>Erskine, David Mr. (M.P.)</persName>
 						<note>David Charles Erskine attended the Harrow School in London and went onto pursure higher education in France and Germany. In 1897, he became the secretary to the Governor-general of Canada and eventually became Liberal MP for West Perthshire (1906-1910). He was also known for his involvement with the British economic, John Maynard Keynes.</note>
 					</person>
+					<person xml:id="">
+						<persName>Erskine, Mr</persName>
+					</person>
+					<person xml:id="">
+						<persName>Erskine, Mr</persName>
+					</person>
 					<person xml:id="Esne">
+						<persName>Esnè</persName>
+					</person>
+					<person xml:id="">
 						<persName>Esnè</persName>
 					</person>
 					<person xml:id="Eugenie_Empress">
@@ -1009,16 +1055,21 @@
 					</person>
 					<person xml:id="Feilding_Rudolph_Viscount">
 						<persName>Feilding, Rudolph, Viscount</persName>
+						<note>Viscount Feilding was the son of Lord Denbigh. After graduating from Christ Church, Oxford, he became Lieutenant-Colonel in the Coldstream Guards, receiving numerous awards for his service during WWI.
+</note>
 					</person>
 					<person xml:id="Ferroir_Miss">
 						<persName>Ferroir, Miss</persName>
 					</person>
 					<person xml:id="Fielding_Basil">
 						<persName>Fielding, Basil</persName>
+						<note>Basil Feilding was the son of Rudolph William Basil Feilding, 8th Earl of Denbigh, and Lady Denbigh. He graduated with a Doctor of Philosophy and a Doctor of Divinity.
+</note>
 					</person>
 					<person xml:id="Fielding_Everard">
 						<persName>Fielding, Everard</persName>
-						<note>Hon. Francis Henry Everard Joseph Feilding graduated from Trinity College, Cambridge University where he received his B.A. and LL.B. He was a practicing barrister and served time in the military during WWI as well. In 1919, he married Stanislawa Janina Tomczyk. He is the son of Lord Rudolph Feilding of Denbigh and the brother of Lady Agnes.</note>
+						<note>Hon. Everard Feilding was the son of Lady Denbigh and Rudolph William Basil Feilding, 8th Earl of Denbigh. After graduating from Trinity College, Cambridge University, he became a practicing barrister. He was also a member of the Intelligence Staff in Egypt and Palestine during WWI. 
+</note>
 					</person>
 					<person xml:id="Fielding_Lord">
 						<persName>Fielding, Lord</persName>
@@ -1030,6 +1081,8 @@
 					</person>
 					<person xml:id="Fielding_Percy">
 						<persName>Fielding, Percy</persName>
+						<note>Percy Feilding was the cousin of Mr. Feilding and his siblings. He ran an antiquities shop with Mr. Pearsall-Smith, and with the assistance of Miss Berenson. 
+</note>
 					</person>
 					<person xml:id="Fiske_Mr">
 						<persName>Fiske, Mr</persName>
@@ -1286,7 +1339,7 @@
 					<person xml:id="Hale_Miss">
 						<persName>Hale, Miss</persName>
 					</person>
-					<person xml:id="Hall_Caine">
+					<person xml:id="Hall_Caine_Mr">
 						<persName>Hall, Caine, Mr</persName>
 						<note>Sir Thomas Henry Hall Caine attended the Hope Street British Schools in Liverpool and served an apprenticeship in hopes of becoming an architect. However, after moving back to the Isle of Man, he became interested in pursuing a career as a writer and published his first work, Sonnets of Three Centuries, in 1882. In 1886, he married Mary Alice Chandler, with whom he spent most of his time in the following decades traveling to various countries, including Egypt, where he wrote his most controversial work, The White Prophet (1909).</note>
 					</person>
@@ -1298,6 +1351,9 @@
 					</person>
 					<person xml:id="Hamed_Abu">
 						<persName>Hamed, Abu</persName>
+					</person>
+					<person xml:id="">
+						<persName></persName>
 					</person>
 					<person xml:id="Hanser_Mr">
 						<persName>Hanser, Mr.</persName>
@@ -1345,7 +1401,8 @@
 					</person>
 					<person xml:id="Hathor">
 						<persName>Hathor</persName>
-						<note>Hathor was an Egyptian goddess who represented a variety of things such as love, beauty, and fertility. She was the daughter of Ra and wife of Horus. She was also known as the protector of women.</note>
+						<note>Hathor was an Egyptian goddess who represented a variety of things such as love, beauty, and fertility. She was the daughter of Ra and wife of Horus. She was also known as the protector of women.
+</note>
 					</person>
 					<person xml:id="Hawkshaw_Lord">
 						<persName>Hawkshaw, Lord</persName>
@@ -1365,6 +1422,9 @@
 					<person xml:id="Hennop_Grace">
 						<persName>Hennop, Grace</persName>
 						<note>Grace Hennop was the wife of archaeologist Robb de Peyster Tytus, whose work took the couple around the world. These two factors appear to have led to their aquaintance with Emma B. Andrews and Theodore B. Davis. The couple had a house in Tyringham, Mass close by a farm owned by Emma.</note>
+					</person>
+					<person xml:id="">
+						<persName>Hennops</persName>
 					</person>
 					<person xml:id="Henry_Dr">
 						<persName>Henry, Dr</persName>
@@ -1431,10 +1491,13 @@
 						<persName>Huleatt, Mr</persName>
 					</person>
 					<person xml:id="Humphreys_Mr">
-						<persName>Humphreys, Mr</persName>
+						<persName>Mr. Humphreys</persName>
 					</person>
 					<person xml:id="Hunt_Arthur">
 						<persName>Hunt, Arthur</persName>
+					</person>
+					<person xml:id="">
+						<persName>Hunt, Mrs</persName>
 					</person>
 					<person xml:id="Hunter_Mrs">
 						<persName>Hunter, Mrs</persName>
@@ -1475,6 +1538,9 @@
 					<person xml:id="Insinger_Mr">
 						<persName>Insinger, Mr</persName>
 						<note>A famous Dutch Egyptologist and antiquities dealer who is best known for his link to the  "Insinger papyrus, "one of the oldest writings about Egyptian wisdom that is now on display in the National Museum of Antiquities in Leiden.</note>
+					</person>
+					<person xml:id="">
+						<persName>Insingers</persName>
 					</person>
 					<person xml:id="Irving_Henry">
 						<persName>Irving, Henry</persName>
@@ -1571,7 +1637,8 @@
 					</person>
 					<person xml:id="Kelekian_Dikran">
 						<persName>Kelekian, Dikran</persName>
-						<note>Dikran Kelekian was a notable art collector and dealer with ties to many well-known individuals and artists such as Henry Walters, John D. Rockefeller Jr., Mary Cassatt, Pablo Picasso, and Henri Matisse. He studied ancient Near Eastern history at Robert College in Constantinople and went on to open numerous shops in cities such as New York, Paris, and London, exhibiting his collections in museums all over the world as well. In addition to his work as a dealer, he was appointed the Persian Council in New York and as the Commissioner for the Persian Pavilion at the World’s Columbia Exposition.<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Kelekian_Dikran.jpg"/></note>
+						<note>Dikran Kelekian was a notable art collector and dealer with ties to many well-known individuals and artists such as Henry Walters, John D. Rockefeller Jr., Mary Cassatt, Pablo Picasso, and Henri Matisse. He studied ancient Near Eastern history at Robert College in Constantinople and went on to open numerous shops in cities such as New York, Paris, and London, exhibiting his collections in museums all over the world as well. In addition to his work as a dealer, he was appointed the Persian Council in New York and as the Commissioner for the Persian Pavilion at the World’s Columbia Exposition.
+<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Kelekian_Dikran.jpg"/></note>
 					</person>
 					<person xml:id="Kelekian_Mrs">
 						<persName>Kelekian, Mrs</persName>
@@ -1624,7 +1691,8 @@
 					</person>
 					<person xml:id="Kyticas_N_D">
 						<persName>Kyticas, N. D.</persName>
-						<note>Dionysios Kytikas was a well-known antiquities dealer in Cairo, Egypt, along with his relative Panayotis Kytikas. He also published numerous works on Arab literature, Egyptology, and Pharaonic Egypt.</note>
+						<note>Dionysios Kytikas was a well-known antiquities dealer in Cairo, Egypt, along with his relative Panayotis Kytikas. He also published numerous works on Arab literature, Egyptology, and Pharaonic Egypt.
+</note>
 					</person>
 					<person xml:id="Labib-Claudius">
 						<persName>Labib, Claudius</persName>
@@ -1635,6 +1703,10 @@
 					</person>
 					<person xml:id="Hughes_Eva_Lady">
 						<persName>Lady Eva Hughes</persName>
+					</person>
+					<person xml:id="">
+						<persName>Laffan, Mrs</persName>
+						<note>Born Georgiana Thompkins Ratcliffe, daughter of Judge Daniel Ratcliffe; married William Laffan, publisher of the New York Sun, in 1872.</note>
 					</person>
 					<person xml:id="Lagge_F_Mr">
 						<persName>Lagge, F., Mr.</persName>
@@ -1718,6 +1790,9 @@
 					<person xml:id="Lizzie">
 						<persName>Lizzie</persName>
 					</person>
+					<person xml:id="Mr_Loat">
+						<persName></persName>
+					</person>
 					<person xml:id="Logan-Smith_Mr">
 						<persName>Logan-Smith, Mr</persName>
 					</person>
@@ -1800,17 +1875,45 @@
 					<person xml:id="Machaye_Percy">
 						<persName>Machaye, Percy</persName>
 					</person>
+					<person xml:id="">
+						<persName>Mahassib, Hagg</persName>
+					</person>
+					<person xml:id="">
+						<persName>Mahmoud</persName>
+					</person>
 					<person xml:id="Rais_Mahommed">
 						<persName>Mahommed, Rais</persName>
+					</person>
+					<person xml:id="">
+						<persName>Maitland, Tom</persName>
+					</person>
+					<person xml:id="Malbranc_Dr">
+						<persName>Malbrane, Dr</persName>
+					</person>
+					<person xml:id="">
+						<persName>Mandsley, Mr.</persName>
+						<note>While Emma Andrews wrote his name as 'Mr. Mandsley', given the information we have found, there is enough evidence to suggest that she may have been referring to Lieutenant Colonel Henry Maudsley, a Melbourne physician. He left with the First A.I.F. for Egypt, where he was put in charge of No. 1 Australian General Hospital at Heliopolls in 1914. For his service in WWI, he was awarded the Companion of the Order of St Michael and St George.</note>
 					</person>
 					<person xml:id="Mantegna_Andrea">
 						<persName>Mantegna, Andrea</persName>
 					</person>
+					<person xml:id="">
+						<persName>Maquay, Mr</persName>
+					</person>
 					<person xml:id="Margaret_Princess">
 						<persName>Margaret, Princess</persName>
 					</person>
+					<person xml:id="">
+						<persName>Mariette</persName>
+					</person>
+					<person xml:id="">
+						<persName>Markow, Mrs</persName>
+					</person>
 					<person xml:id="Marquand_Allan">
 						<persName>Marquand, Allan</persName>
+					</person>
+					<person xml:id="">
+						<persName>Mary</persName>
 					</person>
 					<person xml:id="Maspero_Gaston">
 						<persName>Maspero, Gaston</persName>
@@ -1822,6 +1925,9 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<persName>Maspero, Mme.</persName>
 						<note>Louise Balluet married Gaston Maspero in 1880 with whom she had 3 children. She is also the sister of Paul d'Estournel de Constant, winner of the 1909 Nobel Peace Prize.
 </note>
+					</person>
+					<person xml:id="">
+						<persName>Mathar</persName>
 					</person>
 					<person xml:id="Boal_Mathilde">
 						<persName>Mathilde</persName>
@@ -1908,15 +2014,27 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Minghetti_Donna_Laura">
 						<persName>Minghetti, Donna, Laura</persName>
 					</person>
+					<person xml:id="">
+						<persName>Miss Harrison and Miss Clarke (from the English dahabeah)</persName>
+					</person>
 					<person xml:id="Gibbs_Sara">
 						<persName>Miss Sara Gibbs</persName>
+					</person>
+					<person xml:id="">
+						<persName>Mitchell</persName>
 					</person>
 					<person xml:id="Salah_Mohammed">
 						<persName>Mohammed Salah</persName>
 						<note>Employed by Theodore Davis as a connection to dealers and persons of importance. </note>
 					</person>
+					<person xml:id="">
+						<persName>Mohammed, General</persName>
+					</person>
 					<person xml:id="Rais_Mohammed">
 						<persName>Mohammed, Rais</persName>
+					</person>
+					<person xml:id="">
+						<persName>Mohammet</persName>
 					</person>
 					<person xml:id="Mohassib_Mohammed">
 						<persName>Mohassib, Mohammed</persName>
@@ -1925,6 +2043,12 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Molesworth_Lady">
 						<persName>Molesworth, Lady</persName>
 						<note>Jane Graham Frost was born to the American Brigadier General Daniel Marsh Frost. She grew up in St Louis, Missouri, and married the baronet Lewis William Molesworth in 1875. Her husband was first High Sheriff of Cornwall and later an M.P. She died of a wasp's sting to her jugular vein while at home in Cornwall in 1913.</note>
+					</person>
+					<person xml:id="Monty">
+						<persName>Monty</persName>
+					</person>
+					<person xml:id="">
+						<persName>Moomond</persName>
 					</person>
 					<person xml:id="Morehouse_Mr">
 						<persName>Morehouse, Mr</persName>
@@ -1942,6 +2066,12 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Morgan_Miss">
 						<persName>Morgan, Miss</persName>
 					</person>
+					<person xml:id="">
+						<persName>Morgan, Morgan</persName>
+					</person>
+					<person xml:id="Morice_Mr">
+						<persName>Morice, Mr</persName>
+					</person>
 					<person xml:id="Morrell_Dr">
 						<persName>Morrell, Dr. </persName>
 						<note>Dr. Ferdinand Gordon Morrill, M.D., was born in Boston in 1843. He graduated from Harvard in 1869 and afterward established a successful medical practice in Boston, as well as working for the Children's Hospital there. He married his wife Arria Niles in 1871. For the last part of his life he and his wife would winter in Egypt, and he died in Aswan in 1907.</note>
@@ -1950,8 +2080,15 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<persName>Morris, Gouverneur</persName>
 						<note>Gouverneur Morris was a great grandson of the Founding Father Gouverneur Morris. After graduating from Yale University, he published numerous novels, some of which were eventually adapted into films.</note>
 					</person>
+					<person xml:id="">
+						<persName>Morton, Miss</persName>
+					</person>
 					<person xml:id="Moussa">
 						<persName>Moussa</persName>
+					</person>
+					<person xml:id="">
+						<persName>Mumm von Schwartzenstein, Alfons, Baron</persName>
+						<note>Alfons Mumm von Schwarzenstein was an aristocratic figure and a diplomat. In 1910, he was the German minister to China.</note>
 					</person>
 					<person xml:id="Murch_Chauncey">
 						<persName>Murch, Chauncey</persName>
@@ -1960,14 +2097,24 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<persName>Murch, Mrs</persName>
 						<note>Amelia Sophronia Canfield was born in Ohio in 1853. She was the daughter of Allen Canfield, a farmer. She married the Rev. Chauncey Murch in 1880 and they moved to Egypt as part of the American Presbyterian Mission shortly thereafter, where they lived until the reverend's death in 1907. Afterwards she and her son James moved back to the United States. She died in Indiana in 1916.</note>
 					</person>
+					<person xml:id="">
+						<persName>Murchison, Dr</persName>
+					</person>
 					<person xml:id="Murray_Keith">
 						<persName>Murray, Keith</persName>
 					</person>
 					<person xml:id="Murray_Miss">
 						<persName>Murray, Miss</persName>
 					</person>
+					<person xml:id="Murray_M_Major">
+						<persName>Murry, Major, M</persName>
+						<note>Malcolm Donald Murray was born in 1867. He was from a family of Scottish nobility who had a history of serving in the British army. He joined the army as a second lieutenant in 1888. After serving abroad as part of the "Seaforth Highlanders" regiment, including during the Second Boer War, he was appointed aide-de-camp to Prince Arthur, third son of Queen Victoria and Duke of Connaught, in 1903. He served as such until his death. He drowned in 1938 at the age of 71 in a lake in Windsor Great Park while on one of the Duke's boats.</note>
+					</person>
 					<person xml:id="Murat">
 						<persName>Murat</persName>
+					</person>
+					<person xml:id="">
+						<persName>Nahmstock, Mr</persName>
 					</person>
 					<person xml:id="Nahman_Maurice">
 						<persName>Nahman </persName>
@@ -1983,8 +2130,20 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<persName>Naville, Mme</persName>
 						<note>Marguerite Naville married Edouard Naville in 1873. She accompanied him on a total of 14 trips to Egypt (1884-1914) where she managed excavation sites, cared for the workers, and recorded much of the findings made by Edouard and other Egyptologists at the time. A number of her photographs and drawings can be seen in her husband's publications. </note>
 					</person>
+					<person xml:id="">
+						<persName>Nectanebo</persName>
+					</person>
+					<person xml:id="">
+						<persName>Nellie</persName>
+					</person>
 					<person xml:id="Nelson_Miss">
 						<persName>Nelson, Miss</persName>
+					</person>
+					<person xml:id="">
+						<persName>Nero</persName>
+					</person>
+					<person xml:id="">
+						<persName>Newberry, Alice</persName>
 					</person>
 					<person xml:id="Newberry_Doris">
 						<persName>Newberry, Doris</persName>
@@ -2014,6 +2173,15 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Newman_Mrs">
 						<persName>Newman, Mrs</persName>
 					</person>
+					<person xml:id="Niblock_Lieutenant">
+						<persName>Niblock, Lieutenant</persName>
+					</person>
+					<person xml:id="Nichols_Mr">
+						<persName>Nichols, Mr</persName>
+					</person>
+					<person xml:id="Nichols_Mrs">
+						<persName>Nichols, Mrs</persName>
+					</person>
 					<person xml:id="Nicol_Erskine">
 						<persName>Nicol, Mr</persName>
 						<note>Erskine E. Nicol was a landscape artist and the son of the renowned Scottish painter Erskine Nicol. His works, like his father's, were often exhibited at the Royal Academy of Arts in London.</note>
@@ -2021,6 +2189,9 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Nicol_Mrs">
 						<persName>Nicol, Mrs</persName>
 						<note>Cecilia Marion Elizabeth Frere was born in 1879 in London. She was a member of the Frere family, who were prominent abolitionists in the nineteenth century. Her father Douglas died young of tuberculosis and she and her four sisters were raised by their mother in London. She met her husband, the painter Erskine Nicol Jr., in Egypt, where they bonded over a mutual fondness for art. They married in 1911. Their daughter Mary (b. 1913) would marry Louis Leakey and go on to become a pioneering figure in the field of paleoanthropology.</note>
+					</person>
+					<person xml:id="">
+						<persName>Nicolls</persName>
 					</person>
 					<person xml:id="Nikolaevich_Militza">
 						<persName>Nikolaevich, Militza</persName>
@@ -2031,15 +2202,39 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Nitocris">
 						<persName>Nitocris</persName>
 					</person>
+					<person xml:id="">
+						<persName>None</persName>
+					</person>
+					<person xml:id="">
+						<persName>Norman, Max</persName>
+					</person>
+					<person xml:id="">
+						<persName>Norman, Mr</persName>
+					</person>
+					<person xml:id="">
+						<persName>Norman, Mrs</persName>
+					</person>
+					<person xml:id="">
+						<persName>Norman, Reginald</persName>
+					</person>
+					<person xml:id="">
+						<persName>Northampton, Lady</persName>
+					</person>
 					<person xml:id="Northampton_Marquis">
 						<persName>Northampton, Marquis</persName>
 						<note>William George Spencer Scott Compton also known as the 5th Marquess of Northampton was educated at Trinity College. He served in the Diplomatic Service as Second Secretary to the British embassies and travelled in Egypt. After becoming interested in Egyptian excavation he financed the excavations in the Theban necropolis directed by Newberry and Wilhelm Spiegelberg. </note>
+					</person>
+					<person xml:id="">
+						<persName>Norton, Miss</persName>
 					</person>
 					<person xml:id="Nott_Major">
 						<persName>Nott, Major</persName>
 					</person>
 					<person xml:id="Nubeewya">
 						<persName>Nubeewya</persName>
+					</person>
+					<person xml:id="Nubia">
+						<persName>Nubia</persName>
 					</person>
 					<person xml:id="Duchess_of_Fife">
 						<persName>Of Fife, Duchess</persName>
@@ -2051,6 +2246,18 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					</person>
 					<person xml:id="Margaret_of_Savoy">
 						<persName>of Savoy, Margaret</persName>
+					</person>
+					<person xml:id="Ogle_Ms">
+						<persName>Ogle, Ms</persName>
+					</person>
+					<person xml:id="">
+						<persName>Ohio, Anita</persName>
+					</person>
+					<person xml:id="">
+						<persName>Oman</persName>
+					</person>
+					<person xml:id="">
+						<persName>Oman, Prof</persName>
 					</person>
 					<person xml:id="Orcagna">
 						<persName>Orcagna</persName>
@@ -2071,8 +2278,20 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Osborne_Mrs">
 						<persName>Osborne, Mrs.</persName>
 					</person>
+					<person xml:id="Osiris">
+						<persName>Osiris</persName>
+					</person>
+					<person xml:id="">
+						<persName>Oswald, St, Lord</persName>
+					</person>
 					<person xml:id="Packett_Mrs">
 						<persName>Packett, Mrs./Kirkbride, Miss</persName>
+					</person>
+					<person xml:id="">
+						<persName>Page, Mr</persName>
+					</person>
+					<person xml:id="">
+						<persName>Page, Mrs</persName>
 					</person>
 					<person xml:id="Paget_Almeric">
 						<persName>Paget, Almeric</persName>
@@ -2083,7 +2302,9 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<note>Sir Arthur Henry Fitzroy Paget served as the Commander-in-Chief, Ireland from 1912-1914 where he took part in the Curragh Incident. In 1918, he was given the title of King of Arms of the Order of the British Empire which he held until his death in 1928.</note>
 					</person>
 					<person xml:id="Paget_Lady">
-						<persName>Paget, Lady</persName>
+						<persName>Paget, Lady
+
+</persName>
 						<note>Mary "Minnie" Fiske Stevens was the daugter of Marietta Reed and Paran Stevens, the New York hotelier. Afer moving to Europe in 1872, she eventually married Sir Arthur Paget (1878) with whom she had 4 children.</note>
 					</person>
 					<person xml:id="Palsley_Mr">
@@ -2119,9 +2340,25 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<persName>Pasha, Isma'il</persName>
 						<note>Isma'il Pasha was the Kehdive of Egypt and Sudan from 1863 to 1879 when he was removed from power by British forces.</note>
 					</person>
+					<person xml:id="">
+						<persName>Paterson, Mr</persName>
+					</person>
+					<person xml:id="">
+						<persName>Peabody, Dr</persName>
+					</person>
 					<person xml:id="Peabody_Endicott_Rev">
 						<persName>Peabody, Rev. Endicott</persName>
 						<note>Reverend Endicott Peabody attended Trinity College, Cambridge and returned to the US in 1880 to train as a minister, graduating from the Episcopal Theological School in 1884. Later in his life, he founded the Groton School for Boys and Brooks School.</note>
+					</person>
+					<person xml:id="Pearsall-Smith_Mr">
+						<persName>Pearsall-Smith, Mr</persName>
+					</person>
+					<person xml:id="">
+						<persName>Pease, Mr.</persName>
+						<note>Thomas Henry Ormston Pease was the son of Thomas Pease (1816-1884), a traveller and collector of Egyptian antiquities. His father had a private collection with the Bristol Museum and was good friends with Miss Amelia B. Edwards, founde of the Egypt Exploration Fund. Ormston himself had also created the Ormston Pease Collection which included two egyptian coffins. After graduating from University Collge London, he became a solicitor in 1877 and practiced in Bristol for the following 2 decades. In December of 1888, he married Mary Ellis Cave and had three children.</note>
+					</person>
+					<person xml:id="">
+						<persName>Peck, Mrs</persName>
 					</person>
 					<person xml:id="Peckett_Mrs">
 						<persName>Peckett,  Mrs</persName>
@@ -2133,6 +2370,9 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Pell_Mrs">
 						<persName>Pell, Mrs</persName>
 						<note>No further information.</note>
+					</person>
+					<person xml:id="">
+						<persName>Pepi II</persName>
 					</person>
 					<person xml:id="Percira_Major">
 						<persName>Percira, Major</persName>
@@ -2146,13 +2386,20 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Baldassare_Peruzzi">
 						<persName>Peruzzi, Baldassare</persName>
 					</person>
+					<person xml:id="">
+						<persName>Peto, Mr</persName>
+					</person>
 					<person xml:id="Petrie_Hilda">
 						<persName>Petrie, Hilda</persName>
 						<note>Hilda Urlin Petrie was the wife of Sir Flinders Petrie. She studied geology and was employed by Petrie as an artist, marrying him soon after. The two left for Egypt in 1896 and she became the chief maanger at many of the excavations her husband worked at. She published numerous works both by herself and with Petrie. The two had a son and daughter.</note>
 					</person>
+					<person xml:id="">
+						<persName>Petrie, Joe</persName>
+					</person>
 					<person xml:id="Petrie_William">
 						<persName>Petrie, Sir, William, Flinders</persName>
-						<note>Sir William Matthew Flinders Petrie was an English Egyptologist and first chair in Egyptology in England at the University College London. He surveyed many archaeological remains in England, Egypt, and Palestine, and published numerous works on his findings. Despite the lack of a formal education, he made many major archaeological discoveries and was eventually knighted for his services in 1923.</note>
+						<note>Sir William Matthew Flinders Petrie was an English Egyptologist and first chair in Egyptology in England at the University College London. He surveyed many archaeological remains in England, Egypt, and Palestine, and published numerous works on his findings. Despite the lack of a formal education, he made many major archaeological discoveries and was eventually knighted for his services in 1923.
+</note>
 					</person>
 					<person xml:id="Philip_II">
 						<persName>Philip II</persName>
@@ -2178,11 +2425,22 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Pinturicchio">
 						<persName>Pinturicchio</persName>
 					</person>
+					<person xml:id="">
+						<persName>Pirie, Miss</persName>
+						<note>Grace Pirie was Annie Pirie Quibell's niece who often visited her. She was the daughter of one of Quibell's brothers.</note>
+					</person>
 					<person xml:id="Pollack_Dr">
 						<persName>Pollack, Dr.</persName>
 					</person>
 					<person xml:id="Pollack_Mrs">
 						<persName>Pollack, Mrs.</persName>
+					</person>
+					<person xml:id="">
+						<persName>Polly, Miss</persName>
+					</person>
+					<person xml:id="">
+						<persName>Ponsonby, Lieut, the, Hon, M, B</persName>
+						<note>Lieutenant Ponsonby fought in the Boer War of 1902, and following this he served as an Aide-de-Camp between the years 1903-1910.</note>
 					</person>
 					<person xml:id="Porch_Mr">
 						<persName>Porch, Mr.</persName>
@@ -2197,8 +2455,14 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Powell_Helen">
 						<persName>Powell, Helen</persName>
 					</person>
+					<person xml:id="">
+						<persName>Pratt, Mr</persName>
+					</person>
 					<person xml:id="Preece_William_Henry_Sir">
 						<persName>Preece, William Henry Sir</persName>
+					</person>
+					<person xml:id="">
+						<persName>Ptolemy XI</persName>
 					</person>
 					<person xml:id="Pumpelly_Raphael">
 						<persName>Pumpelly, Raphael</persName>
@@ -2213,8 +2477,14 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<persName>Quibell, Mrs.</persName>
 						<note>Anne Abernethie Pirie Quibell was a Scottish excavator and draughtsman. She went to Egypt as an assistant to Petrie and helped him on a number of his excavations, contributing to several of his volumes. She later assisted her husband, James Quibell, in his archaeological work. She published two popular books—Egyptian History and Art and A Wayfarer in Egypt</note>
 					</person>
+					<person xml:id="">
+						<persName>Raineria, Felicitas, Desideria, Henriette, Christina, Maria, Queen</persName>
+					</person>
 					<person xml:id="Rais_Achmed">
 						<persName>Rais, Achmed</persName>
+					</person>
+					<person xml:id="Ralem_Von_Miss">
+						<persName>Ralem, Von, Miss</persName>
 					</person>
 					<person xml:id="Ralli_Pandolfi">
 						<persName>Ralli, Pandolfi, Mr</persName>
@@ -2237,7 +2507,8 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					</person>
 					<person xml:id="Ransom_Williams_Caroline">
 						<persName>Ransom Williams, Caroline</persName>
-						<note>Williams attended Lake Erie College (B.A.) and Chicago University (Ph.D.). After receiving her Ph.D. in Egyptology, she became the first female professionally-trained Egyptologist in the US. She worked as the assistant curator in the Metropolitan Museum and served with the Chicago Expedition in Egypt from 1926-7. She also wrote for the Journal of Egyptian Archaeology and published numerous studies regarding Egyptian antiquities as well.</note>
+						<note>Williams attended Lake Erie College (B.A.) and Chicago University (Ph.D.). After receiving her Ph.D. in Egyptology, she became the first female professionally-trained Egyptologist in the US. She worked as the assistant curator in the Metropolitan Museum and served with the Chicago Expedition in Egypt from 1926-7. She also wrote for the Journal of Egyptian Archaeology and published numerous studies regarding Egyptian antiquities as well.
+</note>
 					</person>
 					<person xml:id="Raphael">
 						<persName>Raphael</persName>
@@ -2254,11 +2525,23 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<persName>Rathbone, Mrs</persName>
 						<note>Blanche Luling married William Gair Rathbone VII, and was mother to Elena Rathbone.</note>
 					</person>
-					<person xml:id="Ream_Robert_Clarke - possibly tagged in vol. 13 as #Ream">
+					<person xml:id="">
+						<persName>Read, Constantine, Mrs</persName>
+					</person>
+					<person xml:id="">
+						<persName>Ream, </persName>
+					</person>
+					<person xml:id="Ream_Robert_Clarke">
 						<persName>Ream, Robert Clarke</persName>
+					</person>
+					<person xml:id="">
+						<persName>Red, Rennell</persName>
 					</person>
 					<person xml:id="Reis">
 						<persName>Reis</persName>
+					</person>
+					<person xml:id="">
+						<persName>Reisner, George</persName>
 					</person>
 					<person xml:id="René">
 						<persName>René</persName>
@@ -2278,6 +2561,15 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Ricci_Corrado">
 						<persName>Ricci, Corrado</persName>
 					</person>
+					<person xml:id="">
+						<persName>Richter, Dr</persName>
+					</person>
+					<person xml:id="">
+						<persName>Ritz, Cesar</persName>
+					</person>
+					<person xml:id="">
+						<persName>Roberts, Lord</persName>
+					</person>
 					<person xml:id="Robinson_Mr">
 						<persName>Robinson Mr</persName>
 					</person>
@@ -2285,12 +2577,21 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<persName>Rodier, M</persName>
 						<note>George Rodier was an artist and professor of philosphy at the Sorbonne.</note>
 					</person>
+					<person xml:id="">
+						<persName>Rogers, Andrews</persName>
+					</person>
 					<person xml:id="Rogers_Mary">
 						<persName>Rogers, Mary</persName>
+					</person>
+					<person xml:id="">
+						<persName>Rogers, Will</persName>
 					</person>
 					<person xml:id="Roosevelt_Theodore">
 						<persName>Roosevelt, Theodore</persName>
 						<note>Theodore Roosevelt Jr. was the son of President Theodore Roosevelt, and he served in WWII as a brigadier general. He was also a politician, becoming the Governor of the Philippines and Puerto Rico as well as the Assistant Secretary of the Navy. </note>
+					</person>
+					<person xml:id="">
+						<persName>Rosellini</persName>
 					</person>
 					<person xml:id="Rospigliosi_Giovanni">
 						<persName>Rospigliosi, Giovanni</persName>
@@ -2302,6 +2603,16 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Rowland_Mrs">
 						<persName>Rowland, Mrs</persName>
 					</person>
+					<person xml:id="">
+						<persName>Royal, Judge</persName>
+					</person>
+					<person xml:id="">
+						<persName>Royal, Princess</persName>
+					</person>
+					<person xml:id="">
+						<persName>Russell, Mr</persName>
+						<note>No further information.</note>
+					</person>
 					<person xml:id="Ruth_Miss">
 						<persName>Ruth, Miss</persName>
 					</person>
@@ -2309,13 +2620,18 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<persName>Rutter, Mrs</persName>
 						<note>Geraldine "Geanie" Rutter was the sister of Arthur Weigall. She travelled frequently with her brother and in 1904, she married Jack Rutter, giving birth to her daughter Betty in July of 1908.<graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Rutter_Geanie.jpg"/></note>
 					</person>
+					<person xml:id="">
+						<persName>Ryerson, Mrs</persName>
+					</person>
 					<person xml:id="Ankhesenamen">
 						<persName>S-ankh-aten</persName>
 						<note>S-ankh-aten, known as Ankhesenamun, was the Great Royal Wife of pharaoh Tutankhamun. There is no record of what happened to her after she died, which is why she is called Egypt's lost princess.</note>
 					</person>
-					<person xml:id="#Sahopek_Ida">
+					<person xml:id="">
+						<persName>Sablool</persName>
+					</person>
+					<person xml:id="Sahopek_Ida">
 						<persName>Sahopek, Ida</persName>
-						<note>Breifly mentioned, attended lunch with Emma B. Andrews</note>
 					</person>
 					<person xml:id="Salah_Mohammed">
 						<persName>Salah, Mohammed</persName>
@@ -2326,7 +2642,8 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					</person>
 					<person xml:id="Sammary_Mr">
 						<persName>Sammary, Mr</persName>
-						<note>Samuel Hiseen was a key figure in the Sudan Pioneer Mission (SPM), founded in 1900. After receiving his education from a missionary training college in England, he traveled around Europe for a few years before returning to Nubia for a fellowship with the American Mission School. He joined SPM as an evangelist and missionary, and deemed it his life mission to spread Christianity throughout Nubia.</note>
+						<note>Samuel Hiseen was a key figure in the Sudan Pioneer Mission (SPM), founded in 1900. After receiving his education from a missionary training college in England, he traveled around Europe for a few years before returning to Nubia for a fellowship with the American Mission School. He joined SPM as an evangelist and missionary, and deemed it his life mission to spread Christianity throughout Nubia.
+</note>
 					</person>
 					<person xml:id="Samms_Rev">
 						<persName>Samms, Reverand</persName>
@@ -2351,6 +2668,9 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<persName>Sayce, Archibald</persName>
 						<note>Reverend Archibald Sayce was a professor of Assyriology at Queen's College in Oxford. His work, which involved the writing of scholarly reviews and articles on Near Eastern civilizations, took him to locations all over the world in addition to Egypt.</note>
 					</person>
+					<person xml:id="Schaiyeh_Mohammed">
+						<persName>Schaiyeh, Mohammed</persName>
+					</person>
 					<person xml:id="Schewinfurt_Dr">
 						<persName>Schweinfurt, Dr.</persName>
 					</person>
@@ -2367,8 +2687,20 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Scott_Elliot_Mrs">
 						<persName>Scott-Elliot, Mrs</persName>
 					</person>
+					<person xml:id="Scott_John_Sir">
+						<persName>Scott, John, Sir</persName>
+						<note>Sir John Scott was an English judge who later became the Judicial Advisor to the Khedive of Egypt. As a child he attended the Bruce Castle School and received his BA and MA from Pembroke College, Oxford. During his time in Egypt, he passed numerous laws that reformed the entire judicial system. After retiring from his work, he was knighted in 1894.
+</note>
+					</person>
+					<person xml:id="">
+						<persName>Scott, Miss</persName>
+						<note>Daughter of Sir John Scott.</note>
+					</person>
 					<person xml:id="Selim">
 						<persName>Selim</persName>
+					</person>
+					<person xml:id="">
+						<persName>Seranton, James, B</persName>
 					</person>
 					<person xml:id="Sethe">
 						<persName>Sethe</persName>
@@ -2380,6 +2712,9 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<persName>Sety II</persName>
 						<note>Seti II was the fifth Pharaoh of the 19th Dynasty, and he one of the last rulers of this era. During his rule, he was known to have faced his rival Amenmesse, who had gained control of Thebes and Nubia. </note>
 					</person>
+					<person xml:id="">
+						<persName>Shaw Oliver, Mrs Robert</persName>
+					</person>
 					<person xml:id="Shaw_George_Bernard">
 						<persName>Shaw, George Bernard</persName>
 					</person>
@@ -2388,6 +2723,15 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					</person>
 					<person xml:id="Shaw_Quincy">
 						<persName>Shaw, Quincy</persName>
+					</person>
+					<person xml:id="">
+						<persName>Sheik, Bey, of, the, Ababdehs</persName>
+					</person>
+					<person xml:id="">
+						<persName>Shephard, Mr</persName>
+					</person>
+					<person xml:id="">
+						<persName>Shepheard, Shepheard, Miss</persName>
 					</person>
 					<person xml:id="Luca_Signorelli">
 						<persName>Signorelli, Luca</persName>
@@ -2402,15 +2746,24 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Sitamun">
 						<persName>Sitamun</persName>
 					</person>
+					<person xml:id="Skifeuton_Smyth_Major">
+						<persName>Skifeuton, Smythe, Major</persName>
+						<note>Lieutenant Geoffery Skeffington-Smyth fought in the second Boer War, where he was commended for his bravery after his fleet suffered heavy losses. He received the Queens Medal and was promoted to a Lieutenant for his efforts in South Africa. </note>
+					</person>
 					<person xml:id="Smith_Corinna">
 						<persName>Smith, Corinna</persName>
 						<note>Wife of Joseph Lindon Smith, academic with a focus on Classical Arabic and Islamic Theology, prominent figure in the American Research Center in Egypt, and activist for numerous struggles. She was born in 1876, married in 1879, and died in 1965.</note>
 					</person>
 					<person xml:id="Elliot_Smith_Sir_Grafton">
 						<persName>Smith, G. Elliot, Mr</persName>
+						<note>Sir Grafton Elliot Smith was an expert on brain anatomy, also remembered for his contributions to the field of cultural anthropology. In 1900 he was appointed chair of anatomy at the Government Medical School, Cairo. An expert on mummification, he was the first to examine mummies using radiological techniques. Smith was later a professor of anatomy at the University of Manchester and University College, London. He was knighted in 1934.</note>
 					</person>
 					<person xml:id="Elliot_Smith_Mrs">
 						<persName>Smith, G. Elliot, Mrs</persName>
+						<note>Dame Kathleen (Katie) Emily McCredie was born in 1874 in Sydney, Australia. She married leading anatomist Grafton Elliot Smith in 1900. The two had three sons, Arthur, Grafton, and Stephen, the former two born in Egypt. She died in Oxford, England in 1961.</note>
+					</person>
+					<person xml:id="Smith_George">
+						<persName>Smith, George</persName>
 					</person>
 					<person xml:id="Smith_Harold">
 						<persName>Smith, Harold</persName>
@@ -2419,10 +2772,19 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Smith_Mr">
 						<persName>Smith, Mr</persName>
 					</person>
+					<person xml:id="">
+						<persName>Sohag, Mudir</persName>
+					</person>
 					<person xml:id="Somers_Clarke_George">
 						<persName>Somers, Clarke, George</persName>
 						<note>George Somers Clarke was originally an architect, primarily designing and restoring churches. After retiring from general practice in 1902, he moved to Egypt where he became an archaeologist and oversaw the restoration of various temples and published numerous architectural descriptions of important excavations at the time.
 </note>
+					</person>
+					<person xml:id="Sopher_Mme">
+						<persName>Sopher, Mme</persName>
+					</person>
+					<person xml:id="">
+						<persName>Spiegelberg, Professor</persName>
 					</person>
 					<person xml:id="Sprague_Carleton">
 						<persName>Sprague, Carleton</persName>
@@ -2430,17 +2792,29 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Sprague_Mrs">
 						<persName>Sprague, Mrs</persName>
 					</person>
-					<person xml:id="Sprenger-Muller_Mr">
+					<person xml:id="Sprenger_Muller_Mr">
 						<persName>Sprenger Müller, Mr</persName>
 					</person>
 					<person xml:id="Stanley_Henry_Morton_Sir">
 						<persName>Stanley</persName>
 					</person>
+					<person xml:id="Stauring_General">
+						<persName>Stauring, General</persName>
+					</person>
 					<person xml:id="Stell_Julia">
 						<persName>Stell, Julia</persName>
 					</person>
+					<person xml:id="">
+						<persName>Stephen, King</persName>
+					</person>
 					<person xml:id="Stevens_Joe">
 						<persName>Stevens, Joe</persName>
+					</person>
+					<person xml:id="">
+						<persName>Stevenson, Louis, Robert</persName>
+					</person>
+					<person xml:id="Stillman_Mrs">
+						<persName>Stillman, Mrs</persName>
 					</person>
 					<person xml:id="Stokes_James">
 						<persName>Stokes, James</persName>
@@ -2466,6 +2840,10 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<note>Julia Walbridge Smith Taft married Henry W. Taft on March 28th, 1883, with whom she had four children. She was active in many Catholic charities at St. Patrick’s Cathedral including Helpers of the Holy Souls, the Little Sisters of the Assumption, and the Catholic Center for the Blind.
 </note>
 					</person>
+					<person xml:id="">
+						<persName>Tamai</persName>
+						<note>Wife of Salah, noted to have a child and live somewhat lavishly.</note>
+					</person>
 					<person xml:id="Tarbell_Prof">
 						<persName>Tarbell, Prof</persName>
 						<note>Professor Tarbell's reasons for being in Egypt are not yet known. However, he spent several days with Emma B. Andrews, dining with them after delivering a letter.</note>
@@ -2479,6 +2857,19 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					</person>
 					<person xml:id="Taylor_Mrs">
 						<persName>Taylor, Mrs</persName>
+					</person>
+					<person xml:id="">
+						<persName>Terry</persName>
+					</person>
+					<person xml:id="">
+						<persName>Terry, Ellen</persName>
+						<note>English actress whose work was enjoyed by Emma B. Andrews, who attended her performance in The Dead Heart: A Story of the French Revolution in London.</note>
+					</person>
+					<person xml:id="">
+						<persName>Theodant, Abbe</persName>
+					</person>
+					<person xml:id="">
+						<persName>Thorn</persName>
 					</person>
 					<person xml:id="Thorwaldsen">
 						<persName>Thorwaldsen</persName>
@@ -2496,15 +2887,30 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Thotmes_IV">
 						<persName>Thotmes IV</persName>
 					</person>
+					<person xml:id="">
+						<persName>Thubron, Ernest</persName>
+					</person>
 					<person xml:id="Tutankhamen">
 						<persName>Thut-ankh-Amon</persName>
 						<note>Thut-ankh-Amon, commonly known as Tutankhamun, was an Egyptian pharaoh during the 18th Dynasty of the New Kingdom of Egypt. After his father tried to change the ancient Egyptian religion into monotheism, Tutankhamun began his reign by restoring it back to polytheism, which was a monumental achievement after years of religious turmoil. The discovery of his tomb was one of the biggest archeological finds in history as it contained several artifacts that revealed information about royal life in ancient Egypt, making Tutankhamun one of the world's most famous pharaohs. </note>
 					</person>
+					<person xml:id="">
+						<persName>Ti</persName>
+					</person>
+					<person xml:id="">
+						<persName>Tiberius</persName>
+					</person>
 					<person xml:id="Titian">
 						<persName>Titian</persName>
 					</person>
+					<person xml:id="Titus_Mrs">
+						<persName>Titus, Mrs</persName>
+					</person>
 					<person xml:id="Tjuyu">
 						<persName>Tjuyu</persName>
+					</person>
+					<person xml:id="">
+						<persName>Toby</persName>
 					</person>
 					<person xml:id="Tommy">
 						<persName>Tommy</persName>
@@ -2519,7 +2925,8 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					</person>
 					<person xml:id="Trefusis_Walter_Capt">
 						<persName>Trefusis, Walter, Capt</persName>
-						<note>Captain Walter Trefusis was the son of Charles Trefusis, 20th Lord Clinton and Margaret Walrond (Lady Clinton). In 1911, he married Marjorie Winifred Graham, but they divorced in 1917. He was the brother of Robert Trefusis and Evelyn Trefusis.</note>
+						<note>Captain Walter Trefusis was the son of Charles Trefusis, 20th Lord Clinton and Margaret Walrond (Lady Clinton). In 1911, he married Marjorie Winifred Graham, but they divorced in 1917. He was the brother of Robert Trefusis and Evelyn Trefusis.
+</note>
 					</person>
 					<person xml:id="Tremaine_Mr">
 						<persName>Tremaine, Mr</persName>
@@ -2568,6 +2975,15 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Van_Alen_Mr">
 						<persName>Van Alen, Mr</persName>
 					</person>
+					<person xml:id="">
+						<persName>Van, Renssaelaer</persName>
+					</person>
+					<person xml:id="">
+						<persName>Vanderbilt, Cornelius</persName>
+					</person>
+					<person xml:id="Varley_Mr">
+						<persName>Varley, Mr</persName>
+					</person>
 					<person xml:id="Velazquez_Diego">
 						<persName>Velazquez, Diego</persName>
 					</person>
@@ -2579,6 +2995,12 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					</person>
 					<person xml:id="Villamarina_Contessa_di">
 						<persName>Villamarina, Contessa, di</persName>
+					</person>
+					<person xml:id="Villiers_Eric_Mr.">
+						<persName>Villiers, Eric, Mr</persName>
+					</person>
+					<person xml:id="">
+						<persName>Virginia</persName>
 					</person>
 					<person xml:id="Viti_Timoteo">
 						<persName>Viti, Timoteo</persName>
@@ -2598,10 +3020,10 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<persName>Ward Howe, Mrs, Elliot</persName>
 					</person>
 					<person xml:id="Ward_Howe_Julia">
-						<persName>Ward Howe, Mrs, Julia</persName>
+						<persName>Mrs Julia Ward Howe</persName>
 					</person>
 					<person xml:id="Ware_Dr">
-						<persName>Ware, Dr.</persName>
+						<persName>Dr. Ware</persName>
 					</person>
 					<person xml:id="Warner_Miss">
 						<persName>Warner, Miss</persName>
@@ -2640,6 +3062,10 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Watson_Baby">
 						<persName>Watson, Baby</persName>
 					</person>
+					<person xml:id="">
+						<persName>Webb, Miss</persName>
+						<note>No further information.</note>
+					</person>
 					<person xml:id="Webster_Hamilton_Fish">
 						<persName>Hamilton, Fish</persName>
 						<note><graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Webster_Hamilton_Fish.jpeg"/></note>
@@ -2659,11 +3085,20 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Weigall_Alured">
 						<persName>Weigall, Alured</persName>
 					</person>
+					<person xml:id="">
+						<persName>Weld, Prof</persName>
+					</person>
 					<person xml:id="Wendell_Mr">
 						<persName>Wendell, Mr</persName>
 					</person>
 					<person xml:id="Wendell_Mrs">
 						<persName>Wendell, Mrs</persName>
+					</person>
+					<person xml:id="">
+						<persName>Whaling, Bessie</persName>
+					</person>
+					<person xml:id="">
+						<persName>Whaling, John</persName>
 					</person>
 					<person xml:id="Whalings_Ettie">
 						<persName>Whalings, Ettie</persName>
@@ -2680,6 +3115,15 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<persName>Wherry, Miss</persName>
 						<note>Daughter of Albinia Wherry, niece of Robert Cust. </note>
 					</person>
+					<person xml:id="">
+						<persName>White, Gilbert</persName>
+					</person>
+					<person xml:id="">
+						<persName>Whitehead, Mr</persName>
+					</person>
+					<person xml:id="">
+						<persName>Whitehead, Mrs</persName>
+					</person>
 					<person xml:id="Whiting_Mrs">
 						<persName>Whiting, Mrs</persName>
 					</person>
@@ -2693,7 +3137,8 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					</person>
 					<person xml:id="Whittaker_Mr">
 						<persName>Whittaker, Mr</persName>
-						<note>Hugh Whitaker was a close colleague of Percy Newberry and assisted him on numerous excavations including the discovery of the tombs in Akhmim. He was also close friends with Lady Layard who wrote about him frequently in her journals. </note>
+						<note>Hugh Whitaker was a close colleague of Percy Newberry and assisted him on numerous excavations including the discovery of the tombs in Akhmim. He was also close friends with Lady Layard who wrote about him frequently in her journals. 
+</note>
 					</person>
 					<person xml:id="Whittaker_Mrs">
 						<persName>Whittaker, Mrs</persName>
@@ -2705,6 +3150,9 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					<person xml:id="Wiedemann_Alfred">
 						<persName>Wiedemann, Alfred  </persName>
 						<note><graphic class="graphic" url="https://www.emmabandrews.org/project/files/original/Wiedemann_Alfred.jpeg"/></note>
+					</person>
+					<person xml:id="Wilbur_Mr">
+						<persName>Wilbur, Mr</persName>
 					</person>
 					<person xml:id="Wilhelm_II">
 						<persName>Wilhelm II</persName>
@@ -2726,11 +3174,20 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 						<persName>Wilson, Alice</persName>
 						<note>Alice Wilson was the daughter of Nathaniel Wilson, a prominent Washington DC-based lawyer. She was born in DC in 1869. She spent a lot of time travelling abroad, including passing multiple winters in Egypt with Theodore Davis and Emma Andrews. She never married and died in 1952 at the age of 83.</note>
 					</person>
+					<person xml:id="">
+						<persName>Wilson, Capt, Stewart</persName>
+					</person>
 					<person xml:id="Wilson_Charlie">
 						<persName>Wilson, Charlie</persName>
 					</person>
+					<person xml:id="">
+						<persName>Wilson, Clarence</persName>
+					</person>
 					<person xml:id="Wilson_Mrs">
 						<persName>Wilson, Mrs.</persName>
+					</person>
+					<person xml:id="">
+						<persName>Wilsons</persName>
 					</person>
 					<person xml:id="Winlock_Helen">
 						<persName>Winlock, Helen</persName>
@@ -2741,6 +3198,15 @@ His works include Les Momies royales de Deir-el-Bahari 1889 (The Royal Mummies o
 					</person>
 					<person xml:id="Miss_Wood">
 						<persName>Wood, Miss</persName>
+					</person>
+					<person xml:id="">
+						<persName>Wood, Mrs, John</persName>
+					</person>
+					<person xml:id="Woodward_Haven_Mrs">
+						<persName>Woodward Haven, Mrs</persName>
+					</person>
+					<person xml:id="">
+						<persName>Woodworth, Mrs</persName>
 					</person>
 					<person xml:id="Yarde-Buller_Capt.">
 						<persName>Yarde-Buller, Captain</persName>
