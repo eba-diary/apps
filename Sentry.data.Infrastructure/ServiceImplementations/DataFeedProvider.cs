@@ -1,15 +1,10 @@
-﻿using System;
-using System.Linq;
-using NHibernate;
+﻿using NHibernate;
+using NHibernate.Linq;
 using Sentry.data.Core;
 using Sentry.NHibernate;
-using System.ServiceModel.Syndication;
-using System.Xml;
+using System;
 using System.Collections.Generic;
-using NHibernate.Linq;
-using System.Threading.Tasks;
-using System.Net;
-using System.IO;
+using System.Linq;
 
 namespace Sentry.data.Infrastructure
 {
@@ -21,103 +16,37 @@ namespace Sentry.data.Infrastructure
             NHQueryableExtensionProvider.RegisterQueryableExtensionsProvider<DataFeedProvider>();
         }
 
-        public IList<DataFeed> GetDataFeeds()
-        {
-            return Query<DataFeed>().Cacheable().ToList();
-        }
-
         public IList<DataFeedItem> GetAllFeedItems()
         {
-            List<DataFeed> dataFeeds = GetDataFeeds().ToList();
+            List<DataFeed> dataFeeds = Query<DataFeed>().Cacheable().ToList();
             return GoGetItems(dataFeeds);
-        }
-
-        public IList<DataFeed> GetSentryDataFeeds()
-        {
-            return Query<DataFeed>().Where(w => w.Type == "TAB").Cacheable().ToList();
         }
 
         public IList<DataFeedItem> GetSentryFeedItems()
         {
-            List<DataFeed> dataFeeds = GetSentryDataFeeds().ToList();
+            List<DataFeed> dataFeeds = Query<DataFeed>().Where(w => w.Type == "TAB").Cacheable().ToList();
             return GoGetItems(dataFeeds);
         }
 
         public IList<DataFeedItem> GoGetItems(List<DataFeed> dataFeeds)
         {
             List<DataFeedItem> items = new List<DataFeedItem>();
-
-            object sync = new object();
-
-            Parallel.ForEach(dataFeeds, feed =>
-            {
-                List<DataFeedItem> list = GetFeedItems(feed).ToList();
-                lock (sync)
-                {
-                    items.AddRange(list);
-                }
-            });
-
             items.AddRange(SentryEvents());
-
             return items.OrderByDescending(o => o.PublishDate).Take(100).ToList();
-        }
-
-        public IList<DataFeedItem> GetFeedItems(DataFeed feed)
-        {
-            List<DataFeedItem> dataFeed = new List<DataFeedItem>();
-            try
-            {
-                Sentry.Common.Logging.Logger.Debug($"Feed Url: {feed.Url}");
-
-                string uri = Configuration.Config.GetHostSetting("WebProxyUrl");
-
-                //https://stackoverflow.com/questions/124932/xmldocument-loadurl-through-a-proxy
-                WebProxy wp = new WebProxy(uri);
-                wp.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials;
-                WebClient wc = new WebClient();
-                wc.Proxy = wp;
-
-                MemoryStream ms = new MemoryStream(wc.DownloadData(feed.Url));
-                XmlTextReader reader = new XmlTextReader(ms);
-                
-                SyndicationFeed sf = SyndicationFeed.Load(reader);
-                reader.Close();
-                foreach (SyndicationItem item in sf.Items)
-                {
-                    dataFeed.Add(new DataFeedItem(
-                        item.PublishDate.DateTime,
-                        item.Id,
-                        item.Title.Text,
-                        item.Summary.Text,
-                        feed));
-                }
-
-                wc.Dispose();
-                ms.Dispose();
-
-                return dataFeed.ToList();
-            }
-            catch (Exception e)
-            {                
-                Sentry.Common.Logging.Logger.Debug(e.Message);
-                return dataFeed.ToList();
-            }
         }
 
         public IList<DataFeedItem> SentryEvents()
         {
-
             //NOTE: none of this code is called if CLA2838_DSC_ANOUNCEMENTS is false
-            
+
             //STEP #1 CREATE BLANK LIST OF DataFeedItems
             List<DataFeedItem> items = new List<DataFeedItem>();
 
             //STEP #2 CREATE DATASET DataFeedItems
-            var dsEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Dataset")  && (x.TimeCreated >= DateTime.Now.AddDays(-30))).Take(50).OrderByDescending(o => o.TimeCreated);
+            var dsEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Dataset") && (x.TimeCreated >= DateTime.Now.AddDays(-30))).OrderByDescending(o => o.TimeCreated).Take(25);
             foreach (Event e in dsEvents)
             {
-                Dataset ds = Query<Dataset>().Where(y => y.DatasetId == e.Dataset).FetchMany(x=> x.DatasetCategories).FirstOrDefault();
+                Dataset ds = Query<Dataset>().Where(y => y.DatasetId == e.Dataset).FetchMany(x => x.DatasetCategories).FirstOrDefault();
 
                 if (ds != null)
                 {
@@ -132,15 +61,15 @@ namespace Sentry.data.Infrastructure
                     e.Dataset.ToString(),
                     ds.DatasetName + " - A New Dataset was Created in the " + ds.DatasetCategories.First().Name + " Category",
                     ds.DatasetName + " - A New Dataset was Created in the " + ds.DatasetCategories.First().Name + " Category",
-                    feed 
+                    feed
                     );
 
                     items.Add(dfi);
-                }                
+                }
             }
 
             //STEP #3  CREATE BI ITEMS
-            var rptEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Report") && (x.TimeCreated >= DateTime.Now.AddDays(-30))).Take(50).OrderByDescending(o => o.TimeCreated);
+            var rptEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Report") && (x.TimeCreated >= DateTime.Now.AddDays(-30))).OrderByDescending(o => o.TimeCreated).Take(25);
             foreach (Event e in rptEvents)
             {
                 Dataset ds = Query<Dataset>().FirstOrDefault(y => y.DatasetId == e.Dataset);
@@ -164,9 +93,9 @@ namespace Sentry.data.Infrastructure
                     items.Add(dfi);
                 }
             }
-            
+
             //STEP #4  CREATE NOTIFICATION ITEMS
-            var notifications = Query<Notification>().Where(w => w.ExpirationTime >= DateTime.Now && (BusinessAreaType)w.ParentObject == BusinessAreaType.DSC);
+            var notifications = Query<Notification>().Where(w => w.ExpirationTime >= DateTime.Now && (BusinessAreaType)w.ParentObject == BusinessAreaType.DSC).Take(50);
             foreach (Notification n in notifications)
             {
                 if (n != null)
@@ -174,7 +103,7 @@ namespace Sentry.data.Infrastructure
                     DataFeed feed = new DataFeed();
                     feed.Id = n.NotificationId;
                     feed.Name = GlobalConstants.DataFeedName.NOTIFICATION;
-                    feed.Category = (n.NotificationCategory != null) ? n.NotificationCategory.GetDescription() : feed.Name;     
+                    feed.Category = (n.NotificationCategory != null) ? n.NotificationCategory.GetDescription() : feed.Name;
                     feed.Type = GlobalConstants.DataFeedType.Notifications;
 
                     DataFeedItem dfi = new DataFeedItem(
@@ -212,7 +141,7 @@ namespace Sentry.data.Infrastructure
                             Url = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.Location)) ? ds.Metadata.ReportMetadata.Location : null,
                             UrlType = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.LocationType)) ? ds.Metadata.ReportMetadata.LocationType : null,
                             Type = GlobalConstants.DataFeedType.Exhibits
-                    };
+                        };
                     }
                     else
                     {
@@ -223,7 +152,7 @@ namespace Sentry.data.Infrastructure
                             Url = "/Datasets/Detail/" + ds.DatasetId,
                             UrlType = ds.DatasetType,
                             Type = GlobalConstants.DataFeedType.Datasets
-                    };
+                        };
                     }
 
                     items.Add(new FavoriteItem(

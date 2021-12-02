@@ -44,7 +44,7 @@
         {
             if (item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.DATASET || item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.BUSINESS_INTELLIGENCE)
             {
-                <a href="@item.Url" target="_blank" class="pointer @color">@item.DisplayTitle() &gt;</a>
+                <a href="@item.Url" target="_blank" class="pointer @color">@item.DisplayTitle()</a>
             }
             else
             {
