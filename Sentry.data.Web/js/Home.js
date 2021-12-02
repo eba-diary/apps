@@ -15,6 +15,7 @@ data.Home = {
             //SHOW DSC ANNOUNCEMENTS BASED ON FEATURE FLAG DELETE THIS when feature is complete
             if (data.Home.CLA2838_DSC_ANOUNCEMENTS == true) {
 
+                //THIS AJAX CALL LOADS UP FIRST SET OF ITEMS IN FEED, REST ARE LOADED WHEN USER SCROLLS
                 $.ajax({
                     url: '/Home/GetFeed',
                     dataType: 'html',
@@ -87,15 +88,6 @@ data.Home = {
             return false;
         });
 
-        ////Does not work for less then 100% magnifcation. DO NOT ZOOM OUT.  div.scrollTop is not happy with floating point pixels.
-        //var div = $('div.feedBox');
-        //var scroller = setInterval(function () {
-        //    var pos = div.scrollTop();
-        //    pos = Number((pos).toFixed(0));
-        //    div.scrollTop(++pos);
-        //}, 50);
-
-
         $('body').on('DOMNodeInserted', function (e) {
             var target = e.target; //inserted element;
 
@@ -104,66 +96,32 @@ data.Home = {
             }
         });
 
-        $(document).on("mouseenter", ".feedItem", function () {
-            // hover starts code here
-            clearInterval(scroller);
-        });
-
-        $(document).on("mouseleave", ".feedItem", function () {
-            // hover ends code here
-            scroller = setInterval(function () {
-                var pos = div.scrollTop();
-                pos = Number((pos).toFixed(0));
-                div.scrollTop(++pos);
-            }, 50);
-        });
-
     },
 
+    //WHEN USER SCROLLS FEED THEN MORE ITEMS ARE LOADED
     ScrollBottom: function (e) {
         var elem = $(e.currentTarget);
         var startLoadHt = elem.outerHeight() + 400;
-        //var isSentryFeed = $("#chbx").is(':checked');
         var isSentryFeed = false;
 
         if (data.Home.AllSkipTotal < 100 && data.Home.SentrySkipTotal < 100) {
             if (elem[0].scrollHeight - elem[0].scrollTop <= startLoadHt && data.Home.AjaxStatus) {
                 data.Home.AjaxStatus = false;
+                var skipThese = data.Home.AllSkipTotal;
 
-                if (isSentryFeed) {
-                    var skipThese = data.Home.SentrySkipTotal;
-
-                    $.ajax({
-                        url: '/Home/GetMoreSentryFeeds',
-                        dataType: 'html',
-                        data: { skip: skipThese },
-                        success: function (html) {
-                            $("#sentryFeed").append(html);
-                            data.Home.SentrySkipTotal += 5;
-                            data.Home.AjaxStatus = true;
-                        },
-                        error: function (e) {
-                            data.Home.AjaxStatus = true;
-                        }
-                    });
-                }
-                else {
-                    var skipThese = data.Home.AllSkipTotal;
-
-                    $.ajax({
-                        url: '/Home/GetMoreFeeds',
-                        dataType: 'html',
-                        data: { skip: skipThese },
-                        success: function (html) {
-                            $("#feed").append(html);
-                            data.Home.AllSkipTotal += 5;
-                            data.Home.AjaxStatus = true;
-                        },
-                        error: function (e) {
-                            data.Home.AjaxStatus = true;
-                        }
-                    });
-                }
+                $.ajax({
+                    url: '/Home/GetMoreFeed',
+                    dataType: 'html',
+                    data: { skip: skipThese },
+                    success: function (html) {
+                        $("#feed").append(html);
+                        data.Home.AllSkipTotal += 5;
+                        data.Home.AjaxStatus = true;
+                    },
+                    error: function (e) {
+                        data.Home.AjaxStatus = true;
+                    }
+                });
             }
         }
 

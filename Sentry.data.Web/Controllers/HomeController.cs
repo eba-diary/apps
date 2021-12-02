@@ -148,18 +148,11 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_Feed", allDatafeedItems.Take(10).ToList());
         }
 
-        public ActionResult GetMoreFeeds(int skip)
+        public ActionResult GetMoreFeed(int skip)
         {
             List<DataFeedItem> tempList = _feedContext.GetAllFeedItems().Skip(skip).Take(5).ToList();
             return PartialView("_Feed", tempList);
         }
-
-        public ActionResult GetMoreSentryFeeds(int skip)
-        {
-            List<DataFeedItem> tempList = _feedContext.GetSentryFeedItems().Skip(skip).Take(5).ToList();
-            return PartialView("_Feed", tempList);
-        }
-
 
         public ActionResult GetFavorites()
         {

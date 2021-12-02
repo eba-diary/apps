@@ -22,12 +22,6 @@ namespace Sentry.data.Infrastructure
             return GoGetItems(dataFeeds);
         }
 
-        public IList<DataFeedItem> GetSentryFeedItems()
-        {
-            List<DataFeed> dataFeeds = Query<DataFeed>().Where(w => w.Type == "TAB").Cacheable().ToList();
-            return GoGetItems(dataFeeds);
-        }
-
         public IList<DataFeedItem> GoGetItems(List<DataFeed> dataFeeds)
         {
             List<DataFeedItem> items = new List<DataFeedItem>();
@@ -38,11 +32,9 @@ namespace Sentry.data.Infrastructure
         public IList<DataFeedItem> SentryEvents()
         {
             //NOTE: none of this code is called if CLA2838_DSC_ANOUNCEMENTS is false
-
-            //STEP #1 CREATE BLANK LIST OF DataFeedItems
             List<DataFeedItem> items = new List<DataFeedItem>();
 
-            //STEP #2 CREATE DATASET DataFeedItems
+            //STEP #1 CREATE DATASET DataFeedItems
             var dsEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Dataset") && (x.TimeCreated >= DateTime.Now.AddDays(-30))).OrderByDescending(o => o.TimeCreated).Take(25);
             foreach (Event e in dsEvents)
             {
@@ -68,7 +60,7 @@ namespace Sentry.data.Infrastructure
                 }
             }
 
-            //STEP #3  CREATE BI ITEMS
+            //STEP #2  CREATE BI ITEMS
             var rptEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Report") && (x.TimeCreated >= DateTime.Now.AddDays(-30))).OrderByDescending(o => o.TimeCreated).Take(25);
             foreach (Event e in rptEvents)
             {
@@ -94,8 +86,8 @@ namespace Sentry.data.Infrastructure
                 }
             }
 
-            //STEP #4  CREATE NOTIFICATION ITEMS
-            var notifications = Query<Notification>().Where(w => w.ExpirationTime >= DateTime.Now && (BusinessAreaType)w.ParentObject == BusinessAreaType.DSC).Take(50);
+            //STEP #3  CREATE NOTIFICATION ITEMS
+            var notifications = Query<Notification>().Where(w => w.ExpirationTime >= DateTime.Now && (BusinessAreaType)w.ParentObject == BusinessAreaType.DSC).OrderByDescending(o => o.StartTime).Take(50);
             foreach (Notification n in notifications)
             {
                 if (n != null)
