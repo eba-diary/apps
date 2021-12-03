@@ -477,8 +477,6 @@ data.Dataset = {
 
     UpdateMetadata: function () {
 
-        $("#datasetRowTable").DataTable().destroy();
-
         if (!isNaN(getUrlParameter('configID'))) {
             $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
         }
@@ -1215,7 +1213,7 @@ data.Dataset = {
             url.searchParams.set('configID', $('#datasetConfigList').val());
             window.history.pushState({}, '', url);
 
-            Id = $('#datasetConfigList').val();
+            $("#datasetRowTable").DataTable().destroy();            Id = $('#datasetConfigList').val();
             self.vm.NoColumnsReturned(false);
             $('#schemaHR').show();
             self.vm.SchemaRows.removeAll();
