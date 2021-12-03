@@ -34,7 +34,8 @@
   </teiHeader>
   <text>
     <body>
-      <div xml:id="EBA-" type="entry"><name>
+<!-- Part 1 Start-->
+      <div xml:id="EBA-" type="entry">
         <dateline>
         Bedrescheyn – <placeName>Egypt.</placeName> Dec. 12, 1898.
         </dateline>
@@ -237,7 +238,7 @@
           <p>We got off this morning at 12 o'clock with a very light wind, which growing stronger brought us at 11 o'clock to Esneh.</p>
       </div>
       <div xml:id="EBA-">
-        </dateline>
+        <dateline>
           Saturday. Jan. 28. 41 miles. 
         </dateline>
           <p>A fine wind began at 7 o'clock which has lasted Page 16 all day, and we have made our best record. A splendid day &#8211; every hour delightful. We are about 10 miles south of <placeName>Edfu</placeName> &#8211; passed <placeName>El Kab</placeName> this morning. Mr. <persName>Somers-Clarke</persName> not there &#8211; house shut &#8211; no dahabeah. Brought up at 2:30 at <placeName>Edfu</placeName> where we found the <orgName>Lul&#232;e el Nil.</orgName> The rest went off to the Temple. The natives here very noisy and unmanageable. We got away sometime after the <persName>Lulie el Nil,</persName> but passed her in the evening and are now tied up near each other. A splendid night &#8211; the sight of the full moon sailing up out of the horizon was wonderful.</p>
@@ -283,6 +284,7 @@
           68-1/2 miles. Thursday, Feb. 9. <persName>Wady Halfa.</persName> 
         </dateline>
           <p>Left <persName>Abu Simbel</persName> early this morning &#8211; I was awakened at 3 A.M. by the different people being aroused to see the <name>Southern Cross</name> &#8211; and again by our early start. We reached <name>Halfa</name> at 11 o'clock, passing dahabeah "Thames" on her way down. The country in spite of its desert air, is interesting &#8211; and even beautiful, with its strange mountain peaks, and the evidences everywhere of proplonged water action &#8211; and everything partly submerged in yellow, pink sand drifts &#8211; no birds to be seen &#8211; many fine dome like sycamores, and the finest tamarasks I have ever seen &#8211; the foliage so thick and brightly green. We have made 40 miles. We drew up to what is an entirely new quarter of <name>Halfa,</name> called <name>Tewfikyia</name> &#8211; good <orgName>European</orgName> houses, new and clean &#8211; a fine modern mosque, bazaar, <orgName>Greek</orgName> shops, etc. All our people chose to go to the 2d cataract this afternoon, instead of waiting for the regular excursion in the morning. The wind was strong and cold, and sand flying in clouds. They took one of the large sail boats, and with the <persName>Reis</persName> of the steamer and several of the sailors started, not returning until we had nearly finished dinner. They reported that they were not only able to sail up to the rock of <placeName>Abusir,</placeName> but 3 miles beyond. I spent a quiet, nice afternoon with <persName>Mrs. Parsons</persName> &#8211; the whole boat enveloped in canvass, to protect us from the wind and sand. However the little open space in the center of the steamer, which really serves us as drawing room, was very comfortable. It is where afternoon tea is served, and coffee. This evening we took refuge in the dining saloon Page 22 as it was so cold. The doctor of the <persName>Fort</persName> was on board, and was presented to us &#8211; and has invited us to see the fort tomorrow.</p>
+<!--Part 2 Start-->
       </div>
       <div xml:id="EBA-">
         <dateline>
@@ -512,6 +514,7 @@
         </dateline>
           <p>Went to the <placeName>Palazzo Patri&#232;c&#232;</placeName> to see the pictures with <persName>M. Jeubert.</persName> A desperately dismal palace, and not a picture that I would have had. Did some rummaging about in an old shop, and then drove in the fine, bracing cold air on the <orgName>Pincian.</orgName> At home in the afternoon. <persName>Mary</persName> and <persName>Bessie</persName> hard at work every day sight seeing. <persName>Countess Freufelli-Cibo</persName> called.</p>
       </div>
+<!-- Part 3 Start-->
       <div xml:id="EBA-">
         <dateline>
           Wednesday, April 12.
