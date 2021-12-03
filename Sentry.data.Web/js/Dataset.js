@@ -582,6 +582,12 @@ data.Dataset = {
     },
 
     renderDataPreview: function () {
+
+        if ($("#datasetRowTable_filter").length > 0)
+        {
+            $("#datasetRowTable").DataTable().destroy();
+        };
+
         $.ajax({
             type: "GET",
             url: "/api/v2/querytool/dataset/" + location.pathname.split('/')[3] + "/config/" + $('#datasetConfigList').val() + "/SampleRecords",
@@ -1208,9 +1214,6 @@ data.Dataset = {
         //CONFIG DROP DOWN CHANGE
         //*****************************************************************************************************
         $('#datasetConfigList').on('select2:select', function (e) {
-
-            $("#datasetRowTable").DataTable().destroy();
-
             window.history.pushState('Config Changed', 'Title', '?configID=' + $('#datasetConfigList').val());
             Id = $('#datasetConfigList').val();
             self.vm.NoColumnsReturned(false);
