@@ -1007,8 +1007,6 @@ data.Dataset = {
         });
 
         var Id = $('#datasetConfigList').val();
-        data.Dataset.DatasetFileTableInit(Id);
-        data.Dataset.DatasetBundingFileTableInit(Id);
 
         localStorage.setItem("listOfFilesToBundle", JSON.stringify([]));
 
@@ -1227,6 +1225,7 @@ data.Dataset = {
 
             data.Dataset.UpdateMetadata();
         });
+        Id = $('#datasetConfigList').val();
 
         $('#dataLastUpdatedSpinner').show();
         data.Dataset.UpdateMetadata();
