@@ -2016,7 +2016,7 @@ tr.categoryBanner-darkgray th.sorting_desc {
     }
 
 .feedBox {
-    height: 430px;
+    max-height: 430px;
     overflow-y: auto;
 }
 

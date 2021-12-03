@@ -23,7 +23,7 @@
 
 .favorite-add-scroll {
     overflow-y: auto;
-    max-height: 210px;
+    height: 210px;
 }
 
 
