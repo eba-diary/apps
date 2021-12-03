@@ -1231,6 +1231,8 @@ data.Dataset = {
         $('#dataLastUpdatedSpinner').show();
         data.Dataset.UpdateMetadata();
 
+        data.Dataset.DatasetFileTableInit(Id);
+        data.Dataset.DatasetBundingFileTableInit(Id);
         //Hook up handlers for tabbed sections
 
         $('#detailTabSchemaColumns').click(function (e) {
