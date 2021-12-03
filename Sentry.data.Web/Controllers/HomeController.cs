@@ -145,7 +145,14 @@ namespace Sentry.data.Web.Controllers
         public async Task<ActionResult> GetFeed()
         {
             List<DataFeedItem> allDatafeedItems = _feedContext.GetAllFeedItems().ToList();
-            return PartialView("_Feed", allDatafeedItems.Take(10).ToList());
+            if(allDatafeedItems.Count > 0)
+            {
+                return PartialView("_Feed", allDatafeedItems.Take(10).ToList());
+            }
+            else
+            {
+                return PartialView("_FeedEmpty");
+            }
         }
 
         public ActionResult GetMoreFeed(int skip)
