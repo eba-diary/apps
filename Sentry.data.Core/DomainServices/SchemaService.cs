@@ -842,7 +842,7 @@ namespace Sentry.data.Core
 
         private string GenerateSnowflakeDatabaseName(bool isHumanResources)
         {
-            string dbName = (isHumanResources)? "DATA_HR_" : "DATA_";
+            string dbName = (isHumanResources)? GlobalConstants.SnowflakeDatabase.WDAY : GlobalConstants.SnowflakeDatabase.DATA;
             dbName += Config.GetDefaultEnvironmentName().ToUpper();
             return dbName;
         }

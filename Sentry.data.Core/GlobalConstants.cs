@@ -364,5 +364,12 @@
         {
             public const string WAREHOUSE_NAME = "DATA_WH";       
         }
+
+        public static class SnowflakeDatabase
+        {
+            public const string WDAY = "WDAY_";
+            public const string DATA = "DATA_";
+        }
+
     }
 }
