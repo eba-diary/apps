@@ -620,14 +620,39 @@ namespace Sentry.data.Web.WebApi.Controllers
             return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetFileConfigId:{DatasetConfigID}", GetColumnSchemaInformationForFunction);
 
         }
+        
+        /// <summary>
+         /// Get schema metadata
+         /// </summary>
+         /// <param name="datasetId"></param>
+         /// <param name="schemaId"></param>
+         /// <returns></returns>
+        [HttpPut]
+        [ApiVersionBegin(WebAPI.Version.v2)]
+        [Route("dataset/{datasetId}/schema/{schemaId}")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(bool))]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotImplemented)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        public async Task<IHttpActionResult> UpdateSchema(int datasetId, int schemaId)
+        {
+            IHttpActionResult Updater()
+            {
+                return Ok();
+            }
+
+            return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", Updater);
+        }
 
         #endregion
 
         #region Schema_Endpoints
-        
-       
 
-        
+
+
+
         #endregion
 
         #region Messaging Endpoints
