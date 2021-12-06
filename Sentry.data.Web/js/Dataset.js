@@ -1218,7 +1218,7 @@ data.Dataset = {
             $('#schemaHR').show();
             self.vm.SchemaRows.removeAll();
 
-            if (self.vm.ShowDataFileTable()) {
+            if ($("#datasetFilesTable_filter").length > 0) {
                 var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + $('#datasetConfigList').val();
                 $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
             }
