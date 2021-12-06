@@ -24,6 +24,9 @@ namespace Sentry.data.Core.Helpers
                 case GlobalConstants.DataFeedType.Exhibits:
                     feedImg = "/Images/Icons/Business Intelligence.svg";
                     break;
+                case GlobalConstants.DataFeedType.Notifications:
+                    feedImg = "/Images/Icons/Blogs.png";
+                    break;
             }
 
             return feedImg;

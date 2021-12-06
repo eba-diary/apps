@@ -4,14 +4,6 @@
     string color = "green";
 }
 
-@if (Model.Count == 0)
-{
-    <div class="noFeedBox feedCenter">
-        <div class="glyphicon glyphicon-warning-sign noFeedIcon"></div>
-        <div class="noFeedMessage">Oops! There was a problem loading the feed</div>
-    </div>
-}
-
 @foreach (Sentry.data.Core.DataFeedItem item in Model)
 {
     <div class="feedItem">
@@ -21,30 +13,33 @@
                 <img src="@item.Img" class="feedImg" />
             </div>
             <div class="display-tablecell text-middle">
-                <div class="feedName lt_@color">@item.Feed.Name</div>
+
+                @if (item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.NOTIFICATION)
+                {
+                    <div class="feedName lt_@color">@item.Feed.Category</div>
+                }
+                else
+                {
+                    <div class="feedName lt_@color">@item.Feed.Name</div>
+                }
+
             </div>
         </div>
 
         <p class="feed-date">@Sentry.data.Web.Helpers.Utility.TimeDisplay(item.PublishDate)</p>
 
-        @if (item.Title.Length > 50)
+        @if (item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.NOTIFICATION)
         {
-            <h6 class="@color" data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle()</h6>
+            <h6 class="@color" data-toggle="tooltip" data-placement="top" title="">@item.NotificationTitle</h6>
         }
         else
         {
-            <h6 class="@color">@item.DisplayTitle()</h6>
+            if (item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.DATASET || item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.BUSINESS_INTELLIGENCE)
+            {
+                <a href="@item.Url" target="_blank" class="pointer @color">@item.DisplayTitle()</a>
+            }
         }
 
-        @if (item.Feed.Name == "Datasets" || item.Feed.Name == "Business Intelligence")
-        {
-            <a href="@item.Url" target="_blank" class="pointer">View &gt;</a>
-        }
-        else
-        {
-            <a href="@item.Url" target="_blank" class="pointer">Read more&hellip;</a>
-        }
 
     </div>
 }
-
