@@ -1226,11 +1226,20 @@ data.Dataset = {
             data.Dataset.UpdateMetadata();
         });
         Id = $('#datasetConfigList').val();
+        //on initial load, try pulling the Id from the URL first. 
 
         $('#dataLastUpdatedSpinner').show();
         data.Dataset.UpdateMetadata();
+        var url = new URL(window.location.href);
+
+        Id = url.searchParams.get('configID')
+        if (Id == undefined) {
+            Id = $('#datasetConfigList').val();
+        }
+
         data.Dataset.DatasetFileTableInit(Id);
         data.Dataset.DatasetBundingFileTableInit(Id);
+
         //Hook up handlers for tabbed sections
 
         $('#detailTabSchemaColumns').click(function (e) {
