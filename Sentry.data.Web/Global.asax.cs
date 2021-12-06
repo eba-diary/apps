@@ -9,6 +9,7 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using Sentry.Common.Logging;
 
 namespace Sentry.data.Web
 {
@@ -19,6 +20,12 @@ namespace Sentry.data.Web
 
         protected void Application_Start()
         {
+            //Configure Logging
+            LoggerHelper.ConfigureLogger();
+
+            //setup the ASP.NET thread pool
+            InitThreadPool();
+
             AreaRegistration.RegisterAllAreas();
 
             GlobalConfiguration.Configure(WebApiConfig.Register);
@@ -30,7 +37,6 @@ namespace Sentry.data.Web
             MiniProfilerConfig.RegisterMiniProfilerSettings();
 
             //Application Initialization
-            LoggerHelper.ConfigureLogger();
             Bootstrapper.Init();
 
             //MVC dependency resolver
@@ -70,6 +76,48 @@ namespace Sentry.data.Web
             //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
 
         }
+
+
+
+        /// <summary>
+        /// Update thread pool to custom settings
+        /// See https://support.microsoft.com/en-us/help/821268/contention-poor-performance-and-deadlocks-when-you-make-calls-to-web-s
+        /// </summary>
+        private void InitThreadPool()
+        {
+
+            //Get the defaults (based on the # of cores)
+            int minWorker = 0;
+            int minIo = 0;
+            int maxWorker = 0;
+            int maxIo = 0;
+            System.Threading.ThreadPool.GetMinThreads(out minWorker, out minIo);
+            System.Threading.ThreadPool.GetMaxThreads(out maxWorker, out maxIo);
+            Logger.Debug($"Default thread settings were: minWorker={minWorker}, minIO={minIo}, maxWorker={maxWorker}, maxIO={maxIo}");
+
+            //Attempt to get the overridden setting from Sentry.Configuration.  If not specified for the environment, use the default
+            try
+            {
+                var minWorkerString = Sentry.Configuration.Config.GetHostSetting("MinWorkerThreads");
+                minWorker = int.Parse(minWorkerString);
+                var minIoString = Sentry.Configuration.Config.GetHostSetting("MinIOThreads");
+                minIo = int.Parse(minIoString);
+                var maxWorkerString = Sentry.Configuration.Config.GetHostSetting("MaxWorkerThreads");
+                maxWorker = int.Parse(maxWorkerString);
+                var maxIoString = Sentry.Configuration.Config.GetHostSetting("MaxIOThreads");
+                maxIo = int.Parse(maxIoString);
+            }
+            catch (Exception)
+            {
+            }
+
+            //Now update the minimum thread count settings
+            System.Threading.ThreadPool.SetMaxThreads(maxWorker, maxIo);
+            System.Threading.ThreadPool.SetMinThreads(minWorker, minIo);
+            Logger.Info($"Adjusted thread settings to: minWorker={minWorker}, minIO={minIo}, maxWorker={maxWorker}, maxIO={maxIo}");
+
+        }
+
 
         private void Application_Error(Object sender, EventArgs e)
         {
