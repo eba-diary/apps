@@ -6,6 +6,7 @@ using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Web.Helpers;
 using Sentry.data.Web.Models.ApiModels.Dataset;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using Sentry.WebAPI.Versioning;
@@ -622,28 +623,33 @@ namespace Sentry.data.Web.WebApi.Controllers
         }
         
         /// <summary>
-         /// Get schema metadata
+         /// Update schema metadata
          /// </summary>
-         /// <param name="datasetId"></param>
-         /// <param name="schemaId"></param>
+         /// <param name="schemaModel"></param>
          /// <returns></returns>
         [HttpPut]
         [ApiVersionBegin(WebAPI.Version.v2)]
-        [Route("dataset/{datasetId}/schema/{schemaId}")]
+        [Route("dataset/schema/update")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(bool))]
         [SwaggerResponse(System.Net.HttpStatusCode.NotFound)]
         [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
-        [SwaggerResponse(System.Net.HttpStatusCode.NotImplemented)]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
         [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
-        public async Task<IHttpActionResult> UpdateSchema(int datasetId, int schemaId)
+        public async Task<IHttpActionResult> UpdateSchema(SchemaInfoModel schemaModel)
         {
             IHttpActionResult Updater()
             {
-                return Ok();
+                List<string> validationResults = schemaModel.Validate();
+
+                if (validationResults.Any())
+                {
+                    throw new SchemaConversionException($"Invalid schema request: {string.Join(" | ", validationResults)}");
+                }
+
+                return Ok(_schemaService.UpdateAndSaveSchema(MapConfig.Mapper.Map<FileSchemaDto>(schemaModel)));
             }
 
-            return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", Updater);
+            return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"schemaId:{schemaModel.SchemaId}", Updater);
         }
 
         #endregion

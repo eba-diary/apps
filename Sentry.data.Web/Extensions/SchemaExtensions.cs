@@ -156,7 +156,7 @@ namespace Sentry.data.Web
             {
                 Name = model.Name,
                 Delimiter = model.Delimiter,
-                FileExtenstionName = model.FileFormat,
+                FileExtensionName = model.FileFormat,
                 HasHeader = model.HasHeader,
                 CreateCurrentView = model.CurrentView,
                 Description = model.Description

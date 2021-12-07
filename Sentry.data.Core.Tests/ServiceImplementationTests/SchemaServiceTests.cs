@@ -8,6 +8,8 @@ using System.Linq;
 using Moq;
 using Sentry.FeatureFlags;
 using Sentry.FeatureFlags.Mock;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Helpers;
 
 namespace Sentry.data.Core.Tests
 {
@@ -1767,6 +1769,14 @@ namespace Sentry.data.Core.Tests
 
             // Assert
             Assert.ThrowsException<ArgumentNullException>(() => schemaService.GenerateParquetStoragePrefix("DATA", null, "123456"));
+        }
+
+        [TestMethod]
+        public void Can_Convert_Description_To_Enum()
+        {
+            ObjectStatusEnum result = EnumHelper.GetByDescription<ObjectStatusEnum>("pending delete");
+
+            Assert.AreEqual(ObjectStatusEnum.Pending_Delete, result);
         }
 
         #region Private Methods

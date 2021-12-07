@@ -187,7 +187,7 @@ namespace Sentry.data.Web
                 SchemaEntity_NME = schemaDto.SchemaEntity_NME,
                 Description = schemaDto.Description,
                 StorageCode = schemaDto.StorageCode,
-                Format = schemaDto.FileExtenstionName,
+                Format = schemaDto.FileExtensionName,
                 CurrentView = schemaDto.CreateCurrentView,
                 Delimiter = schemaDto.Delimiter,
                 HasHeader = schemaDto.HasHeader,

@@ -167,13 +167,19 @@ namespace Sentry.data.Core
             return 0;
         }
 
-
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
-            Logger.Info($"startmethod <{m.ReflectedType.Name.ToString()}>");
+            Logger.Info($"startmethod <{m.ReflectedType.Name}>");
 
-            Dataset parentDataset = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaDto.SchemaId).ParentDataset;
+            DatasetFileConfig fileConfig = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaDto.SchemaId);
+
+            if (fileConfig == null)
+            {
+                throw new SchemaNotFoundException();
+            }
+
+            Dataset parentDataset = fileConfig.ParentDataset;
 
             //Check user access to modify schema, of not throw exception
             IApplicationUser user = _userService.GetCurrentUser();
@@ -182,11 +188,8 @@ namespace Sentry.data.Core
             if (!us.CanManageSchema)
             {
                 throw new SchemaUnauthorizedAccessException();
-            }
-            
+            }            
 
-            string SASNotificationType = null;
-            string CurrentViewNotificationType = null;
             JObject whatPropertiesChanged;
             FileSchema schema;
             /* Any exceptions saving schema changes, do not execute remaining line of code */
@@ -196,7 +199,7 @@ namespace Sentry.data.Core
 
                 //Update/save schema within DSC metadata
                 whatPropertiesChanged = UpdateSchema(schemaDto, schema);
-                Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {parentDataset.DatasetName}\\{schema.Name} | {whatPropertiesChanged.ToString()}");
+                Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {parentDataset.DatasetName}\\{schema.Name} | {whatPropertiesChanged}");
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -206,7 +209,7 @@ namespace Sentry.data.Core
             }
 
             /* The remaining actions should all be executed even if one fails
-             * If there are any exceptions, log the exceptions and continue on */
+                * If there are any exceptions, log the exceptions and continue on */
             var exceptions = new List<Exception>();
 
             /*
@@ -231,9 +234,8 @@ namespace Sentry.data.Core
                 Logger.Error($"<{m.ReflectedType.Name.ToLower()}> Failed sending downstream notifications or events", new AggregateException(exceptions));
             }
 
-            Logger.Info($"endmethod <{m.ReflectedType.Name.ToString()}>");
+            Logger.Info($"endmethod <{m.ReflectedType.Name}>");
             return true;
-            
         }
 
         private void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
@@ -422,6 +424,8 @@ namespace Sentry.data.Core
                 schema.SchemaRootPath = dto.SchemaRootPath;
                 chgDetected = true;
             }
+
+            //add two properties here
 
 
             if (chgDetected)
@@ -745,7 +749,7 @@ namespace Sentry.data.Core
                 Name = dto.Name,
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
                 SchemaEntity_NME = dto.SchemaEntity_NME,
-                Extension = (dto.FileExtensionId != 0) ? _datasetContext.GetById<FileExtension>(dto.FileExtensionId) : (dto.FileExtenstionName != null) ? _datasetContext.FileExtensions.Where(w => w.Name == dto.FileExtenstionName).FirstOrDefault() : null,
+                Extension = (dto.FileExtensionId != 0) ? _datasetContext.GetById<FileExtension>(dto.FileExtensionId) : (dto.FileExtensionName != null) ? _datasetContext.FileExtensions.Where(w => w.Name == dto.FileExtensionName).FirstOrDefault() : null,
                 Delimiter = dto.Delimiter,
                 HasHeader = dto.HasHeader,
                 SasLibrary = CommonExtensions.GenerateSASLibaryName(_datasetContext.GetById<Dataset>(dto.ParentDatasetId)),
@@ -808,7 +812,7 @@ namespace Sentry.data.Core
                 StorageCode = scm.StorageCode,
                 StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
                 RawQueryStorage = (Configuration.Config.GetHostSetting("EnableRawQueryStorageInQueryTool").ToLower() == "true" && _datasetContext.SchemaMap.Any(w => w.MappedSchema.SchemaId == scm.SchemaId)) ? GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\" : Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
-                FileExtenstionName = scm.Extension.Name,
+                FileExtensionName = scm.Extension.Name,
                 SnowflakeDatabase = scm.SnowflakeDatabase,
                 SnowflakeTable = scm.SnowflakeTable,
                 SnowflakeSchema = scm.SnowflakeSchema,
