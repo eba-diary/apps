@@ -477,8 +477,6 @@ data.Dataset = {
 
     UpdateMetadata: function () {
 
-        $("#datasetRowTable").DataTable().destroy();
-
         if (!isNaN(getUrlParameter('configID'))) {
             $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
         }
@@ -584,6 +582,11 @@ data.Dataset = {
     },
 
     renderDataPreview: function () {
+
+        if ($("#datasetRowTable_filter").length > 0) {
+            $("#datasetRowTable").DataTable().destroy();
+        };
+
         $.ajax({
             type: "GET",
             url: "/api/v2/querytool/dataset/" + location.pathname.split('/')[3] + "/config/" + $('#datasetConfigList').val() + "/SampleRecords",
@@ -1003,8 +1006,6 @@ data.Dataset = {
         });
 
         var Id = $('#datasetConfigList').val();
-        data.Dataset.DatasetFileTableInit(Id);
-        data.Dataset.DatasetBundingFileTableInit(Id);
 
         localStorage.setItem("listOfFilesToBundle", JSON.stringify([]));
 
@@ -1220,7 +1221,7 @@ data.Dataset = {
             $('#schemaHR').show();
             self.vm.SchemaRows.removeAll();
 
-            if (self.vm.ShowDataFileTable()) {
+            if ($("#datasetFilesTable_filter").length > 0) {
                 var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + $('#datasetConfigList').val();
                 $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
             }
@@ -1228,8 +1229,20 @@ data.Dataset = {
             data.Dataset.UpdateMetadata();
         });
 
+        Id = $('#datasetConfigList').val();
+        //on initial load, try pulling the Id from the URL first.
+
         $('#dataLastUpdatedSpinner').show();
         data.Dataset.UpdateMetadata();
+        var url = new URL(window.location.href);
+
+        Id = url.searchParams.get('configID')
+        if (Id == undefined) {
+            Id = $('#datasetConfigList').val();
+        }
+
+        data.Dataset.DatasetFileTableInit(Id);
+        data.Dataset.DatasetBundingFileTableInit(Id);
 
         //Hook up handlers for tabbed sections
 
