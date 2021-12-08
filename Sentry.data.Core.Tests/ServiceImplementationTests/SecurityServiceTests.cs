@@ -40,7 +40,6 @@ namespace Sentry.data.Core.Tests
 
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
             securable.Stub(x => x.Security).Return(security).Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
@@ -73,7 +72,6 @@ namespace Sentry.data.Core.Tests
             //ARRAGE
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
             user.Stub(x => x.AssociateId).Return("078193").Repeat.Any();
@@ -129,7 +127,6 @@ namespace Sentry.data.Core.Tests
             //ARRAGE
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
             user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
@@ -153,7 +150,6 @@ namespace Sentry.data.Core.Tests
             //ARRAGE
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("999999").Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
             user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
@@ -176,7 +172,6 @@ namespace Sentry.data.Core.Tests
             //ARRAGE
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("999999").Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
             user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
@@ -202,7 +197,6 @@ namespace Sentry.data.Core.Tests
             //ARRAGE
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
             user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
@@ -224,7 +218,6 @@ namespace Sentry.data.Core.Tests
             //ARRAGE
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
             user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
@@ -247,7 +240,6 @@ namespace Sentry.data.Core.Tests
             //ARRAGE
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("999999").Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
             user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
@@ -271,7 +263,6 @@ namespace Sentry.data.Core.Tests
             Security security = BuildBaseSecurity();
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("999999").Repeat.Any();
             securable.Stub(x => x.Security).Return(security).Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
@@ -311,7 +302,6 @@ namespace Sentry.data.Core.Tests
             //mock out securable object and attach security object established above
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
             securable.Stub(x => x.PrimaryContactId).Return("123456").Repeat.Any();
             securable.Stub(x => x.Security).Return(security).Repeat.Any();
 
@@ -352,7 +342,6 @@ namespace Sentry.data.Core.Tests
 
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("999999").Repeat.Any();
             securable.Stub(x => x.Security).Return(security).Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
@@ -384,7 +373,6 @@ namespace Sentry.data.Core.Tests
 
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
             securable.Stub(x => x.Security).Return(security).Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
@@ -415,7 +403,6 @@ namespace Sentry.data.Core.Tests
 
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
             securable.Stub(x => x.Security).Return(security).Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
@@ -446,7 +433,6 @@ namespace Sentry.data.Core.Tests
 
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("999999").Repeat.Any();
             securable.Stub(x => x.Security).Return(security).Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
@@ -477,7 +463,6 @@ namespace Sentry.data.Core.Tests
 
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("999999").Repeat.Any();
             securable.Stub(x => x.Security).Return(security).Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
@@ -509,7 +494,6 @@ namespace Sentry.data.Core.Tests
 
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
             securable.Stub(x => x.Security).Return(security).Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
@@ -540,7 +524,6 @@ namespace Sentry.data.Core.Tests
 
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
             securable.Stub(x => x.Security).Return(security).Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
@@ -564,7 +547,6 @@ namespace Sentry.data.Core.Tests
             //ARRAGE
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
             securable.Stub(x => x.Security).Return(null).Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
@@ -612,7 +594,6 @@ namespace Sentry.data.Core.Tests
 
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
             securable.Stub(x => x.Security).Return(null).Repeat.Any();
 
             //ACT
@@ -643,7 +624,6 @@ namespace Sentry.data.Core.Tests
 
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
             securable.Stub(x => x.Security).Return(security).Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
@@ -679,7 +659,6 @@ namespace Sentry.data.Core.Tests
 
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
             securable.Stub(x => x.Security).Return(security).Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
@@ -715,7 +694,6 @@ namespace Sentry.data.Core.Tests
 
             ISecurable securable = MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
             securable.Stub(x => x.Security).Return(security).Repeat.Any();
 
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();

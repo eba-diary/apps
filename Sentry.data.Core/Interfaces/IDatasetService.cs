@@ -16,7 +16,7 @@ namespace Sentry.data.Core
         void UpdateAndSaveDataset(DatasetDto dto);
         UserSecurity GetUserSecurityForDataset(int datasetId);
         UserSecurity GetUserSecurityForConfig(int configId);
-        AccessRequest GetAccessRequest(int datasetId);
+        Task<AccessRequest> GetAccessRequest(int datasetId);
         string RequestAccessToDataset(AccessRequest request);
         List<Dataset> GetDatasetsForQueryTool();
         List<Dataset> GetDatasetMarkedDeleted();
