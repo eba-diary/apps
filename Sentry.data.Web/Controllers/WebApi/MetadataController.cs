@@ -621,21 +621,23 @@ namespace Sentry.data.Web.WebApi.Controllers
             return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetFileConfigId:{DatasetConfigID}", GetColumnSchemaInformationForFunction);
 
         }
-        
+
         /// <summary>
-         /// Update schema metadata
-         /// </summary>
-         /// <param name="schemaModel"></param>
-         /// <returns></returns>
+        /// Update schema metadata
+        /// </summary>
+        /// <param name="datasetId"></param>
+        /// <param name="schemaId"></param>
+        /// <param name="schemaModel"></param>
+        /// <returns></returns>
         [HttpPut]
         [ApiVersionBegin(WebAPI.Version.v2)]
-        [Route("dataset/schema/update")]
+        [Route("dataset/{datasetId}/schema/{schemaId}")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(bool))]
         [SwaggerResponse(System.Net.HttpStatusCode.NotFound)]
         [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
         [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
-        public async Task<IHttpActionResult> UpdateSchema(SchemaInfoModel schemaModel)
+        public async Task<IHttpActionResult> UpdateSchema(int datasetId, int schemaId, SchemaInfoModel schemaModel)
         {
             IHttpActionResult Updater()
             {
@@ -649,7 +651,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 return Ok(_schemaService.UpdateAndSaveSchema(MapConfig.Mapper.Map<FileSchemaDto>(schemaModel)));
             }
 
-            return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"schemaId:{schemaModel.SchemaId}", Updater);
+            return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", Updater);
         }
 
         #endregion

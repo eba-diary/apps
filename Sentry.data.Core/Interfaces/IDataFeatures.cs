@@ -17,14 +17,12 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; }
         IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime { get; }
         IFeatureFlag<bool> CLA3497_UniqueLivySessionName { get; }
-
         IFeatureFlag<bool> CLA3329_Expose_HR_Category { get; }
         IFeatureFlag<bool> CLA1656_DataFlowEdit_ViewEditPage { get; }
         IFeatureFlag<bool> CLA1656_DataFlowEdit_SubmitEditPage { get; }
-
         IFeatureFlag<bool> CLA2838_DSC_ANOUNCEMENTS { get; }
         IFeatureFlag<bool> CLA3550_DATA_INVENTORY_NEW_COLUMNS { get; }
-
         IFeatureFlag<bool> CLA3541_Dataset_Details_Tabs { get; }
+        IFeatureFlag<bool> CLA3605_AllowSchemaParguetUpdate { get; }
     }
 }

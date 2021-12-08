@@ -20,11 +20,11 @@ namespace Sentry.data.Web.Helpers
                 {
                     MapperConfiguration cfg = new MapperConfiguration((c) =>
                     {
-                        c.CreateMap<SchemaInfoModel, FileSchemaDto>(MemberList.None).ForMember(dto => dto.CLA1286_KafkaFlag, m => m.MapFrom(mdl => mdl.Options.Any(a => a.Equals("CLA1286_KafkaFlag|true", StringComparison.OrdinalIgnoreCase))))
-                                                                                    .ForMember(dto => dto.CLA1396_NewEtlColumns, m => m.MapFrom(mdl => mdl.Options.Any(a => a.Equals("CLA1396_NewEtlColumns|true", StringComparison.OrdinalIgnoreCase))))
-                                                                                    .ForMember(dto => dto.CLA1580_StructureHive, m => m.MapFrom(mdl => mdl.Options.Any(a => a.Equals("CLA1580_StructureHive|true", StringComparison.OrdinalIgnoreCase))))
-                                                                                    .ForMember(dto => dto.CLA2472_EMRSend, m => m.MapFrom(mdl => mdl.Options.Any(a => a.Equals("CLA2472_EMRSend|true", StringComparison.OrdinalIgnoreCase))))
-                                                                                    .ForMember(dto => dto.CLA3014_LoadDataToSnowflake, m => m.MapFrom(mdl => mdl.Options.Any(a => a.Equals("CLA3014_LoadDataToSnowflake|true", StringComparison.OrdinalIgnoreCase))))
+                        c.CreateMap<SchemaInfoModel, FileSchemaDto>(MemberList.None).ForMember(dto => dto.CLA1286_KafkaFlag, m => m.MapFrom(mdl => mdl.Options.Any(a => string.Equals(a, "CLA1286_KafkaFlag|true", StringComparison.OrdinalIgnoreCase))))
+                                                                                    .ForMember(dto => dto.CLA1396_NewEtlColumns, m => m.MapFrom(mdl => mdl.Options.Any(a => string.Equals(a, "CLA1396_NewEtlColumns|true", StringComparison.OrdinalIgnoreCase))))
+                                                                                    .ForMember(dto => dto.CLA1580_StructureHive, m => m.MapFrom(mdl => mdl.Options.Any(a => string.Equals(a, "CLA1580_StructureHive|true", StringComparison.OrdinalIgnoreCase))))
+                                                                                    .ForMember(dto => dto.CLA2472_EMRSend, m => m.MapFrom(mdl => mdl.Options.Any(a => string.Equals(a, "CLA2472_EMRSend|true", StringComparison.OrdinalIgnoreCase))))
+                                                                                    .ForMember(dto => dto.CLA3014_LoadDataToSnowflake, m => m.MapFrom(mdl => mdl.Options.Any(a => string.Equals(a, "CLA3014_LoadDataToSnowflake|true", StringComparison.OrdinalIgnoreCase))))
                                                                                     .ForMember(dto => dto.CreateCurrentView, m => m.MapFrom(mdl => mdl.CurrentView))
                                                                                     .ForMember(dto => dto.HiveStatus, m => m.MapFrom(mdl => mdl.HiveTableStatus))
                                                                                     .ForMember(dto => dto.ObjectStatus, m => m.MapFrom(mdl => EnumHelper.GetByDescription<ObjectStatusEnum>(mdl.ObjectStatus)))

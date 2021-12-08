@@ -16,7 +16,7 @@ namespace Sentry.data.Core.Helpers
             foreach (FieldInfo field in fields)
             {
                 IEnumerable<DescriptionAttribute> attributes = field.GetCustomAttributes<DescriptionAttribute>();
-                if (attributes?.Any() == true && description.Equals(attributes.First().Description, StringComparison.OrdinalIgnoreCase))
+                if (attributes?.Any() == true && string.Equals(description, attributes.First().Description, StringComparison.OrdinalIgnoreCase))
                 {
                     return (T)field.GetValue(null);
                 }

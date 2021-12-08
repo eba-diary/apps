@@ -186,7 +186,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RetrieverTests.cs" />
-    <Compile Include="Map_Config_Can.cs" />
+    <Compile Include="MapConfigTests.cs" />
     <Compile Include="UtilitiesUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>

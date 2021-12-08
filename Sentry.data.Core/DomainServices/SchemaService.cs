@@ -348,95 +348,164 @@ namespace Sentry.data.Core
         /// <param name="dto"></param>
         /// <param name="schema"></param>
         /// <returns> Returns list of properties that have changed.</returns>
+        //private JObject UpdateSchema(FileSchemaDto dto, FileSchema schema)
+        //{
+        //    IList<bool> changes = new List<bool>();
+        //    bool chgDetected = false;
+        //    string whatPropertiesChanged = "{";
+
+        //    if (schema.Name != dto.Name)
+        //    {
+        //        schema.Name = dto.Name;
+        //        chgDetected = true;
+        //    }
+
+        //    if (schema.Delimiter != dto.Delimiter)
+        //    {
+        //        schema.Description = dto.Description;
+        //        chgDetected = true;
+        //    }
+
+        //    if (schema.CreateCurrentView != dto.CreateCurrentView)
+        //    {
+        //        schema.CreateCurrentView = dto.CreateCurrentView;
+        //        chgDetected = true;
+
+        //        if (whatPropertiesChanged != "{")
+        //        { whatPropertiesChanged += ","; }
+
+        //        whatPropertiesChanged += $"\"createcurrentview\":\"{schema.CreateCurrentView.ToString().ToLower()}\"";
+        //    }
+
+        //    if (schema.Description != dto.Description)
+        //    {
+        //        schema.Description = dto.Description;
+        //        chgDetected = true;
+        //    }
+
+        //    if (schema.Extension.Id != dto.FileExtensionId)
+        //    {
+        //        schema.Extension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
+        //        chgDetected = true;
+        //    }
+
+        //    if (schema.HasHeader != dto.HasHeader)
+        //    {
+        //        schema.HasHeader = dto.HasHeader;
+        //        chgDetected = true;
+        //    }
+
+        //    if (schema.CLA1396_NewEtlColumns != dto.CLA1396_NewEtlColumns)
+        //    {
+        //        schema.CLA1396_NewEtlColumns = dto.CLA1396_NewEtlColumns;
+        //        chgDetected = true;
+        //    }
+
+        //    if (schema.CLA1580_StructureHive != dto.CLA1580_StructureHive)
+        //    {
+        //        schema.CLA1580_StructureHive = dto.CLA1580_StructureHive;
+        //        chgDetected = true;
+        //    }
+
+        //    if (schema.CLA2472_EMRSend != dto.CLA2472_EMRSend)
+        //    {
+        //        schema.CLA2472_EMRSend = dto.CLA2472_EMRSend;
+        //        chgDetected = true;
+        //    }
+
+        //    if (schema.CLA1286_KafkaFlag != dto.CLA1286_KafkaFlag)
+        //    {
+        //        schema.CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag;
+        //        chgDetected = true;
+        //    }
+
+        //    if (schema.CLA3014_LoadDataToSnowflake != dto.CLA3014_LoadDataToSnowflake)
+        //    {
+        //        schema.CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake;
+        //        chgDetected = true;
+        //    }
+
+        //    if (schema.SchemaRootPath != dto.SchemaRootPath)
+        //    {
+        //        schema.SchemaRootPath = dto.SchemaRootPath;
+        //        chgDetected = true;
+        //    }
+
+        //    if (_dataFeatures.CLA3605_AllowSchemaParguetUpdate.GetValue())
+        //    {
+        //        changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket, (x) => schema.ParquetStorageBucket = x));
+        //        changes.Add(TryUpdate(() => schema.ParquetStoragePrefix, () => dto.ParquetStoragePrefix, (x) => schema.ParquetStoragePrefix = x));
+        //    }
+
+        //    if (chgDetected || changes.Any(x => x))
+        //    {
+        //        schema.LastUpdatedDTM = DateTime.Now;
+        //        schema.UpdatedBy = _userService.GetCurrentUser().AssociateId;
+        //    }
+
+        //    whatPropertiesChanged += "}";
+
+        //    return JObject.Parse(whatPropertiesChanged);          
+        //}
+
         private JObject UpdateSchema(FileSchemaDto dto, FileSchema schema)
         {
-            bool chgDetected = false;
-            string whatPropertiesChanged = "{";
+            IList<bool> changes = new List<bool>();
+            JObject whatPropertiesChanged = new JObject();
 
-            if (schema.Name != dto.Name)
-            {
-                schema.Name = dto.Name;
-                chgDetected = true;
-            }
-            if (schema.Delimiter != dto.Delimiter)
-            {
-                schema.Description = dto.Description;
-                chgDetected = true;
-            }
+            changes.Add(TryUpdate(() => schema.Name, () => dto.Name, (x) => schema.Name = x));
 
-            if (schema.CreateCurrentView != dto.CreateCurrentView)
-            {
-                schema.CreateCurrentView = dto.CreateCurrentView;
-                chgDetected = true;
+            changes.Add(TryUpdate(() => schema.Delimiter, () => dto.Delimiter, (x) => schema.Delimiter = x));
 
-                if (whatPropertiesChanged != "{")
-                { whatPropertiesChanged += ","; }
+            changes.Add(TryUpdate(() => schema.CreateCurrentView, () => dto.CreateCurrentView, 
+                (x) => {
+                            schema.CreateCurrentView = x;
+                            whatPropertiesChanged.Add("createcurrentview", schema.CreateCurrentView.ToString().ToLower());
+                       }));
 
-                whatPropertiesChanged += $"\"createcurrentview\":\"{schema.CreateCurrentView.ToString().ToLower()}\"";
-            }
+            changes.Add(TryUpdate(() => schema.Description, () => dto.Description, (x) => schema.Description = x));
 
-            if (schema.Description != dto.Description)
+            changes.Add(TryUpdate(() => schema.Extension.Id, () => dto.FileExtensionId, (x) => schema.Extension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId)));
+
+            changes.Add(TryUpdate(() => schema.HasHeader, () => dto.HasHeader, (x) => schema.HasHeader = x));
+
+            changes.Add(TryUpdate(() => schema.CLA1396_NewEtlColumns, () => dto.CLA1396_NewEtlColumns, (x) => schema.CLA1396_NewEtlColumns = x));
+
+            changes.Add(TryUpdate(() => schema.CLA1580_StructureHive, () => dto.CLA1580_StructureHive, (x) => schema.CLA1580_StructureHive = x));
+
+            changes.Add(TryUpdate(() => schema.CLA2472_EMRSend, () => dto.CLA2472_EMRSend, (x) => schema.CLA2472_EMRSend = x));
+
+            changes.Add(TryUpdate(() => schema.CLA1286_KafkaFlag, () => dto.CLA1286_KafkaFlag, (x) => schema.CLA1286_KafkaFlag = x));
+
+            changes.Add(TryUpdate(() => schema.CLA3014_LoadDataToSnowflake, () => dto.CLA3014_LoadDataToSnowflake, (x) => schema.CLA3014_LoadDataToSnowflake = x));
+
+            changes.Add(TryUpdate(() => schema.SchemaRootPath, () => dto.SchemaRootPath, (x) => schema.SchemaRootPath = x));
+
+            if (_dataFeatures.CLA3605_AllowSchemaParguetUpdate.GetValue())
             {
-                schema.Description = dto.Description;
-                chgDetected = true;
-            }
-            if (schema.Extension.Id != dto.FileExtensionId)
-            {
-                schema.Extension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
-                chgDetected = true;
-            }
-            if (schema.HasHeader != dto.HasHeader)
-            {
-                schema.HasHeader = dto.HasHeader;
-                chgDetected = true;
-            }
-            if (schema.CLA1396_NewEtlColumns != dto.CLA1396_NewEtlColumns)
-            {
-                schema.CLA1396_NewEtlColumns = dto.CLA1396_NewEtlColumns;
-                chgDetected = true;
-            }
-            if (schema.CLA1580_StructureHive != dto.CLA1580_StructureHive)
-            {
-                schema.CLA1580_StructureHive = dto.CLA1580_StructureHive;
-                chgDetected = true;
+                changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket, (x) => schema.ParquetStorageBucket = x));
+                changes.Add(TryUpdate(() => schema.ParquetStoragePrefix, () => dto.ParquetStoragePrefix, (x) => schema.ParquetStoragePrefix = x));
             }
 
-            if (schema.CLA2472_EMRSend != dto.CLA2472_EMRSend)
-            {
-                schema.CLA2472_EMRSend = dto.CLA2472_EMRSend;
-                chgDetected = true;
-            }
-
-            if (schema.CLA1286_KafkaFlag != dto.CLA1286_KafkaFlag)
-            {
-                schema.CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag;
-                chgDetected = true;
-            }
-
-            if (schema.CLA3014_LoadDataToSnowflake != dto.CLA3014_LoadDataToSnowflake)
-            {
-                schema.CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake;
-                chgDetected = true;
-            }
-            
-            if (schema.SchemaRootPath != dto.SchemaRootPath)
-            {
-                schema.SchemaRootPath = dto.SchemaRootPath;
-                chgDetected = true;
-            }
-
-            //add two properties here
-
-
-            if (chgDetected)
+            if (changes.Any(x => x))
             {
                 schema.LastUpdatedDTM = DateTime.Now;
                 schema.UpdatedBy = _userService.GetCurrentUser().AssociateId;
             }
 
-            whatPropertiesChanged += "}";
+            return whatPropertiesChanged;
+        }
 
-            return JObject.Parse(whatPropertiesChanged);          
+        private bool TryUpdate<T>(Func<T> existingValue, Func<T> updateValue, Action<T> setter)
+        {
+            T value = updateValue();
+            if (!Equals(existingValue(), value))
+            {
+                setter(value);
+                return true;
+            }
+
+            return false;
         }
 
         public UserSecurity GetUserSecurityForSchema(int schemaId)

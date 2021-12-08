@@ -10,6 +10,8 @@ using Sentry.FeatureFlags;
 using Sentry.FeatureFlags.Mock;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Helpers;
+using Sentry.data.Core.Exceptions;
+using Newtonsoft.Json;
 
 namespace Sentry.data.Core.Tests
 {
@@ -1772,11 +1774,149 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void Can_Convert_Description_To_Enum()
+        public void UpdateAndSaveSchema_UnknownSchemaId_ThrowNotFound()
         {
-            ObjectStatusEnum result = EnumHelper.GetByDescription<ObjectStatusEnum>("pending delete");
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
 
-            Assert.AreEqual(ObjectStatusEnum.Pending_Delete, result);
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet((ctx) => ctx.DatasetFileConfigs).Returns(Enumerable.Empty<DatasetFileConfig>().AsQueryable());
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, null, null, null, null, null, null, null, null);
+
+            FileSchemaDto dto = new FileSchemaDto();
+
+            Assert.ThrowsException<SchemaNotFoundException>(() => schemaService.UpdateAndSaveSchema(dto));
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateAndSaveSchema_BadUser_ThrowUnauthorized()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig();
+            fileConfig.Schema = new FileSchema() { SchemaId = 1 };
+            fileConfig.ParentDataset = new Dataset();
+            List<DatasetFileConfig> fileConfigs = new List<DatasetFileConfig>() { fileConfig };
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet(ctx => ctx.DatasetFileConfigs).Returns(fileConfigs.AsQueryable()).Verifiable();
+
+            Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object).Verifiable();
+
+            UserSecurity security = new UserSecurity() { CanManageSchema = false };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, appUser.Object)).Returns(security).Verifiable();
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, null, null, null);
+
+            FileSchemaDto dto = new FileSchemaDto() { SchemaId = 1 };
+
+            Assert.ThrowsException<SchemaUnauthorizedAccessException>(() => schemaService.UpdateAndSaveSchema(dto));
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateAndSaveSchema_CurrentView_CreateEvent()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            //mock context
+            DatasetFileConfig fileConfig = new DatasetFileConfig()
+            {
+                Schema = new FileSchema() 
+                { 
+                    SchemaId = 1, 
+                    CreateCurrentView = false, 
+                    Extension = new FileExtension() { Id = 4 } 
+                },
+                ParentDataset = new Dataset() { DatasetId = 2 }
+            };
+            List<DatasetFileConfig> fileConfigs = new List<DatasetFileConfig>() { fileConfig };
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(fileConfigs.AsQueryable()).Verifiable();
+            datasetContext.Setup(x => x.GetById<FileSchema>(1)).Returns(fileConfig.Schema).Verifiable();
+            datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
+
+            SchemaRevision revision = new SchemaRevision() 
+            { 
+                ParentSchema = fileConfig.Schema,
+                SchemaRevision_Id = 3 
+            };
+            List<SchemaRevision> revisions = new List<SchemaRevision>() { revision };
+            datasetContext.SetupGet(x => x.SchemaRevision).Returns(revisions.AsQueryable()).Verifiable();
+
+            //mock user service
+            Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
+            appUser.SetupGet(x => x.AssociateId).Returns("000000");
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object).Verifiable();
+
+            //mock security service
+            UserSecurity security = new UserSecurity() { CanManageSchema = true };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, appUser.Object)).Returns(security).Verifiable();
+
+            //mock features
+            Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
+            feature.Setup(x => x.GetValue()).Returns(true);
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.SetupGet(x => x.CLA3605_AllowSchemaParguetUpdate).Returns(feature.Object);
+
+            //mock publisher
+            HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
+            {
+                SchemaID = 1,
+                RevisionID = 3,
+                DatasetID = 2,
+                HiveStatus = null,
+                InitiatorID = "000000",
+                ChangeIND = "{\"createcurrentview\":\"true\"}"
+            };
+
+            SnowTableCreateModel snowCreate = new SnowTableCreateModel()
+            {
+                SchemaID = 1,
+                RevisionID = 3,
+                DatasetID = 2,
+                InitiatorID = "000000",
+                ChangeIND = "{\"createcurrentview\":\"true\"}"
+            };
+
+            Mock<IMessagePublisher> publisher = mr.Create<IMessagePublisher>();
+            publisher.Setup(x => x.PublishDSCEvent("1", JsonConvert.SerializeObject(hiveCreate))).Verifiable();
+            publisher.Setup(x => x.PublishDSCEvent("1", JsonConvert.SerializeObject(snowCreate))).Verifiable();
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, features.Object, publisher.Object, null);
+
+            FileSchemaDto dto = new FileSchemaDto() 
+            { 
+                SchemaId = 1, 
+                CreateCurrentView = true, 
+                FileExtensionId = 4 
+            };
+
+            Assert.IsTrue(schemaService.UpdateAndSaveSchema(dto));
+            Assert.IsTrue(fileConfig.Schema.CreateCurrentView);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateAndSaveSchema_ParquetStorage_True()
+        {
+
+        }
+
+        [TestMethod]
+        public void UpdateAndSaveSchema_FileExtension_True()
+        {
+
         }
 
         #region Private Methods
@@ -2131,8 +2271,5 @@ namespace Sentry.data.Core.Tests
             return field;
         }
         #endregion
-
-
-
     }
 }

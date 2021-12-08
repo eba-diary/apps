@@ -9,10 +9,10 @@ using System.Collections.Generic;
 namespace Sentry.data.Web.Tests
 {
     [TestClass]
-    public class Map_Config_Can
+    public class MapConfigTests
     {
         [TestMethod]
-        public void Map_From_SchemaInfoModel_To_FileSchemaDto()
+        public void Map_SchemaInfoModel_ReturnFileSchemaDto()
         {
             SchemaInfoModel mdl = new SchemaInfoModel()
             {
@@ -80,6 +80,25 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("start,middle,end", dto.SchemaRootPath);
             Assert.AreEqual("PSB", dto.ParquetStorageBucket);
             Assert.AreEqual("PSP", dto.ParquetStoragePrefix);
+        }
+
+        [TestMethod]
+        public void Map_SchemaInfoModel_NullOptions_NullSchemaRootPath_ReturnFileSchemaDto()
+        {
+            SchemaInfoModel mdl = new SchemaInfoModel()
+            {
+                Options = null,
+                SchemaRootPath = null
+            };
+
+            FileSchemaDto dto = MapConfig.Mapper.Map<FileSchemaDto>(mdl);
+
+            Assert.AreEqual(false, dto.CLA1396_NewEtlColumns);
+            Assert.IsFalse(dto.CLA1286_KafkaFlag);
+            Assert.IsFalse(dto.CLA3014_LoadDataToSnowflake);
+            Assert.IsFalse(dto.CLA1580_StructureHive);
+            Assert.IsFalse(dto.CLA2472_EMRSend);
+            Assert.IsNull(dto.SchemaRootPath);
         }
     }
 }
