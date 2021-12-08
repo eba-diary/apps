@@ -1213,13 +1213,11 @@ data.Dataset = {
         //*****************************************************************************************************
         $('#datasetConfigList').on('select2:select', function (e) {
 
-            Id = $('#datasetConfigList').val();
-
             var url = new URL(window.location.href);
             url.searchParams.set('configID', $('#datasetConfigList').val());
             window.history.pushState({}, '', url);
 
-            $("#datasetRowTable").DataTable().destroy();            
+            Id = $('#datasetConfigList').val();
             self.vm.NoColumnsReturned(false);
             $('#schemaHR').show();
             self.vm.SchemaRows.removeAll();
@@ -1233,6 +1231,9 @@ data.Dataset = {
         });
         Id = $('#datasetConfigList').val();
         //on initial load, try pulling the Id from the URL first. 
+
+        Id = $('#datasetConfigList').val();
+        //on initial load, try pulling the Id from the URL first.
 
         $('#dataLastUpdatedSpinner').show();
         data.Dataset.UpdateMetadata();
