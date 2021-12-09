@@ -642,13 +642,17 @@ namespace Sentry.data.Web.WebApi.Controllers
             IHttpActionResult Updater()
             {
                 List<string> validationResults = schemaModel.Validate();
+                if (schemaModel.SchemaId != schemaId)
+                {
+                    validationResults.Add($"The route schemaId {schemaId} does not match the schemaModel.SchemaId {schemaModel.SchemaId}");
+                }
 
                 if (validationResults.Any())
                 {
                     throw new SchemaConversionException($"Invalid schema request: {string.Join(" | ", validationResults)}");
                 }
 
-                return Ok(_schemaService.UpdateAndSaveSchema(MapConfig.Mapper.Map<FileSchemaDto>(schemaModel)));
+                return Ok(_schemaService.UpdateAndSaveSchema(schemaModel.ToDto((x) => _schemaService.GetFileExtensionIdByName(x))));
             }
 
             return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", Updater);

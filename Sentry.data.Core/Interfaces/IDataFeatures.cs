@@ -23,6 +23,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA2838_DSC_ANOUNCEMENTS { get; }
         IFeatureFlag<bool> CLA3550_DATA_INVENTORY_NEW_COLUMNS { get; }
         IFeatureFlag<bool> CLA3541_Dataset_Details_Tabs { get; }
-        IFeatureFlag<bool> CLA3605_AllowSchemaParguetUpdate { get; }
+        IFeatureFlag<bool> CLA3605_AllowSchemaParquetUpdate { get; }
     }
 }

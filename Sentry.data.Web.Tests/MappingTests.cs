@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
-using Sentry.data.Web.Helpers;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using System;
 using System.Collections.Generic;
@@ -9,10 +8,10 @@ using System.Collections.Generic;
 namespace Sentry.data.Web.Tests
 {
     [TestClass]
-    public class MapConfigTests
+    public class MappingTests
     {
         [TestMethod]
-        public void Map_SchemaInfoModel_ReturnFileSchemaDto()
+        public void ToDto_SchemaInfoModel_ReturnFileSchemaDto()
         {
             SchemaInfoModel mdl = new SchemaInfoModel()
             {
@@ -22,7 +21,7 @@ namespace Sentry.data.Web.Tests
                 Name = "SchemaName",
                 Description = "Schema Description",
                 StorageCode = "SC",
-                Format = "csv",
+                Format = "CSV",
                 CurrentView = true,
                 Delimiter = ",",
                 HasHeader = false,
@@ -44,7 +43,7 @@ namespace Sentry.data.Web.Tests
                 ParquetStoragePrefix = "PSP"
             };
 
-            FileSchemaDto dto = MapConfig.Mapper.Map<FileSchemaDto>(mdl);
+            FileSchemaDto dto = mdl.ToDto((x) => 1);
 
             Assert.AreEqual(1, dto.SchemaId);
             Assert.AreEqual("EntityName", dto.SchemaEntity_NME);
@@ -60,7 +59,8 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(true, dto.CLA3014_LoadDataToSnowflake);
             Assert.AreEqual(false, dto.CLA1580_StructureHive);
             Assert.AreEqual(false, dto.CLA2472_EMRSend);
-            Assert.AreEqual(0, dto.FileExtensionId);
+            Assert.AreEqual(1, dto.FileExtensionId);
+            Assert.AreEqual("CSV", dto.FileExtensionName);
             Assert.AreEqual(",", dto.Delimiter);
             Assert.AreEqual(false, dto.HasHeader);
             Assert.AreEqual(true, dto.CreateCurrentView);
@@ -83,7 +83,7 @@ namespace Sentry.data.Web.Tests
         }
 
         [TestMethod]
-        public void Map_SchemaInfoModel_NullOptions_NullSchemaRootPath_ReturnFileSchemaDto()
+        public void ToDto_SchemaInfoModel_NullOptions_NullSchemaRootPath_ReturnFileSchemaDto()
         {
             SchemaInfoModel mdl = new SchemaInfoModel()
             {
@@ -91,7 +91,7 @@ namespace Sentry.data.Web.Tests
                 SchemaRootPath = null
             };
 
-            FileSchemaDto dto = MapConfig.Mapper.Map<FileSchemaDto>(mdl);
+            FileSchemaDto dto = mdl.ToDto((x) => 1);
 
             Assert.AreEqual(false, dto.CLA1396_NewEtlColumns);
             Assert.IsFalse(dto.CLA1286_KafkaFlag);

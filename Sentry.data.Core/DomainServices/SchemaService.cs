@@ -26,6 +26,7 @@ namespace Sentry.data.Core
         private readonly IMessagePublisher _messagePublisher;
         private readonly ISnowProvider _snowProvider;
         private string _bucket;
+        private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
@@ -191,15 +192,12 @@ namespace Sentry.data.Core
             }            
 
             JObject whatPropertiesChanged;
-            FileSchema schema;
             /* Any exceptions saving schema changes, do not execute remaining line of code */
             try
             {
-                schema = _datasetContext.GetById<FileSchema>(schemaDto.SchemaId);
-
                 //Update/save schema within DSC metadata
-                whatPropertiesChanged = UpdateSchema(schemaDto, schema);
-                Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {parentDataset.DatasetName}\\{schema.Name} | {whatPropertiesChanged}");
+                whatPropertiesChanged = UpdateSchema(schemaDto, fileConfig.Schema);
+                Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {parentDataset.DatasetName}\\{fileConfig.Schema.Name} | {whatPropertiesChanged}");
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -219,7 +217,7 @@ namespace Sentry.data.Core
             */
             try
             {
-                GenerateConsumptionLayerEvents(schema, whatPropertiesChanged);
+                GenerateConsumptionLayerEvents(fileConfig.Schema, whatPropertiesChanged);
             }
             catch (Exception ex)
             {
@@ -238,12 +236,23 @@ namespace Sentry.data.Core
             return true;
         }
 
+        public int GetFileExtensionIdByName(string extensionName)
+        {
+            FileExtension extension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Name == extensionName);
+            if (extension != null)
+            {
+                return extension.Id;
+            }
+
+            return 0;
+        }
+
         private void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
         {
             /*Generate *-CREATE-TABLE-REQUESTED event when:
             *  - CreateCurrentView changes
             */
-            if (propertyDeltaList.ContainsKey("createcurrentview"))
+            if (_eventGeneratingUpdateFields.Any(x => propertyDeltaList.ContainsKey(x)))
             {
                 GenerateConsumptionLayerCreateEvent(schema, propertyDeltaList);
             }
@@ -280,7 +289,7 @@ namespace Sentry.data.Core
                 generateEvent = true;
             }
             /* schema configuration trigger for createCurrentView regardless true\false */
-            else if (propertyDeltaList.ContainsKey("createcurrentview"))
+            else if (_eventGeneratingUpdateFields.Any(x => propertyDeltaList.ContainsKey(x)))
             {
                 generateEvent = true;
             }
@@ -431,7 +440,7 @@ namespace Sentry.data.Core
         //        chgDetected = true;
         //    }
 
-        //    if (_dataFeatures.CLA3605_AllowSchemaParguetUpdate.GetValue())
+        //    if (_dataFeatures.CLA3605_AllowSchemaParquetUpdate.GetValue())
         //    {
         //        changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket, (x) => schema.ParquetStorageBucket = x));
         //        changes.Add(TryUpdate(() => schema.ParquetStoragePrefix, () => dto.ParquetStoragePrefix, (x) => schema.ParquetStoragePrefix = x));
@@ -445,7 +454,7 @@ namespace Sentry.data.Core
 
         //    whatPropertiesChanged += "}";
 
-        //    return JObject.Parse(whatPropertiesChanged);          
+        //    return JObject.Parse(whatPropertiesChanged);
         //}
 
         private JObject UpdateSchema(FileSchemaDto dto, FileSchema schema)
@@ -460,7 +469,7 @@ namespace Sentry.data.Core
             changes.Add(TryUpdate(() => schema.CreateCurrentView, () => dto.CreateCurrentView, 
                 (x) => {
                             schema.CreateCurrentView = x;
-                            whatPropertiesChanged.Add("createcurrentview", schema.CreateCurrentView.ToString().ToLower());
+                            whatPropertiesChanged.Add("createcurrentview", x.ToString().ToLower());
                        }));
 
             changes.Add(TryUpdate(() => schema.Description, () => dto.Description, (x) => schema.Description = x));
@@ -481,10 +490,20 @@ namespace Sentry.data.Core
 
             changes.Add(TryUpdate(() => schema.SchemaRootPath, () => dto.SchemaRootPath, (x) => schema.SchemaRootPath = x));
 
-            if (_dataFeatures.CLA3605_AllowSchemaParguetUpdate.GetValue())
+            if (_dataFeatures.CLA3605_AllowSchemaParquetUpdate.GetValue())
             {
-                changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket, (x) => schema.ParquetStorageBucket = x));
-                changes.Add(TryUpdate(() => schema.ParquetStoragePrefix, () => dto.ParquetStoragePrefix, (x) => schema.ParquetStoragePrefix = x));
+                changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket, 
+                    (x) =>
+                    {
+                        schema.ParquetStorageBucket = x;
+                        whatPropertiesChanged.Add("parquetstoragebucket", string.IsNullOrEmpty(x) ? null : x.ToLower());
+                    }));
+                changes.Add(TryUpdate(() => schema.ParquetStoragePrefix, () => dto.ParquetStoragePrefix,
+                    (x) =>
+                    {
+                        schema.ParquetStoragePrefix = x;
+                        whatPropertiesChanged.Add("parquetstorageprefix", string.IsNullOrEmpty(x) ? null : x.ToLower());
+                    }));
             }
 
             if (changes.Any(x => x))
