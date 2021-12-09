@@ -256,15 +256,51 @@ namespace Sentry.data.Core
             Logger.Debug($"End method <{methodName}>");
         }
 
-        public void DeleteJob(List<int> idList, bool logicalDelete = true)
+        /// <summary>
+        /// Find retriever job associated with dataflow and set objectstatus
+        /// based on logicalDeleteflag: true = "Pending Delete", false = "Deleted"
+        /// If deleteIssuerId is not specified, userService will be used to pull current user Id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="deleteIssuerId">If not supplied, will utilize userService to pull current user</param>
+        /// <param name="logicalDelete">Perform soft or hard delete</param>
+        public void DeleteJobByDataFlowId(int id, string deleteIssuerId = null, bool logicalDelete = true)
+        {
+            //Find associated retriever job
+            List<int> jobList = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == id).Select(s => s.Id).ToList();
+
+            //Mark retriever jobs deleted
+            Logger.Info($"{nameof(JobService)}-{nameof(DeleteJobByDataFlowId)}-deleteretrieverjob - dataflowid:{id}");
+            foreach (int job in jobList)
+            {
+                DeleteJob(job, deleteIssuerId:deleteIssuerId, logicalDelete:logicalDelete);
+            }
+        }
+        /// <summary>
+        /// Will perform Delete fore each job id provided.
+        /// If deleteIssuerId is not specified, userService will be used to pull current user Id.
+        /// </summary>
+        /// <param name="idList">List of RetrieverJob identifiers</param>
+        /// <param name="deleteIssuerId">If not supplied, user Id will be pulled from User service</param>
+        /// <param name="logicalDelete">Perform soft or hard delete</param>
+        public void DeleteJob(List<int> idList, string deleteIssuerId = null, bool logicalDelete = true)
         {
             foreach (int jobId in idList)
             {
-                DeleteJob(jobId, logicalDelete);
+                DeleteJob(jobId, deleteIssuerId:deleteIssuerId, logicalDelete:logicalDelete);
             }
         }
-
-        public void DeleteJob(int id, bool logicalDelete = true)
+        /// <summary>
+        /// Mark retriever job objectstatus based
+        /// on logicalDelete flag: true = "Pending Delete", false = "Deleted".
+        /// If deleteIssuerId is not specified, userService will be used to pull current user Id.
+        /// </summary>
+        /// <param name="id">RetrieverJob identifier</param>
+        /// <param name="deleteIssuerId">If not supplied, will utilize userService to pull current user</param>
+        /// <param name="logicalDelete">Perform soft or hard delete</param>
+        /// <remarks>If this is being utilzie by Hangfire, ensure deleteIssuerId is supplied.  Typically if called by Hangfire it would be initiated via API, therefore, pull user id
+        /// metadata before hangfire job is queued. </remarks>
+        public void DeleteJob(int id, string deleteIssuerId = null, bool logicalDelete = true)
         {
             try
             {
@@ -281,7 +317,7 @@ namespace Sentry.data.Core
                     job.Modified = DateTime.Now;
                     job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
                     job.DeleteIssueDTM = DateTime.Now;
-                    job.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
+                    job.DeleteIssuer = deleteIssuerId?? _userService.GetCurrentUser().AssociateId;
                 }
                 else
                 {
@@ -294,6 +330,24 @@ namespace Sentry.data.Core
                     //Mark job as deleted
                     job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
                     job.IsEnabled = false;
+
+
+                    /************************************************
+                     * During conversion for CLA3332, performing dataflow deletes will not do 
+                     *  through Logical delete first, therefore, some of the 
+                     *  values (DeleteIssuer, DeleteIssueDTM) need to be set within this else block. 
+                    ************************************************/
+                    if (string.IsNullOrEmpty(job.DeleteIssuer))
+                    {
+                        job.DeleteIssuer =  !string.IsNullOrEmpty(deleteIssuerId) ? deleteIssuerId: _userService.GetCurrentUser().AssociateId;
+                    }
+                    
+                    //Only comparing date since the milliseconds percision are different, therefore, never evaluates true
+                    //  https://stackoverflow.com/a/44324883
+                    if (DateTime.MaxValue.Date == job.DeleteIssueDTM.Date)
+                    {
+                        job.DeleteIssueDTM = DateTime.Now;
+                    }
                 }
             }
             catch (Exception ex)

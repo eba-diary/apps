@@ -282,26 +282,68 @@
         </div>
     </div>
 
-    <hr />
-
-    @if (Model.Security.CanPreviewDataset)
+    @if (!Model.DisplayTabSections)
     {
-        @Html.Partial("Details/_SchemaAbout", Model)
+        if (Model.Security.CanPreviewDataset)
+        {
+            @Html.Partial("Details/_SchemaAbout", Model)
+        }
+        if (Model.Security.CanPreviewDataset)
+        {
+            @Html.Partial("Details/_SchemaColumns", Model)
+        }
+        if (Model.Security.CanViewFullDataset)
+        {
+            @Html.Partial("Details/_DataPreview", Model)
+        }
+        if (Model.Security.CanViewFullDataset)
+        {
+            @Html.Partial("Details/_DataFiles", Model)
+        }
     }
-
-    @if (Model.Security.CanPreviewDataset)
+    else
     {
-        @Html.Partial("Details/_SchemaColumns", Model)
-    }
+        <div class="tabs-wrapper">
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="nav-item active">
+                    <a class="nav-link active" data-toggle="tab" href="#panelSchemaAbout" id="detailTabSchemaAbout" role="tab">About this Schema</a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#panelSchemaColumns" id="detailTabSchemaColumns" role="tab">Columns</a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Data Preview (Top 20 Rows)</a>
+                </li>
+                <li role="presentation" class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#panelDataFiles" id="detailTabDataFiles" role="tab">Data Files</a>
+                </li>
+            </ul>
+        </div>
 
-    @if (Model.Security.CanViewFullDataset)
-    {
-        @Html.Partial("Details/_DataPreview", Model)
-    }
+        <!-- Tab panels -->
+        <div class="tab-content">
+            <div class="tab-pane fade in active" id="panelSchemaAbout" role="tabpanel">
+                <div id="tabSchemaAbout">
+                    @if (Model.Security.CanPreviewDataset)
+                    {
+                        @Html.Partial("Details/_SchemaAbout", Model)
+                    }
+                </div>
+            </div>
+            <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
+                @if (Model.Security.CanPreviewDataset)
+                {
+                    <div id="tabSchemaColumns"></div>
+                }
+            </div>
+            <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
+                <div id="tabDataPreview"></div>
+            </div>
+            <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
+                <div id="tabDataFiles"></div>
 
-    @if (Model.Security.CanViewFullDataset)
-    {
-        @Html.Partial("Details/_DataFiles", Model)
+            </div>
+        </div>
     }
 </div>
 
@@ -312,6 +354,8 @@
     <script>
 
         $(function () {
+            vm = new data.Dataset.ViewModel();
+            ko.applyBindings(vm);
             data.Dataset.DetailInit();
         });
 
@@ -322,132 +366,7 @@
         var dataAjaxReq;
 
 
-        function renderTable(input, push) {
-            var filters = input.split("\n");
 
-            if (filters[0].startsWith("+-")) {
-
-                if (table) {
-                    table.destroy();
-                }
-                //Column information
-                var columns = filters[1].split('|');
-                var parsedColumns = [];
-                var nullColumns = [];
-
-                $('#tableColumnIDs').empty();
-                $('#tableFirstRow').empty();
-                $('#datasetRowTable tbody').empty();
-
-                for (var i = 1; i < columns.length; i++) {
-                    if (columns[i]) {
-                        nullColumns.push(null);
-                        parsedColumns.push({ 'title': columns[i].trim(), 'width': "auto" });
-                        $('#tableColumnIDs').append("<th>" + columns[i].trim() + "</th>");
-                        $('#tableFirstRow').append("<td></td>");
-                    }
-                }
-
-                var parsedRows = [];
-                //Data for Each Row in the Result Set
-                for (var i = 3; i < filters.length; i++) {
-
-                    if (!filters[i].startsWith("+-")) {
-
-                        var cells = filters[i].split('|');
-                        var parsedCells = [];
-                        cells.splice(0, 1);
-                        cells.splice(cells.length, 1);
-                        for (var j = 0; j < cells.length - 1; j++) {
-                            parsedCells.push(cells[j].trim());
-                        }
-
-                        if (parsedCells.length >= 1) {
-                            parsedRows.push(parsedCells);
-                        }
-                    }
-                }
-
-                if (!push) {
-                    table = $('#datasetRowTable').DataTable({
-                        "scrollX": true,
-                        data: parsedRows,
-                        columns: parsedColumns,
-                    });
-                } else {
-                    table = $('#datasetRowTable').DataTable({ "scrollX": true }).rows.add(parsedRows).draw();
-                    $($('#datasetRowTable_info').children()[2]).text($('#rowCount').text());
-                }
-
-                $(".dataTables_filter").parent().addClass("text-right");
-            }
-        };
-
-
-        //DATA PREVIEW DATA TABLE SETUP
-        function renderTable_v2(input, push) {
-
-            //remove table DOM if needed
-            if (table) {
-                table.destroy();
-            }
-
-            //Determine Column metadata
-            var parsedColumns = [];
-            var nullColumns = [];
-
-            //Remove existing column metadata
-            $('#tableColumnIDs').empty();
-            $('#tableFirstRow').empty();
-            $('#datasetRowTable tbody').empty();
-
-            //SETUP ALL COLUMNS for DATA PREVIEW
-            Object.keys(input[0]).forEach(function (key) {
-                nullColumns.push(null);
-
-                //load up ARRAY with each column
-                //CUSTOM RENDER will wrap column data in DIV which adds a scroll bar if needed since STRUCT columns are HUGE
-                parsedColumns.push({
-                    'title': key.trim(), 'width': "auto", render: function (d) {
-                        var me = "<div style='max-height:100px; overflow-y: auto;'>" + d + "</div>";
-                        return me;
-                    }
-                });
-
-                $('#tableColumnIDs').append("<th>" + key.trim() + "</th>");
-                $('#tableFirstRow').append("<td></td>");
-            });
-
-            var parsedRows = [];
-            //Data for Each Row in the Result Set
-            input.forEach(function (row) {
-                var parsedCells = [];
-
-                for (var key of Object.keys(row)) {
-                    parsedCells.push(row[key]);
-                }
-
-                if (parsedCells.length >= 1) {
-                    parsedRows.push(parsedCells);
-                }
-            });
-
-            if (!push) {
-                table = $('#datasetRowTable').DataTable({
-                    "scrollX": true,
-                    "autoWidth": true,
-                    "scrollY": "1200px",                //set max height at 1200
-                    "scrollCollapse": true,             //if less then 1200, shrink so no white space
-                    data: parsedRows,
-                    columns: parsedColumns,
-                });
-            } else {
-                table = $('#datasetRowTable').DataTable({ "scrollX": true }).rows.add(parsedRows).draw();
-                $($('#datasetRowTable_info').children()[2]).text($('#rowCount').text());
-            }
-
-            $(".dataTables_filter").parent().addClass("text-right");
-        }
 
         var getUrlParameter = function getUrlParameter(sParam) {
             var sPageURL = decodeURIComponent(window.location.search.substring(1)),
@@ -464,355 +383,9 @@
             }
         };
 
-        function SchemaRow(data) {
-            this.Name = ko.observable(data.Name);
-            this.Description = ko.observable(data.Description);
-            this.Type = ko.observable(data.Type);
-            this.Precision = ko.observable(data.Precision);
-            this.Scale = ko.observable(data.Scale);
-            this.LastUpdated = ko.observable(data.LastUpdated);
-        }
-
-        function DropLocation(data) {
-            this.Name = ko.observable(data.Name);
-            this.Location = ko.observable(data.Location);
-            this.JobId = ko.observable(data.JobId);
-            this.IsEnabled = ko.observable(data.IsEnabled);
-        }
-
-        function DataFlow(data) {
-            var self = this;
-            self.Name = ko.observable(data.Name);
-            self.Id = ko.observable(data.Id);
-            self.DetailUrl = ko.observable(data.DetailUrl);
-            self.Jobs = ko.observableArray();
-            self.DetailUrl = "/DataFlow/" + encodeURIComponent(self.Id()) + "/Detail";
-            $.each(data.RetrieverJobs, function (i, val) {
-                var item = new DropLocation(val);
-
-                self.Jobs().push(item);
-            });
-            self.DataFlowDetailRedirect = function () {
-                window.open("/DataFlow/" + encodeURIComponent(this.Id()) + "/Detail");
-            }
-            self.RenderJobs = ko.pureComputed(function () {
-                return ko.unwrap(self.Jobs) ? "RenderJobs" : "noRenderJobs";
-            });
-        }
-
-        function ViewModel() {
-            var self = this;
-
-            self.NoColumnsReturned = ko.observable();
-            self.DataLoading = ko.observable(false);
-            self.DataTableExists = ko.observable(false);
-            self.RowCount = ko.observableArray();
-            self.SchemaRows = ko.observableArray();
-            self.DataLastUpdated = ko.observable();
-            self.Description = ko.observable();
-            self.LessDescription = ko.computed(function () {
-                if (self.Description() != null && self.Description().length > 300) {
-
-                    var last = self.Description().substring(0, 300).lastIndexOf(" ");
-
-                    $('#schemaHasMoreDescription').show();
-                    return self.Description().substring(0, last);
-                } else {
-                    $('#schemaHasMoreDescription').hide();
-                    return self.Description();
-                }
-            });
-            self.MoreDescription = ko.computed(function () {
-                if (self.Description() != null && self.Description().length > 300) {
-                    $('#schemaHasMoreDescription').show();
-                    var last = self.Description().substring(0, 300).lastIndexOf(" ");
-
-                    return " " + self.Description().substring(last);
-                } else {
-                    $('#schemaHasMoreDescription').hide();
-                    return '';
-                }
-            });
-            self.DFSDropLocation = ko.observable();
-            self.S3DropLocation = ko.observable();
-            self.OtherJobs = ko.observableArray();
-            self.DataFlows = ko.observableArray();
-            self.DFSCronJob = ko.observable();
-            self.S3CronJob = ko.observable();
-            self.CronJobs = ko.observableArray();
-            self.Views = ko.observable();
-            self.Downloads = ko.observable();
-            self.FullyQualifiedSnowflakeViews = ko.observableArray();
-            self.RenderDataFlows = ko.computed(function () {
-                if (self.DataFlows == undefined || self.DataFlows().length == 0) {
-                    return false;
-                }
-                else {
-                    return true;
-                }
-            });
-            self.ShowDataFileTable = ko.computed(function () {
-                if (self.DataLastUpdated() === 'No Data Files Exist') {
-                    return false;
-                } else {
-                    return true;
-                }
-            });
-
-            self.FooterRow = ko.computed(function () {
-                if (self.SchemaRows().length > 10) {
-                    return true;
-                } else {
-                    return false;
-                }
-            });
-
-            self.MetadataLastDT = ko.computed(function () {
-                if (self.SchemaRows().length >= 1) {
-                    var d = new Date("September 13, 1989 12:15:00");
-
-                    ko.utils.arrayForEach(self.SchemaRows(), function (feature) {
-                        var f = new Date(feature.LastUpdated());
-                        if (f > d) { d = f }
-                    });
-                    d = d.toLocaleString("en-us", { month: "long" }) + ' ' + d.getDate() + ', ' + d.getFullYear();
-                    $('#sessionSpinner').hide();
-                    return d;
-                }
-                else if (self.NoColumnsReturned()) {
-                    $('#sessionSpinner').hide();
-                    return "No Columns Exist";
-                }
-                else {
-                    $('#sessionSpinner').show();
-                }
-            });
-
-            self.AnyLastUpdated = ko.computed(function () {
-                var d1 = Date.parse(self.DataLastUpdated());
-                var d2 = Date.parse(self.MetadataLastDT());
-
-                //Not dates for both metadata and data
-                if (!isNaN(d1) && !isNaN(d2)) {
-
-                    var d1 = new Date(d1);
-                    var d2 = new Date(d2);
-                    $('#updatedSpinner').hide();
-                    $('#dataPreviewSection').show();
-                    if (d1 > d2) {
-                        return d1.toLocaleString("en-us", { month: "long" }) + ' ' + d1.getDate() + ', ' + d1.getFullYear();
-                    } else {
-                        return d2.toLocaleString("en-us", { month: "long" }) + ' ' + d2.getDate() + ', ' + d2.getFullYear();
-                    }
-                }
-                //Only metadata date
-                else if (!isNaN(d1) && isNaN(d2)) {
-                    $('#updatedSpinner').hide();
-                    $('#dataPreviewSection').show();
-                    var d1 = new Date(d1);
-                    return d1.toLocaleString("en-us", { month: "long" }) + ' ' + d1.getDate() + ', ' + d1.getFullYear();
-                }
-                //Only data date
-                else if (isNaN(d1) && !isNaN(d2)) {
-                    $('#updatedSpinner').hide();
-                    $('#dataPreviewSection').hide();
-                    var d2 = new Date(d2);
-                    return d2.toLocaleString("en-us", { month: "long" }) + ' ' + d2.getDate() + ', ' + d2.getFullYear();
-                }
-                //Are both dates not populated
-                else if (self.DataLastUpdated() === 'No Data Files Exist' && self.MetadataLastDT() === 'No Columns Exist') {
-                    $('#updatedSpinner').hide();
-                    $('#dataPreviewSection').hide();
-                    return $('#datasetInfoLastUpdated').text();
-                }
-            });
-
-            //*****************************************************************************************************
-            //CONFIG DROP DOWN CHANGE
-            //*****************************************************************************************************
-            $('#datasetConfigList').on('select2:select', function (e) {
-
-                window.history.pushState('Config Changed', 'Title', '?configID=' + $('#datasetConfigList').val());
-                Id = $('#datasetConfigList').val();
-                self.NoColumnsReturned(false);
-                $('#schemaHR').show();
-                self.SchemaRows.removeAll();
-                var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + $('#datasetConfigList').val();
-                $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
-
-                UpdateMetadata();
-            });
-
-            $('#dataLastUpdatedSpinner').show();
-            UpdateMetadata();
+        
 
 
-            function UpdateMetadata() {
-
-                if (!isNaN(getUrlParameter('configID'))) {
-                    $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
-                }
-
-                if ($('#datasetConfigList').val() === undefined) { return; }
-
-                var metadataURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val();
-                $.get(metadataURL, function (result) {
-
-                    //Set schema metadata
-                    self.Downloads(result.Downloads);
-                    self.Views(result.Views);
-                    self.Description(result.Description);
-                    self.FullyQualifiedSnowflakeViews.removeAll();
-                    $.each(result.SnowflakeViews, function (i, val) {
-                        self.FullyQualifiedSnowflakeViews.push(val);
-                    });
-
-
-                    //Populate legacy retriever jobs
-                    self.OtherJobs.removeAll();
-                    $.each(result.OtherJobs, function (i, val) {
-                        var item = new DropLocation(val);
-
-                        self.OtherJobs().push(item);
-                    });
-                    self.OtherJobs.notifySubscribers();
-
-                    //Populate associated DataFlows
-                    self.DataFlows.removeAll();
-                    $.each(result.DataFlows, function (i, val) {
-                        var item = new DataFlow(val);
-
-                        self.DataFlows().push(item);
-                    });
-                    self.DataFlows.notifySubscribers();
-
-                    //Determine last
-                    var d = new Date(result.DataLastUpdated);
-                    if (d < new Date('1990-01-01')) {
-                        self.DataLastUpdated('No Data Files Exist');
-                    } else {
-                        d = d.toLocaleString("en-us", { month: "long" }) + ' ' + d.getDate() + ', ' + d.getFullYear();
-                        self.DataLastUpdated(d);
-                    }
-                    $('#dataLastUpdatedSpinner').hide();
-
-                    UpdateColumnSchema();
-                    data.Dataset.delroyReloadEverything(result.DatasetId, result.SchemaId, result.SnowflakeViews);
-                });
-            }
-
-            function UpdateColumnSchema() {
-                if ($('#datasetConfigList').val() === undefined) { return; }
-
-                var schemaURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/columns";
-
-                //remove any children from DOM before injecting spinner
-                $("div.dataPreviewSpinner").empty();
-                //Inject spinner into DOM
-                Sentry.InjectSpinner($(".dataPreviewSpinner"));
-
-                self.DataLoading(true);
-                $('#dataSection').hide();
-
-                //logic to aboart ajax call additional call is triggered before original call finished.
-                //https://stackoverflow.com/a/4551178
-                if (dataAjaxReq && dataAjaxReq.readyState != 4) {
-                    dataAjaxReq.abort()
-                }
-
-                //If no data files exist, 1.) do not query table, 2.) do not show Data Preview section
-                if (!self.ShowDataFileTable()) {
-                    $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
-                }
-                else {
-                    dataAjaxReq = $.ajax({
-                        type: "GET",
-                        url: "/api/v2/querytool/dataset/" + location.pathname.split('/')[3] + "/config/" + $('#datasetConfigList').val() + "/SampleRecords",
-                        data: {
-                            rows: 20
-                        },
-                        dataType: "json",
-                        success: function (msg) {
-                            if (msg !== undefined) {
-                                var obj = JSON.parse(msg);
-                                if (obj.length > 0) {
-
-                                    //pass data returned from AJAX call to render Data Table
-                                    renderTable_v2(obj, false);
-
-                                    $('#dataSection').show();
-                                    self.DataLoading(false);
-                                    self.DataTableExists(true);
-                                    $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
-                                }
-                                else {
-                                    $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
-                                    $('#dataSection').hide();
-                                }
-                            }
-                        },
-                        error: function (error) {
-                            //Schema NotFound response
-                            if (error.status == 404 && error.responseText == "Schema not found") {
-                                $('#dataSection').hide();
-                            }
-
-                            $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
-                        }
-                    }).fail(function () {
-                        $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
-                    });
-                }
-
-                //logic to aboart ajax call additional call is triggered before original call finished.
-                //https://stackoverflow.com/a/4551178
-                if (schemaAjaxReq && schemaAjaxReq.readyState != 4) {
-                    schemaAjaxReq.abort()
-                }
-
-                schemaAjaxReq = $.get(schemaURL, function (result) {
-                    if (result.RowCount) {
-                        self.RowCount(result.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-                    } else {
-                        self.RowCount(0);
-                    }
-
-                    if (result.rows.length == 0) {
-                        self.NoColumnsReturned(true);
-                        //$('#schemaSection').hide();
-                        $('#schemaHR').hide();
-                    }
-                    else {
-                        self.NoColumnsReturned(false);
-                        //$('#schemaSection').show();
-                        $('#schemaHR').show();
-
-                        $.each(result.rows, function (i, val) {
-                            var item = new SchemaRow(val);
-
-                            self.SchemaRows().push(item);
-                        });
-                        self.SchemaRows.notifySubscribers();
-                    }
-                    //$('#panelSpinner').hide();
-
-                }).fail(function () {
-                    self.RowCount(0);
-                    self.SchemaRows([]);
-
-                    self.NoColumnsReturned(true);
-                    //$('#panelSpinner').hide();
-                    //$('#schemaSection').hide();
-                    $('#schemaHR').hide();
-                });
-            }
-
-
-
-        };
-
-        vm = new ViewModel();
-        ko.applyBindings(vm);
 
     </script>
 }

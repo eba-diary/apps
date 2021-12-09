@@ -69,7 +69,6 @@ namespace Sentry.data.Web.Controllers
             if (ModelState.IsValid)
             {
                 model.NotificationId = _notificationService.SubmitNotification(model.ToCore());
-
                 ManageNotificationViewModel vm = new ManageNotificationViewModel()
                 {
                     CanModifyNotifications = _notificationService.CanUserModifyNotifications()
@@ -90,6 +89,7 @@ namespace Sentry.data.Web.Controllers
 
             model.AllSeverities = default(NotificationSeverity).ToEnumSelectList();
             model.AllDataAssets = AreaList;
+            model.AllNotificationCategories = default(NotificationCategory).ToEnumSelectList();
             return View("ModifyNotification",model);
         }
 

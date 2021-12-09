@@ -350,7 +350,7 @@ namespace Sentry.data.Web.Controllers
             {
                 DatasetDetailModel model = new DatasetDetailModel(dto);
                 model.DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue();
-
+                model.DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue();
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
 
                 return View(model);
@@ -358,6 +358,71 @@ namespace Sentry.data.Web.Controllers
             else
             {
                 return HttpNotFound("Invalid Dataset Id"); 
+            }
+        }
+
+        /// <summary>
+        /// Controller to deliver partial views to the tab layout.
+        /// </summary>
+        /// <param name="id">Dataset ID</param>
+        /// <param name="tab">Tab name</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Dataset/DetailTab/{id}/{tab}/")]
+        public ActionResult DetailTab(int id, string tab)
+        {
+            DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
+            if(dto != null)
+            {
+                DatasetDetailModel model = new DatasetDetailModel(dto);
+                switch (tab)
+                {
+                    case ("SchemaColumns"):
+                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Schema Column Tab", dto.DatasetId);
+                        return PartialView("Details/_SchemaColumns", model);
+                    case ("SchemaAbout"):
+                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Schema About Tab", dto.DatasetId);
+                        return PartialView("Details/_SchemaAbout", model);
+                    case ("DataPreview"):
+                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Data Preview Tab", dto.DatasetId);
+                        return PartialView("Details/_DataPreview", model);
+                    case ("DataFiles"):
+                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Data Files Tab", dto.DatasetId);
+                        return PartialView("Details/_DataFiles", model);
+                    default:
+                        return HttpNotFound("Invalid Tab");
+                }
+            }
+            else
+            {
+                return HttpNotFound("Invalid Dataset Id");
+            }
+        }
+
+        /// <summary>
+        /// Controller to log view events of the detail tabs.
+        /// </summary>
+        /// <param name="id">Dataset ID</param>
+        /// <param name="tab">Tab name</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Dataset/DetailTab/{id}/{tab}/LogView/")]
+        public void DetailTabEventLogger(int id, string tab)
+        {
+            switch (tab)
+            {
+                case ("SchemaColumns"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Schema Column Tab", id);
+                    return;
+                case ("SchemaAbout"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Schema About Tab", id);
+                    return;
+                case ("DataPreview"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Data Preview Tab", id);
+                    return;
+                case ("DataFiles"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Data Files Tab", id);
+                    return;
             }
         }
 

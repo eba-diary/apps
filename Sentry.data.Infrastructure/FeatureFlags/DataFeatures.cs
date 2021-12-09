@@ -24,11 +24,17 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA1656_DataFlowEdit_SubmitEditPage { get; }
         public IFeatureFlag<bool> CLA3329_Expose_HR_Category { get; }
         public IFeatureFlag<bool> CLA2838_DSC_ANOUNCEMENTS { get; }
+        public IFeatureFlag<bool> CLA3550_DATA_INVENTORY_NEW_COLUMNS { get; }
 
 
-        
+
+        public IFeatureFlag<bool> CLA3541_Dataset_Details_Tabs { get; }
+
+
+
         public IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; }
         public IFeatureFlag<bool> CLA3497_UniqueLivySessionName { get; }
+        public IFeatureFlag<bool> CLA3240_UseDropLocationV2 { get; }
 
 
 
@@ -44,6 +50,9 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA2838_DSC_ANOUNCEMENTS = new BooleanFeatureFlagAmbientContext("CLA2838_DSC_ANOUNCEMENTS", false, LdClient, () => LdUser);
             CLA3332_ConsolidatedDataFlows = new BooleanFeatureFlagAmbientContext("CLA3332_ConsolidatedDataFlows", false, LdClient, () => LdUser);
             CLA3497_UniqueLivySessionName = new BooleanFeatureFlagAmbientContext("CLA3497_UniqueLivySessionName", false, LdClient, () => LdUser);
+            CLA3550_DATA_INVENTORY_NEW_COLUMNS = new BooleanFeatureFlagAmbientContext("CLA3550_DATA_INVENTORY_NEW_COLUMNS", false, LdClient, () => LdUser);
+            CLA3541_Dataset_Details_Tabs = new BooleanFeatureFlagAmbientContext("CLA3541_DatasetDetailsTabs", false, LdClient, () => LdUser);
+            CLA3240_UseDropLocationV2 = new BooleanFeatureFlagAmbientContext("CLA3240_UseDropLocationV2", false, LdClient, () => LdUser);
 
         }
 
@@ -90,8 +99,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         */
         public IFeatureFlag<string> CLA2671_RefactorEventsToJava { get; } = new StringFeatureFlag("CLA2671_RefactorEventsToJava", databaseRepo_longCache);
         public IFeatureFlag<string> CLA2671_RefactoredDataFlows { get; } = new StringFeatureFlag("CLA2671_RefactoredDataFlows", databaseRepo_longCache);
-
-        public IFeatureFlag<bool> CLA3240_UseDropLocationV2 { get; } = new BooleanFeatureFlag("CLA3240_UseDropLocationV2", databaseRepo_longCache);
         public IFeatureFlag<bool> CLA3241_DisableDfsDropLocation { get; } = new BooleanFeatureFlag("CLA3241_DisableDfsDropLocation", databaseRepo_longCache);
         public IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime { get; } = new BooleanFeatureFlag("CLA3048_StandardizeOnUTCTime", databaseRepo_longCache);
 

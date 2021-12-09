@@ -34,5 +34,6 @@
     [ParquetStorageBucket] VARCHAR(250) NULL, 
     [ParquetStoragePrefix] VARCHAR(250) NULL, 
     [SnowflakeStage] VARCHAR(250) NULL, 
+    [SnowflakeWarehouse] VARCHAR(250) NULL, 
     CONSTRAINT [FK_Schema_FileExtension] FOREIGN KEY ([FileExtension_Id]) REFERENCES [FileExtension]([Extension_Id]) 
 )

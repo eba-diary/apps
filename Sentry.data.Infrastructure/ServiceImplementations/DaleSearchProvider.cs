@@ -73,7 +73,7 @@ namespace Sentry.data.Infrastructure
         private string BuildAQuery(DaleSearchDto dto, ref SqlCommand command)
         {
             string q = String.Empty;
-            string qSelect = "SELECT Asset_CDE, Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM,Prod_Typ,BaseColumn_ID,IsSensitive_FLG,IsOwnerVerified_FLG,Source_NME ";
+            string qSelect = "SELECT Asset_CDE, Server_NME,Database_NME,Base_NME,Type_DSC,Column_NME,Column_TYP,MaxLength_LEN,Precision_LEN,Scale_LEN,IsNullable_FLG,Effective_DTM,Prod_Typ,BaseColumn_ID,IsSensitive_FLG,IsOwnerVerified_FLG,Source_NME,ScanList_NME,SAIDList_NME ";
             string qFrom = (dto.Sensitive == DaleSensitive.SensitiveOnly)? "FROM ColumnSensitivityCurrent_v " : "FROM Column_v ";
             string qWhereStatement = BuildAWhere(dto, ref command);
 
@@ -292,6 +292,9 @@ namespace Sentry.data.Infrastructure
 
             result.SourceType = (!reader.IsDBNull(16)) ? reader.GetString(16) : String.Empty;
 
+            result.ScanCategory = (!reader.IsDBNull(17)) ? reader.GetString(17) : String.Empty;
+            result.ScanType = (!reader.IsDBNull(18)) ? reader.GetString(18) : String.Empty;
+
             return result;
         }
 
@@ -433,21 +436,29 @@ namespace Sentry.data.Infrastructure
 
         private string BuildGetCategoriesByAssetQuery()
         {
-            string q = @"SELECT ScanAction.Alert_NME, CASE WHEN BaseScanAction_SENSITIVE.ScanAction_ID IS NOT NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS IsSensitive_FLG 
-                        FROM ScanAction ScanAction
-                        LEFT JOIN
+            //NOTE: Multiple SAIDExposure_NME's can exist in the list coming back so the GROUP BYs on this essentially bring back a distinct list
+            //the use of MAX here is a trick to bring back anything that is IsSensitive_FLG = 1
+            string q = @"SELECT DALE.SAIDExposure_NME,CAST(MAX(DALE.IsSensitive_FLG) AS BIT) AS IsSensitive_FLG
+                        FROM
                         (
-                            SELECT BaseScanAction.ScanAction_ID
-                            FROM BaseScanAction BaseScanAction
-                            JOIN Column_v Column_v
-                                ON BaseScanAction.Base_ID = Column_v.BaseColumn_ID
-                            WHERE Sensitive_FLG = 1
-                                    AND Column_v.Expiration_DTM IS NULL
-                                    AND Column_v.Asset_CDE = @Criteria
-                            GROUP BY ScanAction_ID
-                        ) AS BaseScanAction_SENSITIVE
-                            ON ScanAction.ScanAction_ID = BaseScanAction_SENSITIVE.ScanAction_ID
-                        WHERE ScanAction.Active_FLG = 1";
+	                        SELECT ScanAction.SAIDExposure_NME, CASE WHEN BaseScanAction_SENSITIVE.ScanAction_ID IS NOT NULL THEN CAST(1 AS INT) ELSE CAST(0 AS INT) END AS IsSensitive_FLG 
+	                        FROM ScanAction ScanAction
+	                        LEFT JOIN
+	                        (
+		                        SELECT BaseScanAction.ScanAction_ID
+		                        FROM BaseScanAction BaseScanAction
+		                        JOIN Column_v Column_v
+			                        ON BaseScanAction.Base_ID = Column_v.BaseColumn_ID
+		                        WHERE Sensitive_FLG = 1
+				                        AND Column_v.Expiration_DTM IS NULL
+				                        AND Column_v.Asset_CDE = @Criteria
+		                        GROUP BY ScanAction_ID
+	                        ) AS BaseScanAction_SENSITIVE
+		                        ON ScanAction.ScanAction_ID = BaseScanAction_SENSITIVE.ScanAction_ID
+	                        WHERE ScanAction.Active_FLG = 1
+	                        GROUP BY  ScanAction.SAIDExposure_NME, CASE WHEN BaseScanAction_SENSITIVE.ScanAction_ID IS NOT NULL THEN CAST(1 AS INT) ELSE CAST(0 AS INT) END
+                        ) AS DALE
+                        GROUP BY DALE.SAIDExposure_NME";
 
             return q;
         }
