@@ -6,6 +6,7 @@ using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Web.Helpers;
 using Sentry.data.Web.Models.ApiModels.Dataset;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using Sentry.WebAPI.Versioning;
@@ -621,13 +622,49 @@ namespace Sentry.data.Web.WebApi.Controllers
 
         }
 
+        /// <summary>
+        /// Update schema metadata
+        /// </summary>
+        /// <param name="datasetId"></param>
+        /// <param name="schemaId"></param>
+        /// <param name="schemaModel"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [ApiVersionBegin(WebAPI.Version.v2)]
+        [Route("dataset/{datasetId}/schema/{schemaId}")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(bool))]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        public async Task<IHttpActionResult> UpdateSchema(int datasetId, int schemaId, SchemaInfoModel schemaModel)
+        {
+            IHttpActionResult Updater()
+            {
+                List<string> validationResults = schemaModel.Validate();
+                if (schemaModel.SchemaId != schemaId)
+                {
+                    validationResults.Add($"The route schemaId {schemaId} does not match the schemaModel.SchemaId {schemaModel.SchemaId}");
+                }
+
+                if (validationResults.Any())
+                {
+                    throw new SchemaConversionException($"Invalid schema request: {string.Join(" | ", validationResults)}");
+                }
+
+                return Ok(_schemaService.UpdateAndSaveSchema(schemaModel.ToDto((x) => _schemaService.GetFileExtensionIdByName(x))));
+            }
+
+            return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", Updater);
+        }
+
         #endregion
 
         #region Schema_Endpoints
-        
-       
 
-        
+
+
+
         #endregion
 
         #region Messaging Endpoints
