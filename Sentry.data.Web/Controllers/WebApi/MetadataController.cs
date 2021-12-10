@@ -6,14 +6,15 @@ using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Web.Models.ApiModels;
 using Sentry.data.Web.Models.ApiModels.Dataset;
+using Sentry.data.Web.Models.ApiModels.DatasetFile;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Results;
@@ -32,11 +33,12 @@ namespace Sentry.data.Web.WebApi.Controllers
         private readonly ISchemaService _schemaService;
         private readonly ISecurityService _securityService;
         private readonly IMessagePublisher _messagePublisher;
+        private readonly Lazy<IDatasetFileService> _datasetFileService;
 
         public MetadataController(IDatasetContext dsContext, UserService userService,
                                 IConfigService configService, IDatasetService datasetService,
                                 ISchemaService schemaService, ISecurityService securityService,
-                                IMessagePublisher messagePublisher)
+                                IMessagePublisher messagePublisher, Lazy<IDatasetFileService> datasetFileService)
         {
             _dsContext = dsContext;
             _userService = userService;
@@ -45,6 +47,12 @@ namespace Sentry.data.Web.WebApi.Controllers
             _schemaService = schemaService;
             _securityService = securityService;
             _messagePublisher = messagePublisher;
+            _datasetFileService = datasetFileService;
+        }
+
+        public IDatasetFileService DatasetFileService
+        {
+            get { return _datasetFileService.Value; }
         }
 
         #region Classes
@@ -280,6 +288,48 @@ namespace Sentry.data.Web.WebApi.Controllers
             }
 
             return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", GetSchemaFunction);
+        }
+
+        [HttpGet]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("~/datasetfile/dataset/{datasetId}/schema/{schemaId}/datasetfile")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<DatasetFileDto>))]
+        public async Task<IHttpActionResult> GetSchemaDatasetFiles(int datasetId, int schemaId)
+        {
+            IHttpActionResult GetSchemaDatasetFilesFunction()
+            {
+                //DatasetFileConfigDto dto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+                List<DatasetFileDto> dtoList = DatasetFileService.GetAllDatasetFilesBySchema(schemaId, x => x.ParentDatasetFileId == null).ToList();
+
+                List<DatasetFileModel> modelList = dtoList.ToModel();
+                                
+                return Ok(modelList);
+            }
+
+            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", GetSchemaDatasetFilesFunction);
+        }
+
+        [HttpGet]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("~/datasetfile/dataset/{datasetId}/schema/{schemaId}/datasetfile_page")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<DatasetFileDto>))]
+        public async Task<IHttpActionResult> GetSchemaDatasetFiles(int datasetId, int schemaId, [FromUri] int pageNumber, [FromUri] int pageSize)
+        {
+            IHttpActionResult GetSchemaDatasetFilesFunction()
+            {
+                //DatasetFileConfigDto dto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+                //List<DatasetFileDto> dtoList = DatasetFileService.GetAllDatasetFilesBySchema(schemaId, x => x.ParentDatasetFileId == null).ToList();
+
+                PageParameters pagingParams = new PageParameters() { PageNumber = pageNumber, PageSize = pageSize };
+
+                List<DatasetFileDto> dtoList = DatasetFileService.GetAllDatasetFilesBySchema(schemaId, pagingParams).ToList();
+
+                List<DatasetFileModel> modelList = dtoList.ToModel();
+
+                return Ok(modelList);
+            }
+
+            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", GetSchemaDatasetFilesFunction);
         }
 
         /// <summary>

@@ -112,6 +112,28 @@ namespace Sentry.data.Core.Tests
             return dtoList;
         }
 
+        public static FileSchema MockFileSchema()
+        {
+            FileSchema fileSchema = new FileSchema()
+            {
+                SchemaId = 23,
+                Name = "Test_Schema_23"
+            };
+
+            return fileSchema;
+        }
+
+        public static SchemaRevision MockSchemaRevision()
+        {
+            SchemaRevision revision = new SchemaRevision()
+            {
+                SchemaRevision_Id = 57,
+                SchemaRevision_Name = "Test Revision"
+            };
+
+            return revision;
+        }
+
         public static FileSchemaDto MockFileSchemaDto(Schema scm)
         {
             FileSchemaDto dto = new FileSchemaDto()
@@ -234,7 +256,7 @@ namespace Sentry.data.Core.Tests
             }
         }
 
-        public static DatasetFile MockDataFile(Dataset ds, DatasetFileConfig dfc, IApplicationUser user)
+        public static DatasetFile MockDatasetFile(Dataset ds, DatasetFileConfig dfc, IApplicationUser user)
         {
             DatasetFile df = new DatasetFile()
             {
@@ -246,7 +268,16 @@ namespace Sentry.data.Core.Tests
                 ModifiedDTM = System.DateTime.Now.AddYears(-12),
                 FileLocation = "data-dev/government/quarterly_census_of_employment_and_wages/235/2018/1/18/2014.annual.singlefile.csv",
                 DatasetFileConfig = dfc,
-                IsBundled = false
+                IsBundled = false,
+                ParentDatasetFileId = 23,
+                VersionId = "QWENUD-asdf9320123n90afs",
+                Information = "Information Text",
+                Size = 1234567890,
+                FlowExecutionGuid = "20211209133645",
+                RunInstanceGuid = "20211210143750",
+                FileExtension = "csv",
+                Schema = MockFileSchema(),
+                SchemaRevision = MockSchemaRevision()
             };
 
             return df;

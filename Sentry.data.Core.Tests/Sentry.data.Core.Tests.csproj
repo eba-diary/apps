@@ -122,6 +122,7 @@
     <Compile Include="ServiceImplementationTests\BusinessAreaServiceTests.cs" />
     <Compile Include="ServiceImplementationTests\BusinessIntelligenceServiceTests.cs" />
     <Compile Include="ServiceImplementationTests\DataFlowProviderTests.cs" />
+    <Compile Include="ServiceImplementationTests\DatasetFileServiceTests.cs" />
     <Compile Include="ServiceImplementationTests\SchemaServiceTests.cs" />
     <Compile Include="ServiceImplementationTests\SecurityServiceTests.cs" />
     <Compile Include="DataFlowServiceTests.cs" />
