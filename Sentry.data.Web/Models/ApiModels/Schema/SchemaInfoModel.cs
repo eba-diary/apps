@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace Sentry.data.Web.Models.ApiModels.Schema
 {
@@ -38,5 +36,44 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public string ParquetStoragePrefix { get; set; }
         public string SnowflakeStage { get; set; }
         public string SnowflakeWarehouse { get; set; }
+
+        public List<string> Validate()
+        {
+            List<string> results = new List<string>();
+
+            if (string.Equals(Format, "csv", StringComparison.OrdinalIgnoreCase) && Delimiter != ",")
+{
+                results.Add("File Extension CSV and it's delimiter do not match");
+            }
+
+            if (string.Equals(Format, "delimited", StringComparison.OrdinalIgnoreCase) && string.IsNullOrWhiteSpace(Delimiter))
+{
+                results.Add("File Extension Delimited is missing it's delimiter");
+            }
+
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                results.Add("Configuration Name is required");
+            }
+            else if (Name.ToUpper() == "DEFAULT")
+            {
+                results.Add("Configuration Name cannot be named default");
+            }
+            else if (Name.Length > 100)
+            {
+                results.Add("Configuration Name number of characters cannot be greater than 100");
+            }
+
+            if (string.IsNullOrWhiteSpace(Description))
+            {
+                results.Add("Configuration Description is required");
+            }
+            else if (Description.Length > 2000)
+            {
+                results.Add("Configuration Description number of characters cannot be greater than 2000");
+            }
+
+            return results;
+        }
     }
 }
