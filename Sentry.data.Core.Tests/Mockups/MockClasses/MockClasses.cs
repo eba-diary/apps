@@ -283,6 +283,22 @@ namespace Sentry.data.Core.Tests
             return df;
         }
 
+        public static DatasetFileDto MockDatasetFileDto(IApplicationUser user = null)
+        {
+            DatasetFileDto dto = new DatasetFileDto()
+            {
+                DatasetFileId = 3000,
+                FileName = "dto.txt",
+                Dataset = 1000,
+                UploadUserName = (user == null) ? "012345" : user.AssociateId,
+                CreateDTM = System.DateTime.Now.AddYears(-12),
+                ModifiedDTM = System.DateTime.Now.AddYears(-12),
+                FileLocation = "data-dev/government/quarterly_census_of_employment_and_wages/235/2018/1/18/2014.annual.singlefile.csv"
+            };
+
+            return dto;
+        }
+
         public static RetrieverJob GetMockRetrieverJob(DatasetFileConfig dfc = null, DataSource dsrc = null, AuthenticationType authType = null)
         {
             Compression compression = new Compression()

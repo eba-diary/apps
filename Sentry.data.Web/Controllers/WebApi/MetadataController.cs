@@ -6,9 +6,7 @@ using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
-using Sentry.data.Web.Models.ApiModels;
 using Sentry.data.Web.Models.ApiModels.Dataset;
-using Sentry.data.Web.Models.ApiModels.DatasetFile;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
@@ -170,96 +168,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId}", GetSchemaByDatasetFunction);
         }
 
-        /// <summary>
-        /// Handles catching the following Core exceptions:
-        ///   DatasetNotFoundException
-        ///   SchemaNotFoundException
-        ///   DatasetUnauthorizedAccessException
-        /// </summary>
-        /// <param name="controllerName"></param>
-        /// <param name="methodName"></param>
-        /// <param name="errorMetadata"></param>
-        /// <param name="myMethod1"></param>
-        /// <returns></returns>
-        /// <exception cref="System.Net.HttpStatusCode.NotFound">Thrown when dataset or schema not found</exception>
-        /// <exception cref="System.Net.HttpStatusCode.Forbidden">Thrown when user does not have access to dataset or schema</exception>
-        /// <exception cref="System.Net.HttpStatusCode.InternalServerError">Thrown when an unhandled exception occurs</exception>
-        private IHttpActionResult ApiTryCatch(string controllerName, string methodName, string errorMetadata, Func<IHttpActionResult> myMethod1)
-        {
-            //return ApiTryCatch(controllerName, methodName, errorMetadata, () => Task.Run(myMethod1)).GetAwaiter().GetResult();
-
-            try
-            {
-                return myMethod1();
-            }
-            catch (DatasetNotFoundException)
-            {
-                Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_notfound dataset - {errorMetadata}");
-                return Content(System.Net.HttpStatusCode.NotFound, "Dataset not found");
-            }
-            catch (SchemaNotFoundException)
-            {
-                Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_notfound schema - {errorMetadata}");
-                return Content(System.Net.HttpStatusCode.NotFound, "Schema not found");
-            }
-            catch (DatasetUnauthorizedAccessException)
-            {
-                Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedaccess dataset - {errorMetadata}");
-                return Content(System.Net.HttpStatusCode.Forbidden, "Unauthroized Access to Dataset");
-            }
-            catch (SchemaUnauthorizedAccessException)
-            {
-                Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedexception schema - {errorMetadata}");
-                return Content(System.Net.HttpStatusCode.Forbidden, "Unauthroized Access to Schema");
-            }
-            catch (SchemaConversionException ex)
-            {
-                Logger.Warn($"{controllerName.ToLower()}_{methodName.ToLower()}_schemaconversionexception - {errorMetadata}", ex);
-                return Content(System.Net.HttpStatusCode.BadRequest, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"{controllerName.ToLower()}_{methodName.ToLower()}_internalservererror - {errorMetadata}", ex);
-                //Logger.Error($"metadataapi_getschemabydataset_internalservererror", ex);
-                return InternalServerError(ex);
-            }
-
-        }
-
-        //private async Task<IHttpActionResult> ApiTryCatchAsync(string controllerName, string methodName, string errorMetadata, Func<Task<IHttpActionResult>> myMethod1)
-        //{
-        //    try
-        //    {
-        //        return await myMethod1();
-        //    }
-        //    catch (DatasetNotFoundException)
-        //    {
-        //        Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_notfound dataset - {errorMetadata}");
-        //        return Content(System.Net.HttpStatusCode.NotFound, "Dataset not found");
-        //    }
-        //    catch (SchemaNotFoundException)
-        //    {
-        //        Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_notfound schema - {errorMetadata}");
-        //        return Content(System.Net.HttpStatusCode.NotFound, "Schema not found");
-        //    }
-        //    catch (DatasetUnauthorizedAccessException)
-        //    {
-        //        Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedaccess dataset - {errorMetadata}");
-        //        return Content(System.Net.HttpStatusCode.Forbidden, "Unauthroized Access to Dataset");
-        //    }
-        //    catch (SchemaUnauthorizedAccessException)
-        //    {
-        //        Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedexception schema - {errorMetadata}");
-        //        return Content(System.Net.HttpStatusCode.Forbidden, "Unauthroized Access to Schema");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logger.Error($"{controllerName.ToLower()}_{methodName.ToLower()}_internalservererror - {errorMetadata}", ex);
-        //        //Logger.Error($"metadataapi_getschemabydataset_internalservererror", ex);
-        //        return InternalServerError(ex);
-        //    }
-        //}
-
 
         /// <summary>
         /// Get schema metadata
@@ -290,47 +198,36 @@ namespace Sentry.data.Web.WebApi.Controllers
             return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", GetSchemaFunction);
         }
 
-        [HttpGet]
-        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        [Route("~/datasetfile/dataset/{datasetId}/schema/{schemaId}/datasetfile")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<DatasetFileDto>))]
-        public async Task<IHttpActionResult> GetSchemaDatasetFiles(int datasetId, int schemaId)
-        {
-            IHttpActionResult GetSchemaDatasetFilesFunction()
-            {
-                //DatasetFileConfigDto dto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
-                List<DatasetFileDto> dtoList = DatasetFileService.GetAllDatasetFilesBySchema(schemaId, x => x.ParentDatasetFileId == null).ToList();
+        ///// <summary>
+        ///// Return all data files associated with schema.
+        ///// </summary>
+        ///// <param name="datasetId"></param>
+        ///// <param name="schemaId"></param>
+        ///// <param name="pageNumber">Default is 1</param>
+        ///// <param name="pageSize">Default is 10, Max is 100</param>
+        ///// <returns></returns>
+        //[HttpGet]
+        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        //[Route("~/api/v2/datafile/dataset/{datasetId}/schema/{schemaId}/datafile")]
+        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<DatasetFileModel>))]
+        //public async Task<IHttpActionResult> GetSchemaDatasetFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] int pageNumber, [FromUri] int pageSize)
+        //{
+        //    IHttpActionResult GetSchemaDatasetFilesFunction()
+        //    {
+        //        //DatasetFileConfigDto dto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+        //        //List<DatasetFileDto> dtoList = DatasetFileService.GetAllDatasetFilesBySchema(schemaId, x => x.ParentDatasetFileId == null).ToList();
 
-                List<DatasetFileModel> modelList = dtoList.ToModel();
-                                
-                return Ok(modelList);
-            }
+        //        PageParameters pagingParams = new PageParameters() { PageNumber = pageNumber, PageSize = pageSize };
 
-            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", GetSchemaDatasetFilesFunction);
-        }
+        //        List<DatasetFileDto> dtoList = DatasetFileService.GetAllDatasetFilesBySchema(schemaId, pagingParams).ToList();
 
-        [HttpGet]
-        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        [Route("~/datasetfile/dataset/{datasetId}/schema/{schemaId}/datasetfile_page")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<DatasetFileDto>))]
-        public async Task<IHttpActionResult> GetSchemaDatasetFiles(int datasetId, int schemaId, [FromUri] int pageNumber, [FromUri] int pageSize)
-        {
-            IHttpActionResult GetSchemaDatasetFilesFunction()
-            {
-                //DatasetFileConfigDto dto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
-                //List<DatasetFileDto> dtoList = DatasetFileService.GetAllDatasetFilesBySchema(schemaId, x => x.ParentDatasetFileId == null).ToList();
+        //        List<DatasetFileModel> modelList = dtoList.ToModel();
 
-                PageParameters pagingParams = new PageParameters() { PageNumber = pageNumber, PageSize = pageSize };
+        //        return Ok(modelList);
+        //    }
 
-                List<DatasetFileDto> dtoList = DatasetFileService.GetAllDatasetFilesBySchema(schemaId, pagingParams).ToList();
-
-                List<DatasetFileModel> modelList = dtoList.ToModel();
-
-                return Ok(modelList);
-            }
-
-            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", GetSchemaDatasetFilesFunction);
-        }
+        //    return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", GetSchemaDatasetFilesFunction);
+        //}
 
         /// <summary>
         /// Get list of revisions for schema

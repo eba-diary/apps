@@ -213,6 +213,7 @@
     <Compile Include="Exceptions\DaleInvalidSearchException.cs" />
     <Compile Include="Exceptions\DaleQueryException.cs" />
     <Compile Include="Exceptions\DaleUnauthorizedAccessException.cs" />
+    <Compile Include="Exceptions\DataFileUnauthorizedException.cs" />
     <Compile Include="Exceptions\DataFlowNotFound.cs" />
     <Compile Include="Exceptions\DataFlowStepNotFound.cs" />
     <Compile Include="Exceptions\AWSLambdaException.cs" />

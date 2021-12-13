@@ -1,5 +1,6 @@
 ﻿using Sentry.data.Core;
 using Sentry.data.Web.Models.ApiModels.DatasetFile;
+using System;
 using System.Collections.Generic;
 
 namespace Sentry.data.Web
@@ -41,6 +42,32 @@ namespace Sentry.data.Web
             };
 
             return model;
-        } 
+        }
+        
+        public static DatasetFileDto ToDto(this DatasetFileModel model)
+        {
+            DatasetFileDto dto = new DatasetFileDto()
+            {
+                DatasetFileId = model.DatasetFileId,
+                FileName = model.FileName,
+                Dataset = model.DatasetId,
+                SchemaRevision = model.SchemaRevisionId,
+                Schema = model.SchemaId,
+                DatasetFileConfig = model.DatasetFileConfigId,
+                UploadUserName = model.UploadUserName,
+                CreateDTM = DateTime.Parse(model.CreateDTM),
+                ModifiedDTM = DateTime.Parse(model.CreateDTM),
+                FileLocation = model.FileLocation,
+                ParentDatasetFileId = model.ParentDatasetFileId,
+                VersionId = model.VersionId,
+                Information = model.Information,
+                Size = model.Size,
+                FlowExecutionGuid = model.FlowExecutionGuid,
+                RunInstanceGuid = model.RunInstanceGuid,
+                FileExtension = model.FileExtension
+            };
+
+            return dto;
+        }
     }
 }

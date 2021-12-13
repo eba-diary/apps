@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -11,19 +7,19 @@ namespace Sentry.data.Core
         public int DatasetFileId { get; set; }
         public string FileName { get; set; }
         public int Dataset { get; set; }
-        public int SchemaRevision { get; internal set; }
-        public int Schema { get; internal set; }
-        public int DatasetFileConfig { get; internal set; }
-        public string UploadUserName { get; internal set; }
-        public DateTime CreateDTM { get; internal set; }
-        public DateTime ModifiedDTM { get; internal set; }
-        public string FileLocation { get; internal set; }
-        public int? ParentDatasetFileId { get; internal set; }
-        public string VersionId { get; internal set; }
-        public string Information { get; internal set; }
-        public long Size { get; internal set; }
-        public string FlowExecutionGuid { get; internal set; }
-        public string RunInstanceGuid { get; internal set; }
-        public string FileExtension { get; internal set; }
+        public int SchemaRevision { get; set; }
+        public int Schema { get; set; }
+        public int DatasetFileConfig { get; set; }
+        public string UploadUserName { get; set; }
+        public DateTime CreateDTM { get; set; }
+        public DateTime ModifiedDTM { get; set; }
+        public string FileLocation { get; set; }
+        public int? ParentDatasetFileId { get; set; }
+        public string VersionId { get; set; }
+        public string Information { get; set; }
+        public long Size { get; set; }
+        public string FlowExecutionGuid { get; set; }
+        public string RunInstanceGuid { get; set; }
+        public string FileExtension { get; set; }
     }
 }
