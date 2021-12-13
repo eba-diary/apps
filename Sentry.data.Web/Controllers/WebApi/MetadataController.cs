@@ -453,35 +453,36 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <param name="schemaId"></param>
         /// <returns></returns>
         [HttpGet]
-        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [ApiVersionBegin(WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}/revision/latest/jsonschema")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(JObject))]
-        [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
-        [SwaggerResponse(System.Net.HttpStatusCode.Forbidden, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaRevisionJsonStructureModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
         public async Task<IHttpActionResult> GetLatestSchemaRevisionJsonFormat(int datasetId, int schemaId)
         {
-            IHttpActionResult GetLatestSchemaRevisionJsonFormatFunction()
-            {
-                if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Where(w => !w.DeleteInd).Any(w => w.Schema.SchemaId == schemaId))
-                {
-                    throw new SchemaNotFoundException();
-                }
+            return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", 
+                               () => Ok(_schemaService.GetLatestSchemaRevisionJsonStructureById(schemaId).ToModel()));
 
-                SchemaRevisionDto revisiondto = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
-                if (revisiondto == null)
-                {
-                    Logger.Info($"metadataapi_getlatestschemarevisiondetail_notfound revision - datasetid:{datasetId} schemaid:{schemaId}");
-                    return Content(System.Net.HttpStatusCode.NotFound, "Schema revisions not found");
-                }
+            //LEGACY CODE
+            //IHttpActionResult GetLatestSchemaRevisionJsonFormatFunction()
+            //{
+            //if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Where(w => !w.DeleteInd).Any(w => w.Schema.SchemaId == schemaId))
+            //{
+            //    throw new SchemaNotFoundException();
+            //}
 
-                SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
-                List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisiondto.RevisionId);
-                revisionDetailModel.Fields = fieldDtoList.ToSchemaFieldModel();
-                return Ok(revisionDetailModel);
-            }
+            //SchemaRevisionDto revisiondto = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
+            //if (revisiondto == null)
+            //{
+            //    Logger.Info($"metadataapi_getlatestschemarevisiondetail_notfound revision - datasetid:{datasetId} schemaid:{schemaId}");
+            //    return Content(System.Net.HttpStatusCode.NotFound, "Schema revisions not found");
+            //}
 
-            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", GetLatestSchemaRevisionJsonFormatFunction);
-
+            //SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
+            //List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisiondto.RevisionId);
+            //revisionDetailModel.Fields = fieldDtoList.ToSchemaFieldModel();
+            //return Ok(revisionDetailModel);
+            //}
         }
 
         /// <summary>

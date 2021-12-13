@@ -8,6 +8,7 @@ using Sentry.data.Core;
 using System.Text;
 using Sentry.data.Core.Factories.Fields;
 using Sentry.Core;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Sentry.data.Web
 {
@@ -25,17 +26,9 @@ namespace Sentry.data.Web
 
         public static SchemaRevisionModel ToModel(this Core.SchemaRevisionDto dto)
         {
-            return new SchemaRevisionModel()
-            {
-                RevisionId = dto.RevisionId,
-                RevisionNumber = dto.RevisionNumber,
-                SchemaRevisionName = dto.SchemaRevisionName,
-                CreatedBy = dto.CreatedBy,
-                CreatedByName = dto.CreatedByName,
-                CreatedDTM = dto.CreatedDTM.ToString("s"),
-                LastUpdatedDTM = dto.LastUpdatedDTM.ToString("s"),
-                JsonSchemaObject = dto.JsonSchemaObject
-            };
+            SchemaRevisionModel mdl = new SchemaRevisionModel();
+            FromSchemaRevisionDtoToModel(dto, mdl);
+            return mdl;
         }
 
         public static List<SchemaRevisionModel> ToModel(this List<Core.SchemaRevisionDto> dtoList)
@@ -236,6 +229,26 @@ namespace Sentry.data.Web
             }
 
             return dto;            
+        }
+
+        public static SchemaRevisionJsonStructureModel ToModel(this SchemaRevisionJsonStructureDto dto)
+        {
+            SchemaRevisionJsonStructureModel mdl = new SchemaRevisionJsonStructureModel();
+            FromSchemaRevisionDtoToModel(dto, mdl);
+            mdl.JsonStructure = dto.JsonStructure;
+            return mdl;
+        }
+
+        private static void FromSchemaRevisionDtoToModel(SchemaRevisionDto dto, SchemaRevisionModel mdl)
+        {
+            mdl.RevisionId = dto.RevisionId;
+            mdl.RevisionNumber = dto.RevisionNumber;
+            mdl.SchemaRevisionName = dto.SchemaRevisionName;
+            mdl.CreatedBy = dto.CreatedBy;
+            mdl.CreatedByName = dto.CreatedByName;
+            mdl.CreatedDTM = dto.CreatedDTM.ToString("s");
+            mdl.LastUpdatedDTM = dto.LastUpdatedDTM.ToString("s");
+            mdl.JsonSchemaObject = dto.JsonSchemaObject;
         }
     }
 }
