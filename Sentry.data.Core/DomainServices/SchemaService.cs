@@ -524,7 +524,7 @@ namespace Sentry.data.Core
             return revision?.ToDto();
         }
 
-        public SchemaRevisionJsonStructureDto GetLatestSchemaRevisionDtoById(int schemaId)
+        public SchemaRevisionJsonStructureDto GetLatestSchemaRevisionJsonStructureById(int schemaId)
         {
             //check schema exists
             DatasetFileConfig fileConfig = GetDatasetFileConfigBySchemaId(schemaId);
@@ -533,52 +533,14 @@ namespace Sentry.data.Core
             //check permissions
             CheckAccessToDataset(ds, (x) => x.CanPreviewDataset || x.CanViewFullDataset || x.CanUploadToDataset || x.CanEditDataset || x.CanManageSchema);
 
-            //external call to calculate json schema from revision
-            //this will be in a helper to be reusable elsewhere
-
             SchemaRevision revision = fileConfig.GetLatestSchemaRevision();
 
-            SchemaRevisionDto dto = revision?.ToDto();
-
-            SchemaRevisionJsonStructureDto dto = new SchemaRevisionJsonStructureDto();
-
             //return result as dto
-
-            return null;
-        }
-
-        private void CheckAccessToDataset(Dataset ds, Func<UserSecurity, bool> userCan)
-        {
-            try
+            return new SchemaRevisionJsonStructureDto()
             {
-                IApplicationUser user = _userService.GetCurrentUser();
-                UserSecurity userSecurity = _securityService.GetUserSecurity(ds, user);
-
-                if (userCan(userSecurity))
-                {
-                    return;
-                }
-
-                Logger.Info($"schmeacontroller-checkdatasetpermission unauthorized_access for {user.AssociateId}");
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"schemacontroller-checkdatasetpermission failed to check access", ex);
-            }
-
-            throw new SchemaUnauthorizedAccessException();
-        }
-
-        private DatasetFileConfig GetDatasetFileConfigBySchemaId(int schemaId)
-        {
-            DatasetFileConfig fileConfig = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).FirstOrDefault();
-
-            if (fileConfig == null)
-            {
-                throw new SchemaNotFoundException();
-            }
-
-            return fileConfig;
+                Revision = revision?.ToDto(),
+                JsonStructure = new JObject() //replace with static call to calculate structure
+            };
         }
 
         public List<DatasetFile> GetDatasetFilesBySchema(int schemaId)
@@ -745,6 +707,40 @@ namespace Sentry.data.Core
                 Logger.Error($"schemaservice-registerrawfile-failed", ex);
                 throw;
             }
+        }
+
+        private void CheckAccessToDataset(Dataset ds, Func<UserSecurity, bool> userCan)
+        {
+            try
+            {
+                IApplicationUser user = _userService.GetCurrentUser();
+                UserSecurity userSecurity = _securityService.GetUserSecurity(ds, user);
+
+                if (userCan(userSecurity))
+                {
+                    return;
+                }
+
+                Logger.Info($"schmeacontroller-checkdatasetpermission unauthorized_access for {user.AssociateId}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"schemacontroller-checkdatasetpermission failed to check access", ex);
+            }
+
+            throw new SchemaUnauthorizedAccessException();
+        }
+
+        private DatasetFileConfig GetDatasetFileConfigBySchemaId(int schemaId)
+        {
+            DatasetFileConfig fileConfig = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).FirstOrDefault();
+
+            if (fileConfig == null)
+            {
+                throw new SchemaNotFoundException();
+            }
+
+            return fileConfig;
         }
 
         private void MapToDatasetFile(DataFlowStepEvent stepEvent, string fileKey, string fileVersionId, DatasetFile file)

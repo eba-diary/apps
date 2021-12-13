@@ -447,7 +447,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         }
 
         /// <summary>
-        ///  Will return jsonschema associated with DSC schema, only if latest revision was updated via API.
+        /// Get the latest schema revisions JSON structure in JSON schema format
         /// </summary>
         /// <param name="datasetId"></param>
         /// <param name="schemaId"></param>
@@ -460,8 +460,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
         public async Task<IHttpActionResult> GetLatestSchemaRevisionJsonFormat(int datasetId, int schemaId)
         {
-            return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", 
-                               () => Ok(_schemaService.GetLatestSchemaRevisionJsonStructureById(schemaId).ToModel()));
+            return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", () => Ok(_schemaService.GetLatestSchemaRevisionJsonStructureById(schemaId).ToModel()));
 
             //LEGACY CODE
             //IHttpActionResult GetLatestSchemaRevisionJsonFormatFunction()
