@@ -49,6 +49,11 @@ namespace Sentry.data.Web.WebApi.Controllers
                 Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_notfound schema - {errorMetadata}");
                 return Content(System.Net.HttpStatusCode.NotFound, "Schema not found");
             }
+            catch (DataFileNotFoundException)
+            {
+                Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_notfound datafile - {errorMetadata}");
+                return Content(System.Net.HttpStatusCode.NotFound, "DataFile not found");
+            }
             catch (DatasetUnauthorizedAccessException)
             {
                 Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedaccess dataset - {errorMetadata}");

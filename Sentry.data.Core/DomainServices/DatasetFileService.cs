@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,21 +29,14 @@ namespace Sentry.data.Core
             return fileDtoList;
         }
 
-        public IEnumerable<DatasetFileDto> GetAllDatasetFilesBySchema(int schemaId, PageParameters pageParameters)
+        public PagedList<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
         {
-            int pageNumber = pageParameters.PageNumber ?? default;
-            int pageSize = pageParameters.PageSize ?? default;
-
-            IEnumerable<DatasetFile> files = _datasetContext.DatasetFile
+            PagedList<DatasetFile> files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFile
                                                 .Where(x => x.Schema.SchemaId == schemaId)
-                                                .OrderBy(o => o.DatasetFileId)
-                                                .Skip((pageNumber - 1) * pageSize)
-                                                .Take(pageSize)
-                                                .AsEnumerable();
+                                                .OrderBy(o => o.DatasetFileId),
+                                                pageParameters.PageNumber, pageParameters.PageSize);
 
-            IEnumerable<DatasetFileDto> fileDtoList = files.ToDto();
-
-            return fileDtoList;
+            return new PagedList<DatasetFileDto>(files.ToDto().ToList(), files.TotalCount, files.CurrentPage, files.PageSize);
         }
 
         public IEnumerable<DatasetFileDto> GetAllDatasetFilesBySchema(int schemaId, Func<DatasetFile, bool> where)
@@ -62,13 +56,25 @@ namespace Sentry.data.Core
                 throw new DataFileUnauthorizedException();
             }
 
-            Dataset ds = _datasetContext.GetById<Dataset>(dto.Dataset);
-            if (ds == null)
-            {
-                throw new DatasetNotFoundException();
-            }
-
             DatasetFile dataFile = _datasetContext.GetById<DatasetFile>(dto.DatasetFileId);
+            if (dataFile == null)
+            {
+                throw new DataFileNotFoundException();
+            }
+            if (dataFile.Dataset.DatasetId != dto.Dataset)
+            {
+                throw new DatasetNotFoundException("DataFile is not associated specified DatasetId");
+            }
+            if ((dataFile.Schema == null && dto.Schema != 0) ||
+                dataFile.Schema.SchemaId != dto.Schema)
+            {
+                throw new SchemaNotFoundException("DataFile is not associated with specified SchemaId");
+            }
+            if ((dataFile.SchemaRevision == null && dto.SchemaRevision != 0) ||
+                dataFile.SchemaRevision.SchemaRevision_Id != dto.SchemaRevision)
+            {
+                throw new SchemaRevisionNotFoundException("DataFile is not associated with specified SchemaRevision");
+            }
 
             UpdateDataFile(dto, dataFile);
 
@@ -80,6 +86,7 @@ namespace Sentry.data.Core
         internal void UpdateDataFile(DatasetFileDto dto, DatasetFile dataFile)
         {
             dataFile.FileLocation = dto.FileLocation;
+            dataFile.VersionId = dto.VersionId;
         }
         #endregion
     }

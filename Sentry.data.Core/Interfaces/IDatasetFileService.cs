@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core.Helpers;
+using System;
 using System.Collections.Generic;
 
 namespace Sentry.data.Core
@@ -19,7 +20,7 @@ namespace Sentry.data.Core
         /// <param name="schemaId"></param>
         /// <param name="pageParameters"></param>
         /// <returns></returns>
-        IEnumerable<DatasetFileDto> GetAllDatasetFilesBySchema(int schemaId, PageParameters pageParameters);
+        PagedList<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters);
 
         /// <summary>
         /// 

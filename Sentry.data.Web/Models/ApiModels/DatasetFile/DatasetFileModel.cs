@@ -1,4 +1,7 @@
-﻿namespace Sentry.data.Web.Models.ApiModels.DatasetFile
+﻿using System;
+using System.Collections.Generic;
+
+namespace Sentry.data.Web.Models.ApiModels.DatasetFile
 {
     public class DatasetFileModel
     {
@@ -33,5 +36,37 @@
 
         public string RunInstanceGuid { get; set; }
         public string FileExtension { get; set; }
+
+        public List<string> Validate()
+        {
+            List<string> results = new List<string>();
+            if (DatasetFileId == 0)
+            {
+                results.Add("DatasetFileId is required");
+            }
+            if (string.IsNullOrWhiteSpace(FileName))
+            {
+                results.Add("FileName is required");
+            }
+            if (DatasetId == 0)
+            {
+                results.Add("DatasetId is required");
+            }
+            if (SchemaRevisionId == 0)
+            {
+                results.Add("SchemaRevisionId is required");
+            }
+            if (SchemaId == 0)
+            {
+                results.Add("SchemaId is required");
+            }
+
+            //if (string.Equals(Format, "csv", StringComparison.OrdinalIgnoreCase) && Delimiter != ",")
+            //{
+            //    results.Add("File Extension CSV and it's delimiter do not match");
+            //}
+
+            return results;
+        }
     }
 }

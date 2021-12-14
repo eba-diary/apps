@@ -293,7 +293,9 @@ namespace Sentry.data.Core.Tests
                 UploadUserName = (user == null) ? "012345" : user.AssociateId,
                 CreateDTM = System.DateTime.Now.AddYears(-12),
                 ModifiedDTM = System.DateTime.Now.AddYears(-12),
-                FileLocation = "data-dev/government/quarterly_census_of_employment_and_wages/235/2018/1/18/2014.annual.singlefile.csv"
+                FileLocation = "data-dev/government/quarterly_census_of_employment_and_wages/235/2018/1/18/2014.annual.singlefile.csv",
+                Schema = 23,
+                SchemaRevision = 57
             };
 
             return dto;

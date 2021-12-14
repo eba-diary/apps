@@ -602,7 +602,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 return Ok(_schemaService.UpdateAndSaveSchema(schemaModel.ToDto((x) => _schemaService.GetFileExtensionIdByName(x))));
             }
 
-            return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", Updater);
+            return ApiTryCatch(nameof(MetadataController), nameof(UpdateSchema), $"datasetid:{datasetId} schemaId{schemaId}", Updater);
         }
 
         #endregion

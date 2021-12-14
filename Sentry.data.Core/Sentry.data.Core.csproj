@@ -213,6 +213,7 @@
     <Compile Include="Exceptions\DaleInvalidSearchException.cs" />
     <Compile Include="Exceptions\DaleQueryException.cs" />
     <Compile Include="Exceptions\DaleUnauthorizedAccessException.cs" />
+    <Compile Include="Exceptions\DataFileNotFound.cs" />
     <Compile Include="Exceptions\DataFileUnauthorizedException.cs" />
     <Compile Include="Exceptions\DataFlowNotFound.cs" />
     <Compile Include="Exceptions\DataFlowStepNotFound.cs" />
@@ -235,6 +236,7 @@
     <Compile Include="Exceptions\SchemaInUseException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaConversionException.cs" />
+    <Compile Include="Exceptions\SchemaRevisionNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaUnauthorizedAccessException.cs" />
     <Compile Include="Extensions\DataFlowExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
@@ -267,6 +269,7 @@
     <Compile Include="Helpers\EnumHelper.cs" />
     <Compile Include="Helpers\LambdaClientConfig.cs" />
     <Compile Include="Helpers\LoggingUtils.cs" />
+    <Compile Include="Helpers\PagedList.cs" />
     <Compile Include="Helpers\ParsingHelpers.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />

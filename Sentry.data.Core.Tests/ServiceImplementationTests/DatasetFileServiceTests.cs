@@ -111,7 +111,7 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DatasetFileService_UpdateAndSave_DataseNotFound()
+        public void DatasetFileService_UpdateAndSave_DataFileNotFoundException()
         {
             // Arrange
             var userService = new Mock<IUserService>();
@@ -126,7 +126,130 @@ namespace Sentry.data.Core.Tests
             var datasetFileService = new DatasetFileService(context.Object, null, userService.Object);
 
             // Assert
+            Assert.ThrowsException<DataFileNotFoundException>(() => datasetFileService.UpdateAndSave(datasetFileDto));
+        }
+
+        [TestMethod]
+        public void DatasetFileService_UpdateAndSave_DataseNotFound()
+        {
+            // Arrange
+            var userService = new Mock<IUserService>();
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.IsAdmin).Returns(true);
+            userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
+
+
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFile dataFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            var datasetFileDto = MockClasses.MockDatasetFileDto();
+
+            var context = new Mock<IDatasetContext>();
+            context.Setup(d => d.GetById<DatasetFile>(3000)).Returns(dataFile);
+
+            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object);
+
+            // Assert
             Assert.ThrowsException<DatasetNotFoundException>(() => datasetFileService.UpdateAndSave(datasetFileDto));
+        }
+
+        [TestMethod]
+        public void DatasetFileService_UpdateAndSave_SchemaNotFoundException_Incorrect_SchemaId()
+        {
+            // Arrange
+            var userService = new Mock<IUserService>();
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.IsAdmin).Returns(true);
+            userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
+
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFile dataFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            var datasetFileDto = MockClasses.MockDatasetFileDto();
+            datasetFileDto.Schema = 39;
+
+            var context = new Mock<IDatasetContext>();
+            context.Setup(d => d.GetById<DatasetFile>(3000)).Returns(dataFile);
+
+            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object);
+
+            // Assert
+            Assert.ThrowsException<SchemaNotFoundException>(() => datasetFileService.UpdateAndSave(datasetFileDto));
+        }
+
+        [TestMethod]
+        public void DatasetFileService_UpdateAndSave_SchemaNotFoundException_Null_Schema_On_DataFile()
+        {
+            // Arrange
+            var userService = new Mock<IUserService>();
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.IsAdmin).Returns(true);
+            userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
+
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFile dataFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            dataFile.Schema = null;
+            
+            var datasetFileDto = MockClasses.MockDatasetFileDto();            
+
+            var context = new Mock<IDatasetContext>();
+            context.Setup(d => d.GetById<DatasetFile>(3000)).Returns(dataFile);
+
+            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object);
+
+            // Assert
+            Assert.ThrowsException<SchemaNotFoundException>(() => datasetFileService.UpdateAndSave(datasetFileDto));
+        }
+
+        [TestMethod]
+        public void DatasetFileService_UpdateAndSave_SchemaRevisionNotFoundException_Null_SchemaRevision_On_DataFile()
+        {
+            // Arrange
+            var userService = new Mock<IUserService>();
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.IsAdmin).Returns(true);
+            userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
+
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFile dataFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            dataFile.SchemaRevision = null;
+
+            var datasetFileDto = MockClasses.MockDatasetFileDto();
+
+            var context = new Mock<IDatasetContext>();
+            context.Setup(d => d.GetById<DatasetFile>(3000)).Returns(dataFile);
+
+            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object);
+
+            // Assert
+            Assert.ThrowsException<SchemaRevisionNotFoundException>(() => datasetFileService.UpdateAndSave(datasetFileDto));
+        }
+
+        [TestMethod]
+        public void DatasetFileService_UpdateAndSave_SchemaRevisionNotFoundException_Incorrect_SchemaRevisionID_On_Dto()
+        {
+            // Arrange
+            var userService = new Mock<IUserService>();
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.IsAdmin).Returns(true);
+            userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
+
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFile dataFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+
+            var datasetFileDto = MockClasses.MockDatasetFileDto();
+            datasetFileDto.SchemaRevision = 97;
+
+            var context = new Mock<IDatasetContext>();
+            context.Setup(d => d.GetById<DatasetFile>(3000)).Returns(dataFile);
+
+            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object);
+
+            // Assert
+            Assert.ThrowsException<SchemaRevisionNotFoundException>(() => datasetFileService.UpdateAndSave(datasetFileDto));
         }
 
         [TestMethod]
@@ -135,6 +258,7 @@ namespace Sentry.data.Core.Tests
             // Arrage
             var datasetFileDto = MockClasses.MockDatasetFileDto();
             datasetFileDto.FileLocation = "target/location.txt";
+            datasetFileDto.VersionId = "New_versionid12312445";
 
             Dataset ds = MockClasses.MockDataset();
             DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
@@ -175,7 +299,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(193, datasetFile.DatasetFileConfig.ConfigId);
             Assert.AreEqual(false, datasetFile.IsBundled);
             Assert.AreEqual(23, datasetFile.ParentDatasetFileId);
-            Assert.AreEqual("qwerty-asdf9320123n90afs", datasetFile.VersionId);
+            Assert.AreEqual("New_versionid12312445", datasetFile.VersionId);
             Assert.AreEqual("Austin is the Man!", datasetFile.Information);
             Assert.AreEqual(123456, datasetFile.Size);
             Assert.AreEqual("12340945576", datasetFile.FlowExecutionGuid);

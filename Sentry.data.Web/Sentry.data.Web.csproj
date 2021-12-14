@@ -413,6 +413,8 @@
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileModel.cs" />
+    <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
+    <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\Dale\DaleAdvancedCriteriaModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
