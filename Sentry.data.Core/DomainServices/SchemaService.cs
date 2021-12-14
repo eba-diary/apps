@@ -524,7 +524,7 @@ namespace Sentry.data.Core
             return revision?.ToDto();
         }
 
-        public SchemaRevisionJsonStructureDto GetLatestSchemaRevisionJsonStructureById(int schemaId)
+        public SchemaRevisionJsonStructureDto GetLatestSchemaRevisionJsonStructureBySchemaId(int schemaId)
         {
             //check schema exists
             DatasetFileConfig fileConfig = GetDatasetFileConfigBySchemaId(schemaId);
@@ -533,13 +533,14 @@ namespace Sentry.data.Core
             //check permissions
             CheckAccessToDataset(ds, (x) => x.CanPreviewDataset || x.CanViewFullDataset || x.CanUploadToDataset || x.CanEditDataset || x.CanManageSchema);
 
+            //get latest revision
             SchemaRevision revision = fileConfig.GetLatestSchemaRevision();
 
             //return result as dto
             return new SchemaRevisionJsonStructureDto()
             {
                 Revision = revision?.ToDto(),
-                JsonStructure = new JObject() //replace with static call to calculate structure
+                JsonStructure = revision?.ToJsonStructure()
             };
         }
 

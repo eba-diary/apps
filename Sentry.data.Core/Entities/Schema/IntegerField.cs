@@ -1,4 +1,6 @@
-﻿namespace Sentry.data.Core
+﻿using Newtonsoft.Json.Linq;
+
+namespace Sentry.data.Core
 {
     public class IntegerField : BaseField, ISchemaField
     {
@@ -9,6 +11,14 @@
                 return SchemaDatatypes.INTEGER;
             }
             set => FieldType = SchemaDatatypes.INTEGER;
+        }
+
+        protected override JObject GetJsonTypeDefinition()
+        {
+            return new JObject()
+            {
+                { "type", "integer"}
+            };
         }
     }
 }

@@ -34,7 +34,7 @@ namespace Sentry.data.Core
         /// <param name="schemaId"></param>
         /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to schema</exception>
         /// <returns></returns>
-        SchemaRevisionJsonStructureDto GetLatestSchemaRevisionJsonStructureById(int schemaId);
+        SchemaRevisionJsonStructureDto GetLatestSchemaRevisionJsonStructureBySchemaId(int schemaId);
 
         int CreateAndSaveSchema(FileSchemaDto schemaDto);
 
