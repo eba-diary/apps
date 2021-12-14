@@ -143,6 +143,7 @@ namespace Sentry.data.Core.Tests
             DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
             DatasetFile dataFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
             var datasetFileDto = MockClasses.MockDatasetFileDto();
+            datasetFileDto.Dataset = 93;
 
             var context = new Mock<IDatasetContext>();
             context.Setup(d => d.GetById<DatasetFile>(3000)).Returns(dataFile);
