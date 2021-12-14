@@ -24,7 +24,6 @@
                 <br />
 
                 @Html.HiddenFor(model => model.DatasetId)
-                @Html.HiddenFor(model => model.PrimaryOwnerId)
                 @Html.HiddenFor(model => model.PrimaryContactId)
                 @Html.HiddenFor(model => model.UploadUserId)
                 @Html.HiddenFor(model => model.HrempServiceUrl)
@@ -200,14 +199,6 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    @Html.LabelFor(model => model.PrimaryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.PrimaryOwnerName, new { htmlAttributes = new { @readonly = true, @class = "form-control edit-dataset-row", @placeholder = "Please select SAID Asset and this box will be auto-filled" } })
-                        @Html.ValidationMessageFor(model => model.PrimaryOwnerName, "", new { @class = "text-danger" })
-                        @Html.HiddenFor(model => model.PrimaryOwnerId)
-                    </div>
-                </div>
                 <div class="form-group">
                     @Html.LabelFor(model => model.PrimaryContactName, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">

@@ -82,7 +82,6 @@ namespace Sentry.data.Core
 
 
         //ISecurable Impl.
-        public virtual string PrimaryOwnerId { get; set; }
         public virtual string PrimaryContactId { get; set; }
         public virtual bool IsSecured { get; set; }
         public virtual Security Security { get; set; }
@@ -123,10 +122,6 @@ namespace Sentry.data.Core
             {
                 vr.Add(ValidationErrors.datasetUploadedByRequired, "The Dataset Upload User Name is required");
             }
-            if (!Regex.IsMatch(PrimaryOwnerId, "(^[0-9]{6,6}$)"))
-            {
-                vr.Add(ValidationErrors.datasetOwnerInvalid, "The Sentry Owner ID should contain owners Sentry ID");
-            }
             if (DatasetDtm < new DateTime(1800, 1, 1)) // null dates are ancient; this suffices to check for null dates
             {
                 vr.Add(ValidationErrors.datasetDateRequired, "The Dataset Date is required");
@@ -149,8 +144,6 @@ namespace Sentry.data.Core
         {
             public const string datasetNameDuplicate = "datasetNameDuplicate";
             public const string datasetDescriptionRequired = "datasetDescriptionRequired";
-            public const string datasetOwnerRequired = "datasetOwnerRequired";
-            public const string datasetOwnerInvalid = "datasetOwnerInvalid";
             public const string datasetCreatedByRequired = "datasetCreatedByRequired";
             public const string datasetUploadedByRequired = "datasetUploadedByRequired";
             public const string datasetContactRequired = "datasetContactRequired";
