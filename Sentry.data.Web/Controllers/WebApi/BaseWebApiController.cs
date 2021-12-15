@@ -31,6 +31,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <exception cref="System.Net.HttpStatusCode.NotFound">Thrown when dataset or schema not found</exception>
         /// <exception cref="System.Net.HttpStatusCode.Forbidden">Thrown when user does not have access to dataset or schema</exception>
         /// <exception cref="System.Net.HttpStatusCode.InternalServerError">Thrown when an unhandled exception occurs</exception>
+        /// <exception cref="System.Net.HttpStatusCode.BadRequest">Thrown when an unhandled exception occurs</exception>
         protected IHttpActionResult ApiTryCatch(string controllerName, string methodName, string errorMetadata, Func<IHttpActionResult> myMethod1)
         {
             //return ApiTryCatch(controllerName, methodName, errorMetadata, () => Task.Run(myMethod1)).GetAwaiter().GetResult();
@@ -48,6 +49,11 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_notfound schema - {errorMetadata}");
                 return Content(System.Net.HttpStatusCode.NotFound, "Schema not found");
+            }
+            catch (SchemaRevisionNotFoundException)
+            {
+                Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_notfound schemaRevision - {errorMetadata}");
+                return Content(System.Net.HttpStatusCode.Forbidden, "Schema Revision not found");
             }
             catch (DataFileNotFoundException)
             {
