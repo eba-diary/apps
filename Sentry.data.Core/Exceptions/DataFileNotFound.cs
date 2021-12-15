@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Sentry.data.Core.Exceptions
 {
     [Serializable]
-    public class DataFileNotFoundException : UnauthorizedAccessException, ISerializable
+    public class DataFileNotFoundException : Exception
     {
         public DataFileNotFoundException() { }
         public DataFileNotFoundException(string message) : base(message) { }

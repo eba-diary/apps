@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Sentry.data.Core.Exceptions
 {
     [Serializable]
-    public class HiveQueryException : Exception, ISerializable
+    public class HiveQueryException : Exception
     {
         public HiveQueryException() { }
         public HiveQueryException(string message) : base(message) { }

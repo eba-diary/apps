@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Sentry.data.Core.Exceptions
 {
     [Serializable]
-    public class HiveTableViewNotFoundException : Exception, ISerializable
+    public class HiveTableViewNotFoundException : Exception
     {
         public HiveTableViewNotFoundException() { }
         public HiveTableViewNotFoundException(string message) : base(message) { }
