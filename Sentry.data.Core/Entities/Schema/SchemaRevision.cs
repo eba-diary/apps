@@ -26,19 +26,15 @@ namespace Sentry.data.Core
 
         public virtual JObject ToJsonStructure()
         {
-            JObject properties = new JObject();
-
-            foreach (BaseField field in Fields.OrderBy(x => x.OrdinalPosition).ToList())
-            {
-                properties.Add(field.Name, field.ToJsonPropertyDefinition());
-            }
-
-            return new JObject()
+            JObject structure = new JObject()
             {
                 { "title", SchemaRevision_Name },
-                { "type", "object" },
-                { "properties", properties }
+                { "type", "object" }
             };
+
+            structure.AddJsonStructureProperties(Fields.Where(x => x.ParentField == null));
+
+            return structure;
         }
     }
 }

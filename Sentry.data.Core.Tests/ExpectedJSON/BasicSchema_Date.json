@@ -1,0 +1,12 @@
+{
+  "title": "StructureTest",
+  "type": "object",
+  "properties": {
+    "fieldname": {
+      "type": "string",
+      "format": "date",
+      "dsc-format": "yyyy-MM-dd",
+      "description": "Field Description"
+    }
+  }
+}

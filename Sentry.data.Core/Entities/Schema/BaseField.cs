@@ -69,22 +69,7 @@ namespace Sentry.data.Core
             else
             {
                 definition = GetJsonTypeDefinition();
-            }
-
-            //determine how to handle Child Fields
-            if (ChildFields?.Any() == true)
-            {
-                //this code below is the same code in SchemaRevision.ToJsonStructure, is there a way to consolidate?
-                //consolidating might mean going to a static translator, the method would take a list of BaseFields 
-                JObject childProperties = new JObject();
-
-                foreach (BaseField field in ChildFields.OrderBy(x => x.OrdinalPosition).ToList())
-                {
-                    childProperties.Add(field.Name, field.ToJsonPropertyDefinition());
-                }
-
-                definition.Add("properties", childProperties);
-            }
+            }            
 
             if (!string.IsNullOrEmpty(Description))
             {

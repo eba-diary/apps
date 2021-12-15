@@ -1,0 +1,12 @@
+{
+  "title": "StructureTest",
+  "type": "object",
+  "properties": {
+    "fieldname": {
+      "type": "number",
+      "dsc-precision": 9,
+      "dsc-scale": 2,
+      "description": "Field Description"
+    }
+  }
+}

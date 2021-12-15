@@ -1,0 +1,10 @@
+{
+  "title": "StructureTest",
+  "type": "object",
+  "properties": {
+    "fieldname": {
+      "type": "integer",
+      "description":  "Field Description"
+    }
+  }
+}

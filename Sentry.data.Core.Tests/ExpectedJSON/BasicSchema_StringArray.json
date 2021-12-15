@@ -1,0 +1,16 @@
+{
+  "title": "StructureTest",
+  "type": "object",
+  "properties": {
+    "fieldname": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "maxlength": 1000
+        }
+      ],
+      "description": "Field Description"
+    }
+  }
+}

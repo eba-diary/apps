@@ -1,0 +1,11 @@
+{
+  "title": "StructureTest",
+  "type": "object",
+  "properties": {
+    "fieldname": {
+      "type": "integer",
+      "format":  "biginteger",
+      "description":  "Field Description"
+    }
+  }
+}

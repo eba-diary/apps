@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace Sentry.data.Core
 {
@@ -15,10 +16,14 @@ namespace Sentry.data.Core
 
         protected override JObject GetJsonTypeDefinition()
         {
-            return new JObject()
+            JObject definition = new JObject() { { "type", "object" } };
+
+            if (ChildFields?.Any() == true)
             {
-                { "type", "object" }
-            };
+                definition.AddJsonStructureProperties(ChildFields);
+            }
+
+            return definition;
         }
     }
 }

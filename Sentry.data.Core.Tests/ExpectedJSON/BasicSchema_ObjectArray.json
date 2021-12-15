@@ -1,0 +1,26 @@
+{
+  "title": "StructureTest",
+  "type": "object",
+  "properties": {
+    "fieldname": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "childfieldname": {
+              "type": "string",
+              "maxlength": 10,
+              "description": "Child Field Description"
+            },
+            "childfieldname2": {
+              "type": "integer",
+              "description": "Child Field 2 Description"
+            }
+          }
+        }
+      ],
+      "description": "Field Description"
+    }
+  }
+}

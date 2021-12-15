@@ -1,0 +1,33 @@
+{
+  "title": "StructureTest",
+  "type": "object",
+  "properties": {
+    "fieldname": {
+      "type": "object",
+      "properties": {
+        "childfieldname": {
+          "type": "string",
+          "maxlength": 10,
+          "description": "Child Field Description"
+        },
+        "structchildfieldname": {
+          "type": "object",
+          "properties": {
+            "innerchildfieldname": {
+              "type": "string",
+              "format": "date",
+              "dsc-format": "yyyy-MM-dd",
+              "description": "Inner Child Field Description"
+            },
+            "innerchildfieldname2": {
+              "type": "integer",
+              "description": "Inner Child Field 2 Description"
+            }
+          },
+          "description": "Struct Child Field Description"
+        }
+      },
+      "description": "Field Description"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "title": "StructureTest",
+  "type": "object",
+  "properties": {
+    "fieldname": {
+      "type": "string",
+      "maxlength": 1000,
+      "description":  "Field Description"
+    }
+  }
+}
