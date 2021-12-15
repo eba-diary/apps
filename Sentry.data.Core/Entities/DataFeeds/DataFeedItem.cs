@@ -30,6 +30,14 @@ namespace Sentry.data.Core
             }
         }
 
+        public System.Web.HtmlString NotificationTitle
+        {
+            get
+            {
+                return new System.Web.HtmlString(System.Net.WebUtility.HtmlDecode(Title));
+            }
+        }
+
         public string Title { get; set; }
         public DateTime PublishDate { get; set; }
         public string Url { get; set; }

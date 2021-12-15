@@ -16,7 +16,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44321</IISExpressSSLPort>
+    <IISExpressSSLPort>44371</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -1632,6 +1632,7 @@
     <Content Include="Views\Dataset\Details\_SchemaColumns.cshtml" />
     <Content Include="Views\Dataset\Details\_DataPreview.cshtml" />
     <Content Include="Views\Dataset\Details\_DataFiles.cshtml" />
+    <Content Include="Views\Home\_FeedEmpty.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

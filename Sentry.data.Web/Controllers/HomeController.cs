@@ -144,22 +144,22 @@ namespace Sentry.data.Web.Controllers
 
         public async Task<ActionResult> GetFeed()
         {
-            List<DataFeedItem> allDatafeedItems = cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList(), TimeSpan.FromHours(1));
-            return PartialView("_Feed", allDatafeedItems.Take(10).ToList());
+            List<DataFeedItem> allDatafeedItems = _feedContext.GetAllFeedItems().ToList();
+            if(allDatafeedItems.Count > 0)
+            {
+                return PartialView("_Feed", allDatafeedItems.Take(10).ToList());
+            }
+            else
+            {
+                return PartialView("_FeedEmpty");
+            }
         }
 
-        public ActionResult GetMoreFeeds(int skip)
+        public ActionResult GetMoreFeed(int skip)
         {
-            List<DataFeedItem> tempList = cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList()).Skip(skip).Take(5).ToList();
+            List<DataFeedItem> tempList = _feedContext.GetAllFeedItems().Skip(skip).Take(5).ToList();
             return PartialView("_Feed", tempList);
         }
-
-        public ActionResult GetMoreSentryFeeds(int skip)
-        {
-            List<DataFeedItem> tempList = cache.GetOrAdd("feedSentry", () => _feedContext.GetSentryFeedItems().ToList()).Skip(skip).Take(5).ToList();
-            return PartialView("_Feed", tempList);
-        }
-
 
         public ActionResult GetFavorites()
         {

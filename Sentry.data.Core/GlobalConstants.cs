@@ -121,6 +121,15 @@
             public const string Datasets = "Datasets";
             public const string DataAssets = "Data Assets";
             public const string Exhibits = "Exhibits";
+            public const string Notifications = "Notifications";
+        }
+
+
+        public static class DataFeedName
+        {
+            public const string BUSINESS_INTELLIGENCE = "Business Intelligence";
+            public const string DATASET = "Datasets";
+            public const string NOTIFICATION = "Notification";
         }
 
         public static class BusinessObjectExhibit
@@ -355,5 +364,12 @@
         {
             public const string WAREHOUSE_NAME = "DATA_WH";       
         }
+
+        public static class SnowflakeDatabase
+        {
+            public const string WDAY = "WDAY_";
+            public const string DATA = "DATA_";
+        }
+
     }
 }

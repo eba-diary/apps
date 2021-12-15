@@ -498,7 +498,7 @@ data.Dataset = {
             //Populate legacy retriever jobs
             self.vm.OtherJobs.removeAll();
             $.each(result.OtherJobs, function (i, val) {
-                var item = new DropLocation(val);
+                var item = new data.Dataset.DropLocation(val);
 
                 self.vm.OtherJobs().push(item);
             });
@@ -583,7 +583,8 @@ data.Dataset = {
 
     renderDataPreview: function () {
 
-        if ($("#datasetRowTable_filter").length > 0) {
+        if ($("#datasetRowTable_filter").length > 0)
+        {
             $("#datasetRowTable").DataTable().destroy();
         };
 
@@ -1212,7 +1213,10 @@ data.Dataset = {
         //*****************************************************************************************************
         $('#datasetConfigList').on('select2:select', function (e) {
 
-            window.history.pushState('Config Changed', 'Title', '?configID=' + $('#datasetConfigList').val());
+            var url = new URL(window.location.href);
+            url.searchParams.set('configID', $('#datasetConfigList').val());
+            window.history.pushState({}, '', url);
+
             Id = $('#datasetConfigList').val();
             self.vm.NoColumnsReturned(false);
             $('#schemaHR').show();
@@ -1225,6 +1229,8 @@ data.Dataset = {
 
             data.Dataset.UpdateMetadata();
         });
+        Id = $('#datasetConfigList').val();
+        //on initial load, try pulling the Id from the URL first. 
 
         Id = $('#datasetConfigList').val();
         //on initial load, try pulling the Id from the URL first.
@@ -1247,6 +1253,10 @@ data.Dataset = {
             e.preventDefault();
             var id = $('#RequestAccessButton').attr("data-id");
 
+            var url = new URL(window.location.href);
+            url.searchParams.set('tab', 'SchemaColumns');
+            window.history.pushState({}, '', url);
+
             if ($('#tabSchemaColumns').is(':empty')) {
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaColumns',
@@ -1268,6 +1278,11 @@ data.Dataset = {
 
         $('#detailTabSchemaAbout').click(function (e) {
             e.preventDefault();
+
+            var url = new URL(window.location.href);
+            url.searchParams.set('tab', 'SchemaAbout');
+            window.history.pushState({}, '', url);
+
             var id = $('#RequestAccessButton').attr("data-id");
 
             if ($('#tabSchemaAbout').is(':empty')) {
@@ -1276,6 +1291,7 @@ data.Dataset = {
                     dataType: 'html',
                     success: function (view) {
                         $('#tabSchemaAbout').html(view);
+                        ko.applyBindings(self.vm, $("#tabSchemaAbout")[0]);
                         data.Dataset.UpdateMetadata();
                     }
                 });
@@ -1289,6 +1305,11 @@ data.Dataset = {
 
         $('#detailTabDataPreview').click(function (e) {
             e.preventDefault();
+
+            var url = new URL(window.location.href);
+            url.searchParams.set('tab', 'DataPreview');
+            window.history.pushState({}, '', url);
+
             var id = $('#RequestAccessButton').attr("data-id");
 
             if ($('#tabDataPreview').is(':empty')) {
@@ -1314,6 +1335,10 @@ data.Dataset = {
             e.preventDefault();
             var id = $('#RequestAccessButton').attr("data-id");
 
+            var url = new URL(window.location.href);
+            url.searchParams.set('tab', 'DataFiles');
+            window.history.pushState({}, '', url);
+
             if ($('#tabDataFiles').is(':empty')) {
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataFiles',
@@ -1335,6 +1360,13 @@ data.Dataset = {
             }
         });
 
+
+        var url = new URL(window.location.href);
+        var tab = url.searchParams.get('tab');
+        if (tab == undefined) {
+            tab = 'SchemaAbout';
+        }        
+        $("#detailTab" + tab).trigger('click');
 
     },
 
@@ -2122,7 +2154,5 @@ data.Dataset = {
             data.Dataset.initNamedEnvironmentEvents();
         });
     }
-
-
 
 };
