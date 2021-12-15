@@ -217,11 +217,11 @@
     <Compile Include="Exceptions\DataFileUnauthorizedException.cs" />
     <Compile Include="Exceptions\DataFlowNotFound.cs" />
     <Compile Include="Exceptions\DataFlowStepNotFound.cs" />
-    <Compile Include="Exceptions\AWSLambdaException.cs" />
-    <Compile Include="Exceptions\AWSLambdaInvalidParameterException.cs" />
-    <Compile Include="Exceptions\AWSLambdaNotFoundException.cs" />
-    <Compile Include="Exceptions\AWSLambdaRequestLimitException.cs" />
-    <Compile Include="Exceptions\AWSLambdaServiceException.cs" />
+    <Compile Include="Exceptions\AwsLambdaException.cs" />
+    <Compile Include="Exceptions\AwsLambdaInvalidParameterException.cs" />
+    <Compile Include="Exceptions\AwsLambdaNotFoundException.cs" />
+    <Compile Include="Exceptions\AwsLambdaRequestLimitException.cs" />
+    <Compile Include="Exceptions\AwsLambdaServiceException.cs" />
     <Compile Include="Exceptions\DataFlowStepNotImplementedException.cs" />
     <Compile Include="Exceptions\DataFlowUnauthorizedAccessException.cs" />
     <Compile Include="Exceptions\DatasetFileConfigDeletedException.cs" />
