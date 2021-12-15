@@ -65,23 +65,23 @@ namespace Sentry.data.Infrastructure
             }
             catch (InvalidParameterValueException paramEx)
             {
-                throw new AWSLambdaInvalidParameterException("One of the parameters in the request is invalid.", paramEx);
+                throw new AwsLambdaInvalidParameterException("One of the parameters in the request is invalid.", paramEx);
             }
             catch (ResourceNotFoundException resourceEx)
             {
-                throw new AWSLambdaNotFoundException("The resource specified in the request does not exist.", resourceEx);
+                throw new AwsLambdaNotFoundException("The resource specified in the request does not exist.", resourceEx);
             }
             catch (ServiceException serviceEx)
             {
-                throw new AWSLambdaServiceException("The AWS Lambda service encountered an internal error.", serviceEx);
+                throw new AwsLambdaServiceException("The AWS Lambda service encountered an internal error.", serviceEx);
             }
             catch (TooManyRequestsException requestLimitEx)
             {
-                throw new AWSLambdaRequestLimitException("The request throughput limit was exceeded.", requestLimitEx);
+                throw new AwsLambdaRequestLimitException("The request throughput limit was exceeded.", requestLimitEx);
             }
             catch (Exception ex)
             {
-                throw new AWSLambdaException("Error Unknown", ex);
+                throw new AwsLambdaException("Error Unknown", ex);
             }
         }
 
