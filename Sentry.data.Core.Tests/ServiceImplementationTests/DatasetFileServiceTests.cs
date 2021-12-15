@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,24 +46,139 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DatasetFileService_GetAllDatasetFilesBySchema_Schema_Without_DataFlies()
+        public void DatasetFileService_GetAllDaatsetFileBySchema_PageParameters_Ordering_Is_Ascending()
         {
-            // Arrange
-            var context = new Mock<IDatasetContext>();
-            var datasetFileArray = new List<DatasetFile>();
             Dataset ds = MockClasses.MockDataset();
             DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            FileSchema schema = MockClasses.MockFileSchema();
+            dfc.Schema = schema;
+
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.AssociateId).Returns("123456");
+            
+
+            var userSecurity = new UserSecurity();
+            userSecurity.CanViewFullDataset = true;
+            var securityService = new Mock<ISecurityService>();
+            securityService.Setup(r => r.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(userSecurity);
+
+            var userService = new Mock<IUserService>();
+            userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
+
+            PageParameters pageParams = new PageParameters(1, 5);
+
+            var context = new Mock<IDatasetContext>();
+            var datasetFileArray = new List<DatasetFile>();
+            //Add multiple files to array
+            for (int i = 1; (i - 1) < 10; i++)
+            {
+                DatasetFile file = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+                file.DatasetFileId = i;
+                file.Schema = schema;
+                datasetFileArray.Add(file);
+            }
+            context.Setup(f => f.DatasetFile).Returns(datasetFileArray.AsQueryable());
+
+            IQueryable<DatasetFileConfig> configQueryable = new List<DatasetFileConfig>() { dfc }.AsQueryable();
+            context.Setup(f => f.DatasetFileConfigs).Returns(configQueryable);
+
+            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object);
+
+            // Act
+            PagedList<DatasetFileDto> dtoList = datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams);
+
+            // Assert
+            List<int> excludedIdList = Enumerable.Range(6, 5).ToList();
+            List<int> includedIdList = Enumerable.Range(1, 5).ToList();
+
+            Assert.AreEqual(false, dtoList.All(w => excludedIdList.Contains(w.DatasetFileId)));
+            Assert.AreEqual(true, dtoList.All(w => includedIdList.Contains(w.DatasetFileId)));
+        }
+
+        [TestMethod]
+        public void DatasetFileService_GetAllDatsetFileBySchema_DatasetUnauthorisedAccessException()
+        {
+            // Arrange
+            //setup user
             var user1 = new Mock<IApplicationUser>();
             user1.Setup(f => f.AssociateId).Returns("123456");
 
-            datasetFileArray.Add(MockClasses.MockDatasetFile(ds, dfc, user1.Object));
+            //setup userService
+            var userService = new Mock<IUserService>();            
+            userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
 
-            context.Setup(f => f.DatasetFile).Returns(datasetFileArray.AsQueryable());
+            //setup securityService
+            var userSecurity = new UserSecurity
+            {
+                CanViewFullDataset = false
+            };
+            var securityService = new Mock<ISecurityService>();
+            securityService.Setup(r => r.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(userSecurity);
 
-            var datasetFileService = new DatasetFileService(context.Object, null, null);
+            //setup Entity objects 
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            FileSchema schema = MockClasses.MockFileSchema();
+            dfc.Schema = schema;
+
+
+            //setup db context with DatasetFile, DatasetFileConfig
+            var context = new Mock<IDatasetContext>();
+            var datasetFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            datasetFile.Schema = schema;
+            context.Setup(f => f.DatasetFile).Returns(new List<DatasetFile>() { datasetFile }.AsQueryable());
+
+            IQueryable<DatasetFileConfig> configQueryable = new List<DatasetFileConfig>() { dfc }.AsQueryable();
+            context.Setup(f => f.DatasetFileConfigs).Returns(configQueryable);
+
+            PageParameters pageParams = new PageParameters(1, 5);
+
+            //Initialize Service
+            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object);
+
+            // Assert
+            Assert.ThrowsException<DatasetUnauthorizedAccessException>(() => datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams));
+        }
+
+
+
+        [TestMethod]
+        public void DatasetFileService_GetAllDatasetFilesBySchema_Schema_Without_DataFlies()
+        {
+            // Arrange
+            //setup user
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.AssociateId).Returns("123456");
+
+            //setup userService
+            var userService = new Mock<IUserService>();
+            userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
+
+            //setup securityService
+            var userSecurity = new UserSecurity
+            {
+                CanViewFullDataset = true
+            };
+            var securityService = new Mock<ISecurityService>();
+            securityService.Setup(r => r.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(userSecurity);
+
+            //setup Entity objects
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            FileSchema schema = MockClasses.MockFileSchema();
+            dfc.Schema = schema;
+
+            //setup db context with DatasetFileConfig
+            var context = new Mock<IDatasetContext>();
+            context.Setup(f => f.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { dfc }.AsQueryable());
+
+            PageParameters pageParams = new PageParameters(1, 5);
+
+            //Initialize Service
+            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object);
 
             // Act
-            var result = datasetFileService.GetAllDatasetFilesBySchema(11);
+            var result = datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams);
 
             // Assert
             Assert.AreEqual(false, result.Any());
@@ -73,21 +189,43 @@ namespace Sentry.data.Core.Tests
         public void DatasetFileService_GetAllDatasetFilesBySchema_Schema_With_DataFlies()
         {
             // Arrange
-            var context = new Mock<IDatasetContext>();
-            var datasetFileArray = new List<DatasetFile>();
-            Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            //setup user
             var user1 = new Mock<IApplicationUser>();
             user1.Setup(f => f.AssociateId).Returns("123456");
 
-            datasetFileArray.Add(MockClasses.MockDatasetFile(ds, dfc, user1.Object));
+            //setup userService
+            var userService = new Mock<IUserService>();
+            userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
 
-            context.Setup(f => f.DatasetFile).Returns(datasetFileArray.AsQueryable());
+            //setup securityService
+            var userSecurity = new UserSecurity
+            {
+                CanViewFullDataset = true
+            };
+            var securityService = new Mock<ISecurityService>();
+            securityService.Setup(r => r.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(userSecurity);
 
-            var datasetFileService = new DatasetFileService(context.Object, null, null);
+            //setup Entity objects
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            FileSchema schema = MockClasses.MockFileSchema();
+            dfc.Schema = schema;
+
+            //setup db context with DatasetFileConfig
+            var context = new Mock<IDatasetContext>();
+            context.Setup(f => f.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { dfc }.AsQueryable());
+
+            var datasetFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            datasetFile.Schema = schema;
+            context.Setup(f => f.DatasetFile).Returns(new List<DatasetFile>() { datasetFile }.AsQueryable());
+
+            PageParameters pageParams = new PageParameters(1, 5);
+
+            //Initialize Service
+            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object);
 
             // Act
-            var result = datasetFileService.GetAllDatasetFilesBySchema(23);
+            var result = datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams);
 
             // Assert
             Assert.AreEqual(true, result.Any());

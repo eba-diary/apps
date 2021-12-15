@@ -77,7 +77,7 @@ namespace Sentry.data.Core.Tests
             return categories;
         }
 
-        public static DatasetFileConfig MockDataFileConfig(Dataset ds = null)
+        public static DatasetFileConfig MockDataFileConfig(Dataset ds = null, FileSchema schema = null)
         {
             DatasetFileConfig dfc = new DatasetFileConfig()
             {
@@ -89,6 +89,7 @@ namespace Sentry.data.Core.Tests
                 DatasetScopeType = MockScopeTypes()[0],
                 FileExtension = MockFileExtensions()[0],
                 RetrieverJobs = new List<RetrieverJob>(),
+                Schema = schema
             };
 
             return dfc;

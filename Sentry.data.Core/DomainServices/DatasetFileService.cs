@@ -1,7 +1,5 @@
 ﻿using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Helpers;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Sentry.data.Core
@@ -20,50 +18,22 @@ namespace Sentry.data.Core
             _userService = userService;
         }
 
-        public IEnumerable<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId)
-        {
-            IEnumerable<DatasetFile> files = _datasetContext.DatasetFile.Where(x => x.Schema.SchemaId == schemaId).AsEnumerable();
-
-            UserSecurity us = _securityService.GetUserSecurity(files.First().Dataset, _userService.GetCurrentUser());
-            if (!us.CanViewFullDataset)
-            {
-                throw new DatasetUnauthorizedAccessException();
-            }
-
-            IEnumerable<DatasetFileDto> fileDtoList = files.ToDto();
-
-            return fileDtoList;
-        }
-
         public PagedList<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
         {
-            PagedList<DatasetFile> files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFile
-                                                .Where(x => x.Schema.SchemaId == schemaId)
-                                                .OrderBy(o => o.DatasetFileId),
-                                                pageParameters.PageNumber, pageParameters.PageSize);
+            DatasetFileConfig config = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId);
 
-            UserSecurity us = _securityService.GetUserSecurity(files.First().Dataset, _userService.GetCurrentUser());
+            UserSecurity us = _securityService.GetUserSecurity(config.ParentDataset, _userService.GetCurrentUser());
             if (!us.CanViewFullDataset)
             {
                 throw new DatasetUnauthorizedAccessException();
             }
+
+            PagedList<DatasetFile> files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFile
+                                                .Where(x => x.Schema == config.Schema)
+                                                .OrderBy(o => o.DatasetFileId),
+                                                pageParameters.PageNumber, pageParameters.PageSize);            
 
             return new PagedList<DatasetFileDto>(files.ToDto().ToList(), files.TotalCount, files.CurrentPage, files.PageSize);
-        }
-
-        public IEnumerable<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, Func<DatasetFile, bool> where)
-        {
-            IEnumerable<DatasetFile> files = _datasetContext.DatasetFile.Where(x => x.Schema.SchemaId == schemaId).Where(where).AsEnumerable();
-
-            UserSecurity us = _securityService.GetUserSecurity(files.First().Dataset, _userService.GetCurrentUser());
-            if (!us.CanViewFullDataset)
-            {
-                throw new DatasetUnauthorizedAccessException();
-            }
-
-            IEnumerable<DatasetFileDto> fileDtoList = files.ToDto();
-
-            return fileDtoList;
         }
 
         public void UpdateAndSave(DatasetFileDto dto)
