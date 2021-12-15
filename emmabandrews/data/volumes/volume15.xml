@@ -117,6 +117,8 @@
                     fixed placeName and name tags.</item>
                     <item><date when="2021-05-30">30 May 2021</date> Last checked by SLK. Minor semantic edits, updated list of biographers.</item>
                     <item><date when="2021-07-11">11 July 2021</date> Isabelle Schlegel began edits</item>
+                    <item><date when="2021-12-15">15 December 2021</date> SLK final check</item>
+
             </list>
         </revisionDesc>
     </teiHeader>
@@ -405,7 +407,7 @@
         <p><persName ref="#Nicol_Erskine">Mr. Erskine, Nicol</persName> and <persName ref="#Whymper_Charles">Mr. Whymper</persName> called. We went back with them to their boat to see <persName ref="#Nicol_Erskine">Mr. Nicol's</persName> pictures. <persName ref="#Davis_Theodore_M">Theo</persName> bought a beauty for &#163;50 <!--are we tagging currency?-->. We started for <placeName ref="#Aswan">Aswan</placeName> at 1 o'clock and having a light wind got within <measure type="distance">3 miles</measure> of <placeName ref="#Erment">Erment</placeName>, where we had to stop for the night.</p>
       </div>
       <div xml:id="EBA-1908-02-07" type = "entry">
-        <dateline><date when="1908-02-07">Feb. 7th. Friday</date></dateline>.
+        <dateline><date when="1908-02-07">Feb. 7th. Friday</date>.</dateline>
         <p>A cold west wind blowing all day - a real gale - we towed and pulled to anchor, making <measure type="distance">1-1/2 miles</measure>!</p>
       </div>
       <div xml:id="EBA-1908-02-08" type = "entry">
@@ -413,15 +415,15 @@
         <p><measure type="distance">30 miles</measure>. Towed from 7 A.M. to 10 o'clock. Then the gale began again and was so strong we furled the big sail and went on with the felucca sail, but struck a sand bank with such force that I was thrown off my feet - lamp overturned - ornaments etc. thrown. We then went on more slowly passing the <placeName ref="#Esneh_Bridge">Esneh bridge</placeName> and sailing until 6 o'clock.</p>
       </div>
       <div xml:id="EBA-1908-02-09" type = "entry">
-        <dateline><date when="1908-02-09">Fifth Sunday after <name type="event" ref="#Epiphany">Epiphany</name>. Feb. 9th</date></dateline>.
+        <dateline><date when="1908-02-09">Fifth Sunday after <name type="event" ref="#Epiphany">Epiphany</name>. Feb. 9th</date>.</dateline>
         <p><measure type="distance">31 miles</measure>. Started at 7 A.M. with light wind, growing stronger at 10 proving a gale. We again put up our felucca sail and went on with it until driven to the bank at 4 o'clock - afterwards going on until 5:30 - cold - and atmosphere filled with dust.</p>
       </div>
       <div xml:id="EBA-1908-02-10" type = "entry">
-        <dateline><date when="1908-02-10">Feb. 10. Monday</date></dateline>.
+        <dateline><date when="1908-02-10">Feb. 10. Monday</date>.</dateline>
         <p>A fine good sailing day - have made <measure type="distance">41 miles</measure>, and are <measure type="distance">3 miles</measure> above <placeName ref="#Kawm_Umbū">Kom Ombo</placeName>.</p>
       </div>
       <div xml:id="EBA-1908-02-11" type = "entry">
-        <dateline><date when="1908-02-11">Feb. 11. Tuesday</date></dateline>.
+        <dateline><date when="1908-02-11">Feb. 11. Tuesday</date>.</dateline>
         <p><measure type="distance">23 miles</measure>. A difficult day, light, variable winds - which have brought us our old "Sycamore tree".</p>
       </div>
       <div xml:id="EBA-1908-02-12" type = "entry">
@@ -486,32 +488,28 @@
       <!-- Harold Jones or Harold Smith? -->
       <div xml:id="EBA-1908-02-26" type = "entry">
         <dateline><date when="1908-02-26">Feb. 26. Wednesday</date>.</dateline>
-        <p>All of us went to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> this morning. The first door of the tomb is cleared - the corridor filled with rubbish. <persName ref="#Ayrton_Edward">Ayrton</persName> crawled through with great difficulty and said he could see another door quite filled up. <persName ref="#Davis_Theodore_M">Theo</persName> thinks it an 18th dynasty tomb. <persName ref="#Sproston_Mr #Sproston_Mrs">Mr. and Mrs. <sic><choice>Spreston</choice><corr>Sproston</corr></sic></persName> called this evening, bringing a letter of introduction from <persName ref="#Fielding_Everard">Everard Fielding</persName>. She was a <persName ref="#de_Trafford_Miss">Miss de Trafford</persName> <!--double check this tag/mrs. sproston might merge with de trafford?-->. The <persName>McKeever girls</persName> <!--tag--> and <persName ref="#Forbes_Mr">Mr. Forbes</persName> called before dinner, and <persName ref="#Dalison_Max">Mr. Dalison</persName> this evening.</p>
+        <p>All of us went to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> this morning. The first door of the tomb is cleared - the corridor filled with rubbish. <persName ref="#Ayrton_Edward">Ayrton</persName> crawled through with great difficulty and said he could see another door quite filled up. <persName ref="#Davis_Theodore_M">Theo</persName> thinks it an 18th dynasty tomb. <persName ref="#Sproston_Mr #Sproston_Mrs">Mr. and Mrs. <choice><sic>Spreston</sic><corr>Sproston</corr></choice></persName> called this evening, bringing a letter of introduction from <persName ref="#Fielding_Everard">Everard Fielding</persName>. She was a <persName ref="#Sproston_Mrs">Miss de Trafford</persName>. The <persName ref="McKeever_Miss">McKeever girls</persName> and <persName ref="#Forbes_Mr">Mr. Forbes</persName> called before dinner, and <persName ref="#Dalison_Max">Mr. Dalison</persName> this evening.</p>
       </div>
-      <!-- Person Group - Sprestons, McKeever girls -->
       <!-- 2nd half of this entry makes no sense... -->
       <div xml:id="EBA-1908-02-27" type = "entry">
         <dateline><date when="1908-02-27">Feb. 27. Thursday</date>.</dateline>
         <p>A quiet day - <persName>Harold</persName> has stayed in the <placeName ref="#Bībān al-Mulūk">Valley</placeName> yesterday and today.</p>
       </div>
-      <!-- Harold Jones or Harold Smith? -->
       <div xml:id="EBA-1908-02-28" type = "entry">
         <dateline><date when="1908-02-28">Feb. 28. Friday</date>.</dateline>
         <p><persName ref="#Davis_Theodore_M">Theo</persName> over in the <placeName ref="#Bībān al-Mulūk">Valley</placeName> all day - he reports that the door of the tomb is nearly free, and the at the men are clearing a passage through the debris in the corridor. Very hot today.</p>
       </div>
       <div xml:id="EBA-1908-02-29" type = "entry">
         <dateline><date when="1908-02-29">Feb. 29. Saturday</date>.</dateline>
-        <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Jones_Harold">Harold</persName> went of course to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> this morning. They found <persName ref="#Ayrton_Edward">Ayrton</persName>, <persName ref="#Dalison_Max">Dalison</persName> and <persName ref="#Weigall_Arthur">Weigall</persName> waiting for them, and in spite of their protestations <persName ref="#Davis_Theodore_M">Theo</persName> insisted upon entering the tomb, and going first. They found it very difficult and hot. It soon declared itself as the <name type="historical" ref="#KV57">tomb of <persName ref="#Horemheb"><sic><choice>Heromheb</choice><corr>Horemheb</corr></sic></persName></name> - a very long tomb - with corridors, well, fully fresh, of Gods, a magnificent Sarcophagus, and figures in wood and marble - a few bones - no mummy - <measure type="feet">200 ft.</measure> long.</p>
+        <p><persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Jones_Harold">Harold</persName> went of course to the <placeName ref="#Bībān al-Mulūk">Valley</placeName> this morning. They found <persName ref="#Ayrton_Edward">Ayrton</persName>, <persName ref="#Dalison_Max">Dalison</persName> and <persName ref="#Weigall_Arthur">Weigall</persName> waiting for them, and in spite of their protestations <persName ref="#Davis_Theodore_M">Theo</persName> insisted upon entering the tomb, and going first. They found it very difficult and hot. It soon declared itself as the <name type="historical" ref="#KV57">tomb of <persName ref="#Horemheb"><choice><sic>Heromheb</sic><corr>Horemheb</corr></choice></persName></name> - a very long tomb - with corridors, well, fully fresh, of Gods, a magnificent Sarcophagus, and figures in wood and marble - a few bones - no mummy - <measure type="feet">200 ft.</measure> long.</p>
       </div>
-      <!-- Harold Jones or Harold Smith? -->
-      <!-- Olivia Mhyre's Code -->
       <div xml:id="EBA-1908-03-01" type="entry">
         <dateline><date when="1908-03-01">March 1st</date>. <name type="event" ref="#Quinquagesima">Quinquagesima Sunday</name></dateline>
-        <p><persName ref="#Davis_Theodore_M">Theo</persName> met the <persName ref="#Connaught_Family">Connaught</persName> <!--check tag--> party at <placeName ref="#Karnak">Karnac</placeName> this afternoon - and invited them to tea tomorrow!</p>
+        <p><persName ref="#Davis_Theodore_M">Theo</persName> met the <persName ref="#Connaught_Family">Connaught</persName> party at <placeName ref="#Karnak">Karnac</placeName> this afternoon - and invited them to tea tomorrow!</p>
       </div>
       <div xml:id="EBA-1908-03-02" type="entry"> <!--nov 10-->
         <dateline><date when="1908-03-02">March 2. Monday</date>.</dateline>
-        <p>The <persName ref="#Connaught_Family">Connaughts</persName> <!--change--> arrived from the <placeName ref="#Bībān al-Mulūk">Valley</placeName> about 4:30 - quite an imposing array - several mounted guards arrived before them - and the <persName ref="#Connaught_Duchess">Duchess</persName> and <persName ref="#Connaught_Patricia_Princess">Princess Patricia</persName> arrived first. I took them to my room, and left them to tidy themselves. I found in the salon <persName ref="#Pelly_Miss">Miss Pelly</persName>, whom I had met before, Lady in waiting, then came the <persName ref="#Connaught_Duke">Duke</persName> with members of his staff - <persName ref="#Murray_M_Major">Major M. Murray</persName> - <persName ref="#Ponsonby_M_B_Lieutenant">Lieut. the Hon. M. B. Ponsonby</persName> - <persName ref="#Maxwell_John_Sir">Sir John Maxwell</persName>, whom we knew, <persName ref="#Watson_Major">Major Watson</persName>, an old friend, and <persName ref="#Weigall_Arthur">Mr. Weigall</persName>. They looked first at the gold find, and then went on deck for tea. I thought I had never seen so many nice looking men together - and the <persName ref="#Connaught_Family">Connaughts</persName> <!--change-->are delightful, simple people to entertain. After they went away the <persName ref="#McKewer_Family">McKewers</persName> <!--change, probably same as mckeevers--> and <persName ref="#Forbes_Mr #Forbes_Mrs">Mr. and Mrs. Forbes</persName> came. They said they had been watching from the Hotel opposite the royal entourage on the sand, waiting until it was over.</p>
+        <p>The <persName ref="#Connaught_Family">Connaughts</persName> arrived from the <placeName ref="#Bībān al-Mulūk">Valley</placeName> about 4:30 - quite an imposing array - several mounted guards arrived before them - and the <persName ref="#Connaught_Duchess">Duchess</persName> and <persName ref="#Connaught_Patricia_Princess">Princess Patricia</persName> arrived first. I took them to my room, and left them to tidy themselves. I found in the salon <persName ref="#Pelly_Miss">Miss Pelly</persName>, whom I had met before, Lady in waiting, then came the <persName ref="#Connaught_Duke">Duke</persName> with members of his staff - <persName ref="#Murray_M_Major">Major M. Murray</persName> - <persName ref="#Ponsonby_M_B_Lieutenant">Lieut. the Hon. M. B. Ponsonby</persName> - <persName ref="#Maxwell_John_Sir">Sir John Maxwell</persName>, whom we knew, <persName ref="#Watson_Major">Major Watson</persName>, an old friend, and <persName ref="#Weigall_Arthur">Mr. Weigall</persName>. They looked first at the gold find, and then went on deck for tea. I thought I had never seen so many nice looking men together - and the <persName ref="#Connaught_Family">Connaughts</persName> are delightful, simple people to entertain. After they went away the <persName ref="#McKewer_Family">McKewers</persName> <!--change, probably same as mckeevers--> and <persName ref="#Forbes_Mr #Forbes_Mrs">Mr. and Mrs. Forbes</persName> came. They said they had been watching from the Hotel opposite the royal entourage on the sand, waiting until it was over.</p>
       </div>
       <div xml:id="EBA-1908-03-03" type="entry">
         <dateline><date when="1908-03-03">March 3rd. Tuesday</date>.</dateline>
