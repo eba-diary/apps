@@ -20,9 +20,15 @@ namespace Sentry.data.Core
             _userService = userService;
         }
 
-        public IEnumerable<DatasetFileDto> GetAllDatasetFilesBySchema(int schemaId)
+        public IEnumerable<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId)
         {
             IEnumerable<DatasetFile> files = _datasetContext.DatasetFile.Where(x => x.Schema.SchemaId == schemaId).AsEnumerable();
+
+            UserSecurity us = _securityService.GetUserSecurity(files.First().Dataset, _userService.GetCurrentUser());
+            if (!us.CanViewFullDataset)
+            {
+                throw new DatasetUnauthorizedAccessException();
+            }
 
             IEnumerable<DatasetFileDto> fileDtoList = files.ToDto();
 
@@ -36,12 +42,24 @@ namespace Sentry.data.Core
                                                 .OrderBy(o => o.DatasetFileId),
                                                 pageParameters.PageNumber, pageParameters.PageSize);
 
+            UserSecurity us = _securityService.GetUserSecurity(files.First().Dataset, _userService.GetCurrentUser());
+            if (!us.CanViewFullDataset)
+            {
+                throw new DatasetUnauthorizedAccessException();
+            }
+
             return new PagedList<DatasetFileDto>(files.ToDto().ToList(), files.TotalCount, files.CurrentPage, files.PageSize);
         }
 
-        public IEnumerable<DatasetFileDto> GetAllDatasetFilesBySchema(int schemaId, Func<DatasetFile, bool> where)
+        public IEnumerable<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, Func<DatasetFile, bool> where)
         {
             IEnumerable<DatasetFile> files = _datasetContext.DatasetFile.Where(x => x.Schema.SchemaId == schemaId).Where(where).AsEnumerable();
+
+            UserSecurity us = _securityService.GetUserSecurity(files.First().Dataset, _userService.GetCurrentUser());
+            if (!us.CanViewFullDataset)
+            {
+                throw new DatasetUnauthorizedAccessException();
+            }
 
             IEnumerable<DatasetFileDto> fileDtoList = files.ToDto();
 

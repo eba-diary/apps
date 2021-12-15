@@ -11,7 +11,7 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="schemaId"></param>
         /// <returns></returns>
-        IEnumerable<DatasetFileDto> GetAllDatasetFilesBySchema(int schemaId);
+        IEnumerable<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId);
 
         /// <summary>
         /// Get all data files associated with schema.  PageParameters included to 
@@ -27,7 +27,7 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="schemaId"></param>
         /// <returns></returns>
-        IEnumerable<DatasetFileDto> GetAllDatasetFilesBySchema(int schemaId, Func<DatasetFile, bool> where);
+        IEnumerable<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, Func<DatasetFile, bool> where);
 
         /// <summary>
         /// Update data file record and save
