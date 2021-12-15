@@ -29,6 +29,7 @@
             <respStmt>
                <resp>proofreading and tagging</resp>
                <persName ref="#IW">Izzy Wiebe</persName>
+               <persName ref="#SLK">Sarah L. Ketchley</persName>
             </respStmt>
             <respStmt>
                     <resp>biographical research and writing</resp> 
@@ -91,18 +92,16 @@
       <revisionDesc> <!-- update this with major revision list-->
          <list>
             <item>
-               <date when="2021-05-08">8 May 2021</date> Last checked by SLK. Updated header, fixed
+                <date when="2021-05-08">8 May 2021</date> Last checked by SLK. Updated header, fixed
                placeName and name tags.</item>
+               <item><date when="2021-09-10">10 September 2021</date>Izzy Wiebe</item>
+
          </list>
       </revisionDesc>
    </teiHeader>
    <text> <!-- ignore these tags, just copy/paste the header above-->
     <body>
-<<<<<<< Updated upstream
       <div xml:id="EBA-1903-11-15" type="entry">
-=======
-      <div xml:id="EBA-1903-11-15">
->>>>>>> Stashed changes
         <dateline>
           Sunday, 23d after <name type="event" ref="#Trinity">Trinity</name>. 
           <date when="1903-11-15">Nov. 15, 1903</date>.
@@ -548,7 +547,7 @@
           <date when="1904-02-22">Monday, Feb. 22</date>.
           <measure type="distance">26 miles</measure>.
         </dateline>
-          <p>Started at 7 and reached <placeName ref="#Kawm_Umbū">Kom Ombo</placeName> at 9. Found the <persName ref="Birds_Group">Birds</persName> lying here - and exchanged a few words in passing. Went up to the <name type="historical" ref="">Temple</name><!---->, and got away at 10:30 - a very hot day. Tied up at 7 P.M. - <measure type="distance">5 miles</measure> below <placeName ref="#Silsilis">Silsilis</placeName>. The two dahabeas <!--[illegible]--> and <name type="boat" ref="#Nekht-Heb">"Nekht-Heb"</name> passed us bound up.</p>
+          <p>Started at 7 and reached <placeName ref="#Kawm_Umbū">Kom Ombo</placeName> at 9. Found the <persName ref="Birds_Group">Birds</persName> lying here - and exchanged a few words in passing. Went up to the <name type="historical" ref="Temple_of_Kawm_Umbū">Temple</name>, and got away at 10:30 - a very hot day. Tied up at 7 P.M. - <measure type="distance">5 miles</measure> below <placeName ref="#Silsilis">Silsilis</placeName>. The two dahabeas <!--[illegible]--> and <name type="boat" ref="#Nekht-Heb">"Nekht-Heb"</name> passed us bound up.</p>
       </div>
       <div xml:id="EBA-1904-02-23">
         <dateline>
@@ -938,7 +937,7 @@
         <dateline>
           <date when="1904-04-30">Saturday, April 30</date>. 
         </dateline>
-          <p>To the <persName ref="Cobbs_Group">Cobbs</persName>< this morning - to see the pretty leather work. Left <persName ref="#Buttles_Jeanette">Nettie</persName> and <persName ref="#Hardy_Jean">Jean</persName> at <name  type="historical" ref="#San_Marco">S. Marco</name>, and <persName ref="#Buttles_Mary">Mary</persName> and I drove up to the Rose Garden near <name type="historical" ref="#San_Miniato">S. Miniato</name>. Such miles of splendid roses! <persName ref="#Newman_Henry_Roderick #Newman_Mrs">Mr. and Mrs. Newman</persName> to lunch - pleasant. <persName ref="#Hardy_Jean">Jean</persName> and I then went out to <placeName ref="#Lettignano">Lettignano</placeName> to have tea with the <persName ref="#Berensons_Group">Berensons</persName>. We had been asked to lunch, but could only make it to tea. They were very amusing and interesting about their <orgName ref="#American">American</orgName> visit.</p>
+          <p>To the <persName ref="Cobbs_Group">Cobbs</persName> this morning - to see the pretty leather work. Left <persName ref="#Buttles_Jeanette">Nettie</persName> and <persName ref="#Hardy_Jean">Jean</persName> at <name  type="historical" ref="#San_Marco">S. Marco</name>, and <persName ref="#Buttles_Mary">Mary</persName> and I drove up to the Rose Garden near <name type="historical" ref="#San_Miniato">S. Miniato</name>. Such miles of splendid roses! <persName ref="#Newman_Henry_Roderick #Newman_Mrs">Mr. and Mrs. Newman</persName> to lunch - pleasant. <persName ref="#Hardy_Jean">Jean</persName> and I then went out to <placeName ref="#Lettignano">Lettignano</placeName> to have tea with the <persName ref="#Berensons_Group">Berensons</persName>. We had been asked to lunch, but could only make it to tea. They were very amusing and interesting about their <orgName ref="#American">American</orgName> visit.</p>
       </div>
       <div xml:id="EBA-1904-05-01">
         <dateline>
