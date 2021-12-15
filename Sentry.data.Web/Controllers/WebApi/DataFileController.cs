@@ -32,7 +32,6 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <param name="schemaId"></param>
         /// <param name="pageNumber">Default is 1</param>
         /// <param name="pageSize">Default is 1000, Max is 10000</param>
-        /// <param name="includeMetadata"></param>
         /// <returns></returns>
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
