@@ -461,27 +461,6 @@ namespace Sentry.data.Web.WebApi.Controllers
         public async Task<IHttpActionResult> GetLatestSchemaRevisionJsonFormat(int datasetId, int schemaId)
         {
             return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", () => Ok(_schemaService.GetLatestSchemaRevisionJsonStructureBySchemaId(schemaId).ToModel()));
-
-            //LEGACY CODE
-            //IHttpActionResult GetLatestSchemaRevisionJsonFormatFunction()
-            //{
-            //if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Where(w => !w.DeleteInd).Any(w => w.Schema.SchemaId == schemaId))
-            //{
-            //    throw new SchemaNotFoundException();
-            //}
-
-            //SchemaRevisionDto revisiondto = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
-            //if (revisiondto == null)
-            //{
-            //    Logger.Info($"metadataapi_getlatestschemarevisiondetail_notfound revision - datasetid:{datasetId} schemaid:{schemaId}");
-            //    return Content(System.Net.HttpStatusCode.NotFound, "Schema revisions not found");
-            //}
-
-            //SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
-            //List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisiondto.RevisionId);
-            //revisionDetailModel.Fields = fieldDtoList.ToSchemaFieldModel();
-            //return Ok(revisionDetailModel);
-            //}
         }
 
         /// <summary>
