@@ -1214,7 +1214,7 @@ data.Dataset = {
 
 
 
-            Sentry.InjectSpinner($("#datasetDetailTabs"));
+            Sentry.InjectSpinner($("#tab-container"));
 
 
             var url = new URL(window.location.href);
@@ -1233,7 +1233,7 @@ data.Dataset = {
 
             data.Dataset.UpdateMetadata();
 
-            data.RemoveSpinner('#datasetDetailTabs');
+            data.RemoveSpinner('#tab-container');
 
         });
         Id = $('#datasetConfigList').val();
@@ -1264,10 +1264,10 @@ data.Dataset = {
             url.searchParams.set('tab', 'SchemaColumns');
             window.history.pushState({}, '', url);
 
-            Sentry.InjectSpinner($("#tab-container"));
 
 
             if ($('#tabSchemaColumns').is(':empty')) {
+                Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaColumns',
                     dataType: 'html',
@@ -1299,9 +1299,9 @@ data.Dataset = {
 
             var id = $('#RequestAccessButton').attr("data-id");
 
-            Sentry.InjectSpinner($("#tab-container"));
 
             if ($('#tabSchemaAbout').is(':empty')) {
+                Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaAbout',
                     dataType: 'html',
@@ -1333,10 +1333,10 @@ data.Dataset = {
 
             var id = $('#RequestAccessButton').attr("data-id");
 
-            Sentry.InjectSpinner($("#tab-container"));
 
 
             if ($('#tabDataPreview').is(':empty')) {
+                Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataPreview',
                     dataType: 'html',
@@ -1365,9 +1365,9 @@ data.Dataset = {
             var url = new URL(window.location.href);
             url.searchParams.set('tab', 'DataFiles');
             window.history.pushState({}, '', url);
-            Sentry.InjectSpinner($("#tab-container"));
 
             if ($('#tabDataFiles').is(':empty')) {
+                Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataFiles',
                     dataType: 'html',

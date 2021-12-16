@@ -4,9 +4,13 @@
 
 <div class="row">
     <div class="col-lg-12">
-        <div id="aboutThisSchema" class="@(Model.DisplayTabSections == true ?"visible-item":"hidden-item")">
-            <h3 class="@color">About this Schema</h3>
-        </div>
+        @if (!Model.DisplayTabSections)
+        {
+            <div id="aboutThisSchema">
+                <h3 class="@color">About this Schema</h3>
+            </div>
+        }
+
         <br />
         <div class="metadataBody container row">
             <div class="col-lg-4">
