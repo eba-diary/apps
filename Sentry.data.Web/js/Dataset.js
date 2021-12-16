@@ -509,7 +509,8 @@ data.Dataset = {
             $.each(result.DataFlows, function (i, val) {
                 var item = new data.Dataset.DataFlow(val);
 
-                self.vm.DataFlows().push(item);
+                //only add if data flow is active
+                if (val.ObjectStatus === 1) self.vm.DataFlows().push(item);
             });
             self.vm.DataFlows.notifySubscribers();
 

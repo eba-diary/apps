@@ -634,6 +634,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("dataset/{datasetId}/schema/{schemaId}")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(bool))]
         [SwaggerResponse(System.Net.HttpStatusCode.NotFound)]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest)]
         [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
         [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
@@ -649,7 +650,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
                 if (validationResults.Any())
                 {
-                    throw new SchemaConversionException($"Invalid schema request: {string.Join(" | ", validationResults)}");
+                    return Content(System.Net.HttpStatusCode.BadRequest, $"Invalid schema request: {string.Join(" | ", validationResults)}");
                 }
 
                 return Ok(_schemaService.UpdateAndSaveSchema(schemaModel.ToDto((x) => _schemaService.GetFileExtensionIdByName(x))));
