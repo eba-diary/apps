@@ -585,7 +585,7 @@ data.Dataset = {
     renderDataPreview: function () {
         if ($("#datasetRowTable_filter").length > 0) {
             $("#datasetRowTable").DataTable().destroy();
-        };
+        }
         $.ajax({
             type: "GET",
             url: "/api/v2/querytool/dataset/" + location.pathname.split('/')[3] + "/config/" + $('#datasetConfigList').val() + "/SampleRecords",
@@ -666,7 +666,7 @@ data.Dataset = {
         });
         if ($("#datasetRowTable_filter").length > 0) { 
             $("#datasetRowTable").DataTable().destroy();
-        };
+        }
         if (!push) {
             $('#datasetRowTable').DataTable({
                 "scrollX": true,
@@ -2187,15 +2187,6 @@ data.Dataset = {
             $('div#DatasetFormContent #NamedEnvironmentPartial').html(result);
             data.Dataset.initNamedEnvironmentEvents();
         });
-    },
-
-    sleep(milliseconds) {
-        var start = new Date().getTime();
-        for (var i = 0; i < 1e7; i++) {
-            if ((new Date().getTime() - start) > milliseconds) {
-                break;
-            }
-        }
     }
 
 };
