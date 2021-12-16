@@ -192,13 +192,9 @@ namespace Sentry.data.Core
                 : _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
 
             SAIDRole prodCust = await _saidService.GetProdCustByKeyCode(ds.SAIDAssetKeyCode).ConfigureAwait(false);
-            ar.ApproverList.Add(new KeyValuePair<string, string>(prodCust.AssociateId, prodCust.Name + " (Owner)"));
 
-            if (!string.IsNullOrWhiteSpace(ds.PrimaryContactId))
-            {
-                IApplicationUser secondaryUser = _userService.GetByAssociateId(ds.PrimaryContactId);
-                ar.ApproverList.Add(new KeyValuePair<string, string>(ds.PrimaryContactId, secondaryUser.DisplayName + " (Contact)"));
-            }
+            ar.ApproverList.Add(new KeyValuePair<string, string>(prodCust.AssociateId, prodCust.Name + " (Owner)"));
+            //add all prod cust
 
             return ar;
         }
