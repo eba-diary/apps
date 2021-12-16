@@ -76,11 +76,8 @@ namespace Sentry.data.Core.Tests
 
             public IFeatureFlag<bool> CLA2838_DSC_ANOUNCEMENTS => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3550_DATA_INVENTORY_NEW_COLUMNS => throw new NotImplementedException();
-
-            
-
             public IFeatureFlag<bool> CLA3541_Dataset_Details_Tabs => throw new NotImplementedException();
+            public IFeatureFlag<bool> CLA3605_AllowSchemaParquetUpdate => throw new NotImplementedException();
         }
-
     }
 }

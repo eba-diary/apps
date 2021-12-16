@@ -1,6 +1,9 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Helpers;
 using Sentry.data.Web.Models.ApiModels.Config;
 using Sentry.data.Web.Models.ApiModels.Schema;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -103,7 +106,9 @@ namespace Sentry.data.Web
                 Delimiter = model.Delimiter,
                 CreateCurrentView = model.CreateCurrentView,
                 ObjectStatus = model.ObjectStatus,
-                SchemaRootPath = model.SchemaRootPath
+                SchemaRootPath = model.SchemaRootPath,
+                ParquetStorageBucket = model.ParquetStorageBucket,
+                ParquetStoragePrefix = model.ParquetStoragePrefix
             };
         }
 
@@ -127,7 +132,9 @@ namespace Sentry.data.Web
                 CLA1286_KafkaFlag = model.CLA1286_KafkaFlag,
                 CLA3014_LoadDataToSnowflake = model.CLA3014_LoadDataToSnowflake,
                 ObjectStatus = model.ObjectStatus,
-                SchemaRootPath = model.SchemaRootPath
+                SchemaRootPath = model.SchemaRootPath,
+                ParquetStorageBucket = model.ParquetStorageBucket,
+                ParquetStoragePrefix = model.ParquetStoragePrefix
             };
         }
 
@@ -187,7 +194,7 @@ namespace Sentry.data.Web
                 SchemaEntity_NME = schemaDto.SchemaEntity_NME,
                 Description = schemaDto.Description,
                 StorageCode = schemaDto.StorageCode,
-                Format = schemaDto.FileExtenstionName,
+                Format = schemaDto.FileExtensionName,
                 CurrentView = schemaDto.CreateCurrentView,
                 Delimiter = schemaDto.Delimiter,
                 HasHeader = schemaDto.HasHeader,
@@ -216,6 +223,43 @@ namespace Sentry.data.Web
                 ParquetStoragePrefix = schemaDto.ParquetStoragePrefix,
                 SnowflakeStage = schemaDto.SnowflakeStage,
                 SnowflakeWarehouse = schemaDto.SnowflakeWarehouse
+            };
+        }
+
+        public static FileSchemaDto ToDto(this SchemaInfoModel mdl, Func<string, int> extIdLookup)
+        {
+            return new FileSchemaDto()
+            {
+                SchemaId = mdl.SchemaId,
+                SchemaEntity_NME = mdl.SchemaEntity_NME,
+                Name = mdl.Name,
+                Description = mdl.Description,
+                ObjectStatus = EnumHelper.GetByDescription<ObjectStatusEnum>(mdl.ObjectStatus),
+                DeleteInd = mdl.DeleteInd,
+                CLA1396_NewEtlColumns = mdl.Options?.Any(a => string.Equals(a, "CLA1396_NewEtlColumns|true", StringComparison.OrdinalIgnoreCase)) == true,
+                CLA1580_StructureHive = mdl.Options?.Any(a => string.Equals(a, "CLA1580_StructureHive|true", StringComparison.OrdinalIgnoreCase)) == true,
+                CLA2472_EMRSend = mdl.Options?.Any(a => string.Equals(a, "CLA2472_EMRSend|true", StringComparison.OrdinalIgnoreCase)) == true,
+                CLA1286_KafkaFlag = mdl.Options?.Any(a => string.Equals(a, "CLA1286_KafkaFlag|true", StringComparison.OrdinalIgnoreCase)) == true,
+                CLA3014_LoadDataToSnowflake = mdl.Options?.Any(a => string.Equals(a, "CLA3014_LoadDataToSnowflake|true", StringComparison.OrdinalIgnoreCase)) == true,
+                FileExtensionId = extIdLookup(mdl.Format),
+                FileExtensionName = mdl.Format,
+                Delimiter = mdl.Delimiter,
+                HasHeader = mdl.HasHeader,
+                CreateCurrentView = mdl.CurrentView,
+                HiveTable = mdl.HiveTable,
+                HiveDatabase = mdl.HiveDatabase,
+                HiveLocation = mdl.HiveLocation,
+                HiveStatus = mdl.HiveTableStatus,
+                StorageCode = mdl.StorageCode,
+                SnowflakeDatabase = mdl.SnowflakeDatabase,
+                SnowflakeTable = mdl.SnowflakeTable,
+                SnowflakeSchema = mdl.SnowflakeSchema,
+                SnowflakeStatus = mdl.SnowflakeStatus,
+                SchemaRootPath = mdl.SchemaRootPath != null ? string.Join(",", mdl.SchemaRootPath) : null,
+                ParquetStorageBucket = mdl.ParquetStorageBucket,
+                ParquetStoragePrefix = mdl.ParquetStoragePrefix,
+                SnowflakeStage = mdl.SnowflakeStage,
+                SnowflakeWarehouse = mdl.SnowflakeWarehouse
             };
         }
 
@@ -254,6 +298,9 @@ namespace Sentry.data.Web
             model.DeleteInd = config.Schema.DeleteInd;
             model.ObjectStatus = config.ObjectStatus;
             model.SchemaRootPath = config.Schema?.SchemaRootPath;
+            model.ObjectStatus = config.ObjectStatus;
+            model.ParquetStorageBucket = config.Schema?.ParquetStorageBucket;
+            model.ParquetStoragePrefix = config.Schema?.ParquetStoragePrefix;
         }
     }
 }

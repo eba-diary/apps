@@ -26,6 +26,7 @@ namespace Sentry.data.Core
         private readonly IMessagePublisher _messagePublisher;
         private readonly ISnowProvider _snowProvider;
         private string _bucket;
+        private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
@@ -167,13 +168,19 @@ namespace Sentry.data.Core
             return 0;
         }
 
-
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
-            Logger.Info($"startmethod <{m.ReflectedType.Name.ToString()}>");
+            Logger.Info($"startmethod <{m.ReflectedType.Name}>");
 
-            Dataset parentDataset = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaDto.SchemaId).ParentDataset;
+            DatasetFileConfig fileConfig = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaDto.SchemaId);
+
+            if (fileConfig == null)
+            {
+                throw new SchemaNotFoundException();
+            }
+
+            Dataset parentDataset = fileConfig.ParentDataset;
 
             //Check user access to modify schema, of not throw exception
             IApplicationUser user = _userService.GetCurrentUser();
@@ -182,21 +189,15 @@ namespace Sentry.data.Core
             if (!us.CanManageSchema)
             {
                 throw new SchemaUnauthorizedAccessException();
-            }
-            
+            }            
 
-            string SASNotificationType = null;
-            string CurrentViewNotificationType = null;
             JObject whatPropertiesChanged;
-            FileSchema schema;
             /* Any exceptions saving schema changes, do not execute remaining line of code */
             try
             {
-                schema = _datasetContext.GetById<FileSchema>(schemaDto.SchemaId);
-
                 //Update/save schema within DSC metadata
-                whatPropertiesChanged = UpdateSchema(schemaDto, schema);
-                Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {parentDataset.DatasetName}\\{schema.Name} | {whatPropertiesChanged.ToString()}");
+                whatPropertiesChanged = UpdateSchema(schemaDto, fileConfig.Schema);
+                Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {parentDataset.DatasetName}\\{fileConfig.Schema.Name} | {whatPropertiesChanged}");
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -206,7 +207,7 @@ namespace Sentry.data.Core
             }
 
             /* The remaining actions should all be executed even if one fails
-             * If there are any exceptions, log the exceptions and continue on */
+                * If there are any exceptions, log the exceptions and continue on */
             var exceptions = new List<Exception>();
 
             /*
@@ -216,7 +217,7 @@ namespace Sentry.data.Core
             */
             try
             {
-                GenerateConsumptionLayerEvents(schema, whatPropertiesChanged);
+                GenerateConsumptionLayerEvents(fileConfig.Schema, whatPropertiesChanged);
             }
             catch (Exception ex)
             {
@@ -231,9 +232,19 @@ namespace Sentry.data.Core
                 Logger.Error($"<{m.ReflectedType.Name.ToLower()}> Failed sending downstream notifications or events", new AggregateException(exceptions));
             }
 
-            Logger.Info($"endmethod <{m.ReflectedType.Name.ToString()}>");
+            Logger.Info($"endmethod <{m.ReflectedType.Name}>");
             return true;
-            
+        }
+
+        public int GetFileExtensionIdByName(string extensionName)
+        {
+            FileExtension extension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Name == extensionName);
+            if (extension != null)
+            {
+                return extension.Id;
+            }
+
+            return 0;
         }
 
         private void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
@@ -241,7 +252,7 @@ namespace Sentry.data.Core
             /*Generate *-CREATE-TABLE-REQUESTED event when:
             *  - CreateCurrentView changes
             */
-            if (propertyDeltaList.ContainsKey("createcurrentview"))
+            if (_eventGeneratingUpdateFields.Any(x => propertyDeltaList.ContainsKey(x)))
             {
                 GenerateConsumptionLayerCreateEvent(schema, propertyDeltaList);
             }
@@ -278,7 +289,7 @@ namespace Sentry.data.Core
                 generateEvent = true;
             }
             /* schema configuration trigger for createCurrentView regardless true\false */
-            else if (propertyDeltaList.ContainsKey("createcurrentview"))
+            else if (_eventGeneratingUpdateFields.Any(x => propertyDeltaList.ContainsKey(x)))
             {
                 generateEvent = true;
             }
@@ -348,91 +359,72 @@ namespace Sentry.data.Core
         /// <returns> Returns list of properties that have changed.</returns>
         private JObject UpdateSchema(FileSchemaDto dto, FileSchema schema)
         {
-            bool chgDetected = false;
-            string whatPropertiesChanged = "{";
+            IList<bool> changes = new List<bool>();
+            JObject whatPropertiesChanged = new JObject();
 
-            if (schema.Name != dto.Name)
-            {
-                schema.Name = dto.Name;
-                chgDetected = true;
-            }
-            if (schema.Delimiter != dto.Delimiter)
-            {
-                schema.Description = dto.Description;
-                chgDetected = true;
-            }
+            changes.Add(TryUpdate(() => schema.Name, () => dto.Name, (x) => schema.Name = x));
 
-            if (schema.CreateCurrentView != dto.CreateCurrentView)
-            {
-                schema.CreateCurrentView = dto.CreateCurrentView;
-                chgDetected = true;
+            changes.Add(TryUpdate(() => schema.Delimiter, () => dto.Delimiter, (x) => schema.Delimiter = x));
 
-                if (whatPropertiesChanged != "{")
-                { whatPropertiesChanged += ","; }
+            changes.Add(TryUpdate(() => schema.CreateCurrentView, () => dto.CreateCurrentView, 
+                (x) => {
+                            schema.CreateCurrentView = x;
+                            whatPropertiesChanged.Add("createcurrentview", x.ToString().ToLower());
+                       }));
 
-                whatPropertiesChanged += $"\"createcurrentview\":\"{schema.CreateCurrentView.ToString().ToLower()}\"";
-            }
+            changes.Add(TryUpdate(() => schema.Description, () => dto.Description, (x) => schema.Description = x));
 
-            if (schema.Description != dto.Description)
+            changes.Add(TryUpdate(() => schema.Extension.Id, () => dto.FileExtensionId, (x) => schema.Extension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId)));
+
+            changes.Add(TryUpdate(() => schema.HasHeader, () => dto.HasHeader, (x) => schema.HasHeader = x));
+
+            changes.Add(TryUpdate(() => schema.CLA1396_NewEtlColumns, () => dto.CLA1396_NewEtlColumns, (x) => schema.CLA1396_NewEtlColumns = x));
+
+            changes.Add(TryUpdate(() => schema.CLA1580_StructureHive, () => dto.CLA1580_StructureHive, (x) => schema.CLA1580_StructureHive = x));
+
+            changes.Add(TryUpdate(() => schema.CLA2472_EMRSend, () => dto.CLA2472_EMRSend, (x) => schema.CLA2472_EMRSend = x));
+
+            changes.Add(TryUpdate(() => schema.CLA1286_KafkaFlag, () => dto.CLA1286_KafkaFlag, (x) => schema.CLA1286_KafkaFlag = x));
+
+            changes.Add(TryUpdate(() => schema.CLA3014_LoadDataToSnowflake, () => dto.CLA3014_LoadDataToSnowflake, (x) => schema.CLA3014_LoadDataToSnowflake = x));
+
+            changes.Add(TryUpdate(() => schema.SchemaRootPath, () => dto.SchemaRootPath, (x) => schema.SchemaRootPath = x));
+
+            if (_dataFeatures.CLA3605_AllowSchemaParquetUpdate.GetValue())
             {
-                schema.Description = dto.Description;
-                chgDetected = true;
-            }
-            if (schema.Extension.Id != dto.FileExtensionId)
-            {
-                schema.Extension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
-                chgDetected = true;
-            }
-            if (schema.HasHeader != dto.HasHeader)
-            {
-                schema.HasHeader = dto.HasHeader;
-                chgDetected = true;
-            }
-            if (schema.CLA1396_NewEtlColumns != dto.CLA1396_NewEtlColumns)
-            {
-                schema.CLA1396_NewEtlColumns = dto.CLA1396_NewEtlColumns;
-                chgDetected = true;
-            }
-            if (schema.CLA1580_StructureHive != dto.CLA1580_StructureHive)
-            {
-                schema.CLA1580_StructureHive = dto.CLA1580_StructureHive;
-                chgDetected = true;
+                changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket, 
+                    (x) =>
+                    {
+                        schema.ParquetStorageBucket = x;
+                        whatPropertiesChanged.Add("parquetstoragebucket", string.IsNullOrEmpty(x) ? null : x.ToLower());
+                    }));
+                changes.Add(TryUpdate(() => schema.ParquetStoragePrefix, () => dto.ParquetStoragePrefix,
+                    (x) =>
+                    {
+                        schema.ParquetStoragePrefix = x;
+                        whatPropertiesChanged.Add("parquetstorageprefix", string.IsNullOrEmpty(x) ? null : x.ToLower());
+                    }));
             }
 
-            if (schema.CLA2472_EMRSend != dto.CLA2472_EMRSend)
-            {
-                schema.CLA2472_EMRSend = dto.CLA2472_EMRSend;
-                chgDetected = true;
-            }
-
-            if (schema.CLA1286_KafkaFlag != dto.CLA1286_KafkaFlag)
-            {
-                schema.CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag;
-                chgDetected = true;
-            }
-
-            if (schema.CLA3014_LoadDataToSnowflake != dto.CLA3014_LoadDataToSnowflake)
-            {
-                schema.CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake;
-                chgDetected = true;
-            }
-            
-            if (schema.SchemaRootPath != dto.SchemaRootPath)
-            {
-                schema.SchemaRootPath = dto.SchemaRootPath;
-                chgDetected = true;
-            }
-
-
-            if (chgDetected)
+            if (changes.Any(x => x))
             {
                 schema.LastUpdatedDTM = DateTime.Now;
                 schema.UpdatedBy = _userService.GetCurrentUser().AssociateId;
             }
 
-            whatPropertiesChanged += "}";
+            return whatPropertiesChanged;
+        }
 
-            return JObject.Parse(whatPropertiesChanged);          
+        private bool TryUpdate<T>(Func<T> existingValue, Func<T> updateValue, Action<T> setter)
+        {
+            T value = updateValue();
+            if (!Equals(existingValue(), value))
+            {
+                setter(value);
+                return true;
+            }
+
+            return false;
         }
 
         public UserSecurity GetUserSecurityForSchema(int schemaId)
@@ -745,7 +737,7 @@ namespace Sentry.data.Core
                 Name = dto.Name,
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
                 SchemaEntity_NME = dto.SchemaEntity_NME,
-                Extension = (dto.FileExtensionId != 0) ? _datasetContext.GetById<FileExtension>(dto.FileExtensionId) : (dto.FileExtenstionName != null) ? _datasetContext.FileExtensions.Where(w => w.Name == dto.FileExtenstionName).FirstOrDefault() : null,
+                Extension = (dto.FileExtensionId != 0) ? _datasetContext.GetById<FileExtension>(dto.FileExtensionId) : (dto.FileExtensionName != null) ? _datasetContext.FileExtensions.Where(w => w.Name == dto.FileExtensionName).FirstOrDefault() : null,
                 Delimiter = dto.Delimiter,
                 HasHeader = dto.HasHeader,
                 SasLibrary = CommonExtensions.GenerateSASLibaryName(_datasetContext.GetById<Dataset>(dto.ParentDatasetId)),
@@ -808,7 +800,7 @@ namespace Sentry.data.Core
                 StorageCode = scm.StorageCode,
                 StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
                 RawQueryStorage = (Configuration.Config.GetHostSetting("EnableRawQueryStorageInQueryTool").ToLower() == "true" && _datasetContext.SchemaMap.Any(w => w.MappedSchema.SchemaId == scm.SchemaId)) ? GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\" : Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
-                FileExtenstionName = scm.Extension.Name,
+                FileExtensionName = scm.Extension.Name,
                 SnowflakeDatabase = scm.SnowflakeDatabase,
                 SnowflakeTable = scm.SnowflakeTable,
                 SnowflakeSchema = scm.SnowflakeSchema,

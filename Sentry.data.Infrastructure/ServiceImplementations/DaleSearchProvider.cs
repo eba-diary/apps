@@ -455,7 +455,7 @@ namespace Sentry.data.Infrastructure
 		                        GROUP BY ScanAction_ID
 	                        ) AS BaseScanAction_SENSITIVE
 		                        ON ScanAction.ScanAction_ID = BaseScanAction_SENSITIVE.ScanAction_ID
-	                        WHERE ScanAction.Active_FLG = 1
+	                        WHERE ScanAction.Active_FLG = 1 AND ScanAction.WebUse_FLG = 1
 	                        GROUP BY  ScanAction.SAIDExposure_NME, CASE WHEN BaseScanAction_SENSITIVE.ScanAction_ID IS NOT NULL THEN CAST(1 AS INT) ELSE CAST(0 AS INT) END
                         ) AS DALE
                         GROUP BY DALE.SAIDExposure_NME";

@@ -3,13 +3,11 @@
     string headerColor = "categoryBanner-" + Model.CategoryColor;
 }
 
-<hr />
-
 <div class="" id="schemaSection">
-    <div id="columnsInThisSchema" class="@(Model.DisplayTabSections != true ?"visible-item":"hidden-item")">
+    <div id="columnsInThisSchema" class="@(Model.DisplayTabSections == true ?"visible-item":"hidden-item")">
         <h3 class="detailSection @color">Columns</h3>
     </div>
-    <div id="delroyBorder" style="border: 1px #DDDDDD solid; background: white; padding: 10px;" class="metadataBody container row">
+    <div id="delroyBorder">
 
         <div id="delroySpinner">
             <div class="sentry-spinner-container" style=" width: 1166px; margin-top: 25px;">
