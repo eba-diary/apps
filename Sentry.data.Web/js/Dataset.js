@@ -583,7 +583,10 @@ data.Dataset = {
 
     renderDataPreview: function () {
 
-
+        if ($("#datasetRowTable_filter").length > 0)
+        {
+            $("#datasetRowTable").DataTable().destroy();
+        };
 
         $.ajax({
             type: "GET",
@@ -663,9 +666,7 @@ data.Dataset = {
                 parsedRows.push(parsedCells);
             }
         });
-        if ($("#datasetRowTable_filter").length > 0) {
-            $("#datasetRowTable").DataTable().destroy();
-        };
+
         if (!push) {
             $('#datasetRowTable').DataTable({
                 "scrollX": true,
@@ -1192,11 +1193,6 @@ data.Dataset = {
         //*****************************************************************************************************
         $('#datasetConfigList').on('select2:select', function (e) {
 
-
-
-            Sentry.InjectSpinner($("#datasetDetailTabs"));
-
-
             var url = new URL(window.location.href);
             url.searchParams.set('configID', $('#datasetConfigList').val());
             window.history.pushState({}, '', url);
@@ -1212,9 +1208,6 @@ data.Dataset = {
             }
 
             data.Dataset.UpdateMetadata();
-
-            data.RemoveSpinner('#datasetDetailTabs');
-
         });
         Id = $('#datasetConfigList').val();
         //on initial load, try pulling the Id from the URL first. 
@@ -1244,9 +1237,6 @@ data.Dataset = {
             url.searchParams.set('tab', 'SchemaColumns');
             window.history.pushState({}, '', url);
 
-            Sentry.InjectSpinner($("#tab-container"));
-
-
             if ($('#tabSchemaColumns').is(':empty')) {
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaColumns',
@@ -1256,8 +1246,6 @@ data.Dataset = {
                         data.Dataset.delroyInit();
                         data.Dataset.UpdateMetadata();
                         $('#delroySpinner').hide();
-                        data.RemoveSpinner('#tab-container');
-
                     }
                 });
             }
@@ -1266,8 +1254,6 @@ data.Dataset = {
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaColumns/LogView',
                 });
             }
-
-
         });
 
         $('#detailTabSchemaAbout').click(function (e) {
@@ -1279,8 +1265,6 @@ data.Dataset = {
 
             var id = $('#RequestAccessButton').attr("data-id");
 
-            Sentry.InjectSpinner($("#tab-container"));
-
             if ($('#tabSchemaAbout').is(':empty')) {
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaAbout',
@@ -1289,19 +1273,14 @@ data.Dataset = {
                         $('#tabSchemaAbout').html(view);
                         ko.applyBindings(self.vm, $("#tabSchemaAbout")[0]);
                         data.Dataset.UpdateMetadata();
-                        data.RemoveSpinner('#tab-container');
-
                     }
                 });
             }
-
             else {
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaAbout/LogView',
                 });
             }
-
-
         });
 
         $('#detailTabDataPreview').click(function (e) {
@@ -1313,9 +1292,6 @@ data.Dataset = {
 
             var id = $('#RequestAccessButton').attr("data-id");
 
-            Sentry.InjectSpinner($("#tab-container"));
-
-
             if ($('#tabDataPreview').is(':empty')) {
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataPreview',
@@ -1325,7 +1301,6 @@ data.Dataset = {
                         if (self.vm.ShowDataFileTable()) {
                             data.Dataset.renderDataPreview();
                         }
-                        data.RemoveSpinner('#tab-container');
                     }
                 });
             }
@@ -1334,8 +1309,6 @@ data.Dataset = {
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataPreview/LogView',
                 });
             }
-
-
         });
 
         $('#detailTabDataFiles').click(function (e) {
@@ -1345,7 +1318,6 @@ data.Dataset = {
             var url = new URL(window.location.href);
             url.searchParams.set('tab', 'DataFiles');
             window.history.pushState({}, '', url);
-            Sentry.InjectSpinner($("#tab-container"));
 
             if ($('#tabDataFiles').is(':empty')) {
                 $.ajax({
@@ -1353,16 +1325,11 @@ data.Dataset = {
                     dataType: 'html',
                     success: function (view) {
                         $('#tabDataFiles').html(view);
-
                         if (self.vm.ShowDataFileTable()) {
                             var configId = $('#datasetConfigList').val();
                             data.Dataset.DatasetFileTableInit(configId);
                             data.Dataset.DatasetBundingFileTableInit(configId);
                         }
-
-                        data.RemoveSpinner('#tab-container');
-
-
                     }
                 });
             }
@@ -1378,7 +1345,7 @@ data.Dataset = {
         var tab = url.searchParams.get('tab');
         if (tab == undefined) {
             tab = 'SchemaAbout';
-        }
+        }        
         $("#detailTab" + tab).trigger('click');
 
     },
@@ -2166,15 +2133,6 @@ data.Dataset = {
             $('div#DatasetFormContent #NamedEnvironmentPartial').html(result);
             data.Dataset.initNamedEnvironmentEvents();
         });
-    },
-
-    sleep(milliseconds) {
-        var start = new Date().getTime();
-        for (var i = 0; i < 1e7; i++) {
-            if ((new Date().getTime() - start) > milliseconds) {
-                break;
-            }
-        }
     }
 
 };

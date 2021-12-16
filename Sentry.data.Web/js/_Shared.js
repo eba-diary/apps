@@ -26,8 +26,4 @@ var data = new function () {
     this.HelperMethod = function (param1, param2) {
         //logic goes here
     };
-
-    this.RemoveSpinner = function (selector) {
-        $(selector).children('.sentry-spinner-container').remove();
-    }
 }

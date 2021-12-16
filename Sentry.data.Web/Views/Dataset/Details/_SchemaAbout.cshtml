@@ -4,11 +4,10 @@
 
 <div class="row">
     <div class="col-lg-12">
-        <div id="aboutThisSchema" class="@(Model.DisplayTabSections == true ?"visible-item":"hidden-item")">
+        <div id="aboutThisSchema" class="@(Model.DisplayTabSections != true ?"visible-item":"hidden-item")">
             <h3 class="@color">About this Schema</h3>
         </div>
-        <br />
-        <div class="metadataBody container row">
+        <div class="metadataBody container row" style="border: 1px #DDDDDD solid; background: white; padding: 10px;">
             <div class="col-lg-4">
                 <div class="row">
                     <div class="col-lg-12">
