@@ -130,7 +130,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("User", mdl.Revision.CreatedByName);
             Assert.AreEqual("2021-12-15T15:15:00", mdl.Revision.CreatedDTM);
             Assert.AreEqual("2021-12-15T15:15:00", mdl.Revision.LastUpdatedDTM);
-            Assert.AreEqual("Object", mdl.Revision.JsonSchemaObject);
+            Assert.AreEqual(null, mdl.Revision.JsonSchemaObject);
             Assert.IsNotNull(mdl.JsonStructure);
         }
 

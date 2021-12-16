@@ -1,11 +1,12 @@
 {
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "StructureTest",
   "type": "object",
   "properties": {
     "fieldname": {
       "type": "string",
       "maxlength": 1000,
-      "description":  "Field Description"
+      "description": "Field Description"
     }
   }
 }
