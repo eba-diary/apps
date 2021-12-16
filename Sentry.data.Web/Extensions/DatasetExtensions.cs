@@ -20,6 +20,8 @@ namespace Sentry.data.Web
                 DatasetName = model.DatasetName,
                 DatasetDesc = model.DatasetDesc,
                 DatasetInformation = model.DatasetInformation,
+                PrimaryOwnerId = model.PrimaryOwnerId,
+                PrimaryOwnerName = model.PrimaryOwnerName,
                 PrimaryContactId = model.PrimaryContactId,
                 PrimaryContactName = model.PrimaryContactName,
                 CreationUserId = model.CreationUserId,

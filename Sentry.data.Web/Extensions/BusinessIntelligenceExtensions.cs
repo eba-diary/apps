@@ -21,6 +21,7 @@ namespace Sentry.data.Web
                 DatasetFunctionIds = (model.DatasetFunctionIds == null) ? new List<int>() : model.DatasetFunctionIds,
                 DatasetName = model.DatasetName,
                 DatasetDesc = model.DatasetDesc,
+                PrimaryOwnerId = model.PrimaryOwnerId,
                 PrimaryContactId = model.PrimaryContactId,
                 CreationUserId = model.CreationUserId,
                 UploadUserId = model.UploadUserId,

@@ -24,6 +24,11 @@ namespace Sentry.data.Web
             this.DatasetDesc = dto.DatasetDesc;
             this.CreationUserId = dto.CreationUserId;
             this.CreationUserName = dto.CreationUserName;
+            this.PrimaryOwnerId = dto.PrimaryOwnerId;
+            this.PrimaryOwnerName = dto.PrimaryOwnerName;
+            this.PrimaryContactId = dto.PrimaryContactId;
+            this.PrimaryContactName = dto.PrimaryContactName;
+            this.PrimaryContactEmail = dto.PrimaryContactEmail;
             this.IsSecured = dto.IsSecured;
             this.DatasetCategoryIds = dto.DatasetCategoryIds;
             this.TagIds = string.Join(",", dto.TagIds);
@@ -68,6 +73,8 @@ namespace Sentry.data.Web
         [MaxLength(128)]
         [DisplayName("Originating Creator")]
         public string CreationUserId { get; set; }
+        [DisplayName("Owner")]
+        public string PrimaryOwnerName { get; set; }
         [Required]
         [DisplayName("Creation Date")]
         [DataType(DataType.Date)]
@@ -106,6 +113,7 @@ namespace Sentry.data.Web
 
         //hidden properties
         public int DatasetId { get; set; }
+        public string PrimaryOwnerId { get; set; }
         public string PrimaryContactId { get; set; }
         public string PrimaryContactEmail { get; set; }
         public string UploadUserId { get; set; }

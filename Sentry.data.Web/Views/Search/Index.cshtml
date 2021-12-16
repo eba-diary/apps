@@ -194,6 +194,10 @@
                                     <div class="dataset-list-content dataset-detail-content-info">
                                         <div>
                                             <!-- ko ifnot: Type === "RPT" -->
+                                            <div class="SentryOwner col-lg-5 dataset-detail-content-info-row">
+                                                <span class="bold ownerDate" data-bind="css : Color">Sentry Owner:</span>
+                                                <span data-bind="text: SentryOwner"></span>
+                                            </div>
                                             <div class="col-lg-5 dataset-detail-content-info-row">
                                                 <span class=" bold ownerDate" data-bind="css : Color">Last Activity Date:</span>
                                                 <span data-bind="text: ChangedDtm"></span>
@@ -350,6 +354,7 @@
             var self = this;
 
             self.DatasetDesc = data.DatasetDesc;
+            self.SentryOwner = data.SentryOwnerName;
             self.DatasetId = data.DatasetId;
             self.ObjectStatus = data.ObjectStatus;
             self.IsAdmin = data.IsAdmin;
@@ -653,13 +658,46 @@
                         item = v;
                     }
                 });
-                if (item) {
+                if (item !== undefined) {
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
                 self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1, true));
                 temp = [];
+
+
+                //Guarentee order of Owners to ensure filter numbering is consistent
+                //https://stackoverflow.com/a/13359705
+                //pulling all unique category values from observablearray
+                var uniqueOwners = ko.dependentObservable(function () {
+                    var Owners = ko.utils.arrayMap(datasets, function (item) { return item.SentryOwner });
+                    return ko.utils.arrayGetDistinctValues(Owners).sort();
+                })
+                //SENTRYOWNER FILTER
+                for (var item, i = 0; item = uniqueOwners()[i++];) {
+                    var owner = item;
+
+                    if (!(owner in ownerLookup)) {
+                        ownerLookup[owner] = 1;
+                        self.OwnerFilters.push(new data.Search.Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
+
+                        temp.push(new data.Search.Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
+                    }
+
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Sentry Owner') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new data.Search.FilterCategory('Sentry Owner', temp, 2, true));
+                temp = [];
+
 
                 ////EXTENSION FILTER
                 //counter = 0; //Needs seperate counter as multiple objects can appear per iteration
@@ -956,6 +994,30 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
                 self.AllFilters.push(new data.Search.FilterCategory('Business Unit', temp, 2, false));
+
+
+                //SENTRYOWNER FILTER
+                for (var item, i = 0; item = allObjects[i++];) {
+                    var owner = item.SentryOwner;
+
+                    if (!(owner in ownerLookup)) {
+                        ownerLookup[owner] = 1;
+                        self.OwnerFilters.push(new data.Search.Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
+
+                        temp.push(new data.Search.Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
+                    }
+
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Sentry Owner') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new data.Search.FilterCategory('Sentry Owner', temp, 3, true));
                 temp = [];
 
 
@@ -1005,7 +1067,7 @@
                         item = v;
                     }
                 });
-                if (item) {
+                if (item !== undefined) {
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
@@ -1154,6 +1216,9 @@
                             ********************************************/
                             var desc = dataset.DatasetDesc.toString();
                             var name = dataset.DatasetName.toString();
+                            if (!jQuery.isEmptyObject(dataset.SentryOwner)) {
+                                var owner = dataset.SentryOwner.toString();
+                            };
 
                             if (desc.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
                                 keywordFound = true;
@@ -1181,6 +1246,19 @@
                                     count++;
                                 }
                             });
+
+
+                            /*************************
+                             * BI Specific metadata or searches *
+                            **************************/
+                            //Search Owner
+                            //  Only users which can edit reports can see the owner
+                            //  therefore we need to inlucde it only if current user
+                            //  has permissions to edit reports
+                            if (dataset.Type == 'RPT' && dataset.CanEditDataset && !jQuery.isEmptyObject(owner) && owner.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
+                                keywordFound = true;
+                                count++;
+                            }
 
                             //Search Tags
                             if (!jQuery.isEmptyObject(dataset.TagNames)) {
@@ -1229,6 +1307,14 @@
                                     count++;
                                 }
                             }
+
+                            /*****************************
+                             * Dataset Specific metadata or searches *
+                            ******************************/
+                            if (dataset.Type == 'DS' && !jQuery.isEmptyObject(owner) && owner.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
+                                keywordFound = true;
+                                count++;
+                            }
                         }
 
                     if (keywordFound) {
@@ -1251,6 +1337,7 @@
                         type: 'POST',
                         url: '/Search/SearchEvent/' + self.SearchType() +
                             '?categoryFilters=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.CategoryFilters, self.SelectedFilters())) +
+                            '&sentryOwners=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.OwnerFilters, self.SelectedFilters())) +
                             '&extensions=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.ExtensionFilters, self.SelectedFilters())) +
                             '&businessUnits=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.BusinessUnitFilters, self.SelectedFilters())) +
                             '&datasetFunctions=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.DatasetFunctionFilters, self.SelectedFilters())) + 
@@ -1326,7 +1413,7 @@
                                 success: function () {                                    
                                 }
                             });
-                            Sentry.ShowModalAlert(//TODO
+                            Sentry.ShowModalAlert(
                                 "User does not have sufficient permissions to selected file. </br></br>  Contact <b>" + data.SentryOwner + "</b> to request access to exhibit."
                             );
                         }

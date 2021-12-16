@@ -1,9 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.Core;
-using Sentry.data.Core.Entities;
 using Sentry.data.Core.Entities.S3;
-using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,12 +21,11 @@ namespace Sentry.data.Core
         private readonly IAWSLambdaProvider _awsLambdaProvider;
         private readonly IQuartermasterService _quartermasterService;
         private readonly ObjectCache cache = MemoryCache.Default;
-        private readonly ISAIDService _saidService;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
                             UserService userService, IConfigService configService, 
                             ISchemaService schemaService, IAWSLambdaProvider awsLambdaProvider,
-                            IQuartermasterService quartermasterService, ISAIDService saidService)
+                            IQuartermasterService quartermasterService)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -37,7 +34,6 @@ namespace Sentry.data.Core
             _schemaService = schemaService;
             _awsLambdaProvider = awsLambdaProvider;
             _quartermasterService = quartermasterService;
-            _saidService = saidService;
         }
 
 
@@ -175,7 +171,7 @@ namespace Sentry.data.Core
             return datasetsCanQuery;
         }
 
-        public async Task<AccessRequest> GetAccessRequest(int datasetId)
+        public AccessRequest GetAccessRequest(int datasetId)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
 
@@ -191,8 +187,9 @@ namespace Sentry.data.Core
                 ? _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET && x.PermissionCode == GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA).ToList()
                 : _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
 
-            SAIDRole prodCust = await _saidService.GetProdCustByKeyCode(ds.SAIDAssetKeyCode).ConfigureAwait(false);
-            ar.ApproverList.Add(new KeyValuePair<string, string>(prodCust.AssociateId, prodCust.Name + " (Owner)"));
+
+            IApplicationUser primaryUser = _userService.GetByAssociateId(ds.PrimaryOwnerId);
+            ar.ApproverList.Add(new KeyValuePair<string, string>(ds.PrimaryOwnerId, primaryUser.DisplayName + " (Owner)"));
 
             if (!string.IsNullOrWhiteSpace(ds.PrimaryContactId))
             {
@@ -266,6 +263,10 @@ namespace Sentry.data.Core
             if (dto.DatasetDtm > DateTime.MinValue)
             {
                 ds.DatasetDtm = dto.DatasetDtm;
+            }
+            if (null != dto.PrimaryOwnerId && dto.PrimaryOwnerId.Length > 0)
+            {
+                ds.PrimaryOwnerId = dto.PrimaryOwnerId;
             }
             if (null != dto.PrimaryContactId && dto.PrimaryContactId.Length > 0)
             {
@@ -397,6 +398,11 @@ namespace Sentry.data.Core
                 results.Add(Dataset.ValidationErrors.datasetNameDuplicate,"Dataset name already exists within category");
             }
 
+            if (String.IsNullOrWhiteSpace(dto.PrimaryOwnerId))
+            {
+                results.Add(Dataset.ValidationErrors.datasetOwnerRequired, "Owner is required.  Please select SAID Asset and this box will be auto-filled.");
+            }
+
             if (String.IsNullOrWhiteSpace(dto.PrimaryContactId))
             {
                 results.Add(Dataset.ValidationErrors.datasetContactRequired, "Contact is required.");
@@ -449,6 +455,7 @@ namespace Sentry.data.Core
                 DatasetDesc = dto.DatasetDesc,
                 DatasetInformation = dto.DatasetInformation,
                 CreationUserName = dto.CreationUserId,
+                PrimaryOwnerId = dto.PrimaryOwnerId,
                 PrimaryContactId = dto.PrimaryContactId,
                 UploadUserName = dto.UploadUserId,
                 OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), dto.OriginationId),
@@ -494,11 +501,13 @@ namespace Sentry.data.Core
 
         private void MapToDto(Dataset ds, DatasetDto dto)
         {
+            IApplicationUser primaryOwner = _userService.GetByAssociateId(ds.PrimaryOwnerId);
             IApplicationUser primaryContact = _userService.GetByAssociateId(ds.PrimaryContactId);
             IApplicationUser uploader = _userService.GetByAssociateId(ds.UploadUserName);
 
             //map the ISecurable properties
             dto.Security = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+            dto.PrimaryOwnerId = ds.PrimaryOwnerId;
             dto.PrimaryContactId = ds.PrimaryContactId;
             dto.IsSecured = ds.IsSecured;
 
@@ -514,6 +523,7 @@ namespace Sentry.data.Core
 
             dto.CreationUserId = ds.CreationUserName;
             dto.CreationUserName = ds.CreationUserName;
+            dto.PrimaryOwnerName = (primaryOwner != null ? primaryOwner.DisplayName : "Not Available");
             dto.PrimaryContactName = (primaryContact != null ? primaryContact.DisplayName : "Not Available");
             dto.PrimaryContactEmail = (primaryContact != null ? primaryContact.EmailAddress : "");
             dto.UploadUserId = ds.UploadUserName;

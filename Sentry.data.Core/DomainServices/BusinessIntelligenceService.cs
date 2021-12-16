@@ -443,6 +443,7 @@ namespace Sentry.data.Core
             ds.DatasetName = dto.DatasetName;
             ds.DatasetDesc = dto.DatasetDesc;
             ds.CreationUserName = dto.CreationUserId;
+            ds.PrimaryOwnerId = dto.PrimaryOwnerId ?? "000000";
             ds.PrimaryContactId = dto.PrimaryContactId ?? "000000";
             ds.UploadUserName = dto.UploadUserId;
             ds.OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), 1);  //All reports are internal
@@ -490,10 +491,12 @@ namespace Sentry.data.Core
         //could probably be an extension.
         private void MapToDto(Dataset ds, BusinessIntelligenceDto dto)
         {
+            IApplicationUser owner = (ds.PrimaryOwnerId == "000000")? null : _userService.GetByAssociateId(ds.PrimaryOwnerId);
             IApplicationUser contact = (ds.PrimaryContactId == "000000")? null : _userService.GetByAssociateId(ds.PrimaryContactId);
             IApplicationUser uploaded = _userService.GetByAssociateId(ds.UploadUserName);
 
             dto.Security = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+            dto.PrimaryOwnerId = ds.PrimaryOwnerId;
             dto.PrimaryContactId = ds.PrimaryContactId;
             dto.IsSecured = ds.IsSecured;
 
@@ -503,6 +506,7 @@ namespace Sentry.data.Core
             dto.DatasetFunctionIds = ds.DatasetFunctions.Select(x => x.Id).ToList();
             dto.DatasetName = ds.DatasetName;
             dto.DatasetDesc = ds.DatasetDesc;
+            dto.PrimaryOwnerName = (owner != null ? owner.DisplayName : "Not Available");
             dto.PrimaryContactName = (contact != null ? contact.DisplayName : "Not Available");
             dto.PrimaryContactEmail = (contact != null ? contact.EmailAddress : "");
 

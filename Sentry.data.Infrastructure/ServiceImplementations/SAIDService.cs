@@ -31,19 +31,6 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
             return asset;
         }
 
-        public async Task<SAIDRole> GetProdCustByKeyCode(string keyCode)
-        {
-            SAIDAsset asset = await GetAssetByKeyCode(keyCode).ConfigureAwait(false);
-            foreach(SAIDRole role in asset.Roles)
-            {
-                if (role.Role.Equals("Custodian - Production"))
-                {
-                    return role;
-                }
-            }
-            return new SAIDRole();
-        }
-
         public async Task<List<SAIDAsset>> GetAllAssets()
         {
             /* We are caching the list of all SAID assets for two reasons:
