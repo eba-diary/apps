@@ -706,8 +706,8 @@
          </dateline>
          <p>
             Went into town this morning with <persName ref="#Davis_Theodore_M">Theodore</persName> on our donkeys, - to
-             the Indian shop - to the <name type="hotel" ref="#Luxor_Hotel"><choice><sic>Luxer</sic><corr>Luxor</corr></choice> hotel</name>- and
-             various places. Home in the afternoon - a cold, high wind blowing -
+             the Indian shop - to the <name type="hotel" ref="#Luxor_Hotel"><choice><sic>Luxer</sic><corr>Luxor</corr></choice> hotel</name>
+            - and various places. Home in the afternoon - a cold, high wind blowing -
              <persName ref="#Davis_Theodore_M">Theodore</persName> off all day.
          </p>
       </div>
@@ -716,11 +716,12 @@
             <date when="1902-01-10">Friday, Jan. 10</date>.
          </dateline>
          <p>
+            <!-- who is the hennass family -->
             A real gale has been blowing all day - cold, the river is rough waves. I have not been
              off the boat - and we have had our little stoves going. The
              <persName>Hennass</persName> family came to tea - <persName>Father</persName>,
              <persName>Mother</persName> and the two tall girls - also
-             <persName>Mr. Wallis</persName> - and as <persName ref="#Newberry_Percy">Mr. Newberry</persName> was here
+             <persName ref="#Wallis_Mr">Mr. Wallis</persName> - and as <persName ref="#Newberry_Percy">Mr. Newberry</persName> was here
              most of the afternoon we had quite a tea party - and the little saloon seemed very full.
          </p>
       </div>
@@ -734,18 +735,18 @@
              and to have no wind - but hardly had we spoken, when with a sudden blast, the wind
              came cold and strong - however <persName ref="#Davis_Theodore_M">Theodore</persName>,
              <persName ref="#Buttles_Jeanette">Nettie</persName> and I went out
-             to <placeName>Karnac</placeName> - where the dust and sand blew in clouds, paid a
-             visit to <placeName>Mohassib</placeName> and saw some pretty enormously dear things.
-             This is the beginning of <orgName>Bieram</orgName> - and it was nice to see the
+             to <placeName ref="#Karnak">Karnac</placeName> - where the dust and sand blew in clouds, paid a
+             visit to <persName ref="#Mohassib_Mohammed">Mohassib</persName> and saw some pretty enormously dear things.
+             This is the beginning of <name type="event" ref="">Bieram</name> - and it was nice to see the
              people all in their best attire, and the dignified figures walking about in best
              black robes, with many white draperies. All the crew, headed by the Captain came
              this morning to give us the usual <orgName>Beiram</orgName> greetings.
              <persName ref="#Buttles_Jeanette">Nettie</persName> and I stayed at home this afternoon.
-             <persName ref="#Davis_Theodore_M">Theodore</persName> at <placeName>Der el Bahari</placeName> and brought
-             home <persName>Carter</persName> for dinner. <persName ref="#Newberry_Percy">Newberry</persName> also here.
+             <persName ref="#Davis_Theodore_M">Theodore</persName> at <placeName ref="#Der_el_Bahari">Der el Bahari</placeName> and brought
+             home <persName ref="#Carter_Howard">Carter</persName> for dinner. <persName ref="#Newberry_Percy">Newberry</persName> also here.
              Our lovely little new moon was seen for the first time tonight.
              <persName ref="#Buttles_Jeanette">Nettie</persName> and I at tea with <persName ref="#Tytus_Mrs">Mrs. Tytus</persName>,
-             <persName>Lady Dunmore</persName> and 2 girls - such typical
+             <persName ref="#Dunmore_Lady">Lady Dunmore</persName> and 2 girls - such typical
              English Women of a certain kind.
          </p>
       </div>
@@ -754,8 +755,8 @@
             <date when="1902-01-13">Monday, Jan. 13</date>.
          </dateline>
          <p>
-            This morning <persName ref="#von_Bissing_Baron">v. Bissing</persName> went to <placeName>El Kab</placeName> to
-             spend a few days with <persName>Mr. Somers- Clarke</persName>. Soon after lunch
+            This morning <persName ref="#von_Bissing_Baron">v. Bissing</persName> went to <placeName ref="#El_Kab">El Kab</placeName> to
+             spend a few days with <persName ref="#Somers_Clarke_George">Mr. Somers- Clarke</persName>. Soon after lunch
              <persName ref="#Davis_Theodore_M">Theodore</persName>, <persName ref="#Buttles_Jeanette">
             Nettie</persName> and I rode over to the palace to see what was
              going on at the diggings. <persName ref="#Jones_Daniel">Jones</persName> and the tea basket went along.
@@ -767,13 +768,13 @@
             <date when="1902-01-14">Tuesday, Jan. 14</date>.
          </dateline>
          <p>
-            A cold wind today. The Parkers from the dahabeah <placeName>Sa</placeName> &#8216;fa
-             which they have just bought came this morning to pay us a visit - much interested in
-             our boat, as they are obliged to quite do over theirs next year.
+            A cold wind today. <persName ref="#Parker_Group">The Parkers</persName> from the dahabeah
+            <name type="boat" ref="#Safa">Sa &#8216;fa</name> which they have just bought came this
+             morning to pay us a visit - much interested in our boat, as they are obliged to quite do over theirs next year.
              <persName ref="#Davis_Theodore_M">Theodore</persName> and <persName ref="#Buttles_Jeanette">Nettie</persName> went over to
              <placeName ref="#Medinet_Habu">Medinet Habu</placeName> and then on to the palace this afternoon - but
-             I would not go in this furious wind. <persName>Maspero,</persName> on the
-             <persName>Miriam</persName>, arrived down today.
+             I would not go in this furious wind. <persName ref="#Maspero_Gaston">Maspero</persName>, on the
+             <name type="boat" ref="#Miriam">Miriam</name>, arrived down today.
          </p>
       </div>
       <div xml:id="EBA-1902-01-15" type="entry">
@@ -781,9 +782,10 @@
             <date when="1902-01-15">Wednesday, Jan. 15</date>.
          </dateline>
          <p>
-            <persName>Prof. Goodwin</persName> and his wife of <name>Harvard</name> came to lunch
-             today. <persName ref="#Newberry_Percy">Newberry</persName> and <persName>Carter</persName> to dinner, and
-             played bridge all the evening. <persName>
+            <!-- do we think his wife the same Mrs. Goodwin from Boston already in the indices? if not, what should i tag it as?-->
+            <persName ref="#Goodwin_Prof">Prof. Goodwin</persName> and his wife of Harvard came to lunch
+             today. <persName ref="#Newberry_Percy">Newberry</persName> and <persName ref="#Carter_Howard">Carter</persName> to dinner, and
+             played bridge all the evening. <persName ref="#Maspero_Gaston #Maspero_Louise">
             M. and Mme. Maspero</persName> made us a long call in the afternoon. Still very cold
              and high wind, the boat rocking a good deal.
          </p>
@@ -793,8 +795,8 @@
             <date when="1902-01-16">Thursday, Jan. 16</date>.
          </dateline>
          <p>
-            At home all day - because of the wind. <persName>Mlle. de Deak</persName>, and
-             <persName>Miss Culbord</persName> came to tea. The <persName ref="#von_Bissing_Baron">Baron</persName> came
+            At home all day - because of the wind. <persName ref="#de_Deak_Mlle">Mlle. de Deak</persName>, and
+             <persName ref="#Culbord_Miss">Miss Culbord</persName> came to tea. The <persName ref="#von_Bissing_Baron">Baron</persName> came
              home this afternoon.
          </p>
       </div>
@@ -805,36 +807,36 @@
          <p>
             Again the same account. I have never known <placeName ref="#Luxor">Luxor</placeName> like this.
              Every morning the ther. goes down to 50-52&#176; in my room and we have had no life
-             on deck since we came. Our little stoves in daily use. <persName>Carter</persName>
+             on deck since we came. Our little stoves in daily use. <persName ref="#Carter_Howard">Carter</persName>
              dined with us - always so pleasant - in spite of his dominant personality. His taste
              for all natural things is so charming to me and how he draws and paints. He is very
              much absorbed now in trying to bring on the trial of the thief who broke into the
-             tomb, and robbed the body of the great <persName>Amenhotep III.</persName> The
+             tomb, and robbed the body of the great <persName ref="#Amenhotep_III">Amenhotep III</persName>. The
              administration of justice is in this country administered in a very funny and
              desultory fashion. The thief of whose identity everyone is convinced, is at large on
              bail at the magnificent sum of [symbol] 1 and the film gaffirs, or watchmen who are
              suspected of complicity, are contentedly reposing in prison having now no work to do,
-             and more to eat than they usually have and although <persName>Carter</persName> has
+             and more to eat than they usually have and although <persName ref="#Carter_Howard">Carter</persName> has
              offered [symbol] 100 to anyone who will tell him the truth, the natives stand in
              such fear of each other that they all swear total ignorance.
-             <persName>Carter,</persName> who is Inspector of <placeName>Upper Egypt</placeName>
+             <persName ref="#Carter_Howard">Carter</persName>, who is Inspector of <placeName ref="#As_Said">Upper Egypt</placeName>
              has proved himself a most efficient officer - is absolutely fearless - carries no
              arms - and rides about quite unattended at all hours of the night.
              <persName ref="#Sayce_Archibald">Sayce</persName> and his friends <persName ref="Ward_Mr">Mr. Ward</persName> dined also
              with us. I think we were all a little tired - for directly after breakfast we had
-             started over to the <orgName>Tombs of the Kings</orgName> &amp; I in my chair - in which
+             started over to the <placeName ref="#Bībān al-Mulūk">Tombs of the Kings</placeName> &amp; I in my chair - in which
              I have had so comfortable a ride, as both donkeys went so well. It proved to be
              rather a bad day for the expedition, for the wind grew violent, and as 2 steamers
              were in port, we had two parties of tourists there - and every available lunch place
-             being in use, <persName>Carter</persName> gave us permission to have our lunch table
+             being in use, <persName ref="#Carter_Howard">Carter</persName> gave us permission to have our lunch table
              spread just behind the grille of the tomb now decided I believe to have been that of
-             <persName>Ramses IV</persName> where in great privacy and comfort we ate it; first,
-             however, going with <persName>Maspero</persName> and <persName>Carter</persName>
-             into the raided <placeName>Amenhotep III</placeName> tomb - what a sad change we
-             found! It has not been shown since the robbery, and <persName>M. Maspero</persName>
+             <persName ref="#Rameses_IV">Ramses IV</persName> where in great privacy and comfort we ate it; first,
+             however, going with <persName ref="#Maspero_Gaston">Maspero</persName> and <persName ref="#Carter_Howard">Carter</persName>
+             into the raided <persName ref="#Amenhotep_III">Amenhotep III</persName> tomb - what a sad change we
+             found! It has not been shown since the robbery, and <persName ref="#Maspero_Gaston">M. Maspero</persName>
              was to make his official examination of the body. No one but
-             <persName>Carter</persName> and the head police officer had been in it. On his
-             first visit <persName>Carter</persName> found certain footprints belonging to one
+             <persName ref="#Carter_Howard">Carter</persName> and the head police officer had been in it. On his
+             first visit <persName ref="#Carter_Howard">Carter</persName> found certain footprints belonging to one
              pair of feet, which he instantly photographed, and on reaching home found they
              agreed perfectly with photos he had lately taken of suspected foot prints in
              another raided tomb - and on an official examination of the suspected man, these
@@ -846,11 +848,11 @@
              the entrance, and to the light of day and fresh air - and then waited until the
              men had finished their examination. They reported that not the slightest thing of
              value - no inscription remained. That the king was quite majestic - reminding one
-             of <persName>Ramses II</persName> - that his hair was brown, and parted in the
-             middle! After lunch, <persName>Maspero</persName> and <persName>Carter</persName>
+             of <persName ref="#Rameses_II">Ramses II</persName> - that his hair was brown, and parted in the
+             middle! After lunch, <persName ref="#Maspero_Gaston">Maspero</persName> and <persName ref="#Carter_Howard">Carter</persName>
              walked about with <persName ref="#Davis_Theodore_M">Theodore</persName> to fix upon the site of an
-             exploration, which <persName ref="#Davis_Theodore_M">Theodore</persName> under <persName>Carter</persName>
-             is to make in the Valley of the Tombs. The sky was threatening, and we then started
+             exploration, which <persName ref="#Davis_Theodore_M">Theodore</persName> under <persName ref="#Carter_Howard">Carter</persName>
+             is to make in the <placeName ref="#Bībān al-Mulūk">Valley of the Tombs</placeName>. The sky was threatening, and we then started
              for home. On coming out of the valley with its sheltering mountains we found a
              raging wind, the plain all one cloud of dust and sand, and
              <placeName ref="#Luxor">Luxor</placeName> hardly visible. We came home rapidly - how horrid it
@@ -870,14 +872,14 @@
       </div>
       <div xml:id="EBA-1902-01-19" type="entry">
          <dateline>
-            <date when="1902-01-19">Second Sunday after Epiphany, Jan. 19</date>.
+            <date when="1902-01-19">Second Sunday after <name type="event" ref="#Epiphany">Epiphany</name>, Jan. 19</date>.
          </dateline>
          <p>
-            Again cold and windy - I went with <persName>Amelie</persName> to the little church -
+            Again cold and windy - I went with <persName ref="#Burgnoyne_Amelie">Amelie</persName> to the little church -
              and heard a short, good sermon from <persName ref="#Sayce_Archibald">Mr. Sayce</persName>. I would have
              liked my fur cloak. <persName ref="#Newberry_Percy">Newberry</persName> came in the afternoon and stayed
-             to tea. <persName>Dr. Schweinfurt</persName> and the
-             <persName ref="#Tytus_Bob">Bob Tytus</persName> - and <persName>Mr. Wallace</persName> came in.
+             to tea. <persName ref="#Schewinfurt_Dr">Dr. Schweinfurt</persName> and the
+             <persName ref="#Tytus_Bob">Bob Tytus</persName> - and <persName ref="#Wallace_Mr">Mr. Wallace</persName> came in.
          </p>
       </div>
       <div xml:id="EBA-1902-01-20" type="entry">
@@ -888,13 +890,11 @@
             At home writing letters all the morning. Early in the afternoon we crossed and went to
              the palace - <persName ref="#Davis_Theodore_M">Theodore</persName> and
              <persName ref="#von_Bissing_Baron">v. Bissing</persName> going
-             first to <placeName ref="#Medinet_Habu">Medinet Habu</placeName> to meet <persName>Prof. Lyon</persName>
-             and his wife. They came to our tent and had tea. For we have a big double tent
+             first to <placeName ref="#Medinet_Habu">Medinet Habu</placeName> to meet <persName ref="#Lyon_David_Gordon">Prof. Lyon</persName>
+             and his <persName ref="#Lyon_Mrs">wife</persName>. They came to our tent and had tea. For we have a big double tent
              spread at the edge of the desert, we have a table, chairs, 2 good skeleton lounges
-             with mats and rugs - and a wooden floor. The <persName>Lyons</persName> were
-             delighted, - a most lovely ride home. <persName>(I</persName> put a page break here,
-             because I think the diary pages got mixed up) turning suddenly - vivid lightning.
-             We have been in doors all day.
+             with mats and rugs - and a wooden floor. The <persName ref="#Lyon_David_Gordon #Lyon_Mrs">Lyons</persName> were
+             delighted, - a most lovely ride home.
          </p>
       </div>
       <div xml:id="EBA-1902-01-21" type="entry">
@@ -903,7 +903,7 @@
          </dateline>
          <p>
             The best day we have had since we came - almost free from wind. The
-             <persName>Lyons</persName> came to lunch - <persName ref="#Davis_Theodore_M">Theodore</persName>
+            <persName ref="#Lyon_David_Gordon #Lyon_Mrs">Lyons</persName> came to lunch - <persName ref="#Davis_Theodore_M">Theodore</persName>
              and <persName ref="#von_Bissing_Baron">v. Bissing</persName> went after lunch to the palace - and
              <persName ref="#Buttles_Jeanette">Nettie</persName> and I had one of our old fashioned teas on
              deck. <persName ref="#Newberry_Percy">Newberry</persName> to dinner - and we had such a merry
@@ -921,10 +921,10 @@
          <p>
             A beautiful and busy day at home - until at 5 o'clock <persName ref="#Buttles_Jeanette">Nettie</persName>
              and I took a walk along the high path leading back in the pretty country near us. A
-             superb sunset and lovely effects - met <persName>Mr. Wallace</persName>
+             superb sunset and lovely effects - met <persName ref="#Wallace_Mr">Mr. Wallace</persName>
              coming home from his walk and we stopped at the <name type="boat" ref="#Scarab">Scarab</name> for a
              little visit. <persName ref="#Buttles_Jeanette">Nettie</persName> dined there. Nothing more
-             beautiful than <persName>Venus</persName> now and our full moon.
+             beautiful than Venus now and our full moon.
          </p>
       </div>
       <div xml:id="EBA-1902-01-23" type="entry">
@@ -943,7 +943,7 @@
          </dateline>
          <p>
             At home all day - cold wind - <persName ref="#Davis_Theodore_M">Theodore</persName> went over to
-             the palace this afternoon, and took tea for <persName>Prof.
+             the palace this afternoon, and took tea for <persName ref="#Goodwin_Prof">Prof.
              Goodwin</persName> and wife.
          </p>
       </div>
@@ -956,7 +956,8 @@
              and I went over to <placeName>Sheik Abd el Kurnah</placeName> this afternoon
              to meet <persName ref="#Newberry_Percy">Newberry</persName> - found him with the
              <name>Ogden party</name> at the tomb of <orgName>Rek-ma-ra</orgName>.
-             Then we took our tea to <persName>Carter</persName>'s house, he being away,
+             Then we took our tea to <persName ref="#Carter_Howard">Carter</persName>'s
+             <placeName ref="#Castle_Carter">house</placeName>, he being away,
              and had tea on his verandah. It was lovely - and all came home together.
          </p>
       </div>
@@ -1018,10 +1019,10 @@
          </dateline>
          <p>
             <persName>Mr. and Mrs. Phillips Schuyler</persName>, <persName>Mrs. Frank
-             Millet</persName>, <persName>Mr. Carter</persName> and
+             Millet</persName>, <persName ref="#Carter_Howard">Mr. Carter</persName> and
              <persName>Cadwallader,</persName> all on their private steamer "<name>Oonas</name>",
              took tea with us and <persName>Dr. Roundtree</persName> dined with us.
-             <persName>Carter</persName> lunched with us.
+             <persName ref="#Carter_Howard">Carter</persName> lunched with us.
          </p>
       </div>
       <div xml:id="EBA-1902-01-31" type="entry">
@@ -1032,7 +1033,7 @@
             A lovely warm day. <persName ref="#Buttles_Jeanette">Nettie</persName> and I went over early to the palace,
              and spent a quiet day in our tent. <persName ref="#Davis_Theodore_M">Theodore</persName> had the
              <persName ref="#Quibell_James #Quibell_Annie_Pirie">Quibells</persName> to lunch, and then brought them over to
-             <persName>Der el Bahari</persName> for tea, where
+             <placeName ref="#Der_el_Bahari">Der el Bahari</placeName> for tea, where
              <persName ref="#Buttles_Jeanette">Nettie</persName> and I joined them.
          </p>
       </div>
@@ -1048,12 +1049,13 @@
       </div>
       <div xml:id="EBA-1902-02-02" type="entry">
          <dateline>
-            <date when="1902-02-02">Sexigesima Sunday, Feb. 2</date>.
+            <date when="1902-02-02"><choice><sic>Sexigesima</sic><corr><name type="event" ref="#Sexagesima">Sexagesima</name></corr></choice>
+               Sunday, Feb. 2</date>.
          </dateline>
          <p>
             Another lovely day of occupation on deck. <persName ref="#Newberry_Percy">Newberry</persName>
              lunched with us, and <persName ref="#Davis_Theodore_M">Theodore</persName> afterwards
-             rode to <placeName>Karnak</placeName>.
+             rode to <placeName ref="#Karnak">Karnak</placeName>.
          </p>
       </div>
       <div xml:id="EBA-1902-02-03" type="entry">
@@ -1102,7 +1104,7 @@
              went over quite early this morning to <persName>Abd el Kurnah</persName> to see
              the private tombs under <persName ref="#Newberry_Percy">Newberry</persName> and to lunch with him -
              and <persName ref="#Davis_Theodore_M">Theodore</persName> and I went across the river at 3:30 with
-             the tea basket to <placeName>Carter</placeName>'s house - where the rest
+             the tea basket to <persName ref="#Carter_Howard">Carter</persName>'s <placeName ref="#Castle_Carter">house</placeName> - where the rest
              joined us - and we all rode home together - the warmest day we have had for weeks.
          </p>
       </div>
@@ -1156,13 +1158,13 @@
          </dateline>
          <p>
             We started with quite a good wind at 7 o'clock this morning - and drew up at
-             <placeName>El Kab</placeName> just as we were finishing lunch. Found the
+             <placeName ref="#El_Kab">El Kab</placeName> just as we were finishing lunch. Found the
              <name type="boat" ref="#Istar">Istar</name> here, on her downward journey, as well as
              <orgName>Parker's</orgName> boat the <name type="boat" ref="#Safa">Sa &#8216;fa</name>.
-             <persName>Mr. Somers-Clarke</persName> came over at once, bringing some letters
+             <persName ref="#Somers_Clarke_George">Mr. Somers-Clarke</persName> came over at once, bringing some letters
              for <persName ref="#Quibell_James">Mr. Quibell</persName>, which determined him to leave us and return
              to <placeName ref="#Cairo">Cairo</placeName> the next day. So he went over to stay with
-             <persName>Somers-Clarke</persName> the night. So sorry to have him go
+             <persName ref="#Somers_Clarke_George">Somers-Clarke</persName> the night. So sorry to have him go
              - <persName ref="#Sayce_Archibald">Mr. Sayce</persName> also came and made us a visit - and wanted us
              to stop for tea - but the wind was too good - we are about 3 miles above
              <persName>Edfou.</persName>
@@ -1303,20 +1305,20 @@
       </div>
       <div xml:id="EBA-1902-02-17" type="entry">
          <dateline>
-            <placeName>El Kab</placeName>. <date when="1902-02-17">Monday, Feb. 17</date>. 15-1/2 miles.
+            <placeName ref="#El_Kab">El Kab</placeName>. <date when="1902-02-17">Monday, Feb. 17</date>. 15-1/2 miles.
          </dateline>
          <p>
             Arrived at 10:30 this morning - a very hot day - the hottest I have ever known on the
-             <placeName ref="#Nile">Nile</placeName>. <persName>The Parkers</persName>,
-             <persName ref="#Sayce_Archibald">Mr. Sayce</persName>, and <persName>Mr. Somers-Clarke</persName> called.
+             <placeName ref="#Nile">Nile</placeName>. <persName ref="#Parker_Group">The Parkers</persName>,
+             <persName ref="#Sayce_Archibald">Mr. Sayce</persName>, and <persName ref="#Somers_Clarke_George">Mr. Somers-Clarke</persName> called.
              We went to tea with <persName ref="#Sayce_Archibald">Mr. Sayce</persName> and then visited the
-             <persName>Parkers</persName> on the <name type="boat" ref="#Safa">Sa &#8216;fa</name> - and
+             <persName ref="#Parker_Group">Parkers</persName> on the <name type="boat" ref="#Safa">Sa &#8216;fa</name> - and
              <placeName>Mr. S.C.</placeName> and <persName ref="#Sayce_Archibald">Sayce</persName> dined with us - a
              very pleasant evening - and after dinner we sat on deck without an awning - with no
              wraps and found the still, dry, warm air delicious - we saw nothing of
-             <name>El Kab</name> - the day was too hot. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> showed
+             <placeName ref="#El_Kab">El Kab</placeName> - the day was too hot. <persName ref="#Sayce_Archibald">Mr. Sayce</persName> showed
              us some most interesting little amulets - prehistoric he said - they certainly had the
-             name of <orgName>Neb-ka-</orgName> first king of the 3d dynasty.
+             name of <persName ref="#Neb-ka">Neb-ka</persName>- first king of the 3d dynasty.
          </p>
       </div>
       <div xml:id="EBA-1902-02-18" type="entry">
@@ -1335,7 +1337,7 @@
          </dateline>
          <p>
             Reached <placeName ref="#Luxor">Luxor</placeName> at 10:30 A.M. 4 days and a quarter from
-             <placeName>Aswan</placeName> - counting our stop at <placeName>El Kab</placeName>
+             <placeName>Aswan</placeName> - counting our stop at <placeName ref="#El_Kab">El Kab</placeName>
              <persName ref="#Davis_Theodore_M">Theodore</persName> went across to <placeName>Carter</placeName>'s
              this afternoon.
          </p>
@@ -1347,7 +1349,7 @@
          <p>
             <persName ref="#Davis_Theodore_M">Theodore</persName>, <persName ref="#Buttles_Jeanette">Nettie</persName> and I went across to
              the <placeName>Palace</placeName> this afternoon and took tea.
-             <persName ref="#Newberry_Percy">Newberry</persName> joined us. <persName>Carter</persName> lunched with
+             <persName ref="#Newberry_Percy">Newberry</persName> joined us. <persName ref="#Carter_Howard">Carter</persName> lunched with
              us and is staying with us.
          </p>
       </div>
@@ -1357,9 +1359,9 @@
          </dateline>
          <p>
             <persName ref="#Davis_Theodore_M">Theodore</persName> and I dined this evening with <persName ref="#Tytus_Mrs">Mrs.
-             Tytus</persName>. <persName>Mr. Carter</persName> is still with us. The Crown Prince
+             Tytus</persName>. <persName ref="#Carter_Howard">Mr. Carter</persName> is still with us. The Crown Prince
              of <name>Siam</name> with his suite arrived in <placeName ref="#Luxor">Luxor</placeName> today
-             - and <persName>Carter</persName> is obliged to dance attendance upon him, in
+             - and <persName ref="#Carter_Howard">Carter</persName> is obliged to dance attendance upon him, in
              his official character.
          </p>
       </div>
@@ -1368,7 +1370,8 @@
             <date when="1902-02-22">Saturday, Feb. 22</date>.
          </dateline>
          <p>
-            Every one else went over to <persName>Carter</persName>'s house this afternoon to see
+            Every one else went over to <persName ref="#Carter_Howard">Carter</persName>'s
+             <placeName ref="#Castle_Carter">house</placeName> this afternoon to see
              two mummies <persName ref="#Newberry_Percy">Mr. Newberry</persName> found in one of the tombs he is
              excavating for <persName ref="#Davis_Theodore_M">Theodore</persName>. It was so hot, and the idea of a
              mummy did not allure me. <persName ref="#Tytus_Mrs">Mrs. Tytus</persName>, <persName ref="#Tytus_Bob">Bob</persName>,
@@ -1385,7 +1388,7 @@
              air. We began the day with <persName ref="#Newberry_Percy">Mr. Newberry</persName> to breakfast, and he
              stayed all the morning and to lunch. The rest of the family, <persName>Mr.
              and Mrs. Gardiner</persName>, and <persName>Miss Appleby</persName> also lunched
-             with us. <persName>Miss Lamb</persName> and <persName>Mrs. Goodwin</persName>
+             with us. <persName>Miss Lamb</persName> and <persName ref="#Goodwin_Mrs">Mrs. Goodwin</persName>
              came to tea - and <persName ref="#Newberry_Percy">Newberry</persName> to dinner - a pleasant evening -
              but I am very tired.
          </p>
@@ -1396,7 +1399,7 @@
          </dateline>
          <p>
             A day of wind and sand. Did not stir from the boat, though <persName ref="#Davis_Theodore_M">Theodore
-            </persName> went across to <persName>Carters</persName> to tea.
+            </persName> went across to <placeName>Carters</placeName> to tea.
          </p>
       </div>
       <div xml:id="EBA-1902-02-25" type="entry">
@@ -1405,9 +1408,9 @@
          </dateline>
          <p>
             <persName ref="#Davis_Theodore_M">Theodore</persName> and <persName ref="#Buttles_Jeanette">Nettie</persName> went across to the
-             <placeName>Tombs of the Kings</placeName>, and met <persName>Carter</persName> and
+             <placeName>Tombs of the Kings</placeName>, and met <persName ref="#Carter_Howard">Carter</persName> and
              <persName ref="#Newberry_Percy">Newberry</persName> and <persName>Mr. Varley</persName> for lunch, and to
-             open the tomb <persName>Mr. Carter</persName>'s workmen have been busy with for
+             open the tomb <persName ref="#Carter_Howard">Mr. Carter</persName>'s workmen have been busy with for
              some days which he is opening for <persName ref="#Davis_Theodore_M">Theodore</persName>. A great deal had
              been expected of this tomb. But it was found to be quite full of water - and the
              beautiful coffin had quite mouldered, as well as the mummy. Fragments of very fine
@@ -1437,7 +1440,7 @@
             A very warm morning - <persName ref="#Buttles_Jeanette">Nettie</persName> and I went
             over to the <name type="boat" ref="#Istar">Istar</name> to
             see <persName ref="#Sayce_Archibald">Mr. Sayce</persName> - who is a prisoner with a bad foot. He
-             fell down the shaft of one of his 12 dynasty tombs at <placeName>El Kab</placeName> the
+             fell down the shaft of one of his 12 dynasty tombs at <placeName ref="#El_Kab">El Kab</placeName> the
             other day, and is now in the doctor's hands. Then we stopped at the <name type="boat" ref="#Scarab">
             Scarab</name> to see <persName ref="#Tytus_Mrs">Mrs. Tytus</persName>. The wind was strong
              and air delicous as we rowed up the river again - but as we left the <name type="boat" ref="#Scarab">
@@ -1447,10 +1450,10 @@
             Oonas</name> with the <orgName>Schuylers</orgName> on board, we saw them smothered
              in dust and sand - and soon after we got home, the <persName>Oonas</persName> came
              up the river and stopped just in front of us, at 4 o'clock this afternoon we went
-             across to have tea with <persName>Carter</persName> - such a pleasant visit -
+             across to have tea with <persName ref="#Carter_Howard">Carter</persName> - such a pleasant visit -
              <persName ref="#Newberry_Percy">Newberry</persName> was there - we had tea as usual on the terrace
              and the young donkey <orgName>San Toy</orgName> was roaming about the compound
-             - and much interested in us. <persName>Carter</persName> showed us some of his
+             - and much interested in us. <persName ref="#Carter_Howard">Carter</persName> showed us some of his
              beautiful drawings before we left. It was past 6 o'clock when we reached home, and
              <persName>Miss Buchanan</persName> was here - and we settled about
              <persName ref="#Nubia">Nubia</persName> - who after 3 weeks now at school shows such
@@ -1467,8 +1470,8 @@
             We were to go to the <placeName>Murches</placeName> to tea this afternoon, but
              there was such a gale blowing that we gave it up, and sent excuses. <persName ref="#Tytus_Mrs">
             Mrs. Tytus</persName> and <persName ref="#Tytus_Bob">Bob</persName> were here to tea.
-             <persName>Mr. Carter</persName> and <persName ref="#Newberry_Percy">Newberry</persName> here to
-             dinner. <persName>Mr. Schuyler</persName> called. <persName>Carter</persName>
+             <persName ref="#Carter_Howard">Mr. Carter</persName> and <persName ref="#Newberry_Percy">Newberry</persName> here to
+             dinner. <persName>Mr. Schuyler</persName> called. <persName ref="#Carter_Howard">Carter</persName>
              stayed all night.
          </p>
       </div>
@@ -1915,7 +1918,7 @@
             Mary</persName> and <persName>Clarence</persName> were with us.
              The house is much improved, and gardens in beautiful order. <persName ref="#Newberry_Percy">
             Newberry</persName> and <persName ref="#Tytus_Bob">Bob Tytus</persName> came to dinner -
-             <persName>Carter</persName> was also dining here with <persName>
+             <persName ref="#Carter_Howard">Carter</persName> was also dining here with <persName>
             Lady William Cecil</persName>.
          </p>
       </div>
@@ -1930,7 +1933,7 @@
              boat getting into covers and closets, and all kinds of packing.
              <persName>Mr. and Mrs. Newman</persName> are at <name type="hotel" ref="#Shepheards_Hotel">
             Shepheards</name>, going off to <placeName ref="#Florence">Florence</placeName> tomorrow.
-             <persName>Carter</persName> dined with us. <persName ref="#Newberry_Percy">Newberry</persName>
+             <persName ref="#Carter_Howard">Carter</persName> dined with us. <persName ref="#Newberry_Percy">Newberry</persName>
              and <persName>Tytus</persName> came to say goodbye.
          </p>
       </div>
@@ -1965,7 +1968,7 @@
          <p>
             A very busy day - a most delicious cool air. We lunched with the charming
              <persName>Mrs. Goff</persName> - who among others, also had
-             <persName>Carter</persName> - who poor man goes back to <placeName ref="#Luxor">
+             <persName ref="#Carter_Howard">Carter</persName> - who poor man goes back to <placeName ref="#Luxor">
             Luxor</placeName> tomorrow for his lonely summer.
              <persName ref="#Sandwith_Dr #Sandwith_Mrs">Dr. and Mrs. Sandwith</persName> dined with us
              and a charming evening. Ready for our departure tomorrow.
@@ -1984,7 +1987,7 @@
              <persName>the Dervish</persName>, <persName>Abdul</persName>,
              and many others waiting for us at the station. <persName ref="#von_Bissing_Baron">
             V. Bissing</persName>, <persName>Weigall</persName>, and
-             <persName>Carter</persName> also came - and <persName>
+             <persName ref="#Carter_Howard">Carter</persName> also came - and <persName>
             Mr. Bachler</persName> - reached <placeName>Port Said</placeName>
              at 6:30 P.M. and rowed out to the <placeName>P. &amp; O.</placeName>
              <name>SS. Isis</name>, looking so pretty and trim - not many passengers -
