@@ -827,7 +827,27 @@ data.Dataset = {
         //saidAsset onChange needs to update #PrimaryOwnerName and #PrimaryOwnerId based on saidAsset picked
         $("#saidAsset").change(function () {
 
+            //GET SAID ASSET FROM DROPDOWN
+            var assetKeyCode = $("#saidAsset").val();
 
+            //Send the JSON array to Controller using AJAX.
+            $.ajax({
+                type: "POST",
+                url: "/Dataset/GetOwner",
+                traditional: true,
+                data: JSON.stringify({ assetKeyCode: assetKeyCode }),
+                contentType: "application/json",
+                success: function (r) {
+                    $("#PrimaryOwnerName").val(r.primaryOwnerName);
+                    $("#PrimaryOwnerId").val(r.primaryOwnerId);
+                },
+                failure: function () {
+                    data.Dale.makeToast("error", "Error retrieving SAID Primary Owner.");
+                },
+                error: function () {
+                    data.Dale.makeToast("error", "Error retrieving SAID Primary Owner.");
+                }
+            });
 
             //Load the named environments for the selected asset
             Sentry.InjectSpinner($("div#DatasetFormContent #namedEnvironmentSpinner"), 30);

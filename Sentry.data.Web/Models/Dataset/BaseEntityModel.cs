@@ -24,9 +24,6 @@ namespace Sentry.data.Web
             this.DatasetDesc = dto.DatasetDesc;
             this.CreationUserId = dto.CreationUserId;
             this.CreationUserName = dto.CreationUserName;
-            this.PrimaryContactId = dto.PrimaryContactId;
-            this.PrimaryContactName = dto.PrimaryContactName;
-            this.PrimaryContactEmail = dto.PrimaryContactEmail;
             this.IsSecured = dto.IsSecured;
             this.DatasetCategoryIds = dto.DatasetCategoryIds;
             this.TagIds = string.Join(",", dto.TagIds);
