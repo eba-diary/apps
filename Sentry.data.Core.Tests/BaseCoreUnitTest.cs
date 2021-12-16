@@ -1,8 +1,10 @@
-﻿using Rhino.Mocks;
+﻿using Newtonsoft.Json.Linq;
+using Rhino.Mocks;
 using Sentry.FeatureFlags;
 using Sentry.FeatureFlags.Mock;
 using StructureMap;
 using System;
+using System.IO;
 
 namespace Sentry.data.Core.Tests
 {
@@ -38,6 +40,14 @@ namespace Sentry.data.Core.Tests
         protected void TestCleanup()
         {
             _container.Dispose();
+        }
+
+        protected JObject GetData(string fileName)
+        {
+            using (StreamReader rdr = new StreamReader($@"ExpectedJSON\{fileName}"))
+            {
+                return JObject.Parse(rdr.ReadToEnd().Replace("\r\n", string.Empty));
+            }
         }
 
         public class MockDataFeatures : IDataFeatures

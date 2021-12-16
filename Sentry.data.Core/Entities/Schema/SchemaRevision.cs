@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sentry.data.Core
 {
@@ -21,5 +23,19 @@ namespace Sentry.data.Core
         public virtual int SchemaStruct_Id { get; set; }
         public virtual IList<BaseField> Fields { get; set; }
         public virtual string JsonSchemaObject { get; set; }
+
+        public virtual JObject ToJsonStructure()
+        {
+            JObject structure = new JObject()
+            {
+                { "$schema", "http://json-schema.org/draft-04/schema#" },
+                { "title", SchemaRevision_Name },
+                { "type", "object" }
+            };
+
+            structure.AddJsonStructureProperties(Fields.Where(x => x.ParentField == null));
+
+            return structure;
+        }
     }
 }
