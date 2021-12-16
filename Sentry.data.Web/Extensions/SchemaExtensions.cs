@@ -241,11 +241,16 @@ namespace Sentry.data.Web
 
         public static SchemaRevisionJsonStructureModel ToModel(this SchemaRevisionJsonStructureDto dto)
         {
-            return new SchemaRevisionJsonStructureModel()
+            SchemaRevisionJsonStructureModel mdl = new SchemaRevisionJsonStructureModel()
             {
                 Revision = dto.Revision?.ToModel(),
                 JsonStructure = dto.JsonStructure
             };
+
+            //setting to null because would be duplicating what is in JsonStructure
+            mdl.Revision.JsonSchemaObject = null;
+
+            return mdl;
         }
     }
 }

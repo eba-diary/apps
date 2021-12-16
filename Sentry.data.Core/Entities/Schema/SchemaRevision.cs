@@ -28,6 +28,7 @@ namespace Sentry.data.Core
         {
             JObject structure = new JObject()
             {
+                { "$schema", "http://json-schema.org/draft-04/schema#" },
                 { "title", SchemaRevision_Name },
                 { "type", "object" }
             };
