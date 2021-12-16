@@ -375,6 +375,7 @@ namespace Sentry.data.Web.Controllers
             if(dto != null)
             {
                 DatasetDetailModel model = new DatasetDetailModel(dto);
+                model.DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue();
                 switch (tab)
                 {
                     case ("SchemaColumns"):

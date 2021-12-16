@@ -583,9 +583,9 @@ data.Dataset = {
     },
 
     renderDataPreview: function () {
-
-
-
+        if ($("#datasetRowTable_filter").length > 0) {
+            $("#datasetRowTable").DataTable().destroy();
+        };
         $.ajax({
             type: "GET",
             url: "/api/v2/querytool/dataset/" + location.pathname.split('/')[3] + "/config/" + $('#datasetConfigList').val() + "/SampleRecords",
@@ -664,7 +664,7 @@ data.Dataset = {
                 parsedRows.push(parsedCells);
             }
         });
-        if ($("#datasetRowTable_filter").length > 0) {
+        if ($("#datasetRowTable_filter").length > 0) { 
             $("#datasetRowTable").DataTable().destroy();
         };
         if (!push) {
