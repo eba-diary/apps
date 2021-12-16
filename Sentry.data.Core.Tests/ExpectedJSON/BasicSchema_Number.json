@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "StructureTest",
+  "type": "object",
+  "properties": {
+    "fieldname": {
+      "type": "number",
+      "dsc-precision": 9,
+      "dsc-scale": 2,
+      "description": "Field Description"
+    }
+  }
+}
