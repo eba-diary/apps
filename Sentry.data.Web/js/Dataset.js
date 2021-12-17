@@ -585,7 +585,9 @@ data.Dataset = {
     renderDataPreview: function () {
         if ($("#datasetRowTable_filter").length > 0) {
             $("#datasetRowTable").DataTable().destroy();
-        }
+        };
+        Sentry.InjectSpinner($("#tab-container"));
+
         $.ajax({
             type: "GET",
             url: "/api/v2/querytool/dataset/" + location.pathname.split('/')[3] + "/config/" + $('#datasetConfigList').val() + "/SampleRecords",
@@ -597,7 +599,6 @@ data.Dataset = {
                 if (msg !== undefined) {
                     var obj = JSON.parse(msg);
                     if (obj.length > 0) {
-
                         //pass data returned from AJAX call to render Data Table
                         data.Dataset.renderTable_v2(obj, false);
 
@@ -605,6 +606,7 @@ data.Dataset = {
                         self.vm.DataLoading(false);
                         self.vm.DataTableExists(true);
                         $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
+
                     }
                     else {
                         $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
@@ -619,10 +621,14 @@ data.Dataset = {
                 }
 
                 $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+            },
+            complete: function () {
+                data.RemoveSpinner("#tab-container");
             }
         }).fail(function () {
             $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
         });
+
     },
 
     //DATA PREVIEW DATA TABLE SETUP
