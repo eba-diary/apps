@@ -173,7 +173,7 @@ namespace Sentry.data.Core
             MethodBase m = MethodBase.GetCurrentMethod();
             Logger.Info($"startmethod <{m.ReflectedType.Name}>");
 
-            DatasetFileConfig fileConfig = GetDatasetFileConfigBySchemaId(schemaDto.SchemaId);
+            DatasetFileConfig fileConfig = GetDatasetFileConfig(schemaDto.ParentDatasetId, schemaDto.SchemaId);
             Dataset parentDataset = fileConfig.ParentDataset;
 
             //Check user access to modify schema, of not throw exception
@@ -524,10 +524,10 @@ namespace Sentry.data.Core
             return revision?.ToDto();
         }
 
-        public SchemaRevisionJsonStructureDto GetLatestSchemaRevisionJsonStructureBySchemaId(int schemaId)
+        public SchemaRevisionJsonStructureDto GetLatestSchemaRevisionJsonStructureBySchemaId(int datasetId, int schemaId)
         {
             //check schema exists
-            DatasetFileConfig fileConfig = GetDatasetFileConfigBySchemaId(schemaId);
+            DatasetFileConfig fileConfig = GetDatasetFileConfig(datasetId, schemaId);
             Dataset ds = fileConfig.ParentDataset;
 
             //check permissions
@@ -732,9 +732,16 @@ namespace Sentry.data.Core
             throw new SchemaUnauthorizedAccessException();
         }
 
-        private DatasetFileConfig GetDatasetFileConfigBySchemaId(int schemaId)
+        private DatasetFileConfig GetDatasetFileConfig(int datasetId, int schemaId)
         {
-            DatasetFileConfig fileConfig = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).FirstOrDefault();
+            Dataset ds = _datasetContext.Datasets.FirstOrDefault(x => x.DatasetId == datasetId && x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
+
+            if (ds == null)
+            {
+                throw new DatasetNotFoundException();
+            }
+
+            DatasetFileConfig fileConfig = ds.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId);
 
             if (fileConfig == null)
             {
