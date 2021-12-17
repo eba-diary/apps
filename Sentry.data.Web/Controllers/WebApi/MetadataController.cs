@@ -6,7 +6,6 @@ using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
-using Sentry.data.Web.Helpers;
 using Sentry.data.Web.Models.ApiModels.Dataset;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using Sentry.WebAPI.Versioning;
@@ -142,7 +141,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 return Ok(modelList);
             }
 
-            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, null, GetDatasetsFunction);
+            return ApiTryCatch(nameof(MetadataController), nameof(GetDatasetsFunction), null, GetDatasetsFunction);
         }
 
         /// <summary>
@@ -166,7 +165,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 return Ok(modelList);
             }
 
-            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId}", GetSchemaByDatasetFunction);
+            return ApiTryCatch(nameof(MetadataController), nameof(GetSchemaByDataset), $"datasetid:{datasetId}", GetSchemaByDatasetFunction);
         }
 
 
@@ -196,7 +195,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 return Ok(model);
             }
 
-            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", GetSchemaFunction);
+            return ApiTryCatch(nameof(MetadataController), nameof(GetSchema), $"datasetid:{datasetId} schemaId{schemaId}", GetSchemaFunction);
         }
 
         ///// <summary>
@@ -260,7 +259,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 return Ok(modelList);
             }
 
-            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", GetSchemaRevisionBySchemaFunction);
+            return ApiTryCatch(nameof(MetadataController), nameof(GetSchemaRevisionBySchema), $"datasetid:{datasetId} schemaId{schemaId}", GetSchemaRevisionBySchemaFunction);
         }
 
         [HttpPost]
@@ -389,7 +388,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 return Ok(revisionDetailModel);
             }
 
-            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", GetLatestSchemaRevisionDetailFunction);
+            return ApiTryCatch(nameof(MetadataController), nameof(GetLatestSchemaRevisionDetail), $"datasetid:{datasetId} schemaId{schemaId}", GetLatestSchemaRevisionDetailFunction);
 
         }
 
@@ -407,7 +406,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
         public async Task<IHttpActionResult> GetLatestSchemaRevisionJsonFormat(int datasetId, int schemaId)
         {
-            return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", () => Ok(_schemaService.GetLatestSchemaRevisionJsonStructureBySchemaId(schemaId).ToModel()));
+            return ApiTryCatch(nameof(MetadataController), nameof(GetLatestSchemaRevisionJsonFormat), $"datasetid:{datasetId} schemaId{schemaId}", () => Ok(_schemaService.GetLatestSchemaRevisionJsonStructureBySchemaId(schemaId).ToModel()));
         }
 
         /// <summary>
@@ -446,7 +445,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 }
             }
 
-            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", SyncConsumptionLayerFunction);
+            return ApiTryCatch(nameof(MetadataController), nameof(SyncConsumptionLayer), $"datasetid:{datasetId} schemaId{schemaId}", SyncConsumptionLayerFunction);
         }
 
         /// <summary>
@@ -477,7 +476,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 return await GetMetadata(config);
             }
 
-            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetFileConfigId:{DatasetConfigID}", GetBasicMetadataInformationForFunction);
+            return ApiTryCatch(nameof(MetadataController), nameof(GetBasicMetadataInformationFor), $"datasetFileConfigId:{DatasetConfigID}", GetBasicMetadataInformationForFunction);
         }
 
 
@@ -511,7 +510,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 }
             }
 
-            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetFileConfigId:{DatasetConfigID}", GetPrimaryHiveTableForFunction);
+            return ApiTryCatch(nameof(MetadataController), nameof(GetPrimaryHiveTableFor), $"datasetFileConfigId:{DatasetConfigID}", GetPrimaryHiveTableForFunction);
 
         }
 
@@ -544,7 +543,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 return await GetColumnSchema(config, SchemaID);
             }
 
-            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetFileConfigId:{DatasetConfigID}", GetColumnSchemaInformationForFunction);
+            return ApiTryCatch(nameof(MetadataController), nameof(GetColumnSchemaInformationFor), $"datasetFileConfigId:{DatasetConfigID}", GetColumnSchemaInformationForFunction);
 
         }
 
