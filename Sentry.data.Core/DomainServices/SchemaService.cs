@@ -1072,9 +1072,9 @@ namespace Sentry.data.Core
                 }
 
                 //Varchar Length
-                if (fieldDto.FieldType == GlobalConstants.Datatypes.VARCHAR && (fieldDto.Length < 1 || fieldDto.Length > 65535))
+                if (fieldDto.FieldType == GlobalConstants.Datatypes.VARCHAR && (fieldDto.Length < 1 || fieldDto.Length > 16000000)) //true max is 16777216
                 {
-                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) VARCHAR length ({fieldDto.Length}) is required to be between 1 and 65535");
+                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) VARCHAR length ({fieldDto.Length}) is required to be between 1 and 100000");
                 }
 
                 //Decimal Precision
