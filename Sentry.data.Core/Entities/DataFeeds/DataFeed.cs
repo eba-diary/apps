@@ -12,6 +12,7 @@ namespace Sentry.data.Core
         public DataFeed() { }
 
         public virtual int Id { get; set; }
+        public virtual int? Id2 { get; set; }
         public virtual string Url { get; set; }
         public virtual string UrlType { get; set; }
         public virtual string Type { get; set; }

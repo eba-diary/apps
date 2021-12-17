@@ -35,7 +35,10 @@ namespace Sentry.data.Infrastructure
             List<DataFeedItem> items = new List<DataFeedItem>();
 
             //STEP #1 CREATE DATASET DataFeedItems
-            var dsEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Dataset") && (x.TimeCreated >= DateTime.Now.AddDays(-30))).OrderByDescending(o => o.TimeCreated).Take(25);
+            var dsEvents = Query<Event>().Where(x => x.Dataset != null 
+                                                    && (x.EventType.Description == GlobalConstants.EventType.CREATED_DATASET || x.EventType.Description == GlobalConstants.EventType.CREATE_DATASET_SCHEMA) 
+                                                    && (x.TimeCreated >= DateTime.Now.AddDays(-30))
+                                                ).OrderByDescending(o => o.TimeCreated).Take(25);
             foreach (Event e in dsEvents)
             {
                 Dataset ds = Query<Dataset>().Where(y => y.DatasetId == e.Dataset).FetchMany(x => x.DatasetCategories).FirstOrDefault();
@@ -44,16 +47,42 @@ namespace Sentry.data.Infrastructure
                 {
                     DataFeed feed = new DataFeed();
                     feed.Id = ds.DatasetId;
-                    feed.Name = GlobalConstants.DataFeedName.DATASET;
-                    feed.Url = "/Datasets/Detail/" + e.Dataset;
-                    feed.Type = GlobalConstants.DataFeedType.Datasets;
+                                       
+                    string shortDesc = String.Empty;
+                    string longDesc = String.Empty;
 
+                    //SCHEMA
+                    if(e.SchemaId != null && e.SchemaId > 0 && e.DataConfig != null)
+                    {
+                        feed.Id2 = e.DataConfig;
+                        feed.Name = GlobalConstants.DataFeedName.SCHEMA;
+                        feed.Type = GlobalConstants.DataFeedType.Schemas;
+                        Schema schema = Query<Schema>().Where(w => w.SchemaId == e.SchemaId).FirstOrDefault();
+                        if(schema != null)
+                        {
+                            shortDesc = " A new schema called " + schema.Name + " was created under " + ds.DatasetName + " in " + ds.DatasetCategories.First().Name;
+                        }
+                        else
+                        {
+                            shortDesc = " A new schema was created under " + ds.DatasetName + " in " + ds.DatasetCategories.First().Name;
+                        }
+                                               
+                        longDesc = shortDesc;
+                    }
+                    else  //DATASET
+                    {
+                        feed.Name = GlobalConstants.DataFeedName.DATASET;
+                        feed.Type = GlobalConstants.DataFeedType.Datasets;
+                        shortDesc = " A new dataset called " + ds.DatasetName + " was created in " + ds.DatasetCategories.First().Name;
+                        longDesc = shortDesc;
+                    }
+
+                    //CREATE DATAFEED ITEM
                     DataFeedItem dfi = new DataFeedItem(
-                    e.TimeCreated,
-                    e.Dataset.ToString(),
-                    ds.DatasetName + " - A New Dataset was Created in the " + ds.DatasetCategories.First().Name + " Category",
-                    ds.DatasetName + " - A New Dataset was Created in the " + ds.DatasetCategories.First().Name + " Category",
-                    feed
+                        e.TimeCreated,                                                                                                          //pubDate
+                        shortDesc,                                                                                                              //shortDesc
+                        longDesc,                                                                                                               //longDesc
+                        feed                                                                                                                    //DataFeed
                     );
 
                     items.Add(dfi);
@@ -61,7 +90,7 @@ namespace Sentry.data.Infrastructure
             }
 
             //STEP #2  CREATE BI ITEMS
-            var rptEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Report") && (x.TimeCreated >= DateTime.Now.AddDays(-30))).OrderByDescending(o => o.TimeCreated).Take(25);
+            var rptEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == GlobalConstants.EventType.CREATED_REPORT) && (x.TimeCreated >= DateTime.Now.AddDays(-30))).OrderByDescending(o => o.TimeCreated).Take(25);
             foreach (Event e in rptEvents)
             {
                 Dataset ds = Query<Dataset>().FirstOrDefault(y => y.DatasetId == e.Dataset);
@@ -71,15 +100,13 @@ namespace Sentry.data.Infrastructure
                     DataFeed feed = new DataFeed();
                     feed.Id = ds.DatasetId;
                     feed.Name = GlobalConstants.DataFeedName.BUSINESS_INTELLIGENCE;
-                    feed.Url = "/BusinessIntelligence/Detail/" + e.Dataset;
                     feed.Type = GlobalConstants.DataFeedType.Exhibits;
 
                     DataFeedItem dfi = new DataFeedItem(
-                    e.TimeCreated,
-                    e.Dataset.ToString(),
-                    ds.DatasetName + " - A New Exhibit was Created",
-                    ds.DatasetName + " - A New Exhibit was Created",
-                    feed
+                        e.TimeCreated,
+                        ds.DatasetName + " - A New Exhibit was Created",
+                        ds.DatasetName + " - A New Exhibit was Created",
+                        feed
                     );
 
                     items.Add(dfi);
@@ -100,7 +127,6 @@ namespace Sentry.data.Infrastructure
 
                     DataFeedItem dfi = new DataFeedItem(
                         n.StartTime,                                                //PublishDate
-                        n.NotificationId.ToString(),                                //Id
                         n.Title,                                                    //shortDesc
                         "",                                                         //longDesc
                         feed                                                        //DataFeed

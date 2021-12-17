@@ -42,6 +42,8 @@ namespace Sentry.data.Core
 
         public virtual Notification Notification { get; set; }
 
+        public virtual int? SchemaId { get; set; }
+
 
     }
 }

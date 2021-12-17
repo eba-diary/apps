@@ -6,40 +6,37 @@
 
 @foreach (Sentry.data.Core.DataFeedItem item in Model)
 {
-    <div class="feedItem">
+<div class="feedItem">
 
-        <div class="display-table">
-            <div class="display-tablecell text-middle">
-                <img src="@item.Img" class="feedImg" />
-            </div>
-            <div class="display-tablecell text-middle">
-
-                @if (item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.NOTIFICATION)
-                {
-                    <div class="feedName lt_@color">@item.Feed.Category</div>
-                }
-                else
-                {
-                    <div class="feedName lt_@color">@item.Feed.Name</div>
-                }
-
-            </div>
+    <div class="display-table">
+        <div class="display-tablecell text-middle">
+            <img src="@item.Img" class="feedImg" />
         </div>
+        <div class="display-tablecell text-middle">
 
-        <p class="feed-date">@Sentry.data.Web.Helpers.Utility.TimeDisplay(item.PublishDate)</p>
-
-        @if (item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.NOTIFICATION)
-        {
-            <h6 class="@color" data-toggle="tooltip" data-placement="top" title="">@item.NotificationTitle</h6>
-        }
-        else
-        {
-            if (item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.DATASET || item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.BUSINESS_INTELLIGENCE)
+            @if (item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.NOTIFICATION)
             {
-                <a href="@item.Url" target="_blank" class="pointer @color">@item.DisplayTitle()</a>
+                <div class="feedName lt_@color">@item.Feed.Category</div>
             }
-        }
+            else
+            {
+                <div class="feedName lt_@color">@item.Feed.Name</div>
+            }
 
-
+        </div>
     </div>
+
+    <p class="feed-date">@Sentry.data.Web.Helpers.Utility.TimeDisplay(item.PublishDate)</p>
+
+    @if (item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.NOTIFICATION)
+    {
+        <h6 class="@color" data-toggle="tooltip" data-placement="top" title="">@item.NotificationTitle</h6>
+    }
+    else if (item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.DATASET || item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.SCHEMA || item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.BUSINESS_INTELLIGENCE)
+    {
+        <a href="@item.Url" target="_blank" class="pointer @color">@item.DisplayTitle()</a>
+    }
+
+
+</div>
 }
