@@ -1,4 +1,7 @@
-﻿namespace Sentry.data.Core
+﻿using Newtonsoft.Json.Linq;
+using System.Linq;
+
+namespace Sentry.data.Core
 {
     public class StructField : BaseField, ISchemaField
     {
@@ -9,6 +12,18 @@
                 return SchemaDatatypes.STRUCT;
             }
             set => FieldType = SchemaDatatypes.STRUCT;
+        }
+
+        protected override JObject GetJsonTypeDefinition()
+        {
+            JObject definition = new JObject() { { "type", "object" } };
+
+            if (ChildFields?.Any() == true)
+            {
+                definition.AddJsonStructureProperties(ChildFields);
+            }
+
+            return definition;
         }
     }
 }

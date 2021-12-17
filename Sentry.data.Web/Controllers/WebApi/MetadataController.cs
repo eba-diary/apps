@@ -394,41 +394,20 @@ namespace Sentry.data.Web.WebApi.Controllers
         }
 
         /// <summary>
-        ///  Will return jsonschema associated with DSC schema, only if latest revision was updated via API.
+        /// Get the latest schema revisions JSON structure in JSON schema format
         /// </summary>
         /// <param name="datasetId"></param>
         /// <param name="schemaId"></param>
         /// <returns></returns>
         [HttpGet]
-        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [ApiVersionBegin(WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}/revision/latest/jsonschema")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(JObject))]
-        [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
-        [SwaggerResponse(System.Net.HttpStatusCode.Forbidden, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaRevisionJsonStructureModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
         public async Task<IHttpActionResult> GetLatestSchemaRevisionJsonFormat(int datasetId, int schemaId)
         {
-            IHttpActionResult GetLatestSchemaRevisionJsonFormatFunction()
-            {
-                if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Where(w => !w.DeleteInd).Any(w => w.Schema.SchemaId == schemaId))
-                {
-                    throw new SchemaNotFoundException();
-                }
-
-                SchemaRevisionDto revisiondto = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
-                if (revisiondto == null)
-                {
-                    Logger.Info($"metadataapi_getlatestschemarevisiondetail_notfound revision - datasetid:{datasetId} schemaid:{schemaId}");
-                    return Content(System.Net.HttpStatusCode.NotFound, "Schema revisions not found");
-                }
-
-                SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
-                List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisiondto.RevisionId);
-                revisionDetailModel.Fields = fieldDtoList.ToSchemaFieldModel();
-                return Ok(revisionDetailModel);
-            }
-
-            return ApiTryCatch("metdataapi", System.Reflection.MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", GetLatestSchemaRevisionJsonFormatFunction);
-
+            return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", () => Ok(_schemaService.GetLatestSchemaRevisionJsonStructureBySchemaId(schemaId).ToModel()));
         }
 
         /// <summary>
@@ -581,6 +560,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("dataset/{datasetId}/schema/{schemaId}")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(bool))]
         [SwaggerResponse(System.Net.HttpStatusCode.NotFound)]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest)]
         [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
         [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
@@ -596,7 +576,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
                 if (validationResults.Any())
                 {
-                    throw new SchemaConversionException($"Invalid schema request: {string.Join(" | ", validationResults)}");
+                    return Content(System.Net.HttpStatusCode.BadRequest, $"Invalid schema request: {string.Join(" | ", validationResults)}");
                 }
 
                 return Ok(_schemaService.UpdateAndSaveSchema(schemaModel.ToDto((x) => _schemaService.GetFileExtensionIdByName(x))));
