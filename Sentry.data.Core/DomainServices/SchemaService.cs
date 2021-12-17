@@ -173,11 +173,7 @@ namespace Sentry.data.Core
             MethodBase m = MethodBase.GetCurrentMethod();
             Logger.Info($"startmethod <{m.ReflectedType.Name}>");
 
-            DatasetFileConfig fileConfig = GetDatasetFileConfig(schemaDto.ParentDatasetId, schemaDto.SchemaId);
-            Dataset parentDataset = fileConfig.ParentDataset;
-
-            //Check user access to modify schema, of not throw exception
-            CheckAccessToDataset(parentDataset, x => x.CanManageSchema);          
+            DatasetFileConfig fileConfig = GetDatasetFileConfig(schemaDto.ParentDatasetId, schemaDto.SchemaId, x => x.CanManageSchema);
 
             JObject whatPropertiesChanged;
             /* Any exceptions saving schema changes, do not execute remaining line of code */
@@ -185,7 +181,7 @@ namespace Sentry.data.Core
             {
                 //Update/save schema within DSC metadata
                 whatPropertiesChanged = UpdateSchema(schemaDto, fileConfig.Schema);
-                Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {parentDataset.DatasetName}\\{fileConfig.Schema.Name} | {whatPropertiesChanged}");
+                Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {fileConfig.ParentDataset.DatasetName}\\{fileConfig.Schema.Name} | {whatPropertiesChanged}");
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -527,11 +523,7 @@ namespace Sentry.data.Core
         public SchemaRevisionJsonStructureDto GetLatestSchemaRevisionJsonStructureBySchemaId(int datasetId, int schemaId)
         {
             //check schema exists
-            DatasetFileConfig fileConfig = GetDatasetFileConfig(datasetId, schemaId);
-            Dataset ds = fileConfig.ParentDataset;
-
-            //check permissions
-            CheckAccessToDataset(ds, (x) => x.CanPreviewDataset || x.CanViewFullDataset || x.CanUploadToDataset || x.CanEditDataset || x.CanManageSchema);
+            DatasetFileConfig fileConfig = GetDatasetFileConfig(datasetId, schemaId, x => x.CanPreviewDataset || x.CanViewFullDataset || x.CanUploadToDataset || x.CanEditDataset || x.CanManageSchema);
 
             //get latest revision
             SchemaRevision revision = fileConfig.GetLatestSchemaRevision();
@@ -732,7 +724,7 @@ namespace Sentry.data.Core
             throw new SchemaUnauthorizedAccessException();
         }
 
-        private DatasetFileConfig GetDatasetFileConfig(int datasetId, int schemaId)
+        private DatasetFileConfig GetDatasetFileConfig(int datasetId, int schemaId, Func<UserSecurity, bool> userCan)
         {
             Dataset ds = _datasetContext.Datasets.FirstOrDefault(x => x.DatasetId == datasetId && x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
 
@@ -740,6 +732,8 @@ namespace Sentry.data.Core
             {
                 throw new DatasetNotFoundException();
             }
+
+            CheckAccessToDataset(ds, userCan);
 
             DatasetFileConfig fileConfig = ds.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId);
 
