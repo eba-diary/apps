@@ -2163,7 +2163,7 @@ namespace Sentry.data.Core.Tests
             Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
             securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, appUser.Object)).Returns(security).Verifiable();
 
-            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, null, null, null);
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, null, null, null,null);
 
             SchemaRevisionJsonStructureDto dto = schemaService.GetLatestSchemaRevisionJsonStructureBySchemaId(1);
 
