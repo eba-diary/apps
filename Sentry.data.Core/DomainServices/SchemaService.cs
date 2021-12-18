@@ -176,23 +176,11 @@ namespace Sentry.data.Core
             MethodBase m = MethodBase.GetCurrentMethod();
             Logger.Info($"startmethod <{m.ReflectedType.Name}>");
 
-            DatasetFileConfig fileConfig = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaDto.SchemaId);
-
-            if (fileConfig == null)
-            {
-                throw new SchemaNotFoundException();
-            }
-
+            DatasetFileConfig fileConfig = GetDatasetFileConfigBySchemaId(schemaDto.SchemaId);
             Dataset parentDataset = fileConfig.ParentDataset;
 
             //Check user access to modify schema, of not throw exception
-            IApplicationUser user = _userService.GetCurrentUser();
-            UserSecurity us = _securityService.GetUserSecurity(parentDataset, user);
-
-            if (!us.CanManageSchema)
-            {
-                throw new SchemaUnauthorizedAccessException();
-            }            
+            CheckAccessToDataset(parentDataset, x => x.CanManageSchema);          
 
             JObject whatPropertiesChanged;
             /* Any exceptions saving schema changes, do not execute remaining line of code */
@@ -513,8 +501,7 @@ namespace Sentry.data.Core
             
             try
             {
-                UserSecurity us;
-                us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+                UserSecurity us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
                 if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset || us.CanManageSchema))
                 {
                     try
@@ -537,7 +524,27 @@ namespace Sentry.data.Core
 
             SchemaRevision revision = _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schemaId).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();
 
-            return (revision == null) ? null : revision.ToDto();
+            return revision?.ToDto();
+        }
+
+        public SchemaRevisionJsonStructureDto GetLatestSchemaRevisionJsonStructureBySchemaId(int schemaId)
+        {
+            //check schema exists
+            DatasetFileConfig fileConfig = GetDatasetFileConfigBySchemaId(schemaId);
+            Dataset ds = fileConfig.ParentDataset;
+
+            //check permissions
+            CheckAccessToDataset(ds, (x) => x.CanPreviewDataset || x.CanViewFullDataset || x.CanUploadToDataset || x.CanEditDataset || x.CanManageSchema);
+
+            //get latest revision
+            SchemaRevision revision = fileConfig.GetLatestSchemaRevision();
+
+            //return result as dto
+            return new SchemaRevisionJsonStructureDto()
+            {
+                Revision = revision?.ToDto(),
+                JsonStructure = revision?.ToJsonStructure()
+            };
         }
 
         public List<DatasetFile> GetDatasetFilesBySchema(int schemaId)
@@ -704,6 +711,40 @@ namespace Sentry.data.Core
                 Logger.Error($"schemaservice-registerrawfile-failed", ex);
                 throw;
             }
+        }
+
+        private void CheckAccessToDataset(Dataset ds, Func<UserSecurity, bool> userCan)
+        {
+            try
+            {
+                IApplicationUser user = _userService.GetCurrentUser();
+                UserSecurity userSecurity = _securityService.GetUserSecurity(ds, user);
+
+                if (userCan(userSecurity))
+                {
+                    return;
+                }
+
+                Logger.Info($"schmeacontroller-checkdatasetpermission unauthorized_access for {user.AssociateId}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"schemacontroller-checkdatasetpermission failed to check access", ex);
+            }
+
+            throw new SchemaUnauthorizedAccessException();
+        }
+
+        private DatasetFileConfig GetDatasetFileConfigBySchemaId(int schemaId)
+        {
+            DatasetFileConfig fileConfig = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).FirstOrDefault();
+
+            if (fileConfig == null)
+            {
+                throw new SchemaNotFoundException();
+            }
+
+            return fileConfig;
         }
 
         private void MapToDatasetFile(DataFlowStepEvent stepEvent, string fileKey, string fileVersionId, DatasetFile file)
@@ -1038,9 +1079,9 @@ namespace Sentry.data.Core
                 }
 
                 //Varchar Length
-                if (fieldDto.FieldType == GlobalConstants.Datatypes.VARCHAR && (fieldDto.Length < 1 || fieldDto.Length > 65535))
+                if (fieldDto.FieldType == GlobalConstants.Datatypes.VARCHAR && (fieldDto.Length < 1 || fieldDto.Length > 16000000)) //true max is 16777216
                 {
-                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) VARCHAR length ({fieldDto.Length}) is required to be between 1 and 65535");
+                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) VARCHAR length ({fieldDto.Length}) is required to be between 1 and 100000");
                 }
 
                 //Decimal Precision

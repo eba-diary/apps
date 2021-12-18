@@ -12,6 +12,7 @@ using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Helpers;
 using Sentry.data.Core.Exceptions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Sentry.data.Core.Tests
 {
@@ -2127,8 +2128,57 @@ namespace Sentry.data.Core.Tests
             mr.VerifyAll();
         }
 
+        [TestMethod]
+        public void GetLatestSchemaRevisionJsonStructureBySchemaId_1_SchemaRevisionJsonStructureDto()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            //mock context
+            DatasetFileConfig fileConfig = new DatasetFileConfig()
+            {
+                Schema = new FileSchema()
+                {
+                    SchemaId = 1,
+                    Revisions = new List<SchemaRevision>() { new SchemaRevision()
+                    {
+                        SchemaRevision_Name = "StructureTest",
+                        Revision_NBR = 1,
+                        Fields = new List<BaseField>() { new IntegerField() { Name = "FieldName", Description = "Field Description" } }
+                    } }
+                },
+                ParentDataset = new Dataset() { DatasetId = 2 }
+            };
+            List<DatasetFileConfig> fileConfigs = new List<DatasetFileConfig>() { fileConfig };
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(fileConfigs.AsQueryable()).Verifiable();
+
+            //mock user service
+            Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object).Verifiable();
+
+            //mock security service
+            UserSecurity security = new UserSecurity() { CanManageSchema = true };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, appUser.Object)).Returns(security).Verifiable();
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, null, null, null);
+
+            SchemaRevisionJsonStructureDto dto = schemaService.GetLatestSchemaRevisionJsonStructureBySchemaId(1);
+
+            Assert.IsNotNull(dto.Revision);
+            Assert.AreEqual(1, dto.Revision.RevisionNumber);
+            Assert.AreEqual("StructureTest", dto.Revision.SchemaRevisionName);
+
+            Assert.IsNotNull(dto.JsonStructure);
+            Assert.IsTrue(JToken.DeepEquals(GetData("BasicSchema_Integer.json"), dto.JsonStructure));
+
+            mr.VerifyAll();
+        }
+
         #region Private Methods
-        private JsonSchema BuildMockJsonSchemaWithDecimalField()
+            private JsonSchema BuildMockJsonSchemaWithDecimalField()
         {
             string jsonSchema = @"{
                 ""type"": ""object"",
