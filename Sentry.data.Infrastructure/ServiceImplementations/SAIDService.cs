@@ -31,17 +31,23 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
             return asset;
         }
 
-        public async Task<SAIDRole> GetProdCustByKeyCode(string keyCode)
+        /// <summary>
+        /// Gets all Production Custodians for a given SAID asset.
+        /// </summary>
+        /// <param name="keyCode">SAID Asset Keycode</param>
+        /// <returns></returns>
+        public async Task<List<SAIDRole>> GetAllProdCustByKeyCode(string keyCode)
         {
             SAIDAsset asset = await GetAssetByKeyCode(keyCode).ConfigureAwait(false);
+            List<SAIDRole> prodCusts = new List<SAIDRole>();
             foreach(SAIDRole role in asset.Roles)
             {
                 if (role.Role.Equals("Custodian - Production"))
                 {
-                    return role;
+                    prodCusts.Add(role);
                 }
             }
-            return new SAIDRole();
+            return prodCusts;
         }
 
         public async Task<List<SAIDAsset>> GetAllAssets()

@@ -191,10 +191,11 @@ namespace Sentry.data.Core
                 ? _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET && x.PermissionCode == GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA).ToList()
                 : _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
 
-            SAIDRole prodCust = await _saidService.GetProdCustByKeyCode(ds.SAIDAssetKeyCode).ConfigureAwait(false);
-
-            ar.ApproverList.Add(new KeyValuePair<string, string>(prodCust.AssociateId, prodCust.Name + " (Owner)"));
-            //add all prod cust
+            List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCode(ds.SAIDAssetKeyCode).ConfigureAwait(false);
+            foreach(SAIDRole prodCust in prodCusts)
+            {
+                ar.ApproverList.Add(new KeyValuePair<string, string>(prodCust.AssociateId, prodCust.Name));
+            }
 
             return ar;
         }
