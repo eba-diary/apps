@@ -3,11 +3,11 @@ namespace Sentry.data.Core.Helpers
 {
     public static class DataFeedHelper
     {
-        public static string GetImage(string feedType)
+        public static string GetImage(DataFeed df)
         {
             string feedImg = "";
 
-            switch (feedType)
+            switch (df.Type)
             {
                 case GlobalConstants.DataFeedType.SAS:
                     feedImg = "/Images/sas_logo_min.png";
@@ -27,31 +27,43 @@ namespace Sentry.data.Core.Helpers
                 case GlobalConstants.DataFeedType.Notifications:
                     feedImg = "/Images/Icons/Blogs.png";
                     break;
+                case GlobalConstants.DataFeedType.Schemas:
+                    feedImg = "/Images/Icons/Metadata.png";
+                    break;
+                default:
+                    feedImg = "/Images/Icons/Metadata.png";
+                    break;
             }
 
             return feedImg;
         }
 
-        public static string GetUrl(string feedType, string feedId)
+        public static string GetUrl(DataFeed df)
         {
             string feedUrl = "";
 
-            switch (feedType)
+            switch (df.Type)
             {
                 case GlobalConstants.DataFeedType.SAS:
-                    feedUrl = feedId;
+                    feedUrl = df.Id.ToString();
                     break;
                 case GlobalConstants.DataFeedType.Tab:
-                    feedUrl = feedId;
+                    feedUrl = df.Id.ToString();
                     break;
                 case GlobalConstants.DataFeedType.Datasets:
-                    feedUrl = "/Dataset/Detail/" + feedId;
+                    feedUrl = "/Dataset/Detail/" + df.Id.ToString();
                     break;
                 case GlobalConstants.DataFeedType.DataAssets:
-                    feedUrl = feedId;
+                    feedUrl = df.Id.ToString();
                     break;
                 case GlobalConstants.DataFeedType.Exhibits:
-                    feedUrl = "/BusinessIntelligence/Detail/" + feedId;
+                    feedUrl = "/BusinessIntelligence/Detail/" + df.Id.ToString();
+                    break;
+                case GlobalConstants.DataFeedType.Schemas:
+                    feedUrl = "/Dataset/Detail/" + df.Id.ToString() + "?configID=" + df.Id2.ToString();
+                    break;
+                default:
+                    feedUrl = string.Empty;
                     break;
             }
 

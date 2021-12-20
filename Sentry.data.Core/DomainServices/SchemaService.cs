@@ -25,12 +25,15 @@ namespace Sentry.data.Core
         private readonly IDataFeatures _dataFeatures;
         private readonly IMessagePublisher _messagePublisher;
         private readonly ISnowProvider _snowProvider;
+        private readonly IEventService _eventService;
+
+
         private string _bucket;
         private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, IEventService eventService)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -41,7 +44,7 @@ namespace Sentry.data.Core
             _dataFeatures = dataFeatures;
             _messagePublisher = messagePublisher;
             _snowProvider = snowProvider;
-
+            _eventService = eventService;
         }
 
         private string RootBucket
@@ -815,6 +818,10 @@ namespace Sentry.data.Core
 
             };
             _datasetContext.Add(schema);
+            
+            //ADD SCHEMA CREATED EVENT HERE BECAUSE THIS IS WHERE ITS ADDED EITHER FROM NEW DATASET OR NEW SCHEMA
+            _eventService.PublishSuccessEventBySchemaId(GlobalConstants.EventType.CREATE_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, GlobalConstants.EventType.CREATE_DATASET_SCHEMA, dto.ParentDatasetId, schema.SchemaId);
+
             return schema;
         }
 
