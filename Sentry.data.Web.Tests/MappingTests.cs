@@ -135,6 +135,21 @@ namespace Sentry.data.Web.Tests
         }
 
         [TestMethod]
+        public void ToModel_SchemaRevisionJsonStructureDto_NullRevision_SchemaRevisionJsonStructureModel()
+        {
+            SchemaRevisionJsonStructureDto dto = new SchemaRevisionJsonStructureDto()
+            {
+                Revision = null,
+                JsonStructure = null
+            };
+
+            SchemaRevisionJsonStructureModel mdl = dto.ToModel();
+
+            Assert.IsNull(mdl.Revision);
+            Assert.IsNull(mdl.JsonStructure);
+        }
+
+        [TestMethod]
         public void ToDto_SchemaRevision_SchemaRevisionDto()
         {
             SchemaRevision revision = new SchemaRevision()
