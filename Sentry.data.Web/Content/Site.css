@@ -2079,6 +2079,7 @@ tr.categoryBanner-darkgray th.sorting_desc {
 
 .feedItem {
     margin-right: 0.5em;
+    word-wrap: break-word;
 }
 
 .feed-date {

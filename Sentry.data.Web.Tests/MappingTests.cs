@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Models.ApiModels.Schema;
@@ -43,13 +44,13 @@ namespace Sentry.data.Web.Tests
                 ParquetStoragePrefix = "PSP"
             };
 
-            FileSchemaDto dto = mdl.ToDto((x) => 1);
+            FileSchemaDto dto = mdl.ToDto(1, (x) => 1);
 
             Assert.AreEqual(1, dto.SchemaId);
             Assert.AreEqual("EntityName", dto.SchemaEntity_NME);
             Assert.AreEqual("SchemaName", dto.Name);
             Assert.AreEqual("Schema Description", dto.Description);
-            Assert.AreEqual(0, dto.ParentDatasetId);
+            Assert.AreEqual(1, dto.ParentDatasetId);
             Assert.AreEqual(ObjectStatusEnum.Active, dto.ObjectStatus);
             Assert.AreEqual(false, dto.DeleteInd);
             Assert.AreEqual(null, dto.DeleteIssuer);
@@ -91,7 +92,7 @@ namespace Sentry.data.Web.Tests
                 SchemaRootPath = null
             };
 
-            FileSchemaDto dto = mdl.ToDto((x) => 1);
+            FileSchemaDto dto = mdl.ToDto(1, (x) => 1);
 
             Assert.AreEqual(false, dto.CLA1396_NewEtlColumns);
             Assert.IsFalse(dto.CLA1286_KafkaFlag);
@@ -99,6 +100,63 @@ namespace Sentry.data.Web.Tests
             Assert.IsFalse(dto.CLA1580_StructureHive);
             Assert.IsFalse(dto.CLA2472_EMRSend);
             Assert.IsNull(dto.SchemaRootPath);
+        }
+
+        [TestMethod]
+        public void ToModel_SchemaRevisionJsonStructureDto_SchemaRevisionJsonStructureModel()
+        {
+            SchemaRevisionJsonStructureDto dto = new SchemaRevisionJsonStructureDto()
+            {
+                Revision = new SchemaRevisionDto()
+                {
+                    RevisionId = 1,
+                    RevisionNumber = 1,
+                    SchemaRevisionName = "RevisionName",
+                    CreatedBy = "000000",
+                    CreatedByName = "User",
+                    CreatedDTM = DateTime.Parse("2021-12-15 15:15:00"),
+                    LastUpdatedDTM = DateTime.Parse("2021-12-15 15:15:00"),
+                    JsonSchemaObject = "Object"
+                },
+                JsonStructure = new JObject() { { "Property", "Value" } }
+            };
+
+            SchemaRevisionJsonStructureModel mdl = dto.ToModel();
+
+            Assert.AreEqual(1, mdl.Revision.RevisionId);
+            Assert.AreEqual(1, mdl.Revision.RevisionNumber);
+            Assert.AreEqual("RevisionName", mdl.Revision.SchemaRevisionName);
+            Assert.AreEqual("000000", mdl.Revision.CreatedBy);
+            Assert.AreEqual("User", mdl.Revision.CreatedByName);
+            Assert.AreEqual("2021-12-15T15:15:00", mdl.Revision.CreatedDTM);
+            Assert.AreEqual("2021-12-15T15:15:00", mdl.Revision.LastUpdatedDTM);
+            Assert.AreEqual(null, mdl.Revision.JsonSchemaObject);
+            Assert.IsNotNull(mdl.JsonStructure);
+        }
+
+        [TestMethod]
+        public void ToDto_SchemaRevision_SchemaRevisionDto()
+        {
+            SchemaRevision revision = new SchemaRevision()
+            {
+                SchemaRevision_Id = 1,
+                Revision_NBR = 1,
+                SchemaRevision_Name = "RevisionName",
+                CreatedBy = "000000",
+                CreatedDTM = DateTime.Parse("2021-12-15 15:15:00"),
+                LastUpdatedDTM = DateTime.Parse("2021-12-15 15:15:00"),
+                JsonSchemaObject = "Object"
+            };
+
+            SchemaRevisionDto dto = revision.ToDto();
+
+            Assert.AreEqual(1, dto.RevisionId);
+            Assert.AreEqual(1, dto.RevisionNumber);
+            Assert.AreEqual("RevisionName", dto.SchemaRevisionName);
+            Assert.AreEqual("000000", dto.CreatedBy);
+            Assert.AreEqual(DateTime.Parse("2021-12-15 15:15:00"), dto.CreatedDTM);
+            Assert.AreEqual(DateTime.Parse("2021-12-15 15:15:00"), dto.LastUpdatedDTM);
+            Assert.AreEqual("Object", dto.JsonSchemaObject);
         }
     }
 }

@@ -12,6 +12,7 @@ using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Helpers;
 using Sentry.data.Core.Exceptions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Sentry.data.Core.Tests
 {
@@ -1774,16 +1775,56 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void UpdateAndSaveSchema_UnknownSchemaId_ThrowNotFound()
+        public void UpdateAndSaveSchema_UnknownSchemaId_ThrowDatasetNotFound()
         {
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
-            datasetContext.SetupGet((ctx) => ctx.DatasetFileConfigs).Returns(Enumerable.Empty<DatasetFileConfig>().AsQueryable());
+            datasetContext.SetupGet((ctx) => ctx.Datasets).Returns(Enumerable.Empty<Dataset>().AsQueryable());
 
             SchemaService schemaService = new SchemaService(datasetContext.Object, null, null, null, null, null, null, null, null);
 
             FileSchemaDto dto = new FileSchemaDto();
+
+            Assert.ThrowsException<DatasetNotFoundException>(() => schemaService.UpdateAndSaveSchema(dto));
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateAndSaveSchema_UnknownSchemaId_ThrowSchemaNotFound()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Dataset ds = new Dataset() 
+            { 
+                DatasetId = 2,
+                ObjectStatus = ObjectStatusEnum.Active
+            };
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig()
+            {
+                Schema = new FileSchema() { SchemaId = 1 },
+                ParentDataset = ds
+            };
+
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            List<Dataset> datasets = new List<Dataset>() { ds };
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet((ctx) => ctx.Datasets).Returns(datasets.AsQueryable());
+
+            Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object).Verifiable();
+
+            UserSecurity security = new UserSecurity() { CanManageSchema = true };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, null, null, null);
+
+            FileSchemaDto dto = new FileSchemaDto() { SchemaId = 5, ParentDatasetId = 2 };
 
             Assert.ThrowsException<SchemaNotFoundException>(() => schemaService.UpdateAndSaveSchema(dto));
 
@@ -1795,13 +1836,23 @@ namespace Sentry.data.Core.Tests
         {
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
-            DatasetFileConfig fileConfig = new DatasetFileConfig();
-            fileConfig.Schema = new FileSchema() { SchemaId = 1 };
-            fileConfig.ParentDataset = new Dataset();
-            List<DatasetFileConfig> fileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            Dataset ds = new Dataset() 
+            { 
+                DatasetId = 2,
+                ObjectStatus = ObjectStatusEnum.Active
+            };
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig()
+            {
+                Schema = new FileSchema() { SchemaId = 1 },
+                ParentDataset = ds
+            };
+
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            List<Dataset> datasets = new List<Dataset>() { ds };
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
-            datasetContext.SetupGet(ctx => ctx.DatasetFileConfigs).Returns(fileConfigs.AsQueryable()).Verifiable();
+            datasetContext.SetupGet(ctx => ctx.Datasets).Returns(datasets.AsQueryable()).Verifiable();
 
             Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
             Mock<IUserService> userService = mr.Create<IUserService>();
@@ -1809,11 +1860,11 @@ namespace Sentry.data.Core.Tests
 
             UserSecurity security = new UserSecurity() { CanManageSchema = false };
             Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
-            securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, appUser.Object)).Returns(security).Verifiable();
+            securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
 
             SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, null, null, null);
 
-            FileSchemaDto dto = new FileSchemaDto() { SchemaId = 1 };
+            FileSchemaDto dto = new FileSchemaDto() { SchemaId = 1, ParentDatasetId = 2 };
 
             Assert.ThrowsException<SchemaUnauthorizedAccessException>(() => schemaService.UpdateAndSaveSchema(dto));
 
@@ -1826,6 +1877,13 @@ namespace Sentry.data.Core.Tests
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
             //mock context
+            Dataset ds = new Dataset()
+            {
+                DatasetId = 2,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DatasetFileConfigs = new List<DatasetFileConfig>()
+            };
+
             DatasetFileConfig fileConfig = new DatasetFileConfig()
             {
                 Schema = new FileSchema() 
@@ -1834,12 +1892,15 @@ namespace Sentry.data.Core.Tests
                     CreateCurrentView = false, 
                     Extension = new FileExtension() { Id = 4 } 
                 },
-                ParentDataset = new Dataset() { DatasetId = 2 }
+                ParentDataset = ds
             };
-            List<DatasetFileConfig> fileConfigs = new List<DatasetFileConfig>() { fileConfig };
+
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            List<Dataset> datasets = new List<Dataset>() { ds };
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
-            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(fileConfigs.AsQueryable()).Verifiable();
+            datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(ds.DatasetFileConfigs.AsQueryable()).Verifiable();
             datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
 
             SchemaRevision revision = new SchemaRevision() 
@@ -1859,7 +1920,7 @@ namespace Sentry.data.Core.Tests
             //mock security service
             UserSecurity security = new UserSecurity() { CanManageSchema = true };
             Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
-            securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, appUser.Object)).Returns(security).Verifiable();
+            securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
 
             //mock features
             Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
@@ -1896,6 +1957,7 @@ namespace Sentry.data.Core.Tests
             FileSchemaDto dto = new FileSchemaDto() 
             { 
                 SchemaId = 1, 
+                ParentDatasetId = 2,
                 CreateCurrentView = true, 
                 FileExtensionId = 4 
             };
@@ -1920,6 +1982,13 @@ namespace Sentry.data.Core.Tests
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
             //mock context
+            Dataset ds = new Dataset()
+            {
+                DatasetId = 2,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DatasetFileConfigs = new List<DatasetFileConfig>()
+            };
+
             DatasetFileConfig fileConfig = new DatasetFileConfig()
             {
                 Schema = new FileSchema()
@@ -1929,12 +1998,15 @@ namespace Sentry.data.Core.Tests
                     ParquetStoragePrefix = "Prefix",
                     Extension = new FileExtension() { Id = 4 }
                 },
-                ParentDataset = new Dataset() { DatasetId = 2 }
+                ParentDataset = ds
             };
-            List<DatasetFileConfig> fileConfigs = new List<DatasetFileConfig>() { fileConfig };
+
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            List<Dataset> datasets = new List<Dataset>() { ds };
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
-            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(fileConfigs.AsQueryable()).Verifiable();
+            datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(ds.DatasetFileConfigs.AsQueryable()).Verifiable();
             datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
 
             SchemaRevision revision = new SchemaRevision()
@@ -1954,7 +2026,7 @@ namespace Sentry.data.Core.Tests
             //mock security service
             UserSecurity security = new UserSecurity() { CanManageSchema = true };
             Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
-            securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, appUser.Object)).Returns(security).Verifiable();
+            securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
 
             //mock features
             Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
@@ -1993,7 +2065,8 @@ namespace Sentry.data.Core.Tests
                 SchemaId = 1,
                 ParquetStorageBucket = "NewBucket",
                 ParquetStoragePrefix = "NewPrefix",
-                FileExtensionId = 4
+                FileExtensionId = 4,
+                ParentDatasetId = 2
             };
 
             Assert.IsTrue(schemaService.UpdateAndSaveSchema(dto));
@@ -2017,6 +2090,13 @@ namespace Sentry.data.Core.Tests
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
             //mock context
+            Dataset ds = new Dataset()
+            {
+                DatasetId = 2,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DatasetFileConfigs = new List<DatasetFileConfig>()
+            };
+
             DatasetFileConfig fileConfig = new DatasetFileConfig()
             {
                 Schema = new FileSchema()
@@ -2024,12 +2104,14 @@ namespace Sentry.data.Core.Tests
                     SchemaId = 1,
                     Extension = new FileExtension() { Id = 4,  }
                 },
-                ParentDataset = new Dataset() { DatasetId = 2 }
+                ParentDataset = ds
             };
-            List<DatasetFileConfig> fileConfigs = new List<DatasetFileConfig>() { fileConfig };
+
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            List<Dataset> datasets = new List<Dataset>() { ds };
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
-            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(fileConfigs.AsQueryable()).Verifiable();
+            datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
             datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
             datasetContext.Setup(x => x.GetById<FileExtension>(5)).Returns(new FileExtension() { Id = 5 }).Verifiable();
 
@@ -2042,7 +2124,7 @@ namespace Sentry.data.Core.Tests
             //mock security service
             UserSecurity security = new UserSecurity() { CanManageSchema = true };
             Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
-            securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, appUser.Object)).Returns(security).Verifiable();
+            securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
 
             //mock features
             Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
@@ -2055,7 +2137,8 @@ namespace Sentry.data.Core.Tests
             FileSchemaDto dto = new FileSchemaDto()
             {
                 SchemaId = 1,
-                FileExtensionId = 5
+                FileExtensionId = 5,
+                ParentDatasetId = 2
             };
 
             Assert.IsTrue(schemaService.UpdateAndSaveSchema(dto));
@@ -2074,6 +2157,13 @@ namespace Sentry.data.Core.Tests
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
             //mock context
+            Dataset ds = new Dataset()
+            {
+                DatasetId = 2,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DatasetFileConfigs = new List<DatasetFileConfig>()
+            };
+
             DatasetFileConfig fileConfig = new DatasetFileConfig()
             {
                 Schema = new FileSchema()
@@ -2084,12 +2174,14 @@ namespace Sentry.data.Core.Tests
                     UpdatedBy = "000001",
                     Extension = new FileExtension() { Id = 4, }
                 },
-                ParentDataset = new Dataset() { DatasetId = 2 }
+                ParentDataset = ds
             };
-            List<DatasetFileConfig> fileConfigs = new List<DatasetFileConfig>() { fileConfig };
+
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            List<Dataset> datasets = new List<Dataset>() { ds };
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
-            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(fileConfigs.AsQueryable()).Verifiable();
+            datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
             datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
 
             //mock user service
@@ -2100,7 +2192,7 @@ namespace Sentry.data.Core.Tests
             //mock security service
             UserSecurity security = new UserSecurity() { CanManageSchema = true };
             Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
-            securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, appUser.Object)).Returns(security).Verifiable();
+            securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
 
             //mock features
             Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
@@ -2115,7 +2207,8 @@ namespace Sentry.data.Core.Tests
                 SchemaId = 1,
                 Name = "Name",
                 Description = "Description",
-                FileExtensionId = 4
+                FileExtensionId = 4,
+                ParentDatasetId = 2
             };
 
             Assert.IsTrue(schemaService.UpdateAndSaveSchema(dto));
@@ -2127,8 +2220,66 @@ namespace Sentry.data.Core.Tests
             mr.VerifyAll();
         }
 
+        [TestMethod]
+        public void GetLatestSchemaRevisionJsonStructureBySchemaId_1_SchemaRevisionJsonStructureDto()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            //mock context
+            Dataset ds = new Dataset() 
+            { 
+                DatasetId = 2,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DatasetFileConfigs = new List<DatasetFileConfig>()
+            };
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig()
+            {
+                Schema = new FileSchema()
+                {
+                    SchemaId = 1,
+                    Revisions = new List<SchemaRevision>() { new SchemaRevision()
+                    {
+                        SchemaRevision_Name = "StructureTest",
+                        Revision_NBR = 1,
+                        Fields = new List<BaseField>() { new IntegerField() { Name = "FieldName", Description = "Field Description" } }
+                    } }
+                },
+                ParentDataset = ds
+            };
+
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            List<Dataset> datasets = new List<Dataset>() { ds };
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
+
+            //mock user service
+            Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object).Verifiable();
+
+            //mock security service
+            UserSecurity security = new UserSecurity() { CanManageSchema = true };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, null, null, null);
+
+            SchemaRevisionJsonStructureDto dto = schemaService.GetLatestSchemaRevisionJsonStructureBySchemaId(2, 1);
+
+            Assert.IsNotNull(dto.Revision);
+            Assert.AreEqual(1, dto.Revision.RevisionNumber);
+            Assert.AreEqual("StructureTest", dto.Revision.SchemaRevisionName);
+
+            Assert.IsNotNull(dto.JsonStructure);
+            Assert.IsTrue(JToken.DeepEquals(GetData("BasicSchema_Integer.json"), dto.JsonStructure));
+
+            mr.VerifyAll();
+        }
+
         #region Private Methods
-        private JsonSchema BuildMockJsonSchemaWithDecimalField()
+            private JsonSchema BuildMockJsonSchemaWithDecimalField()
         {
             string jsonSchema = @"{
                 ""type"": ""object"",

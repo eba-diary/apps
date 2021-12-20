@@ -17,6 +17,7 @@ namespace Sentry.data.Core
         /// <exception cref="SchemaNotFoundException">Thrown when schema is not found</exception>
         /// <returns></returns>
         List<SchemaRevisionDto> GetSchemaRevisionDtoBySchema(int id);
+
         List<BaseFieldDto> GetBaseFieldDtoBySchemaRevision(int revisionId);
 
         /// <summary>
@@ -26,6 +27,15 @@ namespace Sentry.data.Core
         /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to schema</exception>
         /// <returns></returns>
         SchemaRevisionDto GetLatestSchemaRevisionDtoBySchema(int schemaId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="schemaId"></param>
+        /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to schema</exception>
+        /// <returns></returns>
+        SchemaRevisionJsonStructureDto GetLatestSchemaRevisionJsonStructureBySchemaId(int datasetId, int schemaId);
+
         int CreateAndSaveSchema(FileSchemaDto schemaDto);
 
         /// <summary>

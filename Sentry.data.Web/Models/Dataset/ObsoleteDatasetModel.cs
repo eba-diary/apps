@@ -20,6 +20,7 @@ namespace Sentry.data.Web
 
         public ObsoleteDatasetModel(Dataset ds, IAssociateInfoProvider associateInfoService, IDatasetContext datasetContext = null)
         {
+            this.SentryOwner = associateInfoService.GetAssociateInfo(ds.PrimaryOwnerId);
             this.SentryOwnerName = this.SentryOwner.FullName;
             this.DatasetId = ds.DatasetId;
             this.Category = ds.DatasetCategories.First().Name;

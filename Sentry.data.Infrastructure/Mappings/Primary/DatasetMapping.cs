@@ -180,6 +180,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             //ISecurable Mapping
             this.Property((x) => x.IsSecured, (m) => m.Column("IsSecured_IND"));
+            this.Property((x) => x.PrimaryOwnerId, (m) => m.Column("PrimaryOwner_ID"));
             this.Property((x) => x.PrimaryContactId, (m) => m.Column("PrimaryContact_ID"));
             this.ManyToOne(x => x.Security, m =>
             {

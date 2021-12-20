@@ -3,16 +3,18 @@
     string headerColor = "categoryBanner-" + Model.CategoryColor;
 }
 
-<div class="@(Model.DisplayTabSections != true ?"visible-item":"hidden-item")">
-    <h3 class="@color">Data Preview (Top 20 Rows)</h3>
-</div>
+@if (!Model.DisplayTabSections)
+{
+    <div>
+        <h3 class="@color">Data Preview (Top 20 Rows)</h3>
+    </div>
+}
 
 <div class="@(Model.DatasetFileCount == 0 ?"visible-item":"hidden-item")">
     <h5 class="@color">No Data Files Available</h5>
 </div>
 
 <div class="@(Model.DatasetFileCount != 0 ?"visible-item":"hidden-item")">
-    <hr id="schemaHR" />
     <div id="dataSection" data-bind="visible: DataLoading() == false">
         <div class="row">
             <div class="col-lg-12">
