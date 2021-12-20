@@ -82,7 +82,6 @@ namespace Sentry.data.Core
 
 
         //ISecurable Impl.
-        public virtual string PrimaryOwnerId { get; set; }
         public virtual string PrimaryContactId { get; set; }
         public virtual bool IsSecured { get; set; }
         public virtual Security Security { get; set; }
@@ -122,10 +121,6 @@ namespace Sentry.data.Core
             if (string.IsNullOrWhiteSpace(UploadUserName))
             {
                 vr.Add(ValidationErrors.datasetUploadedByRequired, "The Dataset Upload User Name is required");
-            }
-            if (!Regex.IsMatch(PrimaryOwnerId, "(^[0-9]{6,6}$)"))
-            {
-                vr.Add(ValidationErrors.datasetOwnerInvalid, "The Sentry Owner ID should contain owners Sentry ID");
             }
             if (DatasetDtm < new DateTime(1800, 1, 1)) // null dates are ancient; this suffices to check for null dates
             {

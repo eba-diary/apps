@@ -588,10 +588,7 @@ data.Dataset = {
         };
         Sentry.InjectSpinner($("#tab-container"));
 
-        if ($("#datasetRowTable_filter").length > 0)
-        {
-            $("#datasetRowTable").DataTable().destroy();
-        };
+
 
         $.ajax({
             type: "GET",
@@ -838,9 +835,6 @@ data.Dataset = {
 
         //saidAsset onChange needs to update #PrimaryOwnerName and #PrimaryOwnerId based on saidAsset picked
         $("#saidAsset").change(function () {
-
-
-
             //Load the named environments for the selected asset
             Sentry.InjectSpinner($("div#DatasetFormContent #namedEnvironmentSpinner"), 30);
             data.Dataset.populateNamedEnvironments();
@@ -1266,6 +1260,7 @@ data.Dataset = {
                         data.Dataset.delroyInit();
                         data.Dataset.UpdateMetadata();
                         $('#delroySpinner').hide();
+                        data.RemoveSpinner('#tab-container');
                     }
                 });
             }
@@ -1294,6 +1289,7 @@ data.Dataset = {
                         $('#tabSchemaAbout').html(view);
                         ko.applyBindings(self.vm, $("#tabSchemaAbout")[0]);
                         data.Dataset.UpdateMetadata();
+                        data.RemoveSpinner('#tab-container');
                     }
                 });
             }
@@ -1323,6 +1319,7 @@ data.Dataset = {
                         if (self.vm.ShowDataFileTable()) {
                             data.Dataset.renderDataPreview();
                         }
+                        data.RemoveSpinner('#tab-container');
                     }
                 });
             }
@@ -1353,6 +1350,7 @@ data.Dataset = {
                             data.Dataset.DatasetFileTableInit(configId);
                             data.Dataset.DatasetBundingFileTableInit(configId);
                         }
+                        data.RemoveSpinner('#tab-container');
                     }
                 });
             }

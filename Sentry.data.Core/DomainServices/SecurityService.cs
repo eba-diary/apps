@@ -68,7 +68,8 @@ namespace Sentry.data.Core
             //if the user is one of the primary owners or primary contact, they should have all permissions without even requesting it.
             //Admins also get all the permissions.
             bool IsAdmin = user.IsAdmin;
-            bool IsOwner = (user.AssociateId == securable?.PrimaryOwnerId || user.AssociateId == securable?.PrimaryContactId) && user.CanModifyDataset;
+            //SES TODO SAID API
+            bool IsOwner = (user.AssociateId == securable?.PrimaryContactId) && user.CanModifyDataset;
             List<string> userPermissions = new List<string>();
 
             //set the user based permissions based off obsidian and ownership

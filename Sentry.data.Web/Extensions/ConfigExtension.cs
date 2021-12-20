@@ -77,8 +77,6 @@ namespace Sentry.data.Web
                 Scope = model.Scope,
                 RequestHeaders = model.Headers,
                 IsSecured = model.IsSecured,
-                PrimaryOwnerId = model.PrimaryOwnerId,
-                PrimaryOwnerName = model.PrimaryOwnerName,
                 PrimaryContactId= model.PrimaryContactId,
                 PrimaryContactName = model.PrimaryContactName
             };
