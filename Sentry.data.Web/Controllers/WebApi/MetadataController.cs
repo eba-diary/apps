@@ -460,7 +460,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
         public async Task<IHttpActionResult> GetLatestSchemaRevisionJsonFormat(int datasetId, int schemaId)
         {
-            return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", () => Ok(_schemaService.GetLatestSchemaRevisionJsonStructureBySchemaId(schemaId).ToModel()));
+            return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", () => Ok(_schemaService.GetLatestSchemaRevisionJsonStructureBySchemaId(datasetId, schemaId).ToModel()));
         }
 
         /// <summary>
@@ -632,7 +632,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     return Content(System.Net.HttpStatusCode.BadRequest, $"Invalid schema request: {string.Join(" | ", validationResults)}");
                 }
 
-                return Ok(_schemaService.UpdateAndSaveSchema(schemaModel.ToDto((x) => _schemaService.GetFileExtensionIdByName(x))));
+                return Ok(_schemaService.UpdateAndSaveSchema(schemaModel.ToDto(datasetId, (x) => _schemaService.GetFileExtensionIdByName(x))));
             }
 
             return ApiTryCatch("metdataapi", MethodBase.GetCurrentMethod().Name, $"datasetid:{datasetId} schemaId{schemaId}", Updater);
