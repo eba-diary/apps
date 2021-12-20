@@ -15,6 +15,7 @@ namespace Sentry.data.Web
         {
             dto.Name = model.Name;
             dto.Description = model.Description;
+            dto.ParentDatasetId = model.DatasetId;
             return dto;
         }
 
@@ -226,7 +227,7 @@ namespace Sentry.data.Web
             };
         }
 
-        public static FileSchemaDto ToDto(this SchemaInfoModel mdl, Func<string, int> extIdLookup)
+        public static FileSchemaDto ToDto(this SchemaInfoModel mdl, int datasetId, Func<string, int> extIdLookup)
         {
             return new FileSchemaDto()
             {
@@ -236,6 +237,7 @@ namespace Sentry.data.Web
                 Description = mdl.Description,
                 ObjectStatus = EnumHelper.GetByDescription<ObjectStatusEnum>(mdl.ObjectStatus),
                 DeleteInd = mdl.DeleteInd,
+                ParentDatasetId = datasetId,
                 CLA1396_NewEtlColumns = mdl.Options?.Any(a => string.Equals(a, "CLA1396_NewEtlColumns|true", StringComparison.OrdinalIgnoreCase)) == true,
                 CLA1580_StructureHive = mdl.Options?.Any(a => string.Equals(a, "CLA1580_StructureHive|true", StringComparison.OrdinalIgnoreCase)) == true,
                 CLA2472_EMRSend = mdl.Options?.Any(a => string.Equals(a, "CLA2472_EMRSend|true", StringComparison.OrdinalIgnoreCase)) == true,
