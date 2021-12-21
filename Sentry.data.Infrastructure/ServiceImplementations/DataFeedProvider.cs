@@ -113,8 +113,7 @@ namespace Sentry.data.Infrastructure
 
             foreach (Event e in rptEvents)
             {
-                Dataset ds = Query<Dataset>().FirstOrDefault(y => y.DatasetId == e.Dataset);
-
+                Dataset ds = Query<Dataset>().Where(y => y.DatasetId == e.Dataset).FetchMany(x => x.DatasetCategories).FirstOrDefault(); 
                 if (ds != null)
                 {
                     DataFeed feed = new DataFeed();
@@ -122,10 +121,20 @@ namespace Sentry.data.Infrastructure
                     feed.Name = GlobalConstants.DataFeedName.BUSINESS_INTELLIGENCE;
                     feed.Type = GlobalConstants.DataFeedType.Exhibits;
 
+                    string shortDesc = String.Empty;
+                    if(ds.DatasetCategories != null)
+                    {
+                        shortDesc = "A New Exhibit called " + ds.DatasetName + " was Created in " + ds.DatasetCategories.First().Name;
+                    }
+                    else
+                    {
+                        shortDesc = "A New Exhibit called " + ds.DatasetName + " was Created";
+                    }
+                    
                     DataFeedItem dfi = new DataFeedItem(
                         e.TimeCreated,
-                        ds.DatasetName + " - A New Exhibit was Created",
-                        ds.DatasetName + " - A New Exhibit was Created",
+                        shortDesc,
+                        shortDesc,
                         feed
                     );
 
