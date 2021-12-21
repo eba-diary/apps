@@ -248,7 +248,10 @@ namespace Sentry.data.Web
             };
 
             //setting to null because would be duplicating what is in JsonStructure
-            mdl.Revision.JsonSchemaObject = null;
+            if (mdl.Revision != null)
+            {
+                mdl.Revision.JsonSchemaObject = null;
+            }
 
             return mdl;
         }
