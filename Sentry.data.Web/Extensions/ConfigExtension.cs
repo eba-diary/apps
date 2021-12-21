@@ -227,6 +227,16 @@ namespace Sentry.data.Web
             };
         }
 
+        public static List<SchemaInfoModel> ToSchemaModel(this List<Core.DatasetFileConfigDto> dtoList)
+        {
+            List<SchemaInfoModel> modelList = new List<SchemaInfoModel>();
+            foreach (Core.DatasetFileConfigDto dto in dtoList)
+            {
+                modelList.Add(dto.ToSchemaModel());
+            }
+            return modelList;
+        }
+
         public static FileSchemaDto ToDto(this SchemaInfoModel mdl, int datasetId, Func<string, int> extIdLookup)
         {
             return new FileSchemaDto()
@@ -263,16 +273,6 @@ namespace Sentry.data.Web
                 SnowflakeStage = mdl.SnowflakeStage,
                 SnowflakeWarehouse = mdl.SnowflakeWarehouse
             };
-        }
-
-        public static List<SchemaInfoModel> ToSchemaModel(this List<Core.DatasetFileConfigDto> dtoList)
-        {
-            List<SchemaInfoModel> modelList = new List<SchemaInfoModel>();
-            foreach (Core.DatasetFileConfigDto dto in dtoList)
-            {
-                modelList.Add(dto.ToSchemaModel());
-            }
-            return modelList;
         }
 
         public static void ToModel(this DatasetFileConfigsModel model, Core.DatasetFileConfig config)

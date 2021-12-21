@@ -14,6 +14,7 @@
             public const string VERSION_QUERYTOOL = VERSION + "/queryTool";
             public const string VERSION_DATAFLOW = VERSION + "/dataflow";
             public const string VERSION_TAG = VERSION + "/tags";
+            public const string VERSION_DATAFILE = VERSION + "/datafile";
         }
 
 

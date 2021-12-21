@@ -19,5 +19,44 @@ namespace Sentry.data.Core
             }
             return resultList;
         }
+
+
+        public static IEnumerable<DatasetFileDto> ToDto(this IEnumerable<DatasetFile> datasetFileList)
+        {
+            List<DatasetFileDto> dtoList = new List<DatasetFileDto>();
+
+            foreach (DatasetFile file in datasetFileList)
+            {
+                dtoList.Add(file.ToDto());
+            }
+
+            return dtoList.AsEnumerable();
+        }
+
+        public static DatasetFileDto ToDto(this DatasetFile file)
+        {
+            DatasetFileDto dto = new DatasetFileDto()
+            {
+                DatasetFileId = file.DatasetFileId,
+                FileName = file.FileName,
+                Dataset = file.Dataset.DatasetId,
+                SchemaRevision = (file.SchemaRevision != null) ? file.SchemaRevision.SchemaRevision_Id : 0,
+                Schema = file.Schema.SchemaId,
+                DatasetFileConfig = (file.DatasetFileConfig != null) ? file.DatasetFileConfig.ConfigId : 0,
+                UploadUserName = file.UploadUserName,
+                CreateDTM = file.CreateDTM,
+                ModifiedDTM = file.ModifiedDTM,
+                FileLocation = file.FileLocation,
+                ParentDatasetFileId = file.ParentDatasetFileId,
+                VersionId = file.VersionId,
+                Information = file.Information,
+                Size = file.Size,
+                FlowExecutionGuid = file.FlowExecutionGuid,
+                RunInstanceGuid = file.RunInstanceGuid,
+                FileExtension = file.FileExtension
+            };
+
+            return dto;
+        }
     }
 }

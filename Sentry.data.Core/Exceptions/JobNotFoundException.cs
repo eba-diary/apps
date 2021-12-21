@@ -3,7 +3,8 @@ using System.Runtime.Serialization;
 
 namespace Sentry.data.Core.Exceptions
 {
-    public class JobNotFoundException : Exception, ISerializable
+    [Serializable]
+    public class JobNotFoundException : Exception
     {
         public JobNotFoundException() { }
         public JobNotFoundException(string message) : base(message) { }
