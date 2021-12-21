@@ -1,15 +1,16 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sentry.data.Core.Helpers;
+using Sentry.data.Core.Helpers.Paginate;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Sentry.data.Core.Tests
 {
     [TestClass]
-    public class PagedListTests
+    public class PaginateTests
     {
+        [TestCategory("PagedList")]
         [TestMethod]
-        public void TotalCount_Initialized()
+        public void PagedList_TotalCount_Initialized()
         {
             // Arrange
             List<int> intArray = Enumerable.Range(0, 1000).ToList();
@@ -21,8 +22,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(1000, list.TotalCount);
         }
 
+        [TestCategory("PagedList")]
         [TestMethod]
-        public void PageSize_Initialized()
+        public void PagedList_PageSize_Initialized()
         {
             // Arrange
             List<int> intArray = Enumerable.Range(0, 1000).ToList();
@@ -34,8 +36,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(10, list.PageSize);
         }
 
+        [TestCategory("PagedList")]
         [TestMethod]
-        public void CurrentPage_Initialized()
+        public void PagedList_CurrentPage_Initialized()
         {
             // Arrange
             List<int> intArray = Enumerable.Range(0, 1000).ToList();
@@ -47,8 +50,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(1, list.CurrentPage);
         }
 
+        [TestCategory("PagedList")]
         [TestMethod]
-        public void TotalPages_Initialized()
+        public void PagedList_TotalPages_Initialized()
         {
             // Arrange
             List<int> intArray = Enumerable.Range(0, 1000).ToList();
@@ -60,8 +64,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(100, list.TotalPages);
         }
 
+        [TestCategory("PagedList")]
         [TestMethod]
-        public void Items_Added_Initialized()
+        public void PagedList_Items_Added_Initialized()
         {
             // Arrange
             List<int> intArray = Enumerable.Range(0, 1000).ToList();
@@ -73,8 +78,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(1000, list.Count);
         }
 
+        [TestCategory("PagedList")]
         [TestMethod]
-        public void ToPagedList_CurrentPage_Initialized()
+        public void PagedList_ToPagedList_CurrentPage_Initialized()
         {
             // Arrange
             IQueryable<int> intQueryArray = Enumerable.Range(0, 1000).AsQueryable();
@@ -86,8 +92,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(1, list.CurrentPage);
         }
 
+        [TestCategory("PagedList")]
         [TestMethod]
-        public void ToPagedList_PageSize_Initialized()
+        public void PagedList_ToPagedList_PageSize_Initialized()
         {
             // Arrange
             IQueryable<int> intQueryArray = Enumerable.Range(0, 1000).AsQueryable();
@@ -99,8 +106,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(10, list.PageSize);
         }
 
+        [TestCategory("PagedList")]
         [TestMethod]
-        public void ToPagedList_Total_Count()
+        public void PagedList_ToPagedList_Total_Count()
         {
             // Arrange
             IQueryable<int> intQueryArray = Enumerable.Range(0, 1000).AsQueryable();
@@ -112,8 +120,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(1000, list.TotalCount);
         }
 
+        [TestCategory("PagedList")]
         [TestMethod]
-        public void ToPagedList_HasPrevious_and_HasNext_on_First_Page()
+        public void PagedList_ToPagedList_HasPrevious_and_HasNext_on_First_Page()
         {
             // Arrange
             IQueryable<int> intQueryArray = Enumerable.Range(0, 3).AsQueryable();
@@ -126,8 +135,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(true, list.HasNext);
         }
 
+        [TestCategory("PagedList")]
         [TestMethod]
-        public void ToPagedList_HasPrevious_and_HasNext_on_Middle_Page()
+        public void PagedList_ToPagedList_HasPrevious_and_HasNext_on_Middle_Page()
         {
             // Arrange
             IQueryable<int> intQueryArray = Enumerable.Range(0, 3).AsQueryable();
@@ -140,8 +150,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(true, list.HasNext);
         }
 
+        [TestCategory("PagedList")]
         [TestMethod]
-        public void ToPagedList_HasPrevious_and_HasNext_on_Last_Page()
+        public void PagedList_ToPagedList_HasPrevious_and_HasNext_on_Last_Page()
         {
             // Arrange
             IQueryable<int> intQueryArray = Enumerable.Range(0, 3).AsQueryable();
@@ -154,8 +165,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(false, list.HasNext);
         }
 
+        [TestCategory("PagedList")]
         [TestMethod]
-        public void ToPagedList_HasPrevious_and_HasNext_on_Only_Page()
+        public void PagedList_ToPagedList_HasPrevious_and_HasNext_on_Only_Page()
         {
             // Arrange
             IQueryable<int> intQueryArray = Enumerable.Range(0, 1).AsQueryable();
@@ -168,8 +180,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(false, list.HasNext);
         }
 
+        [TestCategory("PagedList")]
         [TestMethod]
-        public void ToPagedList_Page_Greater_Than_Exists()
+        public void PagedList_ToPagedList_Page_Greater_Than_Exists()
         {
             // Arrange
             IQueryable<int> intQueryArray = Enumerable.Range(0, 1).AsQueryable();
@@ -181,6 +194,105 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(true, list.HasPrevious);
             Assert.AreEqual(false, list.HasNext);
             Assert.AreEqual(0, list.Count);
+        }
+
+        [TestCategory("PageParameters")]
+        [TestMethod]
+        public void PageParameters_PageNumber_Non_Null_Value_Is_Not_Defaulted()
+        {
+            // Arrage
+            PageParameters pageParams = new PageParameters(123, null);
+
+            // Assert
+            Assert.AreEqual(123, pageParams.PageNumber);
+        }
+
+        [TestCategory("PageParameters")]
+        [TestMethod]
+        public void PageParameters_PageNumber_Null_Value_Is_Defaulted()
+        {
+            // Arrage
+            PageParameters pageParams = new PageParameters(null, null);
+
+            // Assert
+            Assert.AreEqual(1, pageParams.PageNumber);
+        }
+
+        [TestCategory("PageParameters")]
+        [TestMethod]
+        public void PageParameters_PageNumber_Zero_Value_Is_Defaulted()
+        {
+            // Arrage
+            PageParameters pageParams = new PageParameters(0, null);
+
+            // Assert
+            Assert.AreEqual(1, pageParams.PageNumber);
+        }
+
+        [TestCategory("PageParameters")]
+        [TestMethod]
+        public void PageParameters_PageNumber_Negative_Value_Is_Defaulted()
+        {
+            // Arrage
+            PageParameters pageParams = new PageParameters(-1, null);
+
+            // Assert
+            Assert.AreEqual(1, pageParams.PageNumber);
+        }
+
+        [TestCategory("PageParameters")]
+        [TestMethod]
+        public void PageParameters_PageSize_Value_Greater_Than_Max_Size_Is_Defaulted_To_MaxPageSize()
+        {
+            // Arrage
+            PageParameters pageParams = new PageParameters(null, 10001);
+
+            // Assert
+            Assert.AreEqual(10000, pageParams.PageSize);
+        }
+
+        [TestCategory("PageParameters")]
+        [TestMethod]
+        public void PageParameters_PageSize_Non_Null_Value_Is_Not_Defaulted()
+        {
+            // Arrage
+            PageParameters pageParams = new PageParameters(null, 543);
+
+            // Assert
+            Assert.AreEqual(543, pageParams.PageSize);
+        }
+
+        [TestCategory("PageParameters")]
+        [TestMethod]
+        public void PageParameters_PageSize_Null_Value_Is_Defaulted()
+        {
+            // Arrage
+            PageParameters pageParams = new PageParameters(null, null);
+
+            // Assert
+            Assert.AreEqual(10, pageParams.PageSize);
+        }
+
+        [TestCategory("PageParameters")]
+        [TestMethod]
+        public void PageParameters_PageSize_Zero_Value_Is_Defaulted()
+        {
+            // Arrage
+            PageParameters pageParams = new PageParameters(null, 0);
+
+            // Assert
+            Assert.AreEqual(10, pageParams.PageSize);
+        }
+
+        [TestCategory("PageParameters")]
+        [TestMethod]
+        public void PageParameters_PageSize_Negative_Value_Is_Defaulted()
+        {
+            // Arrage
+            PageParameters pageParams = new PageParameters(null, -1);
+
+            // Assert
+            Assert.AreEqual(10, pageParams.PageSize);
         }
     }
 }

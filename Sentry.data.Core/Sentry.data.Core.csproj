@@ -193,7 +193,7 @@
     <Compile Include="Entities\MessageFormats\S3Event.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableCreateModel.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
-    <Compile Include="Entities\PageParameters.cs" />
+    <Compile Include="Helpers\Paginate\PageParameters.cs" />
     <Compile Include="Entities\S3\S3LambdaEvent.cs" />
     <Compile Include="Entities\S3\S3ObjectEvent.cs" />
     <Compile Include="Entities\Security\SAIDAsset.cs" />
@@ -271,7 +271,7 @@
     <Compile Include="Extensions\JsonStructureExtensions.cs" />
     <Compile Include="Helpers\LambdaClientConfig.cs" />
     <Compile Include="Helpers\LoggingUtils.cs" />
-    <Compile Include="Helpers\PagedList.cs" />
+    <Compile Include="Helpers\Paginate\PagedList.cs" />
     <Compile Include="Helpers\ParsingHelpers.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />

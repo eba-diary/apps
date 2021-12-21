@@ -1,5 +1,5 @@
 ﻿using Sentry.data.Core.Exceptions;
-using Sentry.data.Core.Helpers;
+using Sentry.data.Core.Helpers.Paginate;
 using System.Linq;
 
 namespace Sentry.data.Core
@@ -21,6 +21,11 @@ namespace Sentry.data.Core
         public PagedList<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
         {
             DatasetFileConfig config = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+            
+            if (config == null)
+            {
+                throw new SchemaNotFoundException();
+            }
 
             UserSecurity us = _securityService.GetUserSecurity(config.ParentDataset, _userService.GetCurrentUser());
             if (!us.CanViewFullDataset)

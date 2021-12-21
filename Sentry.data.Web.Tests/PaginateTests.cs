@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sentry.data.Core.Helpers;
+using Sentry.data.Core.Helpers.Paginate;
 using Sentry.data.Web.Models.ApiModels;
 using System.Linq;
 

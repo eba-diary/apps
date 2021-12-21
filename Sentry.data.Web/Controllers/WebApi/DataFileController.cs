@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
-using Sentry.data.Core.Helpers;
+using Sentry.data.Core.Helpers.Paginate;
 using Sentry.data.Web.Models.ApiModels.DatasetFile;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;

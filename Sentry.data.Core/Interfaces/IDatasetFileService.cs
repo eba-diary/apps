@@ -1,4 +1,4 @@
-﻿using Sentry.data.Core.Helpers;
+﻿using Sentry.data.Core.Helpers.Paginate;
 
 namespace Sentry.data.Core
 {

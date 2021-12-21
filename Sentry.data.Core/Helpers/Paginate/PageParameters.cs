@@ -1,11 +1,11 @@
-﻿namespace Sentry.data.Core
+﻿namespace Sentry.data.Core.Helpers.Paginate
 {
     public class PageParameters
     {
         public PageParameters(int? pageNumber, int? pageSize)
         {
-            _pageNumber = pageNumber ?? 1;
-            if (pageSize == null || pageSize == 0)
+            _pageNumber = pageNumber.GetValueOrDefault() <= 0 ? 1 : pageNumber.Value;
+            if (pageSize.GetValueOrDefault() <= 0)
             {
                 _pageSize = defaultPageSize;
             }

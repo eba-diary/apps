@@ -1,4 +1,4 @@
-﻿using Sentry.data.Core.Helpers;
+﻿using Sentry.data.Core.Helpers.Paginate;
 using System.Collections.Generic;
 
 namespace Sentry.data.Web.Models.ApiModels

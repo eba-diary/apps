@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Sentry.data.Core.Helpers
+namespace Sentry.data.Core.Helpers.Paginate
 {
     public class PagedList<T> : List<T>
     {

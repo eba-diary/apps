@@ -118,7 +118,7 @@
     <Compile Include="BaseCoreUnitTest.cs" />
     <Compile Include="DatasetTests.cs" />
     <Compile Include="Mockups\MockClasses\MockClasses.cs" />
-    <Compile Include="PagedListTests.cs" />
+    <Compile Include="PaginateTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceImplementationTests\BusinessAreaServiceTests.cs" />
     <Compile Include="ServiceImplementationTests\BusinessIntelligenceServiceTests.cs" />

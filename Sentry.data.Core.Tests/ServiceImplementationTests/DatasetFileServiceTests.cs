@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Sentry.data.Core.Exceptions;
-using Sentry.data.Core.Helpers;
+using Sentry.data.Core.Helpers.Paginate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
