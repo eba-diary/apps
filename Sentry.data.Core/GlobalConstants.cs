@@ -46,6 +46,7 @@
 
             public const string DELETE_DATASET_SCHEMA = "Deleted Dataset Schema";
             public const string SYNC_DATASET_SCHEMA = "Sync Schema";
+            public const string CREATE_DATASET_SCHEMA = "Created Dataset Schema";
 
             public const string CREATED_TAG = "Created Tag";
             public const string UPDATED_TAG = "Updated Tag";
@@ -122,13 +123,15 @@
             public const string DataAssets = "Data Assets";
             public const string Exhibits = "Exhibits";
             public const string Notifications = "Notifications";
+            public const string Schemas = "Schemas";
         }
 
 
         public static class DataFeedName
         {
             public const string BUSINESS_INTELLIGENCE = "Business Intelligence";
-            public const string DATASET = "Datasets";
+            public const string DATASET = "Dataset";
+            public const string SCHEMA = "Schema";
             public const string NOTIFICATION = "Notification";
         }
 

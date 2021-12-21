@@ -25,12 +25,15 @@ namespace Sentry.data.Core
         private readonly IDataFeatures _dataFeatures;
         private readonly IMessagePublisher _messagePublisher;
         private readonly ISnowProvider _snowProvider;
+        private readonly IEventService _eventService;
+
+
         private string _bucket;
         private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, IEventService eventService)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -41,7 +44,7 @@ namespace Sentry.data.Core
             _dataFeatures = dataFeatures;
             _messagePublisher = messagePublisher;
             _snowProvider = snowProvider;
-
+            _eventService = eventService;
         }
 
         private string RootBucket
@@ -173,11 +176,7 @@ namespace Sentry.data.Core
             MethodBase m = MethodBase.GetCurrentMethod();
             Logger.Info($"startmethod <{m.ReflectedType.Name}>");
 
-            DatasetFileConfig fileConfig = GetDatasetFileConfigBySchemaId(schemaDto.SchemaId);
-            Dataset parentDataset = fileConfig.ParentDataset;
-
-            //Check user access to modify schema, of not throw exception
-            CheckAccessToDataset(parentDataset, x => x.CanManageSchema);          
+            DatasetFileConfig fileConfig = GetDatasetFileConfig(schemaDto.ParentDatasetId, schemaDto.SchemaId, x => x.CanManageSchema);
 
             JObject whatPropertiesChanged;
             /* Any exceptions saving schema changes, do not execute remaining line of code */
@@ -185,7 +184,7 @@ namespace Sentry.data.Core
             {
                 //Update/save schema within DSC metadata
                 whatPropertiesChanged = UpdateSchema(schemaDto, fileConfig.Schema);
-                Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {parentDataset.DatasetName}\\{fileConfig.Schema.Name} | {whatPropertiesChanged}");
+                Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {fileConfig.ParentDataset.DatasetName}\\{fileConfig.Schema.Name} | {whatPropertiesChanged}");
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -524,14 +523,10 @@ namespace Sentry.data.Core
             return revision?.ToDto();
         }
 
-        public SchemaRevisionJsonStructureDto GetLatestSchemaRevisionJsonStructureBySchemaId(int schemaId)
+        public SchemaRevisionJsonStructureDto GetLatestSchemaRevisionJsonStructureBySchemaId(int datasetId, int schemaId)
         {
             //check schema exists
-            DatasetFileConfig fileConfig = GetDatasetFileConfigBySchemaId(schemaId);
-            Dataset ds = fileConfig.ParentDataset;
-
-            //check permissions
-            CheckAccessToDataset(ds, (x) => x.CanPreviewDataset || x.CanViewFullDataset || x.CanUploadToDataset || x.CanEditDataset || x.CanManageSchema);
+            DatasetFileConfig fileConfig = GetDatasetFileConfig(datasetId, schemaId, x => x.CanPreviewDataset || x.CanViewFullDataset || x.CanUploadToDataset || x.CanEditDataset || x.CanManageSchema);
 
             //get latest revision
             SchemaRevision revision = fileConfig.GetLatestSchemaRevision();
@@ -732,9 +727,18 @@ namespace Sentry.data.Core
             throw new SchemaUnauthorizedAccessException();
         }
 
-        private DatasetFileConfig GetDatasetFileConfigBySchemaId(int schemaId)
+        private DatasetFileConfig GetDatasetFileConfig(int datasetId, int schemaId, Func<UserSecurity, bool> userCan)
         {
-            DatasetFileConfig fileConfig = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).FirstOrDefault();
+            Dataset ds = _datasetContext.Datasets.FirstOrDefault(x => x.DatasetId == datasetId && x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
+
+            if (ds == null)
+            {
+                throw new DatasetNotFoundException();
+            }
+
+            CheckAccessToDataset(ds, userCan);
+
+            DatasetFileConfig fileConfig = ds.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId);
 
             if (fileConfig == null)
             {
@@ -814,6 +818,10 @@ namespace Sentry.data.Core
 
             };
             _datasetContext.Add(schema);
+            
+            //ADD SCHEMA CREATED EVENT HERE BECAUSE THIS IS WHERE ITS ADDED EITHER FROM NEW DATASET OR NEW SCHEMA
+            _eventService.PublishSuccessEventBySchemaId(GlobalConstants.EventType.CREATE_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, GlobalConstants.EventType.CREATE_DATASET_SCHEMA, dto.ParentDatasetId, schema.SchemaId);
+
             return schema;
         }
 
@@ -1072,9 +1080,9 @@ namespace Sentry.data.Core
                 }
 
                 //Varchar Length
-                if (fieldDto.FieldType == GlobalConstants.Datatypes.VARCHAR && (fieldDto.Length < 1 || fieldDto.Length > 65535))
+                if (fieldDto.FieldType == GlobalConstants.Datatypes.VARCHAR && (fieldDto.Length < 1 || fieldDto.Length > 16000000)) //true max is 16777216
                 {
-                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) VARCHAR length ({fieldDto.Length}) is required to be between 1 and 65535");
+                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) VARCHAR length ({fieldDto.Length}) is required to be between 1 and 100000");
                 }
 
                 //Decimal Precision

@@ -120,8 +120,8 @@
 
     <br />
 
-    <div class="row">
-        <div class="col-lg-12">
+    <div>
+        <div>
             <div class="row">
                 <div class="col-lg-8 col-sm-6">
                     <div>
@@ -150,7 +150,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                         }
 
                         @if (!String.IsNullOrWhiteSpace(Model.DatasetInformation) && Model.Security.CanPreviewDataset)
@@ -259,8 +259,9 @@
                 </div>
             </div>
         </div>
+
     </div>
-    <hr/>
+    <hr />
 
     @if (!Model.DisplayTabSections)
     {
@@ -283,43 +284,45 @@
     }
     else
     {
-        <div class="tabs-wrapper">
-            <ul class="nav nav-tabs">
-                <li role="presentation" class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#panelSchemaAbout" id="detailTabSchemaAbout" role="tab">About this Schema</a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#panelSchemaColumns" id="detailTabSchemaColumns" role="tab">Columns</a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Data Preview (Top 20 Rows)</a>
-                </li>
-                <li role="presentation" class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#panelDataFiles" id="detailTabDataFiles" role="tab">Data Files</a>
-                </li>
-            </ul>
-        </div>
+        <div id="datasetDetailTabs">
+            <div class="tabs-wrapper">
+                <ul class="nav nav-tabs">
+                    <li role="presentation" class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#panelSchemaAbout" id="detailTabSchemaAbout" role="tab">About this Schema</a>
+                    </li>
+                    <li role="presentation" class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#panelSchemaColumns" id="detailTabSchemaColumns" role="tab">Columns</a>
+                    </li>
+                    <li role="presentation" class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Data Preview (Top 20 Rows)</a>
+                    </li>
+                    <li role="presentation" class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#panelDataFiles" id="detailTabDataFiles" role="tab">Data Files</a>
+                    </li>
+                </ul>
+            </div>
 
-        <!-- Tab panels -->
-        <div class="tab-content">
-            <div class="tab-pane fade" id="panelSchemaAbout" role="tabpanel">
-                @if (Model.Security.CanPreviewDataset)
-                {
-                    <div id="tabSchemaAbout"></div>
-                }
-            </div>
-            <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
-                @if (Model.Security.CanPreviewDataset)
-                {
-                    <div id="tabSchemaColumns"></div>
-                }
-            </div>
-            <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
-                <div id="tabDataPreview"></div>
-            </div>
-            <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
-                <div id="tabDataFiles"></div>
+            <!-- Tab panels -->
+            <div class="tab-content" id="tab-container">
+                <div class="tab-pane fade" id="panelSchemaAbout" role="tabpanel">
+                    @if (Model.Security.CanPreviewDataset)
+                    {
+                        <div id="tabSchemaAbout"></div>
+                    }
+                </div>
+                <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
+                    @if (Model.Security.CanPreviewDataset)
+                    {
+                        <div id="tabSchemaColumns"></div>
+                    }
+                </div>
+                <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
+                    <div id="tabDataPreview"></div>
+                </div>
+                <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
+                    <div id="tabDataFiles"></div>
 
+                </div>
             </div>
         </div>
     }

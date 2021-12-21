@@ -44,13 +44,13 @@ namespace Sentry.data.Web.Tests
                 ParquetStoragePrefix = "PSP"
             };
 
-            FileSchemaDto dto = mdl.ToDto((x) => 1);
+            FileSchemaDto dto = mdl.ToDto(1, (x) => 1);
 
             Assert.AreEqual(1, dto.SchemaId);
             Assert.AreEqual("EntityName", dto.SchemaEntity_NME);
             Assert.AreEqual("SchemaName", dto.Name);
             Assert.AreEqual("Schema Description", dto.Description);
-            Assert.AreEqual(0, dto.ParentDatasetId);
+            Assert.AreEqual(1, dto.ParentDatasetId);
             Assert.AreEqual(ObjectStatusEnum.Active, dto.ObjectStatus);
             Assert.AreEqual(false, dto.DeleteInd);
             Assert.AreEqual(null, dto.DeleteIssuer);
@@ -92,7 +92,7 @@ namespace Sentry.data.Web.Tests
                 SchemaRootPath = null
             };
 
-            FileSchemaDto dto = mdl.ToDto((x) => 1);
+            FileSchemaDto dto = mdl.ToDto(1, (x) => 1);
 
             Assert.AreEqual(false, dto.CLA1396_NewEtlColumns);
             Assert.IsFalse(dto.CLA1286_KafkaFlag);
@@ -132,6 +132,21 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("2021-12-15T15:15:00", mdl.Revision.LastUpdatedDTM);
             Assert.AreEqual(null, mdl.Revision.JsonSchemaObject);
             Assert.IsNotNull(mdl.JsonStructure);
+        }
+
+        [TestMethod]
+        public void ToModel_SchemaRevisionJsonStructureDto_NullRevision_SchemaRevisionJsonStructureModel()
+        {
+            SchemaRevisionJsonStructureDto dto = new SchemaRevisionJsonStructureDto()
+            {
+                Revision = null,
+                JsonStructure = null
+            };
+
+            SchemaRevisionJsonStructureModel mdl = dto.ToModel();
+
+            Assert.IsNull(mdl.Revision);
+            Assert.IsNull(mdl.JsonStructure);
         }
 
         [TestMethod]

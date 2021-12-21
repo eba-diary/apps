@@ -33,7 +33,7 @@
 									(24, 'Deleted Dataset', 1,0,@GroupDATASET),
 									(25, 'Downloaded Report', 1,0,@GroupDATASET),
 									(26, 'Sync Schema', 1,0,@GroupDATASET),
-									(37, 'Deleted Dataset Schema', 1,0,@GroupDATASET),
+									
 									
 									(27, 'Critical Notification'		,1	,1	,@GroupBUSINESSAREA),
 									(28, 'Warning Notification'			,2	,1	,@GroupBUSINESSAREA),
@@ -47,7 +47,10 @@
 									(34, 'Warning Notification Update'	,2	,0	,@GroupBUSINESSAREA),
 									(35, 'Info Notification Update'		,3	,0	,@GroupBUSINESSAREA),
 
-									(36, 'DaleQuery'							,3	,0	,@GroupDALE)
+									(36, 'DaleQuery'							,3	,0	,@GroupDALE),
+									
+									(37, 'Deleted Dataset Schema', 1,0,@GroupDATASET),
+									(38, 'Created Dataset Schema', 1,0,@GroupDATASET)
 
 								)
 								AS Source ([Type_ID], [Description], Severity, Display_IND, [Group_CDE]) 
