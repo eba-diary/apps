@@ -2242,7 +2242,7 @@ namespace Sentry.data.Core.Tests
                     {
                         SchemaRevision_Name = "StructureTest",
                         Revision_NBR = 1,
-                        Fields = new List<BaseField>() { new IntegerField() { Name = "FieldName", Description = "Field Description" } }
+                        Fields = new List<BaseField>() { new IntegerField() { Name = "fieldname", Description = "Field Description" } }
                     } }
                 },
                 ParentDataset = ds
