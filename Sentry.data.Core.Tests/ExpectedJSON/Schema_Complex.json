@@ -3,29 +3,29 @@
   "title": "StructureTest",
   "type": "object",
   "properties": {
-    "basename": {
+    "baseName": {
       "type": "string",
       "maxlength": 1000,
       "description": "baseName Description"
     },
-    "basedate": {
+    "baseDate": {
       "type": "string",
       "format": "date",
       "dsc-format": "yyyy-MM-dd",
       "description": "baseDate Description"
     },
-    "baseobjectarray": {
+    "baseObjectArray": {
       "type": "array",
       "items": [
         {
           "type": "object",
           "properties": {
-            "objectarrayname": {
+            "objectArrayName": {
               "type": "string",
               "maxlength": 1000,
               "description": "objectArrayName Description"
             },
-            "objectarraynumberarray": {
+            "objectArrayNumberArray": {
               "type": "array",
               "items": [
                 {
@@ -34,32 +34,32 @@
               ],
               "description": "objectArrayNumberArray Description"
             },
-            "objectarrayobject": {
+            "objectArrayObject": {
               "type": "object",
               "properties": {
-                "objectarrayobjectname": {
+                "objectArrayObjectName": {
                   "type": "string",
                   "maxlength": 1000,
                   "description": "objectArrayObjectName Description"
                 },
-                "objectarrayobjectdatetime": {
+                "objectArrayObjectDateTime": {
                   "type": "string",
                   "format": "date-time",
                   "dsc-format": "yyyy-MM-dd HH:mm:ss",
                   "description": "objectArrayObjectDateTime Description"
                 },
-                "objectarrayobjectarray": {
+                "objectArrayObjectArray": {
                   "type": "array",
                   "items": [
                     {
                       "type": "object",
                       "properties": {
-                        "objectarrayobjectarrayname": {
+                        "objectArrayObjectArrayName": {
                           "type": "string",
                           "maxlength": 1000,
                           "description": "objectArrayObjectArrayName Description"
                         },
-                        "objectarrayobjectarraynumber": {
+                        "objectArrayObjectArrayNumber": {
                           "type": "number",
                           "dsc-precision": 11,
                           "dsc-scale": 2,
@@ -78,14 +78,14 @@
       ],
       "description": "baseObjectArray Description"
     },
-    "baseobject": {
+    "baseObject": {
       "type": "object",
       "properties": {
-        "objectnumber": {
+        "objectNumber": {
           "type": "integer",
           "description": "objectNumber Description"
         },
-        "objectdatearray": {
+        "objectDateArray": {
           "type": "array",
           "items": [
             {
@@ -96,40 +96,40 @@
           ],
           "description": "objectDateArray Description"
         },
-        "objectobject": {
+        "objectObject": {
           "type": "object",
           "properties": {
-            "objectobjectnumber": {
+            "objectObjectNumber": {
               "type": "number",
               "dsc-precision": 5,
               "dsc-scale": 2,
               "description": "objectObjectNumber Description"
             },
-            "objectobjectobject": {
+            "objectObjectObject": {
               "type": "object",
               "properties": {
-                "objectobjectobjectname": {
+                "objectObjectObjectName": {
                   "type": "string",
                   "maxlength": 1000,
                   "description": "objectObjectObjectName Description"
                 },
-                "objectobjectobjectdatetime": {
+                "objectObjectObjectDateTime": {
                   "type": "string",
                   "format": "date-time",
                   "dsc-format": "yyyy-MM-dd hh:mm:ss",
                   "description": "objectObjectObjectDateTime Description"
                 },
-                "objectobjectobjectobjectarray": {
+                "objectObjectObjectObjectArray": {
                   "type": "array",
                   "items": [
                     {
                       "type": "object",
                       "properties": {
-                        "objectobjectobjectobjectarraynumber": {
+                        "objectObjectObjectObjectArrayNumber": {
                           "type": "integer",
                           "description": "objectObjectObjectObjectArrayNumber Description"
                         },
-                        "objectobjectobjectobjectarrayarray": {
+                        "objectObjectObjectObjectArrayArray": {
                           "type": "array",
                           "items": [
                             {
