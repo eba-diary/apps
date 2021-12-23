@@ -139,29 +139,6 @@ namespace Sentry.data.Core.Tests
             //ASSERT
             Assert.IsFalse(us.CanEditDataset);
         }
-        
-        
-        /// <summary>
-        /// user should be able to edit dataset with Modify permission and being the owner.
-        /// </summary>
-        [TestMethod]
-        public void Security_Can_Edit_Dataset_As_Owner()
-        {
-            //ARRAGE
-            ISecurable securable = MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
-
-            IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
-
-            //ACT
-            var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
-
-            //ASSERT
-            Assert.IsTrue(us.CanEditDataset);
-        }
 
         /// <summary>
         /// Even though the user is the owner, they do not have the modify permission, they should not be able to edit dataset.
@@ -229,28 +206,6 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsFalse(us.CanManageSchema);
-        }
-
-        /// <summary>
-        /// user should be able to manage schema with Modify permission and being the owner.
-        /// </summary>
-        [TestMethod]
-        public void Security_Can_Manage_Schema_NonSecured_As_Owner_With_Modify_Permission()
-        {
-            //ARRAGE
-            ISecurable securable = MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
-
-            IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
-
-            //ACT
-            var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
-
-            //ASSERT
-            Assert.IsTrue(us.CanManageSchema);
         }
 
         /// <summary>
@@ -326,37 +281,6 @@ namespace Sentry.data.Core.Tests
         #endregion
 
         #region "CanPreviewDataset"
-        /// <summary>
-        /// Can Preview Dataset.  Assume ticket is not approved, user is in group, user is the owner.
-        /// </summary>
-        [TestMethod]
-        public void Security_CanPreview_NotApproved_Owner_InGroup()
-        {
-            //ARRAGE
-            Security security = BuildBaseSecurity();
-            SecurityTicket ticket = BuildBaseTicket(security, "MyAdGroupName");
-            SecurityPermission previewPermission = BuildBasePermission(ticket, CanPreviewDataset(), false);
-
-            ticket.Permissions.Add(previewPermission);
-            security.Tickets.Add(ticket);
-
-            ISecurable securable = MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
-
-            IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket.AdGroupName)).Return(true).Repeat.Any();
-            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
-
-            //ACT
-            var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
-
-            //ASSERT
-            Assert.IsTrue(us.CanPreviewDataset);
-        }
-
         /// <summary>
         /// Can Preview Dataset.  Assume ticket is not approved, user is in group, user is not the owner.
         /// </summary>
@@ -438,37 +362,6 @@ namespace Sentry.data.Core.Tests
             IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
             user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
             user.Stub(x => x.IsInGroup(ticket.AdGroupName)).Return(true).Repeat.Any();
-
-            //ACT
-            var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
-
-            //ASSERT
-            Assert.IsTrue(us.CanPreviewDataset);
-        }
-
-        /// <summary>
-        /// Can Preview Dataset.  Assume ticket is approved, user not in group, user is the owner.
-        /// </summary>
-        [TestMethod]
-        public void Security_CanPreview_Approval_Owner_NotInGroup()
-        {
-            //ARRAGE
-            Security security = BuildBaseSecurity();
-            SecurityTicket ticket = BuildBaseTicket(security, "MyAdGroupName");
-            SecurityPermission previewPermission = BuildBasePermission(ticket, CanPreviewDataset(), true);
-
-            ticket.Permissions.Add(previewPermission);
-            security.Tickets.Add(ticket);
-
-            ISecurable securable = MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
-
-            IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket.AdGroupName)).Return(false).Repeat.Any();
-            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
