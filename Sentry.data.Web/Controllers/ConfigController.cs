@@ -173,11 +173,13 @@ namespace Sentry.data.Web.Controllers
                 if (dto.ConfigId == 0)
                 { //Create Dataset File Config
                     bool IsSuccessful = false;
+                    
                     int newSchemaId = _schemaService.CreateAndSaveSchema(schemaDto);
                     if (newSchemaId != 0)
                     {
                         dto.SchemaId = newSchemaId;
                         IsSuccessful = _configService.CreateAndSaveDatasetFileConfig(dto);
+                        _schemaService.PublishSchemaEvent(schemaDto.ParentDatasetId, newSchemaId);
                     }
 
                     if (IsSuccessful)
