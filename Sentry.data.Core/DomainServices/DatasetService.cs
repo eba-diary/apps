@@ -231,10 +231,10 @@ namespace Sentry.data.Core
 
             DatasetFileConfigDto configDto = dto.ToConfigDto();
             FileSchemaDto fileDto = dto.ToSchemaDto();
+            
             configDto.SchemaId = _schemaService.CreateAndSaveSchema(fileDto);
             _configService.CreateAndSaveDatasetFileConfig(configDto);
-
-
+            _schemaService.PublishSchemaEvent(dto.DatasetId, configDto.SchemaId);
             _datasetContext.SaveChanges();
 
             return ds.DatasetId;
