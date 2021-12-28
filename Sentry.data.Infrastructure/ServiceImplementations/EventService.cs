@@ -39,7 +39,6 @@ namespace Sentry.data.Infrastructure
             Task.Factory.StartNew(() => SaveEvent(eventType, userId, reason, datasetId, 0, null, 0, schemaId, null, null), TaskCreationOptions.RunContinuationsAsynchronously);
         }
 
-
         private void SaveEvent(string eventType, string userId, string reason, int datasetId, int configId, Notification notification, int dataAssetId, int schemaId, string lineCde = null, string search = null)
         {
             using (IDatasetContext _datasetContext = Bootstrapper.Container.GetNestedContainer().GetInstance<IDatasetContext>())
@@ -51,19 +50,45 @@ namespace Sentry.data.Infrastructure
                 {
                     datasetId = _datasetContext.GetById<DatasetFileConfig>(configId).ParentDataset.DatasetId;
                 }
-                if (configId == 0 && datasetId != 0)
-                {
-                    //Need to ensure object has not been deleted (i.e. Deleted Report event will be submitted after successfuly deleted)
-                    Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
-                    DatasetFileConfig dfc = (ds == null) ? null : ds.DatasetFileConfigs.FirstOrDefault();
-                    configId = (dfc == null) ? 0 : dfc.ConfigId;
-                }
 
+                configId = GetConfigId(datasetId, schemaId);
                 Event evt = CreateEvent(et, status, userId, reason, datasetId, configId, notification, dataAssetId, schemaId, lineCde, search);
-
                 _datasetContext.Add(evt);
                 _datasetContext.SaveChanges();
             }
+        }
+
+        private int GetConfigId(int datasetId, int schemaId)
+        {
+            int configId = 0;
+
+            using (IDatasetContext _datasetContext = Bootstrapper.Container.GetNestedContainer().GetInstance<IDatasetContext>())
+            {
+                if (configId == 0 && datasetId != 0)
+                {
+                    Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+                    DatasetFileConfig dfc;
+                    if (ds != null)
+                    {
+                        if (schemaId == 0)
+                        {
+                            dfc = ds.DatasetFileConfigs.FirstOrDefault();
+                        }
+                        else
+                        {
+                            dfc = ds.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+                        }
+                    }
+                    else
+                    {
+                        dfc = null;
+                    }
+
+                    configId = (dfc == null) ? 0 : dfc.ConfigId;
+                }
+            }
+
+            return configId;
         }
 
         private Event CreateEvent(EventType eventType, Status status, string userId, string reason, int? datasetId, int? configId, Notification notification, int? dataAssetId,  int? schemaId, string lineCde, string search)
