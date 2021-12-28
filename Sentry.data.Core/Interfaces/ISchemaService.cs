@@ -57,6 +57,7 @@ namespace Sentry.data.Core
         /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to manage schema</exception>
         /// <returns></returns>
         bool UpdateAndSaveSchema(FileSchemaDto schemaDto);
+        void PublishSchemaEvent(int datasetId, int schemaId);
 
         /// <summary>
         /// 

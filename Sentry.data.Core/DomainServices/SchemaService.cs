@@ -83,6 +83,12 @@ namespace Sentry.data.Core
             return newSchema.SchemaId;
         }
 
+        //SINCE SCHEMA SAVED FROM MULTIPLE PLACES, HAVE ONE METHOD TO TAKE CARE OF PUBLISHING SAVE
+        public void PublishSchemaEvent(int datasetId, int schemaId)
+        {
+            _eventService.PublishSuccessEventBySchemaId(GlobalConstants.EventType.CREATE_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, GlobalConstants.EventType.CREATE_DATASET_SCHEMA, datasetId, schemaId);
+        }
+
         public int CreateAndSaveSchemaRevision(int schemaId, List<BaseFieldDto> schemaRows, string revisionname, string jsonSchema = null)
         {
             Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).Select(s => s.ParentDataset).FirstOrDefault();
@@ -818,9 +824,6 @@ namespace Sentry.data.Core
 
             };
             _datasetContext.Add(schema);
-            
-            //ADD SCHEMA CREATED EVENT HERE BECAUSE THIS IS WHERE ITS ADDED EITHER FROM NEW DATASET OR NEW SCHEMA
-            _eventService.PublishSuccessEventBySchemaId(GlobalConstants.EventType.CREATE_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, GlobalConstants.EventType.CREATE_DATASET_SCHEMA, dto.ParentDatasetId, schema.SchemaId);
 
             return schema;
         }
