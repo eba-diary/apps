@@ -13,7 +13,7 @@ namespace Sentry.data.Web.Controllers
         private readonly IDataFeatures _featureFlags;
         private readonly IDaleService _daleService;
 
-        public DaleController(IEventService eventService,IDataFeatures featureFlags, IDaleService daleService)
+        public DaleController(IEventService eventService, IDataFeatures featureFlags, IDaleService daleService)
         {
             _eventService = eventService;
             _featureFlags = featureFlags;

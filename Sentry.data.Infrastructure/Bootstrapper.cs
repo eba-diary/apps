@@ -14,6 +14,7 @@ using Polly.Registry;
 using Sentry.data.Infrastructure.PollyPolicies;
 using System;
 using Hangfire;
+using Nest;
 
 namespace Sentry.data.Infrastructure
 {
@@ -123,6 +124,15 @@ namespace Sentry.data.Infrastructure
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
             registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
             registry.For<RestSharp.IRestClient>().Use(() => new RestSharp.RestClient()).AlwaysUnique();
+
+            ConnectionSettings settings = new ConnectionSettings(new Uri(Configuration.Config.GetHostSetting("ElasticUrl")));
+            settings.BasicAuthentication(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"));
+            settings.DefaultMappingFor<DataInventory>(x => x.IndexName("data-field-inventory"));
+            registry.For<IElasticClient>().Singleton().Use(new ElasticClient(settings));
+
+            registry.For<IDaleSearchProvider>().Use<DaleSearchProvider>().Named("SQL");
+            registry.For<IDaleSearchProvider>().Add<ElasticDataInventorySearchProvider>().Named("ELASTIC");
+            registry.For<IDaleService>().Use<DaleService>().Ctor<IDaleSearchProvider>().Is(x => x.GetInstance<IDaleSearchProvider>(x.GetInstance<IDataFeatures>().CLA3707_DataInventorySource.GetValue()));
 
             // Choose the parameterless constructor.
             registry.For<IBackgroundJobClient>().Singleton().Use<BackgroundJobClient>().SelectConstructor(() => new BackgroundJobClient());
