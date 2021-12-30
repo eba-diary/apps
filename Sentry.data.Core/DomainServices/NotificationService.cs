@@ -361,7 +361,7 @@ namespace Sentry.data.Core
 
         public void CreateUpdateSubscription(SubscriptionDto dto)
         {
-            //ONLY UPDATE Subsriptions for BusinessArea and BusinessAreaDSC EventTypeGroups
+            //ONLY UPDATE Subsriptions for BusinessArea and BusinessAreaDSC EventTypeGroups for now
             if(dto.group == EventTypeGroup.BusinessArea || dto.group == EventTypeGroup.BusinessAreaDSC)
             {
                 List<BusinessAreaSubscription> oldSubs = GetAllUserSubscriptions(dto.group);
