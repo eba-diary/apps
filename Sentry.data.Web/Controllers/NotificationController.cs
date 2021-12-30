@@ -146,15 +146,16 @@ namespace Sentry.data.Web.Controllers
         public ActionResult SubscribeDisplay(int group)
         {
             SubscriptionModel sm = new SubscriptionModel();
-            sm.group = (EventTypeGroup) group;                                                                                                               //need to teach MODEL what KIND of Subscription it is,either DATASET=1 or BUSINESSAREA=2
+            sm.group = (EventTypeGroup) group;     //need to teach MODEL what KIND of Subscription it is,either DATASET=1 or BUSINESSAREA=2   or BUSINESSAREA_DSC=3
             sm.AllIntervals  = _notificationService.GetAllIntervals().Select((c) => new SelectListItem { Text = c.Description, Value = c.Interval_ID.ToString() });
             sm.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
 
             //BUSINESSAREA      AUSTIN:  FUTURE we will put DATASET in here too, you can maybe even add another function to pass stuff here and make below even more generic
-            if(sm.group == EventTypeGroup.BusinessArea)
+            if(sm.group == EventTypeGroup.BusinessArea || sm.group == EventTypeGroup.BusinessAreaDSC)
             {
-                BusinessAreaType bat = BusinessAreaType.PersonalLines;
-                sm.businessAreaID = (int)BusinessAreaType.PersonalLines;
+                //BUSINESSAREA is either PersonalLines or DSC, But they share different EventTypes so set the right variables here so proper subscriptions are brought back
+                BusinessAreaType bat = (sm.group == EventTypeGroup.BusinessArea) ? BusinessAreaType.PersonalLines : BusinessAreaType.DSC;
+                sm.businessAreaID = (sm.group == EventTypeGroup.BusinessArea) ?  (int)BusinessAreaType.PersonalLines : (int)BusinessAreaType.DSC;
 
                 //get list of subscriptions the user has saved
                 List<BusinessAreaSubscription> tempCurrentSubscriptionsBusinessArea = _notificationService.GetAllUserSubscriptions(sm.group).OrderBy(o => o.EventType.Type_ID).ToList();
@@ -177,7 +178,7 @@ namespace Sentry.data.Web.Controllers
 
                 sm.CurrentSubscriptionsBusinessArea = tempCurrentSubscriptionsBusinessArea.OrderBy(o => o.EventType.Type_ID).ToList();
             }
-            
+
             return PartialView("_SubscribeHero", sm);
         }
 
