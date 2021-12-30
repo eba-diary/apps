@@ -210,7 +210,7 @@
 
                         //NOTE: DISABLE for the following scenarios: (1)no permissions to sensitive (2)have permission to sensitive but no permissions to owner and owner has been checked
                         //basically if they don't have permissions to owner verify and owner verified is checked, then don't let them change IsSensitive
-                        if (!obj.canDaleSensitiveEdit || ( obj.canDaleSensitiveEdit && !obj.canDaleOwnerVerifiedEdit && d.IsOwnerVerified ) )
+                        if (!obj.canDaleSensitiveEdit || (obj.canDaleSensitiveEdit && !obj.canDaleOwnerVerifiedEdit && d.IsOwnerVerified) || !obj.CLA3707_UsingSQLSource)
                         {
                             disabled = ' disabled="disabled" ';
                         }

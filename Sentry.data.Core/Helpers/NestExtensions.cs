@@ -9,15 +9,35 @@ namespace Sentry.data.Core
     {
         public static void TryAddWildcard<T>(this List<QueryContainer> container, Expression<Func<T, object>> field, string value) where T : class
         {
+            if (TryBuild(field, value, out WildcardQuery query))
+            {
+                query.Value = $"*{value}*";
+                query.CaseInsensitive = true;
+
+                container.Add(query);
+            }
+        }
+
+        public static void TryAddMatch<T>(this List<QueryContainer> container, Expression<Func<T, object>> field, string value) where T : class
+        {
+            if (TryBuild(field, value, out MatchQuery query))
+            {
+                query.Query = value;
+                container.Add(query);
+            }
+        }
+
+        private static bool TryBuild<T, T2>(Expression<Func<T2, object>> field, string value, out T result) where T : FieldNameQueryBase where T2 : class
+        {
             if (!string.IsNullOrWhiteSpace(value))
             {
-                container.Add(new WildcardQuery()
-                {
-                    Field = Infer.Field(field),
-                    Value = $"*{value}*",
-                    CaseInsensitive = false
-                });
+                result = Activator.CreateInstance<T>();
+                result.Field = Infer.Field(field);
+                return true;
             }
+
+            result = default;
+            return false;
         }
     }
 }

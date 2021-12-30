@@ -33,7 +33,7 @@ namespace Sentry.data.Web.Controllers
                 searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
                 searchModel.DaleAdvancedCriteria = new DaleAdvancedCriteriaModel() { };
                 searchModel.CLA3550_DATA_INVENTORY_NEW_COLUMNS = _featureFlags.CLA3550_DATA_INVENTORY_NEW_COLUMNS.GetValue();
-
+                searchModel.CLA3707_UsingSQLSource = _featureFlags.CLA3707_DataInventorySource.GetValue() == "SQL";
 
                 if (String.IsNullOrEmpty(search))
                 {
@@ -147,9 +147,6 @@ namespace Sentry.data.Web.Controllers
                 SourceType = sourceType
             };
 
-
-
-
             if (sensitive && searchModel.CanDaleSensitiveView)
             {
                 searchModel.Sensitive = DaleSensitive.SensitiveOnly;
@@ -259,7 +256,11 @@ namespace Sentry.data.Web.Controllers
         //method called by dale.js to return whether user can edit IsSensitive IND
         public JsonResult GetCanDaleSensitive()
         {
-            return Json(new {canDaleSensitiveEdit = CanDaleSensitiveEdit(), canDaleOwnerVerifiedEdit = CanDaleOwnerVerifiedEdit(), canDaleSensitiveView = CanDaleSensitiveView() },JsonRequestBehavior.AllowGet);
+            return Json(new {canDaleSensitiveEdit = CanDaleSensitiveEdit(), 
+                             canDaleOwnerVerifiedEdit = CanDaleOwnerVerifiedEdit(), 
+                             canDaleSensitiveView = CanDaleSensitiveView(),
+                             CLA3707_UsingSQLSource = _featureFlags.CLA3707_DataInventorySource.GetValue() == "SQL"
+                        },JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]

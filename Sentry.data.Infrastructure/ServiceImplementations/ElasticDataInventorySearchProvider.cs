@@ -42,11 +42,27 @@ namespace Sentry.data.Infrastructure
                 should.TryAddWildcard<DataInventory>(x => x.SourceName, dto.Criteria);
             }
 
+            List<QueryContainer> must = new List<QueryContainer>();
+
+            if (dto.Sensitive == Core.GlobalEnums.DaleSensitive.SensitiveOnly)
+            {
+                must.TryAddMatch<DataInventory>(x => x.IsSensitive, "true");
+            }
+            else if (dto.Sensitive == Core.GlobalEnums.DaleSensitive.SensitiveNone)
+            {
+                must.TryAddMatch<DataInventory>(x => x.IsSensitive, "false");
+            }
+
             SearchRequest<DataInventory> request = new SearchRequest<DataInventory>()
             {
                 From = 0,
                 Size = 100,
-                Query = new BoolQuery() { Should = should }
+                Query = new BoolQuery() 
+                { 
+                    Must = must,
+                    Should = should,
+                    MinimumShouldMatch = 1
+                }
             };
 
             IList<DataInventory> results = _context.Search(request);
