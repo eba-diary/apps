@@ -33,9 +33,9 @@ namespace Sentry.data.Web.Controllers
                 searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
                 searchModel.DaleAdvancedCriteria = new DaleAdvancedCriteriaModel() { };
                 searchModel.CLA3550_DATA_INVENTORY_NEW_COLUMNS = _featureFlags.CLA3550_DATA_INVENTORY_NEW_COLUMNS.GetValue();
-                searchModel.CLA3707_UsingSQLSource = _featureFlags.CLA3707_DataInventorySource.GetValue() == "SQL";
+                searchModel.CLA3707_UsingSQLSource = UsingSQLSource();
 
-                if (String.IsNullOrEmpty(search))
+                if (string.IsNullOrEmpty(search))
                 {
                     searchModel.Destiny = DaleDestiny.Column;
                 }
@@ -132,9 +132,20 @@ namespace Sentry.data.Web.Controllers
         {
             DaleSearchModel searchModel = new DaleSearchModel();
             searchModel.Criteria = searchCriteria;
-            searchModel.Destiny = destination.ToDaleDestiny();
             searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
             searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
+            searchModel.CLA3707_UsingSQLSource = UsingSQLSource();
+
+            //if using SQL source, get the destiny enum value as usual
+            //if using ELASTIC source, destiny will be null unless doing an advanced search because the radio buttons do not exist
+            if (searchModel.CLA3707_UsingSQLSource)
+            {
+                searchModel.Destiny = destination.ToDaleDestiny();
+            }
+            else
+            {
+                searchModel.Destiny = string.IsNullOrEmpty(destination) ? default(DaleDestiny) : DaleDestiny.Advanced;
+            }
 
             searchModel.DaleAdvancedCriteria = new DaleAdvancedCriteriaModel()
             {
@@ -252,6 +263,11 @@ namespace Sentry.data.Web.Controllers
             return false;
         }
 
+        private bool UsingSQLSource()
+        {
+            return _featureFlags.CLA3707_DataInventorySource.GetValue() == "SQL";
+        }
+
         [HttpGet]
         //method called by dale.js to return whether user can edit IsSensitive IND
         public JsonResult GetCanDaleSensitive()
@@ -259,7 +275,7 @@ namespace Sentry.data.Web.Controllers
             return Json(new {canDaleSensitiveEdit = CanDaleSensitiveEdit(), 
                              canDaleOwnerVerifiedEdit = CanDaleOwnerVerifiedEdit(), 
                              canDaleSensitiveView = CanDaleSensitiveView(),
-                             CLA3707_UsingSQLSource = _featureFlags.CLA3707_DataInventorySource.GetValue() == "SQL"
+                             CLA3707_UsingSQLSource = UsingSQLSource()
                         },JsonRequestBehavior.AllowGet);
         }
 

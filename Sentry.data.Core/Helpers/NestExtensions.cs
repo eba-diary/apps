@@ -7,7 +7,7 @@ namespace Sentry.data.Core
 {
     public static class NestExtensions
     {
-        public static void TryAddWildcard<T>(this List<QueryContainer> container, Expression<Func<T, object>> field, string value) where T : class
+        public static void AddWildcard<T>(this List<QueryContainer> container, Expression<Func<T, object>> field, string value) where T : class
         {
             if (TryBuild(field, value, out WildcardQuery query))
             {
@@ -18,7 +18,7 @@ namespace Sentry.data.Core
             }
         }
 
-        public static void TryAddMatch<T>(this List<QueryContainer> container, Expression<Func<T, object>> field, string value) where T : class
+        public static void AddMatch<T>(this List<QueryContainer> container, Expression<Func<T, object>> field, string value) where T : class
         {
             if (TryBuild(field, value, out MatchQuery query))
             {

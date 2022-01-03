@@ -147,7 +147,7 @@
         $("#daleResultsTable").DataTable({
 
             //client side setup
-            pageLength: 100,
+            pageLength: 25,
 
             //ON table creation or refresh this AJAX code is called to fill grid
             ajax: {
@@ -260,15 +260,15 @@
                 { data: "ScanType", className: "ScanType", width: "20%", visible: false }
             ],
 
-            aLengthMenu: [
-                [20, 100, 500],
-                [20, 100, 500]
-            ],
+            aLengthMenu: [10, 25, 100, 500],
 
-            order: [2, 'desc'],
+            order: [],
 
             //style for columnVisibility and paging to show
-            dom: 'Blrtip',
+            dom: "<'row'<'col-xs-6'l><'col-xs-6 text-right'B>>" +
+                 "<'row'<'col-xs-12'tr>>" +
+                 "<'row'<'col-xs-6'i><'col-xs-6 text-right'p>>",
+            //dom: 'Blrtip',
 
             //buttons to show and customize text for them
             buttons:

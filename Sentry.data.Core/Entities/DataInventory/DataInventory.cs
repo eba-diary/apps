@@ -55,10 +55,10 @@ namespace Sentry.data.Core
         public DateTime EffectiveDateTime { get; set; }
 
         [PropertyName("expiration_dte")]
-        public DateTime ExpirationDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
 
         [PropertyName("expiration_dtm")]
-        public DateTime ExpirationDateTime { get; set; }
+        public DateTime? ExpirationDateTime { get; set; }
 
         [PropertyName("isnullable_flg")]
         public bool IsNullable { get; set; }

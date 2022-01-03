@@ -22,46 +22,46 @@ namespace Sentry.data.Infrastructure
             if (dto.Destiny == Core.GlobalEnums.DaleDestiny.Advanced)
             {
                 //only add specific properties to be searched             
-                should.TryAddWildcard<DataInventory>(x => x.AssetCode, dto.AdvancedCriteria.Asset);
-                should.TryAddWildcard<DataInventory>(x => x.ServerName, dto.AdvancedCriteria.Server);
-                should.TryAddWildcard<DataInventory>(x => x.DatabaseName, dto.AdvancedCriteria.Database);
-                should.TryAddWildcard<DataInventory>(x => x.BaseName, dto.AdvancedCriteria.Object);
-                should.TryAddWildcard<DataInventory>(x => x.TypeDescription, dto.AdvancedCriteria.ObjectType);
-                should.TryAddWildcard<DataInventory>(x => x.ColumnName, dto.AdvancedCriteria.Column);
-                should.TryAddWildcard<DataInventory>(x => x.SourceName, dto.AdvancedCriteria.SourceType);
+                should.AddWildcard<DataInventory>(x => x.AssetCode, dto.AdvancedCriteria.Asset);
+                should.AddWildcard<DataInventory>(x => x.ServerName, dto.AdvancedCriteria.Server);
+                should.AddWildcard<DataInventory>(x => x.DatabaseName, dto.AdvancedCriteria.Database);
+                should.AddWildcard<DataInventory>(x => x.BaseName, dto.AdvancedCriteria.Object);
+                should.AddWildcard<DataInventory>(x => x.TypeDescription, dto.AdvancedCriteria.ObjectType);
+                should.AddWildcard<DataInventory>(x => x.ColumnName, dto.AdvancedCriteria.Column);
+                should.AddWildcard<DataInventory>(x => x.SourceName, dto.AdvancedCriteria.SourceType);
             }
             else
             {
                 //Add all properties to be searched based on criteria
-                should.TryAddWildcard<DataInventory>(x => x.AssetCode, dto.Criteria);
-                should.TryAddWildcard<DataInventory>(x => x.ServerName, dto.Criteria);
-                should.TryAddWildcard<DataInventory>(x => x.DatabaseName, dto.Criteria);
-                should.TryAddWildcard<DataInventory>(x => x.BaseName, dto.Criteria);
-                should.TryAddWildcard<DataInventory>(x => x.TypeDescription, dto.Criteria);
-                should.TryAddWildcard<DataInventory>(x => x.ColumnName, dto.Criteria);
-                should.TryAddWildcard<DataInventory>(x => x.SourceName, dto.Criteria);
+                should.AddWildcard<DataInventory>(x => x.AssetCode, dto.Criteria);
+                should.AddWildcard<DataInventory>(x => x.ServerName, dto.Criteria);
+                should.AddWildcard<DataInventory>(x => x.DatabaseName, dto.Criteria);
+                should.AddWildcard<DataInventory>(x => x.BaseName, dto.Criteria);
+                should.AddWildcard<DataInventory>(x => x.TypeDescription, dto.Criteria);
+                should.AddWildcard<DataInventory>(x => x.ColumnName, dto.Criteria);
+                should.AddWildcard<DataInventory>(x => x.SourceName, dto.Criteria);
             }
 
             List<QueryContainer> must = new List<QueryContainer>();
 
             if (dto.Sensitive == Core.GlobalEnums.DaleSensitive.SensitiveOnly)
             {
-                must.TryAddMatch<DataInventory>(x => x.IsSensitive, "true");
+                must.AddMatch<DataInventory>(x => x.IsSensitive, "true");
             }
             else if (dto.Sensitive == Core.GlobalEnums.DaleSensitive.SensitiveNone)
             {
-                must.TryAddMatch<DataInventory>(x => x.IsSensitive, "false");
+                must.AddMatch<DataInventory>(x => x.IsSensitive, "false");
             }
 
             SearchRequest<DataInventory> request = new SearchRequest<DataInventory>()
             {
                 From = 0,
-                Size = 100,
+                Size = 1000,
                 Query = new BoolQuery() 
                 { 
                     Must = must,
                     Should = should,
-                    MinimumShouldMatch = 1
+                    MinimumShouldMatch = should.Any() ? 1 : 0
                 }
             };
 
