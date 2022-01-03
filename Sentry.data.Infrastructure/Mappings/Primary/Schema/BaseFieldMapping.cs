@@ -27,6 +27,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property((x) => x.FieldGuid, (m) => m.Column("FieldGuid"));
             Property((x) => x.Description, (m) => m.Column("Description"));
             Property(x => x.FieldLength, m => m.Column("FieldLength"));
+            Property((x) => x.DotNamePath, (m) => m.Column("DotNamePath"));
+
             Discriminator(x => x.Column("Type"));
 
             ManyToOne((x) => x.ParentField, (m) =>
