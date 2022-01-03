@@ -178,7 +178,7 @@ namespace Sentry.data.Core
         public async Task<AccessRequest> GetAccessRequestAsync(int datasetId)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
-
+            
             AccessRequest ar = new AccessRequest()
             {
                 ApproverList = new List<KeyValuePair<string, string>>(),
