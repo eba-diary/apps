@@ -64,7 +64,7 @@ namespace Sentry.data.Core
                 throw new SchemaNotFoundException("DataFile is not associated with specified SchemaId");
             }
             if ((dataFile.SchemaRevision == null && dto.SchemaRevision != 0) ||
-                dataFile.SchemaRevision.SchemaRevision_Id != dto.SchemaRevision)
+                (dataFile.SchemaRevision != null && dataFile.SchemaRevision.SchemaRevision_Id != dto.SchemaRevision))
             {
                 throw new SchemaRevisionNotFoundException("DataFile is not associated with specified SchemaRevision");
             }

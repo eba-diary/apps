@@ -52,10 +52,6 @@ namespace Sentry.data.Web.Models.ApiModels.DatasetFile
             {
                 results.Add("DatasetId is required");
             }
-            if (SchemaRevisionId == 0)
-            {
-                results.Add("SchemaRevisionId is required");
-            }
             if (SchemaId == 0)
             {
                 results.Add("SchemaId is required");
