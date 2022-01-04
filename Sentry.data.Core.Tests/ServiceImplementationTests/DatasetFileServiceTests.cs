@@ -367,6 +367,39 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
+        public void DatasetFileService_UpdateAndSave_SchemaRevisionNotFoundException_Null_SchemaRevision_On_DataFile_and_Dto()
+        {
+            // Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            Mock<IApplicationUser> user1 = mr.Create<IApplicationUser>();
+            user1.Setup(f => f.IsAdmin).Returns(true);
+            user1.SetupGet(x => x.AssociateId).Returns("000000");
+            userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
+
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFile dataFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            dataFile.SchemaRevision = null;
+
+            var datasetFileDto = MockClasses.MockDatasetFileDto();
+            datasetFileDto.SchemaRevision = 0;
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(d => d.GetById<DatasetFile>(3000)).Returns(dataFile);
+            context.Setup(x => x.SaveChanges(true)).Verifiable();
+
+            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object);
+
+            //Act
+            datasetFileService.UpdateAndSave(datasetFileDto);
+
+            // Assert
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
         public void DatasetFileService_UpdateAndSave_SchemaRevisionNotFoundException_Incorrect_SchemaRevisionID_On_Dto()
         {
             // Arrange

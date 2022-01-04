@@ -18,19 +18,27 @@
                 <span>Do you have data that you want to use and share with others? <br /> We can help. First, you'll need to tell us about your data.</span>
             </div>
         </div>
-
         <div class="col-md-12">
             @*Show the custom validation summary*@
             @Html.DisplayFor((model) => ViewData.ModelState)
         </div>
         <div class="form-group col-md-12">
             <br />
-            <div class="col-md-5"><h4>How will the data be sent to us?</h4>    </div>
-            <div class="col-md-4" data-toggle="tooltip" data-placement="right" title="Will your process send a file to DSC (User_Push)? Or will DSC need to pick up the file from an external location (DSC_Pull)?">
-                @Html.DropDownListFor(
-                    x => x.IngestionTypeSelection,
-                    Model.IngestionTypeDropDown,
-                    new { @class = "selectpicker" })
+            <div class="col-md-5">
+                <h4>How will the data be sent to us?</h4>
+            </div>
+            <div class="col-md-3">
+                <div  data-toggle="tooltip" data-placement="right" title="Will your process send a file to DSC (User_Push)? Or will DSC need to pick up the file from an external location (DSC_Pull)?">
+                    @Html.DropDownListFor(
+                       x => x.IngestionTypeSelection,
+                       Model.IngestionTypeDropDown,
+                       new { @class = "selectpicker" })
+                </div>
+            </div>
+            <div class="col-md-4 text-right">
+                <a href="https://confluence.sentry.com/pages/viewpage.action?spaceKey=CLA&title=Send+Data+to+DSC" target="_blank" class="btn btn-info">
+                    <span class="glyphicon glyphicon-question-sign"></span>  Help
+                </a>
             </div>
         </div>
         <div class="namePanel" style="display:none;">
