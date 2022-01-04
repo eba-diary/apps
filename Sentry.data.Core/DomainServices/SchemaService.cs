@@ -717,13 +717,13 @@ namespace Sentry.data.Core
         /// Recursive function to traverse a schema structure and build a list of names.
         /// </summary>
         /// <param name="field">The field to generate the name for.</param>
-        /// <returns></returns>
+        /// <returns>The Path of Structs for the input field</returns>
         public string BuildDotNamePath(BaseField field)
         {
             string hierarchy = "";
             if (field.ParentField != null)
             {
-                hierarchy = BuildDotNamePath(field.ParentField);
+                hierarchy = field.ParentField.DotNamePath;
             }
             if (!String.IsNullOrEmpty(hierarchy))
             {
@@ -740,11 +740,11 @@ namespace Sentry.data.Core
         {
             foreach (BaseField field in fields)
             {
+                field.DotNamePath = BuildDotNamePath(field);
                 if (field.ChildFields.Count > 0)
                 {
                     SchemaFieldsBuildDotNamePath(field.ChildFields);
                 }
-                field.DotNamePath = BuildDotNamePath(field);
             }
         }
 

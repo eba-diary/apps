@@ -2278,8 +2278,19 @@ namespace Sentry.data.Core.Tests
             mr.VerifyAll();
         }
 
+        [TestMethod]
+        public void TestDotNamePathBuild()
+        {
+            List<BaseField> fields = BuildMockNestedSchema();
+            SchemaService schemaService = new SchemaService(null, null, null, null, null, null, null, null, null, null);
+            schemaService.SchemaFieldsBuildDotNamePath(fields);
+            Assert.AreEqual("Root", fields[0].DotNamePath);
+            Assert.AreEqual("Root.Middle", fields[1].DotNamePath);
+            Assert.AreEqual("Root.Middle.Child", fields[2].DotNamePath);
+        }
+
         #region Private Methods
-            private JsonSchema BuildMockJsonSchemaWithDecimalField()
+        private JsonSchema BuildMockJsonSchemaWithDecimalField()
         {
             string jsonSchema = @"{
                 ""type"": ""object"",
@@ -2628,6 +2639,23 @@ namespace Sentry.data.Core.Tests
             };
 
             return field;
+        }
+
+        private List<BaseField> BuildMockNestedSchema()
+        {
+            List<BaseField> schemaList = new List<BaseField>();
+            StructField root = new StructField();
+            root.Name = "Root";
+            StructField middle = new StructField();
+            middle.ParentField = root;
+            middle.Name = "Middle";
+            StructField child = new StructField();
+            child.ParentField = middle;
+            child.Name = "Child";
+            schemaList.Add(root);
+            schemaList.Add(middle);
+            schemaList.Add(child);
+            return schemaList;
         }
         #endregion
     }
