@@ -59,6 +59,12 @@ namespace Sentry.data.Core
         public DataFlowDetailDto GetDataFlowDetailDto(int id)
         {
             DataFlow df = _datasetContext.GetById<DataFlow>(id);
+
+            if (df == null)
+            {
+                throw new DataFlowNotFound();
+            }
+
             DataFlowDetailDto dto = new DataFlowDetailDto();
             MapToDetailDto(df, dto);
             return dto;
