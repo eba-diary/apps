@@ -76,7 +76,7 @@ namespace Sentry.data.Core.Tests
             return categories;
         }
 
-        public static DatasetFileConfig MockDataFileConfig(Dataset ds = null)
+        public static DatasetFileConfig MockDataFileConfig(Dataset ds = null, FileSchema schema = null)
         {
             DatasetFileConfig dfc = new DatasetFileConfig()
             {
@@ -88,6 +88,7 @@ namespace Sentry.data.Core.Tests
                 DatasetScopeType = MockScopeTypes()[0],
                 FileExtension = MockFileExtensions()[0],
                 RetrieverJobs = new List<RetrieverJob>(),
+                Schema = schema
             };
 
             return dfc;
@@ -109,6 +110,28 @@ namespace Sentry.data.Core.Tests
             }
 
             return dtoList;
+        }
+
+        public static FileSchema MockFileSchema()
+        {
+            FileSchema fileSchema = new FileSchema()
+            {
+                SchemaId = 23,
+                Name = "Test_Schema_23"
+            };
+
+            return fileSchema;
+        }
+
+        public static SchemaRevision MockSchemaRevision()
+        {
+            SchemaRevision revision = new SchemaRevision()
+            {
+                SchemaRevision_Id = 57,
+                SchemaRevision_Name = "Test Revision"
+            };
+
+            return revision;
         }
 
         public static FileSchemaDto MockFileSchemaDto(Schema scm)
@@ -233,7 +256,7 @@ namespace Sentry.data.Core.Tests
             }
         }
 
-        public static DatasetFile MockDataFile(Dataset ds, DatasetFileConfig dfc, IApplicationUser user)
+        public static DatasetFile MockDatasetFile(Dataset ds, DatasetFileConfig dfc, IApplicationUser user)
         {
             DatasetFile df = new DatasetFile()
             {
@@ -245,10 +268,37 @@ namespace Sentry.data.Core.Tests
                 ModifiedDTM = System.DateTime.Now.AddYears(-12),
                 FileLocation = "data-dev/government/quarterly_census_of_employment_and_wages/235/2018/1/18/2014.annual.singlefile.csv",
                 DatasetFileConfig = dfc,
-                IsBundled = false
+                IsBundled = false,
+                ParentDatasetFileId = 23,
+                VersionId = "QWENUD-asdf9320123n90afs",
+                Information = "Information Text",
+                Size = 1234567890,
+                FlowExecutionGuid = "20211209133645",
+                RunInstanceGuid = "20211210143750",
+                FileExtension = "csv",
+                Schema = MockFileSchema(),
+                SchemaRevision = MockSchemaRevision()
             };
 
             return df;
+        }
+
+        public static DatasetFileDto MockDatasetFileDto(IApplicationUser user = null)
+        {
+            DatasetFileDto dto = new DatasetFileDto()
+            {
+                DatasetFileId = 3000,
+                FileName = "dto.txt",
+                Dataset = 1000,
+                UploadUserName = (user == null) ? "012345" : user.AssociateId,
+                CreateDTM = System.DateTime.Now.AddYears(-12),
+                ModifiedDTM = System.DateTime.Now.AddYears(-12),
+                FileLocation = "data-dev/government/quarterly_census_of_employment_and_wages/235/2018/1/18/2014.annual.singlefile.csv",
+                Schema = 23,
+                SchemaRevision = 57
+            };
+
+            return dto;
         }
 
         public static RetrieverJob GetMockRetrieverJob(DatasetFileConfig dfc = null, DataSource dsrc = null, AuthenticationType authType = null)

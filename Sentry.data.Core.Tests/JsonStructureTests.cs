@@ -12,7 +12,7 @@ namespace Sentry.data.Core.Tests
         {
             VarcharField field = new VarcharField()
             {
-                Name = "FieldName",
+                Name = "fieldname",
                 Description = "Field Description",
                 OrdinalPosition = 1,
                 FieldLength = 1000
@@ -36,7 +36,7 @@ namespace Sentry.data.Core.Tests
         {
             DateField field = new DateField()
             {
-                Name = "FieldName",
+                Name = "fieldname",
                 Description = "Field Description",
                 OrdinalPosition = 1,
                 SourceFormat = "yyyy-MM-dd"
@@ -60,7 +60,7 @@ namespace Sentry.data.Core.Tests
         {
             TimestampField field = new TimestampField()
             {
-                Name = "FieldName",
+                Name = "fieldname",
                 Description = "Field Description",
                 OrdinalPosition = 1,
                 SourceFormat = "yyyy-MM-dd HH:mm:ss"
@@ -84,7 +84,7 @@ namespace Sentry.data.Core.Tests
         {
             IntegerField field = new IntegerField()
             {
-                Name = "FieldName",
+                Name = "fieldname",
                 Description = "Field Description",
                 OrdinalPosition = 1
             };
@@ -107,7 +107,7 @@ namespace Sentry.data.Core.Tests
         {
             BigIntField field = new BigIntField()
             {
-                Name = "FieldName",
+                Name = "fieldname",
                 Description = "Field Description",
                 OrdinalPosition = 1
             };
@@ -130,7 +130,7 @@ namespace Sentry.data.Core.Tests
         {
             DecimalField field = new DecimalField()
             {
-                Name = "FieldName",
+                Name = "fieldname",
                 Description = "Field Description",
                 OrdinalPosition = 1,
                 Precision = 9,
@@ -155,14 +155,14 @@ namespace Sentry.data.Core.Tests
         {
             StructField field = new StructField()
             {
-                Name = "FieldName",
+                Name = "fieldname",
                 Description = "Field Description",
                 OrdinalPosition = 1
             };
 
             VarcharField childField = new VarcharField()
             {
-                Name = "ChildFieldName",
+                Name = "childfieldname",
                 Description = "Child Field Description",
                 OrdinalPosition = 2,
                 FieldLength = 10,
@@ -187,7 +187,7 @@ namespace Sentry.data.Core.Tests
         {
             VarcharField field = new VarcharField()
             {
-                Name = "FieldName",
+                Name = "fieldname",
                 Description = "Field Description",
                 OrdinalPosition = 1,
                 FieldLength = 1000,
@@ -212,7 +212,7 @@ namespace Sentry.data.Core.Tests
         {
             StructField field = new StructField()
             {
-                Name = "FieldName",
+                Name = "fieldname",
                 Description = "Field Description",
                 OrdinalPosition = 1,
                 IsArray = true
@@ -220,7 +220,7 @@ namespace Sentry.data.Core.Tests
 
             VarcharField childField = new VarcharField()
             {
-                Name = "ChildFieldName",
+                Name = "childfieldname",
                 Description = "Child Field Description",
                 OrdinalPosition = 2,
                 FieldLength = 10,
@@ -229,7 +229,7 @@ namespace Sentry.data.Core.Tests
 
             IntegerField childField2 = new IntegerField()
             {
-                Name = "ChildFieldName2",
+                Name = "childfieldname2",
                 Description = "Child Field 2 Description",
                 OrdinalPosition = 3,
                 ParentField = field
@@ -253,14 +253,14 @@ namespace Sentry.data.Core.Tests
         {
             StructField field = new StructField()
             {
-                Name = "FieldName",
+                Name = "fieldname",
                 Description = "Field Description",
                 OrdinalPosition = 1
             };
 
             VarcharField childField = new VarcharField()
             {
-                Name = "ChildFieldName",
+                Name = "childfieldname",
                 Description = "Child Field Description",
                 OrdinalPosition = 2,
                 FieldLength = 10,
@@ -269,7 +269,7 @@ namespace Sentry.data.Core.Tests
 
             StructField childField2 = new StructField()
             {
-                Name = "StructChildFieldName",
+                Name = "structchildfieldname",
                 Description = "Struct Child Field Description",
                 OrdinalPosition = 3,
                 ParentField = field
@@ -277,7 +277,7 @@ namespace Sentry.data.Core.Tests
             
             DateField innerChildField = new DateField()
             {
-                Name = "InnerChildFieldName",
+                Name = "innerchildfieldname",
                 Description = "Inner Child Field Description",
                 OrdinalPosition = 4,
                 SourceFormat = "yyyy-MM-dd",
@@ -286,7 +286,7 @@ namespace Sentry.data.Core.Tests
 
             IntegerField innerChildField2 = new IntegerField()
             {
-                Name = "InnerChildFieldName2",
+                Name = "innerchildfieldname2",
                 Description = "Inner Child Field 2 Description",
                 OrdinalPosition = 5,
                 ParentField = childField2

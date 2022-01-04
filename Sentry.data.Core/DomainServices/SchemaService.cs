@@ -25,12 +25,15 @@ namespace Sentry.data.Core
         private readonly IDataFeatures _dataFeatures;
         private readonly IMessagePublisher _messagePublisher;
         private readonly ISnowProvider _snowProvider;
+        private readonly IEventService _eventService;
+
+
         private string _bucket;
         private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, IEventService eventService)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -41,7 +44,7 @@ namespace Sentry.data.Core
             _dataFeatures = dataFeatures;
             _messagePublisher = messagePublisher;
             _snowProvider = snowProvider;
-
+            _eventService = eventService;
         }
 
         private string RootBucket
@@ -78,6 +81,12 @@ namespace Sentry.data.Core
             }
 
             return newSchema.SchemaId;
+        }
+
+        //SINCE SCHEMA SAVED FROM MULTIPLE PLACES, HAVE ONE METHOD TO TAKE CARE OF PUBLISHING SAVE
+        public void PublishSchemaEvent(int datasetId, int schemaId)
+        {
+            _eventService.PublishSuccessEventBySchemaId(GlobalConstants.EventType.CREATE_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, GlobalConstants.EventType.CREATE_DATASET_SCHEMA, datasetId, schemaId);
         }
 
         public int CreateAndSaveSchemaRevision(int schemaId, List<BaseFieldDto> schemaRows, string revisionname, string jsonSchema = null)
@@ -815,6 +824,7 @@ namespace Sentry.data.Core
 
             };
             _datasetContext.Add(schema);
+
             return schema;
         }
 
@@ -1075,7 +1085,7 @@ namespace Sentry.data.Core
                 //Varchar Length
                 if (fieldDto.FieldType == GlobalConstants.Datatypes.VARCHAR && (fieldDto.Length < 1 || fieldDto.Length > 16000000)) //true max is 16777216
                 {
-                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) VARCHAR length ({fieldDto.Length}) is required to be between 1 and 100000");
+                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) VARCHAR length ({fieldDto.Length}) is required to be between 1 and 16000000");
                 }
 
                 //Decimal Precision

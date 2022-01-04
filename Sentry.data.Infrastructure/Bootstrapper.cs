@@ -101,10 +101,7 @@ namespace Sentry.data.Infrastructure
 
 
             //Register event handlers for MetadataProcessorService
-            registry.For<IMessageHandler<string>>().Add<S3EventService>();
             registry.For<IMessageHandler<string>>().Add<HiveMetadataService>();
-            registry.For<IMessageHandler<string>>().Add<DataStepProcessorService>();
-            registry.For<IMessageHandler<string>>().Add<DfsEventService>();
             registry.For<IMessageHandler<string>>().Add<SnowflakeEventService>();
 
             //Wire up Obsidian provider

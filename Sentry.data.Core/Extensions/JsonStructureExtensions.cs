@@ -12,7 +12,7 @@ namespace Sentry.data.Core
 
             foreach (BaseField field in fields.OrderBy(x => x.OrdinalPosition).ToList())
             {
-                properties.Add(field.Name.ToLower(), field.ToJsonPropertyDefinition());
+                properties.Add(field.Name, field.ToJsonPropertyDefinition());
             }
 
             structure.Add("properties", properties);

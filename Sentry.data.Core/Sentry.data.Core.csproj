@@ -110,6 +110,7 @@
     <Compile Include="DomainServices\DaleService.cs" />
     <Compile Include="DomainServices\DataProcessing\DataFlowService.cs" />
     <Compile Include="DomainServices\DataProcessing\DataStepService.cs" />
+    <Compile Include="DomainServices\DatasetFileService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
     <Compile Include="DomainServices\JobService.cs" />
     <Compile Include="DomainServices\MessageHandlers\DataStepProcessorHandler.cs" />
@@ -136,6 +137,7 @@
     <Compile Include="DTO\Dataset\DatasetSummaryMetadataDTO.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
+    <Compile Include="DTO\Schema\DatasetFileDto.cs" />
     <Compile Include="DTO\Schema\Fields\BaseFieldDto.cs" />
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
     <Compile Include="DTO\Schema\Fields\DateFieldDto.cs" />
@@ -191,6 +193,7 @@
     <Compile Include="Entities\MessageFormats\S3Event.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableCreateModel.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
+    <Compile Include="Helpers\Paginate\PageParameters.cs" />
     <Compile Include="Entities\S3\S3LambdaEvent.cs" />
     <Compile Include="Entities\S3\S3ObjectEvent.cs" />
     <Compile Include="Entities\Security\SAIDAsset.cs" />
@@ -211,13 +214,15 @@
     <Compile Include="Exceptions\DaleInvalidSearchException.cs" />
     <Compile Include="Exceptions\DaleQueryException.cs" />
     <Compile Include="Exceptions\DaleUnauthorizedAccessException.cs" />
+    <Compile Include="Exceptions\DataFileNotFound.cs" />
+    <Compile Include="Exceptions\DataFileUnauthorizedException.cs" />
     <Compile Include="Exceptions\DataFlowNotFound.cs" />
     <Compile Include="Exceptions\DataFlowStepNotFound.cs" />
-    <Compile Include="Exceptions\AWSLambdaException.cs" />
-    <Compile Include="Exceptions\AWSLambdaInvalidParameterException.cs" />
-    <Compile Include="Exceptions\AWSLambdaNotFoundException.cs" />
-    <Compile Include="Exceptions\AWSLambdaRequestLimitException.cs" />
-    <Compile Include="Exceptions\AWSLambdaServiceException.cs" />
+    <Compile Include="Exceptions\AwsLambdaException.cs" />
+    <Compile Include="Exceptions\AwsLambdaInvalidParameterException.cs" />
+    <Compile Include="Exceptions\AwsLambdaNotFoundException.cs" />
+    <Compile Include="Exceptions\AwsLambdaRequestLimitException.cs" />
+    <Compile Include="Exceptions\AwsLambdaServiceException.cs" />
     <Compile Include="Exceptions\DataFlowStepNotImplementedException.cs" />
     <Compile Include="Exceptions\DataFlowUnauthorizedAccessException.cs" />
     <Compile Include="Exceptions\DatasetFileConfigDeletedException.cs" />
@@ -232,6 +237,7 @@
     <Compile Include="Exceptions\SchemaInUseException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaConversionException.cs" />
+    <Compile Include="Exceptions\SchemaRevisionNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaUnauthorizedAccessException.cs" />
     <Compile Include="Extensions\DataFlowExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
@@ -265,6 +271,7 @@
     <Compile Include="Extensions\JsonStructureExtensions.cs" />
     <Compile Include="Helpers\LambdaClientConfig.cs" />
     <Compile Include="Helpers\LoggingUtils.cs" />
+    <Compile Include="Helpers\Paginate\PagedList.cs" />
     <Compile Include="Helpers\ParsingHelpers.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />
@@ -287,6 +294,7 @@
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\IApacheLivyProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IXMLAction.cs" />
+    <Compile Include="Interfaces\IDatasetFileService.cs" />
     <Compile Include="Interfaces\IHostSettings.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
     <Compile Include="Interfaces\IDaleSearchProvider.cs" />

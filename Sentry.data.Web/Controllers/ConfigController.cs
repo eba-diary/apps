@@ -173,6 +173,7 @@ namespace Sentry.data.Web.Controllers
                 if (dto.ConfigId == 0)
                 { //Create Dataset File Config
                     bool IsSuccessful = false;
+                    
                     int newSchemaId = _schemaService.CreateAndSaveSchema(schemaDto);
                     if (newSchemaId != 0)
                     {
@@ -183,6 +184,7 @@ namespace Sentry.data.Web.Controllers
                     if (IsSuccessful)
                     {
                         //return RedirectToAction("Index", new { id = dto.ParentDatasetId });
+                        _schemaService.PublishSchemaEvent(schemaDto.ParentDatasetId, newSchemaId);
                         return Json(new { Success = true, dataset_id = dto.ParentDatasetId, schema_id = dto.SchemaId });
                     }
                 }

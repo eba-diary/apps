@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Sentry.data.Core.Exceptions
 {
     [Serializable]
-    public class SchemaNotFoundException : Exception, ISerializable
+    public class SchemaNotFoundException : Exception
     {
         public SchemaNotFoundException() { }
         public SchemaNotFoundException(string message) : base(message) { }
