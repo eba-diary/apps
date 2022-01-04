@@ -153,6 +153,8 @@ namespace Sentry.data.Core
 
                     //Add posible checksum validation here
 
+                    SchemaFieldsBuildDotNamePath(revision.Fields);
+
                     _datasetContext.SaveChanges();
 
                     
@@ -708,6 +710,41 @@ namespace Sentry.data.Core
             {
                 Logger.Error($"schemaservice-registerrawfile-failed", ex);
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// Recursive function to traverse a schema structure and build a list of names.
+        /// </summary>
+        /// <param name="field">The field to generate the name for.</param>
+        /// <returns>The Path of Structs for the input field</returns>
+        public string BuildDotNamePath(BaseField field)
+        {
+            string hierarchy = "";
+            if (field.ParentField != null)
+            {
+                hierarchy = field.ParentField.DotNamePath;
+            }
+            if (!String.IsNullOrEmpty(hierarchy))
+            {
+                hierarchy = hierarchy + ".";
+            }
+            return hierarchy + field.Name;
+        }
+
+        /// <summary>
+        /// Recursive function to traverse a layer of schema to call BuildParentChildHierarchy on. 
+        /// </summary>
+        /// <param name="fields">List of fields to iterate over</param>
+        public void SchemaFieldsBuildDotNamePath(IList<BaseField> fields)
+        {
+            foreach (BaseField field in fields)
+            {
+                field.DotNamePath = BuildDotNamePath(field);
+                if (field.ChildFields.Count > 0)
+                {
+                    SchemaFieldsBuildDotNamePath(field.ChildFields);
+                }
             }
         }
 
