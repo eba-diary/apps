@@ -68,6 +68,10 @@
 
             public const string DALE_SEARCH = "DaleQuery";
 
+            public const string NOTIFICATION_DSC_RELEASE_NOTES = "Release Notes";
+            public const string NOTIFICATION_DSC_TECH_DOC = "Technical Documentation";
+            public const string NOTIFICATION_DSC_NEWS = "News";
+
         }
 
         public static class Statuses
