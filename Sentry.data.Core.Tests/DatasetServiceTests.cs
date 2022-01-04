@@ -31,7 +31,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, quartermasterService.Object);
+            var datasetService = new DatasetService(context.Object, null, null, null, null, null, quartermasterService.Object, null);
             var dataset = new DatasetDto()
             {
                 DatasetName = "Foo",

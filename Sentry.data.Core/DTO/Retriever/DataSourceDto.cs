@@ -35,8 +35,6 @@ namespace Sentry.data.Core
 
         public List<RequestHeader> RequestHeaders { get; set; }
         public bool IsSecured { get; set; }
-        public string PrimaryOwnerId { get; set; }
-        public string PrimaryOwnerName { get; set; }
         public string PrimaryContactId { get; set; }
         public string PrimaryContactName { get; set; }
         public string PrimaryContactEmail { get; set; }

@@ -292,12 +292,9 @@ namespace Sentry.data.Core
         public List<KeyValuePair<string, string>> GetApproversByBusinessArea(int businessAreaId)
         {
             BusinessArea ba = _domainContext.BusinessAreas.FirstOrDefault(x => x.Id == businessAreaId);
-            IApplicationUser owner = _userService.GetByAssociateId(ba.PrimaryOwnerId);
             IApplicationUser contact = _userService.GetByAssociateId(ba.PrimaryContactId);
-
             var owners = new List<KeyValuePair<string, string>>
             {
-                new KeyValuePair<string, string>(ba.PrimaryOwnerId, owner.DisplayName + " (Owner)"),
                 new KeyValuePair<string, string>(ba.PrimaryContactId, contact.DisplayName + " (Contact)")
             };
 

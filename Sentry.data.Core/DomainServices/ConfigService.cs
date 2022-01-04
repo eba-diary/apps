@@ -1,12 +1,15 @@
 ﻿using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.Configuration;
+using Sentry.data.Core.Entities;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -25,11 +28,13 @@ namespace Sentry.data.Core
         private readonly IDataFeatures _featureFlags;
         private Guid _guid;
         private string _bucket;
+        private readonly ISAIDService _saidService;
+
 
         public ConfigService(IDatasetContext dsCtxt, IUserService userService, IEventService eventService, 
             IMessagePublisher messagePublisher, IEncryptionService encryptService, ISecurityService securityService,
             IJobService jobService, IS3ServiceProvider s3ServiceProvider,
-            ISchemaService schemaService, IDataFeatures dataFeatures, IDataFlowService dataFlowService)
+            ISchemaService schemaService, IDataFeatures dataFeatures, IDataFlowService dataFlowService, ISAIDService saidService)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
@@ -42,6 +47,7 @@ namespace Sentry.data.Core
             _schemaService = schemaService;
             _featureFlags = dataFeatures;
             _dataFlowService = dataFlowService;
+            _saidService = saidService;
         }
 
         private IJobService JobService
@@ -205,11 +211,6 @@ namespace Sentry.data.Core
                 case "DFSBasic":
                 default:
                     throw new NotImplementedException();
-            }
-
-            if (String.IsNullOrWhiteSpace(dto.PrimaryOwnerId))
-            {
-                errors.Add("Owner is requried.");
             }
 
             if (String.IsNullOrWhiteSpace(dto.PrimaryContactId))
@@ -436,7 +437,7 @@ namespace Sentry.data.Core
             return _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
         }
 
-        public AccessRequest GetDataSourceAccessRequest(int dataSourceId)
+        public async Task<AccessRequest> GetDataSourceAccessRequest(int dataSourceId)
         {
             DataSource ds = _datasetContext.GetById<DataSource>(dataSourceId);
 
@@ -448,13 +449,10 @@ namespace Sentry.data.Core
                 SecurableObjectName = ds.Name
             };
 
-            IApplicationUser primaryUser = _userService.GetByAssociateId(ds.PrimaryOwnerId);
-            ar.ApproverList.Add(new KeyValuePair<string, string>(ds.PrimaryOwnerId, primaryUser.DisplayName + " (Owner)"));
-
-            if (!string.IsNullOrWhiteSpace(ds.PrimaryContactId))
+            List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCode(ds.KeyCode).ConfigureAwait(false);
+            foreach (SAIDRole prodCust in prodCusts)
             {
-                IApplicationUser secondaryUser = _userService.GetByAssociateId(ds.PrimaryContactId);
-                ar.ApproverList.Add(new KeyValuePair<string, string>(ds.PrimaryContactId, secondaryUser.DisplayName + " (Contact)"));
+                ar.ApproverList.Add(new KeyValuePair<string, string>(prodCust.AssociateId, prodCust.Name));
             }
 
             return ar;
@@ -831,7 +829,6 @@ namespace Sentry.data.Core
 
         private void MapToDto(DataSource dsrc, DataSourceDto dto)
         {
-            IApplicationUser primaryOwner = _userService.GetByAssociateId(dsrc.PrimaryOwnerId);
             IApplicationUser primaryContact = _userService.GetByAssociateId(dsrc.PrimaryContactId);
 
             dto.OriginatingId = dsrc.Id;
@@ -849,8 +846,6 @@ namespace Sentry.data.Core
             dto.PrimaryContactId = dsrc.PrimaryContactId;
             dto.PrimaryContactName = (primaryContact != null && primaryContact.AssociateId != "000000" ? primaryContact.DisplayName : "Not Available");
             dto.PrimaryContactEmail = (primaryContact != null && primaryContact.AssociateId != "000000" ? primaryContact.EmailAddress : "");
-            dto.PrimaryOwnerId = dsrc.PrimaryOwnerId;
-            dto.PrimaryOwnerName = (primaryOwner != null && primaryOwner.AssociateId != "000000" ? primaryOwner.DisplayName : "Not Available");
             dto.Security = _securityService.GetUserSecurity(dsrc, _userService.GetCurrentUser());
             dto.MailToLink = "mailto:" + dto.PrimaryContactEmail + "?Subject=Data%20Source%20Inquiry%20-%20" + dsrc.Name;
 
@@ -894,7 +889,6 @@ namespace Sentry.data.Core
 
         private void MapDataSourceSecurity(DataSourceDto dto, DataSource dsrc)
         {
-            dsrc.PrimaryOwnerId = dto.PrimaryOwnerId;
             dsrc.PrimaryContactId = dto.PrimaryContactId;
 
             if (dsrc.Security == null)
@@ -1059,7 +1053,6 @@ namespace Sentry.data.Core
             source.BaseUri = dto.BaseUri;
             source.PortNumber = dto.PortNumber;
             source.IsSecured = dto.IsSecured;
-            source.PrimaryOwnerId = dto.PrimaryOwnerId;
             source.PrimaryContactId = dto.PrimaryContactId;
 
             _datasetContext.Add(source);

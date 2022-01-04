@@ -83,7 +83,6 @@ namespace Sentry.data.Web.Tests
                 mockDatasetContext.Stub(x => x.Datasets).Return(dsList.AsQueryable());
                 mockDatasetContext.Stub(x => x.GetDatasetCount()).Return(dsList.Count);
                 mockDatasetContext.Stub(x => x.GetById(ds.DatasetId)).Return(ds);
-                mockDatasetContext.Stub(x => x.IsUserSubscribedToDataset(ds.PrimaryOwnerId, ds.DatasetId)).Return(true);
                 mockDatasetContext.Stub(x => x.GetAllUserSubscriptionsForDataset(user.AssociateId, ds.DatasetId)).Return(datasetSubscriptions == null ? new List<DatasetSubscription>() : datasetSubscriptions);
             }
 
@@ -138,8 +137,6 @@ namespace Sentry.data.Web.Tests
 
             var ds = dfc.ParentDataset;
 
-            mockAssociateService.Stub(x => x.GetAssociateInfo(ds.PrimaryOwnerId)).Return(new Associates.Associate() { FullName = "Bill Nye" });
-
             if (ds != null)
             {
                 List<Dataset> dsList = new List<Dataset>();
@@ -149,8 +146,6 @@ namespace Sentry.data.Web.Tests
                 mockDatasetContext.Stub(x => x.GetById<Dataset>(ds.DatasetId)).Return(ds);
                 mockDatasetContext.Stub(x => x.getDatasetFileConfigs(dfc.ConfigId)).Return(dfc);
                 mockDatasetContext.Stub(x => x.GetAllDatasetScopeTypes()).Return(new List<DatasetScopeType>());
-                mockDatasetContext.Stub(x => x.IsUserSubscribedToDataset(ds.PrimaryOwnerId, ds.DatasetId)).Return(true);
-                mockDatasetContext.Stub(x => x.GetAllUserSubscriptionsForDataset(ds.PrimaryOwnerId, ds.DatasetId)).Return(new List<DatasetSubscription>());
             }
 
             mockDatasetContext.Stub(x => x.EventTypes).Return(MockClasses.MockEventTypes().AsQueryable());

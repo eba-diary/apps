@@ -78,7 +78,6 @@
                             $('#schedulePanel').hide();
                         }
 
-                        $('#primaryOwner').text(datain.PrimaryOwnerName);
                         $('#dataSourceContactEmail').attr("href", datain.MailToLink)
                         $('#dataSourceContactEmail').text(datain.PrimaryContactName);
                         //$('#primaryContact.a').text("<a href/" + data.MailToLink + "/"adfad");
@@ -133,7 +132,6 @@
                 //data: { Id: $('#SelectedDataSource :selected').val() },
                 success: function (datain) {
 
-                    $('#primaryOwner').text(datain.PrimaryOwnerName);
                     $('#dataSourceContactEmail').attr("href", datain.MailToLink)
                     $('#dataSourceContactEmail').text(datain.PrimaryContactName);
                     $("#editDataSource").attr("href", "/Config/Source/Edit/" + $("[id$='SelectedDataSource'] :selected").val());
