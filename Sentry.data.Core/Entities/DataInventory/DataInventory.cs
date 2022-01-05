@@ -61,7 +61,7 @@ namespace Sentry.data.Core
         public DateTime? ExpirationDateTime { get; set; }
 
         [PropertyName("isnullable_flg")]
-        public bool IsNullable { get; set; }
+        public bool? IsNullable { get; set; }
 
         [PropertyName("isownerverified_flg")]
         public bool IsOwnerVerified { get; set; }
@@ -126,7 +126,7 @@ namespace Sentry.data.Core
                 MaxLength = MaxLength,
                 Precision = Precision,
                 Scale = Scale,
-                IsNullable = IsNullable,
+                IsNullable = IsNullable ?? false,
                 EffectiveDate = EffectiveDateTime,
                 BaseColumnId = Id,
                 IsOwnerVerified = IsOwnerVerified,

@@ -17,10 +17,10 @@ namespace Sentry.data.Infrastructure
 
         public void Index<T>(T document) where T : class
         {
-            throw new NotImplementedException();
-
             //Commenting out to not allow indexing to Elastic via app at this time
             //GetResponse(() => _client.IndexDocument(document));
+
+            throw new NotImplementedException();
         }
 
         public IList<T> Search<T>(Func<SearchDescriptor<T>, ISearchRequest> selector) where T : class

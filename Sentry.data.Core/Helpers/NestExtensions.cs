@@ -7,6 +7,12 @@ namespace Sentry.data.Core
 {
     public static class NestExtensions
     {
+        public static void AddTextSearch<T>(this List<QueryContainer> container, Expression<Func<T, object>> field, string value) where T : class
+        {
+            container.AddMatch(field, value);
+            container.AddWildcard(field, value);
+        }
+
         public static void AddWildcard<T>(this List<QueryContainer> container, Expression<Func<T, object>> field, string value) where T : class
         {
             if (TryBuild(field, value, out WildcardQuery query))
