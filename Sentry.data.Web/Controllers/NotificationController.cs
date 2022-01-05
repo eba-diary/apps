@@ -155,7 +155,7 @@ namespace Sentry.data.Web.Controllers
             {
                 //BUSINESSAREA is either PersonalLines or DSC, But they share different EventTypes so set the right variables here so proper subscriptions are brought back
                 BusinessAreaType bat = (sm.group == EventTypeGroup.BusinessArea) ? BusinessAreaType.PersonalLines : BusinessAreaType.DSC;
-                sm.businessAreaID = (sm.group == EventTypeGroup.BusinessArea) ?  (int)BusinessAreaType.PersonalLines : (int)BusinessAreaType.DSC;
+                sm.businessAreaID = (int)bat;
 
                 //get list of subscriptions the user has saved
                 List<BusinessAreaSubscription> tempCurrentSubscriptionsBusinessArea = _notificationService.GetAllUserSubscriptions(sm.group).OrderBy(o => o.EventType.Type_ID).ToList();
