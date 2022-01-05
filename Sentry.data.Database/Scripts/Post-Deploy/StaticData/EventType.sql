@@ -1,9 +1,10 @@
 ﻿BEGIN TRAN 
 	BEGIN TRY 
 
-		DECLARE	@GroupDATASET VARCHAR(25)			= 'DATASET'
-				,@GroupBUSINESSAREA VARCHAR(25)		= 'BUSINESSAREA'
-				,@GroupDALE VARCHAR(25)		= 'DALE'
+		DECLARE	@GroupDATASET VARCHAR(25)				= 'DATASET'
+				,@GroupBUSINESSAREA VARCHAR(25)			= 'BUSINESSAREA'
+				,@GroupDALE VARCHAR(25)					= 'DALE'
+				,@GroupBUSINESSAREA_DSC VARCHAR(25)		= 'BUSINESSAREA_DSC'
 		
 		MERGE INTO EventType AS Target 
 		USING (VALUES 
@@ -50,7 +51,16 @@
 									(36, 'DaleQuery'							,3	,0	,@GroupDALE),
 									
 									(37, 'Deleted Dataset Schema', 1,0,@GroupDATASET),
-									(38, 'Created Dataset Schema', 1,0,@GroupDATASET)
+									(38, 'Created Dataset Schema', 1,0,@GroupDATASET),
+
+									--BUSINESSAREA_DSC is another group that falls under the BUSINESSAREA umbrella
+									--I created another EventTypeGroup because BUSINESSAREA PL and DSC don't share the same Subscription Events
+									--and therefore don't share the same EventTypeGroup which dictates what EventTypes they can subscribe too
+									(39, 'Release Notes', 1,1,@GroupBUSINESSAREA_DSC),
+									(40, 'Technical Documentation', 1,1,@GroupBUSINESSAREA_DSC),
+									(41, 'News', 1,1,@GroupBUSINESSAREA_DSC)
+
+
 
 								)
 								AS Source ([Type_ID], [Description], Severity, Display_IND, [Group_CDE]) 

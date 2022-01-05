@@ -7,6 +7,10 @@
         {
             data.Subscription.SubscribeModal(group);
         });
+
+        $("[id^='subscribe-Feed-icon']").click(function () {
+            data.Subscription.SubscribeModal(group);
+        });
     },
 
     //this function is executed when SubscribeModal BTN is clicked
@@ -15,12 +19,12 @@
         var modal = Sentry.ShowModalWithSpinner("Subscribe");
 
         //for now only BUSINESSAREA EXISTS
-        if (group === 2)
+        if (group === 2 || group === 3)
         {
             $.get("/Notification/SubscribeDisplay/?group=" + group, function (e)
             {
                 modal.ReplaceModalBody(e);
             });
-        }
+        }        
     }
 };   
