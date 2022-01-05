@@ -238,12 +238,14 @@
                 case "googleapi":
                     $('.jobquestion.ftpPattern').hide();
                     $('.jobquestion.targetFileName').show();
+                    $('.jobquestion.searchCriteria').hide();
                     $('.httpSourcePanel').show();
                     $('.httpPostPanel').hide();
                     break;
                 case "https":
                     $('.jobquestion.ftpPattern').hide();
                     $('.jobquestion.targetFileName').show();
+                    $('.jobquestion.searchCriteria').hide();
                     $('.httpSourcePanel').show();
                     $('.httpPostPanel').hide();
                     $('.jobquestion.compression').show();
@@ -253,6 +255,7 @@
                 case "dfscustom":
                     $('.jobquestion.ftpPattern').hide();
                     $('.jobquestion.compression').show();
+                    $('.jobquestion.searchCriteria').hide();
             }
 
             //show common questions
