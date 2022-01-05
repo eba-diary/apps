@@ -12,8 +12,11 @@ namespace Sentry.data.Core
         [Description("DATASET")]   
         DataSet = 1,
         
-        [Description("BUSINESSAREA")] 
-        BusinessArea = 2
+        [Description("BUSINESSAREA")]       //CURRENTLY PL IS ONLY BUSINESS AREA, LEAVE GENERIC IN CASE FUTURE BUSINESSAREA IS ADDED THAT SHARES EVENTTYPES
+        BusinessArea = 2,
+
+        [Description("BUSINESSAREA_DSC")]   //DSC IS A BUSINESSAREA AS FAR AS NOTIFICATIONS GO BUT HAVE SEPERATE EVENTTYPES
+        BusinessAreaDSC = 3
     }
     
 }

@@ -54,6 +54,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Class(typeof(Notification));
             });
 
+            this.Property((x) => x.SchemaId, (m) => m.Column("Schema_Id"));
         }
     }
 }

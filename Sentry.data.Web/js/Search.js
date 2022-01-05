@@ -151,7 +151,6 @@ data.Search = {
             var selectedBusinessUnits = data.Search.GetSelectedFiltersFromGroup(window.vm.BusinessUnitFilters, selectedFilters);
             var selectedFunctions = data.Search.GetSelectedFiltersFromGroup(window.vm.DatasetFunctionFilters, selectedFilters);
             var selectedExtensions = data.Search.GetSelectedFiltersFromGroup(window.vm.ExtensionFilters, selectedFilters);
-            var selectedOwners = data.Search.GetSelectedFiltersFromGroup(window.vm.OwnerFilters, selectedFilters);
 
             var items = [];
 
@@ -160,13 +159,6 @@ data.Search = {
                 var datasetsToLoop = filterForCount(selectedFilters, selectedCategories);
                 items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
                     if (dataset.Categories.includes(Title)) { return dataset; }
-                });
-            }
-            else if (Category === 'Sentry Owner') {
-                //filter datasets for the count
-                var datasetsToLoop = filterForCount(selectedFilters, selectedOwners);
-                items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
-                    if (dataset.SentryOwner === Title) { return dataset; }
                 });
             }
             else if (Category === 'Extension' || Category === "Report Type") {

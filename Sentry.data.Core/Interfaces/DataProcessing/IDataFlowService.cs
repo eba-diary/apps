@@ -11,6 +11,12 @@ namespace Sentry.data.Core
     public interface IDataFlowService
     {
         List<DataFlowDto> ListDataFlows();
+        /// <summary>
+        /// Returns dataflow detail dto by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="Sentry.data.Core.Exceptions.DataFlowNotFound"></exception>
         DataFlowDetailDto GetDataFlowDetailDto(int id);
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
         int CreateandSaveDataFlow(DataFlowDto dto);

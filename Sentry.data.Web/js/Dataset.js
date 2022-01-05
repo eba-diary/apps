@@ -509,7 +509,8 @@ data.Dataset = {
             $.each(result.DataFlows, function (i, val) {
                 var item = new data.Dataset.DataFlow(val);
 
-                self.vm.DataFlows().push(item);
+                //only add if data flow is active
+                if (val.ObjectStatus === 1) self.vm.DataFlows().push(item);
             });
             self.vm.DataFlows.notifySubscribers();
 
@@ -582,11 +583,12 @@ data.Dataset = {
     },
 
     renderDataPreview: function () {
-
-        if ($("#datasetRowTable_filter").length > 0)
-        {
+        if ($("#datasetRowTable_filter").length > 0) {
             $("#datasetRowTable").DataTable().destroy();
         };
+        Sentry.InjectSpinner($("#tab-container"));
+
+
 
         $.ajax({
             type: "GET",
@@ -599,7 +601,6 @@ data.Dataset = {
                 if (msg !== undefined) {
                     var obj = JSON.parse(msg);
                     if (obj.length > 0) {
-
                         //pass data returned from AJAX call to render Data Table
                         data.Dataset.renderTable_v2(obj, false);
 
@@ -607,6 +608,7 @@ data.Dataset = {
                         self.vm.DataLoading(false);
                         self.vm.DataTableExists(true);
                         $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
+
                     }
                     else {
                         $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
@@ -621,10 +623,14 @@ data.Dataset = {
                 }
 
                 $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+            },
+            complete: function () {
+                data.RemoveSpinner("#tab-container");
             }
         }).fail(function () {
             $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
         });
+
     },
 
     //DATA PREVIEW DATA TABLE SETUP
@@ -666,7 +672,9 @@ data.Dataset = {
                 parsedRows.push(parsedCells);
             }
         });
-
+        if ($("#datasetRowTable_filter").length > 0) { 
+            $("#datasetRowTable").DataTable().destroy();
+        }
         if (!push) {
             $('#datasetRowTable').DataTable({
                 "scrollX": true,
@@ -827,29 +835,6 @@ data.Dataset = {
 
         //saidAsset onChange needs to update #PrimaryOwnerName and #PrimaryOwnerId based on saidAsset picked
         $("#saidAsset").change(function () {
-
-            //GET SAID ASSET FROM DROPDOWN
-            var assetKeyCode = $("#saidAsset").val();
-
-            //Send the JSON array to Controller using AJAX.
-            $.ajax({
-                type: "POST",
-                url: "/Dataset/GetOwner",
-                traditional: true,
-                data: JSON.stringify({ assetKeyCode: assetKeyCode }),
-                contentType: "application/json",
-                success: function (r) {
-                    $("#PrimaryOwnerName").val(r.primaryOwnerName);
-                    $("#PrimaryOwnerId").val(r.primaryOwnerId);
-                },
-                failure: function () {
-                    data.Dale.makeToast("error", "Error retrieving SAID Primary Owner.");
-                },
-                error: function () {
-                    data.Dale.makeToast("error", "Error retrieving SAID Primary Owner.");
-                }
-            });
-
             //Load the named environments for the selected asset
             Sentry.InjectSpinner($("div#DatasetFormContent #namedEnvironmentSpinner"), 30);
             data.Dataset.populateNamedEnvironments();
@@ -1213,13 +1198,16 @@ data.Dataset = {
         //*****************************************************************************************************
         $('#datasetConfigList').on('select2:select', function (e) {
 
-            Id = $('#datasetConfigList').val();
+
+
+            Sentry.InjectSpinner($("#tab-container"));
+
 
             var url = new URL(window.location.href);
             url.searchParams.set('configID', $('#datasetConfigList').val());
             window.history.pushState({}, '', url);
 
-            $("#datasetRowTable").DataTable().destroy();            
+            Id = $('#datasetConfigList').val();
             self.vm.NoColumnsReturned(false);
             $('#schemaHR').show();
             self.vm.SchemaRows.removeAll();
@@ -1230,9 +1218,15 @@ data.Dataset = {
             }
 
             data.Dataset.UpdateMetadata();
+
+            data.RemoveSpinner('#tab-container');
+
         });
         Id = $('#datasetConfigList').val();
         //on initial load, try pulling the Id from the URL first. 
+
+        Id = $('#datasetConfigList').val();
+        //on initial load, try pulling the Id from the URL first.
 
         $('#dataLastUpdatedSpinner').show();
         data.Dataset.UpdateMetadata();
@@ -1257,6 +1251,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             if ($('#tabSchemaColumns').is(':empty')) {
+                Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaColumns',
                     dataType: 'html',
@@ -1265,6 +1260,7 @@ data.Dataset = {
                         data.Dataset.delroyInit();
                         data.Dataset.UpdateMetadata();
                         $('#delroySpinner').hide();
+                        data.RemoveSpinner('#tab-container');
                     }
                 });
             }
@@ -1285,6 +1281,7 @@ data.Dataset = {
             var id = $('#RequestAccessButton').attr("data-id");
 
             if ($('#tabSchemaAbout').is(':empty')) {
+                Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaAbout',
                     dataType: 'html',
@@ -1292,6 +1289,7 @@ data.Dataset = {
                         $('#tabSchemaAbout').html(view);
                         ko.applyBindings(self.vm, $("#tabSchemaAbout")[0]);
                         data.Dataset.UpdateMetadata();
+                        data.RemoveSpinner('#tab-container');
                     }
                 });
             }
@@ -1312,6 +1310,7 @@ data.Dataset = {
             var id = $('#RequestAccessButton').attr("data-id");
 
             if ($('#tabDataPreview').is(':empty')) {
+                Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataPreview',
                     dataType: 'html',
@@ -1320,6 +1319,7 @@ data.Dataset = {
                         if (self.vm.ShowDataFileTable()) {
                             data.Dataset.renderDataPreview();
                         }
+                        data.RemoveSpinner('#tab-container');
                     }
                 });
             }
@@ -1339,6 +1339,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             if ($('#tabDataFiles').is(':empty')) {
+                Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataFiles',
                     dataType: 'html',
@@ -1349,6 +1350,7 @@ data.Dataset = {
                             data.Dataset.DatasetFileTableInit(configId);
                             data.Dataset.DatasetBundingFileTableInit(configId);
                         }
+                        data.RemoveSpinner('#tab-container');
                     }
                 });
             }

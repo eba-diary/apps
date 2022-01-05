@@ -8,6 +8,7 @@ using Sentry.data.Core;
 using System.Text;
 using Sentry.data.Core.Factories.Fields;
 using Sentry.Core;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Sentry.data.Web
 {
@@ -156,7 +157,7 @@ namespace Sentry.data.Web
             {
                 Name = model.Name,
                 Delimiter = model.Delimiter,
-                FileExtenstionName = model.FileFormat,
+                FileExtensionName = model.FileFormat,
                 HasHeader = model.HasHeader,
                 CreateCurrentView = model.CurrentView,
                 Description = model.Description
@@ -236,6 +237,23 @@ namespace Sentry.data.Web
             }
 
             return dto;            
+        }
+
+        public static SchemaRevisionJsonStructureModel ToModel(this SchemaRevisionJsonStructureDto dto)
+        {
+            SchemaRevisionJsonStructureModel mdl = new SchemaRevisionJsonStructureModel()
+            {
+                Revision = dto.Revision?.ToModel(),
+                JsonStructure = dto.JsonStructure
+            };
+
+            //setting to null because would be duplicating what is in JsonStructure
+            if (mdl.Revision != null)
+            {
+                mdl.Revision.JsonSchemaObject = null;
+            }
+
+            return mdl;
         }
     }
 }

@@ -8,6 +8,11 @@ using System.Linq;
 using Moq;
 using Sentry.FeatureFlags;
 using Sentry.FeatureFlags.Mock;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Helpers;
+using Sentry.data.Core.Exceptions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Sentry.data.Core.Tests
 {
@@ -1677,7 +1682,7 @@ namespace Sentry.data.Core.Tests
         public void SchemaService_GenerateParquetStorageBucket_HRBucket()
         {
             // Arrange
-            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null);
+            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null,null);
 
             // Act
             var result = schemaService.GenerateParquetStorageBucket(true,"DATA","DEV");
@@ -1690,7 +1695,7 @@ namespace Sentry.data.Core.Tests
         public void SchemaService_GenerateParquetStorageBucket_BaseBucket()
         {
             // Arrange
-            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null);
+            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null, null);
 
             // Act
             var result = schemaService.GenerateParquetStorageBucket(false, "DATA", "DEV");
@@ -1706,7 +1711,7 @@ namespace Sentry.data.Core.Tests
             var dataFeatures = new MockDataFeatures();
             ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
 
-            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null);
+            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null, null);
 
 
             // Act
@@ -1723,7 +1728,7 @@ namespace Sentry.data.Core.Tests
             var dataFeatures = new MockDataFeatures();
             ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
-            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null);
+            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null, null);
 
 
             // Act
@@ -1740,7 +1745,7 @@ namespace Sentry.data.Core.Tests
             var dataFeatures = new MockDataFeatures();
             ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
-            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null);
+            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null, null);
 
             // Assert
             Assert.ThrowsException<ArgumentNullException>(() => schemaService.GenerateParquetStoragePrefix(null, "DEV", "123456"));
@@ -1750,7 +1755,7 @@ namespace Sentry.data.Core.Tests
         public void SchemaService_GenerateParquetStoragePrefix_Null_Storagecode()
         {
             // Arrange
-            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null);
+            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null, null);
 
             // Assert
             Assert.ThrowsException<ArgumentNullException>(() => schemaService.GenerateParquetStoragePrefix("DATA", "DEV", null));
@@ -1763,10 +1768,525 @@ namespace Sentry.data.Core.Tests
             var dataFeatures = new MockDataFeatures();
             ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
-            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null);
+            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null, null);
 
             // Assert
             Assert.ThrowsException<ArgumentNullException>(() => schemaService.GenerateParquetStoragePrefix("DATA", null, "123456"));
+        }
+
+        [TestMethod]
+        public void UpdateAndSaveSchema_UnknownSchemaId_ThrowDatasetNotFound()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet((ctx) => ctx.Datasets).Returns(Enumerable.Empty<Dataset>().AsQueryable());
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, null, null, null, null, null, null, null, null, null);
+
+            FileSchemaDto dto = new FileSchemaDto();
+
+            Assert.ThrowsException<DatasetNotFoundException>(() => schemaService.UpdateAndSaveSchema(dto));
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateAndSaveSchema_UnknownSchemaId_ThrowSchemaNotFound()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Dataset ds = new Dataset() 
+            { 
+                DatasetId = 2,
+                ObjectStatus = ObjectStatusEnum.Active
+            };
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig()
+            {
+                Schema = new FileSchema() { SchemaId = 1 },
+                ParentDataset = ds
+            };
+
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            List<Dataset> datasets = new List<Dataset>() { ds };
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet((ctx) => ctx.Datasets).Returns(datasets.AsQueryable());
+
+            Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object).Verifiable();
+
+            UserSecurity security = new UserSecurity() { CanManageSchema = true };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, null, null, null,null);
+
+            FileSchemaDto dto = new FileSchemaDto() { SchemaId = 5, ParentDatasetId = 2 };
+
+            Assert.ThrowsException<SchemaNotFoundException>(() => schemaService.UpdateAndSaveSchema(dto));
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateAndSaveSchema_BadUser_ThrowUnauthorized()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Dataset ds = new Dataset() 
+            { 
+                DatasetId = 2,
+                ObjectStatus = ObjectStatusEnum.Active
+            };
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig()
+            {
+                Schema = new FileSchema() { SchemaId = 1 },
+                ParentDataset = ds
+            };
+
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            List<Dataset> datasets = new List<Dataset>() { ds };
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet(ctx => ctx.Datasets).Returns(datasets.AsQueryable()).Verifiable();
+
+            Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object).Verifiable();
+
+            UserSecurity security = new UserSecurity() { CanManageSchema = false };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, null, null, null, null);
+
+            FileSchemaDto dto = new FileSchemaDto() { SchemaId = 1, ParentDatasetId = 2 };
+
+            Assert.ThrowsException<SchemaUnauthorizedAccessException>(() => schemaService.UpdateAndSaveSchema(dto));
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateAndSaveSchema_CurrentView_TrueAndCreateEvent()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            //mock context
+            Dataset ds = new Dataset()
+            {
+                DatasetId = 2,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DatasetFileConfigs = new List<DatasetFileConfig>()
+            };
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig()
+            {
+                Schema = new FileSchema() 
+                { 
+                    SchemaId = 1, 
+                    CreateCurrentView = false, 
+                    Extension = new FileExtension() { Id = 4 } 
+                },
+                ParentDataset = ds
+            };
+
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            List<Dataset> datasets = new List<Dataset>() { ds };
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(ds.DatasetFileConfigs.AsQueryable()).Verifiable();
+            datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
+
+            SchemaRevision revision = new SchemaRevision() 
+            { 
+                ParentSchema = fileConfig.Schema,
+                SchemaRevision_Id = 3 
+            };
+            List<SchemaRevision> revisions = new List<SchemaRevision>() { revision };
+            datasetContext.SetupGet(x => x.SchemaRevision).Returns(revisions.AsQueryable()).Verifiable();
+
+            //mock user service
+            Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
+            appUser.SetupGet(x => x.AssociateId).Returns("000000");
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object).Verifiable();
+
+            //mock security service
+            UserSecurity security = new UserSecurity() { CanManageSchema = true };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
+
+            //mock features
+            Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
+            feature.Setup(x => x.GetValue()).Returns(true);
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.SetupGet(x => x.CLA3605_AllowSchemaParquetUpdate).Returns(feature.Object);
+
+            //mock publisher
+            HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
+            {
+                SchemaID = 1,
+                RevisionID = 3,
+                DatasetID = 2,
+                HiveStatus = null,
+                InitiatorID = "000000",
+                ChangeIND = "{\"createcurrentview\":\"true\"}"
+            };
+
+            SnowTableCreateModel snowCreate = new SnowTableCreateModel()
+            {
+                SchemaID = 1,
+                RevisionID = 3,
+                DatasetID = 2,
+                InitiatorID = "000000",
+                ChangeIND = "{\"createcurrentview\":\"true\"}"
+            };
+
+            Mock<IMessagePublisher> publisher = mr.Create<IMessagePublisher>();
+            publisher.Setup(x => x.PublishDSCEvent("1", JsonConvert.SerializeObject(hiveCreate))).Verifiable();
+            publisher.Setup(x => x.PublishDSCEvent("1", JsonConvert.SerializeObject(snowCreate))).Verifiable();
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, features.Object, publisher.Object, null, null);
+
+            FileSchemaDto dto = new FileSchemaDto() 
+            { 
+                SchemaId = 1, 
+                ParentDatasetId = 2,
+                CreateCurrentView = true, 
+                FileExtensionId = 4 
+            };
+
+            Assert.IsTrue(schemaService.UpdateAndSaveSchema(dto));
+
+            //verify change was detected
+            Assert.AreEqual("000000", fileConfig.Schema.UpdatedBy);
+
+            //verify current view updated
+            Assert.IsTrue(fileConfig.Schema.CreateCurrentView);
+
+            //verify extension didn't change
+            Assert.AreEqual(4, fileConfig.Schema.Extension.Id);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateAndSaveSchema_ParquetStorage_TrueAndCreateEvent()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            //mock context
+            Dataset ds = new Dataset()
+            {
+                DatasetId = 2,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DatasetFileConfigs = new List<DatasetFileConfig>()
+            };
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig()
+            {
+                Schema = new FileSchema()
+                {
+                    SchemaId = 1,
+                    ParquetStorageBucket = "Bucket",
+                    ParquetStoragePrefix = "Prefix",
+                    Extension = new FileExtension() { Id = 4 }
+                },
+                ParentDataset = ds
+            };
+
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            List<Dataset> datasets = new List<Dataset>() { ds };
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(ds.DatasetFileConfigs.AsQueryable()).Verifiable();
+            datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
+
+            SchemaRevision revision = new SchemaRevision()
+            {
+                ParentSchema = fileConfig.Schema,
+                SchemaRevision_Id = 3
+            };
+            List<SchemaRevision> revisions = new List<SchemaRevision>() { revision };
+            datasetContext.SetupGet(x => x.SchemaRevision).Returns(revisions.AsQueryable()).Verifiable();
+
+            //mock user service
+            Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
+            appUser.SetupGet(x => x.AssociateId).Returns("000000");
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object).Verifiable();
+
+            //mock security service
+            UserSecurity security = new UserSecurity() { CanManageSchema = true };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
+
+            //mock features
+            Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
+            feature.Setup(x => x.GetValue()).Returns(true);
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.SetupGet(x => x.CLA3605_AllowSchemaParquetUpdate).Returns(feature.Object);
+
+            //mock publisher
+            HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
+            {
+                SchemaID = 1,
+                RevisionID = 3,
+                DatasetID = 2,
+                HiveStatus = null,
+                InitiatorID = "000000",
+                ChangeIND = "{\"parquetstoragebucket\":\"newbucket\",\"parquetstorageprefix\":\"newprefix\"}"
+            };
+
+            SnowTableCreateModel snowCreate = new SnowTableCreateModel()
+            {
+                SchemaID = 1,
+                RevisionID = 3,
+                DatasetID = 2,
+                InitiatorID = "000000",
+                ChangeIND = "{\"parquetstoragebucket\":\"newbucket\",\"parquetstorageprefix\":\"newprefix\"}"
+            };
+
+            Mock<IMessagePublisher> publisher = mr.Create<IMessagePublisher>();
+            publisher.Setup(x => x.PublishDSCEvent("1", JsonConvert.SerializeObject(hiveCreate))).Verifiable();
+            publisher.Setup(x => x.PublishDSCEvent("1", JsonConvert.SerializeObject(snowCreate))).Verifiable();
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, features.Object, publisher.Object, null, null);
+
+            FileSchemaDto dto = new FileSchemaDto()
+            {
+                SchemaId = 1,
+                ParquetStorageBucket = "NewBucket",
+                ParquetStoragePrefix = "NewPrefix",
+                FileExtensionId = 4,
+                ParentDatasetId = 2
+            };
+
+            Assert.IsTrue(schemaService.UpdateAndSaveSchema(dto));
+
+            //verify change was detected
+            Assert.AreEqual("000000", fileConfig.Schema.UpdatedBy);
+
+            //verify parquet properties updated
+            Assert.AreEqual("NewBucket", fileConfig.Schema.ParquetStorageBucket);
+            Assert.AreEqual("NewPrefix", fileConfig.Schema.ParquetStoragePrefix);
+
+            //verify extension didn't change
+            Assert.AreEqual(4, fileConfig.Schema.Extension.Id);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateAndSaveSchema_FileExtension_True()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            //mock context
+            Dataset ds = new Dataset()
+            {
+                DatasetId = 2,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DatasetFileConfigs = new List<DatasetFileConfig>()
+            };
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig()
+            {
+                Schema = new FileSchema()
+                {
+                    SchemaId = 1,
+                    Extension = new FileExtension() { Id = 4,  }
+                },
+                ParentDataset = ds
+            };
+
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            List<Dataset> datasets = new List<Dataset>() { ds };
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
+            datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
+            datasetContext.Setup(x => x.GetById<FileExtension>(5)).Returns(new FileExtension() { Id = 5 }).Verifiable();
+
+            //mock user service
+            Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
+            appUser.SetupGet(x => x.AssociateId).Returns("000000");
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object).Verifiable();
+
+            //mock security service
+            UserSecurity security = new UserSecurity() { CanManageSchema = true };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
+
+            //mock features
+            Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
+            feature.Setup(x => x.GetValue()).Returns(true);
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.SetupGet(x => x.CLA3605_AllowSchemaParquetUpdate).Returns(feature.Object);
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, features.Object, null, null, null);
+
+            FileSchemaDto dto = new FileSchemaDto()
+            {
+                SchemaId = 1,
+                FileExtensionId = 5,
+                ParentDatasetId = 2
+            };
+
+            Assert.IsTrue(schemaService.UpdateAndSaveSchema(dto));
+            //verify change was detected
+            Assert.AreEqual("000000", fileConfig.Schema.UpdatedBy);
+
+            //verify extension
+            Assert.AreEqual(5, fileConfig.Schema.Extension.Id);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateAndSaveSchema_NoUpdate_True()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            //mock context
+            Dataset ds = new Dataset()
+            {
+                DatasetId = 2,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DatasetFileConfigs = new List<DatasetFileConfig>()
+            };
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig()
+            {
+                Schema = new FileSchema()
+                {
+                    SchemaId = 1,
+                    Name = "Name",
+                    Description = "Description",
+                    UpdatedBy = "000001",
+                    Extension = new FileExtension() { Id = 4, }
+                },
+                ParentDataset = ds
+            };
+
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            List<Dataset> datasets = new List<Dataset>() { ds };
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
+            datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
+
+            //mock user service
+            Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object).Verifiable();
+
+            //mock security service
+            UserSecurity security = new UserSecurity() { CanManageSchema = true };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
+
+            //mock features
+            Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
+            feature.Setup(x => x.GetValue()).Returns(true);
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.SetupGet(x => x.CLA3605_AllowSchemaParquetUpdate).Returns(feature.Object);
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, features.Object, null, null, null);
+
+            FileSchemaDto dto = new FileSchemaDto()
+            {
+                SchemaId = 1,
+                Name = "Name",
+                Description = "Description",
+                FileExtensionId = 4,
+                ParentDatasetId = 2
+            };
+
+            Assert.IsTrue(schemaService.UpdateAndSaveSchema(dto));
+            //verify properties have not changed
+            Assert.AreEqual("000001", fileConfig.Schema.UpdatedBy);
+            Assert.AreEqual("Name", fileConfig.Schema.Name);
+            Assert.AreEqual("Description", fileConfig.Schema.Description);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetLatestSchemaRevisionJsonStructureBySchemaId_1_SchemaRevisionJsonStructureDto()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            //mock context
+            Dataset ds = new Dataset() 
+            { 
+                DatasetId = 2,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DatasetFileConfigs = new List<DatasetFileConfig>()
+            };
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig()
+            {
+                Schema = new FileSchema()
+                {
+                    SchemaId = 1,
+                    Revisions = new List<SchemaRevision>() { new SchemaRevision()
+                    {
+                        SchemaRevision_Name = "StructureTest",
+                        Revision_NBR = 1,
+                        Fields = new List<BaseField>() { new IntegerField() { Name = "fieldname", Description = "Field Description" } }
+                    } }
+                },
+                ParentDataset = ds
+            };
+
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            List<Dataset> datasets = new List<Dataset>() { ds };
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
+
+            //mock user service
+            Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object).Verifiable();
+
+            //mock security service
+            UserSecurity security = new UserSecurity() { CanManageSchema = true };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, null, null, null,null);
+
+            SchemaRevisionJsonStructureDto dto = schemaService.GetLatestSchemaRevisionJsonStructureBySchemaId(2, 1);
+
+            Assert.IsNotNull(dto.Revision);
+            Assert.AreEqual(1, dto.Revision.RevisionNumber);
+            Assert.AreEqual("StructureTest", dto.Revision.SchemaRevisionName);
+
+            Assert.IsNotNull(dto.JsonStructure);
+            Assert.IsTrue(JToken.DeepEquals(GetData("BasicSchema_Integer.json"), dto.JsonStructure));
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void TestDotNamePathBuild()
+        {
+            List<BaseField> fields = BuildMockNestedSchema();
+            SchemaService schemaService = new SchemaService(null, null, null, null, null, null, null, null, null, null);
+            schemaService.SchemaFieldsBuildDotNamePath(fields);
+            Assert.AreEqual("Root", fields[0].DotNamePath);
+            Assert.AreEqual("Root.Middle", fields[1].DotNamePath);
+            Assert.AreEqual("Root.Middle.Child", fields[2].DotNamePath);
         }
 
         #region Private Methods
@@ -2120,9 +2640,23 @@ namespace Sentry.data.Core.Tests
 
             return field;
         }
+
+        private List<BaseField> BuildMockNestedSchema()
+        {
+            List<BaseField> schemaList = new List<BaseField>();
+            StructField root = new StructField();
+            root.Name = "Root";
+            StructField middle = new StructField();
+            middle.ParentField = root;
+            middle.Name = "Middle";
+            StructField child = new StructField();
+            child.ParentField = middle;
+            child.Name = "Child";
+            schemaList.Add(root);
+            schemaList.Add(middle);
+            schemaList.Add(child);
+            return schemaList;
+        }
         #endregion
-
-
-
     }
 }

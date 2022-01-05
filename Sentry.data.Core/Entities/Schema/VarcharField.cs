@@ -1,4 +1,6 @@
-﻿namespace Sentry.data.Core
+﻿using Newtonsoft.Json.Linq;
+
+namespace Sentry.data.Core
 {
     public class VarcharField : BaseField, ISchemaField
     {
@@ -9,6 +11,15 @@
                 return SchemaDatatypes.VARCHAR;
             }
             set => FieldType = SchemaDatatypes.VARCHAR;
+        }
+
+        protected override JObject GetJsonTypeDefinition()
+        {
+            return new JObject()
+            {
+                { "type", "string" },
+                { "maxlength", FieldLength }
+            };
         }
     }
 }

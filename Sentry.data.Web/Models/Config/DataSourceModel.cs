@@ -38,8 +38,6 @@ namespace Sentry.data.Web
             PrimaryContactId = dto.PrimaryContactId;
             PrimaryContactName = dto.PrimaryContactName;
             PrimaryContactEmail = dto.PrimaryContactEmail;
-            PrimaryOwnerId = dto.PrimaryOwnerId;
-            PrimaryOwnerName = dto.PrimaryOwnerName;
             IsSecured = dto.IsSecured;
             Security = dto.Security.ToModel();
             MailToLink = dto.MailToLink;
@@ -118,8 +116,6 @@ namespace Sentry.data.Web
         [DisplayName("Request Headers")]
         public List<RequestHeader> Headers { get; set; }
 
-        [DisplayName("Owner")]
-        public string PrimaryOwnerName { get; set; }
 
         #region Security
         [DisplayName("Contact")]

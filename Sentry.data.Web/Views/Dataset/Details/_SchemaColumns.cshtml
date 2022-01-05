@@ -2,22 +2,18 @@
     string color = Model.CategoryColor;
     string headerColor = "categoryBanner-" + Model.CategoryColor;
 }
-
-<hr />
-
+<br />
 <div class="" id="schemaSection">
-    <div id="columnsInThisSchema" class="@(Model.DisplayTabSections != true ?"visible-item":"hidden-item")">
-        <h3 class="detailSection @color">Columns</h3>
-    </div>
-    <div id="delroyBorder" style="border: 1px #DDDDDD solid; background: white; padding: 10px;" class="metadataBody container row">
 
-        <div id="delroySpinner">
-            <div class="sentry-spinner-container" style=" width: 1166px; margin-top: 25px;">
-                <span class="sentry-spinner" style="height:200px"></span>
-            </div>
+    @if (!Model.DisplayTabSections)
+    {
+        <div id="columnsInThisSchema">
+            <h3 class="detailSection @color">Columns</h3>
         </div>
+    }
 
 
+    <div id="delroyBorder">
         <div id="delroyFriends">
             <ol class="breadcrumb orange" id="delroyBreadcrumb" data-page-color="@color">   </ol>
 

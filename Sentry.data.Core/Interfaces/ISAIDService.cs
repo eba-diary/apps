@@ -8,5 +8,6 @@ namespace Sentry.data.Core.Interfaces
     {
         Task<SAIDAsset> GetAssetByKeyCode(string keyCode);
         Task<List<SAIDAsset>> GetAllAssets();
+        Task<List<SAIDRole>> GetAllProdCustByKeyCode(string keyCode);
     }
 }

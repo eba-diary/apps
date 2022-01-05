@@ -161,7 +161,7 @@ namespace Sentry.data.Web.Helpers
                     {
                         Selected = ((int)v == preProcessingOptionSelections),
                         Text = v.GetDescription(),
-                        Value = v.ToString()
+                        Value = ((int)v).ToString()
                     }).ToList());
             }
             return items;

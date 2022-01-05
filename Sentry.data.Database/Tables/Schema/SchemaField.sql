@@ -18,6 +18,7 @@
     [FieldLength] INT NULL, 
     [FieldGuid] UNIQUEIDENTIFIER NULL, 
     [Description] VARCHAR(2000) NULL, 
+    [DotNamePath] NCHAR(1000) NULL, 
     CONSTRAINT [PK_SchemaField] PRIMARY KEY CLUSTERED (Field_Id ASC),
     CONSTRAINT [FK_SchemaField_SchemaField] FOREIGN KEY ([ParentField]) REFERENCES [SchemaField]([Field_Id]), 
     CONSTRAINT [FK_SchemaField_SchemaRevision] FOREIGN KEY ([ParentSchemaRevision]) REFERENCES [SchemaRevision]([SchemaRevision_Id])

@@ -56,8 +56,8 @@
     <Reference Include="Namotion.Reflection, Version=1.0.11.0, Culture=neutral, PublicKeyToken=c2f9c3bdfae56102, processorArchitecture=MSIL">
       <HintPath>..\packages\Namotion.Reflection.1.0.11\lib\net45\Namotion.Reflection.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NJsonSchema, Version=10.1.18.0, Culture=neutral, PublicKeyToken=c2f9c3bdfae56102, processorArchitecture=MSIL">
       <HintPath>..\packages\NJsonSchema.10.1.18\lib\net45\NJsonSchema.dll</HintPath>
@@ -110,6 +110,7 @@
     <Compile Include="DomainServices\DaleService.cs" />
     <Compile Include="DomainServices\DataProcessing\DataFlowService.cs" />
     <Compile Include="DomainServices\DataProcessing\DataStepService.cs" />
+    <Compile Include="DomainServices\DatasetFileService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
     <Compile Include="DomainServices\JobService.cs" />
     <Compile Include="DomainServices\MessageHandlers\DataStepProcessorHandler.cs" />
@@ -136,6 +137,7 @@
     <Compile Include="DTO\Dataset\DatasetSummaryMetadataDTO.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
+    <Compile Include="DTO\Schema\DatasetFileDto.cs" />
     <Compile Include="DTO\Schema\Fields\BaseFieldDto.cs" />
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
     <Compile Include="DTO\Schema\Fields\DateFieldDto.cs" />
@@ -148,6 +150,7 @@
     <Compile Include="DTO\Schema\FileSchemaDto.cs" />
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
+    <Compile Include="DTO\Schema\SchemaRevisionJsonStructureDto.cs" />
     <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\FixedWidthAction.cs" />
@@ -190,6 +193,7 @@
     <Compile Include="Entities\MessageFormats\S3Event.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableCreateModel.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
+    <Compile Include="Helpers\Paginate\PageParameters.cs" />
     <Compile Include="Entities\S3\S3LambdaEvent.cs" />
     <Compile Include="Entities\S3\S3ObjectEvent.cs" />
     <Compile Include="Entities\Security\SAIDAsset.cs" />
@@ -210,13 +214,15 @@
     <Compile Include="Exceptions\DaleInvalidSearchException.cs" />
     <Compile Include="Exceptions\DaleQueryException.cs" />
     <Compile Include="Exceptions\DaleUnauthorizedAccessException.cs" />
+    <Compile Include="Exceptions\DataFileNotFound.cs" />
+    <Compile Include="Exceptions\DataFileUnauthorizedException.cs" />
     <Compile Include="Exceptions\DataFlowNotFound.cs" />
     <Compile Include="Exceptions\DataFlowStepNotFound.cs" />
-    <Compile Include="Exceptions\AWSLambdaException.cs" />
-    <Compile Include="Exceptions\AWSLambdaInvalidParameterException.cs" />
-    <Compile Include="Exceptions\AWSLambdaNotFoundException.cs" />
-    <Compile Include="Exceptions\AWSLambdaRequestLimitException.cs" />
-    <Compile Include="Exceptions\AWSLambdaServiceException.cs" />
+    <Compile Include="Exceptions\AwsLambdaException.cs" />
+    <Compile Include="Exceptions\AwsLambdaInvalidParameterException.cs" />
+    <Compile Include="Exceptions\AwsLambdaNotFoundException.cs" />
+    <Compile Include="Exceptions\AwsLambdaRequestLimitException.cs" />
+    <Compile Include="Exceptions\AwsLambdaServiceException.cs" />
     <Compile Include="Exceptions\DataFlowStepNotImplementedException.cs" />
     <Compile Include="Exceptions\DataFlowUnauthorizedAccessException.cs" />
     <Compile Include="Exceptions\DatasetFileConfigDeletedException.cs" />
@@ -231,6 +237,7 @@
     <Compile Include="Exceptions\SchemaInUseException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaConversionException.cs" />
+    <Compile Include="Exceptions\SchemaRevisionNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaUnauthorizedAccessException.cs" />
     <Compile Include="Extensions\DataFlowExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
@@ -260,8 +267,11 @@
     <Compile Include="GlobalEnums\ObjectStatus.cs" />
     <Compile Include="GlobalEnums\RetrieverJobScheduleTypes.cs" />
     <Compile Include="GlobalEnums\SchemaDatatypes.cs" />
+    <Compile Include="Helpers\EnumHelper.cs" />
+    <Compile Include="Extensions\JsonStructureExtensions.cs" />
     <Compile Include="Helpers\LambdaClientConfig.cs" />
     <Compile Include="Helpers\LoggingUtils.cs" />
+    <Compile Include="Helpers\Paginate\PagedList.cs" />
     <Compile Include="Helpers\ParsingHelpers.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />
@@ -284,6 +294,7 @@
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\IApacheLivyProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IXMLAction.cs" />
+    <Compile Include="Interfaces\IDatasetFileService.cs" />
     <Compile Include="Interfaces\IHostSettings.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
     <Compile Include="Interfaces\IDaleSearchProvider.cs" />

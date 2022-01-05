@@ -21,7 +21,6 @@ namespace Sentry.data.Web.Tests
                 DatasetDesc = "Test Claim Dataset",
                 DatasetInformation = "Specific Information regarding datasetfile consumption",
                 CreationUserName = user != null ? user.DisplayName : "Nye, Bill",
-                PrimaryOwnerId = user != null ? user.AssociateId : "012345",
                 UploadUserName = user != null ? user.DisplayName : "Nye, Bill",
                 OriginationCode = "Internal",
                 DatasetDtm = System.DateTime.Now.AddYears(-13),

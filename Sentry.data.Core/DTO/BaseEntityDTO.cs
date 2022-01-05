@@ -10,8 +10,6 @@ namespace Sentry.data.Core
         public int DatasetId { get; set; }
         public string DatasetName { get; set; }
         public string DatasetDesc { get; set; }
-        public string PrimaryOwnerName { get; set; }
-        public string PrimaryOwnerId { get; set; }
         public string PrimaryContactId { get; set; }
         public string PrimaryContactName { get; set; }
         public string PrimaryContactEmail { get; set; }

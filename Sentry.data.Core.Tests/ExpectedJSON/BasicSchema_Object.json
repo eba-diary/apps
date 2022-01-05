@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "StructureTest",
+  "type": "object",
+  "properties": {
+    "fieldname": {
+      "type": "object",
+      "properties": {
+        "childfieldname": {
+          "type": "string",
+          "maxlength": 10,
+          "description": "Child Field Description"
+        }
+      },
+      "description": "Field Description"
+    }
+  }
+}

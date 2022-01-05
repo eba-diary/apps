@@ -19,6 +19,7 @@
 	[Consumption_Layer] AS JSON_VALUE(Search, '$.Consumption_Layer'),
 	[Lineage_Table] AS JSON_VALUE(Search, '$.Lineage_Table'),
 	[Notification_ID] INT NULL, 
+	[Schema_Id] INT NULL, 
     CONSTRAINT [FK_EventType] FOREIGN KEY ([EventType]) REFERENCES [EventType]([Type_ID]), 
     CONSTRAINT [FK_StatusType] FOREIGN KEY ([StatusType]) REFERENCES [StatusType]([Status_ID]),
 	CONSTRAINT [FK_Notifications] FOREIGN KEY ([Notification_ID]) REFERENCES [Notifications]([Notification_ID])

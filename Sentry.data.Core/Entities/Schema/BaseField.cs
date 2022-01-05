@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sentry.data.Core
 {
@@ -51,8 +53,34 @@ namespace Sentry.data.Core
         }
         public virtual SchemaRevision ParentSchemaRevision { get; set; }
         public virtual int FieldLength { get; set; }
+        public virtual string DotNamePath { get; set; }
+
 
         //abstract properties
         public abstract SchemaDatatypes FieldType { get; set; }
+
+        public virtual JObject ToJsonPropertyDefinition()
+        {
+            JObject definition = new JObject();
+
+            if (IsArray)
+            {
+                definition.Add("type", "array");
+                definition.Add("items", new JArray() { GetJsonTypeDefinition() });
+            }
+            else
+            {
+                definition = GetJsonTypeDefinition();
+            }            
+
+            if (!string.IsNullOrEmpty(Description))
+            {
+                definition.Add("description", Description);
+            }
+
+            return definition;
+        }
+
+        protected abstract JObject GetJsonTypeDefinition();
     }
 }

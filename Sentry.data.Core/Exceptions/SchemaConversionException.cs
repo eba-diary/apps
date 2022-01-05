@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Sentry.data.Core.Exceptions
 {
     [Serializable]
-    public class SchemaConversionException : UnauthorizedAccessException, ISerializable
+    public class SchemaConversionException : Exception
     {
         public SchemaConversionException() { }
         public SchemaConversionException(string message) : base(message) { }

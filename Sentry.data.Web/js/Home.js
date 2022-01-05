@@ -15,6 +15,9 @@ data.Home = {
             //SHOW DSC ANNOUNCEMENTS BASED ON FEATURE FLAG DELETE THIS when feature is complete
             if (data.Home.CLA2838_DSC_ANOUNCEMENTS == true) {
 
+                //init Subscription which basicaly sends up an event handler and modal when they click subscribe
+                data.Subscription.init(3);
+
                 //THIS AJAX CALL LOADS UP FIRST SET OF ITEMS IN FEED, REST ARE LOADED WHEN USER SCROLLS
                 $.ajax({
                     url: '/Home/GetFeed',

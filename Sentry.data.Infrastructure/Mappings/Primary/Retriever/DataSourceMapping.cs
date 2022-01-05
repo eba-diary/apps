@@ -91,7 +91,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.ForeignKey("FK_DataSource_AuthenticationType");
                 m.Class(typeof(AuthenticationType));
             });
-            this.Property((x) => x.PrimaryOwnerId, (m) => m.Column("PrimaryOwner_ID"));
             this.Property((x) => x.PrimaryContactId, (m) => m.Column("PrimaryContact_ID"));
 
             //ISecurable Mapping
