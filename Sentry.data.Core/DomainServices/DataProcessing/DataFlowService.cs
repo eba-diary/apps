@@ -59,6 +59,12 @@ namespace Sentry.data.Core
         public DataFlowDetailDto GetDataFlowDetailDto(int id)
         {
             DataFlow df = _datasetContext.GetById<DataFlow>(id);
+
+            if (df == null)
+            {
+                throw new DataFlowNotFound();
+            }
+
             DataFlowDetailDto dto = new DataFlowDetailDto();
             MapToDetailDto(df, dto);
             return dto;
@@ -904,8 +910,6 @@ namespace Sentry.data.Core
             dto.Id = df.Id;
             dto.FlowGuid = df.FlowGuid;
             dto.SaidKeyCode = df.SaidKeyCode;
-            dto.DatasetId = df.DatasetId;
-            dto.SchemaId = df.SchemaId;
             dto.Name = df.Name;
             dto.CreateDTM = df.CreatedDTM;
             dto.CreatedBy = df.CreatedBy;
@@ -933,6 +937,9 @@ namespace Sentry.data.Core
                 }
             }
             dto.SchemaMap = scmMapDtoList;
+
+            dto.DatasetId = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() && df.DatasetId != 0) ? df.DatasetId : dto.SchemaMap.FirstOrDefault().DatasetId;
+            dto.SchemaId = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() && df.SchemaId != 0) ? df.SchemaId : dto.SchemaMap.FirstOrDefault().SchemaId;
         }
 
         private List<int> GetMappedFileSchema(int dataflowId)

@@ -139,7 +139,7 @@ namespace Sentry.data.Goldeneye
                             var user = _associateInfoProvider.GetAssociateInfo(_event.UserWhoStartedEvent.Trim());
                             authorProcessed = true;
 
-                            if(user != null)
+                            if (user != null)
                             {
                                 UserEvent ue;
                                 //attach Event to existing UserEvent if it already exists
@@ -157,7 +157,7 @@ namespace Sentry.data.Goldeneye
                                     userEvents.Add(ue);
                                 }
                             }
-                            
+
                         }
 
 
@@ -181,7 +181,7 @@ namespace Sentry.data.Goldeneye
                                 ).ToList()
                             );
                         }
-                        else if (_event.EventType.Group == EventTypeGroup.BusinessArea.GetDescription() && _event.Notification != null && _event.Notification.ParentObject != (int) BusinessAreaType.DSC)     //ONLY PROCESS BUSINESSAREA EXCLUDING BusinessAreaType=DSC
+                        else if ( ( _event.EventType.Group == EventTypeGroup.BusinessArea.GetDescription() || _event.EventType.Group == EventTypeGroup.BusinessAreaDSC.GetDescription() ) && _event.Notification != null /*&& */)     //ONLY PROCESS BUSINESSAREA EXCLUDING BusinessAreaType=DSC
                         {
                             subsThatMatch.AddRange
                             (
@@ -195,11 +195,11 @@ namespace Sentry.data.Goldeneye
                             );
 
                             //Call ADAttack for INSTANT BUSINESSAREA EVENTS ONLY to determine if we should email anyone in the CriticalNotificationsADGroup
-                            if(interval == "Instant")
+                            if (_event.Notification.ParentObject == (int)BusinessAreaType.PersonalLines && interval == "Instant")
                             {
                                 ADAttack(subsThatMatch, _event);
                             }
-                            
+
                         }
 
                         

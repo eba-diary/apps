@@ -701,8 +701,11 @@ namespace Sentry.data.Infrastructure
         public List<BusinessAreaSubscription> GetAllUserSubscriptionsByEventTypeGroup(string SentryOwnerName,EventTypeGroup group)
         {
 
+            //GET SUBSCRIPTIONS BASED ON EventTypeGroup which equates to BusinessAreaType
             if (group == EventTypeGroup.BusinessArea)
-                return Query<BusinessAreaSubscription>().Where(x => x.SentryOwnerName == SentryOwnerName).ToList();
+                return Query<BusinessAreaSubscription>().Where(x => x.SentryOwnerName == SentryOwnerName && x.BusinessAreaType == BusinessAreaType.PersonalLines).ToList();
+            else if(group == EventTypeGroup.BusinessAreaDSC)
+                return Query<BusinessAreaSubscription>().Where(x => x.SentryOwnerName == SentryOwnerName && x.BusinessAreaType == BusinessAreaType.DSC).ToList();
             else
                 return null;
         }
