@@ -73,7 +73,7 @@ namespace Sentry.data.Core
         public int MaxLength { get; set; }
 
         [PropertyName("precision_len")]
-        public int Precision { get; set; }
+        public int? Precision { get; set; }
 
         [PropertyName("prod_typ")]
         public string ProdType { get; set; }
@@ -82,7 +82,7 @@ namespace Sentry.data.Core
         public string SAIDListName { get; set; }
 
         [PropertyName("scale_len")]
-        public int Scale { get; set; }
+        public int? Scale { get; set; }
 
         [PropertyName("scanlist_nme")]
         public string ScanListName { get; set; }
@@ -124,8 +124,8 @@ namespace Sentry.data.Core
                 ProdType = ProdType,
                 ColumnType = ColumnType,
                 MaxLength = MaxLength,
-                Precision = Precision,
-                Scale = Scale,
+                Precision = Precision ?? 0,
+                Scale = Scale ?? 0,
                 IsNullable = IsNullable ?? false,
                 EffectiveDate = EffectiveDateTime,
                 BaseColumnId = Id,

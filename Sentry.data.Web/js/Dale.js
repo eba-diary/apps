@@ -3,6 +3,7 @@
 
     sensitive: false,                                                                   //declare a property within the data.Dale that essentially represents a global var that all functions can use within data.Dale to set whether sensitive or not
     currentSearchType: 'BASIC',
+    usingSqlSource: true,
 
     init: function ()
     {
@@ -17,6 +18,8 @@
             dataType: 'json',
             success: function (obj) {
                 data.Dale.dataTablCreate(obj);
+
+                data.Dale.usingSqlSource = obj.CLA3707_UsingSQLSource;
 
                 if (!obj.canDaleSensitiveView) {
                     data.Dale.makeToast("error", "All results may not be displayed. Additional permission is needed to view columns marked as sensitive. Please click the Data Inventory info icon for more information.");
@@ -163,7 +166,7 @@
                     d.objectType = $('#daleObjectType').val();
                     d.column = $('#daleColumn').val();
                     d.sourceType = $('#daleSourceType').val();
-                    d.sensitive = data.Dale.sensitive;
+                    d.sensitive = data.Dale.getIsSensitive();
                 }
             },
 
@@ -449,6 +452,16 @@
         }
 
         return daleDestiny;
+    },
+
+    //figure out if BASIC OR ADVANCED Destiny
+    getIsSensitive: function () {
+        if (data.Dale.usingSqlSource) {
+            return data.Dale.sensitive;
+        }
+        else {
+            return $('#daleSensitive').is(':checked');
+        }
     },
 
     //disable all controls user can hit during search

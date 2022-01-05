@@ -44,13 +44,13 @@ namespace Sentry.data.Infrastructure
             else
             {
                 //broad search for criteria across all searchable fields
-                should.AddTextSearch<DataInventory>(x => x.AssetCode, dto.Criteria);
-                should.AddTextSearch<DataInventory>(x => x.ServerName, dto.Criteria);
-                should.AddTextSearch<DataInventory>(x => x.DatabaseName, dto.Criteria);
-                should.AddTextSearch<DataInventory>(x => x.BaseName, dto.Criteria);
-                should.AddTextSearch<DataInventory>(x => x.TypeDescription, dto.Criteria);
-                should.AddTextSearch<DataInventory>(x => x.ColumnName, dto.Criteria);
-                should.AddTextSearch<DataInventory>(x => x.SourceName, dto.Criteria);
+                should.AddMatchAndWildcard<DataInventory>(x => x.AssetCode, dto.Criteria);
+                should.AddMatchAndWildcard<DataInventory>(x => x.ServerName, dto.Criteria);
+                should.AddMatchAndWildcard<DataInventory>(x => x.DatabaseName, dto.Criteria);
+                should.AddMatchAndWildcard<DataInventory>(x => x.BaseName, dto.Criteria);
+                should.AddMatchAndWildcard<DataInventory>(x => x.TypeDescription, dto.Criteria);
+                should.AddMatchAndWildcard<DataInventory>(x => x.ColumnName, dto.Criteria);
+                should.AddMatchAndWildcard<DataInventory>(x => x.SourceName, dto.Criteria);
 
                 if (should.Any())
                 {
@@ -58,20 +58,13 @@ namespace Sentry.data.Infrastructure
                 }
             }
 
-            List<QueryContainer> mustNot = new List<QueryContainer>();
-
             if (dto.Sensitive == Core.GlobalEnums.DaleSensitive.SensitiveOnly)
             {
                 must.AddMatch<DataInventory>(x => x.IsSensitive, "true");
             }
-            else
+            else if (dto.Sensitive == Core.GlobalEnums.DaleSensitive.SensitiveNone)
             {
-                mustNot.Add(new ExistsQuery() { Field = Infer.Field<DataInventory>(x => x.ExpirationDateTime) });
-
-                if (dto.Sensitive == Core.GlobalEnums.DaleSensitive.SensitiveNone)
-                {
-                    must.AddMatch<DataInventory>(x => x.IsSensitive, "false");
-                }
+                must.AddMatch<DataInventory>(x => x.IsSensitive, "false");
             }
 
             SearchRequest<DataInventory> request = new SearchRequest<DataInventory>()
@@ -79,14 +72,17 @@ namespace Sentry.data.Infrastructure
                 Size = 1000,
                 Query = new BoolQuery()
                 {
-                    MustNot = mustNot,
+                    MustNot = new List<QueryContainer>() { new ExistsQuery() { Field = Infer.Field<DataInventory>(x => x.ExpirationDateTime) } },
                     Must = must,
                     Should = should,
                     MinimumShouldMatch = minShould
                 }
             };
 
-            return SearchDataInventory<DaleResultDto>(dto, request);
+            DaleResultDto resultDto = new DaleResultDto();
+            resultDto.DaleResults = SearchDataInventory(dto, request, resultDto).Select(x => x.ToDto()).ToList();
+
+            return resultDto;
         }
 
         public override DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dto)
@@ -123,7 +119,10 @@ namespace Sentry.data.Infrastructure
                 }
             };
 
-            return SearchDataInventory<DaleContainSensitiveResultDto>(dto, request);
+            DaleContainSensitiveResultDto resultDto = new DaleContainSensitiveResultDto();
+            resultDto.DoesContainSensitiveResults = SearchDataInventory(dto, request, resultDto).Any();
+
+            return resultDto;
         }
 
         public override bool SaveSensitive(string sensitiveBlob)
@@ -133,12 +132,11 @@ namespace Sentry.data.Infrastructure
             throw new NotImplementedException();
         }
 
-        private T SearchDataInventory<T>(DaleSearchDto dto, SearchRequest<DataInventory> searchRequest) where T : DaleEventableDto
+        private IList<DataInventory> SearchDataInventory(DaleSearchDto dto, SearchRequest<DataInventory> searchRequest, DaleEventableDto resultDto)
         {
-            T resultDto = Activator.CreateInstance<T>();
             resultDto.DaleEvent = new DaleEventDto()
             {
-                Criteria = dto.Criteria,
+                Criteria = dto.Destiny == Core.GlobalEnums.DaleDestiny.Advanced ? dto.AdvancedCriteria.ToEventString() : dto.Criteria,
                 Destiny = dto.Destiny.GetDescription(),
                 QuerySuccess = true,
                 Sensitive = dto.Sensitive.GetDescription()
@@ -146,16 +144,16 @@ namespace Sentry.data.Infrastructure
 
             try
             {
-                resultDto.SetResult(_context.Search(searchRequest));
+                return _context.Search(searchRequest);
             }
             catch (Exception ex)
             {
                 resultDto.DaleEvent.QuerySuccess = false;
-                resultDto.DaleEvent.QueryErrorMessage = $"Data Inventory Elasticsearch query failed. Exception: {ex}";
+                resultDto.DaleEvent.QueryErrorMessage = $"Data Inventory Elasticsearch query failed. Exception: {ex.Message}";
                 Logger.Error(resultDto.DaleEvent.QueryErrorMessage, ex);
             }
 
-            return resultDto;
+            return new List<DataInventory>();
         }
     }
 }

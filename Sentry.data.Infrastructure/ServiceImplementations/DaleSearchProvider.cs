@@ -412,7 +412,6 @@ namespace Sentry.data.Infrastructure
                     while (reader.Read())
                     {
                         daleResult.DaleCategories.Add(CreateCategoryResult(reader));
-
                     }
 
                     reader.Close();

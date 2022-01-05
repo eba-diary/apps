@@ -73,9 +73,10 @@
                     </div>
                 </div>
 
-                <div class="dale-basic-search" style="display:flex; padding-top:5px;">
-                    @if (Model.CLA3707_UsingSQLSource)
-                    {
+                @if (Model.CLA3707_UsingSQLSource)
+                {
+                    <div class="dale-basic-search" style="display:flex;">
+
                         @*NOTE! the flex style basically pushes the radio button and sensitive controls to the button of the screen levereging the flex-end tag that sits on the actual control*@
                         <span id="radioMadness" style="display:flex; align-items:flex-end;">
                             <span style="text-align: left; font-family: KievitSlabWeb W03,Lucida Sans,serif;width:250px;">
@@ -95,23 +96,32 @@
                                 </label>
                             </span>
                         </span>
-                    }
 
-                    @if (Model.CanDaleSensitiveView)
-                    {
-                        <span style="align-items: flex-end;display: flex;">
-                            <em class="glyphicon glyphicon-warning-sign pull-right" style="color:#003da5;margin-bottom: 4px; margin-right:1px;"></em>
-                            <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500;">Show Sensitive Columns</a>
-                        </span>
-                    }
-                    else
-                    {
-                        <span style="align-items: flex-end;display: flex;" data-toggle="tooltip" data-placement="right" title="Please request the App_DATA_DINV_Sens_View entitlement via MyAccess to view sensitive column information on the Data Inventory site.">
-                            <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;margin-bottom: 4px; margin-right:1px;"></em>
-                            <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500; pointer-events:none;">Show Sensitive Columns</a>
-                        </span>
-                    }
-                </div>
+                        @if (Model.CanDaleSensitiveView)
+                        {
+                            <span style="align-items: flex-end;display: flex;">
+                                <em class="glyphicon glyphicon-warning-sign pull-right" style="color:#003da5;margin-bottom: 4px; margin-right:1px;"></em>
+                                <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500;">Show Sensitive Columns</a>
+                            </span>
+                        }
+                        else
+                        {
+                            <span style="align-items: flex-end;display: flex;" data-toggle="tooltip" data-placement="right" title="Please request the App_DATA_DINV_Sens_View entitlement via MyAccess to view sensitive column information on the Data Inventory site.">
+                                <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;margin-bottom: 4px; margin-right:1px;"></em>
+                                <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500; pointer-events:none;">Show Sensitive Columns</a>
+                            </span>
+                        }
+                    </div>
+                }
+                else if (Model.CanDaleSensitiveView)
+                {
+                    <div style="display:flex;margin-top:0.25em">
+                        <label style="display:contents">
+                            <input type="checkbox" id="daleSensitive" style="margin-right:0.25em;" />
+                            Search Sensitive Only
+                        </label>
+                    </div>
+                }
             </div>
         </div>
     </div>
