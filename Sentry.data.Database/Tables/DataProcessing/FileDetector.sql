@@ -2,5 +2,7 @@
 	[FileDetectorId] [int] IDENTITY(1,1) NOT NULL,
 	[FilePath] [varchar](1000) NULL,
 	[FileDTM] [datetime] NULL,
-	[CreatedDTM] [datetime] NULL
+	[CreatedDTM] [datetime] NULL,
+	[FileCreatedDTM] [datetime] NULL,
+	[FileModifiedDTM] [datetime] NULL
 );
