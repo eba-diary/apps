@@ -716,11 +716,10 @@
             <date when="1902-01-10">Friday, Jan. 10</date>.
          </dateline>
          <p>
-            <!-- who is the hennass family -->
             A real gale has been blowing all day - cold, the river is rough waves. I have not been
              off the boat - and we have had our little stoves going. The
-             <persName>Hennass</persName> family came to tea - <persName>Father</persName>,
-             <persName>Mother</persName> and the two tall girls - also
+             <persName ref="#Hennass_Mr #Hennass_Mrs #Hennass_girls">Hennass</persName> family came to tea - <persName ref="#Hennass_Mr">Father</persName>,
+             <persName ref="#Hennass_Mrs">Mother</persName> and the two tall <persName ref="#Hennass_girls">girls</persName> - also
              <persName ref="#Wallis_Mr">Mr. Wallis</persName> - and as <persName ref="#Newberry_Percy">Mr. Newberry</persName> was here
              most of the afternoon we had quite a tea party - and the little saloon seemed very full.
          </p>
@@ -737,10 +736,10 @@
              <persName ref="#Buttles_Jeanette">Nettie</persName> and I went out
              to <placeName ref="#Karnak">Karnac</placeName> - where the dust and sand blew in clouds, paid a
              visit to <persName ref="#Mohassib_Mohammed">Mohassib</persName> and saw some pretty enormously dear things.
-             This is the beginning of <name type="event" ref="">Bieram</name> - and it was nice to see the
+             This is the beginning of <name type="event" ref="#Id_al-Fitr"><choice><sic>Bieram</sic><corr>Bairam</corr></choice></name> - and it was nice to see the
              people all in their best attire, and the dignified figures walking about in best
              black robes, with many white draperies. All the crew, headed by the Captain came
-             this morning to give us the usual <orgName>Beiram</orgName> greetings.
+             this morning to give us the usual <name type="event" ref="#Id_al-Fitr"><choice><sic>Beiram</sic><corr>Bairam</corr></choice></name> greetings.
              <persName ref="#Buttles_Jeanette">Nettie</persName> and I stayed at home this afternoon.
              <persName ref="#Davis_Theodore_M">Theodore</persName> at <placeName ref="#Der_el_Bahari">Der el Bahari</placeName> and brought
              home <persName ref="#Carter_Howard">Carter</persName> for dinner. <persName ref="#Newberry_Percy">Newberry</persName> also here.
@@ -953,9 +952,10 @@
          </dateline>
          <p>
             An almost calm day - at home this morning. <persName ref="#Davis_Theodore_M">Theodore</persName>
-             and I went over to <placeName>Sheik Abd el Kurnah</placeName> this afternoon
+             and I went over to <placeName ref="#Sheikh Abd el-Qurna">Sheik Abd el Kurnah</placeName> this afternoon
              to meet <persName ref="#Newberry_Percy">Newberry</persName> - found him with the
-             <name>Ogden party</name> at the tomb of <orgName>Rek-ma-ra</orgName>.
+             <persName ref="#Ogden_party #Ogden_Mr">Ogden party</persName> at the tomb of
+             <persName ref="#Rekhmire"><choice><sic>Rek-ma-ra</sic><corr>Rekhmire</corr></choice></persName>.
              Then we took our tea to <persName ref="#Carter_Howard">Carter</persName>'s
              <placeName ref="#Castle_Carter">house</placeName>, he being away,
              and had tea on his verandah. It was lovely - and all came home together.
@@ -963,7 +963,7 @@
       </div>
       <div xml:id="EBA-1902-01-26" type="entry">
          <dateline>
-            <date when="1902-01-26">Septuagesima Sunday. Jan. 26</date>.
+            <date when="1902-01-26"><name type="event" ref="#Septuagesima">Septuagesima</name> Sunday. Jan. 26</date>.
          </dateline>
          <p>
             <persName ref="#Buttles_Jeanette">Nettie</persName> came back from <placeName ref="#Cairo">Cairo</placeName>
@@ -972,7 +972,7 @@
              <persName ref="#Quibell_James #Quibell_Annie_Pirie">Quibells</persName>. She reports <placeName ref="#Cairo">Cairo</placeName> horrid,
              after a heavy rain, and any one who has been in <placeName ref="#Cairo">Cairo</placeName>
              under these circumstances can testify to its unpleasantness.
-             <persName>Mr. Ogden</persName> and his daughter dined with us.
+             <persName ref="#Ogden_Mr">Mr. Ogden</persName> and his daughter dined with us.
          </p>
       </div>
       <div xml:id="EBA-1902-01-27" type="entry">
@@ -981,12 +981,12 @@
          </dateline>
          <p>
             A very cold night, and a beautiful calm day. <persName ref="#Davis_Theodore_M">Theodore</persName>
-             went to the tombs of the Kings with <persName ref="#Newberry_Percy">Newberry</persName>, and met
-             the <placeName>Ogden</placeName> party there. <persName ref="#Buttles_Jeanette">Nettie</persName> and
+             went to the <placeName ref="#Bībān al-Mulūk">tombs of the Kings</placeName> with <persName ref="#Newberry_Percy">Newberry</persName>, and met
+             the <persName ref="#Ogden_party #Ogden_Mr">Ogden party</persName> there. <persName ref="#Buttles_Jeanette">Nettie</persName> and
              I took a frugal lunch and went out to the palace, and spent the day - having our tea
              basket with us. <persName ref="#Tytus_Mrs">Mrs. Tytus</persName> with us.
-             <persName>Theo</persName> and <persName ref="#Newberry_Percy">Newberry</persName> joined us for
-             tea - but the later returned to his little <placeName>Gurneh</placeName> house.
+             <persName ref="#Davis_Theodore_M">Theo</persName> and <persName ref="#Newberry_Percy">Newberry</persName> joined us for
+             tea - but the later returned to his little <placeName ref="#Kurna">Gurneh</placeName> house.
          </p>
       </div>
       <div xml:id="EBA-1902-01-28" type="entry">
@@ -994,11 +994,11 @@
             <date when="1902-01-28">Tuesday, Jan. 28</date>.
          </dateline>
          <p>
-            Cold wind again. <persName>Mr. Ogden</persName> and <persName>Livingston</persName>
+            Cold wind again. <persName ref="#Ogden_Mr">Mr. Ogden</persName> and <persName ref="#Collander_Livingston_John">Livingston</persName>
              came to call this evening. <persName ref="#Quibell_James #Quibell_Annie_Pirie">Mr. and Mrs. Quibell</persName> arrived
              at the <name type="hotel" ref="#Grand_Hotel">Grand Hotel</name> this morning and took lunch with us. The
              <name>Mureh</name> family and <persName>Miss Buckanan</persName>
-             and friend of the <name>Girls' Mission School</name> came to tea -
+             and friend of the <orgName>Girls' Mission School</orgName> came to tea -
              and the <orgName>Insingers</orgName> to call.
          </p>
       </div>
@@ -1020,7 +1020,7 @@
          <p>
             <persName>Mr. and Mrs. Phillips Schuyler</persName>, <persName>Mrs. Frank
              Millet</persName>, <persName ref="#Carter_Howard">Mr. Carter</persName> and
-             <persName>Cadwallader,</persName> all on their private steamer "<name>Oonas</name>",
+             <persName>Cadwallader</persName>, all on their private steamer "<name type="boat" ref="#Oonas">Oonas</name>",
              took tea with us and <persName>Dr. Roundtree</persName> dined with us.
              <persName ref="#Carter_Howard">Carter</persName> lunched with us.
          </p>
@@ -1115,7 +1115,7 @@
          <p>
             While we were at breakfast the <persName ref="#Quibell_James #Quibell_Annie_Pirie">Quibells</persName> arrived, with very
              long faces, saying <persName ref="#Quibell_Annie_Pirie">Mrs. Quibell</persName>'s young niece in
-             <placeName ref="#Cairo">Cairo</placeName>, just out from <placeName>Scotland</placeName> was
+             <placeName ref="#Cairo">Cairo</placeName>, just out from Scotland was
              very ill with dysentery - and that she had to return to <placeName ref="#Cairo">Cairo</placeName>
              that night - and so she cannot go with us to <placeName>Aswan</placeName>
              as she intended to her great disappointment. We were all most dismal over it. Then
@@ -1446,9 +1446,9 @@
              and air delicous as we rowed up the river again - but as we left the <name type="boat" ref="#Scarab">
             Scarab</name>, it had increased almost to a hurricane , and looking back to where
              the <name type="boat" ref="#Istar">Istar</name> is lying opposite <placeName ref="#Luxor">Luxor</placeName>,
-             with the <persName>Strange Hathor</persName> and the steamer <name type="">
+             with the <persName>Strange Hathor</persName> and the steamer <name type="boat" ref="#Oonas">
             Oonas</name> with the <orgName>Schuylers</orgName> on board, we saw them smothered
-             in dust and sand - and soon after we got home, the <persName>Oonas</persName> came
+             in dust and sand - and soon after we got home, the <name type="boat" ref="#Oonas">Oonas</name> came
              up the river and stopped just in front of us, at 4 o'clock this afternoon we went
              across to have tea with <persName ref="#Carter_Howard">Carter</persName> - such a pleasant visit -
              <persName ref="#Newberry_Percy">Newberry</persName> was there - we had tea as usual on the terrace
