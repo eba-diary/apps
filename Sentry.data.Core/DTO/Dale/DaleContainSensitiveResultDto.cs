@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace Sentry.data.Core
+﻿namespace Sentry.data.Core
 {
-    public class DaleContainSensitiveResultDto
+    public class DaleContainSensitiveResultDto : DaleEventableDto
     {
         public bool DoesContainSensitiveResults { get; set; }
-        public DaleEventDto DaleEvent { get; set; }
     }
 }
