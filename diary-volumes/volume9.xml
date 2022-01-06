@@ -1531,10 +1531,10 @@
              north wind until 12 - when we had a little from the south - reached
              <placeName ref="#Naj_Hammadi">Nagh Hamadi</placeName> as usual too late to catch the bridge open -
              just what we did last year. Are tied up to a very high villainously high bank - with
-             the little dahabeah "Memphis" just in front of us - and later a gentleman and lady
-             came to call, sending in cards of <persName>Lt. Col. Biddulph</persName>,
-             Royal Field Artillery, and <persName>Mrs. Biddulph</persName> and we found
-             them very pleasant. He is invalided from <placeName>South Africa</placeName>.
+             the little dahabeah <name type="boat" ref="#Memphis">"Memphis"</name> just in front of us - and later a gentleman and lady
+             came to call, sending in cards of <persName ref="#Biddulph">Lt. Col. Biddulph</persName>,
+             Royal Field Artillery, and <persName ref="#Biddulph_Mrs">Mrs. Biddulph</persName> and we found
+             them very pleasant. He is invalided from South Africa.
          </p>
       </div>
       <div xml:id="EBA-1902-03-05" type="entry">
@@ -1542,9 +1542,9 @@
             <date when="1902-03-05">Wednesday, Mar. 5</date>. 16 miles.
          </dateline>
          <p>
-            We got through the bridge at 8:30 this A.M. just after the <placeName>
-            Memphis</placeName> - and have been fighting our way along with an almost constant head
-             wind - day fine - are about 2 miles above <placeName>Balliana</placeName>.
+            We got through the bridge at 8:30 this A.M. just after the <name type="boat" ref="#Memphis">
+            Memphis</name> - and have been fighting our way along with an almost constant head
+             wind - day fine - are about 2 miles above <placeName ref="#Balyana_Al">Balliana</placeName>.
          </p>
       </div>
       <div xml:id="EBA-1902-03-06" type="entry">
@@ -1555,10 +1555,10 @@
             The north wind was howling this morning but at 6 o'clock we started, and after battling
              for an hour with it, we pulled up about half a mile from the place we had started from
              - so we gave it up as a bad job - started a washing, and turned out our fowls. At 3
-             o'clock we started again, passed <persName>Balliana</persName> where the
-             <persName>Rameses III</persName> was lying, with all her tourists just back from
+             o'clock we started again, passed <placeName ref="#Balyana_Al">Balliana</placeName> where the
+             <persName ref="#Rameses_III">Rameses III</persName> was lying, with all her tourists just back from
              a hot ride to <placeName ref="#Abydos">Abydos</placeName> - at 7 o'clock we pulled up to a
-             high bank, with the lights of <placeName>Girga</placeName> in the distance, where
+             high bank, with the lights of <placeName ref="#Jirjā">Girga</placeName> in the distance, where
              we intend to stop tomorrow - high wind and water making a great noise.
          </p>
       </div>
@@ -1567,24 +1567,24 @@
             <date when="1902-03-07">Friday, Mar. 7</date>. 2 miles.
          </dateline>
          <p>
-            With much difficulty we managed to pull past <persName>Girga</persName> opposite
-             to the <placeName>Reisner</placeName> camp about noon. We sent a man across
-             with a note asking <persName>Mr. and Mrs. Reisner</persName>,
-             <persName>Mr. Mace</persName> and <persName>Mr. Lithcoe</persName>
+            With much difficulty we managed to pull past <placeName ref="#Jirjā">Girga</placeName> opposite
+             to the <persName ref="#Reisner_George#Reisner_Mrs">Reisner</persName> camp about noon. We sent a man across
+             with a note asking <persName ref="#Reisner_George#Reisner_Mrs">Mr. and Mrs. Reisner</persName>,
+             <persName ref="#Cruttenden_Mace_Arthur">Mr. Mace</persName> and <persName ref="#Lithcoe">Mr. Lithcoe</persName>
              to dine with us this evening - and <persName ref="#Davis_Theodore_M">Theodore</persName> and
              <persName ref="#Buttles_Jeanette">Nettie</persName> at 4 o'clock braved the hot sun and the high
              wind, and went over and had tea with them. The <persName ref="#Quibell_James #Quibell_Annie_Pirie">Quibells</persName>
              are now there, and in a camp of their own, and quite a little collection of tents
              showed on the shelving desert, with the great cliffs behind. They came back late,
-             bringing the guests with them. Reisner's work this winter has been very interesting
-             - he is making it for <persName>Mrs. Hearst</persName> of
-             <placeName>California</placeName> and has unlimited money for it. Tombs of
+             bringing the guests with them. <persName ref="#Reisner_George">Reisner's</persName> work this winter has been very interesting
+             - he is making it for <persName ref="#Hearst_Mrs">Mrs. Hearst</persName> of
+             <placeName ref="#California">California</placeName> and has unlimited money for it. Tombs of
              the 5-6 and 12th dynasties and an archaic cemetery which <persName ref="#Davis_Theodore_M">
-            Theodore</persName> said was most interesting. <persName>Mace</persName>
-             and <persName>Lithcoe</persName> are the real explorers - and are considered
-             most intelligent - the latter is an <orgName>American</orgName>, from
-             <placeName>Providence</placeName> - <persName ref="#Buttles_Jeanette">Nettie</persName>
-             reported the <persName>Reisner</persName> house intolerably hot, and
+             Theodore</persName> said was most interesting. <persName ref="#Cruttenden_Mace_Arthur">Mace</persName>
+             and <persName ref="#Lithcoe">Lithcoe</persName> are the real explorers - and are considered
+             most intelligent - the latter is an American, from
+             <placeName ref="#Providence">Providence</placeName> - <persName ref="#Buttles_Jeanette">Nettie</persName>
+             reported the <persName ref="#Reisner_George#Reisner_Mrs">Reisner</persName> house intolerably hot, and
              crammed with flies - and gave a dismal picture of it.
          </p>
       </div>
@@ -1711,7 +1711,7 @@
              for their last drink, the little kids and lambs now so plentiful, crying out like
              babies - "and all the land had rest". It was a heavenly evening. <persName ref="#Davis_Theodore_M">
             Theodore</persName> has sent a man across the fields to the R.R. station, with a
-             telegram for <persName ref="#Quibell_Annie_Pirie">Mrs. Quibell</persName> at <placeName>
+             telegram for <persName ref="#Quibell_Annie_Pirie">Mrs. Quibell</persName> at <placeName ref="#Jirjā">
             Girga</placeName>, asking her to join us at <placeName>
             Minia</placeName>, day after tomorrow.
          </p>
