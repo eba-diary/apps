@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Sentry.data.Core;
 
 namespace Sentry.data.Core
 {
@@ -19,8 +18,8 @@ namespace Sentry.data.Core
             FeedUrl = feed.Url;
             FeedId = feed.Id;
 
-            Img = Helpers.DataFeedHelper.GetImage(feed.Type);
-            Url = Helpers.DataFeedHelper.GetUrl(feed.Type, feed.Id.ToString());
+            Img = Helpers.DataFeedHelper.GetImage(feed);
+            Url = Helpers.DataFeedHelper.GetUrl(feed);
         }
 
         public int Id { get; set; }

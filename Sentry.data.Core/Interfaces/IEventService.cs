@@ -9,5 +9,7 @@ namespace Sentry.data.Core
         void PublishSuccessEventByDatasetId(string eventType, string userId, string reason, int datasetId);
         void PublishSuccessEventByDataAsset(string eventType, string userId, string reason, int dataAssetId, string lineCde = null, string search = null);
         void PublishSuccessEventByNotificationId(string eventTypeDescription, string userId, string reason, Notification notification);
+        void PublishSuccessEventBySchemaId(string eventType, string userId, string reason, int datasetId, int schemaId);
+
     }
 }

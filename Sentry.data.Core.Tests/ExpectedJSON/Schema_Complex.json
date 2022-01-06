@@ -1,0 +1,157 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "StructureTest",
+  "type": "object",
+  "properties": {
+    "baseName": {
+      "type": "string",
+      "maxlength": 1000,
+      "description": "baseName Description"
+    },
+    "baseDate": {
+      "type": "string",
+      "format": "date",
+      "dsc-format": "yyyy-MM-dd",
+      "description": "baseDate Description"
+    },
+    "baseObjectArray": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "objectArrayName": {
+              "type": "string",
+              "maxlength": 1000,
+              "description": "objectArrayName Description"
+            },
+            "objectArrayNumberArray": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "integer"
+                }
+              ],
+              "description": "objectArrayNumberArray Description"
+            },
+            "objectArrayObject": {
+              "type": "object",
+              "properties": {
+                "objectArrayObjectName": {
+                  "type": "string",
+                  "maxlength": 1000,
+                  "description": "objectArrayObjectName Description"
+                },
+                "objectArrayObjectDateTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "dsc-format": "yyyy-MM-dd HH:mm:ss",
+                  "description": "objectArrayObjectDateTime Description"
+                },
+                "objectArrayObjectArray": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "objectArrayObjectArrayName": {
+                          "type": "string",
+                          "maxlength": 1000,
+                          "description": "objectArrayObjectArrayName Description"
+                        },
+                        "objectArrayObjectArrayNumber": {
+                          "type": "number",
+                          "dsc-precision": 11,
+                          "dsc-scale": 2,
+                          "description": "objectArrayObjectArrayNumber Description"
+                        }
+                      }
+                    }
+                  ],
+                  "description": "objectArrayObjectArray Description"
+                }
+              },
+              "description": "objectArrayObject Description"
+            }
+          }
+        }
+      ],
+      "description": "baseObjectArray Description"
+    },
+    "baseObject": {
+      "type": "object",
+      "properties": {
+        "objectNumber": {
+          "type": "integer",
+          "description": "objectNumber Description"
+        },
+        "objectDateArray": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string",
+              "format": "date",
+              "dsc-format": "yyyy-MM-dd"
+            }
+          ],
+          "description": "objectDateArray Description"
+        },
+        "objectObject": {
+          "type": "object",
+          "properties": {
+            "objectObjectNumber": {
+              "type": "number",
+              "dsc-precision": 5,
+              "dsc-scale": 2,
+              "description": "objectObjectNumber Description"
+            },
+            "objectObjectObject": {
+              "type": "object",
+              "properties": {
+                "objectObjectObjectName": {
+                  "type": "string",
+                  "maxlength": 1000,
+                  "description": "objectObjectObjectName Description"
+                },
+                "objectObjectObjectDateTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "dsc-format": "yyyy-MM-dd hh:mm:ss",
+                  "description": "objectObjectObjectDateTime Description"
+                },
+                "objectObjectObjectObjectArray": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "objectObjectObjectObjectArrayNumber": {
+                          "type": "integer",
+                          "description": "objectObjectObjectObjectArrayNumber Description"
+                        },
+                        "objectObjectObjectObjectArrayArray": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "string",
+                              "maxlength": 1000
+                            }
+                          ],
+                          "description": "objectObjectObjectObjectArrayArray Description"
+                        }
+                      }
+                    }
+                  ],
+                  "description": "objectObjectObjectObjectArray Description"
+                }
+              },
+              "description": "objectObjectObject Description"
+            }
+          },
+          "description": "objectObject Description"
+        }
+      },
+      "description": "baseObject Description"
+    }
+  }
+}

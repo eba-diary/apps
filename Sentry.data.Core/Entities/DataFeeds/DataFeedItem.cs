@@ -1,4 +1,5 @@
 ﻿using System;
+using Sentry.data.Core.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,14 +9,14 @@ namespace Sentry.data.Core
 {
     public class DataFeedItem
     {
-        public DataFeedItem(DateTime pubDate, string id, string shortDesc, string longDesc, DataFeed type)
+        public DataFeedItem(DateTime pubDate, string shortDesc, string longDesc, DataFeed dataFeed)
         {
             PublishDate = pubDate;
             Title = shortDesc;
             Description = longDesc;
-            Feed = type;
-            Img = Helpers.DataFeedHelper.GetImage(Feed.Type);
-            Url = Helpers.DataFeedHelper.GetUrl(Feed.Type, Feed.Id.ToString());
+            Feed = dataFeed;
+            Img = Helpers.DataFeedHelper.GetImage(dataFeed);
+            Url = Helpers.DataFeedHelper.GetUrl(dataFeed);
         }
 
         public string DisplayTitle()

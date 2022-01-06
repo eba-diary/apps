@@ -25,11 +25,15 @@ namespace Sentry.data.Core
         private readonly IDataFeatures _dataFeatures;
         private readonly IMessagePublisher _messagePublisher;
         private readonly ISnowProvider _snowProvider;
+        private readonly IEventService _eventService;
+
+
         private string _bucket;
+        private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, IEventService eventService)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -40,7 +44,7 @@ namespace Sentry.data.Core
             _dataFeatures = dataFeatures;
             _messagePublisher = messagePublisher;
             _snowProvider = snowProvider;
-
+            _eventService = eventService;
         }
 
         private string RootBucket
@@ -77,6 +81,12 @@ namespace Sentry.data.Core
             }
 
             return newSchema.SchemaId;
+        }
+
+        //SINCE SCHEMA SAVED FROM MULTIPLE PLACES, HAVE ONE METHOD TO TAKE CARE OF PUBLISHING SAVE
+        public void PublishSchemaEvent(int datasetId, int schemaId)
+        {
+            _eventService.PublishSuccessEventBySchemaId(GlobalConstants.EventType.CREATE_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, GlobalConstants.EventType.CREATE_DATASET_SCHEMA, datasetId, schemaId);
         }
 
         public int CreateAndSaveSchemaRevision(int schemaId, List<BaseFieldDto> schemaRows, string revisionname, string jsonSchema = null)
@@ -167,36 +177,20 @@ namespace Sentry.data.Core
             return 0;
         }
 
-
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
-            Logger.Info($"startmethod <{m.ReflectedType.Name.ToString()}>");
+            Logger.Info($"startmethod <{m.ReflectedType.Name}>");
 
-            Dataset parentDataset = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaDto.SchemaId).ParentDataset;
+            DatasetFileConfig fileConfig = GetDatasetFileConfig(schemaDto.ParentDatasetId, schemaDto.SchemaId, x => x.CanManageSchema);
 
-            //Check user access to modify schema, of not throw exception
-            IApplicationUser user = _userService.GetCurrentUser();
-            UserSecurity us = _securityService.GetUserSecurity(parentDataset, user);
-
-            if (!us.CanManageSchema)
-            {
-                throw new SchemaUnauthorizedAccessException();
-            }
-            
-
-            string SASNotificationType = null;
-            string CurrentViewNotificationType = null;
             JObject whatPropertiesChanged;
-            FileSchema schema;
             /* Any exceptions saving schema changes, do not execute remaining line of code */
             try
             {
-                schema = _datasetContext.GetById<FileSchema>(schemaDto.SchemaId);
-
                 //Update/save schema within DSC metadata
-                whatPropertiesChanged = UpdateSchema(schemaDto, schema);
-                Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {parentDataset.DatasetName}\\{schema.Name} | {whatPropertiesChanged.ToString()}");
+                whatPropertiesChanged = UpdateSchema(schemaDto, fileConfig.Schema);
+                Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {fileConfig.ParentDataset.DatasetName}\\{fileConfig.Schema.Name} | {whatPropertiesChanged}");
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -206,7 +200,7 @@ namespace Sentry.data.Core
             }
 
             /* The remaining actions should all be executed even if one fails
-             * If there are any exceptions, log the exceptions and continue on */
+                * If there are any exceptions, log the exceptions and continue on */
             var exceptions = new List<Exception>();
 
             /*
@@ -216,7 +210,7 @@ namespace Sentry.data.Core
             */
             try
             {
-                GenerateConsumptionLayerEvents(schema, whatPropertiesChanged);
+                GenerateConsumptionLayerEvents(fileConfig.Schema, whatPropertiesChanged);
             }
             catch (Exception ex)
             {
@@ -231,9 +225,19 @@ namespace Sentry.data.Core
                 Logger.Error($"<{m.ReflectedType.Name.ToLower()}> Failed sending downstream notifications or events", new AggregateException(exceptions));
             }
 
-            Logger.Info($"endmethod <{m.ReflectedType.Name.ToString()}>");
+            Logger.Info($"endmethod <{m.ReflectedType.Name}>");
             return true;
-            
+        }
+
+        public int GetFileExtensionIdByName(string extensionName)
+        {
+            FileExtension extension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Name == extensionName);
+            if (extension != null)
+            {
+                return extension.Id;
+            }
+
+            return 0;
         }
 
         private void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
@@ -241,7 +245,7 @@ namespace Sentry.data.Core
             /*Generate *-CREATE-TABLE-REQUESTED event when:
             *  - CreateCurrentView changes
             */
-            if (propertyDeltaList.ContainsKey("createcurrentview"))
+            if (_eventGeneratingUpdateFields.Any(x => propertyDeltaList.ContainsKey(x)))
             {
                 GenerateConsumptionLayerCreateEvent(schema, propertyDeltaList);
             }
@@ -278,7 +282,7 @@ namespace Sentry.data.Core
                 generateEvent = true;
             }
             /* schema configuration trigger for createCurrentView regardless true\false */
-            else if (propertyDeltaList.ContainsKey("createcurrentview"))
+            else if (_eventGeneratingUpdateFields.Any(x => propertyDeltaList.ContainsKey(x)))
             {
                 generateEvent = true;
             }
@@ -348,91 +352,72 @@ namespace Sentry.data.Core
         /// <returns> Returns list of properties that have changed.</returns>
         private JObject UpdateSchema(FileSchemaDto dto, FileSchema schema)
         {
-            bool chgDetected = false;
-            string whatPropertiesChanged = "{";
+            IList<bool> changes = new List<bool>();
+            JObject whatPropertiesChanged = new JObject();
 
-            if (schema.Name != dto.Name)
-            {
-                schema.Name = dto.Name;
-                chgDetected = true;
-            }
-            if (schema.Delimiter != dto.Delimiter)
-            {
-                schema.Description = dto.Description;
-                chgDetected = true;
-            }
+            changes.Add(TryUpdate(() => schema.Name, () => dto.Name, (x) => schema.Name = x));
 
-            if (schema.CreateCurrentView != dto.CreateCurrentView)
-            {
-                schema.CreateCurrentView = dto.CreateCurrentView;
-                chgDetected = true;
+            changes.Add(TryUpdate(() => schema.Delimiter, () => dto.Delimiter, (x) => schema.Delimiter = x));
 
-                if (whatPropertiesChanged != "{")
-                { whatPropertiesChanged += ","; }
+            changes.Add(TryUpdate(() => schema.CreateCurrentView, () => dto.CreateCurrentView, 
+                (x) => {
+                            schema.CreateCurrentView = x;
+                            whatPropertiesChanged.Add("createcurrentview", x.ToString().ToLower());
+                       }));
 
-                whatPropertiesChanged += $"\"createcurrentview\":\"{schema.CreateCurrentView.ToString().ToLower()}\"";
-            }
+            changes.Add(TryUpdate(() => schema.Description, () => dto.Description, (x) => schema.Description = x));
 
-            if (schema.Description != dto.Description)
+            changes.Add(TryUpdate(() => schema.Extension.Id, () => dto.FileExtensionId, (x) => schema.Extension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId)));
+
+            changes.Add(TryUpdate(() => schema.HasHeader, () => dto.HasHeader, (x) => schema.HasHeader = x));
+
+            changes.Add(TryUpdate(() => schema.CLA1396_NewEtlColumns, () => dto.CLA1396_NewEtlColumns, (x) => schema.CLA1396_NewEtlColumns = x));
+
+            changes.Add(TryUpdate(() => schema.CLA1580_StructureHive, () => dto.CLA1580_StructureHive, (x) => schema.CLA1580_StructureHive = x));
+
+            changes.Add(TryUpdate(() => schema.CLA2472_EMRSend, () => dto.CLA2472_EMRSend, (x) => schema.CLA2472_EMRSend = x));
+
+            changes.Add(TryUpdate(() => schema.CLA1286_KafkaFlag, () => dto.CLA1286_KafkaFlag, (x) => schema.CLA1286_KafkaFlag = x));
+
+            changes.Add(TryUpdate(() => schema.CLA3014_LoadDataToSnowflake, () => dto.CLA3014_LoadDataToSnowflake, (x) => schema.CLA3014_LoadDataToSnowflake = x));
+
+            changes.Add(TryUpdate(() => schema.SchemaRootPath, () => dto.SchemaRootPath, (x) => schema.SchemaRootPath = x));
+
+            if (_dataFeatures.CLA3605_AllowSchemaParquetUpdate.GetValue())
             {
-                schema.Description = dto.Description;
-                chgDetected = true;
-            }
-            if (schema.Extension.Id != dto.FileExtensionId)
-            {
-                schema.Extension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
-                chgDetected = true;
-            }
-            if (schema.HasHeader != dto.HasHeader)
-            {
-                schema.HasHeader = dto.HasHeader;
-                chgDetected = true;
-            }
-            if (schema.CLA1396_NewEtlColumns != dto.CLA1396_NewEtlColumns)
-            {
-                schema.CLA1396_NewEtlColumns = dto.CLA1396_NewEtlColumns;
-                chgDetected = true;
-            }
-            if (schema.CLA1580_StructureHive != dto.CLA1580_StructureHive)
-            {
-                schema.CLA1580_StructureHive = dto.CLA1580_StructureHive;
-                chgDetected = true;
+                changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket, 
+                    (x) =>
+                    {
+                        schema.ParquetStorageBucket = x;
+                        whatPropertiesChanged.Add("parquetstoragebucket", string.IsNullOrEmpty(x) ? null : x.ToLower());
+                    }));
+                changes.Add(TryUpdate(() => schema.ParquetStoragePrefix, () => dto.ParquetStoragePrefix,
+                    (x) =>
+                    {
+                        schema.ParquetStoragePrefix = x;
+                        whatPropertiesChanged.Add("parquetstorageprefix", string.IsNullOrEmpty(x) ? null : x.ToLower());
+                    }));
             }
 
-            if (schema.CLA2472_EMRSend != dto.CLA2472_EMRSend)
-            {
-                schema.CLA2472_EMRSend = dto.CLA2472_EMRSend;
-                chgDetected = true;
-            }
-
-            if (schema.CLA1286_KafkaFlag != dto.CLA1286_KafkaFlag)
-            {
-                schema.CLA1286_KafkaFlag = dto.CLA1286_KafkaFlag;
-                chgDetected = true;
-            }
-
-            if (schema.CLA3014_LoadDataToSnowflake != dto.CLA3014_LoadDataToSnowflake)
-            {
-                schema.CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake;
-                chgDetected = true;
-            }
-            
-            if (schema.SchemaRootPath != dto.SchemaRootPath)
-            {
-                schema.SchemaRootPath = dto.SchemaRootPath;
-                chgDetected = true;
-            }
-
-
-            if (chgDetected)
+            if (changes.Any(x => x))
             {
                 schema.LastUpdatedDTM = DateTime.Now;
                 schema.UpdatedBy = _userService.GetCurrentUser().AssociateId;
             }
 
-            whatPropertiesChanged += "}";
+            return whatPropertiesChanged;
+        }
 
-            return JObject.Parse(whatPropertiesChanged);          
+        private bool TryUpdate<T>(Func<T> existingValue, Func<T> updateValue, Action<T> setter)
+        {
+            T value = updateValue();
+            if (!Equals(existingValue(), value))
+            {
+                setter(value);
+                return true;
+            }
+
+            return false;
         }
 
         public UserSecurity GetUserSecurityForSchema(int schemaId)
@@ -518,8 +503,7 @@ namespace Sentry.data.Core
             
             try
             {
-                UserSecurity us;
-                us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+                UserSecurity us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
                 if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset || us.CanManageSchema))
                 {
                     try
@@ -542,7 +526,23 @@ namespace Sentry.data.Core
 
             SchemaRevision revision = _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schemaId).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();
 
-            return (revision == null) ? null : revision.ToDto();
+            return revision?.ToDto();
+        }
+
+        public SchemaRevisionJsonStructureDto GetLatestSchemaRevisionJsonStructureBySchemaId(int datasetId, int schemaId)
+        {
+            //check schema exists
+            DatasetFileConfig fileConfig = GetDatasetFileConfig(datasetId, schemaId, x => x.CanPreviewDataset || x.CanViewFullDataset || x.CanUploadToDataset || x.CanEditDataset || x.CanManageSchema);
+
+            //get latest revision
+            SchemaRevision revision = fileConfig.GetLatestSchemaRevision();
+
+            //return result as dto
+            return new SchemaRevisionJsonStructureDto()
+            {
+                Revision = revision?.ToDto(),
+                JsonStructure = revision?.ToJsonStructure()
+            };
         }
 
         public List<DatasetFile> GetDatasetFilesBySchema(int schemaId)
@@ -711,6 +711,49 @@ namespace Sentry.data.Core
             }
         }
 
+        private void CheckAccessToDataset(Dataset ds, Func<UserSecurity, bool> userCan)
+        {
+            try
+            {
+                IApplicationUser user = _userService.GetCurrentUser();
+                UserSecurity userSecurity = _securityService.GetUserSecurity(ds, user);
+
+                if (userCan(userSecurity))
+                {
+                    return;
+                }
+
+                Logger.Info($"schmeacontroller-checkdatasetpermission unauthorized_access for {user.AssociateId}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"schemacontroller-checkdatasetpermission failed to check access", ex);
+            }
+
+            throw new SchemaUnauthorizedAccessException();
+        }
+
+        private DatasetFileConfig GetDatasetFileConfig(int datasetId, int schemaId, Func<UserSecurity, bool> userCan)
+        {
+            Dataset ds = _datasetContext.Datasets.FirstOrDefault(x => x.DatasetId == datasetId && x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
+
+            if (ds == null)
+            {
+                throw new DatasetNotFoundException();
+            }
+
+            CheckAccessToDataset(ds, userCan);
+
+            DatasetFileConfig fileConfig = ds.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+
+            if (fileConfig == null)
+            {
+                throw new SchemaNotFoundException();
+            }
+
+            return fileConfig;
+        }
+
         private void MapToDatasetFile(DataFlowStepEvent stepEvent, string fileKey, string fileVersionId, DatasetFile file)
         {
             file.DatasetFileId = 0;
@@ -745,7 +788,7 @@ namespace Sentry.data.Core
                 Name = dto.Name,
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
                 SchemaEntity_NME = dto.SchemaEntity_NME,
-                Extension = (dto.FileExtensionId != 0) ? _datasetContext.GetById<FileExtension>(dto.FileExtensionId) : (dto.FileExtenstionName != null) ? _datasetContext.FileExtensions.Where(w => w.Name == dto.FileExtenstionName).FirstOrDefault() : null,
+                Extension = (dto.FileExtensionId != 0) ? _datasetContext.GetById<FileExtension>(dto.FileExtensionId) : (dto.FileExtensionName != null) ? _datasetContext.FileExtensions.Where(w => w.Name == dto.FileExtensionName).FirstOrDefault() : null,
                 Delimiter = dto.Delimiter,
                 HasHeader = dto.HasHeader,
                 SasLibrary = CommonExtensions.GenerateSASLibaryName(_datasetContext.GetById<Dataset>(dto.ParentDatasetId)),
@@ -781,6 +824,7 @@ namespace Sentry.data.Core
 
             };
             _datasetContext.Add(schema);
+
             return schema;
         }
 
@@ -808,7 +852,7 @@ namespace Sentry.data.Core
                 StorageCode = scm.StorageCode,
                 StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
                 RawQueryStorage = (Configuration.Config.GetHostSetting("EnableRawQueryStorageInQueryTool").ToLower() == "true" && _datasetContext.SchemaMap.Any(w => w.MappedSchema.SchemaId == scm.SchemaId)) ? GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\" : Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
-                FileExtenstionName = scm.Extension.Name,
+                FileExtensionName = scm.Extension.Name,
                 SnowflakeDatabase = scm.SnowflakeDatabase,
                 SnowflakeTable = scm.SnowflakeTable,
                 SnowflakeSchema = scm.SnowflakeSchema,
@@ -1039,9 +1083,9 @@ namespace Sentry.data.Core
                 }
 
                 //Varchar Length
-                if (fieldDto.FieldType == GlobalConstants.Datatypes.VARCHAR && (fieldDto.Length < 1 || fieldDto.Length > 65535))
+                if (fieldDto.FieldType == GlobalConstants.Datatypes.VARCHAR && (fieldDto.Length < 1 || fieldDto.Length > 16000000)) //true max is 16777216
                 {
-                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) VARCHAR length ({fieldDto.Length}) is required to be between 1 and 65535");
+                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) VARCHAR length ({fieldDto.Length}) is required to be between 1 and 16000000");
                 }
 
                 //Decimal Precision

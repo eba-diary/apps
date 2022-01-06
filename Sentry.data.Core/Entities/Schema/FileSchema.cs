@@ -26,5 +26,7 @@
         public virtual string ParquetStoragePrefix { get; set; }
         public virtual string SnowflakeStage { get; set; }
         public virtual string SnowflakeWarehouse { get; set; }
+
+        
     }
 }

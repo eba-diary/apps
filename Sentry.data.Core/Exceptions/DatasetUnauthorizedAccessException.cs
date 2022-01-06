@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Sentry.data.Core.Exceptions
 {
     [Serializable]
-    public class DatasetUnauthorizedAccessException : UnauthorizedAccessException, ISerializable
+    public class DatasetUnauthorizedAccessException : UnauthorizedAccessException
     {
         public DatasetUnauthorizedAccessException() { }
         public DatasetUnauthorizedAccessException(string message) : base(message) { }

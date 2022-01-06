@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "StructureTest",
+  "type": "object",
+  "properties": {
+    "fieldname": {
+      "type": "string",
+      "format": "date-time",
+      "dsc-format": "yyyy-MM-dd HH:mm:ss",
+      "description": "Field Description"
+    }
+  }
+}

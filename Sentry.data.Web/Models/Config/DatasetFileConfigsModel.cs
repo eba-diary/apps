@@ -52,6 +52,8 @@ namespace Sentry.data.Web
             this.CLA3014_LoadDataToSnowflake = (dto.Schema != null) ? dto.Schema.CLA3014_LoadDataToSnowflake : false;
             this.ObjectStatus = dto.ObjectStatus;
             this.SchemaRootPath = dto.SchemaRootPath;
+            this.ParquetStorageBucket = dto.ParquetStorageBucket;
+            this.ParquetStoragePrefix = dto.ParquetStoragePrefix;
             //this.CLA24 = (dto.Schema != null) ? dto.Schema.CLA1580_StructureHive : false;
         }
 
@@ -148,5 +150,7 @@ namespace Sentry.data.Web
         public string SasLibrary { get; set; }
         public bool DeleteInd { get; set; }
         public ObjectStatusEnum ObjectStatus { get; set; }
+        public string ParquetStorageBucket { get; set; }
+        public string ParquetStoragePrefix { get; set; }
     }
 }
