@@ -2,7 +2,7 @@
 	BEGIN TRY 
 		
 		MERGE	INTO BusinessArea						AS TARGET 
-		USING	( VALUES	(1, 'Personal Lines', 'PL','079012','070557',1,'619c7006-68ca-4d58-ae6a-acabb562dc19')	,
+		USING	( VALUES	(1, 'Personal Lines', 'PL','080550','070557',1,'619c7006-68ca-4d58-ae6a-acabb562dc19')	,
 							(2, 'Data.sentry.com', 'DSC','065520','065520',1,'D564ADC6-DAAB-48A4-90D4-F76CC0CE2249')
 		
 		
