@@ -81,31 +81,31 @@
         <dateline>
           <date when="1898-12-19">Monday, Dec. 19</date>. 
         </dateline>
-          <p>Started for <name>El Medina, Fayum</name> by rail at 10:30, <persName>Parson</persName> included &#8211; and folted in fairly comfortable fashion across the desert to <placeName>Medina</placeName> which we reached at 12 o'clock &#8211; and had an excellent luncheon at the <placeName>Hotel du Fayoum</placeName> &#8211; where one could be very comfortable for a few days and see the district thoroughly. Then we had 3 carriages! and drove about through the town and environs. The town is quite <orgName>European,</orgName> is of much importance, 40,000 inhabitants &#8211; and the great canal, the <persName>Bahr Jusuf</persName> which leaves the <placeName>Nile</placeName> near <placeName>Assiut</placeName> and flows to the <placeName>Fayoum</placeName> gives extraordinary fertility to this district. Its many branches flowing through the town, and the numerous bridges we crossed gave many novel features &#8211; making a kind of <placeName>Egyptian Venice</placeName> or Amsterdam. Very good streets, with handsome buildings, and gardens &#8211; most interesting. <persName>Theodore</persName> made the acquaintance of an unknown <orgName>Englishman</orgName> who has lived there for 10 years &#8211; and he says one can drive quite comfortably to the pyramids of <placeName>Hawara</placeName> and <placeName>Illahun.</placeName> Home by 5 o'clock tired and glad. Fine evening effects returning across the desert. The <orgName>Meydum</orgName> pyramid touched to radiance by the setting sun, while all about was grey and dark.</p>
+          <p>Started for <name>El Medina, Fayum</name> by rail at 10:30, <persName>Parson</persName> included &#8211; and folted in fairly comfortable fashion across the desert to <placeName>Medina</placeName> which we reached at 12 o'clock &#8211; and had an excellent luncheon at the <name type="hotel" ref="#Hotel_du_Fayoum">Hotel du Fayoum</name> &#8211; where one could be very comfortable for a few days and see the district thoroughly. Then we had 3 carriages! and drove about through the town and environs. The town is quite <orgName ref="#European">European</orgName>, <!--keep European tag? And Egyptian?--> is of much importance, 40,000 inhabitants &#8211; and the great canal, the <placeName ref="#Bahr_Yussef">Bahr Jusuf</placeName> which leaves the <placeName ref="#Nile">Nile</placeName> near <placeName ref="#Asyut">Assiut</placeName> and flows to the <placeName ref="#Al_Fayyūm">Fayoum</placeName> gives extraordinary fertility to this district. Its many branches flowing through the town, and the numerous bridges we crossed gave many novel features &#8211; making a kind of Egyptian <placeName ref="#Venice">Venice</placeName> or <placeName ref="#Amsterdam">Amsterdam</placeName>. Very good streets, with handsome buildings, and gardens &#8211; most interesting. <persName ref="#Davis_Theodore_M">Theodore</persName> made the acquaintance of an unknown <orgName ref="#English">Englishman</orgName> who has lived there for 10 years &#8211; and he says one can drive quite comfortably to the pyramids of <name type="historical" ref="#Pyramid_of_Amenemhat_III">Hawara</name> and <name type="historical" ref="#Pyramid_of_Senusret_II">Illahun</placeName>. Home by 5 o'clock tired and glad. Fine evening effects returning across the desert. The <name type="historical" ref="#Meidum_Pyramid">Meydum pyramid</name> touched to radiance by the setting sun, while all about was grey and dark.</p>
       </div>
       <div xml:id="EBA-">
         <dateline>
-          Tuesday, Dec. 20.
+          <date when="1898-12-20">Tuesday, Dec. 20</date>.
         </dateline>
-          <p>Very heavy fog this morning &#8211; and no wind until 11 o'clock &#8211; very shifting all day &#8211; with heavy clouds about late in the afternoon, and some lightning and a little rain. Made about 6 miles. I had one charming hour on deck just after lunch, while we were anchored in a dead calm. Water like glass &#8211; the delicate colouring of that hour of the day &#8211; the utter stillness only emphasised by a boat descending the other side of the wide river, with its boatmen crooning and singing. What heavenly repose!</p>
+          <p>Very heavy fog this morning &#8211; and no wind until 11 o'clock &#8211; very shifting all day &#8211; with heavy clouds about late in the afternoon, and some lightning and a little rain. Made about <measure type="distance">6 miles</measure>. I had one charming hour on deck just after lunch, while we were anchored in a dead calm. Water like glass &#8211; the delicate colouring of that hour of the day &#8211; the utter stillness only emphasised by a boat descending the other side of the wide river, with its boatmen crooning and singing. What heavenly repose!</p>
       </div>
       <div xml:id="EBA-">
         <dateline>
-          Wednesday, Dec. 21.
+          <date when="1898-12-21">Wednesday, Dec. 21</date>.
         </dateline>
-          <p>A cool morning and but little wind until about 3 P.M. when with a west wind we sailed until 4:30 and made near 6 miles, and then obliged to tie up to the bank.</p>
+          <p>A cool morning and but little wind until about 3 P.M. when with a west wind we sailed until 4:30 and made near <measure type="distance">6 miles</measure>, and then obliged to tie up to the bank.</p>
       </div>
       <div xml:id="EBA-">
         <dateline>
-          Thursday, Dec. 22. 3 miles.
+          <date when="1898-12-22">Thursday, Dec. 22</date>. <measure type="distance">3 miles</measure>.<!--check datelines-->
         </dateline>
-          <p>A splendid cloudless day with light south west wind &#8211; we pulled to the anchor to opposite side of river, tracked a little way, and then pulled back and tracked &#8211; making 3 miles, we suppose we are about 15 miles south of Wasta. A radiant night!</p>
+          <p>A splendid cloudless day with light south west wind &#8211; we pulled to the anchor to opposite side of river, tracked a little way, and then pulled back and tracked &#8211; making <measure type="distance">3 miles</measure>, we suppose we are about <measure type="distance">15 miles</measure> south of <placeName ref="#Al_Wasta">Wasta</placeName>. A radiant night!</p>
       </div>
       <div xml:id="EBA-">
         <dateline>
-          Friday, Dec. 23. One mile.
+          <date when="1898-12-23">Friday, Dec. 23</date>. <measure type="distance">One mile</measure>. <!--1/5 stopping point IS-->
         </dateline>
-          <p><placeName>S.E.</placeName> wind still holds &#8211; tracked a little &#8211; and beginning to feel a little discouraged. The "Thames" with the <orgName>Kidders</orgName> from <placeName>Boston,</placeName> is lying ahead of us, too far for visiting. The "Eurydice" somewhere near her, on which are a <orgName>Canadian</orgName> family (Smith) who crossed with us on the <persName>Kaiser Wilhem.</persName></p>
+          <p>S.E. wind still holds &#8211; tracked a little &#8211; and beginning to feel a little discouraged. The "Thames" with the <orgName>Kidders</orgName> from <placeName>Boston,</placeName> is lying ahead of us, too far for visiting. The "Eurydice" somewhere near her, on which are a <orgName>Canadian</orgName> family (Smith) who crossed with us on the <persName>Kaiser Wilhem.</persName></p>
       </div>
       <div xml:id="EBA-">
         <dateline>
