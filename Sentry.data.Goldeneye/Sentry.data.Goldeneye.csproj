@@ -209,8 +209,16 @@
       <Link>AWSSettings.config</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="..\DefaultSettings\defaultSettings.config">
+      <Link>defaultSettings.config</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="..\FeatureFlagSettings.config">
       <Link>FeatureFlagSettings.config</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\HiveODBC.config">
+      <Link>HiveODBC.config</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\KafkaSettings.config">
