@@ -10,12 +10,14 @@ namespace Sentry.data.Core
         public int Id { get; set; }
 
         [PropertyName("asset_cde")]
+        [GlobalSearchField]
         public string AssetCode { get; set; }
 
         [PropertyName("basedatabase_id")]
         public int BaseDatabaseId { get; set; }
 
         [PropertyName("base_nme")]
+        [GlobalSearchField]
         public string BaseName { get; set; }
 
         [PropertyName("change_cnt")]
@@ -25,6 +27,7 @@ namespace Sentry.data.Core
         public string ColumnContentType { get; set; }
 
         [PropertyName("column_nme")]
+        [GlobalSearchField]
         public string ColumnName { get; set; }
 
         [PropertyName("column_typ")]
@@ -37,6 +40,7 @@ namespace Sentry.data.Core
         public int CurrentCount { get; set; }
 
         [PropertyName("database_nme")]
+        [GlobalSearchField]
         public string DatabaseName { get; set; }
 
         [PropertyName("effectivechange_cnt")]
@@ -44,12 +48,6 @@ namespace Sentry.data.Core
 
         [PropertyName("effective_dte")]
         public DateTime EffectiveDate { get; set; }
-
-        [PropertyName("@version")]
-        public string Version { get; set; }
-
-        [PropertyName("@timestamp")]
-        public DateTime Timestamp { get; set; }
 
         [PropertyName("effective_dtm")]
         public DateTime EffectiveDateTime { get; set; }
@@ -79,7 +77,7 @@ namespace Sentry.data.Core
         public string ProdType { get; set; }
 
         [PropertyName("saidlist_nme")]
-        public string SAIDListName { get; set; }
+        public string SaidListName { get; set; }
 
         [PropertyName("scale_len")]
         public int? Scale { get; set; }
@@ -97,16 +95,25 @@ namespace Sentry.data.Core
         public string SchemaName { get; set; }
 
         [PropertyName("server_nme")]
+        [GlobalSearchField]
         public string ServerName { get; set; }
 
         [PropertyName("source_nme")]
+        [GlobalSearchField]
         public string SourceName { get; set; }
+
+        [PropertyName("@timestamp")]
+        public DateTime Timestamp { get; set; }
 
         [PropertyName("total_cnt")]
         public int TotalCount { get; set; }
 
         [PropertyName("type_dsc")]
+        [GlobalSearchField]
         public string TypeDescription { get; set; }
+
+        [PropertyName("@version")]
+        public string Version { get; set; }
         #endregion
 
         #region Mappings
@@ -132,7 +139,7 @@ namespace Sentry.data.Core
                 IsOwnerVerified = IsOwnerVerified,
                 SourceType = SourceName,
                 ScanCategory = ScanListName,
-                ScanType = SAIDListName
+                ScanType = SaidListName
             };
         }
         #endregion

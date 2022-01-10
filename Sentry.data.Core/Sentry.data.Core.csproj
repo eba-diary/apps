@@ -127,6 +127,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\GlobalSearchField.cs" />
     <Compile Include="DomainServices\BusinessAreaService.cs" />
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DaleService.cs" />
@@ -218,6 +219,7 @@
     <Compile Include="Entities\MessageFormats\SnowTableCreateModel.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Helpers\NestExtensions.cs" />
+    <Compile Include="Helpers\NestHelper.cs" />
     <Compile Include="Helpers\Paginate\PageParameters.cs" />
     <Compile Include="Entities\S3\S3LambdaEvent.cs" />
     <Compile Include="Entities\S3\S3ObjectEvent.cs" />

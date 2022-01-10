@@ -1,8 +1,7 @@
 ﻿namespace Sentry.data.Core
 {
     public static class GlobalConstants
-    {
-        
+    {        
         public static class System
         {
             public const string NAME = "Data.Sentry.Com";
@@ -378,5 +377,16 @@
             public const string DATA = "DATA_";
         }
 
+        public static class ElasticAliases
+        {
+            public const string DATA_INVENTORY = "data-inventory";
+        }
+
+        public static class EnvironmentFilters
+        {
+            public const string ALL = "ALL";
+            public const string NONPROD = "NONPROD";
+            public const string PROD = "PROD";
+        }
     }
 }

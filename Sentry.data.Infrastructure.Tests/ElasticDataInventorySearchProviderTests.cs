@@ -223,7 +223,7 @@ namespace Sentry.data.Infrastructure.Tests
                     IsOwnerVerified = true,
                     SourceName = "Source",
                     ScanListName = "Scan",
-                    SAIDListName = "SaidList"
+                    SaidListName = "SaidList"
                 }
             };
         }

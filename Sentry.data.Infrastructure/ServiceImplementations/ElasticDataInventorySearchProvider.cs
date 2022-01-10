@@ -4,6 +4,7 @@ using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
 {
@@ -33,29 +34,34 @@ namespace Sentry.data.Infrastructure
                 must.AddWildcard<DataInventory>(x => x.ColumnName, dto.AdvancedCriteria.Column);
                 must.AddWildcard<DataInventory>(x => x.SourceName, dto.AdvancedCriteria.SourceType);
 
-                should.AddMatch<DataInventory>(x => x.AssetCode, dto.AdvancedCriteria.Asset);
-                should.AddMatch<DataInventory>(x => x.ServerName, dto.AdvancedCriteria.Server);
-                should.AddMatch<DataInventory>(x => x.DatabaseName, dto.AdvancedCriteria.Database);
-                should.AddMatch<DataInventory>(x => x.BaseName, dto.AdvancedCriteria.Object);
-                should.AddMatch<DataInventory>(x => x.TypeDescription, dto.AdvancedCriteria.ObjectType);
-                should.AddMatch<DataInventory>(x => x.ColumnName, dto.AdvancedCriteria.Column);
-                should.AddMatch<DataInventory>(x => x.SourceName, dto.AdvancedCriteria.SourceType);
+                should.AddFuzzyMatch<DataInventory>(x => x.AssetCode, dto.AdvancedCriteria.Asset);
+                should.AddFuzzyMatch<DataInventory>(x => x.ServerName, dto.AdvancedCriteria.Server);
+                should.AddFuzzyMatch<DataInventory>(x => x.DatabaseName, dto.AdvancedCriteria.Database);
+                should.AddFuzzyMatch<DataInventory>(x => x.BaseName, dto.AdvancedCriteria.Object);
+                should.AddFuzzyMatch<DataInventory>(x => x.TypeDescription, dto.AdvancedCriteria.ObjectType);
+                should.AddFuzzyMatch<DataInventory>(x => x.ColumnName, dto.AdvancedCriteria.Column);
+                should.AddFuzzyMatch<DataInventory>(x => x.SourceName, dto.AdvancedCriteria.SourceType);
             }
-            else
+            else if (!string.IsNullOrWhiteSpace(dto.Criteria))
             {
                 //broad search for criteria across all searchable fields
-                should.AddMatchAndWildcard<DataInventory>(x => x.AssetCode, dto.Criteria);
-                should.AddMatchAndWildcard<DataInventory>(x => x.ServerName, dto.Criteria);
-                should.AddMatchAndWildcard<DataInventory>(x => x.DatabaseName, dto.Criteria);
-                should.AddMatchAndWildcard<DataInventory>(x => x.BaseName, dto.Criteria);
-                should.AddMatchAndWildcard<DataInventory>(x => x.TypeDescription, dto.Criteria);
-                should.AddMatchAndWildcard<DataInventory>(x => x.ColumnName, dto.Criteria);
-                should.AddMatchAndWildcard<DataInventory>(x => x.SourceName, dto.Criteria);
-
-                if (should.Any())
+                Nest.Fields fields = NestHelper.GlobalSearchFields<DataInventory>();
+                
+                should.Add(new MultiMatchQuery()
                 {
-                    minShould = 1;
-                }
+                    Query = dto.Criteria,
+                    Fields = fields,
+                    Fuzziness = Fuzziness.Auto
+                });
+
+                should.Add(new QueryStringQuery()
+                {
+                    Query = $"*{dto.Criteria}*",
+                    Fields = fields,
+                    AnalyzeWildcard = true
+                });
+
+                minShould = 1;
             }
 
             if (dto.Sensitive == Core.GlobalEnums.DaleSensitive.SensitiveOnly)
@@ -65,6 +71,15 @@ namespace Sentry.data.Infrastructure
             else if (dto.Sensitive == Core.GlobalEnums.DaleSensitive.SensitiveNone)
             {
                 must.AddMatch<DataInventory>(x => x.IsSensitive, "false");
+            }
+
+            if (dto.EnvironmentFilter == EnvironmentFilters.PROD)
+            {
+                must.AddMatch<DataInventory>(x => x.ProdType, "P");
+            }
+            else if (dto.EnvironmentFilter == EnvironmentFilters.NONPROD)
+            {
+                must.AddMatch<DataInventory>(x => x.ProdType, "D");
             }
 
             SearchRequest<DataInventory> request = new SearchRequest<DataInventory>()
