@@ -9,113 +9,59 @@ namespace Sentry.data.Web.Controllers
 
     public class DaleController : BaseController
     {
-        private readonly IEventService _eventService;
+        #region Fields
         private readonly IDataFeatures _featureFlags;
         private readonly IDaleService _daleService;
+        #endregion
 
-        public DaleController(IEventService eventService, IDataFeatures featureFlags, IDaleService daleService)
+        #region Constructor
+        public DaleController(IDataFeatures featureFlags, IDaleService daleService)
         {
-            _eventService = eventService;
             _featureFlags = featureFlags;
             _daleService = daleService;
         }
+        #endregion
 
+        #region Methods
         //ALLOWED TARGETS=entity,column,SAID
         //https://localhost.sentry.com:44371/DataInventory/Search/?target=column&search=weather&filter=ssn
         //https://localhost.sentry.com:44371/DataInventory/Search/?target=said&search=CODS
         [Route("DataInventory/Search/")]
         public ActionResult DaleSearch(string target=null, string search=null, string filter=null)
         {
-            if( CanDaleView() ) 
+            DaleSearchModel searchModel = new DaleSearchModel
             {
-                DaleSearchModel searchModel = new DaleSearchModel();
-                searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
-                searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
-                searchModel.DaleAdvancedCriteria = new DaleAdvancedCriteriaModel() { };
-                searchModel.CLA3550_DATA_INVENTORY_NEW_COLUMNS = _featureFlags.CLA3550_DATA_INVENTORY_NEW_COLUMNS.GetValue();
-                searchModel.CLA3707_UsingSQLSource = UsingSQLSource();
+                CanDaleSensitiveView = CanDaleSensitiveView(),
+                CanDaleSensitiveEdit = CanDaleSensitiveEdit(),
+                DaleAdvancedCriteria = new DaleAdvancedCriteriaModel(),
+                CLA3550_DATA_INVENTORY_NEW_COLUMNS = _featureFlags.CLA3550_DATA_INVENTORY_NEW_COLUMNS.GetValue(),
+                CLA3707_UsingSQLSource = UsingSqlSource()
+            };
 
-                if (string.IsNullOrEmpty(search))
-                {
-                    searchModel.Destiny = DaleDestiny.Column;
-                }
-                else
-                {
-                    searchModel.Criteria = search;                       
-                    bool targetFound = false;
-
-                    if(IsTargetValid(target))
-                    {
-                        if (target.ToUpper() == "SAID")
-                        {
-                            searchModel.Destiny = DaleDestiny.SAID;
-                            targetFound = true;
-                            
-                        }
-                        else if (target.ToUpper() == "ENTITY")
-                        {
-                            searchModel.Destiny = DaleDestiny.Object;
-                            targetFound = true;
-                        }
-                    }
-                    
-                    if(!targetFound)
-                    {
-                        searchModel.Destiny = DaleDestiny.Column;           //default to column
-                    }
-                }
-
-                return View(searchModel);
+            if (string.IsNullOrEmpty(search))
+            {
+                searchModel.Destiny = DaleDestiny.Column;
             }
             else
             {
-                return View("Forbidden");
+                searchModel.Criteria = search;
+
+                if (string.Equals(target, "SAID", StringComparison.OrdinalIgnoreCase))
+                {
+                    searchModel.Destiny = DaleDestiny.SAID;
+                }
+                else if (string.Equals(target, "ENTITY", StringComparison.OrdinalIgnoreCase))
+                {
+                    searchModel.Destiny = DaleDestiny.Object;
+                }
+                else
+                {
+                    searchModel.Destiny = DaleDestiny.Column;
+                }
             }
+
+            return View(searchModel);
         }
-
-        private bool IsTargetValid(string target)
-        {
-            bool valid = false;
-
-            if (String.IsNullOrEmpty(target))
-            {
-                return false;
-            }
-
-            if (target.ToUpper() == "SAID")
-            {
-                valid = true;
-            }
-            
-            if (target.ToUpper() == "ENTITY")
-            {
-                valid = true;
-            }
-
-            return valid;
-        }
-
-        //use for ServerSide DataTable processing
-        //public JsonResult GetSearchResultsServer([ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest,string searchCriteria, string destination)
-        //{
-        //    DaleSearchModel searchModel = new DaleSearchModel();
-        //    searchModel.Criteria = searchCriteria;
-        //    searchModel.Destiny = destination.ToDaleDestiny();
-
-        //    if (IsCriteriaValid(searchModel))
-        //    {
-        //        searchModel.DaleResults = _daleService.GetSearchResults(searchModel.ToDto()).ToWeb();
-        //    }
-        //    else
-        //    {
-        //        searchModel.DaleResults = new List<DaleResultModel>();
-        //    }
-
-        //    DataTablesQueryableAdapter<DaleResultModel> dtqa = new DataTablesQueryableAdapter<DaleResultModel>(searchModel.DaleResults.AsQueryable(), dtRequest);
-        //    DataTablesResponse response = dtqa.GetDataTablesResponse();
-
-        //     return Json(response);
-        //}
 
         //use for ClientSide DataTable processing
         public JsonResult GetSearchResultsClient(string searchCriteria, 
@@ -130,11 +76,13 @@ namespace Sentry.data.Web.Controllers
                                                 bool sensitive=false
          )
         {
-            DaleSearchModel searchModel = new DaleSearchModel();
-            searchModel.Criteria = searchCriteria;
-            searchModel.CanDaleSensitiveView = CanDaleSensitiveView();
-            searchModel.CanDaleSensitiveEdit = CanDaleSensitiveEdit();
-            searchModel.CLA3707_UsingSQLSource = UsingSQLSource();
+            DaleSearchModel searchModel = new DaleSearchModel
+            {
+                Criteria = searchCriteria,
+                CanDaleSensitiveView = CanDaleSensitiveView(),
+                CanDaleSensitiveEdit = CanDaleSensitiveEdit(),
+                CLA3707_UsingSQLSource = UsingSqlSource()
+            };
 
             //if using SQL source, get the destiny enum value as usual
             //if using ELASTIC source, destiny will be null unless doing an advanced search because the radio buttons do not exist
@@ -144,7 +92,7 @@ namespace Sentry.data.Web.Controllers
             }
             else
             {
-                searchModel.Destiny = string.IsNullOrEmpty(destination) ? default(DaleDestiny) : DaleDestiny.Advanced;
+                searchModel.Destiny = string.IsNullOrEmpty(destination) ? default : DaleDestiny.Advanced;
             }
 
             searchModel.DaleAdvancedCriteria = new DaleAdvancedCriteriaModel()
@@ -174,8 +122,10 @@ namespace Sentry.data.Web.Controllers
             //DO NOT perform search if invalid criteria OR sensitive and they lack permissions. NOTE: if they lack permissions, VIEW hides ability to even click sensitive link
             if (!IsCriteriaValid(searchModel) || ( sensitive && !CanDaleSensitiveView() ) )            
             {
-                searchModel.DaleResultModel = new DaleResultModel();
-                searchModel.DaleResultModel.DaleResults = new List<DaleResultRowModel>();
+                searchModel.DaleResultModel = new DaleResultModel
+                {
+                    DaleResults = new List<DaleResultRowModel>()
+                };
             }
             else
             {
@@ -188,6 +138,27 @@ namespace Sentry.data.Web.Controllers
             return result;
         }
 
+        [HttpGet]
+        //method called by dale.js to return whether user can edit IsSensitive IND
+        public JsonResult GetCanDaleSensitive()
+        {
+            return Json(new
+            {
+                canDaleSensitiveEdit = CanDaleSensitiveEdit(),
+                canDaleOwnerVerifiedEdit = CanDaleOwnerVerifiedEdit(),
+                canDaleSensitiveView = CanDaleSensitiveView(),
+                CLA3707_UsingSQLSource = UsingSqlSource()
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult UpdateIsSensitive(List<DaleSensitiveModel> models)
+        {
+            return Json(new { success = _daleService.UpdateIsSensitive(models.ToDto()) });
+        }
+        #endregion
+
+        #region Private
         private bool IsCriteriaValid(DaleSearchModel model)
         {
             //if sensitive query, don't bother to validate criteria and immediately return true
@@ -209,19 +180,10 @@ namespace Sentry.data.Web.Controllers
             }
 
             //validate that if advanced search is happening at least something is filled in
-            if (model.Destiny == DaleDestiny.Advanced
-                                    && (!model.DaleAdvancedCriteria.AssetIsValid)
-                                     && (!model.DaleAdvancedCriteria.ServerIsValid)
-                                     && (!model.DaleAdvancedCriteria.DatabaseIsValid)
-                                     && (!model.DaleAdvancedCriteria.ObjectIsValid)
-                                     && (!model.DaleAdvancedCriteria.ObjectTypeIsValid)
-                                     && (!model.DaleAdvancedCriteria.ColumnIsValid)
-                                     && (!model.DaleAdvancedCriteria.SourceTypeIsValid)
-                )
+            if (model.Destiny == DaleDestiny.Advanced && !model.DaleAdvancedCriteria.IsValid())
             {
                 return false;
             }
-
 
             return true;
         }
@@ -233,11 +195,6 @@ namespace Sentry.data.Web.Controllers
                 return false;
             }
 
-            return true;
-        }
-
-        private bool CanDaleView()
-        {
             return true;
         }
 
@@ -263,37 +220,10 @@ namespace Sentry.data.Web.Controllers
             return false;
         }
 
-        private bool UsingSQLSource()
+        private bool UsingSqlSource()
         {
             return _featureFlags.CLA3707_DataInventorySource.GetValue() == "SQL";
         }
-
-        [HttpGet]
-        //method called by dale.js to return whether user can edit IsSensitive IND
-        public JsonResult GetCanDaleSensitive()
-        {
-            return Json(new {canDaleSensitiveEdit = CanDaleSensitiveEdit(), 
-                             canDaleOwnerVerifiedEdit = CanDaleOwnerVerifiedEdit(), 
-                             canDaleSensitiveView = CanDaleSensitiveView(),
-                             CLA3707_UsingSQLSource = UsingSQLSource()
-                        },JsonRequestBehavior.AllowGet);
-        }
-
-        [HttpPost]
-        public ActionResult UpdateIsSensitive(List<DaleSensitiveModel> models)
-        {
-            bool success = false;
-
-            success = _daleService.UpdateIsSensitive(models.ToDto());
-
-            if(success)
-            {
-                return Json(new { success = true });
-            }
-            else
-            {
-                return Json(new { success = false });
-            }
-        }
+        #endregion
     }
 }
