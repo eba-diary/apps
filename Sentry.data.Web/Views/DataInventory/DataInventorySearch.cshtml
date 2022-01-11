@@ -1,174 +1,96 @@
-﻿@using Sentry.data.Core.GlobalEnums;
-@using Sentry.data.Web;
+﻿@using Sentry.data.Web;
 @model DaleSearchModel
 
 @{
     ViewBag.Title = "Data Inventory";
-    ViewBag.Fluid = true;   /*this is needed so results grid grows because of column additions*/
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Fluid = true;
 }
 
-<div id="search-pg-wrapper">
+<!-- row for search bar at top -->
+<div class="row di-horizontal-center">
+    <div class="di-search-head">
+        <div class="di-head-item"><img src="~/Images/Dale/DataInventoryIcon.png" class="di-img leftFloat" /></div>
+        <div class="di-head-item"><h1 class="htCenter datasetHeader">Data Inventory</h1></div>
 
-    <div class="row">
-
-        @* filters *@
-        <div class="hidden-xs hidden-sm col-md-3 col-lg-3">
-            <div id="search-pg-filters">
-
-                <div id="filterColumn" style="display:none;">
-                    <!-- ko foreach: AllFilters -->
-                    @* category header *@
-                    <div class="panel panel-default dataset-list-filters">
-                        <div class="panel-heading filterHead" data-bind="attr: { id: HeadId }">
-                            <span class="filterCategoryName" data-bind="text : Name"></span>
-                            <span class="glyphicon glyphicon-chevron-down rightFloat filterViewIcon" data-bind="attr: { id: HeadIcon }"></span>
-                        </div>
-
-                        @* foreach of the category filters *@
-                        <div class="dataset-list-filter-category panel-body" data-bind="attr: {id : HeadHide }" style="display: none;">
-                            <!-- ko if: (OrderedFilters().length > 0) -->
-                            <ul class="list-unstyled ul-filter-list">
-                                <!-- ko if: !ShowMore -->
-                                <!-- ko foreach: OrderedFilters -->
-                                <li class="list-unstyled li-filter-disabled filterList" data-bind="css: { notAllowed: Count() == 0 }">
-                                    <label data-bind="attr: { id: id }">
-                                        <input type="checkbox" class="filterChbx"
-                                               data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
-                                        <strong data-bind="text : Title"></strong>
-                                        <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
-                                    </label>
-                                </li>
-                                <!-- /ko -->
-                                <!-- /ko -->
-                                <!-- ko if: ShowMore -->
-                                <!-- ko foreach: OrderedFilters -->
-                                <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6, css: { notAllowed: Count() == 0 }">
-                                    <label data-bind="attr: { id: id }">
-                                        <input type="checkbox" class="filterChbx"
-                                               data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
-                                        <strong data-bind="text : Title"></strong>
-                                        <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
-                                    </label>
-                                </li>
-                                <!-- /ko -->
-
-                                <li data-bind="attr: {id : HiddenMore}">
-                                    <!-- ko foreach: OrderedFilters -->
-                                    <ul class="notNested">
-                                        <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6, css: { notAllowed: Count() == 0 }">
-                                            <label data-bind="attr: { id: id }">
-                                                <input type="checkbox" class="filterChbx"
-                                                       data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
-                                                <strong data-bind="text : Title"></strong>
-                                                <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
-                                            </label>
-                                        </li>
-                                    </ul>
-                                    <!-- /ko -->
-                                </li>
-                                <!-- /ko -->
-
-                            </ul>
-                            <!-- /ko -->
-                            <!-- ko if: (OrderedFilters().length > 6 && ShowMore) -->
-                            <a href="#" class="filterMore" data-bind="attr: { id:  HiddenId}">
-                                <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></div>
-                                <div class="leftFloat txt_filterMore" data-bind="attr: {id: TxtMore}">Show More</div>
-                            </a>
-                            <!-- /ko -->
-                        </div>
-                    </div>
-                    <!-- /ko -->
-                </div>
-            </div>
-        </div>
-
-        @* main content *@
-        <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
-
-            <div id="search-pg-content-wrapper">
-                @* page title *@
-                <div class="listHeadGroup">
-                    <img src="~/Images/Dale/DataInventoryIcon.png" class="datasetImg leftFloat" />
-                    <h1 class="htCenter datasetHeader">Data Inventory</h1>
-                </div>
-
-                @* spinner (shown until content loads) *@
-                <div id="filterSpinner">
-                    <div class="sentry-spinner-container" style="padding-top: 150px; margin-left: -80px;">
-                        <span class="sentry-spinner"></span>
-                    </div>
-                </div>
-
-                @* search box *@
-                <div class="searchBoxDS  has-feedback has-feedback-left">
-                    <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Datasets..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('Datasets'), event: {'keyup': searchResults.toFirstPage }" autocomplete="off" style="display: none;">
-                    <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Exhibits and Dashboards..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('BusinessIntelligence')" autocomplete="off" style="display: none;">
-                    <i class="form-control-feedback glyphicon glyphicon-search"></i>
-                </div>
-
-                @* filters/tiles (hidden by default until content loads *@
-                <div id="dataColumn" style="display:none;">
-                    <div id="DatasetItemList" class="dataset-list inlineBlock text-left">
-                        <div>
-                            <h4 class="found">
-                                Active Filters:
-                                <button type="button" class="btn btn-sm btn-primary" id="btnClearFilters" data-bind="click: clearFilters, enable: SelectedFilters().length !== 0">Clear Filters</button>
-                            </h4>
-
-                            <select multiple="" class="form-control select2-hidden-accessible"
-                                    id="filterSelector" name="filterSelector" tabindex="-1" aria-hidden="true">
-                                <!-- ko foreach: AllFilters -->
-                                <optgroup data-bind="attr: {label: Name}">
-                                    <!-- ko foreach: Filters -->
-                                    <option data-bind="value: $data.id, text: $data.Title"></option>
-                                    <!-- /ko -->
-                                </optgroup>
-                                <!-- /ko -->
-                            </select>
-                        </div>
-
-                        <div id="search-tile-header">
-                            @* number of items option *@
-                            <div id="nbr-search-results-wrapper" class="float-l">
-                                <div>Showing</div>
-                                <div>
-                                    <select id="search-results-choices" class="form-control" data-bind="event: { change: window.vm.limitSearchResults() }">
-                                        <option value="15" selected>15</option>
-                                        <option value="25">25</option>
-                                        <option value="50">50</option>
-                                        <option value="All">All</option>
-                                    </select>
-                                </div>
-                                <div>results</div>
-                            </div>
-                        </div>
-
-                        <hr>
-
-                        <!-- ko if: searchResults().length == 0 -->
-                        <div>
-                            <h4>
-                                No results given the active filters and/or search text.  Please refine your search parameters.
-                            </h4>
-                        </div>
-                        <!-- /ko -->
-                    </div>
-                </div>
-            </div>
+        <div id="di-search-box" class="has-feedback has-feedback-left">
+            <input class="form-control searchTextDS text-box single-line" type="text" id="inventorySearchText" placeholder="Search Data Inventory" value="@Model.Criteria" />
+            <i class="form-control-feedback glyphicon glyphicon-search"></i>
+            <i class="form-control-feedback fa fa-circle-o-notch fa-spin hidden"></i>
         </div>
     </div>
 </div>
 
-@section Scripts
-{
-    @Scripts.Render("~/bundles/dataTables")
-    <script type="text/javascript">
+<!-- row for filters and results -->
+<div class="row">
+    <div class="hidden-xs hidden-sm col-md-3" id="search-pg-filters">
+        <div id="filterColumn">
+            <!-- ko foreach: AllFilters -->
+            @* category header *@
+            <div class="panel panel-default dataset-list-filters">
+                <div class="panel-heading filterHead" data-bind="attr: { id: HeadId }">
+                    <span class="filterCategoryName" data-bind="text : Name"></span>
+                    <span class="glyphicon glyphicon-chevron-down rightFloat filterViewIcon" data-bind="attr: { id: HeadIcon }"></span>
+                </div>
 
-        $(function () {
-            data.Dale.init();
-        });
+                @* foreach of the category filters *@
+                <div class="dataset-list-filter-category panel-body" data-bind="attr: {id : HeadHide }" style="display: none;">
+                    <!-- ko if: (OrderedFilters().length > 0) -->
+                    <ul class="list-unstyled ul-filter-list">
+                        <!-- ko if: !ShowMore -->
+                        <!-- ko foreach: OrderedFilters -->
+                        <li class="list-unstyled li-filter-disabled filterList" data-bind="css: { notAllowed: Count() == 0 }">
+                            <label data-bind="attr: { id: id }">
+                                <input type="checkbox" class="filterChbx" data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
+                                <strong data-bind="text : Title"></strong>
+                                <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
+                            </label>
+                        </li>
+                        <!-- /ko -->
+                        <!-- /ko -->
+                        <!-- ko if: ShowMore -->
+                        <!-- ko foreach: OrderedFilters -->
+                        <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6, css: { notAllowed: Count() == 0 }">
+                            <label data-bind="attr: { id: id }">
+                                <input type="checkbox" class="filterChbx" data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
+                                <strong data-bind="text : Title"></strong>
+                                <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
+                            </label>
+                        </li>
+                        <!-- /ko -->
 
-    </script>
-}
+                        <li data-bind="attr: {id : HiddenMore}">
+                            <!-- ko foreach: OrderedFilters -->
+                            <ul class="notNested">
+                                <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6, css: { notAllowed: Count() == 0 }">
+                                    <label data-bind="attr: { id: id }">
+                                        <input type="checkbox" class="filterChbx" data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
+                                        <strong data-bind="text : Title"></strong>
+                                        <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
+                                    </label>
+                                </li>
+                            </ul>
+                            <!-- /ko -->
+                        </li>
+                        <!-- /ko -->
+
+                    </ul>
+                    <!-- /ko -->
+                    <!-- ko if: (OrderedFilters().length > 6 && ShowMore) -->
+                    <a href="#" class="filterMore" data-bind="attr: { id:  HiddenId}">
+                        <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></div>
+                        <div class="leftFloat txt_filterMore" data-bind="attr: {id: TxtMore}">Show More</div>
+                    </a>
+                    <!-- /ko -->
+
+                </div>
+            </div>
+
+            <!-- /ko -->
+        </div>
+
+    </div>
+
+    <div class="col-xs-12 col-md-9">
+        where active filters will go
+    </div>
+</div>

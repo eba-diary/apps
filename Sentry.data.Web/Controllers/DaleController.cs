@@ -60,7 +60,12 @@ namespace Sentry.data.Web.Controllers
                 }
             }
 
-            return View("DataInventorySearch", searchModel);
+            if (searchModel.CLA3707_UsingSQLSource)
+            {
+                return View(searchModel);
+            }
+
+            return View("~/Views/DataInventory/DataInventorySearch.cshtml", searchModel);
         }
 
         //use for ClientSide DataTable processing

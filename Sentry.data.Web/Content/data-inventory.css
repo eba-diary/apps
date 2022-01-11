@@ -1,0 +1,24 @@
+﻿.di-search-head {
+    display: inline-block;
+    width:40%;
+    min-width: 500px;
+}
+
+.di-head-item {
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 0.25em;
+}
+
+.di-img {
+    width: 50px;
+}
+
+#di-search-box {
+    
+}
+
+.di-horizontal-center {
+    display: flex;
+    justify-content: center;
+}

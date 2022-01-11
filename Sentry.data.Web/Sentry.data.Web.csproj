@@ -611,6 +611,7 @@
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.min.css" />
     <Content Include="Content\dale.css" />
+    <Content Include="Content\data-inventory.css" />
     <Content Include="Content\dataflow.css" />
     <Content Include="Content\dataset-detail.css" />
     <Content Include="Content\datasets.css" />
