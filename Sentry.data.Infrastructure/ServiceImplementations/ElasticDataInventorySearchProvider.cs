@@ -61,6 +61,13 @@ namespace Sentry.data.Infrastructure
                     AnalyzeWildcard = true
                 });
 
+                should.Add(new MultiMatchQuery()
+                {
+                    Query = dto.Criteria,
+                    Fields = fields,
+                    Type = TextQueryType.CrossFields
+                });
+
                 minShould = 1;
             }
 
