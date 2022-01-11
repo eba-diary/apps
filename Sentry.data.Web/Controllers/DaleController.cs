@@ -60,7 +60,7 @@ namespace Sentry.data.Web.Controllers
                 }
             }
 
-            return View(searchModel);
+            return View("DataInventorySearch", searchModel);
         }
 
         //use for ClientSide DataTable processing
