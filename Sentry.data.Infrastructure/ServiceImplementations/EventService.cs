@@ -51,22 +51,25 @@ namespace Sentry.data.Infrastructure
                     datasetId = _datasetContext.GetById<DatasetFileConfig>(configId).ParentDataset.DatasetId;
                 }
 
-                configId = GetConfigId(datasetId, schemaId);
+                GetConfigIdAndReason(eventType,datasetId, schemaId, ref configId, ref reason);
                 Event evt = CreateEvent(et, status, userId, reason, datasetId, configId, notification, dataAssetId, schemaId, lineCde, search);
                 _datasetContext.Add(evt);
                 _datasetContext.SaveChanges();
             }
         }
 
-        private int GetConfigId(int datasetId, int schemaId)
+        //GET CONFIGID AND CREATE A REASON FOR EVENT
+        private int GetConfigIdAndReason(string eventType, int datasetId, int schemaId, ref int configId, ref string reason)
         {
-            int configId = 0;
+            configId = 0;
 
             using (IDatasetContext _datasetContext = Bootstrapper.Container.GetNestedContainer().GetInstance<IDatasetContext>())
             {
                 if (configId == 0 && datasetId != 0)
                 {
                     Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+                    Schema schema = _datasetContext.GetById<Schema>(schemaId); 
+
                     DatasetFileConfig dfc;
                     if (ds != null)
                     {
@@ -78,6 +81,8 @@ namespace Sentry.data.Infrastructure
                         {
                             dfc = ds.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId);
                         }
+
+                        reason = CreateReason(eventType, ds, schema);
                     }
                     else
                     {
@@ -90,6 +95,35 @@ namespace Sentry.data.Infrastructure
 
             return configId;
         }
+
+        //CREATE A DETAILED REASON HERE ONE TIME SO THIS CAN BE USED BY DataFeedProvider and EmailService
+        private string CreateReason(string eventType, Dataset ds, Schema schema)
+        {
+            string reason = eventType;      //DEFAULT TO eventType in case none of the overrides happen below
+
+            if (schema != null && eventType == GlobalConstants.EventType.CREATE_DATASET_SCHEMA)        
+            {
+                //SCHEMA SCENARIO
+                reason = "A new schema called " + schema.Name + " was created under " + ds.DatasetName + " in " + ds.DatasetCategories.First().Name;
+            }
+            else if(eventType == GlobalConstants.EventType.CREATED_REPORT || eventType == GlobalConstants.EventType.CREATED_DATASET)        
+            {
+                //DATASET OR SCHEMA
+                string whatAmI = (eventType == GlobalConstants.EventType.CREATED_REPORT) ? "exhibit" : "dataset";
+
+                if (ds.DatasetCategories != null)
+                {
+                    reason = "A new " + whatAmI + " called " + ds.DatasetName + " was Created in " + ds.DatasetCategories.First().Name;
+                }
+                else
+                {
+                    reason = "A new " + whatAmI + " called " + ds.DatasetName + " was Created";
+                }
+            }
+
+            return reason;
+        }
+
 
         private Event CreateEvent(EventType eventType, Status status, string userId, string reason, int? datasetId, int? configId, Notification notification, int? dataAssetId,  int? schemaId, string lineCde, string search)
         {

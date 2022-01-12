@@ -80,6 +80,48 @@ namespace Sentry.data.Goldeneye
 
         }
 
+        //DETERMINE IF BUSINESSAREA PL
+        private static bool IsBusinessArea(Event e)
+        {
+            if(e.EventType.Group == EventTypeGroup.BusinessArea.GetDescription()  && e.Notification != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        //DETERMINE IF BUSINESSAREA DSC : these will have a group = BUSINESSAREA_DSC and a valid Notification
+        private static bool IsBusinessAreaDSC(Event e)
+        {
+            
+            if( e.EventType.Group == EventTypeGroup.BusinessAreaDSC.GetDescription() && e.Notification != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        //DETERMINE IF BUSINESSAREA DSC : these will have a group = BUSINESSAREA_DSC but will be EventTypes related to DATASET Events
+        private static bool IsBusinessArea_DSC_Dataset(Event e)
+        {
+            if(    e.EventType.Group == EventTypeGroup.BusinessAreaDSC.GetDescription() 
+                    &&  (e.EventType.Description == GlobalConstants.EventType.CREATED_DATASET || e.EventType.Description == GlobalConstants.EventType.CREATE_DATASET_SCHEMA || e.EventType.Description == GlobalConstants.EventType.CREATED_REPORT)
+            )
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public static void Run(string interval)
         {
             try
@@ -181,14 +223,14 @@ namespace Sentry.data.Goldeneye
                                 ).ToList()
                             );
                         }
-                        else if ( ( _event.EventType.Group == EventTypeGroup.BusinessArea.GetDescription() || _event.EventType.Group == EventTypeGroup.BusinessAreaDSC.GetDescription() ) && _event.Notification != null /*&& */)     //ONLY PROCESS BUSINESSAREA EXCLUDING BusinessAreaType=DSC
+                        else if ( IsBusinessArea(_event) || IsBusinessAreaDSC(_event) )     
                         {
                             subsThatMatch.AddRange
                             (
                                 _datasetContext.GetAllSubscriptionsForReal().Where
                                 (w =>
                                          (w as BusinessAreaSubscription)?.BusinessAreaType == (BusinessAreaType)_event.Notification.ParentObject
-                                         && w.EventType.Description == _notificationService.FindEventTypeParent(_event.EventType).Description
+                                         && w.EventType.Description == _notificationService.FindEventTypeParent(_event.EventType).Description               //if they have a subscription to e.g. NOTIFICATION_CRITICAL and the _event is a NOTIFICATION_CRITICAL_ADD then they should still get an email
                                          && w.Interval == _datasetContext.GetInterval(interval)
 
                                 ).ToList()
@@ -201,8 +243,21 @@ namespace Sentry.data.Goldeneye
                             }
 
                         }
+                        else if (IsBusinessArea_DSC_Dataset(_event))
+                        {
+                            subsThatMatch.AddRange
+                           (
+                               _datasetContext.GetAllSubscriptionsForReal().Where
+                               (w =>
+                                        w.EventType.Description == _event.EventType.Description
+                                        && w.Interval == _datasetContext.GetInterval(interval)
 
-                        
+                               ).ToList()
+                           );
+
+                        }
+
+
 
                         foreach (Subscription ds in subsThatMatch)
                         {

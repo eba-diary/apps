@@ -25,8 +25,9 @@ namespace Sentry.data.Core
         /// </summary>
         public virtual Boolean Display { get; set; }
 
-        //AUSTIN:  this is the new column
         public virtual string Group { get; set; }
+
+        public virtual string DisplayName { get; set; }         //USED TO DISPLAY IN SUBSCRIPTION UI
 
     }
 }

@@ -66,9 +66,19 @@ namespace Sentry.data.Infrastructure
             }
 
             
-            List<Event> dsEvents = events.Where(w => w.EventType.Group == EventTypeGroup.DataSet.GetDescription()).Distinct().ToList();
+            List<Event> dsEvents = events.Where(w => w.EventType.Group == EventTypeGroup.DataSet.GetDescription()
+                                                    || w.EventType.Description == GlobalConstants.EventType.CREATED_DATASET
+                                                    || w.EventType.Description == GlobalConstants.EventType.CREATE_DATASET_SCHEMA
+                                                    || w.EventType.Description == GlobalConstants.EventType.CREATED_REPORT
+                                                ).Distinct().ToList();
+
             List<Event> baEvents = events.Where(w => w.EventType.Group == EventTypeGroup.BusinessArea.GetDescription()).Distinct().OrderBy(o => o.TimeCreated).ToList();
-            List<Event> DSCEvents = events.Where(w => w.EventType.Group == EventTypeGroup.BusinessAreaDSC.GetDescription()).Distinct().OrderBy(o => o.TimeCreated).ToList();
+            
+            List<Event> DSCEvents = events.Where(w => w.EventType.Group == EventTypeGroup.BusinessAreaDSC.GetDescription()
+                                                    && w.EventType.Description != GlobalConstants.EventType.CREATED_DATASET
+                                                    && w.EventType.Description != GlobalConstants.EventType.CREATE_DATASET_SCHEMA
+                                                    && w.EventType.Description != GlobalConstants.EventType.CREATED_REPORT
+                                                ).Distinct().OrderBy(o => o.TimeCreated).ToList();
 
 
             string header = String.Empty;
