@@ -14,14 +14,15 @@
 
         <div id="di-search-box" class="has-feedback has-feedback-left">
             <input class="form-control searchTextDS text-box single-line" type="text" id="inventorySearchText" placeholder="Search Data Inventory" value="@Model.Criteria" />
-            <i class="form-control-feedback glyphicon glyphicon-search"></i>
+            <i class="form-control-feedback glyphicon glyphicon-search clickable" data-bind="click: {}"></i>
             <i class="form-control-feedback fa fa-circle-o-notch fa-spin hidden"></i>
         </div>
     </div>
 </div>
 
 <!-- row for filters and results -->
-<div class="row">
+<div class="row di-body">
+    <!-- Left Pane Filters -->
     <div class="hidden-xs hidden-sm col-md-3" id="search-pg-filters">
         <div id="filterColumn">
             <!-- ko foreach: AllFilters -->
@@ -37,35 +38,35 @@
                     <!-- ko if: (OrderedFilters().length > 0) -->
                     <ul class="list-unstyled ul-filter-list">
                         <!-- ko if: !ShowMore -->
-                        <!-- ko foreach: OrderedFilters -->
+                        <!-- ko foreach: OrderedFilters() -->
                         <li class="list-unstyled li-filter-disabled filterList" data-bind="css: { notAllowed: Count() == 0 }">
                             <label data-bind="attr: { id: id }">
                                 <input type="checkbox" class="filterChbx" data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
                                 <strong data-bind="text : Title"></strong>
-                                <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
+                                <span class="filter-tile-count">(<!--ko text: Count()--><!--/ko-->)</span>
                             </label>
                         </li>
                         <!-- /ko -->
                         <!-- /ko -->
                         <!-- ko if: ShowMore -->
-                        <!-- ko foreach: OrderedFilters -->
+                        <!-- ko foreach: OrderedFilters() -->
                         <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6, css: { notAllowed: Count() == 0 }">
                             <label data-bind="attr: { id: id }">
                                 <input type="checkbox" class="filterChbx" data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
                                 <strong data-bind="text : Title"></strong>
-                                <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
+                                <span class="filter-tile-count">(<!--ko text: Count()--><!--/ko-->)</span>
                             </label>
                         </li>
                         <!-- /ko -->
 
                         <li data-bind="attr: {id : HiddenMore}">
-                            <!-- ko foreach: OrderedFilters -->
+                            <!-- ko foreach: OrderedFilters() -->
                             <ul class="notNested">
                                 <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6, css: { notAllowed: Count() == 0 }">
                                     <label data-bind="attr: { id: id }">
                                         <input type="checkbox" class="filterChbx" data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
                                         <strong data-bind="text : Title"></strong>
-                                        <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
+                                        <span class="filter-tile-count">(<!--ko text: Count()--><!--/ko-->)</span>
                                     </label>
                                 </li>
                             </ul>
@@ -87,10 +88,22 @@
 
             <!-- /ko -->
         </div>
-
     </div>
 
+    <!-- Active Filters & Results Body -->
     <div class="col-xs-12 col-md-9">
-        where active filters will go
+        <div class="sentry-spinner-container vertCenter">
+            <span class="sentry-spinner"></span>
+        </div>
     </div>
 </div>
+
+@section Scripts
+{
+    @Scripts.Render("~/bundles/dataTables")
+    <script type="text/javascript">
+
+        $(function () { data.DataInventory.init(); });
+
+    </script>
+}

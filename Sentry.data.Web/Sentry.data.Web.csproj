@@ -789,6 +789,7 @@
     <Content Include="js\BusinessArea.js" />
     <Content Include="js\Dale.js" />
     <Content Include="js\DataFlow.js" />
+    <Content Include="js\DataInventory.js" />
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
     <Content Include="js\Job.js" />

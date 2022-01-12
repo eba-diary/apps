@@ -14,11 +14,13 @@
     width: 50px;
 }
 
-#di-search-box {
-    
+#di-search-box a {
+    color: inherit;
 }
 
 .di-horizontal-center {
     display: flex;
     justify-content: center;
+    padding-top: 0.5em;
+    margin-bottom: 2em;
 }
