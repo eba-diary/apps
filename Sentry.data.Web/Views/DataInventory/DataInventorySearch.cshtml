@@ -6,7 +6,7 @@
     ViewBag.Fluid = true;
 }
 
-<!-- row for search bar at top -->
+<!-- Top Search Row -->
 <div class="row di-horizontal-center">
     <div class="di-search-head">
         <div class="di-head-item"><img src="~/Images/Dale/DataInventoryIcon.png" class="di-img leftFloat" /></div>
@@ -20,9 +20,9 @@
     </div>
 </div>
 
-<!-- row for filters and results -->
+<!-- Body Row -->
 <div class="row di-body">
-    <!-- Left Pane Filters -->
+    <!-- Left Pane - Filters -->
     <div class="hidden-xs hidden-sm col-md-3" id="search-pg-filters">
         <div id="filterColumn">
             <!-- ko foreach: AllFilters -->
@@ -90,7 +90,7 @@
         </div>
     </div>
 
-    <!-- Active Filters & Results Body -->
+    <!-- Body - Active Filters & Results -->
     <div class="col-xs-12 col-md-9">
         <div class="sentry-spinner-container vertCenter">
             <span class="sentry-spinner"></span>

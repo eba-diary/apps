@@ -44,20 +44,6 @@
             HeadHide: 'hide_filterType_Environment',
             OrderedFilters: () => categoryOptions
         };
-        
-        $('#dataColumn').show();
-        $('#filter-by-label').show();
-        $('#filterColumn').show();
-        $(".select2-container--default").css('width', '100%');
-
-        // have the first filter section expanded by default
-        $("#filterColumn .panel:first-child .filterViewIcon").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
-        $("#filterColumn .panel:first-child .dataset-list-filter-category").show();
-
-        // set the height of the filters <div> dynamically
-        //$("#search-pg-filters").height(
-        //    $(window).height() - $(".sentry-navbar").height() - 30
-        //);
 
         window.vm = {
             AllFilters: [category, category2],
@@ -95,5 +81,10 @@
                 $(txt).text("Show Less");
             }
         });
+        $('#filterColumn').show();
+
+        // have the first filter section expanded by default
+        $("#filterColumn .panel:first-child .filterViewIcon").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
+        $("#filterColumn .panel:first-child .dataset-list-filter-category").show();
     }
 }
