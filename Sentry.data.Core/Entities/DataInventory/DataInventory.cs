@@ -68,7 +68,7 @@ namespace Sentry.data.Core
         public bool IsSensitive { get; set; }
 
         [PropertyName("maxlength_len")]
-        public int MaxLength { get; set; }
+        public int? MaxLength { get; set; }
 
         [PropertyName("precision_len")]
         public int? Precision { get; set; }
@@ -130,7 +130,7 @@ namespace Sentry.data.Core
                 IsSensitive = IsSensitive,
                 ProdType = ProdType,
                 ColumnType = ColumnType,
-                MaxLength = MaxLength,
+                MaxLength = MaxLength ?? 0,
                 Precision = Precision ?? 0,
                 Scale = Scale ?? 0,
                 IsNullable = IsNullable ?? false,

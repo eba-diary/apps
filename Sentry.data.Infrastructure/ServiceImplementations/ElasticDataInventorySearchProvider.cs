@@ -46,47 +46,71 @@ namespace Sentry.data.Infrastructure
             {
                 //broad search for criteria across all searchable fields
                 Nest.Fields fields = NestHelper.GlobalSearchFields<DataInventory>();
-                
-                should.Add(new MultiMatchQuery()
-                {
-                    Query = dto.Criteria,
-                    Fields = fields,
-                    Fuzziness = Fuzziness.Auto
-                });
 
-                should.Add(new QueryStringQuery()
-                {
-                    Query = $"*{dto.Criteria}*",
-                    Fields = fields,
-                    AnalyzeWildcard = true
-                });
+                //split search terms regardless of amount of spaces between words
+                List<string> terms = dto.Criteria.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
-                should.Add(new MultiMatchQuery()
+                //perform cross field search when multiple words in search criteria
+                if (terms.Count > 1)
                 {
-                    Query = dto.Criteria,
-                    Fields = fields,
-                    Type = TextQueryType.CrossFields
-                });
+                    should.Add(new QueryStringQuery()
+                    {
+                        Query = string.Join(" ", terms),
+                        Fields = fields,
+                        Fuzziness = Fuzziness.Auto,
+                        Type = TextQueryType.CrossFields,
+                        DefaultOperator = Operator.And
+                    });
+
+                    should.Add(new QueryStringQuery()
+                    {
+                        Query = string.Join(" ", terms.Select(x => $"*{x}*")),
+                        Fields = fields,
+                        AnalyzeWildcard = true,
+                        Type = TextQueryType.CrossFields,
+                        DefaultOperator = Operator.And
+                    });
+                }
+                else
+                {
+                    should.Add(new QueryStringQuery()
+                    {
+                        Query = terms.First(),
+                        Fields = fields,
+                        Fuzziness = Fuzziness.Auto,
+                        Type = TextQueryType.MostFields
+                    });
+
+                    should.Add(new QueryStringQuery()
+                    {
+                        Query = $"*{terms.First()}*",
+                        Fields = fields,
+                        AnalyzeWildcard = true,
+                        Type = TextQueryType.MostFields
+                    });
+                }
 
                 minShould = 1;
             }
 
+            List<QueryContainer> filter = new List<QueryContainer>();
+
             if (dto.Sensitive == Core.GlobalEnums.DaleSensitive.SensitiveOnly)
             {
-                must.AddMatch<DataInventory>(x => x.IsSensitive, "true");
+                filter.AddMatch<DataInventory>(x => x.IsSensitive, "true");
             }
             else if (dto.Sensitive == Core.GlobalEnums.DaleSensitive.SensitiveNone)
             {
-                must.AddMatch<DataInventory>(x => x.IsSensitive, "false");
+                filter.AddMatch<DataInventory>(x => x.IsSensitive, "false");
             }
 
             if (dto.EnvironmentFilter == EnvironmentFilters.PROD)
             {
-                must.AddMatch<DataInventory>(x => x.ProdType, "P");
+                filter.AddMatch<DataInventory>(x => x.ProdType, "P");
             }
             else if (dto.EnvironmentFilter == EnvironmentFilters.NONPROD)
             {
-                must.AddMatch<DataInventory>(x => x.ProdType, "D");
+                filter.AddMatch<DataInventory>(x => x.ProdType, "D");
             }
 
             SearchRequest<DataInventory> request = new SearchRequest<DataInventory>()
@@ -95,6 +119,7 @@ namespace Sentry.data.Infrastructure
                 Query = new BoolQuery()
                 {
                     MustNot = new List<QueryContainer>() { new ExistsQuery() { Field = Infer.Field<DataInventory>(x => x.ExpirationDateTime) } },
+                    Filter = filter,
                     Must = must,
                     Should = should,
                     MinimumShouldMatch = minShould
