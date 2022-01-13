@@ -18,6 +18,7 @@ namespace Sentry.data.Core
             ChildFields = new List<BaseFieldDto>();
             Length = field.FieldLength;
             OrdinalPosition = field.OrdinalPosition;
+            DotNamePath = field.DotNamePath;
         }
 
         public BaseFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, int position, bool array)
@@ -46,6 +47,7 @@ namespace Sentry.data.Core
             OrdinalPosition = row.Position;
             Length = (Int32.TryParse(row.Length, out int x) ? x : 0);
             DeleteInd = row.DeleteInd;
+            DotNamePath = row.DotNamePath;
         }
 
         public int FieldId { get; set; }
@@ -58,6 +60,7 @@ namespace Sentry.data.Core
         public List<BaseFieldDto> ChildFields { get; set; }
         public bool IsArray { get; set; }
         public bool HasChildren { get; set; }
+        public string DotNamePath { get; set; }
 
 
         public abstract string FieldType { get; }

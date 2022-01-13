@@ -299,7 +299,6 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Detail(int id)
         {
             DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
-
             if (dto != null)
             {
                 DatasetDetailModel model = new DatasetDetailModel(dto);
@@ -586,9 +585,6 @@ namespace Sentry.data.Web.Controllers
             }
 
             DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
-            int a = dtqa.GetDataTablesResponse().data.Count();
-
-            Debug.WriteLine(a);
             
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
