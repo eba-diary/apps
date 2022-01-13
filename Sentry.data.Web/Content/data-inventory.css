@@ -24,3 +24,20 @@
     padding-top: 0.5em;
     margin-bottom: 2em;
 }
+
+.filters-category {
+    padding: 0;
+}
+
+.filters-pane {
+    vertical-align: top;
+    margin-bottom: 0px;
+    display: inline-block;
+    width: 100%;
+}
+
+.table-element-checkbox {
+    margin: auto;
+    width: 100%;
+    zoom: 1.25;
+}
