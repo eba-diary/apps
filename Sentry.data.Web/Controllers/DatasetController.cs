@@ -299,7 +299,6 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Detail(int id)
         {
             DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
-
             if (dto != null)
             {
                 DatasetDetailModel model = new DatasetDetailModel(dto);
@@ -572,6 +571,10 @@ namespace Sentry.data.Web.Controllers
 
             UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
 
+            DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(Id);
+            DatasetModel model = new DatasetModel(dto);
+
+            bool IsHr = model.CategoryNames.Contains("HR");
 
             //Query the Dataset for the following information:
             foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDatasetFileConfig(Id, x => !x.IsBundled).ToList())
@@ -580,15 +583,13 @@ namespace Sentry.data.Web.Controllers
                 {
                     CanViewFullDataset = us.CanViewFullDataset,
                     CanEditDataset = us.CanEditDataset,
-                    CanPreviewDataset = us.CanPreviewDataset
+                    CanPreviewDataset = us.CanPreviewDataset,
+                    IsHR = IsHr
                 };
                 files.Add(dfgm);
             }
 
             DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
-            int a = dtqa.GetDataTablesResponse().data.Count();
-
-            Debug.WriteLine(a);
             
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }

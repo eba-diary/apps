@@ -131,7 +131,8 @@ namespace Sentry.data.Web
                 Scale = dto.Scale.ToString(),
                 LastUpdated = dto.LastUpdatedDtm.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds,
                 DataObjectField_ID = dto.FieldId,
-                Length = dto.Length.ToString()
+                Length = dto.Length.ToString(),
+                DotNamePath = dto.DotNamePath
             };
 
             if (dto.ChildFields.Any())
