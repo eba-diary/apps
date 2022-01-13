@@ -1588,6 +1588,7 @@
              crammed with flies - and gave a dismal picture of it.
          </p>
       </div>
+      <!-- is Gebel et Toukh a mispelling of somewhere in Toukh, the city? -->
       <div xml:id="EBA-1902-03-08" type="entry">
          <dateline>
             <date when="1902-03-08">Saturday, Mar. 8</date>. 8 miles.
@@ -1600,6 +1601,7 @@
              evening.
          </p>
       </div>
+      <!-- is Gebel el Heridi a mispelling of Gabal El Haridi? -->
       <div xml:id="EBA-1902-03-09" type="entry">
          <dateline>
             Sunday - 4th in Lent - <date when="1902-03-09">Mar. 9</date>. 38 miles.
@@ -1634,7 +1636,7 @@
          </dateline>
          <p>
             When I wakened this morning, I found we were sailing finally and would soon reach
-             <placeName>Asiut</placeName> - I had two letters I wanted to write, but had only time
+             <placeName ref="#Asyut">Asiut</placeName> - I had two letters I wanted to write, but had only time
              to write in bed to <persName ref="#Newberry_Percy">Mr. Newberry</persName>, about the money for his
              publications. We stopped for mail, and then started at 10, hoping to get through the
              canal - but the wind was so strong we could only float down to a sand bank near it
@@ -1649,10 +1651,10 @@
          <p>
             We got through the canal this morning at 6 o'clock - I saw it very well from my windows
              and <persName ref="#Davis_Theodore_M">Theodore</persName> from the salon. <persName ref="#Buttles_Jeanette">
-            Nettie</persName> dressed and went on deck - it is a stupendous piece of work - this
-             great granite <orgName>Weir</orgName>, which stretches across the river. We
+             Nettie</persName> dressed and went on deck - it is a stupendous piece of work - this
+             great granite Weir, which stretches across the river. We
              came to a low sand bank in the middle of the river just below the
-             <placeName>Weir</placeName>, and have stayed here all day - the wind too high to move.
+             Weir, and have stayed here all day - the wind too high to move.
          </p>
       </div>
       <div xml:id="EBA-1902-03-14" type="entry">
@@ -1662,7 +1664,7 @@
          <p>
             We made our few miles by starting out too early for the north wind. As we were trying
              to get about one of the great turns of the river here, the <name type="boat" ref="#Scarab">
-            Scarab</name> passed us. It was too early to see any one, as we were
+             Scarab</name> passed us. It was too early to see any one, as we were
              all in bed, and I fancy they were. We have had a great change of temperature - and
              it is really cold.
          </p>
@@ -1673,8 +1675,8 @@
          </dateline>
          <p>
             We made these by starting at 4 o'clock but were laid up by the wind at a bank near the
-             town of <placeName>Hawatkah</placeName>, 4 miles from
-             <placeName>Manfalout</placeName>. Since then the wind has raged, and is
+             town of <placeName ref="#Al_Hawatkah">Hawatkah</placeName>, 4 miles from
+             <placeName ref="#Manfalût">Manfalout</placeName>. Since then the wind has raged, and is
              still roaring and whistling. S.S. "Rameses the Great" and "Tewfih" passed down - and
              the dahabeah "Hope", german flag, with a tug.
          </p>
@@ -1691,15 +1693,17 @@
              drops did fall this afternoon - but the sky is very overcast this evening.
          </p>
       </div>
+      <!-- is Sa'fa a nickname for a place? -->
+      <!-- khamseeny (khamaseen) is a dry, hot, sandy local wind affecting Egypt, so how should it be tagged? -->
       <div xml:id="EBA-1902-03-17" type="entry">
          <dateline>
             <date when="1902-03-17">Monday, Mar. 17th</date>. 35-1/2 miles.
          </dateline>
          <p>
-            Our best day - got away early from the landing near <placeName>
-            Manfalout</placeName> - and rowing and sailing brought up here at <placeName>
-            Mellawie</placeName> at 7 o'clock. The wind came lightly from the south this afternoon
-             - got past the <persName>Gebel Abu-Feda</persName> by 11 o'clock, in
+            Our best day - got away early from the landing near <placeName ref="#Manfalût">
+             Manfalout</placeName> - and rowing and sailing brought up here at <placeName ref="#Mallawi">
+             Mellawie</placeName> at 7 o'clock. The wind came lightly from the south this afternoon
+             - got past the <persName ref="#Gebel_Abu_Foda">Gebel Abu-Feda</persName> by 11 o'clock, in
              fortunately quiet weather. Came across the "<placeName>Sa'fa</placeName>"
              hard and fast upon the sand at one o'clock - dropped anchor and sent our men across to
              help them, and in less than an hour they were off. The day has been a great contrast
@@ -1710,10 +1714,10 @@
              us smoothly and mysteriously along, the flocks and herds all coming down to the river
              for their last drink, the little kids and lambs now so plentiful, crying out like
              babies - "and all the land had rest". It was a heavenly evening. <persName ref="#Davis_Theodore_M">
-            Theodore</persName> has sent a man across the fields to the R.R. station, with a
-             telegram for <persName ref="#Quibell_Annie_Pirie">Mrs. Quibell</persName> at <placeName ref="#Jirjā">
-            Girga</placeName>, asking her to join us at <placeName>
-            Minia</placeName>, day after tomorrow.
+             Theodore</persName> has sent a man across the fields to the R.R. station, with a
+             telegram for <persName ref="#Quibell_Annie_Pirie">Mrs. Quibell</persName> at <placeName ref="#Al_Minya">
+             Girga</placeName>, asking her to join us at <placeName>
+             Minia</placeName>, day after tomorrow.
          </p>
       </div>
       <div xml:id="EBA-1902-03-18" type="entry">
@@ -1743,7 +1747,7 @@
          </dateline>
          <p>
             Made our few miles before 9:30 - when the north wind fell suddenly upon us, and has
-             raged ever since. We are within a mile of <placeName>Minia</placeName>, and sent
+             raged ever since. We are within a mile of <placeName ref="#Al_Minya">Minia</placeName>, and sent
              the <persName>Dervish</persName> in the town for our mail and with a note for
              <persName ref="#Quibell_Annie_Pirie">Mrs. Quibell</persName>, hoping she was waiting there; but a letter from
              her stated she had gone back to <placeName ref="#Cairo">Cairo</placeName>, but would join us
