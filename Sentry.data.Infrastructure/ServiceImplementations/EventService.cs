@@ -59,7 +59,7 @@ namespace Sentry.data.Infrastructure
         }
 
         //GET CONFIGID AND CREATE A REASON FOR EVENT
-        private int GetConfigIdAndReason(string eventType, int datasetId, int schemaId, ref int configId, ref string reason)
+        private void GetConfigIdAndReason(string eventType, int datasetId, int schemaId, ref int configId, ref string reason)
         {
             configId = 0;
 
@@ -92,8 +92,6 @@ namespace Sentry.data.Infrastructure
                     configId = (dfc == null) ? 0 : dfc.ConfigId;
                 }
             }
-
-            return configId;
         }
 
         //CREATE A DETAILED REASON HERE ONE TIME SO THIS CAN BE USED BY DataFeedProvider and EmailService
