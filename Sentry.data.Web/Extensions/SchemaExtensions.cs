@@ -73,7 +73,8 @@ namespace Sentry.data.Web
                 Precision = dto.Precision,
                 Scale = dto.Scale,
                 SourceFormat = (dto.FieldType.ToUpper() == Core.SchemaDatatypes.TIMESTAMP.ToString() || dto.FieldType.ToUpper() == Core.SchemaDatatypes.DATE.ToString()) ? SetFieldDefaults(dto.FieldType, dto.SourceFormat) : dto.SourceFormat,
-                Length = dto.Length
+                Length = dto.Length,
+                DotNamePath = dto.DotNamePath
             };
 
             if (dto.ChildFields.Any())

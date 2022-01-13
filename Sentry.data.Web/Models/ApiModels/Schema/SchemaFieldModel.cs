@@ -21,5 +21,6 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public int OrdinalPosition { get; set; }
         public string Description { get; set; }
         public int Length { get; set; }
+        public string DotNamePath { get; set; }
     }
 }
