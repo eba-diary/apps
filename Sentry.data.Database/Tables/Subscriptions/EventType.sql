@@ -4,5 +4,6 @@
 	[Description] [varchar](1024) NOT NULL,
 	[Severity] INT NOT NULL, 
     [Display_IND] BIT NOT NULL,
-	[Group_CDE] [varchar](60) NULL
+	[Group_CDE] [varchar](60) NULL,
+	[DisplayName] [varchar](150) NULL
 )
