@@ -83,43 +83,21 @@ namespace Sentry.data.Goldeneye
         //DETERMINE IF BUSINESSAREA PL
         private static bool IsBusinessArea(Event e)
         {
-            if(e.EventType.Group == EventTypeGroup.BusinessArea.GetDescription()  && e.Notification != null)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return (e.EventType.Group == EventTypeGroup.BusinessArea.GetDescription() && e.Notification != null);
         }
 
         //DETERMINE IF BUSINESSAREA DSC : these will have a group = BUSINESSAREA_DSC and a valid Notification
         private static bool IsBusinessAreaDSC(Event e)
         {
-            
-            if( e.EventType.Group == EventTypeGroup.BusinessAreaDSC.GetDescription() && e.Notification != null)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+
+            return (e.EventType.Group == EventTypeGroup.BusinessAreaDSC.GetDescription() && e.Notification != null);
         }
 
         //DETERMINE IF BUSINESSAREA DSC : these will have a group = BUSINESSAREA_DSC but will be EventTypes related to DATASET Events
         private static bool IsBusinessArea_DSC_Dataset(Event e)
         {
-            if(    e.EventType.Group == EventTypeGroup.BusinessAreaDSC.GetDescription() 
-                    &&  (e.EventType.Description == GlobalConstants.EventType.CREATED_DATASET || e.EventType.Description == GlobalConstants.EventType.CREATE_DATASET_SCHEMA || e.EventType.Description == GlobalConstants.EventType.CREATED_REPORT)
-            )
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return (e.EventType.Group == EventTypeGroup.BusinessAreaDSC.GetDescription()
+                    && (e.EventType.Description == GlobalConstants.EventType.CREATED_DATASET || e.EventType.Description == GlobalConstants.EventType.CREATE_DATASET_SCHEMA || e.EventType.Description == GlobalConstants.EventType.CREATED_REPORT));
         }
 
         public static void Run(string interval)
