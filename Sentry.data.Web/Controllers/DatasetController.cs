@@ -571,10 +571,6 @@ namespace Sentry.data.Web.Controllers
 
             UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
 
-            DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(Id);
-            DatasetModel model = new DatasetModel(dto);
-
-            bool IsHr = model.CategoryNames.Contains("HR");
 
             //Query the Dataset for the following information:
             foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDatasetFileConfig(Id, x => !x.IsBundled).ToList())
@@ -583,8 +579,7 @@ namespace Sentry.data.Web.Controllers
                 {
                     CanViewFullDataset = us.CanViewFullDataset,
                     CanEditDataset = us.CanEditDataset,
-                    CanPreviewDataset = us.CanPreviewDataset,
-                    IsHR = IsHr
+                    CanPreviewDataset = us.CanPreviewDataset
                 };
                 files.Add(dfgm);
             }
