@@ -1,0 +1,99 @@
+﻿
+// Form inputs (to support types: color, datetime, month
+.input-group-prepend, .input-group-append {
+    padding: 0.375rem 0.75rem;
+    align-items: center;
+}
+
+input[type=color],
+input[type=datetime],
+input[type=month],
+input[type=week] {
+    // General Styles
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid $input-border-color;
+    border-radius: 0;
+    outline: none;
+    height: 2.1rem;
+    width: 100%;
+    font-size: 1rem;
+    box-shadow: none;
+    $input-box-sizing: content-box;
+    -webkit-box-sizing: $input-box-sizing;
+    -moz-box-sizing: $input-box-sizing;
+    box-sizing: $input-box-sizing;
+    transition: all .3s;
+    // Disabled input style
+    &:disabled,
+    &:disabled,
+    &[readonly="readonly"] {
+        color: $input-disabled-color;
+        border-bottom: 1px dotted $input-disabled-color;
+        background-color: transparent;
+    }
+    // Disabled label style
+    &:disabled + label,
+    &[readonly="readonly"] + label {
+        color: $input-disabled-color;
+        background-color: transparent;
+    }
+    // Focused input style
+    &:focus:not([readonly]) {
+        border-bottom: 1px solid $input-focus-color;
+        box-shadow: 0 1px 0 0 $input-focus-color;
+    }
+    // Focused label style
+    &:focus:not([readonly]) + label {
+        color: $input-focus-color;
+    }
+    // Valid Input Style
+    &.valid,
+    &:focus.valid {
+        border-bottom: 1px solid $input-success-color;
+        box-shadow: 0 1px 0 0 $input-success-color;
+    }
+    // Custom Success Message
+    &.valid + label:after,
+    &:focus.valid + label:after {
+        content: attr(data-success);
+        color: $input-success-color;
+        opacity: 1;
+    }
+    // Invalid Input Style
+    &.invalid,
+    &:focus.invalid {
+        border-bottom: 1px solid $input-error-color;
+        box-shadow: 0 1px 0 0 $input-error-color;
+    }
+    // Custom Error message
+    &.invalid + label:after,
+    &:focus.invalid + label:after {
+        content: attr(data-error);
+        color: $input-error-color;
+        opacity: 1;
+    }
+    // Form Message Shared Styles
+    & + label:after {
+        display: block;
+        content: "";
+        position: absolute;
+        top: 65px;
+        opacity: 0;
+        transition: .2s opacity ease-out, .2s color ease-out;
+    }
+
+    &.input-alternate {
+        padding: 0 15px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .2), 0 1px 1px 0 rgba(0, 0, 0, .14), 0 2px 1px -1px rgba(0, 0, 0, .12);
+        font-size: 0.875rem;
+        border-bottom: 0;
+        transition: none !important;
+
+        &:hover,
+        &:focus {
+            box-shadow: 0 3px 8px 0 rgba(0, 0, 0, .2), 0 0 0 1px rgba(0, 0, 0, .08) !important;
+            border-bottom: 0;
+        }
+    }
+}

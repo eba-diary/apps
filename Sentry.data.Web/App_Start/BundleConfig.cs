@@ -112,7 +112,7 @@ namespace Sentry.data.Web
             //This bundle contains styles that override everything else, and must come after all other css includes
             bundles.Add(new StyleBundle("~/bundles/css/site").
                  Include("~/Content/bootstrap-datetimepicker.css", new CssRewriteUrlTransform()).
-                        Include("~/Content/sentry-internal.min.css", new CssRewriteUrlTransform()).
+                        Include("~/Content/sentry-styles.min.css", new CssRewriteUrlTransform()).
                         Include("~/Content/toastr.min.css").
                         Include("~/Content/query-builder.default.min.css").
                         Include("~/Content/query-tool.css").
