@@ -13,6 +13,8 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult Search(FilterSearchModel searchModel)
         {
+            searchModel.PageTitle = "Data Inventory";
+            searchModel.IconPath = "~/Images/Dale/DataInventoryIcon.png";
             searchModel.FilterCategories = new List<FilterCategoryModel>()
             {
                 new FilterCategoryModel()

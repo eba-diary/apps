@@ -9,8 +9,8 @@
 <!-- Top Search Row -->
 <div class="row di-horizontal-center">
     <div class="di-search-head">
-        <div class="di-head-item"><img src="~/Images/Dale/DataInventoryIcon.png" class="di-img leftFloat" /></div>
-        <div class="di-head-item"><h1 class="htCenter datasetHeader">Data Inventory</h1></div>
+        <div class="di-head-item"><img src="@Model.IconPath" class="di-img leftFloat" /></div>
+        <div class="di-head-item"><h1 class="htCenter datasetHeader">@Model.PageTitle</h1></div>
 
         <div id="di-search-box" class="has-feedback has-feedback-left">
             <input class="form-control searchTextDS text-box single-line" type="text" id="inventorySearchText" placeholder="Search Data Inventory" value="@Model.SearchText" />
