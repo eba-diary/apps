@@ -114,7 +114,6 @@
             $(this).show();
         });
 
-        $("#di-result-spinner").hide();
         $("#daleContainer").show();
         $("#filterColumn").show();
     },

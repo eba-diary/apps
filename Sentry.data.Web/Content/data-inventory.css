@@ -29,7 +29,7 @@
     padding: 0;
 }
 
-.filters-pane {
+.search-filter-categories-container {
     vertical-align: top;
     margin-bottom: 0px;
     display: inline-block;
@@ -41,3 +41,4 @@
     width: 100%;
     zoom: 1.25;
 }
+

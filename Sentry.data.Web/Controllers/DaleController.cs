@@ -7,17 +7,15 @@ using System.Web.Mvc;
 namespace Sentry.data.Web.Controllers
 {
 
-    public class DaleController : BaseController
+    public class DaleController : BaseDataInventoryController
     {
         #region Fields
-        private readonly IDataFeatures _featureFlags;
         private readonly IDaleService _daleService;
         #endregion
 
         #region Constructor
-        public DaleController(IDataFeatures featureFlags, IDaleService daleService)
+        public DaleController(IDataFeatures featureFlags, IDaleService daleService) : base(featureFlags)
         {
-            _featureFlags = featureFlags;
             _daleService = daleService;
         }
         #endregion
@@ -26,13 +24,13 @@ namespace Sentry.data.Web.Controllers
         //ALLOWED TARGETS=entity,column,SAID
         //https://localhost.sentry.com:44371/DataInventory/Search/?target=column&search=weather&filter=ssn
         //https://localhost.sentry.com:44371/DataInventory/Search/?target=said&search=CODS
-        [Route("DataInventory/Search/")]
+        //[Route("DataInventory/Search/")]
         public ActionResult DaleSearch(string target=null, string search=null, string filter=null)
         {
             DaleSearchModel searchModel = new DaleSearchModel
             {
-                CanDaleSensitiveView = CanDaleSensitiveView(),
-                CanDaleSensitiveEdit = CanDaleSensitiveEdit(),
+                CanDaleSensitiveView = CanViewSensitive(),
+                CanDaleSensitiveEdit = CanEditSensitive(),
                 DaleAdvancedCriteria = new DaleAdvancedCriteriaModel(),
                 CLA3550_DATA_INVENTORY_NEW_COLUMNS = _featureFlags.CLA3550_DATA_INVENTORY_NEW_COLUMNS.GetValue(),
                 CLA3707_UsingSQLSource = UsingSqlSource()
@@ -84,8 +82,8 @@ namespace Sentry.data.Web.Controllers
             DaleSearchModel searchModel = new DaleSearchModel
             {
                 Criteria = searchCriteria,
-                CanDaleSensitiveView = CanDaleSensitiveView(),
-                CanDaleSensitiveEdit = CanDaleSensitiveEdit(),
+                CanDaleSensitiveView = CanViewSensitive(),
+                CanDaleSensitiveEdit = CanEditSensitive(),
                 CLA3707_UsingSQLSource = UsingSqlSource()
             };
 
@@ -125,7 +123,7 @@ namespace Sentry.data.Web.Controllers
             }
 
             //DO NOT perform search if invalid criteria OR sensitive and they lack permissions. NOTE: if they lack permissions, VIEW hides ability to even click sensitive link
-            if (!IsCriteriaValid(searchModel) || ( sensitive && !CanDaleSensitiveView() ) )            
+            if (!IsCriteriaValid(searchModel) || ( sensitive && !CanViewSensitive() ) )            
             {
                 searchModel.DaleResultModel = new DaleResultModel
                 {
@@ -141,19 +139,6 @@ namespace Sentry.data.Web.Controllers
             result.MaxJsonLength = Int32.MaxValue;  //need to set MaxJsonLength to avoid 500 exceptions because of large json coming back since we are doing client side for max performance
 
             return result;
-        }
-
-        [HttpGet]
-        //method called by dale.js to return whether user can edit IsSensitive IND
-        public JsonResult GetCanDaleSensitive()
-        {
-            return Json(new
-            {
-                canDaleSensitiveEdit = CanDaleSensitiveEdit(),
-                canDaleOwnerVerifiedEdit = CanDaleOwnerVerifiedEdit(),
-                canDaleSensitiveView = CanDaleSensitiveView(),
-                CLA3707_UsingSQLSource = UsingSqlSource()
-            }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -191,43 +176,6 @@ namespace Sentry.data.Web.Controllers
             }
 
             return true;
-        }
-
-        private bool CanDaleSensitiveView()
-        {
-            if (!SharedContext.CurrentUser.CanDaleSensitiveView)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private bool CanDaleSensitiveEdit()
-        {
-            if( SharedContext.CurrentUser.CanDaleSensitiveEdit || SharedContext.CurrentUser.IsAdmin )
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private bool CanDaleOwnerVerifiedEdit()
-        {
-            if ((_featureFlags.Dale_Expose_EditOwnerVerified_CLA_1911.GetValue() && SharedContext.CurrentUser.CanDaleOwnerVerifiedEdit)
-                || SharedContext.CurrentUser.IsAdmin
-              )
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private bool UsingSqlSource()
-        {
-            return _featureFlags.CLA3707_DataInventorySource.GetValue() == "SQL";
         }
         #endregion
     }

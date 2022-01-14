@@ -1,5 +1,5 @@
 ﻿@using Sentry.data.Web;
-@model DaleSearchModel
+@model FilterSearchModel
 
 @{
     ViewBag.Title = "Data Inventory";
@@ -13,7 +13,7 @@
         <div class="di-head-item"><h1 class="htCenter datasetHeader">Data Inventory</h1></div>
 
         <div id="di-search-box" class="has-feedback has-feedback-left">
-            <input class="form-control searchTextDS text-box single-line" type="text" id="inventorySearchText" placeholder="Search Data Inventory" value="@Model.Criteria" />
+            <input class="form-control searchTextDS text-box single-line" type="text" id="inventorySearchText" placeholder="Search Data Inventory" value="@Model.SearchText" />
             <i class="form-control-feedback glyphicon glyphicon-search clickable" data-bind="click: {}"></i>
             <i class="form-control-feedback fa fa-circle-o-notch fa-spin hidden"></i>
         </div>
@@ -22,19 +22,25 @@
 
 <!-- Body Row -->
 <div class="row di-body">
-    <!-- Left Pane - Filters() -->
+    <!-- Filters -->
     <div class="hidden-xs hidden-sm col-md-3" id="search-pg-filters">
+        <!-- Title, Badges & Clear-->
+        <div class="search-filter-title-container">
+            <div class="search-filter-title">Filter</div>
+            <a href="#" id="search-filter-clear">Clear All</a>
+        </div>
+
         <div id="filterColumn" class="display-none">
             <!-- ko foreach: { data: FilterCategories, as: 'category' } -->
-            <div class="panel panel-default filters-pane">
+            <div class="panel panel-default search-filter-categories-container">
                 <div class="panel-heading filterHead" data-bind="attr: { id: category.HeadId }">
                     <span class="filterCategoryName" data-bind="text: category.Name"></span>
                     <span class="glyphicon glyphicon-chevron-down rightFloat filterViewIcon" data-bind="attr: { id: category.HeadIcon }"></span>
                 </div>
 
                 <div class="filters-category panel-body display-none" data-bind="attr: {id : category.HeadHide }">
-                    <!-- ko foreach: { data: category.FilterCategoryOptions, as: 'option' } -->
                     <ul class="list-unstyled ul-filter-list">
+                        <!-- ko foreach: { data: category.FilterCategoryOptions, as: 'option' } -->
                         <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6, css: { notAllowed: option.Count == 0 }">
                             <label data-bind="attr: { id: option.id }">
                                 <input type="checkbox" class="filterChbx" data-bind="value: option.id, checked: option.DefaultSelected, attr: { id: option.id, disabled: option.Count == 0 }" />
@@ -43,9 +49,10 @@
                             </label>
                         </li>
 
+                        <!-- ko if: $index() >= 6 -->
                         <li data-bind="attr: { id : category.HiddenMore }">
                             <ul class="notNested">
-                                <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6, css: { notAllowed: option.Count == 0 }">
+                                <li class="list-unstyled li-filter-disabled filterList" data-bind="css: { notAllowed: option.Count == 0 }">
                                     <label data-bind="attr: { id: option.id }">
                                         <input type="checkbox" class="filterChbx" data-bind="value: option.id, checked: option.DefaultSelected, attr: { id: option.id, disabled: option.Count == 0 }" />
                                         <strong data-bind="text: option.Title"></strong>
@@ -54,8 +61,9 @@
                                 </li>
                             </ul>
                         </li>
+                        <!-- /ko -->
+                        <!-- /ko -->
                     </ul>
-                    <!-- /ko -->
 
                     <!-- ko if: (category.FilterCategoryOptions.length > 6) -->
                     <a href="#" class="filterMore" data-bind="attr: { id: category.HiddenId}">
@@ -73,24 +81,7 @@
 
     <!-- Body - Active Filters & Results -->
     <div class="col-sm-12 col-md-9">
-        <div>
-            <h4 class="found">
-                Active Filters:
-                <button type="button" class="btn btn-sm btn-primary" id="btnClearFilters" data-bind="">Clear Filters</button>
-            </h4>
-
-            <select multiple="" class="form-control select2-hidden-accessible" id="filterSelector" name="filterSelector" tabindex="-1" aria-hidden="true" data-bind="foreach: { data: FilterCategories, as: 'category' }">
-                <optgroup data-bind="attr: {label: category.Name}, foreach: { data: category.FilterCategoryOptions, as: 'option' }">
-                    <option data-bind="value: option.id, text: option.Title"></option>
-                </optgroup>
-            </select>
-        </div>
-
-        <div id="di-result-spinner" class="sentry-spinner-container vertCenter">
-            <span class="sentry-spinner"></span>
-        </div>
-
-        @Html.Partial("~/Views/Dale/DaleResult.cshtml", Model)
+        @Html.Partial("~/Views/Dale/DaleResult.cshtml", true)
     </div>
 </div>
 
@@ -100,6 +91,6 @@
     <script type="text/javascript">
 
         $(function () { data.DataInventory.init(); });
-
+        0]\
     </script>
 }
