@@ -1,0 +1,114 @@
+﻿@using Sentry.data.Web;
+@model FilterSearchModel
+
+@{
+    ViewBag.Title = "Data Inventory";
+    ViewBag.Fluid = true;
+}
+
+<!-- Top Search Row -->
+<div class="row search-horizontal-center">
+    <div class="search-head">
+        <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" /></div>
+        <div class="search-head-item"><h1 class="datasetHeader">@Model.PageTitle</h1></div>
+
+        <div id="search-box" class="has-feedback has-feedback-left">
+            <input class="form-control searchTextDS text-box single-line" type="text" id="inventorySearchText" placeholder="Search @Model.PageTitle" value="@Model.SearchText" />
+            <i class="form-control-feedback glyphicon glyphicon-search clickable"></i>
+            <i class="form-control-feedback fa fa-circle-o-notch fa-spin hidden"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Body Row -->
+<div class="filter-search-body">
+    <!-- Filters -->
+    <div class="filter-search-container">
+        <!-- Title & Clear-->
+        <div class="filter-search-title-container">
+            <h1 class="filter-search-title">Filter</h1>
+            <a href="#" id="filter-search-clear">Clear All</a>
+        </div>
+        <!-- Title & Clear - End -->
+
+        <!-- Badges -->
+        @*<div class="">
+            <button type="button" class="btn btn-sm btn-primary" id="btnClearFilters" data-bind="click: clearFilters, enable: SelectedFilters().length !== 0">Clear Filters</button>
+        </div>*@
+        <!-- Badges - End -->
+
+        <!-- Categories -->
+        <div class="filter-search-categories display-none">
+            @foreach (FilterCategoryModel category in Model.FilterCategories)
+            {
+                IEnumerable<FilterCategoryOptionModel> options = category.CategoryOptions.OrderBy(o => o.OptionName).OrderByDescending(o => o.DefaultSelected);
+                string categoryTypeId = "categoryType_" + category.CategoryName.Replace(" ", "_");
+                string categoryMoreId = "categoryMore_" + category.CategoryName.Replace(" ", "_");
+
+                <div class="filter-search-category-container">
+                    <div class="filter-search-category-head" id="@categoryTypeId">
+                        <span class="">@category.CategoryName</span>
+                        <span class="glyphicon glyphicon-chevron-down" id="icon_@categoryTypeId"></span>
+                    </div>
+
+                    <div class="filter-search-category-options" id="hide_@categoryTypeId">
+                        <ul class="list-unstyled">
+                            @foreach (FilterCategoryOptionModel option in options.Take(5).ToList())
+                            {
+                                if (option.ResultCount > 0)
+                                {
+                                    <li class="filter-search-category-option">
+                                        <label id="@option.OptionId">
+                                            <input type="checkbox" class="filter-search-category-option-checkbox" id="@option.OptionId" value="@option.OptionId" checked="@option.DefaultSelected" />
+                                            <strong>@option.OptionName</strong>
+                                            <span>(@option.ResultCount)</span>
+                                        </label>
+                                    </li>
+                                }
+                            }
+                            
+                            <li class="display-none" id="hidden_@categoryMoreId">
+                                <ul class="notNested">
+                                    @foreach (FilterCategoryOptionModel option in options.Skip(5).ToList())
+                                    {
+                                        <li class="filter-search-category-option">
+                                            <label id="@option.OptionId">
+                                                <input type="checkbox" class="filter-search-category-option-checkbox" id="@option.OptionId" value="@option.OptionId" checked="@option.DefaultSelected" />
+                                                <strong>@option.OptionName</strong>
+                                                <span>(@option.ResultCount)</span>
+                                            </label>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        </ul>
+
+                        @if (category.CategoryOptions.Count >= 6)
+                        {
+                            <a href="#" class="filter-search-category-more" id="@categoryMoreId">Show More</a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        <!-- Categories - End -->
+    </div>
+    <!-- Filters - End -->
+
+    <!-- Active Filters & Results -->
+    <div class="filter-search-results-container">
+        @Html.Partial("~/Views/Dale/DaleResult.cshtml", true)
+    </div>
+    <!-- Active Filters & Results - End -->
+</div>
+<!-- Body Row - End -->
+
+@section Scripts
+{
+    @Scripts.Render("~/bundles/dataTables")
+    <script type="text/javascript">
+
+        $(function () { data.FilterSearch.init(); });
+        
+    </script>
+}

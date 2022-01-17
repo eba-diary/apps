@@ -617,7 +617,7 @@
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.min.css" />
     <Content Include="Content\dale.css" />
-    <Content Include="Content\data-inventory.css" />
+    <Content Include="Content\filter-search.css" />
     <Content Include="Content\dataflow.css" />
     <Content Include="Content\dataset-detail.css" />
     <Content Include="Content\datasets.css" />
@@ -795,7 +795,7 @@
     <Content Include="js\BusinessArea.js" />
     <Content Include="js\Dale.js" />
     <Content Include="js\DataFlow.js" />
-    <Content Include="js\DataInventory.js" />
+    <Content Include="js\FilterSearch.js" />
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
     <Content Include="js\Job.js" />
@@ -1653,7 +1653,7 @@
     <Content Include="Views\Dataset\Details\_DataPreview.cshtml" />
     <Content Include="Views\Dataset\Details\_DataFiles.cshtml" />
     <Content Include="Views\Home\_FeedEmpty.cshtml" />
-    <Content Include="Views\DataInventory\Search.cshtml" />
+    <Content Include="Views\Search\FilterSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

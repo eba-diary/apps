@@ -1,11 +1,5 @@
-﻿data.DataInventory = {
+﻿data.FilterSearch = {
     init: function () {
-
-        var viewModel = {
-            FilterCategories: this.initFilters()
-        }
-
-        ko.applyBindings(viewModel);
 
         this.initEvents();
         this.initDataTable();
@@ -13,70 +7,8 @@
         this.initUserInterface();
     },
 
-    initFilters: function() {
-        var sensitiveOptions = [];
-
-        sensitiveOptions.push({
-            id: 1,
-            Title: "Sensitive",
-            Count: 3,
-            DefaultSelected: false
-        });
-
-        sensitiveOptions.push({
-            id: 2,
-            Title: "Public",
-            Count: 10,
-            DefaultSelected: false
-        });
-
-        var category = {
-            Name: "Sensitivity",
-            Sequence: 1,
-            FilterCategoryOptions: sensitiveOptions,
-            HiddenId: 'filterMore_Sensitivity',
-            HiddenMore: 'hidden_filterMore_Sensitivity',
-            IconMore: 'icon_filterMore_Sensitivity',
-            TxtMore: 'txt_filterMore_Sensitivity',
-            HeadId: 'filterType_Sensitivity',
-            HeadIcon: 'icon_filterType_Sensitivity',
-            HeadHide: 'hide_filterType_Sensitivity'
-        };
-
-        var environmentOptions = [];
-
-        environmentOptions.push({
-            id: 1,
-            Title: "Prod",
-            Count: 3,
-            DefaultSelected: true
-        });
-
-        environmentOptions.push({
-            id: 2,
-            Title: "NonProd",
-            Count: 10,
-            DefaultSelected: false
-        });
-
-        var category2 = {
-            Name: "Environment",
-            Sequence: 2,
-            FilterCategoryOptions: environmentOptions,
-            HiddenId: 'filterMore_Environment',
-            HiddenMore: 'hidden_filterMore_Environment',
-            IconMore: 'icon_filterMore_Environment',
-            TxtMore: 'txt_filterMore_Environment',
-            HeadId: 'filterType_Environment',
-            HeadIcon: 'icon_filterType_Environment',
-            HeadHide: 'hide_filterType_Environment'
-        };
-
-        return [category, category2];
-    },
-
     initEvents: function () {
-        $(document).on("click", "[id^='filterType_']", function (e) {
+        $(document).on("click", "[id^='categoryType_']", function (e) {
             e.preventDefault();
 
             var id = $(this).attr("id");
@@ -87,35 +19,32 @@
             $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
         });
 
-        $(document).on("click", "[id^='filterMore_']", function (e) {
+        $(document).on("click", "[id^='categoryMore_']", function (e) {
             e.preventDefault();
 
             var id = $(this).attr("id");
             var show = "#hidden_" + id
-            var icon = "#icon_" + id;
-            var txt = "#txt_" + id;
 
             $(show).slideToggle();
-            $(icon).toggleClass("glyphicon-plus-sign glyphicon-minus-sign");
 
-            if ($(txt).text() === "Show Less") {
-                $(txt).text("Show More");
+            if ($(this).text() === "Show Less") {
+                $(this).text("Show More");
             }
             else {
-                $(txt).text("Show Less");
+                $(this).text("Show Less");
             }
         });
     },
 
     initUserInterface: function () {
         //open all filters with a filter checked
-        $('.filterChbx:checkbox:checked').closest('.filters-category').each(function () {
+        $('.filter-search-category-option-checkbox:checkbox:checked').closest('.filter-search-category-options').each(function () {
             $('#' + this.id.replace("hide", "icon")).removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
             $(this).show();
         });
 
         $("#daleContainer").show();
-        $("#filterColumn").show();
+        $(".filter-search-categories").show();
     },
 
     initDataTable: function () {
@@ -174,9 +103,9 @@
                         //the key piece here is including a label with text to indicate whether IsSensitive column is true or false so the filtering works
                         //Since I did not want user to see label text and still have a filter.  My cheat to this was to style label with display:none while still keeping the filtering ability
                         //later on when they check/uncheck the box my editRow() function will refresh the data associated with the grid which changes the label hidden text to the opposite so filtering can refresh
-                        { data: null, className: "IsSensitive", visible: false, render: (d) => data.DataInventory.getTableElementCheckbox(!obj.canDaleSensitiveEdit || (obj.canDaleSensitiveEdit && !obj.canDaleOwnerVerifiedEdit && d.IsOwnerVerified) || !obj.CLA3707_UsingSQLSource, d.IsSensitive) },
+                        { data: null, className: "IsSensitive", visible: false, render: (d) => data.FilterSearch.getTableElementCheckbox(!obj.canDaleSensitiveEdit || (obj.canDaleSensitiveEdit && !obj.canDaleOwnerVerifiedEdit && d.IsOwnerVerified) || !obj.CLA3707_UsingSQLSource, d.IsSensitive) },
                         //OWNER VERIFIED CHECKBOX
-                        { data: null, className: "IsOwnerVerified", visible: false, render: (d) => data.DataInventory.getTableElementCheckbox(!obj.canDaleOwnerVerifiedEdit, d.IsOwnerVerified) },
+                        { data: null, className: "IsOwnerVerified", visible: false, render: (d) => data.FilterSearch.getTableElementCheckbox(!obj.canDaleOwnerVerifiedEdit, d.IsOwnerVerified) },
                         { data: "ProdType", className: "ProdType", visible: false },
                         { data: "ColumnType", className: "ColumnType", visible: false },
                         { data: "MaxLength", className: "MaxLength", visible: false },
@@ -230,11 +159,11 @@
         var cellValue = 'false';
 
         if (isDisabled) {
-            disabled = 'disabled="disabled" ';
+            disabled = 'disabled ';
         }
 
         if (isChecked) {
-            checked = 'checked="checked" ';
+            checked = 'checked ';
             cellValue = 'true';
         }
 
@@ -242,11 +171,9 @@
     },
 
     initActiveFilters: function () {
-        $("#filterSelector").select2({
-            selectOnClose: false,
-            closeOnSelect: false,
-            templateSelection: formatTag,
-            placeholder: "There are no active filters.  Pick an option to the left or click here to begin filtering.",
+        $("#filter-search-option-selector").select2({
+            width: '100%',
+            allowClear: true
         });
 
         //This is fed into the Select2 Box to format tags.

@@ -58,7 +58,7 @@ namespace Sentry.data.Web.Controllers
                         {
                             OptionId = "3",
                             OptionName = "Dev",
-                            ResultCount = 0
+                            ResultCount = 2
                         },
                         new FilterCategoryOptionModel()
                         {
@@ -77,12 +77,18 @@ namespace Sentry.data.Web.Controllers
                             OptionId = "6",
                             OptionName = "Beta",
                             ResultCount = 1
+                        },
+                        new FilterCategoryOptionModel()
+                        {
+                            OptionId = "7",
+                            OptionName = "Local",
+                            ResultCount = 1
                         }
                     }
                 }
             };
 
-            return View(searchModel);
+            return View("~/Views/Search/FilterSearch.cshtml", searchModel);
         }
     }
 }
