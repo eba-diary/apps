@@ -70,14 +70,17 @@ data.Dataset = {
                 });
                 d = d.toLocaleString("en-us", { month: "long" }) + ' ' + d.getDate() + ', ' + d.getFullYear();
                 $('#sessionSpinner').hide();
+                $('#metadataNoneMessage').hide();
                 return d;
             }
             else if (self.NoColumnsReturned()) {
                 $('#sessionSpinner').hide();
+                $('#metadataNoneMessage').hide();
                 return null;
             }
             else {
                 $('#sessionSpinner').show();
+                $('#metadataNoneMessage').show();
             }
         });
 
