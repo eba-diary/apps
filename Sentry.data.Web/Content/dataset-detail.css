@@ -104,3 +104,10 @@
 #datasetDetailTabs {
     position: relative;
 }
+
+.datasetMetadataBoxHr {
+    display: block;
+    width: 100%;
+    clear: both;
+    border-top: 1px solid #e6e6e6;
+}

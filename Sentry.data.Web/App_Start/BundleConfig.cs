@@ -33,13 +33,10 @@ namespace Sentry.data.Web
 
             //This bundle contains basic bootstrap stuff and some common plugins specific to bootstrap
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").
-                        Include("~/Scripts/bootstrap.js").
+                        Include("~/Scripts/MDB/mdb.js").
+                        Include("~/Scripts/bootstrap.bundle.js").
                         Include("~/Scripts/respond.js").
                         Include(dataTablesScriptsDirectory + "/moment.js").
-                        Include("~/Scripts/bootstrap-datepicker.js").
-                        Include("~/Scripts/bootstrap-datetimepicker.js").
-                        Include("~/Scripts/bootstrap-datetimepicker.min.js").
-                        Include("~/Scripts/bootstrap-submenu.js").
                         Include("~/Scripts/typeahead.bundle.js").
                         Include("~/Scripts/sentry.associates.js").
                         Include("~/Scripts/sentry.common.js"));
@@ -52,25 +49,20 @@ namespace Sentry.data.Web
 
             //This bundle contains scripts needed for DataTables and related plugins
             bundles.Add(new ScriptBundle("~/bundles/dataTables").
-
-                        //DataTable Buttons required
-                        Include(dataTablesScriptsDirectory + "/jquery.dataTables.js").          //required for DataTable COLVIS
-                        Include(dataTablesScriptsDirectory + "/dataTables.buttons.min.js").     //required for DataTable COLVIS
-                        Include(dataTablesScriptsDirectory + "/buttons.bootstrap.min.js").      //required for DataTable COLVIS
-                        Include(dataTablesScriptsDirectory + "/buttons.colVis.min.js").         //required for DataTable COLVIS
-                        Include(dataTablesScriptsDirectory + "/dataTables.columnFilter.js").    //required for DataTable Filter
-                        Include(dataTablesScriptsDirectory + "/buttons.flash.min.js").          //required for Datatable CSV
-                        Include(dataTablesScriptsDirectory + "/buttons.html5.min.js").          //required for Datatable CSV
-
-
-                        Include(dataTablesScriptsDirectory + "/dataTables.bootstrap3.js").
+                        Include(dataTablesScriptsDirectory + "/jquery.dataTables.js").
+                        Include(dataTablesScriptsDirectory + "/dataTables.bootstrap4.js").
+                        Include(dataTablesScriptsDirectory + "/dataTables.columnFilter.js").
                         Include(dataTablesScriptsDirectory + "/dataTables.responsive.js").
                         Include(dataTablesScriptsDirectory + "/jquery.dataTables.odata.js").
-                        Include(dataTablesScriptsDirectory + "/moment-with-locales.js").
-                        Include(dataTablesScriptsDirectory + "/moment-with-locales.min.js").
-                        Include(dataTablesScriptsDirectory + "/moment.js").
-                        Include(dataTablesScriptsDirectory + "/moment.min.js")
-                        );
+                        Include(dataTablesScriptsDirectory + "/dataTables.buttons.js").
+                        Include(dataTablesScriptsDirectory + "/buttons.colVis.js").
+                        Include(dataTablesScriptsDirectory + "/buttons.bootstrap4.js").
+                        Include(dataTablesScriptsDirectory + "/dataTables.responsive.js").
+                        Include(dataTablesScriptsDirectory + "/buttons.print.min.js").
+                        Include(dataTablesScriptsDirectory + "/dataTables.rowGroup.js").
+                        Include(dataTablesScriptsDirectory + "/dataTables.fixedHeader.js").
+                        Include(dataTablesScriptsDirectory + "/dataTables.select.js").
+                        Include("~/Scripts/jquery.dataTables.yadcf.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/prettyCron").
                         Include(dataTablesScriptsDirectory + "/moment.js").
@@ -89,6 +81,7 @@ namespace Sentry.data.Web
             //This bundle contains styles that are used commonly across the site, including bootstrap and jquery plugins
             bundles.Add(new StyleBundle("~/bundles/css/main").
                         Include("~/Content/bootstrap.min.css", new CssRewriteUrlTransform()).
+                        Include("~/Content/sentry-styles.min.css", new CssRewriteUrlTransform()).
 
                         Include("~/Content/font-awesome.css", new CssRewriteUrlTransform()).
                         Include("~/Content/css/select2.css", new CssRewriteUrlTransform()).
@@ -99,20 +92,17 @@ namespace Sentry.data.Web
             //This bundle contains styles specific to DataTables and related plugins
             string dataTablesStylesDirectory = "~/Content/DataTables/css";
             bundles.Add(new StyleBundle("~/bundles/css/dataTables").
-
-                        Include(dataTablesStylesDirectory + "/jquery.dataTables.min.css").      //required for DataTable Buttons
-                        Include(dataTablesStylesDirectory + "/buttons.dataTables.min.css").     //required for DataTable Buttons
-                        Include(dataTablesStylesDirectory + "/dataTables.bootstrap3.css").
-                        Include(dataTablesStylesDirectory + "/dataTables.fontAwesome.css").
-                        Include(dataTablesStylesDirectory + "/dataTables.responsive.css")
-                        );
+                    Include(dataTablesStylesDirectory + "/dataTables.bootstrap4.css").
+                    Include(dataTablesStylesDirectory + "/dataTables.responsive.css").
+                    Include(dataTablesStylesDirectory + "/buttons.bootstrap4.css").
+                    Include(dataTablesStylesDirectory + "/dataTables.fontAwesome.css").
+                    Include(dataTablesStylesDirectory + "/buttons.dataTables.css"));
 
 
 
             //This bundle contains styles that override everything else, and must come after all other css includes
             bundles.Add(new StyleBundle("~/bundles/css/site").
                  Include("~/Content/bootstrap-datetimepicker.css", new CssRewriteUrlTransform()).
-                        Include("~/Content/sentry-styles.min.css", new CssRewriteUrlTransform()).
                         Include("~/Content/toastr.min.css").
                         Include("~/Content/query-builder.default.min.css").
                         Include("~/Content/query-tool.css").

@@ -119,7 +119,8 @@
     },
 
     InitIngestionType() {
-        var selection = $("[id$=IngestionTypeSelection]").val();
+        $("#IngestionTypeSelection").materialSelect();
+        var selection = $("#IngestionTypeSelection").val();
 
         if (selection === "2") {
             $('.namePanel').show();
@@ -156,7 +157,7 @@
             $('.formSubmitButtons').show();
         }            
 
-        $("[id$=IngestionTypeSelection]").on('change', function () {
+        $("#IngestionTypeSelection").on('change', function () {
             var ingestionSelection = $(this).val();
             //if changing to Pull
             if (ingestionSelection === "2") {

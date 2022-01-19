@@ -203,7 +203,7 @@ data.Dataset = {
                     render: function (d, type, row, meta) {
                         var color = $('#delroyBreadcrumb').data('page-color');
                         var innerLink = "<a  class='" + color + "' style='cursor:pointer' > " + d + "</a >";                        //want cursor too turn pointer
-                        var parent = "<em class='glyphicon glyphicon-folder-close " + color + "' > " + innerLink + "</em>";
+                        var parent = "<em class=' icon-folder " + color + "' > " + innerLink + "</em>";
 
                         if (row.Fields != null) {
                             return parent;
@@ -229,12 +229,31 @@ data.Dataset = {
             order: [0, 'desc'],
 
             //style for columnVisibility and paging to show
-            dom: 'Blrtip',
+            //dom: 'B',
 
-            //buttons to show and customize text for them
-            buttons:
-                [
-                    { extend: 'colvis', text: 'Columns' },
+            dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>t<"d-inline-block"i><"float-right d-inline-block"p>',
+            buttons: {
+                dom: {
+                    container: {
+                        className: 'dt-buttons btn-group'
+                    },
+                    button: {
+                        className: 'btn btn-primary p-2'
+                    },
+                    collection: {
+                        //tag: 'div',
+                        className: 'dt-button-collection dropdown-menu',
+                        button: {
+                            //tag: 'a',
+                            className: 'dropdown-item'
+                        }
+                    }
+                },
+                buttons: [
+                    {
+                        extend: 'colvis',
+                        //text: "<i class='icon-onecol_twocol'></i>"
+                    },
                     {
                         text: 'Snowflake Query',
                         action: function () {
@@ -242,8 +261,10 @@ data.Dataset = {
                         }
                     }
                 ]
+            }
         });
 
+        /* TODO: Replace with YADCF
         //add a filter in each column
         $("#delroyTable").dataTable().columnFilter({
             sPlaceHolder: "head:after",
@@ -258,6 +279,7 @@ data.Dataset = {
                 { type: "text" }
             ]
         });
+        */
 
     },
 
@@ -353,7 +375,7 @@ data.Dataset = {
 
         //add breadcrumb to UI
         var color = $('#delroyBreadcrumb').data('page-color');
-        var h = "<li id='" + index.toString() + "' ><a  class='" + color + "' style='cursor:pointer' >" + field.Name + "</a></li>";
+        var h = "<li class='breadcrumb-item' id='" + index.toString() + "' ><a  class='" + color + "' style='cursor:pointer' >" + field.Name + "</a></li>";
         $('#delroyBreadcrumb').append(h);
 
         //add struct too tracker to hold if a query needs to be generated
@@ -586,7 +608,7 @@ data.Dataset = {
         if ($("#datasetRowTable_filter").length > 0) {
             $("#datasetRowTable").DataTable().destroy();
         };
-        Sentry.InjectSpinner($("#tab-container"));
+        //Sentry.InjectSpinner($("#tab-container"));
 
 
 
@@ -1110,7 +1132,7 @@ data.Dataset = {
                 url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent($(this).data("id")),
                 method: "GET",
                 dataType: 'json',
-                success: function () { icon.toggleClass("glyphicon-star glyphicon-star-empty"); },
+                success: function () { icon.toggleClass("icon-filled-star icon-star"); },
                 error: function () { Sentry.ShowModalAlert("Failed to toggle favorite."); }
             });
         });
@@ -1200,7 +1222,7 @@ data.Dataset = {
 
 
 
-            Sentry.InjectSpinner($("#tab-container"));
+            //Sentry.InjectSpinner($("#tab-container"));
 
 
             var url = new URL(window.location.href);
@@ -1251,7 +1273,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             if ($('#tabSchemaColumns').is(':empty')) {
-                Sentry.InjectSpinner($("#tab-container"));
+                //Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaColumns',
                     dataType: 'html',
@@ -1281,7 +1303,7 @@ data.Dataset = {
             var id = $('#RequestAccessButton').attr("data-id");
 
             if ($('#tabSchemaAbout').is(':empty')) {
-                Sentry.InjectSpinner($("#tab-container"));
+                //Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaAbout',
                     dataType: 'html',
@@ -1310,7 +1332,7 @@ data.Dataset = {
             var id = $('#RequestAccessButton').attr("data-id");
 
             if ($('#tabDataPreview').is(':empty')) {
-                Sentry.InjectSpinner($("#tab-container"));
+                //Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataPreview',
                     dataType: 'html',
@@ -1339,7 +1361,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             if ($('#tabDataFiles').is(':empty')) {
-                Sentry.InjectSpinner($("#tab-container"));
+                //Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataFiles',
                     dataType: 'html',
@@ -1654,7 +1676,7 @@ data.Dataset = {
             stateSave: true,
             "createdRow": function (row, data, dataIndex) { }
         });
-
+        /* TODO REPLACE WITH YADCF
         $("#datasetFilesTable").dataTable().columnFilter({
             sPlaceHolder: "head:after",
             aoColumns: [
@@ -1667,6 +1689,7 @@ data.Dataset = {
                 { type: "text" }
             ]
         });
+        */
 
         $(".dataTables_filter").parent().addClass("text-right");
         $(".dataTables_filter").parent().css("right", "3px");
@@ -1850,6 +1873,8 @@ data.Dataset = {
 
         var values = [true, false];
 
+                /* TODO REPLACE WITH YADCF
+
         $("#bundledDatasetFilesTable").dataTable().columnFilter({
             sPlaceHolder: "head:after",
             aoColumns: [
@@ -1862,6 +1887,7 @@ data.Dataset = {
                 { type: "text" }
             ]
         });
+        */
 
         $('#bundledDatasetFilesTable').on('draw.dt', function () {
             if ($("#bundledDatasetFilesTable").DataTable().page.info().recordsTotal !== 0) {
@@ -2001,6 +2027,8 @@ data.Dataset = {
             "createdRow": function (row, data, dataIndex) { }
         });
 
+                /* TODO REPLACE WITH YADCF
+
         $("#datasetFilesVersionsTable").dataTable().columnFilter({
             sPlaceHolder: "head:after",
             aoColumns: [
@@ -2013,6 +2041,7 @@ data.Dataset = {
                 { type: "text" }
             ]
         });
+        */
 
         // DataTable
         var table = $('#datasetFilesVersionsTable').DataTable();

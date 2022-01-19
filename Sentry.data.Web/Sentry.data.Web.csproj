@@ -783,6 +783,7 @@
     <Content Include="Content\fields.css" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\home.css" />
+    <Content Include="Content\icons.css" />
     <Content Include="Content\jquery.json-viewer.css" />
     <Content Include="Content\MDB\img\lightbox\default-skin.png" />
     <Content Include="Content\MDB\img\lightbox\default-skin.svg" />
@@ -806,6 +807,7 @@
     <Content Include="Content\sentry-styles.min.css" />
     <Content Include="Content\toastr.css" />
     <Content Include="Content\toastr.min.css" />
+    <Content Include="fonts\icomoon.svg" />
     <Content Include="Images\arrow_left.svg" />
     <Content Include="Images\arrow_right.svg" />
     <Content Include="Images\BusinessAreaTiles\Meeting3.jpg" />
@@ -1028,6 +1030,10 @@
     <Content Include="Scripts\i18n\zh-TW.js" />
     <Content Include="Scripts\jquery-ui.js" />
     <Content Include="Scripts\jQuery.extendext.min.js" />
+    <Content Include="fonts\icomoon.eot" />
+    <Content Include="fonts\icomoon.ttf" />
+    <Content Include="fonts\icomoon.woff" />
+    <Content Include="fonts\icomoon.woff2" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
