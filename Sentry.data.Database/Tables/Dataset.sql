@@ -3,6 +3,7 @@
 	[Dataset_NME] [varchar](1024) NOT NULL,
 	[Dataset_DSC] [varchar](4096) NULL,
 	[FileCreator_NME] [varchar](128) NOT NULL,
+	[PrimaryOwner_ID] [varchar](8) NULL,
 	[UploadedBy_NME] [varchar](128) NOT NULL,
 	[Origination_CDE] [varchar](16) NULL,
 	[Dataset_DTM] [datetime] NOT NULL,
