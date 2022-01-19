@@ -1,0 +1,44 @@
+﻿@{
+    Layout = "~/Views/Shared/_FilterSearch.cshtml";
+    ViewBag.Title = "DataInventory";
+}
+
+@section FilterSearchResult
+{
+    <table class="table table-striped table-bordered blue" id="di-result-table">
+        <thead>
+            <tr class="table-header_blue categoryBanner-blue">
+                <th>Asset</th>
+                <th>Server</th>
+                <th>Database</th>
+                <th>Table/View Name</th>
+                <th>Type</th>
+                <th>Column</th>
+                <th>Is Sensitive</th>
+                <th>Owner Verified</th>
+                <th>Server Type</th>
+                <th>Datatype</th>
+                <th>Length</th>
+                <th>Precision</th>
+                <th>Scale</th>
+                <th>Is Nullable</th>
+                <th>Discovery Date</th>
+                <th>Source Type</th>
+                <th>Scan Category</th>
+                <th>Scan Type</th>
+            </tr>
+        </thead>
+    </table>
+}
+
+@section FilterSearchResultScript
+{
+    @Scripts.Render("~/bundles/dataTables")
+    <script type="text/javascript">
+
+        $(function () {
+            data.DataInventory.init();
+        });
+
+    </script>
+}

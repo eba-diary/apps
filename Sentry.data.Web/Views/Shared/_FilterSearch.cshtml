@@ -1,20 +1,20 @@
-﻿@using Sentry.data.Web;
-@model FilterSearchModel
+﻿@model FilterSearchModel
 
 @{
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Fluid = true;
 }
 
 <!-- Top Search Row -->
-<div class="row search-horizontal-center">
+<div class="search-horizontal-center">
     <div class="search-head">
         <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" /></div>
         <div class="search-head-item"><h1 class="datasetHeader">@Model.PageTitle</h1></div>
 
         <div id="search-box" class="has-feedback has-feedback-left">
             <input class="form-control searchTextDS text-box single-line" type="text" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.SearchText" />
-            <i class="form-control-feedback glyphicon glyphicon-search clickable"></i>
-            <i class="form-control-feedback fa fa-circle-o-notch fa-spin hidden"></i>
+            <i class="form-control-feedback glyphicon glyphicon-search clickable filter-search-start"></i>
+            <i class="form-control-feedback fa fa-circle-o-notch fa-spin display-none"></i>
         </div>
     </div>
 </div>
@@ -27,17 +27,16 @@
         <div class="filter-search-title-container bottom-border">
             <h1 class="filter-search-title">Filter</h1>
             <span class="filter-search-clear-container"><a href="#" class="display-none" id="filter-search-clear">Clear All</a></span>
-            <button type="button" class="btn btn-primary display-none" id="filter-search-apply"><i class="glyphicon glyphicon-search filter-search-apply-icon"></i>Apply</button>
+            <button type="button" class="btn btn-primary display-none filter-search-start" id="filter-search-apply"><i class="glyphicon glyphicon-search filter-search-apply-icon"></i>Apply</button>
         </div>
         <!-- Title & Clear - End -->
-
         <!-- Badges -->
         <div class="filter-search-active-options-container bottom-border display-none">
             @foreach (FilterCategoryModel category in Model.FilterCategories)
             {
                 foreach (FilterCategoryOptionModel option in category.CategoryOptions.OrderBy(o => o.OptionName).ToList())
                 {
-                    <button type = "button" class="btn btn-default filter-search-active-option-close display-none" id="clearOption_@option.OptionId">
+                    <button type="button" class="btn btn-default filter-search-active-option-close display-none" id="clearOption_@option.OptionId">
                         <span class="active-option-close-symbol">&#x2715</span>
                         <span>@option.OptionName</span>
                     </button>
@@ -45,7 +44,6 @@
             }
         </div>
         <!-- Badges - End -->
-
         <!-- Categories -->
         <div class="filter-search-categories">
             @foreach (FilterCategoryModel category in Model.FilterCategories)
@@ -103,24 +101,28 @@
         <!-- Categories - End -->
     </div>
     <!-- Filters - End -->
-
-    <!-- Active Filters & Results -->
-    <div class="filter-search-results-container">
-        @*@RenderSection("FilterSearchResults", true);*@
-        @Html.Partial("~/Views/Dale/DaleResult.cshtml", true)
+    <!-- Results -->
+    <div class="filter-search-sentry-spinner-container">
+        <span class="sentry-spinner"></span>
     </div>
-    <!-- Active Filters & Results - End -->
+
+    <div class="filter-search-results-container display-none">
+        @RenderSection("FilterSearchResult", true)
+    </div>
+    <!-- Results - End -->
 </div>
 <!-- Body Row - End -->
 
 @section Scripts
 {
-    @Scripts.Render("~/bundles/dataTables")
     <script type="text/javascript">
 
         $(function () {
-            data.FilterSearch.init(@Html.Raw(Json.Encode(Model.FilterCategories.SelectMany(x => x.CategoryOptions.Where(w => w.Selected).ToList()).ToList())));
+            data.FilterSearch.init();
         });
-        
+
     </script>
+
+    @*script is required because will need to register what submit event does*@
+    @RenderSection("FilterSearchResultScript", true)
 }

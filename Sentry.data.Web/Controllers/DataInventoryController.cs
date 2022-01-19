@@ -103,7 +103,7 @@ namespace Sentry.data.Web.Controllers
                 }
             };
 
-            return View("~/Views/Search/FilterSearch.cshtml", searchModel);
+            return View(searchModel);
         }
     }
 }
