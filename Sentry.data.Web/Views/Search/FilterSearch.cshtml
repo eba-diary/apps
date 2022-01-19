@@ -23,57 +23,67 @@
 <!-- Body Row -->
 <div class="filter-search-body">
     <!-- Filters -->
-    <div class="filter-search-container">
+    <div class="filter-search-container display-none">
         <!-- Title & Clear-->
-        <div class="filter-search-title-container">
+        <div class="filter-search-title-container bottom-border">
             <h1 class="filter-search-title">Filter</h1>
             <a href="#" id="filter-search-clear">Clear All</a>
+            <button type="button" class="btn btn-primary" id="apply">Apply</button>
         </div>
         <!-- Title & Clear - End -->
 
         <!-- Badges -->
-        @*<div class="">
-            <button type="button" class="btn btn-sm btn-primary" id="btnClearFilters" data-bind="click: clearFilters, enable: SelectedFilters().length !== 0">Clear Filters</button>
-        </div>*@
+        <div class="filter-search-active-options-container bottom-border display-none">
+            @foreach (FilterCategoryModel category in Model.FilterCategories)
+            {
+                foreach (FilterCategoryOptionModel option in category.CategoryOptions.OrderBy(o => o.OptionName).ToList())
+                {
+                    <button type = "button" class="btn btn-primary filter-search-active-option-close display-none" id="clearOption_@option.OptionId">
+                        <span class="active-option-close-symbol">&#x2715</span>
+                        <span>@option.OptionName</span>
+                    </button>
+                }
+            }
+        </div>
         <!-- Badges - End -->
 
         <!-- Categories -->
-        <div class="filter-search-categories display-none">
+        <div class="filter-search-categories">
             @foreach (FilterCategoryModel category in Model.FilterCategories)
             {
-                IEnumerable<FilterCategoryOptionModel> options = category.CategoryOptions.OrderBy(o => o.OptionName).OrderByDescending(o => o.DefaultSelected);
+                IEnumerable<FilterCategoryOptionModel> options = category.CategoryOptions.OrderBy(o => o.OptionName).OrderByDescending(o => o.Selected);
                 string categoryTypeId = "categoryType_" + category.CategoryName.Replace(" ", "_");
                 string categoryMoreId = "categoryMore_" + category.CategoryName.Replace(" ", "_");
 
-                <div class="filter-search-category-container">
+                <div class="filter-search-category-container bottom-border">
                     <div class="filter-search-category-head" id="@categoryTypeId">
-                        <span class="">@category.CategoryName</span>
+                        <span>@category.CategoryName</span>
                         <span class="glyphicon glyphicon-chevron-down" id="icon_@categoryTypeId"></span>
                     </div>
 
-                    <div class="filter-search-category-options" id="hide_@categoryTypeId">
+                    <div class="filter-search-category-options display-none" id="hide_@categoryTypeId">
                         <ul class="list-unstyled">
                             @foreach (FilterCategoryOptionModel option in options.Take(5).ToList())
                             {
                                 if (option.ResultCount > 0)
                                 {
                                     <li class="filter-search-category-option">
-                                        <label id="@option.OptionId">
-                                            <input type="checkbox" class="filter-search-category-option-checkbox" id="@option.OptionId" value="@option.OptionId" checked="@option.DefaultSelected" />
+                                        <label>
+                                            <input type="checkbox" class="filter-search-category-option-checkbox" id="@option.OptionId" value="@option.OptionId" checked="@option.Selected" />
                                             <strong>@option.OptionName</strong>
                                             <span>(@option.ResultCount)</span>
                                         </label>
                                     </li>
                                 }
                             }
-                            
+
                             <li class="display-none" id="hidden_@categoryMoreId">
                                 <ul class="notNested">
                                     @foreach (FilterCategoryOptionModel option in options.Skip(5).ToList())
                                     {
                                         <li class="filter-search-category-option">
-                                            <label id="@option.OptionId">
-                                                <input type="checkbox" class="filter-search-category-option-checkbox" id="@option.OptionId" value="@option.OptionId" checked="@option.DefaultSelected" />
+                                            <label>
+                                                <input type="checkbox" class="filter-search-category-option-checkbox" id="@option.OptionId" value="@option.OptionId" checked="@option.Selected" />
                                                 <strong>@option.OptionName</strong>
                                                 <span>(@option.ResultCount)</span>
                                             </label>

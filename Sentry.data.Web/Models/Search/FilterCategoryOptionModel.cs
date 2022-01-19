@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace Sentry.data.Web
+﻿namespace Sentry.data.Web
 {
     public class FilterCategoryOptionModel
     {
-        public string OptionId { get; set; }
+        private string _id;
+
+        public string OptionId 
+        {             
+            get => string.IsNullOrEmpty(ParentCategoryName) ? _id : ParentCategoryName.Replace(" ", "_") + "_" + _id;
+            set => _id = value;
+        }
         public string OptionName { get; set; }
+        public string ParentCategoryName { get; set; }
         public int ResultCount { get; set; }
-        public bool DefaultSelected { get; set; }
+        public bool Selected { get; set; }
     }
 }

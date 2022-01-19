@@ -26,13 +26,15 @@ namespace Sentry.data.Web.Controllers
                         {
                             OptionId = "1",
                             OptionName = "Sensitive",
-                            ResultCount = 1
+                            ResultCount = 1,
+                            ParentCategoryName = "Sensitivity"
                         },
                         new FilterCategoryOptionModel()
                         {
                             OptionId = "2",
                             OptionName = "Public",
-                            ResultCount = 12
+                            ResultCount = 12,
+                            ParentCategoryName = "Sensitivity"
                         }
                     }
                 },
@@ -46,43 +48,56 @@ namespace Sentry.data.Web.Controllers
                             OptionId = "1",
                             OptionName = "Prod",
                             ResultCount = 3,
-                            DefaultSelected = true
+                            Selected = false,
+                            ParentCategoryName = "Environment"
                         },
                         new FilterCategoryOptionModel()
                         {
                             OptionId = "2",
                             OptionName = "NonProd",
-                            ResultCount = 6
+                            ResultCount = 6,
+                            Selected = false,
+                            ParentCategoryName = "Environment"
                         },
                         new FilterCategoryOptionModel()
                         {
                             OptionId = "3",
                             OptionName = "Dev",
-                            ResultCount = 2
+                            ResultCount = 2,
+                            Selected = false,
+                            ParentCategoryName = "Environment"
                         },
                         new FilterCategoryOptionModel()
                         {
                             OptionId = "4",
                             OptionName = "Test",
-                            ResultCount = 1
+                            ResultCount = 1,
+                            Selected = false,
+                            ParentCategoryName = "Environment"
                         },
                         new FilterCategoryOptionModel()
                         {
                             OptionId = "5",
                             OptionName = "Qual",
-                            ResultCount = 1
+                            ResultCount = 1,
+                            Selected = false,
+                            ParentCategoryName = "Environment"
                         },
                         new FilterCategoryOptionModel()
                         {
                             OptionId = "6",
                             OptionName = "Beta",
-                            ResultCount = 1
+                            ResultCount = 1,
+                            Selected = false,
+                            ParentCategoryName = "Environment"
                         },
                         new FilterCategoryOptionModel()
                         {
                             OptionId = "7",
                             OptionName = "Local",
-                            ResultCount = 1
+                            ResultCount = 1,
+                            Selected = false,
+                            ParentCategoryName = "Environment"
                         }
                     }
                 }

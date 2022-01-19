@@ -32,22 +32,43 @@
 
 .filter-search-container {
     margin-right: 1em;
+    width: 300px;
 }
 
 .filter-search-title-container {
-    border-bottom: 1px solid #ebebeb;
-    position: relative;
+    display: flex;
 }
 
 .filter-search-title {
     margin-top: 15px;
+    margin-bottom: 0.25em;
 }
 
 #filter-search-clear {
+    margin-bottom: 0.25em;
+    align-self: end;
+    width: 100%;
+    text-align: right;
+}
+
+#apply {
     position: absolute;
     bottom: 0;
     right: 0;
     margin-bottom: 10px;
+}
+
+.filter-search-active-options-container {
+    text-align: center;
+    padding: 1em 0 0.7em 0;
+}
+
+.filter-search-active-option-close {
+    margin: 0 0 0.3em 0.2em;
+}
+
+.active-option-close-symbol {
+    font-size: 12px;
 }
 
 .filter-search-category-container {
@@ -55,7 +76,6 @@
     margin-bottom: 0px;
     display: inline-block;
     width: 100%;
-    border-bottom: 1px solid #ebebeb;
 }
 
 .filter-search-category-head {
@@ -128,4 +148,8 @@
     margin: auto;
     width: 100%;
     zoom: 1.25;
+}
+
+.bottom-border {
+    border-bottom: 1px solid #ebebeb;
 }
