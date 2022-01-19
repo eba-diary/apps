@@ -48,7 +48,7 @@ namespace Sentry.data.Web.Controllers
                             OptionId = "1",
                             OptionName = "Prod",
                             ResultCount = 3,
-                            Selected = false,
+                            Selected = true,
                             ParentCategoryName = "Environment"
                         },
                         new FilterCategoryOptionModel()

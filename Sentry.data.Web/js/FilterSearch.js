@@ -1,9 +1,13 @@
 ﻿data.FilterSearch = {
-    init: function () {
+
+    initialFilters: [],
+
+    init: function (selectedFilters) {
+
+        this.initialFilters = selectedFilters;
 
         this.initEvents();
         this.initDataTable();
-        this.initActiveFilters();
         this.initUserInterface();
     },
 
@@ -49,6 +53,8 @@
 
             //hide the clicked badge
             $(this).hide();
+
+            data.FilterSearch.showHideApplyFilter();
         });
 
         //select category option
@@ -59,12 +65,14 @@
 
             if (this.checked) {
                 badge.show()
-                $(".filter-search-active-options-container").slideDown();
+                data.FilterSearch.showBadgeContainer();
             }
             else {
                 data.FilterSearch.hideBadgeContainer(false);
                 badge.hide();
             }
+
+            data.FilterSearch.showHideApplyFilter();
         });
 
         //clear all badges
@@ -80,12 +88,47 @@
             $('.filter-search-category-option-checkbox:checkbox:checked').each(function () {
                 $(this).prop('checked', false);
             })
+
+            data.FilterSearch.showHideApplyFilter();
+        });
+
+        //Apply filters (ie. Search)
+        $(document).on("click", "#filter-search-apply", function (e) {
+            e.preventDefault();
+
+            console.log('submitted filters');
         });
     },
 
     hideBadgeContainer: function (clearAll) {
         if ($("[id^='clearOption_']:visible").length === 1 || clearAll) {
             $(".filter-search-active-options-container").slideUp();
+            $("#filter-search-clear").hide();
+        }
+    },
+
+    showBadgeContainer: function () {
+        $(".filter-search-active-options-container").slideDown();
+        $("#filter-search-clear").show();
+    },
+
+    showHideApplyFilter: function () {
+        //get all checked filters
+        var selectedOptions = $('.filter-search-category-option-checkbox:checkbox:checked');
+
+        var hasSameValues = true;
+        //determine all selected filters were in the initial filter
+        selectedOptions.each(function () {
+            hasSameValues = data.FilterSearch.initialFilters.some(i => this.id === i.OptionId);
+            return hasSameValues;
+        });
+
+        //hide apply button if filters are same as initial search, show if filters are different
+        if (selectedOptions.length === data.FilterSearch.initialFilters.length && hasSameValues) {
+            $("#filter-search-apply").hide();
+        }
+        else {
+            $("#filter-search-apply").show();
         }
     },
 
@@ -106,7 +149,7 @@
 
         //show active options container if there are active options
         if (selectedOptions.length > 0) {
-            $(".filter-search-active-options-container").show();
+            data.FilterSearch.showBadgeContainer();
         }
 
         $("#daleContainer").show();
@@ -234,54 +277,5 @@
         }
 
         return '<input type="checkbox" value="true" class="table-element-checkbox" ' + checked + disabled + '><label class="display-none">' + cellValue + '</label>';
-    },
-
-    initActiveFilters: function () {
-        $("#filter-search-option-selector").select2({
-            width: '100%',
-            allowClear: true
-        });
-
-        //This is fed into the Select2 Box to format tags.
-        function formatTag(tag) {
-            var cat = "";
-
-            for (var i = 0; i < vm.FilterCategories.length; i++) {
-                for (var j = 0; j < vm.FilterCategories[i].FilterCategoryOptions.length; j++) {
-                    if (vm.FilterCategories[i].FilterCategoryOptions[j].id === tag.id) {
-                        cat = vm.AllFilters()[i].Filters()[j].Category;
-                        break;
-                    }
-                }
-                if (cat !== "") {
-                    break;
-                }
-            }
-
-            var $state = $(
-                '<span class="' + cat.split(" ").join("_").toLowerCase() + '_filter">' + cat + " : " + tag.text + '</span>'
-            );
-
-            return $state;
-        };
-
-
-        $('#filterSelector').on('select2:select', function (e) {
-
-            var data = e.params.data;
-            console.log(data);
-
-            // push the selected filter Id to the observable array
-            //window.vm.SelectedFilters.push(data.id);
-        });
-
-        $('#filterSelector').on('select2:unselect', function (e) {
-
-            var data = e.params.data;
-            console.log(data);
-
-            // remove the selected filter Id from the observable array
-            //window.vm.RemoveSelection(data.id);
-        });
     }
 }
