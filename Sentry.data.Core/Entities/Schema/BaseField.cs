@@ -53,6 +53,8 @@ namespace Sentry.data.Core
         }
         public virtual SchemaRevision ParentSchemaRevision { get; set; }
         public virtual int FieldLength { get; set; }
+        public virtual string DotNamePath { get; set; }
+
 
         //abstract properties
         public abstract SchemaDatatypes FieldType { get; set; }

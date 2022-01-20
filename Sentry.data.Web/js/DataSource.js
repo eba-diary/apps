@@ -4,14 +4,6 @@
         //Set Secure HREmp service URL for associate picker
         $.assocSetup({ url: hrEmpUrl });
         var permissionFilter = "DatasetModify,DatasetManagement," + hrEmpEnv;
-        $("#PrimaryOwnerName").assocAutocomplete({
-            associateSelected: function (associate) {
-                $('#PrimaryOwnerId').val(associate.Id);
-            },
-            filterPermission: permissionFilter,
-            minLength: 0,
-            maxResults: 10
-        });
         $("#PrimaryContactName").assocAutocomplete({
             associateSelected: function (associate) {
                 $('#PrimaryContactId').val(associate.Id);

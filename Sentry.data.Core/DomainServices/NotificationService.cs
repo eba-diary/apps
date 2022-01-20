@@ -149,21 +149,30 @@ namespace Sentry.data.Core
             //pattern because it works, so don't judge me.
             string eventTypeDescription = null;
 
-            switch (notification.MessageSeverity)
+            //BusinessAreaType == DSC has different EventTypes
+            if(notification.ParentObject == (int)BusinessAreaType.DSC)
             {
-                case NotificationSeverity.Critical:
-                    eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_CRITICAL_ADD : GlobalConstants.EventType.NOTIFICATION_CRITICAL_UPDATE;
-                    break;
-                case NotificationSeverity.Warning:
-                    eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_WARNING_ADD : GlobalConstants.EventType.NOTIFICATION_WARNING_UPDATE;
-                    break;
-                case NotificationSeverity.Info:
-                    eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_INFO_ADD : GlobalConstants.EventType.NOTIFICATION_INFO_UPDATE;
-                    break;
-                default:
-                    Logger.Error("Notification Severity Not Found to log EventType of " + notification.MessageSeverity.ToString() + " for NotificationId = " + notification.NotificationId.ToString());
-                    break;
+                eventTypeDescription = notification.NotificationCategory.GetDescription();
             }
+            else
+            {
+                switch (notification.MessageSeverity)
+                {
+                    case NotificationSeverity.Critical:
+                        eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_CRITICAL_ADD : GlobalConstants.EventType.NOTIFICATION_CRITICAL_UPDATE;
+                        break;
+                    case NotificationSeverity.Warning:
+                        eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_WARNING_ADD : GlobalConstants.EventType.NOTIFICATION_WARNING_UPDATE;
+                        break;
+                    case NotificationSeverity.Info:
+                        eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_INFO_ADD : GlobalConstants.EventType.NOTIFICATION_INFO_UPDATE;
+                        break;
+                    default:
+                        Logger.Error("Notification Severity Not Found to log EventType of " + notification.MessageSeverity.ToString() + " for NotificationId = " + notification.NotificationId.ToString());
+                        break;
+                }
+            }
+
 
             if (eventTypeDescription != null)
                 _eventService.PublishSuccessEventByNotificationId(eventTypeDescription, _userService.GetCurrentUser().AssociateId, eventTypeDescription, notification);
@@ -361,8 +370,8 @@ namespace Sentry.data.Core
 
         public void CreateUpdateSubscription(SubscriptionDto dto)
         {
-            
-            if(dto.group == EventTypeGroup.BusinessArea)
+            //ONLY UPDATE Subsriptions for BusinessArea and BusinessAreaDSC EventTypeGroups for now
+            if(dto.group == EventTypeGroup.BusinessArea || dto.group == EventTypeGroup.BusinessAreaDSC)
             {
                 List<BusinessAreaSubscription> oldSubs = GetAllUserSubscriptions(dto.group);
 
@@ -414,30 +423,33 @@ namespace Sentry.data.Core
         {
             string parentDescription = null;
 
-            switch (child.Description)
+            if(child.Group == EventTypeGroup.BusinessAreaDSC.GetDescription())
             {
-                case GlobalConstants.EventType.NOTIFICATION_CRITICAL_ADD:
-                case GlobalConstants.EventType.NOTIFICATION_CRITICAL_UPDATE:
-                    parentDescription = GlobalConstants.EventType.NOTIFICATION_CRITICAL;
-                    break;
-                case GlobalConstants.EventType.NOTIFICATION_WARNING_ADD:
-                case GlobalConstants.EventType.NOTIFICATION_WARNING_UPDATE:
-                    parentDescription = GlobalConstants.EventType.NOTIFICATION_WARNING;
-                    break;
-                case GlobalConstants.EventType.NOTIFICATION_INFO_ADD:
-                case GlobalConstants.EventType.NOTIFICATION_INFO_UPDATE:
-                    parentDescription = GlobalConstants.EventType.NOTIFICATION_INFO;
-                    break;
-                default:
-                    break;
+                parentDescription = child.Description;
+            }
+            else
+            {
+                switch (child.Description)
+                {
+                    case GlobalConstants.EventType.NOTIFICATION_CRITICAL_ADD:
+                    case GlobalConstants.EventType.NOTIFICATION_CRITICAL_UPDATE:
+                        parentDescription = GlobalConstants.EventType.NOTIFICATION_CRITICAL;
+                        break;
+                    case GlobalConstants.EventType.NOTIFICATION_WARNING_ADD:
+                    case GlobalConstants.EventType.NOTIFICATION_WARNING_UPDATE:
+                        parentDescription = GlobalConstants.EventType.NOTIFICATION_WARNING;
+                        break;
+                    case GlobalConstants.EventType.NOTIFICATION_INFO_ADD:
+                    case GlobalConstants.EventType.NOTIFICATION_INFO_UPDATE:
+                        parentDescription = GlobalConstants.EventType.NOTIFICATION_INFO;
+                        break;
+                    default:
+                        break;
+                }
             }
 
-            EventType parentEventType;
-            if (parentDescription != null)              //PARENT EXISTS, so GRAB PARENT
-                parentEventType = _domainContext.EventTypes.FirstOrDefault(w => w.Description == parentDescription);        
-            else
-                parentEventType = new EventType();      //NO PARENT
-            
+            EventType parentEventType = (parentDescription != null)? _domainContext.EventTypes.FirstOrDefault(w => w.Description == parentDescription) : new EventType();      //NO PARENT
+
             return parentEventType;
         }
     }

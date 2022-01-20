@@ -60,40 +60,24 @@ namespace Sentry.data.Infrastructure
                     DataFeed feed = new DataFeed();
                     feed.Id = ds.DatasetId;
 
-                    string shortDesc = String.Empty;
-                    string longDesc = String.Empty;
-
                     //SCHEMA
                     if (e.SchemaId != null && e.SchemaId > 0 && e.DataConfig != null)
                     {
                         feed.Id2 = e.DataConfig;
                         feed.Name = GlobalConstants.DataFeedName.SCHEMA;
                         feed.Type = GlobalConstants.DataFeedType.Schemas;
-                        Schema schema = Query<Schema>().Where(w => w.SchemaId == e.SchemaId).FirstOrDefault();
-                        if (schema != null)
-                        {
-                            shortDesc = " A new schema called " + schema.Name + " was created under " + ds.DatasetName + " in " + ds.DatasetCategories.First().Name;
-                        }
-                        else
-                        {
-                            shortDesc = " A new schema was created under " + ds.DatasetName + " in " + ds.DatasetCategories.First().Name;
-                        }
-
-                        longDesc = shortDesc;
                     }
                     else  //DATASET
                     {
                         feed.Name = GlobalConstants.DataFeedName.DATASET;
                         feed.Type = GlobalConstants.DataFeedType.Datasets;
-                        shortDesc = " A new dataset called " + ds.DatasetName + " was created in " + ds.DatasetCategories.First().Name;
-                        longDesc = shortDesc;
                     }
 
                     //CREATE DATAFEED ITEM
                     DataFeedItem dfi = new DataFeedItem(
                         e.TimeCreated,                                                                                                          //pubDate
-                        shortDesc,                                                                                                              //shortDesc
-                        longDesc,                                                                                                               //longDesc
+                        e.Reason,                                                                                                               //shortDesc
+                        e.Reason,                                                                                                               //longDesc
                         feed                                                                                                                    //DataFeed
                     );
 
@@ -121,20 +105,10 @@ namespace Sentry.data.Infrastructure
                     feed.Name = GlobalConstants.DataFeedName.BUSINESS_INTELLIGENCE;
                     feed.Type = GlobalConstants.DataFeedType.Exhibits;
 
-                    string shortDesc = String.Empty;
-                    if(ds.DatasetCategories != null)
-                    {
-                        shortDesc = "A New Exhibit called " + ds.DatasetName + " was Created in " + ds.DatasetCategories.First().Name;
-                    }
-                    else
-                    {
-                        shortDesc = "A New Exhibit called " + ds.DatasetName + " was Created";
-                    }
-                    
                     DataFeedItem dfi = new DataFeedItem(
                         e.TimeCreated,
-                        shortDesc,
-                        shortDesc,
+                        e.Reason,
+                        e.Reason,
                         feed
                     );
 

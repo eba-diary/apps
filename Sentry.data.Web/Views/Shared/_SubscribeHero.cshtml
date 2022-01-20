@@ -42,7 +42,7 @@
                     <tr class="@cssClass">
                         <td>
                             @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessArea[subId].EventType.Type_ID)
-                            @Html.DisplayFor(model => model.CurrentSubscriptionsBusinessArea[subId].EventType.Description)
+                            @Html.DisplayFor(model => model.CurrentSubscriptionsBusinessArea[subId].EventType.DisplayName)
                         </td>
                         <td>
                             @Html.DropDownListFor(model => model.CurrentSubscriptionsBusinessArea[subId].Interval.Interval_ID,

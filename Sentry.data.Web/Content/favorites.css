@@ -77,3 +77,14 @@
         color: #d80000;
         text-decoration: none;
     }
+
+
+#edit-Feed-icon {
+    font-size: 23px;
+    margin: 18px 8px 0px 0px;
+}
+
+#subscribe-Feed-icon {
+    font-size: 23px;
+    margin: 18px 12px 0px 0px;
+}

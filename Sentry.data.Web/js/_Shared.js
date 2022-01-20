@@ -29,5 +29,5 @@ var data = new function () {
 
     this.RemoveSpinner = function (selector) {
         $(selector).children('.sentry-spinner-container').remove();
-    }
+    };
 }

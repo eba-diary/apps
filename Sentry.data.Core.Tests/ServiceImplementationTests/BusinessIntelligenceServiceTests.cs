@@ -383,7 +383,6 @@ namespace Sentry.data.Core.Tests
             Dataset newDs = new Dataset()
             {
                 DatasetId = 1,
-                PrimaryOwnerId = "081226",
                 PrimaryContactId = "081226",
                 UploadUserName = "081226",
                 IsSecured = false,

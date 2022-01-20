@@ -215,52 +215,6 @@ namespace Sentry.data.Web.Controllers
             return PartialView(model);
         }
 
-        [HttpPost]
-        //GET OWNER OF SAID ASSET
-        public async Task<ActionResult> GetOwner(string assetKeyCode)
-        {
-            DatasetModel cdm = new DatasetModel();
-
-            //CALL SAID SERVICE TO RETURN ASSET
-            SAIDAsset asset = await _saidService.GetAssetByKeyCode(assetKeyCode);
-            
-            if (asset != null && asset.Roles != null && asset.Roles.Count > 0)
-            {
-                //LOCATE OWNER IN ASSET
-                FindOwnerInAsset(asset, ref cdm);
-                return Json(new { success = true, primaryOwnerName = cdm.PrimaryOwnerName, primaryOwnerId = cdm.PrimaryOwnerId });
-            }
-            else
-            {
-                return Json(new { success = false, primaryOwnerName = String.Empty, primaryOwnerId = String.Empty });
-            }
-        }
-
-        private void FindOwnerInAsset(SAIDAsset asset, ref DatasetModel model)
-        {
-            //FIRST try for Information Owner
-            SAIDRole role = asset.Roles.FirstOrDefault(w => w.Role == "Information Owner");
-
-            //SECOND try for Custodian
-            if (role == null)
-            {
-                role = asset.Roles.FirstOrDefault(w => w.Role == "Custodian - Production");
-            }
-
-            //THIRD take anything
-            if (role == null)
-            {
-                role = asset.Roles.FirstOrDefault();
-            }
-
-            if (role != null)
-            {
-                model.PrimaryOwnerId = role.AssociateId;
-                model.PrimaryOwnerName = role.Name;
-            }
-        }
-
-
         private async Task<List<SelectListItem>> BuildSAIDAssetDropDown(string keyCode)
         {
             List<SelectListItem> output = new List<SelectListItem>();
@@ -345,7 +299,6 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Detail(int id)
         {
             DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
-
             if (dto != null)
             {
                 DatasetDetailModel model = new DatasetDetailModel(dto);
@@ -430,7 +383,7 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public ActionResult AccessRequest(int datasetId)
         {
-            DatasetAccessRequestModel model = _datasetService.GetAccessRequest(datasetId).ToDatasetModel();
+            DatasetAccessRequestModel model = _datasetService.GetAccessRequestAsync(datasetId).Result.ToDatasetModel();
             model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
             return PartialView("DatasetAccessRequest", model);
         }
@@ -632,9 +585,6 @@ namespace Sentry.data.Web.Controllers
             }
 
             DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
-            int a = dtqa.GetDataTablesResponse().data.Count();
-
-            Debug.WriteLine(a);
             
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
@@ -1398,10 +1348,6 @@ namespace Sentry.data.Web.Controllers
                         break;
                     case Dataset.ValidationErrors.datasetDescriptionRequired:
                         ModelState.AddModelError(nameof(DatasetModel.DatasetDesc), vr.Description);
-                        break;
-                    case Dataset.ValidationErrors.datasetOwnerRequired:
-                    case Dataset.ValidationErrors.datasetOwnerInvalid:
-                        ModelState.AddModelError(nameof(DatasetModel.PrimaryOwnerId), vr.Description);
                         break;
                     case Dataset.ValidationErrors.datasetCreatedByRequired:
                         ModelState.AddModelError(nameof(DatasetModel.CreationUserId), vr.Description);

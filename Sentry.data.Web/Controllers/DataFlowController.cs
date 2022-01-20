@@ -133,6 +133,10 @@ namespace Sentry.data.Web.Controllers
             }
 
             DataFlowDetailDto dto = _dataFlowService.GetDataFlowDetailDto(id);
+            if (dto.ObjectStatus != ObjectStatusEnum.Active)
+            {
+                return View("NotFound");
+            }
             DataFlowModel model = ToDataFlowModel(dto);
 
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);

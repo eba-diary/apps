@@ -588,6 +588,8 @@ data.Dataset = {
         };
         Sentry.InjectSpinner($("#tab-container"));
 
+
+
         $.ajax({
             type: "GET",
             url: "/api/v2/querytool/dataset/" + location.pathname.split('/')[3] + "/config/" + $('#datasetConfigList').val() + "/SampleRecords",
@@ -833,29 +835,6 @@ data.Dataset = {
 
         //saidAsset onChange needs to update #PrimaryOwnerName and #PrimaryOwnerId based on saidAsset picked
         $("#saidAsset").change(function () {
-
-            //GET SAID ASSET FROM DROPDOWN
-            var assetKeyCode = $("#saidAsset").val();
-
-            //Send the JSON array to Controller using AJAX.
-            $.ajax({
-                type: "POST",
-                url: "/Dataset/GetOwner",
-                traditional: true,
-                data: JSON.stringify({ assetKeyCode: assetKeyCode }),
-                contentType: "application/json",
-                success: function (r) {
-                    $("#PrimaryOwnerName").val(r.primaryOwnerName);
-                    $("#PrimaryOwnerId").val(r.primaryOwnerId);
-                },
-                failure: function () {
-                    data.Dale.makeToast("error", "Error retrieving SAID Primary Owner.");
-                },
-                error: function () {
-                    data.Dale.makeToast("error", "Error retrieving SAID Primary Owner.");
-                }
-            });
-
             //Load the named environments for the selected asset
             Sentry.InjectSpinner($("div#DatasetFormContent #namedEnvironmentSpinner"), 30);
             data.Dataset.populateNamedEnvironments();
@@ -1271,8 +1250,6 @@ data.Dataset = {
             url.searchParams.set('tab', 'SchemaColumns');
             window.history.pushState({}, '', url);
 
-
-
             if ($('#tabSchemaColumns').is(':empty')) {
                 Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
@@ -1284,7 +1261,6 @@ data.Dataset = {
                         data.Dataset.UpdateMetadata();
                         $('#delroySpinner').hide();
                         data.RemoveSpinner('#tab-container');
-
                     }
                 });
             }
@@ -1293,8 +1269,6 @@ data.Dataset = {
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaColumns/LogView',
                 });
             }
-
-
         });
 
         $('#detailTabSchemaAbout').click(function (e) {
@@ -1306,7 +1280,6 @@ data.Dataset = {
 
             var id = $('#RequestAccessButton').attr("data-id");
 
-
             if ($('#tabSchemaAbout').is(':empty')) {
                 Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
@@ -1317,18 +1290,14 @@ data.Dataset = {
                         ko.applyBindings(self.vm, $("#tabSchemaAbout")[0]);
                         data.Dataset.UpdateMetadata();
                         data.RemoveSpinner('#tab-container');
-
                     }
                 });
             }
-
             else {
                 $.ajax({
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaAbout/LogView',
                 });
             }
-
-
         });
 
         $('#detailTabDataPreview').click(function (e) {
@@ -1339,8 +1308,6 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             var id = $('#RequestAccessButton').attr("data-id");
-
-
 
             if ($('#tabDataPreview').is(':empty')) {
                 Sentry.InjectSpinner($("#tab-container"));
@@ -1361,8 +1328,6 @@ data.Dataset = {
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataPreview/LogView',
                 });
             }
-
-
         });
 
         $('#detailTabDataFiles').click(function (e) {
@@ -1380,16 +1345,12 @@ data.Dataset = {
                     dataType: 'html',
                     success: function (view) {
                         $('#tabDataFiles').html(view);
-
                         if (self.vm.ShowDataFileTable()) {
                             var configId = $('#datasetConfigList').val();
                             data.Dataset.DatasetFileTableInit(configId);
                             data.Dataset.DatasetBundingFileTableInit(configId);
                         }
-
                         data.RemoveSpinner('#tab-container');
-
-
                     }
                 });
             }
@@ -1405,7 +1366,7 @@ data.Dataset = {
         var tab = url.searchParams.get('tab');
         if (tab == undefined) {
             tab = 'SchemaAbout';
-        }
+        }        
         $("#detailTab" + tab).trigger('click');
 
     },

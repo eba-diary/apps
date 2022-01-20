@@ -1,6 +1,7 @@
 ﻿using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -16,8 +17,10 @@ namespace Sentry.data.Core
         bool UpdateAndSaveDatasetFileConfig(DatasetFileConfigDto dto);
         DataSourceDto GetDataSourceDto(int Id);
         UserSecurity GetUserSecurityForDataSource(int id);
-        AccessRequest GetDataSourceAccessRequest(int dataSourceId);
+        Task<AccessRequest> GetDataSourceAccessRequest(int dataSourceId);
+
         string RequestAccessToDataSource(AccessRequest request);
+
 
         /// <summary>
         /// Return DastasetFileConfig Dto object

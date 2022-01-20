@@ -1,4 +1,6 @@
-﻿namespace Sentry.data.Core
+﻿using System.Collections.Generic;
+
+namespace Sentry.data.Core
 {
     public class DaleAdvancedCriteriaDto
     {
@@ -24,6 +26,43 @@
 
         public string SourceType { get; set; }
         public bool SourceTypeIsValid { get; set; }
+
+        public string ToEventString()
+        {
+            List<string> criterias = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(Asset))
+            {
+                criterias.Add($"Asset:{Asset}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(Server))
+            {
+                criterias.Add($"Server:{Server}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(Database))
+            {
+                criterias.Add($"Database:{Database}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(Object))
+            {
+                criterias.Add($"Object:{Object}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(ObjectType))
+            {
+                criterias.Add($"ObjectType:{ObjectType}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(Column))
+            {
+                criterias.Add($"Column:{Column}");
+            }
+
+            return string.Join(" AND ", criterias);
+        }
 
     }
 }

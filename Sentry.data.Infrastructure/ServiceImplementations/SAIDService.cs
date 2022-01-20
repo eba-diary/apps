@@ -31,6 +31,25 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
             return asset;
         }
 
+        /// <summary>
+        /// Gets all Production Custodians for a given SAID asset.
+        /// </summary>
+        /// <param name="keyCode">SAID Asset Keycode</param>
+        /// <returns></returns>
+        public async Task<List<SAIDRole>> GetAllProdCustByKeyCode(string keyCode)
+        {
+            SAIDAsset asset = await GetAssetByKeyCode(keyCode).ConfigureAwait(false);
+            List<SAIDRole> prodCusts = new List<SAIDRole>();
+            foreach(SAIDRole role in asset.Roles)
+            {
+                if (role.Role.Equals("Custodian - Production"))
+                {
+                    prodCusts.Add(role);
+                }
+            }
+            return prodCusts;
+        }
+
         public async Task<List<SAIDAsset>> GetAllAssets()
         {
             /* We are caching the list of all SAID assets for two reasons:

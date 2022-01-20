@@ -8,10 +8,7 @@ namespace Sentry.data.Web
     public class SearchModel
     {
         public SearchModel(Dataset ds, IAssociateInfoProvider _associateInfoProvider)
-        {
-
-            Sentry.Associates.Associate sentryAssociate = String.IsNullOrWhiteSpace(ds.PrimaryOwnerId)? null : _associateInfoProvider.GetAssociateInfo(ds.PrimaryOwnerId);
-            
+        {            
             if (ds.DatasetCategories.Count > 1)
             {
                 List<string> catNameList = new List<string>();
@@ -44,7 +41,6 @@ namespace Sentry.data.Web
             this.DatasetId = ds.DatasetId;
             this.DatasetDesc = ds.DatasetDesc;
             this.DatasetInformation = ds.DatasetInformation;
-            this.SentryOwnerName = (sentryAssociate == null) ? null : Sentry.data.Core.Helpers.DisplayFormatter.FormatAssociateName(sentryAssociate);
             //this.DistinctFileExtensions = ds.DatasetFiles.Select(x => Utilities.GetFileExtension(x.FileName).ToLower()).Distinct().ToList();
             this.Frequencies = null;
             this.BusinessUnits = ds.BusinessUnits.Select(x => x.Name).ToList();
@@ -123,7 +119,6 @@ namespace Sentry.data.Web
 
         public string DatasetInformation { get; set; }
 
-        public string SentryOwnerName { get; set; }
 
         public List<string> DistinctFileExtensions { get; set; }
 

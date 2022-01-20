@@ -66,8 +66,20 @@ namespace Sentry.data.Infrastructure
             }
 
             
-            List<Event> dsEvents = events.Where(w => w.EventType.Group != EventTypeGroup.BusinessArea.GetDescription()).Distinct().ToList();
+            List<Event> dsEvents = events.Where(w => w.EventType.Group == EventTypeGroup.DataSet.GetDescription()
+                                                    || w.EventType.Description == GlobalConstants.EventType.CREATED_DATASET
+                                                    || w.EventType.Description == GlobalConstants.EventType.CREATE_DATASET_SCHEMA
+                                                    || w.EventType.Description == GlobalConstants.EventType.CREATED_REPORT
+                                                ).Distinct().ToList();
+
             List<Event> baEvents = events.Where(w => w.EventType.Group == EventTypeGroup.BusinessArea.GetDescription()).Distinct().OrderBy(o => o.TimeCreated).ToList();
+            
+            List<Event> DSCEvents = events.Where(w => w.EventType.Group == EventTypeGroup.BusinessAreaDSC.GetDescription()
+                                                    && w.EventType.Description != GlobalConstants.EventType.CREATED_DATASET
+                                                    && w.EventType.Description != GlobalConstants.EventType.CREATE_DATASET_SCHEMA
+                                                    && w.EventType.Description != GlobalConstants.EventType.CREATED_REPORT
+                                                ).Distinct().OrderBy(o => o.TimeCreated).ToList();
+
 
             string header = String.Empty;
             //DATASET
@@ -85,6 +97,15 @@ namespace Sentry.data.Infrastructure
                 header = @"<tr bgcolor='00A3E0'><td><b>Creation Date</b></td><td><b>Description</b></td><td><b>Initiator</b></td><td><b>Event Type</b></td><td><b>Expiration Date</b></td></tr>";
                 body.Append(CreateEvents(header, EventTypeGroup.BusinessArea, baEvents));
             }
+
+            //BUSINESSAREA DSC
+            if (DSCEvents.Any())
+            {
+                body.Append(@"</p><table cellpadding='0' cellspacing='0' border='0' width='100 % '><tr bgcolor='003DA5'><td><b>Data.Sentry.com Events</b></td></table></p>");
+                header = @"<tr bgcolor='00A3E0'><td><b>Creation Date</b></td><td><b>Description</b></td><td><b>Initiator</b></td><td><b>Event Type</b></td><td><b>Expiration Date</b></td></tr>";
+                body.Append(CreateEvents(header, EventTypeGroup.BusinessAreaDSC, DSCEvents));
+            }
+
             myMail.Body = body.ToString();
             smtpClient.Send(myMail);
         }
@@ -143,7 +164,8 @@ namespace Sentry.data.Infrastructure
             body.Append(@" <tr>");
             body.Append(@" <td" + columnStyle   + " >" + e.TimeCreated + @"</td>");
 
-            if (group == EventTypeGroup.BusinessArea)
+            //EventTypeGroup's BusinessArea and BusinessAreaDSC both share same format
+            if (group == EventTypeGroup.BusinessArea || group == EventTypeGroup.BusinessAreaDSC )
             {
                 //BA Events Title and Message needs to be decoded because its stored as encoded HTML to show a RTF
                 string reason = System.Net.WebUtility.HtmlDecode(e.Notification.Title);
@@ -162,7 +184,7 @@ namespace Sentry.data.Infrastructure
             body.Append(@"<td" + columnStyle + ">" + user + @"</td>");
             body.Append(@"<td" + columnStyle + ">" + e.EventType.Description + @"</td>");
 
-            if(group == EventTypeGroup.BusinessArea)
+            if(group == EventTypeGroup.BusinessArea || group == EventTypeGroup.BusinessAreaDSC)
             {
                 body.Append(@"<td" + columnStyle + ">" + e.Notification.ExpirationTime + @"</td>");
             }

@@ -80,7 +80,6 @@ namespace Sentry.data.Core.Tests
                 DatasetDesc = "Test Claim Datasaet",
                 DatasetInformation = "Specific Information regarding datasetfile consumption",
                 CreationUserName = "Creater_User",
-                PrimaryOwnerId = "072984",
                 UploadUserName = "Upload_User",
                 OriginationCode = "Internal",
                 DatasetDtm = System.DateTime.Now.AddYears(-13),

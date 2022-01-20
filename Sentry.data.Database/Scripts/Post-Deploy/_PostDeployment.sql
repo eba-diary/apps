@@ -75,5 +75,6 @@ DECLARE @ErrorState INT;
 :r ..\Post-Deploy\SupportingScripts\Sprint_22_01_01\HOTFIX-CLA-3556-DEFAULT-EXHIBIT-SAID-ASSET.sql
 :r ..\Post-Deploy\SupportingScripts\Release_02_00_03\CLA-3465-HISTORY-FIX-SCHEMA-SnowflakeWarehouse.sql
 :r ..\Post-Deploy\SupportingScripts\Release_02_00_03\CLA3606_Move_CLA3240_UseDropLocationV2_to_LaunchDarkly.sql
-
+:r ..\Post-Deploy\SupportingScripts\Release_02_00_07\CLA-3729-HISTORY-FIX-EVENT-Reason.sql
+:r ..\Post-Deploy\SupportingScripts\Release_02_00_07\CLA-3729-HISTORY-FIX-EVENT-IsProcessed.sql
 

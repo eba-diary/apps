@@ -1624,7 +1624,7 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public ActionResult DataSourceAccessRequest(int dataSourceId)
         {
-            DataSourceAccessRequestModel model = _configService.GetDataSourceAccessRequest(dataSourceId).ToDataSourceModel();
+            DataSourceAccessRequestModel model = _configService.GetDataSourceAccessRequest(dataSourceId).Result.ToDataSourceModel();
             model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
             return PartialView("DataSourceAccessRequest", model);
         }
