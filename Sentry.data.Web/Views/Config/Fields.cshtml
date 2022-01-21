@@ -25,12 +25,6 @@
                     }
                 </h1>
 
-                @{
-                    foreach (string item in Model.DistinctFileExtensions())
-                    {
-                        <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
-                    }
-                }
 
                 <div style="margin-top:-29px;">
                     <div class="btn-group rightFloat dataset-operation-button">

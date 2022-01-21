@@ -333,7 +333,7 @@ namespace Sentry.data.Core
 
 
                     /************************************************
-                     * During conversion for CLA3332, performing dataflow deletes will not do 
+                     * During conversion for CLA3332, performing dataflow deletes will not go 
                      *  through Logical delete first, therefore, some of the 
                      *  values (DeleteIssuer, DeleteIssueDTM) need to be set within this else block. 
                     ************************************************/
