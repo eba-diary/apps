@@ -450,6 +450,8 @@ namespace Sentry.data.Core
             /* Get associated producer flow(s) */
             List<int> producerDataflowIdList = GetProducerFlowsToBeDeletedBySchemaId(scm.SchemaId);
 
+            Logger.Info($"{producerDataflowIdList.Count} dataflows identified");
+
             if (logicalDelete)
             {
                 /* Mark associated producer dataflows for deletion */
@@ -489,7 +491,7 @@ namespace Sentry.data.Core
             {
                 Logger.Debug($"Schema Flow not found by name, attempting to detect by id...");
 
-                SchemaMap mappedStep = _datasetContext.SchemaMap.SingleOrDefault(w => w.MappedSchema.SchemaId == scm.SchemaId && w.DataFlowStepId.Action.Name == "Schema Load");
+                SchemaMap mappedStep = _datasetContext.SchemaMap.SingleOrDefault(w => w.MappedSchema.SchemaId == scm.SchemaId && w.DataFlowStepId.Action.Name == "Schema Load" && w.DataFlowStepId.DataFlow.Name.StartsWith("FileSchema"));
                 if (mappedStep != null)
                 {
                     Logger.Debug($"detected schema flow by Id");
@@ -559,10 +561,15 @@ namespace Sentry.data.Core
 
         private List<int> GetProducerFlowsToBeDeletedBySchemaId(int schemaId)
         {
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(GetProducerFlowsToBeDeletedBySchemaId)}> Method Start");
             List<int> producerFlowIdList = new List<int>();
 
-            /* Get producer flow Ids which map to schema */
-            List<Tuple<int, int>> producerSchemaMapIds = _datasetContext.SchemaMap.Where(w => w.MappedSchema.SchemaId == schemaId && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaMap).Select(s => new Tuple<int, int>(s.DataFlowStepId.Id, s.DataFlowStepId.DataFlow.Id)).ToList();
+            /* Get producer flow Ids which map to schema that are active*/
+            List<Tuple<int, int>> producerSchemaMapIds = _datasetContext.SchemaMap.Where(w => 
+                                            w.MappedSchema.SchemaId == schemaId
+                                            && !w.DataFlowStepId.DataFlow.Name.Contains("FileSchemaFlow")
+                                            && w.DataFlowStepId.DataFlow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active
+                                            ).Select(s => new Tuple<int, int>(s.DataFlowStepId.Id, s.DataFlowStepId.DataFlow.Id)).ToList();
 
             foreach (Tuple<int, int> item in producerSchemaMapIds)
             {
@@ -582,6 +589,7 @@ namespace Sentry.data.Core
                 }
             }
 
+            Logger.Info($"<{nameof(DataFlowService)}-{nameof(GetProducerFlowsToBeDeletedBySchemaId)}> Method End");
             return producerFlowIdList;
         }
 

@@ -302,12 +302,19 @@ namespace Sentry.data.Core
         /// metadata before hangfire job is queued. </remarks>
         public void DeleteJob(int id, string deleteIssuerId = null, bool logicalDelete = true)
         {
+            string methodName = $"{nameof(JobService).ToLower()}_{nameof(DeleteJob).ToLower()}";
+            Logger.Debug($"{methodName} Start Method");
             try
             {
                 //Get RetrieverJob
                 RetrieverJob job = _datasetContext.GetById<RetrieverJob>(id);
 
-                if (logicalDelete)
+                //If retriever job is already deleted, stop processing
+                if (job.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted)
+                {
+                    Logger.Debug($"{methodName} retiever job already deleted (jobid:{job.Id})");
+                }
+                else if (logicalDelete)
                 {
                     //Remove job from HangFire scheduler
                     DeleteJobFromScheduler(job);
@@ -349,10 +356,12 @@ namespace Sentry.data.Core
                         job.DeleteIssueDTM = DateTime.Now;
                     }
                 }
+
+                Logger.Debug($"{methodName} End Method");
             }
             catch (Exception ex)
             {
-                Logger.Error($"jobservice-deletejob-failed - jobid:{id}", ex);
+                Logger.Error($"{methodName} - failed - jobid:{id}", ex);
                 throw;
             }
         }
