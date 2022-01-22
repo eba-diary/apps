@@ -5,6 +5,6 @@ namespace Sentry.data.Core
     public class FilterCategoryDto
     {
         public string CategoryName { get; set; }
-        public List<string> CategoryOptionValues { get; set; }
+        public List<FilterCategoryOptionDto> CategoryOptions { get; set; } = new List<FilterCategoryOptionDto>();
     }
 }

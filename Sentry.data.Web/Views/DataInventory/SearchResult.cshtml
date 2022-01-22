@@ -1,22 +1,24 @@
-﻿<table class="table table-striped table-bordered blue" id="di-result-table">
+﻿@using Sentry.data.Core
+
+<table class="table table-striped table-bordered blue" id="di-result-table">
     <thead>
         <tr class="table-header_blue categoryBanner-blue">
-            <th>Asset</th>
-            <th>Server</th>
-            <th>Database</th>
-            <th>Table/View Name</th>
-            <th>Type</th>
-            <th>Column</th>
-            <th>Is Sensitive</th>
+            <th>@GlobalConstants.FilterCategoryNames.ASSET</th>
+            <th>@GlobalConstants.FilterCategoryNames.SERVER</th>
+            <th>@GlobalConstants.FilterCategoryNames.DATABASE</th>
+            <th>@GlobalConstants.FilterCategoryNames.TABLEVIEWNAME</th>
+            <th>@GlobalConstants.FilterCategoryNames.TYPE</th>
+            <th>@GlobalConstants.FilterCategoryNames.COLUMN</th>
+            <th>@GlobalConstants.FilterCategoryNames.SENSITIVE</th>
             <th>Owner Verified</th>
-            <th>Server Type</th>
-            <th>Datatype</th>
+            <th>@GlobalConstants.FilterCategoryNames.ENVIRONMENT</th>
+            <th>@GlobalConstants.FilterCategoryNames.DATATYPE</th>
             <th>Length</th>
             <th>Precision</th>
             <th>Scale</th>
-            <th>Is Nullable</th>
+            <th>@GlobalConstants.FilterCategoryNames.NULLABLE</th>
             <th>Discovery Date</th>
-            <th>Source Type</th>
+            <th>@GlobalConstants.FilterCategoryNames.SOURCETYPE</th>
             <th>Scan Category</th>
             <th>Scan Type</th>
         </tr>

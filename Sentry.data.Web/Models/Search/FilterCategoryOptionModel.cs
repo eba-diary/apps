@@ -14,7 +14,7 @@ namespace Sentry.data.Web
 
         public string OptionValue { get; set; }
         public string ParentCategoryName { get; set; }
-        public int ResultCount { get; set; }
+        public long ResultCount { get; set; }
         public bool Selected { get; set; }
     }
 }

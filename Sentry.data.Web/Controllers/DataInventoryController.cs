@@ -20,12 +20,10 @@ namespace Sentry.data.Web.Controllers
             searchModel.PageTitle = "Data Inventory";
             searchModel.IconPath = "~/Images/Dale/DataInventoryIcon.png";
             searchModel.ResultView = "SearchResult";
-            searchModel.FilterCategories = new List<FilterCategoryModel>()
+            searchModel.FilterCategories.Add(new FilterCategoryModel()
             {
-                new FilterCategoryModel()
-                {
-                    CategoryName = "Environment",
-                    CategoryOptions = new List<FilterCategoryOptionModel>()
+                CategoryName = "Environment",
+                CategoryOptions = new List<FilterCategoryOptionModel>()
                     {
                         new FilterCategoryOptionModel()
                         {
@@ -34,8 +32,7 @@ namespace Sentry.data.Web.Controllers
                             ParentCategoryName = "Environment"
                         }
                     }
-                }
-            };
+            });
 
             if (!CanViewSensitive())
             {

@@ -38,11 +38,25 @@ namespace Sentry.data.Infrastructure
             SearchRequest<DataInventory> request = BuildTextSearchRequest(dto, 0);
             request.Aggregations = aggregations;
 
-            AggregateDictionary results = _context.Aggregate(request);
+            AggregateDictionary aggResults = _context.Aggregate(request);
 
-            //Go through the results and build the list of FilterCategoryDto
+            List<FilterCategoryDto> dtos = new List<FilterCategoryDto>();
 
-            return null;
+            foreach (string categoryName in filterCategoryFields.Keys)
+            {
+                TermsAggregate<string> categoryResults = aggResults.Terms(categoryName);
+                if (categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
+                {
+                    FilterCategoryDto categoryDto = new FilterCategoryDto() { CategoryName = categoryName };
+
+                    foreach (var bucket in categoryResults.Buckets)
+                    {
+                        categoryDto.CategoryOptions.Add(new FilterCategoryOptionDto() { OptionValue = bucket.Key, ResultCount = bucket.DocCount.GetValueOrDefault() });
+                    }
+                }
+            }
+
+            return dtos;
         }
 
         public override DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dto)

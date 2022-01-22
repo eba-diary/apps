@@ -14,7 +14,7 @@ namespace Sentry.data.Core
         
         public bool HasFilterFor(string category, string value)
         {
-            return Filters?.Any(f => f.CategoryName == category && f.CategoryOptionValues.Contains(value)) == true;
+            return Filters?.Any(f => f.CategoryName == category && f.CategoryOptions?.Any(x => x.OptionValue == value) == true) == true;
         }
     }
 }

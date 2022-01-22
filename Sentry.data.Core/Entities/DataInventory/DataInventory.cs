@@ -1,5 +1,6 @@
 ﻿using Nest;
 using System;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
@@ -11,6 +12,7 @@ namespace Sentry.data.Core
 
         [PropertyName("asset_cde")]
         [GlobalSearchField]
+        [FilterSearchField(FilterCategoryNames.ASSET)]
         public string AssetCode { get; set; }
 
         [PropertyName("basedatabase_id")]
@@ -18,6 +20,7 @@ namespace Sentry.data.Core
 
         [PropertyName("base_nme")]
         [GlobalSearchField]
+        [FilterSearchField(FilterCategoryNames.TABLEVIEWNAME)]
         public string BaseName { get; set; }
 
         [PropertyName("change_cnt")]
@@ -28,9 +31,11 @@ namespace Sentry.data.Core
 
         [PropertyName("column_nme")]
         [GlobalSearchField]
+        [FilterSearchField(FilterCategoryNames.COLUMN)]
         public string ColumnName { get; set; }
 
         [PropertyName("column_typ")]
+        [FilterSearchField(FilterCategoryNames.DATATYPE)]
         public string ColumnType { get; set; }
 
         [PropertyName("content_id")]
@@ -41,6 +46,7 @@ namespace Sentry.data.Core
 
         [PropertyName("database_nme")]
         [GlobalSearchField]
+        [FilterSearchField(FilterCategoryNames.DATABASE)]
         public string DatabaseName { get; set; }
 
         [PropertyName("effectivechange_cnt")]
@@ -59,12 +65,14 @@ namespace Sentry.data.Core
         public DateTime? ExpirationDateTime { get; set; }
 
         [PropertyName("isnullable_flg")]
+        [FilterSearchField(FilterCategoryNames.NULLABLE)]
         public bool? IsNullable { get; set; }
 
         [PropertyName("isownerverified_flg")]
         public bool IsOwnerVerified { get; set; }
 
         [PropertyName("issensitive_flg")]
+        [FilterSearchField(FilterCategoryNames.SENSITIVE)]
         public bool IsSensitive { get; set; }
 
         [PropertyName("maxlength_len")]
@@ -74,6 +82,7 @@ namespace Sentry.data.Core
         public int? Precision { get; set; }
 
         [PropertyName("prod_typ")]
+        [FilterSearchField(FilterCategoryNames.ENVIRONMENT)]
         public string ProdType { get; set; }
 
         [PropertyName("saidlist_nme")]
@@ -96,10 +105,12 @@ namespace Sentry.data.Core
 
         [PropertyName("server_nme")]
         [GlobalSearchField]
+        [FilterSearchField(FilterCategoryNames.SERVER)]
         public string ServerName { get; set; }
 
         [PropertyName("source_nme")]
         [GlobalSearchField]
+        [FilterSearchField(FilterCategoryNames.SOURCETYPE)]
         public string SourceName { get; set; }
 
         [PropertyName("@timestamp")]
@@ -110,6 +121,7 @@ namespace Sentry.data.Core
 
         [PropertyName("type_dsc")]
         [GlobalSearchField]
+        [FilterSearchField(FilterCategoryNames.TYPE)]
         public string TypeDescription { get; set; }
 
         [PropertyName("@version")]
