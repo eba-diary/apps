@@ -1,10 +1,16 @@
 ﻿data.FilterSearch = {
 
     lastSearchOptions: [],
+    executeSearch: function () { },
+    retrieveFilterOptions: function () { },
 
-    init: function () {
-        this.initUserInterface();
+    init: function (searchExecuter, filterRetriever) {
+        this.executeSearch = searchExecuter;
+        this.retrieveFilterOptions = filterRetriever;
+
         this.initEvents();
+
+        $(".filter-search-container").show();
     },
 
     initEvents: function () {
@@ -87,6 +93,30 @@
 
             data.FilterSearch.showHideApplyFilter();
         });
+
+        //search when focus on search box and hit enter
+        $("#filter-search-text").on("keypress", function (e) {
+            var keycode = (e.keyCode ? e.keyCode : e.which);
+            var input = $(this).val();
+
+            if (keycode == '13' && input && (input = $.trim(input))) {
+                data.FilterSearch.search();
+            }
+        });
+
+        //search when apply filters
+        $(".filter-search-start").on("click", function (e) {
+            e.preventDefault();
+            data.FilterSearch.search();
+        });
+    },
+
+    search: function () {
+        data.FilterSearch.searchPrep();
+        data.FilterSearch.filterRetrivalPrep();
+
+        data.FilterSearch.retrieveFilterOptions();
+        data.FilterSearch.executeSearch();
     },
 
     hideBadgeContainer: function (clearAll) {
@@ -108,7 +138,7 @@
         var hasSameValues = true;
         //determine all selected filters were in the initial filter
         selectedOptions.each(function () {
-            hasSameValues = data.FilterSearch.lastSearchOptions.some(i => this.id === i);
+            hasSameValues = data.FilterSearch.lastSearchOptions.includes(this.id);
             return hasSameValues;
         });
 
@@ -121,11 +151,42 @@
         }
     },
 
-    initUserInterface: function () {
+    searchPrep: function () {
+        $("#filter-search-text").prop("disabled", true);
+
+        $(".glyphicon-search").hide();
+        $(".filter-search-results-container").hide();
+
+        $(".fa-spin").show();
+        $(".filter-search-result-sentry-spinner").show();
+    },
+
+    completeSearch: function () {
+        $("#filter-search-text").prop("disabled", false);
+
+        $(".fa-spin").hide();
+        $(".filter-search-result-sentry-spinner").hide();
+
+        $(".glyphicon-search").show();
+        $(".filter-search-results-container").slideDown();
+
+        selectedOptions = $('.filter-search-category-option-checkbox:checkbox:checked');
+    },
+
+    filterRetrivalPrep: function () {
+        $(".filter-search-categories-container").hide();
+        $(".filter-search-result-sentry-spinner").show();
+        $("#filter-search-clear").hide();
+        $("#filter-search-apply").hide();
+    },
+
+    completeFilterRetrieval: function () {
+        $(".filter-search-categories-sentry-spinner").hide();
+        $(".filter-search-categories-container").show();
 
         var selectedOptions = $('.filter-search-category-option-checkbox:checkbox:checked');
 
-        data.FilterSearch.setLastSearchOptions(selectedOptions);
+        data.FilterSearch.lastSearchOptions = selectedOptions.map(function () { return this.id }).get();
 
         //open all filter categories with a selected option
         selectedOptions.closest('.filter-search-category-options').each(function () {
@@ -142,44 +203,34 @@
         if (selectedOptions.length > 0) {
             data.FilterSearch.showBadgeContainer();
         }
-
-        $(".filter-search-container").show();
     },
 
-    setLastSearchOptions: function (selectedOptions) {
-        this.lastSearchOptions = selectedOptions.map(function (x) { return x.id });
-    },
+    getSelectedCategoryOptions: function () {
 
-    startSearch: function () {
-        $("#filter-search-text").prop("disabled", true);
-        $(".filter-search-active-option-close").prop("disabled", true);
-        $(".filter-search-category-option-checkbox").prop("disabled", true);
+        var categories = [];
 
-        $(".glyphicon-search").hide();
-        $(".filter-search-results-container").hide();
-        $("#filter-search-clear").hide();
-        $("#filter-search-apply").hide();
+        $('.filter-search-category-option-checkbox:checkbox:checked').each(function () {
+            var parts = this.id.split('_');
 
-        $(".fa-spin").show();
-        $(".filter-search-sentry-spinner-container").show();
-    },
+            var option = {
+                OptionValue: $(this).attr('value'),
+                ParentCategoryName: parts[0],
+                Selected: true
+            };
 
-    completeSearch: function () {
-        $("#filter-search-text").prop("disabled", false);
-        $(".filter-search-active-option-close").prop("disabled", false);
-        $(".filter-search-category-option-checkbox").prop("disabled", false);
+            var exists = categories.find(x => x.CategoryName == option.ParentCategoryName);
 
-        $(".fa-spin").hide();
-        $(".filter-search-sentry-spinner-container").hide();
+            if (exists) {
+                exists.CategoryOptions.push(option)
+            }
+            else {
+                categories.push({
+                    CategoryName: option.ParentCategoryName,
+                    CategoryOptions: [option]
+                })
+            }
+        });
 
-        $(".glyphicon-search").show();
-        $(".filter-search-results-container").slideDown();
-
-        selectedOptions = $('.filter-search-category-option-checkbox:checkbox:checked');
-
-        if (selectedOptions.length > 0) {
-            data.FilterSearch.setLastSearchOptions(selectedOptions);
-            data.FilterSearch.showBadgeContainer();
-        }
+        return categories;
     }
 }

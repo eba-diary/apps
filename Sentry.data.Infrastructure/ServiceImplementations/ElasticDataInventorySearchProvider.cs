@@ -19,117 +19,30 @@ namespace Sentry.data.Infrastructure
 
         public override DaleResultDto GetSearchResults(DaleSearchDto dto)
         {
-            List<QueryContainer> must = new List<QueryContainer>();
-            List<QueryContainer> should = new List<QueryContainer>();
-            int minShould = 0;
-
-            if (dto.Destiny == Core.GlobalEnums.DaleDestiny.Advanced)
-            {
-                //targeted search of only fields with criteria            
-                must.AddWildcard<DataInventory>(x => x.AssetCode, dto.AdvancedCriteria.Asset);
-                must.AddWildcard<DataInventory>(x => x.ServerName, dto.AdvancedCriteria.Server);
-                must.AddWildcard<DataInventory>(x => x.DatabaseName, dto.AdvancedCriteria.Database);
-                must.AddWildcard<DataInventory>(x => x.BaseName, dto.AdvancedCriteria.Object);
-                must.AddWildcard<DataInventory>(x => x.TypeDescription, dto.AdvancedCriteria.ObjectType);
-                must.AddWildcard<DataInventory>(x => x.ColumnName, dto.AdvancedCriteria.Column);
-                must.AddWildcard<DataInventory>(x => x.SourceName, dto.AdvancedCriteria.SourceType);
-
-                should.AddFuzzyMatch<DataInventory>(x => x.AssetCode, dto.AdvancedCriteria.Asset);
-                should.AddFuzzyMatch<DataInventory>(x => x.ServerName, dto.AdvancedCriteria.Server);
-                should.AddFuzzyMatch<DataInventory>(x => x.DatabaseName, dto.AdvancedCriteria.Database);
-                should.AddFuzzyMatch<DataInventory>(x => x.BaseName, dto.AdvancedCriteria.Object);
-                should.AddFuzzyMatch<DataInventory>(x => x.TypeDescription, dto.AdvancedCriteria.ObjectType);
-                should.AddFuzzyMatch<DataInventory>(x => x.ColumnName, dto.AdvancedCriteria.Column);
-                should.AddFuzzyMatch<DataInventory>(x => x.SourceName, dto.AdvancedCriteria.SourceType);
-            }
-            else if (!string.IsNullOrWhiteSpace(dto.Criteria))
-            {
-                //broad search for criteria across all searchable fields
-                Nest.Fields fields = NestHelper.GlobalSearchFields<DataInventory>();
-
-                //split search terms regardless of amount of spaces between words
-                List<string> terms = dto.Criteria.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-
-                //perform cross field search when multiple words in search criteria
-                if (terms.Count > 1)
-                {
-                    should.Add(new QueryStringQuery()
-                    {
-                        Query = string.Join(" ", terms),
-                        Fields = fields,
-                        Fuzziness = Fuzziness.Auto,
-                        Type = TextQueryType.CrossFields,
-                        DefaultOperator = Operator.And
-                    });
-
-                    should.Add(new QueryStringQuery()
-                    {
-                        Query = string.Join(" ", terms.Select(x => $"*{x}*")),
-                        Fields = fields,
-                        AnalyzeWildcard = true,
-                        Type = TextQueryType.CrossFields,
-                        DefaultOperator = Operator.And
-                    });
-                }
-                else
-                {
-                    should.Add(new QueryStringQuery()
-                    {
-                        Query = terms.First(),
-                        Fields = fields,
-                        Fuzziness = Fuzziness.Auto,
-                        Type = TextQueryType.MostFields
-                    });
-
-                    should.Add(new QueryStringQuery()
-                    {
-                        Query = $"*{terms.First()}*",
-                        Fields = fields,
-                        AnalyzeWildcard = true,
-                        Type = TextQueryType.MostFields
-                    });
-                }
-
-                minShould = 1;
-            }
-
-            List<QueryContainer> filter = new List<QueryContainer>();
-
-            if (dto.Sensitive == Core.GlobalEnums.DaleSensitive.SensitiveOnly)
-            {
-                filter.AddMatch<DataInventory>(x => x.IsSensitive, "true");
-            }
-            else if (dto.Sensitive == Core.GlobalEnums.DaleSensitive.SensitiveNone)
-            {
-                filter.AddMatch<DataInventory>(x => x.IsSensitive, "false");
-            }
-
-            if (dto.EnvironmentFilter == EnvironmentFilters.PROD)
-            {
-                filter.AddMatch<DataInventory>(x => x.ProdType, "P");
-            }
-            else if (dto.EnvironmentFilter == EnvironmentFilters.NONPROD)
-            {
-                filter.AddMatch<DataInventory>(x => x.ProdType, "D");
-            }
-
-            SearchRequest<DataInventory> request = new SearchRequest<DataInventory>()
-            {
-                Size = 1000,
-                Query = new BoolQuery()
-                {
-                    MustNot = new List<QueryContainer>() { new ExistsQuery() { Field = Infer.Field<DataInventory>(x => x.ExpirationDateTime) } },
-                    Filter = filter,
-                    Must = must,
-                    Should = should,
-                    MinimumShouldMatch = minShould
-                }
-            };
-
             DaleResultDto resultDto = new DaleResultDto();
-            resultDto.DaleResults = SearchDataInventory(dto, request, resultDto).Select(x => x.ToDto()).ToList();
-
+            resultDto.DaleResults = SearchDataInventory(dto, BuildTextSearchRequest(dto, 10000), resultDto).Select(x => x.ToDto()).ToList();
             return resultDto;
+        }
+
+        public override List<FilterCategoryDto> GetSearchFilters(DaleSearchDto dto)
+        {
+            AggregationDictionary aggregations = new AggregationDictionary();
+
+            Dictionary<string, Field> filterCategoryFields = NestHelper.FilterCategoryFields<DataInventory>();
+
+            foreach (KeyValuePair<string, Field> field in filterCategoryFields)
+            {
+                aggregations.Add(field.Key, new TermsAggregation(field.Key) { Field = field.Value });
+            }
+
+            SearchRequest<DataInventory> request = BuildTextSearchRequest(dto, 0);
+            request.Aggregations = aggregations;
+
+            AggregateDictionary results = _context.Aggregate(request);
+
+            //Go through the results and build the list of FilterCategoryDto
+
+            return null;
         }
 
         public override DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dto)
@@ -201,6 +114,97 @@ namespace Sentry.data.Infrastructure
             }
 
             return new List<DataInventory>();
+        }
+
+        private SearchRequest<DataInventory> BuildTextSearchRequest(DaleSearchDto dto, int searchSize)
+        {
+            List<QueryContainer> must = new List<QueryContainer>();
+            List<QueryContainer> should = new List<QueryContainer>();
+            int minShould = 0;
+
+            if (!string.IsNullOrWhiteSpace(dto.Criteria))
+            {
+                //broad search for criteria across all searchable fields
+                Nest.Fields fields = NestHelper.SearchFields<DataInventory>();
+
+                //split search terms regardless of amount of spaces between words
+                List<string> terms = dto.Criteria.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+                //perform cross field search when multiple words in search criteria
+                if (terms.Count > 1)
+                {
+                    should.Add(new QueryStringQuery()
+                    {
+                        Query = string.Join(" ", terms),
+                        Fields = fields,
+                        Fuzziness = Fuzziness.Auto,
+                        Type = TextQueryType.CrossFields,
+                        DefaultOperator = Operator.And
+                    });
+
+                    should.Add(new QueryStringQuery()
+                    {
+                        Query = string.Join(" ", terms.Select(x => $"*{x}*")),
+                        Fields = fields,
+                        AnalyzeWildcard = true,
+                        Type = TextQueryType.CrossFields,
+                        DefaultOperator = Operator.And
+                    });
+                }
+                else
+                {
+                    should.Add(new QueryStringQuery()
+                    {
+                        Query = terms.First(),
+                        Fields = fields,
+                        Fuzziness = Fuzziness.Auto,
+                        Type = TextQueryType.MostFields
+                    });
+
+                    should.Add(new QueryStringQuery()
+                    {
+                        Query = $"*{terms.First()}*",
+                        Fields = fields,
+                        AnalyzeWildcard = true,
+                        Type = TextQueryType.MostFields
+                    });
+                }
+
+                minShould = 1;
+            }
+
+            List<QueryContainer> filter = new List<QueryContainer>();
+
+            if (dto.HasFilterFor("Sensitivity", "Sensitive"))
+            {
+                filter.AddMatch<DataInventory>(x => x.IsSensitive, "true");
+            }
+            else if (dto.HasFilterFor("Sensitivity", "Public"))
+            {
+                filter.AddMatch<DataInventory>(x => x.IsSensitive, "false");
+            }
+
+            if (dto.HasFilterFor("Environment", "Prod"))
+            {
+                filter.AddMatch<DataInventory>(x => x.ProdType, "P");
+            }
+            else if (dto.HasFilterFor("Environment", "NonProd"))
+            {
+                filter.AddMatch<DataInventory>(x => x.ProdType, "D");
+            }
+
+            return new SearchRequest<DataInventory>()
+            {
+                Size = searchSize,
+                Query = new BoolQuery()
+                {
+                    MustNot = new List<QueryContainer>() { new ExistsQuery() { Field = Infer.Field<DataInventory>(x => x.ExpirationDateTime) } },
+                    Filter = filter,
+                    Must = must,
+                    Should = should,
+                    MinimumShouldMatch = minShould
+                }
+            };
         }
     }
 }

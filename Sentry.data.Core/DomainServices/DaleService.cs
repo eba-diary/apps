@@ -28,6 +28,11 @@ namespace Sentry.data.Core
             return dtoResult;
         }
 
+        public List<FilterCategoryDto> GetSearchFilters(DaleSearchDto searchDto)
+        {
+            return _daleSearchProvider.GetSearchFilters(searchDto);
+        }
+
         public bool UpdateIsSensitive(List<DaleSensitiveDto> dtos)
         {
             bool success = false;

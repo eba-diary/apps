@@ -1655,8 +1655,9 @@
     <Content Include="Views\Dataset\Details\_DataPreview.cshtml" />
     <Content Include="Views\Dataset\Details\_DataFiles.cshtml" />
     <Content Include="Views\Home\_FeedEmpty.cshtml" />
-    <Content Include="Views\Shared\_FilterSearch.cshtml" />
-    <Content Include="Views\DataInventory\Search.cshtml" />
+    <Content Include="Views\DataInventory\SearchResult.cshtml" />
+    <Content Include="Views\Search\FilterSearch.cshtml" />
+    <Content Include="Views\Search\FilterCategories.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

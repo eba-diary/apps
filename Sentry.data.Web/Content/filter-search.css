@@ -101,6 +101,11 @@
     }
 
 
+.filter-search-categories-sentry-spinner {
+    display: flex;
+    margin-top: 10em;
+}
+
 .filter-search-category-options {
     padding: 0;
 }
@@ -141,7 +146,7 @@
     padding-bottom: 1em
 }
 
-.filter-search-sentry-spinner-container {
+.filter-search-result-sentry-spinner {
     width: 100%;
     display: flex;
 }

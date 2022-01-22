@@ -1,38 +1,16 @@
 ﻿data.DataInventory = {
 
     init: function () {
+        this.aggregateFilter();
         this.initDataTable();
-        this.initEvents();
-    },
-
-    initEvents: function () {
-        $("#filter-search-text").keypress(function (e) {
-            e.preventDefault();
-
-            var keycode = (e.keyCode ? e.keyCode : e.which);
-
-            if (keycode == '13') {
-                data.DataInventory.executeSearch();
-            }
-        });
-
-        $(".filter-search-start").on("click", function (e) {
-            e.preventDefault();
-            data.DataInventory.executeSearch();            
-        });
     },
 
     executeSearch: function () {
+        $("#di-result-table").DataTable().ajax.reload(data.FilterSearch.completeSearch);
+    },
 
-        data.FilterSearch.startSearch();
-
-        console.log('searching...');
-
-        setTimeout(function () {
-            console.log('complete');
-            data.FilterSearch.completeSearch();
-        }, 5000);
-        //$("#di-result-table").DataTable().ajax.reload();
+    aggregateFilter: function () {
+        $('.filter-search-categories-container').load("/DataInventory/FilterCategories/", data.DataInventory.buildRequest(), data.FilterSearch.completeFilterRetrieval);
     },
 
     initDataTable: function () {
@@ -45,21 +23,10 @@
                     pageLength: 20,
                     ordering: false,
                     ajax: {
-                        url: "/Dale/GetSearchResultsClient/",
-                        type: "GET",
-                        data: function (d) {
-                            d.searchCriteria = ""
-                            d.destination = "";
-                            d.asset = "";
-                            d.server = "";
-                            d.database = "";
-                            d.daleObject = "";
-                            d.objectType = "";
-                            d.column = "";
-                            d.sourceType = "";
-                            d.sensitive = true;
-                        }
-                    },
+                        url: "/DataInventory/SearchResult/",
+                        type: "POST",
+                        data: data.DataInventory.buildRequest
+                    },                    
                     columns: [
                         {
                             data: null, className: "Asset", render: function (data) {
@@ -114,6 +81,13 @@
                 });
             }
         });
+    },
+
+    buildRequest: function () {
+        return {
+            SearchText: $("#filter-search-text").val(),
+            FilterCategories: data.FilterSearch.getSelectedCategoryOptions()
+        }
     },
 
     getTableElementCheckbox: function (isDisabled, isChecked) {

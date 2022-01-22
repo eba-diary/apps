@@ -1,5 +1,6 @@
 ﻿using Sentry.data.Core.GlobalEnums;
-using static Sentry.data.Core.GlobalConstants;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Sentry.data.Core
 {
@@ -9,6 +10,11 @@ namespace Sentry.data.Core
         public DaleDestiny Destiny { get; set; }
         public DaleSensitive Sensitive { get; set; }
         public DaleAdvancedCriteriaDto AdvancedCriteria { get; set; }
-        public string EnvironmentFilter { get; set; } = EnvironmentFilters.PROD;
+        public List<FilterCategoryDto> Filters { get; set; }
+        
+        public bool HasFilterFor(string category, string value)
+        {
+            return Filters?.Any(f => f.CategoryName == category && f.CategoryOptionValues.Contains(value)) == true;
+        }
     }
 }

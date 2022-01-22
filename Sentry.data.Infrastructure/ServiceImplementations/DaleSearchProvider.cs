@@ -68,7 +68,10 @@ namespace Sentry.data.Infrastructure
             return daleResult;
         }
 
-        
+        public virtual List<FilterCategoryDto> GetSearchFilters(DaleSearchDto dto)
+        {
+            throw new NotImplementedException();
+        }
 
         private string BuildAQuery(DaleSearchDto dto, ref SqlCommand command)
         {

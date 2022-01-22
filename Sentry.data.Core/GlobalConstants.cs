@@ -381,12 +381,5 @@
         {
             public const string DATA_INVENTORY = "data-inventory";
         }
-
-        public static class EnvironmentFilters
-        {
-            public const string ALL = "ALL";
-            public const string NONPROD = "NONPROD";
-            public const string PROD = "PROD";
-        }
     }
 }
