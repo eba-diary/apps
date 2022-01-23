@@ -68,7 +68,7 @@ namespace Sentry.data.Infrastructure
             return daleResult;
         }
 
-        public virtual List<FilterCategoryDto> GetSearchFilters(DaleSearchDto dto)
+        public virtual FilterSearchDto GetSearchFilters(DaleSearchDto dto)
         {
             throw new NotImplementedException();
         }

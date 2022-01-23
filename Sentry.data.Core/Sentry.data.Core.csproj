@@ -178,6 +178,7 @@
     <Compile Include="DTO\Schema\SchemaRevisionJsonStructureDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryOptionDto.cs" />
+    <Compile Include="DTO\Search\FilterSearchDto.cs" />
     <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />

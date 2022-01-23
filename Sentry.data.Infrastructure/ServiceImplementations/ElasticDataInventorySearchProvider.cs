@@ -4,7 +4,6 @@ using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
 {
@@ -20,16 +19,17 @@ namespace Sentry.data.Infrastructure
         public override DaleResultDto GetSearchResults(DaleSearchDto dto)
         {
             DaleResultDto resultDto = new DaleResultDto();
-            resultDto.DaleResults = SearchDataInventory(dto, BuildTextSearchRequest(dto, 10000), resultDto).Select(x => x.ToDto()).ToList();
+            EventWrapper(dto, () => resultDto.DaleResults = _context.Search(BuildTextSearchRequest(dto, 10000)).Select(x => x.ToDto()).ToList(), resultDto);
             return resultDto;
         }
 
-        public override List<FilterCategoryDto> GetSearchFilters(DaleSearchDto dto)
+        public override FilterSearchDto GetSearchFilters(DaleSearchDto dto)
         {
-            AggregationDictionary aggregations = new AggregationDictionary();
-
+            //get fields that are filterable via custom attribute
             Dictionary<string, Field> filterCategoryFields = NestHelper.FilterCategoryFields<DataInventory>();
 
+            //build aggregation query
+            AggregationDictionary aggregations = new AggregationDictionary();
             foreach (KeyValuePair<string, Field> field in filterCategoryFields)
             {
                 aggregations.Add(field.Key, new TermsAggregation(field.Key) { Field = field.Value });
@@ -38,10 +38,12 @@ namespace Sentry.data.Infrastructure
             SearchRequest<DataInventory> request = BuildTextSearchRequest(dto, 0);
             request.Aggregations = aggregations;
 
-            AggregateDictionary aggResults = _context.Aggregate(request);
+            //get aggregation results
+            AggregateDictionary aggResults = new AggregateDictionary(new Dictionary<string, IAggregate>());
+            FilterSearchDto resultDto = new FilterSearchDto();
+            EventWrapper(dto, () => aggResults = _context.Aggregate(request), resultDto);
 
-            List<FilterCategoryDto> dtos = new List<FilterCategoryDto>();
-
+            //translate results to dto
             foreach (string categoryName in filterCategoryFields.Keys)
             {
                 TermsAggregate<string> categoryResults = aggResults.Terms(categoryName);
@@ -51,12 +53,24 @@ namespace Sentry.data.Infrastructure
 
                     foreach (var bucket in categoryResults.Buckets)
                     {
-                        categoryDto.CategoryOptions.Add(new FilterCategoryOptionDto() { OptionValue = bucket.Key, ResultCount = bucket.DocCount.GetValueOrDefault() });
+                        long docCount = bucket.DocCount.GetValueOrDefault();
+                        if (docCount != 0)
+                        {
+                            categoryDto.CategoryOptions.Add(new FilterCategoryOptionDto()
+                            {
+                                OptionValue = bucket.Key,
+                                ResultCount = docCount,
+                                ParentCategoryName = categoryName,
+                                Selected = dto.Filters?.Any(x => x.CategoryName == categoryName && x.CategoryOptions?.Any(o => o.OptionValue == bucket.Key && o.Selected) == true) == true
+                            });
+                        }
                     }
+
+                    resultDto.FilterCategories.Add(categoryDto);
                 }
             }
 
-            return dtos;
+            return resultDto;
         }
 
         public override DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dto)
@@ -94,7 +108,7 @@ namespace Sentry.data.Infrastructure
             };
 
             DaleContainSensitiveResultDto resultDto = new DaleContainSensitiveResultDto();
-            resultDto.DoesContainSensitiveResults = SearchDataInventory(dto, request, resultDto).Any();
+            EventWrapper(dto, () => resultDto.DoesContainSensitiveResults = _context.Search(request).Any(), resultDto);
 
             return resultDto;
         }
@@ -106,7 +120,7 @@ namespace Sentry.data.Infrastructure
             throw new NotImplementedException();
         }
 
-        private IList<DataInventory> SearchDataInventory(DaleSearchDto dto, SearchRequest<DataInventory> searchRequest, DaleEventableDto resultDto)
+        private void EventWrapper(DaleSearchDto dto, Action search, DaleEventableDto resultDto)
         {
             resultDto.DaleEvent = new DaleEventDto()
             {
@@ -118,7 +132,7 @@ namespace Sentry.data.Infrastructure
 
             try
             {
-                return _context.Search(searchRequest);
+                search();
             }
             catch (Exception ex)
             {
@@ -126,8 +140,6 @@ namespace Sentry.data.Infrastructure
                 resultDto.DaleEvent.QueryErrorMessage = $"Data Inventory Elasticsearch query failed. Exception: {ex.Message}";
                 Logger.Error(resultDto.DaleEvent.QueryErrorMessage, ex);
             }
-
-            return new List<DataInventory>();
         }
 
         private SearchRequest<DataInventory> BuildTextSearchRequest(DaleSearchDto dto, int searchSize)

@@ -1,5 +1,4 @@
-﻿using Sentry.data.Core;
-using System;
+﻿using System;
 
 namespace Sentry.data.Web
 {

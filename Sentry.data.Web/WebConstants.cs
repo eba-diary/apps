@@ -16,12 +16,5 @@
             public const string VERSION_TAG = VERSION + "/tags";
             public const string VERSION_DATAFILE = VERSION + "/datafile";
         }
-
-        public static class FilterCategoryDisplayNames
-        {
-            //Not sure if this is how I want to make it consistant across the code
-            public const string ENVIRONMENT = "Environment";
-            public const string SENSITIVITY = "Sensitivity";
-        }
     }
 }

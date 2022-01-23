@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -22,34 +23,17 @@ namespace Sentry.data.Web.Controllers
             searchModel.ResultView = "SearchResult";
             searchModel.FilterCategories.Add(new FilterCategoryModel()
             {
-                CategoryName = "Environment",
+                CategoryName = FilterCategoryNames.ENVIRONMENT,
                 CategoryOptions = new List<FilterCategoryOptionModel>()
                     {
                         new FilterCategoryOptionModel()
                         {
                             OptionValue = "Prod",
                             Selected = true,
-                            ParentCategoryName = "Environment"
+                            ParentCategoryName = FilterCategoryNames.ENVIRONMENT
                         }
                     }
             });
-
-            if (!CanViewSensitive())
-            {
-                searchModel.FilterCategories.Add(new FilterCategoryModel()
-                {
-                    CategoryName = "Sensitivity",
-                    CategoryOptions = new List<FilterCategoryOptionModel>()
-                    {
-                        new FilterCategoryOptionModel()
-                        {
-                            OptionValue = "Public",
-                            Selected = true,
-                            ParentCategoryName = "Sensitivity"
-                        }
-                    }
-                });
-            }
 
             return View("~/Views/Search/FilterSearch.cshtml", searchModel);
         }
@@ -59,10 +43,7 @@ namespace Sentry.data.Web.Controllers
         {
             List<DaleResultRowModel> results = new List<DaleResultRowModel>();
 
-            CleanFilters(searchModel.FilterCategories);
-
-            //there is search text or a filter to search on
-            if (!string.IsNullOrWhiteSpace(searchModel.SearchText) || searchModel.FilterCategories?.Any(x => x.CategoryOptions?.Any(o => o.Selected) == true) == true)
+            if (searchModel.IsValid(CanViewSensitive()))
             {
                 results = _service.GetSearchResults(searchModel.ToDto()).DaleResults.Select(x => x.ToWeb()).ToList();
             }
@@ -75,63 +56,12 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public ActionResult FilterCategories(FilterSearchModel searchModel)
         {
-            //aggregation still needs to be run based on
-
-            searchModel.FilterCategories = new List<FilterCategoryModel>()
+            if (searchModel.IsValid(CanViewSensitive()))
             {
-                new FilterCategoryModel()
-                {
-                    CategoryName = "Sensitivity",
-                    CategoryOptions = new List<FilterCategoryOptionModel>()
-                    {
-                        new FilterCategoryOptionModel()
-                        {
-                            OptionValue = "Sensitive",
-                            ResultCount = 1,
-                            ParentCategoryName = "Sensitivity"
-                        },
-                        new FilterCategoryOptionModel()
-                        {
-                            OptionValue = "Public",
-                            ResultCount = 12,
-                            ParentCategoryName = "Sensitivity"
-                        }
-                    }
-                },
-                new FilterCategoryModel()
-                {
-                    CategoryName = "Environment",
-                    CategoryOptions = new List<FilterCategoryOptionModel>()
-                    {
-                        new FilterCategoryOptionModel()
-                        {
-                            OptionValue = "Prod",
-                            ResultCount = 3,
-                            Selected = true,
-                            ParentCategoryName = "Environment"
-                        },
-                        new FilterCategoryOptionModel()
-                        {
-                            OptionValue = "NonProd",
-                            ResultCount = 6,
-                            Selected = false,
-                            ParentCategoryName = "Environment"
-                        }
-                    }
-                }
-            };
-
-            CleanFilters(searchModel.FilterCategories);
+                searchModel.FilterCategories = _service.GetSearchFilters(searchModel.ToDto()).FilterCategories.Select(x => x.ToModel()).ToList();
+            }
 
             return PartialView("~/Views/Search/FilterCategories.cshtml", searchModel.FilterCategories);
-        }
-
-        private void CleanFilters(List<FilterCategoryModel> categories)
-        {
-            if (!CanViewSensitive() && categories?.Any(c => c.CategoryName == "Sensitivity") == true)
-            {
-                categories.RemoveAll(c => c.CategoryName == "Sensitivity");
-            }
         }
     }
 }
