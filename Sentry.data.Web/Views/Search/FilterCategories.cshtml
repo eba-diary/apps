@@ -1,21 +1,25 @@
 ﻿@model List<FilterCategoryModel>
 
+@{ 
+    IEnumerable<FilterCategoryModel> orderedModel = Model.OrderBy(x => x.CategoryName);
+}
+
 <div class="filter-search-active-options-container bottom-border display-none">
-    @foreach (FilterCategoryOptionModel option in Model.SelectMany(x => x.CategoryOptions.OrderBy(o => o.OptionValue).ToList()))
+    @foreach (FilterCategoryOptionModel option in orderedModel.SelectMany(x => x.CategoryOptions.OrderBy(o => o.OptionValue).ToList()))
     {
         <button type="button" class="btn btn-default filter-search-active-option-close display-none" id="clearOption_@option.OptionId">
             <span class="active-option-close-symbol">&#x2715</span>
-            <span>@option.OptionValue</span>
+            <span>@option.ParentCategoryName: @option.OptionValue</span>
         </button>
     }
 </div>
 
 <div class="filter-search-categories">
-    @foreach (FilterCategoryModel category in Model)
+    @foreach (FilterCategoryModel category in orderedModel)
     {
         IEnumerable<FilterCategoryOptionModel> options = category.CategoryOptions.OrderBy(o => o.OptionValue);
-        string categoryTypeId = "categoryType_" + category.CategoryName.Replace(" ", "_");
-        string categoryMoreId = "categoryMore_" + category.CategoryName.Replace(" ", "_");
+        string categoryTypeId = "categoryType_" + category.CategoryName.Replace(" ", "_").Replace("/", "_");
+        string categoryMoreId = "categoryMore_" + category.CategoryName.Replace(" ", "_").Replace("/", "_");
 
         <div class="filter-search-category-container bottom-border">
             <div class="filter-search-category-head" id="@categoryTypeId">
@@ -31,7 +35,7 @@
                             <label>
                                 <input type="checkbox" class="filter-search-category-option-checkbox" id="@option.OptionId" value="@option.OptionValue" checked="@option.Selected" />
                                 <strong class="filter-search-category-option-name">@option.OptionValue</strong>
-                                <span>(@option.ResultCount)</span>
+                                <span>(@option.ResultCount.ToString("N0"))</span>
                             </label>
                         </li>
                     }
@@ -44,7 +48,7 @@
                                     <label>
                                         <input type="checkbox" class="filter-search-category-option-checkbox" id="@option.OptionId" value="@option.OptionValue" checked="@option.Selected" />
                                         <strong>@option.OptionValue</strong>
-                                        <span>(@option.ResultCount)</span>
+                                        <span>(@option.ResultCount.ToString("N0"))</span>
                                     </label>
                                 </li>
                             }

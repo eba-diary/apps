@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web
@@ -12,7 +11,7 @@ namespace Sentry.data.Web
         public string PageTitle { get; set; }
         public string ResultView { get; set; }
         
-        public bool IsValid(bool canViewSensitive)
+        public void Validate(bool canViewSensitive)
         {
             if (!canViewSensitive)
             {
@@ -21,9 +20,6 @@ namespace Sentry.data.Web
                 FilterCategoryModel category = new FilterCategoryModel() { CategoryName = FilterCategoryNames.SENSITIVE };
                 category.CategoryOptions.Add(new FilterCategoryOptionModel() { OptionValue = "D", Selected = true, ParentCategoryName = category.CategoryName });
             }
-
-            //must have search text or at least 1 selected filter to search on
-            return !string.IsNullOrWhiteSpace(SearchText) || FilterCategories?.Any(x => x.CategoryOptions?.Any(o => o.Selected) == true) == true;
         }
     }
 }

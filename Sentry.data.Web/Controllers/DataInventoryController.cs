@@ -28,7 +28,7 @@ namespace Sentry.data.Web.Controllers
                     {
                         new FilterCategoryOptionModel()
                         {
-                            OptionValue = "Prod",
+                            OptionValue = "P",
                             Selected = true,
                             ParentCategoryName = FilterCategoryNames.ENVIRONMENT
                         }
@@ -41,14 +41,8 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public JsonResult SearchResult(FilterSearchModel searchModel)
         {
-            List<DaleResultRowModel> results = new List<DaleResultRowModel>();
-
-            if (searchModel.IsValid(CanViewSensitive()))
-            {
-                results = _service.GetSearchResults(searchModel.ToDto()).DaleResults.Select(x => x.ToWeb()).ToList();
-            }
-
-            JsonResult result = Json(new { data = results });
+            searchModel.Validate(CanViewSensitive());
+            JsonResult result = Json(new { data = _service.GetSearchResults(searchModel.ToDto()).DaleResults.Select(x => x.ToWeb()).ToList() });
             result.MaxJsonLength = int.MaxValue;
             return result;
         }
@@ -56,12 +50,8 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public ActionResult FilterCategories(FilterSearchModel searchModel)
         {
-            if (searchModel.IsValid(CanViewSensitive()))
-            {
-                searchModel.FilterCategories = _service.GetSearchFilters(searchModel.ToDto()).FilterCategories.Select(x => x.ToModel()).ToList();
-            }
-
-            return PartialView("~/Views/Search/FilterCategories.cshtml", searchModel.FilterCategories);
+            searchModel.Validate(CanViewSensitive());
+            return PartialView("~/Views/Search/FilterCategories.cshtml", _service.GetSearchFilters(searchModel.ToDto()).FilterCategories.Select(x => x.ToModel()).ToList());
         }
     }
 }

@@ -47,7 +47,7 @@ namespace Sentry.data.Infrastructure
             foreach (string categoryName in filterCategoryFields.Keys)
             {
                 TermsAggregate<string> categoryResults = aggResults.Terms(categoryName);
-                if (categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
+                if (categoryResults != null && categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
                 {
                     FilterCategoryDto categoryDto = new FilterCategoryDto() { CategoryName = categoryName };
 
@@ -56,12 +56,13 @@ namespace Sentry.data.Infrastructure
                         long docCount = bucket.DocCount.GetValueOrDefault();
                         if (docCount != 0)
                         {
+                            string bucketKey = bucket.KeyAsString ?? bucket.Key;
                             categoryDto.CategoryOptions.Add(new FilterCategoryOptionDto()
                             {
-                                OptionValue = bucket.Key,
+                                OptionValue = bucketKey,
                                 ResultCount = docCount,
                                 ParentCategoryName = categoryName,
-                                Selected = dto.Filters?.Any(x => x.CategoryName == categoryName && x.CategoryOptions?.Any(o => o.OptionValue == bucket.Key && o.Selected) == true) == true
+                                Selected = dto.Filters?.Any(x => x.CategoryName == categoryName && x.CategoryOptions?.Any(o => o.OptionValue == bucketKey && o.Selected) == true) == true
                             });
                         }
                     }
@@ -144,9 +145,7 @@ namespace Sentry.data.Infrastructure
 
         private SearchRequest<DataInventory> BuildTextSearchRequest(DaleSearchDto dto, int searchSize)
         {
-            List<QueryContainer> must = new List<QueryContainer>();
             List<QueryContainer> should = new List<QueryContainer>();
-            int minShould = 0;
 
             if (!string.IsNullOrWhiteSpace(dto.Criteria))
             {
@@ -195,28 +194,17 @@ namespace Sentry.data.Infrastructure
                         Type = TextQueryType.MostFields
                     });
                 }
-
-                minShould = 1;
             }
 
             List<QueryContainer> filter = new List<QueryContainer>();
 
-            if (dto.HasFilterFor("Sensitivity", "Sensitive"))
+            foreach (FilterCategoryDto category in dto.Filters)
             {
-                filter.AddMatch<DataInventory>(x => x.IsSensitive, "true");
-            }
-            else if (dto.HasFilterFor("Sensitivity", "Public"))
-            {
-                filter.AddMatch<DataInventory>(x => x.IsSensitive, "false");
-            }
-
-            if (dto.HasFilterFor("Environment", "Prod"))
-            {
-                filter.AddMatch<DataInventory>(x => x.ProdType, "P");
-            }
-            else if (dto.HasFilterFor("Environment", "NonProd"))
-            {
-                filter.AddMatch<DataInventory>(x => x.ProdType, "D");
+                filter.Add(new QueryStringQuery()
+                {
+                    Query = string.Join(" OR ", category.CategoryOptions.Where(x => x.Selected).Select(x => x.OptionValue)),
+                    DefaultField = NestHelper.FilterCategoryField<DataInventory>(category.CategoryName)
+                });
             }
 
             return new SearchRequest<DataInventory>()
@@ -226,9 +214,8 @@ namespace Sentry.data.Infrastructure
                 {
                     MustNot = new List<QueryContainer>() { new ExistsQuery() { Field = Infer.Field<DataInventory>(x => x.ExpirationDateTime) } },
                     Filter = filter,
-                    Must = must,
                     Should = should,
-                    MinimumShouldMatch = minShould
+                    MinimumShouldMatch = should.Any() ? 1 : 0
                 }
             };
         }

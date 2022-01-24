@@ -23,7 +23,7 @@ namespace Sentry.data.Core
             DaleResultDto dtoResult = _daleSearchProvider.GetSearchResults(dtoSearch);
 
             string queryBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtoResult.DaleEvent);
-            _eventService.PublishSuccessEvent("DaleQuery", _userService.GetCurrentUser().AssociateId, "Dale Query Executed", null, queryBlob);
+            _eventService.PublishSuccessEvent("DaleQuery", _userService.GetCurrentUser().AssociateId, "Dale Query Executed", search: queryBlob);
 
             return dtoResult;
         }
@@ -33,7 +33,7 @@ namespace Sentry.data.Core
             FilterSearchDto dtoResult = _daleSearchProvider.GetSearchFilters(dtoSearch);
             
             string queryBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtoResult.DaleEvent);
-            _eventService.PublishSuccessEvent("DataInventoryFilterQuery", _userService.GetCurrentUser().AssociateId, "Data Inventory Filter Query Executed", search: queryBlob);
+            _eventService.PublishSuccessEvent("DaleQuery", _userService.GetCurrentUser().AssociateId, "Data Inventory Filter Query Executed", search: queryBlob);
 
             return dtoResult;
         }

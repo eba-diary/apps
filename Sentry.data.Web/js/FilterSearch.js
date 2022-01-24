@@ -153,7 +153,8 @@
 
     searchPrep: function () {
         $("#filter-search-text").prop("disabled", true);
-
+        $("#filter-search-apply").prop("disabled", true);
+        
         $(".glyphicon-search").hide();
         $(".filter-search-results-container").hide();
 
@@ -163,6 +164,7 @@
 
     completeSearch: function () {
         $("#filter-search-text").prop("disabled", false);
+        $("#filter-search-apply").prop("disabled", false);
 
         $(".fa-spin").hide();
         $(".filter-search-result-sentry-spinner").hide();
@@ -175,7 +177,7 @@
 
     filterRetrivalPrep: function () {
         $(".filter-search-categories-container").hide();
-        $(".filter-search-result-sentry-spinner").show();
+        $(".filter-search-categories-sentry-spinner").show();
         $("#filter-search-clear").hide();
         $("#filter-search-apply").hide();
     },
@@ -214,7 +216,7 @@
 
             var option = {
                 OptionValue: $(this).attr('value'),
-                ParentCategoryName: parts[0],
+                ParentCategoryName: parts[0].replace('-', ' '),
                 Selected: true
             };
 

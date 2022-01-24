@@ -8,7 +8,7 @@ namespace Sentry.data.Web
 
         public string OptionId
         {
-            get => string.IsNullOrEmpty(ParentCategoryName) ? _id : ParentCategoryName.Replace(" ", "_") + "_" + _id;
+            get => string.IsNullOrEmpty(ParentCategoryName) ? _id : ParentCategoryName.Replace(" ", "-") + "_" + _id;
         }
 
         public string OptionValue { get; set; }
