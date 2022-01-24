@@ -19,7 +19,12 @@ namespace Sentry.data.Infrastructure
         public override DaleResultDto GetSearchResults(DaleSearchDto dto)
         {
             DaleResultDto resultDto = new DaleResultDto();
-            EventWrapper(dto, () => resultDto.DaleResults = _context.Search(BuildTextSearchRequest(dto, 10000)).Select(x => x.ToDto()).ToList(), resultDto);
+
+            EventWrapper(dto, resultDto, () =>
+            {
+                resultDto.DaleResults = _context.Search(BuildTextSearchRequest(dto, 10000)).Select(x => x.ToDto()).ToList();
+            });
+
             return resultDto;
         }
 
@@ -41,7 +46,11 @@ namespace Sentry.data.Infrastructure
             //get aggregation results
             AggregateDictionary aggResults = new AggregateDictionary(new Dictionary<string, IAggregate>());
             FilterSearchDto resultDto = new FilterSearchDto();
-            EventWrapper(dto, () => aggResults = _context.Aggregate(request), resultDto);
+
+            EventWrapper(dto, resultDto, () => 
+            {
+                aggResults = _context.Aggregate(request);
+            });
 
             //translate results to dto
             foreach (string categoryName in filterCategoryFields.Keys)
@@ -62,7 +71,7 @@ namespace Sentry.data.Infrastructure
                                 OptionValue = bucketKey,
                                 ResultCount = docCount,
                                 ParentCategoryName = categoryName,
-                                Selected = dto.Filters?.Any(x => x.CategoryName == categoryName && x.CategoryOptions?.Any(o => o.OptionValue == bucketKey && o.Selected) == true) == true
+                                Selected = dto.FilterCategories?.Any(x => x.CategoryName == categoryName && x.CategoryOptions?.Any(o => o.OptionValue == bucketKey && o.Selected) == true) == true
                             });
                         }
                     }
@@ -109,7 +118,11 @@ namespace Sentry.data.Infrastructure
             };
 
             DaleContainSensitiveResultDto resultDto = new DaleContainSensitiveResultDto();
-            EventWrapper(dto, () => resultDto.DoesContainSensitiveResults = _context.Search(request).Any(), resultDto);
+
+            EventWrapper(dto, resultDto, () => 
+            {
+                resultDto.DoesContainSensitiveResults = _context.Search(request).Any();
+            });
 
             return resultDto;
         }
@@ -121,11 +134,11 @@ namespace Sentry.data.Infrastructure
             throw new NotImplementedException();
         }
 
-        private void EventWrapper(DaleSearchDto dto, Action search, DaleEventableDto resultDto)
+        private void EventWrapper(DaleSearchDto dto, DaleEventableDto resultDto, Action search)
         {
             resultDto.DaleEvent = new DaleEventDto()
             {
-                Criteria = dto.Destiny == Core.GlobalEnums.DaleDestiny.Advanced ? dto.AdvancedCriteria.ToEventString() : dto.Criteria,
+                Criteria = dto.CriteriaToString(),
                 Destiny = dto.Destiny.GetDescription(),
                 QuerySuccess = true,
                 Sensitive = dto.Sensitive.GetDescription()
@@ -198,7 +211,7 @@ namespace Sentry.data.Infrastructure
 
             List<QueryContainer> filter = new List<QueryContainer>();
 
-            foreach (FilterCategoryDto category in dto.Filters)
+            foreach (FilterCategoryDto category in dto.FilterCategories)
             {
                 filter.Add(new QueryStringQuery()
                 {

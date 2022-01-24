@@ -10,7 +10,7 @@ namespace Sentry.data.Web
             return new DaleSearchDto()
             {
                 Criteria = model.SearchText,
-                Filters = model.FilterCategories?.Select(x => x.ToDto()).ToList()
+                FilterCategories = model.FilterCategories?.Select(x => x.ToDto()).ToList()
             };
         }
 
@@ -19,7 +19,7 @@ namespace Sentry.data.Web
             return new FilterCategoryDto()
             {
                 CategoryName = model.CategoryName,
-                CategoryOptions = model.CategoryOptions?.Where(x => x.Selected).Select(x => x.ToDto()).ToList()
+                CategoryOptions = model.CategoryOptions?.Select(x => x.ToDto()).ToList()
             };
         }
 
@@ -34,12 +34,11 @@ namespace Sentry.data.Web
             };
         }
 
-        public static FilterSearchModel ToModel(this DaleSearchDto dto)
+        public static FilterSearchModel ToModel(this FilterSearchDto dto)
         {
             return new FilterSearchModel()
             {
-                SearchText = dto.Criteria,
-                FilterCategories = dto.Filters?.Select(x => x.ToModel()).ToList()
+                FilterCategories = dto.FilterCategories?.Select(x => x.ToModel()).ToList()
             };
         }
 

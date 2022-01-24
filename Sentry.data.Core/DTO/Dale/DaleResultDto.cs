@@ -4,6 +4,6 @@ namespace Sentry.data.Core
 {
     public class DaleResultDto : DaleEventableDto
     {
-        public List<DaleResultRowDto> DaleResults { get; set; }
+        public List<DaleResultRowDto> DaleResults { get; set; } = new List<DaleResultRowDto>();
     }
 }

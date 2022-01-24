@@ -51,7 +51,7 @@ namespace Sentry.data.Web.Controllers
         public ActionResult FilterCategories(FilterSearchModel searchModel)
         {
             searchModel.Validate(CanViewSensitive());
-            return PartialView("~/Views/Search/FilterCategories.cshtml", _service.GetSearchFilters(searchModel.ToDto()).FilterCategories.Select(x => x.ToModel()).ToList());
+            return PartialView("~/Views/Search/FilterCategories.cshtml", _service.GetSearchFilters(searchModel.ToDto()).ToModel().FilterCategories);
         }
     }
 }

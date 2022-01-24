@@ -30,36 +30,26 @@ namespace Sentry.data.Infrastructure
 
         public IList<T> Search<T>(Func<SearchDescriptor<T>, ISearchRequest> selector) where T : class
         {
-            return RequestFluent(selector).Documents.ToList();
+            return GetResponse(() => _client.Search(selector)).Documents.ToList();
         }
 
         public IList<T> Search<T>(SearchRequest<T> searchRequest) where T : class
         {
-            return RequestInitializer(searchRequest).Documents.ToList();
+            return GetResponse(() => _client.Search<T>(searchRequest)).Documents.ToList();
         }
 
-        public AggregateDictionary Aggregate<T>(Func<SearchDescriptor<T>, ISearchRequest> searchRequest) where T : class
+        public AggregateDictionary Aggregate<T>(Func<SearchDescriptor<T>, ISearchRequest> selector) where T : class
         {
-            return RequestFluent(searchRequest).Aggregations;
+            return GetResponse(() => _client.Search(selector)).Aggregations;
         }
 
         public AggregateDictionary Aggregate<T>(SearchRequest<T> searchRequest) where T : class
         {
-            return RequestInitializer(searchRequest).Aggregations;
+            return GetResponse(() => _client.Search<T>(searchRequest)).Aggregations;
         }
         #endregion
 
         #region Methods
-        private ISearchResponse<T> RequestFluent<T>(Func<SearchDescriptor<T>, ISearchRequest> selector) where T : class
-        {
-            return GetResponse(() => _client.Search(selector));
-        }
-
-        private ISearchResponse<T> RequestInitializer<T>(SearchRequest<T> searchRequest) where T : class
-        {
-            return GetResponse(() => _client.Search<T>(searchRequest));
-        }
-
         private T GetResponse<T>(Func<T> request) where T : IResponse
         {
             T response = request();
