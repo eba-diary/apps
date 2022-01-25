@@ -51,7 +51,7 @@
 
         $(function () {
                 @(controllerName).init();
-                data.FilterSearch.init(@(controllerName).executeSearch, @(controllerName).aggregateFilter);
+                data.FilterSearch.init(@(controllerName).executeSearch, @(controllerName).buildFilter);
             });
 
     </script>

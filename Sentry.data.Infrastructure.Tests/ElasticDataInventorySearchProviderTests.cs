@@ -30,6 +30,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Table", result.DaleEvent.Criteria);
             Assert.IsTrue(string.IsNullOrEmpty(result.DaleEvent.QueryErrorMessage));
 
+            Assert.AreEqual(1, result.SearchTotal);
             Assert.IsTrue(result.DaleResults.Any());
 
             //assert dto mapping
@@ -59,7 +60,7 @@ namespace Sentry.data.Infrastructure.Tests
         public void GetSearchResults_NoResultsSearch_EmptyDaleResultDto()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.Search(It.IsAny<SearchRequest<DataInventory>>())).Returns(new List<DataInventory>());
+            elasticContext.Setup(x => x.Search(It.IsAny<SearchRequest<DataInventory>>())).Returns(new ElasticResult<DataInventory>());
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
 
@@ -67,6 +68,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             elasticContext.VerifyAll();
 
+            Assert.AreEqual(0, result.SearchTotal);
             Assert.IsFalse(result.DaleResults.Any());
         }
 
@@ -87,6 +89,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Table", result.DaleEvent.Criteria);
             Assert.AreEqual("Data Inventory Elasticsearch query failed. Exception: FAIL", result.DaleEvent.QueryErrorMessage);
 
+            Assert.AreEqual(0, result.SearchTotal);
             Assert.IsFalse(result.DaleResults.Any());
         }
 
@@ -123,7 +126,7 @@ namespace Sentry.data.Infrastructure.Tests
         public void GetSearchFilters_BasicSearch_FilterSearchDto()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.Aggregate(It.IsAny<SearchRequest<DataInventory>>())).Returns(GetAggregateDictionary());
+            elasticContext.Setup(x => x.Search(It.IsAny<SearchRequest<DataInventory>>())).Returns(GetAggregateDictionary());
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
 
@@ -195,7 +198,7 @@ namespace Sentry.data.Infrastructure.Tests
         public void GetSearchFilters_ErrorSearch_QueryFailDaleEvent()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.Aggregate(It.IsAny<SearchRequest<DataInventory>>())).Throws(new ElasticsearchClientException("FAIL"));
+            elasticContext.Setup(x => x.Search(It.IsAny<SearchRequest<DataInventory>>())).Throws(new ElasticsearchClientException("FAIL"));
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
 
@@ -249,92 +252,92 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         #region Methods
-        private IList<DataInventory> GetDataInventoryList()
+        private ElasticResult<DataInventory> GetDataInventoryList()
         {
-            return new List<DataInventory>()
+            return new ElasticResult<DataInventory>()
             {
-                new DataInventory()
+                SearchTotal = 1,
+                Documents = new List<DataInventory>()
                 {
-                    Id = 1,
-                    AssetCode = "CODE",
-                    BaseName = "TableName",
-                    ServerName = "server.sentry.com",
-                    DatabaseName = "DBName",
-                    TypeDescription = "Table",
-                    ColumnName = "column_nme",
-                    IsSensitive = false,
-                    ProdType = "P",
-                    ColumnType = "Type",
-                    MaxLength = 100,
-                    Precision = 7,
-                    Scale = 2,
-                    IsNullable = null,
-                    EffectiveDateTime = DateTime.Parse("2022-01-05T05:00:00.000"),
-                    IsOwnerVerified = true,
-                    SourceName = "Source",
-                    ScanListName = "Scan",
-                    SaidListName = "SaidList"
+                    new DataInventory()
+                    {
+                        Id = 1,
+                        AssetCode = "CODE",
+                        BaseName = "TableName",
+                        ServerName = "server.sentry.com",
+                        DatabaseName = "DBName",
+                        TypeDescription = "Table",
+                        ColumnName = "column_nme",
+                        IsSensitive = false,
+                        ProdType = "P",
+                        ColumnType = "Type",
+                        MaxLength = 100,
+                        Precision = 7,
+                        Scale = 2,
+                        IsNullable = null,
+                        EffectiveDateTime = DateTime.Parse("2022-01-05T05:00:00.000"),
+                        IsOwnerVerified = true,
+                        SourceName = "Source",
+                        ScanListName = "Scan",
+                        SaidListName = "SaidList"
+                    }
                 }
             };
         }
 
-        private AggregateDictionary GetAggregateDictionary()
+        private ElasticResult<DataInventory> GetAggregateDictionary()
         {
-            return new AggregateDictionary(new Dictionary<string, IAggregate>
+            return new ElasticResult<DataInventory>()
             {
-                [FilterCategoryNames.ENVIRONMENT] = new BucketAggregate()
+                Aggregations = new AggregateDictionary(new Dictionary<string, IAggregate>
                 {
-                    SumOtherDocCount = 0,
-                    Items = new List<KeyedBucket<object>>
+                    [FilterCategoryNames.ENVIRONMENT] = new BucketAggregate()
                     {
-                        new KeyedBucket<object>(new Dictionary<string, IAggregate>())
+                        SumOtherDocCount = 0,
+                        Items = new List<KeyedBucket<object>>
                         {
-                            DocCount = 5,
-                            Key = "P"
-                        },
-
-                        new KeyedBucket<object>(new Dictionary<string, IAggregate>())
-                        {
-                            DocCount = 3,
-                            Key = "D"
-                        },
-
-                        new KeyedBucket<object>(new Dictionary<string, IAggregate>())
-                        {
-                            DocCount = 0,
-                            Key = "value3"
-                        }
-                    }.AsReadOnly()
-                },
-                [FilterCategoryNames.SENSITIVE] = new BucketAggregate()
-                {
-                    SumOtherDocCount = 0,
-                    Items = new List<KeyedBucket<object>>
+                            new KeyedBucket<object>(new Dictionary<string, IAggregate>())
+                            {
+                                DocCount = 5,
+                                Key = "P"
+                            },
+                            new KeyedBucket<object>(new Dictionary<string, IAggregate>())
+                            {
+                                DocCount = 3,
+                                Key = "D"
+                            }
+                        }.AsReadOnly()
+                    },
+                    [FilterCategoryNames.SENSITIVE] = new BucketAggregate()
                     {
-                        new KeyedBucket<object>(new Dictionary<string, IAggregate>())
+                        SumOtherDocCount = 0,
+                        Items = new List<KeyedBucket<object>>
                         {
-                            DocCount = 2,
-                            Key = "0",
-                            KeyAsString = "false"
-                        },
-                        new KeyedBucket<object>(new Dictionary<string, IAggregate>())
-                        {
-                            DocCount = 6,
-                            Key = "1",
-                            KeyAsString = "true"
-                        }
-                    }.AsReadOnly()
-                },
-                ["NoMatchAgg"] = new BucketAggregate()
-                {
-                    Items = new List<KeyedBucket<string>>().AsReadOnly()
-                },
-                [FilterCategoryNames.DATABASE] = new BucketAggregate()
-                {
-                    SumOtherDocCount = 10,
-                    Items = new List<KeyedBucket<string>>().AsReadOnly()
-                }
-            });
+                            new KeyedBucket<object>(new Dictionary<string, IAggregate>())
+                            {
+                                DocCount = 2,
+                                Key = "0",
+                                KeyAsString = "false"
+                            },
+                            new KeyedBucket<object>(new Dictionary<string, IAggregate>())
+                            {
+                                DocCount = 6,
+                                Key = "1",
+                                KeyAsString = "true"
+                            }
+                        }.AsReadOnly()
+                    },
+                    ["NoMatchAgg"] = new BucketAggregate()
+                    {
+                        Items = new List<KeyedBucket<string>>().AsReadOnly()
+                    },
+                    [FilterCategoryNames.DATABASE] = new BucketAggregate()
+                    {
+                        SumOtherDocCount = 10,
+                        Items = new List<KeyedBucket<string>>().AsReadOnly()
+                    }
+                })
+            };
         }
         #endregion
     }

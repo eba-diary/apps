@@ -1,20 +1,16 @@
 ﻿data.DataInventory = {
 
-    newFilter: true,
-
     init: function () {
         this.initDataTable();
-        this.aggregateFilter();
+        this.buildFilter();
     },
 
     executeSearch: function () {
         $("#di-result-table").DataTable().ajax.reload(data.FilterSearch.completeSearch);
     },
 
-    aggregateFilter: function () {
-        if (data.DataInventory.newFilter) {
-            $('.filter-search-categories-container').load("/DataInventory/FilterCategories/", data.DataInventory.buildRequest(), data.FilterSearch.completeFilterRetrieval);
-        }
+    buildFilter: function () {
+        $('.filter-search-categories-container').load("/DataInventory/FilterCategories/", data.DataInventory.buildRequest(), data.FilterSearch.completeFilterRetrieval);
     },
 
     initDataTable: function () {
@@ -24,27 +20,17 @@
             dataType: 'json',
             success: function (obj) {
                 $("#di-result-table").DataTable({
-                    //serverSide: true,
-                    searching: true,
                     pageLength: 20,
+                    deferRender: true,
                     ordering: false,
                     ajax: {
                         url: "/DataInventory/SearchResult/",
                         type: "POST",
-                        data: function (d) {
-                            var baseRequest = data.DataInventory.buildRequest();
-                            //baseRequest.Draw = d.draw;
-                            //baseRequest.Start = d.start;
-                            //baseRequest.Length = d.length;
-
-                            //data.DataInventory.newFilter = baseRequest.Start == 0;
-
-                            return baseRequest;
-                        }
-                    },                    
+                        data: data.DataInventory.buildRequest
+                    },
                     columns: [
                         {
-                            data: null, className: "Asset", searchable:true, render: function (data) {
+                            data: null, className: "Asset", searchable: true, render: function (data) {
                                 //the following render func is called for every single row column and passes in data as the specific value.  our func body below will insert our list of assets as links
                                 if (data.AssetList != null) {
 
@@ -63,7 +49,7 @@
                                 return assetHtml;
                             }
                         },
-                        { data: "Server", searchable:true, className: "Server" },
+                        { data: "Server", searchable: true, className: "Server" },
                         { data: "Database", className: "Database" },
                         { data: "Object", className: "Object" },
                         { data: "ObjectType", className: "ObjectType" },
@@ -87,12 +73,13 @@
                         { data: "ScanType", className: "ScanType", visible: false }
                     ],
                     aLengthMenu: [10, 20, 50, 100, 500],
-                    dom: "<'row'<'col-xs-12'i>>" +
-                        "<'row'<'col-xs-6'l><'col-xs-6 text-right'B>>" +
+                    dom: "<'row'<'col-xs-6'l><'col-xs-6 text-right'B>>" +
                         "<'row'<'col-xs-12'tr>>" +
-                        "<'row'<'col-xs-12 text-center'p>>",
+                        "<'row'<'col-xs-6'i><'col-xs-6 text-right'p>>",
                     buttons: [{ extend: 'colvis', text: 'Columns' }],
-                    initComplete: data.FilterSearch.completeSearch
+                    initComplete: function (settings, json) {
+                        data.FilterSearch.completeSearch()
+                    }
                 });
             }
         });

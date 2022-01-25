@@ -5,15 +5,6 @@ namespace Sentry.data.Web
 {
     public static class FilterSearchExtensions
     {
-        public static DaleSearchDto ToDto(this FilterCategoriesSearchModel model)
-        {
-            return new DaleSearchDto()
-            {
-                Criteria = model.SearchText,
-                FilterCategories = model.FilterCategories?.Select(x => x.ToDto()).ToList()
-            };
-        }
-
         public static DaleSearchDto ToDto(this FilterSearchModel model)
         {
             return new DaleSearchDto()

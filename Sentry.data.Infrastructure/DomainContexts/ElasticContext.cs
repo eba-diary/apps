@@ -1,7 +1,6 @@
 ﻿using Nest;
 using Sentry.data.Core;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Sentry.data.Infrastructure
@@ -28,24 +27,14 @@ namespace Sentry.data.Infrastructure
             throw new NotImplementedException();
         }
 
-        public IList<T> Search<T>(Func<SearchDescriptor<T>, ISearchRequest> selector) where T : class
+        public ElasticResult<T> Search<T>(Func<SearchDescriptor<T>, ISearchRequest> selector) where T : class
         {
-            return GetResponse(() => _client.Search(selector)).Documents.ToList();
+            return ResultFrom(GetResponse(() => _client.Search(selector)));
         }
 
-        public IList<T> Search<T>(SearchRequest<T> searchRequest) where T : class
+        public ElasticResult<T> Search<T>(SearchRequest<T> searchRequest) where T : class
         {
-            return GetResponse(() => _client.Search<T>(searchRequest)).Documents.ToList();
-        }
-
-        public AggregateDictionary Aggregate<T>(Func<SearchDescriptor<T>, ISearchRequest> selector) where T : class
-        {
-            return GetResponse(() => _client.Search(selector)).Aggregations;
-        }
-
-        public AggregateDictionary Aggregate<T>(SearchRequest<T> searchRequest) where T : class
-        {
-            return GetResponse(() => _client.Search<T>(searchRequest)).Aggregations;
+            return ResultFrom(GetResponse(() => _client.Search<T>(searchRequest)));
         }
         #endregion
 
@@ -60,6 +49,16 @@ namespace Sentry.data.Infrastructure
             }
 
             return response;
+        }
+
+        private ElasticResult<T> ResultFrom<T>(ISearchResponse<T> response) where T : class
+        {
+            return new ElasticResult<T>()
+            {
+                SearchTotal = response.Total,
+                Documents = response.Documents.ToList(),
+                Aggregations = response.Aggregations
+            };
         }
         #endregion
     }

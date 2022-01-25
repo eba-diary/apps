@@ -1,5 +1,4 @@
-﻿using Nest;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
@@ -23,7 +22,7 @@ namespace Sentry.data.Web.Controllers
                 PageTitle = "Data Inventory",
                 IconPath = "~/Images/Dale/DataInventoryIcon.png",
                 ResultView = "SearchResult",
-                DefaultSearch = new FilterCategoriesSearchModel()
+                DefaultSearch = new FilterSearchModel()
                 {
                     FilterCategories = new List<FilterCategoryModel>()
                     {
@@ -51,26 +50,17 @@ namespace Sentry.data.Web.Controllers
         public JsonResult SearchResult(FilterSearchModel searchModel)
         {
             searchModel.Validate(CanViewSensitive());
-            List<DaleResultRowModel> results = _service.GetSearchResults(searchModel.ToDto()).DaleResults.Select(x => x.ToWeb()).ToList();
 
-            JsonResult result = Json(new
-            {
-                data = results
+            DaleResultDto resultDto = _service.GetSearchResults(searchModel.ToDto());
+
+            return Json(new { 
+                data = resultDto.DaleResults.Select(x => x.ToWeb()).ToList(),
+                searchTotal = resultDto.SearchTotal
             });
-
-            //JsonResult result = Json(new { 
-            //    draw = searchModel.Draw,
-            //    recordsTotal = results.Count,
-            //    recordsFiltered = results.Count,
-            //    data = results.Take(searchModel.Length).ToList()
-            //});
-
-            result.MaxJsonLength = int.MaxValue;
-            return result;
         }
 
         [HttpPost]
-        public ActionResult FilterCategories(FilterCategoriesSearchModel searchModel)
+        public ActionResult FilterCategories(FilterSearchModel searchModel)
         {
             searchModel.Validate(CanViewSensitive());
             return PartialView("~/Views/Search/FilterCategories.cshtml", _service.GetSearchFilters(searchModel.ToDto()).ToModel().FilterCategories);

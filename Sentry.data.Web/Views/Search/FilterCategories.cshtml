@@ -1,7 +1,7 @@
 ﻿@model List<FilterCategoryModel>
 
 @{ 
-    IEnumerable<FilterCategoryModel> orderedModel = Model.OrderBy(x => x.CategoryName);
+    IEnumerable<FilterCategoryModel> orderedModel = Model.Where(x => x.CategoryOptions.Count > 1 || x.CategoryOptions.All(a => a.Selected)).OrderBy(x => x.CategoryName);
 }
 
 <div class="filter-search-active-options-container bottom-border display-none">

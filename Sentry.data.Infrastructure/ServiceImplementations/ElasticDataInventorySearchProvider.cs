@@ -20,10 +20,16 @@ namespace Sentry.data.Infrastructure
         {
             DaleResultDto resultDto = new DaleResultDto();
 
-            EventWrapper(dto, resultDto, () =>
+            SearchRequest<DataInventory> searchRequest = BuildTextSearchRequest(dto, 1000);
+            searchRequest.TrackTotalHits = true;
+
+            ElasticResult<DataInventory> result = GetElasticResult(dto, resultDto, searchRequest);
+
+            if (result.Documents?.Any() == true)
             {
-                resultDto.DaleResults = _context.Search(BuildTextSearchRequest(dto, 10000)).Select(x => x.ToDto()).ToList();
-            });
+                resultDto.DaleResults = result.Documents.Select(x => x.ToDto()).ToList();
+                resultDto.SearchTotal = result.SearchTotal;
+            }
 
             return resultDto;
         }
@@ -44,39 +50,34 @@ namespace Sentry.data.Infrastructure
             request.Aggregations = aggregations;
 
             //get aggregation results
-            AggregateDictionary aggResults = new AggregateDictionary(new Dictionary<string, IAggregate>());
             FilterSearchDto resultDto = new FilterSearchDto();
 
-            EventWrapper(dto, resultDto, () => 
-            {
-                aggResults = _context.Aggregate(request);
-            });
+            AggregateDictionary aggResults = GetElasticResult(dto, resultDto, request).Aggregations;
 
             //translate results to dto
-            foreach (string categoryName in filterCategoryFields.Keys)
+            if (aggResults != null)
             {
-                TermsAggregate<string> categoryResults = aggResults.Terms(categoryName);
-                if (categoryResults != null && categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
+                foreach (string categoryName in filterCategoryFields.Keys)
                 {
-                    FilterCategoryDto categoryDto = new FilterCategoryDto() { CategoryName = categoryName };
-
-                    foreach (var bucket in categoryResults.Buckets)
+                    TermsAggregate<string> categoryResults = aggResults.Terms(categoryName);
+                    if (categoryResults != null && categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
                     {
-                        long docCount = bucket.DocCount.GetValueOrDefault();
-                        if (docCount != 0)
+                        FilterCategoryDto categoryDto = new FilterCategoryDto() { CategoryName = categoryName };
+
+                        foreach (var bucket in categoryResults.Buckets)
                         {
                             string bucketKey = bucket.KeyAsString ?? bucket.Key;
                             categoryDto.CategoryOptions.Add(new FilterCategoryOptionDto()
                             {
                                 OptionValue = bucketKey,
-                                ResultCount = docCount,
+                                ResultCount = bucket.DocCount.GetValueOrDefault(),
                                 ParentCategoryName = categoryName,
                                 Selected = dto.FilterCategories?.Any(x => x.CategoryName == categoryName && x.CategoryOptions?.Any(o => o.OptionValue == bucketKey && o.Selected) == true) == true
                             });
                         }
-                    }
 
-                    resultDto.FilterCategories.Add(categoryDto);
+                        resultDto.FilterCategories.Add(categoryDto);
+                    }
                 }
             }
 
@@ -118,11 +119,7 @@ namespace Sentry.data.Infrastructure
             };
 
             DaleContainSensitiveResultDto resultDto = new DaleContainSensitiveResultDto();
-
-            EventWrapper(dto, resultDto, () => 
-            {
-                resultDto.DoesContainSensitiveResults = _context.Search(request).Any();
-            });
+            resultDto.DoesContainSensitiveResults = GetElasticResult(dto, resultDto, request).Documents?.Any() == true;
 
             return resultDto;
         }
@@ -134,7 +131,7 @@ namespace Sentry.data.Infrastructure
             throw new NotImplementedException();
         }
 
-        private void EventWrapper(DaleSearchDto dto, DaleEventableDto resultDto, Action search)
+        private ElasticResult<DataInventory> GetElasticResult(DaleSearchDto dto, DaleEventableDto resultDto, SearchRequest<DataInventory> searchRequest)
         {
             resultDto.DaleEvent = new DaleEventDto()
             {
@@ -146,7 +143,7 @@ namespace Sentry.data.Infrastructure
 
             try
             {
-                search();
+                return _context.Search(searchRequest);
             }
             catch (Exception ex)
             {
@@ -154,9 +151,11 @@ namespace Sentry.data.Infrastructure
                 resultDto.DaleEvent.QueryErrorMessage = $"Data Inventory Elasticsearch query failed. Exception: {ex.Message}";
                 Logger.Error(resultDto.DaleEvent.QueryErrorMessage, ex);
             }
+
+            return new ElasticResult<DataInventory>();
         }
 
-        private SearchRequest<DataInventory> BuildTextSearchRequest(DaleSearchDto dto, int searchSize)
+        private SearchRequest<DataInventory> BuildTextSearchRequest(DaleSearchDto dto, int size)
         {
             List<QueryContainer> should = new List<QueryContainer>();
 
@@ -222,7 +221,7 @@ namespace Sentry.data.Infrastructure
 
             return new SearchRequest<DataInventory>()
             {
-                Size = searchSize,
+                Size = size,
                 Query = new BoolQuery()
                 {
                     MustNot = new List<QueryContainer>() { new ExistsQuery() { Field = Infer.Field<DataInventory>(x => x.ExpirationDateTime) } },
