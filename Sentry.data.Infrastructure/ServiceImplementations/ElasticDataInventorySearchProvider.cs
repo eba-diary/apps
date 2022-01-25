@@ -60,7 +60,7 @@ namespace Sentry.data.Infrastructure
                 foreach (string categoryName in filterCategoryFields.Keys)
                 {
                     TermsAggregate<string> categoryResults = aggResults.Terms(categoryName);
-                    if (categoryResults != null && categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
+                    if (categoryResults?.Buckets?.Any() == true && categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
                     {
                         FilterCategoryDto categoryDto = new FilterCategoryDto() { CategoryName = categoryName };
 
