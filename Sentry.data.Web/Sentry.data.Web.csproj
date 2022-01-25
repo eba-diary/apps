@@ -427,8 +427,10 @@
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
     <Compile Include="Models\Dale\DaleAdvancedCriteriaModel.cs" />
+    <Compile Include="Models\Search\FilterCategoriesSearchModel.cs" />
     <Compile Include="Models\Search\FilterCategoryModel.cs" />
     <Compile Include="Models\Search\FilterCategoryOptionModel.cs" />
+    <Compile Include="Models\Search\FilterSearchConfigModel.cs" />
     <Compile Include="Models\Search\FilterSearchModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />

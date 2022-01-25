@@ -115,8 +115,8 @@
         data.FilterSearch.searchPrep();
         data.FilterSearch.filterRetrivalPrep();
 
-        data.FilterSearch.retrieveFilterOptions();
         data.FilterSearch.executeSearch();
+        data.FilterSearch.retrieveFilterOptions();
     },
 
     hideBadgeContainer: function (clearAll) {

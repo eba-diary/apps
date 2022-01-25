@@ -1,4 +1,4 @@
-﻿@model FilterSearchModel
+﻿@model FilterSearchConfigModel
 
 @{
     ViewBag.Fluid = true;
@@ -11,7 +11,7 @@
         <div class="search-head-item"><h1 class="datasetHeader">@Model.PageTitle</h1></div>
 
         <div id="search-box" class="has-feedback has-feedback-left">
-            <input class="form-control searchTextDS text-box single-line" type="text" id="filter-search-text" placeholder="Search @Model.PageTitle" value="" disabled />
+            <input class="form-control searchTextDS text-box single-line" type="text" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled />
             <i class="form-control-feedback glyphicon glyphicon-search clickable filter-search-start display-none"></i>
             <i class="form-control-feedback fa fa-circle-o-notch fa-spin"></i>
         </div>
@@ -31,7 +31,7 @@
         </div>
 
         <div class="filter-search-categories-container display-none">
-            @Html.Partial("~/Views/Search/FilterCategories.cshtml", Model.FilterCategories)
+            @Html.Partial("~/Views/Search/FilterCategories.cshtml", Model.DefaultSearch.FilterCategories)
         </div>
     </div>
 

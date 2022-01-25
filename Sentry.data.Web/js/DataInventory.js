@@ -1,8 +1,10 @@
 ﻿data.DataInventory = {
 
+    newFilter: true,
+
     init: function () {
-        this.aggregateFilter();
         this.initDataTable();
+        this.aggregateFilter();
     },
 
     executeSearch: function () {
@@ -10,7 +12,9 @@
     },
 
     aggregateFilter: function () {
-        $('.filter-search-categories-container').load("/DataInventory/FilterCategories/", data.DataInventory.buildRequest(), data.FilterSearch.completeFilterRetrieval);
+        if (data.DataInventory.newFilter) {
+            $('.filter-search-categories-container').load("/DataInventory/FilterCategories/", data.DataInventory.buildRequest(), data.FilterSearch.completeFilterRetrieval);
+        }
     },
 
     initDataTable: function () {
@@ -20,16 +24,27 @@
             dataType: 'json',
             success: function (obj) {
                 $("#di-result-table").DataTable({
+                    //serverSide: true,
+                    searching: true,
                     pageLength: 20,
                     ordering: false,
                     ajax: {
                         url: "/DataInventory/SearchResult/",
                         type: "POST",
-                        data: data.DataInventory.buildRequest
+                        data: function (d) {
+                            var baseRequest = data.DataInventory.buildRequest();
+                            //baseRequest.Draw = d.draw;
+                            //baseRequest.Start = d.start;
+                            //baseRequest.Length = d.length;
+
+                            //data.DataInventory.newFilter = baseRequest.Start == 0;
+
+                            return baseRequest;
+                        }
                     },                    
                     columns: [
                         {
-                            data: null, className: "Asset", render: function (data) {
+                            data: null, className: "Asset", searchable:true, render: function (data) {
                                 //the following render func is called for every single row column and passes in data as the specific value.  our func body below will insert our list of assets as links
                                 if (data.AssetList != null) {
 
@@ -48,7 +63,7 @@
                                 return assetHtml;
                             }
                         },
-                        { data: "Server", className: "Server" },
+                        { data: "Server", searchable:true, className: "Server" },
                         { data: "Database", className: "Database" },
                         { data: "Object", className: "Object" },
                         { data: "ObjectType", className: "ObjectType" },
@@ -76,7 +91,7 @@
                         "<'row'<'col-xs-6'l><'col-xs-6 text-right'B>>" +
                         "<'row'<'col-xs-12'tr>>" +
                         "<'row'<'col-xs-12 text-center'p>>",
-                    buttons: [{ extend: 'colvis', text: 'Columns' }, { extend: 'csv', text: 'Download' }],
+                    buttons: [{ extend: 'colvis', text: 'Columns' }],
                     initComplete: data.FilterSearch.completeSearch
                 });
             }

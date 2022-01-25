@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core;
+﻿using Nest;
+using Sentry.data.Core;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
@@ -15,40 +16,61 @@ namespace Sentry.data.Web.Controllers
             _service = service;
         }
 
-        public ActionResult Search(FilterSearchModel searchModel)
+        public ActionResult Search()
         {
-            //this is the view setup and initial filters for default search
-            searchModel.PageTitle = "Data Inventory";
-            searchModel.IconPath = "~/Images/Dale/DataInventoryIcon.png";
-            searchModel.ResultView = "SearchResult";
-            searchModel.FilterCategories.Add(new FilterCategoryModel()
+            FilterSearchConfigModel model = new FilterSearchConfigModel()
             {
-                CategoryName = FilterCategoryNames.ENVIRONMENT,
-                CategoryOptions = new List<FilterCategoryOptionModel>()
+                PageTitle = "Data Inventory",
+                IconPath = "~/Images/Dale/DataInventoryIcon.png",
+                ResultView = "SearchResult",
+                DefaultSearch = new FilterCategoriesSearchModel()
+                {
+                    FilterCategories = new List<FilterCategoryModel>()
                     {
-                        new FilterCategoryOptionModel()
+                        new FilterCategoryModel()
                         {
-                            OptionValue = "P",
-                            Selected = true,
-                            ParentCategoryName = FilterCategoryNames.ENVIRONMENT
+                            CategoryName = FilterCategoryNames.ENVIRONMENT,
+                            CategoryOptions = new List<FilterCategoryOptionModel>()
+                            {
+                                new FilterCategoryOptionModel()
+                                {
+                                    OptionValue = "P",
+                                    ParentCategoryName = FilterCategoryNames.ENVIRONMENT,
+                                    Selected = true
+                                }
+                            }
                         }
                     }
-            });
+                }
+            };
 
-            return View("~/Views/Search/FilterSearch.cshtml", searchModel);
+            return View("~/Views/Search/FilterSearch.cshtml", model);
         }
 
         [HttpPost]
         public JsonResult SearchResult(FilterSearchModel searchModel)
         {
             searchModel.Validate(CanViewSensitive());
-            JsonResult result = Json(new { data = _service.GetSearchResults(searchModel.ToDto()).DaleResults.Select(x => x.ToWeb()).ToList() });
+            List<DaleResultRowModel> results = _service.GetSearchResults(searchModel.ToDto()).DaleResults.Select(x => x.ToWeb()).ToList();
+
+            JsonResult result = Json(new
+            {
+                data = results
+            });
+
+            //JsonResult result = Json(new { 
+            //    draw = searchModel.Draw,
+            //    recordsTotal = results.Count,
+            //    recordsFiltered = results.Count,
+            //    data = results.Take(searchModel.Length).ToList()
+            //});
+
             result.MaxJsonLength = int.MaxValue;
             return result;
         }
 
         [HttpPost]
-        public ActionResult FilterCategories(FilterSearchModel searchModel)
+        public ActionResult FilterCategories(FilterCategoriesSearchModel searchModel)
         {
             searchModel.Validate(CanViewSensitive());
             return PartialView("~/Views/Search/FilterCategories.cshtml", _service.GetSearchFilters(searchModel.ToDto()).ToModel().FilterCategories);
