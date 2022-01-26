@@ -15,6 +15,7 @@ using Sentry.data.Infrastructure.PollyPolicies;
 using System;
 using Hangfire;
 using Nest;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
 {
@@ -127,7 +128,7 @@ namespace Sentry.data.Infrastructure
 
             ConnectionSettings settings = new ConnectionSettings(new Uri(Configuration.Config.GetHostSetting("ElasticUrl")));
             settings.BasicAuthentication(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"));
-            settings.DefaultMappingFor<DataInventory>(x => x.IndexName("data-field-inventory"));
+            settings.DefaultMappingFor<DataInventory>(x => x.IndexName(ElasticAliases.DATA_INVENTORY)); //using index alias
             registry.For<IElasticClient>().Singleton().Use(new ElasticClient(settings));
 
             registry.For<IDaleSearchProvider>().Use<DaleSearchProvider>().Named("SQL");

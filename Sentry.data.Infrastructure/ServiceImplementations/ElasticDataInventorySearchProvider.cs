@@ -18,69 +18,68 @@ namespace Sentry.data.Infrastructure
 
         public override DaleResultDto GetSearchResults(DaleSearchDto dto)
         {
-            List<QueryContainer> must = new List<QueryContainer>();
-            List<QueryContainer> should = new List<QueryContainer>();
-            int minShould = 0;
-
-            if (dto.Destiny == Core.GlobalEnums.DaleDestiny.Advanced)
-            {
-                //targeted search of only fields with criteria            
-                must.AddWildcard<DataInventory>(x => x.AssetCode, dto.AdvancedCriteria.Asset);
-                must.AddWildcard<DataInventory>(x => x.ServerName, dto.AdvancedCriteria.Server);
-                must.AddWildcard<DataInventory>(x => x.DatabaseName, dto.AdvancedCriteria.Database);
-                must.AddWildcard<DataInventory>(x => x.BaseName, dto.AdvancedCriteria.Object);
-                must.AddWildcard<DataInventory>(x => x.TypeDescription, dto.AdvancedCriteria.ObjectType);
-                must.AddWildcard<DataInventory>(x => x.ColumnName, dto.AdvancedCriteria.Column);
-                must.AddWildcard<DataInventory>(x => x.SourceName, dto.AdvancedCriteria.SourceType);
-
-                should.AddMatch<DataInventory>(x => x.AssetCode, dto.AdvancedCriteria.Asset);
-                should.AddMatch<DataInventory>(x => x.ServerName, dto.AdvancedCriteria.Server);
-                should.AddMatch<DataInventory>(x => x.DatabaseName, dto.AdvancedCriteria.Database);
-                should.AddMatch<DataInventory>(x => x.BaseName, dto.AdvancedCriteria.Object);
-                should.AddMatch<DataInventory>(x => x.TypeDescription, dto.AdvancedCriteria.ObjectType);
-                should.AddMatch<DataInventory>(x => x.ColumnName, dto.AdvancedCriteria.Column);
-                should.AddMatch<DataInventory>(x => x.SourceName, dto.AdvancedCriteria.SourceType);
-            }
-            else
-            {
-                //broad search for criteria across all searchable fields
-                should.AddMatchAndWildcard<DataInventory>(x => x.AssetCode, dto.Criteria);
-                should.AddMatchAndWildcard<DataInventory>(x => x.ServerName, dto.Criteria);
-                should.AddMatchAndWildcard<DataInventory>(x => x.DatabaseName, dto.Criteria);
-                should.AddMatchAndWildcard<DataInventory>(x => x.BaseName, dto.Criteria);
-                should.AddMatchAndWildcard<DataInventory>(x => x.TypeDescription, dto.Criteria);
-                should.AddMatchAndWildcard<DataInventory>(x => x.ColumnName, dto.Criteria);
-                should.AddMatchAndWildcard<DataInventory>(x => x.SourceName, dto.Criteria);
-
-                if (should.Any())
-                {
-                    minShould = 1;
-                }
-            }
-
-            if (dto.Sensitive == Core.GlobalEnums.DaleSensitive.SensitiveOnly)
-            {
-                must.AddMatch<DataInventory>(x => x.IsSensitive, "true");
-            }
-            else if (dto.Sensitive == Core.GlobalEnums.DaleSensitive.SensitiveNone)
-            {
-                must.AddMatch<DataInventory>(x => x.IsSensitive, "false");
-            }
-
-            SearchRequest<DataInventory> request = new SearchRequest<DataInventory>()
-            {
-                Size = 1000,
-                Query = new BoolQuery()
-                {
-                    MustNot = new List<QueryContainer>() { new ExistsQuery() { Field = Infer.Field<DataInventory>(x => x.ExpirationDateTime) } },
-                    Must = must,
-                    Should = should,
-                    MinimumShouldMatch = minShould
-                }
-            };
-
             DaleResultDto resultDto = new DaleResultDto();
-            resultDto.DaleResults = SearchDataInventory(dto, request, resultDto).Select(x => x.ToDto()).ToList();
+
+            SearchRequest<DataInventory> searchRequest = BuildTextSearchRequest(dto, 1000);
+            searchRequest.TrackTotalHits = true;
+
+            ElasticResult<DataInventory> result = GetElasticResult(dto, resultDto, searchRequest);
+
+            if (result.Documents?.Any() == true)
+            {
+                resultDto.DaleResults = result.Documents.Select(x => x.ToDto()).ToList();
+                resultDto.SearchTotal = result.SearchTotal;
+            }
+
+            return resultDto;
+        }
+
+        public override FilterSearchDto GetSearchFilters(DaleSearchDto dto)
+        {
+            //get fields that are filterable via custom attribute
+            Dictionary<string, Field> filterCategoryFields = NestHelper.FilterCategoryFields<DataInventory>();
+
+            //build aggregation query
+            AggregationDictionary aggregations = new AggregationDictionary();
+            foreach (KeyValuePair<string, Field> field in filterCategoryFields)
+            {
+                aggregations.Add(field.Key, new TermsAggregation(field.Key) { Field = field.Value });
+            }
+
+            SearchRequest<DataInventory> request = BuildTextSearchRequest(dto, 0);
+            request.Aggregations = aggregations;
+
+            //get aggregation results
+            FilterSearchDto resultDto = new FilterSearchDto();
+
+            AggregateDictionary aggResults = GetElasticResult(dto, resultDto, request).Aggregations;
+
+            //translate results to dto
+            if (aggResults != null)
+            {
+                foreach (string categoryName in filterCategoryFields.Keys)
+                {
+                    TermsAggregate<string> categoryResults = aggResults.Terms(categoryName);
+                    if (categoryResults?.Buckets?.Any() == true && categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
+                    {
+                        FilterCategoryDto categoryDto = new FilterCategoryDto() { CategoryName = categoryName };
+
+                        foreach (var bucket in categoryResults.Buckets)
+                        {
+                            string bucketKey = bucket.KeyAsString ?? bucket.Key;
+                            categoryDto.CategoryOptions.Add(new FilterCategoryOptionDto()
+                            {
+                                OptionValue = bucketKey,
+                                ResultCount = bucket.DocCount.GetValueOrDefault(),
+                                ParentCategoryName = categoryName,
+                                Selected = dto.FilterCategories?.Any(x => x.CategoryName == categoryName && x.CategoryOptions?.Any(o => o.OptionValue == bucketKey && o.Selected) == true) == true
+                            });
+                        }
+
+                        resultDto.FilterCategories.Add(categoryDto);
+                    }
+                }
+            }
 
             return resultDto;
         }
@@ -120,7 +119,7 @@ namespace Sentry.data.Infrastructure
             };
 
             DaleContainSensitiveResultDto resultDto = new DaleContainSensitiveResultDto();
-            resultDto.DoesContainSensitiveResults = SearchDataInventory(dto, request, resultDto).Any();
+            resultDto.DoesContainSensitiveResults = GetElasticResult(dto, resultDto, request).Documents?.Any() == true;
 
             return resultDto;
         }
@@ -132,11 +131,11 @@ namespace Sentry.data.Infrastructure
             throw new NotImplementedException();
         }
 
-        private IList<DataInventory> SearchDataInventory(DaleSearchDto dto, SearchRequest<DataInventory> searchRequest, DaleEventableDto resultDto)
+        private ElasticResult<DataInventory> GetElasticResult(DaleSearchDto dto, DaleEventableDto resultDto, SearchRequest<DataInventory> searchRequest)
         {
             resultDto.DaleEvent = new DaleEventDto()
             {
-                Criteria = dto.Destiny == Core.GlobalEnums.DaleDestiny.Advanced ? dto.AdvancedCriteria.ToEventString() : dto.Criteria,
+                Criteria = dto.CriteriaToString(),
                 Destiny = dto.Destiny.GetDescription(),
                 QuerySuccess = true,
                 Sensitive = dto.Sensitive.GetDescription()
@@ -144,16 +143,93 @@ namespace Sentry.data.Infrastructure
 
             try
             {
-                return _context.Search(searchRequest);
+                return _context.SearchAsync(searchRequest).Result;
             }
-            catch (Exception ex)
+            catch (AggregateException ex)
             {
                 resultDto.DaleEvent.QuerySuccess = false;
                 resultDto.DaleEvent.QueryErrorMessage = $"Data Inventory Elasticsearch query failed. Exception: {ex.Message}";
                 Logger.Error(resultDto.DaleEvent.QueryErrorMessage, ex);
             }
 
-            return new List<DataInventory>();
+            return new ElasticResult<DataInventory>();
+        }
+
+        private SearchRequest<DataInventory> BuildTextSearchRequest(DaleSearchDto dto, int size)
+        {
+            List<QueryContainer> should = new List<QueryContainer>();
+
+            if (!string.IsNullOrWhiteSpace(dto.Criteria))
+            {
+                //broad search for criteria across all searchable fields
+                Nest.Fields fields = NestHelper.SearchFields<DataInventory>();
+
+                //split search terms regardless of amount of spaces between words
+                List<string> terms = dto.Criteria.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+                //perform cross field search when multiple words in search criteria
+                if (terms.Count > 1)
+                {
+                    should.Add(new QueryStringQuery()
+                    {
+                        Query = string.Join(" ", terms),
+                        Fields = fields,
+                        Fuzziness = Fuzziness.Auto,
+                        Type = TextQueryType.CrossFields,
+                        DefaultOperator = Operator.And
+                    });
+
+                    should.Add(new QueryStringQuery()
+                    {
+                        Query = string.Join(" ", terms.Select(x => $"*{x}*")),
+                        Fields = fields,
+                        AnalyzeWildcard = true,
+                        Type = TextQueryType.CrossFields,
+                        DefaultOperator = Operator.And
+                    });
+                }
+                else
+                {
+                    should.Add(new QueryStringQuery()
+                    {
+                        Query = terms.First(),
+                        Fields = fields,
+                        Fuzziness = Fuzziness.Auto,
+                        Type = TextQueryType.MostFields
+                    });
+
+                    should.Add(new QueryStringQuery()
+                    {
+                        Query = $"*{terms.First()}*",
+                        Fields = fields,
+                        AnalyzeWildcard = true,
+                        Type = TextQueryType.MostFields
+                    });
+                }
+            }
+
+            List<QueryContainer> filter = new List<QueryContainer>();
+
+            foreach (FilterCategoryDto category in dto.FilterCategories)
+            {
+                filter.Add(new QueryStringQuery()
+                {
+                    Query = string.Join(" OR ", category.CategoryOptions.Where(x => x.Selected).Select(x => x.OptionValue)),
+                    DefaultField = NestHelper.FilterCategoryField<DataInventory>(category.CategoryName)
+                });
+            }
+
+            return new SearchRequest<DataInventory>()
+            {
+                Size = size,
+                Query = new BoolQuery()
+                {
+                    MustNot = new List<QueryContainer>() { new ExistsQuery() { Field = Infer.Field<DataInventory>(x => x.ExpirationDateTime) } },
+                    Filter = filter,
+                    Should = should,
+                    MinimumShouldMatch = should.Any() ? 1 : 0
+                }
+            };
         }
     }
 }

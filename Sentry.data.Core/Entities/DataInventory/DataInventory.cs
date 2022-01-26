@@ -1,5 +1,6 @@
 ﻿using Nest;
 using System;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
@@ -10,12 +11,16 @@ namespace Sentry.data.Core
         public int Id { get; set; }
 
         [PropertyName("asset_cde")]
+        [GlobalSearchField]
+        [FilterSearchField(FilterCategoryNames.ASSET)]
         public string AssetCode { get; set; }
 
         [PropertyName("basedatabase_id")]
         public int BaseDatabaseId { get; set; }
 
         [PropertyName("base_nme")]
+        [GlobalSearchField]
+        [FilterSearchField(FilterCategoryNames.TABLEVIEWNAME)]
         public string BaseName { get; set; }
 
         [PropertyName("change_cnt")]
@@ -25,9 +30,12 @@ namespace Sentry.data.Core
         public string ColumnContentType { get; set; }
 
         [PropertyName("column_nme")]
+        [GlobalSearchField]
+        [FilterSearchField(FilterCategoryNames.COLUMN)]
         public string ColumnName { get; set; }
 
         [PropertyName("column_typ")]
+        [FilterSearchField(FilterCategoryNames.DATATYPE)]
         public string ColumnType { get; set; }
 
         [PropertyName("content_id")]
@@ -37,6 +45,8 @@ namespace Sentry.data.Core
         public int CurrentCount { get; set; }
 
         [PropertyName("database_nme")]
+        [GlobalSearchField]
+        [FilterSearchField(FilterCategoryNames.DATABASE)]
         public string DatabaseName { get; set; }
 
         [PropertyName("effectivechange_cnt")]
@@ -44,12 +54,6 @@ namespace Sentry.data.Core
 
         [PropertyName("effective_dte")]
         public DateTime EffectiveDate { get; set; }
-
-        [PropertyName("@version")]
-        public string Version { get; set; }
-
-        [PropertyName("@timestamp")]
-        public DateTime Timestamp { get; set; }
 
         [PropertyName("effective_dtm")]
         public DateTime EffectiveDateTime { get; set; }
@@ -61,25 +65,28 @@ namespace Sentry.data.Core
         public DateTime? ExpirationDateTime { get; set; }
 
         [PropertyName("isnullable_flg")]
+        [FilterSearchField(FilterCategoryNames.NULLABLE)]
         public bool? IsNullable { get; set; }
 
         [PropertyName("isownerverified_flg")]
         public bool IsOwnerVerified { get; set; }
 
         [PropertyName("issensitive_flg")]
+        [FilterSearchField(FilterCategoryNames.SENSITIVE)]
         public bool IsSensitive { get; set; }
 
         [PropertyName("maxlength_len")]
-        public int MaxLength { get; set; }
+        public int? MaxLength { get; set; }
 
         [PropertyName("precision_len")]
         public int? Precision { get; set; }
 
         [PropertyName("prod_typ")]
+        [FilterSearchField(FilterCategoryNames.ENVIRONMENT)]
         public string ProdType { get; set; }
 
         [PropertyName("saidlist_nme")]
-        public string SAIDListName { get; set; }
+        public string SaidListName { get; set; }
 
         [PropertyName("scale_len")]
         public int? Scale { get; set; }
@@ -97,16 +104,28 @@ namespace Sentry.data.Core
         public string SchemaName { get; set; }
 
         [PropertyName("server_nme")]
+        [GlobalSearchField]
+        [FilterSearchField(FilterCategoryNames.SERVER)]
         public string ServerName { get; set; }
 
         [PropertyName("source_nme")]
+        [GlobalSearchField]
+        [FilterSearchField(FilterCategoryNames.SOURCETYPE)]
         public string SourceName { get; set; }
+
+        [PropertyName("@timestamp")]
+        public DateTime Timestamp { get; set; }
 
         [PropertyName("total_cnt")]
         public int TotalCount { get; set; }
 
         [PropertyName("type_dsc")]
+        [GlobalSearchField]
+        [FilterSearchField(FilterCategoryNames.TYPE)]
         public string TypeDescription { get; set; }
+
+        [PropertyName("@version")]
+        public string Version { get; set; }
         #endregion
 
         #region Mappings
@@ -123,7 +142,7 @@ namespace Sentry.data.Core
                 IsSensitive = IsSensitive,
                 ProdType = ProdType,
                 ColumnType = ColumnType,
-                MaxLength = MaxLength,
+                MaxLength = MaxLength ?? 0,
                 Precision = Precision ?? 0,
                 Scale = Scale ?? 0,
                 IsNullable = IsNullable ?? false,
@@ -132,7 +151,7 @@ namespace Sentry.data.Core
                 IsOwnerVerified = IsOwnerVerified,
                 SourceType = SourceName,
                 ScanCategory = ScanListName,
-                ScanType = SAIDListName
+                ScanType = SaidListName
             };
         }
         #endregion

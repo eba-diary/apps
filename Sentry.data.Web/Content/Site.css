@@ -2833,3 +2833,7 @@ a.forbiddenHero:hover {
     border-bottom-left-radius: 5px;
     padding:5px;
 }
+
+.display-none {
+    display: none;
+}
