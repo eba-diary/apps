@@ -60,7 +60,7 @@
                         //later on when they check/uncheck the box my editRow() function will refresh the data associated with the grid which changes the label hidden text to the opposite so filtering can refresh
                         { data: null, className: "IsSensitive", visible: false, render: (d) => data.DataInventory.getTableElementCheckbox(!obj.canDaleSensitiveEdit || (obj.canDaleSensitiveEdit && !obj.canDaleOwnerVerifiedEdit && d.IsOwnerVerified) || !obj.CLA3707_UsingSQLSource, d.IsSensitive) },
                         //OWNER VERIFIED CHECKBOX
-                        { data: null, className: "IsOwnerVerified", visible: false, render: (d) => data.DataInventory.getTableElementCheckbox(!obj.canDaleOwnerVerifiedEdit, d.IsOwnerVerified) },
+                        { data: null, className: "IsOwnerVerified", visible: false, render: (d) => data.DataInventory.getTableElementCheckbox(!obj.canDaleOwnerVerifiedEdit || !obj.CLA3707_UsingSQLSource, d.IsOwnerVerified) },
                         { data: "ProdType", className: "ProdType", visible: false },
                         { data: "ColumnType", className: "ColumnType", visible: false },
                         { data: "MaxLength", className: "MaxLength", visible: false },
@@ -73,9 +73,10 @@
                         { data: "ScanType", className: "ScanType", visible: false }
                     ],
                     aLengthMenu: [10, 20, 50, 100, 500],
-                    dom: "<'row'<'col-xs-6'l><'col-xs-6 text-right'B>>" +
+                    dom: "<'row'<'col-xs-12'i>>" +
+                        "<'row'<'col-xs-6'l><'col-xs-6 text-right'B>>" +
                         "<'row'<'col-xs-12'tr>>" +
-                        "<'row'<'col-xs-6'i><'col-xs-6 text-right'p>>",
+                        "<'row'<'col-xs-12 text-center'p>>",
                     buttons: [{ extend: 'colvis', text: 'Columns' }],
                     initComplete: function (settings, json) {
                         data.FilterSearch.completeSearch()

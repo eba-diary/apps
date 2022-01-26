@@ -51,14 +51,6 @@ namespace Sentry.data.Core
             return Infer.Field(property);
         }
 
-        public static Field BuildExpression<T, TValue>(PropertyInfo property) where T : class
-        {
-            ParameterExpression parameter = Expression.Parameter(typeof(T));
-            Expression<Func<T, TValue>> expression = Expression.Lambda<Func<T, TValue>>(Expression.Property(parameter, property.Name), parameter);
-
-            return Infer.Field(expression.AppendSuffix("keyword"));
-        }
-
         private static IEnumerable<PropertyInfo> GetPropertiesWithAttribute<T, attrT>()
         {
             return typeof(T).GetProperties().Where(p => Attribute.IsDefined(p, typeof(attrT)));
