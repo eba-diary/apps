@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Elasticsearch.Net;
 using static Sentry.data.Core.GlobalConstants;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure.Tests
 {
@@ -17,7 +18,7 @@ namespace Sentry.data.Infrastructure.Tests
         public void GetSearchResults_BasicSearch_DaleResultDto()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.Search(It.IsAny<SearchRequest<DataInventory>>())).Returns(GetDataInventoryList());
+            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Returns(Task.FromResult(GetDataInventoryList()));
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
 
@@ -60,7 +61,7 @@ namespace Sentry.data.Infrastructure.Tests
         public void GetSearchResults_NoResultsSearch_EmptyDaleResultDto()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.Search(It.IsAny<SearchRequest<DataInventory>>())).Returns(new ElasticResult<DataInventory>());
+            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Returns(Task.FromResult(new ElasticResult<DataInventory>()));
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
 
@@ -76,7 +77,7 @@ namespace Sentry.data.Infrastructure.Tests
         public void GetSearchResults_ErrorSearch_QueryFailDaleEvent()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.Search(It.IsAny<SearchRequest<DataInventory>>())).Throws(new ElasticsearchClientException("FAIL"));
+            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Throws(new AggregateException(new List<Exception>() { new ElasticsearchClientException("FAIL") }));
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
 
@@ -87,7 +88,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.IsNotNull(result.DaleEvent);
             Assert.IsFalse(result.DaleEvent.QuerySuccess);
             Assert.AreEqual("Table", result.DaleEvent.Criteria);
-            Assert.AreEqual("Data Inventory Elasticsearch query failed. Exception: FAIL", result.DaleEvent.QueryErrorMessage);
+            Assert.AreEqual("Data Inventory Elasticsearch query failed. Exception: One or more errors occurred.", result.DaleEvent.QueryErrorMessage);
 
             Assert.AreEqual(0, result.SearchTotal);
             Assert.IsFalse(result.DaleResults.Any());
@@ -97,7 +98,7 @@ namespace Sentry.data.Infrastructure.Tests
         public void DoesItemContainSensitive_DaleSearchDto_True()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.Search(It.IsAny<SearchRequest<DataInventory>>())).Returns(GetDataInventoryList());
+            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Returns(Task.FromResult(GetDataInventoryList()));
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
 
@@ -126,7 +127,7 @@ namespace Sentry.data.Infrastructure.Tests
         public void GetSearchFilters_BasicSearch_FilterSearchDto()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.Search(It.IsAny<SearchRequest<DataInventory>>())).Returns(GetAggregateDictionary());
+            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Returns(Task.FromResult(GetAggregateDictionary()));
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
 
@@ -198,7 +199,7 @@ namespace Sentry.data.Infrastructure.Tests
         public void GetSearchFilters_ErrorSearch_QueryFailDaleEvent()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.Search(It.IsAny<SearchRequest<DataInventory>>())).Throws(new ElasticsearchClientException("FAIL"));
+            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Throws(new AggregateException(new List<Exception>() { new ElasticsearchClientException("FAIL") }));
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
 
@@ -246,7 +247,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.IsNotNull(result.DaleEvent);
             Assert.IsFalse(result.DaleEvent.QuerySuccess);
             Assert.AreEqual("Environment:P OR D AND Sensitive:true", result.DaleEvent.Criteria);
-            Assert.AreEqual("Data Inventory Elasticsearch query failed. Exception: FAIL", result.DaleEvent.QueryErrorMessage);
+            Assert.AreEqual("Data Inventory Elasticsearch query failed. Exception: One or more errors occurred.", result.DaleEvent.QueryErrorMessage);
 
             Assert.IsFalse(result.FilterCategories.Any());
         }

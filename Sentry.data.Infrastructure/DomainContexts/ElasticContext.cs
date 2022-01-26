@@ -2,6 +2,7 @@
 using Sentry.data.Core;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
@@ -27,32 +28,27 @@ namespace Sentry.data.Infrastructure
             throw new NotImplementedException();
         }
 
-        public ElasticResult<T> Search<T>(Func<SearchDescriptor<T>, ISearchRequest> selector) where T : class
+        public async Task<ElasticResult<T>> SearchAsync<T>(Func<SearchDescriptor<T>, ISearchRequest> selector) where T : class
         {
-            return ResultFrom(GetResponse(() => _client.Search(selector)));
+            return await GetResponse(() => _client.SearchAsync(selector)).ConfigureAwait(false);
         }
 
-        public ElasticResult<T> Search<T>(SearchRequest<T> searchRequest) where T : class
+        public async Task<ElasticResult<T>> SearchAsync<T>(SearchRequest<T> searchRequest) where T : class
         {
-            return ResultFrom(GetResponse(() => _client.Search<T>(searchRequest)));
+            return await GetResponse(() => _client.SearchAsync<T>(searchRequest)).ConfigureAwait(false);
         }
         #endregion
 
         #region Methods
-        private T GetResponse<T>(Func<T> request) where T : IResponse
+        private async Task<ElasticResult<T>> GetResponse<T>(Func<Task<ISearchResponse<T>>> request) where T : class
         {
-            T response = request();
+            ISearchResponse<T> response = await request().ConfigureAwait(false);
 
             if (!response.IsValid)
             {
                 throw response.OriginalException;
             }
 
-            return response;
-        }
-
-        private ElasticResult<T> ResultFrom<T>(ISearchResponse<T> response) where T : class
-        {
             return new ElasticResult<T>()
             {
                 SearchTotal = response.Total,

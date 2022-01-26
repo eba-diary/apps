@@ -143,9 +143,9 @@ namespace Sentry.data.Infrastructure
 
             try
             {
-                return _context.Search(searchRequest);
+                return _context.SearchAsync(searchRequest).Result;
             }
-            catch (Exception ex)
+            catch (AggregateException ex)
             {
                 resultDto.DaleEvent.QuerySuccess = false;
                 resultDto.DaleEvent.QueryErrorMessage = $"Data Inventory Elasticsearch query failed. Exception: {ex.Message}";
