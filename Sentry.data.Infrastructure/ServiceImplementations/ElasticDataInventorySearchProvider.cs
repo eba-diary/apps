@@ -4,19 +4,22 @@ using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
-    public class ElasticDataInventorySearchProvider : DaleSearchProvider
+    public class ElasticDataInventorySearchProvider : IDaleSearchProvider
     {
         private readonly IElasticContext _context;
+        private readonly string AssetCategoriesAggregationKey = "SaidListNames";
 
         public ElasticDataInventorySearchProvider(IElasticContext context)
         {
             _context = context;
         }
 
-        public override DaleResultDto GetSearchResults(DaleSearchDto dto)
+        #region IDaleSearchProvider Implementation
+        public DaleResultDto GetSearchResults(DaleSearchDto dto)
         {
             DaleResultDto resultDto = new DaleResultDto();
 
@@ -34,7 +37,7 @@ namespace Sentry.data.Infrastructure
             return resultDto;
         }
 
-        public override FilterSearchDto GetSearchFilters(DaleSearchDto dto)
+        public FilterSearchDto GetSearchFilters(DaleSearchDto dto)
         {
             //get fields that are filterable via custom attribute
             Dictionary<string, Field> filterCategoryFields = NestHelper.FilterCategoryFields<DataInventory>();
@@ -84,7 +87,7 @@ namespace Sentry.data.Infrastructure
             return resultDto;
         }
 
-        public override DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dto)
+        public DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dto)
         {
             List<QueryContainer> must = new List<QueryContainer>();
             must.AddMatch<DataInventory>(x => x.IsSensitive, "true");
@@ -102,20 +105,13 @@ namespace Sentry.data.Infrastructure
                     break;
             }
 
+            BoolQuery boolQuery = GetBaseBoolQuery();
+            boolQuery.Must = must;
+
             SearchRequest<DataInventory> request = new SearchRequest<DataInventory>()
             {
                 Size = 1,
-                Query = new BoolQuery()
-                {
-                    MustNot = new List<QueryContainer>()
-                    {
-                        new ExistsQuery()
-                        {
-                            Field = Infer.Field<DataInventory>(f => f.ExpirationDateTime)
-                        }
-                    },
-                    Must = must
-                }
+                Query = boolQuery
             };
 
             DaleContainSensitiveResultDto resultDto = new DaleContainSensitiveResultDto();
@@ -124,13 +120,58 @@ namespace Sentry.data.Infrastructure
             return resultDto;
         }
 
-        public override bool SaveSensitive(string sensitiveBlob)
+        public DaleCategoryResultDto GetCategoriesByAsset(string search)
+        {
+            DaleCategoryResultDto resultDto = new DaleCategoryResultDto()
+            {
+                DaleCategories = new List<DaleCategoryDto>(),
+                DaleEvent = new DaleEventDto()
+                {
+                    Criteria = search,
+                    QuerySuccess = true
+                }
+            };
+
+            BoolQuery boolQuery = GetBaseBoolQuery();
+
+            Task<ElasticResult<DataInventory>> allCategoriesTask = _context.SearchAsync(GetBaseSaidListRequest(boolQuery));
+
+            List<QueryContainer> filters = new List<QueryContainer>();
+            filters.AddMatch<DataInventory>(x => x.AssetCode, search);
+            filters.AddMatch<DataInventory>(x => x.IsSensitive, "true");
+
+            boolQuery.Filter = filters;
+
+            Task<ElasticResult<DataInventory>> assetCategoriesTask = _context.SearchAsync(GetBaseSaidListRequest(boolQuery));
+
+            try
+            {
+                List<string> allNames = ExtractAggregationBucketKeys(allCategoriesTask, resultDto.DaleEvent);
+                List<string> assetNames = ExtractAggregationBucketKeys(assetCategoriesTask, resultDto.DaleEvent);
+
+                resultDto.DaleCategories = allNames.Select(x => new DaleCategoryDto()
+                {
+                    Category = x,
+                    IsSensitive = assetNames.Contains(x)
+                }).ToList();
+            }
+            catch (AggregateException ex)
+            {
+                HandleAggregateException(ex, resultDto.DaleEvent);
+            }
+
+            return resultDto;
+        }
+
+        public bool SaveSensitive(string sensitiveBlob)
         {
             //Currently not allowed at this time when source feature flag is set to ELASTIC
             //Solution for real-time updates has not been determined
             throw new NotImplementedException();
         }
+        #endregion
 
+        #region Methods
         private ElasticResult<DataInventory> GetElasticResult(DaleSearchDto dto, DaleEventableDto resultDto, SearchRequest<DataInventory> searchRequest)
         {
             resultDto.DaleEvent = new DaleEventDto()
@@ -147,9 +188,7 @@ namespace Sentry.data.Infrastructure
             }
             catch (AggregateException ex)
             {
-                resultDto.DaleEvent.QuerySuccess = false;
-                resultDto.DaleEvent.QueryErrorMessage = $"Data Inventory Elasticsearch query failed. Exception: {ex.Message}";
-                Logger.Error(resultDto.DaleEvent.QueryErrorMessage, ex);
+                HandleAggregateException(ex, resultDto.DaleEvent);
             }
 
             return new ElasticResult<DataInventory>();
@@ -157,7 +196,7 @@ namespace Sentry.data.Infrastructure
 
         private SearchRequest<DataInventory> BuildTextSearchRequest(DaleSearchDto dto, int size)
         {
-            List<QueryContainer> should = new List<QueryContainer>();
+            BoolQuery boolQuery = GetBaseBoolQuery();
 
             if (!string.IsNullOrWhiteSpace(dto.Criteria))
             {
@@ -170,42 +209,48 @@ namespace Sentry.data.Infrastructure
                 //perform cross field search when multiple words in search criteria
                 if (terms.Count > 1)
                 {
-                    should.Add(new QueryStringQuery()
+                    boolQuery.Should = new List<QueryContainer>() 
                     {
-                        Query = string.Join(" ", terms),
-                        Fields = fields,
-                        Fuzziness = Fuzziness.Auto,
-                        Type = TextQueryType.CrossFields,
-                        DefaultOperator = Operator.And
-                    });
-
-                    should.Add(new QueryStringQuery()
-                    {
-                        Query = string.Join(" ", terms.Select(x => $"*{x}*")),
-                        Fields = fields,
-                        AnalyzeWildcard = true,
-                        Type = TextQueryType.CrossFields,
-                        DefaultOperator = Operator.And
-                    });
+                        new QueryStringQuery()
+                        {
+                            Query = string.Join(" ", terms),
+                            Fields = fields,
+                            Fuzziness = Fuzziness.Auto,
+                            Type = TextQueryType.CrossFields,
+                            DefaultOperator = Operator.And
+                        },
+                        new QueryStringQuery()
+                        {
+                            Query = string.Join(" ", terms.Select(x => $"*{x}*")),
+                            Fields = fields,
+                            AnalyzeWildcard = true,
+                            Type = TextQueryType.CrossFields,
+                            DefaultOperator = Operator.And
+                        }
+                    };
                 }
                 else
                 {
-                    should.Add(new QueryStringQuery()
+                    boolQuery.Should = new List<QueryContainer>()
                     {
-                        Query = terms.First(),
-                        Fields = fields,
-                        Fuzziness = Fuzziness.Auto,
-                        Type = TextQueryType.MostFields
-                    });
-
-                    should.Add(new QueryStringQuery()
-                    {
-                        Query = $"*{terms.First()}*",
-                        Fields = fields,
-                        AnalyzeWildcard = true,
-                        Type = TextQueryType.MostFields
-                    });
+                        new QueryStringQuery()
+                        {
+                            Query = terms.First(),
+                            Fields = fields,
+                            Fuzziness = Fuzziness.Auto,
+                            Type = TextQueryType.MostFields
+                        },
+                        new QueryStringQuery()
+                        {
+                            Query = $"*{terms.First()}*",
+                            Fields = fields,
+                            AnalyzeWildcard = true,
+                            Type = TextQueryType.MostFields
+                        }
+                    };
                 }
+
+                boolQuery.MinimumShouldMatch = boolQuery.Should.Any() ? 1 : 0;
             }
 
             List<QueryContainer> filter = new List<QueryContainer>();
@@ -219,17 +264,48 @@ namespace Sentry.data.Infrastructure
                 });
             }
 
+            boolQuery.Filter = filter;
+
             return new SearchRequest<DataInventory>()
             {
                 Size = size,
-                Query = new BoolQuery()
+                Query = boolQuery
+            };
+        }
+
+        private BoolQuery GetBaseBoolQuery()
+        {
+            return new BoolQuery()
+            {
+                MustNot = new List<QueryContainer>() { new ExistsQuery() { Field = Infer.Field<DataInventory>(x => x.ExpirationDateTime) } }
+            };
+        }
+
+        private SearchRequest<DataInventory> GetBaseSaidListRequest(QueryContainer query)
+        {
+            return new SearchRequest<DataInventory>()
+            {
+                Size = 0,
+                Query = query,
+                Aggregations = new AggregationDictionary()
                 {
-                    MustNot = new List<QueryContainer>() { new ExistsQuery() { Field = Infer.Field<DataInventory>(x => x.ExpirationDateTime) } },
-                    Filter = filter,
-                    Should = should,
-                    MinimumShouldMatch = should.Any() ? 1 : 0
+                    { AssetCategoriesAggregationKey, new TermsAggregation(AssetCategoriesAggregationKey) { Field = Infer.Field<DataInventory>(x => x.SaidListName.Suffix("keyword")), Size = 40 } }
                 }
             };
         }
+
+        private void HandleAggregateException(AggregateException ex, DaleEventDto eventDto)
+        {
+            eventDto.QuerySuccess = false;
+            eventDto.QueryErrorMessage = $"Data Inventory Elasticsearch query failed. Exception: {ex.Message}";
+            Logger.Error(eventDto.QueryErrorMessage, ex);
+        }
+
+        private List<string> ExtractAggregationBucketKeys(Task<ElasticResult<DataInventory>> resultTask, DaleEventDto eventDto)
+        {
+            TermsAggregate<string> agg = resultTask.Result.Aggregations.Terms(AssetCategoriesAggregationKey);
+            return agg.Buckets.SelectMany(x => x.Key.Split(',').Select(s => s.Trim())).Distinct().ToList();
+        }
+        #endregion
     }
 }

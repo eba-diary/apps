@@ -10,7 +10,7 @@ namespace Sentry.data.Infrastructure
 {
     public class DaleSearchProvider : IDaleSearchProvider
     {
-        public virtual DaleResultDto GetSearchResults(DaleSearchDto dto)
+        public DaleResultDto GetSearchResults(DaleSearchDto dto)
         {
             DaleResultDto daleResult = new DaleResultDto();
             daleResult.DaleResults = new List<DaleResultRowDto>();
@@ -68,7 +68,7 @@ namespace Sentry.data.Infrastructure
             return daleResult;
         }
 
-        public virtual FilterSearchDto GetSearchFilters(DaleSearchDto dto)
+        public FilterSearchDto GetSearchFilters(DaleSearchDto dto)
         {
             throw new NotImplementedException();
         }
@@ -203,7 +203,7 @@ namespace Sentry.data.Infrastructure
         }
 
 
-        public virtual bool SaveSensitive(string sensitiveBlob)
+        public bool SaveSensitive(string sensitiveBlob)
         {
             bool success = true;
 
@@ -301,7 +301,7 @@ namespace Sentry.data.Infrastructure
             return result;
         }
 
-        public virtual DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dto)
+        public DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dto)
         {
             DaleContainSensitiveResultDto daleResult = new DaleContainSensitiveResultDto();
             daleResult.DoesContainSensitiveResults = false;
@@ -383,7 +383,7 @@ namespace Sentry.data.Infrastructure
             return q;
         }
 
-        public virtual DaleCategoryResultDto GetCategoriesByAsset(string search)
+        public DaleCategoryResultDto GetCategoriesByAsset(string search)
         {
             DaleCategoryResultDto daleResult = new DaleCategoryResultDto();
             daleResult.DaleCategories = new List<DaleCategoryDto>();
