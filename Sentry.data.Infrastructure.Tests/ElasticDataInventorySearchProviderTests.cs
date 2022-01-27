@@ -18,7 +18,7 @@ namespace Sentry.data.Infrastructure.Tests
         public void GetSearchResults_BasicSearch_DaleResultDto()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Returns(Task.FromResult(GetDataInventoryList()));
+            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetDataInventoryList());
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
 
@@ -77,7 +77,8 @@ namespace Sentry.data.Infrastructure.Tests
         public void GetSearchResults_ErrorSearch_QueryFailDaleEvent()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Throws(new AggregateException(new List<Exception>() { new ElasticsearchClientException("FAIL") }));
+            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
+                .ThrowsAsync(new AggregateException(new List<Exception>() { new ElasticsearchClientException("FAIL") }));
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
 
@@ -98,7 +99,7 @@ namespace Sentry.data.Infrastructure.Tests
         public void DoesItemContainSensitive_DaleSearchDto_True()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Returns(Task.FromResult(GetDataInventoryList()));
+            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetDataInventoryList());
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
 
@@ -127,7 +128,7 @@ namespace Sentry.data.Infrastructure.Tests
         public void GetSearchFilters_BasicSearch_FilterSearchDto()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Returns(Task.FromResult(GetAggregateDictionary()));
+            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetAggregateDictionary());
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
 
@@ -199,7 +200,8 @@ namespace Sentry.data.Infrastructure.Tests
         public void GetSearchFilters_ErrorSearch_QueryFailDaleEvent()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Throws(new AggregateException(new List<Exception>() { new ElasticsearchClientException("FAIL") }));
+            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
+                .ThrowsAsync(new AggregateException(new List<Exception>() { new ElasticsearchClientException("FAIL") }));
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
 
@@ -250,6 +252,105 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Data Inventory Elasticsearch query failed. Exception: One or more errors occurred.", result.DaleEvent.QueryErrorMessage);
 
             Assert.IsFalse(result.FilterCategories.Any());
+        }
+
+        [TestMethod]
+        public void GetCategoriesByAsset_AssetHasSensitive_DaleCategoryResultDto()
+        {
+            Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
+            elasticContext.SetupSequence(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
+                .ReturnsAsync(GetCategoryAggregateDictionary(GetAllCategories()))
+                .ReturnsAsync(GetCategoryAggregateDictionary(new List<string>() { "PCI", "User Setting" }));
+
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+
+            DaleCategoryResultDto result = searchProvider.GetCategoriesByAsset("DATA");
+
+            elasticContext.VerifyAll();
+
+            Assert.IsNotNull(result.DaleEvent);
+            Assert.IsTrue(result.DaleEvent.QuerySuccess);
+            Assert.AreEqual("DATA", result.DaleEvent.Criteria);
+            Assert.IsTrue(string.IsNullOrEmpty(result.DaleEvent.QueryErrorMessage));
+
+            Assert.AreEqual(4, result.DaleCategories.Count);
+
+            //assert dto mapping
+            DaleCategoryDto category = result.DaleCategories.FirstOrDefault(x => x.Category == "PCI");
+            Assert.IsNotNull(category);
+            Assert.IsTrue(category.IsSensitive);
+
+            category = result.DaleCategories.FirstOrDefault(x => x.Category == "User Setting");
+            Assert.IsNotNull(category);
+            Assert.IsTrue(category.IsSensitive);
+
+            category = result.DaleCategories.FirstOrDefault(x => x.Category == "Financial Personal Information");
+            Assert.IsNotNull(category);
+            Assert.IsFalse(category.IsSensitive);
+
+            category = result.DaleCategories.FirstOrDefault(x => x.Category == "Authentication Verifier");
+            Assert.IsNotNull(category);
+            Assert.IsFalse(category.IsSensitive);
+        }
+
+        [TestMethod]
+        public void GetCategoriesByAsset_AssetNotFound_DaleCategoryResultDto()
+        {
+            Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
+            elasticContext.SetupSequence(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
+                .ReturnsAsync(GetCategoryAggregateDictionary(GetAllCategories()))
+                .ReturnsAsync(GetCategoryAggregateDictionary(new List<string>()));
+
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+
+            DaleCategoryResultDto result = searchProvider.GetCategoriesByAsset("DATA");
+
+            elasticContext.VerifyAll();
+
+            Assert.IsNotNull(result.DaleEvent);
+            Assert.IsTrue(result.DaleEvent.QuerySuccess);
+            Assert.AreEqual("DATA", result.DaleEvent.Criteria);
+            Assert.IsTrue(string.IsNullOrEmpty(result.DaleEvent.QueryErrorMessage));
+
+            Assert.AreEqual(4, result.DaleCategories.Count);
+
+            //assert dto mapping
+            DaleCategoryDto category = result.DaleCategories.FirstOrDefault(x => x.Category == "PCI");
+            Assert.IsNotNull(category);
+            Assert.IsFalse(category.IsSensitive);
+
+            category = result.DaleCategories.FirstOrDefault(x => x.Category == "User Setting");
+            Assert.IsNotNull(category);
+            Assert.IsFalse(category.IsSensitive);
+
+            category = result.DaleCategories.FirstOrDefault(x => x.Category == "Financial Personal Information");
+            Assert.IsNotNull(category);
+            Assert.IsFalse(category.IsSensitive);
+
+            category = result.DaleCategories.FirstOrDefault(x => x.Category == "Authentication Verifier");
+            Assert.IsNotNull(category);
+            Assert.IsFalse(category.IsSensitive);
+        }
+
+        [TestMethod]
+        public void GetCategoriesByAsset_Error_DaleCategoryResultDto()
+        {
+            Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
+            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
+                .ThrowsAsync(new AggregateException(new List<Exception>() { new ElasticsearchClientException("FAIL") }));
+
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+
+            DaleCategoryResultDto result = searchProvider.GetCategoriesByAsset("DATA");
+
+            elasticContext.VerifyAll();
+
+            Assert.IsNotNull(result.DaleEvent);
+            Assert.IsFalse(result.DaleEvent.QuerySuccess);
+            Assert.AreEqual("DATA", result.DaleEvent.Criteria);
+            Assert.AreEqual("Data Inventory Elasticsearch query failed. Exception: One or more errors occurred.", result.DaleEvent.QueryErrorMessage);
+
+            Assert.IsFalse(result.DaleCategories.Any());
         }
 
         #region Methods
@@ -338,6 +439,48 @@ namespace Sentry.data.Infrastructure.Tests
                         Items = new List<KeyedBucket<string>>().AsReadOnly()
                     }
                 })
+            };
+        }
+
+        private ElasticResult<DataInventory> GetCategoryAggregateDictionary(List<string> categories)
+        {
+            List<KeyedBucket<object>> buckets = new List<KeyedBucket<object>>();
+
+            foreach (string category in categories)
+            {
+                buckets.Add(new KeyedBucket<object>(new Dictionary<string, IAggregate>())
+                {
+                    DocCount = 5,
+                    Key = category
+                });
+            }
+
+            return new ElasticResult<DataInventory>()
+            {
+                Aggregations = new AggregateDictionary(new Dictionary<string, IAggregate>
+                {
+                    ["SaidListNames"] = new BucketAggregate()
+                    {
+                        SumOtherDocCount = 0,
+                        Items = buckets.AsReadOnly()
+                    }
+                })
+            };
+        }
+
+        private List<string> GetAllCategories()
+        {
+            return new List<string>()
+            {
+                "Financial Personal Information",
+                "PCI",
+                "User Setting",
+                "Authentication Verifier",
+                "Financial Personal Information, PCI",
+                "Financial Personal Information, PCI, User Setting",
+                "Financial Personal Information, User Setting",
+				"Authentication Verifier, Financial Personal Information",
+				"PCI, User Setting"
             };
         }
         #endregion
