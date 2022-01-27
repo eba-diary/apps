@@ -146,8 +146,8 @@ namespace Sentry.data.Infrastructure
 
             try
             {
-                List<string> allNames = ExtractAggregationBucketKeys(allCategoriesTask, resultDto.DaleEvent);
-                List<string> assetNames = ExtractAggregationBucketKeys(assetCategoriesTask, resultDto.DaleEvent);
+                List<string> allNames = ExtractAggregationBucketKeys(allCategoriesTask);
+                List<string> assetNames = ExtractAggregationBucketKeys(assetCategoriesTask);
 
                 resultDto.DaleCategories = allNames.Select(x => new DaleCategoryDto()
                 {
@@ -301,7 +301,7 @@ namespace Sentry.data.Infrastructure
             Logger.Error(eventDto.QueryErrorMessage, ex);
         }
 
-        private List<string> ExtractAggregationBucketKeys(Task<ElasticResult<DataInventory>> resultTask, DaleEventDto eventDto)
+        private List<string> ExtractAggregationBucketKeys(Task<ElasticResult<DataInventory>> resultTask)
         {
             TermsAggregate<string> agg = resultTask.Result.Aggregations.Terms(AssetCategoriesAggregationKey);
             return agg.Buckets.SelectMany(x => x.Key.Split(',').Select(s => s.Trim())).Distinct().ToList();
