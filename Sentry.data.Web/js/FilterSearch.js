@@ -1,8 +1,12 @@
 ﻿data.FilterSearch = {
 
     lastSearchOptions: [],
-    executeSearch: function () { },
-    retrieveFilterOptions: function () { },
+    executeSearch: function () {
+        console.log('Must pass searchExecuter parameter to data.FilterSearch.init')
+    },
+    retrieveFilterOptions: function () {
+        console.log('Must pass filterRetriever parameter to data.FilterSearch.init')
+    },
 
     init: function (searchExecuter, filterRetriever) {
         this.executeSearch = searchExecuter;
@@ -171,8 +175,6 @@
 
         $(".glyphicon-search").show();
         $(".filter-search-results-container").slideDown();
-
-        selectedOptions = $('.filter-search-category-option-checkbox:checkbox:checked');
     },
 
     filterRetrivalPrep: function () {
