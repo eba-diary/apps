@@ -755,6 +755,8 @@ namespace Sentry.data.Core
 
             Logger.Debug($"Is DataFlowDto Null:{dto == null}");
             Logger.Debug($"Is DataFlow Null:{df == null}");
+            Logger.Debug($"IsCompressed:::{dto.IsCompressed}");
+            Logger.Debug($"IsPreProcessingRequired:::{dto.IsCompressed}");
 
             if (!_dataFeatures.CLA3241_DisableDfsDropLocation.GetValue())
             {
@@ -787,6 +789,7 @@ namespace Sentry.data.Core
 
             if (dto.IsCompressed)
             {
+                Logger.Debug($"Is CompressionJob Null:::{dto.CompressionJob == null}");
                 switch (dto.CompressionJob.CompressionType)
                 {
                     case CompressionTypes.ZIP:
@@ -802,6 +805,7 @@ namespace Sentry.data.Core
 
             if (dto.IsPreProcessingRequired)
             {
+                Logger.Debug($"Is PreProcessingOption Null:::{dto.PreProcessingOption == null}");
                 switch (dto.PreProcessingOption)
                 {
                     case (int)DataFlowPreProcessingTypes.googleapi:
@@ -958,6 +962,13 @@ namespace Sentry.data.Core
             dto.SaidKeyCode = df.SaidKeyCode;
             dto.NamedEnvironment = df.NamedEnvironment;
             dto.NamedEnvironmentType = df.NamedEnvironmentType;
+
+            if (dto.IsCompressed)
+            {
+                CompressionJobDto jobDto = new CompressionJobDto();
+                jobDto.CompressionType = (df.CompressionType == null) ? CompressionTypes.ZIP : (CompressionTypes)df.CompressionType;
+                dto.CompressionJob = jobDto;
+            }
 
             List<SchemaMapDto> scmMapDtoList = new List<SchemaMapDto>();
             foreach (DataFlowStep step in df.Steps.Where(w => w.SchemaMappings != null && w.SchemaMappings.Any()))
