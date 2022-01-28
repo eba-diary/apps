@@ -305,6 +305,8 @@ data.Config = {
         });
     },
 
+    previousDelimiter: '',
+
     SetFileExtensionProperites: function (extension) {
         //Determine which container to find the delimiter field within
         // and set delimiterelement appropriately
@@ -333,27 +335,25 @@ data.Config = {
                 $('.delimiterPanel').show();
                 $('#HasHeader').prop("readonly", false);
                 $('#HasHeader').prop("disabled", false);
-                if (!editMode) {
-                    delimiterelement.text(',');
-                    delimiterelement.val(',');
-                }
                 delimiterelement.prop("readonly", "readonly");
+
+                //CSV is always ',' so set value anyway
+                delimiterelement.text(',');
+                delimiterelement.val(',');
                 break;
             case "DELIMITED":
             case "ANY":
                 $('.delimiterPanel').show();
-                if (!editMode) {
-                    delimiterelement.val('');
-                }
+                delimiterelement.val(data.Config.previousDelimiter);
                 delimiterelement.prop("readonly", "");
                 $('#HasHeader').prop("readonly", false);
                 $('#HasHeader').prop("disabled", false);
                 break;
             default:
                 $('.delimiterPanel').hide();
-                if (!editMode) {
-                    delimiterelement.val('');
-                }
+                //always clear delimiter so that it isn't saved to schema with a non-delimiting type
+                data.Config.previousDelimiter = delimiterelement.val();
+                delimiterelement.val('');
                 delimiterelement.prop("readonly", "readonly");
                 $('#HasHeader').prop("readonly", true);
                 $('#HasHeader').prop("disabled", true);
