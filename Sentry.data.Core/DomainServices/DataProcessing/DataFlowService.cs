@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Hangfire;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Core
 {
@@ -966,7 +967,7 @@ namespace Sentry.data.Core
             if (dto.IsCompressed)
             {
                 CompressionJobDto jobDto = new CompressionJobDto();
-                jobDto.CompressionType = (df.CompressionType == null) ? CompressionTypes.ZIP : (CompressionTypes)df.CompressionType;
+                jobDto.CompressionType = (df.CompressionType.HasValue) ? (CompressionTypes)df.CompressionType : 0;
                 dto.CompressionJob = jobDto;
             }
 
