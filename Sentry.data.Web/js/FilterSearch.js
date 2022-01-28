@@ -103,7 +103,7 @@
             var keycode = (e.keyCode ? e.keyCode : e.which);
             var input = $(this).val();
 
-            if (keycode == '13' && input && (input = $.trim(input))) {
+            if (keycode == '13' && input && $.trim(input)) {
                 data.FilterSearch.search();
             }
         });

@@ -7,13 +7,13 @@
 
 <div class="search-horizontal-center">
     <div class="search-head">
-        <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" /></div>
+        <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" alt="Source icon"/></div>
         <div class="search-head-item"><h1 class="datasetHeader">@Model.PageTitle</h1></div>
 
         <div id="search-box" class="has-feedback has-feedback-left">
             <input class="form-control searchTextDS text-box single-line" type="text" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled />
-            <i class="form-control-feedback glyphicon glyphicon-search clickable filter-search-start display-none"></i>
-            <i class="form-control-feedback fa fa-circle-o-notch fa-spin"></i>
+            <em class="form-control-feedback glyphicon glyphicon-search clickable filter-search-start display-none"></em>
+            <em class="form-control-feedback fa fa-circle-o-notch fa-spin"></em>
         </div>
     </div>
 </div>
@@ -23,7 +23,7 @@
         <div class="filter-search-title-container bottom-border">
             <h1 class="filter-search-title">Filter</h1>
             <span class="filter-search-clear-container"><a href="#" class="display-none" id="filter-search-clear">Clear All</a></span>
-            <button type="button" class="btn btn-primary display-none filter-search-start" id="filter-search-apply" disabled><i class="glyphicon glyphicon-search filter-search-apply-icon"></i>Apply</button>
+            <button type="button" class="btn btn-primary display-none filter-search-start" id="filter-search-apply" disabled><em class="glyphicon glyphicon-search filter-search-apply-icon"></em>Apply</button>
         </div>
 
         <div class="filter-search-categories-sentry-spinner">

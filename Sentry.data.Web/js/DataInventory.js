@@ -88,7 +88,7 @@
 
     buildRequest: function () {
         return {
-            SearchText: $("#filter-search-text").val(),
+            SearchText: $.trim($("#filter-search-text").val()),
             FilterCategories: data.FilterSearch.getSelectedCategoryOptions()
         }
     },

@@ -7,7 +7,7 @@ namespace Sentry.data.Web.Controllers
     {
         protected readonly IDataFeatures _featureFlags;
 
-        public BaseDataInventoryController(IDataFeatures featureFlags)
+        protected BaseDataInventoryController(IDataFeatures featureFlags)
         {
             _featureFlags = featureFlags;
         }
