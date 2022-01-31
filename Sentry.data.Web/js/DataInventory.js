@@ -6,7 +6,7 @@
     },
 
     executeSearch: function () {
-        $("#di-result-table").DataTable().ajax.reload(data.FilterSearch.completeSearch);
+        $("#di-result-table").DataTable().ajax.reload(json => data.FilterSearch.completeSearch(json.searchTotal));
     },
 
     buildFilter: function () {
@@ -78,9 +78,7 @@
                         "<'row'<'col-xs-12'tr>>" +
                         "<'row'<'col-xs-12 text-center'p>>",
                     buttons: [{ extend: 'colvis', text: 'Columns' }],
-                    initComplete: function (settings, json) {
-                        data.FilterSearch.completeSearch()
-                    }
+                    initComplete: (settings, json) => data.FilterSearch.completeSearch(json.searchTotal)
                 });
             }
         });

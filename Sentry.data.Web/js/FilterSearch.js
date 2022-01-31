@@ -161,12 +161,13 @@
         
         $(".glyphicon-search").hide();
         $(".filter-search-results-container").hide();
+        $(".filter-search-results-none").hide();
 
         $(".fa-spin").show();
         $(".filter-search-result-sentry-spinner").show();
     },
 
-    completeSearch: function () {
+    completeSearch: function (totalResults) {
         $("#filter-search-text").prop("disabled", false);
         $("#filter-search-apply").prop("disabled", false);
 
@@ -174,7 +175,13 @@
         $(".filter-search-result-sentry-spinner").hide();
 
         $(".glyphicon-search").show();
-        $(".filter-search-results-container").slideDown();
+
+        if (totalResults > 0) {
+            $(".filter-search-results-container").slideDown();
+        }
+        else {
+            $(".filter-search-results-none").show();
+        }
     },
 
     filterRetrivalPrep: function () {
