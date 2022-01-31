@@ -781,6 +781,7 @@
     <Content Include="Images\BusinessAreaTiles\Meeting3.jpg" />
     <Content Include="Images\Category\hr.png" />
     <Content Include="Images\Category\hr.svg" />
+    <Content Include="Images\Category\investment.svg" />
     <Content Include="Images\Dale\DataInventoryHomePage.jpg" />
     <Content Include="Images\Dale\DataInventoryIcon.png" />
     <Content Include="Images\DataFlow\ConceptTeamwork1.jpg" />
