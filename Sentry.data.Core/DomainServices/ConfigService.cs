@@ -87,11 +87,6 @@ namespace Sentry.data.Core
                 errors.Add("File Extension CSV and it's delimiter do not match.");
             }
 
-            if (currentFileExtension == "delimited" && string.IsNullOrWhiteSpace(dto.Delimiter))
-            {
-                errors.Add("File Extension Delimited is missing it's delimiter.");
-            }
-
             if (dto.Name == null)
             {
                 errors.Add("Configuration Name is required.");
