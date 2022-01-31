@@ -23,19 +23,25 @@ namespace Sentry.data.Core
             DaleResultDto dtoResult = _daleSearchProvider.GetSearchResults(dtoSearch);
 
             string queryBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtoResult.DaleEvent);
-            _eventService.PublishSuccessEvent("DaleQuery", _userService.GetCurrentUser().AssociateId, "Dale Query Executed", null, queryBlob);
+            _eventService.PublishSuccessEvent("DaleQuery", _userService.GetCurrentUser().AssociateId, "Dale Query Executed", search: queryBlob);
+
+            return dtoResult;
+        }
+
+        public FilterSearchDto GetSearchFilters(DaleSearchDto dtoSearch)
+        {
+            FilterSearchDto dtoResult = _daleSearchProvider.GetSearchFilters(dtoSearch);
+            
+            string queryBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtoResult.DaleEvent);
+            _eventService.PublishSuccessEvent("DaleQuery", _userService.GetCurrentUser().AssociateId, "Data Inventory Filter Query Executed", search: queryBlob);
 
             return dtoResult;
         }
 
         public bool UpdateIsSensitive(List<DaleSensitiveDto> dtos)
         {
-            bool success = false;
-
             string sensitiveBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtos);
-            success = _daleSearchProvider.SaveSensitive(sensitiveBlob);
-
-            return success;
+            return _daleSearchProvider.SaveSensitive(sensitiveBlob);
         }
 
         public DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dtoSearch)
@@ -61,7 +67,7 @@ namespace Sentry.data.Core
 
             CanDaleSensitiveView();
 
-            if (String.IsNullOrWhiteSpace(search))
+            if (string.IsNullOrWhiteSpace(search))
             {
                 throw new DaleInvalidSearchException();
             }

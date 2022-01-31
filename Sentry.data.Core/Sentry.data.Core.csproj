@@ -127,6 +127,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\FilterSearchField.cs" />
+    <Compile Include="Attributes\GlobalSearchField.cs" />
     <Compile Include="DomainServices\BusinessAreaService.cs" />
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DaleService.cs" />
@@ -174,6 +176,9 @@
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionJsonStructureDto.cs" />
+    <Compile Include="DTO\Search\FilterCategoryDto.cs" />
+    <Compile Include="DTO\Search\FilterCategoryOptionDto.cs" />
+    <Compile Include="DTO\Search\FilterSearchDto.cs" />
     <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
@@ -203,6 +208,7 @@
     <Compile Include="Entities\DataProcessing\RunInstance.cs" />
     <Compile Include="Entities\Datasets\DatasetFileParquet.cs" />
     <Compile Include="Entities\Datasets\DatasetFileReply.cs" />
+    <Compile Include="Entities\Elastic\ElasticResult.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\Authentications\OAuthAuthentication.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DfsDataFlowBasic.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleAPISource.cs" />
@@ -218,6 +224,7 @@
     <Compile Include="Entities\MessageFormats\SnowTableCreateModel.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Helpers\NestExtensions.cs" />
+    <Compile Include="Helpers\NestHelper.cs" />
     <Compile Include="Helpers\Paginate\PageParameters.cs" />
     <Compile Include="Entities\S3\S3LambdaEvent.cs" />
     <Compile Include="Entities\S3\S3ObjectEvent.cs" />
