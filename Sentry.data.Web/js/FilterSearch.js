@@ -181,8 +181,8 @@
             $(".filter-search-results-container").slideDown();
 
             $("#filter-search-total").text(totalResultCount.toLocaleString("en-US"));
-            data.FilterSearch.setPageInfo(1, pageSize);
             $("#filter-search-returned-total").text(returnedResultCount.toLocaleString("en-US"));
+            data.FilterSearch.setPageInfo(1, pageSize < returnedResultCount ? pageSize : returnedResultCount);
             $(".filter-search-result-count-container").slideDown();
         }
         else {
