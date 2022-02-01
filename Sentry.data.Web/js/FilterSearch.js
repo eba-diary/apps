@@ -162,12 +162,13 @@
         $(".glyphicon-search").hide();
         $(".filter-search-results-container").hide();
         $(".filter-search-results-none").hide();
+        $(".filter-search-result-count-container").hide();
 
         $(".fa-spin").show();
         $(".filter-search-result-sentry-spinner").show();
     },
 
-    completeSearch: function (totalResults) {
+    completeSearch: function (totalResultCount, pageSize, returnedResultCount) {
         $("#filter-search-text").prop("disabled", false);
         $("#filter-search-apply").prop("disabled", false);
 
@@ -176,8 +177,13 @@
 
         $(".glyphicon-search").show();
 
-        if (totalResults > 0) {
+        if (totalResultCount > 0) {
             $(".filter-search-results-container").slideDown();
+
+            $("#filter-search-total").text(totalResultCount.toLocaleString("en-US"));
+            data.FilterSearch.setPageInfo(1, pageSize);
+            $("#filter-search-returned-total").text(returnedResultCount.toLocaleString("en-US"));
+            $(".filter-search-result-count-container").slideDown();
         }
         else {
             $(".filter-search-results-none").show();
@@ -243,5 +249,9 @@
         });
 
         return categories;
+    },
+
+    setPageInfo: function (start, end) {
+        $("#filter-search-page-size").text(start.toLocaleString("en-US") + ' - ' + end.toLocaleString("en-US"));
     }
 }

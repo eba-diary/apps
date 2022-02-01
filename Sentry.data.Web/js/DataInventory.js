@@ -3,10 +3,14 @@
     init: function () {
         this.initDataTable();
         this.buildFilter();
+        this.initEvents();
     },
 
     executeSearch: function () {
-        $("#di-result-table").DataTable().ajax.reload(json => data.FilterSearch.completeSearch(json.searchTotal));
+        $("#di-result-table").DataTable().ajax.reload(function(json) {
+            var tableInfo = $("#di-result-table").DataTable().page.info();
+            data.FilterSearch.completeSearch(json.searchTotal, tableInfo.length, json.data.length);
+        });
     },
 
     buildFilter: function () {
@@ -73,15 +77,32 @@
                         { data: "ScanType", className: "ScanType", visible: false }
                     ],
                     aLengthMenu: [10, 20, 50, 100, 500],
-                    dom: "<'row'<'col-xs-12'i>>" +
-                        "<'row'<'col-xs-6'l><'col-xs-6 text-right'B>>" +
+                    dom: "<'row'" +
+                        "<'col-xs-6'l>" +
+                        "<'col-xs-6 text-right'B>>" +
                         "<'row'<'col-xs-12'tr>>" +
                         "<'row'<'col-xs-12 text-center'p>>",
                     buttons: [{ extend: 'colvis', text: 'Columns' }],
-                    initComplete: (settings, json) => data.FilterSearch.completeSearch(json.searchTotal)
+                    initComplete: function (settings, json) {
+                        data.FilterSearch.completeSearch(json.searchTotal, settings.oInit.pageLength, json.data.length);
+                    }
                 });
             }
         });
+    },
+
+    initEvents: function () {
+
+        //datatable page change
+        $(document).on("page.dt", "#di-result-table", data.DataInventory.updatePageInfo);
+
+        //datatable page length change
+        $(document).on("length.dt", "#di-result-table", data.DataInventory.updatePageInfo);
+    },
+
+    updatePageInfo: function () {
+        var tableInfo = $("#di-result-table").DataTable().page.info();
+        data.FilterSearch.setPageInfo(++tableInfo.start, tableInfo.end);
     },
 
     buildRequest: function () {
