@@ -5,8 +5,6 @@
     <h2 id="ds-welcome-text">Welcome to the Sentry Dataset Portal. Please type below to search or choose a category.</h2>
     @{
         var category = Model.Categories.ToList();
-        int c = category.Count();
-        string[] colors = new string[] { "blueGray", "orange", "gold", "green", "plum", "blue", "gray", "darkGreen" };
     }
     <div class="container">
         <div id="ds-search-wrapper" class="ds-grid col-md-12">
@@ -30,9 +28,10 @@
                 {
                     @:<div class="row text-center">
                 }
-                var color = category[i].Name.ToLower() + "Tile";
+                var tileName = category[i].Name.ToLower() + "Tile";
+                var color = category[i].Color;
 
-                <div class="col-md-3 tile border_@colors[i] @color ">
+                <div class="col-md-3 tile border_@color @tileName ">
                     <a class="" href="~/Search/Datasets/Index?category=@category[i].Name">
 
                         @if (String.IsNullOrWhiteSpace(category[i].AbbreviatedName))
@@ -48,8 +47,9 @@
 
                     </a>
                 </div>
-                if (i % 3 == 2 || i + 1 == c)
-                        {
+
+                if (i % 3 == 2 || i + 1 == category.Count())
+                {
                     @:</div>
                 }
             }
