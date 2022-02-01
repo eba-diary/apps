@@ -27,7 +27,7 @@ namespace Sentry.data.Web
         {
             return new FilterCategoryOptionDto() 
             {
-                OptionValue = model.OptionValue,
+                OptionValue = FilterCategoryOptionNormalizer.Denormalize(model.ParentCategoryName, model.OptionValue),
                 ResultCount = model.ResultCount,
                 ParentCategoryName = model.ParentCategoryName,
                 Selected = model.Selected
@@ -55,7 +55,7 @@ namespace Sentry.data.Web
         {
             return new FilterCategoryOptionModel()
             {
-                OptionValue = dto.OptionValue,
+                OptionValue = FilterCategoryOptionNormalizer.Normalize(dto.ParentCategoryName, dto.OptionValue),
                 ResultCount = dto.ResultCount,
                 ParentCategoryName = dto.ParentCategoryName,
                 Selected = dto.Selected

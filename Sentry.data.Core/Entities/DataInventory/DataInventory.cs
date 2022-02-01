@@ -140,7 +140,7 @@ namespace Sentry.data.Core
                 ObjectType = TypeDescription,
                 Column = ColumnName,
                 IsSensitive = IsSensitive,
-                ProdType = ProdType,
+                ProdType = FilterCategoryOptionNormalizer.Normalize(FilterCategoryNames.ENVIRONMENT, ProdType),
                 ColumnType = ColumnType,
                 MaxLength = MaxLength ?? 0,
                 Precision = Precision ?? 0,

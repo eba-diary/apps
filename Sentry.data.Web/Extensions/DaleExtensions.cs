@@ -55,10 +55,8 @@ namespace Sentry.data.Web
                 Object = dto.Object,
                 ObjectType = dto.ObjectType,
                 Column = dto.Column,
-
                 IsSensitive = dto.IsSensitive,
                 ProdType = dto.ProdType,
-
                 ColumnType = dto.ColumnType,
                 MaxLength = dto.MaxLength,
                 Precision = dto.Precision,
@@ -66,11 +64,9 @@ namespace Sentry.data.Web
                 IsNullable = dto.IsNullable,
                 EffectiveDate = dto.EffectiveDate.ToString("MM/dd/yyyy HH:mm:ss"),
                 BaseColumnId = dto.BaseColumnId,
-
                 IsOwnerVerified = dto.IsOwnerVerified,
                 AssetList = CreateAssetList(dto.Asset),
                 SourceType = dto.SourceType,
-
                 ScanCategory = dto.ScanCategory,
                 ScanType = dto.ScanType
             };
