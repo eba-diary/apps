@@ -204,15 +204,25 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                if (_dataFeatures.Value.CLA3329_Expose_HR_Category.GetValue() || _userService.Value.GetCurrentUser().IsAdmin)
+                if (_dataFeatures.Value.CLA3329_Expose_HR_Category.GetValue() && _dataFeatures.Value.CLA3637_EXPOSE_INV_CATEGORY.GetValue())    //all Category feature flags on, bring back everything
                 {
-                    //admin or featureFlag is true so return ALL Categories
+                    //HR ON, INV ON
                     return Query<Category>().Cacheable();  
+                }
+                else if( !_dataFeatures.Value.CLA3329_Expose_HR_Category.GetValue() && _dataFeatures.Value.CLA3637_EXPOSE_INV_CATEGORY.GetValue() )
+                {
+                    //HR OFF, INV ON
+                    return Query<Category>().Cacheable().Where(w => w.Name != "Human Resources");   
+
+                }else if (_dataFeatures.Value.CLA3329_Expose_HR_Category.GetValue() && !_dataFeatures.Value.CLA3637_EXPOSE_INV_CATEGORY.GetValue())
+                {
+                    //HR ON, INV OFF
+                    return Query<Category>().Cacheable().Where(w => w.Name != "Investment" );
                 }
                 else
                 {
-                    //feature flag is OFF and NOT admin:  return anything with abbreviated name not HR or has empty abbreviated name since some do not have abbreviated name filled
-                    return Query<Category>().Cacheable().Where(w => w.AbbreviatedName != "HR" || w.AbbreviatedName == null || w.AbbreviatedName == String.Empty);   
+                    //HR OFF, INV OFF
+                    return Query<Category>().Cacheable().Where(w => w.Name != "Human Resources" && w.Name != "Investment");
                 }
             }
         }

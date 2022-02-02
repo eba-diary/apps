@@ -574,7 +574,6 @@ tr.categoryBanner-orange th.sorting_desc {
 }
 
 
-
 .categoryBanner-gray {
     background-color: #9E9FA1 !important;
     color: #FFFFFF;
@@ -588,6 +587,19 @@ tr.categoryBanner-gray th.sorting_desc {
     background-color: #53565A !important;
 }
 
+
+.categoryBanner-darkGreen {
+    background-color: #005844 !important;
+    color: #FFFFFF;
+}
+
+tr.categoryBanner-darkGreen th.sorting_asc {
+    background-color: #005844 !important;
+}
+
+tr.categoryBanner-darkGreen th.sorting_desc {
+    background-color: #005844 !important;
+}
 
 
 
@@ -1345,6 +1357,11 @@ tr.categoryBanner-darkgray th.sorting_desc {
     border-left: 6px solid lightgrey;
 }
 
+.borderSide_darkGreen {
+    border: 1.5px solid #005844;
+    border-left: 6px solid #005844;
+}
+
 .borderSide_darkgray {
     border: 1.5px solid #53565a;
     border-left: 6px solid #53565a;
@@ -1600,6 +1617,11 @@ tr.categoryBanner-darkgray th.sorting_desc {
     color: white !important;
 }
 
+
+.darkGreen {
+    color: #005844;
+}
+
 .gray {
     color: gray;
 }
@@ -1721,13 +1743,15 @@ tr.categoryBanner-darkgray th.sorting_desc {
     border-top: 6px solid #89ABE3;
 }
 
-/*keep*/
 .border_gray {
     border: 1.5px solid #888888;
     border-top: 6px solid #888888;
 }
 
-
+.border_darkGreen {
+    border: 1.5px solid #005844;
+    border-top: 6px solid #005844;
+}
 
 /* CSS for Data Asset with Status and Last Updated */
 
