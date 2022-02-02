@@ -46,6 +46,13 @@
             }
         });
 
+        //open see all modal
+        //$(document).on("click", "[id^='categoryAll_']", function (e) {
+        //    e.preventDefault();
+
+        //    console.log("see all");
+        //});
+
         //clear single badge
         $(document).on("click", "[id^='clearOption_']", function (e) {
             e.preventDefault();
@@ -67,13 +74,23 @@
         $(document).on("change", ".filter-search-category-option-checkbox", function (e) {
             e.preventDefault();
 
-            var badge = $("#clearOption_" + this.id);
+            var id = this.id.replace('modal_', '');
+
+            var badge = $("#clearOption_" + id);
 
             if (this.checked) {
+                //making sure both modal and filter checkbox gets checked
+                $("#" + id).prop('checked', true);
+                $("#modal_" + id).prop('checked', true);
+
                 badge.show()
                 data.FilterSearch.showBadgeContainer();
             }
             else {
+                //making sure both modal and filter checkbox gets unchecked
+                $("#" + id).prop('checked', false);
+                $("#modal_" + id).prop('checked', false);
+
                 data.FilterSearch.hideBadgeContainer(false);
                 badge.hide();
             }
@@ -197,29 +214,34 @@
         $("#filter-search-apply").hide();
     },
 
-    completeFilterRetrieval: function () {
-        $(".filter-search-categories-sentry-spinner").hide();
-        $(".filter-search-categories-container").show();
+    completeFilterRetrieval: function (filters) {
+        var categories = { 'filterCategories': filters }
+        $('.filter-search-show-all-container').load("/FilterSearch/FilterShowAll/", categories);
+        $('.filter-search-categories-container').load("/FilterSearch/FilterCategories/", categories, function () {
 
-        var selectedOptions = $('.filter-search-category-option-checkbox:checkbox:checked');
+            $(".filter-search-categories-sentry-spinner").hide();
+            $(".filter-search-categories-container").show();
 
-        data.FilterSearch.lastSearchOptions = selectedOptions.map(function () { return this.id }).get();
+            var selectedOptions = $('.filter-search-category-option-checkbox:checkbox:checked');
 
-        //open all filter categories with a selected option
-        selectedOptions.closest('.filter-search-category-options').each(function () {
-            $("#" + this.id.replace("hide", "icon")).removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
-            $(this).show();
+            data.FilterSearch.lastSearchOptions = selectedOptions.map(function () { return this.id }).get();
+
+            //open all filter categories with a selected option
+            selectedOptions.closest('.filter-search-category-options').each(function () {
+                $("#" + this.id.replace("hide", "icon")).removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
+                $(this).show();
+            });
+
+            //show selected option badges
+            selectedOptions.each(function () {
+                $('#clearOption_' + this.id).show();
+            });
+
+            //show active options container if there are active options
+            if (selectedOptions.length > 0) {
+                data.FilterSearch.showBadgeContainer();
+            }
         });
-
-        //show selected option badges
-        selectedOptions.each(function () {
-            $('#clearOption_' + this.id).show();
-        });
-
-        //show active options container if there are active options
-        if (selectedOptions.length > 0) {
-            data.FilterSearch.showBadgeContainer();
-        }
     },
 
     getSelectedCategoryOptions: function () {
@@ -229,22 +251,24 @@
         $('.filter-search-category-option-checkbox:checkbox:checked').each(function () {
             var parts = this.id.split('_');
 
-            var option = {
-                OptionValue: $(this).attr('value'),
-                ParentCategoryName: parts[0].replace('-', ' '),
-                Selected: true
-            };
+            if (parts[0] != 'modal') {
+                var option = {
+                    OptionValue: $(this).attr('value'),
+                    ParentCategoryName: parts[0].replace('-', ' '),
+                    Selected: true
+                };
 
-            var exists = categories.find(x => x.CategoryName == option.ParentCategoryName);
+                var exists = categories.find(x => x.CategoryName == option.ParentCategoryName);
 
-            if (exists) {
-                exists.CategoryOptions.push(option)
-            }
-            else {
-                categories.push({
-                    CategoryName: option.ParentCategoryName,
-                    CategoryOptions: [option]
-                })
+                if (exists) {
+                    exists.CategoryOptions.push(option)
+                }
+                else {
+                    categories.push({
+                        CategoryName: option.ParentCategoryName,
+                        CategoryOptions: [option]
+                    })
+                }
             }
         });
 

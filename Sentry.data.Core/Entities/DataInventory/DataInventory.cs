@@ -12,7 +12,7 @@ namespace Sentry.data.Core
 
         [PropertyName("asset_cde")]
         [GlobalSearchField]
-        [FilterSearchField(FilterCategoryNames.ASSET)]
+        [FilterSearchField(FilterCategoryNames.ASSET, true)]
         public string AssetCode { get; set; }
 
         [PropertyName("basedatabase_id")]
@@ -20,7 +20,7 @@ namespace Sentry.data.Core
 
         [PropertyName("base_nme")]
         [GlobalSearchField]
-        [FilterSearchField(FilterCategoryNames.TABLEVIEWNAME)]
+        [FilterSearchField(FilterCategoryNames.COLLECTIONNAME)]
         public string BaseName { get; set; }
 
         [PropertyName("change_cnt")]
@@ -46,7 +46,7 @@ namespace Sentry.data.Core
 
         [PropertyName("database_nme")]
         [GlobalSearchField]
-        [FilterSearchField(FilterCategoryNames.DATABASE)]
+        [FilterSearchField(FilterCategoryNames.DATABASE, true)]
         public string DatabaseName { get; set; }
 
         [PropertyName("effectivechange_cnt")]
@@ -121,7 +121,7 @@ namespace Sentry.data.Core
 
         [PropertyName("type_dsc")]
         [GlobalSearchField]
-        [FilterSearchField(FilterCategoryNames.TYPE)]
+        [FilterSearchField(FilterCategoryNames.COLLECTIONTYPE)]
         public string TypeDescription { get; set; }
 
         [PropertyName("@version")]

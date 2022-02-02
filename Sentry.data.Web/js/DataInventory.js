@@ -14,7 +14,7 @@
     },
 
     buildFilter: function () {
-        $('.filter-search-categories-container').load("/DataInventory/FilterCategories/", data.DataInventory.buildRequest(), data.FilterSearch.completeFilterRetrieval);
+        $.post("/DataInventory/SearchFilters/", data.DataInventory.buildRequest(), (x) => data.FilterSearch.completeFilterRetrieval(x));
     },
 
     initDataTable: function () {

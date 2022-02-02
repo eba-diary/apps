@@ -38,19 +38,9 @@ namespace Sentry.data.Infrastructure
         }
 
         public FilterSearchDto GetSearchFilters(DaleSearchDto dto)
-        {
-            //get fields that are filterable via custom attribute
-            Dictionary<string, Field> filterCategoryFields = NestHelper.FilterCategoryFields<DataInventory>();
-
-            //build aggregation query
-            AggregationDictionary aggregations = new AggregationDictionary();
-            foreach (KeyValuePair<string, Field> field in filterCategoryFields)
-            {
-                aggregations.Add(field.Key, new TermsAggregation(field.Key) { Field = field.Value });
-            }
-
+        {           
             SearchRequest<DataInventory> request = BuildTextSearchRequest(dto, 0);
-            request.Aggregations = aggregations;
+            request.Aggregations = NestHelper.GetFilterAggregations<DataInventory>();
 
             //get aggregation results
             FilterSearchDto resultDto = new FilterSearchDto();
@@ -60,7 +50,7 @@ namespace Sentry.data.Infrastructure
             //translate results to dto
             if (aggResults != null)
             {
-                foreach (string categoryName in filterCategoryFields.Keys)
+                foreach (string categoryName in request.Aggregations.Select(x => x.Key).ToList())
                 {
                     TermsAggregate<string> categoryResults = aggResults.Terms(categoryName);
                     if (categoryResults?.Buckets?.Any() == true && categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
@@ -201,7 +191,7 @@ namespace Sentry.data.Infrastructure
             if (!string.IsNullOrWhiteSpace(dto.Criteria))
             {
                 //broad search for criteria across all searchable fields
-                Nest.Fields fields = NestHelper.SearchFields<DataInventory>();
+                Nest.Fields fields = NestHelper.GetSearchFields<DataInventory>();
 
                 //split search terms regardless of amount of spaces between words
                 List<string> terms = dto.Criteria.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -260,7 +250,7 @@ namespace Sentry.data.Infrastructure
                 filter.Add(new QueryStringQuery()
                 {
                     Query = string.Join(" OR ", category.CategoryOptions.Where(x => x.Selected).Select(x => x.OptionValue)),
-                    DefaultField = NestHelper.FilterCategoryField<DataInventory>(category.CategoryName)
+                    DefaultField = NestHelper.GetFilterCategoryField<DataInventory>(category.CategoryName)
                 });
             }
 

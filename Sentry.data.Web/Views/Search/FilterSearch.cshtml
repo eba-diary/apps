@@ -7,7 +7,7 @@
 
 <div class="search-horizontal-center">
     <div class="search-head">
-        <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" alt="Source icon"/></div>
+        <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" alt="Source icon" /></div>
         <div class="search-head-item"><h1 class="datasetHeader">@Model.PageTitle</h1></div>
 
         <div id="search-box" class="has-feedback has-feedback-left">
@@ -53,6 +53,10 @@
     <div class="filter-search-results-container display-none">
         @Html.Partial(Model.ResultView)
     </div>
+</div>
+
+<div class="filter-search-show-all-container">
+
 </div>
 
 @section Scripts

@@ -145,8 +145,8 @@
 
     .filter-search-category-option input {
         cursor: pointer;
-        min-width: 18px;
-        min-height: 18px;
+        min-width: 16px;
+        min-height: 16px;
         margin: 0 0.5em 0 0 !important;
     }
 
@@ -209,4 +209,14 @@
 
 .bottom-border {
     border-bottom: 1px solid #ebebeb;
+}
+
+.filter-search-modal-body {
+    max-height: calc(100vh - 221px);
+    overflow-y: auto;
+}
+
+.filter-search-modal-option {
+    display: inline-block;
+    width: 33%;
 }
