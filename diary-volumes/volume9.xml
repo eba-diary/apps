@@ -183,7 +183,7 @@
             We all had a fine drive this morning, and stopped at the
              <name type="hotel" ref="#Hotel_Splendid">Hotel Splendid</name>, one of <persName ref="#Bertalini_Mr">
             Bertalini</persName>'s hotels to see it. It is splendidly situated, almost on the level of
-             <name>Capo di Monte</name>, and <placeName>San Martino</placeName>. It has just been
+             <placeName ref="#Capodimonte">Capo di Monte</placeName>, and <placeName ref="#San_Martino">San Martino</placeName>. It has just been
              opened - and is very attractive. The <placeName ref="#Naples">Naples</placeName> tram lands you
              just below the hotel, where a huge lift has been built straight through the rock -
              and you are carried straight up to the restaurant level, which is at the top of the
