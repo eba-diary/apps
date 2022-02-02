@@ -1995,101 +1995,106 @@
              and a charming evening. Ready for our departure tomorrow.
          </p>
       </div>
+      <!-- who is Matter and what is their first name? -->
+      <!-- is P. &amp; O. a boat or typo? -->
+      <!-- is $aggie a nickname for a place? -->
+      <!-- what is VIII C. an abbreviation for? -->
+      <!-- who are the Fascherari family? -->
       <div xml:id="EBA-1902-04-13" type="entry">
          <dateline>
-            2d Sunday after Easter. <date when="1902-04-13">April 13</date>. <placeName>Bologna</placeName>.
+            2d Sunday after Easter. <date when="1902-04-13">April 13</date>. <placeName ref="#Bologna">Bologna</placeName>.
             <name type="hotel">Hotel Brun</name>.
          </dateline>
          <p>
             Just a week ago since we quitted <placeName ref="#Egypt">Egypt</placeName>. Laden with
-             flowers, we left the <name type="">Ghizereh Palace</name> early
-             <date when="1902-04-07">Monday</date> morning - and found <persName>
-            Reis Fuli</persName>, <persName>Matter</persName>,
-             <persName ref="#Dervish_Mohammed">the Dervish</persName>, <persName>Abdul</persName>,
+             flowers, we left the <placeName ref="#Ghezireh_Palace">Ghizereh Palace</placeName> early
+             <date when="1902-04-07">Monday</date> morning - and found <persName ref="#Fuli_Rais">
+             Reis Fuli</persName>, <persName>Matter</persName>,
+             <persName ref="#Dervish_Mohammed">the Dervish</persName>, <persName ref="#Abdul">Abdul</persName>,
              and many others waiting for us at the station. <persName ref="#von_Bissing_Baron">
-            V. Bissing</persName>, <persName>Weigall</persName>, and
-             <persName ref="#Carter_Howard">Carter</persName> also came - and <persName>
-            Mr. Bachler</persName> - reached <placeName>Port Said</placeName>
+             V. Bissing</persName>, <persName ref="#Weigall_Arthur">Weigall</persName>, and
+             <persName ref="#Carter_Howard">Carter</persName> also came - and <persName ref="#Baehler_Charles">
+             Mr. Bachler</persName> - reached <placeName ref="#Port_Said">Port Said</placeName>
              at 6:30 P.M. and rowed out to the <placeName>P. &amp; O.</placeName>
-             <name>SS. Isis</name>, looking so pretty and trim - not many passengers -
-             most of them arriving on the "<name>India</name>" from
-             <placeName>Australia</placeName> at midnight, for whose mail we waited.
+             <name type="boat" ref="#Isis">SS. Isis</name>, looking so pretty and trim - not many passengers -
+             most of them arriving on the "<name type="boat" ref="#India_boat">India</name>" from
+             <placeName ref="#Australia">Australia</placeName> at midnight, for whose mail we waited.
              The first day and night were quite perfect - good weather and smooth seas - and we
              went to bed quite hoping that these unusual conditions would prevail the next day,
-             through the <placeName>Aegean Sea</placeName> and islands - but at 7
+             through the <placeName ref="#Aegean_Sea">Aegean Sea</placeName> and islands - but at 7
              o'clock we encountered a fearful storm, and the last 24 hours were diabolical. I have
              never known anything like it since many years ago we crossed from
-             <placeName>Alexandria</placeName> to <placeName>
-            Constantinople</placeName>! Reached <placeName ref="#Brindisi">Brindisi</placeName>
-             <date when="1902-04-10">Thursday</date> 6 A.M. and found the <placeName>
-            London</placeName> through train de luxe waiting at the landing - and we soon were in
+             <placeName ref="#Alexandria">Alexandria</placeName> to <placeName ref="#Constantinople">
+             Constantinople</placeName>! Reached <placeName ref="#Brindisi">Brindisi</placeName>
+             <date when="1902-04-10">Thursday</date> 6 A.M. and found the <placeName ref="#London">
+             London</placeName> through train de luxe waiting at the landing - and we soon were in
              the admirable sleeping car, with dining room attached. We had a double and a single
-             compartment to ourselves and were most comfortable. From <persName>
-            Faggie</persName> on, the route was unfamiliar to us - and all the way to
-             <placeName>Ancona</placeName>, it was by the sea shore, -- the day was
+             compartment to ourselves and were most comfortable. From <placeName>
+             Faggie</placeName> on, the route was unfamiliar to us - and all the way to
+             <placeName ref="#Ancona">Ancona</placeName>, it was by the sea shore, -- the day was
              fine, delicious air, fragrant with apple and pear blossoms - the sea, liquid turquoise
              - and the hoary, old battlemented towns on their heights, with their towns, cathedrals,
              castles - the picturesque little fishing villages - the wide desolate plains - the
              richly cultivated fields - the roadsides brilliant with flowers of every colour, with
              poppies predominating - and towards the later afternoon, the snow covered peaks of the
-             <placeName>Abruggi Mountains</placeName> showing - and the fishing
+             <placeName ref="#Appennin_Abruzzese">Abruggi Mountains</placeName> showing - and the fishing
              fleets coming home - with their orange, red, cinnamon coloured, sails so diversely
              painted, that they had the air of huge butterflies resting on the water - all made a
              scene of ravishing beauty, that one is thankful to remember. We reached
-             <placeName>Bologna</placeName> at midnight, and are established in the
+             <placeName ref="#Bologna">Bologna</placeName> at midnight, and are established in the
              familiar rooms of this fine old hotel, where we have been twice before. It is and has
              been dull and rainy since we arrived - not a glint of sunlight. Each day has been busy
-             - on <date when="1902-04-11">Friday</date> we went to the <orgName>Academia</orgName>, and stayed the
-             morning - saw two lovely <orgName>Francias</orgName>, the incomparable
-             [illegible] (Madonna enthroned) <name>Raphael's St. Cecilia</name>,
+             - on <date when="1902-04-11">Friday</date> we went to the <placeName ref="#Gallerie_dell_Accademia">Academia</placeName>, and stayed the
+             morning - saw two lovely <persName ref="#Francia_Francesco">Francias</persName>, the incomparable
+             [illegible] (Madonna enthroned) <placeName ref="#Raphael's_Saint_Cecilia">Raphael's St. Cecilia</placeName>,
              which one seems to care for less and less - the more one sees it - a fine
-             <orgName>Loppe</orgName>. There are really few things of paramount
+             <persName ref="#Gabriel_Loppé">Loppe</persName>. There are really few things of paramount
              worth in this gallery. In the afternoon it rained, and we all stayed indoors.
-             <date when="1902-04-12">Saturday</date>, yesterday we went to <placeName>
-            S. Petronio</placeName> - interesting but disappointing. The most interesting thing to
+             <date when="1902-04-12">Saturday</date>, yesterday we went to <placeName ref="#San_Petronio">
+             S. Petronio</placeName> - interesting but disappointing. The most interesting thing to
              me, were the 4 rude stone crosses, supposed to have been erected by
-             <persName>Petronius</persName>, Bishop of <placeName>
-            Bologna</placeName>, near the old gates in the V Century. The best were the sculptures
+             <persName ref="#Petronius">Petronius</persName>, Bishop of
+             Bologna, near the old gates in the V Century. The best were the sculptures
              outside the church, which we could not well see, because of the rain and wet - a
-             beautiful <persName>Francia</persName> in one of the chapels. Then to the
-             church of <placeName>S. Dominico</placeName> - which contains the body of
-             the saint who died here - a sarcophagus or "area" by <persName>
-            Nicola Pisano</persName> and pupils - beautiful in detail but clumsy in effect
+             beautiful <persName ref="#Francia_Francesco">Francia</persName> in one of the chapels. Then to the
+             church of <placeName ref="#San_Domenico">S. Dominico</placeName> - which contains the body of
+             the saint who died here - a sarcophagus or "area" by <persName ref="#Nicola_Pisano">
+             Nicola Pisano</persName> and pupils - beautiful in detail but clumsy in effect
              architecturally. Two or three good figures standing on it - and 2 angels holding
-             candlesticks, the one to the left quite lovely by <persName>
-            Nicola dell'Area</persName> - the angel on the right and the <persName>
-            S. Petronius</persName> with the church in his hand are said to have been by
-             <persName>Michaelangelo</persName>. In the vestibule a monument of
-             <placeName>Tartagni</placeName>, jurist, by <persName>
-            Francesco di Simone</persName>. The <placeName>Piazzo</placeName> outside
-             called <placeName>Galileo</placeName>, is very pretty and picturesque -
-             with two columns bearing statues of <persName>S. Dominico</persName>
-             and the <orgName>Madonna</orgName>, and two important monuments of the
+             candlesticks, the one to the left quite lovely by <persName ref="#Nicola_dell'Area">
+             Nicola dell'Area</persName> - the angel on the right and the <persName ref="#Petronius">
+             S. Petronius</persName> with the church in his hand are said to have been by
+             <persName ref="#Michelangelo">Michaelangelo</persName>. In the vestibule a monument of
+             <persName ref="#Alessandro_Tartagni">Tartagni</persName>, jurist, by <persName ref="#Francesco_di_Simone">
+             Francesco di Simone</persName>. The Piazzo outside
+             called Galileo, is very pretty and picturesque -
+             with two columns bearing statues of <persName ref="#Saint_Dominic">S. Dominico</persName>
+             and the <objectName ref="#Madonna">Madonna</objectName>, and two important monuments of the
              XIII Cent. on columns, - the one belonging to the family <persName>
-            Fascherari</persName> is very interesting because of an elegant work of the
+             Fascherari</persName> is very interesting because of an elegant work of the
              <orgName>VIII C.</orgName> an arc of a ciborium applied to the tomb - a
              rich archivolt with foliage, in the corners 2 peacocks in rather coarse work.
-             <persName>Cattaneo</persName> pronounces this to be "veritable and pure
-             remains of the antique. Then to the church of <persName>
-            S. Giacomo Maggiere</persName>, where in the <placeName>Capella
-             Bentivoglie</placeName> is one of the finest paintings of
-             <placeName>Francia</placeName> - <persName>Madonna</persName>
+             <persName ref="#Carlo_Cattaneo">Cattaneo</persName> pronounces this to be "veritable and pure
+             remains of the antique. Then to the church of <placeName ref="#San_Giacomo_Maggiore">
+             S. Giacomo Maggiere</placeName>, where in the <objectName ref="#Cappella_Bentivoglio">Capella
+             Bentivoglie</objectName> is one of the finest paintings of
+             <placeName ref="#Francia_Francesco">Francia</placeName> - <persName>Madonna</persName>
              with saints - the child almost the same as the one in <persName ref="#Davis_Theodore_M">
-            Theodore</persName>'s pictures - and the <persName>Madonna</persName>
+             Theodore</persName>'s pictures - and the <persName>Madonna</persName>
              very like - lovely - outside the chapel, the monument of <persName>
-            Antonio Dontiveglio</persName> by <persName>Jacopa
+             Antonio Dontiveglio</persName> by <persName>Jacopa
              della Quercia</persName> - with beautiful figures of the virtues - the Oratory of
-             <persName>S. Cecilia</persName> with frescoes by <persName>
-            Francia</persName>, <persName>Costa</persName>, <persName>
-            Aspertini</persName> - those of <persName>Francia</persName> quite
+             <persName>S. Cecilia</persName> with frescoes by <persName ref="#Francia_Francesco">
+             Francia</persName>, <persName>Costa</persName>, <persName>
+             Aspertini</persName> - those of <persName ref="#Francia_Francesco">Francia</persName> quite
              lovely. After lunch we went to the <placeName>
-            Museu Civioco</placeName>, where we were intensely interested in the
+             Museu Civioco</placeName>, where we were intensely interested in the
              <orgName>Etruscan</orgName> and <orgName>Egyptian</orgName>
              remains - and the exquisite "Head" supposed to be a copy from the bronze original of
              <orgName>Pheidias</orgName> - stopped on coming home at a shop near
              here and bought some beautiful embroideries on linen, native Bolognese work - and also
              visited <placeName>San Vitale</placeName>, or the <orgName>
-            "Seven Churches"</orgName> most interesting - but gloomy, and cold. This morning I went
+             "Seven Churches"</orgName> most interesting - but gloomy, and cold. This morning I went
              for a drive to a <placeName>Villa Revedin</placeName>, belonging
              to a <persName>Ferrara</persName> family of that name - very high with
              fine views of the town, and the level, flat plain beyond. The grounds were pretty with
@@ -2100,7 +2105,7 @@
              bearing a <persName>Madonna</persName> from one church to another.
              Italian religious functions possess such incongruities and I always wonder if they are
              not apparent to the populace and priests. We go to <placeName ref="#Florence">
-            Florence</placeName> tomorrow.
+             Florence</placeName> tomorrow.
          </p>
       </div>
       <div xml:id="EBA-1902-04-14" type="entry">
@@ -2166,7 +2171,7 @@
              city of all others, rising from them, with the setting sun burnishing its towers and
              buildings. We are in the same princely apartment of two years ago, and we found
              <persName>Phoebe</persName> and <persName>Dr. Clarke</persName>
-             here. This morning we went to <persName>S. Francesco</persName> to
+             here. This morning we went to <placeName>S. Francesco</placeName> to
              see the <persName>Negroponte</persName> beautiful <persName>Madonna</persName>,
              and to <persName>S. Maria Formosa</persName>, to see especially a painting
              in the sacristy of a <persName>Madonna</persName> and Child by
@@ -2184,7 +2189,7 @@
              the showers and got home. This morning we went to <placeName>
             Berozzi</placeName>'s atelier and saw some lovely frames, and a casom - which
              <persName ref="#Davis_Theodore_M">Theodore</persName> bought. The rest of the morning we spent at
-             the <orgName>Academia.</orgName> This afternoon we went to see
+             the <placeName ref="#Gallerie_dell_Accademia">Academia.</placeName> This afternoon we went to see
              the <persName>Benson</persName>'s - and found them as usual - such a
              sufferer and cripple as she is! and so cheerful and interesting!
              <persName>Phoebe</persName> and <persName>Dr. Clarke</persName>
@@ -2295,7 +2300,7 @@
              came to dine. This morning it rained and was cold, and I stayed at home, with
              <persName>Mary</persName>, who is not very well. <persName ref="#Sayce_Archibald">Mr.
              Sayce</persName> came in to say goodbye - and sat some time - we started soon after
-             for <placeName>London</placeName>. <persName>Marie Gwynne</persName>
+             for <placeName ref="#London">London</placeName>. <persName>Marie Gwynne</persName>
              came to lunch - and went out with <persName ref="#Davis_Theodore_M">Theodore</persName> and
              <persName>Bessie</persName> to see <persName>S. Eustorgio</persName>
              and <persName>S. Lorenzo.</persName> It has poured with rain this afternoon.
@@ -2375,7 +2380,7 @@
       <div xml:id="EBA-1902-05-28" type="entry">
          <dateline>
             <name>Claridge's Hotel, Brooke St.</name>
-             	<placeName>London</placeName>, <date when="1902-05-28">28 May</date>.
+             	<placeName ref="#London">London</placeName>, <date when="1902-05-28">28 May</date>.
          </dateline>
          <p>
             We had a fine crossing the other day - but I had to enjoy it from the seclusion of my
@@ -2391,8 +2396,8 @@
              <persName ref="#Buttles_Jeanette">Nettie</persName> leave <placeName ref="#Florence">Florence</placeName>
              on <date>June 2</date> - and they all meet at <placeName>
             Weisbaden</placeName>, and go on to <persName>Schwalback</persName> for
-             the summer. We have had fine weather ever since we came to <placeName>
-            London</placeName> - but I alas! have been staying indoors with my troublesome cough.
+             the summer. We have had fine weather ever since we came to <placeName ref="#London">
+             London</placeName> - but I alas! have been staying indoors with my troublesome cough.
              <persName>Fielding</persName> lunched with us yesterday -
              <persName>Gaspard Farrer</persName> turned up on Monday - and asked
              us all to dinner with him for last night. I couldn't go, and <persName>
