@@ -2309,15 +2309,16 @@
              Tomorrow we go over to <persName ref="#Lucero">Lucerno</persName>.
          </p>
       </div>
+      <!-- is G&#246;sechnen a typo? -->
       <div xml:id="EBA-1902-05-06" type="entry">
          <dateline>
             <name>Hotel National</name> - <placeName>Lucerno</placeName> -<date when="1902-05-06">May 6</date>.
          </dateline>
          <p>
             We had the most beautiful day yesterday - most of the morning at the
-             <placeName>Poldo-Pezzoli</placeName> - left <placeName ref="#Duomo_di_Milano">Milan</placeName>
+             <placeName ref="#Museo_Poldi_Pezzoli">Poldo-Pezzoli</placeName> - left <placeName ref="#Duomo_di_Milano">Milan</placeName>
              at 12:30 in 2 comfortable compartments. The afternoon was warm, even hot - and we were
-             glad to get into the shade of the big <placeName>St. Gotthard</placeName>
+             glad to get into the shade of the big <placeName ref="#Gotthard_Pass">St. Gotthard</placeName>
              tunnel. What was our astonishment to find on emerging from it, the snow falling fast
              and continuously. We drew up at the station of <placeName>G&#246;sechnen</placeName>,
              and had some of their excellent coffee, which was handed into the windows to us - then
@@ -2328,7 +2329,7 @@
              morrow which promise sadly was not fulfilled - for it has rained most of the day - and
              has been very cold. No one but <persName ref="#Davis_Theodore_M">Theodore</persName> went out
              -and no views of the mountains - hardly of the lake. We are off at 7 A.M. tomorrow for
-             <placeName>Paris</placeName>.
+             <placeName ref="#Paris">Paris</placeName>.
          </p>
       </div>
       <div xml:id="EBA-1902-05-10" type="entry">
