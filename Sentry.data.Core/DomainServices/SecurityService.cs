@@ -66,7 +66,8 @@ namespace Sentry.data.Core
             if(user == null) { return new UserSecurity(); }
 
             //if the user is one of the primary owners or primary contact, they should have all permissions without even requesting it.
-            //Admins also get all the permissions.
+            //Admins also get all the permissions, except if the securable is sensitive (ie HR) 
+
             bool IsAdmin = user.IsAdmin;
             bool IsOwner = (user.AssociateId == securable?.PrimaryContactId) && user.CanModifyDataset;
             List<string> userPermissions = new List<string>();
@@ -127,7 +128,7 @@ namespace Sentry.data.Core
 
             //from the list of permissions, build out the security object.
             us.CanPreviewDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_PREVIEW_DATASET) || IsOwner || IsAdmin;
-            us.CanViewFullDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_VIEW_FULL_DATASET) || IsOwner || IsAdmin;
+            us.CanViewFullDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_VIEW_FULL_DATASET) || IsOwner || (IsAdmin && !securable.IsSensitive);
             us.CanQueryDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_QUERY_DATASET) || IsOwner || IsAdmin;
             us.CanUploadToDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_UPLOAD_TO_DATASET) || IsOwner || IsAdmin;
             us.CanModifyNotifications = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MODIFY_NOTIFICATIONS) || IsOwner || IsAdmin;
