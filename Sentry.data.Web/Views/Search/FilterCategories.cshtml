@@ -4,6 +4,14 @@
     IEnumerable<FilterCategoryModel> orderedModel = Model.Where(x => x.CategoryOptions.Count > 1 || x.CategoryOptions.All(a => a.Selected)).OrderBy(x => x.CategoryName);
 }
 
+@functions
+{
+    public string SafeValue(string value)
+    {
+        return value.Length > 25 ? value.Substring(0, 22) + "..." : value;
+    }
+}
+
 @helper DisplayCategoryOptions(IEnumerable<FilterCategoryOptionModel> options)
 {
     foreach (FilterCategoryOptionModel option in options.ToList())
@@ -11,7 +19,7 @@
         <li class="filter-search-category-option" title="@option.OptionValue">
             <label>
                 <input type="checkbox" class="filter-search-category-option-checkbox" id="@option.OptionId" value="@option.OptionValue" checked="@option.Selected" />
-                <strong>@(option.OptionValue.Length > 25 ? option.OptionValue.Substring(0, 22) + "..." : option.OptionValue)</strong>
+                <strong>@SafeValue(option.OptionValue)</strong>
                 <span>(@option.ResultCount.ToString("N0"))</span>
             </label>
         </li>
@@ -23,7 +31,7 @@
     {
         <button type="button" class="btn btn-default filter-search-active-option-close display-none" id="clearOption_@option.OptionId">
             <span class="active-option-close-symbol">&#x2715</span>
-            <span>@option.ParentCategoryName: @option.OptionValue</span>
+            <span><b>@option.ParentCategoryName</b>: @SafeValue(option.OptionValue)</span>
         </button>
     }
 </div>

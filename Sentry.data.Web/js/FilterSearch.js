@@ -1,6 +1,7 @@
 ﻿data.FilterSearch = {
 
-    lastSearchOptions: [],
+    lastSelectedOptionIds: [],
+
     executeSearch: function () {
         console.log('Must pass searchExecuter parameter to data.FilterSearch.init')
     },
@@ -46,13 +47,6 @@
             }
         });
 
-        //open see all modal
-        //$(document).on("click", "[id^='categoryAll_']", function (e) {
-        //    e.preventDefault();
-
-        //    console.log("see all");
-        //});
-
         //clear single badge
         $(document).on("click", "[id^='clearOption_']", function (e) {
             e.preventDefault();
@@ -62,7 +56,7 @@
 
             //uncheck the category option that was removed
             var optionId = $(this).attr("id").replace("clearOption_", "");
-            $("#" + optionId).prop('checked', false);
+            data.FilterSearch.setOptionCheckbox(optionId, false);
 
             //hide the clicked badge
             $(this).hide();
@@ -80,16 +74,14 @@
 
             if (this.checked) {
                 //making sure both modal and filter checkbox gets checked
-                $("#" + id).prop('checked', true);
-                $("#modal_" + id).prop('checked', true);
+                data.FilterSearch.setOptionCheckbox(id, true);
 
                 badge.show()
                 data.FilterSearch.showBadgeContainer();
             }
             else {
                 //making sure both modal and filter checkbox gets unchecked
-                $("#" + id).prop('checked', false);
-                $("#modal_" + id).prop('checked', false);
+                data.FilterSearch.setOptionCheckbox(id, false);
 
                 data.FilterSearch.hideBadgeContainer(false);
                 badge.hide();
@@ -116,20 +108,24 @@
         });
 
         //search when focus on search box and hit enter
-        $("#filter-search-text").on("keypress", function (e) {
+        $(document).on("keypress", "#filter-search-text", function (e) {
             var keycode = (e.keyCode ? e.keyCode : e.which);
-            var input = $(this).val();
 
-            if (keycode == '13' && input && $.trim(input)) {
+            if (keycode == '13') {
                 data.FilterSearch.search();
             }
         });
 
         //search when apply filters
-        $(".filter-search-start").on("click", function (e) {
+        $(document).on("click", ".filter-search-start", function (e) {
             e.preventDefault();
             data.FilterSearch.search();
         });
+    },
+
+    setOptionCheckbox: function (id, checked) {
+        $("#" + id).prop('checked', checked);
+        $("#modal_" + id).prop('checked', checked);
     },
 
     search: function () {
@@ -159,23 +155,24 @@
         var hasSameValues = true;
         //determine all selected filters were in the initial filter
         selectedOptions.each(function () {
-            hasSameValues = data.FilterSearch.lastSearchOptions.includes(this.id);
+            hasSameValues = data.FilterSearch.lastSelectedOptionIds.includes(this.id);
             return hasSameValues;
         });
 
         //hide apply button if filters are same as initial search, show if filters are different
-        if (selectedOptions.length === data.FilterSearch.lastSearchOptions.length && hasSameValues) {
-            $("#filter-search-apply").hide();
+        if (selectedOptions.length === data.FilterSearch.lastSelectedOptionIds.length && hasSameValues) {
+            $(".filter-search-apply").hide();
         }
         else {
-            $("#filter-search-apply").show();
+            $(".filter-search-apply").show();
         }
     },
 
     searchPrep: function () {
         $("#filter-search-text").prop("disabled", true);
-        $("#filter-search-apply").prop("disabled", true);
-        
+        $(".filter-search-apply").prop("disabled", true);
+
+        $(".modal").modal("hide");
         $(".glyphicon-search").hide();
         $(".filter-search-results-container").hide();
         $(".filter-search-results-none").hide();
@@ -187,7 +184,7 @@
 
     completeSearch: function (totalResultCount, pageSize, returnedResultCount) {
         $("#filter-search-text").prop("disabled", false);
-        $("#filter-search-apply").prop("disabled", false);
+        $(".filter-search-apply").prop("disabled", false);
 
         $(".fa-spin").hide();
         $(".filter-search-result-sentry-spinner").hide();
@@ -211,11 +208,21 @@
         $(".filter-search-categories-container").hide();
         $(".filter-search-categories-sentry-spinner").show();
         $("#filter-search-clear").hide();
-        $("#filter-search-apply").hide();
+        $(".filter-search-apply").hide();
     },
 
     completeFilterRetrieval: function (filters) {
-        var categories = { 'filterCategories': filters }
+
+        var categories = { 'filterCategories': [] }
+
+        if (filters && filters.length) {
+            categories.filterCategories = filters;
+        }
+        else {
+            //set the categories to previous available filters with the selected options at the time of searching
+            categories.filterCategories = data.FilterSearch.getSelectedCategoryOptions()
+        }
+
         $('.filter-search-show-all-container').load("/FilterSearch/FilterShowAll/", categories);
         $('.filter-search-categories-container').load("/FilterSearch/FilterCategories/", categories, function () {
 
@@ -224,7 +231,7 @@
 
             var selectedOptions = $('.filter-search-category-option-checkbox:checkbox:checked');
 
-            data.FilterSearch.lastSearchOptions = selectedOptions.map(function () { return this.id }).get();
+            data.FilterSearch.lastSelectedOptionIds = selectedOptions.map(function () { return this.id }).get();
 
             //open all filter categories with a selected option
             selectedOptions.closest('.filter-search-category-options').each(function () {

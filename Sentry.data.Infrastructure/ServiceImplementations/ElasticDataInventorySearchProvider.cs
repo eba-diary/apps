@@ -48,29 +48,12 @@ namespace Sentry.data.Infrastructure
             AggregateDictionary aggResults = GetElasticResult(dto, resultDto, request).Aggregations;
 
             //translate results to dto
-            if (aggResults != null)
+            foreach (string categoryName in request.Aggregations.Select(x => x.Key).ToList())
             {
-                foreach (string categoryName in request.Aggregations.Select(x => x.Key).ToList())
+                TermsAggregate<string> categoryResults = aggResults?.Terms(categoryName);
+                if (categoryResults?.Buckets?.Any() == true && categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
                 {
-                    TermsAggregate<string> categoryResults = aggResults.Terms(categoryName);
-                    if (categoryResults?.Buckets?.Any() == true && categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
-                    {
-                        FilterCategoryDto categoryDto = new FilterCategoryDto() { CategoryName = categoryName };
-
-                        foreach (var bucket in categoryResults.Buckets)
-                        {
-                            string bucketKey = bucket.KeyAsString ?? bucket.Key;
-                            categoryDto.CategoryOptions.Add(new FilterCategoryOptionDto()
-                            {
-                                OptionValue = bucketKey,
-                                ResultCount = bucket.DocCount.GetValueOrDefault(),
-                                ParentCategoryName = categoryName,
-                                Selected = dto.FilterCategories?.Any(x => x.CategoryName == categoryName && x.CategoryOptions?.Any(o => o.OptionValue == bucketKey && o.Selected) == true) == true
-                            });
-                        }
-
-                        resultDto.FilterCategories.Add(categoryDto);
-                    }
+                    resultDto.FilterCategories.Add(BuildFilterCategoryDto(categoryResults.Buckets, categoryName, dto.FilterCategories));
                 }
             }
 
@@ -295,6 +278,31 @@ namespace Sentry.data.Infrastructure
         {
             TermsAggregate<string> agg = resultTask.Result.Aggregations.Terms(AssetCategoriesAggregationKey);
             return agg.Buckets.SelectMany(x => x.Key.Split(',').Select(s => s.Trim())).Distinct().ToList();
+        }
+
+        private FilterCategoryDto BuildFilterCategoryDto(IReadOnlyCollection<KeyedBucket<string>> buckets, string categoryName, List<FilterCategoryDto> requestFilters)
+        {
+            FilterCategoryDto categoryDto = new FilterCategoryDto() { CategoryName = categoryName };
+
+            foreach (var bucket in buckets)
+            {
+                string bucketKey = bucket.KeyAsString ?? bucket.Key;
+                categoryDto.CategoryOptions.Add(new FilterCategoryOptionDto()
+                {
+                    OptionValue = bucketKey,
+                    ResultCount = bucket.DocCount.GetValueOrDefault(),
+                    ParentCategoryName = categoryName,
+                    Selected = requestFilters?.Any(x => x.CategoryName == categoryName && x.CategoryOptions?.Any(o => o.OptionValue == bucketKey && o.Selected) == true) == true
+                });
+            }
+
+            List<FilterCategoryOptionDto> selectedOptionsWithNoResults = requestFilters?.FirstOrDefault(x => x.CategoryName == categoryName)?.CategoryOptions?.Where(x => x.Selected && !categoryDto.CategoryOptions.Any(o => o.OptionValue == x.OptionValue)).ToList();
+            if (selectedOptionsWithNoResults?.Any() == true)
+            {
+                categoryDto.CategoryOptions.AddRange(selectedOptionsWithNoResults);
+            }
+
+            return categoryDto;
         }
         #endregion
     }

@@ -63,7 +63,7 @@
     width: 100%;
 }
 
-#filter-search-apply {
+.filter-search-apply {
     margin: 0 0 0.5em 0.5em;
     height: fit-content;
     align-self: end;

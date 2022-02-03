@@ -9,13 +9,13 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public ActionResult FilterCategories(List<FilterCategoryModel> filterCategories)
         {
-            return PartialView("~/Views/Search/FilterCategories.cshtml", filterCategories.ToList());
+            return PartialView("~/Views/Search/FilterCategories.cshtml", filterCategories ?? new List<FilterCategoryModel>());
         }
 
         [HttpPost]
         public ActionResult FilterShowAll(List<FilterCategoryModel> filterCategories)
         {
-            return PartialView("~/Views/Search/FilterShowAll.cshtml", filterCategories.ToList());
+            return PartialView("~/Views/Search/FilterShowAll.cshtml", filterCategories ?? new List<FilterCategoryModel>());
         }
     }
 }
