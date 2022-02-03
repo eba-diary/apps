@@ -443,12 +443,14 @@ namespace Sentry.data.Core
         /// <param name="logicalDelete">True to logically delete the dataflow; false to physically delete it</param>
         public void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true)
         {
-            Logger.Info($"<{nameof(DataFlowService)}-{nameof(DeleteFlowsByFileSchema)}> Method Start");
+            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(DeleteFlowsByFileSchema).ToLower()} Method Start");
 
             DeleteSchemaFlowByFileSchema(scm, logicalDelete);
 
             /* Get associated producer flow(s) */
             List<int> producerDataflowIdList = GetProducerFlowsToBeDeletedBySchemaId(scm.SchemaId);
+
+            Logger.Info($"{producerDataflowIdList.Count} dataflows identified");
 
             if (logicalDelete)
             {
@@ -464,7 +466,7 @@ namespace Sentry.data.Core
                 }
             }
 
-            Logger.Info($"<{nameof(DataFlowService)}-{nameof(DeleteFlowsByFileSchema)}> Method End");
+            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(DeleteFlowsByFileSchema).ToLower()} Method End");
         }
 
         /// <summary>
@@ -479,7 +481,7 @@ namespace Sentry.data.Core
         /// </remarks>
         private void DeleteSchemaFlowByFileSchema(FileSchema scm, bool logicalDelete)
         {
-            Logger.Info($"<{nameof(DataFlowService)}-{nameof(DeleteSchemaFlowByFileSchema)} Method Start");
+            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(DeleteSchemaFlowByFileSchema).ToLower()} Method Start");
             /* Get Schema Flow */
             var schemaflowName = GetDataFlowNameForFileSchema(scm);
             DataFlow schemaFlow = _datasetContext.DataFlow.FirstOrDefault(w => w.Name == schemaflowName);
@@ -489,7 +491,7 @@ namespace Sentry.data.Core
             {
                 Logger.Debug($"Schema Flow not found by name, attempting to detect by id...");
 
-                SchemaMap mappedStep = _datasetContext.SchemaMap.SingleOrDefault(w => w.MappedSchema.SchemaId == scm.SchemaId && w.DataFlowStepId.Action.Name == "Schema Load");
+                SchemaMap mappedStep = _datasetContext.SchemaMap.SingleOrDefault(w => w.MappedSchema.SchemaId == scm.SchemaId && w.DataFlowStepId.Action.Name == "Schema Load" && w.DataFlowStepId.DataFlow.Name.StartsWith("FileSchema"));
                 if (mappedStep != null)
                 {
                     Logger.Debug($"detected schema flow by Id");
@@ -518,7 +520,7 @@ namespace Sentry.data.Core
                 }
             }
 
-            Logger.Info($"<{nameof(DataFlowService)}-{nameof(DeleteSchemaFlowByFileSchema)} Method End");
+            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(DeleteSchemaFlowByFileSchema).ToLower()} Method End");
         }
 
         /// <summary>
@@ -559,10 +561,15 @@ namespace Sentry.data.Core
 
         private List<int> GetProducerFlowsToBeDeletedBySchemaId(int schemaId)
         {
+            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(GetProducerFlowsToBeDeletedBySchemaId).ToLower()} Method Start");
             List<int> producerFlowIdList = new List<int>();
 
-            /* Get producer flow Ids which map to schema */
-            List<Tuple<int, int>> producerSchemaMapIds = _datasetContext.SchemaMap.Where(w => w.MappedSchema.SchemaId == schemaId && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaMap).Select(s => new Tuple<int, int>(s.DataFlowStepId.Id, s.DataFlowStepId.DataFlow.Id)).ToList();
+            /* Get producer flow Ids which map to schema that are active*/
+            List<Tuple<int, int>> producerSchemaMapIds = _datasetContext.SchemaMap.Where(w => 
+                                            w.MappedSchema.SchemaId == schemaId
+                                            && !w.DataFlowStepId.DataFlow.Name.Contains("FileSchemaFlow")
+                                            && w.DataFlowStepId.DataFlow.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted
+                                            ).Select(s => new Tuple<int, int>(s.DataFlowStepId.Id, s.DataFlowStepId.DataFlow.Id)).ToList();
 
             foreach (Tuple<int, int> item in producerSchemaMapIds)
             {
@@ -582,6 +589,7 @@ namespace Sentry.data.Core
                 }
             }
 
+            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(GetProducerFlowsToBeDeletedBySchemaId).ToLower()} Method End");
             return producerFlowIdList;
         }
 
@@ -600,9 +608,9 @@ namespace Sentry.data.Core
         [AutomaticRetry(Attempts = 0)]
         public void Delete(int dataFlowId, string userId, bool commitChanges = false)
         {
-            Logger.Debug($"Start method <{nameof(Delete)}>");
+            Logger.Debug($"{nameof(DataFlowService).ToLower()}_{nameof(Delete).ToLower()} Method Start");
 
-            Logger.Info($"{nameof(DataFlowService)}-{nameof(Delete)}-start - dataflowid:{dataFlowId}");
+            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(Delete).ToLower()} - dataflowid:{dataFlowId}");
 
             //Find DataFlow
             DataFlow flow = _datasetContext.GetById<DataFlow>(dataFlowId);
@@ -610,13 +618,13 @@ namespace Sentry.data.Core
 
             if (flow == null)
             {
-                Logger.Debug($"{nameof(DataFlowService)}-{nameof(Delete)} DataFlow not found - dataflowid:{dataFlowId}");
+                Logger.Debug($"{nameof(DataFlowService).ToLower()}_{nameof(Delete).ToLower()} DataFlow not found - dataflowid:{dataFlowId}");
                 throw new DataFlowNotFound();
             }
             //If dataflow is already deleted then exit
             else if (flow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted)
             {
-                Logger.Debug($"{nameof(DataFlowService)}-{nameof(Delete)} DataFlow already deleted - dataflowid:{dataFlowId}");
+                Logger.Debug($"{nameof(DataFlowService).ToLower()}_{nameof(Delete).ToLower()} DataFlow already deleted - dataflowid:{dataFlowId}");
             }
             else
             {
@@ -643,7 +651,7 @@ namespace Sentry.data.Core
                 }
             }            
 
-            Logger.Debug($"End method <{nameof(Delete)}>");
+            Logger.Debug($"{nameof(DataFlowService).ToLower()}_{nameof(Delete).ToLower()} Method End");
         }
 
         public List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId)
