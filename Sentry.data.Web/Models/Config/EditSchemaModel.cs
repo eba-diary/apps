@@ -26,8 +26,6 @@ namespace Sentry.data.Web
         public virtual int Schema_Id { get; set; }
         public virtual string FileType { get; set; }
         public virtual int FileTypeId { get; set; }
-
-        [RequiredDelimiter("FileTypeId")]
         public virtual string Delimiter { get; set; }
         public virtual Boolean HasHeader { get; set; }
 

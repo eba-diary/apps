@@ -161,10 +161,7 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetFileConfigDto dto = dfcm.ToDto();
 
-            if (dto.ConfigId == 0)
-            {
-                AddCoreValidationExceptionsToModel(_configService.Validate(dto));
-            }
+            AddCoreValidationExceptionsToModel(_configService.Validate(dto));
 
             if (ModelState.IsValid)
             {
