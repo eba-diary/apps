@@ -25,6 +25,7 @@ using System.Web.SessionState;
 using Sentry.data.Core.Interfaces;
 using Sentry.data.Core.Entities;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Entities.Schema.Elastic;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -45,6 +46,7 @@ namespace Sentry.data.Web.Controllers
         private readonly ISAIDService _saidService;
         private readonly IJobService _jobService;
         private readonly NamedEnvironmentBuilder _namedEnvironmentBuilder;
+        private readonly IElasticContext _elasticContext;
 
         public DatasetController(
             IDatasetContext dsCtxt,
@@ -56,10 +58,11 @@ namespace Sentry.data.Web.Controllers
             IDatasetService datasetService,
             IEventService eventService,
             IConfigService configService,
-            IDataFeatures featureFlags, 
+            IDataFeatures featureFlags,
             ISAIDService saidService,
             IJobService jobService,
-            NamedEnvironmentBuilder namedEnvironmentBuilder)
+            NamedEnvironmentBuilder namedEnvironmentBuilder,
+            IElasticContext elasticContext)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
@@ -74,6 +77,7 @@ namespace Sentry.data.Web.Controllers
             _saidService = saidService;
             _jobService = jobService;
             _namedEnvironmentBuilder = namedEnvironmentBuilder;
+            _elasticContext = elasticContext;
         }
 
         public ActionResult Index()
@@ -90,7 +94,7 @@ namespace Sentry.data.Web.Controllers
             return View(hm);
         }
 
-       
+
         #region Dataset Modification
 
         [HttpGet]
@@ -107,7 +111,7 @@ namespace Sentry.data.Web.Controllers
 
             Utility.SetupLists(_datasetContext, cdm);
             cdm.SAIDAssetDropDown = await BuildSAIDAssetDropDown(cdm.SAIDAssetKeyCode);
-            
+
             var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(cdm.SAIDAssetKeyCode, cdm.NamedEnvironment);
             cdm.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             cdm.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
@@ -126,7 +130,7 @@ namespace Sentry.data.Web.Controllers
         {
             // TODO: CLA-2765 - Add filtering to ensure EDIT only occurs for ACTIVE object status
             UserSecurity us = _datasetService.GetUserSecurityForDataset(id);
-            if(us != null && us.CanEditDataset)
+            if (us != null && us.CanEditDataset)
             {
                 DatasetDto dto = _datasetService.GetDatasetDto(id);
                 DatasetModel model = new DatasetModel(dto);
@@ -139,7 +143,7 @@ namespace Sentry.data.Web.Controllers
                 model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Edit Page", id);
-                
+
                 ViewData["Title"] = "Edit Dataset";
 
                 return View("DatasetForm", model);
@@ -219,7 +223,7 @@ namespace Sentry.data.Web.Controllers
         {
             List<SelectListItem> output = new List<SelectListItem>();
             List<SAIDAsset> assetList = await _saidService.GetAllAssets().ConfigureAwait(false);
-            
+
             if (String.IsNullOrWhiteSpace(keyCode) || !assetList.Any(a => a.SaidKeyCode == keyCode))
             {
                 output.Add(new SelectListItem
@@ -268,7 +272,7 @@ namespace Sentry.data.Web.Controllers
                     int datasetId = _datasetService.CreateAndSaveNewDataset(dto);
 
                     _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.CREATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", datasetId);
-                    return Json(new { Success = true, dataset_id = datasetId});
+                    return Json(new { Success = true, dataset_id = datasetId });
                     //return RedirectToAction("Detail", new { id = datasetId });
                 }
                 else
@@ -284,7 +288,7 @@ namespace Sentry.data.Web.Controllers
 
             Utility.SetupLists(_datasetContext, model);
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
-            
+
             var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
@@ -310,7 +314,7 @@ namespace Sentry.data.Web.Controllers
             }
             else
             {
-                return HttpNotFound("Invalid Dataset Id"); 
+                return HttpNotFound("Invalid Dataset Id");
             }
         }
 
@@ -325,7 +329,7 @@ namespace Sentry.data.Web.Controllers
         public ActionResult DetailTab(int id, string tab)
         {
             DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
-            if(dto != null)
+            if (dto != null)
             {
                 DatasetDetailModel model = new DatasetDetailModel(dto);
                 model.DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue();
@@ -343,6 +347,9 @@ namespace Sentry.data.Web.Controllers
                     case ("DataFiles"):
                         _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Data Files Tab", dto.DatasetId);
                         return PartialView("Details/_DataFiles", model);
+                    case ("SchemaSearch"):
+                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Schema Search Tab", dto.DatasetId);
+                        return PartialView("Details/_SchemaSearch", model);
                     default:
                         return HttpNotFound("Invalid Tab");
                 }
@@ -496,6 +503,15 @@ namespace Sentry.data.Web.Controllers
             return View("Configuration", model);
         }
 
+        [Route("Dataset/Detail/{datasetId}/SchemaSearch/{schemaId}/{search?}")]
+        [HttpGet]
+        public JsonResult SchemaSearcher(int datasetId, int schemaId, string search = null)
+        {
+            ElasticSchemaSearchProvider elasticSchemaSearch = new ElasticSchemaSearchProvider(_elasticContext, datasetId);
+            List<ElasticSchemaField> results = elasticSchemaSearch.elasticSearchSchemaFields(search);
+            return Json(results, JsonRequestBehavior.AllowGet);
+        }
+
         [HttpGet]
         public ActionResult Subscribe(int id)
         {
@@ -585,7 +601,7 @@ namespace Sentry.data.Web.Controllers
             }
 
             DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
-            
+
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
 
@@ -689,7 +705,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         #endregion
-        
+
         #region Helpers
 
         [HttpGet()]
@@ -1028,7 +1044,7 @@ namespace Sentry.data.Web.Controllers
 
         #endregion
 
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)] 
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         [HttpPost]
         public ActionResult RunRetrieverJob(int id)
         {
@@ -1059,7 +1075,7 @@ namespace Sentry.data.Web.Controllers
             {
                 Logger.Error($"Error disabling retriever job ({id}).", ex);
                 return Json(new { Success = false, Message = "Failed disabling job.  If problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>." });
-            }            
+            }
         }
 
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
@@ -1116,7 +1132,7 @@ namespace Sentry.data.Web.Controllers
         {
             List<SelectListItem> sList = new List<SelectListItem>();
 
-            var groupedDatasets = _datasetService.GetDatasetsForQueryTool().GroupBy(x=> x.DatasetCategories.First());
+            var groupedDatasets = _datasetService.GetDatasetsForQueryTool().GroupBy(x => x.DatasetCategories.First());
 
             foreach (var ds in groupedDatasets)
             {
@@ -1130,7 +1146,7 @@ namespace Sentry.data.Web.Controllers
 
             return Json(sList, JsonRequestBehavior.AllowGet);
         }
-        
+
         public JsonResult GetSourceDescription(string DiscrimatorValue)
         {
             var obj = _datasetContext.DataSourceTypes.Where(x => x.DiscrimatorValue == DiscrimatorValue).Select(x => x.Description);
@@ -1179,7 +1195,7 @@ namespace Sentry.data.Web.Controllers
         //RECURSIVE FUNCTION
         //pass array of Fields and will format a line for each child field it finds
         //IF child field is a NON ARRAY STRUCT, call itself again and pass the STRUCT's children and print out all children and keep going
-        private string GenerateSnow(List<Models.ApiModels.Schema.SchemaFieldModel> models, string alias, ref bool first, ref bool columnExists,List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
+        private string GenerateSnow(List<Models.ApiModels.Schema.SchemaFieldModel> models, string alias, ref bool first, ref bool columnExists, List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
             StringBuilder line = new StringBuilder();
 
@@ -1198,7 +1214,7 @@ namespace Sentry.data.Web.Controllers
                     line.Append(alias).Append(field.Name).Append(DelroyCastMonster(field) + Environment.NewLine);
                     columnExists = true;
                 }
-                else if(!field.IsArray)
+                else if (!field.IsArray)
                 {
                     //pass "parentStructs" plus append current field so child nodes can get all parent structs appended
                     //pass "first" as reference to know whether to append a comma or not
@@ -1214,13 +1230,13 @@ namespace Sentry.data.Web.Controllers
         {
             string cast = "::" + field.FieldType;
 
-            if(field.FieldType.ToUpper() == "DECIMAL")
+            if (field.FieldType.ToUpper() == "DECIMAL")
             {
                 cast += "(" + field.Precision.ToString() + "," + field.Scale.ToString() + ") ";
             }
-            else if(field.FieldType.ToUpper() == "VARCHAR")
+            else if (field.FieldType.ToUpper() == "VARCHAR")
             {
-                cast +="(" + field.Length.ToString() + ") ";
+                cast += "(" + field.Length.ToString() + ") ";
             }
 
             return cast;
@@ -1235,7 +1251,7 @@ namespace Sentry.data.Web.Controllers
         {
             StringBuilder alias = new StringBuilder();
 
-            if(structTracker == null)
+            if (structTracker == null)
             {
                 return alias.ToString();
             }
@@ -1275,7 +1291,7 @@ namespace Sentry.data.Web.Controllers
             return alias.ToString();
         }
 
-       
+
 
 
         //CREATE FROM STATEMENT FOR SNOWFLAKE
@@ -1301,7 +1317,7 @@ namespace Sentry.data.Web.Controllers
         //CREATE LATERAL FLATTEN STATEMENT FOR SNOWFLAKE
         private string DelroyCreateLateralFlatten(List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
-            
+
             StringBuilder flattenStatement = new StringBuilder();
             bool first = true;
             string parentFlatten = String.Empty;

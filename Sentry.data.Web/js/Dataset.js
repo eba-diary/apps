@@ -672,7 +672,7 @@ data.Dataset = {
                 parsedRows.push(parsedCells);
             }
         });
-        if ($("#datasetRowTable_filter").length > 0) { 
+        if ($("#datasetRowTable_filter").length > 0) {
             $("#datasetRowTable").DataTable().destroy();
         }
         if (!push) {
@@ -1361,12 +1361,38 @@ data.Dataset = {
             }
         });
 
+        $('#detailTabSchemaSearch').click(function (e) {
+            e.preventDefault();
+            var id = $('#RequestAccessButton').attr("data-id");
+
+            var url = new URL(window.location.href);
+            url.searchParams.set('tab', 'SchemaSearch');
+            window.history.pushState({}, '', url);
+
+            if ($('#tabSchemaSearch').is(':empty')) {
+                Sentry.InjectSpinner($("#tab-container"));
+                $.ajax({
+                    url: '/Dataset/DetailTab/' + id + '/' + 'SchemaSearch',
+                    dataType: 'html',
+                    success: function (view) {
+                        $('#tabSchemaSearch').html(view);
+                        data.Dataset.InitSchemaSearchTab();
+                        data.RemoveSpinner('#tab-container');
+                    }
+                });
+            }
+            else {
+                $.ajax({
+                    url: '/Dataset/DetailTab/' + id + '/' + 'SchemaSearch/LogView',
+                });
+            }
+        });
 
         var url = new URL(window.location.href);
         var tab = url.searchParams.get('tab');
         if (tab == undefined) {
             tab = 'SchemaAbout';
-        }        
+        }
         $("#detailTab" + tab).trigger('click');
 
     },
@@ -2154,6 +2180,27 @@ data.Dataset = {
             $('div#DatasetFormContent #NamedEnvironmentPartial').html(result);
             data.Dataset.initNamedEnvironmentEvents();
         });
-    }
+    },
 
+    InitSchemaSearchTab() {
+        $("#schemaSearchTable").DataTable({
+            "ajax": {
+                "url": "/Dataset/Detail/20/SchemaSearch/40/",
+                "dataSrc": ""
+            },
+            "columns": [
+                { "data": "Name" },
+                { "data": "Description" },
+                { "data": "DotNamePath" }
+            ],
+            "dom": 'lrtip'
+        });
+
+        //search button on change query elastic
+        $("#schemaSearchInput").change(function () {
+            var searchInput = $("#schemaSearchInput").val();
+            var schemaSearchTable = $("#schemaSearchTable").DataTable();
+            schemaSearchTable.ajax.url("/Dataset/Detail/20/SchemaSearch/40/" + searchInput).load();
+        });
+    }
 };
