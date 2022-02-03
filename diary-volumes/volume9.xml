@@ -183,7 +183,7 @@
             We all had a fine drive this morning, and stopped at the
              <name type="hotel" ref="#Hotel_Splendid">Hotel Splendid</name>, one of <persName ref="#Bertalini_Mr">
             Bertalini</persName>'s hotels to see it. It is splendidly situated, almost on the level of
-             <name>Capo di Monte</name>, and <placeName>San Martino</placeName>. It has just been
+             <placeName ref="#Capodimonte">Capo di Monte</placeName>, and <placeName ref="#San_Martino">San Martino</placeName>. It has just been
              opened - and is very attractive. The <placeName ref="#Naples">Naples</placeName> tram lands you
              just below the hotel, where a huge lift has been built straight through the rock -
              and you are carried straight up to the restaurant level, which is at the top of the
@@ -939,7 +939,7 @@
       </div>
       <div xml:id="EBA-1902-01-24" type="entry">
          <dateline>
-            <date when="">1902-01-24</date>.
+            <date when="1902-01-24">Friday. Jan. 24</date>.
          </dateline>
          <p>
             At home all day - cold wind - <persName ref="#Davis_Theodore_M">Theodore</persName> went over to
@@ -1297,7 +1297,7 @@
              o'clock - the day very hot, with much light north wind. Our men have done well - and
              brought us at 6:30 to within 3 miles below <placeName>Sileilis</placeName>. I have been very little on deck
              the heat was so intense - The <name type="boat" ref="#Scarab">S.S. Scarab</name> passed us about 10 o'clock
-             - they flew by us - and we had only a glimpse of them. The <name type="boat" ref="">Hathor</name>
+             - they flew by us - and we had only a glimpse of them. The <name type="boat" ref="Hathor">Hathor</name>
              with a powerful tug passed us near <placeName ref="#Kawm_Umbū">Kom Ombo</placeName> with
              <persName ref="#Salah_Mohammed">Salah</persName> and a large English party. At 6:30
              this evening the thermometer on the cabins stood at 85.
@@ -1586,8 +1586,8 @@
          </dateline>
          <p>
             With much difficulty we managed to pull past <placeName ref="#Jirjā">Girga</placeName> opposite
-             to the <persName ref="#Reisner_George#Reisner_Mrs">Reisner</persName> camp about noon. We sent a man across
-             with a note asking <persName ref="#Reisner_George#Reisner_Mrs">Mr. and Mrs. Reisner</persName>,
+             to the <persName ref="#Reisner_George">Reisner</persName> camp about noon. We sent a man across
+             with a note asking <persName ref="#Reisner_George #Reisner_Mrs">Mr. and Mrs. Reisner</persName>,
              <persName ref="#Cruttenden_Mace_Arthur">Mr. Mace</persName> and <persName ref="#Lithcoe">Mr. Lithcoe</persName>
              to dine with us this evening - and <persName ref="#Davis_Theodore_M">Theodore</persName> and
              <persName ref="#Buttles_Jeanette">Nettie</persName> at 4 o'clock braved the hot sun and the high
@@ -1602,7 +1602,7 @@
              and <persName ref="#Lithcoe">Lithcoe</persName> are the real explorers - and are considered
              most intelligent - the latter is an American, from
              <placeName ref="#Providence">Providence</placeName> - <persName ref="#Buttles_Jeanette">Nettie</persName>
-             reported the <persName ref="#Reisner_George#Reisner_Mrs">Reisner</persName> house intolerably hot, and
+             reported the <persName ref="#Reisner_George #Reisner_Mrs">Reisner</persName> house intolerably hot, and
              crammed with flies - and gave a dismal picture of it.
          </p>
       </div>
@@ -1807,7 +1807,7 @@
          <p>
             The usual history of the day - battling with the wind - but it fell with the sunset,
              and the moon being at the full, we rowed until 9 o'clock and pulled up opposite
-             <place ref="#Biba">Bibeh</place>. The river has been very difficult - enormous sand banks,
+             <placeName ref="#Biba">Bibeh</placeName>. The river has been very difficult - enormous sand banks,
              about and around which we had to take our uncertain way. But the effects wonderful.
          </p>
       </div>
@@ -1871,7 +1871,7 @@
          <p>
             A lovely morning - we drove into town, stopped at <name type="hotel" ref="#Shepheards_Hotel">
              Shepheards</name> - saw <persName ref="#Tytus_Bob">Bob Tytus</persName> for a moment
-             and some other people we knew on the <place ref="#Sloane_Terrace">Terrace</place>,
+             and some other people we knew on the <placeName ref="#Sloane_Terrace">Terrace</placeName>,
              then I went to church and joined the others later and came home.
              <persName ref="#von_Bissing_Baron">V. Bissing</persName> to lunch, <persName ref="#Newberry_Percy">
              Newberry</persName> came in after - and when they had gone <persName ref="#Buttles_Jeanette">
