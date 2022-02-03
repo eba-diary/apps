@@ -43,4 +43,3 @@ namespace Sentry.data.Core.Entities.Schema.Elastic
         int SchemaId { get; set; }
     }
 }
-

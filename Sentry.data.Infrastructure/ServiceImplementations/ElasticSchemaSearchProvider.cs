@@ -29,7 +29,7 @@ namespace Sentry.data.Infrastructure
             {
                 toSearch = '*' + toSearch + '*';
             }
-            return (List<ElasticSchemaField>)_context.Search<ElasticSchemaField>(s => s
+            Task<ElasticResult<ElasticSchemaField>> result = _context.SearchAsync<ElasticSchemaField>(s => s
                 .Index("data-schema-column-metadata")
                 .AnalyzeWildcard()
                 .Query(q => q
@@ -38,7 +38,8 @@ namespace Sentry.data.Infrastructure
                     .Term(p => p.DotNamePath, toSearch)
                 )
                 .Size(1000)
-            ); ;
+            );
+            return (List<ElasticSchemaField>)result.Result.Documents;
         }
 
 
