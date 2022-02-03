@@ -1712,7 +1712,7 @@
          </p>
       </div>
       <!-- is Sa'fa a nickname for a place? -->
-      <!-- khamseeny (khamaseen) is a dry, hot, sandy local wind affecting Egypt, so how should it be tagged? -->
+      <!-- khamseeny (khamaseen) means a dry, hot, sandy local wind affecting Egypt, should i tag it? -->
       <div xml:id="EBA-1902-03-17" type="entry">
          <dateline>
             <date when="1902-03-17">Monday, Mar. 17th</date>. 35-1/2 miles.
@@ -1895,8 +1895,7 @@
              and I had a quiet tea by myself.
          </p>
       </div>
-      <!-- beduin seems to be a group of nomadic people? but emma refers to it as something she's on? -->
-      <!-- should we tag Bazaar, which is a market in a middle eastern country? -->
+      <!-- Bazaar means market in a middle eastern country, should i tag it? -->
       <div xml:id="EBA-1902-04-01" type="entry">
          <dateline>
             <date when="1902-04-01">Tuesday, April 1st</date>.
@@ -2000,6 +1999,8 @@
       <!-- is $aggie a nickname for a place? -->
       <!-- what is VIII C. an abbreviation for? -->
       <!-- who are the Fascherari family? -->
+      <!-- how should i tag Madonna? as separate statues, a religious figure? -->
+      <!-- who are the Ferrara  family? -->
       <div xml:id="EBA-1902-04-13" type="entry">
          <dateline>
             2d Sunday after Easter. <date when="1902-04-13">April 13</date>. <placeName ref="#Bologna">Bologna</placeName>.
@@ -2069,7 +2070,7 @@
              Francesco di Simone</persName>. The Piazzo outside
              called Galileo, is very pretty and picturesque -
              with two columns bearing statues of <persName ref="#Saint_Dominic">S. Dominico</persName>
-             and the <objectName ref="#Madonna">Madonna</objectName>, and two important monuments of the
+             and the <persName>Madonna</persName>, and two important monuments of the
              XIII Cent. on columns, - the one belonging to the family <persName>
              Fascherari</persName> is very interesting because of an elegant work of the
              <orgName>VIII C.</orgName> an arc of a ciborium applied to the tomb - a
@@ -2081,21 +2082,21 @@
              <placeName ref="#Francia_Francesco">Francia</placeName> - <persName>Madonna</persName>
              with saints - the child almost the same as the one in <persName ref="#Davis_Theodore_M">
              Theodore</persName>'s pictures - and the <persName>Madonna</persName>
-             very like - lovely - outside the chapel, the monument of <persName>
-             Antonio Dontiveglio</persName> by <persName>Jacopa
+             very like - lovely - outside the chapel, the monument of <persName ref="#Antonio_Dontiveglio">
+             Antonio Dontiveglio</persName> by <persName ref="#Jacopo_della_Quercia">Jacopa
              della Quercia</persName> - with beautiful figures of the virtues - the Oratory of
-             <persName>S. Cecilia</persName> with frescoes by <persName ref="#Francia_Francesco">
-             Francia</persName>, <persName>Costa</persName>, <persName>
+             <persName ref="#Saint_Cecilia">S. Cecilia</persName> with frescoes by <persName ref="#Francia_Francesco">
+             Francia</persName>, <persName ref="#Lorenzo_Costa">Costa</persName>, <persName ref="#Amico_Aspertini">
              Aspertini</persName> - those of <persName ref="#Francia_Francesco">Francia</persName> quite
-             lovely. After lunch we went to the <placeName>
+             lovely. After lunch we went to the <placeName ref="#Museu_Civico">
              Museu Civioco</placeName>, where we were intensely interested in the
-             <orgName>Etruscan</orgName> and <orgName>Egyptian</orgName>
+             Etruscan and Egyptian
              remains - and the exquisite "Head" supposed to be a copy from the bronze original of
-             <orgName>Pheidias</orgName> - stopped on coming home at a shop near
+             <persName ref="#Phidias">Pheidias</persName> - stopped on coming home at a shop near
              here and bought some beautiful embroideries on linen, native Bolognese work - and also
-             visited <placeName>San Vitale</placeName>, or the <orgName>
-             "Seven Churches"</orgName> most interesting - but gloomy, and cold. This morning I went
-             for a drive to a <placeName>Villa Revedin</placeName>, belonging
+             visited <placeName ref="#San_Vitale">San Vitale</placeName>, or the
+             "Seven Churches" most interesting - but gloomy, and cold. This morning I went
+             for a drive to a <placeName ref="#Villa_Revedin">Villa Revedin</placeName>, belonging
              to a <persName>Ferrara</persName> family of that name - very high with
              fine views of the town, and the level, flat plain beyond. The grounds were pretty with
              some fine trees - and some wonderful Wistaria vines coming into flower - a large
@@ -2108,6 +2109,7 @@
              Florence</placeName> tomorrow.
          </p>
       </div>
+      <!-- is Capodi Stagieni a title in another language? -->
       <div xml:id="EBA-1902-04-14" type="entry">
          <dateline>
             <date when="1902-04-14">Tuesday, April 14</date>. <placeName ref="#Florence">Florence</placeName>.
@@ -2121,14 +2123,14 @@
              <placeName>Capodi Stagieni</placeName>, when he discovered it; but it
              did not avail to dislodge the rude intruders - so the train was held, until a fresh car
              could be brought up, which was fresh, clean and convenient and which we had entirely to
-             ourselves. Found <persName>Bessie</persName> and <persName>
-            Mary</persName> waiting at the station. This morning we spent at the
-             <orgName>Uffissi</orgName> - and afternoon at the
-             <persName>Constantini</persName>'s and at tea at <persName>
-            Lizzie</persName>'s. Delighted to have a visit today from <persName>
-            Pheobe Clark</persName> and <persName>her husband</persName> - they have
+             ourselves. Found <persName ref="#Koon_Bessie">Bessie</persName> and <persName ref="#Newberry_Mary">
+             Mary</persName> waiting at the station. This morning we spent at the
+             <placeName ref="#Uffizi_Gallery">Uffissi</placeName> - and afternoon at the
+             <persName ref="#Constantini_David#Constantini_Mrs.">Constantini</persName>'s and at tea at <persName ref="#Buttles_Lizzie">
+             Lizzie</persName>'s. Delighted to have a visit today from <persName ref="#Clarke_Miss">
+             Pheobe Clark</persName> and <persName ref="#Doctor_Clarke">her husband</persName> - they have
              come over for a stay of 6 months for a rest for him; who looks poorly.
-             <persName>Constantini</persName> dined this evening with us.
+             <persName ref="#Constantini_David">Constantini</persName> dined this evening with us.
          </p>
       </div>
       <div xml:id="EBA-1902-04-24" type="entry">
@@ -2136,26 +2138,26 @@
             <date when="1902-04-24">Thursday, April 24th</date>.
          </dateline>
          <p>
-            We go tomorrow to <placeName>Venice</placeName>- and will take
-             <persName>Mary</persName> with us, and then to <placeName>
-            Paris</placeName> - we have had a charming stay here. The weather has been beautiful,
+            We go tomorrow to <placeName ref="#Venice">Venice</placeName>- and will take
+             <persName ref="#Newberry_Mary">Mary</persName> with us, and then to <placeName ref="#Paris">
+             Paris</placeName> - we have had a charming stay here. The weather has been beautiful,
              and I have been perfectly well - delightful combination indeed! We have seen the
              beautiful pictures, marbles and statuary and churches, seen all our friends - made many
-             visits - received many. Last Sunday we drove up to "<persName>
-            I Tatti</persName>" to lunch with the <persName>Berensons</persName>
+             visits - received many. Last Sunday we drove up to "<placeName ref="#Villa_I_Tatti">
+             I Tatti</placeName>" to lunch with the <persName ref="#Abbott_Senda_Berenson#Berenson_Bernard">Berensons</persName>
              in their charming villa - two pleasant Englishmen also to lunch. The old house with its
              corridors, stately rooms, pretty courts and gardens and the little chapel is entirely
              interesting and charming - and the whole world of <placeName ref="#Florence">
-            Florence</placeName> is seen below it. This morning <persName ref="#Buttles_Jeanette">Nettie</persName>
+             Florence</placeName> is seen below it. This morning <persName ref="#Buttles_Jeanette">Nettie</persName>
              went about with me for half an hour, and then we drove, in spite of threatening clouds,
-             to <placeName>San Miaiato</placeName>. We had it quite to ourselves -
+             to <placeName ref="#San_Miniato">San Miaiato</placeName>. We had it quite to ourselves -
              and after coming out of the church, we hung over the parapet of coarse and looked at
              <placeName ref="#Florence">Florence</placeName> as she winds her lovely length through
              the plain - and at the great shadows of the clouds on the mountains. The young
-             <persName>Countess Gigala</persName> and her brother
-             <persName>Enrico</persName> came to lunch. <persName ref="#Davis_Theodore_M">
-            Theodore</persName> and I started for a drive at 3 o'clock but such a sudden and heavy
-             storm came up we stopped at <placeName>Lizzie</placeName>'s
+             <persName ref="#Countess_Cigala">Countess Gigala</persName> and her brother
+             <persName ref="#Enrico">Enrico</persName> came to lunch. <persName ref="#Davis_Theodore_M">
+             Theodore</persName> and I started for a drive at 3 o'clock but such a sudden and heavy
+             storm came up we stopped at <persName ref="#Buttles_Lizzie">Lizzie</persName>'s
              and had tea, and finally drove home in the rain.
          </p>
       </div>
@@ -2170,31 +2172,31 @@
              ancient cities - and to have sight again of the lagoons, and opalescent waters, and the
              city of all others, rising from them, with the setting sun burnishing its towers and
              buildings. We are in the same princely apartment of two years ago, and we found
-             <persName>Phoebe</persName> and <persName>Dr. Clarke</persName>
-             here. This morning we went to <placeName>S. Francesco</placeName> to
-             see the <persName>Negroponte</persName> beautiful <persName>Madonna</persName>,
-             and to <persName>S. Maria Formosa</persName>, to see especially a painting
+             <persName ref="#Clarke_Miss">Phoebe</persName> and <persName ref="#Doctor_Clarke">Dr. Clarke</persName>
+             here. This morning we went to <placeName ref="#San_Francesco">S. Francesco</placeName> to
+             see the <objectName ref="#Antonio_Falier_da_Negroponte">Negroponte</objectName> beautiful <persName>Madonna</persName>,
+             and to <placeName ref="#Santa_Maria_Formosa">S. Maria Formosa</placeName>, to see especially a painting
              in the sacristy of a <persName>Madonna</persName> and Child by
-             <persName>Pietro da Messina</persName> - the artist by whom was
+             <persName ref="#Pietro_da_Messina">Pietro da Messina</persName> - the artist by whom was
              painted a very charming Madonna <persName ref="#Davis_Theodore_M">Theodore</persName>
              bought in <placeName ref="#Florence">Florence</placeName>. It was very like - and
-             was a signed picture. Then we went to the great <placeName>
-            Giovanni o Paola Church</placeName> - and looked at its monuments and pictures and
+             was a signed picture. Then we went to the great <placeName ref="#Giovanni_o_Paola_Church">
+             Giovanni o Paola Church</placeName> - and looked at its monuments and pictures and
              studied its effects - and home for lunch. In the afternoon <persName ref="#Davis_Theodore_M">
-            Theodore</persName> and I went to <placeName>Berozzo</placeName>'s and
-             after we met the girls, and <persName>Phoebe</persName> and
-             <persName>Dr. Clarke</persName> in the piazza and had tea - and the
+             Theodore</persName> and I went to <persName ref="#Berozzo">Berozzo</persName>'s and
+             after we met the girls, and <persName ref="#Clarke_Miss">Phoebe</persName> and
+             <persName ref="#Doctor_Clarke">Dr. Clarke</persName> in the piazza and had tea - and the
              rain came down, and we had to go inside the cafe. Then we brought up at
-             <placeName>Orcania</placeName>'s the publishers, and quite late, dodged
-             the showers and got home. This morning we went to <placeName>
-            Berozzi</placeName>'s atelier and saw some lovely frames, and a casom - which
+             <placeName ref="#Orcania">Orcania</placeName>'s the publishers, and quite late, dodged
+             the showers and got home. This morning we went to <persName ref="#Berozzo">
+             Berozzi</persName>'s atelier and saw some lovely frames, and a casom - which
              <persName ref="#Davis_Theodore_M">Theodore</persName> bought. The rest of the morning we spent at
              the <placeName ref="#Gallerie_dell_Accademia">Academia.</placeName> This afternoon we went to see
-             the <persName>Benson</persName>'s - and found them as usual - such a
+             the <persName ref="#Benson_Mr">Benson</persName>'s - and found them as usual - such a
              sufferer and cripple as she is! and so cheerful and interesting!
-             <persName>Phoebe</persName> and <persName>Dr. Clarke</persName>
+             <persName ref="#Clarke_Miss">Phoebe</persName> and <persName ref="#Doctor_Clarke">Dr. Clarke</persName>
              came in the evening - and we have arranged to take them out in a steam launch tomorrow
-             to <placeName>Torcello</placeName>.
+             to <placeName ref="#Torcello">Torcello</placeName>.
          </p>
       </div>
       <div xml:id="EBA-1902-04-27" type="entry">
@@ -2204,9 +2206,9 @@
          <p>
             It has been a day of constant wind and rain - <persName ref="#Davis_Theodore_M">Theodore</persName>
              is the only one who has been out - A gondola in the wind was impossible. We have not
-             only lost a day, but our chance of seeing <persName>Torcello
-            </persName>-- and <persName>Dr. Clarke</persName> and <persName>
-            Phoebe</persName> wisely decided to go over to <placeName>Milan</placeName>,
+             only lost a day, but our chance of seeing <placeName ref="#Torcello">Torcello
+             </placeName>-- and <persName ref="#Doctor_Clarke">Dr. Clarke</persName> and <persName ref="#Clarke_Miss">
+             Phoebe</persName> wisely decided to go over to <placeName ref="#Duomo_di_Milano">Milan</placeName>,
              in order to have more time there.
          </p>
       </div>
@@ -2216,12 +2218,12 @@
          </dateline>
          <p>
             A very busy day - with churches, pictures etc. A large part of the morning at the
-             <placeName>Frari</placeName> - <persName>Bessie</persName>
-             and I brought up at <placeName>St. Marks</placeName> at 4:30 - after
-             having had tea on the <placeName>Piazza</placeName>; the church was
+             <placeName ref="#Basilica_di_Santa_Maria_Gloriosa_dei_Frari">Frari</placeName> - <persName ref="#Koon_Bessie">Bessie</persName>
+             and I brought up at <placeName ref="#St_Marks_Campanile">St. Marks</placeName> at 4:30 - after
+             having had tea on the Piazza; the church was
              glorious, a little too late to see all the details, but the effect wonderful - for all
              the dim harmony of colour of the church leads up to the splendour of the high altar,
-             where the <orgName>Pala d'Oro</orgName> was shining - like a rich high
+             where the <objectName ref="#Pala_d'Oro">Pala d'Oro</objectName> was shining - like a rich high
              light. That church is a great marvel - a dim, mysterious, encrusted jewel - there is
              nothing like it in all the world.
          </p>
@@ -2231,13 +2233,13 @@
             <date when="1902-04-29">Thursday, April 29th</date>.
          </dateline>
          <p>
-            Another busy day - with the delights of <placeName>Venice</placeName> -
+            Another busy day - with the delights of <placeName ref="#Venice">Venice</placeName> -
              <persName ref="#Davis_Theodore_M">Theodore</persName> has bought a really beautiful statue of
              the <persName>Madonna</persName> and Child - except for the difference of
              material and size it reminds one of the old French ivory statuettes - the leaning
-             Virgin and child. It came from a suppressed convent in <placeName>
-            Verona</placeName> - and is claimed to be by one of <orgName>Pisanos</orgName>.
-             He has also bought some lovely frames and a cassone from <placeName>Bereggi</placeName>.
+             Virgin and child. It came from a suppressed convent in <placeName ref="#Verona">
+             Verona</placeName> - and is claimed to be by one of <persName ref="#Nicola_Pisano">Pisanos</persName>.
+             He has also bought some lovely frames and a cassone from <placeName ref="#Bergeggi">Bereggi</placeName>.
          </p>
       </div>
       <div xml:id="EBA-1902-04-30" type="entry">
@@ -2245,15 +2247,15 @@
             <date when="1902-04-30">Friday, April 30th</date>.
          </dateline>
          <p>
-            Left <placeName>Venice</placeName> this morning, 2 P.M. most reluctantly, and
-             arrived here at <placeName>Verona</placeName>, <name>Hotel
+            Left <placeName ref="#Venice">Venice</placeName> this morning, 2 P.M. most reluctantly, and
+             arrived here at <placeName ref="#Verona">Verona</placeName>, <name type="hotel" ref="#Hotel_de_Londres">Hotel
              de Londres</name>, at 5:30. Our hotel is comfortable enough - not cheerful - and very
-             frigid. The town looks tremendously interesting - <persName>Mary</persName>
-             and I walked a short distance from here and found the <placeName>
-            Scaliger</placeName> tombs - the great square of <placeName>Signoria</placeName>,
-             the ancient palace of the <placeName>Padesta</placeName> - many curious
+             frigid. The town looks tremendously interesting - <persName ref="#Newberry_Mary">Mary</persName>
+             and I walked a short distance from here and found the <placeName ref="#Scaliger_Tombs">
+             Scaliger tombs</placeName> - the great square of <placeName ref="#Piazza_della_Signoria">Signoria</placeName>,
+             the ancient palace of the <placeName ref="#Palazzo_del_Podestà">Padesta</placeName> - many curious
              and ancient forms of architecture and home by the busy and quaint
-             <placeName>Piazza d'Erhe</placeName>, now a market.
+             <placeName ref="#Piazza_d'Erbe">Piazza d'Erhe</placeName>, now a market.
          </p>
       </div>
       <div xml:id="EBA-1902-05-02" type="entry">
@@ -2261,50 +2263,50 @@
             <date when="1902-05-02">Friday, May 2</date>.
          </dateline>
          <p>
-            We are off for <name>Milan</name> this afternoon - have found <placeName>
+            We are off for <placeName ref="#Duomo_di_Milano">Milan</placeName> this afternoon - have found <placeName ref="#Verona">
             Verona</placeName> delightfully interesting. Spent yesterday at the
-             <placeName>Gallery</placeName>, where there are some good things - and
-             then went to the great old church of <persName>S. Zeno</persName>, about
+             <placeName ref="#Uffizi_Gallery">Gallery</placeName>, where there are some good things - and
+             then went to the great old church of <persName ref="#Basilica_di_San_Zeno">S. Zeno</persName>, about
              which I had read and know from photographs - wonderful bronze doors - carvings - grand
-             effects - mediaeval features. <persName>Mantegna</persName>'s
-             great enthroned <name>Madonna and Saints</name> - which
-             <persName>Napoleon</persName> kindly conveyed to <placeName>
-            Paris</placeName>, but which was returned afterwards to <placeName>
-            Italy</placeName>. After lunch, to the <placeName>Duomo</placeName>
-             - <placeName>Baptistry</placeName> - wonderful Roman pavement, discovered
+             effects - mediaeval features. <persName ref="#Andrea_Mantegna">Mantegna</persName>'s
+             great enthroned Madonna and Saints - which
+             <persName ref="#Napoleon_Bonaparte">Napoleon</persName> kindly conveyed to <placeName ref="#Paris">
+             Paris</placeName>, but which was returned afterwards to <placeName ref="#Italy">
+             Italy</placeName>. After lunch, to the <placeName ref="#Duomo_di_Milano">Duomo</placeName>
+             - Baptistry - wonderful Roman pavement, discovered
              under the cloister and then for a fine drive into the country - with all
-             <placeName>Verona</placeName> and its surroundings - and the splendid
-             sweep of blue, blue mountains with the <placeName>Tyrolean
+             <placeName ref="#Verona">Verona</placeName> and its surroundings - and the splendid
+             sweep of blue, blue mountains with the <placeName ref="#Tyrolean_Alps">Tyrolean
              Alps</placeName> covered with snow
          </p>
       </div>
       <div xml:id="EBA-1902-05-04" type="entry">
          <dateline>
             Rogation Sunday - <date when="1902-05-04">May 4</date> -
-             <name type="hotel">Hotel Cavour</name> - <placeName>Milan</placeName>.
+             <name type="hotel">Hotel Cavour</name> - <placeName ref="#Duomo_di_Milano">Milan</placeName>.
          </dateline>
          <p>
-            A charming ride from <placeName>Verona</placeName> on Friday - with the chain of
-             the snow covered <placeName>Alps</placeName> with us all the way - arrived at
+            A charming ride from <placeName ref="#Verona">Verona</placeName> on Friday - with the chain of
+             the snow covered <placeName ref="#Tyrolean_Alps">Alps</placeName> with us all the way - arrived at
              7:30 - found our old rooms in readiness - fire - dinner table all ready, with its
              shining silver, and spotless linen. This is certainly the best and most comfortable
              hotel in Europe! We spent all day yesterday in stony galleries - the morning at the
-             <placeName>Brera</placeName> which is undergoing great changes and
-             improvements; the afternoon at the <placeName>Museo Lapidario</placeName>
-             in the old <placeName>Castle</placeName> - the home of the
-             <orgName>Viscontis</orgName> and <placeName>Sforzas</placeName>
+             <placeName ref="#Brera">Brera</placeName> which is undergoing great changes and
+             improvements; the afternoon at the <placeName ref="#Museo_Lapidario">Museo Lapidario</placeName>
+             in the old <placeName ref="#Visconti_Castle">Castle</placeName> - the home of the
+             <persName ref="#Visconti_family">Viscontis</persName> and <placeName ref="#Sforza_family">Sforzas</placeName>
              - enormously interesting - I saw for the first time the beautiful monument of
-             <placeName>Caston de Foix</placeName> - and so many charming and
+             <persName ref="#Gaston_de_Foix">Caston de Foix</persName> - and so many charming and
              interesting sculptures - afterwards we had a drive. <persName ref="#Sayce_Archibald">Mr.
              Sayce</persName> who came here the same day we did, called soon after breakfast - and
              came to dine. This morning it rained and was cold, and I stayed at home, with
-             <persName>Mary</persName>, who is not very well. <persName ref="#Sayce_Archibald">Mr.
+             <persName ref="#Newberry_Mary">Mary</persName>, who is not very well. <persName ref="#Sayce_Archibald">Mr.
              Sayce</persName> came in to say goodbye - and sat some time - we started soon after
-             for <placeName ref="#London">London</placeName>. <persName>Marie Gwynne</persName>
+             for <placeName ref="#London">London</placeName>. <persName ref="#Gwynne_Maria">Marie Gwynne</persName>
              came to lunch - and went out with <persName ref="#Davis_Theodore_M">Theodore</persName> and
-             <persName>Bessie</persName> to see <persName>S. Eustorgio</persName>
-             and <persName>S. Lorenzo.</persName> It has poured with rain this afternoon.
-             Tomorrow we go over to <name>Lucerno</name>.
+             <persName ref="#Koon_Bessie">Bessie</persName> to see <placeName ref="#Basílica_de_Sant'Eustorgio">S. Eustorgio</placeName>
+             and <placeName ref="#Basílica_de_Sant'Eustorgio">S. Lorenzo.</placeName> It has poured with rain this afternoon.
+             Tomorrow we go over to <persName ref="#Lucero">Lucerno</persName>.
          </p>
       </div>
       <div xml:id="EBA-1902-05-06" type="entry">
@@ -2313,7 +2315,7 @@
          </dateline>
          <p>
             We had the most beautiful day yesterday - most of the morning at the
-             <placeName>Poldo-Pezzoli</placeName> - left <placeName>Milan</placeName>
+             <placeName>Poldo-Pezzoli</placeName> - left <placeName ref="#Duomo_di_Milano">Milan</placeName>
              at 12:30 in 2 comfortable compartments. The afternoon was warm, even hot - and we were
              glad to get into the shade of the big <placeName>St. Gotthard</placeName>
              tunnel. What was our astonishment to find on emerging from it, the snow falling fast
@@ -2331,7 +2333,7 @@
       </div>
       <div xml:id="EBA-1902-05-10" type="entry">
          <dateline>
-            <placeName>Paris</placeName> - <date when="1902-05-10">May 10th</date> - Saturday. <name>Hotel Westminster</name>.
+            <placeName ref="#Paris">Paris</placeName> - <date when="1902-05-10">May 10th</date> - Saturday. <name>Hotel Westminster</name>.
          </dateline>
          <p>
             We reached here the other day after a not very fatiguing ride - and were so glad to
@@ -2344,13 +2346,13 @@
             <date when="1902-05-17">Saturday, May 17th</date>.
          </dateline>
          <p>
-            This morning, <persName ref="#Davis_Theodore_M">Theodore</persName>, <persName>Constantini</persName>,
+            This morning, <persName ref="#Davis_Theodore_M">Theodore</persName>, <persName ref="#Constantini_David">Constantini</persName>,
              who is staying with us, and I spent the morning at the <placeName>
             Louvre</placeName>, in the <orgName>Renaissance Rooms</orgName> - how cold they
              were - we were perished on coming out - but what treasures! Rain all the time - took
              tea the other day with the <persName>Kerbs</persName> - he very suffering,
              poor man. <persName>Tom Whistler</persName> came in the evening.
-             <persName>Mathilde Boal</persName> in <placeName>Paris</placeName>,
+             <persName>Mathilde Boal</persName> in <placeName ref="#Paris">Paris</placeName>,
              managing her sister's wedding. She is here much of the time. <persName>
             Mrs. Davis</persName>, <persName>Sara Buttles</persName>, <persName>
             Pierre</persName> and <persName>his governess</persName> down in
@@ -2388,11 +2390,11 @@
             her sister</persName> and sister's fiance, <persName>M. Seychelle-Dulong</persName>
              came to say goodbye before we left, and <persName>Mathilde</persName> brought
              me some lovely pansies, from "my fazzer's little garden". We left poor
-             <persName>Mary</persName> in tears, but she was to go off directly to the old
+             <persName ref="#Newberry_Mary">Mary</persName> in tears, but she was to go off directly to the old
              place in <placeName>Rue Bassano</placeName>, now the <name>
             Hotel Belmont</name>, where she once spent a winter. <persName>Mrs.
              La Farge</persName> and <persName>Margaret</persName> are there, and
-             we hear almost daily from her. <persName>Lizzie</persName> and
+             we hear almost daily from her. <persName ref="#Buttles_Lizzie">Lizzie</persName> and
              <persName ref="#Buttles_Jeanette">Nettie</persName> leave <placeName ref="#Florence">Florence</placeName>
              on <date>June 2</date> - and they all meet at <placeName>
             Weisbaden</placeName>, and go on to <persName>Schwalback</persName> for
@@ -2400,7 +2402,7 @@
              London</placeName> - but I alas! have been staying indoors with my troublesome cough.
              <persName>Fielding</persName> lunched with us yesterday -
              <persName>Gaspard Farrer</persName> turned up on Monday - and asked
-             us all to dinner with him for last night. I couldn't go, and <persName>
+             us all to dinner with him for last night. I couldn't go, and <persName ref="#Koon_Bessie">
             Bessie</persName> stayed with me. <persName ref="#Davis_Theodore_M">Theodore</persName> went,
              and had a jolly time - old <persName>Sir William</persName> was there,
              alert and vigorous as ever, except for his lameness. We like this hotel immensely -
@@ -2418,7 +2420,7 @@
             Such a dull story to tell - in doors all the time - weather bad and cold -
              <persName ref="#Weigall_Arthur">Weigall</persName> came to tea yesterday - and to lunch
              today. <persName>Fielding</persName> here too - and this afternoon
-             <persName>Bessie</persName> and I went out in a closed carriage - and
+             <persName ref="#Koon_Bessie">Bessie</persName> and I went out in a closed carriage - and
              left cards on the <persName>Farrers</persName> and <placeName>
             Denbighs</placeName> - <persName>Miss Farrer</persName> having been here,
              and I having to decline even lunch - and not able to see
