@@ -5,6 +5,7 @@ using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sentry.data.Web.Tests
 {
@@ -172,6 +173,186 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(DateTime.Parse("2021-12-15 15:15:00"), dto.CreatedDTM);
             Assert.AreEqual(DateTime.Parse("2021-12-15 15:15:00"), dto.LastUpdatedDTM);
             Assert.AreEqual("Object", dto.JsonSchemaObject);
+        }
+
+        [TestMethod]
+        public void ToDto_FilterSearchModel_DaleSearchDto()
+        {
+            FilterSearchModel model = new FilterSearchModel()
+            {
+                SearchText = "Search",
+                FilterCategories = new List<FilterCategoryModel>()
+                {
+                    new FilterCategoryModel()
+                    {
+                        CategoryName = "Category",
+                        CategoryOptions = new List<FilterCategoryOptionModel>()
+                        {
+                            new FilterCategoryOptionModel()
+                            {
+                                OptionValue = "Value",
+                                ResultCount = 10,
+                                ParentCategoryName = "Category",
+                                Selected = true
+                            },
+                            new FilterCategoryOptionModel()
+                            {
+                                OptionValue = "Value2",
+                                ResultCount = 4,
+                                ParentCategoryName = "Category",
+                                Selected = false
+                            }
+                        }
+                    },
+                    new FilterCategoryModel()
+                    {
+                        CategoryName = "Category2",
+                        CategoryOptions = new List<FilterCategoryOptionModel>()
+                        {
+                            new FilterCategoryOptionModel()
+                            {
+                                OptionValue = "Value",
+                                ResultCount = 5,
+                                ParentCategoryName = "Category2",
+                                Selected = false
+                            },
+                            new FilterCategoryOptionModel()
+                            {
+                                OptionValue = "Value2",
+                                ResultCount = 9,
+                                ParentCategoryName = "Category2",
+                                Selected = false
+                            }
+                        }
+                    }
+                }
+            };
+
+            DaleSearchDto dto = model.ToDto();
+
+            Assert.AreEqual("Search", dto.Criteria);
+            Assert.AreEqual(2, dto.FilterCategories.Count);
+
+            FilterCategoryDto categoryDto = dto.FilterCategories.First();
+            Assert.AreEqual("Category", categoryDto.CategoryName);
+            Assert.AreEqual(2, categoryDto.CategoryOptions.Count);
+
+            FilterCategoryOptionDto optionDto = categoryDto.CategoryOptions.First();
+            Assert.AreEqual("Value", optionDto.OptionValue);
+            Assert.AreEqual(10, optionDto.ResultCount);
+            Assert.AreEqual("Category", optionDto.ParentCategoryName);
+            Assert.IsTrue(optionDto.Selected);
+
+            optionDto = categoryDto.CategoryOptions.Last();
+            Assert.AreEqual("Value2", optionDto.OptionValue);
+            Assert.AreEqual(4, optionDto.ResultCount);
+            Assert.AreEqual("Category", optionDto.ParentCategoryName);
+            Assert.IsFalse(optionDto.Selected);
+
+            categoryDto = dto.FilterCategories.Last();
+            Assert.AreEqual("Category2", categoryDto.CategoryName);
+            Assert.AreEqual(2, categoryDto.CategoryOptions.Count);
+
+            optionDto = categoryDto.CategoryOptions.First();
+            Assert.AreEqual("Value", optionDto.OptionValue);
+            Assert.AreEqual(5, optionDto.ResultCount);
+            Assert.AreEqual("Category2", optionDto.ParentCategoryName);
+            Assert.IsFalse(optionDto.Selected);
+
+            optionDto = categoryDto.CategoryOptions.Last();
+            Assert.AreEqual("Value2", optionDto.OptionValue);
+            Assert.AreEqual(9, optionDto.ResultCount);
+            Assert.AreEqual("Category2", optionDto.ParentCategoryName);
+            Assert.IsFalse(optionDto.Selected);
+        }
+
+        [TestMethod]
+        public void ToModel_FilterSearchDto_FilterSearchModel()
+        {
+            FilterSearchDto dto = new FilterSearchDto()
+            {
+                FilterCategories = new List<FilterCategoryDto>()
+                {
+                    new FilterCategoryDto()
+                    {
+                        CategoryName = "Category",
+                        CategoryOptions = new List<FilterCategoryOptionDto>()
+                        {
+                            new FilterCategoryOptionDto()
+                            {
+                                OptionValue = "Value",
+                                ResultCount = 10,
+                                ParentCategoryName = "Category",
+                                Selected = true
+                            },
+                            new FilterCategoryOptionDto()
+                            {
+                                OptionValue = "Value2",
+                                ResultCount = 4,
+                                ParentCategoryName = "Category",
+                                Selected = false
+                            }
+                        }
+                    },
+                    new FilterCategoryDto()
+                    {
+                        CategoryName = "Category2",
+                        CategoryOptions = new List<FilterCategoryOptionDto>()
+                        {
+                            new FilterCategoryOptionDto()
+                            {
+                                OptionValue = "Value",
+                                ResultCount = 5,
+                                ParentCategoryName = "Category2",
+                                Selected = false
+                            },
+                            new FilterCategoryOptionDto()
+                            {
+                                OptionValue = "Value2",
+                                ResultCount = 9,
+                                ParentCategoryName = "Category2",
+                                Selected = false
+                            }
+                        }
+                    }
+                }
+            };
+
+            FilterSearchModel model = dto.ToModel();
+
+            Assert.AreEqual(2, model.FilterCategories.Count);
+
+            FilterCategoryModel categoryModel = model.FilterCategories.First();
+            Assert.AreEqual("Category", categoryModel.CategoryName);
+            Assert.AreEqual(2, categoryModel.CategoryOptions.Count);
+
+            FilterCategoryOptionModel optionModel = categoryModel.CategoryOptions.First();
+            Assert.AreEqual("Value", optionModel.OptionValue);
+            Assert.AreEqual(10, optionModel.ResultCount);
+            Assert.AreEqual("Category", optionModel.ParentCategoryName);
+            Assert.IsTrue(optionModel.Selected);
+
+            optionModel = categoryModel.CategoryOptions.Last();
+            Assert.AreEqual("Value2", optionModel.OptionValue);
+            Assert.AreEqual(4, optionModel.ResultCount);
+            Assert.AreEqual("Category", optionModel.ParentCategoryName);
+            Assert.IsFalse(optionModel.Selected);
+
+            categoryModel = model.FilterCategories.Last();
+            Assert.AreEqual("Category2", categoryModel.CategoryName);
+            Assert.AreEqual(2, categoryModel.CategoryOptions.Count);
+
+            optionModel = categoryModel.CategoryOptions.First();
+            Assert.AreEqual("Value", optionModel.OptionValue);
+            Assert.AreEqual(5, optionModel.ResultCount);
+            Assert.AreEqual("Category2", optionModel.ParentCategoryName);
+            Assert.IsFalse(optionModel.Selected);
+
+            optionModel = categoryModel.CategoryOptions.Last();
+            Assert.AreEqual("Value2", optionModel.OptionValue);
+            Assert.AreEqual(9, optionModel.ResultCount);
+            Assert.AreEqual("Category2", optionModel.ParentCategoryName);
+            Assert.IsFalse(optionModel.Selected);
         }
     }
 }

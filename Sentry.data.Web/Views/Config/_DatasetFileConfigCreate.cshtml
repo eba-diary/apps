@@ -109,10 +109,14 @@
                             <span class="text-muted">Specify schema root element path (<a href="@Sentry.data.Core.GlobalConstants.DocumentationLinks.SCHEMA_ROOT_PATH_USAGE" target="_blank">usage documentation</a>)</span>
                         </div>
                     </div>
+
                     <div class="delimiterPanel">
-                        @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
-                        <div class="col-md-4">
-                            @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
+                        <div class="form-group delimiter">
+                            @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
+                            <div class="col-md-4">
+                                @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
+                                @Html.ValidationMessageFor(model => model.Delimiter, "", new { @class = "text-danger" })
+                            </div>
                         </div>
 
                         <div class="col-md-5 col-md-offset-6">
@@ -124,15 +128,6 @@
                         </div>
                     </div>
                 </div>
-
-                @*<div class="form-group delimiter">
-
-            </div>
-
-            <div class="form-group fieldDescription delimiter delimiterDescription">
-                <label class="control-label col-md-2"></label>
-
-            </div>*@
 
                 <div class="form-group">
                     @Html.LabelFor(model => model.HasHeader, new { @class = "control-label col-md-2 optional" })

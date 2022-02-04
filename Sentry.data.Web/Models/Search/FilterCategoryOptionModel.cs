@@ -1,0 +1,19 @@
+﻿using System;
+
+namespace Sentry.data.Web
+{
+    public class FilterCategoryOptionModel
+    {
+        private readonly string _id = Guid.NewGuid().ToString();
+
+        public string OptionId
+        {
+            get => string.IsNullOrEmpty(ParentCategoryName) ? _id : ParentCategoryName.Replace(" ", "-") + "_" + _id;
+        }
+
+        public string OptionValue { get; set; }
+        public string ParentCategoryName { get; set; }
+        public long ResultCount { get; set; }
+        public bool Selected { get; set; }
+    }
+}

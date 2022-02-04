@@ -25,5 +25,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA3541_Dataset_Details_Tabs { get; }
         IFeatureFlag<bool> CLA3605_AllowSchemaParquetUpdate { get; }
         IFeatureFlag<string> CLA3707_DataInventorySource { get; }
+        IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY { get; }
     }
 }
