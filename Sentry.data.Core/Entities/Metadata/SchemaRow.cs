@@ -29,5 +29,6 @@ namespace Sentry.data.Core
         public bool DeleteInd { get; set; }
         public bool IsArray { get; set; }
         public Guid FieldGuid { get; set; }
+        public string DotNamePath { get; set; }
     }
 }

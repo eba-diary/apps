@@ -44,14 +44,8 @@ namespace Sentry.data.Web
             this.CanDisplay = ds.CanDisplay;
             this.DatasetInformation = ds.DatasetInformation;
 
-            this.IsPushToTableauCompatible = false;
             this.DatasetCategory = ds.DatasetCategories.First();
-            this.DatasetFiles = new List<BaseDatasetFileModel>();
-
-            foreach (DatasetFile df in ds.DatasetFiles.OrderByDescending(x => x.CreateDTM))
-            {
-                this.DatasetFiles.Add(new BaseDatasetFileModel(df));
-            }
+            
 
             this.DatasetScopeType = ds.DatasetScopeType;
 
@@ -78,16 +72,7 @@ namespace Sentry.data.Web
             this.DropLocations = locations;
 
 
-            if (this.DistinctFileExtensions().Where(w => Utilities.IsExtentionPushToSAScompatible(w)).Count() > 0)
-            { this.IsPushToSASCompatible = true; }
-            else
-            { this.IsPushToSASCompatible = false; }
-
-            if (this.DistinctFileExtensions().Where(w => Utilities.IsExtentionPreviewCompatible(w)).Count() > 0)
-            { this.IsPreviewCompatible = true; }
-            else
-            { this.IsPreviewCompatible = false; }
-
+            
             if (!String.IsNullOrWhiteSpace(ds.DatasetType) && ds.DatasetType == GlobalConstants.DataEntityCodes.REPORT)
             {
                 List<MetadataTag> tagList = new List<MetadataTag>();
@@ -112,16 +97,7 @@ namespace Sentry.data.Web
 
         }
 
-        public List<string> DistinctFileExtensions()
-        {
-            List<string> extensions = new List<string>();
-            foreach (BaseDatasetFileModel item in this.DatasetFiles)
-            {
-                extensions.Add(Utilities.GetFileExtension(item.FileName));
-            }
-            return extensions.Distinct().ToList();
-        }
-
+       
 
         public int DatasetId { get; set; }
 
@@ -204,17 +180,12 @@ namespace Sentry.data.Web
 
         public Boolean CanEditDataset { get; set; }
         public Boolean CanUpload { get; set; }
-        public Boolean IsPushToSASCompatible { get; set; }
-        public Boolean IsPushToTableauCompatible { get; set; }
         public Boolean IsPreviewCompatible { get; set; }
         public Boolean CanQueryTool { get; set; }
         public Boolean CanManageReport { get; set; }
 
         public Boolean IsSubscribed { get; set; }
         public Category DatasetCategory { get; set; }
-
-
-        public IList<BaseDatasetFileModel> DatasetFiles { get; set; }
 
         [DisplayName("Dataset Scope")]
         public List<DatasetScopeType> DatasetScopeType { get; set; }

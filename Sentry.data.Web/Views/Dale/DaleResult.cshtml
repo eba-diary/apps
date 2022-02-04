@@ -1,7 +1,6 @@
-﻿@model DaleSearchModel
+﻿@model bool
 
-<div id="daleContainer" style="display:none; margin-top:25px; overflow-x: auto;">
-
+<div id="daleContainer" style="display:none;">
     <table class="table table-striped table-bordered blue" id="daleResultsTable" style="width:100%">
         <thead>
             <tr class="filter-row">
@@ -11,11 +10,6 @@
                 <td></td>
                 <td></td>
                 <td></td>
-
-                <td></td>
-                <td></td>
-                <td></td>
-
                 <td></td>
                 <td></td>
                 <td></td>
@@ -23,16 +17,16 @@
                 <td></td>
                 <td></td>
                 <td></td>
-
+                <td></td>
+                <td></td>
+                <td></td>
             
                 @*ONLY SHOW NEW COLUMNS IF FEATURE FLAG IS TRUE*@
-                @if (Model.CLA3550_DATA_INVENTORY_NEW_COLUMNS)
+                @if (Model)
                 {
                     <td></td>
                     <td></td>
                 }
-
-
             </tr>
 
             <tr class="table-header_blue categoryBanner-blue">
@@ -42,11 +36,9 @@
                 <th>Table/View Name</th>
                 <th>Type</th>
                 <th>Column</th>
-
                 <th>Is Sensitive</th>
                 <th>Owner Verified</th>
                 <th>Server Type</th>
-
                 <th>Datatype</th>
                 <th>Length</th>
                 <th>Precision</th>
@@ -55,15 +47,12 @@
                 <th>Discovery Date</th>
                 <th>Source Type</th>
 
-
                 @*ONLY SHOW NEW COLUMNS IF FEATURE FLAG IS TRUE*@
-                @if (Model.CLA3550_DATA_INVENTORY_NEW_COLUMNS)
+                @if (Model)
                 {
                     <th>Scan Category</th>
                     <th>Scan Type</th>
                 }
-
-
             </tr>
         </thead>
     </table>

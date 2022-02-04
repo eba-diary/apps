@@ -3,6 +3,7 @@
 
     sensitive: false,                                                                   //declare a property within the data.Dale that essentially represents a global var that all functions can use within data.Dale to set whether sensitive or not
     currentSearchType: 'BASIC',
+    usingSqlSource: true,
 
     init: function ()
     {
@@ -17,6 +18,8 @@
             dataType: 'json',
             success: function (obj) {
                 data.Dale.dataTablCreate(obj);
+
+                data.Dale.usingSqlSource = obj.CLA3707_UsingSQLSource;
 
                 if (!obj.canDaleSensitiveView) {
                     data.Dale.makeToast("error", "All results may not be displayed. Additional permission is needed to view columns marked as sensitive. Please click the Data Inventory info icon for more information.");
@@ -147,7 +150,7 @@
         $("#daleResultsTable").DataTable({
 
             //client side setup
-            pageLength: 100,
+            pageLength: 25,
 
             //ON table creation or refresh this AJAX code is called to fill grid
             ajax: {
@@ -163,14 +166,13 @@
                     d.objectType = $('#daleObjectType').val();
                     d.column = $('#daleColumn').val();
                     d.sourceType = $('#daleSourceType').val();
-                    d.sensitive = data.Dale.sensitive;
+                    d.sensitive = data.Dale.getIsSensitive();
                 }
             },
 
             columns: [
                 {
-                    data: null, className: "Asset", render: function (data)
-                    {
+                    data: null, className: "Asset", render: function (data) {
                         //the following render func is called for every single row column and passes in data as the specific value.  our func body below will insert our list of assets as links
                         if (data.AssetList != null) {
 
@@ -191,8 +193,8 @@
                 },
 
                 { data: "Server", className: "Server" },
-                { data: "Database", className: "Database", width: "15%"},
-                { data: "Object", className: "Object", width: "15%"},
+                { data: "Database", className: "Database", width: "15%" },
+                { data: "Object", className: "Object", width: "15%" },
                 { data: "ObjectType", className: "ObjectType" },
                 { data: "Column", className: "ColumnMan" },
 
@@ -201,7 +203,7 @@
                 //Since I did not want user to see label text and still have a filter.  My cheat to this was to style label with display:none while still keeping the filtering ability
                 //later on when they check/uncheck the box my editRow() function will refresh the data associated with the grid which changes the label hidden text to the opposite so filtering can refresh
                 {
-                    data: null, className: "IsSensitive", visible: false,  render: function (d) {
+                    data: null, className: "IsSensitive", visible: false, render: function (d) {
 
                         //the below code is a way to not have to repeat the html checkbox creation below because it can be disabled or checked based on whether they can edit or if its IsSensitive
                         var disabled = '';
@@ -210,12 +212,11 @@
 
                         //NOTE: DISABLE for the following scenarios: (1)no permissions to sensitive (2)have permission to sensitive but no permissions to owner and owner has been checked
                         //basically if they don't have permissions to owner verify and owner verified is checked, then don't let them change IsSensitive
-                        if (!obj.canDaleSensitiveEdit || ( obj.canDaleSensitiveEdit && !obj.canDaleOwnerVerifiedEdit && d.IsOwnerVerified ) )
-                        {
+                        if (!obj.canDaleSensitiveEdit || (obj.canDaleSensitiveEdit && !obj.canDaleOwnerVerifiedEdit && d.IsOwnerVerified) || !obj.CLA3707_UsingSQLSource) {
                             disabled = ' disabled="disabled" ';
                         }
 
-                        if (d.IsSensitive){
+                        if (d.IsSensitive) {
                             checked = ' checked="checked" ';
                             cellValue = 'true';
                         }
@@ -260,16 +261,16 @@
                 { data: "ScanType", className: "ScanType", width: "20%", visible: false }
             ],
 
-            aLengthMenu: [
-                [20, 100, 500],
-                [20, 100, 500]
-            ],
+            aLengthMenu: [10, 25, 100, 500],
 
-            order: [2, 'desc'],
+            order: [],
 
             //style for columnVisibility and paging to show
-            dom: 'Blrtip',
-
+            dom: "<'row'<'col-xs-12'i>>" +
+                "<'row'<'col-xs-6'l><'col-xs-6 text-right'B>>" +
+                "<'row'<'col-xs-12'tr>>" +
+                "<'row'<'col-xs-12 text-center'p>>",
+            
             //buttons to show and customize text for them
             buttons:
                 [
@@ -452,6 +453,16 @@
         }
 
         return daleDestiny;
+    },
+
+    //figure out if BASIC OR ADVANCED Destiny
+    getIsSensitive: function () {
+        if (data.Dale.usingSqlSource) {
+            return data.Dale.sensitive;
+        }
+        else {
+            return $('#daleSensitive').is(':checked');
+        }
     },
 
     //disable all controls user can hit during search

@@ -68,7 +68,10 @@ namespace Sentry.data.Infrastructure
             return daleResult;
         }
 
-        
+        public FilterSearchDto GetSearchFilters(DaleSearchDto dto)
+        {
+            throw new NotImplementedException();
+        }
 
         private string BuildAQuery(DaleSearchDto dto, ref SqlCommand command)
         {
@@ -136,44 +139,44 @@ namespace Sentry.data.Infrastructure
         //NOTE!! only add params if they are used
         private string AddAllAdvancedParams(DaleAdvancedCriteriaDto advanced, ref SqlCommand command)
         {
-            string qWhereStatement = String.Empty;
+            string qWhereStatement = string.Empty;
 
-            if(advanced.AssetIsValid)
+            if (!string.IsNullOrWhiteSpace(advanced.Asset))
             {
                 qWhereStatement = AddSingleAdvancedParam(qWhereStatement, "Asset_CDE", advanced.Asset, ref command);
             }
 
-            if (advanced.ServerIsValid)
+            if (!string.IsNullOrWhiteSpace(advanced.Server))
             {
                 qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Server_NME", advanced.Server, ref command);
             }
 
-            if (advanced.DatabaseIsValid)
+            if (!string.IsNullOrWhiteSpace(advanced.Database))
             {
                 qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Database_NME", advanced.Database, ref command);
             }
 
-            if (advanced.ObjectIsValid)
+            if (!string.IsNullOrWhiteSpace(advanced.Object))
             {
                 qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Base_NME", advanced.Object, ref command);
             }
 
-            if (advanced.ObjectTypeIsValid)
+            if (!string.IsNullOrWhiteSpace(advanced.ObjectType))
             {
                 qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Type_DSC", advanced.ObjectType, ref command);
             }
 
-            if (advanced.ColumnIsValid)
+            if (!string.IsNullOrWhiteSpace(advanced.Column))
             {
                 qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Column_NME", advanced.Column, ref command);
             }
 
-            if (advanced.SourceTypeIsValid)
+            if (!string.IsNullOrWhiteSpace(advanced.SourceType))
             {
                 qWhereStatement += AddSingleAdvancedParam(qWhereStatement, "Source_NME", advanced.SourceType, ref command);
             }
 
-            if (!String.IsNullOrWhiteSpace(qWhereStatement))
+            if (!string.IsNullOrWhiteSpace(qWhereStatement))
             {
                 qWhereStatement = " WHERE " + qWhereStatement + " AND Expiration_DTM IS NULL";
             }
@@ -412,7 +415,6 @@ namespace Sentry.data.Infrastructure
                     while (reader.Read())
                     {
                         daleResult.DaleCategories.Add(CreateCategoryResult(reader));
-
                     }
 
                     reader.Close();

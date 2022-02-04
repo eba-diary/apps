@@ -1,8 +1,7 @@
 ﻿namespace Sentry.data.Core
 {
     public static class GlobalConstants
-    {
-        
+    {        
         public static class System
         {
             public const string NAME = "Data.Sentry.Com";
@@ -34,19 +33,17 @@
             public const string EDITED_DATA_FILE = "Edited Data File";
 
             public const string VIEWED_REPORT = "Viewed Report";
-            public const string CREATED_REPORT = "Created Report";
             public const string UPDATED_REPORT = "Updated Report";
             public const string DELETED_REPORT = "Deleted Report";
             public const string DOWNLOADED_REPORT = "Downloaded Report";
 
             public const string VIEWED_DATASET = "Viewed Dataset";
-            public const string CREATED_DATASET = "Created Dataset";
             public const string UPDATED_DATASET = "Updated Dataset";
             public const string DELETE_DATASET = "Deleted Dataset";
 
             public const string DELETE_DATASET_SCHEMA = "Deleted Dataset Schema";
             public const string SYNC_DATASET_SCHEMA = "Sync Schema";
-            public const string CREATE_DATASET_SCHEMA = "Created Dataset Schema";
+            
 
             public const string CREATED_TAG = "Created Tag";
             public const string UPDATED_TAG = "Updated Tag";
@@ -68,6 +65,11 @@
 
             public const string DALE_SEARCH = "DaleQuery";
 
+
+            //DSC NOTIFICATION FEED EVENTS
+            public const string CREATED_REPORT = "Created Report";
+            public const string CREATED_DATASET = "Created Dataset";
+            public const string CREATE_DATASET_SCHEMA = "Created Dataset Schema";
             public const string NOTIFICATION_DSC_RELEASE_NOTES = "Release Notes";
             public const string NOTIFICATION_DSC_TECH_DOC = "Technical Documentation";
             public const string NOTIFICATION_DSC_NEWS = "News";
@@ -378,5 +380,24 @@
             public const string DATA = "DATA_";
         }
 
+        public static class ElasticAliases
+        {
+            public const string DATA_INVENTORY = "data-inventory";
+        }
+
+        public static class FilterCategoryNames
+        {
+            public const string ASSET = "Asset";
+            public const string TABLEVIEWNAME = "Table/View Name";
+            public const string COLUMN = "Column";
+            public const string DATATYPE = "Datatype";
+            public const string DATABASE = "Database";
+            public const string NULLABLE = "Nullable";
+            public const string SENSITIVE = "Sensitive";
+            public const string ENVIRONMENT = "Environment";
+            public const string SERVER = "Server";
+            public const string SOURCETYPE = "Source Type";
+            public const string TYPE = "Type";
+        }
     }
 }

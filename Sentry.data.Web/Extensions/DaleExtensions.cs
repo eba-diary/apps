@@ -35,26 +35,13 @@ namespace Sentry.data.Web
 
             return new DaleAdvancedCriteriaDto()
             {
-                Asset = model.Asset,
-                AssetIsValid = model.AssetIsValid,
-                
+                Asset = model.Asset,                
                 Server = model.Server,
-                ServerIsValid = model.ServerIsValid,
-
                 Database = model.Database,
-                DatabaseIsValid = model.DatabaseIsValid,
-
                 Object = model.Object,
-                ObjectIsValid = model.ObjectIsValid,
-
                 ObjectType = model.ObjectType,
-                ObjectTypeIsValid = model.ObjectTypeIsValid,
-
                 Column = model.Column,
-                ColumnIsValid = model.ColumnIsValid,
-
-                SourceType = model.SourceType,
-                SourceTypeIsValid = model.SourceTypeIsValid
+                SourceType = model.SourceType
             };
         }
 

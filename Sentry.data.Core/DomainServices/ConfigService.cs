@@ -87,11 +87,6 @@ namespace Sentry.data.Core
                 errors.Add("File Extension CSV and it's delimiter do not match.");
             }
 
-            if (currentFileExtension == "delimited" && string.IsNullOrWhiteSpace(dto.Delimiter))
-            {
-                errors.Add("File Extension Delimited is missing it's delimiter.");
-            }
-
             if (dto.Name == null)
             {
                 errors.Add("Configuration Name is required.");
@@ -1197,7 +1192,7 @@ namespace Sentry.data.Core
             if (_featureFlags.CLA3332_ConsolidatedDataFlows.GetValue())
             {
                 //Get DataFlow id which populates data to schema
-                int schemaDataFlowId = _datasetContext.DataFlow.Where(w => w.SchemaId == config.Schema.SchemaId).Select(s => s.Id).FirstOrDefault();
+                int schemaDataFlowId = _datasetContext.DataFlow.Where(w => w.SchemaId == config.Schema.SchemaId && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Select(s => s.Id).FirstOrDefault();
                 if (schemaDataFlowId != 0)
                 {
                     DataFlowDetailDto schemaFlowDto = _dataFlowService.GetDataFlowDetailDto(schemaDataFlowId);

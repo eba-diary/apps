@@ -13,6 +13,7 @@ namespace Sentry.data.Core
         public virtual string AbbreviatedName { get; set; }
 
         //ISecurable Impl.
+        public virtual string PrimaryOwnerId { get; set; }
         public virtual string PrimaryContactId { get; set; }
         public virtual bool IsSecured { get; set; }
         public virtual Security Security { get; set; }

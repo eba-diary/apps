@@ -2,9 +2,9 @@
 
 namespace Sentry.data.Core
 {
-    public class DaleResultDto
+    public class DaleResultDto : DaleEventableDto
     {
-        public List<DaleResultRowDto> DaleResults { get; set; }
-        public DaleEventDto DaleEvent { get; set; }
+        public long SearchTotal { get; set; }
+        public List<DaleResultRowDto> DaleResults { get; set; } = new List<DaleResultRowDto>();
     }
 }

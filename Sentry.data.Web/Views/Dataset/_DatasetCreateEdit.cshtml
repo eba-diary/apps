@@ -298,6 +298,7 @@
                             @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
                             <div class="col-md-10">
                                 @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
+                                @Html.ValidationMessageFor(model => model.Delimiter, "", new { @class = "text-danger" })
                             </div>
                         </div>
 
