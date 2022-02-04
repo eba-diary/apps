@@ -106,7 +106,7 @@ namespace Sentry.data.Web.Tests
 
             var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, 
                 mockAssociateService, mockObsidianService, mockDatasetService, mockEventService, mockConfigService,
-                mockFeatureFlag, null, null, null);
+                mockFeatureFlag, null, null, null, null);
             dsc.SharedContext = mockSharedContextModel;
 
             return dsc;
@@ -155,7 +155,8 @@ namespace Sentry.data.Web.Tests
 
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());
 
-            var cc = new ConfigController(mockDatasetContext, mockUserService, mockAssociateService, mockConfigService, mockEvensService, mockDatasetService, mockObsidianService, mockSecurityService, mockSchemaService, mockDataFeatures);
+            var cc = new ConfigController(mockDatasetContext, mockUserService, mockAssociateService, mockConfigService, mockEvensService, 
+                mockDatasetService, mockObsidianService, mockSecurityService, mockSchemaService, mockDataFeatures, null);
             cc.SharedContext = mockSharedContextModel;
 
             return cc;

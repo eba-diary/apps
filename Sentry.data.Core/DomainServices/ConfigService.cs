@@ -394,7 +394,9 @@ namespace Sentry.data.Core
                 FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId),
                 DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
                 //Schemas = deList,
-                ObjectStatus = dto.ObjectStatus
+                ObjectStatus = dto.ObjectStatus,
+                DeleteIssuer = null,
+                DeleteIssueDTM = DateTime.MaxValue
             };
             dfc.IsSchemaTracked = true;
             dfc.Schema = _datasetContext.GetById<FileSchema>(dto.SchemaId);
@@ -491,7 +493,14 @@ namespace Sentry.data.Core
             return string.Empty;
         }
 
-        public bool Delete(int id, bool logicalDelete = true, bool parentDriven = false)
+        /// <summary>
+        /// Config delete
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="user"></param>
+        /// <param name="logicalDelete"></param>
+        /// <returns></returns>
+        public bool Delete(int id, IApplicationUser user, bool logicalDelete)
         {            
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
 
@@ -535,8 +544,6 @@ namespace Sentry.data.Core
 
                     /* Mark schema object for delete */
                     MarkForDelete(scm);
-
-                    _datasetContext.SaveChanges();
                 }
                 catch (Exception ex)
                 {
@@ -563,34 +570,13 @@ namespace Sentry.data.Core
                 Logger.Info($"configservice-delete-physical - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                 try
                 {
-                    //Ensure all associated RetrieverJobs are disabled
-                    //TODO: CLA-2765 - Revist adding ObjectStatus to RetrieverJobs
-                    //TODO: CLA-2765 - Revist moving Parquet files to glacier storage tier
-                    //TODO: CLA-2765 - Revist moving raw data files to glacier storage tier
-                    //TODO: CLA-2765 - Do Datasetfile records need an objectstatus?
-
-                    ////Delete associated dataflows\steps
-                    //Logger.Info($"configservice-delete-dataflowmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                    //_dataFlowService.DeleteByFileSchema(scm);
-
 
                     //Mark DatasetFileConfig record deleted
                     dfc.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
                     dfc.Schema.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
 
-                    /*
-                        *  Mark all dataflows, for deletion, associated with schema on new processing platform
-                        */
                     //Disable all retriever jobs, associated with schema flow
                     _dataFlowService.DeleteFlowsByFileSchema(scm, logicalDelete);
-
-                    //Logger.Info($"configservice-delete-configmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                    //if (!parentDriven)
-                    //{
-                    //    _datasetContext.Remove(dfc);
-                    //}
-
-                    _datasetContext.SaveChanges();
 
                 }
                 catch (Exception ex)

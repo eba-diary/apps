@@ -30,13 +30,14 @@ namespace Sentry.data.Web.Controllers
         private readonly ISecurityService _securityService;
         private readonly ISchemaService _schemaService;
         private readonly IDataFeatures _featureFlags;
+        private readonly Lazy<IDataApplicationService> _dataApplicationService;
         private string _bucket;
         private string _awsRegion;
 
         public ConfigController(IDatasetContext dsCtxt, UserService userService, IAssociateInfoProvider associateInfoService,
             IConfigService configService, IEventService eventService, IDatasetService datasetService, 
             IObsidianService obsidianService, ISecurityService securityService, ISchemaService schemaService, 
-            IDataFeatures dataFeatures)
+            IDataFeatures dataFeatures, Lazy<IDataApplicationService> dataApplicationService)
         {
             _cache = new CachingService();
             _datasetContext = dsCtxt;
@@ -49,6 +50,12 @@ namespace Sentry.data.Web.Controllers
             _securityService = securityService;
             _schemaService = schemaService;
             _featureFlags = dataFeatures;
+            _dataApplicationService = dataApplicationService;
+        }
+
+        private IDataApplicationService DataApplicationService
+        {
+            get { return _dataApplicationService.Value; }
         }
 
         [HttpGet]
@@ -229,7 +236,7 @@ namespace Sentry.data.Web.Controllers
 
                 if (us != null && us.CanEditDataset)
                 {
-                    bool IsDeleted = _configService.Delete(id);
+                    bool IsDeleted = DataApplicationService.DeleteDatasetFileConfig(new List<int>(id), SharedContext.CurrentUser);
                     if (!IsDeleted)
                     {
                         return Json(new { Success = false, Message = "Schema was not deleted" });

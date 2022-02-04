@@ -45,6 +45,7 @@ namespace Sentry.data.Web.Controllers
         private readonly ISAIDService _saidService;
         private readonly IJobService _jobService;
         private readonly NamedEnvironmentBuilder _namedEnvironmentBuilder;
+        private readonly Lazy<IDataApplicationService> _dataApplicationService;
 
         public DatasetController(
             IDatasetContext dsCtxt,
@@ -59,7 +60,8 @@ namespace Sentry.data.Web.Controllers
             IDataFeatures featureFlags, 
             ISAIDService saidService,
             IJobService jobService,
-            NamedEnvironmentBuilder namedEnvironmentBuilder)
+            NamedEnvironmentBuilder namedEnvironmentBuilder,
+            Lazy<IDataApplicationService> dataApplicationService)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
@@ -74,6 +76,12 @@ namespace Sentry.data.Web.Controllers
             _saidService = saidService;
             _jobService = jobService;
             _namedEnvironmentBuilder = namedEnvironmentBuilder;
+            _dataApplicationService = dataApplicationService;
+        }
+
+        private IDataApplicationService DataApplicationService
+        {
+            get { return _dataApplicationService.Value; }
         }
 
         public ActionResult Index()
@@ -155,12 +163,13 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
+
                 UserSecurity us = _datasetService.GetUserSecurityForDataset(id);
 
                 if (us.CanEditDataset)
                 {
                     //Issue logical delete
-                    _datasetService.Delete(id);
+                    DataApplicationService.DeleteDataset(new List<int>() { id }, SharedContext.CurrentUser);                    
                     _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.DELETE_DATASET, SharedContext.CurrentUser.AssociateId, "Deleted Dataset", id);
                     return Json(new { Success = true, Message = "Dataset successfully deleted" });
                 }

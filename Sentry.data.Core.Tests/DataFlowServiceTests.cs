@@ -1,18 +1,17 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Hangfire;
+using Hangfire.Common;
+using Hangfire.States;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Sentry.Core;
 using Sentry.data.Core.Entities.DataProcessing;
-using Sentry.data.Core.GlobalEnums;
-using System.Linq;
-using System.Threading.Tasks;
-using Sentry.FeatureFlags.Mock;
-using Sentry.FeatureFlags;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.FeatureFlags.Mock;
 using System;
 using System.Collections.Generic;
-using Hangfire;
-using Hangfire.Common;
-using Hangfire.States;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core.Tests
 {
@@ -932,14 +931,11 @@ namespace Sentry.data.Core.Tests
             var dataflowService = new DataFlowService(null, userService.Object, null, null, null, null, null, client.Object);
 
             // Act
-            dataflowService.DeleteDataFlows(new int[] { 1, 2 });
+            dataflowService.Delete(1, user1.Object, true);
 
             // Assert
             client.Verify(x => x.Create(
                 It.Is<Job>(job => job.Method.Name == "Delete" && (int)job.Args[0] == 1),
-                It.IsAny<EnqueuedState>()), Times.Once);
-            client.Verify(x => x.Create(
-                It.Is<Job>(job => job.Method.Name == "Delete" && (int)job.Args[0] == 2),
                 It.IsAny<EnqueuedState>()), Times.Once);
         }
 
@@ -955,12 +951,15 @@ namespace Sentry.data.Core.Tests
                 ObjectStatus = ObjectStatusEnum.Active
             };
 
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("123456");
+
             context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
 
             var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null, null);
 
             //Assert
-            Assert.ThrowsException<DataFlowNotFound>(() => dataflowService.Delete(2, "123456", false));
+            Assert.ThrowsException<DataFlowNotFound>(() => dataflowService.Delete(2, 123456, false));
         }
 
         [TestMethod]
@@ -984,7 +983,7 @@ namespace Sentry.data.Core.Tests
             var dataflowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null);
 
             //Act
-            dataflowService.Delete(1, "123456", false);
+            dataflowService.Delete(1, 123456, false);
 
             //Assert
             DataFlow deletedFlow = context.Object.GetById<DataFlow>(1);

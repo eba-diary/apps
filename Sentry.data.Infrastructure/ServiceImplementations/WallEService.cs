@@ -54,7 +54,7 @@ namespace Sentry.data.Infrastructure
                     foreach (Tuple<int, string, int, string> listItem in tupleList)
                     {
                         Logger.Info($"walleservice-schemadelete-start - DatasetId:{listItem.Item1} DatasetName:{listItem.Item2} ConfigId:{listItem.Item3} ConfigName:{listItem.Item4} guid:{_runGuid}");
-                        bool IsSuccessful = configService.Delete(listItem.Item3, false, false);
+                        bool IsSuccessful = configService.Delete(listItem.Item3, null, false);
                         if (!IsSuccessful)
                         {
                             Logger.Info($"walleservice-schemadelete ended with failures - DatasetId:{listItem.Item1} DatasetName:{listItem.Item2} ConfigId:{listItem.Item3} ConfigName:{listItem.Item4} guid:{_runGuid}");
@@ -89,7 +89,7 @@ namespace Sentry.data.Infrastructure
                     foreach (var ds in dsList)
                     {
                         Logger.Info($"walleservice-datasetdelete-start - DatasetId:{ds.Key} DatasetName:{ds.Value} guid:{_runGuid}");
-                        bool IsSuccessful = _datasetService.Delete(ds.Key, false);
+                        bool IsSuccessful = _datasetService.Delete(ds.Key, null, false);
                         if (IsSuccessful)
                         {
                             Logger.Info($"walleservice-datasetdelete-end - DatasetId:{ds.Key} DatasetName:{ds.Value} guid:{_runGuid}");

@@ -116,6 +116,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="BaseCoreUnitTest.cs" />
+    <Compile Include="DataApplicationServiceTests.cs" />
     <Compile Include="DatasetTests.cs" />
     <Compile Include="Mockups\MockClasses\MockClasses.cs" />
     <Compile Include="PaginateTests.cs" />
