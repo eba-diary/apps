@@ -1,5 +1,6 @@
 ﻿using Sentry.data.Core;
 using System.Linq;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web
 {
