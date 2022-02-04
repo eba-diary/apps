@@ -89,6 +89,7 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA3541_Dataset_Details_Tabs => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3605_AllowSchemaParquetUpdate => throw new NotImplementedException();
             public IFeatureFlag<string> CLA3707_DataInventorySource => throw new NotImplementedException();
+            public IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY => throw new NotImplementedException();
         }
     }
 }

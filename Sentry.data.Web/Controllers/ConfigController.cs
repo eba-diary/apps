@@ -161,45 +161,29 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetFileConfigDto dto = dfcm.ToDto();
 
-            if (dto.ConfigId == 0)
-            {
-                AddCoreValidationExceptionsToModel(_configService.Validate(dto));
-            }
+            AddCoreValidationExceptionsToModel(_configService.Validate(dto));
 
             if (ModelState.IsValid)
             {
                 FileSchemaDto schemaDto = dfcm.ToSchema();
 
-                if (dto.ConfigId == 0)
-                { //Create Dataset File Config
-                    bool IsSuccessful = false;
-                    
+                if (dto.ConfigId == 0) //Create Dataset File Config
+                {                     
                     int newSchemaId = _schemaService.CreateAndSaveSchema(schemaDto);
                     if (newSchemaId != 0)
                     {
                         dto.SchemaId = newSchemaId;
-                        IsSuccessful = _configService.CreateAndSaveDatasetFileConfig(dto);
-                    }
 
-                    if (IsSuccessful)
-                    {
-                        //return RedirectToAction("Index", new { id = dto.ParentDatasetId });
-                        _schemaService.PublishSchemaEvent(schemaDto.ParentDatasetId, newSchemaId);
-                        return Json(new { Success = true, dataset_id = dto.ParentDatasetId, schema_id = dto.SchemaId });
+                        if (_configService.CreateAndSaveDatasetFileConfig(dto))
+                        {
+                            _schemaService.PublishSchemaEvent(schemaDto.ParentDatasetId, newSchemaId);
+                            return Json(new { Success = true, dataset_id = dto.ParentDatasetId, schema_id = dto.SchemaId });
+                        }
                     }
                 }
-                else
-                { //Edit Dataset File Config
-                    bool IsSuccessful = false;
-                    if (_schemaService.UpdateAndSaveSchema(schemaDto))
-                    {
-                        IsSuccessful = _configService.UpdateAndSaveDatasetFileConfig(dto);
-                    }
-
-                    if (IsSuccessful)
-                    {
-                        return RedirectToAction("Index", new { id = dto.ParentDatasetId });
-                    }
+                else if (_schemaService.UpdateAndSaveSchema(schemaDto) && _configService.UpdateAndSaveDatasetFileConfig(dto)) //Edit Dataset File Config
+                {
+                    return RedirectToAction("Index", new { id = dto.ParentDatasetId });
                 }
             }
 
@@ -211,7 +195,6 @@ namespace Sentry.data.Web.Controllers
             if (dto.ConfigId == 0)
             {
                 return PartialView("_DatasetFileConfigCreate", dfcm);
-                //return View("Create", dfcm);
             }
             else
             {

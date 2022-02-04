@@ -215,13 +215,10 @@ data.Config = {
 
         $("[id^='CancelDatasetFileConfigForm']").off('click').on('click', PageCancelFunction);
 
-        //determine current file extension selection for initialzation of page
-        var currentFileExtension = $('#FileExtensionID option:selected').text();
-
         //Call SetFileExtensionProperites method on initialization, then call on change of FileExtensionId
-        data.Config.SetFileExtensionProperites(currentFileExtension);
+        data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text(), false);
         $("#FileExtensionID").change(function () {
-            data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
+            data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text(), true);
         });
 
         data.Config.DatasetScopeTypeInit($("#DatasetScopeTypeID"));
@@ -298,14 +295,14 @@ data.Config = {
     EditInit: function () {
         $("#EditConfigForm").validateBootstrap(true);
 
-        data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
+        data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text(), false);
 
         $("#FileExtensionID").change(function () {
-            data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
+            data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text(), true);
         });
     },
 
-    SetFileExtensionProperites: function (extension) {
+    SetFileExtensionProperites: function (extension, clearDelimiter) {
         //Determine which container to find the delimiter field within
         // and set delimiterelement appropriately
         var delimiterelement;
@@ -323,9 +320,9 @@ data.Config = {
             delimiterelement = $("#DatasetFormContainer").find('#Delimiter');
         }
 
-        var editMode = false;
-        if ($('#ConfigId').val() !== undefined && $('#ConfigId').val() !== "0") {
-            editMode = true;
+        //clear delimiter on change event so that it isn't saved to schema with a non-delimiting type
+        if (clearDelimiter) {
+            delimiterelement.val('');
         }
 
         switch (extension) {
@@ -333,27 +330,21 @@ data.Config = {
                 $('.delimiterPanel').show();
                 $('#HasHeader').prop("readonly", false);
                 $('#HasHeader').prop("disabled", false);
-                if (!editMode) {
-                    delimiterelement.text(',');
-                    delimiterelement.val(',');
-                }
                 delimiterelement.prop("readonly", "readonly");
+
+                //CSV is always ',' so set value anyway
+                delimiterelement.val(',');
                 break;
             case "DELIMITED":
             case "ANY":
                 $('.delimiterPanel').show();
-                if (!editMode) {
-                    delimiterelement.val('');
-                }
                 delimiterelement.prop("readonly", "");
                 $('#HasHeader').prop("readonly", false);
                 $('#HasHeader').prop("disabled", false);
                 break;
             default:
                 $('.delimiterPanel').hide();
-                if (!editMode) {
-                    delimiterelement.val('');
-                }
+                delimiterelement.val('');
                 delimiterelement.prop("readonly", "readonly");
                 $('#HasHeader').prop("readonly", true);
                 $('#HasHeader').prop("disabled", true);
