@@ -45,7 +45,7 @@ namespace Sentry.data.Core
 
         public virtual DateTime Created { get; set; }
         public virtual DateTime Modified { get; set; }
-        public virtual string Bucket { get; set; }658
+        public virtual string Bucket { get; set; }
 
         #region Security
 
