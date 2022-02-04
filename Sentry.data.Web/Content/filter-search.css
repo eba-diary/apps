@@ -10,6 +10,10 @@
     min-width: 500px;
 }
 
+    .search-head a {
+        vertical-align: super;
+    }
+
 .search-head-item {
     display: inline-block;
     vertical-align: middle;

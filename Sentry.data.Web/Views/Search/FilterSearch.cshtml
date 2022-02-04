@@ -8,7 +8,13 @@
 <div class="search-horizontal-center">
     <div class="search-head">
         <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" alt="Source icon" /></div>
-        <div class="search-head-item"><h1 class="datasetHeader">@Model.PageTitle</h1></div>
+        <div class="search-head-item">
+            <h1 class="datasetHeader">@Model.PageTitle</h1>
+        </div>
+
+        <a target="_blank" rel="noopener noreferrer" href="https://confluence.sentry.com/display/CLA/Data+Inventory">
+            <em class="glyphicon glyphicon-info-sign blue"></em>
+        </a>
 
         <div id="search-box" class="has-feedback has-feedback-left">
             <input class="form-control searchTextDS text-box single-line" type="text" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled />
