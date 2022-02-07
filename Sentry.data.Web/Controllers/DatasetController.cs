@@ -1379,6 +1379,9 @@ namespace Sentry.data.Web.Controllers
                     case Dataset.ValidationErrors.datasetLocationRequired:
                         ModelState.AddModelError(nameof(ReportMetadata.Location), vr.Description);
                         break;
+                    case Dataset.ValidationErrors.datasetOriginationRequired:
+                        ModelState.AddModelError(nameof(DatasetModel.OriginationID), vr.Description);
+                        break;
                     default:
                         ModelState.AddModelError(string.Empty, vr.Description);
                         break;
