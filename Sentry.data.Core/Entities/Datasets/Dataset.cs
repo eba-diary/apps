@@ -160,6 +160,7 @@ namespace Sentry.data.Core
             public const string datasetScopeRequired = "datasetScopeRequired";
             public const string datasetDateRequired = "datasetDateRequired";
             public const string datasetLocationRequired = "datasetLocationRequired";
+            public const string datasetOriginationRequired = "datasetOriginationRequired";
         }
     }
 }
