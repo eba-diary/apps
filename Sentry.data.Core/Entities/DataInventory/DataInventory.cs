@@ -58,6 +58,9 @@ namespace Sentry.data.Core
         [PropertyName("effective_dtm")]
         public DateTime EffectiveDateTime { get; set; }
 
+        [PropertyName("expirationchange_cnt")]
+        public int ExpirationChangeCount { get; set; }
+
         [PropertyName("expiration_dte")]
         public DateTime? ExpirationDate { get; set; }
 
