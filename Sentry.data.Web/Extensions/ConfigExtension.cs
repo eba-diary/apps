@@ -28,7 +28,8 @@ namespace Sentry.data.Web
                 Delimiter = model.Delimiter,
                 HasHeader = model.HasHeader,
                 FileExtensionId = model.FileExtensionId,
-                ObjectStatus = model.ObjectStatus
+                ObjectStatus = model.ObjectStatus,
+                SchemaRootPath = model.SchemaRootPath
             };
         }
 

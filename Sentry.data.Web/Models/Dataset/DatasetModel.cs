@@ -51,6 +51,9 @@ namespace Sentry.data.Web
         [DisplayName("File Extension")]
         public int FileExtensionId { get; set; }
 
+        [DisplayName("Schema Root Path")]
+        public string SchemaRootPath { get; set; }
+
         [MaxLength(4096)]
         [DisplayName("Usage Information")]
         public string DatasetInformation { get; set; }
