@@ -4,11 +4,26 @@ namespace Sentry.data.Web
 {
     public class FilterCategoryOptionModel
     {
-        private readonly string _id = Guid.NewGuid().ToString();
+        private string _id;
+        private string _fullId;
 
         public string OptionId
         {
-            get => string.IsNullOrEmpty(ParentCategoryName) ? _id : ParentCategoryName.Replace(" ", "-") + "_" + _id;
+            get 
+            {
+                if (string.IsNullOrEmpty(_fullId))
+                {
+                    if (string.IsNullOrEmpty(_id))
+                    {
+                        _id = Guid.NewGuid().ToString();
+                    }
+
+                    return string.IsNullOrEmpty(ParentCategoryName) ? _id : ParentCategoryName.Replace(" ", "-") + "_" + _id;
+                }
+
+                return _fullId;
+            }
+            set => _fullId = value;
         }
 
         public string OptionValue { get; set; }

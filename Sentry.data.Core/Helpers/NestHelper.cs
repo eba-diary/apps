@@ -9,14 +9,14 @@ namespace Sentry.data.Core
 {
     public static class NestHelper
     {
-        public static Nest.Fields SearchFields<T>()
+        public static Nest.Fields GetSearchFields<T>()
         {
             return Infer.Fields(GetPropertiesWithAttribute<T, GlobalSearchField>().ToArray());
         }
 
-        public static Dictionary<string, Field> FilterCategoryFields<T>() where T : class
+        public static AggregationDictionary GetFilterAggregations<T>() where T : class
         {
-            Dictionary<string, Field> categoryFields = new Dictionary<string, Field>();
+            AggregationDictionary aggregations = new AggregationDictionary();
 
             foreach (PropertyInfo property in GetPropertiesWithAttribute<T, FilterSearchField>())
             {
@@ -32,14 +32,19 @@ namespace Sentry.data.Core
                 {
                     field = Infer.Field(property);
                 }
-                
-                categoryFields.Add(property.GetCustomAttribute<FilterSearchField>().FilterCategoryName, field);
+
+                FilterSearchField filterAttribute = property.GetCustomAttribute<FilterSearchField>();
+                aggregations.Add(filterAttribute.FilterCategoryName, new TermsAggregation(filterAttribute.FilterCategoryName)
+                {
+                    Field = field,
+                    Size = filterAttribute.IsPinnedFilter ? 10000 : 15
+                });
             }
 
-            return categoryFields;
+            return aggregations;
         }
 
-        public static Field FilterCategoryField<T>(string categoryName)
+        public static Field GetFilterCategoryField<T>(string categoryName)
         {
             PropertyInfo property = GetPropertiesWithAttribute<T, FilterSearchField>().FirstOrDefault(x => x.GetCustomAttribute<FilterSearchField>().FilterCategoryName == categoryName);
 
