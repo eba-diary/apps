@@ -34,6 +34,7 @@ namespace Sentry.data.Core
         public virtual bool IsSecured { get; set; }
         public virtual string PrimaryContactId { get; set; }
         public virtual Security Security { get; set; }
+        public virtual bool IsSensitive { get; set; }
 
 
 
