@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Sentry.data.Core.GlobalEnums;
+﻿using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Core
 {
@@ -11,6 +10,7 @@ namespace Sentry.data.Core
         public string ConfigFileDesc { get; set; }
         public int FileExtensionId { get; set; }
         public string Delimiter { get; set; }
+        public string SchemaRootPath { get; set; }
         public bool HasHeader { get; set; }
         public int DatasetScopeTypeId { get; set; }
         public string DatasetInformation { get; set; }

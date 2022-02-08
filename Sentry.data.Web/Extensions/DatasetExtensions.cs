@@ -31,6 +31,7 @@ namespace Sentry.data.Web
                 ConfigFileDesc = model.ConfigFileDesc,
                 FileExtensionId = model.FileExtensionId,
                 Delimiter = model.Delimiter,
+                SchemaRootPath = model.SchemaRootPath,
                 DatasetScopeTypeId = model.DatasetScopeTypeId,
                 DataClassification = model.DataClassification,
                 IsSecured = model.IsSecured,
