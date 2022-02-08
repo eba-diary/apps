@@ -1,15 +1,16 @@
-﻿using System.Threading.Tasks;
+﻿using Nest;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
     public interface IEventService
     {
-        void PublishSuccessEvent(string eventType, string userId, string reason, string lineCde = null, string search = null);
-        void PublishSuccessEventByConfigId(string eventType, string userId, string reason, int configId);
-        void PublishSuccessEventByDatasetId(string eventType, string userId, string reason, int datasetId);
-        void PublishSuccessEventByDataAsset(string eventType, string userId, string reason, int dataAssetId, string lineCde = null, string search = null);
-        void PublishSuccessEventByNotificationId(string eventTypeDescription, string userId, string reason, Notification notification);
-        void PublishSuccessEventBySchemaId(string eventType, string userId, string reason, int datasetId, int schemaId);
+        Task PublishSuccessEvent(string eventType, string reason, string lineCde = null, string search = null);
+        Task PublishSuccessEventByConfigId(string eventType, string reason, int configId);
+        Task PublishSuccessEventByDatasetId(string eventType, string reason, int datasetId);
+        Task PublishSuccessEventByDataAsset(string eventType, string reason, int dataAssetId, string lineCde, string search);
+        Task PublishSuccessEventByNotificationId(string eventType, string reason, Notification notification);
+        Task PublishSuccessEventBySchemaId(string eventType, string reason, int datasetId, int schemaId);
 
     }
 }

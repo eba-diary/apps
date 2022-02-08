@@ -50,15 +50,14 @@ namespace Sentry.data.Web.Controllers
                 da.LastUpdated = DateTime.Now;
                 da.Status = 1;
 
-                Event e = new Event();
-                e.EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-                e.Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                e.TimeCreated = DateTime.Now;
-                e.TimeNotified = DateTime.Now;
-                e.IsProcessed = false;
-                e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-                e.DataAsset = da.Id;
-                e.Reason = "Viewed Data Asset";
+                Event e = new Event
+                {
+                    EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                    Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                    UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
+                    DataAsset = da.Id,
+                    Reason = "Viewed Data Asset"
+                };
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
             }
 
@@ -72,13 +71,13 @@ namespace Sentry.data.Web.Controllers
             ViewBag.IsLine = true;
             ViewBag.LineName = line;
 
-            Event e = new Event();
-            e.EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            Event e = new Event
+            {
+                EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId
+            };
+
             if (line == "Personal Lines" || line.ToUpper() == "PL")
             {
                 e.Line_CDE = "PL";
@@ -110,16 +109,15 @@ namespace Sentry.data.Web.Controllers
                 da.LastUpdated = DateTime.Now;
                 da.Status = 1;
 
-                Event e = new Event();
-                e.EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-                e.Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                e.TimeCreated = DateTime.Now;
-                e.TimeNotified = DateTime.Now;
-                e.IsProcessed = false;
-                e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-                e.DataAsset = da.Id;
+                Event e = new Event
+                {
+                    EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                    Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                    UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
+                    DataAsset = da.Id
+                };
 
-                if(line == "Personal Lines" || line.ToUpper() == "PL")
+                if (line == "Personal Lines" || line.ToUpper() == "PL")
                 {
                     e.Line_CDE = "PL";
                 }
@@ -145,7 +143,7 @@ namespace Sentry.data.Web.Controllers
             ViewBag.DataAssets = das.Select(x => new Models.AssetUIModel(x)).ToList();
             ViewBag.CanUserSwitch = SharedContext.CurrentUser.CanUserSwitch;
 
-            assetName = (assetName == null) ? das[0].Name : assetName;
+            assetName = assetName ?? das[0].Name;
 
             DataAsset da = _dataAssetContext.GetDataAsset(assetName);
             if (da != null)
@@ -154,20 +152,18 @@ namespace Sentry.data.Web.Controllers
                 da.LastUpdated = DateTime.Now;
                 da.Status = 1;
 
-                Event e = new Event();
-                e.EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-                e.Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                e.TimeCreated = DateTime.Now;
-                e.TimeNotified = DateTime.Now;
-                e.IsProcessed = false;
-                e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-                e.DataAsset = da.Id;
-                e.Reason = "Viewed Data Asset";
+                Event e = new Event
+                {
+                    EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                    Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                    UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
+                    DataAsset = da.Id,
+                    Reason = "Viewed Data Asset"
+                };
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
             }
 
-            if (da != null) { return View("Index", da); }
-            else { return RedirectToAction("NotFound", "Error"); }
+            return da != null ? View("Index", da) : (ActionResult)RedirectToAction("NotFound", "Error");
         }
 
 

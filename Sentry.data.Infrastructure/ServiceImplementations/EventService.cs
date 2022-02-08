@@ -1,5 +1,4 @@
-﻿using Sentry.Common.Logging;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,105 +8,99 @@ namespace Sentry.data.Infrastructure
 {
     public class EventService : IEventService
     {
-        public void PublishSuccessEventByConfigId(string eventType, string userId, string reason, int configId)
+        private readonly IDatasetContext _context;
+        private readonly IUserService _userService;
+        private readonly Lazy<Status> _successStatus;
+
+        public EventService(IDatasetContext context, IUserService userService)
         {
-            Task.Factory.StartNew(() => SaveEvent(eventType, userId, reason, 0, configId, null,  0, 0, null, null), TaskCreationOptions.RunContinuationsAsynchronously);
+            _context = context;
+            _userService = userService;
+            _successStatus = new Lazy<Status>(() => _context.EventStatus.Where(w => w.Description == GlobalConstants.Statuses.SUCCESS).FirstOrDefault());
         }
 
-        public void PublishSuccessEventByDatasetId(string eventType, string userId, string reason, int datasetId)
+        public async Task PublishSuccessEventByConfigId(string eventType, string reason, int configId)
         {
-            Task.Factory.StartNew(() => SaveEvent(eventType, userId, reason, datasetId, 0, null, 0, 0, null, null), TaskCreationOptions.RunContinuationsAsynchronously);
+            await SaveEvent(eventType, new Event() { Reason = reason, DataConfig = configId }).ConfigureAwait(false);
         }
 
-        public void PublishSuccessEventByDataAsset(string eventType, string userId, string reason, int dataAssetId, string lineCde = null, string search = null)
+        public async Task PublishSuccessEventByDatasetId(string eventType, string reason, int datasetId)
         {
-            Task.Factory.StartNew(() => SaveEvent(eventType, userId, reason, 0, 0, null, dataAssetId, 0, lineCde, search), TaskCreationOptions.RunContinuationsAsynchronously);
+            await SaveEvent(eventType, new Event() { Reason = reason, Dataset = datasetId }).ConfigureAwait(false);
         }
 
-        public void PublishSuccessEvent(string eventType, string userId, string reason, string lineCde = null, string search = null)
-        {
-            Task.Factory.StartNew(() => SaveEvent(eventType, userId, reason, 0, 0, null, 0, 0, lineCde, search), TaskCreationOptions.RunContinuationsAsynchronously);
+        public async Task PublishSuccessEventByDataAsset(string eventType, string reason, int dataAssetId, string lineCde, string search)
+{
+            await SaveEvent(eventType, new Event() { Reason = reason, DataAsset = dataAssetId, Line_CDE = lineCde, Search = search }).ConfigureAwait(false);
         }
 
-        public void PublishSuccessEventByNotificationId(string eventTypeDescription, string userId, string reason, Notification notification)
+        public async Task PublishSuccessEvent(string eventType, string reason, string lineCde = null, string search = null)
         {
-            Task.Factory.StartNew(() => SaveEvent(eventTypeDescription, userId, reason, 0, 0, notification,  0, 0, null, null), TaskCreationOptions.RunContinuationsAsynchronously);
+            await SaveEvent(eventType, new Event() { Reason = reason, Line_CDE = lineCde, Search = search }).ConfigureAwait(false);
         }
 
-        public void PublishSuccessEventBySchemaId(string eventType, string userId, string reason, int datasetId, int schemaId)
+        public async Task PublishSuccessEventByNotificationId(string eventType, string reason, Notification notification)
         {
-            Task.Factory.StartNew(() => SaveEvent(eventType, userId, reason, datasetId, 0, null, 0, schemaId, null, null), TaskCreationOptions.RunContinuationsAsynchronously);
+            await SaveEvent(eventType, new Event() { Reason = reason, Notification = notification }).ConfigureAwait(false);
         }
 
-        private void SaveEvent(string eventType, string userId, string reason, int datasetId, int configId, Notification notification, int dataAssetId, int schemaId, string lineCde = null, string search = null)
+        public async Task PublishSuccessEventBySchemaId(string eventType, string reason, int datasetId, int schemaId)
         {
-            using (IDatasetContext _datasetContext = Bootstrapper.Container.GetNestedContainer().GetInstance<IDatasetContext>())
-            {
-                EventType et = _datasetContext.EventTypes.Where(w => w.Description == eventType).FirstOrDefault();
-                Status status = _datasetContext.EventStatus.Where(w => w.Description == GlobalConstants.Statuses.SUCCESS).FirstOrDefault();
+            await SaveEvent(eventType, new Event() { Reason = reason, Dataset = datasetId, SchemaId = schemaId }).ConfigureAwait(false);
+        }
 
-                if (datasetId == 0 && configId != 0)
+        private Task SaveEvent(string eventType, Event evt)
+        {
+            return Task.Factory.StartNew(() => {
+                evt.EventType = _context.EventTypes.Where(w => w.Description == eventType).FirstOrDefault();
+                evt.Status = _successStatus.Value;
+                evt.UserWhoStartedEvent = _userService.GetCurrentUser().AssociateId;
+
+                if (evt.Dataset.GetValueOrDefault() == 0 && evt.DataConfig.GetValueOrDefault() != 0)
                 {
-                    datasetId = _datasetContext.GetById<DatasetFileConfig>(configId).ParentDataset.DatasetId;
+                    evt.Dataset = _context.GetById<DatasetFileConfig>(evt.DataConfig).ParentDataset.DatasetId;
                 }
 
-                GetConfigIdAndReason(eventType,datasetId, schemaId, ref configId, ref reason);
-                Event evt = CreateEvent(et, status, userId, reason, datasetId, configId, notification, dataAssetId, schemaId, lineCde, search);
-                _datasetContext.Add(evt);
-                _datasetContext.SaveChanges();
-            }
+                AddConfigIdAndReason(evt);
+
+                _context.Add(evt);
+                _context.SaveChanges();
+            });
         }
 
-        //GET CONFIGID AND CREATE A REASON FOR EVENT
-        private void GetConfigIdAndReason(string eventType, int datasetId, int schemaId, ref int configId, ref string reason)
+        private void AddConfigIdAndReason(Event evt)
         {
-            configId = 0;
-
-            using (IDatasetContext _datasetContext = Bootstrapper.Container.GetNestedContainer().GetInstance<IDatasetContext>())
+            if (evt.DataConfig == 0 && evt.Dataset.GetValueOrDefault() != 0)
             {
-                if (configId == 0 && datasetId != 0)
+                Dataset ds = _context.GetById<Dataset>(evt.Dataset);
+
+                DatasetFileConfig dfc = null;
+                if (ds != null)
                 {
-                    Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
-                    Schema schema = _datasetContext.GetById<Schema>(schemaId); 
+                    dfc = evt.SchemaId.GetValueOrDefault() == 0
+                        ? ds.DatasetFileConfigs.FirstOrDefault()
+                        : ds.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == evt.SchemaId);
 
-                    DatasetFileConfig dfc;
-                    if (ds != null)
-                    {
-                        if (schemaId == 0)
-                        {
-                            dfc = ds.DatasetFileConfigs.FirstOrDefault();
-                        }
-                        else
-                        {
-                            dfc = ds.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId);
-                        }
-
-                        reason = CreateReason(eventType, ds, schema);
-                    }
-                    else
-                    {
-                        dfc = null;
-                    }
-
-                    configId = (dfc == null) ? 0 : dfc.ConfigId;
+                    AddReason(evt, ds);
                 }
+
+                evt.DataConfig = dfc == null ? 0 : dfc.ConfigId;
             }
         }
-
-        //CREATE A DETAILED REASON HERE ONE TIME SO THIS CAN BE USED BY DataFeedProvider and EmailService
-        private string CreateReason(string eventType, Dataset ds, Schema schema)
+        private void AddReason(Event evt, Dataset ds)
         {
-            string reason = eventType;      //DEFAULT TO eventType in case none of the overrides happen below
+            string reason = evt.EventType.Description;      //DEFAULT TO eventType in case none of the overrides happen below
+            Schema schema = _context.GetById<Schema>(evt.SchemaId);
 
-            if (schema != null && eventType == GlobalConstants.EventType.CREATE_DATASET_SCHEMA)        
+            if (schema != null && evt.EventType.Description == GlobalConstants.EventType.CREATE_DATASET_SCHEMA)
             {
                 //SCHEMA SCENARIO
                 reason = "A new schema called " + schema.Name + " was created under " + ds.DatasetName + " in " + ds.DatasetCategories.First().Name;
             }
-            else if(eventType == GlobalConstants.EventType.CREATED_REPORT || eventType == GlobalConstants.EventType.CREATED_DATASET)        
+            else if (evt.EventType.Description == GlobalConstants.EventType.CREATED_REPORT || evt.EventType.Description == GlobalConstants.EventType.CREATED_DATASET)
             {
                 //DATASET OR SCHEMA
-                string whatAmI = (eventType == GlobalConstants.EventType.CREATED_REPORT) ? "exhibit" : "dataset";
+                string whatAmI = (evt.EventType.Description == GlobalConstants.EventType.CREATED_REPORT) ? "exhibit" : "dataset";
 
                 if (ds.DatasetCategories != null)
                 {
@@ -119,30 +112,103 @@ namespace Sentry.data.Infrastructure
                 }
             }
 
-            return reason;
+            evt.Reason = reason;
         }
 
+        //private void SaveEvent(string eventType, string userId, string reason, int datasetId, int configId, Notification notification, int dataAssetId, int schemaId, string lineCde = null, string search = null)
+        //{
+        //    Task.Factory.StartNew(() => {
+        //        EventType et = _context.EventTypes.Where(w => w.Description == eventType).FirstOrDefault();
 
-        private Event CreateEvent(EventType eventType, Status status, string userId, string reason, int? datasetId, int? configId, Notification notification, int? dataAssetId,  int? schemaId, string lineCde, string search)
-        {
-            return new Event()
-            {
-                EventType = eventType,
-                Status = status,
-                TimeCreated = DateTime.Now,
-                TimeNotified = DateTime.Now,
-                IsProcessed = false,
-                DataConfig = configId,
-                Dataset = datasetId,
-                UserWhoStartedEvent = userId,
-                Reason = reason,
-                Notification = notification,
-                DataAsset = dataAssetId,
-                SchemaId = schemaId,
-                Line_CDE = lineCde,
-                Search = search
-            };
-        }
+        //        if (datasetId == 0 && configId != 0)
+        //        {
+        //            datasetId = _context.GetById<DatasetFileConfig>(configId).ParentDataset.DatasetId;
+        //        }
 
+        //        GetConfigIdAndReason(eventType, datasetId, schemaId, ref configId, ref reason);
+
+        //        Event evt = new Event()
+        //        {
+        //            EventType = et,
+        //            Status = _successStatus.Value,
+        //            DataConfig = configId,
+        //            Dataset = datasetId,
+        //            UserWhoStartedEvent = userId,
+        //            Reason = reason,
+        //            Notification = notification,
+        //            DataAsset = dataAssetId,
+        //            SchemaId = schemaId,
+        //            Line_CDE = lineCde,
+        //            Search = search
+        //        };
+
+        //        _context.Add(evt);
+        //        _context.SaveChanges();
+        //    });
+        //}
+
+        //GET CONFIGID AND CREATE A REASON FOR EVENT
+        //private void GetConfigIdAndReason(string eventType, int datasetId, int schemaId, ref int configId, ref string reason)
+        //{
+        //    configId = 0;
+
+        //    using (IDatasetContext _datasetContext = Bootstrapper.Container.GetNestedContainer().GetInstance<IDatasetContext>())
+        //    {
+        //        if (configId == 0 && datasetId != 0)
+        //        {
+        //            Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+        //            Schema schema = _datasetContext.GetById<Schema>(schemaId); 
+
+        //            DatasetFileConfig dfc;
+        //            if (ds != null)
+        //            {
+        //                if (schemaId == 0)
+        //                {
+        //                    dfc = ds.DatasetFileConfigs.FirstOrDefault();
+        //                }
+        //                else
+        //                {
+        //                    dfc = ds.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+        //                }
+
+        //                reason = CreateReason(eventType, ds, schema);
+        //            }
+        //            else
+        //            {
+        //                dfc = null;
+        //            }
+
+        //            configId = (dfc == null) ? 0 : dfc.ConfigId;
+        //        }
+        //    }
+        //}
+
+        //CREATE A DETAILED REASON HERE ONE TIME SO THIS CAN BE USED BY DataFeedProvider and EmailService
+        //private string CreateReason(string eventType, Dataset ds, Schema schema)
+        //{
+        //    string reason = eventType;      //DEFAULT TO eventType in case none of the overrides happen below
+
+        //    if (schema != null && eventType == GlobalConstants.EventType.CREATE_DATASET_SCHEMA)        
+        //    {
+        //        //SCHEMA SCENARIO
+        //        reason = "A new schema called " + schema.Name + " was created under " + ds.DatasetName + " in " + ds.DatasetCategories.First().Name;
+        //    }
+        //    else if(eventType == GlobalConstants.EventType.CREATED_REPORT || eventType == GlobalConstants.EventType.CREATED_DATASET)        
+        //    {
+        //        //DATASET OR SCHEMA
+        //        string whatAmI = (eventType == GlobalConstants.EventType.CREATED_REPORT) ? "exhibit" : "dataset";
+
+        //        if (ds.DatasetCategories != null)
+        //        {
+        //            reason = "A new " + whatAmI + " called " + ds.DatasetName + " was Created in " + ds.DatasetCategories.First().Name;
+        //        }
+        //        else
+        //        {
+        //            reason = "A new " + whatAmI + " called " + ds.DatasetName + " was Created";
+        //        }
+        //    }
+
+        //    return reason;
+        //}
     }
 }

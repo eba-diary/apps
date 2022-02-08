@@ -175,7 +175,7 @@ namespace Sentry.data.Core
 
 
             if (eventTypeDescription != null)
-                _eventService.PublishSuccessEventByNotificationId(eventTypeDescription, _userService.GetCurrentUser().AssociateId, eventTypeDescription, notification);
+                _eventService.PublishSuccessEventByNotificationId(eventTypeDescription, eventTypeDescription, notification);
         }
 
         public List<NotificationDto> GetNotificationsForDataAsset()

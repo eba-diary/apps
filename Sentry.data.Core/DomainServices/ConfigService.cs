@@ -695,11 +695,11 @@ namespace Sentry.data.Core
                 //Write success event
                 if (RefreshAllSchema)
                 {
-                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.SYNC_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, "Sync all schemas for dataset", datasetId);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.SYNC_DATASET_SCHEMA, "Sync all schemas for dataset", datasetId);
                 }
                 else
                 {
-                    _eventService.PublishSuccessEventByConfigId(GlobalConstants.EventType.SYNC_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, "Sync specific schema", configList.First().ConfigId);
+                    _eventService.PublishSuccessEventByConfigId(GlobalConstants.EventType.SYNC_DATASET_SCHEMA, "Sync specific schema", configList.First().ConfigId);
                 }
                                 
                 return true;

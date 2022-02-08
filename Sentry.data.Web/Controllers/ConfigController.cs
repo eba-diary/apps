@@ -93,9 +93,6 @@ namespace Sentry.data.Web.Controllers
                 {
                     EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
                     Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                    TimeCreated = DateTime.Now,
-                    TimeNotified = DateTime.Now,
-                    IsProcessed = false,
                     Dataset = ds.DatasetId,
                     UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
                     Reason = "Viewed Dataset Configuration Page"
@@ -128,7 +125,7 @@ namespace Sentry.data.Web.Controllers
                 ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };
 
-            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Configuration Creation Page", dfcm.DatasetId);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Configuration Creation Page", dfcm.DatasetId);
 
             return View(dfcm);
         }
@@ -149,7 +146,7 @@ namespace Sentry.data.Web.Controllers
                 ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };
 
-            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Configuration Creation Page", dfcm.DatasetId);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Configuration Creation Page", dfcm.DatasetId);
 
             return PartialView("_DatasetFileConfigCreate", dfcm);
         }
@@ -217,7 +214,7 @@ namespace Sentry.data.Web.Controllers
                     {
                         return Json(new { Success = false, Message = "Schema was not deleted" });
                     }
-                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.DELETE_DATASET_SCHEMA, SharedContext.CurrentUser.AssociateId, "Deleted Dataset Schema", id);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.DELETE_DATASET_SCHEMA, "Deleted Dataset Schema", id);
                     return Json(new { Success = true, Message = "Schema was successfully deleted" });
                 }
                 return Json(new { Success = false, Message = "You do not have permissions to delete schema" });
@@ -244,9 +241,6 @@ namespace Sentry.data.Web.Controllers
             {
                 EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
                 Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                TimeCreated = DateTime.Now,
-                TimeNotified = DateTime.Now,
-                IsProcessed = false,
                 UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
                 Reason = "Viewed Configuration Management Page"
             };
@@ -279,7 +273,7 @@ namespace Sentry.data.Web.Controllers
 
                 //ViewBag.ModifyType = "Edit";
 
-                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Configuration Edit Page", dfcm.DatasetId);
+                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Configuration Edit Page", dfcm.DatasetId);
 
                 return View(dfcm);
             }
@@ -366,9 +360,6 @@ namespace Sentry.data.Web.Controllers
             {
                 EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
                 Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                TimeCreated = DateTime.Now,
-                TimeNotified = DateTime.Now,
-                IsProcessed = false,
                 DataConfig = dfc.ConfigId,
                 Dataset = dfc.ParentDataset.DatasetId,
                 UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
@@ -556,9 +547,6 @@ namespace Sentry.data.Web.Controllers
             {
                 EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
                 Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                TimeCreated = DateTime.Now,
-                TimeNotified = DateTime.Now,
-                IsProcessed = false,
                 UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
                 Reason = "Viewed Retrieval Edit Page"
             };
@@ -763,9 +751,6 @@ namespace Sentry.data.Web.Controllers
             {
                 EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
                 Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                TimeCreated = DateTime.Now,
-                TimeNotified = DateTime.Now,
-                IsProcessed = false,
                 UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
                 Reason = "Viewed Data Source Creation Page"
             };
@@ -855,7 +840,7 @@ namespace Sentry.data.Web.Controllers
                     bool IsSuccessful = _configService.CreateAndSaveNewDataSource(dto);
                     if (IsSuccessful)
                     {
-                        _eventService.PublishSuccessEvent(GlobalConstants.EventType.CREATED_DATASOURCE, SharedContext.CurrentUser.AssociateId, dto.Name + " was created.");
+                        _eventService.PublishSuccessEvent(GlobalConstants.EventType.CREATED_DATASOURCE, dto.Name + " was created.");
 
                         return !String.IsNullOrWhiteSpace(model.ReturnUrl) 
                             ? Redirect(model.ReturnUrl) 
@@ -867,7 +852,7 @@ namespace Sentry.data.Web.Controllers
                     bool IsSuccessful = _configService.UpdateAndSaveDataSource(dto);
                     if (IsSuccessful)
                     {
-                        _eventService.PublishSuccessEvent(GlobalConstants.EventType.UPDATED_DATASOURCE, SharedContext.CurrentUser.AssociateId, dto.Name + " was updated.");
+                        _eventService.PublishSuccessEvent(GlobalConstants.EventType.UPDATED_DATASOURCE, dto.Name + " was updated.");
                         return !String.IsNullOrWhiteSpace(model.ReturnUrl) 
                             ? Redirect(model.ReturnUrl) 
                             : Redirect("/");
@@ -903,7 +888,7 @@ namespace Sentry.data.Web.Controllers
 
                 EditSourceDropDown(model);
 
-                _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Data Source Edit Page");
+                _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, "Viewed Data Source Edit Page");
 
                 return View("EditDataSource", model);
             }
@@ -1318,9 +1303,6 @@ namespace Sentry.data.Web.Controllers
                     Event e = new Event();
                     e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
                     e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                    e.TimeCreated = DateTime.Now;
-                    e.TimeNotified = DateTime.Now;
-                    e.IsProcessed = false;
                     e.DataConfig = configDto.ConfigId;
                     e.Dataset = configDto.ParentDatasetId;
                     e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
@@ -1418,9 +1400,6 @@ namespace Sentry.data.Web.Controllers
             {
                 EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
                 Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                TimeCreated = DateTime.Now,
-                TimeNotified = DateTime.Now,
-                IsProcessed = false,
                 UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
                 Reason = "Viewed Retrieval Edit Page"
             };
@@ -1504,9 +1483,6 @@ namespace Sentry.data.Web.Controllers
                     {
                         EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
                         Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                        TimeCreated = DateTime.Now,
-                        TimeNotified = DateTime.Now,
-                        IsProcessed = false,
                         UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
                         Reason = "Viewed Retrieval Edit Page"
                     };
