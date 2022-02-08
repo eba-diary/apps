@@ -105,14 +105,13 @@ namespace Sentry.data.Infrastructure
                 }
             };
 
-            BoolQuery boolQuery = GetBaseBoolQuery();
-
-            Task<ElasticResult<DataInventory>> allCategoriesTask = _context.SearchAsync(GetBaseSaidListRequest(boolQuery));
+            Task<ElasticResult<DataInventory>> allCategoriesTask = _context.SearchAsync(GetBaseSaidListRequest(GetBaseBoolQuery()));
 
             List<QueryContainer> filters = new List<QueryContainer>();
             filters.AddMatch<DataInventory>(x => x.AssetCode, search);
             filters.AddMatch<DataInventory>(x => x.IsSensitive, "true");
 
+            BoolQuery boolQuery = GetBaseBoolQuery();
             boolQuery.Filter = filters;
 
             Task<ElasticResult<DataInventory>> assetCategoriesTask = _context.SearchAsync(GetBaseSaidListRequest(boolQuery));
