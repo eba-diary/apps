@@ -39,13 +39,11 @@ namespace Sentry.data.Core
         /// <exception cref="DatasetNotFoundException">Thrown when user does not have access to dataset</exception>
         List<DatasetFileConfigDto> GetDatasetFileConfigDtoByDataset(int datasetId);
         /// <summary>
-        /// 
+        /// Will set objectstatus appropriately for given object.  Will trigger same action on immediate children objects.
         /// </summary>
         /// <param name="id">DatasetFileConfig identifier</param>
         /// <param name="logicalDelete">Perform soft or hard delete</param>
         /// <param name="parentDriven">Is this driven by parent object</param>
-        /// <returns></returns>
-        /// <exception cref="DatasetFileConfigDeletedException">When DatasetFileConfig is already marked for deletion</exception>
         bool Delete(int id, bool logicalDelete = true, bool parentDriven = false);
         UserSecurity GetUserSecurityForConfig(int id);
         /// <summary>
