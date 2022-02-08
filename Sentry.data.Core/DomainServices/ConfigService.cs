@@ -225,12 +225,21 @@ namespace Sentry.data.Core
         {
             List<string> errors = new List<string>();
 
-            Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
-
-            //remove any schemas which are marked for deletion
-            if (parent.DatasetFileConfigs.Any(x => !x.DeleteInd && x.Name.ToLower() == dto.Name.ToLower()))
+            if (dto.ConfigId == 0)
             {
-                errors.Add("Dataset config with that name already exists within dataset");
+                Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
+
+                //remove any schemas which are marked for deletion
+                if (parent.DatasetFileConfigs.Any(x => !x.DeleteInd && x.Name.ToLower() == dto.Name.ToLower()))
+                {
+                    errors.Add("Dataset config with that name already exists within dataset");
+                }
+            }
+
+            var currentFileExtension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Id == dto.FileExtensionId).Name.ToLower();
+            if (currentFileExtension == "delimited" && string.IsNullOrWhiteSpace(dto.Delimiter))
+            {
+                errors.Add("File Extension Delimited is missing it's delimiter.");
             }
 
             return errors;
@@ -492,7 +501,13 @@ namespace Sentry.data.Core
         }
 
         public bool Delete(int id, bool logicalDelete = true, bool parentDriven = false)
-        {            
+        {
+            string methodName = $"{nameof(ConfigService).ToLower()}_{nameof(Delete).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
+
+            bool returnResult = true;
+            bool alreadyDeleted = false;
+
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
 
             //Do not proceed with dataset file configuration is already marked for deletion
@@ -501,7 +516,18 @@ namespace Sentry.data.Core
                 dfc.ObjectStatus == GlobalEnums.ObjectStatusEnum.Pending_Delete || 
                 dfc.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted))
             {
-                throw new DatasetFileConfigDeletedException("Already marked for deletion");
+                alreadyDeleted = true;
+            }
+            else if (!logicalDelete && dfc.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted)
+            {
+                alreadyDeleted = true;
+            }
+
+            if (alreadyDeleted)
+            {
+                Logger.Info($"{methodName} Object already has status {dfc.ObjectStatus}");
+                Logger.Info($"{methodName} Method End");
+                return returnResult;
             }
 
             FileSchema scm = _datasetContext.GetById<FileSchema>(dfc.Schema.SchemaId);
@@ -541,22 +567,25 @@ namespace Sentry.data.Core
                 catch (Exception ex)
                 {
                     Logger.Error($"configservice-delete-logical-failed - configid:{id}", ex);
-                    return false;
+                    returnResult = false;
                 }
 
-                //We do not want to fail the delete due to events not being sent
-                try
+                if (returnResult)
                 {
-                    GenerateConsumptionLayerDeleteEvent(dfc);
-                }
-                catch (AggregateException agEx)
-                {
-                    var flatArgExs = agEx.Flatten().InnerExceptions;
-                    foreach (var ex in flatArgExs)
+                    //We do not want to fail the delete due to events not being sent
+                    try
                     {
-                        Logger.Error("Failed generating consumption layer event", ex);
+                        GenerateConsumptionLayerDeleteEvent(dfc);
                     }
-                }
+                    catch (AggregateException agEx)
+                    {
+                        var flatArgExs = agEx.Flatten().InnerExceptions;
+                        foreach (var ex in flatArgExs)
+                        {
+                            Logger.Error("Failed generating consumption layer event", ex);
+                        }
+                    }
+                }                
             }
             else
             {
@@ -596,11 +625,11 @@ namespace Sentry.data.Core
                 catch (Exception ex)
                 {
                     Logger.Error($"configservice-delete-permanant-failed - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}", ex);
-                    return false;
+                    returnResult = false;
                 }
             }
 
-            return true;
+            return returnResult;
         }
 
         public UserSecurity GetUserSecurityForConfig(int id)

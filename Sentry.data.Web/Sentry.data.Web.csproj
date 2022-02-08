@@ -405,6 +405,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\DataInventoryRouteConstraint.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\MiniProfilerConfig.cs" />
     <Compile Include="App_Start\ProfilingViewEngine.cs" />
@@ -414,15 +415,23 @@
     <AdditionalFiles Include="..\.sonarlint\data_data.sentry.com\CSharp\SonarLint.xml">
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
+    <Compile Include="Controllers\BaseDataInventoryController.cs" />
+    <Compile Include="Controllers\DataInventoryController.cs" />
+    <Compile Include="Controllers\FilterSearchController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
+    <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileModel.cs" />
     <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
     <Compile Include="Models\Dale\DaleAdvancedCriteriaModel.cs" />
+    <Compile Include="Models\Search\FilterCategoryModel.cs" />
+    <Compile Include="Models\Search\FilterCategoryOptionModel.cs" />
+    <Compile Include="Models\Search\FilterSearchConfigModel.cs" />
+    <Compile Include="Models\Search\FilterSearchModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
     <Compile Include="WebProxy\Win32Api.cs" />
@@ -611,6 +620,8 @@
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.min.css" />
     <Content Include="Content\dale.css" />
+    <Content Include="Content\data-inventory.css" />
+    <Content Include="Content\filter-search.css" />
     <Content Include="Content\dataflow.css" />
     <Content Include="Content\dataset-detail.css" />
     <Content Include="Content\datasets.css" />
@@ -781,6 +792,7 @@
     <Content Include="Images\BusinessAreaTiles\Meeting3.jpg" />
     <Content Include="Images\Category\hr.png" />
     <Content Include="Images\Category\hr.svg" />
+    <Content Include="Images\Category\investment.svg" />
     <Content Include="Images\Dale\DataInventoryHomePage.jpg" />
     <Content Include="Images\Dale\DataInventoryIcon.png" />
     <Content Include="Images\DataFlow\ConceptTeamwork1.jpg" />
@@ -788,6 +800,8 @@
     <Content Include="js\BusinessArea.js" />
     <Content Include="js\Dale.js" />
     <Content Include="js\DataFlow.js" />
+    <Content Include="js\DataInventory.js" />
+    <Content Include="js\FilterSearch.js" />
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
     <Content Include="js\Job.js" />
@@ -1645,16 +1659,23 @@
     <Content Include="Views\Dataset\Details\_DataPreview.cshtml" />
     <Content Include="Views\Dataset\Details\_DataFiles.cshtml" />
     <Content Include="Views\Home\_FeedEmpty.cshtml" />
+    <Content Include="Views\DataInventory\SearchResult.cshtml" />
+    <Content Include="Views\Search\FilterSearch.cshtml" />
+    <Content Include="Views\Search\FilterCategories.cshtml" />
+    <Content Include="Views\Search\FilterShowAll.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Helpers\Validation\" />
     <Folder Include="Images\Home\" />
     <Folder Include="Models\Dataset\ApiModels\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\AccessRequest\" />
     <Folder Include="Views\Admin\DisplayTemplates\" />
     <Folder Include="Views\Alert\" />
+    <Folder Include="Views\BaseDataInventory\" />
     <Folder Include="Views\ExternalFile\" />
+    <Folder Include="Views\FilterSearch\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Security\" />
     <Folder Include="Views\Subscription\" />

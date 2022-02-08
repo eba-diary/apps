@@ -101,8 +101,10 @@ namespace Sentry.data.Web
 
         [DisplayName("Description")]
         public string ConfigFileDesc { get; set; }
+
         [DisplayName("Delimiter")]
         public string Delimiter { get; set; }
+
         [DisplayName("Includes Header Row")]
         public bool HasHeader { get; set; }
 

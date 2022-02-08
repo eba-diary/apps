@@ -6,5 +6,6 @@ namespace Sentry.data.Core
         bool IsSecured { get; set; }
         Security Security { get; set; }
         string PrimaryContactId { get; set; }
+        bool IsSensitive { get; }
     }
 }

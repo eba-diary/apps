@@ -35,26 +35,13 @@ namespace Sentry.data.Web
 
             return new DaleAdvancedCriteriaDto()
             {
-                Asset = model.Asset,
-                AssetIsValid = model.AssetIsValid,
-                
+                Asset = model.Asset,                
                 Server = model.Server,
-                ServerIsValid = model.ServerIsValid,
-
                 Database = model.Database,
-                DatabaseIsValid = model.DatabaseIsValid,
-
                 Object = model.Object,
-                ObjectIsValid = model.ObjectIsValid,
-
                 ObjectType = model.ObjectType,
-                ObjectTypeIsValid = model.ObjectTypeIsValid,
-
                 Column = model.Column,
-                ColumnIsValid = model.ColumnIsValid,
-
-                SourceType = model.SourceType,
-                SourceTypeIsValid = model.SourceTypeIsValid
+                SourceType = model.SourceType
             };
         }
 
@@ -68,10 +55,8 @@ namespace Sentry.data.Web
                 Object = dto.Object,
                 ObjectType = dto.ObjectType,
                 Column = dto.Column,
-
                 IsSensitive = dto.IsSensitive,
                 ProdType = dto.ProdType,
-
                 ColumnType = dto.ColumnType,
                 MaxLength = dto.MaxLength,
                 Precision = dto.Precision,
@@ -79,11 +64,9 @@ namespace Sentry.data.Web
                 IsNullable = dto.IsNullable,
                 EffectiveDate = dto.EffectiveDate.ToString("MM/dd/yyyy HH:mm:ss"),
                 BaseColumnId = dto.BaseColumnId,
-
                 IsOwnerVerified = dto.IsOwnerVerified,
                 AssetList = CreateAssetList(dto.Asset),
                 SourceType = dto.SourceType,
-
                 ScanCategory = dto.ScanCategory,
                 ScanType = dto.ScanType
             };

@@ -266,9 +266,10 @@
             order: [],
 
             //style for columnVisibility and paging to show
-            dom: "<'row'<'col-xs-6'l><'col-xs-6 text-right'B>>" +
+            dom: "<'row'<'col-xs-12'i>>" +
+                "<'row'<'col-xs-6'l><'col-xs-6 text-right'B>>" +
                 "<'row'<'col-xs-12'tr>>" +
-                "<'row'<'col-xs-6'i><'col-xs-6 text-right'p>>",
+                "<'row'<'col-xs-12 text-center'p>>",
             
             //buttons to show and customize text for them
             buttons:

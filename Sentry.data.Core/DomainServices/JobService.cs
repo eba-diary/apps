@@ -122,8 +122,12 @@ namespace Sentry.data.Core
 
         public RetrieverJob InstantiateJobsForCreation(DataFlow df, DataSource dataSource)
         {
+            string methodName = $"{nameof(JobService)}_{nameof(InstantiateJobsForCreation)}";
+            Logger.Info($"{methodName} Method Start");
+
             RetrieverJob newJob = InstantiateJob(null, dataSource, df);
-            //_datasetContext.Add(newJob);
+
+            Logger.Info($"{methodName} Method End");
             return newJob;
         }
 
@@ -167,6 +171,9 @@ namespace Sentry.data.Core
 
         public void CreateDropLocation(RetrieverJob job)
         {
+            string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(CreateDropLocation).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
+
             try
             {
                 if ((job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsDataFlowBasic>())  && !System.IO.Directory.Exists(job.GetUri().LocalPath))
@@ -185,6 +192,7 @@ namespace Sentry.data.Core
 
                 Logger.Error(errmsg.ToString(), e);
             }
+            Logger.Info($"{methodName} Method End");
         }
 
         public void DisableJob(int id)
@@ -388,14 +396,21 @@ namespace Sentry.data.Core
 
         private RetrieverJob InstantiateJob(DatasetFileConfig dfc, DataSource dataSource, DataFlow df)
         {
+            string methodName = $"{nameof(JobService)}_{nameof(InstantiateJob)}";
+            Logger.Info($"{methodName} Method Start");
+
             Guid g = Guid.NewGuid();
+
+            Logger.Debug($"{methodName} compression object creation start");
             RetrieverJobOptions.Compression compression = new RetrieverJobOptions.Compression()
             {
                 IsCompressed = false,
                 CompressionType = null,
                 FileNameExclusionList = new List<string>()
             };
+            Logger.Debug($"{methodName} compression object creation end");
 
+            Logger.Debug($"{methodName} retrieverjoboptions object creation start");
             RetrieverJobOptions rjo = new RetrieverJobOptions()
             {
                 OverwriteDataFile = false,
@@ -405,7 +420,9 @@ namespace Sentry.data.Core
                 SearchCriteria = "\\.",
                 CompressionOptions = compression
             };
+            Logger.Debug($"{methodName} retrieverjoboptions object creation end");
 
+            Logger.Debug($"{methodName} retrieverjob object creation start");
             RetrieverJob rj = new RetrieverJob()
             {
                 TimeZone = "Central Standard Time",
@@ -422,7 +439,9 @@ namespace Sentry.data.Core
                 ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
                 DeleteIssueDTM = DateTime.MaxValue
             };
+            Logger.Debug($"{methodName} retrieverjob object creation End");
 
+            Logger.Debug($"{methodName} retrieverjob schedule creation start");
             if (dataSource.Is<S3Basic>())
             {
                 rj.Schedule = "*/1 * * * *";
@@ -435,6 +454,9 @@ namespace Sentry.data.Core
             {
                 throw new NotImplementedException("This method does not support this type of Data Source");
             }
+            Logger.Debug($"{methodName} retrieverjob schedule creation end");
+
+            Logger.Info($"{methodName} Method End");
 
             return rj;
         }

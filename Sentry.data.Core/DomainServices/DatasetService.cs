@@ -414,6 +414,11 @@ namespace Sentry.data.Core
                 results.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "SAID Asset is required.");
             }
 
+            if(dto.OriginationId == 0)
+            {
+                results.Add(Dataset.ValidationErrors.datasetOriginationRequired, "Dataset Origination is required");
+            }
+
             //Validate the Named Environment selection using the QuartermasterService
             results.MergeInResults(await _quartermasterService.VerifyNamedEnvironmentAsync(dto.SAIDAssetKeyCode, dto.NamedEnvironment, dto.NamedEnvironmentType).ConfigureAwait(false));
 

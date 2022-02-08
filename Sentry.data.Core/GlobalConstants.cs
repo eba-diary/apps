@@ -1,8 +1,7 @@
 ﻿namespace Sentry.data.Core
 {
     public static class GlobalConstants
-    {
-        
+    {        
         public static class System
         {
             public const string NAME = "Data.Sentry.Com";
@@ -381,5 +380,24 @@
             public const string DATA = "DATA_";
         }
 
+        public static class ElasticAliases
+        {
+            public const string DATA_INVENTORY = "data-inventory";
+        }
+
+        public static class FilterCategoryNames
+        {
+            public const string ASSET = "Asset";
+            public const string COLLECTIONNAME = "Collection Name";
+            public const string COLUMN = "Column";
+            public const string DATATYPE = "Datatype";
+            public const string DATABASE = "Database";
+            public const string NULLABLE = "Nullable";
+            public const string SENSITIVE = "Sensitive";
+            public const string ENVIRONMENT = "Environment";
+            public const string SERVER = "Server";
+            public const string SOURCETYPE = "Source Type";
+            public const string COLLECTIONTYPE = "Collection Type";
+        }
     }
 }
