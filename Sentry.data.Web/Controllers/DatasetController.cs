@@ -319,6 +319,7 @@ namespace Sentry.data.Web.Controllers
         /// </summary>
         /// <param name="id">Dataset ID</param>
         /// <param name="tab">Tab name</param>
+        /// <param name="data">DatasetDetailModel from the parent view</param>
         /// <returns></returns>
         [HttpPost]
         [Route("Dataset/DetailTab/{id}/{tab}/")]
