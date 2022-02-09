@@ -267,7 +267,7 @@ namespace Sentry.data.Web.Controllers
                 {
                     int datasetId = _datasetService.CreateAndSaveNewDataset(dto);
 
-                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.CREATED_DATASET, dto.DatasetName + " was created.", datasetId);
+                    _ = _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.CREATED_DATASET, dto.DatasetName + " was created.", datasetId);
                     return Json(new { Success = true, dataset_id = datasetId});
                     //return RedirectToAction("Detail", new { id = datasetId });
                 }
@@ -275,7 +275,7 @@ namespace Sentry.data.Web.Controllers
                 {
                     _datasetService.UpdateAndSaveDataset(dto);
 
-                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.UPDATED_DATASET, dto.DatasetName + " was created.", dto.DatasetId);
+                    _ = _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.UPDATED_DATASET, dto.DatasetName + " was created.", dto.DatasetId);
                     return Json(new { Success = true, dataset_id = dto.DatasetId });
                     //return RedirectToAction("Detail", new { id = dto.DatasetId });
                 }

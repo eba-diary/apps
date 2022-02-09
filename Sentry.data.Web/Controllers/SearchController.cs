@@ -115,7 +115,7 @@ namespace Sentry.data.Web.Controllers
                 Results_Returned = resultsReturned
             });
 
-            _eventService.PublishSuccessEvent(_datasetContext.EventTypes.Where(w => w.Description == "Search").FirstOrDefault().Description, reason, null, searchValue);
+            _eventService.PublishSuccessEvent(_datasetContext.EventTypes.Where(w => w.Description == "Search").FirstOrDefault().Description, reason, searchValue);
 
             return Json(true, JsonRequestBehavior.AllowGet);
         }

@@ -77,8 +77,8 @@ namespace Sentry.data.Web.WebApi.Controllers
                         Lineage_Table = HttpUtility.UrlDecode(DataObject_NME),
                         Results_Returned = allLineage.Count
                     });
-                    
-                    _eventService.PublishSuccessEventByDataAsset(_dataSetContext.EventTypes.Where(w => w.Description == "Search").FirstOrDefault().Description, "Searched Lineage", DataAsset_ID ?? 0, LineCDE, search);
+
+                    _ = _eventService.PublishSuccessEventByDataAsset(_dataSetContext.EventTypes.Where(w => w.Description == "Search").FirstOrDefault().Description, "Searched Lineage", DataAsset_ID ?? 0, LineCDE, search);
                     
                     return Ok(allLineage);
                 }

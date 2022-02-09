@@ -273,7 +273,7 @@ namespace Sentry.data.Web.Controllers
 
                 //ViewBag.ModifyType = "Edit";
 
-                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Configuration Edit Page", dfcm.DatasetId);
+                _eventService.PublishSuccessEventByConfigId(GlobalConstants.EventType.VIEWED, "Viewed Configuration Edit Page", configId);
 
                 return View(dfcm);
             }
