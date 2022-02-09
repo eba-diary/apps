@@ -3,6 +3,7 @@ using Hangfire;
 using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.Core;
+using Sentry.Configuration;
 using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure;
@@ -328,35 +329,22 @@ namespace Sentry.data.Web.Controllers
         [Route("Dataset/DetailTab/{id}/{tab}/")]
         public ActionResult DetailTab(int id, string tab)
         {
-            DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
-            if (dto != null)
+            switch (tab)
             {
-                DatasetDetailModel model = new DatasetDetailModel(dto);
-                model.DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue();
-                switch (tab)
-                {
-                    case ("SchemaColumns"):
-                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Schema Column Tab", dto.DatasetId);
-                        return PartialView("Details/_SchemaColumns", model);
-                    case ("SchemaAbout"):
-                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Schema About Tab", dto.DatasetId);
-                        return PartialView("Details/_SchemaAbout", model);
-                    case ("DataPreview"):
-                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Data Preview Tab", dto.DatasetId);
-                        return PartialView("Details/_DataPreview", model);
-                    case ("DataFiles"):
-                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Data Files Tab", dto.DatasetId);
-                        return PartialView("Details/_DataFiles", model);
-                    case ("SchemaSearch"):
-                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Schema Search Tab", dto.DatasetId);
-                        return PartialView("Details/_SchemaSearch", model);
-                    default:
-                        return HttpNotFound("Invalid Tab");
-                }
-            }
-            else
-            {
-                return HttpNotFound("Invalid Dataset Id");
+                case ("SchemaColumns"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Schema Column Tab", id);
+                    return PartialView("Details/_SchemaColumns", data);
+                case ("SchemaAbout"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Schema About Tab", id);
+                    return PartialView("Details/_SchemaAbout", data);
+                case ("DataPreview"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Data Preview Tab", id);
+                    return PartialView("Details/_DataPreview", data);
+                case ("DataFiles"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Data Files Tab", id);
+                    return PartialView("Details/_DataFiles", data);
+                default:
+                    return HttpNotFound("Invalid Tab");
             }
         }
 
@@ -507,8 +495,8 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public JsonResult SchemaSearcher(int datasetId, int schemaId, string search = null)
         {
-            ElasticSchemaSearchProvider elasticSchemaSearch = new ElasticSchemaSearchProvider(_elasticContext, datasetId);
-            List<ElasticSchemaField> results = elasticSchemaSearch.elasticSearchSchemaFields(search);
+            ElasticSchemaSearchProvider elasticSchemaSearch = new ElasticSchemaSearchProvider(_elasticContext, datasetId, schemaId);
+            List<ElasticSchemaField> results = elasticSchemaSearch.Search(search);
             return Json(results, JsonRequestBehavior.AllowGet);
         }
 
