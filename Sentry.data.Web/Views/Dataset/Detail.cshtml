@@ -292,9 +292,13 @@
                     <li role="presentation" class="nav-item">
                         <a class="nav-link" data-toggle="tab" href="#panelSchemaColumns" id="detailTabSchemaColumns" role="tab">Columns</a>
                     </li>
-                    <li role="presentation" class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Data Preview (Top 20 Rows)</a>
-                    </li>
+
+                    @if (Model.Security.CanViewFullDataset)
+                    {
+                        <li role="presentation" class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Data Preview (Top 20 Rows)</a>
+                        </li>
+                    }
                     <li role="presentation" class="nav-item">
                         <a class="nav-link" data-toggle="tab" href="#panelDataFiles" id="detailTabDataFiles" role="tab">Data Files</a>
                     </li>
@@ -318,12 +322,14 @@
                         <div id="tabSchemaColumns"></div>
                     }
                 </div>
-                <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
-                    <div id="tabDataPreview"></div>
-                </div>
+                @if (Model.Security.CanViewFullDataset)
+                {
+                    <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
+                        <div id="tabDataPreview"></div>
+                    </div>
+                }
                 <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
                     <div id="tabDataFiles"></div>
-
                 </div>
                 <div class="tab-pane fade" id="panelSchemaSearch" role="tabpanel">
                     <div id="tabSchemaSearch"></div>
@@ -337,12 +343,13 @@
     @Scripts.Render("~/bundles/prettyCron")
     @Scripts.Render("~/bundles/dataTables")
 
-    <script>
+<script>
 
         $(function () {
             vm = new data.Dataset.ViewModel();
             ko.applyBindings(vm);
-            data.Dataset.DetailInit();
+
+            data.Dataset.DetailInit(@(Html.Raw(Json.Encode(Model))));
         });
 
         var table;
@@ -373,5 +380,5 @@
 
 
 
-    </script>
+</script>
 }

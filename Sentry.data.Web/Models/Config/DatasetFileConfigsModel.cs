@@ -102,7 +102,6 @@ namespace Sentry.data.Web
         [DisplayName("Description")]
         public string ConfigFileDesc { get; set; }
 
-        [RequiredDelimiter("FileExtensionID")]
         [DisplayName("Delimiter")]
         public string Delimiter { get; set; }
 
