@@ -63,8 +63,8 @@ namespace Sentry.data.Infrastructure
         private string getElasticIndex()
         {
             string env = Config.GetDefaultEnvironmentName().ToLower();
-            if(env.Equals("test")) return "data-schema-column-metadata-test"
-            return "data-schema-column-metadata"
+            if (env.Equals("test")) return "data-schema-column-metadata-test";
+            return "data-schema-column-metadata";
         }
 
     }
