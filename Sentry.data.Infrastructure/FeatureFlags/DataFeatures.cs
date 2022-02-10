@@ -32,6 +32,9 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA3605_AllowSchemaParquetUpdate { get; }
         public IFeatureFlag<string> CLA3707_DataInventorySource { get; }
 
+        public IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY { get; }
+
+
         public DataFeatures(UserService userService)
         {
             _userService = userService;
@@ -49,6 +52,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA3240_UseDropLocationV2 = new BooleanFeatureFlagAmbientContext("CLA3240_UseDropLocationV2", false, LdClient, () => LdUser);
             CLA3605_AllowSchemaParquetUpdate = new BooleanFeatureFlagAmbientContext("CLA3605_AllowSchemaParquetUpdate", false, LdClient, () => LdUser);
             CLA3707_DataInventorySource = new StringFeatureFlagAmbientContext("CLA3707_DataInventorySource", "SQL", LdClient, () => LdUser);
+            CLA3637_EXPOSE_INV_CATEGORY = new BooleanFeatureFlagAmbientContext("CLA3637_EXPOSE_INV_CATEGORY", false, LdClient, () => LdUser);
         }
 
         /// <summary>

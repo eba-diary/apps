@@ -225,12 +225,21 @@ namespace Sentry.data.Core
         {
             List<string> errors = new List<string>();
 
-            Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
-
-            //remove any schemas which are marked for deletion
-            if (parent.DatasetFileConfigs.Any(x => !x.DeleteInd && x.Name.ToLower() == dto.Name.ToLower()))
+            if (dto.ConfigId == 0)
             {
-                errors.Add("Dataset config with that name already exists within dataset");
+                Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
+
+                //remove any schemas which are marked for deletion
+                if (parent.DatasetFileConfigs.Any(x => !x.DeleteInd && x.Name.ToLower() == dto.Name.ToLower()))
+                {
+                    errors.Add("Dataset config with that name already exists within dataset");
+                }
+            }
+
+            var currentFileExtension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Id == dto.FileExtensionId).Name.ToLower();
+            if (currentFileExtension == "delimited" && string.IsNullOrWhiteSpace(dto.Delimiter))
+            {
+                errors.Add("File Extension Delimited is missing it's delimiter.");
             }
 
             return errors;
