@@ -113,7 +113,7 @@ namespace Sentry.data.Web.Controllers
             cdm.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             cdm.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
 
-            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Creation Page", cdm.DatasetId);
+            _ = _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Creation Page", cdm.DatasetId);
 
             ViewData["Title"] = "Create Dataset";
 
@@ -138,7 +138,7 @@ namespace Sentry.data.Web.Controllers
                 model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
                 model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
 
-                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Edit Page", id);
+                _ = _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Edit Page", id);
                 
                 ViewData["Title"] = "Edit Dataset";
 
@@ -191,7 +191,7 @@ namespace Sentry.data.Web.Controllers
             cdm.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             cdm.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
 
-            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Creation Page", cdm.DatasetId);
+            _ = _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Creation Page", cdm.DatasetId);
             ViewData["Title"] = "Create Dataset";
             return PartialView("_DatasetCreateEdit", cdm);
         }
@@ -489,7 +489,7 @@ namespace Sentry.data.Web.Controllers
             DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
             DatasetDetailModel model = new DatasetDetailModel(dto);
 
-            Task.Factory.StartNew(() => _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Configuration Page", dto.DatasetId), TaskCreationOptions.LongRunning);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Configuration Page", dto.DatasetId);
 
             return View("Configuration", model);
         }
