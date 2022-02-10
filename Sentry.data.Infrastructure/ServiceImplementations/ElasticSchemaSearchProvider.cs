@@ -13,7 +13,7 @@ namespace Sentry.data.Infrastructure
         private readonly IElasticContext _context;
         private readonly int DatasetId;
         private readonly string Index;
-        private int SchemaId;
+        private readonly int SchemaId;
 
         public ElasticSchemaSearchProvider(IElasticContext context, int datasetId, int schemaId)
         {
