@@ -289,7 +289,7 @@ namespace Sentry.data.Goldeneye
                     //STEP 3: MARK EVENTS as PROCESSED
                     foreach (Event _event in events)
                     {
-                        if (_event.IsProcessed == false)
+                        if (!_event.IsProcessed)
                         {
                             _event.IsProcessed = true;
                             _event.TimeNotified = DateTime.Now;

@@ -469,15 +469,12 @@ namespace Sentry.data.Core.Tests
 
         public static Event MockEvent()
         {
-            Event e = new Event();
-            e.EventType = MockEventTypes()[0];
-            e.Status = MockEventStatuses()[0];
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = "012345";
-
-            return e;
+            return new Event
+            {
+                EventType = MockEventTypes()[0],
+                Status = MockEventStatuses()[0],
+                UserWhoStartedEvent = "012345"
+            };
         }
 
         public static List<ProducerS3DropAction> MockProducerS3DropActions()

@@ -86,7 +86,7 @@ namespace Sentry.data.Core
         //SINCE SCHEMA SAVED FROM MULTIPLE PLACES, HAVE ONE METHOD TO TAKE CARE OF PUBLISHING SAVE
         public void PublishSchemaEvent(int datasetId, int schemaId)
         {
-            _eventService.PublishSuccessEventBySchemaId(GlobalConstants.EventType.CREATE_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, GlobalConstants.EventType.CREATE_DATASET_SCHEMA, datasetId, schemaId);
+            _eventService.PublishSuccessEventBySchemaId(GlobalConstants.EventType.CREATE_DATASET_SCHEMA, GlobalConstants.EventType.CREATE_DATASET_SCHEMA, datasetId, schemaId);
         }
 
         public int CreateAndSaveSchemaRevision(int schemaId, List<BaseFieldDto> schemaRows, string revisionname, string jsonSchema = null)
