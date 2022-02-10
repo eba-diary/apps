@@ -1663,6 +1663,7 @@
     <Content Include="Views\Search\FilterSearch.cshtml" />
     <Content Include="Views\Search\FilterCategories.cshtml" />
     <Content Include="Views\Search\FilterShowAll.cshtml" />
+    <Content Include="Views\Dataset\Details\_SchemaSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

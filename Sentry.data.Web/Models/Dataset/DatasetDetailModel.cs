@@ -38,5 +38,6 @@ namespace Sentry.data.Web
         public List<Tuple<string, List<AssociatedDataFlowModel>>> DataFlows { get; set; }
         public bool DisplayDataflowMetadata { get; set; }
         public bool DisplayTabSections { get; set; }
+        public bool DisplaySchemaSearch { get; set; }
     }
 }
