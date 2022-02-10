@@ -40,6 +40,7 @@ data.Dataset = {
             }
         });
         self.DFSDropLocation = ko.observable();
+        self.SchemaId = null;
         self.S3DropLocation = ko.observable();
         self.OtherJobs = ko.observableArray();
         self.DataFlows = ko.observableArray();
@@ -513,7 +514,7 @@ data.Dataset = {
                 if (val.ObjectStatus === 1) self.vm.DataFlows().push(item);
             });
             self.vm.DataFlows.notifySubscribers();
-
+            self.vm.SchemaId = result.SchemaId;
             //Determine last
             var d = new Date(result.DataLastUpdated);
             if (d < new Date('1990-01-01')) {
@@ -1376,8 +1377,9 @@ data.Dataset = {
             if ($('#tabSchemaSearch').is(':empty')) {
                 Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
+                    type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaSearch',
-                    dataType: 'html',
+                    data: datasetDetailModel,
                     success: function (view) {
                         $('#tabSchemaSearch').html(view);
                         data.Dataset.InitSchemaSearchTab();
@@ -2187,9 +2189,12 @@ data.Dataset = {
     },
 
     InitSchemaSearchTab() {
+        var datasetId = $('#RequestAccessButton').attr("data-id");
+        
         $("#schemaSearchTable").DataTable({
             "ajax": {
-                "url": "/Dataset/Detail/20/SchemaSearch/40/",
+                "url": "/Dataset/Detail/" + datasetId + "/SchemaSearch/" + self.vm.SchemaId + "/",
+                "type": "POST",
                 "dataSrc": ""
             },
             "columns": [
@@ -2197,14 +2202,16 @@ data.Dataset = {
                 { "data": "Description" },
                 { "data": "DotNamePath" }
             ],
-            "dom": 'lrtip'
+            "dom": 'lrt<"dataset-detail-datatable-information"i><"dataset-detail-datatable-pagination"p>'
         });
 
         //search button on change query elastic
         $("#schemaSearchInput").change(function () {
             var searchInput = $("#schemaSearchInput").val();
             var schemaSearchTable = $("#schemaSearchTable").DataTable();
-            schemaSearchTable.ajax.url("/Dataset/Detail/20/SchemaSearch/40/" + searchInput).load();
+            var datasetId = $('#RequestAccessButton').attr("data-id");
+
+            schemaSearchTable.ajax.url("/Dataset/Detail/" + datasetId +"/SchemaSearch/" + self.vm.SchemaId + "/" + searchInput).load();
         });
     }
 };

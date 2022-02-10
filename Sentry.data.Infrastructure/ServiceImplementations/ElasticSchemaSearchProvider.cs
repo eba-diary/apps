@@ -32,23 +32,21 @@ namespace Sentry.data.Infrastructure
             Task<ElasticResult<ElasticSchemaField>> result = _context.SearchAsync<ElasticSchemaField>(s => s
                 .Index(Index)
                 .Query(q => q
-                    .Term(p => p.Name, toSearch) || q
-                    .Term(p => p.Description, toSearch) || q
-                    .Term(p => p.DotNamePath, toSearch)
+                    .Bool(b => b
+                        .Filter(
+                            bm => bm.Term(p => p.DatasetId, 301),
+                            bm => bm.Term(p => p.SchemaId, 1121)
+                        )
+                        .Should(
+                            bs => bs.Term(p => p.Name, toSearch),
+                            bs => bs.Term(p => p.Description, toSearch),
+                            bs => bs.Term(p => p.DotNamePath, toSearch)
+                        ).MinimumShouldMatch(String.IsNullOrEmpty(toSearch) ? 0 : 1) //If we are searching, we need something to match.
+                    )
                 )
-                .Size(1000)
+                .Size(2000)
             );
             return (List<ElasticSchemaField>)result.Result.Documents;
-        }
-
-
-        /// <summary>
-        /// Method to change schema. 
-        /// </summary>
-        /// <param name="newSchemaId"></param>
-        public void changeSchema(int newSchemaId)
-        {
-            //SchemaId = newSchemaId;
         }
 
         /// <summary>

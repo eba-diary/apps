@@ -309,6 +309,7 @@ namespace Sentry.data.Web.Controllers
                 DatasetDetailModel model = new DatasetDetailModel(dto);
                 model.DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue();
                 model.DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue();
+                model.DisplaySchemaSearch = _featureFlags.CLA3553_SchemaSearch.GetValue();
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
 
                 return View(model);
@@ -344,6 +345,9 @@ namespace Sentry.data.Web.Controllers
                 case ("DataFiles"):
                     _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Data Files Tab", id);
                     return PartialView("Details/_DataFiles", data);
+                case ("SchemaSearch"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Schema Search Tab", id);
+                    return PartialView("Details/_SchemaSearch", data);
                 default:
                     return HttpNotFound("Invalid Tab");
             }
@@ -372,6 +376,9 @@ namespace Sentry.data.Web.Controllers
                     return;
                 case ("DataFiles"):
                     _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Data Files Tab", id);
+                    return;
+                case ("SchemaSearch"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Schema Search Tab", id);
                     return;
             }
         }
@@ -493,8 +500,8 @@ namespace Sentry.data.Web.Controllers
         }
 
         [Route("Dataset/Detail/{datasetId}/SchemaSearch/{schemaId}/{search?}")]
-        [HttpGet]
-        public JsonResult SchemaSearcher(int datasetId, int schemaId, string search = null)
+        [HttpPost]
+        public JsonResult SchemaSearch(int datasetId, int schemaId, string search = null)
         {
             ElasticSchemaSearchProvider elasticSchemaSearch = new ElasticSchemaSearchProvider(_elasticContext, datasetId, schemaId);
             List<ElasticSchemaField> results = elasticSchemaSearch.Search(search);

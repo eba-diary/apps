@@ -5,20 +5,23 @@
 
 <br />
 
-<div>
-    <div class="input-group mb-3 inputGroupCenter">
-        <span class="input-group-addon">
-            <i class="glyphicon glyphicon-search"></i>
-        </span>
-        <input id="schemaSearchInput" type="text" class="form-control" placeholder="Column Search" aria-label="Search" aria-describedby="basic-addon1">
+<div class="container">
+    <div class="row table-responsive">
+        <div class="input-group mb-3 inputGroupCenter">
+            <span class="input-group-addon">
+                <i class="glyphicon glyphicon-search"></i>
+            </span>
+            <input id="schemaSearchInput" type="text" class="form-control" placeholder="Column Search" aria-label="Search" aria-describedby="basic-addon1">
+        </div>
+
+        <table class="table table-striped table-bordered table-hover nowrap dataTable no-footer" id="schemaSearchTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>DotNamePath</th>
+                </tr>
+            </thead>
+        </table>
     </div>
-    <table class="table table-striped table-bordered table-hover nowrap dataTable no-footer" id="schemaSearchTable">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>DotNamePath</th>
-            </tr>
-        </thead>
-    </table>
 </div>

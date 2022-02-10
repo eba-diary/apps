@@ -110,3 +110,12 @@
     margin-left: auto;
     margin-right: auto;
 }
+
+.dataset-detail-datatable-pagination {
+    display: inline-block;
+    float: right;
+}
+
+.dataset-detail-datatable-information {
+    display: inline-block;
+}

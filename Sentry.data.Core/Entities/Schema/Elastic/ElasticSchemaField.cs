@@ -38,8 +38,8 @@ namespace Sentry.data.Core.Entities.Schema.Elastic
         [PropertyName("DotNamePath")]
         public string DotNamePath { get; set; }
         [PropertyName("DatasetId")]
-        int DatasetId { get; set; }
+        public int DatasetId { get; set; }
         [PropertyName("SchemaId")]
-        int SchemaId { get; set; }
+        public int SchemaId { get; set; }
     }
 }
