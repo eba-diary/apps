@@ -815,6 +815,14 @@ data.Dataset = {
     //INIT _DatasetCreateEdit.cshtml
     FormInit: function (hrEmpUrl, hrEmpEnv, PageSubmitFunction, PageCancelFunction) {
 
+        //_DatasetCreateEdit Submit Button click 
+        $('#SubmitDatasetForm').click(function (e) {
+
+            //disable submit button so they cannot click more than once
+            $('#SubmitDatasetForm').addClass("dale-disable-stuff");
+        });
+
+
         //CONFIGURE SAID ASSET PICKER on _DatasetCreateEdit.cshtml TO INCLUDE a filter box that comes up
         $(document).ready(function () {
             $('.selectpicker').selectpicker({
