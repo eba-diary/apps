@@ -106,8 +106,7 @@ namespace Sentry.data.Web.Controllers
             ViewBag.IsLine = false;
             ViewBag.DataAsset = da;
 
-            if (da != null) { return View(da); }
-            else { return RedirectToAction("NotFound", "Error"); }
+            return da != null ? View(da) : (ActionResult)RedirectToAction("NotFound", "Error");
         }
 
         public ActionResult DataAsset(string assetName)
