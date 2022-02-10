@@ -346,7 +346,7 @@ namespace Sentry.data.Web.Controllers
                     _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Detail Data Files Tab", id);
                     return PartialView("Details/_DataFiles", data);
                 case ("SchemaSearch"):
-                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Schema Search Tab", id);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Schema Search Tab", id);
                     return PartialView("Details/_SchemaSearch", data);
                 default:
                     return HttpNotFound("Invalid Tab");
@@ -378,7 +378,7 @@ namespace Sentry.data.Web.Controllers
                     _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Detail Data Files Tab", id);
                     return;
                 case ("SchemaSearch"):
-                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Schema Search Tab", id);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Schema Search Tab", id);
                     return;
             }
         }
