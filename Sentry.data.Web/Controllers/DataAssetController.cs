@@ -1,31 +1,26 @@
-﻿using System;
+﻿using Sentry.data.Common;
+using Sentry.data.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using Sentry.data.Core;
-using System.Text;
-using Sentry.DataTables.Mvc;
-using Sentry.DataTables.Shared;
-using Sentry.DataTables.QueryableAdapter;
-using Sentry.data.Infrastructure;
 using System.Threading.Tasks;
-using Sentry.data.Common;
+using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
 {
     [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATA_ASSET_VIEW)]
     public class DataAssetController : BaseController
     {
+        #region Fields
         public readonly MetadataRepositoryService _metadataRepositoryService;
-
         public readonly IDataAssetContext _dataAssetContext;
         public readonly IDatasetContext _dataSetContext;
-
         public readonly IAssociateInfoProvider _associateInfoService;
         public readonly UserService _userService;
+        #endregion
 
-        public DataAssetController(MetadataRepositoryService metadataRepositoryService, IDataAssetContext dataAssetContext, IDatasetContext datasetContext,  IAssociateInfoProvider associateInfoService, UserService userService)
+        #region Constructor
+        public DataAssetController(MetadataRepositoryService metadataRepositoryService, IDataAssetContext dataAssetContext, IDatasetContext datasetContext, IAssociateInfoProvider associateInfoService, UserService userService)
         {
             _metadataRepositoryService = metadataRepositoryService;
             _dataAssetContext = dataAssetContext;
@@ -33,7 +28,9 @@ namespace Sentry.data.Web.Controllers
             _associateInfoService = associateInfoService;
             _userService = userService;
         }
+        #endregion
 
+        #region Controller Methods
         public ActionResult Index(int id)
         {
             var das = new List<DataAsset>(_dataAssetContext.GetDataAssets());
@@ -50,19 +47,10 @@ namespace Sentry.data.Web.Controllers
                 da.LastUpdated = DateTime.Now;
                 da.Status = 1;
 
-                Event e = new Event
-                {
-                    EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
-                    Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                    UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
-                    DataAsset = da.Id,
-                    Reason = "Viewed Data Asset"
-                };
-                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+                CreateEvent("Views Data Asset", da.Id);
             }
 
-            if (da != null) { return View(da); }
-            else { return RedirectToAction("NotFound", "Error"); }
+            return da != null ? View(da) : (ActionResult)RedirectToAction("NotFound", "Error");
         }
 
         [Route("Lineage/{line}")]
@@ -71,24 +59,17 @@ namespace Sentry.data.Web.Controllers
             ViewBag.IsLine = true;
             ViewBag.LineName = line;
 
-            Event e = new Event
-            {
-                EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
-                Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId
-            };
-
+            string lineCde = null;
             if (line == "Personal Lines" || line.ToUpper() == "PL")
             {
-                e.Line_CDE = "PL";
+                lineCde = "PL";
             }
             else if (line == "Commercial Lines" || line.ToUpper() == "CL")
             {
-                e.Line_CDE = "CL";
+                lineCde = "CL";
             }
 
-            e.Reason = "Viewed Lineage for " + line;
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+            CreateEvent($"Viewed Lineage for {line}", lineCode: lineCde);
 
             return View();
         }
@@ -109,25 +90,17 @@ namespace Sentry.data.Web.Controllers
                 da.LastUpdated = DateTime.Now;
                 da.Status = 1;
 
-                Event e = new Event
-                {
-                    EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
-                    Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                    UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
-                    DataAsset = da.Id
-                };
-
+                string lineCode = null;
                 if (line == "Personal Lines" || line.ToUpper() == "PL")
                 {
-                    e.Line_CDE = "PL";
+                    lineCode = "PL";
                 }
                 else if (line == "Commercial Lines" || line.ToUpper() == "CL")
                 {
-                    e.Line_CDE = "CL";
+                    lineCode = "CL";
                 }
 
-                e.Reason = "Viewed Lineage for " + da.DisplayName;
-                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+                CreateEvent($"Viewed Lineage for {da.DisplayName}", da.Id, lineCode);
             }
 
             ViewBag.IsLine = false;
@@ -152,20 +125,28 @@ namespace Sentry.data.Web.Controllers
                 da.LastUpdated = DateTime.Now;
                 da.Status = 1;
 
-                Event e = new Event
-                {
-                    EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
-                    Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                    UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
-                    DataAsset = da.Id,
-                    Reason = "Viewed Data Asset"
-                };
-                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+                CreateEvent("Viewed Data Asset", da.Id);
             }
 
             return da != null ? View("Index", da) : (ActionResult)RedirectToAction("NotFound", "Error");
         }
+        #endregion
 
+        #region Methods
+        private void CreateEvent(string reason, int? dataAssetId = null, string lineCode = null)
+        {
+            Event e = new Event()
+            {
+                EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
+                Reason = reason,
+                DataAsset = dataAssetId,
+                Line_CDE = lineCode
+            };
 
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+        }
+        #endregion
     }
 }
