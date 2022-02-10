@@ -1,66 +1,86 @@
 ﻿@model List<FilterCategoryModel>
 
-@{ 
+@{
     IEnumerable<FilterCategoryModel> orderedModel = Model.Where(x => x.CategoryOptions.Count > 1 || x.CategoryOptions.All(a => a.Selected)).OrderBy(x => x.CategoryName);
 }
 
+@functions
+{
+    public string SafeValue(string value)
+    {
+        return value.Length > 25 ? value.Substring(0, 22) + "..." : value;
+    }
+}
+
+@helper DisplayCategoryOptions(IEnumerable<FilterCategoryOptionModel> options)
+{
+    foreach (FilterCategoryOptionModel option in options.ToList())
+    {
+        <li class="filter-search-category-option" title="@option.OptionValue">
+            <label>
+                <input type="checkbox" class="filter-search-category-option-checkbox" id="@option.OptionId" value="@option.OptionValue" checked="@option.Selected" />
+                <strong>@SafeValue(option.OptionValue)</strong>
+                <span>(@option.ResultCount.ToString("N0"))</span>
+            </label>
+        </li>
+    }
+}
+
 <div class="filter-search-active-options-container bottom-border display-none">
-    @foreach (FilterCategoryOptionModel option in orderedModel.SelectMany(x => x.CategoryOptions.OrderBy(o => o.OptionValue).ToList()))
+    @foreach (FilterCategoryOptionModel option in orderedModel.SelectMany(x => x.CategoryOptions.OrderByDescending(o => o.ResultCount).ToList()))
     {
         <button type="button" class="btn btn-default filter-search-active-option-close display-none" id="clearOption_@option.OptionId">
             <span class="active-option-close-symbol">&#x2715</span>
-            <span>@option.ParentCategoryName: @option.OptionValue</span>
+            <span><strong>@option.ParentCategoryName</strong>: @SafeValue(option.OptionValue)</span>
         </button>
     }
 </div>
 
 <div class="filter-search-categories">
-    @foreach (FilterCategoryModel category in orderedModel)
+    @if (orderedModel.Any())
     {
-        IEnumerable<FilterCategoryOptionModel> options = category.CategoryOptions.OrderBy(o => o.OptionValue);
-        string categoryTypeId = "categoryType_" + category.CategoryName.Replace(" ", "_").Replace("/", "_");
-        string categoryMoreId = "categoryMore_" + category.CategoryName.Replace(" ", "_").Replace("/", "_");
+        foreach (FilterCategoryModel category in orderedModel)
+        {
+            IEnumerable<FilterCategoryOptionModel> options = category.CategoryOptions.OrderByDescending(o => o.ResultCount);
+            string safeName = category.CategoryName.Replace(" ", "_").Replace("/", "_");
+            string categoryTypeId = "categoryType_" + safeName;
+            string categoryMoreId = "categoryMore_" + safeName;
+            int visibleOptionCount = 8;
 
-        <div class="filter-search-category-container bottom-border">
-            <div class="filter-search-category-head" id="@categoryTypeId">
-                <span>@category.CategoryName</span>
-                <span class="glyphicon glyphicon-chevron-down" id="icon_@categoryTypeId"></span>
-            </div>
+            <div class="filter-search-category-container bottom-border">
+                <div class="filter-search-category-head" id="@categoryTypeId">
+                    <span>@category.CategoryName</span>
+                    <span class="glyphicon glyphicon-chevron-down" id="icon_@categoryTypeId"></span>
+                </div>
 
-            <div class="filter-search-category-options display-none" id="hide_@categoryTypeId">
-                <ul class="list-unstyled">
-                    @foreach (FilterCategoryOptionModel option in options.Take(5).ToList())
-                    {
-                        <li class="filter-search-category-option">
-                            <label>
-                                <input type="checkbox" class="filter-search-category-option-checkbox" id="@option.OptionId" value="@option.OptionValue" checked="@option.Selected" />
-                                <strong class="filter-search-category-option-name">@option.OptionValue</strong>
-                                <span>(@option.ResultCount.ToString("N0"))</span>
-                            </label>
+                <div class="filter-search-category-options display-none" id="hide_@categoryTypeId">
+                    <ul class="list-unstyled">
+                        @DisplayCategoryOptions(options.Take(visibleOptionCount))
+
+                        <li class="display-none" id="hidden_@categoryMoreId">
+                            <ul class="notNested">
+                                @DisplayCategoryOptions(options.Skip(visibleOptionCount))
+                            </ul>
                         </li>
+                    </ul>
+
+                    @if (category.CategoryOptions.Count > 15)
+                    {
+                        <a href="#" class="filter-search-category-more" id="@("categoryAll_" + safeName)" data-toggle="modal" data-target="#categoryModal_@safeName">See All</a>
                     }
-
-                    <li class="display-none" id="hidden_@categoryMoreId">
-                        <ul class="notNested">
-                            @foreach (FilterCategoryOptionModel option in options.Skip(5).ToList())
-                            {
-                                <li class="filter-search-category-option">
-                                    <label>
-                                        <input type="checkbox" class="filter-search-category-option-checkbox" id="@option.OptionId" value="@option.OptionValue" checked="@option.Selected" />
-                                        <strong>@option.OptionValue</strong>
-                                        <span>(@option.ResultCount.ToString("N0"))</span>
-                                    </label>
-                                </li>
-                            }
-                        </ul>
-                    </li>
-                </ul>
-
-                @if (category.CategoryOptions.Count >= 6)
-                {
-                    <a href="#" class="filter-search-category-more" id="@categoryMoreId">Show More</a>
-                }
+                    else if (category.CategoryOptions.Count > visibleOptionCount)
+                    {
+                        <a href="#" class="filter-search-category-more" id="@categoryMoreId">Show More</a>
+                    }
+                </div>
             </div>
+        }
+    }
+    else
+    {
+        <div class="filter-search-categories-none">
+            <span class="glyphicon glyphicon-alert"></span>
+            <div>No filters available for current search</div>
         </div>
     }
 </div>

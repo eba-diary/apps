@@ -12,7 +12,7 @@ namespace Sentry.data.Core
 
         [PropertyName("asset_cde")]
         [GlobalSearchField]
-        [FilterSearchField(FilterCategoryNames.ASSET)]
+        [FilterSearchField(FilterCategoryNames.ASSET, true)]
         public string AssetCode { get; set; }
 
         [PropertyName("basedatabase_id")]
@@ -20,7 +20,7 @@ namespace Sentry.data.Core
 
         [PropertyName("base_nme")]
         [GlobalSearchField]
-        [FilterSearchField(FilterCategoryNames.TABLEVIEWNAME)]
+        [FilterSearchField(FilterCategoryNames.COLLECTIONNAME)]
         public string BaseName { get; set; }
 
         [PropertyName("change_cnt")]
@@ -46,7 +46,7 @@ namespace Sentry.data.Core
 
         [PropertyName("database_nme")]
         [GlobalSearchField]
-        [FilterSearchField(FilterCategoryNames.DATABASE)]
+        [FilterSearchField(FilterCategoryNames.DATABASE, true)]
         public string DatabaseName { get; set; }
 
         [PropertyName("effectivechange_cnt")]
@@ -57,6 +57,9 @@ namespace Sentry.data.Core
 
         [PropertyName("effective_dtm")]
         public DateTime EffectiveDateTime { get; set; }
+
+        [PropertyName("expirationchange_cnt")]
+        public int ExpirationChangeCount { get; set; }
 
         [PropertyName("expiration_dte")]
         public DateTime? ExpirationDate { get; set; }
@@ -121,7 +124,7 @@ namespace Sentry.data.Core
 
         [PropertyName("type_dsc")]
         [GlobalSearchField]
-        [FilterSearchField(FilterCategoryNames.TYPE)]
+        [FilterSearchField(FilterCategoryNames.COLLECTIONTYPE)]
         public string TypeDescription { get; set; }
 
         [PropertyName("@version")]
@@ -140,7 +143,7 @@ namespace Sentry.data.Core
                 ObjectType = TypeDescription,
                 Column = ColumnName,
                 IsSensitive = IsSensitive,
-                ProdType = ProdType,
+                ProdType = FilterCategoryOptionNormalizer.Normalize(FilterCategoryNames.ENVIRONMENT, ProdType),
                 ColumnType = ColumnType,
                 MaxLength = MaxLength ?? 0,
                 Precision = Precision ?? 0,

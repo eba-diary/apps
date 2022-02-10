@@ -1,7 +1,7 @@
 ﻿.search-horizontal-center {
     display: flex;
     justify-content: center;
-    padding-top: 0.5em;
+    padding: 0.5em 0;
 }
 
 .search-head {
@@ -9,6 +9,10 @@
     width:40%;
     min-width: 500px;
 }
+
+    .search-head a {
+        vertical-align: super;
+    }
 
 .search-head-item {
     display: inline-block;
@@ -34,6 +38,21 @@
     width: 300px;
 }
 
+.filter-search-result-count-container {
+    text-align: right;
+}
+
+    .filter-search-result-count-container span {
+        color: #003da5;
+        font-weight: bold;
+        font-family: sans-serif;
+    }
+
+.filter-search-total-results {
+    font-size: 1.25em;
+    margin: 0;
+}
+
 .filter-search-title-container {
     display: flex;
 }
@@ -48,7 +67,7 @@
     width: 100%;
 }
 
-#filter-search-apply {
+.filter-search-apply {
     margin: 0 0 0.5em 0.5em;
     height: fit-content;
     align-self: end;
@@ -84,7 +103,7 @@
     background-color: #fff !important;
     border: none !important;
     cursor: pointer;
-    padding: 1em;
+    padding: 0.75em;
 }
 
     .filter-search-category-head span:first-of-type {
@@ -114,7 +133,7 @@
     font-size: 14px;
     cursor: pointer;
     width: 100%;
-    padding: 0.5em 0 0.5em 1em;
+    padding: 0.5em 1em;
     list-style: none;
 }
 
@@ -130,14 +149,19 @@
 
     .filter-search-category-option input {
         cursor: pointer;
-        width: 18px;
-        height: 18px;
+        min-width: 16px;
+        min-height: 16px;
         margin: 0 0.5em 0 0 !important;
+    }
+
+    .filter-search-category-option strong {
+        width: 100%;
     }
 
     .filter-search-category-option span {
         font-size: 12px;
         margin-left: 0.25em;
+        font-family: sans-serif;
     }
 
 .filter-search-category-more {
@@ -146,14 +170,38 @@
     padding-bottom: 1em
 }
 
+.filter-search-categories-none {
+    text-align: center;
+    margin-top: 5em;
+}
+
+    .filter-search-categories-none span {
+        font-size: 2em;
+    }
+
+    .filter-search-categories-none div {
+        font-size: 1.5em;
+    }
+
 .filter-search-result-sentry-spinner {
     width: 100%;
     display: flex;
+    margin-top: 8em;
 }
+
+.filter-search-results-none {
+    width: 100%;
+    margin-top: 4em;
+    text-align: center;
+    font-size: 1.75em;
+}
+
+    .filter-search-results-none span {
+        font-size: 2.5em;
+    }
 
 .filter-search-results-container {
     width: 100%;
-    margin-top: 1em;
 }
 
 .pagination {
@@ -165,4 +213,14 @@
 
 .bottom-border {
     border-bottom: 1px solid #ebebeb;
+}
+
+.filter-search-modal-body {
+    max-height: calc(100vh - 221px);
+    overflow-y: auto;
+}
+
+.filter-search-modal-option {
+    display: inline-block;
+    width: 33%;
 }

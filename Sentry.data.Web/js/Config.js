@@ -253,7 +253,10 @@ data.Config = {
     },
 
     CreateFormSubmitInit: function (e) {
-        e.preventDefault();
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
+
         $.ajax({
             url: "/Config/DatasetFileConfigForm",
             method: "POST",
@@ -280,7 +283,10 @@ data.Config = {
     },
 
     CreateFormCancelInit: function (e) {
-        e.preventDefault();
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
+
         window.location = data.Config.CancelLink($(this).data("id"));
     },
 

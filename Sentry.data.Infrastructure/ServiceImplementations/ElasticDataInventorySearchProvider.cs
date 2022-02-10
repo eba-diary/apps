@@ -38,19 +38,9 @@ namespace Sentry.data.Infrastructure
         }
 
         public FilterSearchDto GetSearchFilters(DaleSearchDto dto)
-        {
-            //get fields that are filterable via custom attribute
-            Dictionary<string, Field> filterCategoryFields = NestHelper.FilterCategoryFields<DataInventory>();
-
-            //build aggregation query
-            AggregationDictionary aggregations = new AggregationDictionary();
-            foreach (KeyValuePair<string, Field> field in filterCategoryFields)
-            {
-                aggregations.Add(field.Key, new TermsAggregation(field.Key) { Field = field.Value });
-            }
-
+        {           
             SearchRequest<DataInventory> request = BuildTextSearchRequest(dto, 0);
-            request.Aggregations = aggregations;
+            request.Aggregations = NestHelper.GetFilterAggregations<DataInventory>();
 
             //get aggregation results
             FilterSearchDto resultDto = new FilterSearchDto();
@@ -58,29 +48,12 @@ namespace Sentry.data.Infrastructure
             AggregateDictionary aggResults = GetElasticResult(dto, resultDto, request).Aggregations;
 
             //translate results to dto
-            if (aggResults != null)
+            foreach (string categoryName in request.Aggregations.Select(x => x.Key).ToList())
             {
-                foreach (string categoryName in filterCategoryFields.Keys)
+                TermsAggregate<string> categoryResults = aggResults?.Terms(categoryName);
+                if (categoryResults?.Buckets?.Any() == true && categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
                 {
-                    TermsAggregate<string> categoryResults = aggResults.Terms(categoryName);
-                    if (categoryResults?.Buckets?.Any() == true && categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
-                    {
-                        FilterCategoryDto categoryDto = new FilterCategoryDto() { CategoryName = categoryName };
-
-                        foreach (var bucket in categoryResults.Buckets)
-                        {
-                            string bucketKey = bucket.KeyAsString ?? bucket.Key;
-                            categoryDto.CategoryOptions.Add(new FilterCategoryOptionDto()
-                            {
-                                OptionValue = bucketKey,
-                                ResultCount = bucket.DocCount.GetValueOrDefault(),
-                                ParentCategoryName = categoryName,
-                                Selected = dto.FilterCategories?.Any(x => x.CategoryName == categoryName && x.CategoryOptions?.Any(o => o.OptionValue == bucketKey && o.Selected) == true) == true
-                            });
-                        }
-
-                        resultDto.FilterCategories.Add(categoryDto);
-                    }
+                    resultDto.FilterCategories.Add(BuildFilterCategoryDto(categoryResults.Buckets, categoryName, dto.FilterCategories));
                 }
             }
 
@@ -201,7 +174,7 @@ namespace Sentry.data.Infrastructure
             if (!string.IsNullOrWhiteSpace(dto.Criteria))
             {
                 //broad search for criteria across all searchable fields
-                Nest.Fields fields = NestHelper.SearchFields<DataInventory>();
+                Nest.Fields fields = NestHelper.GetSearchFields<DataInventory>();
 
                 //split search terms regardless of amount of spaces between words
                 List<string> terms = dto.Criteria.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -260,7 +233,7 @@ namespace Sentry.data.Infrastructure
                 filter.Add(new QueryStringQuery()
                 {
                     Query = string.Join(" OR ", category.CategoryOptions.Where(x => x.Selected).Select(x => x.OptionValue)),
-                    DefaultField = NestHelper.FilterCategoryField<DataInventory>(category.CategoryName)
+                    DefaultField = NestHelper.GetFilterCategoryField<DataInventory>(category.CategoryName)
                 });
             }
 
@@ -305,6 +278,31 @@ namespace Sentry.data.Infrastructure
         {
             TermsAggregate<string> agg = resultTask.Result.Aggregations.Terms(AssetCategoriesAggregationKey);
             return agg.Buckets.SelectMany(x => x.Key.Split(',').Select(s => s.Trim())).Distinct().ToList();
+        }
+
+        private FilterCategoryDto BuildFilterCategoryDto(IReadOnlyCollection<KeyedBucket<string>> buckets, string categoryName, List<FilterCategoryDto> requestFilters)
+        {
+            FilterCategoryDto categoryDto = new FilterCategoryDto() { CategoryName = categoryName };
+
+            foreach (var bucket in buckets)
+            {
+                string bucketKey = bucket.KeyAsString ?? bucket.Key;
+                categoryDto.CategoryOptions.Add(new FilterCategoryOptionDto()
+                {
+                    OptionValue = bucketKey,
+                    ResultCount = bucket.DocCount.GetValueOrDefault(),
+                    ParentCategoryName = categoryName,
+                    Selected = requestFilters?.Any(x => x.CategoryName == categoryName && x.CategoryOptions?.Any(o => o.OptionValue == bucketKey && o.Selected) == true) == true
+                });
+            }
+
+            List<FilterCategoryOptionDto> selectedOptionsWithNoResults = requestFilters?.FirstOrDefault(x => x.CategoryName == categoryName)?.CategoryOptions?.Where(x => x.Selected && !categoryDto.CategoryOptions.Any(o => o.OptionValue == x.OptionValue)).ToList();
+            if (selectedOptionsWithNoResults?.Any() == true)
+            {
+                categoryDto.CategoryOptions.AddRange(selectedOptionsWithNoResults);
+            }
+
+            return categoryDto;
         }
         #endregion
     }

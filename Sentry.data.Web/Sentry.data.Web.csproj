@@ -417,6 +417,7 @@
     </AdditionalFiles>
     <Compile Include="Controllers\BaseDataInventoryController.cs" />
     <Compile Include="Controllers\DataInventoryController.cs" />
+    <Compile Include="Controllers\FilterSearchController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
@@ -1661,6 +1662,7 @@
     <Content Include="Views\DataInventory\SearchResult.cshtml" />
     <Content Include="Views\Search\FilterSearch.cshtml" />
     <Content Include="Views\Search\FilterCategories.cshtml" />
+    <Content Include="Views\Search\FilterShowAll.cshtml" />
     <Content Include="Views\Dataset\Details\_SchemaSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -1674,6 +1676,7 @@
     <Folder Include="Views\Alert\" />
     <Folder Include="Views\BaseDataInventory\" />
     <Folder Include="Views\ExternalFile\" />
+    <Folder Include="Views\FilterSearch\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Security\" />
     <Folder Include="Views\Subscription\" />
