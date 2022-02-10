@@ -2,8 +2,6 @@
 using Nest;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.Configuration;
@@ -34,14 +32,14 @@ namespace Sentry.data.Infrastructure
                 .Query(q => q
                     .Bool(b => b
                         .Filter(
-                            bm => bm.Term(p => p.DatasetId, 301),
-                            bm => bm.Term(p => p.SchemaId, 1121)
+                            bm => bm.Term(p => p.DatasetId, DatasetId),
+                            bm => bm.Term(p => p.SchemaId, SchemaId)
                         )
                         .Should(
                             bs => bs.Term(p => p.Name, toSearch),
                             bs => bs.Term(p => p.Description, toSearch),
                             bs => bs.Term(p => p.DotNamePath, toSearch)
-                        ).MinimumShouldMatch(String.IsNullOrEmpty(toSearch) ? 0 : 1) //If we are searching, we need something to match.
+                        ).MinimumShouldMatch(String.IsNullOrEmpty(toSearch) ? 0 : 1) //If we are searching, we need something to match on (exclusing the dataset id or schema id).
                     )
                 )
                 .Size(2000)
