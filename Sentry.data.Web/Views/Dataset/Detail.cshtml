@@ -337,12 +337,13 @@
     @Scripts.Render("~/bundles/prettyCron")
     @Scripts.Render("~/bundles/dataTables")
 
-    <script>
+<script>
 
         $(function () {
             vm = new data.Dataset.ViewModel();
             ko.applyBindings(vm);
-            data.Dataset.DetailInit();
+
+            data.Dataset.DetailInit(@(Html.Raw(Json.Encode(Model))));
         });
 
         var table;
@@ -373,5 +374,5 @@
 
 
 
-    </script>
+</script>
 }

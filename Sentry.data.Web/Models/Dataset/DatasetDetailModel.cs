@@ -25,6 +25,8 @@ namespace Sentry.data.Web
             //}
         }
 
+        public DatasetDetailModel() { }
+
         public int Downloads { get; set; }
         public int GroupAccessCount { get; set; }
         public string OriginationCode { get; set; }

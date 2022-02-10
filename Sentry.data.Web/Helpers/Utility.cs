@@ -59,6 +59,7 @@ namespace Sentry.data.Web.Helpers
         [Obsolete("The function is fine but I wanted that this should not use the domain context and these should all be Enums")]
         public static void SetupLists(IDatasetContext _datasetContext, DatasetModel model)
         {
+            //Categories
             var temp = GetCategoryList(_datasetContext).ToList();
 
             if(model.DatasetCategoryIds?.Count == 1 && model.DatasetCategoryIds[0] != 0)
@@ -115,10 +116,12 @@ namespace Sentry.data.Web.Helpers
                 Disabled = true
             });
             model.AllDatasetScopeTypes = temp.OrderBy(x => x.Value);
+
             model.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
             model.AllDataClassifications = BuildDataClassificationSelectList(model.DataClassification);
 
+            //File Extension
             IEnumerable<SelectListItem> dFileExtensions;
             if (model.FileExtensionId == 0)
             {
@@ -141,8 +144,6 @@ namespace Sentry.data.Web.Helpers
                     });
             }
             model.AllExtensions = dFileExtensions.OrderByDescending(x => x.Selected);
-
-
         }
 
         public static IEnumerable<SelectListItem> BuildPreProcessingOptionsDropdown(int preProcessingOptionSelections)
@@ -165,6 +166,19 @@ namespace Sentry.data.Web.Helpers
                     }).ToList());
             }
             return items;
+        }
+
+        public static IEnumerable<SelectListItem> BuildFileTypeDropdown(int fileTypeSelection)
+        {
+            List<SelectListItem> items = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v =>
+            new SelectListItem
+            {
+                Selected = ((int)(object)v).ToString() == fileTypeSelection.ToString(),
+                Text = (v.GetDescription() == FileType.DataFile.GetDescription()) ? $"{v.GetDescription()} (most common)" : v.GetDescription(),
+                Value = ((int)(object)v).ToString()
+            }).ToList();
+
+            return items.OrderBy(o => o.Text);
         }
 
         public static IEnumerable<SelectListItem> BuildIngestionTypeDropdown(int ingestionTypeSelection)
