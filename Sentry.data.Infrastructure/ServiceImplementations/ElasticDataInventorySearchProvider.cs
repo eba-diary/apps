@@ -180,7 +180,7 @@ namespace Sentry.data.Infrastructure
                             tasks.Add(di.Id, _context.Update(di));
                         }
 
-                        //wait for all requests to complete
+                        //wait for all requests to complete (WaitAll lets all complete before error is thrown)
                         Task.WaitAll(tasks.Values.ToArray());
 
                         success = true;
