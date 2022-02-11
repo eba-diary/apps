@@ -3,6 +3,8 @@ using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -135,11 +137,72 @@ namespace Sentry.data.Infrastructure
             return resultDto;
         }
 
-        public bool SaveSensitive(string sensitiveBlob)
+        public bool SaveSensitive(List<DaleSensitiveDto> dtos)
         {
-            //Currently not allowed at this time when source feature flag is set to ELASTIC
-            //Solution for real-time updates has not been determined
-            throw new NotImplementedException();
+            bool success = false;
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+
+            //update SQL first
+            using (SqlConnection connection = new SqlConnection(Configuration.Config.GetHostSetting("DaleConnectionString")))
+            {
+                SqlCommand command = new SqlCommand("exec usp_DALE_BaseScanAction_UPDATE @sensitiveBlob", connection)
+                {
+                    CommandTimeout = 0
+                };
+
+                command.Parameters.AddWithValue("@sensitiveBlob", System.Data.SqlDbType.NVarChar);
+                command.Parameters["@sensitiveBlob"].Value = Newtonsoft.Json.JsonConvert.SerializeObject(dtos);
+
+                try
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+
+                    //if SQL succeeds, update in elastic
+                    try
+                    {
+                        //get documents to update by ids
+                        IList<DataInventory> diToUpdate = _context.SearchAsync<DataInventory>(x => x
+                            .Query(q => q
+                                .Ids(i => i
+                                    .Values(dtos.Select(dto => new Id(dto.BaseColumnId)).ToList())))).Result.Documents;
+
+                        Dictionary<int, Task<bool>> tasks = new Dictionary<int, Task<bool>>();
+
+                        //submit async update requests per document to update
+                        foreach (DataInventory di in diToUpdate)
+                        {
+                            DaleSensitiveDto dto = dtos.FirstOrDefault(x => x.BaseColumnId == di.Id);
+                            di.IsSensitive = dto.IsSensitive;
+                            di.IsOwnerVerified = dto.IsOwnerVerified;
+
+                            tasks.Add(di.Id, _context.Update(di));
+                        }
+
+                        //wait for all requests to complete
+                        Task.WaitAll(tasks.Values.ToArray());
+
+                        success = true;
+                    }
+                    catch (AggregateException aggEx)
+                    {
+                        //if diToUpdate is empty, failed search
+                        //else update failed and need to sort out which id(s) failed
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("ElasticDataInventorySearchProvider.SaveSensitive() Failed!!", ex);
+                }
+            }
+
+            stopWatch.Stop();
+            TimeSpan ts = stopWatch.Elapsed;
+            Logger.Info($"ElasticDataInventorySearchProvider.SaveSensitive() Elapsed Seconds:{ts.Seconds}");
+
+            return success;
         }
         #endregion
 
