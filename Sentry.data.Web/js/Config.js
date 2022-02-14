@@ -4,22 +4,6 @@
 
 data.Config = {
     IndexInit: function () {
-        $('body').on('click', '.configHeader', function () {
-
-            if ($(this).children('.tracker-menu-icon').hasClass('glyphicon-menu-down')) {
-                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
-            } else {
-                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-up', 'glyphicon-menu-down');
-            }
-            $(this).next('.configContainer').toggle();
-
-            if ($(this).next('.configContainer:visible').length == 0) {
-                // action when all are hidden
-                $(this).css('border-radius', '5px 5px 5px 5px');
-            } else {
-                $(this).css('border-radius', '5px 5px 0px 0px');
-            }
-        });
 
         $('body').on('click', '.jobstatus', function () {
             if ($(this).hasClass('jobstatus_enabled')) {
@@ -48,19 +32,21 @@ data.Config = {
             });
         });
 
-        $('body').on('click', '.jobHeader', function () {
-            if ($(this).children('.tracker-menu-icon').hasClass('glyphicon-menu-down')) {
-                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
+        $('body').on('click', '.tracker-menu-icon', function () {
+            if ($(this).hasClass('glyphicon-menu-down')) {
+                $(this).switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
             } else {
-                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-up', 'glyphicon-menu-down');
+                $(this).switchClass('glyphicon-menu-up', 'glyphicon-menu-down');
             }
-            $(this).next('.jobContainer').toggle();
+            var parentElement = $(this).parent();
+            var detailContainer = parentElement.next('div');
+            detailContainer.toggle();
 
-            if ($(this).next('.jobContainer:visible').length == 0) {
+            if (detailContainer.is(":visible")) {
                 // action when all are hidden
-                $(this).css('border-radius', '5px 5px 5px 5px');
+                parentElement.css('border-radius', '5px 5px 0px 0px');
             } else {
-                $(this).css('border-radius', '5px 5px 0px 0px');
+                parentElement.css('border-radius', '5px 5px 5px 5px');
             }
         });
 

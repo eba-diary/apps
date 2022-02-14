@@ -64,6 +64,7 @@ namespace Sentry.data.Web.Controllers
             DataFlowDetailDto dto = _dataFlowService.GetDataFlowDetailDto(id);
             DataFlowDetailModel model = new DataFlowDetailModel(dto);
 
+            model.DisplayDataflowEdit = _dataFeatures.Value.CLA1656_DataFlowEdit_ViewEditPage.GetValue();
             model.UserSecurity = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
 
             return View(model);

@@ -715,14 +715,16 @@ data.Dataset = {
         self.Id = ko.observable(dataInput.Id);
         self.DetailUrl = ko.observable(dataInput.DetailUrl);
         self.Jobs = ko.observableArray();
-        self.DetailUrl = "/DataFlow/" + encodeURIComponent(self.Id()) + "/Detail";
         $.each(dataInput.RetrieverJobs, function (i, val) {
             var item = new data.Dataset.DropLocation(val);
 
             self.Jobs().push(item);
         });
         self.DataFlowDetailRedirect = function () {
-            window.open("/DataFlow/" + encodeURIComponent(this.Id()) + "/Detail");
+            data.DataFlow.DetailUrlRedirect(this.Id());
+        }
+        self.DataFlowEditRedirect = function () {
+            data.DataFlow.EditUrlRedirect(this.Id());
         }
         self.RenderJobs = ko.pureComputed(function () {
             return ko.unwrap(self.Jobs) ? "RenderJobs" : "noRenderJobs";
