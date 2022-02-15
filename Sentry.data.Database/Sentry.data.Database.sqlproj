@@ -162,6 +162,7 @@
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Dale\Release_02_00_04" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_02_00_07" />
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\SnowflakeGenerator" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_22_02_01" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -297,6 +298,8 @@
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_02_00_07\CLA-3729-HISTORY-FIX-EVENT-Reason.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_02_00_07\CLA-3729-HISTORY-FIX-EVENT-IsProcessed.sql" />
     <None Include="Scripts\Pre-Deploy\SupportingScripts\SnowflakeGenerator\GenerateSnowRawQueryHappiness.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_22_02_01\HistoryFix_CLA3790SaidAssetDataflow.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_22_02_01\HistoryFix_CLA3790SaidAssetDatasets.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

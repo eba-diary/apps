@@ -21,7 +21,6 @@ BEGIN TRY
       SaidAsset varchar(10) not null
       )
 
-    insert into #DatasetsFromSpreadsheet select 16,	'DATA'
 	insert into #DatasetsFromSpreadsheet select 275,	'CRVS'
 	insert into #DatasetsFromSpreadsheet select 276,	'CRVS'
 	insert into #DatasetsFromSpreadsheet select 307,	'DAPA'

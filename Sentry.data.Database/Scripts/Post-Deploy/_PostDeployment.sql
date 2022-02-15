@@ -77,6 +77,6 @@ DECLARE @ErrorState INT;
 :r ..\Post-Deploy\SupportingScripts\Release_02_00_03\CLA3606_Move_CLA3240_UseDropLocationV2_to_LaunchDarkly.sql
 :r ..\Post-Deploy\SupportingScripts\Release_02_00_07\CLA-3729-HISTORY-FIX-EVENT-Reason.sql
 :r ..\Post-Deploy\SupportingScripts\Release_02_00_07\CLA-3729-HISTORY-FIX-EVENT-IsProcessed.sql
-:r ..\Post-Deploy\SupportingScripts\Sprint_22_02_01\HistoryFix_CLA3790SaidAssetDataflow.sql
-:r ..\Post-Deploy\SupportingScripts\Sprint_22_02_01\HistoryFix_CLA3790SaidAssetDatasets.sql
+:r ..\post-deploy\supportingscripts\sprint_22_02_01\historyfix_cla3790saidassetdataflow.sql
+:r ..\post-deploy\supportingscripts\sprint_22_02_01\historyfix_cla3790saidassetdatasets.sql
 

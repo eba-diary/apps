@@ -9,7 +9,17 @@ BEGIN TRY
 
     IF OBJECT_ID('tempdb..#FlowsFromSpreadsheet') IS NOT NULL DROP TABLE #FlowsFromSpreadsheet
 
+	IF OBJECT_ID('tempdb..#S3DropUpdates') IS NOT NULL DROP TABLE #S3DropUpdates
+
+	IF OBJECT_ID('tempdb..#RawStorageUpdates') IS NOT NULL DROP TABLE #RawStorageUpdates
+
     DECLARE @ENV_CLA3790_DATAFLOW VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
+	DECLARE @OldDropPrefix__CLA3790 VARCHAR(25)
+
+	if (@ENV_CLA3790_DATAFLOW = 'PROD')
+	BEGIN
+		SET @OldDropPrefix__CLA3790 = 'droplocation/data/'
+	END
 
     Select @ENV_CLA3790_DATAFLOW
 
@@ -93,7 +103,62 @@ BEGIN TRY
 	from #FlowsFromSpreadsheet x
 	where Id = x.DataFlowID
 
-    END
+	select 
+	DF.Id as 'DataFlowId',
+	EF.SaidAsset,
+	DFS.Id as 'DataFlowStepId',
+	DFS.Action_Id,
+	DFS.DataAction_Type_Id,
+	12 as 'NewDataAction_Type_Id',
+	DFS.TriggerKey,
+	REPLACE(DFS.TriggerKey, @OldDropPrefix__CLA3790, 'droplocation/data/' + EF.SaidAsset + '/') as 'NewTriggerKey',
+	DFS.TargetPrefix,
+	DAT.Name as 'DataActionTypeName',
+	DFS.SourceDependencyBucket
+	into #S3DropUpdates
+	from DataFlow DF
+	join #FlowsFromSpreadsheet EF on
+		DF.Id = EF.DataFlowID
+	join DataFlowStep DFS on
+		DF.Id = DFS.DataFlow_ID
+	join DataActionTypes DAT on
+		DFS.DataAction_Type_Id = DAT.Id
+	where DAT.Name in ('Producer S3 Drop')
+
+	DECLARE @S3DropUpdateCnt INT = (Select COUNT(*) from #S3DropUpdates)
+	print (CAST(@S3DropUpdateCnt as VARCHAR(4))) +  ' Producer S3 Drop updates identified'
+
+	Update DataFlowStep
+	SET TriggerKey = x.NewTriggerKey
+	from
+	(select * from #S3DropUpdates) x
+	where Id = x.DataFlowStepId
+
+	select 
+	DF.Id as 'DataFlowId',
+	DFS.Id as 'DataFlowStepId',
+	EF.SaidAsset,
+	DFS.SourceDependencyPrefix,
+	REPLACE(DFS.SourceDependencyPrefix, @OldDropPrefix__CLA3790, 'droplocation/data/' + EF.SaidAsset + '/') as 'NewSourceDependencyPrefix'	
+	into #RawStorageUpdates
+	from DataFlow DF
+	join #FlowsFromSpreadsheet EF on
+		DF.Id = EF.DataFlowID
+	join DataFlowStep DFS on
+		DF.Id = DFS.DataFlow_ID
+	join DataActionTypes DAT on
+		DFS.DataAction_Type_Id = DAT.Id
+	where DAT.Name in ('Raw Storage')
+
+	DECLARE @RawStorageUpdateCnt INT = (Select COUNT(*) from #RawStorageUpdates)
+	print (CAST(@RawStorageUpdateCnt as VARCHAR(4))) +  'Raw Storage updates identified'
+
+	Update DataFlowStep
+	SET	SourceDependencyPrefix = x.NewSourceDependencyPrefix
+	from
+	(select * from #RawStorageUpdates) x
+	where Id = x.DataFlowStepId
+	END
 
 
     -- END POST-DEPLOY SCRIPT --
