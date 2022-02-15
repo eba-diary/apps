@@ -527,6 +527,8 @@ data.Dataset = {
 
             data.Dataset.UpdateColumnSchema();
             data.Dataset.delroyReloadEverything(result.DatasetId, result.SchemaId, result.SnowflakeViews);
+
+            data.Dataset.tryUpdateSchemaSearchTab();
         });
     },
 
@@ -1390,7 +1392,14 @@ data.Dataset = {
                     data: datasetDetailModel,
                     success: function (view) {
                         $('#tabSchemaSearch').html(view);
-                        data.Dataset.InitSchemaSearchTab();
+
+                        var metadataURL = "/api/v2/metadata/datasets/" + $('#datasetConfigList').val();
+
+                        $.get(metadataURL, function (result) {
+                            self.vm.SchemaId = result.SchemaId;
+                            data.Dataset.InitSchemaSearchTab();
+                        });
+
                         data.RemoveSpinner('#tab-container');
                     }
                 });
@@ -2215,11 +2224,20 @@ data.Dataset = {
 
         //search button on change query elastic
         $("#schemaSearchInput").change(function () {
-            var searchInput = $("#schemaSearchInput").val();
-            var schemaSearchTable = $("#schemaSearchTable").DataTable();
-            var datasetId = $('#RequestAccessButton').attr("data-id");
-
-            schemaSearchTable.ajax.url("/Dataset/Detail/" + datasetId +"/SchemaSearch/" + self.vm.SchemaId + "/" + searchInput).load();
+            data.Dataset.UpdateSchemaSearchTab();
         });
+    },
+
+    UpdateSchemaSearchTab() {
+        var searchInput = $("#schemaSearchInput").val();
+        var schemaSearchTable = $("#schemaSearchTable").DataTable();
+        var datasetId = $('#RequestAccessButton').attr("data-id");
+        schemaSearchTable.ajax.url("/Dataset/Detail/" + datasetId + "/SchemaSearch/" + self.vm.SchemaId + "/" + searchInput).load();
+    },
+
+    tryUpdateSchemaSearchTab() {
+        if ($('#schemaSearchTable_wrapper').length) {
+            data.Dataset.UpdateSchemaSearchTab();
+        }
     }
 };
