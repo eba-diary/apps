@@ -76,7 +76,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             {
                 //Apply defaults if neccessary
                 Precision = (this.Precision == 0) ? GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT : this.Precision,
-                Scale = (this.Scale == 0) ? GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT : this.Scale
+                Scale = this.Scale
             };
             base.ToEntity(newEntityField, parentField, parentRevision);
             return newEntityField;
