@@ -306,31 +306,34 @@
         </div>
         <div xml:id="EBA-1898-02-21" type="entry">
             <dateline><date when="1898-02-21">Monday, Feb. 21</date>. </dateline>
-            <p><persName ref="#Buttles_Jeanette">Nettie</persName> and I walked into town - went to the <persName ref="#Wetzstein_Dr">German Consul</persName>s and looked at his curiosities. Sun warm, and much dirt.<persName ref="#Huhatt_Mr"> Mr. Huhatt</persName> came to play chess with <persName ref="#Davis_Theodore_M">Mr. Davis</persName>, and stayed to lunch. <persName ref="#Insinger_Mr">Mr. Insinger</persName> called. <pb n="162"/></p> 
+            <p><persName ref="#Buttles_Jeanette">Nettie</persName> and I walked into town - went to the <persName ref="#Wetzstein_Dr">German Consul</persName>s and looked at his curiosities. Sun warm, and much dirt.<persName ref="#Huhatt_Mr">Mr. Huhatt</persName> came to play chess with <persName ref="#Davis_Theodore_M">Mr. Davis</persName>, and stayed to lunch. <persName ref="#Insinger_Mr">Mr. Insinger</persName> called. <pb n="162"/></p> 
         </div>
+        <!--Hamilton Fish-->
         <div xml:id="EBA-1898-02-22" type="entry">
             <dateline><date when="1898-02-22">Tuesday, Feb. 22</date>. </dateline>
             <p>We have had up all our flag decorations in honor of the day. <persName ref="#Varley_Mr">Mr. Varley</persName> called. The <name>Hamilton Fisks</name> just down from <placeName ref="#Aswan">Assouan</placeName> in the steamer came to dine.</p> 
         </div>
+        <!--gezireh??-->
         <div xml:id="EBA-1898-02-23" type="entry">
             <dateline><date when="1898-02-23">Wednesday, Feb. 23</date>. </dateline>
-            <p>The "Olga" with the <persName>Ayer</persName> family came down this morning and is near us. They came over at once to call. The "Alma" also arrived, and went across to the gezireh - and they all came over to see us. This afternoon we went over to the <placeName>"Seura" Varley's</placeName> boat, to see his <placeName>Nile</placeName> sketches. <persName>Theodore</persName> bought the 2 best. Then we went to the <orgName>"Hyksos",</orgName> to have tea with <persName>Miss Shepheard.</persName></p> 
+            <p>The "<name type="boat" ref="#Olga">Olga</name>" with the <personGrp ref="#Ayer">Ayer family</personGrp> came down this morning and is near us. They came over at once to call. The "<name type="boat" ref="#Alma">Alma</name>" also arrived, and went across to the gezireh - and they all came over to see us. This afternoon we went over to the "<name type="boat" ref="#Seura">Seura</name>" <persName ref="#Varley_Mr">Varley</persName>'s boat, to see his <objectName ref="#Nile_Sketches">Nile sketches</objectName>. <persName ref="#Davis_Theodore_M">Theodore</persName> bought the 2 best. Then we went to the "<name type="boat" ref="#Hyksos">Hyksos</name>", to have tea with <persName ref="#Shepheard_Miss">Miss Shepheard</persName>.</p> 
         </div>
         <div xml:id="EBA-1898-02-24" type="entry">
             <dateline><date when="1898-02-24">Thursday, Feb. 24</date>. </dateline>
-            <p>Mr. <persName>Varley</persName> and Mr. <persName>Hooker</persName> came over and stayed a long time this morning - and a very pleasant morning it was. We were asked to the "Alma" for tea, but I did not feel well, and <persName>Nettie</persName> went alone. Mr. and <persName>Mrs. Huhatt</persName> dined with us.</p> 
+            <p><persName ref="#Varley_Mr">Mr. Varley</persName> and <persName ref="#Hooker_Mr">Mr. Hooker</persName> came over and stayed a long time this morning - and a very pleasant morning it was. We were asked to the "<name type="boat" ref="#Alma">Alma</name>" for tea, but I did not feel well, and <persName ref="#Buttles_Jeanette">Nettie</persName> went alone. <personGrp ref="#Huhatt">Mr. and Mrs. Huhatt</personGrp> dined with us.</p> 
         </div>
+        <!--Ayer daughter-->
         <div xml:id="EBA-1898-02-25" type="entry">
             <dateline><date when="1898-02-25">Friday, 25 Feb</date>. </dateline>
-            <p>A quiet morning on deck with my books - it has been hot for days - and grateful the heat is. <persName>Miss Broderick</persName> and <persName>Miss Morton</persName> came to tea - and <persName>Mr.</persName> and <persName>Mrs. Ayer,</persName> and the daughter dined with us. PAGE 163</p> 
+            <p>A quiet morning on deck with my books - it has been hot for days - and grateful the heat is. <persName ref="#Broderick_Miss">Miss Broderick</persName> and <persName ref="#Morton_Miss">Miss Morton</persName> came to tea - and <personGrp ref="#Ayer">Mr. and Mrs. Ayer</personGrp>, and the daughter dined with us. <pb n="163"/></p> 
         </div>
         <div xml:id="EBA-1898-02-26" type="entry">
             <dateline><date when="1898-02-26">Saturday, Feb. 26</date>. </dateline>
-            <p>"Istar" came in early this morning - <persName>Nettie</persName> and I went to tea with Mr. <persName>Sayce</persName> - and the evening being so radiantly beautiful, we went out rowing all of us - and serenaded the "Alma" people.</p> 
+            <p>"<name type="boat" ref="#Istar">Istar</name>" came in early this morning - <persName ref="#Buttles_Jeanette">Nettie</persName> and I went to tea with <persName ref="#Sayce_Archibald">Mr. Sayce</persName> - and the evening being so radiantly beautiful, we went out rowing all of us - and serenaded the "<name type="boat" ref="#Alma">Alma</name>" people.</p> 
         </div>
         <div xml:id="EBA-1898-02-27" type="entry">
             <dateline><date when="1898-02-27">Sunday, Feb. 27</date>. </dateline>
-            <p><persName>Nettie</persName> and I went to church this morning - over to the "Olga" for tea this afternoon with <persName>Theodore</persName> and <persName>Monty</persName> - met Mr. <persName>Fiske</persName> of <placeName>Florence</placeName> and Mr. <persName>Sayce</persName> - as the latter had been asked to dine with us this evening we also asked Mr. <persName>Fiske</persName> - and had a charming evening.</p> 
+            <p><persName ref="#Buttles_Jeanette">Nettie</persName> and I went to church this morning - over to the "<name type="boat" ref="#Olga">Olga</name>" for tea this afternoon with <persName ref="#Davis_Theodore_M">Theodore</persName> and <persName ref="#Monty">Monty</persName> - met <persName ref="#Fiske_Mr">Mr. Fiske</persName> of <placeName ref="#Florence">Florence</placeName> and <persName ref="#Sayce_Archibald">Mr. Sayce</persName> - as the latter had been asked to dine with us this evening we also asked <persName ref="#Fiske_Mr">Mr. Fiske</persName> - and had a charming evening.</p> 
         </div>
         <!--end of olivia's section-->
         <!--emma's section below-->
