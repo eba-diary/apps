@@ -217,9 +217,9 @@ data.Dataset = {
                 { data: "Description", className: "Description" },
                 { data: "FieldType", className: "FieldType" },
                 { data: "IsArray", className: "IsArray" },
-                { data: "Length", className: "Length", visible: false, render: function (d) { return data.Dataset.delroyFillGridCheckForNull(d); } },
-                { data: "Precision", className: "Precision", visible: false, render: function (d) { return data.Dataset.delroyFillGridCheckForNull(d); } },
-                { data: "Scale", className: "Scale", visible: false, render: function (d) { return data.Dataset.delroyFillGridCheckForNull(d); } }
+                { data: "Length", className: "Length", visible: false, render: function (d, type, row, meta)        { return data.Dataset.delroyFillGridLength(d,row); } },
+                { data: "Precision", className: "Precision", visible: false, render: function (d, type, row, meta)  { return data.Dataset.delroyFillGridPrecisionScale(d,row); } },
+                { data: "Scale", className: "Scale", visible: false, render: function (d, type, row, meta)          { return data.Dataset.delroyFillGridPrecisionScale(d,row); } }
             ],
 
             aLengthMenu: [
@@ -398,8 +398,9 @@ data.Dataset = {
     },
 
 
-    //ONLY RETURN DATA IF VALID
-    delroyFillGridCheckForNull: function (d) {
+    //LENGTH COLUMN LOGIC:  ONLY RETURN DATA IF VALID
+        //Reason we do this is so for Length Column in Grid, zero won't show up because if its zero, we don't want to see it
+    delroyFillGridLength: function (d,row) {
         if (d) {
             return d;
         }
@@ -407,6 +408,18 @@ data.Dataset = {
             return ' ';
         }
     },
+
+    //PRECISION AND SCALE LOGIC:  ONLY RETURN DATA IF VALID AND DECIMAL
+        //Reason we do this is so for Prec/Scale is so they only show up for DECIMAL datatypes since thats only datatype to have prec/scale
+    delroyFillGridPrecisionScale: function (d, row) {
+        if (d != null && row.FieldType == 'DECIMAL') {
+            return d;
+        }
+        else {
+            return ' ';
+        }
+    },
+
 
     //GENERATE QUERY BASED ON WHERE THEY ARE IN SCHEMA     
     delroyQueryGenerator: function () {
