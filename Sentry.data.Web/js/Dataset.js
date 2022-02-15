@@ -2232,7 +2232,6 @@ data.Dataset = {
         var searchInput = $("#schemaSearchInput").val();
         var schemaSearchTable = $("#schemaSearchTable").DataTable();
         var datasetId = $('#RequestAccessButton').attr("data-id");
-        console.log("Updating Search Tab: Dataset: " + datasetId + " Schema: " + self.vm.SchemaId)
         schemaSearchTable.ajax.url("/Dataset/Detail/" + datasetId + "/SchemaSearch/" + self.vm.SchemaId + "/" + searchInput).load();
     },
 
