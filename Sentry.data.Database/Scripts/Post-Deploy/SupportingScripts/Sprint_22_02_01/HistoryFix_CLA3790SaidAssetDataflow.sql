@@ -130,8 +130,7 @@ BEGIN TRY
 
 	Update DataFlowStep
 	SET TriggerKey = x.NewTriggerKey
-	from
-	(select * from #S3DropUpdates) x
+	from #S3DropUpdates x
 	where Id = x.DataFlowStepId
 
 	select 
@@ -155,8 +154,7 @@ BEGIN TRY
 
 	Update DataFlowStep
 	SET	SourceDependencyPrefix = x.NewSourceDependencyPrefix
-	from
-	(select * from #RawStorageUpdates) x
+	from #RawStorageUpdates x
 	where Id = x.DataFlowStepId
 	END
 
