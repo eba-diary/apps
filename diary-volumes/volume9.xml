@@ -2348,16 +2348,16 @@
          </dateline>
          <p>
             This morning, <persName ref="#Davis_Theodore_M">Theodore</persName>, <persName ref="#Constantini_David">Constantini</persName>,
-             who is staying with us, and I spent the morning at the <placeName>
-            Louvre</placeName>, in the <orgName>Renaissance Rooms</orgName> - how cold they
+             who is staying with us, and I spent the morning at the <placeName ref="#Louvre">
+             Louvre</placeName>, in the Renaissance Rooms - how cold they
              were - we were perished on coming out - but what treasures! Rain all the time - took
-             tea the other day with the <persName>Kerbs</persName> - he very suffering,
-             poor man. <persName>Tom Whistler</persName> came in the evening.
-             <persName>Mathilde Boal</persName> in <placeName ref="#Paris">Paris</placeName>,
-             managing her sister's wedding. She is here much of the time. <persName>
-            Mrs. Davis</persName>, <persName>Sara Buttles</persName>, <persName>
-            Pierre</persName> and <persName>his governess</persName> down in
-             <placeName>Savoy</placeName>.
+             tea the other day with the <persName ref="#Kerb">Kerbs</persName> - he very suffering,
+             poor man. <persName ref="#Tommy_Whistler">Tom Whistler</persName> came in the evening.
+             <persName ref="#Boal_Mathilde">Mathilde Boal</persName> in <placeName ref="#Paris">Paris</placeName>,
+             managing her sister's wedding. She is here much of the time. <persName ref="#Davis_Annie">
+             Mrs. Davis</persName>, <persName ref="#Buttles_Sara">Sara Buttles</persName>, <persName ref="#Lacau_M">
+             Pierre</persName> and <persName ref="#Lacau_Governess">his governess</persName> down in
+             <placeName ref="#Savoy">Savoy</placeName>.
          </p>
       </div>
       <div xml:id="EBA-1902-05-20" type="entry">
@@ -2376,7 +2376,7 @@
          <p>
             This is our last day here, and we have altogether in the 17 days here, not had one
              pleasant one. Business and sightseeing have occupied us - and paying and receiving many
-             visits. <persName>Margaret La Farge</persName> and <persName>
+             visits. <persName ref="#Margaret_La_Farge">Margaret La Farge</persName> and <persName ref="#La_Farge_Mother">
             her mother</persName> made a long pleasant visit this afternoon.
          </p>
       </div>
@@ -2387,29 +2387,29 @@
          </dateline>
          <p>
             We had a fine crossing the other day - but I had to enjoy it from the seclusion of my
-             cabin because of my cold. <persName>Mathilde</persName>, <persName>
-            her sister</persName> and sister's fiance, <persName>M. Seychelle-Dulong</persName>
-             came to say goodbye before we left, and <persName>Mathilde</persName> brought
+             cabin because of my cold. <persName ref="#Boal_Mathilde">Mathilde</persName>, <persName ref="#Boal_Sister">
+             her sister</persName> and sister's fiance, <persName ref="#Seychelle-Dulong_Mr">M. Seychelle-Dulong</persName>
+             came to say goodbye before we left, and <persName ref="#Boal_Mathilde">Mathilde</persName> brought
              me some lovely pansies, from "my fazzer's little garden". We left poor
              <persName ref="#Newberry_Mary">Mary</persName> in tears, but she was to go off directly to the old
-             place in <placeName>Rue Bassano</placeName>, now the <name>
-            Hotel Belmont</name>, where she once spent a winter. <persName>Mrs.
-             La Farge</persName> and <persName>Margaret</persName> are there, and
+             place in <placeName ref="#Rue_Bassano">Rue Bassano</placeName>, now the <name type="hotel" ref="#Hotel_Belmont">
+             Hotel Belmont</name>, where she once spent a winter. <persName ref="#La_Farge_Mother">Mrs.
+             La Farge</persName> and <persName ref="#Margaret_La_Farge">Margaret</persName> are there, and
              we hear almost daily from her. <persName ref="#Buttles_Lizzie">Lizzie</persName> and
              <persName ref="#Buttles_Jeanette">Nettie</persName> leave <placeName ref="#Florence">Florence</placeName>
-             on <date>June 2</date> - and they all meet at <placeName>
-            Weisbaden</placeName>, and go on to <persName>Schwalback</persName> for
+             on <date when="1902-06-02">June 2</date> - and they all meet at <placeName ref="#Wiesbaden">
+             Weisbaden</placeName>, and go on to <placeName ref="#Schwalbach">Schwalback</placeName> for
              the summer. We have had fine weather ever since we came to <placeName ref="#London">
              London</placeName> - but I alas! have been staying indoors with my troublesome cough.
-             <persName>Fielding</persName> lunched with us yesterday -
-             <persName>Gaspard Farrer</persName> turned up on Monday - and asked
+             <persName ref="#Fielding_Mr">Fielding</persName> lunched with us yesterday -
+             <persName ref="#Farrer_Gaspard">Gaspard Farrer</persName> turned up on Monday - and asked
              us all to dinner with him for last night. I couldn't go, and <persName ref="#Koon_Bessie">
-            Bessie</persName> stayed with me. <persName ref="#Davis_Theodore_M">Theodore</persName> went,
-             and had a jolly time - old <persName>Sir William</persName> was there,
+             Bessie</persName> stayed with me. <persName ref="#Davis_Theodore_M">Theodore</persName> went,
+             and had a jolly time - old <persName ref="#Farrar_William_Sir">Sir William</persName> was there,
              alert and vigorous as ever, except for his lameness. We like this hotel immensely -
              except the prices! We have a charming apartment on the 4th floor above the neighboring
              chimney pots - and we actually see the sunset from our windows. Everything is new,
-             fresh and pretty, and such a pleasant contrast to the dingy old <placeName>
+             fresh and pretty, and such a pleasant contrast to the dingy old <placeName ref="#Hotel_Bristol">
             Hotel Bristol</placeName> where we stayed such years.
          </p>
       </div>
@@ -2420,14 +2420,14 @@
          <p>
             Such a dull story to tell - in doors all the time - weather bad and cold -
              <persName ref="#Weigall_Arthur">Weigall</persName> came to tea yesterday - and to lunch
-             today. <persName>Fielding</persName> here too - and this afternoon
+             today. <persName ref="#Fielding_Mr">Fielding</persName> here too - and this afternoon
              <persName ref="#Koon_Bessie">Bessie</persName> and I went out in a closed carriage - and
-             left cards on the <persName>Farrers</persName> and <placeName>
-            Denbighs</placeName> - <persName>Miss Farrer</persName> having been here,
+             left cards on the <persName ref="#Farrar_William_Sir#Farrer_Gaspard#Farrer_Miss">Farrers</persName> and <placeName ref="#Denbigh">
+             Denbighs</placeName> - <persName ref="#Farrer_Miss">Miss Farrer</persName> having been here,
              and I having to decline even lunch - and not able to see
-             <persName>Lord and Lady Denbigh</persName> when they called.
+             <persName ref="#Feilding_Rudolph_Lord#Denbigh_Lady">Lord and Lady Denbigh</persName> when they called.
              <persName ref="#Newberry_Percy">Newberry</persName> came this afternoon to say goodbye - and
-             <persName>Gaspard Farrer</persName> - we are off tomorrow.
+             <persName ref="#Farrer_Gaspard">Gaspard Farrer</persName> - we are off tomorrow.
          </p>
       </div>
       <div xml:id="EBA-1902-06-07" type="entry">
@@ -2437,8 +2437,8 @@
          </dateline>
          <p>
             We arrived safely yesterday at 7 o'clock P.M. being the evening of the 8th day of the
-             voyage - the longest <placeName>N. Atlantic</placeName> crossing I have
-             made for years. The "<name>St. Louis</name>" was a very comfortable
+             voyage - the longest <placeName ref="#Atlantic_Ocean">N. Atlantic</placeName> crossing I have
+             made for years. The "<name type="boat" ref="#St_Louis">St. Louis</name>" was a very comfortable
              boat but not a fast one - I had a charming deck room, with private bath room - and as
              it was cold, gray and damp - I stayed in my room - most of the time in bed. We cannot
              get rooms on Monday's boat - and are obliged to stay over for Tuesday morning - vexing!
