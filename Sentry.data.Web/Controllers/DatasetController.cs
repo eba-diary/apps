@@ -310,6 +310,7 @@ namespace Sentry.data.Web.Controllers
                 model.DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue();
                 model.DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue();
                 model.DisplaySchemaSearch = _featureFlags.CLA3553_SchemaSearch.GetValue();
+                model.DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue();
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Detail Page", dto.DatasetId);
 
                 return View(model);
