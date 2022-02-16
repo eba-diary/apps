@@ -1502,7 +1502,7 @@
              sent for <persName ref="#Nubia">Nubia</persName> to come on deck and gave her breakfast there.
              Our awnings are all down - everything ready and waiting for wind to drop -
              <persName ref="Carter_Howard">Carter</persName> went off to <placeName ref="Aswan">Aswan</placeName> to
-             inspect one of <persName ref="#Lady_William_Cecil">Lady Wm. Cecil's</persName> tombs.
+             inspect one of <persName ref="#Lady_William_Cecil">Lady Wm. Cecil</persName>'s tombs.
              <persName ref="#Newberry_Percy">Newberry</persName> came to lunch. <persName ref="#Tytus_Bob">Bob</persName>
              and <persName ref="#Tytus_Mrs">Mrs. Tytus</persName> to say again goodbye! A quiet evening -
              and a nice one!
@@ -1549,7 +1549,7 @@
              north wind until 12 - when we had a little from the south - reached
              <placeName ref="#Naj_Hammadi">Nagh Hamadi</placeName> as usual too late to catch the bridge open -
              just what we did last year. Are tied up to a very high villainously high bank - with
-             the little dahabeah <name type="boat" ref="#Memphis">"Memphis"</name> just in front of us - and later a gentleman and lady
+             the little dahabeah "<name type="boat" ref="#Memphis">Memphis</name>" just in front of us - and later a gentleman and lady
              came to call, sending in cards of <persName ref="#Biddulph">Lt. Col. Biddulph</persName>,
              Royal Field Artillery, and <persName ref="#Biddulph_Mrs">Mrs. Biddulph</persName> and we found
              them very pleasant. He is invalided from South Africa.
@@ -1561,7 +1561,7 @@
          </dateline>
          <p>
             We got through the bridge at 8:30 this A.M. just after the <name type="boat" ref="#Memphis">
-            Memphis</name> - and have been fighting our way along with an almost constant head
+             Memphis</name> - and have been fighting our way along with an almost constant head
              wind - day fine - are about 2 miles above <placeName ref="#Balyana_Al">Balliana</placeName>.
          </p>
       </div>
@@ -1594,7 +1594,7 @@
              wind, and went over and had tea with them. The <persName ref="#Quibell_James #Quibell_Annie_Pirie">Quibells</persName>
              are now there, and in a camp of their own, and quite a little collection of tents
              showed on the shelving desert, with the great cliffs behind. They came back late,
-             bringing the guests with them. <persName ref="#Reisner_George">Reisner's</persName> work this winter has been very interesting
+             bringing the guests with them. <persName ref="#Reisner_George">Reisner</persName>'s work this winter has been very interesting
              - he is making it for <persName ref="#Hearst_Mrs">Mrs. Hearst</persName> of
              <placeName ref="#California">California</placeName> and has unlimited money for it. Tombs of
              the 5-6 and 12th dynasties and an archaic cemetery which <persName ref="#Davis_Theodore_M">
@@ -1606,7 +1606,6 @@
              crammed with flies - and gave a dismal picture of it.
          </p>
       </div>
-      <!-- is Gebel et Toukh a mispelling of somewhere in Toukh, the city? -->
       <div xml:id="EBA-1902-03-08" type="entry">
          <dateline>
             <date when="1902-03-08">Saturday, Mar. 8</date>. 8 miles.
@@ -1614,12 +1613,11 @@
          <p>
             Started early - but not too early for the n. wind - against which we struggled all the
              day - tying up just opposite the cliffs at the northern end of
-             <placeName>Gebel et Toukh</placeName> - with the lights of
+             <placeName ref="#Gebel_et_Toukh">Gebel et Toukh</placeName> - with the lights of
              <placeName ref="#Mensheeh">Menshieh</placeName> visible - very hot - especially this afternoon and
              evening.
          </p>
       </div>
-      <!-- is Gebel el Heridi a mispelling of Gabal El Haridi? -->
       <div xml:id="EBA-1902-03-09" type="entry">
          <dateline>
             Sunday - 4th in <name type="event" ref="#Lent">Lent</name> - <date when="1902-03-09">Mar. 9</date>. 38 miles.
@@ -1627,7 +1625,7 @@
          <p>
             Started early - and have had no wind or very light wind all day. Stopped at
              <placeName ref="#Sohag">Sohag</placeName> - 11 A.M. - very hot - are lying at northern end
-             of <placeName>Gebel el Heridi</placeName>.
+             of <placeName ref="#Gebel_el_Heridi">Gebel el Heridi</placeName>.
          </p>
       </div>
       <div xml:id="EBA-1902-03-10" type="entry">
@@ -1711,8 +1709,6 @@
              drops did fall this afternoon - but the sky is very overcast this evening.
          </p>
       </div>
-      <!-- is Sa'fa a nickname for a place? -->
-      <!-- khamseeny (khamaseen) means a dry, hot, sandy local wind affecting Egypt, should i tag it? -->
       <div xml:id="EBA-1902-03-17" type="entry">
          <dateline>
             <date when="1902-03-17">Monday, Mar. 17th</date>. 35-1/2 miles.
@@ -1722,10 +1718,10 @@
              Manfalout</placeName> - and rowing and sailing brought up here at <placeName ref="#Mallawi">
              Mellawie</placeName> at 7 o'clock. The wind came lightly from the south this afternoon
              - got past the <persName ref="#Gebel_Abu_Foda">Gebel Abu-Feda</persName> by 11 o'clock, in
-             fortunately quiet weather. Came across the "<placeName>Sa'fa</placeName>"
+             fortunately quiet weather. Came across the "Sa'fa"
              hard and fast upon the sand at one o'clock - dropped anchor and sent our men across to
              help them, and in less than an hour they were off. The day has been a great contrast
-             to yesterday - very <persName>Khamseeny</persName>- very hot - the sky
+             to yesterday - very Khamseeny- very hot - the sky
              overclouded. From 5 o'clock after we had had our tea on deck, until we tied up, it was
              something especially lovely. No sun, and that subdued stillness that seems to belong
              to such a condition, - almost a feeling of rain in the air - the mild breeze carried
@@ -1790,7 +1786,7 @@
             A very good record for such a day of continued n. wind. We have not once tied up, but
              have floated between rowing with the plank out and are now lying at
              <placeName ref="#Maghaghah">Maghagah</placeName>. We passed 5-6 miles from here one of the
-             <persName ref="#Cook_Thomas">Cooks</persName> postal boats, <name type="boat" ref="#Ammartis">Amenartis,</name>
+             <persName ref="#Cook_Thomas">Cooks</persName> postal boats, <name type="boat" ref="#Ammartis">Amenartis</name>,
              hard upon the sand with many gyassas about her, filled with her cargoe. Soon after,
              she got off. The Anglo-American steamer has pulled in
              ahead of us - the last big steamer on the river, I think. The afternoon had such
@@ -1824,7 +1820,6 @@
              in spite of the heat.
          </p>
       </div>
-      <!-- khamseeny (khamaseen) is a dry, hot, sandy local wind affecting Egypt, so how should it be tagged? -->
       <div xml:id="EBA-1902-03-25" type="entry">
          <dateline>
             <date when="1902-03-25">Tuesday, Mar. 25</date>. 41 miles.
@@ -1895,7 +1890,6 @@
              and I had a quiet tea by myself.
          </p>
       </div>
-      <!-- Bazaar means market in a middle eastern country, should i tag it? -->
       <div xml:id="EBA-1902-04-01" type="entry">
          <dateline>
             <date when="1902-04-01">Tuesday, April 1st</date>.
@@ -1917,8 +1911,8 @@
              <persName ref="#Quibell_Annie_Pirie">Mrs. Quibell</persName> and <persName ref="#Miss_Pirie">Miss Pirie</persName>
              came also to dine. This morning, <persName ref="#Newberry_Percy">Newberry</persName>,
              <persName ref="#Buttles_Jeanette">Nettie</persName> and I went into town to do some little
-             shoppings at the <placeName>Bazaar</placeName>. Met
-             <persName>Mr. and Mrs. Newman</persName>, just down from
+             shoppings at the Bazaar. Met
+             <persName ref="#Newman_Henry_Roderick#Newman_Mrs">Mr. and Mrs. Newman</persName>, just down from
              <placeName ref="#Aswan">Aswan</placeName>, and they came to tea, and were very pleasant.
              We have addressed ourselves for 2 days as often as we could, to packing arranging -
              weather warm, with very high winds, and dust everywhere.
@@ -1947,14 +1941,13 @@
             <date when="1902-04-03">Thursday, April 3d</date>.
          </dateline>
          <p>
-         <!-- is tytus bob or mrs.? -->
             <persName ref="#Davis_Theodore_M">Theodore</persName> and I drove into town and to the boat and
              to the <placeName ref="#South_Kensington_Museum">Museum</placeName> this morning - everything at the
              boat getting into covers and closets, and all kinds of packing.
-             <persName>Mr. and Mrs. Newman</persName> are at <name type="hotel" ref="#Shepheards_Hotel">
+             <persName ref="#Newman_Henry_Roderick#Newman_Mrs">Mr. and Mrs. Newman</persName> are at <name type="hotel" ref="#Shepheards_Hotel">
             Shepheards</name>, going off to <placeName ref="#Florence">Florence</placeName> tomorrow.
              <persName ref="#Carter_Howard">Carter</persName> dined with us. <persName ref="#Newberry_Percy">Newberry</persName>
-             and <persName>Tytus</persName> came to say goodbye.
+             and <persName ref="#Tytus_Bob">Tytus</persName> came to say goodbye.
          </p>
       </div>
       <div xml:id="EBA-1902-04-04" type="entry">
@@ -1994,13 +1987,6 @@
              and a charming evening. Ready for our departure tomorrow.
          </p>
       </div>
-      <!-- who is Matter and what is their first name? -->
-      <!-- is P. &amp; O. a boat or typo? -->
-      <!-- is $aggie a nickname for a place? -->
-      <!-- what is VIII C. an abbreviation for? -->
-      <!-- who are the Fascherari family? -->
-      <!-- how should i tag Madonna? as separate statues, a religious figure? -->
-      <!-- who are the Ferrara  family? -->
       <div xml:id="EBA-1902-04-13" type="entry">
          <dateline>
             2d Sunday after Easter. <date when="1902-04-13">April 13</date>. <placeName ref="#Bologna">Bologna</placeName>.
@@ -2010,7 +1996,7 @@
             Just a week ago since we quitted <placeName ref="#Egypt">Egypt</placeName>. Laden with
              flowers, we left the <placeName ref="#Ghezireh_Palace">Ghizereh Palace</placeName> early
              <date when="1902-04-07">Monday</date> morning - and found <persName ref="#Fuli_Rais">
-             Reis Fuli</persName>, <persName>Matter</persName>,
+             Reis Fuli</persName>, <persName ref="#Matter">Matter</persName>,
              <persName ref="#Dervish_Mohammed">the Dervish</persName>, <persName ref="#Abdul">Abdul</persName>,
              and many others waiting for us at the station. <persName ref="#von_Bissing_Baron">
              V. Bissing</persName>, <persName ref="#Weigall_Arthur">Weigall</persName>, and
@@ -2030,7 +2016,7 @@
              <date when="1902-04-10">Thursday</date> 6 A.M. and found the <placeName ref="#London">
              London</placeName> through train de luxe waiting at the landing - and we soon were in
              the admirable sleeping car, with dining room attached. We had a double and a single
-             compartment to ourselves and were most comfortable. From <placeName>
+             compartment to ourselves and were most comfortable. From <placeName ref="#Faggie">
              Faggie</placeName> on, the route was unfamiliar to us - and all the way to
              <placeName ref="#Ancona">Ancona</placeName>, it was by the sea shore, -- the day was
              fine, delicious air, fragrant with apple and pear blossoms - the sea, liquid turquoise
@@ -2071,9 +2057,9 @@
              called Galileo, is very pretty and picturesque -
              with two columns bearing statues of <persName ref="#Saint_Dominic">S. Dominico</persName>
              and the <persName>Madonna</persName>, and two important monuments of the
-             XIII Cent. on columns, - the one belonging to the family <persName>
+             XIII Cent. on columns, - the one belonging to the family <persName ref="#Fascherari">
              Fascherari</persName> is very interesting because of an elegant work of the
-             <orgName>VIII C.</orgName> an arc of a ciborium applied to the tomb - a
+             VIII C. an arc of a ciborium applied to the tomb - a
              rich archivolt with foliage, in the corners 2 peacocks in rather coarse work.
              <persName ref="#Carlo_Cattaneo">Cattaneo</persName> pronounces this to be "veritable and pure
              remains of the antique. Then to the church of <placeName ref="#San_Giacomo_Maggiore">
@@ -2097,7 +2083,7 @@
              visited <placeName ref="#San_Vitale">San Vitale</placeName>, or the
              "Seven Churches" most interesting - but gloomy, and cold. This morning I went
              for a drive to a <placeName ref="#Villa_Revedin">Villa Revedin</placeName>, belonging
-             to a <persName>Ferrara</persName> family of that name - very high with
+             to a <persName ref="#Ferrara">Ferrara</persName> family of that name - very high with
              fine views of the town, and the level, flat plain beyond. The grounds were pretty with
              some fine trees - and some wonderful Wistaria vines coming into flower - a large
              pergola, walls, terraces covered with them - a great terrace in front of the house -
@@ -2109,7 +2095,6 @@
              Florence</placeName> tomorrow.
          </p>
       </div>
-      <!-- is Capodi Stagieni a title in another language? -->
       <div xml:id="EBA-1902-04-14" type="entry">
          <dateline>
             <date when="1902-04-14">Tuesday, April 14</date>. <placeName ref="#Florence">Florence</placeName>.
@@ -2120,7 +2105,7 @@
              journey, though there were some unpropitius moments at the railway station, when we
              found in all the hurry and crowd that a lot of noisy Germans had appropriated our
              reserved compartment - great vociferation and indignation on the part of the
-             <placeName>Capodi Stagieni</placeName>, when he discovered it; but it
+             <persName ref="#Capodi_Stagieni">Capodi Stagieni</persName>, when he discovered it; but it
              did not avail to dislodge the rude intruders - so the train was held, until a fresh car
              could be brought up, which was fresh, clean and convenient and which we had entirely to
              ourselves. Found <persName ref="#Koon_Bessie">Bessie</persName> and <persName ref="#Newberry_Mary">
@@ -2191,7 +2176,7 @@
              the showers and got home. This morning we went to <persName ref="#Berozzo">
              Berozzi</persName>'s atelier and saw some lovely frames, and a casom - which
              <persName ref="#Davis_Theodore_M">Theodore</persName> bought. The rest of the morning we spent at
-             the <placeName ref="#Gallerie_dell_Accademia">Academia.</placeName> This afternoon we went to see
+             the <placeName ref="#Gallerie_dell_Accademia">Academia</placeName>. This afternoon we went to see
              the <persName ref="#Benson_Mr">Benson</persName>'s - and found them as usual - such a
              sufferer and cripple as she is! and so cheerful and interesting!
              <persName ref="#Clarke_Miss">Phoebe</persName> and <persName ref="#Doctor_Clarke">Dr. Clarke</persName>
