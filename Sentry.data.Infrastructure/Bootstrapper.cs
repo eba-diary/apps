@@ -134,7 +134,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IElasticClient>().Singleton().Use(new ElasticClient(settings));
 
             registry.For<IDaleSearchProvider>().Use<DaleSearchProvider>().Named("SQL");
-            registry.For<IDaleSearchProvider>().Add<ElasticDataInventorySearchProvider>().Named("ELASTIC");
+            registry.For<IDaleSearchProvider>().Add<ElasticDataInventorySearchProvider>().Ctor<IDbExecuter>().Is(new DataInventorySqlExecuter()).Named("ELASTIC");
             registry.For<IDaleService>().Use<DaleService>().Ctor<IDaleSearchProvider>().Is(x => x.GetInstance<IDaleSearchProvider>(x.GetInstance<IDataFeatures>().CLA3707_DataInventorySource.GetValue()));
 
             // Choose the parameterless constructor.

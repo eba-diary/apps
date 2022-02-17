@@ -3,8 +3,6 @@ using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,11 +11,13 @@ namespace Sentry.data.Infrastructure
     public class ElasticDataInventorySearchProvider : IDaleSearchProvider
     {
         private readonly IElasticContext _context;
+        private readonly IDbExecuter _dbExecuter;
         private readonly string AssetCategoriesAggregationKey = "SaidListNames";
 
-        public ElasticDataInventorySearchProvider(IElasticContext context)
+        public ElasticDataInventorySearchProvider(IElasticContext context, IDbExecuter dbExecuter)
         {
             _context = context;
+            _dbExecuter = dbExecuter;
         }
 
         #region IDaleSearchProvider Implementation
@@ -139,71 +139,51 @@ namespace Sentry.data.Infrastructure
 
         public bool SaveSensitive(List<DaleSensitiveDto> dtos)
         {
-            bool success = false;
-            Stopwatch stopWatch = new Stopwatch();
-            stopWatch.Start();
-
-            //update SQL first
-            using (SqlConnection connection = new SqlConnection(Configuration.Config.GetHostSetting("DaleConnectionString")))
+            try
             {
-                SqlCommand command = new SqlCommand("exec usp_DALE_BaseScanAction_UPDATE @sensitiveBlob", connection)
-                {
-                    CommandTimeout = 0
-                };
+                //update SQL first
+                _dbExecuter.ExecuteCommand(Newtonsoft.Json.JsonConvert.SerializeObject(dtos));
 
-                command.Parameters.AddWithValue("@sensitiveBlob", System.Data.SqlDbType.NVarChar);
-                command.Parameters["@sensitiveBlob"].Value = Newtonsoft.Json.JsonConvert.SerializeObject(dtos);
-
+                //if SQL succeeds, update in elastic
+                IList<DataInventory> diToUpdate = null;
+                Dictionary<int, Task<bool>> tasks = new Dictionary<int, Task<bool>>();
                 try
                 {
-                    connection.Open();
-                    command.ExecuteNonQuery();
+                    //get documents to update by ids
+                    diToUpdate = _context.SearchAsync<DataInventory>(x => x
+                        .Query(q => q
+                            .Ids(i => i
+                                .Values(dtos.Select(dto => new Id(dto.BaseColumnId)).ToList())))).Result.Documents;
 
-                    //if SQL succeeds, update in elastic
-                    IList<DataInventory> diToUpdate = null;
-                    Dictionary<int, Task<bool>> tasks = new Dictionary<int, Task<bool>>();
-                    try
+                    //submit async update requests per document to update
+                    foreach (DataInventory di in diToUpdate)
                     {
-                        //get documents to update by ids
-                        diToUpdate = _context.SearchAsync<DataInventory>(x => x
-                            .Query(q => q
-                                .Ids(i => i
-                                    .Values(dtos.Select(dto => new Id(dto.BaseColumnId)).ToList())))).Result.Documents;
+                        DaleSensitiveDto dto = dtos.FirstOrDefault(x => x.BaseColumnId == di.Id);
+                        di.IsSensitive = dto.IsSensitive;
+                        di.IsOwnerVerified = dto.IsOwnerVerified;
 
-                        //submit async update requests per document to update
-                        foreach (DataInventory di in diToUpdate)
-                        {
-                            DaleSensitiveDto dto = dtos.FirstOrDefault(x => x.BaseColumnId == di.Id);
-                            di.IsSensitive = dto.IsSensitive;
-                            di.IsOwnerVerified = dto.IsOwnerVerified;
-
-                            tasks.Add(di.Id, _context.Update(di));
-                        }
-
-                        //wait for all requests to complete (WaitAll lets all complete before error is thrown)
-                        Task.WaitAll(tasks.Values.ToArray());
-
-                        success = true;
+                        tasks.Add(di.Id, _context.Update(di));
                     }
-                    catch (AggregateException aggEx)
-                    {
-                        //search failed if diToUpdate is empty, else update(s) failed
-                        Logger.Error(diToUpdate?.Any() == false
-                            ? $"ElasticDataInventorySearchProvider failed to retrieve Ids: {string.Join(", ", dtos.Select(x => x.BaseColumnId))} from index"
-                            : $"ElasticDataInventorySearchProvider failed to update Ids: {string.Join(", ", tasks.Where(x => x.Value.IsFaulted).Select(x => x.Key))}", aggEx);
-                    }
+
+                    //wait for all requests to complete (WaitAll lets all complete before error is thrown)
+                    Task.WaitAll(tasks.Values.ToArray());
+
+                    return true;
                 }
-                catch (Exception ex)
+                catch (AggregateException aggEx)
                 {
-                    Logger.Error("ElasticDataInventorySearchProvider.SaveSensitive() Failed!!", ex);
+                    //search failed if diToUpdate is empty, else update(s) failed
+                    Logger.Error(diToUpdate?.Any() == false
+                        ? $"ElasticDataInventorySearchProvider failed to retrieve Ids: {string.Join(", ", dtos.Select(x => x.BaseColumnId))} from index"
+                        : $"ElasticDataInventorySearchProvider failed to update Ids: {string.Join(", ", tasks.Where(x => x.Value.IsFaulted).Select(x => x.Key))}", aggEx);
                 }
             }
+            catch (Exception ex)
+            {
+                Logger.Error("ElasticDataInventorySearchProvider.SaveSensitive() Failed!!", ex);
+            }
 
-            stopWatch.Stop();
-            TimeSpan ts = stopWatch.Elapsed;
-            Logger.Info($"ElasticDataInventorySearchProvider.SaveSensitive() Elapsed Seconds:{ts.Seconds}");
-
-            return success;
+            return false;
         }
         #endregion
 

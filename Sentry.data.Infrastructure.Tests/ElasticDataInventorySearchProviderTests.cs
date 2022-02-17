@@ -20,7 +20,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetDataInventoryList());
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             DaleResultDto result = searchProvider.GetSearchResults(new DaleSearchDto() { Criteria = "Table" });
 
@@ -63,7 +63,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Returns(Task.FromResult(new ElasticResult<DataInventory>()));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             DaleResultDto result = searchProvider.GetSearchResults(new DaleSearchDto());
 
@@ -80,7 +80,7 @@ namespace Sentry.data.Infrastructure.Tests
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
                 .ThrowsAsync(new AggregateException(new List<Exception>() { new ElasticsearchClientException("FAIL") }));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             DaleResultDto result = searchProvider.GetSearchResults(new DaleSearchDto() { Criteria = "Table" });
 
@@ -101,7 +101,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetDataInventoryList());
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             DaleSearchDto searchDto = new DaleSearchDto()
             {
@@ -130,7 +130,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetAggregateDictionary());
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             FilterSearchDto result = searchProvider.GetSearchFilters(new DaleSearchDto() 
             {
@@ -203,7 +203,7 @@ namespace Sentry.data.Infrastructure.Tests
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
                 .ThrowsAsync(new AggregateException(new List<Exception>() { new ElasticsearchClientException("FAIL") }));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             FilterSearchDto result = searchProvider.GetSearchFilters(new DaleSearchDto()
             {
@@ -262,7 +262,7 @@ namespace Sentry.data.Infrastructure.Tests
                 .ReturnsAsync(GetCategoryAggregateDictionary(GetAllCategories()))
                 .ReturnsAsync(GetCategoryAggregateDictionary(new List<string>() { "PCI", "User Setting" }));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             DaleCategoryResultDto result = searchProvider.GetCategoriesByAsset("DATA");
 
@@ -301,7 +301,7 @@ namespace Sentry.data.Infrastructure.Tests
                 .ReturnsAsync(GetCategoryAggregateDictionary(GetAllCategories()))
                 .ReturnsAsync(GetCategoryAggregateDictionary(new List<string>()));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             DaleCategoryResultDto result = searchProvider.GetCategoriesByAsset("DATA");
 
@@ -339,7 +339,7 @@ namespace Sentry.data.Infrastructure.Tests
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
                 .ThrowsAsync(new AggregateException(new List<Exception>() { new ElasticsearchClientException("FAIL") }));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             DaleCategoryResultDto result = searchProvider.GetCategoriesByAsset("DATA");
 
@@ -351,6 +351,30 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Data Inventory Elasticsearch query failed. Exception: One or more errors occurred.", result.DaleEvent.QueryErrorMessage);
 
             Assert.IsFalse(result.DaleCategories.Any());
+        }
+
+        [TestMethod]
+        public void SaveSensitive_DaleSensitiveDtos_True()
+        {
+
+        }
+
+        [TestMethod]
+        public void SaveSensitive_DaleSensitiveDtos_SqlFail_False()
+        {
+
+        }
+
+        [TestMethod]
+        public void SaveSensitive_DaleSensitiveDtos_ElasticSearchFail_False()
+        {
+
+        }
+
+        [TestMethod]
+        public void SaveSensitive_DaleSensitiveDtos_ElasticUpdateFail_False()
+        {
+
         }
 
         #region Methods
