@@ -330,7 +330,6 @@
     <Compile Include="Interfaces\IDataApplicationService.cs" />
     <Compile Include="Interfaces\IDatasetFileService.cs" />
     <Compile Include="Interfaces\IEntityService.cs" />
-    <Compile Include="Interfaces\IStateful.cs" />
     <Compile Include="Interfaces\IElasticContext.cs" />
     <Compile Include="Interfaces\IHostSettings.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />

@@ -181,14 +181,59 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="idList"></param>
         /// <remarks> This will serves an Admin only funtionlaity within DataFlow API </remarks>
-        public bool Delete(int id, IApplicationUser user, bool logicalDelete)
+        public bool Delete_Queue(List<int> idList, string userId, bool logicalDelete)
         {
-            Logger.Info($"<{nameof(DataFlowService)}-{nameof(Delete)}> Method Start");
+            string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(Delete).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
 
-            _hangfireBackgroundJobClient.Enqueue<DataFlowService>(x => x.Delete(id, Int32.Parse(user.AssociateId), true));
+            foreach(int id in idList)
+            {
+                _hangfireBackgroundJobClient.Enqueue<DataFlowService>(x => x.Delete(id, userId, true));                
+            }
 
-            Logger.Info($"<{nameof(DataFlowService)}-{nameof(Delete)}> Method End");
+            Logger.Info($"{methodName} Method End");
             return true;
+        }
+
+        /// <summary>
+        /// Only used to facilitate hangfire delete call
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="userId"></param>
+        /// <param name="logicalDelete"></param>
+        public void Delete(int id, string userId, bool logicalDelete)
+        {
+            IApplicationUser user = _userService.GetByAssociateId(userId);            
+            bool isSuccessfull = Delete(id, user, logicalDelete);
+            if (!isSuccessfull)
+            {
+                throw new Exception();
+            }
+        }
+
+        /// <summary>
+        /// For the list of dataflow ids provided, this will set ObjectStatus appropriately based on logicDelete flag.
+        /// In addition,
+        ///   will find any retrieverjobs, associated with specified dataflow, and 
+        ///   set its ObjectStatus = Deleted.
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <param name="user"></param>
+        /// <param name="logicalDelete"></param>
+        /// <remarks>logicalDelete = true sets objectstatus to Pending_Delete. 
+        /// logicalDelete = false sets objectstatus to Deleted.</remarks>
+        public bool Delete(List<int> idList, IApplicationUser user, bool logicalDelete)
+        {
+            bool allDeletesSuccessfull = true;
+            foreach (int id in idList)
+            {
+                bool isSuccessful = Delete(id, user, logicalDelete);
+                if (!isSuccessful)
+                {
+                    allDeletesSuccessfull = isSuccessful;
+                }
+            }
+            return allDeletesSuccessfull;
         }
 
         /// <summary>
@@ -196,41 +241,55 @@ namespace Sentry.data.Core
         ///   will find any retrieverjobs, associated with specified dataflow, and 
         ///   set its ObjectStatus = Deleted.
         /// </summary>
-        /// <param name="dataFlowId"></param>
+        /// <param name="id"></param>
+        /// <param name="user"></param>
+        /// <param name="logicalDelete"></param>
         /// <remarks>
         /// This method can be triggered by Hangfire.  
         /// Added the AutomaticRetry attribute to ensure retries do not occur for this method.
         /// https://docs.hangfire.io/en/latest/background-processing/dealing-with-exceptions.html
         /// </remarks>
         [AutomaticRetry(Attempts = 0)]
-        internal void Delete(int dataFlowId, int userId, bool logicalDelete)
+        public bool Delete(int id, IApplicationUser user, bool logicalDelete)
         {
-            Logger.Debug($"{nameof(DataFlowService).ToLower()}_{nameof(Delete).ToLower()} Method Start");
+            string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(Delete).ToLower()}";
+            Logger.Debug($"{methodName} Method Start");
+            Logger.Info($"{methodName} - dataflowid:{id}");
 
-            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(Delete).ToLower()} - dataflowid:{dataFlowId}");
+            bool returnResult = true;
 
             //Find DataFlow
-            DataFlow flow = _datasetContext.GetById<DataFlow>(dataFlowId);
+            DataFlow flow = _datasetContext.GetById<DataFlow>(id);
 
-
+            bool PerformDeleteLogic = true;
             if (flow == null)
             {
-                Logger.Debug($"{nameof(DataFlowService).ToLower()}_{nameof(Delete).ToLower()} DataFlow not found - dataflowid:{dataFlowId}");
+                Logger.Debug($"{methodName} DataFlow not found - dataflowid:{id}");
                 throw new DataFlowNotFound();
             }
-            //If dataflow is already deleted then exit
-            else if (flow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted)
+
+            //Determine if flow is already deleted
+            if (logicalDelete && (flow.ObjectStatus == ObjectStatusEnum.Pending_Delete || flow.ObjectStatus == ObjectStatusEnum.Deleted))
             {
-                Logger.Debug($"{nameof(DataFlowService).ToLower()}_{nameof(Delete).ToLower()} DataFlow already deleted - dataflowid:{dataFlowId}");
+                PerformDeleteLogic = false;
             }
-            else
+            else if (!logicalDelete && flow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted)
+            {
+                PerformDeleteLogic = false;
+            }
+
+            if (!PerformDeleteLogic)
+            {
+                Logger.Info($"{methodName} Object already has status {flow.ObjectStatus}");
+                Logger.Info($"{methodName} Method End");
+                return returnResult;
+            }
+
+            if (logicalDelete)
             {
                 //Mark dataflow deleted
-                flow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
-                if (string.IsNullOrEmpty(flow.DeleteIssuer))
-                {
-                    flow.DeleteIssuer = userId.ToString();
-                }
+                flow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
+                flow.DeleteIssuer = flow.DeleteIssuer ?? user.AssociateId.ToString();
 
                 //Only comparing date since the milliseconds percision are different, therefore, never evaluates true
                 //  https://stackoverflow.com/a/44324883
@@ -240,98 +299,40 @@ namespace Sentry.data.Core
                 }
 
                 //Delete associated retriever jobs
-                _jobService.DeleteJobByDataFlowId(dataFlowId, deleteIssuerId: userId.ToString(), logicalDelete: false);
+                List<int> jobList = GetRetrieverJobsByDataFlowId(id);
+                if (jobList.Any())
+                {
+                    _jobService.Delete(jobList, user, true);
+                }
 
-            }
-
-            Logger.Debug($"{nameof(DataFlowService).ToLower()}_{nameof(Delete).ToLower()} Method End");
-        }
-
-        /// <summary>
-        /// Delete all data flows for a given <see cref="FileSchema"/> object.
-        /// </summary>
-        /// <param name="scm">The FileSchema object</param>
-        /// <param name="logicalDelete">True to logically delete the dataflow; false to physically delete it</param>
-        public void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true)
-        {
-            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(DeleteFlowsByFileSchema).ToLower()} Method Start");
-
-            DeleteSchemaFlowByFileSchema(scm, logicalDelete);
-
-            /* Get associated producer flow(s) */
-            List<int> producerDataflowIdList = GetProducerFlowsToBeDeletedBySchemaId(scm.SchemaId);
-
-            Logger.Info($"{producerDataflowIdList.Count} dataflows identified");
-
-            if (logicalDelete)
-            {
-                /* Mark associated producer dataflows for deletion */
-                MarkDataFlowForDeletionById(producerDataflowIdList);
             }
             else
             {
-                foreach (int flowId in producerDataflowIdList)
+                //Mark dataflow deleted
+                flow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
+                flow.DeleteIssuer = flow.DeleteIssuer ?? user.AssociateId.ToString();
+
+                //Only comparing date since the milliseconds percision are different, therefore, never evaluates true
+                //  https://stackoverflow.com/a/44324883
+                if (DateTime.MaxValue.Date == flow.DeleteIssueDTM.Date)
                 {
-                    IApplicationUser user = _userService.GetCurrentUser();
-                    Delete(flowId, user, false);
+                    flow.DeleteIssueDTM = DateTime.Now;
                 }
+
+                //Delete associated retriever jobs
+                List<int> jobList = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == id).Select(s => s.Id).ToList();
+                _jobService.Delete(jobList, user, false);
             }
 
-            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(DeleteFlowsByFileSchema).ToLower()} Method End");
+            Logger.Debug($"{methodName} Method End");
+            return returnResult;
         }
 
-        /// <summary>
-        /// Finds a Schema Flow associated with the provided <see cref="FileSchema"/>, and deletes it.
-        /// The method is OK if no Schema Flow is associated/found.
-        /// </summary>
-        /// <param name="scm">The FileSchema object</param>
-        /// <param name="logicalDelete">True to logically delete the dataflow; false to physically delete it</param>
-        /// <remarks>
-        /// Schema Flows will stop being created as seperate flows as part of CLA-3332. However, this
-        /// code is still needed for existing data flows - until they're converted.
-        /// </remarks>
-        private void DeleteSchemaFlowByFileSchema(FileSchema scm, bool logicalDelete)
+        private List<int> GetRetrieverJobsByDataFlowId(int id)
         {
-            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(DeleteSchemaFlowByFileSchema).ToLower()} Method Start");
-            /* Get Schema Flow */
-            var schemaflowName = GetDataFlowNameForFileSchema(scm);
-            DataFlow schemaFlow = _datasetContext.DataFlow.FirstOrDefault(w => w.Name == schemaflowName);
-
-            //some legacy dataset\schema may not have associated schema flow
-            if (schemaFlow == null)
-            {
-                Logger.Debug($"Schema Flow not found by name, attempting to detect by id...");
-
-                SchemaMap mappedStep = _datasetContext.SchemaMap.SingleOrDefault(w => w.MappedSchema.SchemaId == scm.SchemaId && w.DataFlowStepId.Action.Name == "Schema Load" && w.DataFlowStepId.DataFlow.Name.StartsWith("FileSchema"));
-                if (mappedStep != null)
-                {
-                    Logger.Debug($"detected schema flow by Id");
-                    schemaFlow = mappedStep.DataFlowStepId.DataFlow;
-                }
-                else
-                {
-                    Logger.Debug($"schema flow not detected by id");
-                    Logger.Debug($"no schema flow associated with schema");
-                }
-            }
-
-            if (schemaFlow != null)
-            {
-                Logger.Debug($"schema flow name: {schemaFlow.Name}");
-
-                if (logicalDelete)
-                {
-                    /* Mark schema dataflow for deletion */
-                    MarkDataFlowForDeletionById(schemaFlow.Id);
-                }
-                else
-                {
-                    IApplicationUser user = _userService.GetCurrentUser();
-                    Delete(schemaFlow.Id, user, false);
-                }
-            }
-
-            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(DeleteSchemaFlowByFileSchema).ToLower()} Method End");
+            List<int> jobIdList = new List<int>();
+            jobIdList.AddRange(_datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == id).Select(s => s.Id));
+            return jobIdList;
         }
 
         public int CreateandSaveDataFlow(DataFlowDto dto)
@@ -444,7 +445,7 @@ namespace Sentry.data.Core
             if (deleteOriginal)
             {
                 //Delete existing dataflow
-                MarkDataFlowForDeletionById(dfDto.Id);
+                Delete(dfDto.Id, _userService.GetCurrentUser(), false);
             }
 
             _datasetContext.SaveChanges();
@@ -575,42 +576,6 @@ namespace Sentry.data.Core
 
             return schemaLoadStep.SchemaMappings.Single().MappedSchema.StorageCode;
 
-        }
-
-        /// <summary>
-        /// Marks dataflows, along with associated retriever jobs, as Pending Delete
-        /// </summary>
-        /// <param name="idList"></param>
-        private void MarkDataFlowForDeletionById(List<int> idList)
-        {
-            foreach (int id in idList)
-            {
-                MarkDataFlowForDeletionById(id);
-            }
-        }
-
-        /// <summary>
-        /// Marks dataflow, along with associated retriever jobs, as Pending Delete
-        /// </summary>
-        /// <param name="id">DataFlow Id</param>
-        private void MarkDataFlowForDeletionById(int id)
-        {
-            Logger.Info($"<{nameof(DataFlowService)}-{nameof(MarkDataFlowForDeletionById)}> Method Start");
-
-            //Get DataFlow and mark for deletion
-            DataFlow dataFlow = _datasetContext.GetById<DataFlow>(id);
-            dataFlow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
-            dataFlow.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
-            dataFlow.DeleteIssueDTM = DateTime.Now;
-
-            //Get associated retrieverjobs and mark for deletion
-            List<int> jobList = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == id).Select(s => s.Id).ToList();
-            if (jobList.Any())
-            {
-                _jobService.DeleteJob(jobList);
-            }
-
-            Logger.Info($"<{nameof(DataFlowService)}-{nameof(MarkDataFlowForDeletionById)}> Method End");
         }
 
         private List<int> GetProducerFlowsToBeDeletedBySchemaId(int schemaId)

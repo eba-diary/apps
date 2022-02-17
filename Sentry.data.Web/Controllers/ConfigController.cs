@@ -219,7 +219,7 @@ namespace Sentry.data.Web.Controllers
 
                 if (us != null && us.CanEditDataset)
                 {
-                    bool IsDeleted = DataApplicationService.DeleteDatasetFileConfig(new List<int>(id), SharedContext.CurrentUser);
+                    bool IsDeleted = DataApplicationService.DeleteDatasetFileConfig(new List<int> { id }, SharedContext.CurrentUser);
                     if (!IsDeleted)
                     {
                         return Json(new { Success = false, Message = "Schema was not deleted" });

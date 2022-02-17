@@ -18,7 +18,7 @@ namespace Sentry.data.Core.Tests
         
         [TestCategory("Core DatasetService")]
         [TestMethod]
-        public async Task DatasetService_Validate_DuplicateName_NoNamedEnvironments()
+        public async Task Validate_DuplicateName_NoNamedEnvironments()
         {
             // Arrange
             var context = new Mock<IDatasetContext>();
@@ -51,7 +51,7 @@ namespace Sentry.data.Core.Tests
 
         [TestCategory("Core DatasetService")]
         [TestMethod]
-        public void DatasetService_Delete_Does_Not_Call_Save_Changes()
+        public void Delete_Does_Not_Call_Save_Changes()
         {
             // Arrange
             MockRepository mr = new MockRepository(MockBehavior.Strict);

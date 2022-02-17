@@ -175,8 +175,6 @@ namespace Sentry.data.Core.Tests
             // Arrange
             MockRepository mr = new MockRepository(MockBehavior.Loose);
 
-            bool deleteDatasetResult = true;
-
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.SaveChanges(true));
 
@@ -188,11 +186,10 @@ namespace Sentry.data.Core.Tests
 
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
             var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null);
+
+
             // Act
-            
-
-
-             dataApplicationService.DeleteDataset(idList, user.Object);
+            dataApplicationService.DeleteDataset(idList, user.Object);
 
             // Assert
             context.Verify(x => x.SaveChanges(It.IsAny<bool>()), Times.Never);

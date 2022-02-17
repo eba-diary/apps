@@ -31,7 +31,7 @@ namespace Sentry.data.Infrastructure
             using (IContainer container = Bootstrapper.Container.GetNestedContainer())
             {
                 IDatasetContext _datasetContext = container.GetInstance<IDatasetContext>();
-                IConfigService configService = container.GetInstance<IConfigService>();
+                IDataApplicationService dataApplicationService = container.GetInstance<IDataApplicationService>();
                 
                 /*  Return list which meet the following:
                  *  1.) Parent dataset is Active
@@ -54,7 +54,7 @@ namespace Sentry.data.Infrastructure
                     foreach (Tuple<int, string, int, string> listItem in tupleList)
                     {
                         Logger.Info($"walleservice-schemadelete-start - DatasetId:{listItem.Item1} DatasetName:{listItem.Item2} ConfigId:{listItem.Item3} ConfigName:{listItem.Item4} guid:{_runGuid}");
-                        bool IsSuccessful = configService.Delete(listItem.Item3, null, false);
+                        bool IsSuccessful = dataApplicationService.DeleteDatasetFileConfig(new List<int>() { listItem.Item3 }, null, true);
                         if (!IsSuccessful)
                         {
                             Logger.Info($"walleservice-schemadelete ended with failures - DatasetId:{listItem.Item1} DatasetName:{listItem.Item2} ConfigId:{listItem.Item3} ConfigName:{listItem.Item4} guid:{_runGuid}");
@@ -77,7 +77,7 @@ namespace Sentry.data.Infrastructure
             using (IContainer container = Bootstrapper.Container.GetNestedContainer())
             {
                 IDatasetContext _datasetContext = container.GetInstance<IDatasetContext>();
-                IDatasetService _datasetService = container.GetInstance<IDatasetService>();
+                IDataApplicationService dataApplicationService = container.GetInstance<IDataApplicationService>();
                 Dictionary<int, string> dsList = _datasetContext.Datasets.Where(w => w.ObjectStatus == Core.GlobalEnums.ObjectStatusEnum.Pending_Delete
                                                                                 && w.DeleteIssueDTM < DateTime.Now.AddDays(Double.Parse(Configuration.Config.GetHostSetting("DatasetDeleteWaitDays"))))
                                                                                 .Select(s => new { s.DatasetId, s.DatasetName })
@@ -89,7 +89,7 @@ namespace Sentry.data.Infrastructure
                     foreach (var ds in dsList)
                     {
                         Logger.Info($"walleservice-datasetdelete-start - DatasetId:{ds.Key} DatasetName:{ds.Value} guid:{_runGuid}");
-                        bool IsSuccessful = _datasetService.Delete(ds.Key, null, false);
+                        bool IsSuccessful = dataApplicationService.DeleteDataset(new List<int>(){ ds.Key }, null, true);
                         if (IsSuccessful)
                         {
                             Logger.Info($"walleservice-datasetdelete-end - DatasetId:{ds.Key} DatasetName:{ds.Value} guid:{_runGuid}");

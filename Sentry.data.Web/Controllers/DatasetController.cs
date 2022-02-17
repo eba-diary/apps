@@ -1,10 +1,11 @@
-﻿using Amazon.S3;
-using Hangfire;
-using Newtonsoft.Json;
+﻿using Hangfire;
 using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Common;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Interfaces;
 using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
 using Sentry.DataTables.Mvc;
@@ -12,7 +13,6 @@ using Sentry.DataTables.QueryableAdapter;
 using Sentry.DataTables.Shared;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Dynamic;
@@ -22,9 +22,6 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.SessionState;
-using Sentry.data.Core.Interfaces;
-using Sentry.data.Core.Entities;
-using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Web.Controllers
 {

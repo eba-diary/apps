@@ -92,8 +92,12 @@ namespace Sentry.data.Web.WebApi.Controllers
         public IHttpActionResult DeleteDataFlows(int[] idList)
         {
 
-            DataApplicaitonService.DeleteDataflow(idList.ToList(), _userService.GetCurrentUser());
+            bool isSuccessful = DataApplicaitonService.DeleteDataFlow_Queue(idList.ToList(), _userService.GetCurrentUser().AssociateId, true);
 
+            if (!isSuccessful)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "Unable to queue all deletes");
+            }
             return Ok();
         }
     }

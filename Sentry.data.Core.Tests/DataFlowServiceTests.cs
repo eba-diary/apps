@@ -22,6 +22,7 @@ namespace Sentry.data.Core.Tests
         /// - Test that the DataFlowService.Validate() method correctly identifies a duplicate DataFlow name
         /// and responds with the correct validation result.
         /// </summary>
+        [TestCategory("Core DataFlowService")]
         [TestMethod]
         public async Task DataFlowService_Validate_DuplicateName_NoNamedEnvironments()
         {
@@ -48,6 +49,7 @@ namespace Sentry.data.Core.Tests
         /// <summary>
         /// Tests successful validation of the DataFlowDto
         /// </summary>
+        [TestCategory("Core DataFlowService")]
         [TestMethod]
         public async Task DataFlowService_Validate_Success()
         {
@@ -746,6 +748,7 @@ namespace Sentry.data.Core.Tests
 
         #endregion
 
+        [TestCategory("Core DataFlowService")]
         [TestMethod]
         public void DataFlowService_UpgradeDataFlow_Invalid_DataFlow_Id()
         {
@@ -764,6 +767,7 @@ namespace Sentry.data.Core.Tests
             Assert.ThrowsException<DataFlowNotFound>(() => dataflowService.UpgradeDataFlow(2));
         }
 
+        [TestCategory("Core DataFlowService")]
         [TestMethod]
         public void DataFlowService_UpgradeDataFlow_Multiple_SchemaMappings()
         {
@@ -806,6 +810,7 @@ namespace Sentry.data.Core.Tests
             Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
         }
 
+        [TestCategory("Core DataFlowService")]
         [TestMethod]
         public void DataFlowService_UpgradeDataFlow_FileSchemaFlow_Not_Upgraded()
         {
@@ -833,6 +838,7 @@ namespace Sentry.data.Core.Tests
             Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
         }
 
+        [TestCategory("Core DataFlowService")]
         [TestMethod]
         public void DataFlowService_UpgradeDataFlow_No_SchemaMap_Step_Not_Upgraded()
         {
@@ -860,6 +866,7 @@ namespace Sentry.data.Core.Tests
             Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
         }
 
+        [TestCategory("Core DataFlowService")]
         [TestMethod]
         public void DataFlowService_UpgradeDataFlow_Only_Active_DataFlows_Upgraded()
         {
@@ -898,6 +905,7 @@ namespace Sentry.data.Core.Tests
             Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(3));
         }
 
+        [TestCategory("Core DataFlowService")]
         [TestMethod]
         public void CheckForUpgradeDataFlow_ShouldBeEnqueued_OnlyOnce()
         {
@@ -916,22 +924,23 @@ namespace Sentry.data.Core.Tests
                 It.Is<Job>(job => job.Method.Name == "UpgradeDataFlow" && (int)job.Args[0] == 2),
                 It.IsAny<EnqueuedState>()), Times.Once);
         }
+        [TestCategory("Core DataFlowService")]
         [TestMethod]
         public void CheckForDeleteDataFlow_ShouldBeEnqueued_OnlyOnce()
         {
             // Arrange
             var client = new Mock<IBackgroundJobClient>();
 
-            var userService = new Mock<IUserService>();
-            var user1 = new Mock<IApplicationUser>();
-            user1.Setup(f => f.AssociateId).Returns("123456");
+            //var userService = new Mock<IUserService>();
+            //var user1 = new Mock<IApplicationUser>();
+            //user1.Setup(f => f.AssociateId).Returns("123456");
 
-            userService.Setup(f => f.GetCurrentUser()).Returns(user1.Object);
+            //userService.Setup(f => f.GetCurrentUser()).Returns(user1.Object);
 
-            var dataflowService = new DataFlowService(null, userService.Object, null, null, null, null, null, client.Object);
+            var dataflowService = new DataFlowService(null, null, null, null, null, null, null, client.Object);
 
             // Act
-            dataflowService.Delete(1, user1.Object, true);
+            dataflowService.Delete_Queue(new List<int>() { 1 }, "123456", true);
 
             // Assert
             client.Verify(x => x.Create(
@@ -939,6 +948,7 @@ namespace Sentry.data.Core.Tests
                 It.IsAny<EnqueuedState>()), Times.Once);
         }
 
+        [TestCategory("Core DataFlowService")]
         [TestMethod]
         public void DataFlow_Delete_DataFlowNotFound_Is_Thrown()
         {
@@ -959,11 +969,12 @@ namespace Sentry.data.Core.Tests
             var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null, null);
 
             //Assert
-            Assert.ThrowsException<DataFlowNotFound>(() => dataflowService.Delete(2, 123456, false));
+            Assert.ThrowsException<DataFlowNotFound>(() => dataflowService.Delete(2, user.Object, false));
         }
 
+        [TestCategory("Core DataFlowService")]
         [TestMethod]
-        public void DataFlow_Delete__Delete_Metadata_Set_Propertly()
+        public void Delete_Sets_Object_Metadata_Correctly_When_Incoming_Object_Active_And_LogicalDelete_False()
         {
             //Arrange
             var context = new Mock<IDatasetContext>();
@@ -977,13 +988,16 @@ namespace Sentry.data.Core.Tests
             };
             context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
 
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("123456");
+
             //We need to mock out IJobService due to call to DeleteJobByDataFlowId()
             var jobService = new Mock<IJobService>();
 
             var dataflowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null);
 
             //Act
-            dataflowService.Delete(1, 123456, false);
+            dataflowService.Delete(1, user.Object, false);
 
             //Assert
             DataFlow deletedFlow = context.Object.GetById<DataFlow>(1);
@@ -991,6 +1005,42 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(ObjectStatusEnum.Deleted, deletedFlow.ObjectStatus);
             Assert.AreEqual("123456", deletedFlow.DeleteIssuer);
             Assert.AreNotEqual(DateTime.MaxValue, deletedFlow.DeleteIssueDTM);
+        }
+
+
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public void Delete_Does_Not_Call_Save_Changes()
+        {
+            // Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Loose);
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(s => s.DisplayName).Returns("displayName");
+            user.Setup(s => s.AssociateId).Returns("123456");
+           
+
+            DataFlow df = MockClasses.MockDataFlow();
+            RetrieverJob job = MockClasses.GetMockRetrieverJob(
+                                        MockClasses.MockDataFileConfig(
+                                                MockClasses.MockDataset()));
+            job.DataFlow = df;
+            List<RetrieverJob> jobList = new List<RetrieverJob>() { job };
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.GetById<DataFlow>(It.IsAny<int>())).Returns(df);
+            context.Setup(s => s.RetrieverJob).Returns(jobList.AsQueryable());
+
+            Mock<IJobService> jobService = mr.Create<IJobService>();
+            jobService.Setup(s => s.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
+
+            var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null);
+            
+            //Act
+            dataFlowService.Delete(df.Id, user.Object, true);
+
+            //Assert
+            context.Verify(x => x.SaveChanges(true), Times.Never);
         }
     }
 }

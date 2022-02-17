@@ -135,9 +135,12 @@
   </Choose>
   <ItemGroup>
     <Compile Include="BaseCoreUnitTest.cs" />
+    <Compile Include="ConfigServiceTests.cs" />
     <Compile Include="DataApplicationServiceTests.cs" />
     <Compile Include="DatasetTests.cs" />
+    <Compile Include="JobServiceTests.cs" />
     <Compile Include="Mockups\MockClasses\MockClasses.cs" />
+    <Compile Include="Mockups\MockExtensions.cs" />
     <Compile Include="PaginateTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceImplementationTests\BusinessAreaServiceTests.cs" />

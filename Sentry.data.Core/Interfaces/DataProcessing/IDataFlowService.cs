@@ -54,17 +54,27 @@ namespace Sentry.data.Core
         /// <param name="producerDataFlowIds"></param>
         void UpgradeDataFlows(int[] producerDataFlowIds);
 
-        /// <summary> 
+        /// <summary>
+        /// For the list of dataflow ids provided, this will set ObjectStatus appropriately based on logicDelete flag.
+        /// In addition,
+        ///   will find any retrieverjobs, associated with specified dataflow, and 
+        ///   set its ObjectStatus = Deleted.
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <param name="user"></param>
+        /// <param name="logicalDelete"></param>
+        /// <remarks>logicalDelete = true sets objectstatus to Pending_Delete. 
+        /// logicalDelete = false sets objectstatus to Deleted.</remarks>
+        bool Delete(List<int> idList, IApplicationUser user, bool logicalDelete);
+
+        /// <summary>
         /// Will enqueue a hangfire job, for each id in idList,
         ///   that will run on hangfire background server and peform
         ///   the dataflow delete.
         /// </summary>
         /// <param name="idList"></param>
-        /// <param name="deleteIssuerId">User id of delete issuer</param>
-        bool Delete(int id, IApplicationUser user, bool logicalDelete);
-
-
-        void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true);
+        /// <remarks> This will serves an Admin only funtionlaity within DataFlow API </remarks>
+        bool Delete_Queue(List<int> idList, string userId, bool logicalDelete);
 
         /// <summary>
         /// 
