@@ -1017,7 +1017,7 @@ namespace Sentry.data.Core.Tests
             DataFlow df = MockClasses.MockDataFlow();
             RetrieverJob job = MockClasses.GetMockRetrieverJob(
                                         MockClasses.MockDataFileConfig(
-                                                MockClasses.MockDataset()));
+                                                MockClasses.MockDataset()), new FtpSource());
             job.DataFlow = df;
             List<RetrieverJob> jobList = new List<RetrieverJob>() { job };
 

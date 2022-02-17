@@ -16,7 +16,7 @@ namespace Sentry.data.Core.Tests
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("123456");
 
-            RetrieverJob job = MockClasses.GetMockRetrieverJob();
+            RetrieverJob job = MockClasses.GetMockRetrieverJob(null, new FtpSource(), null);
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<RetrieverJob>(job.Id)).Returns(job);
@@ -42,7 +42,7 @@ namespace Sentry.data.Core.Tests
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("123456");
 
-            RetrieverJob job = MockClasses.GetMockRetrieverJob();
+            RetrieverJob job = MockClasses.GetMockRetrieverJob(null, new FtpSource(), null);
             job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
@@ -67,7 +67,7 @@ namespace Sentry.data.Core.Tests
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("123456");
 
-            RetrieverJob job = MockClasses.GetMockRetrieverJob();
+            RetrieverJob job = MockClasses.GetMockRetrieverJob(null, new FtpSource(), null);
             job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
@@ -92,7 +92,7 @@ namespace Sentry.data.Core.Tests
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("123456");
 
-            RetrieverJob job = MockClasses.GetMockRetrieverJob();
+            RetrieverJob job = MockClasses.GetMockRetrieverJob(null, new FtpSource(), null);
             job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
@@ -117,7 +117,7 @@ namespace Sentry.data.Core.Tests
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("123456");
 
-            RetrieverJob job = MockClasses.GetMockRetrieverJob();
+            RetrieverJob job = MockClasses.GetMockRetrieverJob(null, new FtpSource(), null);
             job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
@@ -142,7 +142,7 @@ namespace Sentry.data.Core.Tests
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("123456");
 
-            RetrieverJob job = MockClasses.GetMockRetrieverJob();
+            RetrieverJob job = MockClasses.GetMockRetrieverJob(null, new FtpSource(), null);
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<RetrieverJob>(job.Id)).Returns(job);
@@ -168,7 +168,7 @@ namespace Sentry.data.Core.Tests
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("123456");
 
-            RetrieverJob job = MockClasses.GetMockRetrieverJob();
+            RetrieverJob job = MockClasses.GetMockRetrieverJob(null, new FtpSource(), null);
             job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
