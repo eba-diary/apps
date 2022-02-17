@@ -160,15 +160,15 @@ namespace Sentry.data.Infrastructure
                     command.ExecuteNonQuery();
 
                     //if SQL succeeds, update in elastic
+                    IList<DataInventory> diToUpdate = null;
+                    Dictionary<int, Task<bool>> tasks = new Dictionary<int, Task<bool>>();
                     try
                     {
                         //get documents to update by ids
-                        IList<DataInventory> diToUpdate = _context.SearchAsync<DataInventory>(x => x
+                        diToUpdate = _context.SearchAsync<DataInventory>(x => x
                             .Query(q => q
                                 .Ids(i => i
                                     .Values(dtos.Select(dto => new Id(dto.BaseColumnId)).ToList())))).Result.Documents;
-
-                        Dictionary<int, Task<bool>> tasks = new Dictionary<int, Task<bool>>();
 
                         //submit async update requests per document to update
                         foreach (DataInventory di in diToUpdate)
@@ -187,9 +187,10 @@ namespace Sentry.data.Infrastructure
                     }
                     catch (AggregateException aggEx)
                     {
-                        //if diToUpdate is empty, failed search
-                        //else update failed and need to sort out which id(s) failed
-
+                        //search failed if diToUpdate is empty, else update(s) failed
+                        Logger.Error(diToUpdate?.Any() == false
+                            ? $"ElasticDataInventorySearchProvider failed to retrieve Ids: {string.Join(", ", dtos.Select(x => x.BaseColumnId))} from index"
+                            : $"ElasticDataInventorySearchProvider failed to update Ids: {string.Join(", ", tasks.Where(x => x.Value.IsFaulted).Select(x => x.Key))}", aggEx);
                     }
                 }
                 catch (Exception ex)
