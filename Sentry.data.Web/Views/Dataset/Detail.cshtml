@@ -283,21 +283,32 @@
     }
     else
     {
+        <h5>Schema Details:</h5>
         <div id="datasetDetailTabs">
             <div class="tabs-wrapper">
                 <ul class="nav nav-tabs">
                     <li role="presentation" class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#panelSchemaAbout" id="detailTabSchemaAbout" role="tab">About this Schema</a>
+                        <a class="nav-link" data-toggle="tab" href="#panelSchemaAbout" id="detailTabSchemaAbout" role="tab">About</a>
                     </li>
                     <li role="presentation" class="nav-item">
                         <a class="nav-link" data-toggle="tab" href="#panelSchemaColumns" id="detailTabSchemaColumns" role="tab">Columns</a>
                     </li>
+
+                    @if (Model.Security.CanViewFullDataset)
+                    {
+                        <li role="presentation" class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Preview</a>
+                        </li>
+                    }
                     <li role="presentation" class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Data Preview (Top 20 Rows)</a>
+                        <a class="nav-link" data-toggle="tab" href="#panelDataFiles" id="detailTabDataFiles" role="tab">Files</a>
                     </li>
-                    <li role="presentation" class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#panelDataFiles" id="detailTabDataFiles" role="tab">Data Files</a>
-                    </li>
+                    @if (Model.DisplaySchemaSearch)
+                    {
+                        <li role="presentation" class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#panelSchemaSearch" id="detailTabSchemaSearch" role="tab">Search</a>
+                        </li>
+                    }
                 </ul>
             </div>
 
@@ -315,13 +326,21 @@
                         <div id="tabSchemaColumns"></div>
                     }
                 </div>
-                <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
-                    <div id="tabDataPreview"></div>
-                </div>
+                @if (Model.Security.CanViewFullDataset)
+                {
+                    <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
+                        <div id="tabDataPreview"></div>
+                    </div>
+                }
                 <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
                     <div id="tabDataFiles"></div>
-
                 </div>
+                @if (Model.DisplaySchemaSearch)
+                {
+                    <div class="tab-pane fade" id="panelSchemaSearch" role="tabpanel">
+                        <div id="tabSchemaSearch"></div>
+                    </div>
+                }
             </div>
         </div>
     }
@@ -331,12 +350,13 @@
     @Scripts.Render("~/bundles/prettyCron")
     @Scripts.Render("~/bundles/dataTables")
 
-    <script>
+<script>
 
         $(function () {
             vm = new data.Dataset.ViewModel();
             ko.applyBindings(vm);
-            data.Dataset.DetailInit();
+
+            data.Dataset.DetailInit(@(Html.Raw(Json.Encode(Model))));
         });
 
         var table;
@@ -367,5 +387,5 @@
 
 
 
-    </script>
+</script>
 }

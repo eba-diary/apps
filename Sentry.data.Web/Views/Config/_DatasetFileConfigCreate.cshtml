@@ -10,7 +10,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-8">
-                        <h4>Dataset Retrieval Configuration</h4>
+                        <h4>Schema Configuration Metadata</h4>
                     </div>
                     <div class="col-md-4 text-right">
                         <a href="https://confluence.sentry.com/pages/viewpage.action?spaceKey=CLA&title=Send+Data+to+DSC" target="_blank" class="btn btn-info">
@@ -19,6 +19,7 @@
                     </div>
                 </div>
             </div>
+            <br/>
 
             @Html.DisplayFor((model) => ViewData.ModelState)
 
@@ -28,13 +29,7 @@
             @Html.HiddenFor(model => model.SchemaId)
             @Html.HiddenFor(model => model.ObjectStatus)
 
-            <hr />
             <div id="detailSectionHeader_Simple">
-                <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Simple"></span>
-                <h5 class="detailSection">Basic Configuration</h5>
-            </div>
-            <div id="hide_detailSectionHeader_Simple">
-
                 <div class="form-group">
                     @Html.LabelFor(model => model.ParentDatasetName, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">

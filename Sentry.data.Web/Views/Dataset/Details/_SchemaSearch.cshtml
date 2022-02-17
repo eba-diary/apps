@@ -1,0 +1,28 @@
+﻿﻿@{
+    string color = Model.CategoryColor;
+    string headerColor = "categoryBanner-" + Model.CategoryColor;
+}
+
+<br />
+
+<div class="container">
+    <div class="row table-responsive">
+        <div class="input-group mb-3 inputGroupCenter">
+            <span class="input-group-addon">
+                <em class="glyphicon glyphicon-search"></em>
+            </span>
+            <input id="schemaSearchInput" type="text" class="form-control" placeholder="Column Search" aria-label="Search" aria-describedby="basic-addon1">
+        </div>
+
+        <table class="table table-striped table-bordered table-hover nowrap dataTable no-footer" id="schemaSearchTable">
+            <caption>Results from searching flattened schema fields.</caption>
+            <thead>
+                <tr>
+                    <th id="SchemaSearchName">Name</th>
+                    <th id="SchemaSearchDescription">Description</th>
+                    <th id="SchemaSearchDotNamePath">DotNamePath</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>

@@ -7,8 +7,14 @@
 
 <div class="search-horizontal-center">
     <div class="search-head">
-        <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" alt="Source icon"/></div>
-        <div class="search-head-item"><h1 class="datasetHeader">@Model.PageTitle</h1></div>
+        <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" alt="Source icon" /></div>
+        <div class="search-head-item">
+            <h1 class="datasetHeader">@Model.PageTitle</h1>
+        </div>
+
+        <a target="_blank" rel="noopener noreferrer" href="https://confluence.sentry.com/display/CLA/Data+Inventory">
+            <em class="glyphicon glyphicon-info-sign blue"></em>
+        </a>
 
         <div id="search-box" class="has-feedback has-feedback-left">
             <input class="form-control searchTextDS text-box single-line" type="text" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled />
@@ -20,10 +26,15 @@
 
 <div class="filter-search-body">
     <div class="filter-search-container">
+        <div class="filter-search-result-count-container display-none">
+            <h2 class="filter-search-total-results"><span id="filter-search-total"></span> Total Results</h2>
+            <div>Showing <span id="filter-search-page-size"></span> of <span id="filter-search-returned-total"></span></div>
+        </div>
+
         <div class="filter-search-title-container bottom-border">
             <h1 class="filter-search-title">Filter</h1>
             <span class="filter-search-clear-container"><a href="#" class="display-none" id="filter-search-clear">Clear All</a></span>
-            <button type="button" class="btn btn-primary display-none filter-search-start" id="filter-search-apply" disabled><em class="glyphicon glyphicon-search filter-search-apply-icon"></em>Apply</button>
+            <button type="button" class="btn btn-primary display-none filter-search-start filter-search-apply" disabled><em class="glyphicon glyphicon-search filter-search-apply-icon"></em>Apply</button>
         </div>
 
         <div class="filter-search-categories-sentry-spinner">
@@ -39,9 +50,19 @@
         <span class="sentry-spinner"></span>
     </div>
 
+    <div class="filter-search-results-none display-none">
+        <span class="glyphicon glyphicon-alert"></span>
+        <div>No results found.</div>
+        <div>Try modifying your search.</div>
+    </div>
+
     <div class="filter-search-results-container display-none">
         @Html.Partial(Model.ResultView)
     </div>
+</div>
+
+<div class="filter-search-show-all-container">
+
 </div>
 
 @section Scripts

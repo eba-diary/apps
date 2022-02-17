@@ -23,7 +23,7 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-md-8">
-                            <h4>Dataset Information</h4>
+                            <h4>Dataset Metadata</h4>
                         </div>
                         <div class="col-md-4 text-right">
                             <a href="https://confluence.sentry.com/pages/viewpage.action?spaceKey=CLA&title=Send+Data+to+DSC" target="_blank" class="btn btn-info">
@@ -238,7 +238,7 @@
             {
                 <div id="retrievalPanel" class="form-horizontal">
                     <br />
-                    <h4>Dataset Retrieval</h4>
+                    <h4>Schema Configuration Metadata</h4>
                     <br />
 
                     <div id="hide_detailSectionHeader_Simple">
@@ -278,38 +278,36 @@
 
                         <div class="form-group">
                             @Html.LabelFor((model) => model.FileExtensionId, new { @class = "control-label col-md-2" })
-                            <div class="col-md-10">
+                            <div class="col-md-2">
                                 @Html.DropDownListFor((model) => model.FileExtensionId, Model.AllExtensions, new { @class = "form-control edit-dataset-row" })
                                 @Html.ValidationMessageFor((model) => model.FileExtensionId, "", new { @class = "text-danger" })
                             </div>
-                        </div>
-                        <div class="form-group fieldDescription">
-                            <label class="control-label col-md-2"></label>
-                            <div class="col-md-10">
-                                <span class="text-muted">
-                                    <em id="fileExtensionInfo"></em>
-                                    File extension which will be loaded into this configuration.
-                                    Extensions not matching this file extension will not be processed.
-                                </span>
-                            </div>
-                        </div>
 
-                        <div class="form-group delimiter">
-                            @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
-                            <div class="col-md-10">
-                                @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
-                                @Html.ValidationMessageFor(model => model.Delimiter, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
+                            <div class="schemaRootPathPanel">
+                                @Html.LabelFor((model) => model.SchemaRootPath, new { @class = "control-label col-md-2 optional" })
+                                <div class="col-md-4">
+                                    @Html.TextBoxFor(model => model.SchemaRootPath, new { @class = "form-control edit-dataset-row" })
+                                </div>
 
-                        <div class="form-group fieldDescription delimiter delimiterDescription">
-                            <label class="control-label col-md-2"></label>
-                            <div class="col-md-10">
-                                <span class="text-muted">
-                                    <em id="DelimiterInfo"></em>The character or set of characters used to delimit a file.
-                                    <br />
-                                    Note: When uploading a tab ( \t ) or pipe ( | ) delimited file please choose the DELIMITED file extension option.  If your file is comma delimited please choose the CSV file extension option.
-                                </span>
+                                <div class="col-md-5 col-md-offset-6">
+                                    <span class="text-muted">Specify schema root element path (<a href="@Sentry.data.Core.GlobalConstants.DocumentationLinks.SCHEMA_ROOT_PATH_USAGE" target="_blank">usage documentation</a>)</span>
+                                </div>
+                            </div>
+
+                            <div class="delimiterPanel">
+                                @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
+                                <div class="col-md-4">
+                                    @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
+                                    @Html.ValidationMessageFor(model => model.Delimiter, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="col-md-5 col-md-offset-6">
+                                    <span class="text-muted">
+                                        <em id="fileTypeInfo"></em>The character or set of characters used to delimit a file.
+                                        <br />Common delimiters include; tab (\t), pipe (|), tilda (~).
+                                        <br />Note: If your file is comma (,) delimited please choose the CSV file extension option. 
+                                    </span>
+                                </div>
                             </div>
                         </div>
 

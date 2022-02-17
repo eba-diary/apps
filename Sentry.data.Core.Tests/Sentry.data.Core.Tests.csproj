@@ -152,6 +152,7 @@
     <Compile Include="EnumHelperTests.cs" />
     <Compile Include="JsonStructureTests.cs" />
     <Compile Include="NestHelperTests.cs" />
+    <Compile Include="FilterCategoryOptionNormalizerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

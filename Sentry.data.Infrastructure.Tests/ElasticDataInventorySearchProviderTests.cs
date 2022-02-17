@@ -43,7 +43,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Table", rowDto.ObjectType);
             Assert.AreEqual("column_nme", rowDto.Column);
             Assert.IsFalse(rowDto.IsSensitive);
-            Assert.AreEqual("P", rowDto.ProdType);
+            Assert.AreEqual("Prod", rowDto.ProdType);
             Assert.AreEqual("Type", rowDto.ColumnType);
             Assert.AreEqual(100, rowDto.MaxLength);
             Assert.AreEqual(7, rowDto.Precision);

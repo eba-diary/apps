@@ -25,6 +25,8 @@ namespace Sentry.data.Web
             //}
         }
 
+        public DatasetDetailModel() { }
+
         public int Downloads { get; set; }
         public int GroupAccessCount { get; set; }
         public string OriginationCode { get; set; }
@@ -36,5 +38,6 @@ namespace Sentry.data.Web
         public List<Tuple<string, List<AssociatedDataFlowModel>>> DataFlows { get; set; }
         public bool DisplayDataflowMetadata { get; set; }
         public bool DisplayTabSections { get; set; }
+        public bool DisplaySchemaSearch { get; set; }
     }
 }

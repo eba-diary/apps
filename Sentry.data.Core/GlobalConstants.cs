@@ -388,7 +388,7 @@
         public static class FilterCategoryNames
         {
             public const string ASSET = "Asset";
-            public const string TABLEVIEWNAME = "Table/View Name";
+            public const string COLLECTIONNAME = "Collection Name";
             public const string COLUMN = "Column";
             public const string DATATYPE = "Datatype";
             public const string DATABASE = "Database";
@@ -397,7 +397,7 @@
             public const string ENVIRONMENT = "Environment";
             public const string SERVER = "Server";
             public const string SOURCETYPE = "Source Type";
-            public const string TYPE = "Type";
+            public const string COLLECTIONTYPE = "Collection Type";
         }
     }
 }

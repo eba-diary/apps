@@ -223,6 +223,8 @@
     <Compile Include="Entities\MessageFormats\S3Event.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableCreateModel.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
+    <Compile Include="Entities\Schema\Elastic\ElasticSchemaField.cs" />
+    <Compile Include="Helpers\FilterCategoryOptionNormalizer.cs" />
     <Compile Include="Helpers\NestExtensions.cs" />
     <Compile Include="Helpers\NestHelper.cs" />
     <Compile Include="Helpers\Paginate\PageParameters.cs" />
