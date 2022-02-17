@@ -26,7 +26,7 @@ namespace Sentry.data.Core.Tests
             datasetService.Setup(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true).Verifiable();
 
             var lazyService = new Lazy<IDatasetService>(() => datasetService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, lazyService, null, null);
+            var dataApplicationService = new DataApplicationService(context.Object, lazyService, null, null, null, null);
 
             // Act
             dataApplicationService.DeleteDataset(idList, user.Object);
@@ -52,7 +52,7 @@ namespace Sentry.data.Core.Tests
             configService.Setup(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true).Verifiable();
 
             var lazyService = new Lazy<IConfigService>(() => configService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, null, lazyService, null);
+            var dataApplicationService = new DataApplicationService(context.Object, null, lazyService, null, null, null);
 
             // Act
             dataApplicationService.DeleteDatasetFileConfig(idList, user.Object);
@@ -78,7 +78,7 @@ namespace Sentry.data.Core.Tests
             dataFlowService.Setup(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true).Verifiable();
 
             var lazyService = new Lazy<IDataFlowService>(() => dataFlowService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, null, null, lazyService);
+            var dataApplicationService = new DataApplicationService(context.Object, null, null, lazyService, null, null);
 
             // Act
             dataApplicationService.DeleteDataflow(idList, user.Object);
@@ -104,7 +104,7 @@ namespace Sentry.data.Core.Tests
             datasetService.Setup(x => x.Delete(idList[0], user.Object, true)).Returns(true);
 
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null);
+            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null);
 
             // Act
             dataApplicationService.DeleteDataset(idList, user.Object);
@@ -130,7 +130,7 @@ namespace Sentry.data.Core.Tests
             datasetService.Setup(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
 
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null);
+            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null);
 
             // Act
             dataApplicationService.DeleteDataset(idList, user.Object);
@@ -158,7 +158,7 @@ namespace Sentry.data.Core.Tests
             datasetService.Setup(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(false);
 
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null);
+            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null);
 
             // Act
             dataApplicationService.DeleteDataset(idList, user.Object);
@@ -185,7 +185,7 @@ namespace Sentry.data.Core.Tests
             datasetService.Setup(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(false);
 
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null);
+            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null);
 
 
             // Act
@@ -202,84 +202,6 @@ namespace Sentry.data.Core.Tests
             var dataApplicationService = new Mock<IDataApplicationService>();
             dataApplicationService.Setup(x => x.DeleteDataset(new List<int>() { 1 }, new Mock<IApplicationUser>().Object, false)).Returns(false);
         }
-
-        //[TestCategory("DataApplicationServiceTests")]
-        //[TestMethod]
-        //public void Delete_Selects_ConfigService()
-        //{
-        //    // Arrange
-        //    MockRepository mr = new MockRepository(MockBehavior.Strict);
-
-        //    Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
-        //    context.Setup(x => x.SaveChanges(true));
-
-        //    Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
-        //    List<int> idList = new List<int>() { 1 };
-
-        //    Mock<IConfigService> configService = mr.Create<IConfigService>();
-        //    configService.Setup(x => x.Delete(idList[0], true,false)).Returns(true).Verifiable();
-
-        //    var lazyConfigService = new Lazy<IConfigService>(() => configService.Object);
-        //    var dataApplicationService = new DataApplicationService(context.Object, null, lazyConfigService, null);
-
-        //    // Act
-        //    dataApplicationService.Delete<DatasetFileConfig>(idList, user.Object);
-
-        //    // Assert
-        //    mr.VerifyAll();
-        //}
-
-        //[TestCategory("DataApplicationServiceTests")]
-        //[TestMethod]
-        //public void Delete_Selects_DataFlowService()
-        //{
-        //    // Arrange
-        //    MockRepository mr = new MockRepository(MockBehavior.Strict);
-
-        //    Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
-        //    context.Setup(x => x.SaveChanges(true));
-
-        //    Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
-        //    List<int> idList = new List<int>() { 1 };
-
-        //    Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
-        //    dataFlowService.Setup(x => x.DeleteDataFlows(idList.ToArray(), user.Object)).Verifiable();
-
-        //    var lazyDataFlowService = new Lazy<IDataFlowService>(() => dataFlowService.Object);
-        //    var dataApplicationService = new DataApplicationService(context.Object, null, null, lazyDataFlowService);
-
-        //    // Act
-        //    dataApplicationService.Delete<Entities.DataProcessing.DataFlow>(idList, user.Object);
-
-        //    // Assert
-        //    mr.VerifyAll();
-        //}
-
-        //[TestCategory("DataApplicationServiceTests")]
-        //[TestMethod]
-        //public void Delete_Clears_DatasetContext_On_Failure()
-        //{
-        //    MockRepository mr = new MockRepository(MockBehavior.Strict);
-
-        //    Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
-        //    context.Setup(x => x.SaveChanges(true));
-        //    context.Setup(x => x.Clear());
-
-        //    Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
-        //    List<int> idList = new List<int>() { 1 };
-
-        //    Mock<IConfigService> configService = mr.Create<IConfigService>();
-        //    configService.Setup(x => x.Delete(idList[0], true, false)).Returns(false);
-
-        //    var lazyConfigService = new Lazy<IConfigService>(() => configService.Object);
-        //    var dataApplicationService = new DataApplicationService(context.Object, null, lazyConfigService, null);
-
-        //    // Act
-        //    dataApplicationService.Delete<DatasetFileConfig>(idList, user.Object);
-
-        //    context.Verify(x => x.SaveChanges(true), Times.Never);
-        //    context.Verify(x => x.Clear(), Times.Once);
-        //}
 
     }
 }

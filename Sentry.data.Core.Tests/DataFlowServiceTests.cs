@@ -931,12 +931,6 @@ namespace Sentry.data.Core.Tests
             // Arrange
             var client = new Mock<IBackgroundJobClient>();
 
-            //var userService = new Mock<IUserService>();
-            //var user1 = new Mock<IApplicationUser>();
-            //user1.Setup(f => f.AssociateId).Returns("123456");
-
-            //userService.Setup(f => f.GetCurrentUser()).Returns(user1.Object);
-
             var dataflowService = new DataFlowService(null, null, null, null, null, null, null, client.Object);
 
             // Act
