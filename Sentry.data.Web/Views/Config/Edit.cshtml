@@ -8,9 +8,8 @@
 </div>
 
 
-<h1>Basic Configuration</h1>
-
-<hr/>
+<h4>Schema Configuration Metadata</h4>
+<br />
 
 @{using (Html.BeginForm("DatasetFileConfigForm", "Config", FormMethod.Post))
 {
@@ -132,19 +131,9 @@
                         @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
                         <div class="col-md-4">
                             @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
+                            @Html.ValidationMessageFor( model => model.Delimiter, "", new { @class = "text-danger" })
                         </div>
                     </div>
-
-                    @*<div class="form-group fieldDescription delimiter delimiterDescription">
-                    <label class="control-label col-md-2"></label>
-                    <div class="col-md-10">
-                        <span class="text-muted">
-                            <em id="fileTypeInfo"></em>The character or set of characters used to delimit a file.  Common delimiters include; tab (\t), pipe (|), tilda (~).
-                            <br />
-                            Note: If your file is comma (,) delimited please choose the CSV file extension option. 
-                        </span>
-                    </div>
-                </div>*@
 
                     <div class="col-md-5 col-md-offset-6">
                         <span class="text-muted">

@@ -837,6 +837,14 @@ data.Dataset = {
     //INIT _DatasetCreateEdit.cshtml
     FormInit: function (hrEmpUrl, hrEmpEnv, PageSubmitFunction, PageCancelFunction) {
 
+        //_DatasetCreateEdit Submit Button click 
+        $('#SubmitDatasetForm').click(function (e) {
+
+            //disable submit button so they cannot click more than once
+            $('#SubmitDatasetForm').addClass("dale-disable-stuff");
+        });
+
+
         //CONFIGURE SAID ASSET PICKER on _DatasetCreateEdit.cshtml TO INCLUDE a filter box that comes up
         $(document).ready(function () {
             $('.selectpicker').selectpicker({
@@ -957,7 +965,7 @@ data.Dataset = {
         data.Config.DatasetScopeTypeInit($("#DatasetScopeTypeId"));
     },
 
-    DetailInit: function () {
+    DetailInit: function (datasetDetailModel) {
 
         this.delroyInit();
 
@@ -1275,8 +1283,9 @@ data.Dataset = {
             if ($('#tabSchemaColumns').is(':empty')) {
                 //Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
+                    type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaColumns',
-                    dataType: 'html',
+                    data: datasetDetailModel,
                     success: function (view) {
                         $('#tabSchemaColumns').html(view);
                         data.Dataset.delroyInit();
@@ -1305,8 +1314,9 @@ data.Dataset = {
             if ($('#tabSchemaAbout').is(':empty')) {
                 //Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
+                    type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaAbout',
-                    dataType: 'html',
+                    data: datasetDetailModel,
                     success: function (view) {
                         $('#tabSchemaAbout').html(view);
                         ko.applyBindings(self.vm, $("#tabSchemaAbout")[0]);
@@ -1334,8 +1344,9 @@ data.Dataset = {
             if ($('#tabDataPreview').is(':empty')) {
                 //Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
+                    type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataPreview',
-                    dataType: 'html',
+                    data: datasetDetailModel,
                     success: function (view) {
                         $('#tabDataPreview').html(view);
                         if (self.vm.ShowDataFileTable()) {
@@ -1363,8 +1374,9 @@ data.Dataset = {
             if ($('#tabDataFiles').is(':empty')) {
                 //Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
+                    type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataFiles',
-                    dataType: 'html',
+                    data: datasetDetailModel,
                     success: function (view) {
                         $('#tabDataFiles').html(view);
                         if (self.vm.ShowDataFileTable()) {

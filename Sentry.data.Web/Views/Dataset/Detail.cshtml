@@ -302,43 +302,46 @@ else
             </ul>
         </div>
 
-        <!-- Tab panels -->
-        <div class="tab-content" id="tab-container">
-            <div class="tab-pane fade" id="panelSchemaAbout" role="tabpanel">
-                @if (Model.Security.CanPreviewDataset)
+            <!-- Tab panels -->
+            <div class="tab-content" id="tab-container">
+                <div class="tab-pane fade" id="panelSchemaAbout" role="tabpanel">
+                    @if (Model.Security.CanPreviewDataset)
+                    {
+                        <div id="tabSchemaAbout"></div>
+                    }
+                </div>
+                <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
+                    @if (Model.Security.CanPreviewDataset)
+                    {
+                        <div id="tabSchemaColumns"></div>
+                    }
+                </div>
+                @if (Model.Security.CanViewFullDataset)
                 {
-                    <div id="tabSchemaAbout"></div>
+                    <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
+                        <div id="tabDataPreview"></div>
+                    </div>
                 }
-            </div>
-            <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
-                @if (Model.Security.CanPreviewDataset)
-                {
-                    <div id="tabSchemaColumns"></div>
-                }
-            </div>
-            <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
-                <div id="tabDataPreview"></div>
-            </div>
-            <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
-                <div id="tabDataFiles"></div>
-
+                <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
+                    <div id="tabDataFiles"></div>
+                </div>
             </div>
         </div>
-    </div>
-}
-
+    }
+</div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/prettyCron")
     @Scripts.Render("~/bundles/dataTables")
     @Styles.Render("~/bundles/css/dataTables")
 
-    <script>
+<script>
 
         $(function () {
             vm = new data.Dataset.ViewModel();
             ko.applyBindings(vm);
-            data.Dataset.DetailInit();
+
+            data.Dataset.DetailInit(@(Html.Raw(Json.Encode(Model))));
         });
 
         var table;
@@ -369,5 +372,5 @@ else
 
 
 
-    </script>
+</script>
 }
