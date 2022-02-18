@@ -73,6 +73,12 @@ namespace Sentry.data.Web.Controllers
             return Json(filterResult.FilterCategories);
         }
 
+        [HttpPost]
+        public ActionResult Update(List<DaleSensitiveModel> models)
+        {
+            return Json(new { success = _service.UpdateIsSensitive(models.ToDto()) });
+        }
+
         #region Methods
         private void ValidateSearchModel(FilterSearchModel searchModel)
         {
