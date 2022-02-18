@@ -352,7 +352,9 @@ namespace Sentry.data.Web.Controllers
                 ObjectStatus = dto.ObjectStatus,
                 StorageCode = dto.FlowStorageCode,
                 SelectedDataset = dto.DatasetId,
-                SelectedSchema = dto.SchemaId
+                SelectedSchema = dto.SchemaId,
+                NamedEnvironment = dto.NamedEnvironment,
+                NamedEnvironmentType = dto.NamedEnvironmentType
             };
 
             if (dto.SchemaMap.Any())
