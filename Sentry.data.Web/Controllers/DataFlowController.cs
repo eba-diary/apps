@@ -153,6 +153,10 @@ namespace Sentry.data.Web.Controllers
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType),namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
 
             model.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
+            foreach (SchemaMapModel smm in model.SchemaMaps)
+            {
+                smm.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
+            }
 
             return View("DataFlowForm", model);
 
