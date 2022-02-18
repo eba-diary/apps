@@ -163,6 +163,7 @@
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_02_00_07" />
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\SnowflakeGenerator" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_22_02_01" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_22_02_02" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -370,6 +371,7 @@
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_06\HistoryFix_Initialize_ParquetStoragePrefix_on_Schema.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_22_01_01\Remove_CLA3332_ConsolidatedDataFlows_For_LaunchDarkly_Implementation.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_22_01_01\Remove_CLA3497_UniqueLivyNames_For_LaunchDarkly_Implementation.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_22_02_02\HISTORYFIX_CLA3407_Initialize_PreProcesingOption_Where_Null.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Sentry.data.Database.refactorlog" />
