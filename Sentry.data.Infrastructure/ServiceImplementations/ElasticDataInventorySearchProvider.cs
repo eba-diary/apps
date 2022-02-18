@@ -173,9 +173,9 @@ namespace Sentry.data.Infrastructure
                 catch (AggregateException aggEx)
                 {
                     //search failed if diToUpdate is empty, else update(s) failed
-                    Logger.Error(diToUpdate?.Any() == false
-                        ? $"ElasticDataInventorySearchProvider failed to retrieve Ids: {string.Join(", ", dtos.Select(x => x.BaseColumnId))} from index"
-                        : $"ElasticDataInventorySearchProvider failed to update Ids: {string.Join(", ", tasks.Where(x => x.Value.IsFaulted).Select(x => x.Key))}", aggEx);
+                    Logger.Error(diToUpdate?.Any() != true
+                        ? $"ElasticDataInventorySearchProvider failed to retrieve Id(s): {string.Join(", ", dtos.Select(x => x.BaseColumnId))} from index"
+                        : $"ElasticDataInventorySearchProvider failed to update Id(s): {string.Join(", ", tasks.Where(x => x.Value.IsFaulted).Select(x => x.Key))}", aggEx);
                 }
             }
             catch (Exception ex)
