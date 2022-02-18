@@ -132,6 +132,7 @@
     <Compile Include="DomainServices\BusinessAreaService.cs" />
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DaleService.cs" />
+    <Compile Include="DomainServices\DataApplicationService.cs" />
     <Compile Include="DomainServices\DataProcessing\DataFlowService.cs" />
     <Compile Include="DomainServices\DataProcessing\DataStepService.cs" />
     <Compile Include="DomainServices\DatasetFileService.cs" />
@@ -328,7 +329,9 @@
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\IApacheLivyProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IXMLAction.cs" />
+    <Compile Include="Interfaces\IDataApplicationService.cs" />
     <Compile Include="Interfaces\IDatasetFileService.cs" />
+    <Compile Include="Interfaces\IEntityService.cs" />
     <Compile Include="Interfaces\IElasticContext.cs" />
     <Compile Include="Interfaces\IHostSettings.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
@@ -545,6 +548,7 @@
     <None Include="ClassDiagram3.cd" />
     <None Include="ClassDiagram4.cd" />
     <None Include="ClassDiagram5.cd" />
+    <None Include="ClassDiagram6.cd" />
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>

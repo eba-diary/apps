@@ -1,11 +1,12 @@
-﻿using Amazon.S3;
-using Hangfire;
-using Newtonsoft.Json;
+﻿using Hangfire;
 using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.Configuration;
 using Sentry.data.Common;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Interfaces;
 using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
 using Sentry.DataTables.Mvc;
@@ -13,7 +14,6 @@ using Sentry.DataTables.QueryableAdapter;
 using Sentry.DataTables.Shared;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Dynamic;
@@ -48,6 +48,7 @@ namespace Sentry.data.Web.Controllers
         private readonly IJobService _jobService;
         private readonly NamedEnvironmentBuilder _namedEnvironmentBuilder;
         private readonly IElasticContext _elasticContext;
+        private readonly Lazy<IDataApplicationService> _dataApplicationService;
 
         public DatasetController(
             IDatasetContext dsCtxt,
@@ -63,7 +64,8 @@ namespace Sentry.data.Web.Controllers
             ISAIDService saidService,
             IJobService jobService,
             NamedEnvironmentBuilder namedEnvironmentBuilder,
-            IElasticContext elasticContext)
+            IElasticContext elasticContext,
+            Lazy<IDataApplicationService> dataApplicationService)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
@@ -79,6 +81,12 @@ namespace Sentry.data.Web.Controllers
             _jobService = jobService;
             _namedEnvironmentBuilder = namedEnvironmentBuilder;
             _elasticContext = elasticContext;
+            _dataApplicationService = dataApplicationService;
+        }
+
+        private IDataApplicationService DataApplicationService
+        {
+            get { return _dataApplicationService.Value; }
         }
 
         public ActionResult Index()
@@ -160,12 +168,13 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
+
                 UserSecurity us = _datasetService.GetUserSecurityForDataset(id);
 
                 if (us.CanEditDataset)
                 {
                     //Issue logical delete
-                    _datasetService.Delete(id);
+                    DataApplicationService.DeleteDataset(new List<int>() { id }, SharedContext.CurrentUser);
                     _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.DELETE_DATASET, "Deleted Dataset", id);
                     return Json(new { Success = true, Message = "Dataset successfully deleted" });
                 }

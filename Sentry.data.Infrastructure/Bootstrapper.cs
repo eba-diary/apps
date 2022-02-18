@@ -138,6 +138,7 @@ namespace Sentry.data.Infrastructure
 
             // Choose the parameterless constructor.
             registry.For<IBackgroundJobClient>().Singleton().Use<BackgroundJobClient>().SelectConstructor(() => new BackgroundJobClient());
+            registry.For<IRecurringJobManager>().Singleton().Use<RecurringJobManager>().SelectConstructor(() => new RecurringJobManager());
 
 
             //establish generic httpclient singleton to be used where needed across the application
