@@ -142,26 +142,28 @@
 
                 <div class="configContainer" style="display: none;">
 
-                    <h4 class="@color">Schema and Configuration Information</h4>
-                    <hr />
+                    <h4 class="@color">Configuration Metadata</h4>
 
                     <div class="col-md-12">
-                        @if (item.ConfigFileDesc != null && item.ConfigFileDesc.Length >= 300)
-                        {
+                        <div class="col-md-1">Description:</div>
+                        <div class="col-md-11">
+                            @if (item.ConfigFileDesc != null && item.ConfigFileDesc.Length >= 300)
+                            {
 
-                            int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
-                            <p>
-                                <span style="margin-top: 15px;">@item.ConfigFileDesc.Substring(0, lastInfo)</span>
-                                <span id="usageSeeMoreEllipsis">...&nbsp;</span>
-                                <span id="usageSeeMorePanel" style="display: none;">@item.ConfigFileDesc.Substring(lastInfo)</span>
-                                <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
-                                <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
-                            </p>
-                        }
-                        else
-                        {
-                            <p style="margin-top: 15px;">@item.ConfigFileDesc</p>
-                        }
+                                int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
+                                <p>
+                                    <span>@item.ConfigFileDesc.Substring(0, lastInfo)</span>
+                                    <span id="usageSeeMoreEllipsis">...&nbsp;</span>
+                                    <span id="usageSeeMorePanel" style="display: none;">@item.ConfigFileDesc.Substring(lastInfo)</span>
+                                    <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
+                                    <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
+                                </p>
+                            }
+                            else
+                            {
+                                <p>@item.ConfigFileDesc</p>
+                            }
+                        </div>
                     </div>
                     <div class="col-md-12 configDetailRow">
 
@@ -235,63 +237,31 @@
                     @if (item.Schema != null)
                     {
                         <hr />
-                        <h4 class="@color">Schema (columns, datatypes, delimiter, etc.)</h4>
-                        <hr />
-                        <div class="retJob">
-                            <div class="jobHeader categoryBanner-@color">
-                                <h6>@item.Schema.Name</h6>
-                                <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
-                            </div>
-                            <div class="jobContainer" style="display:none;">
-
-                                <p>@item.Schema.Description</p>
-
-                                @if (item.Schema.Revisions.Count() == 0)
-                                {
-                                    <p>This schema is not currently does not yet have any columns associated to it.</p>
-                                }
-                                <p>Created on: @item.Schema.CreatedDTM</p>
-                                <p>Last Modified on: @item.Schema.LastUpdatedDTM</p>
-
-                                <p>
-                                    <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Edit">Edit Schema Metadata</a>
-                                    <br>
-                                    <br>
-
-                                    @if (item.Schema.Revisions.Count() > 0)
-                                    {
-                                        <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">Edit Columns and Fields</a>
-                                        <a class="btn btn-primary" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId">Sync Consumption Layer</a>
-                                    }
-                                    @if (item.Schema.Revisions.Count() == 0)
-                                    {
-                                        <a class="btn btn-success" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">Add Columns and Fields</a>
-                                    }
-                                </p>
-                            </div>
+                        <h4 class="@color">Columns Metadata (name, datatype, is array, etc.)</h4>
+                        <div class="columnsContainer col-md-12">
+                            @if (item.Schema.Revisions.Count() == 0)
+                            {
+                                <p>This schema is not currently does not yet have any columns associated to it.</p>
+                            }
+                            <p>Created on: @item.Schema.CreatedDTM</p>
+                            <p>Last Modified on: @item.Schema.LastUpdatedDTM</p>
                         </div>
-                    }
-
-                    @*// TODO - CLA-2372 - REMOVE COMMENTED CODE - Removing DFSBasic, DfsCustom, S3Basic references*@
-                    @*@if (!Model.DisplayDataflowMetadata)
-                    {
-                        <h4 class="@color">Dataset Retrieval Jobs</h4>
-                        <hr />
-
-                        foreach (var job in item.RetrieverJobs)
+                        if (item.Schema.Revisions.Count() > 0)
                         {
-                            Html.RenderPartial("~/Views/RetrieverJob/_RetrieverJob.cshtml", job, new ViewDataDictionary { { "Color", color } });
+                            <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">Edit Columns Metadata</a>
+                            <a class="btn btn-primary" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId">Sync Consumption Layer</a>
                         }
-
-                        <a class="btn btn-success" href="/Config/@item.ConfigId/Job/Create">Add Job</a>
-                    }*@
-
+                        if (item.Schema.Revisions.Count() == 0)
+                        {
+                            <a class="btn btn-success" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">Add Columns Metadata</a>
+                        }
+                    }
 
                     @if (Model.DisplayDataflowMetadata || Model.Security.ShowAdminControls)
                     {
                         <hr />
-                        <h4 class="@color">Producer DataFlow(s)</h4>
-                        <hr />
+                        <h4 class="@color">Producer DataFlow</h4>
+
                         @* Loop through each external dataflow *@
                         if (!item.ExternalDataFlowJobs.Any())
                         {
@@ -303,6 +273,10 @@
                                 <div class="jobHeader categoryBanner-@color">
                                     <h6>@ext.Name</h6>
                                     <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
+                                    @if (Model.DisplayDataflowEdit)
+                                    {
+                                        <div id="edit-dataflow-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" onclick="data.DataFlow.EditUrlRedirect(@ext.Id)"><span class="glyphicon glyphicon-pencil"></span></div>
+                                    }
                                 </div>
                                 <div class="jobContainer" style="display:none;">
                                     @if (ext.Step.Any(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map"))
@@ -403,22 +377,22 @@
                             @* // TODO - CLA-2372 - REMOVE COMMENTED CODE - Removing DFSBasic, DfsCustom, S3Basic references *@
                             @* Legacy Data Processing Platform Metadata *@
                             @*<div class="retJob">
-                                <div class="jobHeader categoryBanner-gray">
-                                    <h6>Legacy Processing Platform Jobs</h6>
-                                    <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
-                                </div>
-                                <div class="jobContainer" style="display:none;">
-                                    <h4 class="@color">Dataset Retrieval Jobs</h4>
-                                    <hr />
+                    <div class="jobHeader categoryBanner-gray">
+                        <h6>Legacy Processing Platform Jobs</h6>
+                        <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
+                    </div>
+                    <div class="jobContainer" style="display:none;">
+                        <h4 class="@color">Dataset Retrieval Jobs</h4>
+                        <hr />
 
-                                    @foreach (var job in item.RetrieverJobs)
-                                    {
-                                        Html.RenderPartial("~/Views/RetrieverJob/_RetrieverJob.cshtml", job, new ViewDataDictionary { { "Color", color } });
-                                    }
+                        @foreach (var job in item.RetrieverJobs)
+                        {
+                            Html.RenderPartial("~/Views/RetrieverJob/_RetrieverJob.cshtml", job, new ViewDataDictionary { { "Color", color } });
+                        }
 
-                                    <a class="btn btn-success" href="/Config/@item.ConfigId/Job/Create">Add Job</a>
-                                </div>
-                            </div>*@
+                        <a class="btn btn-success" href="/Config/@item.ConfigId/Job/Create">Add Job</a>
+                    </div>
+                </div>*@
                         </div>
                     }
                 </div>

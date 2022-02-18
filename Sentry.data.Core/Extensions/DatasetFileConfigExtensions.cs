@@ -25,7 +25,8 @@ namespace Sentry.data.Core
                 Delimiter = dsDto.Delimiter,
                 HasHeader = dsDto.HasHeader,
                 CreateCurrentView = dsDto.CreateCurrentView,
-                ObjectStatus = dsDto.ObjectStatus
+                ObjectStatus = dsDto.ObjectStatus,
+                SchemaRootPath = dsDto.SchemaRootPath
             };
             dto.Schemas = delist;
             return dto;
@@ -42,7 +43,8 @@ namespace Sentry.data.Core
                 Description = dsDto.ConfigFileDesc,
                 ParentDatasetId = dsDto.DatasetId,
                 CreateCurrentView = dsDto.CreateCurrentView,
-                ObjectStatus = dsDto.ObjectStatus
+                ObjectStatus = dsDto.ObjectStatus,
+                SchemaRootPath = dsDto.SchemaRootPath
             };
         }
     }

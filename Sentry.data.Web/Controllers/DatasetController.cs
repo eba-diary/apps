@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Sentry.Common.Logging;
 using Sentry.Core;
+using Sentry.Configuration;
 using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities;
@@ -22,6 +23,10 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.SessionState;
+using Sentry.data.Core.Interfaces;
+using Sentry.data.Core.Entities;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Entities.Schema.Elastic;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -42,6 +47,7 @@ namespace Sentry.data.Web.Controllers
         private readonly ISAIDService _saidService;
         private readonly IJobService _jobService;
         private readonly NamedEnvironmentBuilder _namedEnvironmentBuilder;
+        private readonly IElasticContext _elasticContext;
         private readonly Lazy<IDataApplicationService> _dataApplicationService;
 
         public DatasetController(
@@ -54,10 +60,11 @@ namespace Sentry.data.Web.Controllers
             IDatasetService datasetService,
             IEventService eventService,
             IConfigService configService,
-            IDataFeatures featureFlags, 
+            IDataFeatures featureFlags,
             ISAIDService saidService,
             IJobService jobService,
             NamedEnvironmentBuilder namedEnvironmentBuilder,
+            IElasticContext elasticContext,
             Lazy<IDataApplicationService> dataApplicationService)
         {
             _datasetContext = dsCtxt;
@@ -73,6 +80,7 @@ namespace Sentry.data.Web.Controllers
             _saidService = saidService;
             _jobService = jobService;
             _namedEnvironmentBuilder = namedEnvironmentBuilder;
+            _elasticContext = elasticContext;
             _dataApplicationService = dataApplicationService;
         }
 
@@ -91,11 +99,11 @@ namespace Sentry.data.Web.Controllers
                 DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue()
             };
 
-            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Home Page", 0);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Home Page", 0);
             return View(hm);
         }
 
-       
+
         #region Dataset Modification
 
         [HttpGet]
@@ -112,13 +120,13 @@ namespace Sentry.data.Web.Controllers
 
             Utility.SetupLists(_datasetContext, cdm);
             cdm.SAIDAssetDropDown = await BuildSAIDAssetDropDown(cdm.SAIDAssetKeyCode);
-            
+
             var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(cdm.SAIDAssetKeyCode, cdm.NamedEnvironment);
             cdm.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             cdm.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             cdm.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
 
-            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Creation Page", cdm.DatasetId);
+            _ = _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Creation Page", cdm.DatasetId);
 
             ViewData["Title"] = "Create Dataset";
 
@@ -131,7 +139,7 @@ namespace Sentry.data.Web.Controllers
         {
             // TODO: CLA-2765 - Add filtering to ensure EDIT only occurs for ACTIVE object status
             UserSecurity us = _datasetService.GetUserSecurityForDataset(id);
-            if(us != null && us.CanEditDataset)
+            if (us != null && us.CanEditDataset)
             {
                 DatasetDto dto = _datasetService.GetDatasetDto(id);
                 DatasetModel model = new DatasetModel(dto);
@@ -143,7 +151,7 @@ namespace Sentry.data.Web.Controllers
                 model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
                 model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
 
-                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Edit Page", id);
+                _ = _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Edit Page", id);
                 
                 ViewData["Title"] = "Edit Dataset";
 
@@ -166,8 +174,8 @@ namespace Sentry.data.Web.Controllers
                 if (us.CanEditDataset)
                 {
                     //Issue logical delete
-                    DataApplicationService.DeleteDataset(new List<int>() { id }, SharedContext.CurrentUser);                    
-                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.DELETE_DATASET, SharedContext.CurrentUser.AssociateId, "Deleted Dataset", id);
+                    DataApplicationService.DeleteDataset(new List<int>() { id }, SharedContext.CurrentUser);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.DELETE_DATASET, "Deleted Dataset", id);
                     return Json(new { Success = true, Message = "Dataset successfully deleted" });
                 }
                 return Json(new { Success = false, Message = "You do not have permissions to delete this dataset" });
@@ -197,7 +205,7 @@ namespace Sentry.data.Web.Controllers
             cdm.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             cdm.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
 
-            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Creation Page", cdm.DatasetId);
+            _ = _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Creation Page", cdm.DatasetId);
             ViewData["Title"] = "Create Dataset";
             return PartialView("_DatasetCreateEdit", cdm);
         }
@@ -225,7 +233,7 @@ namespace Sentry.data.Web.Controllers
         {
             List<SelectListItem> output = new List<SelectListItem>();
             List<SAIDAsset> assetList = await _saidService.GetAllAssets().ConfigureAwait(false);
-            
+
             if (String.IsNullOrWhiteSpace(keyCode) || !assetList.Any(a => a.SaidKeyCode == keyCode))
             {
                 output.Add(new SelectListItem
@@ -273,15 +281,15 @@ namespace Sentry.data.Web.Controllers
                 {
                     int datasetId = _datasetService.CreateAndSaveNewDataset(dto);
 
-                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.CREATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", datasetId);
-                    return Json(new { Success = true, dataset_id = datasetId});
+                    _ = _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.CREATED_DATASET, dto.DatasetName + " was created.", datasetId);
+                    return Json(new { Success = true, dataset_id = datasetId });
                     //return RedirectToAction("Detail", new { id = datasetId });
                 }
                 else
                 {
                     _datasetService.UpdateAndSaveDataset(dto);
 
-                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.UPDATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", dto.DatasetId);
+                    _ = _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.UPDATED_DATASET, dto.DatasetName + " was created.", dto.DatasetId);
                     return Json(new { Success = true, dataset_id = dto.DatasetId });
                     //return RedirectToAction("Detail", new { id = dto.DatasetId });
                 }
@@ -290,7 +298,7 @@ namespace Sentry.data.Web.Controllers
 
             Utility.SetupLists(_datasetContext, model);
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
-            
+
             var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
@@ -310,13 +318,15 @@ namespace Sentry.data.Web.Controllers
                 DatasetDetailModel model = new DatasetDetailModel(dto);
                 model.DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue();
                 model.DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue();
-                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
+                model.DisplaySchemaSearch = _featureFlags.CLA3553_SchemaSearch.GetValue();
+                model.DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue();
+                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Detail Page", dto.DatasetId);
 
                 return View(model);
             }
             else
             {
-                return HttpNotFound("Invalid Dataset Id"); 
+                return HttpNotFound("Invalid Dataset Id");
             }
         }
 
@@ -325,37 +335,31 @@ namespace Sentry.data.Web.Controllers
         /// </summary>
         /// <param name="id">Dataset ID</param>
         /// <param name="tab">Tab name</param>
+        /// <param name="data">DatasetDetailModel from the parent view</param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [Route("Dataset/DetailTab/{id}/{tab}/")]
-        public ActionResult DetailTab(int id, string tab)
+        public ActionResult DetailTab(int id, string tab, DatasetDetailModel data)
         {
-            DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
-            if(dto != null)
+            switch (tab)
             {
-                DatasetDetailModel model = new DatasetDetailModel(dto);
-                model.DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue();
-                switch (tab)
-                {
-                    case ("SchemaColumns"):
-                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Schema Column Tab", dto.DatasetId);
-                        return PartialView("Details/_SchemaColumns", model);
-                    case ("SchemaAbout"):
-                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Schema About Tab", dto.DatasetId);
-                        return PartialView("Details/_SchemaAbout", model);
-                    case ("DataPreview"):
-                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Data Preview Tab", dto.DatasetId);
-                        return PartialView("Details/_DataPreview", model);
-                    case ("DataFiles"):
-                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Data Files Tab", dto.DatasetId);
-                        return PartialView("Details/_DataFiles", model);
-                    default:
-                        return HttpNotFound("Invalid Tab");
-                }
-            }
-            else
-            {
-                return HttpNotFound("Invalid Dataset Id");
+                case ("SchemaColumns"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Detail Schema Column Tab", id);
+                    return PartialView("Details/_SchemaColumns", data);
+                case ("SchemaAbout"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Detail Schema About Tab", id);
+                    return PartialView("Details/_SchemaAbout", data);
+                case ("DataPreview"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Detail Data Preview Tab", id);
+                    return PartialView("Details/_DataPreview", data);
+                case ("DataFiles"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Detail Data Files Tab", id);
+                    return PartialView("Details/_DataFiles", data);
+                case ("SchemaSearch"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Schema Search Tab", id);
+                    return PartialView("Details/_SchemaSearch", data);
+                default:
+                    return HttpNotFound("Invalid Tab");
             }
         }
 
@@ -372,16 +376,19 @@ namespace Sentry.data.Web.Controllers
             switch (tab)
             {
                 case ("SchemaColumns"):
-                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Schema Column Tab", id);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Detail Schema Column Tab", id);
                     return;
                 case ("SchemaAbout"):
-                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Schema About Tab", id);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Detail Schema About Tab", id);
                     return;
                 case ("DataPreview"):
-                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Data Preview Tab", id);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Detail Data Preview Tab", id);
                     return;
                 case ("DataFiles"):
-                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Data Files Tab", id);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Detail Data Files Tab", id);
+                    return;
+                case ("SchemaSearch"):
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Schema Search Tab", id);
                     return;
             }
         }
@@ -428,19 +435,17 @@ namespace Sentry.data.Web.Controllers
             {
                 DatasetFile item = _datasetContext.GetById<DatasetFile>(id);
 
-                Event e = new Event();
-                e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Edited Data File").FirstOrDefault();
-                e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                e.TimeCreated = DateTime.Now;
-                e.TimeNotified = DateTime.Now;
-                e.IsProcessed = false;
-                e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-                e.Dataset = item.Dataset.DatasetId;
-                e.DataFile = item.DatasetFileId;
-                e.DataConfig = item.DatasetFileConfig.ConfigId;
-                e.Reason = "Edited Dataset File";
+                Event e = new Event
+                {
+                    EventType = _datasetContext.EventTypes.Where(w => w.Description == "Edited Data File").FirstOrDefault(),
+                    Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                    UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
+                    Dataset = item.Dataset.DatasetId,
+                    DataFile = item.DatasetFileId,
+                    DataConfig = item.DatasetFileConfig.ConfigId,
+                    Reason = "Edited Dataset File"
+                };
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
 
                 if (ModelState.IsValid)
                 {
@@ -497,9 +502,18 @@ namespace Sentry.data.Web.Controllers
             DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
             DatasetDetailModel model = new DatasetDetailModel(dto);
 
-            Task.Factory.StartNew(() => _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Configuration Page", dto.DatasetId), TaskCreationOptions.LongRunning);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Configuration Page", dto.DatasetId);
 
             return View("Configuration", model);
+        }
+
+        [Route("Dataset/Detail/{datasetId}/SchemaSearch/{schemaId}/{search?}")]
+        [HttpPost]
+        public JsonResult SchemaSearch(int datasetId, int schemaId, string search = null)
+        {
+            ElasticSchemaSearchProvider elasticSchemaSearch = new ElasticSchemaSearchProvider(_elasticContext, datasetId, schemaId);
+            List<ElasticSchemaField> results = elasticSchemaSearch.Search(search);
+            return Json(results, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -591,7 +605,7 @@ namespace Sentry.data.Web.Controllers
             }
 
             DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
-            
+
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
 
@@ -695,7 +709,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         #endregion
-        
+
         #region Helpers
 
         [HttpGet()]
@@ -709,17 +723,14 @@ namespace Sentry.data.Web.Controllers
                 throw new UnauthorizedAccessException();
             }
 
-
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Downloaded Data File").FirstOrDefault();
-
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.DataFile = df.DatasetFileId;
-            e.Dataset = df.Dataset.DatasetId;
-            e.DataConfig = df.DatasetFileConfig.ConfigId;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            Event e = new Event
+            {
+                EventType = _datasetContext.EventTypes.Where(w => w.Description == "Downloaded Data File").FirstOrDefault(),
+                DataFile = df.DatasetFileId,
+                Dataset = df.Dataset.DatasetId,
+                DataConfig = df.DatasetFileConfig.ConfigId,
+                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId
+            };
 
             try
             {
@@ -755,12 +766,11 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public ActionResult PushToSAS(int id, string fileOverride, string delimiter, int guessingrows)
         {
-            Event _event = new Event();
-            _event.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Pushed Data File to SAS").FirstOrDefault();
-            _event.TimeCreated = DateTime.Now;
-            _event.TimeNotified = DateTime.Now;
-            _event.IsProcessed = false;
-            _event.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            Event _event = new Event
+            {
+                EventType = _datasetContext.EventTypes.Where(w => w.Description == "Pushed Data File to SAS").FirstOrDefault(),
+                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId
+            };
 
             try
             {
@@ -963,16 +973,15 @@ namespace Sentry.data.Web.Controllers
                             }
 
                             //Create Upload Success Event
-                            Event e = new Event();
-                            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault();
-                            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Started").FirstOrDefault();
-                            e.TimeCreated = DateTime.Now;
-                            e.TimeNotified = DateTime.Now;
-                            e.IsProcessed = false;
-                            e.UserWhoStartedEvent = user.AssociateId;
-                            e.Dataset = dfc.ParentDataset.DatasetId;
-                            e.DataConfig = dfc.ConfigId;
-                            e.Reason = $"Successfully sent file to drop location [<b>{System.IO.Path.GetFileName(file.FileName)}</b>] for dataset [<b>{dfc.ParentDataset.DatasetName} - {dfc.Schema.Name}</b>]";
+                            Event e = new Event
+                            {
+                                EventType = _datasetContext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault(),
+                                Status = _datasetContext.EventStatus.Where(w => w.Description == "Started").FirstOrDefault(),
+                                UserWhoStartedEvent = user.AssociateId,
+                                Dataset = dfc.ParentDataset.DatasetId,
+                                DataConfig = dfc.ConfigId,
+                                Reason = $"Successfully sent file to drop location [<b>{System.IO.Path.GetFileName(file.FileName)}</b>] for dataset [<b>{dfc.ParentDataset.DatasetName} - {dfc.Schema.Name}</b>]"
+                            };
                             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
                             return Json("File Successfully Sent to Dataset Loader.");
@@ -1034,7 +1043,7 @@ namespace Sentry.data.Web.Controllers
 
         #endregion
 
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)] 
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         [HttpPost]
         public ActionResult RunRetrieverJob(int id)
         {
@@ -1065,7 +1074,7 @@ namespace Sentry.data.Web.Controllers
             {
                 Logger.Error($"Error disabling retriever job ({id}).", ex);
                 return Json(new { Success = false, Message = "Failed disabling job.  If problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>." });
-            }            
+            }
         }
 
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
@@ -1122,7 +1131,7 @@ namespace Sentry.data.Web.Controllers
         {
             List<SelectListItem> sList = new List<SelectListItem>();
 
-            var groupedDatasets = _datasetService.GetDatasetsForQueryTool().GroupBy(x=> x.DatasetCategories.First());
+            var groupedDatasets = _datasetService.GetDatasetsForQueryTool().GroupBy(x => x.DatasetCategories.First());
 
             foreach (var ds in groupedDatasets)
             {
@@ -1136,7 +1145,7 @@ namespace Sentry.data.Web.Controllers
 
             return Json(sList, JsonRequestBehavior.AllowGet);
         }
-        
+
         public JsonResult GetSourceDescription(string DiscrimatorValue)
         {
             var obj = _datasetContext.DataSourceTypes.Where(x => x.DiscrimatorValue == DiscrimatorValue).Select(x => x.Description);
@@ -1152,7 +1161,7 @@ namespace Sentry.data.Web.Controllers
             ViewBag.LivyURL = Sentry.Configuration.Config.GetHostSetting("ApacheLivy");
             ViewBag.IsAdmin = user.IsAdmin;
 
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Query Tool Page");
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, "Viewed Query Tool Page");
 
             return View("QueryTool");
         }
@@ -1185,7 +1194,7 @@ namespace Sentry.data.Web.Controllers
         //RECURSIVE FUNCTION
         //pass array of Fields and will format a line for each child field it finds
         //IF child field is a NON ARRAY STRUCT, call itself again and pass the STRUCT's children and print out all children and keep going
-        private string GenerateSnow(List<Models.ApiModels.Schema.SchemaFieldModel> models, string alias, ref bool first, ref bool columnExists,List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
+        private string GenerateSnow(List<Models.ApiModels.Schema.SchemaFieldModel> models, string alias, ref bool first, ref bool columnExists, List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
             StringBuilder line = new StringBuilder();
 
@@ -1204,7 +1213,7 @@ namespace Sentry.data.Web.Controllers
                     line.Append(alias).Append(field.Name).Append(DelroyCastMonster(field) + Environment.NewLine);
                     columnExists = true;
                 }
-                else if(!field.IsArray)
+                else if (!field.IsArray)
                 {
                     //pass "parentStructs" plus append current field so child nodes can get all parent structs appended
                     //pass "first" as reference to know whether to append a comma or not
@@ -1220,13 +1229,13 @@ namespace Sentry.data.Web.Controllers
         {
             string cast = "::" + field.FieldType;
 
-            if(field.FieldType.ToUpper() == "DECIMAL")
+            if (field.FieldType.ToUpper() == "DECIMAL")
             {
                 cast += "(" + field.Precision.ToString() + "," + field.Scale.ToString() + ") ";
             }
-            else if(field.FieldType.ToUpper() == "VARCHAR")
+            else if (field.FieldType.ToUpper() == "VARCHAR")
             {
-                cast +="(" + field.Length.ToString() + ") ";
+                cast += "(" + field.Length.ToString() + ") ";
             }
 
             return cast;
@@ -1241,7 +1250,7 @@ namespace Sentry.data.Web.Controllers
         {
             StringBuilder alias = new StringBuilder();
 
-            if(structTracker == null)
+            if (structTracker == null)
             {
                 return alias.ToString();
             }
@@ -1281,7 +1290,7 @@ namespace Sentry.data.Web.Controllers
             return alias.ToString();
         }
 
-       
+
 
 
         //CREATE FROM STATEMENT FOR SNOWFLAKE
@@ -1307,7 +1316,7 @@ namespace Sentry.data.Web.Controllers
         //CREATE LATERAL FLATTEN STATEMENT FOR SNOWFLAKE
         private string DelroyCreateLateralFlatten(List<Models.ApiModels.Schema.SchemaFieldModel> structTracker)
         {
-            
+
             StringBuilder flattenStatement = new StringBuilder();
             bool first = true;
             string parentFlatten = String.Empty;
@@ -1384,6 +1393,9 @@ namespace Sentry.data.Web.Controllers
                         break;
                     case Dataset.ValidationErrors.datasetLocationRequired:
                         ModelState.AddModelError(nameof(ReportMetadata.Location), vr.Description);
+                        break;
+                    case Dataset.ValidationErrors.datasetOriginationRequired:
+                        ModelState.AddModelError(nameof(DatasetModel.OriginationID), vr.Description);
                         break;
                     default:
                         ModelState.AddModelError(string.Empty, vr.Description);

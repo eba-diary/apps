@@ -1,0 +1,35 @@
+﻿@model List<FilterCategoryModel>
+
+<div>
+    @foreach (FilterCategoryModel category in Model.Where(x => x.CategoryOptions.Count > 15).ToList())
+    {
+        <div class="modal fade" id="categoryModal_@category.CategoryName.Replace(" ", "_").Replace("/", "_")">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">@category.CategoryName</h4>
+                    </div>
+                    <div class="modal-body filter-search-modal-body">
+                        <ul class="list-unstyled">
+                            @foreach (FilterCategoryOptionModel option in category.CategoryOptions.OrderBy(x => x.OptionValue).ToList())
+                            {
+                                <li class="filter-search-category-option filter-search-modal-option" title="@option.OptionValue">
+                                    <label>
+                                        <input type="checkbox" class="filter-search-category-option-checkbox" id="modal_@option.OptionId" value="@option.OptionValue" checked="@option.Selected" />
+                                        <strong>@(option.OptionValue.Length > 25 ? option.OptionValue.Substring(0, 22) + "..." : option.OptionValue)</strong>
+                                        <span>(@option.ResultCount.ToString("N0"))</span>
+                                    </label>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary display-none filter-search-start filter-search-apply"><em class="glyphicon glyphicon-search filter-search-apply-icon"></em>Apply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

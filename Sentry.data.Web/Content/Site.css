@@ -875,7 +875,6 @@ tr.categoryBanner-darkgray th.sorting_desc {
 }
 
 .detailTable {
-    max-width: calc(100% - 2em);
     min-width: 50%;
     margin: 1em;
 }

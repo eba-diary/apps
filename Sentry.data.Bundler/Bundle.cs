@@ -58,22 +58,19 @@ namespace Sentry.data.Bundler
                 Console.WriteLine($"Loaded request Guid: {_request.RequestGuid}");
                 Logger.Info($"Loaded request Guid: {_request.RequestGuid}");
 
-
-
                 bundleStart = DateTime.Now;
 
                 //Create Bundle Started Event
-                e = new Event();
-                e.EventType = _dscontext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
-                e.Status = _dscontext.EventStatus.Where(w => w.Description == "In Progress").FirstOrDefault();
-                e.TimeCreated = bundleStart;
-                e.TimeNotified = bundleStart;
-                e.IsProcessed = false;
-                e.UserWhoStartedEvent = _request.RequestInitiatorId;
-                e.Dataset = _request.DatasetID;
-                e.DataConfig = _request.DatasetFileConfigId;
-                e.Reason = $"Started bundle request for {_request.TargetFileName}";
-                e.Parent_Event = _request.RequestGuid;
+                e = new Event
+                {
+                    EventType = _dscontext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault(),
+                    Status = _dscontext.EventStatus.Where(w => w.Description == "In Progress").FirstOrDefault(),
+                    UserWhoStartedEvent = _request.RequestInitiatorId,
+                    Dataset = _request.DatasetID,
+                    DataConfig = _request.DatasetFileConfigId,
+                    Reason = $"Started bundle request for {_request.TargetFileName}",
+                    Parent_Event = _request.RequestGuid
+                };
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
                 Logger.Info("Start Event Created.");
@@ -163,17 +160,16 @@ namespace Sentry.data.Bundler
 
                     Logger.Debug("Creating bundle file process event");
                     //Create Bundle Started Event
-                    e = new Event();
-                    e.EventType = _dscontext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
-                    e.Status = _dscontext.EventStatus.Where(w => w.Description == "In Progress").FirstOrDefault();
-                    e.TimeCreated = DateTime.Now;
-                    e.TimeNotified = DateTime.Now;
-                    e.IsProcessed = false;
-                    e.UserWhoStartedEvent = _request.RequestInitiatorId;
-                    e.Dataset = _request.DatasetID;
-                    e.DataConfig = _request.DatasetFileConfigId;
-                    e.Reason = $"Submitted request to dataset loader to upload and register {_request.TargetFileName}";
-                    e.Parent_Event = _request.RequestGuid;
+                    e = new Event
+                    {
+                        EventType = _dscontext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault(),
+                        Status = _dscontext.EventStatus.Where(w => w.Description == "In Progress").FirstOrDefault(),
+                        UserWhoStartedEvent = _request.RequestInitiatorId,
+                        Dataset = _request.DatasetID,
+                        DataConfig = _request.DatasetFileConfigId,
+                        Reason = $"Submitted request to dataset loader to upload and register {_request.TargetFileName}",
+                        Parent_Event = _request.RequestGuid
+                    };
                     Logger.Debug("Successfully created bundle file process event, continuing on...");
 
                     Logger.Debug("Sending bundle file process event");
@@ -210,9 +206,6 @@ namespace Sentry.data.Bundler
                 e = new Event();
                 e.EventType = _dscontext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
                 e.Status = _dscontext.EventStatus.Where(w => w.Description == "Error").FirstOrDefault();
-                e.TimeCreated = DateTime.Now;
-                e.TimeNotified = DateTime.Now;
-                e.IsProcessed = false;
                 e.UserWhoStartedEvent = _request.RequestInitiatorId;
                 e.Dataset = _request.DatasetID;
                 e.DataConfig = _request.DatasetFileConfigId;

@@ -49,7 +49,7 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public JsonResult SearchResult(FilterSearchModel searchModel)
         {
-            searchModel.Validate(CanViewSensitive());
+            ValidateSearchModel(searchModel);
 
             DaleResultDto resultDto = _service.GetSearchResults(searchModel.ToDto());
 
@@ -60,10 +60,37 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult FilterCategories(FilterSearchModel searchModel)
+        public JsonResult SearchFilters(FilterSearchModel searchModel)
         {
-            searchModel.Validate(CanViewSensitive());
-            return PartialView("~/Views/Search/FilterCategories.cshtml", _service.GetSearchFilters(searchModel.ToDto()).ToModel().FilterCategories);
+            ValidateSearchModel(searchModel);
+            FilterSearchModel filterResult = _service.GetSearchFilters(searchModel.ToDto()).ToModel();
+            
+            if (!CanViewSensitive())
+            {
+                RemoveSensitive(filterResult);
+            }
+
+            return Json(filterResult.FilterCategories);
         }
+
+        #region Methods
+        private void ValidateSearchModel(FilterSearchModel searchModel)
+        {
+            if (!CanViewSensitive())
+            {
+                RemoveSensitive(searchModel);
+
+                FilterCategoryModel category = new FilterCategoryModel() { CategoryName = FilterCategoryNames.SENSITIVE };
+                category.CategoryOptions.Add(new FilterCategoryOptionModel() { OptionValue = "false", Selected = true, ParentCategoryName = category.CategoryName });
+
+                searchModel.FilterCategories.Add(category);
+            }
+        }
+
+        private void RemoveSensitive(FilterSearchModel searchModel)
+        {
+            searchModel.FilterCategories.RemoveAll(x => x.CategoryName == FilterCategoryNames.SENSITIVE);
+        }
+        #endregion
     }
 }

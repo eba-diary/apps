@@ -50,9 +50,6 @@ namespace Sentry.data.Web.Controllers
             {
                 EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
                 Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                TimeCreated = DateTime.Now,
-                TimeNotified = DateTime.Now,
-                IsProcessed = false,
                 UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
                 Reason = "Viewed Home Page"
             };

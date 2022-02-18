@@ -85,6 +85,13 @@ namespace Sentry.data.Core
         public virtual string PrimaryContactId { get; set; }
         public virtual bool IsSecured { get; set; }
         public virtual Security Security { get; set; }
+        public virtual bool IsSensitive
+        {
+            get
+            {
+                return DataClassification == DataClassificationType.HighlySensitive;
+            }
+        }
 
         //Delete Implementation
         public virtual ObjectStatusEnum ObjectStatus { get; set; }
@@ -153,6 +160,7 @@ namespace Sentry.data.Core
             public const string datasetScopeRequired = "datasetScopeRequired";
             public const string datasetDateRequired = "datasetDateRequired";
             public const string datasetLocationRequired = "datasetLocationRequired";
+            public const string datasetOriginationRequired = "datasetOriginationRequired";
         }
     }
 }

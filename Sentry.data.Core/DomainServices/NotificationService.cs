@@ -159,13 +159,13 @@ namespace Sentry.data.Core
                 switch (notification.MessageSeverity)
                 {
                     case NotificationSeverity.Critical:
-                        eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_CRITICAL_ADD : GlobalConstants.EventType.NOTIFICATION_CRITICAL_UPDATE;
+                        eventTypeDescription = addNotification ? GlobalConstants.EventType.NOTIFICATION_CRITICAL_ADD : GlobalConstants.EventType.NOTIFICATION_CRITICAL_UPDATE;
                         break;
                     case NotificationSeverity.Warning:
-                        eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_WARNING_ADD : GlobalConstants.EventType.NOTIFICATION_WARNING_UPDATE;
+                        eventTypeDescription = addNotification ? GlobalConstants.EventType.NOTIFICATION_WARNING_ADD : GlobalConstants.EventType.NOTIFICATION_WARNING_UPDATE;
                         break;
                     case NotificationSeverity.Info:
-                        eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_INFO_ADD : GlobalConstants.EventType.NOTIFICATION_INFO_UPDATE;
+                        eventTypeDescription = addNotification ? GlobalConstants.EventType.NOTIFICATION_INFO_ADD : GlobalConstants.EventType.NOTIFICATION_INFO_UPDATE;
                         break;
                     default:
                         Logger.Error("Notification Severity Not Found to log EventType of " + notification.MessageSeverity.ToString() + " for NotificationId = " + notification.NotificationId.ToString());
@@ -175,7 +175,7 @@ namespace Sentry.data.Core
 
 
             if (eventTypeDescription != null)
-                _eventService.PublishSuccessEventByNotificationId(eventTypeDescription, _userService.GetCurrentUser().AssociateId, eventTypeDescription, notification);
+                _eventService.PublishSuccessEventByNotificationId(eventTypeDescription, eventTypeDescription, notification);
         }
 
         public List<NotificationDto> GetNotificationsForDataAsset()
