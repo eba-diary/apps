@@ -180,7 +180,7 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Error("ElasticDataInventorySearchProvider.SaveSensitive() Failed!!", ex);
+                Logger.Error($"ElasticDataInventorySearchProvider SQL command failed to update Id(s): {string.Join(", ", dtos.Select(x => x.BaseColumnId))}", ex);
             }
 
             return false;
