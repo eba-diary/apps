@@ -138,10 +138,9 @@
             <date when="1901-11-24">Sunday evening. Nov. 24</date>.
          </dateline>
          <p>
-<!-- the lloyd s.s. mentioned here is likely one of the ships from either Österreichischer Lloyd or Norddeutscher Lloyd - unknown which-->
             We are obliged to stay here until Thursday of next week, and then take that long railway
-             journey over to <placeName ref="#Brindisi">Brindisi</placeName>, to catch our Austrian
-             <name>Lloyd S.S</name>. We had hoped to get rooms on the <name type="boat" ref="#Prins_Heinrich">Prins Heinrich</name>
+             journey over to <placeName ref="#Brindisi">Brindisi</placeName>, to catch our <orgName ref="#Österreichischer_Lloyd">Austrian Lloyd</orgName>
+             S.S. We had hoped to get rooms on the <name type="boat" ref="#Prins_Heinrich">Prins Heinrich</name>
              going from here the same Thursday, on which will be <persName ref="#Agassiz_Mr">Mr.
              <choice><sic>Agassig</sic><corr>Agassiz</corr></choice></persName> and
              his son <persName ref="#Agassiz_Max">Max</persName> on their way to <placeName ref="#Sri_Lanka">Ceylon</placeName>.
@@ -177,11 +176,8 @@
             <date when="1901-11-26">Wednesday, Nov. 26.</date>.
          </dateline>
          <p>
-         <!-- are capo di monte and san martino hotels or places? -->
-         <!-- should we tag waldorf astoria if it's only referring to a style and not a specific location? -->
-         <!-- is it hotel splendid or splendide? -->
             We all had a fine drive this morning, and stopped at the
-             <name type="hotel" ref="#Hotel_Splendid">Hotel Splendid</name>, one of <persName ref="#Bertalini_Mr">
+             <name type="hotel" ref="#Hotel_Splendide">Hotel Splendide</name>, one of <persName ref="#Bertalini_Mr">
             Bertalini</persName>'s hotels to see it. It is splendidly situated, almost on the level of
              <placeName ref="#Capodimonte">Capo di Monte</placeName>, and <placeName ref="#San_Martino">San Martino</placeName>. It has just been
              opened - and is very attractive. The <placeName ref="#Naples">Naples</placeName> tram lands you
@@ -207,7 +203,7 @@
              <placeName ref="#Florence">Florence</placeName> at 3 o'clock - a little sad - and
              <persName ref="#Woodward_Dr">Woodward</persName>, <persName ref="#Bigelow_Mr">Bigelow</persName>,
              <persName ref="#Davis_Theodore_M">Theodore</persName>, <persName ref="#Buttles_Jeanette">
-            Nettie</persName> and I drove up to the <name type="hotel" ref="#Hotel_Splendid">Splendide</name>
+            Nettie</persName> and I drove up to the <name type="hotel" ref="#Hotel_Splendide">Splendide</name>
              to dine - in an open carriage in the brilliant moonlight.
          </p>
       </div>
@@ -223,14 +219,14 @@
              steamer tonight. Our steamer is due at 3 tomorrow.
          </p>
       </div>
-      <div xml:id="EBA-1901-11-27" type="entry">
+      <div xml:id="EBA-1901-12-01" type="entry">
          <dateline>
             <placeName ref="#Cairo">Cairo</placeName> - <name type="hotel" ref="#Shepheards_Hotel">Shepheards</name> -
              <date when="1901-12-01">Dec. 1st - Monday</date>.
          </dateline>
          <p>
             We have had fearful experiences since my last entry. The <name type="boat" ref="#Cleopatra_boat">Cleopatra</name> of the
-             Austrian <orgName ref="#Lloyd">Lloyd Line</orgName> arrived at
+             <orgName ref="#Österreichischer_Lloyd">Austrian Lloyd Line</orgName> arrived at
              <placeName ref="#Brindisi">Brindisi</placeName> on time, and we were soon off, and found a gale
              outside waiting for us. It was very cold too. <persName ref="#Buttles_Jeanette">Nettie</persName> and I
              went to bed at once to get warm, - the night was hideously rough. We did not get
@@ -326,12 +322,11 @@
             <date when="1901-12-13">Friday, Dec. 13</date>. 36 miles. <placeName ref="#Al-Wasta">Wasta</placeName>.
          </dateline>
          <p>
-         <!-- where is winieh? cannot find it on getty or index -->
             An encouraging run - we might have gone on for another hour, but that the
              <persName ref="#von_Bissing_Baron">Baron</persName> had to stop for his mail. He,
              <persName ref="#Davis_Theodore_M">Theodore</persName> and <persName ref="#Buttles_Jeanette">Nettie</persName>,
              <persName ref="#Jones_Daniel">Jones</persName> and 2 of our men went into the town and
-             were not home until after dark. We will not have our mail until we reach <placeName>Winieh</placeName>.
+             were not home until after dark. We will not have our mail until we reach <placeName ref="#Al_Minya">Minieh</placeName>.
          </p>
       </div>
       <div xml:id="EBA-1901-12-14" type="entry">
@@ -458,12 +453,11 @@
             <date when="1901-12-24">Tuesday, Dec. 24</date>. 8 miles.
          </dateline>
          <p>
-            <!-- Khaenaten's palace? -->
             <!-- Christian family and/or mr and mrs christian? -->
             We had only a breath of wind today, but pulled along until we arrived at
              <placeName ref="#Hag_Kandil">Haji Kandil</placeName>, where the <persName>Christians</persName> also
-             stopped - as we intended going to see the pavement of <placeName>Khaenaten's
-             Palace</placeName>. We went across the river at 3:30 - and walked across to the
+             stopped - as we intended going to see the pavement of <name type="historical" ref="#Northern_Palace">Khaenaten's
+             Palace</name>. We went across the river at 3:30 - and walked across to the
              house which <persName ref="#Petrie_William">Petrie</persName> has had constructed over this pavement
              to preserve it. A noisy lot of children and men followed us - and made it very
              disagreeable. The pavement is not so ruined as I thought it would be, and the
@@ -517,11 +511,9 @@
             <date when="1901-12-27">Friday, Dec. 27</date>.
          </dateline>
          <p>
-            <!-- could gebel abu fedu be Abū Fūdah, Jabal, on getty? a hill? -->
-            <!-- looks like it's a "chain" and say "sailed" later so a river? -->
             We have made a good run, and 37 miles, lying now about 10 miles above
              <placeName ref="#Manfalût">Manfalout</placeName>. Passed the great
-             <placeName>Gebel Abu Fedu</placeName> chain very successfully, until the last
+             <placeName ref="#Jabal_Abū_Fūdah">Gebel Abu Fedu</placeName> chain very successfully, until the last
              turn, where we always come to grief &#8211; we had to track &#8211; but afterwards
              sailed steadily and splendidly through the beautiful evening until 9 o'clock.
          </p>
@@ -1230,7 +1222,6 @@
          </dateline>
          <p>
          <!-- who would Hassan be? many hassan's in the master indicies, none mention a mother -->
-         <!-- Mrs. Johnson - Cecile Davis or someone new? -->
             Not of the boat today. Breakfasted at 8 - and <persName ref="#Davis_Theodore_M">Theodore</persName>
              and <persName ref="#Buttles_Jeanette">Nettie</persName> crossed to the <name type="hotel" ref="#Cataract_Hotel">Cataract
              Hotel</name>, and took one of the sand carriages to the "barrage". They came home
@@ -1246,7 +1237,7 @@
              everything we could think of - and she had brought us 2 chickens, some dates and
              eggs. We hated to keep them, but could not decline. Then <persName ref="#Yemma">
             Yemmie</persName> appeared from <placeName ref="#Philae">Philae</placeName> and two
-             or three other natives - and <persName>Mrs. Johnson</persName>
+             or three other natives - and <persName ref="#Johnson_Mrs">Mrs. Johnson</persName>
              and <persName ref="#Bruce_Miss">Miss Bruce</persName>, <persName ref="#Buchanan_Carrie">Miss
              Buchanan</persName>'s friends, Scoth bodies and very nice too, came to tea - and
              this evening a letter from <persName ref="#Anderson_Hendrick">Henry Anderson</persName>
