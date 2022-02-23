@@ -11,11 +11,13 @@ namespace Sentry.data.Infrastructure
     public class ElasticDataInventorySearchProvider : IDaleSearchProvider
     {
         private readonly IElasticContext _context;
+        private readonly IDbExecuter _dbExecuter;
         private readonly string AssetCategoriesAggregationKey = "SaidListNames";
 
-        public ElasticDataInventorySearchProvider(IElasticContext context)
+        public ElasticDataInventorySearchProvider(IElasticContext context, IDbExecuter dbExecuter)
         {
             _context = context;
+            _dbExecuter = dbExecuter;
         }
 
         #region IDaleSearchProvider Implementation
@@ -135,11 +137,53 @@ namespace Sentry.data.Infrastructure
             return resultDto;
         }
 
-        public bool SaveSensitive(string sensitiveBlob)
+        public bool SaveSensitive(List<DaleSensitiveDto> dtos)
         {
-            //Currently not allowed at this time when source feature flag is set to ELASTIC
-            //Solution for real-time updates has not been determined
-            throw new NotImplementedException();
+            try
+            {
+                //update SQL first
+                _dbExecuter.ExecuteCommand(Newtonsoft.Json.JsonConvert.SerializeObject(dtos));
+
+                //if SQL succeeds, update in elastic
+                IList<DataInventory> diToUpdate = null;
+                Dictionary<int, Task<bool>> tasks = new Dictionary<int, Task<bool>>();
+                try
+                {
+                    //get documents to update by ids
+                    diToUpdate = _context.SearchAsync<DataInventory>(x => x
+                        .Query(q => q
+                            .Ids(i => i
+                                .Values(dtos.Select(dto => new Id(dto.BaseColumnId)).ToList())))).Result.Documents;
+
+                    //submit async update requests per document to update
+                    foreach (DataInventory di in diToUpdate)
+                    {
+                        DaleSensitiveDto dto = dtos.FirstOrDefault(x => x.BaseColumnId == di.Id);
+                        di.IsSensitive = dto.IsSensitive;
+                        di.IsOwnerVerified = dto.IsOwnerVerified;
+
+                        tasks.Add(di.Id, _context.Update(di));
+                    }
+
+                    //wait for all requests to complete (WaitAll lets all complete before error is thrown)
+                    Task.WaitAll(tasks.Values.ToArray());
+
+                    return true;
+                }
+                catch (AggregateException aggEx)
+                {
+                    //search failed if diToUpdate is empty, else update(s) failed
+                    Logger.Error(diToUpdate?.Any() != true
+                        ? $"ElasticDataInventorySearchProvider failed to retrieve Id(s): {string.Join(", ", dtos.Select(x => x.BaseColumnId))} from index"
+                        : $"ElasticDataInventorySearchProvider failed to update Id(s): {string.Join(", ", tasks.Where(x => x.Value.IsFaulted).Select(x => x.Key))}", aggEx);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"ElasticDataInventorySearchProvider SQL command failed to update Id(s): {string.Join(", ", dtos.Select(x => x.BaseColumnId))}", ex);
+            }
+
+            return false;
         }
         #endregion
 

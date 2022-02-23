@@ -40,8 +40,7 @@ namespace Sentry.data.Core
 
         public bool UpdateIsSensitive(List<DaleSensitiveDto> dtos)
         {
-            string sensitiveBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtos);
-            return _daleSearchProvider.SaveSensitive(sensitiveBlob);
+            return _daleSearchProvider.SaveSensitive(dtos);
         }
 
         public DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dtoSearch)

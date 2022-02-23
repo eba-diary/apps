@@ -1,14 +1,14 @@
 ﻿using Sentry.Core;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public interface IDataFlowService
+    public interface IDataFlowService : IEntityService
     {
         List<DataFlowDto> ListDataFlows();
         /// <summary>
@@ -54,30 +54,27 @@ namespace Sentry.data.Core
         /// <param name="producerDataFlowIds"></param>
         void UpgradeDataFlows(int[] producerDataFlowIds);
 
-        /// <summary> 
+        /// <summary>
+        /// For the list of dataflow ids provided, this will set ObjectStatus appropriately based on logicDelete flag.
+        /// In addition,
+        ///   will find any retrieverjobs, associated with specified dataflow, and 
+        ///   set its ObjectStatus = Deleted.
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <param name="user"></param>
+        /// <param name="logicalDelete"></param>
+        /// <remarks>logicalDelete = true sets objectstatus to Pending_Delete. 
+        /// logicalDelete = false sets objectstatus to Deleted.</remarks>
+        bool Delete(List<int> idList, IApplicationUser user, bool logicalDelete);
+
+        /// <summary>
         /// Will enqueue a hangfire job, for each id in idList,
         ///   that will run on hangfire background server and peform
         ///   the dataflow delete.
         /// </summary>
         /// <param name="idList"></param>
-        /// <param name="deleteIssuerId">User id of delete issuer</param>
-        void DeleteDataFlows(int[] idList);
-
-        /// <summary>
-        /// This will set ObjectStatus = Deleted for specified dataflow.  In addition,
-        ///   will find any retrieverjobs, associated with specified dataflow, and 
-        ///   set its ObjectStatus = Deleted.
-        /// </summary>
-        /// <param name="dataFlowId"></param>
-        /// <param name="commitChanges">True: method will save changes to DB, False: relies on calling method to save changes</param>
-        /// <remarks>
-        /// This method can be triggered by Hangfire.  
-        /// Added the AutomaticRetry attribute to ensure retries do not occur for this method.
-        /// https://docs.hangfire.io/en/latest/background-processing/dealing-with-exceptions.html
-        /// </remarks>
-        void Delete(int dataFlowId, string userId, bool commitChanges = false);
-
-        void DeleteFlowsByFileSchema(FileSchema scm, bool logicalDelete = true);
+        /// <remarks> This will serves an Admin only funtionlaity within DataFlow API </remarks>
+        bool Delete_Queue(List<int> idList, string userId, bool logicalDelete);
 
         /// <summary>
         /// 

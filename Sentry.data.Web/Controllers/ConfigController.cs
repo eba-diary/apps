@@ -28,13 +28,14 @@ namespace Sentry.data.Web.Controllers
         private readonly ISecurityService _securityService;
         private readonly ISchemaService _schemaService;
         private readonly IDataFeatures _featureFlags;
+        private readonly Lazy<IDataApplicationService> _dataApplicationService;
         #endregion
 
         #region Constructor
         public ConfigController(IDatasetContext dsCtxt, UserService userService, IAssociateInfoProvider associateInfoService,
-            IConfigService configService, IEventService eventService, IDatasetService datasetService,
-            IObsidianService obsidianService, ISecurityService securityService, ISchemaService schemaService,
-            IDataFeatures dataFeatures)
+            IConfigService configService, IEventService eventService, IDatasetService datasetService, 
+            IObsidianService obsidianService, ISecurityService securityService, ISchemaService schemaService, 
+            IDataFeatures dataFeatures, Lazy<IDataApplicationService> dataApplicationService)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
@@ -46,8 +47,14 @@ namespace Sentry.data.Web.Controllers
             _securityService = securityService;
             _schemaService = schemaService;
             _featureFlags = dataFeatures;
+            _dataApplicationService = dataApplicationService;
         }
         #endregion
+
+        private IDataApplicationService DataApplicationService
+        {
+            get { return _dataApplicationService.Value; }
+        }
 
         #region Controller Methods
         [HttpGet]
@@ -83,7 +90,8 @@ namespace Sentry.data.Web.Controllers
                     DatasetName = dsDto.DatasetName,
                     CategoryColor = dsDto.CategoryColor,
                     DatasetFileConfigs = configModelList,
-                    DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue()
+                    DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue(),
+                    DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue()
                 };
 
                 mcm.Security = _DatasetService.GetUserSecurityForDataset(id);
@@ -167,7 +175,7 @@ namespace Sentry.data.Web.Controllers
 
                 if (us != null && us.CanEditDataset)
                 {
-                    bool IsDeleted = _configService.Delete(id);
+                    bool IsDeleted = DataApplicationService.DeleteDatasetFileConfig(new List<int> { id }, SharedContext.CurrentUser);
                     if (!IsDeleted)
                     {
                         return Json(new { Success = false, Message = "Schema was not deleted" });

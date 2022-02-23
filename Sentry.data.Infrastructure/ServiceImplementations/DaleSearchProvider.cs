@@ -203,7 +203,7 @@ namespace Sentry.data.Infrastructure
         }
 
 
-        public bool SaveSensitive(string sensitiveBlob)
+        public bool SaveSensitive(List<DaleSensitiveDto> dtos)
         {
             bool success = true;
 
@@ -218,7 +218,7 @@ namespace Sentry.data.Infrastructure
                 command.CommandTimeout = 0;
 
                 command.Parameters.AddWithValue("@sensitiveBlob", System.Data.SqlDbType.NVarChar);
-                command.Parameters["@sensitiveBlob"].Value = sensitiveBlob;
+                command.Parameters["@sensitiveBlob"].Value = Newtonsoft.Json.JsonConvert.SerializeObject(dtos);
 
                 try
                 {
