@@ -4,17 +4,17 @@
 		MERGE INTO Category AS Target 
 		USING (VALUES 
 									(1, 'Claim', NULL, 'blueGray', 'DS', NULL),
-									(2, 'Industry', NULL, 'orange', 'DS', NULL),
+									(2, 'Industry', NULL, 'orange-text', 'DS', NULL),
 									(3, 'Government', NULL, 'gold', 'DS', NULL),
-									(4, 'Geographic', NULL, 'green', 'DS', NULL),
+									(4, 'Geographic', NULL, 'sentry-dark-green-text', 'DS', NULL),
 									(5, 'Weather', NULL, 'plum', 'DS', NULL),
-									(6, 'Sentry', NULL, 'blue', 'DS', NULL),
+									(6, 'Sentry', NULL, 'sentry-dark-blue-text', 'DS', NULL),
 									(7, 'Commercial Lines', NULL, 'blueGray', 'RPT', 'CL'),
-									(8, 'Personal Lines', NULL, 'orange', 'RPT', 'PL'),
+									(8, 'Personal Lines', NULL, 'orange-text', 'RPT', 'PL'),
 									(9, 'Claims', NULL, 'gold', 'RPT', NULL),
-									(10, 'Corporate', NULL, 'green', 'RPT', NULL),
+									(10, 'Corporate', NULL, 'sentry-dark-green-text', 'RPT', NULL),
 									(11, 'IT', NULL, 'plum', 'RPT', NULL),
-									(12, 'Life and Annuities', NULL, 'blue', 'RPT', 'LA'),
+									(12, 'Life and Annuities', NULL, 'sentry-dark-blue-text', 'RPT', 'LA'),
 									(13, 'Human Resources', NULL, 'gray', 'DS', 'HR'),
 									(14, 'Investment', NULL, 'darkGreen', 'DS', NULL)
 								)

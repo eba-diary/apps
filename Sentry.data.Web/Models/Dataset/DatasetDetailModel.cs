@@ -18,15 +18,6 @@ namespace Sentry.data.Web
             DistinctFileExtensions = dto.DistinctFileExtensions;
             DataClassificationDescription = dto.DataClassificationDescription;
             GroupAccessCount = dto.GroupAccessCount;
-            switch (dto.CategoryColor)
-            {
-                case "blue":
-                    CssColor = "sentry-dark-blue-text";
-                    break;
-                default:
-                    CssColor = "";
-                    break;
-            }
             //foreach (var item in dto.DataFlows)
             //{
             //    DataFlows.Add(new Tuple<string, List<AssociatedDataFlowModel>>(item.Item1, item.Item2.ToModel()));
@@ -46,7 +37,5 @@ namespace Sentry.data.Web
         public List<Tuple<string, List<AssociatedDataFlowModel>>> DataFlows { get; set; }
         public bool DisplayDataflowMetadata { get; set; }
         public bool DisplayTabSections { get; set; }
-
-        public string CssColor { get; set; }
     }
 }

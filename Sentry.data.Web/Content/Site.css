@@ -2861,3 +2861,40 @@ a.forbiddenHero:hover {
 .display-none {
     display: none;
 }
+
+.multi-level-dropdown .dropdown-item a:active, .multi-level-dropdown .dropdown-item a:hover, .dropdown-submenu a:active, .dropdown-submenu a:hover {
+    color: #fff !important;
+    text-decoration: none !important;
+    background-color: #00A3E0 !important;
+    box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+}
+
+.multi-level-dropdown .dropdown-item a, .multi-level-dropdown .dropdown-submenu a {
+    width: 100% !important;
+    font-size: .9rem !important;
+    padding: 0.5rem !important;
+}
+
+.dropdown-submenu {
+    display: block;
+    width: 100%;
+    padding: 0 !important;
+    margin: 0 !important;
+    clear: both;
+    font-weight: 400;
+    color: #212529;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+    float: left ;
+}
+
+.dropdown-submenu .dropdown-item, .multi-level-dropdown .dropdown-item {
+    padding: 0 !important;
+    background-color: transparent !important;
+}
+
+.multi-level-dropdown .dropdown-header {
+    display: inline !important;
+}

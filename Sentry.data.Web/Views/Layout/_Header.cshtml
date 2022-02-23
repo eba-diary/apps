@@ -84,16 +84,36 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle waves-effect waves-light" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Business Intelligence</a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item waves-effect waves-light" href="~/BusinessIntelligence/Index">Home</a>
+                <li class="nav-item dropdown multi-level-dropdown">
 
+                    <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">Business Intelligence</a>
+                    <ul class="dropdown-menu z-depth-1">
+                        <li class="dropdown-item"><a class="" href="~/BusinessIntelligence/Index">Home</a></li>
 
+                        <li class="dropdown-submenu">
+                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">Search</a>
+                            <ul class="dropdown-menu z-depth-1">
+                                <li class="dropdown-item">
+                                    <a href="/Search/BusinessIntelligence/Index?searchPhrase=" class="waves-effect waves-light">All</a>
+                                </li>
+                                @foreach (Sentry.data.Web.Models.BusinessIntelligenceUIModel da in ViewBag.BusinessIntelligenceCategories)
+                                {
+                                    <li class="dropdown-item">
+                                        <a href="/Search/BusinessIntelligence/Index?category=@da.Name" class="waves-effect waves-light">@da.Name</a>
+                                    </li>
+                                }
 
+                            </ul>
+                        </li>
 
-                    </div>
+                        <li><div class="dropdown-divider"></div></li>
+                        <li><div class="dropdown-header">Exhibit Actions</div></li>
+                        <li class="dropdown-item"><a class="" href="~/BusinessIntelligence/Create">Create Exhibit</a></li>
+
+                    </ul>
                 </li>
+
+               
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle waves-effect waves-light" id="navbarDropdownDatasetLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Datasets</a>
@@ -112,7 +132,6 @@
                         }
                         <div class="dropdown-divider"></div>
                         <div class="dropdown-header">Dataset Administration</div>
-                        <a class="dropdown-item waves-effect waves-light" href="/Config/Manage">Manage Configs</a>
                         <a class="dropdown-item waves-effect waves-light" href="/Config/Source/Create">Create Retriever Source</a>
                     </div>
                 </li>
@@ -129,16 +148,16 @@
                     </li>
                 }
 
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown multi-level-dropdown">
 
                     <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">Dropdown</a>
                     <ul class="dropdown-menu z-depth-1">
 
-                        <li class="dropdown-item dropdown-submenu">
+                        <li class="dropdown-submenu">
                             <a href="#" data-toggle="dropdown" class="dropdown-toggle">Click Me Too! </a>
                             <ul class="dropdown-menu z-depth-1">
                                 <li class="dropdown-item">
-                                    <a href="#" class="nav-link text-black waves-effect waves-light">Hey</a>
+                                    <a href="#" class="waves-effect waves-light">Hey</a>
                                 </li>
                                 <li class="dropdown-item">
                                     <a href="#" class="">Hi</a>
@@ -156,20 +175,8 @@
                                 </li>
                             </ul>
                         </li>
-                        <li class="dropdown-item dropdown-submenu">
-                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">Click me </a>
-                            <ul class="dropdown-menu">
-                                <li class="dropdown-item">
-                                    <a href="#" class="">How</a>
-                                </li>
-                                <li class="dropdown-item">
-                                    <a href="#" class="">are</a>
-                                </li>
-                                <li class="dropdown-item">
-                                    <a href="#" class="nav-link">you </a>
-                                </li>
-                            </ul>
-                        </li>
+                        <li class="dropdown-item"><a class="" href="/Dataset/Create">Create Dataset</a></li>
+
                     </ul>
                 </li>
             </ul>

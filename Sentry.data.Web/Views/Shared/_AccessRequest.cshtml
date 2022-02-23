@@ -8,13 +8,13 @@
     @Html.AntiForgeryToken()
     <div class="form-horizontal">
         <div class="form-group">
-            @Html.LabelFor(m => m.BusinessReason, new { @class = "col-md-2 control-label" })
+            @Html.LabelFor(m => m.BusinessReason, new { @class = "col-md-4 control-label" })
             <div class="col-md-10">
                 @Html.TextAreaFor(model => model.BusinessReason, new { @class = "form-control edit-dataset-row" })
             </div>
         </div>
         <div class="form-group">
-            @Html.LabelFor((model) => model.SelectedApprover, new { @class = "control-label col-md-2" })
+            @Html.LabelFor((model) => model.SelectedApprover, new { @class = "control-label col-md-4" })
             <div class="col-md-10">
                 @Html.DropDownListFor((model) => model.SelectedApprover, Model.AllApprovers, new { @class = "form-control edit-dataset-row" })
             </div>

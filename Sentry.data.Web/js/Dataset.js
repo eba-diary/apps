@@ -1165,7 +1165,7 @@ data.Dataset = {
             Sentry.ShowModalCustom("Delete Dataset", ConfirmMessage, {
                 Confirm: {
                     label: "Confirm",
-                    className: "btn-danger",
+                    className: "btn btn-danger waves-effect waves-light",
                     callback: function () {
                         $.ajax({
                             url: "/Dataset/" + dataset.attr("data-id") + "/Delete",
