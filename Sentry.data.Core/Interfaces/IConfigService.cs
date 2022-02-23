@@ -1,11 +1,12 @@
 ﻿using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public interface IConfigService
+    public interface IConfigService : IEntityService
     {
         List<string> Validate(FileSchemaDto dto);
         List<string> Validate(DataSourceDto dto);
@@ -38,13 +39,6 @@ namespace Sentry.data.Core
         /// <exception cref="DatasetUnauthorizedAccessException">Thrown when user does not have access to dataset</exception>
         /// <exception cref="DatasetNotFoundException">Thrown when user does not have access to dataset</exception>
         List<DatasetFileConfigDto> GetDatasetFileConfigDtoByDataset(int datasetId);
-        /// <summary>
-        /// Will set objectstatus appropriately for given object.  Will trigger same action on immediate children objects.
-        /// </summary>
-        /// <param name="id">DatasetFileConfig identifier</param>
-        /// <param name="logicalDelete">Perform soft or hard delete</param>
-        /// <param name="parentDriven">Is this driven by parent object</param>
-        bool Delete(int id, bool logicalDelete = true, bool parentDriven = false);
         UserSecurity GetUserSecurityForConfig(int id);
         /// <summary>
         /// Generates necessary trigger to regenerate consumption layer components.

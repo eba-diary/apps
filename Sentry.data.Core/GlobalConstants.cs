@@ -280,6 +280,7 @@
                 public const int VARCHAR_LENGTH_DEFAULT = 1000;
                 public const int DECIMAL_PRECISION_DEFAULT = 9;
                 public const int DECIMAL_SCALE_DEFAULT = 2;
+                public const int LENGTH_DEFAULT = 0;
             }
         }
 

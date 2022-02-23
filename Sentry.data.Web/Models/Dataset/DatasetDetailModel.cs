@@ -39,5 +39,6 @@ namespace Sentry.data.Web
         public bool DisplayDataflowMetadata { get; set; }
         public bool DisplayTabSections { get; set; }
         public bool DisplaySchemaSearch { get; set; }
+        public bool DisplayDataflowEdit { get; set; }
     }
 }
