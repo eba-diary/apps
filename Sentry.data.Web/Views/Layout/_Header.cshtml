@@ -19,7 +19,7 @@
         </a>
         <div class="sentry-app-title">
             <h1>data.sentry.com</h1>
-            <p>Do we want something here?</p>
+            <p> &nbsp;</p>
         </div>
 
 
@@ -106,20 +106,19 @@
                             </ul>
                         </li>
 
-                        <li><div class="dropdown-divider"></div></li>
                         <li><div class="dropdown-header">Exhibit Actions</div></li>
                         <li class="dropdown-item"><a class="" href="~/BusinessIntelligence/Create">Create Exhibit</a></li>
 
                     </ul>
                 </li>
 
-               
+
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle waves-effect waves-light" id="navbarDropdownDatasetLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Datasets</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownDatasetLink">
-                        <a class="dropdown-item waves-effect waves-light" href="~/Dataset/Index">Home</a>
-                        <a class="dropdown-item waves-effect waves-light" href="~/Search/Datasets">Search</a>
+                        <a class="dropdown-item" href="~/Dataset/Index">Home</a>
+                        <a class="dropdown-item" href="~/Search/Datasets">Search</a>
                         <div class="dropdown-divider"></div>
                         <div class="dropdown-header">Dataset Actions</div>
                         @if (Model.DisplayDataflowMetadata)
@@ -136,6 +135,122 @@
                     </div>
                 </li>
 
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle waves-effect waves-light" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Business Areas</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownDatasetLink">
+                        <a class="dropdown-item waves-effect waves-light" href="~/BusinessArea/PersonalLines">Personal Lines</a>
+                        <div class="dropdown-divider"></div>
+
+                        <a class="dropdown-item waves-effect waves-light" href="/Notification/ManageNotification">Notifications</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown multi-level-dropdown">
+
+                    <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">Data Assets</a>
+                    <ul class="dropdown-menu z-depth-1">
+                        <li class="dropdown-submenu">
+                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">Assets</a>
+                            <ul class="dropdown-menu z-depth-1">
+                                @foreach (Sentry.data.Web.Models.AssetUIModel da in ViewBag.DataAssets)
+                                {
+                                    <li class="dropdown-item"><a href="/DataAsset/@da.Name">@da.DisplayName</a></li>
+                                }
+                            </ul>
+                        </li>
+
+                        <li class="dropdown-submenu">
+                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">Lineage</a>
+                            <ul class="dropdown-menu z-depth-1">
+                                <li class="dropdown-item dropdown-submenu">
+                                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">Personal Lines</a>
+                                    <ul class="dropdown-menu  z-depth-1">
+                                        <li><div class="dropdown-header">Search</div></li>
+                                        <li class="dropdown-item"><a href="/Lineage/Personal Lines/SERAPL/">Business Term</a></li>
+                                        <li><div class="dropdown-header">Assets</div></li>
+
+                                        <li class="dropdown-item dropdown-submenu">
+                                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">SERA PL</a>
+                                            <ul class="dropdown-menu  z-depth-1">
+                                                <li><div class="dropdown-header">Search</div></li>
+
+                                                <li class="dropdown-item"><a href="/Lineage/Personal Lines/SERAPL/">Business Term</a></li>
+
+                                                <li><div class="dropdown-header">Cubes</div></li>
+
+                                                <li class="dropdown-item"><a href="/Lineage/Personal Lines/SERAPL/Cubes/SERAPL Loss Triangles">SERAPL Loss Triangles</a></li>
+                                                <li class="dropdown-item"><a href="/Lineage/Personal Lines/SERAPL/Cubes/SERAPL Snapshot">SERAPL Snapshot</a></li>
+                                                <li class="dropdown-item"><a href="/Lineage/Personal Lines/SERAPL/Cubes/SERAPL Transactional">SERAPL Transactional</a></li>
+                                                <li class="dropdown-item"><a href="/Lineage/Personal Lines/SERAPL/Cubes/SERAPL Quote">SERAPL Quote</a></li>
+
+                                                <li><div class="dropdown-header">Business Objects</div></li>
+
+                                                <li class="dropdown-item"><a href="/Lineage/Personal Lines/SERAPL/BusinessObjects/SERAPL_Adhoc">SERAPL_Adhoc</a></li>
+                                                <li class="dropdown-item"><a href="/Lineage/Personal Lines/SERAPL/BusinessObjects/SERAPL_Snapshot">SERAPL_Snapshot</a></li>
+                                                <li class="dropdown-item"><a href="/Lineage/Personal Lines/SERAPL/BusinessObjects/SERAPL_Transactional">SERAPL_Transactional</a></li>
+                                                <li class="dropdown-item"><a href="/Lineage/Personal Lines/SERAPL/BusinessObjects/SERAPL_Quote">SERAPL_Quote</a></li>
+                                            </ul>
+                                        </li>
+
+                                        <li class="dropdown-item dropdown-submenu">
+                                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">PL Policy ODS</a>
+                                            <ul class="dropdown-menu  z-depth-1">
+                                                <li><div class="dropdown-header">Search</div></li>
+
+                                                <li class="dropdown-item"><a href="/Lineage/Personal Lines/PLPolicyODS/">Business Term</a></li>
+
+                                                <li><div class="dropdown-header">Business Objects</div></li>
+                                                <li class="dropdown-item"><a href="/Lineage/Personal Lines/PLPolicyODS/BusinessObjects/PL_Policy_ODS_Adhoc">PL_Policy_ODS_Adhoc</a></li>
+                                                <li class="dropdown-item"><a href="/Lineage/Personal Lines/PLPolicyODS/BusinessObjects/PL Billing Adhoc">PL Billing Adhoc </a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown-item"><a href="/Notification/ManageNotification">Notifications</a></li>
+
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link waves-effect waves-light" href="~/DataInventory/Search">Data Inventory</a>
+                </li>
+
+                <li class="nav-item dropdown multi-level-dropdown">
+                    <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">Help</a>
+                    <ul class="dropdown-menu z-depth-1">
+                        <li class="dropdown-item"><a href="mailto:DSCSupport@sentry.com?Subject=Feedback">Provide Feedback</a></li>
+                        <li class="dropdown-item"><a href="mailto:DSCSupport@sentry.com?Subject=Bug&nbsp;Report">Report Bug</a></li>
+
+                        <li class="dropdown-submenu">
+                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">User Guides</a>
+                            <ul class="dropdown-menu z-depth-1">
+                                <li class="dropdown-submenu">
+                                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">Data Assets</a>
+                                    <ul class="dropdown-menu z-depth-1">
+                                        <li class="dropdown-item">
+                                            <a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/DataLineageUserGuide.docx?Web=1">Data Lineage</a>
+                                        </li>
+                                        <li class="dropdown-item">
+                                            <a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/DataAssetAlertNotificationUserGuide.docx?Web=1">Alert Notifications</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown-item"><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/SiteAccess.docx?Web=1">Access Guide</a></li>
+                                <li class="dropdown-item"><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/DSCRolesResponsibilities.docx?Web=1">Roles and Responsiblities</a></li>
+                                <li class="dropdown-item"><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/ChromeBrowserFileTypeOpen.docx?Web=1">Open Files with Chrome</a></li>
+                                <li class="dropdown-item"><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/RetrievalJobUserGuide.docx?Web=1">Retriever Jobs</a></li>
+                                <li class="dropdown-item"><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/QueryToolUserGuide.docx?Web=1">Query Tool</a></li>
+                                <li class="dropdown-item"><a target="_blank" href="https://confluence.sentry.com/display/CLA/Data+Lake+Consumption+Layer+-+Transitioning+from+Hive+to+Snowflake">Snowflake</a></li>
+                                <li class="dropdown-item"><a target="_blank" href="https://confluence.sentry.com/pages/viewpage.action?spaceKey=CLA&title=Send+Data+to+DSC">Sending Data to DSC</a></li>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </li>
+
                 @if (Model.ShowAdminControls)
                 {
                     <!-- API -->
@@ -148,242 +263,7 @@
                     </li>
                 }
 
-                <li class="nav-item dropdown multi-level-dropdown">
-
-                    <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">Dropdown</a>
-                    <ul class="dropdown-menu z-depth-1">
-
-                        <li class="dropdown-submenu">
-                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">Click Me Too! </a>
-                            <ul class="dropdown-menu z-depth-1">
-                                <li class="dropdown-item">
-                                    <a href="#" class="waves-effect waves-light">Hey</a>
-                                </li>
-                                <li class="dropdown-item">
-                                    <a href="#" class="">Hi</a>
-                                </li>
-                                <li class="dropdown-item dropdown-submenu">
-                                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">Hello </a>
-                                    <ul class="dropdown-menu  z-depth-1">
-                                        <li class="dropdown-item">
-                                            <a href="#" class="">Some</a>
-                                        </li>
-                                        <li class="dropdown-item">
-                                            <a href="#" class="">Text</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown-item"><a class="" href="/Dataset/Create">Create Dataset</a></li>
-
-                    </ul>
-                </li>
             </ul>
         </div>
     </nav>
 </div>
-
-
-
-<nav class="navbar navbar-default navbar-fixed-top sentry-navbar" role="navigation">
-
-    <!-- Main Menu -->
-    @*@if (Model.HasMenu)
-        {*@
-    <div class="container-fluid menu">
-        <div class="navbar-header">
-            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-        </div>
-        <div class="navbar-collapse collapse" id="navbar-main">
-            <ul class="nav navbar-nav text-right">
-
-                @*BUSINESS INTELLIGENCE*@
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Business Intelligence <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="~/BusinessIntelligence/Index">Home</a></li>
-                        <li class="dropdown-submenu">
-                            <a data-toggle="dropdown">Search </a>
-                            <ul class="dropdown-menu">
-                                <li class="text-right"><a href="/Search/BusinessIntelligence/Index?searchPhrase=">All</a></li>
-                                @foreach (Sentry.data.Web.Models.BusinessIntelligenceUIModel da in ViewBag.BusinessIntelligenceCategories)
-                                {
-                                    <li class="text-right"><a href="/Search/BusinessIntelligence/Index?category=@da.Name">@da.Name</a></li>
-                                }
-                            </ul>
-                        </li>
-                        <li class="divider"></li>
-                        <li class="dropdown-header">Exhibit Actions</li>
-                        <li><a href="/BusinessIntelligence/Create">Create Exhibit</a></li>
-                    </ul>
-                </li>
-
-                @*DATASETS*@
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="~/Dataset/Index">Home</a></li>
-                        <li><a href="~/Search/Datasets">Search</a></li>
-
-
-                        <li class="divider"></li>
-                        <li class="dropdown-header">Dataset Actions</li>
-                        @if (Model.DisplayDataflowMetadata)
-                        {
-                            <li><a href="/DataFlow/Create">Send Data to DSC</a></li>
-                        }
-                        else
-                        {
-                            <li><a href="/Dataset/Create">Create Dataset</a></li>
-                        }
-                        <li class="divider"></li>
-                        <li class="dropdown-header">Dataset Administration</li>
-                        <li><a href="/Config/Manage">Manage Configs</a></li>
-                        <li><a href="/Config/Source/Create">Create Retriever Source</a></li>
-
-                    </ul>
-                </li>
-
-                @*BUSINESS AREA*@
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Business Areas <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="~/BusinessArea/PersonalLines">Personal Lines</a></li>
-
-                        <li class="divider"></li>
-                        <li><a href="/Notification/ManageNotification">Notifications</a></li>
-                    </ul>
-                </li>
-
-                @*DATA ASSETS*@
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Assets <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li class="dropdown-submenu">
-                            <a data-toggle="dropdown">Assets </a>
-                            <ul class="dropdown-menu">
-                                @foreach (Sentry.data.Web.Models.AssetUIModel da in ViewBag.DataAssets)
-                                {
-                                    <li class="text-right"><a href="/DataAsset/@da.Name">@da.DisplayName</a></li>
-                                }
-                            </ul>
-                        </li>
-
-                        <li class="dropdown-submenu">
-                            <a data-toggle="dropdown">Lineage </a>
-                            <ul class="dropdown-menu">
-
-                                <li class="dropdown-submenu">
-                                    <a data-toggle="dropdown">Personal Lines </a>
-                                    <ul class="dropdown-menu">
-                                        <li class="dropdown-header">Search</li>
-
-                                        <li class="text-left"><a href="/Lineage/Personal Lines/">Business Term</a></li>
-
-                                        <li class="divider"></li>
-
-                                        <li class="dropdown-header">Assets</li>
-
-                                        <li class="dropdown-submenu">
-                                            <a data-toggle="dropdown">SERA PL </a>
-                                            <ul class="dropdown-menu">
-
-                                                <li class="dropdown-header">Search</li>
-
-                                                <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/">Business Term</a></li>
-
-                                                <li class="divider"></li>
-                                                <li class="dropdown-header">Cubes</li>
-
-                                                <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/Cubes/SERAPL Loss Triangles">SERAPL Loss Triangles</a></li>
-                                                <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/Cubes/SERAPL Snapshot">SERAPL Snapshot</a></li>
-                                                <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/Cubes/SERAPL Transactional">SERAPL Transactional</a></li>
-                                                <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/Cubes/SERAPL Quote">SERAPL Quote</a></li>
-
-                                                <li class="divider"></li>
-                                                <li class="dropdown-header">Business Objects</li>
-
-                                                <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/BusinessObjects/SERAPL_Adhoc">SERAPL_Adhoc</a></li>
-                                                <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/BusinessObjects/SERAPL_Snapshot">SERAPL_Snapshot</a></li>
-                                                <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/BusinessObjects/SERAPL_Transactional">SERAPL_Transactional</a></li>
-                                                <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/BusinessObjects/SERAPL_Quote">SERAPL_Quote</a></li>
-
-                                            </ul>
-                                        </li>
-
-                                        <li class="dropdown-submenu">
-                                            <a data-toggle="dropdown">PL Policy ODS</a>
-                                            <ul class="dropdown-menu">
-
-                                                <li class="dropdown-header">Search</li>
-
-                                                <li class="text-left"><a href="/Lineage/Personal Lines/PLPolicyODS/">Business Term</a></li>
-
-                                                <li class="divider"></li>
-                                                <li class="dropdown-header">Business Objects</li>
-                                                <li class="text-left"><a href="/Lineage/Personal Lines/PLPolicyODS/BusinessObjects/PL_Policy_ODS_Adhoc">PL_Policy_ODS_Adhoc</a></li>
-                                                <li class="text-left"><a href="/Lineage/Personal Lines/PLPolicyODS/BusinessObjects/PL Billing Adhoc">PL Billing Adhoc </a></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-
-                        <li class="divider"></li>
-                        <li><a href="/Notification/ManageNotification">Notifications</a></li>
-                    </ul>
-                </li>
-
-
-                @*DATA INVENTORY*@
-                <li>
-                    <a href="~/DataInventory/Search" class="">Data Inventory</a>
-                </li>
-
-
-                <li class="dropdown-xs">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        @*<li><a href="/About/">About</a></li>*@
-                        @*<li><a href="/Home/ReleaseNotes">Release Notes</a></li>*@
-                        <li><a href="mailto:DSCSupport@sentry.com?Subject=Feedback">Provide Feedback</a></li>
-                        <li><a href="mailto:DSCSupport@sentry.com?Subject=Bug&nbsp;Report">Report Bug</a></li>
-                        @*<li><a href="/Tutorial">Tutorial</a></li>*@
-                        <li class="dropdown-submenu">
-                            <a data-toggle="dropdown">User Guides</a>
-                            <ul class="dropdown-menu">
-                                <li class="dropdown-submenu">
-                                    <a data-toggle="dropdown">Data Assets</a>
-                                    <ul class="dropdown-menu">
-                                        <li class="text-right"><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/DataLineageUserGuide.docx?Web=1">Data Lineage</a></li>
-                                        <li class="text-right"><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/DataAssetAlertNotificationUserGuide.docx?Web=1">Alert Notifications</a></li>
-                                    </ul>
-                                </li>
-                                <li><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/SiteAccess.docx?Web=1">Access Guide</a></li>
-                                <li><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/DSCRolesResponsibilities.docx?Web=1">Roles and Responsiblities</a></li>
-                                <li><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/ChromeBrowserFileTypeOpen.docx?Web=1">Open Files with Chrome</a></li>
-                                <li><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/RetrievalJobUserGuide.docx?Web=1">Retriever Jobs</a></li>
-                                <li><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/QueryToolUserGuide.docx?Web=1">Query Tool</a></li>
-                                <li><a target="_blank" href="https://confluence.sentry.com/display/CLA/Data+Lake+Consumption+Layer+-+Transitioning+from+Hive+to+Snowflake">Snowflake</a></li>
-                                <li><a target="_blank" href="https://confluence.sentry.com/pages/viewpage.action?spaceKey=CLA&title=Send+Data+to+DSC">Sending Data to DSC</a></li>
-                            </ul>
-                        </li>
-
-                    </ul>
-                </li>
-
-                @if (Model.ShowAdminControls)
-                {
-                    <li><a href="~/swagger">API</a></li>
-                    <li><a href="~/hangfire">Hangfire</a></li>
-                }
-            </ul>
-        </div>
-    </div>
-</nav>
