@@ -45,19 +45,19 @@ namespace Sentry.data.Infrastructure
             return response.IsValid;
         }
 
-        public BulkResponse DeleteMany<T>(List<T> toDelete) where T : class
+        public void DeleteMany<T>(List<T> toDelete) where T : class
         {
-            return _client.DeleteMany<T>(toDelete);
+            _client.DeleteMany<T>(toDelete);
         }
 
-        public BulkResponse IndexMany<T>(List<T> toIndex) where T : class
+        public void IndexMany<T>(List<T> toIndex) where T : class
         {
-            return _client.IndexMany<T>(toIndex);
+            _client.IndexMany<T>(toIndex);
         }
 
-        public DeleteByQueryResponse DeleteByQuery<T>(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> query) where T : class
+        public void  DeleteByQuery<T>(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> query) where T : class
         {
-           return _client.DeleteByQuery<T>(query);
+           _client.DeleteByQuery<T>(query);
         }    
         #endregion
 
