@@ -1,6 +1,7 @@
 ﻿using Nest;
 using Sentry.data.Core;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -37,6 +38,21 @@ namespace Sentry.data.Infrastructure
         {
             return await GetResponse(() => _client.SearchAsync<T>(searchRequest)).ConfigureAwait(false);
         }
+
+        public BulkResponse DeleteMany<T>(List<T> toDelete) where T : class
+        {
+            return _client.DeleteMany<T>(toDelete);
+        }
+
+        public BulkResponse IndexMany<T>(List<T> toIndex) where T : class
+        {
+            return _client.IndexMany<T>(toIndex);
+        }
+
+        public DeleteByQueryResponse DeleteByQuery<T>(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> query) where T : class
+        {
+           return _client.DeleteByQuery<T>(query);
+        }    
         #endregion
 
         #region Methods

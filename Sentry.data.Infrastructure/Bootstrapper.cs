@@ -16,6 +16,7 @@ using System;
 using Hangfire;
 using Nest;
 using static Sentry.data.Core.GlobalConstants;
+using Sentry.data.Core.Entities.Schema.Elastic;
 
 namespace Sentry.data.Infrastructure
 {
@@ -128,6 +129,8 @@ namespace Sentry.data.Infrastructure
             registry.For<IInstanceGenerator>().Singleton().Use<ThreadSafeInstanceGenerator>();
 
             ConnectionSettings settings = new ConnectionSettings(new Uri(Configuration.Config.GetHostSetting("ElasticUrl")));
+            settings.DefaultMappingFor<ElasticSchemaField>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexSchemaSearch")));
+
             settings.BasicAuthentication(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"));
             settings.DefaultMappingFor<DataInventory>(x => x.IndexName(ElasticAliases.DATA_INVENTORY)); //using index alias
             registry.For<IElasticClient>().Singleton().Use(new ElasticClient(settings));

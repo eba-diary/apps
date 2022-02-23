@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.Configuration;
 using Sentry.Core;
+using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using Nest;
 
 namespace Sentry.data.Core
 {
@@ -26,14 +28,14 @@ namespace Sentry.data.Core
         private readonly IMessagePublisher _messagePublisher;
         private readonly ISnowProvider _snowProvider;
         private readonly IEventService _eventService;
-
+        private readonly IElasticContext _elasticContext;
 
         private string _bucket;
         private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, IEventService eventService)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, IEventService eventService, IElasticContext elasticContext)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -45,6 +47,7 @@ namespace Sentry.data.Core
             _messagePublisher = messagePublisher;
             _snowProvider = snowProvider;
             _eventService = eventService;
+            _elasticContext = elasticContext;
         }
 
         private string RootBucket
@@ -157,7 +160,8 @@ namespace Sentry.data.Core
 
                     _datasetContext.SaveChanges();
 
-                    
+                    DeleteElasticIndexForSchema(schemaId);
+                    IndexElasticFieldsForSchema(schemaId, ds.DatasetId, revision.Fields);
                     GenerateConsumptionLayerCreateEvent(schema, JObject.Parse("{\"revision\":\"added\"}"));
                                         
                     return revision.SchemaRevision_Id;
@@ -746,6 +750,40 @@ namespace Sentry.data.Core
                     SchemaFieldsBuildDotNamePath(field.ChildFields);
                 }
             }
+        }
+
+        private DeleteByQueryResponse DeleteElasticIndexForSchema(int schemaId)
+        {
+            return _elasticContext.DeleteByQuery<ElasticSchemaField>(q => q
+                .Query(qm => qm
+                    .Bool(b => b
+                        .Must(
+                            mm => mm.Term(s => s.SchemaId, schemaId)
+                        )
+                    )
+                )
+            );
+        }
+
+        private BulkResponse IndexElasticFieldsForSchema(int schemaId, int datasetId, IList<BaseField> fields)
+        {
+            List<ElasticSchemaField> elasticFields = BaseFieldsFlatten(fields, schemaId, datasetId).ToList<ElasticSchemaField>();
+            BulkResponse response = _elasticContext.IndexMany<ElasticSchemaField>(elasticFields);
+            return response;
+        }
+
+        private HashSet<ElasticSchemaField> BaseFieldsFlatten(IList<BaseField> fields, int schemaId, int datasetId)
+        {
+            HashSet<ElasticSchemaField> elasticSchemaFields = new HashSet<ElasticSchemaField>();
+            foreach(BaseField field in fields)
+            {
+                if(field.ChildFields.Count > 0)
+                {
+                    elasticSchemaFields.UnionWith(BaseFieldsFlatten(field.ChildFields, schemaId, datasetId));
+                }
+                elasticSchemaFields.Add(new ElasticSchemaField(field, schemaId, datasetId));
+            }
+            return elasticSchemaFields;
         }
 
         private void CheckAccessToDataset(Dataset ds, Func<UserSecurity, bool> userCan)
