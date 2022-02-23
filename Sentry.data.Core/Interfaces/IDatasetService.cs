@@ -1,14 +1,14 @@
 ﻿using Sentry.Core;
+using Sentry.data.Core.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public interface IDatasetService
+    public interface IDatasetService : IEntityService
     {
         Task<ValidationException> Validate(DatasetDto dto);
         int CreateAndSaveNewDataset(DatasetDto dto);
-        bool Delete(int datasetId, bool logicalDelete = true);
         DatasetDto GetDatasetDto(int id);
         List<DatasetDto> GetAllDatasetDto();
         DatasetDetailDto GetDatesetDetailDto(int id);

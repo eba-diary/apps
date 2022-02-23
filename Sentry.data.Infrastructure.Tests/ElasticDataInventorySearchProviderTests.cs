@@ -14,13 +14,14 @@ namespace Sentry.data.Infrastructure.Tests
     [TestClass]
     public class ElasticDataInventorySearchProviderTests
     {
+        #region Tests
         [TestMethod]
         public void GetSearchResults_BasicSearch_DaleResultDto()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetDataInventoryList());
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             DaleResultDto result = searchProvider.GetSearchResults(new DaleSearchDto() { Criteria = "Table" });
 
@@ -63,7 +64,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Returns(Task.FromResult(new ElasticResult<DataInventory>()));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             DaleResultDto result = searchProvider.GetSearchResults(new DaleSearchDto());
 
@@ -78,9 +79,9 @@ namespace Sentry.data.Infrastructure.Tests
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
-                .ThrowsAsync(new AggregateException(new List<Exception>() { new ElasticsearchClientException("FAIL") }));
+                .ThrowsAsync(new ElasticsearchClientException("FAIL"));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             DaleResultDto result = searchProvider.GetSearchResults(new DaleSearchDto() { Criteria = "Table" });
 
@@ -101,7 +102,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetDataInventoryList());
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             DaleSearchDto searchDto = new DaleSearchDto()
             {
@@ -130,7 +131,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetAggregateDictionary());
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             FilterSearchDto result = searchProvider.GetSearchFilters(new DaleSearchDto() 
             {
@@ -201,9 +202,9 @@ namespace Sentry.data.Infrastructure.Tests
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
-                .ThrowsAsync(new AggregateException(new List<Exception>() { new ElasticsearchClientException("FAIL") }));
+                .ThrowsAsync(new ElasticsearchClientException("FAIL"));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             FilterSearchDto result = searchProvider.GetSearchFilters(new DaleSearchDto()
             {
@@ -262,7 +263,7 @@ namespace Sentry.data.Infrastructure.Tests
                 .ReturnsAsync(GetCategoryAggregateDictionary(GetAllCategories()))
                 .ReturnsAsync(GetCategoryAggregateDictionary(new List<string>() { "PCI", "User Setting" }));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             DaleCategoryResultDto result = searchProvider.GetCategoriesByAsset("DATA");
 
@@ -301,7 +302,7 @@ namespace Sentry.data.Infrastructure.Tests
                 .ReturnsAsync(GetCategoryAggregateDictionary(GetAllCategories()))
                 .ReturnsAsync(GetCategoryAggregateDictionary(new List<string>()));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             DaleCategoryResultDto result = searchProvider.GetCategoriesByAsset("DATA");
 
@@ -337,9 +338,9 @@ namespace Sentry.data.Infrastructure.Tests
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
-                .ThrowsAsync(new AggregateException(new List<Exception>() { new ElasticsearchClientException("FAIL") }));
+                .ThrowsAsync(new ElasticsearchClientException("FAIL"));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
             DaleCategoryResultDto result = searchProvider.GetCategoriesByAsset("DATA");
 
@@ -352,6 +353,117 @@ namespace Sentry.data.Infrastructure.Tests
 
             Assert.IsFalse(result.DaleCategories.Any());
         }
+
+        [TestMethod]
+        public void SaveSensitive_DaleSensitiveDtos_True()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDbExecuter> dbExecuter = mockRepository.Create<IDbExecuter>();
+            dbExecuter.Setup(x => x.ExecuteCommand(It.IsAny<object>()));
+
+            Mock<IElasticContext> elasticContext = mockRepository.Create<IElasticContext>();
+            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<DataInventory>, ISearchRequest>>())).ReturnsAsync(GetDataInventoryListWithMultiple());
+            elasticContext.Setup(x => x.Update(It.Is<DataInventory>(i => i.Id == 1))).Callback<DataInventory>(x =>
+            {
+                Assert.IsTrue(x.IsSensitive);
+                Assert.IsFalse(x.IsOwnerVerified);
+            }).ReturnsAsync(true);
+            elasticContext.Setup(x => x.Update(It.Is<DataInventory>(i => i.Id == 2))).Callback<DataInventory>(x =>
+            {
+                Assert.IsFalse(x.IsSensitive);
+                Assert.IsTrue(x.IsOwnerVerified);
+            }).ReturnsAsync(true);
+
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, dbExecuter.Object);
+
+            List<DaleSensitiveDto> dtos = new List<DaleSensitiveDto>()
+            {
+                new DaleSensitiveDto() { BaseColumnId = 1, IsSensitive = true, IsOwnerVerified = false },
+                new DaleSensitiveDto() { BaseColumnId = 2, IsSensitive = false, IsOwnerVerified = true }
+            };
+
+            Assert.IsTrue(searchProvider.SaveSensitive(dtos));
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void SaveSensitive_DaleSensitiveDtos_SqlFail_False()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDbExecuter> dbExecuter = mockRepository.Create<IDbExecuter>();
+            dbExecuter.Setup(x => x.ExecuteCommand(It.IsAny<object>())).Throws<Exception>();
+
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(null, dbExecuter.Object);
+
+            List<DaleSensitiveDto> dtos = new List<DaleSensitiveDto>()
+            {
+                new DaleSensitiveDto() { BaseColumnId = 1, IsSensitive = true, IsOwnerVerified = false },
+                new DaleSensitiveDto() { BaseColumnId = 2, IsSensitive = false, IsOwnerVerified = true }
+            };
+
+            Assert.IsFalse(searchProvider.SaveSensitive(dtos));
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void SaveSensitive_DaleSensitiveDtos_ElasticSearchFail_False()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDbExecuter> dbExecuter = mockRepository.Create<IDbExecuter>();
+            dbExecuter.Setup(x => x.ExecuteCommand(It.IsAny<object>()));
+
+            Mock<IElasticContext> elasticContext = mockRepository.Create<IElasticContext>();
+            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<DataInventory>, ISearchRequest>>()))
+                .ThrowsAsync(new ElasticsearchClientException("FAIL"));
+
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, dbExecuter.Object);
+
+            List<DaleSensitiveDto> dtos = new List<DaleSensitiveDto>()
+            {
+                new DaleSensitiveDto() { BaseColumnId = 1, IsSensitive = true, IsOwnerVerified = false },
+                new DaleSensitiveDto() { BaseColumnId = 2, IsSensitive = false, IsOwnerVerified = true }
+            };
+
+            Assert.IsFalse(searchProvider.SaveSensitive(dtos));
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void SaveSensitive_DaleSensitiveDtos_ElasticUpdateFail_False()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDbExecuter> dbExecuter = mockRepository.Create<IDbExecuter>();
+            dbExecuter.Setup(x => x.ExecuteCommand(It.IsAny<object>()));
+
+            Mock<IElasticContext> elasticContext = mockRepository.Create<IElasticContext>();
+            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<DataInventory>, ISearchRequest>>())).ReturnsAsync(GetDataInventoryListWithMultiple());
+            elasticContext.Setup(x => x.Update(It.Is<DataInventory>(i => i.Id == 1))).ThrowsAsync(new ElasticsearchClientException("FAIL"));
+            elasticContext.Setup(x => x.Update(It.Is<DataInventory>(i => i.Id == 2))).Callback<DataInventory>(x =>
+            {
+                Assert.IsFalse(x.IsSensitive);
+                Assert.IsTrue(x.IsOwnerVerified);
+            }).ReturnsAsync(true);
+
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, dbExecuter.Object);
+
+            List<DaleSensitiveDto> dtos = new List<DaleSensitiveDto>()
+            {
+                new DaleSensitiveDto() { BaseColumnId = 1, IsSensitive = true, IsOwnerVerified = false },
+                new DaleSensitiveDto() { BaseColumnId = 2, IsSensitive = false, IsOwnerVerified = true }
+            };
+
+            Assert.IsFalse(searchProvider.SaveSensitive(dtos));
+
+            mockRepository.VerifyAll();
+        }
+        #endregion
 
         #region Methods
         private ElasticResult<DataInventory> GetDataInventoryList()
@@ -382,6 +494,60 @@ namespace Sentry.data.Infrastructure.Tests
                         SourceName = "Source",
                         ScanListName = "Scan",
                         SaidListName = "SaidList"
+                    }
+                }
+            };
+        }
+        private ElasticResult<DataInventory> GetDataInventoryListWithMultiple()
+        {
+            return new ElasticResult<DataInventory>()
+            {
+                SearchTotal = 2,
+                Documents = new List<DataInventory>()
+                {
+                    new DataInventory()
+                    {
+                        Id = 1,
+                        AssetCode = "CODE",
+                        BaseName = "TableName",
+                        ServerName = "server.sentry.com",
+                        DatabaseName = "DBName",
+                        TypeDescription = "Table",
+                        ColumnName = "column_nme",
+                        IsSensitive = false,
+                        ProdType = "P",
+                        ColumnType = "Type",
+                        MaxLength = 100,
+                        Precision = 7,
+                        Scale = 2,
+                        IsNullable = null,
+                        EffectiveDateTime = DateTime.Parse("2022-01-05T05:00:00.000"),
+                        IsOwnerVerified = true,
+                        SourceName = "Source",
+                        ScanListName = "Scan",
+                        SaidListName = "SaidList"
+                    },
+                    new DataInventory()
+                    {
+                        Id = 2,
+                        AssetCode = "CODE2",
+                        BaseName = "TableName2",
+                        ServerName = "server.sentry.com",
+                        DatabaseName = "DBName2",
+                        TypeDescription = "Table2",
+                        ColumnName = "column_nme2",
+                        IsSensitive = true,
+                        ProdType = "P",
+                        ColumnType = "Type",
+                        MaxLength = 10,
+                        Precision = 0,
+                        Scale = 2,
+                        IsNullable = null,
+                        EffectiveDateTime = DateTime.Parse("2022-01-10T05:00:00.000"),
+                        IsOwnerVerified = false,
+                        SourceName = "Source2",
+                        ScanListName = "Scan2",
+                        SaidListName = "SaidList2"
                     }
                 }
             };

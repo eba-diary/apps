@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class DatasetService : IDatasetService
+    public class DatasetService : IDatasetService, IEntityService
     {
         private readonly IDatasetContext _datasetContext;
         private readonly ISecurityService _securityService;
@@ -39,7 +39,6 @@ namespace Sentry.data.Core
             _quartermasterService = quartermasterService;
             _saidService = saidService;
         }
-
 
         public DatasetDto GetDatasetDto(int id)
         {
@@ -311,43 +310,47 @@ namespace Sentry.data.Core
             _datasetContext.SaveChanges();
         }
 
-        public bool Delete(int datasetId, bool logicalDelete = true)
+        public bool Delete(int id, IApplicationUser user, bool logicalDelete)
         {
-            string methodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-            Logger.Debug($"Start Method <{methodName}>");
-            bool result;
-            Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+            string methodName = $"{nameof(DatasetService).ToLower()}_{nameof(Delete).ToLower()}";
+            Logger.Debug($"{methodName} Method Start");
+
+            bool result = true;
+            Dataset ds = _datasetContext.GetById<Dataset>(id);
+
+            bool HasCorrectStatus = false;
+
+            if (
+                (logicalDelete && (ds.ObjectStatus == GlobalEnums.ObjectStatusEnum.Pending_Delete ||
+                                   ds.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted)
+                                   ) ||
+                (!logicalDelete && ds.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted))
+            {
+                HasCorrectStatus = true;
+            }
+
+            if (HasCorrectStatus)
+            {
+                return result;
+            }
+
 
             if (logicalDelete)
             {
-                Logger.Info($"datasetservice-delete-logical - datasetid:{datasetId} datasetname:{ds.DatasetName}");
+                Logger.Info($"datasetservice-delete-logical - datasetid:{ds.DatasetId} datasetname:{ds.DatasetName}");
 
                 try
                 {
+                    _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+
                     //Mark dataset for soft delete
                     MarkForDelete(ds);
 
-                    ////Remove any favorite links to ensure users do not get dead link
-                    //foreach(var fav in ds.Favorities)
-                    //{
-                    //    _datasetContext.RemoveById<Favorite>(fav.FavoriteId);
-                    //}
-
-                    ////Remove any notification subscriptions to dataset
-                    //foreach (var subscib in _datasetContext.GetSubscriptionsForDataset(ds.DatasetId))
-                    //{
-                    //    _datasetContext.RemoveById<DatasetSubscription>(subscib.ID);
-                    //}
-                    
-                    //Mark Configs for soft delete to ensure no editing and jobs are disabled
+                    ////Mark Configs for soft delete to ensure no editing and jobs are disabled
                     foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
                     {
-                        _configService.Delete(config.ConfigId, logicalDelete, true);
+                        _configService.Delete(config.ConfigId, _userService.GetCurrentUser(), logicalDelete);
                     }
-
-                    _datasetContext.SaveChanges();
-
-                    result = true;
                 }
                 catch (Exception ex)
                 {
@@ -358,19 +361,16 @@ namespace Sentry.data.Core
             }
             else
             {
-                Logger.Info($"datasetservice-delete-physical - datasetid:{datasetId} datasetname:{ds.DatasetName}");
+                Logger.Info($"datasetservice-delete-physical - datasetid:{ds.DatasetId} datasetname:{ds.DatasetName}");
 
                 try
                 {
                     foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
                     {
-                        _configService.Delete(config.ConfigId, logicalDelete, true);
+                        _configService.Delete(config.ConfigId, _userService.GetCurrentUser(), logicalDelete);
                     }
 
                     ds.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
-                    _datasetContext.SaveChanges();
-
-                    result = true;
                 }
                 catch (Exception ex)
                 {
@@ -379,7 +379,7 @@ namespace Sentry.data.Core
                 }                    
             }
 
-            Logger.Debug($"End Method <{methodName}>");
+            Logger.Debug($"{methodName} Method End");
 
             return result;
         }

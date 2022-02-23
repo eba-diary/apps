@@ -1,14 +1,10 @@
-﻿using Sentry.WebAPI.Versioning;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
+using Sentry.WebAPI.Versioning;
+using Swashbuckle.Swagger.Annotations;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
-using Sentry.data.Web.WebApi.Controllers;
-using System.Threading.Tasks;
-using Swashbuckle.Swagger.Annotations;
 
 namespace Sentry.data.Web.WebApi.Controllers
 {
@@ -16,15 +12,25 @@ namespace Sentry.data.Web.WebApi.Controllers
     public class DataFlowController : BaseWebApiController
     {
         private readonly IDataFlowService _dataFlowService;
+        private readonly IUserService _userService;
+        private readonly Lazy<IDataApplicationService> _dataApplicationService;
 
-        public DataFlowController(IDataFlowService dataFlowservice)
+        public DataFlowController(IDataFlowService dataFlowservice, Lazy<IDataApplicationService> dataApplicationService,
+            IUserService userService)
         {
             _dataFlowService = dataFlowservice;
+            _dataApplicationService = dataApplicationService;
+            _userService = userService;
         }
 
         private IDataFlowService DataFlowService
         {
             get { return _dataFlowService; }
+        }
+
+        private IDataApplicationService DataApplicaitonService
+        {
+            get { return _dataApplicationService.Value; }
         }
 
         ////// GET api/<controller>
@@ -85,9 +91,13 @@ namespace Sentry.data.Web.WebApi.Controllers
         [HttpPost]
         public IHttpActionResult DeleteDataFlows(int[] idList)
         {
-            
-            DataFlowService.DeleteDataFlows(idList);
 
+            bool isSuccessful = DataApplicaitonService.DeleteDataFlow_Queue(idList.ToList(), _userService.GetCurrentUser().AssociateId, true);
+
+            if (!isSuccessful)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "Unable to queue all deletes");
+            }
             return Ok();
         }
     }

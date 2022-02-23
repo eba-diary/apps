@@ -79,4 +79,6 @@ DECLARE @ErrorState INT;
 :r ..\Post-Deploy\SupportingScripts\Release_02_00_07\CLA-3729-HISTORY-FIX-EVENT-IsProcessed.sql
 :r ..\post-deploy\supportingscripts\sprint_22_02_01\historyfix_cla3790saidassetdataflow.sql
 :r ..\post-deploy\supportingscripts\sprint_22_02_01\historyfix_cla3790saidassetdatasets.sql
+:r ..\post-deploy\supportingscripts\sprint_22_02_02\HISTORYFIX_CLA3407_Initialize_PreProcesingOption_Where_Null.sql
+
 :r ..\post-deploy\supportingscripts\Release_03_00_03\CLA3722_TransitionToDatasetAsset.sql

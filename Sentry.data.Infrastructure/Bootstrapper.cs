@@ -130,14 +130,16 @@ namespace Sentry.data.Infrastructure
             ConnectionSettings settings = new ConnectionSettings(new Uri(Configuration.Config.GetHostSetting("ElasticUrl")));
             settings.BasicAuthentication(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"));
             settings.DefaultMappingFor<DataInventory>(x => x.IndexName(ElasticAliases.DATA_INVENTORY)); //using index alias
+            settings.ThrowExceptions();
             registry.For<IElasticClient>().Singleton().Use(new ElasticClient(settings));
 
             registry.For<IDaleSearchProvider>().Use<DaleSearchProvider>().Named("SQL");
-            registry.For<IDaleSearchProvider>().Add<ElasticDataInventorySearchProvider>().Named("ELASTIC");
+            registry.For<IDaleSearchProvider>().Add<ElasticDataInventorySearchProvider>().Ctor<IDbExecuter>().Is(new DataInventorySqlExecuter()).Named("ELASTIC");
             registry.For<IDaleService>().Use<DaleService>().Ctor<IDaleSearchProvider>().Is(x => x.GetInstance<IDaleSearchProvider>(x.GetInstance<IDataFeatures>().CLA3707_DataInventorySource.GetValue()));
 
             // Choose the parameterless constructor.
             registry.For<IBackgroundJobClient>().Singleton().Use<BackgroundJobClient>().SelectConstructor(() => new BackgroundJobClient());
+            registry.For<IRecurringJobManager>().Singleton().Use<RecurringJobManager>().SelectConstructor(() => new RecurringJobManager());
 
 
             //establish generic httpclient singleton to be used where needed across the application

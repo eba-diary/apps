@@ -37,17 +37,18 @@ namespace Sentry.data.Infrastructure
         {
             return await GetResponse(() => _client.SearchAsync<T>(searchRequest)).ConfigureAwait(false);
         }
+
+        public async Task<bool> Update<T>(T document) where T : class
+        {
+            IUpdateResponse<T> response = await _client.UpdateAsync(new DocumentPath<T>(document), u => u.Doc(document)).ConfigureAwait(false);
+            return response.IsValid;
+        }
         #endregion
 
         #region Methods
         private async Task<ElasticResult<T>> GetResponse<T>(Func<Task<ISearchResponse<T>>> request) where T : class
         {
             ISearchResponse<T> response = await request().ConfigureAwait(false);
-
-            if (!response.IsValid)
-            {
-                throw response.OriginalException;
-            }
 
             return new ElasticResult<T>()
             {
