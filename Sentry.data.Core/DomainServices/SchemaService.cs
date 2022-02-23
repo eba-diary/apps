@@ -752,9 +752,9 @@ namespace Sentry.data.Core
             }
         }
 
-        private DeleteByQueryResponse DeleteElasticIndexForSchema(int schemaId)
+        private void DeleteElasticIndexForSchema(int schemaId)
         {
-            return _elasticContext.DeleteByQuery<ElasticSchemaField>(q => q
+            _elasticContext.DeleteByQuery<ElasticSchemaField>(q => q
                 .Query(qm => qm
                     .Bool(b => b
                         .Must(
@@ -765,11 +765,10 @@ namespace Sentry.data.Core
             );
         }
 
-        private BulkResponse IndexElasticFieldsForSchema(int schemaId, int datasetId, IList<BaseField> fields)
+        private void IndexElasticFieldsForSchema(int schemaId, int datasetId, IList<BaseField> fields)
         {
             List<ElasticSchemaField> elasticFields = BaseFieldsFlatten(fields, schemaId, datasetId).ToList<ElasticSchemaField>();
-            BulkResponse response = _elasticContext.IndexMany<ElasticSchemaField>(elasticFields);
-            return response;
+            _elasticContext.IndexMany<ElasticSchemaField>(elasticFields);
         }
 
         private HashSet<ElasticSchemaField> BaseFieldsFlatten(IList<BaseField> fields, int schemaId, int datasetId)
