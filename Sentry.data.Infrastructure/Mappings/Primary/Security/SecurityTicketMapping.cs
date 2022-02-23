@@ -33,7 +33,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.TicketStatus, (m) => m.Column("TicketStatus_DSC"));
             this.Property((x) => x.RejectedReason, (m) => m.Column("Rejected_DSC"));
             this.Property((x) => x.GrantPermissionToUserId, (m) => m.Column("GrantPermissionToUser_ID"));
-
+            this.Property((x) => x.AwsArn);
 
             this.Bag(x => x.Permissions, (m) =>
             {

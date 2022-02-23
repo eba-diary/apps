@@ -165,7 +165,8 @@
             public const string DATASET = "Dataset";
             public const string DATA_ASSET = "DataAsset";
             public const string DATASOURCE = "DataSource";
-            public const string BUSINESSAREA = "BusinessArea";
+            public const string BUSINESSAREA = "BusinessArea"; 
+            public const string DATASET_ASSET = "DatasetAsset";
         }
 
         public static class PermissionCodes
@@ -178,6 +179,9 @@
             public const string CAN_MODIFY_NOTIFICATIONS = "CanModifyNotification";
             public const string CAN_USE_DATA_SOURCE = "CanUseDataSource";
             public const string CAN_MANAGE_SCHEMA = "CanManageSchema";
+            public const string S3_ACCESS = "S3Access";
+            public const string SNOWFLAKE_ACCESS = "SnowflakeAccess";
+            public const string INHERIT_PARENT_PERMISSIONS = "InheritParentPermissions";
 
             public const string USE_APP = "UseApp";
 

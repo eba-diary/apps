@@ -10,7 +10,10 @@
 									(5, 'CanUseDataSource', 'Use Data Source', 'Access to use Data Source', 'DataSource'),
 									(6, 'CanModifyNotification', 'Modify Notifications', 'Access to modify notifications for Data.sentry.com', 'DataAsset'),
 									(7, 'CanModifyNotification', 'Modify Notifications', 'Access to modify notifications for Data.sentry.com', 'BusinessArea'),
-									(8, 'CanManageSchema', 'Manage Schema', 'Access to manage schema within dataset', 'Dataset')
+									(8, 'CanManageSchema', 'Manage Schema', 'Access to manage schema within dataset', 'Dataset'),
+									(9, 'S3Access', 'S3 Access', 'Direct access to read this dataset from S3', 'Dataset'),
+									(10, 'SnowflakeAccess', 'Snowflake Access', 'Access to read this dataset from Snowflake', 'Dataset'),
+									(11, 'InheritParentPermissions', 'Inherit Parent Permissions', 'Indicates this dataset inherits permissions from the asset', 'Dataset')
 									
 									--(7, 'CanConnectToDataset', 'Connect to Dataset', 'Access to connect to dataset using business intelligence tools', 'Dataset'),
 									--(enter id here, 'CanConnectToDataset', 'Connect to Dataset', 'Access to connect to dataset using business intelligence tools', 'Dataset'),

@@ -128,6 +128,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<DatasetAsset> DatasetAssets
+        {
+            get
+            {
+                return Query<DatasetAsset>();
+            }
+        }
+
         public IQueryable<DataAsset> DataAsset
         {
             get

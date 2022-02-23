@@ -24,11 +24,13 @@
     [SaidKeyCode] VARCHAR(10) NULL, 
     [NamedEnvironment] VARCHAR(25) NULL, 
     [NamedEnvironmentType] VARCHAR(25) NULL, 
+    [DatasetAsset_ID] INT NULL, 
     PRIMARY KEY CLUSTERED 
 (
 	[Dataset_ID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
- CONSTRAINT [FK_Dataset_Security] FOREIGN KEY ([Security_ID]) REFERENCES [Security]([Security_ID])
+ CONSTRAINT [FK_Dataset_Security] FOREIGN KEY ([Security_ID]) REFERENCES [Security]([Security_ID]),
+ CONSTRAINT [FK_Dataset_DatasetAsset] FOREIGN KEY ([DatasetAsset_ID]) REFERENCES [DatasetAsset]([DatasetAsset_ID])
 ) ON [PRIMARY]
 GO
 EXEC sp_addextendedproperty @name = N'MS_Description',

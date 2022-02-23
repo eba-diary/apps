@@ -1271,7 +1271,7 @@ namespace Sentry.data.Core
                             .FirstOrDefault();
             string saidAsset = _datasetContext.Datasets
                             .Where(w => w.DatasetId == datasetId)
-                            .Select(s => s.SAIDAssetKeyCode)
+                            .Select(s => s.DatasetAsset.SaidKeyCode)
                             .FirstOrDefault();
             return saidAsset;
         }
