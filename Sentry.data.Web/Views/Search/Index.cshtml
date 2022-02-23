@@ -21,7 +21,7 @@
                     <div class="panel panel-default dataset-list-filters">
                         <div class="panel-heading filterHead" data-bind="attr: { id: HeadId }">
                             <span class="filterCategoryName" data-bind="text : Name"></span>
-                            <span class="glyphicon glyphicon-chevron-down rightFloat filterViewIcon" data-bind="attr: { id: HeadIcon }"></span>
+                            <i class="icon-chevron-down rightFloat filterViewIcon" data-bind="attr: { id: HeadIcon }"></i>
                         </div>
 
                         @* foreach of the category filters *@
@@ -72,7 +72,7 @@
                             <!-- /ko -->
                             <!-- ko if: (OrderedFilters().length > 6 && ShowMore) -->
                             <a href="#" class="filterMore" data-bind="attr: { id:  HiddenId}">
-                                <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></div>
+                                <i class="icon-plus inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></i>
                                 <div class="leftFloat txt_filterMore" data-bind="attr: {id: TxtMore}">Show More</div>
                             </a>
                             <!-- /ko -->
@@ -109,7 +109,7 @@
                 <div class="searchBoxDS  has-feedback has-feedback-left">
                     <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Datasets..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('Datasets'), event: {'keyup': searchResults.toFirstPage }" autocomplete="off" style="display: none;">
                     <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Exhibits and Dashboards..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('BusinessIntelligence')" autocomplete="off" style="display: none;">
-                    <i class="form-control-feedback glyphicon glyphicon-search"></i>
+                    <i class="form-control-feedback icon-search"></i>
                 </div>
 
                 @* filters/tiles (hidden by default until content loads *@
@@ -167,8 +167,8 @@
                                 <div>
                                     <div data-bind="if: $index > 20"></div>
                                     <div class="category-type-wrap">
-                                        <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId, title: FavoriteTitle}, visible: IsFavorite, enable: ObjectStatus === 'Active'" style="display: none"></div>
-                                        <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId, title: FavoriteTitle}, visible: IsFavorite == false, enable: ObjectStatus === 'Active'" style="display: none"></div>
+                                        <div class="icon-filled-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId, title: FavoriteTitle}, visible: IsFavorite, enable: ObjectStatus === 'Active'" style="display: none"></div>
+                                        <div class="icon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId, title: FavoriteTitle}, visible: IsFavorite == false, enable: ObjectStatus === 'Active'" style="display: none"></div>
                                         <div class="category-type" data-bind="css: BannerColor, attr: {title: AbbreviatedCategory}">
                                             <span data-bind="text: AbbreviatedCategory" />
                                         </div>

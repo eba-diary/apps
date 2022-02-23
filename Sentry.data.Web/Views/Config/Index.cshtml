@@ -5,7 +5,7 @@
     string color = Model.CategoryColor;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>  Back to Dataset Information</a>
+<a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><i class="icon-chevron-left"></i>  Back to Dataset Information</a>
 
 <div class="topBanner" style="height: 60px;
     margin-top: 20px;
@@ -124,7 +124,7 @@
                             {
                                 <h1 class="@color">@item.ConfigFileName</h1>
                             }
-                            <i class="glyphicon glyphicon-menu-up tracker-menu-icon"></i>
+                            <i class="icon-chevron-up tracker-menu-icon"></i>
                         </div>
                         @*if (item.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
                         {
@@ -272,7 +272,7 @@
                             <div class="retJob">
                                 <div class="jobHeader categoryBanner-@color">
                                     <h6>@ext.Name</h6>
-                                    <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
+                                    <i class="retJobDetails tracker-menu-icon icon-chevron-up"></i>
                                 </div>
                                 <div class="jobContainer" style="display:none;">
                                     @if (ext.Step.Any(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map"))
@@ -296,7 +296,7 @@
                                         <div class="retJob @stepModel.ActionName">
                                             <div class="jobHeader categoryBanner-@color">
                                                 <h6>@stepModel.ActionName</h6>
-                                                <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
+                                                <i class="retJobDetails tracker-menu-icon icon-chevron-up"></i>
                                             </div>
                                             <div class="jobContainer" style="display:none;">
                                                 <div><span>We are watching for files dropped in this AWS S3 url:</span></div>
@@ -330,7 +330,7 @@
                                 <div class="retJob">
                                     <div class="jobHeader categoryBanner-gray">
                                         <h6>Schema DataFlow (@item.DataFlowJobs.Name)</h6>
-                                        <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
+                                        <i class="retJobDetails tracker-menu-icon icon-chevron-up"></i>
                                     </div>
                                     <div class="jobContainer" style="display:none;">
                                         @if (item.DataFlowJobs.Step.Any(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map" || w.ActionName != "Producer S3 Drop"))
@@ -354,7 +354,7 @@
                                             <div class="retJob @stepModel.ActionName">
                                                 <div class="jobHeader categoryBanner-@color">
                                                     <h6>@stepModel.ActionName</h6>
-                                                    <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
+                                                    <i class="retJobDetails tracker-menu-icon icon-chevron-up"></i>
                                                 </div>
                                                 <div class="jobContainer" style="display:none;">
                                                     <div><span>We are watching for files dropped in this AWS S3 url:</span></div>
@@ -403,16 +403,16 @@
     <div>
         @if (HttpContext.Current.IsDebuggingEnabled)
         {
-            <a class="btn btn-success btnCreateDirectory"><span class="glyphicon glyphicon-plus"></span>  Create Directories</a>
+            <a class="btn btn-success btnCreateDirectory"><i class="icon-plus"></i>  Create Directories</a>
             <hr />
         }
-        <a class="btn btn-success" href="/Config/Dataset/@Model.DatasetId/Create"><span class="glyphicon glyphicon-plus"></span>  Create new Data File Configuration</a>
+        <a class="btn btn-success" href="/Config/Dataset/@Model.DatasetId/Create"><i class="icon-plus"></i>  Create new Data File Configuration</a>
     </div>
     <hr />
 }
 
 <div>
-    <a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>  Back to Dataset Information</a>
+    <a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><i class="icon-chevron-left"></i>  Back to Dataset Information</a>
 </div>
 
 <style>

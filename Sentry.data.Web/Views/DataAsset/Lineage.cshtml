@@ -50,7 +50,7 @@
         {
             <div class="visible-xs">
                 <button type="button" class="btn btn-lg btn-default daHamburger" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                    <span class="glyphicon glyphicon-menu-hamburger"></span>
+                    <i class="icon-hamburger"></i>
                 </button>
             </div>
 
@@ -172,7 +172,7 @@
     <li data-bind="css: LayerInfo">
         <div class="lineageRow" data-bind="css: Color">
             <button type="button" class="btn btn-xs" style="display: inline-block;  margin-bottom: 6px;" data-bind="click: ToggleChildren, visible: HasChildren, css : ButtonClass">
-                <span id="icon_" class="glyphicon"  data-bind="css : ButtonSpanClass"></span>
+                <span id="icon_" class=""  data-bind="css : ButtonSpanClass"></span>
             </button>
             <span style="margin-left: 25px;" data-bind="visible: HasChildren() === false"> </span>
 
@@ -480,7 +480,7 @@
 
         $(document).on('click', '.btnShowChildren', function () {
             console.log(this);
-            $($(this).children('span')).toggleClass("glyphicon-plus glyphicon-minus");
+            $($(this).children('span')).toggleClass("icon-plus icon-minus");
 
             var row = $(this).parent().parent();
 
@@ -603,9 +603,9 @@
 
             self.ButtonSpanClass = ko.computed(function () {
                 if (self.Toggled() || vm.ShowAllLayers() || self.ShowChildren()) {
-                     return 'glyphicon-minus';
+                     return 'icon-minus';
                 } else {
-                    return 'glyphicon-plus';
+                    return 'icon-plus';
                 }
             });
 

@@ -7,7 +7,7 @@
     string dateDefault = ViewBag.Date_Default;
     string timestampDefault = ViewBag.Timestamp_Default;
 }
-<a class="backToList" href="/Config/Dataset/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>  Back to Dataset Configuration</a>
+<a class="backToList" href="/Config/Dataset/@Model.DatasetId"><i class="icon-chevron-left"></i>  Back to Dataset Configuration</a>
 
 <div class="topBanner" style="height: 60px;
     margin-top: 20px;
@@ -31,7 +31,7 @@
                         <button type="button"
                                 class="btn btn-default borderdk_gray borderdk_@color dropdown"
                                 data-toggle="dropdown" data-placement="top" title="Additional Actions">
-                            <span class="glyphicon glyphicon-menu-hamburger @color"></span>
+                            <i class="icon-hamburger @color"></i>
                         </button>
 
                         <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
@@ -74,7 +74,7 @@
                         <button type="button"
                                 class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
                                 id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                            <span class="glyphicon glyphicon-edit @color"></span>
+                            <i class="icon-pencil @color"></i>
                         </button>
                     }
 
@@ -100,7 +100,7 @@
                 <button type="button"
                         class="btn btn-default borderdk_gray borderdk_@color dropdown"
                         data-toggle="dropdown">
-                    <span class="glyphicon glyphicon-menu-hamburger @color"></span>
+                    <i class="icon-hamburger @color"></i>
                 </button>
 
                 <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
@@ -190,7 +190,7 @@
 
     <div style="margin-top: 10px;" class="col-lg-12">
         <hr />
-        <button type="button" class="btn btn-sm btn-success" data-bind='click: addRow' style="margin-bottom: 8px;"><i class="glyphicon glyphicon-plus"></i> Add a Field</button>
+        <button type="button" class="btn btn-sm btn-success" data-bind='click: addRow' style="margin-bottom: 8px;"><i class="icon-plus"></i> Add a Field</button>
         <hr />
         <button class="btn btn-success" id="saveBtn" data-bind='click: save'>Save</button>
         <div id="buttonSpinner" style="
@@ -273,13 +273,13 @@
                         <div class="rightButton col-lg-1 col-lg-offset-1" data-bind="visible: $parent.Name === undefined">
 
                             <button type="button" class="btn btn-xs btn-danger" data-bind='click: $parent.removeRow'>
-                                <i class="glyphicon glyphicon-remove"></i>
+                                <i class="icon-close"></i>
                                 Delete
                             </button>
                         </div>
                         <div class="rightButton col-lg-1 col-lg-offset-1" data-bind="visible: $parent.Name !== undefined">
                             <button type="button" class="btn btn-xs btn-danger" data-bind='click: $parent.removeChild'>
-                                <i class="glyphicon glyphicon-remove"></i>
+                                <i class="icon-close"></i>
                                 Delete
                             </button>
                         </div>
@@ -587,9 +587,9 @@
 
             self.ButtonSpanClass = ko.computed(function () {
                 if (self.Toggled()) {
-                    return 'glyphicon-minus';
+                    return 'icon-minus';
                 } else {
-                    return 'glyphicon-plus';
+                    return 'icon-plus';
                 }
             });
 

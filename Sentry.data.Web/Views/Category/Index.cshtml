@@ -23,7 +23,7 @@
 
         <div class="col-md-6">
             <p>
-                <a href="#" id="AddRootCategory"><span class="text-success small glyphicon glyphicon-plus"></span>Add New Root Category</a>
+                <a href="#" id="AddRootCategory"><i class="text-success small icon-plus"></i>Add New Root Category</a>
             </p>
             <ul class="list-no-decoration list-unstyled list-group">
                 @Html.Partial("_CategoryTreeNode", new FullCategoryModel {Id = 0, Name = "", SubCategories = Model.ToList()})

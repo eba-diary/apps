@@ -20,7 +20,7 @@
                     using (Html.BeginForm(@"BusinessIntelligence", "Search", FormMethod.Get, new { @class = "navbar-form navbar-center", @id = "DatasetSearch" }))
                     {
                     <div id="bi-search-input-wrapper" class="input-group">
-                        <span class="input-group-addon clickable bi-search-icon" onclick="$(function() {$('#SearchText').focus();});"><i class="glyphicon glyphicon-search"></i></span>
+                        <span class="input-group-addon clickable bi-search-icon" onclick="$(function() {$('#SearchText').focus();});"><i class="icon-search"></i></span>
 
                         <input type="text" id="SearchText" name="searchPhrase" class="form-control bi-search-textbox" placeholder="Search from @Model.DatasetCount Exhibits and Dashboards ..." />
                     </div>
@@ -66,7 +66,7 @@
                     @if (Model.CanManageReports)
                     {
                         <button type="button" class="btn btn-default btn-lg bi-operation-button" id="CreateExhibit">
-                            <span class="glyphicon glyphicon-plus text-primary"></span> Create Exhibit
+                            <i class="icon-plus text-primary"></i> Create Exhibit
                         </button>
                     }        
                 </div>
