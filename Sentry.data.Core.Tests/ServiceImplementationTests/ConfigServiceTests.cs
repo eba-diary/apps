@@ -23,7 +23,7 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
 
             //Act
-            bool IsSuccessful = configService.Delete(config.ConfigId, true);
+            bool IsSuccessful = configService.Delete(config.ConfigId, null, true);
 
             //Assert
             Assert.AreEqual(true, IsSuccessful);
@@ -45,7 +45,7 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
 
             //Act
-            configService.Delete(config.ConfigId, true);
+            configService.Delete(config.ConfigId, null, true);
 
             //Assert
             context.Verify(x => x.SaveChanges(It.IsAny<bool>()), Times.Never);
@@ -55,7 +55,7 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
 
         [TestCategory("ConfigServiceTests")]
         [TestMethod]
-        public void Delete_Does_Not_Trigger_Child_Delets_When_Incoming_DatasetFileConfig_Is_Marked_PendingDelete_And_Performing_Logical_Delete()
+        public void Delete_Does_Not_Trigger_Child_Deletes_When_Incoming_DatasetFileConfig_Is_Marked_PendingDelete_And_Performing_Logical_Delete()
         {
             //Arrange
             MockRepository mr = new MockRepository(MockBehavior.Strict);
@@ -68,19 +68,19 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             context.Setup(x => x.SaveChanges(It.IsAny<bool>()));
 
             Mock<IJobService> jobService = mr.Create<IJobService>();
-            jobService.Setup(x => x.DeleteJob(It.IsAny<List<int>>(), It.IsAny<string>(), It.IsAny<bool>()));
+            jobService.Setup(x => x.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()));
 
             Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
-            dataFlowService.Setup(x => x.DeleteFlowsByFileSchema(It.IsAny<FileSchema>(), It.IsAny<bool>()));
+            dataFlowService.Setup(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()));
 
             ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, null, dataFlowService.Object, null);
 
             //Act
-            configService.Delete(config.ConfigId, true);
+            configService.Delete(config.ConfigId, null, true);
 
             //Assert
-            jobService.Verify(x => x.DeleteJob(It.IsAny<List<int>>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Never);
-            dataFlowService.Verify(x => x.DeleteFlowsByFileSchema(It.IsAny<FileSchema>(), It.IsAny<bool>()), Times.Never);
+            jobService.Verify(x => x.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()), Times.Never);
+            dataFlowService.Verify(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()), Times.Never);
         }
 
         [TestCategory("ConfigServiceTests")]
@@ -99,7 +99,7 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
 
             //Act
-            bool IsSuccessful = configService.Delete(config.ConfigId);
+            bool IsSuccessful = configService.Delete(config.ConfigId, null, true);
 
             //Assert
             Assert.AreEqual(true, IsSuccessful);
@@ -119,16 +119,16 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             context.Setup(x => x.GetById<DatasetFileConfig>(config.ConfigId)).Returns(config);
             context.Setup(x => x.SaveChanges(It.IsAny<bool>()));
 
-            Mock<IJobService> jobService = mr.Create<IJobService>();
-            jobService.Setup(x => x.DeleteJob(It.IsAny<List<int>>(), It.IsAny<string>(), It.IsAny<bool>()));
+            //Mock<IJobService> jobService = mr.Create<IJobService>();
+            //jobService.Setup(x => x.DeleteJob(It.IsAny<List<int>>(), It.IsAny<string>(), It.IsAny<bool>()));
 
-            Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
-            dataFlowService.Setup(x => x.DeleteFlowsByFileSchema(It.IsAny<FileSchema>(), It.IsAny<bool>()));
+            //Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
+            //dataFlowService.Setup(x => x.DeleteFlowsByFileSchema(It.IsAny<FileSchema>(), It.IsAny<bool>()));
 
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, null, dataFlowService.Object, null);
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
 
             //Act
-            configService.Delete(config.ConfigId);
+            configService.Delete(config.ConfigId, null, true);
 
             //Assert
             context.Verify(x => x.SaveChanges(It.IsAny<bool>()), Times.Never);
@@ -136,7 +136,7 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
 
         [TestCategory("ConfigServiceTests")]
         [TestMethod]
-        public void Delete_Does_Not_Trigger_Child_Delets_When_Incoming_DatasetFileConfig_Is_Marked_Delete_And_Performing_Physical_Delete()
+        public void Delete_Does_Not_Trigger_Child_Deletes_When_Incoming_DatasetFileConfig_Is_Marked_Deleted_And_Performing_Physical_Delete()
         {
             //Arrange
             MockRepository mr = new MockRepository(MockBehavior.Strict);
@@ -149,19 +149,19 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             context.Setup(x => x.SaveChanges(It.IsAny<bool>()));
 
             Mock<IJobService> jobService = mr.Create<IJobService>();
-            jobService.Setup(x => x.DeleteJob(It.IsAny<List<int>>(), It.IsAny<string>(), It.IsAny<bool>()));
+            jobService.Setup(x => x.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()));
 
             Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
-            dataFlowService.Setup(x => x.DeleteFlowsByFileSchema(It.IsAny<FileSchema>(), It.IsAny<bool>()));
+            dataFlowService.Setup(x => x.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()));
 
             ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, null, dataFlowService.Object, null);
 
             //Act
-            configService.Delete(config.ConfigId, false);
+            configService.Delete(config.ConfigId, null, false);
 
             //Assert
-            jobService.Verify(x => x.DeleteJob(It.IsAny<List<int>>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Never);
-            dataFlowService.Verify(x => x.DeleteFlowsByFileSchema(It.IsAny<FileSchema>(), It.IsAny<bool>()), Times.Never);
+            jobService.Verify(x => x.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()), Times.Never);
+            dataFlowService.Verify(x => x.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()), Times.Never);
         }
 
         [TestCategory("ConfigServiceTests")]
@@ -179,20 +179,20 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             context.Setup(x => x.SaveChanges(It.IsAny<bool>()));
 
             Mock<IJobService> jobService = mr.Create<IJobService>();
-            jobService.Setup(x => x.DeleteJob(It.IsAny<List<int>>(), It.IsAny<string>(), It.IsAny<bool>()));
+            jobService.Setup(x => x.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()));
 
             Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
-            dataFlowService.Setup(x => x.DeleteFlowsByFileSchema(It.IsAny<FileSchema>(), It.IsAny<bool>()));
+            dataFlowService.Setup(x => x.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()));
 
             ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, null, dataFlowService.Object, null);
 
             //Act
-            bool IsSuccessful = configService.Delete(config.ConfigId, false);
+            bool IsSuccessful = configService.Delete(config.ConfigId, null, false);
 
             //Assert
             Assert.AreEqual(true, IsSuccessful);
-            jobService.Verify(x => x.DeleteJob(It.IsAny<List<int>>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Never);
-            dataFlowService.Verify(x => x.DeleteFlowsByFileSchema(It.IsAny<FileSchema>(), It.IsAny<bool>()), Times.Never);
+            jobService.Verify(x => x.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()), Times.Never);
+            dataFlowService.Verify(x => x.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()), Times.Never);
             context.Verify(x => x.SaveChanges(It.IsAny<bool>()), Times.Never);
         }
     }

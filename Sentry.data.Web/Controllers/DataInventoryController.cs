@@ -22,6 +22,7 @@ namespace Sentry.data.Web.Controllers
                 PageTitle = "Data Inventory",
                 IconPath = "~/Images/Dale/DataInventoryIcon.png",
                 ResultView = "SearchResult",
+                InfoLink = "https://confluence.sentry.com/display/CLA/Data+Inventory+-+Elastic",
                 DefaultSearch = new FilterSearchModel()
                 {
                     FilterCategories = new List<FilterCategoryModel>()
@@ -71,6 +72,12 @@ namespace Sentry.data.Web.Controllers
             }
 
             return Json(filterResult.FilterCategories);
+        }
+
+        [HttpPost]
+        public ActionResult Update(List<DaleSensitiveModel> models)
+        {
+            return Json(new { success = _service.UpdateIsSensitive(models.ToDto()) });
         }
 
         #region Methods

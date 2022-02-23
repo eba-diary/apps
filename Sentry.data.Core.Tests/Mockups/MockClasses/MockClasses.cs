@@ -88,7 +88,10 @@ namespace Sentry.data.Core.Tests
                 DatasetScopeType = MockScopeTypes()[0],
                 FileExtension = MockFileExtensions()[0],
                 RetrieverJobs = new List<RetrieverJob>(),
-                Schema = schema
+                Schema = schema,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DeleteIssuer = null,
+                DeleteIssueDTM = DateTime.MaxValue
             };
 
             return dfc;
@@ -781,5 +784,22 @@ namespace Sentry.data.Core.Tests
             } };
             return actions.ToList();
         }
+        public static DataFlow MockDataFlow()
+        {
+            DataFlow df = new DataFlow()
+            {
+                Id = 90,
+                Name = "MockDataFlow",
+                SaidKeyCode = "DATA",
+                NamedEnvironment = "TEST",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DeleteIssuer = null,
+                DeleteIssueDTM = DateTime.MaxValue
+            };
+            return df;
+        }
+
+        
     }
 }

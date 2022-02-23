@@ -10,9 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
-using Nest;
 
 namespace Sentry.data.Core
 {
@@ -1169,9 +1167,9 @@ namespace Sentry.data.Core
                 }
 
                 //Decimal Scale
-                if (fieldDto.FieldType == GlobalConstants.Datatypes.DECIMAL && (fieldDto.Scale < 1 || fieldDto.Scale > 38))
+                if (fieldDto.FieldType == GlobalConstants.Datatypes.DECIMAL && (fieldDto.Scale < 0 || fieldDto.Scale > 38))
                 {
-                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Scale ({fieldDto.Scale}) is required to be between 1 and 38");
+                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Scale ({fieldDto.Scale}) is required to be between 0 and 38");
                 }
 
                 //Decimal Scale and Precision dependency
