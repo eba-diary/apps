@@ -80,4 +80,4 @@ DECLARE @ErrorState INT;
 :r ..\post-deploy\supportingscripts\sprint_22_02_01\historyfix_cla3790saidassetdataflow.sql
 :r ..\post-deploy\supportingscripts\sprint_22_02_01\historyfix_cla3790saidassetdatasets.sql
 :r ..\post-deploy\supportingscripts\sprint_22_02_02\HISTORYFIX_CLA3407_Initialize_PreProcesingOption_Where_Null.sql
-
+:r ..\post-deploy\supportingscripts\sprint_22_02_02\HISTORYFIX_CLA3789_Initialize_DeleteIssueDTM_on_DatasetFileConfig.sql
