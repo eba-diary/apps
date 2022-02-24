@@ -437,11 +437,11 @@
          </dateline>
          <p>
             <!-- is Christian family Mr. and Mrs. Christian from later? is young Christian Henry, or is that someone else -->
-            Tracked and polled all the morning, and came in view of a damboah, which turned out
+            Tracked and polled all the morning, and came in view of a dahabeah, which turned out
              to be the "<name type="boat" ref="#Hafiz">Hafiz</name>" with the
-             <persName>Christian family</persName>, under
+             <persName ref="#Christian_family">Christian family</persName>, under
              <persName ref="#Salah_Mohammed">Salah</persName>'s care. We pulled up a little behind them and
-             young <persName>Christian</persName> came over for a few moments this evening.
+             young <persName ref="#Christian_child">Christian</persName> came over for a few moments this evening.
              We gave him all our late papers among which was <persName ref="#Roosevelt_Theodore">President
              Roosevelt</persName>'s first message to Congress,
              in which we had been much interested, and sent him on his way rejoicing.
@@ -455,7 +455,7 @@
          <p>
             <!-- Christian family and/or mr and mrs christian? -->
             We had only a breath of wind today, but pulled along until we arrived at
-             <placeName ref="#Hag_Kandil">Haji Kandil</placeName>, where the <persName>Christians</persName> also
+             <placeName ref="#Hag_Kandil">Haji Kandil</placeName>, where the <persName ref="#Christian_family">Christians</persName> also
              stopped - as we intended going to see the pavement of <name type="historical" ref="#Northern_Palace">Khaenaten's
              Palace</name>. We went across the river at 3:30 - and walked across to the
              house which <persName ref="#Petrie_William">Petrie</persName> has had constructed over this pavement
@@ -1903,7 +1903,7 @@
              came also to dine. This morning, <persName ref="#Newberry_Percy">Newberry</persName>,
              <persName ref="#Buttles_Jeanette">Nettie</persName> and I went into town to do some little
              shoppings at the Bazaar. Met
-             <persName ref="#Newman_Henry_Roderick#Newman_Mrs">Mr. and Mrs. Newman</persName>, just down from
+             <persName ref="#Newman_Henry_Roderick #Newman_Mrs">Mr. and Mrs. Newman</persName>, just down from
              <placeName ref="#Aswan">Aswan</placeName>, and they came to tea, and were very pleasant.
              We have addressed ourselves for 2 days as often as we could, to packing arranging -
              weather warm, with very high winds, and dust everywhere.
@@ -1935,7 +1935,7 @@
             <persName ref="#Davis_Theodore_M">Theodore</persName> and I drove into town and to the boat and
              to the <placeName ref="#South_Kensington_Museum">Museum</placeName> this morning - everything at the
              boat getting into covers and closets, and all kinds of packing.
-             <persName ref="#Newman_Henry_Roderick#Newman_Mrs">Mr. and Mrs. Newman</persName> are at <name type="hotel" ref="#Shepheards_Hotel">
+             <persName ref="#Newman_Henry_Roderick #Newman_Mrs">Mr. and Mrs. Newman</persName> are at <name type="hotel" ref="#Shepheards_Hotel">
             Shepheards</name>, going off to <placeName ref="#Florence">Florence</placeName> tomorrow.
              <persName ref="#Carter_Howard">Carter</persName> dined with us. <persName ref="#Newberry_Percy">Newberry</persName>
              and <persName ref="#Tytus_Bob">Tytus</persName> came to say goodbye.
@@ -2102,7 +2102,7 @@
              ourselves. Found <persName ref="#Koon_Bessie">Bessie</persName> and <persName ref="#Newberry_Mary">
              Mary</persName> waiting at the station. This morning we spent at the
              <placeName ref="#Uffizi_Gallery">Uffissi</placeName> - and afternoon at the
-             <persName ref="#Constantini_David#Constantini_Mrs.">Constantini</persName>'s and at tea at <persName ref="#Buttles_Lizzie">
+             <persName ref="#Constantini_David #Constantini_Mrs.">Constantini</persName>'s and at tea at <persName ref="#Buttles_Lizzie">
              Lizzie</persName>'s. Delighted to have a visit today from <persName ref="#Clarke_Miss">
              Pheobe Clark</persName> and <persName ref="#Doctor_Clarke">her husband</persName> - they have
              come over for a stay of 6 months for a rest for him; who looks poorly.
@@ -2120,7 +2120,7 @@
              and I have been perfectly well - delightful combination indeed! We have seen the
              beautiful pictures, marbles and statuary and churches, seen all our friends - made many
              visits - received many. Last Sunday we drove up to "<placeName ref="#Villa_I_Tatti">
-             I Tatti</placeName>" to lunch with the <persName ref="#Abbott_Senda_Berenson#Berenson_Bernard">Berensons</persName>
+             I Tatti</placeName>" to lunch with the <persName ref="#Abbott_Senda_Berenson #Berenson_Bernard">Berensons</persName>
              in their charming villa - two pleasant Englishmen also to lunch. The old house with its
              corridors, stately rooms, pretty courts and gardens and the little chapel is entirely
              interesting and charming - and the whole world of <placeName ref="#Florence">
@@ -2398,10 +2398,10 @@
              <persName ref="#Weigall_Arthur">Weigall</persName> came to tea yesterday - and to lunch
              today. <persName ref="#Fielding_Mr">Fielding</persName> here too - and this afternoon
              <persName ref="#Koon_Bessie">Bessie</persName> and I went out in a closed carriage - and
-             left cards on the <persName ref="#Farrar_William_Sir#Farrer_Gaspard#Farrer_Miss">Farrers</persName> and <placeName ref="#Denbigh">
+             left cards on the <persName ref="#Farrar_William_Sir #Farrer_Gaspard #Farrer_Miss">Farrers</persName> and <placeName ref="#Denbigh">
              Denbighs</placeName> - <persName ref="#Farrer_Miss">Miss Farrer</persName> having been here,
              and I having to decline even lunch - and not able to see
-             <persName ref="#Feilding_Rudolph_Lord#Denbigh_Lady">Lord and Lady Denbigh</persName> when they called.
+             <persName ref="#Feilding_Rudolph_Lord #Denbigh_Lady">Lord and Lady Denbigh</persName> when they called.
              <persName ref="#Newberry_Percy">Newberry</persName> came this afternoon to say goodbye - and
              <persName ref="#Farrer_Gaspard">Gaspard Farrer</persName> - we are off tomorrow.
          </p>
