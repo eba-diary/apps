@@ -25,6 +25,7 @@ namespace Sentry.data.Core
         public virtual string AdGroupName { get; set; }
         public virtual bool IsSecuredAtUserLevel { get; set; }
         public virtual string GrantPermissionToUserId { get; set; }
+        public virtual string AwsArn { get; set; }
 
         public virtual Security ParentSecurity { get; set; }
 

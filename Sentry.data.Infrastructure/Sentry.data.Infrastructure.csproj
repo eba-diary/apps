@@ -269,6 +269,7 @@
     <Compile Include="Mappings\Primary\DataProcessing\Actions\UncompressGzipActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\UncompressZipActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\XMLActionMapping.cs" />
+    <Compile Include="Mappings\Primary\AssetMapping.cs" />
     <Compile Include="Mappings\Primary\NotificationMapping.cs" />
     <Compile Include="Mappings\Primary\AssetSourceMapping.cs" />
     <Compile Include="Mappings\Primary\BusinessAreaMapping.cs" />

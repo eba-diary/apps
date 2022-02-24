@@ -205,5 +205,45 @@ namespace Sentry.data.Core.Tests
 
 
 
+
+        [TestMethod]
+        public void DatasetService_GetAsset_ExistingAsset()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var expected = new Asset() { AssetId = 1, SaidKeyCode = "ABCD" };
+            var assets = new[] { expected };
+            context.Setup(c => c.Assets).Returns(assets.AsQueryable());
+            var service = new DatasetService(context.Object, null, null, null, null, null, null, null);
+
+            // Act
+            var actual = service.GetAsset("ABCD");
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void DatasetService_GetAsset_NewAsset()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var existing = new Asset() { AssetId = 1, SaidKeyCode = "ABCD" };
+            var assets = new[] { existing };
+            context.Setup(c => c.Assets).Returns(assets.AsQueryable());
+            
+            var user = new Mock<IApplicationUser>();
+            user.Setup(u => u.AssociateId).Returns("000000");
+            var userService = new Mock<IUserService>();
+            userService.Setup(u => u.GetCurrentUser()).Returns(user.Object);
+
+            var service = new DatasetService(context.Object, null, userService.Object, null, null, null, null, null);
+
+            // Act
+            var actual = service.GetAsset("EFGH");
+
+            // Assert
+            Assert.AreNotEqual(existing, actual);
+        }
     }
 }
