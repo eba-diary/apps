@@ -292,7 +292,7 @@ namespace Sentry.data.Core.Tests
             dsContext.Stub(x => x.DatasetScopeTypes).Return(BuildMockDatasetScopeTypes()).Repeat.Any();
             dsContext.Stub(x => x.FileExtensions).Return(BuildMockFileExtensions()).Repeat.Any();
             dsContext.Stub(x => x.Datasets).Return(BuildMockDataset()).Repeat.Any();
-            dsContext.Stub(x => x.DatasetAssets).Return(BuildMockDatasetAsset()).Repeat.Any();
+            dsContext.Stub(x => x.Assets).Return(BuildMockAsset()).Repeat.Any();
 
             IDataAssetContext daContext = MockRepository.GenerateMock<IDataAssetContext>();
             IEmailService emailSrvc = MockRepository.GenerateMock<IEmailService>();
@@ -492,16 +492,16 @@ namespace Sentry.data.Core.Tests
             return ds.AsQueryable();
         }
 
-        private IQueryable<DatasetAsset> BuildMockDatasetAsset()
+        private IQueryable<Asset> BuildMockAsset()
         {
-            DatasetAsset newDs = new DatasetAsset()
+            Asset newDs = new Asset()
             {
-                DatasetAssetId = 1,
+                AssetId = 1,
                 SaidKeyCode = "DATA",
                 Security = BuildMockDatasetSecurity().ToList()[0],
             };
 
-            List<DatasetAsset> ds = new List<DatasetAsset>
+            List<Asset> ds = new List<Asset>
             {
                 newDs
             };

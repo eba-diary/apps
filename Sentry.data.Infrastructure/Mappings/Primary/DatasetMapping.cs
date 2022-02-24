@@ -176,11 +176,11 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 });
             }, map => map.OneToMany(a => a.Class(typeof(Image))));
 
-            ManyToOne(x => x.DatasetAsset, m =>
+            ManyToOne(x => x.Asset, m =>
             {
-                m.Column("DatasetAsset_ID");
-                m.ForeignKey("FK_Dataset_DatasetAsset");
-                m.Class(typeof(DatasetAsset));
+                m.Column("Asset_ID");
+                m.ForeignKey("FK_Dataset_Asset");
+                m.Class(typeof(Asset));
                 m.Cascade(Cascade.All);
             });
 

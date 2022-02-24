@@ -190,7 +190,7 @@ namespace Sentry.data.Core
                 ? _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET && x.PermissionCode == GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA).ToList()
                 : _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
 
-            List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCode(ds.DatasetAsset.SaidKeyCode).ConfigureAwait(false);
+            List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCode(ds.Asset.SaidKeyCode).ConfigureAwait(false);
             foreach(SAIDRole prodCust in prodCusts)
             {
                 ar.ApproverList.Add(new KeyValuePair<string, string>(prodCust.AssociateId, prodCust.Name));
@@ -443,7 +443,7 @@ namespace Sentry.data.Core
 
         private Dataset CreateDataset(DatasetDto dto)
         {
-            DatasetAsset asset = GetDatasetAsset(dto.SAIDAssetKeyCode);
+            Asset asset = GetAsset(dto.SAIDAssetKeyCode);
 
             Dataset ds = new Dataset()
             {
@@ -467,7 +467,7 @@ namespace Sentry.data.Core
                 DeleteInd = false,
                 DeleteIssueDTM = DateTime.MaxValue,
                 ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
-                DatasetAsset = asset,
+                Asset = asset,
                 NamedEnvironment = dto.NamedEnvironment,
                 NamedEnvironmentType = dto.NamedEnvironmentType
             };
@@ -497,19 +497,19 @@ namespace Sentry.data.Core
         }
 
         /// <summary>
-        /// Retrieves the DatasetAsset for the given SAID Asset Key Code.
+        /// Retrieves the Asset for the given SAID Asset Key Code.
         /// If one does not exist, it creates a new one.
         /// </summary>
         /// <param name="saidAssetKeyCode">The 4-character SAID asset key code</param>
-        internal DatasetAsset GetDatasetAsset(string saidAssetKeyCode)
+        internal Asset GetAsset(string saidAssetKeyCode)
         {
-            var asset = _datasetContext.DatasetAssets.FirstOrDefault(da => da.SaidKeyCode == saidAssetKeyCode);
+            var asset = _datasetContext.Assets.FirstOrDefault(da => da.SaidKeyCode == saidAssetKeyCode);
             if (asset == null)
             {
-                asset = new DatasetAsset()
+                asset = new Asset()
                 {
                     SaidKeyCode = saidAssetKeyCode,
-                    Security = new Security(GlobalConstants.SecurableEntityName.DATASET_ASSET)
+                    Security = new Security(GlobalConstants.SecurableEntityName.ASSET)
                     {
                         CreatedById = _userService.GetCurrentUser().AssociateId
                     }
@@ -559,7 +559,7 @@ namespace Sentry.data.Core
             dto.CategoryName = ds.DatasetCategories.First().Name;
             dto.MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/Dataset/Detail/" + ds.DatasetId;
             dto.CategoryNames = ds.DatasetCategories.Select(s => s.Name).ToList();
-            dto.SAIDAssetKeyCode = ds.DatasetAsset.SaidKeyCode;
+            dto.SAIDAssetKeyCode = ds.Asset.SaidKeyCode;
             dto.NamedEnvironment = ds.NamedEnvironment;
             dto.NamedEnvironmentType = ds.NamedEnvironmentType;
         }
@@ -586,7 +586,7 @@ namespace Sentry.data.Core
             dto.CategoryColor = ds.DatasetCategories.First().Color;
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
             dto.GroupAccessCount = _securityService.GetGroupAccessCount(ds);
-            dto.SAIDAssetKeyCode = ds.DatasetAsset.SaidKeyCode;
+            dto.SAIDAssetKeyCode = ds.Asset.SaidKeyCode;
             if (ds.DatasetFiles.Any())
             {
                 dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);

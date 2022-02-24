@@ -12,7 +12,7 @@ namespace Sentry.data.Core
         /** IQueryables **/
 
         IQueryable<Dataset> Datasets { get; }
-        IQueryable<DatasetAsset> DatasetAssets { get; }
+        IQueryable<Asset> Assets { get; }
         IQueryable<DataAsset> DataAsset { get; }
         IQueryable<Notification> Notification { get; }
         IQueryable<DatasetFileConfig> DatasetFileConfigs { get; }

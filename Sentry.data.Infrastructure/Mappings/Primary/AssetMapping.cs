@@ -4,17 +4,17 @@ using Sentry.data.Core;
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
 {
-    public class DatasetAssetMapping : ClassMapping<DatasetAsset>
+    public class AssetMapping : ClassMapping<Asset>
     {
-        public DatasetAssetMapping()
+        public AssetMapping()
         {
-            Table("DatasetAsset");
+            Table("Asset");
 
             Cache(c => c.Usage(CacheUsage.ReadWrite));
 
-            Id(x => x.DatasetAssetId, m =>
+            Id(x => x.AssetId, m =>
             {
-                m.Column("DatasetAsset_ID");
+                m.Column("Asset_ID");
                 m.Generator(Generators.Identity);
             });
 
@@ -24,7 +24,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             ManyToOne(x => x.Security, m =>
             {
                 m.Column("Security_ID");
-                m.ForeignKey("FK_DataAsset_Security");
+                m.ForeignKey("FK_Asset_Security");
                 m.Class(typeof(Security));
                 m.Cascade(Cascade.All);
             });

@@ -464,7 +464,7 @@ namespace Sentry.data.Core
             ds.Tags = _datasetContext.Tags.Where(x => dto.TagIds.Contains(x.TagId.ToString())).ToList();
             ds.DeleteInd = false;
             ds.DeleteIssueDTM = DateTime.MaxValue;
-            ds.DatasetAsset = _datasetContext.DatasetAssets.FirstOrDefault(da => da.SaidKeyCode == "DATA");
+            ds.Asset = _datasetContext.Assets.FirstOrDefault(da => da.SaidKeyCode == "DATA");
 
             return ds;
         }

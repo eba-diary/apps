@@ -1,9 +1,9 @@
 ﻿namespace Sentry.data.Core
 {
-    public class DatasetAsset : ISecurable
+    public class Asset : ISecurable
     {
 
-        public virtual int DatasetAssetId { get; set; }
+        public virtual int AssetId { get; set; }
         public virtual string SaidKeyCode { get; set; }
 
         /// <summary>

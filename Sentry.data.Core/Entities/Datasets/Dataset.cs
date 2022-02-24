@@ -77,7 +77,7 @@ namespace Sentry.data.Core
         public virtual IList<Image> Images { get; set; }
         public virtual string NamedEnvironment { get; set; }
         public virtual NamedEnvironmentType NamedEnvironmentType { get; set; }
-        public virtual DatasetAsset DatasetAsset { get; set; }
+        public virtual Asset Asset { get; set; }
 
 
         //ISecurable Impl.
@@ -112,7 +112,7 @@ namespace Sentry.data.Core
             {
                 vr.Add(ValidationErrors.datasetCategoryRequired, "The Dataset Category is required");
             }
-            if (DatasetAsset == null)
+            if (Asset == null)
             {
                 vr.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "The SAID Asset is required");
             }

@@ -207,30 +207,30 @@ namespace Sentry.data.Core.Tests
 
 
         [TestMethod]
-        public void DatasetService_GetDatasetAsset_ExistingAsset()
+        public void DatasetService_GetAsset_ExistingAsset()
         {
             // Arrange
             var context = new Mock<IDatasetContext>();
-            var expected = new DatasetAsset() { DatasetAssetId = 1, SaidKeyCode = "ABCD" };
-            var datasetAssets = new[] { expected };
-            context.Setup(c => c.DatasetAssets).Returns(datasetAssets.AsQueryable());
+            var expected = new Asset() { AssetId = 1, SaidKeyCode = "ABCD" };
+            var assets = new[] { expected };
+            context.Setup(c => c.Assets).Returns(assets.AsQueryable());
             var service = new DatasetService(context.Object, null, null, null, null, null, null, null);
 
             // Act
-            var actual = service.GetDatasetAsset("ABCD");
+            var actual = service.GetAsset("ABCD");
 
             // Assert
             Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void DatasetService_GetDatasetAsset_NewAsset()
+        public void DatasetService_GetAsset_NewAsset()
         {
             // Arrange
             var context = new Mock<IDatasetContext>();
-            var existing = new DatasetAsset() { DatasetAssetId = 1, SaidKeyCode = "ABCD" };
-            var datasetAssets = new[] { existing };
-            context.Setup(c => c.DatasetAssets).Returns(datasetAssets.AsQueryable());
+            var existing = new Asset() { AssetId = 1, SaidKeyCode = "ABCD" };
+            var assets = new[] { existing };
+            context.Setup(c => c.Assets).Returns(assets.AsQueryable());
             
             var user = new Mock<IApplicationUser>();
             user.Setup(u => u.AssociateId).Returns("000000");
@@ -240,7 +240,7 @@ namespace Sentry.data.Core.Tests
             var service = new DatasetService(context.Object, null, userService.Object, null, null, null, null, null);
 
             // Act
-            var actual = service.GetDatasetAsset("EFGH");
+            var actual = service.GetAsset("EFGH");
 
             // Assert
             Assert.AreNotEqual(existing, actual);

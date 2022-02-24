@@ -1,4 +1,4 @@
-﻿SET @ScriptVersion = 'CLA3722_TransitionToDatasetAsset'
+﻿SET @ScriptVersion = 'CLA3722_TransitionToAsset'
 
 BEGIN TRAN 
 IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion) 
@@ -14,7 +14,7 @@ BEGIN TRY
     IF OBJECT_ID('tempdb..#SecurityEntries') IS NOT NULL DROP TABLE #SecurityEntries
     select SaidKeyCode, NEWID() AS Security_ID into #SecurityEntries from #UniqueSaidKeys
 
-    -- INSERT Security and DatasetAsset records
+    -- INSERT Security and Asset records
     INSERT INTO [Security]
                ([Security_ID]
                ,[SecurableEntity_NME]
@@ -23,17 +23,17 @@ BEGIN TRY
                ,[Removed_DTM]
                ,[UpdatedBy_ID]
                ,[CreatedBy_ID])
-    SELECT Security_ID, 'DatasetAsset', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, null, null, 'SYSTEM' FROM #SecurityEntries
-    INSERT INTO [DatasetAsset]
+    SELECT Security_ID, 'Asset', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, null, null, 'SYSTEM' FROM #SecurityEntries
+    INSERT INTO [Asset]
                ([SaidKey_CDE]
                ,[Security_ID])
     SELECT SaidKeyCode, Security_ID FROM #SecurityEntries
 
     -- UPDATE the FK on the Dataset table
     UPDATE d
-    SET DatasetAsset_ID = da.DatasetAsset_ID
+    SET Asset_ID = da.Asset_ID
     FROM Dataset d
-    join DatasetAsset da on d.SaidKeyCode = da.SaidKey_CDE
+    join Asset da on d.SaidKeyCode = da.SaidKey_CDE
 
     -- END POST-DEPLOY SCRIPT --
     INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
