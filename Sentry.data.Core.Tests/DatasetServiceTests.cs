@@ -203,7 +203,32 @@ namespace Sentry.data.Core.Tests
             context.Verify(x => x.SaveChanges(It.IsAny<bool>()), Times.Never);
         }
 
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public void Delete_Passes_Incoming_User_Info_To_ConfigService_Delete_When_LogicalDelete_Is_False()
+        {
+            // Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
 
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+
+            Dataset ds = MockClasses.MockDataset(null, true, false);
+            ds.ObjectStatus = ObjectStatusEnum.Pending_Delete;
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
+
+            Mock<IConfigService> configService = mr.Create<IConfigService>();
+            configService.Setup(s => s.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
+
+            var datasetService = new DatasetService(context.Object, null, null, configService.Object, null, null, null, null);
+
+            // Act
+            datasetService.Delete(ds.DatasetId, user.Object, false);
+
+            // Assert
+            configService.Verify(v => v.Delete(It.IsAny<int>(), user.Object, false), Times.Once);
+        }
 
 
         [TestMethod]
@@ -244,6 +269,30 @@ namespace Sentry.data.Core.Tests
 
             // Assert
             Assert.AreNotEqual(existing, actual);
+        }
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public void Delete_Passes_Null_User_Info_To_ConfigService_Delete_When_LogicalDelete_Is_False()
+        {
+            // Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Dataset ds = MockClasses.MockDataset(null, true, false);
+            ds.ObjectStatus = ObjectStatusEnum.Pending_Delete;
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
+
+            Mock<IConfigService> configService = mr.Create<IConfigService>();
+            configService.Setup(s => s.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
+
+            var datasetService = new DatasetService(context.Object, null, null, configService.Object, null, null, null, null);
+
+            // Act
+            datasetService.Delete(ds.DatasetId, null, false);
+
+            // Assert
+            configService.Verify(v => v.Delete(It.IsAny<int>(), null, false), Times.Once);
         }
     }
 }
