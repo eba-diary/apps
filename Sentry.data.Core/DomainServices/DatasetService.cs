@@ -341,15 +341,15 @@ namespace Sentry.data.Core
 
                 try
                 {
-                    _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+                    _securityService.GetUserSecurity(ds, user?? _userService.GetCurrentUser());
 
                     //Mark dataset for soft delete
-                    MarkForDelete(ds);
+                    MarkForDelete(ds, user);
 
                     ////Mark Configs for soft delete to ensure no editing and jobs are disabled
                     foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
                     {
-                        _configService.Delete(config.ConfigId, _userService.GetCurrentUser(), logicalDelete);
+                        _configService.Delete(config.ConfigId, user ?? _userService.GetCurrentUser(), logicalDelete);
                     }
                 }
                 catch (Exception ex)
@@ -367,7 +367,7 @@ namespace Sentry.data.Core
                 {
                     foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
                     {
-                        _configService.Delete(config.ConfigId, _userService.GetCurrentUser(), logicalDelete);
+                        _configService.Delete(config.ConfigId, user, logicalDelete);
                     }
 
                     ds.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
@@ -432,11 +432,11 @@ namespace Sentry.data.Core
         }
 
         #region "private functions"
-        private void MarkForDelete(Dataset ds)
+        private void MarkForDelete(Dataset ds, IApplicationUser user)
         {
             ds.CanDisplay = false;
             ds.DeleteInd = true;
-            ds.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
+            ds.DeleteIssuer = (user == null)? _userService.GetCurrentUser().AssociateId : user.AssociateId;
             ds.DeleteIssueDTM = DateTime.Now;
             ds.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
         }

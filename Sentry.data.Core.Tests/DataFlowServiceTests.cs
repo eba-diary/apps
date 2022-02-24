@@ -1001,8 +1001,6 @@ namespace Sentry.data.Core.Tests
             Assert.AreNotEqual(DateTime.MaxValue, deletedFlow.DeleteIssueDTM);
         }
 
-
-
         [TestCategory("Core DataFlowService")]
         [TestMethod]
         public void Delete_Does_Not_Call_Save_Changes()
@@ -1035,6 +1033,82 @@ namespace Sentry.data.Core.Tests
 
             //Assert
             context.Verify(x => x.SaveChanges(true), Times.Never);
+        }
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public void Delete_Passes_Null_User_Info_To_JobService_Delete_When_LogicalDelete_Is_False()
+        {
+            // Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Loose);
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(s => s.DisplayName).Returns("displayName");
+            user.Setup(s => s.AssociateId).Returns("123456");
+
+
+            DataFlow df = MockClasses.MockDataFlow();
+            df.ObjectStatus = ObjectStatusEnum.Pending_Delete;
+            df.DeleteIssuer = "654321";
+
+            RetrieverJob job = MockClasses.GetMockRetrieverJob(
+                                        MockClasses.MockDataFileConfig(
+                                                MockClasses.MockDataset()), new FtpSource());
+            job.DataFlow = df;
+            List<RetrieverJob> jobList = new List<RetrieverJob>() { job };
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.GetById<DataFlow>(It.IsAny<int>())).Returns(df);
+            context.Setup(s => s.RetrieverJob).Returns(jobList.AsQueryable());
+
+            Mock<IJobService> jobService = mr.Create<IJobService>();
+            jobService.Setup(s => s.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
+
+            var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null);
+
+            //Act
+            //Using this syntax to ensure correct delete overload gets called
+            dataFlowService.Delete(id:df.Id, user:null, logicalDelete:false);
+
+            //Assert
+            jobService.Verify(v => v.Delete(It.IsAny<List<int>>(), null, false), Times.Once);
+        }
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public void Delete_Passes_Incoming_User_Info_To_JobService_Delete_When_LogicalDelete_Is_False()
+        {
+            // Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Loose);
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(s => s.DisplayName).Returns("displayName");
+            user.Setup(s => s.AssociateId).Returns("123456");
+
+
+            DataFlow df = MockClasses.MockDataFlow();
+            df.ObjectStatus = ObjectStatusEnum.Pending_Delete;
+            df.DeleteIssuer = "654321";
+
+            RetrieverJob job = MockClasses.GetMockRetrieverJob(
+                                        MockClasses.MockDataFileConfig(
+                                                MockClasses.MockDataset()), new FtpSource());
+            job.DataFlow = df;
+            List<RetrieverJob> jobList = new List<RetrieverJob>() { job };
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.GetById<DataFlow>(It.IsAny<int>())).Returns(df);
+            context.Setup(s => s.RetrieverJob).Returns(jobList.AsQueryable());
+
+            Mock<IJobService> jobService = mr.Create<IJobService>();
+            jobService.Setup(s => s.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
+
+            var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null);
+
+            //Act
+            //Using this syntax to ensure correct delete overload gets called
+            dataFlowService.Delete(id: df.Id, user: user.Object, logicalDelete: false);
+
+            //Assert
+            jobService.Verify(v => v.Delete(It.IsAny<List<int>>(), user.Object, false), Times.Once);
         }
     }
 }

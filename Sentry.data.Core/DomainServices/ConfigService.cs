@@ -621,12 +621,11 @@ namespace Sentry.data.Core
                 Logger.Info($"{methodName} physical - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                 try
                 {
-
                     //Mark DatasetFileConfig record deleted
                     dfc.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
                     dfc.Schema.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
 
-                    //Disable all retriever jobs, associated with schema flow
+                    //Issue deletes for associated dataflows
 
                     List<DataFlow> dataflows = new List<DataFlow>();
                     dataflows.AddRange(GetSchemaFlowByFileSchema(scm));
@@ -638,8 +637,6 @@ namespace Sentry.data.Core
                     {
                         returnResult = allDataFlowDeletesSuccessful;
                     }
-
-
                 }
                 catch (Exception ex)
                 {
