@@ -545,10 +545,12 @@ namespace Sentry.data.Core
                 {
                     Logger.Info($"{methodName} logical - configid:{id} configname:{dfc.Name}");
 
-                    /*  
-                        *  Legacy processing platform jobs where associated directly to datasetfileconfig object
-                        *  Disable all associated RetrieverJobs
-                    */
+                    /*************************
+                    * Legacy processing platform jobs where associated directly to datasetfileconfig object
+                    * Disable all associated RetrieverJobs
+                    *  
+                    * These deletes should be refactored out once DatasetFileConfigs is refactor out
+                    *************************/
                     bool jobsDeletedSuccessfully = true;
                     foreach (var job in dfc.RetrieverJobs)
                     {
@@ -566,9 +568,9 @@ namespace Sentry.data.Core
                     }
 
 
-                    /*
+                    /*************************
                     *  Mark all dataflows, for deletion, associated with schema on new processing platform
-                    */
+                    *************************/
                     List<DataFlow> dataflows = new List<DataFlow>();
                     dataflows.AddRange(GetSchemaFlowByFileSchema(scm));
                     dataflows.AddRange(GetProducerFlowsByFileSchema(scm));
@@ -580,9 +582,11 @@ namespace Sentry.data.Core
                         returnResult = allDataFlowDeletesSuccessful;
                     }
 
-                    /*  Mark objects for delete to ensure they are not displaed in UI
-                        *  WallEService, long running task within Goldeneye service, will perform delete after determined amount of time
-                    */
+
+                    /*************************
+                     * Mark objects for delete to ensure they are not displaed in UI
+                     * WallEService, long running task within Goldeneye service, will perform delete after determined amount of time
+                    *************************/
                     /* Mark dataset file config object for delete */
                     MarkForDelete(dfc);
 
@@ -625,8 +629,33 @@ namespace Sentry.data.Core
                     dfc.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
                     dfc.Schema.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
 
-                    //Issue deletes for associated dataflows
 
+                    /*************************
+                     * RetrieverJob associated with datasetfileconfigs are legacy jobs
+                     * These deletes should be refactored out once DatasetFileConfigs is 
+                     *   refactor out
+                    **************************/
+                    //Issue deletes for any retriever jobs associated with datasetfileconfig object                    
+                    bool jobsDeletedSuccessfully = true;
+                    foreach (var job in dfc.RetrieverJobs)
+                    {
+                        bool successfullJobDelete = _jobService.Delete(job.Id, user, logicalDelete);
+                        if (!successfullJobDelete)
+                        {
+                            jobsDeletedSuccessfully = successfullJobDelete;
+                        }
+                    }
+
+                    //If any jobs failed to delete, then set returnResult = false
+                    if (!jobsDeletedSuccessfully)
+                    {
+                        returnResult = jobsDeletedSuccessfully;
+                    }
+
+
+                    /*************************
+                     * Issue deletes for associated dataflows
+                    *************************/
                     List<DataFlow> dataflows = new List<DataFlow>();
                     dataflows.AddRange(GetSchemaFlowByFileSchema(scm));
                     dataflows.AddRange(GetProducerFlowsByFileSchema(scm));
