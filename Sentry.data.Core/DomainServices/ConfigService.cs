@@ -102,10 +102,10 @@ namespace Sentry.data.Core
                 {
                     errors.Add("Configuration Name is required.");
                 }
-                else if (dto.Name.ToUpper() == "DEFAULT")
-                {
-                    errors.Add("Configuration Name cannot be named default.");
-                }
+                //else if (dto.Name.ToUpper() == "DEFAULT")
+                //{
+                //    errors.Add("Configuration Name cannot be named default.");
+                //}
                 else if (dto.Name.Length > 100)
                 {
                     errors.Add("Configuration Name number of characters cannot be greater than 100.");
