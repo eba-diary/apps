@@ -91,7 +91,7 @@ namespace Sentry.data.Core
                 return DataClassification == DataClassificationType.HighlySensitive;
             }
         }
-        public ISecurable Parent { get => Asset; }
+        public virtual ISecurable Parent { get => Asset; }
 
         //Delete Implementation
         public virtual ObjectStatusEnum ObjectStatus { get; set; }
