@@ -11,11 +11,13 @@ namespace Sentry.data.Core
         private readonly IDatasetContext _datasetContext;
         //BaseTicketProvider implementation is determined within Bootstrapper and could be either ICherwellProvider or IHPSMProvider
         private readonly IBaseTicketProvider _baseTicketProvider;
+        private readonly IDataFeatures _dataFeatures;
 
-        public SecurityService(IDatasetContext datasetContext, IBaseTicketProvider baseTicketProvider)
+        public SecurityService(IDatasetContext datasetContext, IBaseTicketProvider baseTicketProvider, IDataFeatures dataFeatures)
         {
             _datasetContext = datasetContext;
             _baseTicketProvider = baseTicketProvider;
+            _dataFeatures = dataFeatures;
         }
 
         public string RequestPermission(AccessRequest model)
@@ -64,6 +66,98 @@ namespace Sentry.data.Core
         /// <param name="user">The user whose permissions you want to check</param>
         public UserSecurity GetUserSecurity(ISecurable securable, IApplicationUser user)
         {
+            // call different implementations based on the feature flag
+            return _dataFeatures.CLA3861_RefactorGetUserSecurity.GetValue()
+                ? GetUserSecurity_Internal(securable, user)
+                : GetUserSecurity_Internal_Original(securable, user);
+        }
+
+        private UserSecurity GetUserSecurity_Internal_Original(ISecurable securable, IApplicationUser user)
+        {
+            //If the user is nothing for some reason, absolutly no permissions should be returned.
+            if (user == null) { return new UserSecurity(); }
+
+            //if the user is one of the primary owners or primary contact, they should have all permissions without even requesting it.
+            //Admins also get all the permissions, except if the securable is sensitive (ie HR) 
+
+            bool IsAdmin = user.IsAdmin;
+            bool IsOwner = (user.AssociateId == securable?.PrimaryContactId) && user.CanModifyDataset;
+            List<string> userPermissions = new List<string>();
+
+            //set the user based permissions based off obsidian and ownership
+            UserSecurity us = new UserSecurity()
+            {
+                CanEditDataset = IsOwner || IsAdmin,
+                CanCreateDataset = user.CanModifyDataset || IsAdmin,
+                CanEditReport = user.CanManageReports || IsAdmin,
+                CanCreateReport = user.CanManageReports || IsAdmin,
+                CanEditDataSource = IsOwner || IsAdmin,
+                CanCreateDataSource = user.CanModifyDataset || IsAdmin,
+                ShowAdminControls = IsAdmin,
+                CanCreateDataFlow = user.CanModifyDataset || IsAdmin,
+                CanModifyDataflow = user.CanModifyDataset || IsOwner || IsAdmin
+            };
+
+            //if no tickets have been requested, then there should be no permission given.
+            if (securable?.Security?.Tickets != null && securable.Security.Tickets.Count > 0)
+            {
+                //build a adGroupName and  List(of permissionCode) anonymous obj.
+                var adGroups = securable.Security.Tickets.Select(x => new { adGroup = x.AdGroupName, permissions = x.Permissions.Where(y => y.IsEnabled).ToList() }).Where(x => x.adGroup != null).ToList();
+                //loop through the dictionary to see if the user is part of the group, if so grab the permissions.
+                foreach (var item in adGroups)
+                {
+                    if (user.IsInGroup(item.adGroup))
+                    {
+                        userPermissions.AddRange(item.permissions.Select(x => x.Permission.PermissionCode).ToList());
+                    }
+                }
+
+                //build a userId and  List(of permissionCode) anonymous obj.
+                var userGroups = securable.Security.Tickets.Select(x => new { userId = x.GrantPermissionToUserId, permissions = x.Permissions.Where(y => y.IsEnabled).ToList() }).Where(x => x.userId != null).ToList();
+                //loop through the dictionary to see if the user is the user on the ticket, if so grab the permissions.
+                foreach (var item in userGroups)
+                {
+                    if (item.userId == user.AssociateId)
+                    {
+                        userPermissions.AddRange(item.permissions.Select(x => x.Permission.PermissionCode).ToList());
+                    }
+                }
+            }
+
+            //if it is not secure, it should be wide open except for upload and notifications. call everything out for visibility.
+            if (securable == null || securable.Security == null || !securable.IsSecured)
+            {
+                us.CanPreviewDataset = true;
+                us.CanQueryDataset = true;
+                us.CanViewFullDataset = true;
+                us.CanUploadToDataset = IsOwner || IsAdmin;
+                us.CanModifyNotifications = false;
+                us.CanUseDataSource = true;
+                //us.CanManageSchema = (userPermissions.Count > 0) ? ((user.CanModifyDataset && (userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner)) || IsAdmin) : (IsOwner || IsAdmin);
+                us.CanManageSchema = (userPermissions.Count > 0) ? userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin : (IsOwner || IsAdmin);
+                return us;
+            }
+
+            //from the list of permissions, build out the security object.
+            us.CanPreviewDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_PREVIEW_DATASET) || IsOwner || IsAdmin;
+            us.CanViewFullDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_VIEW_FULL_DATASET) || IsOwner || (IsAdmin && !securable.IsSensitive);
+            us.CanQueryDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_QUERY_DATASET) || IsOwner || IsAdmin;
+            us.CanUploadToDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_UPLOAD_TO_DATASET) || IsOwner || IsAdmin;
+            us.CanModifyNotifications = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MODIFY_NOTIFICATIONS) || IsOwner || IsAdmin;
+            us.CanUseDataSource = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_USE_DATA_SOURCE) || IsOwner || IsAdmin;
+            //us.CanManageSchema = (user.CanModifyDataset && (userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner)) || IsAdmin;
+            us.CanManageSchema = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin;
+
+            return us;
+        }
+
+        /// <summary>
+        /// Get's a user's permissions for a securable entity. Refactored to be more concise.
+        /// </summary>
+        /// <param name="securable">The securable entity we're going to check for permissions</param>
+        /// <param name="user">The user whose permissions you want to check</param>
+        private UserSecurity GetUserSecurity_Internal(ISecurable securable, IApplicationUser user)
+        {
             //If the user is nothing for some reason, absolutly no permissions should be returned.
             if (user == null)
             {
@@ -106,7 +200,7 @@ namespace Sentry.data.Core
             if (securable == null || securable.Security == null || !securable.IsSecured)
             {
                 BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, parentSecurity);
-            } 
+            }
             else
             {
                 BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, parentSecurity, securable);
