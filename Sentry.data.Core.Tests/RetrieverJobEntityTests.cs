@@ -14,6 +14,7 @@ namespace Sentry.data.Core.Tests
             RetrieverJob job = new RetrieverJob()
             {
                 RelativeUri = null,
+                Schedule = "Yay",
                 DataSource = new FtpSource()
                 {
                     Id = 1
