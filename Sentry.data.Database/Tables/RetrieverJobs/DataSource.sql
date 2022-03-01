@@ -26,7 +26,7 @@
     [TokenUrl] NVARCHAR(1000) NULL, 
     [TokenExp] INT NULL, 
     [PrimaryContact_ID] VARCHAR(8) NOT NULL DEFAULT '000000', 
-    [PrimaryOwner_ID] VARCHAR(8) NOT NULL, 
+    [PrimaryOwner_ID] VARCHAR(8) NOT NULL DEFAULT '000000', 
     [IsSecured_IND] BIT NOT NULL DEFAULT 0, 
     [Security_ID] UNIQUEIDENTIFIER NULL, 
     PRIMARY KEY CLUSTERED ([DataSource_Id] ASC),

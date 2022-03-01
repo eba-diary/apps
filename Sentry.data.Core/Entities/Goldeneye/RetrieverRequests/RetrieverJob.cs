@@ -256,6 +256,18 @@ namespace Sentry.data.Core
                     vr.Add(ValidationErrors.httpsTargetFileNameBlank, "Target file name is required for HTTPS data sources");
                 }
             }
+
+            if (DataSource.Is<FtpSource>())
+            {
+                if (String.IsNullOrWhiteSpace(this.RelativeUri))
+                {
+                    vr.Add(ValidationErrors.relativeUriNotSpecified, "Relative Uri is required for FTP data sources");
+                }
+                if (string.IsNullOrEmpty(this.Schedule))
+                {
+                    vr.Add(ValidationErrors.scheduleIsNull, "Schedule is required");
+                }
+            }
             return vr;
         }
 
@@ -273,6 +285,8 @@ namespace Sentry.data.Core
             public const string httpsRequestBodyIsBlank = "httpsRequestBodyIsBlank";
             public const string httpsTargetFileNameIsBlank = "httpsTargetFileNameIsBlank";
             public const string ftpPatternNotSelected = "ftpPatternNotSelected";
+            public const string relativeUriNotSpecified = "relativeUriNotSpecified";
+            public const string scheduleIsNull = "scheduleIsNull";
         }
 
         public virtual string JobName()

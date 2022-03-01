@@ -763,7 +763,11 @@ namespace Sentry.data.Web.Controllers
                     case RetrieverJob.ValidationErrors.ftpPatternNotSelected:
                         ModelState.AddModelError("RetrieverJob.FtpPattern", vr.Description);
                         break;
-
+                    case RetrieverJob.ValidationErrors.relativeUriNotSpecified:
+                        ModelState.AddModelError("RetrieverJob.RelativeUri", vr.Description);
+                        break;
+                    case RetrieverJob.ValidationErrors.scheduleIsNull:
+                        ModelState.AddModelError("RetrieverJob.SchedulePicker", vr.Description);
                         break;
                     case DataFlow.ValidationErrors.stepsContainsAtLeastOneSchemaMap:
                     default:
