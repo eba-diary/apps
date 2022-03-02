@@ -7,5 +7,6 @@ namespace Sentry.data.Core
         Security Security { get; set; }
         string PrimaryContactId { get; set; }
         bool IsSensitive { get; }
+        ISecurable Parent { get; }
     }
 }
