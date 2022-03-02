@@ -12,7 +12,7 @@ namespace Sentry.data.Web
         public JobModel()
         {
             IsRegexSearch = true;
-            FtpPattern = FtpPattern.none;
+            FtpPattern = FtpPattern.None;
         }
 
         public string Schedule { get; set; }

@@ -4,7 +4,7 @@ namespace Sentry.data.Core
 {
     public enum FtpPattern
     {
-        none = -1,
+        None = -1,
         [Description("No Pattern")]
         NoPattern = 0,
         //[Description("Specific File")]

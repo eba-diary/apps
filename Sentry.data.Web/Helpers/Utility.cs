@@ -483,7 +483,7 @@ namespace Sentry.data.Web.Helpers
         {
             List<SelectListItem> patterns = new List<SelectListItem>();
 
-            if (selectedType == FtpPattern.none)
+            if (selectedType == FtpPattern.None)
             {
                 patterns.Add(new SelectListItem()
                 {
@@ -496,7 +496,7 @@ namespace Sentry.data.Web.Helpers
 
             foreach (FtpPattern item in Enum.GetValues(typeof(FtpPattern)))
             {
-                if (item == FtpPattern.none) 
+                if (item == FtpPattern.None) 
                 { 
                     continue; 
                 }
