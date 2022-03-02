@@ -483,12 +483,12 @@ namespace Sentry.data.Web.Helpers
         {
             List<SelectListItem> patterns = new List<SelectListItem>();
 
-            if (selectedType == FtpPattern.NoPattern)
+            if (selectedType == FtpPattern.None)
             {
                 patterns.Add(new SelectListItem()
                 {
                     Text = "Pick a ftp pattern",
-                    Value = "0",
+                    Value = "-1",
                     Selected = true,
                     Disabled = true
                 });
@@ -496,12 +496,16 @@ namespace Sentry.data.Web.Helpers
 
             foreach (FtpPattern item in Enum.GetValues(typeof(FtpPattern)))
             {
+                if (item == FtpPattern.None) 
+                { 
+                    continue; 
+                }
                 patterns.Add(new SelectListItem()
                 {
                     Text = item.GetDescription(),
                     Value = ((int)item).ToString(),
                     Selected = selectedType == item
-                });
+                });              
             }
 
             return patterns;
@@ -573,7 +577,7 @@ namespace Sentry.data.Web.Helpers
             {
                 Text = "Pick a Schedule",
                 Value = "0",
-                Selected = String.IsNullOrEmpty(schedule),
+                Selected = (String.IsNullOrEmpty(schedule) || schedule == "0"),
                 Disabled = true
             });
 
