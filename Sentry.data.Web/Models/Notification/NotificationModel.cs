@@ -41,6 +41,8 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> AllNotificationSubCategoriesReleaseNotes { get; set; }
         public IEnumerable<SelectListItem> AllNotificationSubCategoriesNews { get; set; }
 
+        public Boolean CLA3882_DSC_NOTIFICATION_SUBCATEGORY { get; set; }
+
 
 
 

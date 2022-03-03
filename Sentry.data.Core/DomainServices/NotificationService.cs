@@ -14,13 +14,15 @@ namespace Sentry.data.Core
         private readonly ISecurityService _securityService;
         private readonly UserService _userService;
         private readonly IEventService _eventService;
+        private readonly IDataFeatures _featureFlags;
 
-        public NotificationService(IDatasetContext domainContext, ISecurityService securityService, UserService userService, IEventService eventService)
+        public NotificationService(IDatasetContext domainContext, ISecurityService securityService, UserService userService, IEventService eventService, IDataFeatures dataFeatures)
         {
             _domainContext = domainContext;
             _securityService = securityService;
             _userService = userService;
             _eventService = eventService;
+            _featureFlags = dataFeatures;
         }
 
 
@@ -106,7 +108,9 @@ namespace Sentry.data.Core
                 notification.NotificationCategory = dto.NotificationCategory;
 
                 //NOTE: I tried to use Ternary Operators but i got an error that target-typed conditional expression' is not available in C# 7.3. Please use language version 9.0 or greater
-                if (dto.NotificationCategory.GetDescription() == GlobalConstants.EventType.NOTIFICATION_DSC_RELEASE_NOTES)
+                if (    dto.NotificationCategory.GetDescription() == GlobalConstants.EventType.NOTIFICATION_DSC_RELEASE_NOTES
+                        && _featureFlags.CLA3882_DSC_NOTIFICATION_SUBCATEGORY.GetValue()                                            //REMOVE THIS LINE ONLY WHEN FEATURE FLAG IS NA
+                )
                 {
                     notification.NotificationSubCategoryReleaseNotes = dto.NotificationSubCategoryReleaseNotes;
                 }
@@ -116,7 +120,9 @@ namespace Sentry.data.Core
                 }
 
 
-                if (dto.NotificationCategory.GetDescription() == GlobalConstants.EventType.NOTIFICATION_DSC_NEWS)
+                if (    dto.NotificationCategory.GetDescription() == GlobalConstants.EventType.NOTIFICATION_DSC_NEWS
+                        && _featureFlags.CLA3882_DSC_NOTIFICATION_SUBCATEGORY.GetValue()                                            //REMOVE THIS LINE ONLY WHEN FEATURE FLAG IS NA
+                )
                 {
                     notification.NotificationSubCategoryNews = dto.NotificationSubCategoryNews;
                 }

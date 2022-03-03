@@ -27,5 +27,6 @@ namespace Sentry.data.Core
         IFeatureFlag<string> CLA3707_DataInventorySource { get; }
         IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY { get; }
         IFeatureFlag<bool> CLA3553_SchemaSearch { get; }
+        IFeatureFlag<bool> CLA3882_DSC_NOTIFICATION_SUBCATEGORY { get; }
     }
 }

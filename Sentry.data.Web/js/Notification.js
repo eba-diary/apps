@@ -9,6 +9,7 @@ data.Notification = {
     DSCNotificationId: "BA_2",              //DSCNotificationId to recieve special treatment
     DSCReleaseNotes: "ReleaseNotes",        //Notification Category that shows ors hides Subcategory
     DSCNews: "News",                        //Notification Category that shows ors hides Subcategory
+    CLA3882_DSC_NOTIFICATION_SUBCATEGORY: false,
     
 
     Init: function () {
@@ -128,7 +129,11 @@ data.Notification = {
         //Grab Value of NotificationCategory dropdwn which is ObjectId
         var val = $("#NotificationCategory").val();
 
-        if (!data.Notification.isDSCNotification() || (val != data.Notification.DSCReleaseNotes && val != data.Notification.DSCNews) ) {
+        if (    !data.Notification.isDSCNotification()
+            || (val != data.Notification.DSCReleaseNotes && val != data.Notification.DSCNews)
+            || data.Notification.CLA3882_DSC_NOTIFICATION_SUBCATEGORY == false                  //REMOVE THIS LINE ONLY TO REMOVE FEATURE FLAG
+        )
+        {
             $('#notificationSubCategoryReleaseNotesContainer').hide();
             $('#notificationSubCategoryNewsContainer').hide();
         }

@@ -135,16 +135,17 @@ else
 
     @Scripts.Render("~/bundles/quill")
 
-    <script type="text/javascript">
+<script type="text/javascript">
 
         $(function () {
             $('#StartTime').datetimepicker();
             $('#ExpirationTime').datetimepicker();
 
+            data.Notification.CLA3882_DSC_NOTIFICATION_SUBCATEGORY = @Model.CLA3882_DSC_NOTIFICATION_SUBCATEGORY.ToString().ToLower();
             data.Notification.initQuill();      //init Quill RTF editor and fill it with notification message
             data.Notification.initAssetListener();
             data.Notification.initNotificationCategoryListener();
         });
 
-    </script>
+</script>
 }
