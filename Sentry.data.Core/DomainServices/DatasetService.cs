@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class DatasetService : IDatasetService
+    public class DatasetService : IDatasetService, IEntityService
     {
         private readonly IDatasetContext _datasetContext;
         private readonly ISecurityService _securityService;
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
         private readonly IConfigService _configService;
         private readonly ISchemaService _schemaService;
         private readonly IAWSLambdaProvider _awsLambdaProvider;
@@ -26,7 +26,7 @@ namespace Sentry.data.Core
         private readonly ISAIDService _saidService;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
-                            UserService userService, IConfigService configService, 
+                            IUserService userService, IConfigService configService, 
                             ISchemaService schemaService, IAWSLambdaProvider awsLambdaProvider,
                             IQuartermasterService quartermasterService, ISAIDService saidService)
         {
@@ -39,7 +39,6 @@ namespace Sentry.data.Core
             _quartermasterService = quartermasterService;
             _saidService = saidService;
         }
-
 
         public DatasetDto GetDatasetDto(int id)
         {
@@ -191,7 +190,7 @@ namespace Sentry.data.Core
                 ? _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET && x.PermissionCode == GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA).ToList()
                 : _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
 
-            List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCode(ds.SAIDAssetKeyCode).ConfigureAwait(false);
+            List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCode(ds.Asset.SaidKeyCode).ConfigureAwait(false);
             foreach(SAIDRole prodCust in prodCusts)
             {
                 ar.ApproverList.Add(new KeyValuePair<string, string>(prodCust.AssociateId, prodCust.Name));
@@ -311,43 +310,47 @@ namespace Sentry.data.Core
             _datasetContext.SaveChanges();
         }
 
-        public bool Delete(int datasetId, bool logicalDelete = true)
+        public bool Delete(int id, IApplicationUser user, bool logicalDelete)
         {
-            string methodName = System.Reflection.MethodBase.GetCurrentMethod().Name;
-            Logger.Debug($"Start Method <{methodName}>");
-            bool result;
-            Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+            string methodName = $"{nameof(DatasetService).ToLower()}_{nameof(Delete).ToLower()}";
+            Logger.Debug($"{methodName} Method Start");
+
+            bool result = true;
+            Dataset ds = _datasetContext.GetById<Dataset>(id);
+
+            bool HasCorrectStatus = false;
+
+            if (
+                (logicalDelete && (ds.ObjectStatus == GlobalEnums.ObjectStatusEnum.Pending_Delete ||
+                                   ds.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted)
+                                   ) ||
+                (!logicalDelete && ds.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted))
+            {
+                HasCorrectStatus = true;
+            }
+
+            if (HasCorrectStatus)
+            {
+                return result;
+            }
+
 
             if (logicalDelete)
             {
-                Logger.Info($"datasetservice-delete-logical - datasetid:{datasetId} datasetname:{ds.DatasetName}");
+                Logger.Info($"datasetservice-delete-logical - datasetid:{ds.DatasetId} datasetname:{ds.DatasetName}");
 
                 try
                 {
+                    _securityService.GetUserSecurity(ds, user?? _userService.GetCurrentUser());
+
                     //Mark dataset for soft delete
-                    MarkForDelete(ds);
+                    MarkForDelete(ds, user);
 
-                    ////Remove any favorite links to ensure users do not get dead link
-                    //foreach(var fav in ds.Favorities)
-                    //{
-                    //    _datasetContext.RemoveById<Favorite>(fav.FavoriteId);
-                    //}
-
-                    ////Remove any notification subscriptions to dataset
-                    //foreach (var subscib in _datasetContext.GetSubscriptionsForDataset(ds.DatasetId))
-                    //{
-                    //    _datasetContext.RemoveById<DatasetSubscription>(subscib.ID);
-                    //}
-                    
-                    //Mark Configs for soft delete to ensure no editing and jobs are disabled
+                    ////Mark Configs for soft delete to ensure no editing and jobs are disabled
                     foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
                     {
-                        _configService.Delete(config.ConfigId, logicalDelete, true);
+                        _configService.Delete(config.ConfigId, user ?? _userService.GetCurrentUser(), logicalDelete);
                     }
-
-                    _datasetContext.SaveChanges();
-
-                    result = true;
                 }
                 catch (Exception ex)
                 {
@@ -358,19 +361,16 @@ namespace Sentry.data.Core
             }
             else
             {
-                Logger.Info($"datasetservice-delete-physical - datasetid:{datasetId} datasetname:{ds.DatasetName}");
+                Logger.Info($"datasetservice-delete-physical - datasetid:{ds.DatasetId} datasetname:{ds.DatasetName}");
 
                 try
                 {
                     foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
                     {
-                        _configService.Delete(config.ConfigId, logicalDelete, true);
+                        _configService.Delete(config.ConfigId, user, logicalDelete);
                     }
 
                     ds.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
-                    _datasetContext.SaveChanges();
-
-                    result = true;
                 }
                 catch (Exception ex)
                 {
@@ -379,7 +379,7 @@ namespace Sentry.data.Core
                 }                    
             }
 
-            Logger.Debug($"End Method <{methodName}>");
+            Logger.Debug($"{methodName} Method End");
 
             return result;
         }
@@ -432,17 +432,19 @@ namespace Sentry.data.Core
         }
 
         #region "private functions"
-        private void MarkForDelete(Dataset ds)
+        private void MarkForDelete(Dataset ds, IApplicationUser user)
         {
             ds.CanDisplay = false;
             ds.DeleteInd = true;
-            ds.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
+            ds.DeleteIssuer = (user == null)? _userService.GetCurrentUser().AssociateId : user.AssociateId;
             ds.DeleteIssueDTM = DateTime.Now;
             ds.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
         }
 
         private Dataset CreateDataset(DatasetDto dto)
         {
+            Asset asset = GetAsset(dto.SAIDAssetKeyCode);
+
             Dataset ds = new Dataset()
             {
                 DatasetId = dto.DatasetId,
@@ -465,7 +467,7 @@ namespace Sentry.data.Core
                 DeleteInd = false,
                 DeleteIssueDTM = DateTime.MaxValue,
                 ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
-                SAIDAssetKeyCode = dto.SAIDAssetKeyCode,
+                Asset = asset,
                 NamedEnvironment = dto.NamedEnvironment,
                 NamedEnvironmentType = dto.NamedEnvironmentType
             };
@@ -492,6 +494,29 @@ namespace Sentry.data.Core
             };
 
             return ds;
+        }
+
+        /// <summary>
+        /// Retrieves the Asset for the given SAID Asset Key Code.
+        /// If one does not exist, it creates a new one.
+        /// </summary>
+        /// <param name="saidAssetKeyCode">The 4-character SAID asset key code</param>
+        internal Asset GetAsset(string saidAssetKeyCode)
+        {
+            var asset = _datasetContext.Assets.FirstOrDefault(da => da.SaidKeyCode == saidAssetKeyCode);
+            if (asset == null)
+            {
+                asset = new Asset()
+                {
+                    SaidKeyCode = saidAssetKeyCode,
+                    Security = new Security(GlobalConstants.SecurableEntityName.ASSET)
+                    {
+                        CreatedById = _userService.GetCurrentUser().AssociateId
+                    }
+                };
+            }
+
+            return asset;
         }
 
         private void MapToDto(Dataset ds, DatasetDto dto)
@@ -534,7 +559,7 @@ namespace Sentry.data.Core
             dto.CategoryName = ds.DatasetCategories.First().Name;
             dto.MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/Dataset/Detail/" + ds.DatasetId;
             dto.CategoryNames = ds.DatasetCategories.Select(s => s.Name).ToList();
-            dto.SAIDAssetKeyCode = ds.SAIDAssetKeyCode;
+            dto.SAIDAssetKeyCode = ds.Asset.SaidKeyCode;
             dto.NamedEnvironment = ds.NamedEnvironment;
             dto.NamedEnvironmentType = ds.NamedEnvironmentType;
         }
@@ -561,7 +586,7 @@ namespace Sentry.data.Core
             dto.CategoryColor = ds.DatasetCategories.First().Color;
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
             dto.GroupAccessCount = _securityService.GetGroupAccessCount(ds);
-            dto.SAIDAssetKeyCode = ds.SAIDAssetKeyCode;
+            dto.SAIDAssetKeyCode = ds.Asset.SaidKeyCode;
             if (ds.DatasetFiles.Any())
             {
                 dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);

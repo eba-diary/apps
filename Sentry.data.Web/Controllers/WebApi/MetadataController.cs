@@ -750,15 +750,14 @@ namespace Sentry.data.Web.WebApi.Controllers
         {
             try
             {
-                Event e = new Event();
-                e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-                e.Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                e.TimeCreated = DateTime.Now;
-                e.TimeNotified = DateTime.Now;
-                e.IsProcessed = false;
-                e.UserWhoStartedEvent = RequestContext.Principal.Identity.Name;
-                e.DataConfig = config.ConfigId;
-                e.Reason = "Viewed Schema for Dataset";
+                Event e = new Event
+                {
+                    EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                    Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                    UserWhoStartedEvent = RequestContext.Principal.Identity.Name,
+                    DataConfig = config.ConfigId,
+                    Reason = "Viewed Schema for Dataset"
+                };
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
                 Metadata m = new Metadata

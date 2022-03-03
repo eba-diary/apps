@@ -1,8 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Sentry.data.Core;
 
 namespace Sentry.data.Web
 {
@@ -14,5 +11,6 @@ namespace Sentry.data.Web
         public List<DatasetFileConfigsModel> DatasetFileConfigs { get; set; }
         public UserSecurity Security { get; set; }
         public bool DisplayDataflowMetadata { get; set; }
+        public bool DisplayDataflowEdit { get; set; }
     }
 }

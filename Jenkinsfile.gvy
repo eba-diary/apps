@@ -56,6 +56,7 @@ pipeline {
                 // Use defaults.  You can repeat the following line if you have multiple unit test assemblies to run unit tests from
                 dotNetRunTests 'Sentry.data.Web.Tests\\Sentry.data.Web.Tests.dll'
                 dotNetRunTests 'Sentry.data.Core.Tests\\Sentry.data.Core.Tests.dll'
+                dotNetRunTests 'Sentry.data.Infrastructure.Tests\\Sentry.data.Infrastructure.Tests.dll'
  
                 // Gather up the test results and process them so they can be used by Sonar
                 dotNetGatherTestResults()

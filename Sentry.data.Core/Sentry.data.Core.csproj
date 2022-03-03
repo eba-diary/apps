@@ -132,6 +132,7 @@
     <Compile Include="DomainServices\BusinessAreaService.cs" />
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DaleService.cs" />
+    <Compile Include="DomainServices\DataApplicationService.cs" />
     <Compile Include="DomainServices\DataProcessing\DataFlowService.cs" />
     <Compile Include="DomainServices\DataProcessing\DataStepService.cs" />
     <Compile Include="DomainServices\DatasetFileService.cs" />
@@ -206,6 +207,7 @@
     <Compile Include="Entities\DataProcessing\SchemaMap.cs" />
     <Compile Include="Entities\DataProcessing\Log_Level.cs" />
     <Compile Include="Entities\DataProcessing\RunInstance.cs" />
+    <Compile Include="Entities\Datasets\Asset.cs" />
     <Compile Include="Entities\Datasets\DatasetFileParquet.cs" />
     <Compile Include="Entities\Datasets\DatasetFileReply.cs" />
     <Compile Include="Entities\Elastic\ElasticResult.cs" />
@@ -328,7 +330,9 @@
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\IApacheLivyProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IXMLAction.cs" />
+    <Compile Include="Interfaces\IDataApplicationService.cs" />
     <Compile Include="Interfaces\IDatasetFileService.cs" />
+    <Compile Include="Interfaces\IEntityService.cs" />
     <Compile Include="Interfaces\IElasticContext.cs" />
     <Compile Include="Interfaces\IHostSettings.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
@@ -336,6 +340,7 @@
     <Compile Include="Interfaces\IDaleService.cs" />
     <Compile Include="Interfaces\IDataFeatures.cs" />
     <Compile Include="Interfaces\IHttpClientProvider.cs" />
+    <Compile Include="Interfaces\IInstanceGenerator.cs" />
     <Compile Include="Interfaces\IPollyPolicy.cs" />
     <Compile Include="Interfaces\IQuartermasterRestClient.cs" />
     <Compile Include="Interfaces\IQuartermasterService.cs" />
@@ -346,6 +351,7 @@
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
     <Compile Include="Interfaces\ISnowProvider.cs" />
+    <Compile Include="Interfaces\IDbExecuter.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />
     <Compile Include="Interfaces\IBaseTicketProvider.cs" />
     <Compile Include="Interfaces\ICherwellProvider.cs" />
@@ -544,6 +550,7 @@
     <None Include="ClassDiagram3.cd" />
     <None Include="ClassDiagram4.cd" />
     <None Include="ClassDiagram5.cd" />
+    <None Include="ClassDiagram6.cd" />
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>
