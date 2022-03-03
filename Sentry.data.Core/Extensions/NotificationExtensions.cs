@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Core
 {
@@ -23,7 +23,9 @@ namespace Sentry.data.Core
                 NotificationType = core.NotificationType,
                 ObjectId = core.NotificationType + "_" + core.ParentObject.ToString(),
                 Title = core.Title,
-                NotificationCategory = (core.NotificationCategory == null)? GlobalEnums.NotificationCategory.ReleaseNotes : (Sentry.data.Core.GlobalEnums.NotificationCategory) core.NotificationCategory
+                NotificationCategory =                  (core.NotificationCategory == null)?                NotificationCategory.ReleaseNotes       : (NotificationCategory)                core.NotificationCategory,
+                NotificationSubCategoryReleaseNotes =   (core.NotificationSubCategoryReleaseNotes == null)? NotificationSubCategoryReleaseNotes.DSC : (NotificationSubCategoryReleaseNotes) core.NotificationSubCategoryReleaseNotes,
+                NotificationSubCategoryNews =           (core.NotificationSubCategoryNews == null) ?        NotificationSubCategoryNews.DSC         : (NotificationSubCategoryNews)         core.NotificationSubCategoryNews
             };
 
             return model;
@@ -61,12 +63,7 @@ namespace Sentry.data.Core
             return models;
         }
 
-        //public static List<NotificationModel> ToModels(this IQueryable<Notification> cores)
-        //{
-        //    return cores.ToList().ToModels();
-        //}
-
-
+       
         public static Notification ToCore(this NotificationDto model)
         {
             return new Notification()

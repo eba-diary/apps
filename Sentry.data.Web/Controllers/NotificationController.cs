@@ -90,6 +90,10 @@ namespace Sentry.data.Web.Controllers
             model.AllSeverities = default(NotificationSeverity).ToEnumSelectList();
             model.AllDataAssets = AreaList;
             model.AllNotificationCategories = default(NotificationCategory).ToEnumSelectList();
+            model.AllNotificationSubCategoriesReleaseNotes = default(NotificationSubCategoryReleaseNotes).ToEnumSelectList();
+            model.AllNotificationSubCategoriesNews = default(NotificationSubCategoryNews).ToEnumSelectList();
+
+
             return View("ModifyNotification",model);
         }
 

@@ -98,12 +98,33 @@ namespace Sentry.data.Core
             if (!IsNotificationDSC(dto))
             {
                 notification.NotificationCategory = null;
+                notification.NotificationSubCategoryReleaseNotes = null;
+                notification.NotificationSubCategoryNews = null;
             }
             else
             {
                 notification.NotificationCategory = dto.NotificationCategory;
-            }
 
+                //NOTE: I tried to use Ternary Operators but i got an error that target-typed conditional expression' is not available in C# 7.3. Please use language version 9.0 or greater
+                if (dto.NotificationCategory.GetDescription() == GlobalConstants.EventType.NOTIFICATION_DSC_RELEASE_NOTES)
+                {
+                    notification.NotificationSubCategoryReleaseNotes = dto.NotificationSubCategoryReleaseNotes;
+                }
+                else
+                {
+                    notification.NotificationSubCategoryReleaseNotes = null;
+                }
+
+
+                if (dto.NotificationCategory.GetDescription() == GlobalConstants.EventType.NOTIFICATION_DSC_NEWS)
+                {
+                    notification.NotificationSubCategoryNews = dto.NotificationSubCategoryNews;
+                }
+                else
+                {
+                    notification.NotificationSubCategoryNews = null;
+                }
+            }
 
             _domainContext.SaveChanges();
             CreateEvent(addNotification, notification);

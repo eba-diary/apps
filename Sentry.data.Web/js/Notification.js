@@ -7,9 +7,9 @@ data.Notification = {
     QuillEditorTitle: null,                 //declare as property for use later
     QuillEditorMessage: null,               //declare as property for use later
     DSCNotificationId: "BA_2",              //DSCNotificationId to recieve special treatment
-
-
-
+    DSCReleaseNotes: "ReleaseNotes",        //Notification Category that shows ors hides Subcategory
+    DSCNews: "News",                        //Notification Category that shows ors hides Subcategory
+    
 
     Init: function () {
         data.Notification.NotificationTableInit();
@@ -93,6 +93,20 @@ data.Notification = {
         });
     },
 
+
+    //SETUP LISTENER for NotificationCategory Drop down and init beginning state
+    initNotificationCategoryListener: function () {
+
+        //initially hide or show message
+        data.Notification.hideOrShowSubCategories();
+
+        //setup onChange event to fire when asset drop down is changed
+        $('#NotificationCategory').change(function () {
+            data.Notification.hideOrShowSubCategories();
+        });
+    },
+
+
     //function to HIDE OR SHOW CONTAINERS FOR DSC NOTIFICATIONS
     hideOrShowDSCContainers: function () {
 
@@ -104,6 +118,29 @@ data.Notification = {
             $('#messageContainer').show();
             $('#notificationCategoryContainer').hide();
         }
+
+        data.Notification.hideOrShowSubCategories();
+    },
+
+    //function to HIDE OR SHOW SUBCATEGORY DROP DOWNS
+    hideOrShowSubCategories: function () {
+
+        //Grab Value of NotificationCategory dropdwn which is ObjectId
+        var val = $("#NotificationCategory").val();
+
+        if (!data.Notification.isDSCNotification() || (val != data.Notification.DSCReleaseNotes && val != data.Notification.DSCNews) ) {
+            $('#notificationSubCategoryReleaseNotesContainer').hide();
+            $('#notificationSubCategoryNewsContainer').hide();
+        }
+        else if (val === data.Notification.DSCReleaseNotes) {
+            $('#notificationSubCategoryReleaseNotesContainer').show();
+            $('#notificationSubCategoryNewsContainer').hide();
+        }
+        else if (val === data.Notification.DSCNews) {
+            $('#notificationSubCategoryReleaseNotesContainer').hide();
+            $('#notificationSubCategoryNewsContainer').show();
+        }
+       
     },
 
     //TELL US IF WE SHOULD SHOW MESSAGE FOR A GIVEN NOTIFICATION
