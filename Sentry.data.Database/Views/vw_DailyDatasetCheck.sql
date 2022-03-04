@@ -1,4 +1,4 @@
-﻿CREATE VIEW dbo.vw_DailyDatasetCheck as
+﻿CREATE VIEW [dbo].[vw_DailyDatasetCheck] as
 SELECT
 C.Name as Category_NME,
 D.Dataset_NME as Dataset_NME,
@@ -8,7 +8,10 @@ DFC.SchemaID as Schema_ID,
 S.StorageCode as Storage_CDE,
 MAX(DFC.CreateDTM) as LastFileConversion_DTE,
 GETDATE() as Current_DTM,
-CASE WHEN FORMAT(MAX(CreateDTM),'yyyy-MM-dd') = FORMAT(GETDATE(),'yyyy-MM-dd') THEN  'Y'
+--CASE WHEN FORMAT(MAX(CreateDTM),'yyyy-MM-dd') = FORMAT(GETDATE(),'yyyy-MM-dd') THEN  'Y'
+--ELSE 'N'
+--END as Success_IND_Current,
+CASE WHEN DATEDIFF(hh, MAX(CreateDTM), GETDATE()) < 30 THEN 'Y'
 ELSE 'N'
 END as Success_IND
 FROM DatasetFileConverted DFC JOIN Dataset D on d.Dataset_ID = DFC.DatasetID

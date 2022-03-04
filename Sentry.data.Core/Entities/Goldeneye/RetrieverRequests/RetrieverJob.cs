@@ -149,15 +149,8 @@ namespace Sentry.data.Core
                 else if ((!(JobOptions.IsRegexSearch) && !(String.IsNullOrWhiteSpace(JobOptions.TargetFileName))) ||
                         JobOptions.IsRegexSearch && !(String.IsNullOrWhiteSpace(JobOptions.TargetFileName)))
                 {
-                    if (DataSource.Is<HTTPSSource>())
-                    {
-                        outFileName = JobOptions.TargetFileName;
-                    }
-                    else
-                    {
-                        outFileName = JobOptions.TargetFileName + Path.GetExtension(incomingFileName);
-                    }
-                }
+                    outFileName = DataSource.Is<HTTPSSource>() ? JobOptions.TargetFileName : JobOptions.TargetFileName + Path.GetExtension(incomingFileName);
+            }
                 // Regex and TargetFileName is null - Use input file name
                 else if (JobOptions.IsRegexSearch && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
                 {
@@ -178,50 +171,20 @@ namespace Sentry.data.Core
             //if there are no options, then no filtering can take place
             if (!String.IsNullOrEmpty(_jobOptions))
             {
-                if (JobOptions.IsRegexSearch)
-                {
-                    filterfile = !(Regex.IsMatch(fileName, JobOptions.SearchCriteria));
-                }
-                else
-                {
-                    filterfile = (fileName != JobOptions.SearchCriteria);
-                }
+                filterfile = JobOptions.IsRegexSearch ? !(Regex.IsMatch(fileName, JobOptions.SearchCriteria)) : fileName != JobOptions.SearchCriteria;
 
-                if (filterfile) { this.JobLoggerMessage("Info","Incoming file was filtered (search criteria)"); }
-            }
-
-            ////if Job options already is filtering file, no need to check if file extension is correct
-            //if (!filterfile)
-            //{
-            //    switch (DatasetConfig.FileExtension.Name.ToLower().Trim())
-            //    {
-            //        case "any":
-            //        case "delimited":
-            //            //do not perform any extension checking
-            //            break;
-            //        default:
-            //            //Check if incoming extension matches
-            //            filterfile = (DatasetConfig.FileExtension.Name.ToLower().Trim() != Path.GetExtension(fileName).Replace(".", ""));
-            //            break;
-            //    }
-
-            //    if (filterfile) { this.JobLoggerMessage("Info", "Incoming file was filtered (file extension)"); }
-            //}                     
+                if (filterfile) 
+                { this.JobLoggerMessage("Info","Incoming file was filtered (search criteria)"); }
+            }                  
 
             return filterfile;
         }
 
         public virtual void JobLoggerMessage(string severity, string message, Exception ex = null)
         {
-            string jobSpecifics;
-            if (this.DataFlow == null)
-            {
-                jobSpecifics = $"Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}";
-            }
-            else
-            {
-                jobSpecifics = $"Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | DataFlowName:{this.DataFlow.Name} | DataFlowID:{this.DataFlow.Id}";                
-            }
+            string jobSpecifics = this.DataFlow == null
+                ? $"Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}"
+                : $"Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | DataFlowName:{this.DataFlow.Name} | DataFlowID:{this.DataFlow.Id}";
 
             switch (severity.ToUpper())
             {
@@ -232,12 +195,16 @@ namespace Sentry.data.Core
                     Sentry.Common.Logging.Logger.Info($"{message} - {jobSpecifics}");
                     break;
                 case "WARN":
-                    if (ex == null) { Sentry.Common.Logging.Logger.Warn($"{message} - {jobSpecifics}"); }
-                    else { Sentry.Common.Logging.Logger.Warn($"{message} - {jobSpecifics}", ex); }
+                    if (ex == null) 
+                    { Sentry.Common.Logging.Logger.Warn($"{message} - {jobSpecifics}"); }
+                    else 
+                    { Sentry.Common.Logging.Logger.Warn($"{message} - {jobSpecifics}", ex); }
                     break;
                 case "ERROR":
-                    if (ex == null) { Sentry.Common.Logging.Logger.Error($"{message} - {jobSpecifics}"); }
-                    else { Sentry.Common.Logging.Logger.Error($"{message} - {jobSpecifics}", ex); }
+                    if (ex == null) 
+                    { Sentry.Common.Logging.Logger.Error($"{message} - {jobSpecifics}"); }
+                    else 
+                    { Sentry.Common.Logging.Logger.Error($"{message} - {jobSpecifics}", ex); }
                     break;
                 default:
                     break;
@@ -249,11 +216,20 @@ namespace Sentry.data.Core
             ValidationResults vr = new ValidationResults();
 
             //Validations specific for HTTPSSource
-            if (DataSource.Is<HTTPSSource>())
+            if (DataSource.Is<HTTPSSource>() && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
             {
-                if (String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
+                vr.Add(ValidationErrors.httpsTargetFileNameBlank, "Target file name is required for HTTPS data sources");
+            }
+
+            if (DataSource.Is<FtpSource>())
+            {
+                if (String.IsNullOrWhiteSpace(this.RelativeUri))
                 {
-                    vr.Add(ValidationErrors.httpsTargetFileNameBlank, "Target file name is required for HTTPS data sources");
+                    vr.Add(ValidationErrors.relativeUriNotSpecified, "Relative Uri is required for FTP data sources");
+                }
+                if (string.IsNullOrEmpty(this.Schedule))
+                {
+                    vr.Add(ValidationErrors.scheduleIsNull, "Schedule is required");
                 }
             }
             return vr;
@@ -262,9 +238,8 @@ namespace Sentry.data.Core
         public virtual ValidationResults ValidateForDelete()
         {
             return new ValidationResults();
-            //throw new NotImplementedException();
         }
-        public class ValidationErrors
+        public static class ValidationErrors
         {
             public const string httpsTargetFileNameBlank = "keyIsBlank";
             public const string googleApiRelativeUriIsBlank = "googleApiRelativeUriIsBlank";
@@ -273,18 +248,15 @@ namespace Sentry.data.Core
             public const string httpsRequestBodyIsBlank = "httpsRequestBodyIsBlank";
             public const string httpsTargetFileNameIsBlank = "httpsTargetFileNameIsBlank";
             public const string ftpPatternNotSelected = "ftpPatternNotSelected";
+            public const string relativeUriNotSpecified = "relativeUriNotSpecified";
+            public const string scheduleIsNull = "scheduleIsNull";
         }
 
         public virtual string JobName()
         {
-            if (this.DataFlow == null)
-            {
-                return $"RJob~{this.DatasetConfig.ParentDataset.DatasetId}~{this.Id}~{this.DatasetConfig.ConfigId}~{this.DataSource.Name}";
-            }
-            else
-            {
-                return $"RJob~df_{this.DataFlow.FlowStorageCode}~job_{this.Id}~dsrc_{this.DataSource.Name}";
-            }
+            return this.DataFlow == null
+                ? $"RJob~{this.DatasetConfig.ParentDataset.DatasetId}~{this.Id}~{this.DatasetConfig.ConfigId}~{this.DataSource.Name}"
+                : $"RJob~df_{this.DataFlow.FlowStorageCode}~job_{this.Id}~dsrc_{this.DataSource.Name}";
         }
     }
 }
