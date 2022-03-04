@@ -91,6 +91,7 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<string> CLA3707_DataInventorySource => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3553_SchemaSearch => throw new NotImplementedException();
+            public IFeatureFlag<bool> CLA3882_DSC_NOTIFICATION_SUBCATEGORY => throw new NotImplementedException();
         }
     }
 }
