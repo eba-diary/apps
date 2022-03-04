@@ -58,7 +58,7 @@ namespace Sentry.data.Core
 
         string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey);
 
-        string GetDatasetDownloadURL(string key, string versionId, string fileName);
+        string GetDatasetDownloadURL(string key, string versionId = null, string fileName = null);
 
         /// <summary>
         /// Returns object metadata for S3 object.
@@ -78,7 +78,7 @@ namespace Sentry.data.Core
         /// <returns></returns>
         Dictionary<string, string> GetObjectMetadata(string key, string versionId = null);
 
-        Stream GetObject(string key, string versionId);
+        Stream GetObject(string key, string versionId = null);
 
         string StartUpload(string bucket, string uniqueKey);
 

@@ -48,7 +48,10 @@ namespace Sentry.data.Infrastructure
 
         public void Dispose()
         {
-            if (_streamResult != null) _streamResult.Dispose();
+            if (_streamResult != null)
+            {
+                _streamResult.Dispose();
+            }
         }
 
         public Stream GetFileStream(string url)
@@ -163,7 +166,7 @@ namespace Sentry.data.Infrastructure
             FtpWebRequest request = CreateDwnldRequest(url, _creds);
             request.Proxy = null;
             request.Method = WebRequestMethods.Ftp.MakeDirectory;
-            FtpWebResponse resp = (FtpWebResponse)request.GetResponse();
+            _ = (FtpWebResponse)request.GetResponse();
         }
 
         public void RenameFile(string sourceUrl, string targetUrl)
@@ -178,67 +181,8 @@ namespace Sentry.data.Infrastructure
             FtpWebRequest request = CreateDwnldRequest(sourceUrl, _creds);
             request.Method = WebRequestMethods.Ftp.Rename;
             request.RenameTo = targetUrl;
-            FtpWebResponse resp = (FtpWebResponse)request.GetResponse();
+            _ = (FtpWebResponse)request.GetResponse();
         }
-
-        #region WinSCPImplementation
-
-        //public FtpProvider (string hostName, int portNumber, NetworkCredential creds)
-        //{
-        //    CreateSessionOptions(hostName, portNumber, creds);
-        //    session = new Session();
-        //    var d = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
-        //    session.DebugLogPath = "C:\\Temp\\AppLogs\\WinSCP\\Debuglog_"+ d + ".txt";
-        //    session.SessionLogPath = "C:\\Temp\\AppLogs\\WinSCP\\Sessionlog\\Sessionlog_" + d + ".txt";
-
-        //    //session.Open(_sessionOptions);
-
-        //}
-
-        //private void CreateSessionOptions(string hostname, int portNumber, NetworkCredential creds)
-        //{
-        //    _sessionOptions = new SessionOptions
-        //    {
-        //        Protocol = Protocol.Ftp,
-        //        //HostName = hostname,
-        //        //UserName = creds.UserName,
-        //        //Password = creds.Password,
-        //        HostName = "ftp.ncdc.noaa.gov",
-        //        UserName = "ftp",
-        //        Password = "janeDoe@Sentry.com",
-        //        PortNumber = portNumber,
-        //        Timeout = TimeSpan.FromSeconds(120),
-        //        FtpMode = FtpMode.Passive
-
-        //    };
-        //    _sessionOptions.AddRawSettings("ProxyHost", "webproxy.sentry.com");
-        //    _sessionOptions.AddRawSettings("ProxyPort", "80");
-        //    _sessionOptions.AddRawSettings("ProxyMethod", "3");
-        //    _sessionOptions.AddRawSettings("ProxyUsername", Configuration.Config.GetHostSetting("ServiceAccountID"));
-        //    _sessionOptions.AddRawSettings("ProxyPassword", Configuration.Config.GetHostSetting("ServiceAccountPass"));
-
-        //    _sessionOptions.AddRawSettings("FtpForcePasvIp2", "0");
-
-        //    //_sessionOptions.AddRawSettings("ProxyMethod", "4");
-        //    //_sessionOptions.AddRawSettings("FtpProxyLogonType", "5");
-        //}
-
-        //public RemoteDirectoryInfo ListFiles()
-        //{
-        //    RemoteDirectoryInfo dirInfo = session.ListDirectory(remotePath);
-        //    return dirInfo;
-        //}
-
-        //public void GetFile(string fileName, string targetPath)
-        //{
-        //    if (String.IsNullOrWhiteSpace(remotePath))
-        //    {
-        //        throw new ArgumentNullException("remotePath", "remotePath is required to be set.");
-        //    }
-
-        //    session.GetFiles(RemotePath.EscapeFileMask(remotePath + "/" + fileName), targetPath).Check();
-        //}        
-        #endregion
     }
 
 }

@@ -32,7 +32,6 @@ namespace Sentry.data.Infrastructure
 
         public override void Execute(RetrieverJob job)
         {
-            string targetFullPath;
 
             //Set Job
             _job = job;
@@ -109,17 +108,9 @@ namespace Sentry.data.Infrastructure
                     //Need to handle both a retrieverjob target (legacy platform) and 
                     //  S3Drop or ProducerS3Drop (new processing platform) data flow steps
                     //  as targets.
-                    if (_targetStep != null)
-                    {
-                        /******************************************************************************
-                        * Utilizing Trigger bucket since we want to trigger the targetStep identified
-                        ******************************************************************************/
-                        versionId = s3Service.UploadDataFile(tempFile, _targetStep.TriggerBucket, targetkey);
-                    }
-                    else
-                    {
-                        versionId = s3Service.UploadDataFile(tempFile, targetkey);
-                    }
+                    // If _targetStep not null,
+                    //    Utilizing Trigger bucket since we want to trigger the targetStep identified
+                    versionId = _targetStep != null ? s3Service.UploadDataFile(tempFile, _targetStep.TriggerBucket, targetkey) : s3Service.UploadDataFile(tempFile, targetkey);
 
                     _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
 
@@ -231,10 +222,10 @@ namespace Sentry.data.Infrastructure
 
         protected override void ConfigureRequest()
         {
+#pragma warning disable IDE0017 // Simplify object initialization
             _request = new RestRequest();
-
+#pragma warning restore IDE0017 // Simplify object initialization
             _request.Method = Method.GET;
-
             _request.Resource = _job.GetUri().ToString();
 
             //Add datasource specific headers to request

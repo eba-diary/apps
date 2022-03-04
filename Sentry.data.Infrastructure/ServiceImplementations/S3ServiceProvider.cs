@@ -25,7 +25,6 @@ namespace Sentry.data.Infrastructure
         private static string versionId;
         private static string _bucket;
         private static string _awsRegion;
-        private static string _useAws2_0;
 
         public S3ServiceProvider() { }
 
@@ -33,10 +32,7 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                if (_bucket == null)
-                {
-                    _bucket = Config.GetHostSetting("AWS2_0RootBucket");
-                }
+                _bucket = _bucket ?? Config.GetHostSetting("AWS2_0RootBucket");
                 return _bucket;
             }
         }
@@ -44,10 +40,7 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                if (_awsRegion == null)
-                {
-                    _awsRegion = Config.GetHostSetting("AWS2_0Region");
-                }
+                _awsRegion = _awsRegion ?? Config.GetHostSetting("AWS2_0Region");
                 return _awsRegion;
             }
         }
@@ -101,10 +94,7 @@ namespace Sentry.data.Infrastructure
             {
                 lock (padlock)
                 {
-                    if(instance == null)
-                    {
-                        instance = new S3ServiceProvider();
-                    }
+                    instance = instance ?? new S3ServiceProvider();
                     return instance;
                 }
             }
@@ -1261,15 +1251,6 @@ namespace Sentry.data.Infrastructure
             key.Key = input.key;
             key.VersionId = input.versionId;
             return key;
-        }
-        private List<List<string>> GetPartList(List<string> sourceKeys)
-        {
-            throw new NotImplementedException();
-        }
-
-        private int GetObjectSize(string key)
-        {
-            throw new NotImplementedException();
         }
 
         private Dictionary<string, string> ConvertObjectMetadataResponse(GetObjectMetadataResponse resp)

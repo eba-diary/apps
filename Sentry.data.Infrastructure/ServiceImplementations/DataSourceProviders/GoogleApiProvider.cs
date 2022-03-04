@@ -100,9 +100,6 @@ namespace Sentry.data.Infrastructure
             ConfigureClient();
             ConfigureRequest();
 
-            //TODO: Revisit when GOOGLEAPI data source needs paging implemented
-            //do
-            //{
             ConfigurePaging();                
 
             IRestResponse resp = SendRequest();
@@ -149,17 +146,9 @@ namespace Sentry.data.Infrastructure
                 //Need to handle both a retrieverjob target (legacy platform) and 
                 //  S3Drop or ProducerS3Drop (new processing platform) data flow steps
                 //  as targets.
-                if (_targetStep != null)
-                {
-                    /******************************************************************************
-                     * Utilizing Trigger bucket since we want to trigger the targetStep identified
-                     ******************************************************************************/
-                    versionId = s3Service.UploadDataFile(tempFile, _targetStep.TriggerBucket, targetkey);
-                }
-                else
-                {
-                   versionId = s3Service.UploadDataFile(tempFile, targetkey);
-                }
+                //If _targetStep is no null
+                //   Utilizing Trigger bucket since we want to trigger the targetStep identified
+                versionId = _targetStep != null ? s3Service.UploadDataFile(tempFile, _targetStep.TriggerBucket, targetkey) : s3Service.UploadDataFile(tempFile, targetkey);
 
                 _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
 
@@ -203,9 +192,6 @@ namespace Sentry.data.Infrastructure
                     }
                 }
             }
-                
-            //TODO: Revisit when GOOGLEAPI data source needs paging implemented
-            //} while (_hasNext);
         }
 
         public override void Execute(RetrieverJob job, string filePath)
@@ -284,8 +270,7 @@ namespace Sentry.data.Infrastructure
                 Logger.Info($"recieved_oauth_access_token - source:{source.Name} sourceId:{source.Id} expires_in:{expires_in} token_type:{token_type}");
 
                 DateTime newTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(double.Parse(expires_in.ToString()))).TotalSeconds);
-
-                bool result = ConfigService.UpdateandSaveOAuthToken(source, accessToken.ToString(), newTokenExp);
+                _ = ConfigService.UpdateandSaveOAuthToken(source, accessToken.ToString(), newTokenExp);
 
                 return accessToken.ToString();
             }
@@ -327,7 +312,7 @@ namespace Sentry.data.Infrastructure
 
             byte[] bytesToSign = Encoding.UTF8.GetBytes(stringToSign);
 
-            string x = EncryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+            _ = EncryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
 
             byte[] keyBytes = Convert.FromBase64String(EncryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey));
 
@@ -345,7 +330,11 @@ namespace Sentry.data.Infrastructure
             return string.Join(".", segments.ToArray());
         }
 
+        //Leaving method logic for when Paging is needed for GoogleApi
+#pragma warning disable S1144 // Unused private types or members should be removed
+#pragma warning disable IDE0051 // Remove unused private members
         private string AddPageToken(string body)
+#pragma warning restore IDE0051 // Remove unused private members
         {
             JObject x = JObject.Parse(body);
             JArray reportReqeusts = (JArray)x["reportRequests"];
@@ -354,8 +343,13 @@ namespace Sentry.data.Infrastructure
 
             return x.ToString();
         }
+#pragma warning restore S1144 // Unused private types or members should be removed
 
+        //Leaving method logic for when Paging is needed for GoogleApi
+#pragma warning disable S1144 // Unused private types or members should be removed
+#pragma warning disable IDE0051 // Remove unused private members
         private string AddPageSize(string body)
+#pragma warning restore IDE0051 // Remove unused private members
         {
             JObject x = JObject.Parse(body);
             JArray reportReqeusts = (JArray)x["reportRequests"];
@@ -364,6 +358,7 @@ namespace Sentry.data.Infrastructure
 
             return x.ToString();
         }
+#pragma warning restore S1144 // Unused private types or members should be removed
 
         //TODO: Revisit when GOOGLEAPI data source needs paging implemented
         private void ConfigurePaging()
@@ -373,7 +368,9 @@ namespace Sentry.data.Infrastructure
                 string requestBody = _job.JobOptions.HttpOptions.Body;
 
             //    if (((GoogleApiSource)_job.DataSource).PagingEnabled)
-            //    {
+            
+#pragma warning disable S125 // Sections of code should not be commented out
+//    {
             //        ConfigurePaging();
             //        requestBody = AddPageSize(requestBody);
             //        if (_nextVal != "0")
@@ -382,6 +379,7 @@ namespace Sentry.data.Infrastructure
             //        };
             //    }
                 _request.AddJsonBody(requestBody);
+#pragma warning restore S125 // Sections of code should not be commented out
             }
         }
 
