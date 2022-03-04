@@ -6,10 +6,11 @@ namespace Sentry.data.Web
 {
     public class SentryProxy : IWebProxy
     {
-
         private static string proxyConfigScript = Sentry.Configuration.Config.GetHostSetting("WebProxyConfigFile");
         private static string[] useWebProxyList = Sentry.Configuration.Config.GetHostSetting("WebProxyUseList").Split(',');
-        private static string webProxyUrl = Sentry.Configuration.Config.GetHostSetting("WebProxyUrl");
+        private static string webProxyUrl = UseEdgeProxy ? Sentry.Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : Sentry.Configuration.Config.GetHostSetting("WebProxyUrl");
+
+        public static bool UseEdgeProxy { get; set; }
 
         public ICredentials Credentials
         {
@@ -33,6 +34,7 @@ namespace Sentry.data.Web
                     proxyToUse = "http://" + proxyToUse;
                 return new Uri(proxyToUse);
             }
+
             return new Uri(webProxyUrl);
         }
 
