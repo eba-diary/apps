@@ -27,7 +27,7 @@ namespace Sentry.data.Infrastructure
         public GoogleApiProvider(Lazy<IDatasetContext> datasetContext,
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService, 
             Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry,
-            IRestClient restClient) : base(datasetContext, configService, encryptionService, restClient)
+            IRestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
         {
             _jobService = jobService;
             _providerPolicy = policyRegistry.Get<ISyncPolicy>(PollyPolicyKeys.GoogleAPiProviderPolicy);
@@ -259,9 +259,10 @@ namespace Sentry.data.Infrastructure
         {
             if (source.CurrentToken == null || source.CurrentTokenExp == null || source.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
             {
-               var httpHandler = new System.Net.Http.HttpClientHandler()
+                string proxyUrl = (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue()) ? Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : Configuration.Config.GetHostSetting("WebProxyUrl");
+                var httpHandler = new System.Net.Http.HttpClientHandler()
                 {
-                    Proxy = new WebProxy(Configuration.Config.GetHostSetting("WebProxyUrl"))
+                    Proxy = new WebProxy(proxyUrl)
                     {
                         Credentials = CredentialCache.DefaultNetworkCredentials
                     }

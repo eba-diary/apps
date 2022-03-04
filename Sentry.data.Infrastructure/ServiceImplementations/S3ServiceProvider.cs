@@ -52,28 +52,6 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        private static string GetProxyHost()
-        {            
-            if (string.IsNullOrWhiteSpace(Config.GetHostSetting("WebProxyUrl")))
-            {
-                throw new S3ServiceProviderException("WebProxyUrl cannot be found");
-            }
-            else
-            {
-                return new Uri(Config.GetHostSetting("WebProxyUrl")).Host;
-            }
-        }
-        private static int GetProxyPort() 
-        {            
-            if (string.IsNullOrWhiteSpace(Config.GetHostSetting("WebProxyUrl")))
-            {
-                throw new S3ServiceProviderException("WebProxyUrl cannot be found");
-            }
-            else
-            {
-                return new Uri(Config.GetHostSetting("WebProxyUrl")).Port;
-            }
-        }
         private static string GetAwsAccessKey()
         {
             if (string.IsNullOrWhiteSpace(Config.GetHostSetting("AWSAccessKey")))
@@ -147,7 +125,6 @@ namespace Sentry.data.Infrastructure
                     AmazonS3Config s3config = new AmazonS3Config();
                     s3config.RegionEndpoint = RegionEndpoint.GetBySystemName(AwsRegion);
                     //proxy only needed when not running on AWS.  Calling code expected to pass empty value if proxy host not needed.
-                    SetAwsClientProxy(s3config);
 
                     AmazonS3Client client;
                     /*
@@ -212,21 +189,6 @@ namespace Sentry.data.Infrastructure
             string awsSecretKey = GetAwsSecretKey();
             client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);
             return client;
-        }
-
-        private static void SetAwsClientProxy(AmazonS3Config s3config)
-        {
-            Logger.Debug($"<s3serviceprovider> AWSUseProxy : {Config.GetHostSetting("AWSUseProxy")}");
-            if (bool.Parse(Config.GetHostSetting("AWSUseProxy")))
-            {
-                s3config.ProxyHost = GetProxyHost();
-                Logger.Debug($"<s3serviceprovider> WebProxyUrl Host: {GetProxyHost()}");
-
-                s3config.ProxyPort = GetProxyPort();
-                Logger.Debug($"<s3serviceprovider> WebProxyUrl Port: {GetProxyPort()}");
-
-                s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
-            }
         }
 
         /// <summary>

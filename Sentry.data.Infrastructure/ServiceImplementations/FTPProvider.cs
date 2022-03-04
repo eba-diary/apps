@@ -18,10 +18,12 @@ namespace Sentry.data.Infrastructure
         private Stream _streamResult;
         private NetworkCredential _creds;
         private readonly ISyncPolicy _providerPolicy;
+        private readonly IDataFeatures _dataFeatures;
 
-        public FtpProvider(IReadOnlyPolicyRegistry<string> registry)
+        public FtpProvider(IReadOnlyPolicyRegistry<string> registry, IDataFeatures dataFeatures)
         {
             _providerPolicy = registry.Get<ISyncPolicy>(PollyPolicyKeys.FtpProviderPolicy);
+            _dataFeatures = dataFeatures;
         }
         
         public void SetCredentials(NetworkCredential creds)
@@ -32,7 +34,10 @@ namespace Sentry.data.Infrastructure
         private FtpWebRequest CreateDwnldRequest(string url, NetworkCredential creds)
         {
             FtpWebRequest req = (FtpWebRequest)WebRequest.Create(url);
-            req.Proxy = new WebProxy(Configuration.Config.GetHostSetting("WebProxyUrl"))
+
+            string proxyUrl = (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue()) ? Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : Configuration.Config.GetHostSetting("WebProxyUrl");
+
+            req.Proxy = new WebProxy(proxyUrl)
             {
                 Credentials = System.Net.CredentialCache.DefaultNetworkCredentials
             };

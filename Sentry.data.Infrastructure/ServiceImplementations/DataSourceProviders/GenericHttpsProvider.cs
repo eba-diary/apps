@@ -19,7 +19,8 @@ namespace Sentry.data.Infrastructure
 
         public GenericHttpsProvider(Lazy<IDatasetContext> datasetContext,
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService,
-            Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry, IRestClient restClient) : base(datasetContext, configService, encryptionService, restClient)
+            Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry, 
+            IRestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
         {
             _jobService = jobService;
             _providerPolicy = policyRegistry.Get<ISyncPolicy>(PollyPolicyKeys.GenericHttpProviderPolicy);
@@ -211,11 +212,12 @@ namespace Sentry.data.Infrastructure
         protected override void ConfigureClient()
         {
             string baseUri = _job.DataSource.BaseUri.ToString();
-            
+            string proxyUrl = (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue()) ? Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : Configuration.Config.GetHostSetting("WebProxyUrl");
+
             _client = new RestClient
             {
                 BaseUrl = new Uri(baseUri),
-                Proxy = new WebProxy(Configuration.Config.GetHostSetting("WebProxyUrl"))
+                Proxy = new WebProxy(proxyUrl)
                 {
                     Credentials = CredentialCache.DefaultNetworkCredentials
                 }

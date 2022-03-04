@@ -24,16 +24,18 @@ namespace Sentry.data.Infrastructure
         protected DataFlowStep _targetStep;
         protected IAsyncPolicy _providerPolicyAsync;
         protected ISyncPolicy _providerPolicy;
+        protected readonly IDataFeatures _dataFeatures;
         #endregion
 
         protected BaseHttpsProvider(Lazy<IDatasetContext> datasetContext, 
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService,
-            IRestClient restClient)
+            IRestClient restClient, IDataFeatures dataFeatures)
         {
             _dsContext = datasetContext;
             _configService = configService;
             _encryptionService = encryptionService;
             _client = restClient;
+            _dataFeatures = dataFeatures;
         }
 
         protected IDatasetContext DatasetContext
@@ -108,9 +110,10 @@ namespace Sentry.data.Infrastructure
 
         public void CopyToStream(Stream targetStream)
         {
+            string proxyUrl = (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue()) ? Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : Configuration.Config.GetHostSetting("WebProxyUrl");
             RestClient client = new RestClient
             {
-                Proxy = new WebProxy(Configuration.Config.GetHostSetting("WebProxyUrl"))
+                Proxy = new WebProxy(proxyUrl)
                 {
                     Credentials = CredentialCache.DefaultNetworkCredentials
                 }
