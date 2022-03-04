@@ -23,5 +23,6 @@
         public virtual bool IsSensitive { get; }
 
         public virtual Security Security { get; set; }
+        public virtual ISecurable Parent { get; }
     }
 }
