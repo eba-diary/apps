@@ -40,8 +40,14 @@ namespace Sentry.data.Web
                 CanEdit = core.CanEdit,
                 Title = core.Title,
                 ObjectType = core.NotificationType,
-                NotificationCategory = core.NotificationCategory,  
-                AllNotificationCategories = default(NotificationCategory).ToEnumSelectList()
+                NotificationCategory = core.NotificationCategory,
+                NotificationSubCategoryReleaseNotes = core.NotificationSubCategoryReleaseNotes,
+                NotificationSubCategoryNews = core.NotificationSubCategoryNews,
+
+
+                AllNotificationCategories = default(NotificationCategory).ToEnumSelectList(),
+                AllNotificationSubCategoriesReleaseNotes = default(NotificationSubCategoryReleaseNotes).ToEnumSelectList(),
+                AllNotificationSubCategoriesNews = default(NotificationSubCategoryNews).ToEnumSelectList()
             };
         }
 
@@ -66,7 +72,9 @@ namespace Sentry.data.Web
                 ObjectId = model.ObjectId.Split('_')[1],
                 NotificationType = model.ObjectId.Split('_')[0],
                 Title = model.Title,
-                NotificationCategory = model.NotificationCategory
+                NotificationCategory = model.NotificationCategory,
+                NotificationSubCategoryReleaseNotes = model.NotificationSubCategoryReleaseNotes,
+                NotificationSubCategoryNews = model.NotificationSubCategoryNews
             };
         }
 

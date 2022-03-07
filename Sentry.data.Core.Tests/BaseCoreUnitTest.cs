@@ -96,6 +96,7 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA3861_RefactorGetUserSecurity { get; } = new MockBooleanFeatureFlag(true);
 
             public IFeatureFlag<bool> CLA3819_EgressEdgeMigration => throw new NotImplementedException();
+            public IFeatureFlag<bool> CLA3882_DSC_NOTIFICATION_SUBCATEGORY => throw new NotImplementedException();
         }
     }
 }
