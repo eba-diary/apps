@@ -19,6 +19,10 @@ namespace Sentry.data.Core
         //NOTE:  NotificationCategory is nullable so notifications without categories 
         public virtual NotificationCategory? NotificationCategory { get; set; }
 
+        public virtual NotificationSubCategoryReleaseNotes? NotificationSubCategoryReleaseNotes { get; set; }
+        public virtual NotificationSubCategoryNews? NotificationSubCategoryNews { get; set; }
+
+
 
         public virtual string DisplayMessage
         {

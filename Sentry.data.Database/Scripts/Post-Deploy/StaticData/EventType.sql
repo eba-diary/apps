@@ -1,10 +1,12 @@
 ﻿BEGIN TRAN 
 	BEGIN TRY 
 
-		DECLARE	@GroupDATASET VARCHAR(25)				= 'DATASET'
-				,@GroupBUSINESSAREA VARCHAR(25)			= 'BUSINESSAREA'
-				,@GroupDALE VARCHAR(25)					= 'DALE'
-				,@GroupBUSINESSAREA_DSC VARCHAR(25)		= 'BUSINESSAREA_DSC'
+		DECLARE	@GroupDATASET VARCHAR(25)							= 'DATASET'
+				,@GroupBUSINESSAREA VARCHAR(25)						= 'BUSINESSAREA'
+				,@GroupDALE VARCHAR(25)								= 'DALE'
+				,@GroupBUSINESSAREA_DSC VARCHAR(25)					= 'BUSINESSAREA_DSC'
+				,@GroupBUSINESSAREA_DSC_RELEASENOTES VARCHAR(60)	= 'BUSINESSAREA_DSC_RELEASENOTES'
+				,@GroupBUSINESSAREA_DSC_NEWS VARCHAR(60)			= 'BUSINESSAREA_DSC_NEWS'
 		
 		MERGE INTO EventType AS Target 
 		USING (VALUES 
@@ -58,7 +60,25 @@
 									--and therefore don't share the same EventTypeGroup which dictates what EventTypes they can subscribe too
 									(39, 'Release Notes'				,1,1,@GroupBUSINESSAREA_DSC		,'Release Notes'),
 									(40, 'Technical Documentation'		,1,1,@GroupBUSINESSAREA_DSC		,'Technical Documentation'),
-									(41, 'News'							,1,1,@GroupBUSINESSAREA_DSC		,'News')
+									(41, 'News'							,1,1,@GroupBUSINESSAREA_DSC		,'News'),
+
+									--@GroupBUSINESSAREA_DSC_RELEASENOTES is a group that falls under the @GroupBUSINESSAREA_DSC_RELEASENOTES umbrella
+									(42, 'Release Notes DSC'			,1,1,@GroupBUSINESSAREA_DSC_RELEASENOTES		,'DSC'),
+									(43, 'Release Notes CL'				,1,1,@GroupBUSINESSAREA_DSC_RELEASENOTES		,'CL'),
+									(44, 'Release Notes PL'				,1,1,@GroupBUSINESSAREA_DSC_RELEASENOTES		,'PL'),
+									(45, 'Release Notes LifeAnnuity'	,1,1,@GroupBUSINESSAREA_DSC_RELEASENOTES		,'LifeAnnuity'),
+									(46, 'Release Notes Claims'			,1,1,@GroupBUSINESSAREA_DSC_RELEASENOTES		,'Claims'),
+									(47, 'Release Notes Corporate'		,1,1,@GroupBUSINESSAREA_DSC_RELEASENOTES		,'Corporate'),
+
+
+									--@GroupBUSINESSAREA_DSC_RELEASENOTES is a group that falls under the @GroupBUSINESSAREA_DSC_NEWS umbrella
+									(48, 'News DSC'						,1,1,@GroupBUSINESSAREA_DSC_NEWS				,'DSC'),
+									(49, 'News Tableau'					,1,1,@GroupBUSINESSAREA_DSC_NEWS				,'Tableau'),
+									(50, 'News Python'					,1,1,@GroupBUSINESSAREA_DSC_NEWS				,'Python'),
+									(51, 'News SAS'						,1,1,@GroupBUSINESSAREA_DSC_NEWS				,'SAS'),
+									(52, 'News Analytics'				,1,1,@GroupBUSINESSAREA_DSC_NEWS				,'Analytics')
+
+
 
 
 

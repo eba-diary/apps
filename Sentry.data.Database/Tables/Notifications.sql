@@ -9,5 +9,7 @@
     [Severity_TYP] INT NOT NULL, 
     [NotificationType] VARCHAR(20) NOT NULL, 
     [Title] VARCHAR(250) NULL, 
-    [NotificationCategory] INT NULL 
+    [NotificationCategory] INT NULL,
+    [NotificationSubCategoryReleaseNotes] INT NULL,
+    [NotificationSubCategoryNews] INT NULL
 )
