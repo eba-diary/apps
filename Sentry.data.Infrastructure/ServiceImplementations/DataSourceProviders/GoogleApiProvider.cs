@@ -40,6 +40,9 @@ namespace Sentry.data.Infrastructure
 
         protected override void ConfigureClient()
         {
+            string methodName = $"{nameof(GoogleApiProvider).ToLower()}_{nameof(ConfigureClient).ToLower()}";
+            Logger.Debug($"{methodName} Method Start");
+
             string baseUri = _job.DataSource.BaseUri.ToString();
 
             string Find = "/";
@@ -55,6 +58,7 @@ namespace Sentry.data.Infrastructure
 
             if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
             {
+                Logger.Debug($"{methodName} using edge proxy: true");
                 string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
                 string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
                 proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
@@ -62,6 +66,7 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
+                Logger.Debug($"{methodName} using edge proxy: false");
                 proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
                 proxyCredentials = CredentialCache.DefaultNetworkCredentials;
             }
@@ -74,6 +79,8 @@ namespace Sentry.data.Infrastructure
                     Credentials = proxyCredentials
                 }
             };
+
+            Logger.Debug($"{methodName} Method End");
         }
 
         protected override void ConfigureRequest()
@@ -261,12 +268,27 @@ namespace Sentry.data.Infrastructure
         {
             if (source.CurrentToken == null || source.CurrentTokenExp == null || source.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
             {
-                string proxyUrl = (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue()) ? Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : Configuration.Config.GetHostSetting("WebProxyUrl");
+                ICredentials proxyCredentials;
+                string proxyUrl;
+
+                if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
+                {
+                    string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
+                    string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
+                    proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
+                    proxyCredentials = new NetworkCredential(userName, password);
+                }
+                else
+                {
+                    proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
+                    proxyCredentials = CredentialCache.DefaultNetworkCredentials;
+                }
+
                 var httpHandler = new System.Net.Http.HttpClientHandler()
                 {
                     Proxy = new WebProxy(proxyUrl)
                     {
-                        Credentials = CredentialCache.DefaultNetworkCredentials
+                        Credentials = proxyCredentials
                     }
                 };
 

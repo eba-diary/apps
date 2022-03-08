@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Polly;
 using RestSharp;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using System;
@@ -110,11 +111,15 @@ namespace Sentry.data.Infrastructure
 
         public void CopyToStream(Stream targetStream)
         {
+            string methodName = $"{nameof(BaseHttpsProvider).ToLower()}_{nameof(ConfigureClient).ToLower()}";
+            Logger.Debug($"{methodName} Method Start");
+
             ICredentials proxyCredentials;
             string proxyUrl;
 
             if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
             {
+                Logger.Debug($"{methodName} using edge proxy: true");
                 string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
                 string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
                 proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
@@ -122,6 +127,7 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
+                Logger.Debug($"{methodName} using edge proxy: false");
                 proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
                 proxyCredentials = CredentialCache.DefaultNetworkCredentials;
             }
@@ -136,7 +142,9 @@ namespace Sentry.data.Infrastructure
 
             _request.ResponseWriter = (responseStream) => responseStream.CopyTo(targetStream);
 
-            client.DownloadData(_request);            
+            client.DownloadData(_request);
+
+            Logger.Debug($"{methodName} Method End");
         }
 
         public abstract List<IRestResponse> SendPagingRequest();

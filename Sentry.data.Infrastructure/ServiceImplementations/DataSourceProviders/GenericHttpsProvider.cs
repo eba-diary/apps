@@ -2,6 +2,7 @@
 using Polly;
 using Polly.Registry;
 using RestSharp;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using System;
@@ -202,12 +203,16 @@ namespace Sentry.data.Infrastructure
 
         protected override void ConfigureClient()
         {
+            string methodName = $"{nameof(GenericHttpsDataFlowProvider).ToLower()}_{nameof(ConfigureClient).ToLower()}";
+            Logger.Debug($"{methodName} Method Start");
+
             string baseUri = _job.DataSource.BaseUri.ToString();
             ICredentials proxyCredentials;
             string proxyUrl;
 
             if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
             {
+                Logger.Debug($"{methodName} using edge proxy: true");
                 string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
                 string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
                 proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
@@ -215,6 +220,7 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
+                Logger.Debug($"{methodName} using edge proxy: false");
                 proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
                 proxyCredentials = CredentialCache.DefaultNetworkCredentials;
             }
@@ -227,6 +233,8 @@ namespace Sentry.data.Infrastructure
                     Credentials = proxyCredentials
                 }
             };
+
+            Logger.Debug($"{methodName} Method End");
         }
 
         protected override void ConfigureOAuth(IRestRequest req, RetrieverJob job)
