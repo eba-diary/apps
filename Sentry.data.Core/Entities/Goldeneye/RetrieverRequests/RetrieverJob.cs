@@ -216,12 +216,19 @@ namespace Sentry.data.Core
             ValidationResults vr = new ValidationResults();
 
             //Validations specific for HTTPSSource
-            if (DataSource.Is<HTTPSSource>() && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
+            if ( /* Need to take into consideration pre-v3 dataflows may be associated with DatasetConfig and when saved for delete 
+                 *   this validaiton will kick off.  Therefore, the the || is needed. */
+                ((DataFlow != null && DataFlow.IngestionType == (int)IngestionType.DSC_Pull) || DatasetConfig != null)
+                && DataSource.Is<HTTPSSource>()
+                && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
             {
                 vr.Add(ValidationErrors.httpsTargetFileNameBlank, "Target file name is required for HTTPS data sources");
             }
 
-            if (DataSource.Is<FtpSource>())
+            if (/* Need to take into consideration pre-v3 dataflows may be associated with DatasetConfig and when saved for delete 
+                 *   this validaiton will kick off.  Therefore, the the || is needed. */
+                ((DataFlow != null && DataFlow.IngestionType == (int)IngestionType.DSC_Pull) || DatasetConfig != null)
+                && DataSource.Is<FtpSource>())
             {
                 if (String.IsNullOrWhiteSpace(this.RelativeUri))
                 {
@@ -230,6 +237,10 @@ namespace Sentry.data.Core
                 if (string.IsNullOrEmpty(this.Schedule))
                 {
                     vr.Add(ValidationErrors.scheduleIsNull, "Schedule is required");
+                }
+                if (this.JobOptions.FtpPattern == FtpPattern.None)
+                {
+                    vr.Add(ValidationErrors.ftpPatternNotSelected, "The FTP Pattern field is required");
                 }
             }
             return vr;

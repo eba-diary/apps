@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Mvc;
-using System.Web.Script.Serialization;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Web.Helpers
@@ -488,9 +487,9 @@ namespace Sentry.data.Web.Helpers
                 patterns.Add(new SelectListItem()
                 {
                     Text = "Pick a ftp pattern",
-                    Value = "-1",
+                    Value = ((int)FtpPattern.None).ToString(),
                     Selected = true,
-                    Disabled = true
+                    Disabled = false
                 });
             }
 
