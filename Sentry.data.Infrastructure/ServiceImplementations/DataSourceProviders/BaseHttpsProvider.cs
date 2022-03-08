@@ -110,12 +110,27 @@ namespace Sentry.data.Infrastructure
 
         public void CopyToStream(Stream targetStream)
         {
-            string proxyUrl = (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue()) ? Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : Configuration.Config.GetHostSetting("WebProxyUrl");
+            ICredentials proxyCredentials;
+            string proxyUrl;
+
+            if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
+            {
+                string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
+                string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
+                proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
+                proxyCredentials = new NetworkCredential(userName, password);
+            }
+            else
+            {
+                proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
+                proxyCredentials = CredentialCache.DefaultNetworkCredentials;
+            }
+
             RestClient client = new RestClient
             {
                 Proxy = new WebProxy(proxyUrl)
                 {
-                    Credentials = CredentialCache.DefaultNetworkCredentials
+                    Credentials = proxyCredentials
                 }
             };
 

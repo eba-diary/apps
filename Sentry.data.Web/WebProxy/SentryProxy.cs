@@ -9,6 +9,10 @@ namespace Sentry.data.Web
         private static string proxyConfigScript = Sentry.Configuration.Config.GetHostSetting("WebProxyConfigFile");
         private static string[] useWebProxyList = Sentry.Configuration.Config.GetHostSetting("WebProxyUseList").Split(',');
         private static string webProxyUrl = UseEdgeProxy ? Sentry.Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : Sentry.Configuration.Config.GetHostSetting("WebProxyUrl");
+        private static ICredentials proxyCredentials = UseEdgeProxy
+            ? new NetworkCredential(Sentry.Configuration.Config.GetHostSetting("ServiceAccountID"), Sentry.Configuration.Config.GetHostSetting("ServiceAccountPassword")) 
+            : CredentialCache.DefaultNetworkCredentials;
+
 
         public static bool UseEdgeProxy { get; set; }
 
@@ -16,7 +20,7 @@ namespace Sentry.data.Web
         {
             get
             {
-                return CredentialCache.DefaultNetworkCredentials;
+                return proxyCredentials;
             }
 
             set

@@ -48,14 +48,30 @@ namespace Sentry.data.Infrastructure
             if (place != -1)
             {
                 baseUri = baseUri.Remove(place, Find.Length).Insert(place, Replace);
-            }                
+            }
+
+            ICredentials proxyCredentials;
+            string proxyUrl;
+
+            if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
+            {
+                string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
+                string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
+                proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
+                proxyCredentials = new NetworkCredential(userName, password);
+            }
+            else
+            {
+                proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
+                proxyCredentials = CredentialCache.DefaultNetworkCredentials;
+            }
 
             _client = new RestClient
             {
                 BaseUrl = new Uri(baseUri),
-                Proxy = new WebProxy(Configuration.Config.GetHostSetting("WebProxyUrl"))
+                Proxy = new WebProxy(proxyUrl)
                 {
-                    Credentials = CredentialCache.DefaultNetworkCredentials
+                    Credentials = proxyCredentials
                 }
             };
         }
