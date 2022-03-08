@@ -28,7 +28,7 @@
             var icon = "#icon_" + id;
 
             $(category).slideToggle();
-            $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
+            $(icon).toggleClass("icon-chevron-down icon-chevron-up");
         });
 
         //open additional hidden category options
@@ -235,7 +235,7 @@
 
             //open all filter categories with a selected option
             selectedOptions.closest('.filter-search-category-options').each(function () {
-                $("#" + this.id.replace("hide", "icon")).removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
+                $("#" + this.id.replace("hide", "icon")).removeClass("icon-chevron-down").addClass("icon-chevron-up");
                 $(this).show();
             });
 

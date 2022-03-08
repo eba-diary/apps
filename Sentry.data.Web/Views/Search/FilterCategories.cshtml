@@ -17,11 +17,11 @@
     foreach (FilterCategoryOptionModel option in options.ToList())
     {
         <li class="filter-search-category-option" title="@option.OptionValue">
-            <label>
-                <input type="checkbox" class="filter-search-category-option-checkbox" id="@option.OptionId" value="@option.OptionValue" checked="@option.Selected" />
-                <strong>@SafeValue(option.OptionValue)</strong>
+            <fieldset class="form-group mb-0">
+                <input type="checkbox" id="@option.OptionId" class="form-check-input filter-search-category-option-checkbox">
+                <label for="@option.OptionId" class="form-check-label">@SafeValue(option.OptionValue)</label>
                 <span>(@option.ResultCount.ToString("N0"))</span>
-            </label>
+            </fieldset>
         </li>
     }
 }
@@ -50,7 +50,7 @@
             <div class="filter-search-category-container bottom-border">
                 <div class="filter-search-category-head" id="@categoryTypeId">
                     <span>@category.CategoryName</span>
-                    <span class="glyphicon glyphicon-chevron-down" id="icon_@categoryTypeId"></span>
+                    <i class="icon-chevron-down" id="icon_@categoryTypeId"></i>
                 </div>
 
                 <div class="filter-search-category-options display-none" id="hide_@categoryTypeId">

@@ -2,6 +2,7 @@
 
 @{
     ViewBag.Fluid = true;
+    ViewBag.Title = Model.PageTitle;
     string controllerName = "data." + Model.PageTitle.Replace(" ", "");
 }
 
@@ -9,18 +10,19 @@
     <div class="search-head">
         <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" alt="Source icon" /></div>
         <div class="search-head-item">
-            <h1 class="datasetHeader">@Model.PageTitle</h1>
+            <h1 class="datasetHeader pt-2">@Model.PageTitle</h1>
         </div>
 
         <a target="_blank" rel="noopener noreferrer" href="https://confluence.sentry.com/display/CLA/Data+Inventory">
-            <em class="glyphicon glyphicon-info-sign blue"></em>
+            <i class="icon-info-solid dsc-blue-text"></i>
         </a>
 
-        <div id="search-box" class="has-feedback has-feedback-left">
-            <input class="form-control searchTextDS text-box single-line" type="text" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled />
-            <em class="form-control-feedback glyphicon glyphicon-search clickable filter-search-start display-none"></em>
-            <em class="form-control-feedback fa fa-circle-o-notch fa-spin"></em>
+        <div id="search-box" class="md-form input-group has-feedback has-feedback-left">
+            <span class="input-group-prepend sentry-blue white-text icon-search" id="SearchBoxAddon"></span>
+            <input type="text" class="form-control text-box single-line" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled>
+            <span class="form-control-feedback fa fa-circle-o-notch fa-spin"></span>
         </div>
+
     </div>
 </div>
 
@@ -32,9 +34,9 @@
         </div>
 
         <div class="filter-search-title-container bottom-border">
-            <h1 class="filter-search-title">Filter</h1>
+            <h4 class="filter-search-title pt-1">Filter</h4>
             <span class="filter-search-clear-container"><a href="#" class="display-none" id="filter-search-clear">Clear All</a></span>
-            <button type="button" class="btn btn-primary display-none filter-search-start filter-search-apply" disabled><em class="glyphicon glyphicon-search filter-search-apply-icon"></em>Apply</button>
+            <button type="button" class="btn btn-primary display-none filter-search-start filter-search-apply" disabled><em class="icon-search filter-search-apply-icon"></em>Apply</button>
         </div>
 
         <div class="filter-search-categories-sentry-spinner">
@@ -51,7 +53,7 @@
     </div>
 
     <div class="filter-search-results-none display-none">
-        <span class="glyphicon glyphicon-alert"></span>
+        <span class="icon icon-trianglewarningfilled"></span>
         <div>No results found.</div>
         <div>Try modifying your search.</div>
     </div>
@@ -59,6 +61,7 @@
     <div class="filter-search-results-container display-none">
         @Html.Partial(Model.ResultView)
     </div>
+
 </div>
 
 <div class="filter-search-show-all-container">

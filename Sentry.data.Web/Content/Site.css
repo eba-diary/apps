@@ -1468,11 +1468,12 @@ tr.categoryBanner-darkgray th.sorting_desc {
 }
 
 .assetImg {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     margin-left: 1em;
-    margin-top: 0.5em;
+    margin-top: 1em;
 }
+
 
 .daArrow {
     padding-top: 0.5em;
@@ -1490,13 +1491,6 @@ tr.categoryBanner-darkgray th.sorting_desc {
 
 .daCollapse {
     text-align: right;
-}
-
-.daNav {
-    font-size: larger;
-    margin-top: 0.75em;
-    float: right;
-    margin-right: 0.75em;
 }
 
 .desc {
@@ -2897,4 +2891,56 @@ a.forbiddenHero:hover {
 
 .multi-level-dropdown .dropdown-header {
     display: inline !important;
+}
+
+.modal-title {
+    padding-top: 0px !important;
+}
+
+.dsc-blueGray-text {
+    color: #285780;
+}
+
+.dsc-orange-text {
+    color: #683431;
+}
+
+.dsc-gold-text {
+    color: #74531c;
+}
+
+.dsc-green-text {
+    color: #005844;
+}
+
+.dsc-plum-text {
+    color: #72246c;
+}
+
+.dsc-blue-text {
+    color: #003da5;
+}
+
+.dsc-gray-text {
+    color: gray;
+}
+
+.dsc-darkGreen-text {
+    color: #005844;
+}
+
+div.dataTables_wrapper {
+    width: 100% !important;
+}
+
+div.dataTables_wrapper div.dataTables_paginate {
+    margin: 0;
+    white-space: nowrap;
+    text-align: right;
+}
+
+div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+    margin: 2px 0;
+    white-space: nowrap;
+    justify-content: flex-end;
 }

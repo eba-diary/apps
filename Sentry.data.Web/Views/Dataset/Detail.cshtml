@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "View Dataset Details";
     string headerColor = "categoryBanner-" + Model.CategoryColor;
+    string textColor = "dsc-" + Model.CategoryColor + "-text";
     var mailTo = "mailto:" + Model.PrimaryContactEmail + "?Subject=Dataset%20Inquiry%20-%20" + Model.DatasetName;
 }
 
@@ -38,7 +39,7 @@
             <div class="row">
                 <div class="col-7 pl-0">
                     <!-- Dataset Name and Request Access-->
-                    <h2 class="@Model.CategoryColor p-0 mb-1">
+                    <h2 class="@textColor p-0 mb-1">
                         @Model.DatasetName
                         @if (Model.IsSecured)
                         {
@@ -67,11 +68,11 @@
                                id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
                                 @if (Model.IsFavorite)
                                 {
-                                    <i class="icon-filled-star @Model.CategoryColor mr-0 align-middle" id="favoriteIcon"></i>
+                                    <i class="icon-filled-star @textColor mr-0 align-middle" id="favoriteIcon"></i>
                                 }
                                 else
                                 {
-                                    <i class="icon-star @Model.CategoryColor mr-0 align-middle" id="favoriteIcon"></i>
+                                    <i class="icon-star @textColor mr-0 align-middle" id="favoriteIcon"></i>
                                 }
                             </a>
 
@@ -79,7 +80,7 @@
                             {
                                 <a class="btn px-3"
                                    id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                                    <i class="icon-pencil align-self-center @Model.CategoryColor mr-0 align-middle"></i>
+                                    <i class="icon-pencil align-self-center @textColor mr-0 align-middle"></i>
                                 </a>
 
                             }
@@ -87,7 +88,7 @@
 
                                 <a class="btn px-3"
                                    data-toggle="dropdown">
-                                    <i class="icon-hamburger @Model.CategoryColor mr-0 align-middle"></i>
+                                    <i class="icon-hamburger @textColor mr-0 align-middle"></i>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-start">
                                     @if (Model.Security.CanManageSchema)
@@ -124,7 +125,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div>
-                                <h4 class="@Model.CategoryColor pt-1">Description:</h4>
+                                <h4 class="@textColor pt-1">Description:</h4>
                                 @if (Model.DatasetDesc.Length >= 500)
                                 {
 
@@ -152,7 +153,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="spanContainer">
-                                <h4 class="@Model.CategoryColor pt-1">Usage Information:</h4>
+                                <h4 class="@textColor pt-1">Usage Information:</h4>
                                 @if (Model.DatasetInformation.Length >= 300)
                                 {
 
@@ -176,7 +177,7 @@
             {
                 <hr />
                 <div>
-                    <h4 class="@Model.CategoryColor pt-1">
+                    <h4 class="@textColor pt-1">
                         Schemas:
                     </h4>
                 </div>
@@ -197,7 +198,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div style="margin-left: 35px;" data-bind="visible: Description() != null" class="spanContainer">
-                                <h6 class="@Model.CategoryColor pt-2 mb-1">Schema Description:</h6>
+                                <h6 class="@textColor pt-2 mb-1">Schema Description:</h6>
                                 <span data-bind="text: LessDescription"></span>
                                 <span id="schemaHasMoreDescription">
                                     <span id="schemaSeeMoreEllipsis">&nbsp;...</span>
@@ -218,11 +219,11 @@
 
                     <div class="row w-100">
                         <div class="col">
-                            <h5 class="@Model.CategoryColor pt-1">Last Activity Date</h5>
+                            <h5 class="@textColor pt-1">Last Activity Date</h5>
                             <p>@Model.ChangedDtm.ToString("MMMM d, yyyy")</p>
                         </div>
                         <div class="col">
-                            <h5 class="@Model.CategoryColor pt-1">Date Created</h5>
+                            <h5 class="@textColor pt-1">Date Created</h5>
                             <p>@Model.DatasetDtm.ToString("MMMM d, yyyy")</p>
                         </div>
                     </div>
@@ -231,11 +232,11 @@
 
                     <div class="row w-100">
                         <div class="col">
-                            <h5 class="@Model.CategoryColor pt-1">SAID Asset</h5>
+                            <h5 class="@textColor pt-1">SAID Asset</h5>
                             <a target="_blank" rel="noopener noreferrer" href="https://said.sentry.com/ViewAsset.aspx?ID=@Model.SAIDAssetKeyCode">@Model.SAIDAssetKeyCode</a>
                         </div>
                         <div class="col">
-                            <h5 class="@Model.CategoryColor pt-1">Contact</h5>
+                            <h5 class="@textColor pt-1">Contact</h5>
                             <p><a href="@mailTo">@Model.PrimaryContactName</a></p>
                         </div>
                     </div>
@@ -244,11 +245,11 @@
 
                     <div class="row w-100">
                         <div class="col">
-                            <h5 class="@Model.CategoryColor pt-1">Data Classification</h5>
+                            <h5 class="@textColor pt-1">Data Classification</h5>
                             <p>@Model.DataClassificationDescription</p>
                         </div>
                         <div class="col">
-                            <h5 class="@Model.CategoryColor pt-1">Environment</h5>
+                            <h5 class="@textColor pt-1">Environment</h5>
                             <p>@Model.NamedEnvironment</p>
                         </div>
                     </div>

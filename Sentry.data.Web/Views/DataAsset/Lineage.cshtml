@@ -54,24 +54,24 @@
                 </button>
             </div>
 
-            <div class="daNav row">
-                <ul class="nav nav-pills hidden-xs">
-                    <li><a href="~/DataAsset/@dataAsset.Name">Home</a></li>
+            <div class="row mt-3">
+                <ul class="nav nav-pillss">
+                    <li class="nav-item"><a class="nav-link" href="~/DataAsset/@dataAsset.Name">Home</a></li>
 
                     @{ disabled = (dataAsset.DisplayName == "SERA PL" || dataAsset.DisplayName == "PL Policy ODS") ? "" : "disabled"; }
-                    <li class="@disabled"><a href="/Lineage/Personal Lines/@dataAsset.Name">Lineage</a></li>
+                    <li class="@disabled nav-item"><a class="nav-link" href="/Lineage/Personal Lines/@dataAsset.Name">Lineage</a></li>
 
                     @{ disabled = (dataAsset.ArchLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
+                    <li class="@disabled nav-item"><a class="nav-link" href="@arch" target="_blank">Arch Diagrams</a></li>
 
                     @{ disabled = (dataAsset.DataModelLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = dataAsset.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
+                    <li class="@disabled nav-item"><a class="nav-link" href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = dataAsset.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
 
                     @{ disabled = (dataAsset.GuideLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
+                    <li class="@disabled nav-item"><a class="nav-link" href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
 
                     @{ disabled = (dataAsset.Contact != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
+                    <li class="@disabled nav-item"><a class="nav-link" href="mailto:@Model.Contact">Contact Us</a></li>
                 </ul>
             </div>
         }

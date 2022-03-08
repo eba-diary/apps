@@ -101,23 +101,23 @@
              }
      }
 
-    <div class="row page-header indexHeader">
-        <div class="row">
-            <img src="~/Images/Icons/DataAssetsBlue.svg" class="assetImg leftFloat hidden-xs" />
-            <div class="indexName">
-                <h1 class="daName">@Model.DisplayName</h1>
-                @*<a href="#" class="btn btn-primary dropdown-toggle daDD" data-toggle="dropdown" aria-expanded="false"><span class="glyphicon glyphicon-chevron-down daArrow"></span></a>*@
-                @*<ul class="dropdown-menu">
+<div class="page-header indexHeader">
+    <div class="row">
+        <img src="~/Images/Icons/DataAssetsBlue.svg" class="assetImg leftFloat hidden-xs" />
+        <div class="indexName">
+            <h2 class="daName pt-3">@Model.DisplayName</h2>
+            @*<a href="#" class="btn btn-primary dropdown-toggle daDD" data-toggle="dropdown" aria-expanded="false"><span class="glyphicon glyphicon-chevron-down daArrow"></span></a>*@
+            @*<ul class="dropdown-menu">
                     @foreach (Sentry.data.Core.DataAsset da in assets)
                         {
                             string active = (da.DisplayName.Equals(Model.DisplayName)) ? "active" : "";
                         <li class="@active"><a href="@Url.Action("Index", "DataAsset", new { id = da.Id })">@da.DisplayName</a></li>
                     }
                 </ul>*@
-            </div>
+        </div>
 
-            <!-- Removed Status and Last Updated goes here -->
-            @*@{
+        <!-- Removed Status and Last Updated goes here -->
+        @*@{
                 if (!Model.HealthIncludesSourceSystems)
                 {
                     <div>
@@ -125,57 +125,31 @@
                     </div>
                 }
             }*@
-         
 
-            <div class="visible-xs">
-                <button type="button" class="btn btn-lg btn-default daHamburger" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                    <i class="icon-hamburger"></i>
-                </button>
-            </div>
 
-            <div class="daNav row">
-                <ul class="nav nav-pills hidden-xs">
-                    <li><a href="~/DataAsset/@Model.Name">Home</a></li>
+        <div class="row mt-3">
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a class="nav-link" href="~/DataAsset/@Model.Name">Home</a></li>
 
-                    @{ disabled = ((Model.DisplayName == "SERA PL" || Model.DisplayName == "PL Policy ODS")) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="/Lineage/Personal Lines/@Model.Name">Lineage</a></li>
+                @{ disabled = ((Model.DisplayName == "SERA PL" || Model.DisplayName == "PL Policy ODS")) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="/Lineage/Personal Lines/@Model.Name">Lineage</a></li>
 
-                    @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
+                @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="@arch" target="_blank">Arch Diagrams</a></li>
 
-                    @{ disabled = (Model.DataModelLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
+                @{ disabled = (Model.DataModelLink != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
 
-                    @{ disabled = (Model.GuideLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
+                @{ disabled = (Model.GuideLink != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
 
-                    @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="mailto:@Model.Contact">Contact the @Model.DisplayName Team</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="visible-xs daCollapse">
-            <div class="navbar-collapse collapse navbar-responsive-collapse">
-                <ul class="nav navbar-nav">
-                    @{ disabled = ((Model.DisplayName == "SERA PL" || Model.DisplayName == "PL Policy ODS")) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="/Lineage/Personal Lines/@Model.Name/">Lineage</a></li>
-
-                    @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
-
-                    @{ disabled = (Model.DataModelLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
-
-                    @{ disabled = (Model.GuideLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
-
-                    @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="mailto:@Model.Contact">Contact the @Model.DisplayName Team</a></li>
-                </ul>
-            </div>
+                @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="mailto:@Model.Contact">Contact the @Model.DisplayName Team</a></li>
+            </ul>
         </div>
     </div>
+
+</div>
 
     <style>
         .disabled {

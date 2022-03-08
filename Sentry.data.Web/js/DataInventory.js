@@ -107,15 +107,13 @@
                 { data: "ScanType", className: "ScanType", visible: false }
             ],
             aLengthMenu: [10, 20, 50, 100, 500],
-            dom: "<'row'" +
-                "<'col-xs-6'l>" +
-                "<'col-xs-6 text-right'B>>" +
-                "<'row'<'col-xs-12'tr>>" +
-                "<'row'<'col-xs-12 text-center'p>>",
+            dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>t<"float-right d-inline-block"p>',
+
             buttons: [{ extend: 'colvis', text: 'Columns' }],
             initComplete: function (settings, json) {
                 data.FilterSearch.completeSearch(json.searchTotal, settings.oInit.pageLength, json.data.length);
-            }
+            },
+            "autoWidth": false
         });
     },
 
@@ -154,6 +152,6 @@
             cellValue = 'true';
         }
 
-        return '<input type="checkbox" value="true" class="table-element-checkbox" ' + checked + disabled + '><label class="display-none">' + cellValue + '</label>';
+        return '<input type="checkbox" value="true" class="table-element-checkbox form-check-input"" ' + checked + disabled + '><label class="form-check-label display-none">' + cellValue + '</label>';
     }
 }
