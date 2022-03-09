@@ -1,6 +1,7 @@
 ﻿using Polly;
 using Polly.Registry;
 using Sentry.Common.Logging;
+using Sentry.Common.Extensions;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using System;
@@ -37,9 +38,11 @@ namespace Sentry.data.Infrastructure
             string methodName = $"{nameof(FtpProvider).ToLower()}_{nameof(CreateDwnldRequest).ToLower()}";
             Logger.Debug($"{methodName} Method Start");
 
+            
+
             FtpWebRequest req = (FtpWebRequest)WebRequest.Create(url);
 
-            ICredentials proxyCredentials;
+            NetworkCredential proxyCredentials;
             string proxyUrl;
 
             if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
@@ -57,12 +60,16 @@ namespace Sentry.data.Infrastructure
                 proxyCredentials = CredentialCache.DefaultNetworkCredentials;
             }
 
+            Logger.Debug($"{methodName} proxyUser: {proxyCredentials.UserName}");
+
             req.Proxy = new WebProxy(proxyUrl)
             {
                 Credentials = proxyCredentials
             };
 
-            req.Credentials = creds;
+            Logger.Debug($"{methodName} externalUser: {creds.UserName}");
+
+            req.AddBasicAuthenticationHeaders(creds);
             req.ReadWriteTimeout = Timeout.Infinite;
 
             Logger.Debug($"{methodName} Method End");
@@ -117,7 +124,7 @@ namespace Sentry.data.Infrastructure
             {
                 throw new ArgumentException("Set provider credentials");
             }
-
+            
             FtpWebRequest request = CreateDwnldRequest(url, _creds);
             request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
 
