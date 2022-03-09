@@ -31,21 +31,26 @@
     background: #fff url(/Images/DataFlow/Conversation12.jpg) center center/cover;
 }
 
-.bg-photo-dataflow.ic:before {
+.bg-photo-dataflow.ic h4 {
     position: absolute;
     left: 3%;
     top: 75%;
     height: 60px;
     font: 400 40px/40px 'KievitSlabPro-Medium', 'Rockwell', sans-serif;
     color: #003DA5;
-    content: 'Let\'s Get Started.';
+}
+
+.bg-photo-dataflow.ic a {
+    position: absolute;
+    right: 3%;
+    top: 4%;
 }
 
 .bg-photo-dataflow.ic span {
     position: absolute;
     left: 3%;
     right: 0px;
-    top: 10%;
+    top: 4%;
     width: 350px;
     font: 100 23px/33px Lucida Sans, Arial, sans-serif !important;
     color: #00a3e0;

@@ -72,19 +72,8 @@
         data.DataFlow.initNamedEnvironmentEvents();
 
         $(document).ready(function () {
-            $('.selectpicker').selectpicker({
-                liveSearch: false,
-                showSubtext: true,
-                size: '5',
-                dropupAuto: false
-            });
-
-            $(".selectpicker-filtering").selectpicker({
-                liveSearch: true,
-                showSubtext: true,
-                size: '5',
-                dropupAuto: false
-            });
+            $("#SAIDAssetKeyCode").materialSelect();
+            $("#IsCompressed").materialSelect();
         });
         
         data.DataFlow.InitSchemaMaps(datasetId, schemaId);

@@ -2,33 +2,20 @@
 
 @{
     ViewBag.Title = "View Dataset Configuration Details";
-    string color = Model.CategoryColor;
+    string color = "dsc-" + Model.CategoryColor + "-text";
+
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><i class="icon-chevron-left"></i>  Back to Dataset Information</a>
 
-<div class="topBanner" style="height: 60px;
-    margin-top: 20px;
+<div class="topBanner" style="height: 90px;
     border-bottom: 1px #DDDDDD solid;">
     <div class="relative hidden-sm hidden-xs">
         <div>
-
             <div class="no-overflow">
                 <h1 class="detailName leftFloat @color">
                     @Model.DatasetName
-
-                    @*@if (Model.IsSecured)
-                        {
-                            <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
-                        }*@
                 </h1>
-
-                @*@{
-                        foreach (string item in Model.DistinctFileExtensions())
-                        {
-                            <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
-                        }
-                    }*@
             </div>
         </div>
     </div>
@@ -115,7 +102,7 @@
                     @* Only show ACTIVE objects to users.  Administrators can see ACTIVE\PENDING DELETE objects *@
                     @if ((item.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active && !Model.Security.ShowAdminControls) || (Model.Security.ShowAdminControls && item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Deleted))
                     {
-                        <div class="configHeader categoryBanner-@color">
+                        <div class="configHeader categoryBanner-@Model.CategoryColor">
                             @if (item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
                             {
                                 <h1 class="@color">@item.ConfigFileName <strong><i>(@Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete.ToString())</i></strong></h1>

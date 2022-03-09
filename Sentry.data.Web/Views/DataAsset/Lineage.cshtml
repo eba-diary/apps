@@ -39,45 +39,46 @@
         }
     }
 }
-<div class="row page-header indexHeader">
-    <div class="row">
+<div class="page-header indexHeader">
+    <div class="row ml-1">
         <img src="~/Images/Icons/DataAssetsBlue.svg" class="assetImg leftFloat hidden-xs" />
         <div class="indexName">
-            <h1 class="daName">@DisplayName</h1>
+            <h2 class="pt-3 daName">@DisplayName</h2>
         </div>
 
         @if (ViewBag.IsLine == false)
         {
-            <div class="visible-xs">
-                <button type="button" class="btn btn-lg btn-default daHamburger" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                    <i class="icon-hamburger"></i>
-                </button>
-            </div>
+        <div class="ml-auto">
+            <ul class="nav nav-pills mt-3">
+                <li class="nav-item"><a class="nav-link" href="~/DataAsset/@dataAsset.Name">Home</a></li>
 
-            <div class="row mt-3">
-                <ul class="nav nav-pillss">
-                    <li class="nav-item"><a class="nav-link" href="~/DataAsset/@dataAsset.Name">Home</a></li>
+                @{ disabled = (dataAsset.DisplayName == "SERA PL" || dataAsset.DisplayName == "PL Policy ODS") ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="/Lineage/Personal Lines/@dataAsset.Name">Lineage</a></li>
 
-                    @{ disabled = (dataAsset.DisplayName == "SERA PL" || dataAsset.DisplayName == "PL Policy ODS") ? "" : "disabled"; }
-                    <li class="@disabled nav-item"><a class="nav-link" href="/Lineage/Personal Lines/@dataAsset.Name">Lineage</a></li>
+                @{ disabled = (dataAsset.ArchLink != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="@arch" target="_blank">Arch Diagrams</a></li>
 
-                    @{ disabled = (dataAsset.ArchLink != null) ? "" : "disabled"; }
-                    <li class="@disabled nav-item"><a class="nav-link" href="@arch" target="_blank">Arch Diagrams</a></li>
+                @{ disabled = (dataAsset.DataModelLink != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = dataAsset.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
 
-                    @{ disabled = (dataAsset.DataModelLink != null) ? "" : "disabled"; }
-                    <li class="@disabled nav-item"><a class="nav-link" href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = dataAsset.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
+                @{ disabled = (dataAsset.GuideLink != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
 
-                    @{ disabled = (dataAsset.GuideLink != null) ? "" : "disabled"; }
-                    <li class="@disabled nav-item"><a class="nav-link" href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
+                @{ disabled = (dataAsset.Contact != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="mailto:@Model.Contact">Contact Us</a></li>
+            </ul>
+        </div>
 
-                    @{ disabled = (dataAsset.Contact != null) ? "" : "disabled"; }
-                    <li class="@disabled nav-item"><a class="nav-link" href="mailto:@Model.Contact">Contact Us</a></li>
-                </ul>
-            </div>
         }
     </div>
-    @if (ViewBag.IsLine == false)
+    @if (ViewBag.IsLine == true)
     {
+        <div class="visible-xs">
+            <button type="button" class="btn btn-lg btn-default daHamburger" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                <i class="icon-hamburger"></i>
+            </button>
+        </div>
+
         <div class="visible-xs daCollapse">
             <div class="navbar-collapse collapse navbar-responsive-collapse">
                 <ul class="nav navbar-nav">

@@ -46,29 +46,13 @@ data.Report = {
         // Initialize Images for thumbnails
         data.Images.InitImages();
 
-        $("#DatasetCategoryIds").select2({
-            placeholder:"Select Categories"
-        });
-        $("#DatasetBusinessUnitIds").select2({
-            placeholder: "Select Business Units"
-        });
-        $("#DatasetFunctionIds").select2({
-            placeholder: "Select Functions"
-        });
-        $("#DatasetFileTypeId").select2({
-            placeholder: "Select Exhibit Type",
-            allowClear: true
-        });
-        $("#FileTypeId").select2({
-            placeholder: "Select Exhibit Type",
-            allowClear: true,
-            minimumResultsForSearch: 10
-        });
-        $("#FrequencyId").select2({
-            placeholder: "Select Frequency",
-            allowClear: true,
-            minimumResultsForSearch: 10
-        });
+        $("#DatasetCategoryIds").materialSelect(); //multi
+        $("#DatasetBusinessUnitIds").materialSelect(); //multi 
+        $("#DatasetFunctionIds").materialSelect(); //multi
+        $("#DatasetFileTypeId").materialSelect();
+        $("#FileTypeId").materialSelect();
+        $("#FrequencyId").materialSelect();
+
         $("#ContactSearch").attr("placeholder", "Add Associate by name or ID");
 
         /// Initialize the Create Exhibit view

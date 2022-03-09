@@ -26,10 +26,6 @@
     font-feature-settings: "lnum";
 }
 
-#DatasetItemList .pagination > .active > a {
-    background-color: #00a3e0 !important;
-}
-
 #DatasetItemList {
     width: 100%;
 }

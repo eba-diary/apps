@@ -847,19 +847,10 @@ data.Dataset = {
 
         //CONFIGURE SAID ASSET PICKER on _DatasetCreateEdit.cshtml TO INCLUDE a filter box that comes up
         $(document).ready(function () {
-            $('.selectpicker').selectpicker({
-                liveSearch: false,
-                showSubtext: true,
-                size: '5',
-                dropupAuto: false
-            });
-
-            $(".selectpicker-filtering").selectpicker({
-                liveSearch: true,
-                showSubtext: true,
-                size: '5',
-                dropupAuto: false
-            });
+            $("#DatasetCategoryIds").materialSelect();
+            $("#saidAsset").materialSelect();
+            $("#OriginationID").materialSelect();
+            $("#DataClassification").materialSelect();
         });
 
 

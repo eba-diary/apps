@@ -10,6 +10,7 @@
 
     <div class="row">
 
+
         @* filters *@
         <div class="hidden-xs hidden-sm col-md-3 col-lg-3">
             <div id="search-pg-filters">
@@ -31,24 +32,26 @@
                                 <!-- ko if: !ShowMore -->
                                 <!-- ko foreach: OrderedFilters -->
                                 <li class="list-unstyled li-filter-disabled filterList" data-bind="css: { notAllowed: Count() == 0 }">
-                                    <label data-bind="attr: { id: id }">
-                                        <input type="checkbox" class="filterChbx"
+
+                                    <fieldset class="form-group">
+                                        <input type="checkbox" class="form-check-input"
                                                data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
-                                        <strong data-bind="text : Title"></strong>
+                                        <label class="form-check-label" data-bind="text : Title, attr: {for: id}"></label>
                                         <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
-                                    </label>
+                                    </fieldset>
+
                                 </li>
                                 <!-- /ko -->
                                 <!-- /ko -->
                                 <!-- ko if: ShowMore -->
                                 <!-- ko foreach: OrderedFilters -->
                                 <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6, css: { notAllowed: Count() == 0 }">
-                                    <label data-bind="attr: { id: id }">
-                                        <input type="checkbox" class="filterChbx"
+                                    <fieldset class="form-group">
+                                        <input type="checkbox" class="form-check-input"
                                                data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
-                                        <strong data-bind="text : Title"></strong>
+                                        <label class="form-check-label" data-bind="text : Title, attr: {for: id}"></label>
                                         <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
-                                    </label>
+                                    </fieldset>
                                 </li>
                                 <!-- /ko -->
 
@@ -94,8 +97,8 @@
                 <div class="listHeadGroup">
                     <div data-bind="visible: IsShownForCurrentType('Datasets')" style="display: none;"><img src="~/Images/Icons/DatasetsBlue.svg" class="datasetImg leftFloat" /></div>
                     <div data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;"><img src="~/Images/Icons/Business IntelligenceBlue.svg" class="datasetImg leftFloat" /></div>
-                    <div data-bind="visible: IsShownForCurrentType('Datasets')" style="display: none;"><h1 class="htCenter datasetHeader">Datasets</h1></div>
-                    <div data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;"><h1 class="htCenter datasetHeader">Business Intelligence</h1></div>
+                    <div data-bind="visible: IsShownForCurrentType('Datasets')" style="display: none;"><h1 class="htCenter datasetHeader pt-1">Datasets</h1></div>
+                    <div data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;"><h1 class="htCenter datasetHeader pt-1">Business Intelligence</h1></div>
                 </div>
 
                 @* spinner (shown until content loads) *@
@@ -106,17 +109,19 @@
                 </div>
 
                 @* search box *@
-                <div class="searchBoxDS  has-feedback has-feedback-left">
-                    <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Datasets..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('Datasets'), event: {'keyup': searchResults.toFirstPage }" autocomplete="off" style="display: none;">
-                    <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Exhibits and Dashboards..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('BusinessIntelligence')" autocomplete="off" style="display: none;">
-                    <i class="form-control-feedback icon-search"></i>
+                <div class="input-group md-form has-feedback has-feedback-left">
+                    <span class="input-group-prepend sentry-blue white-text icon-search" id="SearchBoxAddon"></span>
+                    <input class="form-control text-box single-line" id="SearchText" placeholder="Search Datasets..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('Datasets'), event: {'keyup': searchResults.toFirstPage }" autocomplete="off" style="display: none;">
+                    <input class="form-control text-box single-line" id="SearchText" placeholder="Search Exhibits and Dashboards..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('BusinessIntelligence')" autocomplete="off" style="display: none;">
                 </div>
+
+
 
                 @* filters/tiles (hidden by default until content loads *@
                 <div id="dataColumn" style="display:none;">
                     <div id="DatasetItemList" class="dataset-list inlineBlock text-left">
                         <div>
-                            <h4 class="found">
+                            <h4 class="found pt-1">
                                 Active Filters:
                                 <button type="button" class="btn btn-sm btn-primary" id="btnClearFilters" data-bind="click: clearFilters, enable: SelectedFilters().length !== 0">Clear Filters</button>
                             </h4>
@@ -167,8 +172,8 @@
                                 <div>
                                     <div data-bind="if: $index > 20"></div>
                                     <div class="category-type-wrap">
-                                        <div class="icon-filled-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId, title: FavoriteTitle}, visible: IsFavorite, enable: ObjectStatus === 'Active'" style="display: none"></div>
-                                        <div class="icon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId, title: FavoriteTitle}, visible: IsFavorite == false, enable: ObjectStatus === 'Active'" style="display: none"></div>
+                                        <div class="icon-filled-star btnFavoriteSearch disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId, title: FavoriteTitle}, visible: IsFavorite, enable: ObjectStatus === 'Active'" style="display: none"></div>
+                                        <div class="icon-star btnFavoriteSearch disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId, title: FavoriteTitle}, visible: IsFavorite == false, enable: ObjectStatus === 'Active'" style="display: none"></div>
                                         <div class="category-type" data-bind="css: BannerColor, attr: {title: AbbreviatedCategory}">
                                             <span data-bind="text: AbbreviatedCategory" />
                                         </div>
@@ -431,7 +436,7 @@
 
             self.CreatedDtm = data.CreatedDtm;
             self.ChangedDtm = data.ChangedDtm;
-            self.Color = data.Color;
+            self.Color = "dsc-" + data.Color + "-text";
 
             self.BannerColor = data.BannerColor;
             self.BorderColor = data.BorderColor;

@@ -1,17 +1,17 @@
 ﻿@{
-    string color = Model.CategoryColor;
+    string color = "dsc-" + Model.CategoryColor + "-text";
     string headerColor = "categoryBanner-" + Model.CategoryColor;
 }
 
 @if (!Model.DisplayTabSections)
 {
     <div>
-        <h3 class="@color">Data Preview (Top 20 Rows)</h3>
+        <h3 class="@color pt-1">Data Preview (Top 20 Rows)</h3>
     </div>
 }
 
 <div class="@(Model.DatasetFileCount == 0 ?"visible-item":"hidden-item")">
-    <h5 class="@color">No Data Files Available</h5>
+    <h5 class="@color pt-1">No Data Files Available</h5>
 </div>
 
 <div class="@(Model.DatasetFileCount != 0 ?"visible-item":"hidden-item")">

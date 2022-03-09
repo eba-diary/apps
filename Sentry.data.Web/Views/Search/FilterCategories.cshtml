@@ -8,6 +8,7 @@
 {
     public string SafeValue(string value)
     {
+        if(value == null) { return ""; }
         return value.Length > 25 ? value.Substring(0, 22) + "..." : value;
     }
 }

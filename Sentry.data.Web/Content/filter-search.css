@@ -65,11 +65,10 @@
     margin: 0 0 0.25em 0.5em;
     align-self: end;
     width: 100%;
+    display: inline-grid;
 }
 
 .filter-search-apply {
-    margin: 0 0 0.5em 0.5em;
-    height: fit-content;
     align-self: end;
 }
 

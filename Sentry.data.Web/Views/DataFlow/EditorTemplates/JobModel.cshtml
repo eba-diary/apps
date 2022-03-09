@@ -2,34 +2,28 @@
 @*@using (Html.BeginCollectionItem("RetrieverJob"))
 {*@
 
-    <div class="col-md-12"><h4>Where Do You Want Us to Pull From?</h4></div>
+    <h4>Where Do You Want Us to Pull From?</h4>
     
-    <div class="form-group col-md-12">
-        <hr />
-        @Html.LabelFor((model) => model.SelectedSourceType, new { @class = "control-label col-md-2" })
-        <div class="col-md-2">
-            @*@Html.EditorFor(m => m.SelectedSourceType, "BootstrapSelec", Model.SourceTypesDropdown)*@
-            @Html.DropDownListFor((model) => model.SelectedSourceType, Model.SourceTypesDropdown, new { @class = "form-control edit-dataset-row" })
+    <div class="md-form">
+        @Html.LabelFor((model) => model.SelectedSourceType, new { @class = "mdb-main-label" })
+            @Html.DropDownListFor((model) => model.SelectedSourceType, Model.SourceTypesDropdown, new { @class = "mdb-select" })
             @Html.ValidationMessageFor((model) => model.SelectedSourceType, "", new { @class = "text-danger" })
-        </div>
     </div>
 
-    <div class="form-group col-md-12">
+    <div class="md-form">
         @Html.LabelFor((model) => model.SelectedDataSource, new { @class = "control-label col-md-2" })
-        <div class="col-md-5" data-toggle="tooltip" data-placement="right" title="If the required data source does not exist, please contact DSCSupport@sentry.com for assistance.">
+        <div class="" data-toggle="tooltip" data-placement="right" title="If the required data source does not exist, please contact DSCSupport@sentry.com for assistance.">
             @Html.DropDownListFor((model) => model.SelectedDataSource, Model.SourcesForDropdown, new { @class = "form-control edit-dataset-row"})
             @Html.ValidationMessageFor((model) => model.SelectedDataSource, "", new { @class = "text-danger" })
         </div>
-        <div class="securityPanel col-md-5" style="display:none;">
-            <div class="form-group col-md-1">
+        <div class="securityPanel" style="display:none;">
+            <div class="md-form">
                 <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
             </div>
-            <div class="col-md-4">
                 <span>
                     <input id="RequestAccessButton" type="button" value="Request Access" class="btn btn-primary"
                            data-toggle="tooltip" data-placement="top" title="Request Access to Data Source" />
                 </span>
-            </div>
         </div>
     </div>
     <br />
@@ -189,79 +183,6 @@
             </div>
         </div>
 
-        @*<div class="jobquestion compression">
-                <div class="form-group configQuestion">
-                    <div class="col-md-12">
-                        <hr />
-                        <h6>Do files need to be decompressed?</h6>
-                    </div>
-                </div>
-
-                <div class="form-group questionDescription">
-                    <div class="col-md-12">
-                        <span class="text-muted">
-                            <em>Compressed files can be decompressed as part of the retrieval processes if needed.  Contents of compressed file will be loaded into this Schema.</em>
-                        </span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    @Html.LabelFor(model => model.IsSourceCompressed, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.CheckBoxFor(model => model.IsSourceCompressed, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                        @Html.ValidationMessageFor(model => model.IsSourceCompressed, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-
-                <div id="compressionPanel">
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.CompressionType, htmlAttributes: new { @class = "control-label col-md-2" })
-                        <div class="col-md-10">
-                            @Html.DropDownListFor(model => model.CompressionType, Model.CompressionTypesDropdown, new { @class = "form-control edit-dataset-row", })
-                            @Html.ValidationMessageFor(model => model.CompressionType, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-
-                    @Html.HiddenFor(model => model.FileNameExclusionList)
-                    @Html.HiddenFor(model => model.NewFileNameExclusionList)
-
-                    <div class="form-group">
-                        <label class="control-label col-md-2" style="font-weight: 100;">File Names to Exclude</label>
-                        <div id="fileNamePanel" class="col-md-10">
-
-                            @foreach (String a in Model.FileNameExclusionList.ToList())
-                            {
-                                <div>
-                                    <input class="form-control edit-dataset-row fileNameExclusion" style="display: inline-block; width: 80%;" value="@a" />
-                                    <a class="removeFileName" style="display: inline-block; margin-left: 10px;"><span class="glyphicon glyphicon-minus"></span> Remove File Name</a>
-                                </div>
-                            }
-
-                            <div>
-                                <input class="form-control edit-dataset-row fileNameExclusion" style="display: inline-block; width: 80%;" />
-                                <a class="removeFileName" style="display: inline-block; margin-left: 10px;"><span class="glyphicon glyphicon-minus"></span> Remove File Name</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group fieldDescription">
-                        <label class="control-label col-md-2"></label>
-                        <div class="col-md-10">
-                            <span class="text-muted">
-                                <em>This is optional.  If no names are provided, all files contined within the compressed file will be uploaded to this config.</em>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="control-label col-md-2"></label>
-                        <div class="col-md-10">
-                            <a class="addFileName"><span class="glyphicon glyphicon-plus"></span> Add File to Exclude</a>
-                        </div>
-                    </div>
-                </div>
-            </div>*@
         <div class="jobquestion targetFileName">
             <div class="form-group configQuestion">
                 <div class="col-md-12">
