@@ -245,7 +245,7 @@ namespace Sentry.data.Infrastructure
                         }
                     };
                 }
-                else if (!string.IsNullOrEmpty(terms.First()))
+                else
                 {
                     boolQuery.Should = new List<QueryContainer>()
                     {
