@@ -372,15 +372,24 @@ namespace Sentry.data.Core
         //    return models;
         //}
 
-        public List<BusinessAreaSubscription> GetAllUserSubscriptions(EventTypeGroup group)
+        public List<BusinessAreaSubscription> GetAllUserSubscriptionsFromDatabase(EventTypeGroup group)
         {
-            return _domainContext.GetAllUserSubscriptionsByEventTypeGroup(_userService.GetCurrentUser().AssociateId, group);
+            List<BusinessAreaSubscription> businessAreaSubscriptions = _domainContext.GetAllUserSubscriptionsByEventTypeGroup(_userService.GetCurrentUser().AssociateId, group);
+            
+            
+            return businessAreaSubscriptions;
         }
 
         public IEnumerable<EventType> GetEventTypes(EventTypeGroup group)
         {
-            IQueryable<EventType> et = _domainContext.EventTypes.Where( w => w.Display && w.Group == group.GetDescription());
-            return et;
+            IQueryable<EventType> eventTypes = _domainContext.EventTypes.Where( w => w.Display && w.Group == group.GetDescription());
+            foreach (EventType et in eventTypes)
+            {
+                IQueryable<EventType> children = _domainContext.EventTypes.Where(w => w.ParentDescription == et.Description);
+                et.ChildEventTypes = children.ToList();
+            }
+
+            return eventTypes;
         }
 
         public List<Interval> GetAllIntervals()
@@ -397,43 +406,14 @@ namespace Sentry.data.Core
 
         public void CreateUpdateSubscription(SubscriptionDto dto)
         {
-            //ONLY UPDATE Subsriptions for BusinessArea and BusinessAreaDSC EventTypeGroups for now
             if(dto.group == EventTypeGroup.BusinessArea || dto.group == EventTypeGroup.BusinessAreaDSC)
             {
-                List<BusinessAreaSubscription> oldSubs = GetAllUserSubscriptions(dto.group);
+                List<BusinessAreaSubscription> dbList = GetAllUserSubscriptionsFromDatabase(dto.group);
+                List<BusinessAreaSubscription> newList = dto.CurrentSubscriptionsBusinessArea;
 
-                foreach (BusinessAreaSubscription newSub in dto.CurrentSubscriptionsBusinessArea)
-                {
-                    bool insertMe = true;
+                UpdateSubscriptionsSmartly(ref dbList, newList);
 
-                    if (oldSubs != null)
-                    {
-                        BusinessAreaSubscription oldSub = (BusinessAreaSubscription)oldSubs.FirstOrDefault(w => w.ID == newSub.ID);
-                        if (oldSub != null)
-                        {
-                            if (oldSub.Interval.Interval_ID != newSub.Interval.Interval_ID)
-                                oldSub.Interval = newSub.Interval;
-
-                            insertMe = false;
-                        }
-                    }
-
-                    if (insertMe)
-                    {
-                        _domainContext.Merge<BusinessAreaSubscription>
-                        (
-                            new BusinessAreaSubscription
-                            (
-                                newSub.BusinessAreaType,
-                                newSub.EventType,
-                                newSub.Interval,
-                                _userService.GetCurrentUser().AssociateId
-                             )
-                        );
-                    }
-                }
-                
-                List<BusinessAreaSubscription> delSubs = oldSubs.Where(w => w.Interval.Interval_ID == 5).ToList();
+                List<BusinessAreaSubscription> delSubs = dbList.Where(w => w.Interval.Interval_ID == 5).ToList();
                 if (delSubs != null)
                 {
                     foreach (BusinessAreaSubscription delSub in delSubs)
@@ -443,6 +423,48 @@ namespace Sentry.data.Core
                 }
 
                 _domainContext.SaveChanges();
+            }
+        }
+
+        //RECURSIVE METHOD THAT WILL TAKE NEW LIST OF SUBSCRIPTIONS AND UPDATE IN DATABASE
+        private void UpdateSubscriptionsSmartly(ref List<BusinessAreaSubscription> dbList, List<BusinessAreaSubscription> newList)
+        {
+            foreach (BusinessAreaSubscription newItem in newList)
+            {
+                bool insertMe = true;
+                if (dbList != null)
+                {
+                    //CHECK IF DB HAS NEW ITEM
+                    BusinessAreaSubscription dbItem = (BusinessAreaSubscription)dbList.FirstOrDefault(w => w.ID == newItem.ID);
+                    if (dbItem != null)
+                    {
+                        //UPDATE ONLY IF INTERVAL HAS CHANGED
+                        if (dbItem.Interval.Interval_ID != newItem.Interval.Interval_ID)
+                        {
+                            dbItem.Interval = newItem.Interval;
+                        }
+                        insertMe = false;
+                    }
+                }
+                if (insertMe)
+                {
+                    _domainContext.Merge<BusinessAreaSubscription>
+                    (
+                        new BusinessAreaSubscription
+                        (
+                            newItem.BusinessAreaType,
+                            newItem.EventType,
+                            newItem.Interval,
+                            _userService.GetCurrentUser().AssociateId
+                         )
+                    );
+                }
+
+                //IF CHILDREN EXIST ON SUBSCRIPTION THEN RESURSIVELY CALL THIS FUNCTION AGAIN TO ADD NEW SUBSCRIPTIONS IF REQUIRED
+                if (newItem.childBusinessAreaSubscriptions != null)
+                {
+                    UpdateSubscriptionsSmartly(ref dbList, newItem.childBusinessAreaSubscriptions);
+                }
             }
         }
 

@@ -152,41 +152,73 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public ActionResult SubscribeDisplay(int group)
         {
-            SubscriptionModel sm = new SubscriptionModel();
-            sm.group = (EventTypeGroup) group;     //need to teach MODEL what KIND of Subscription it is,either DATASET=1 or BUSINESSAREA=2   or BUSINESSAREA_DSC=3
-            sm.AllIntervals  = _notificationService.GetAllIntervals().Select((c) => new SelectListItem { Text = c.Description, Value = c.Interval_ID.ToString() });
-            sm.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
+            //STEP 1:   CREATE MODEL TO HOLD ALL NECESSARY INFO FOR PARTIAL VIEW _SubscribeHero.  NOTE: Passed in Group determines which subscriptions will be displayed of user 
+            SubscriptionModel model = new SubscriptionModel();
+            model.group = (EventTypeGroup) group;                      //DATASET=1 or BUSINESSAREA=2   or BUSINESSAREA_DSC=3
+            model.AllIntervals  = _notificationService.GetAllIntervals().Select((c) => new SelectListItem { Text = c.Description, Value = c.Interval_ID.ToString() });
+            model.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
+            model.businessAreaID = (model.group == EventTypeGroup.BusinessArea) ? (int) BusinessAreaType.PersonalLines : (int) BusinessAreaType.DSC; 
 
-            //BUSINESSAREA      AUSTIN:  FUTURE we will put DATASET in here too, you can maybe even add another function to pass stuff here and make below even more generic
-            if(sm.group == EventTypeGroup.BusinessArea || sm.group == EventTypeGroup.BusinessAreaDSC)
+            //STEP 2: PROCESS ONLY BUSINESSAREA and BUSINESSAREA_DSC.  FUTURE:  ADD DATASET
+            if (model.group == EventTypeGroup.BusinessArea || model.group == EventTypeGroup.BusinessAreaDSC)
             {
-                //BUSINESSAREA is either PersonalLines or DSC, But they share different EventTypes so set the right variables here so proper subscriptions are brought back
-                BusinessAreaType bat = (sm.group == EventTypeGroup.BusinessArea) ? BusinessAreaType.PersonalLines : BusinessAreaType.DSC;
-                sm.businessAreaID = (int)bat;
+                //STEP 3:  GET ALL SUBSCRIPTIONS USER HAS CURRENTLY
+                List<BusinessAreaSubscription> dbSubscriptions = _notificationService.GetAllUserSubscriptionsFromDatabase(model.group).OrderBy(o => o.EventType.Type_ID).ToList();
 
-                //get list of subscriptions the user has saved
-                List<BusinessAreaSubscription> tempCurrentSubscriptionsBusinessArea = _notificationService.GetAllUserSubscriptions(sm.group).OrderBy(o => o.EventType.Type_ID).ToList();
+                //STEP 4:  GET ALL EVENTTYPES IN GROUP 
+                IEnumerable<EventType> eventTypes = _notificationService.GetEventTypes(model.group);
 
-                //add any missing subscriptions the user may not have saved
-                foreach (Core.EventType et in _notificationService.GetEventTypes(sm.group))
-                {
-                    if (!tempCurrentSubscriptionsBusinessArea.Any(x => x.EventType.Type_ID == et.Type_ID))
-                    {
-                        BusinessAreaSubscription subscription = new BusinessAreaSubscription();
-                        subscription.BusinessAreaType = bat;
-                        subscription.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
-                        subscription.EventType = et;
-                        subscription.Interval = _notificationService.GetInterval("Never");
-                        subscription.ID = 0;
+                
+                //STEP 5:   UPDATE SUBSCRIPTIONS
+                UpdateSubscriptions(eventTypes.ToList(), ref dbSubscriptions, (BusinessAreaType)model.businessAreaID);
 
-                        tempCurrentSubscriptionsBusinessArea.Add(subscription);
-                    }
-                }
-
-                sm.CurrentSubscriptionsBusinessArea = tempCurrentSubscriptionsBusinessArea.OrderBy(o => o.EventType.Type_ID).ToList();
+                //STEP 6:  UPDATE CURRENT SUBCRIPTIONS
+                model.CurrentSubscriptionsBusinessArea = dbSubscriptions.OrderBy(o => o.EventType.Type_ID).ToList();
             }
 
-            return PartialView("_SubscribeHero", sm);
+            return PartialView("_SubscribeHero", model);
+        }
+
+
+        //THIS METHOD IS A RECURSIVE METHOD THAT ITERATES THROUGH ALL EVENTTYPES AND ENSURES THAT USER HAS A SUBCRIPTION TO EACH ONE
+        //IF A EVENTTYPE HAS CHILDREN, MAKE SURE TO ADD THAT TO BusinessAreaSubscription.childBusinessAreaSubscriptions
+        private void UpdateSubscriptions(List<EventType> eventTypes, ref List<BusinessAreaSubscription> dbSubscriptions, BusinessAreaType businessAreaType )
+        {
+            //LOOP THROUGH EVENTTYPES
+            foreach(EventType et in eventTypes)
+            {
+                //INITIALIZE NEW SUBSCRIPTION IF NOT EXIST
+                if(dbSubscriptions == null)
+                {
+                    dbSubscriptions = new List<BusinessAreaSubscription>();
+                }
+                
+                BusinessAreaSubscription dbSubscription = dbSubscriptions.FirstOrDefault(w => w.EventType.Type_ID == et.Type_ID);   //CHECK IF SUBSCRIPTION EXISTS TO GIVEN EVENTTYPE
+                List<BusinessAreaSubscription> tempChildren = null;
+                if (dbSubscription == null)                                                                      //INSERT SCENARIO:  SUBSCRIPTION = NULL MEANS ONE NEEDS TO BE ADDED   
+                {
+                    BusinessAreaSubscription newSubscription = new BusinessAreaSubscription();
+                    newSubscription.BusinessAreaType = businessAreaType;
+                    newSubscription.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
+                    newSubscription.EventType = et;
+                    newSubscription.Interval = _notificationService.GetInterval("Never");
+                    newSubscription.ID = 0;
+
+                    if(et.ChildEventTypes != null)
+                    {
+                        tempChildren = newSubscription.childBusinessAreaSubscriptions;                          //NOTE: CANT PASS ANY PARENT.Property AS REF in C#, so make a new var and UPDATE LATER
+                        UpdateSubscriptions(et.ChildEventTypes, ref tempChildren, businessAreaType);
+                        newSubscription.childBusinessAreaSubscriptions = tempChildren;
+                    }
+                    dbSubscriptions.Add(newSubscription);
+                }
+                else if (et.ChildEventTypes != null && et.ChildEventTypes.Count > 0)                            //UPDATE SCENARIO:  SUBSCRIPTION EXISTS BUT NEED TO CHECK IF THEY HAVE ALL CHILDREN
+                {
+                    tempChildren = dbSubscription.childBusinessAreaSubscriptions;
+                    UpdateSubscriptions(et.ChildEventTypes, ref tempChildren, businessAreaType);
+                    dbSubscription.childBusinessAreaSubscriptions = tempChildren;
+                }
+            }
         }
 
         [HttpPost]
