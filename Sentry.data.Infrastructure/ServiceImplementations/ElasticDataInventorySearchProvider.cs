@@ -245,7 +245,7 @@ namespace Sentry.data.Infrastructure
                         }
                     };
                 }
-                else
+                else if (!string.IsNullOrEmpty(terms.First()))
                 {
                     boolQuery.Should = new List<QueryContainer>()
                     {
@@ -273,10 +273,10 @@ namespace Sentry.data.Infrastructure
 
             foreach (FilterCategoryDto category in dto.FilterCategories)
             {
-                filter.Add(new QueryStringQuery()
+                filter.Add(new TermsQuery()
                 {
-                    Query = string.Join(" OR ", category.CategoryOptions.Where(x => x.Selected).Select(x => x.OptionValue)),
-                    DefaultField = NestHelper.GetFilterCategoryField<DataInventory>(category.CategoryName)
+                    Field = NestHelper.GetFilterCategoryField<DataInventory>(category.CategoryName),
+                    Terms = category.CategoryOptions.Where(x => x.Selected).Select(x => x.OptionValue)
                 });
             }
 

@@ -2,6 +2,7 @@
 using Nest;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core.Tests
@@ -70,7 +71,7 @@ namespace Sentry.data.Core.Tests
         public void FilterCategoryFields_DataInventory_AssetCode_FilterSearchField()
         {
             Field field = NestHelper.GetFilterCategoryField<DataInventory>(FilterCategoryNames.ASSET);            
-            Assert.AreEqual("AssetCode", field.Property.Name);
+            Assert.IsNotNull(field.Expression);
         }
 
         [TestMethod]
