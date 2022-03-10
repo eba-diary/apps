@@ -4,63 +4,75 @@
     ViewBag.Title = "Data Flow Detail";
 }
 
-    <div class="detailContainer">
-        <h2> @Model.Name - DataFlow Details </h2>
+<div class="detailContainer">
+    <h1 class="float-l">DataFlow Details </h1>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <h2 class="float-l"> @Model.Name</h2>
+        @if (Model.DisplayDataflowEdit)
+        {
+            <div id="edit-dataflow-icon" class="float-l clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" onclick="data.DataFlow.EditUrlRedirect(@Model.Id)"><span class="glyphicon glyphicon-pencil"></span></div>
+        }
         @if (Model.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete)
         {
             <h3 style="color:red"><strong>Pending Delete - Data will not be processed through this data flow</strong></h3>
         }
-        <br />
-        <h4>Associated Retriever Jobs</h4>
-        @if (Model.AssociatedJobs == null || Model.AssociatedJobs.Count > 0)
-        {
-            <p><em>These jobs pull data from external sources and send it to this data flow.</em></p>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h4>Associated Retriever Jobs</h4>
+            @if (Model.AssociatedJobs == null || Model.AssociatedJobs.Count > 0)
+            {
+                <p><em>These jobs pull data from external sources and send it to this data flow.</em></p>
+                <ul class="stepList">
+                    @foreach (int id in Model.AssociatedJobs)
+                    {
+                        <li>
+                            @Html.Action("_RetrieverJob", "Config", new { jobId = id })
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>There are no retriever jobs sending data to this data flow.</p>
+            }
+            <hr />
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h4>DataFlow Steps </h4>
             <ul class="stepList">
-                @foreach (int id in Model.AssociatedJobs)
+                @foreach (DataFlowStepModel step in Model.Step)
                 {
-                    <li>
-                        @Html.Action("_RetrieverJob", "Config", new { jobId = id })
+                    <li class="retJob @step.ActionName step">
+                        <div class="jobHeader categoryBanner-blue">
+                            <span><h6>@step.ExecutionOrder.ToString()</h6></span>
+                            <h6>@step.ActionName</h6>
+                            <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
+                        </div>
+                        <div class="jobContainer" style="display:none;">
+                            <div><span>@step.ActionDescription</span></div>
+                            <br />
+                            <div><span><strong>This step processes files dropped in this AWS S3 url:</strong></span></div>
+                            <div class="filePath"><span>@step.RootAwsUrl@step.TriggetKey</span></div>
+                            @if (Model.UserSecurity.ShowAdminControls && step.TargetPrefix != null)
+                            {
+                                <div><span><strong>This step produces output to this long term storage url:</strong></span></div>
+                                <div class="filePath"><span>@step.RootAwsUrl@step.TargetPrefix</span></div>
+                            }
+                        </div>
                     </li>
                 }
             </ul>
-        }
-        else
-        {
-            <p>There are no retriever jobs sending data to this data flow.</p>
-        }
-        <br />
-        <hr />
-        <h4>DataFlow Steps </h4>
-        <ul class="stepList">
-            @foreach (DataFlowStepModel step in Model.Step)
-            {
-                <li class="retJob @step.ActionName step">
-                    <div class="jobHeader categoryBanner-blue">
-                        <span><h6>@step.ExecutionOrder.ToString()</h6></span>
-                        <h6>@step.ActionName</h6>
-                        <em class="retJobDetails tracker-menu-icon icon-chevron-up"></em>
-                    </div>
-                    <div class="jobContainer" style="display:none;">
-                        <div><span>@step.ActionDescription</span></div>
-                        <br />
-                        <div><span><strong>This step processes files dropped in this AWS S3 url:</strong></span></div>
-                        <div class="filePath"><span>@step.RootAwsUrl@step.TriggetKey</span></div>
-                        @if (Model.UserSecurity.ShowAdminControls && step.TargetPrefix != null)
-                        {
-                            <div><span><strong>This step produces output to this long term storage url:</strong></span></div>
-                            <div class="filePath"><span>@step.RootAwsUrl@step.TargetPrefix</span></div>
-                        }
-                    </div>
-                </li>
-            }
-        </ul>
-        <br />
-        <hr />
-        <h4><span>Target Schema</span></h4>
-        <div id="targetSchema">
-            <div id="targetSchemaSpinner"></div>
+            <hr />
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h4><span>Target Schema</span></h4>
+            <div id="targetSchema">
+                <div id="targetSchemaSpinner"></div>
+            </div>
         </div>
     </div>
+</div>
 <style>
     .detailContainer {
         width: 75%;

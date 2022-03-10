@@ -55,10 +55,10 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
             {
                 results.Add("Configuration Name is required");
             }
-            else if (Name.ToUpper() == "DEFAULT")
-            {
-                results.Add("Configuration Name cannot be named default");
-            }
+            //else if (Name.ToUpper() == "DEFAULT")
+            //{
+            //    results.Add("Configuration Name cannot be named default");
+            //}
             else if (Name.Length > 100)
             {
                 results.Add("Configuration Name number of characters cannot be greater than 100");

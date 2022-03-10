@@ -12,6 +12,7 @@ namespace Sentry.data.Web
         public JobModel()
         {
             IsRegexSearch = true;
+            FtpPattern = FtpPattern.None;
         }
 
         public string Schedule { get; set; }
@@ -87,12 +88,6 @@ namespace Sentry.data.Web
                 results.Add("SchedulePicker", "Schedule is required");
             }
 
-            //Validate FTP Configuration
-            if (SelectedSourceType == GlobalConstants.DataSoureDiscriminator.FTP_SOURCE)
-            {
-                ValidateFtpJobValues(results);
-            }
-
             //Validate GoogleApi Configuration
             if (SelectedSourceType == GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE)
             {
@@ -100,14 +95,6 @@ namespace Sentry.data.Web
             }
 
             return new ValidationException(results);
-        }
-
-        private void ValidateFtpJobValues(ValidationResults results)
-        {
-            if (FtpPattern == FtpPattern.NoPattern)
-            {
-                results.Add(RetrieverJob.ValidationErrors.ftpPatternNotSelected, "Ftp pattern selection is required");
-            } 
         }
         
         private void ValidateGoogleApiValues(ValidationResults results)

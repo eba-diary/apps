@@ -88,7 +88,10 @@ namespace Sentry.data.Core.Tests
                 DatasetScopeType = MockScopeTypes()[0],
                 FileExtension = MockFileExtensions()[0],
                 RetrieverJobs = new List<RetrieverJob>(),
-                Schema = schema
+                Schema = schema,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DeleteIssuer = null,
+                DeleteIssueDTM = DateTime.MaxValue
             };
 
             return dfc;
@@ -469,15 +472,12 @@ namespace Sentry.data.Core.Tests
 
         public static Event MockEvent()
         {
-            Event e = new Event();
-            e.EventType = MockEventTypes()[0];
-            e.Status = MockEventStatuses()[0];
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = "012345";
-
-            return e;
+            return new Event
+            {
+                EventType = MockEventTypes()[0],
+                Status = MockEventStatuses()[0],
+                UserWhoStartedEvent = "012345"
+            };
         }
 
         public static List<ProducerS3DropAction> MockProducerS3DropActions()
@@ -784,5 +784,22 @@ namespace Sentry.data.Core.Tests
             } };
             return actions.ToList();
         }
+        public static DataFlow MockDataFlow()
+        {
+            DataFlow df = new DataFlow()
+            {
+                Id = 90,
+                Name = "MockDataFlow",
+                SaidKeyCode = "DATA",
+                NamedEnvironment = "TEST",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DeleteIssuer = null,
+                DeleteIssueDTM = DateTime.MaxValue
+            };
+            return df;
+        }
+
+        
     }
 }

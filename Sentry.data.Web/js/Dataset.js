@@ -40,6 +40,7 @@ data.Dataset = {
             }
         });
         self.DFSDropLocation = ko.observable();
+        self.SchemaId = null;
         self.S3DropLocation = ko.observable();
         self.OtherJobs = ko.observableArray();
         self.DataFlows = ko.observableArray();
@@ -216,9 +217,9 @@ data.Dataset = {
                 { data: "Description", className: "Description" },
                 { data: "FieldType", className: "FieldType" },
                 { data: "IsArray", className: "IsArray" },
-                { data: "Length", className: "Length", visible: false, render: function (d) { return data.Dataset.delroyFillGridCheckForNull(d); } },
-                { data: "Precision", className: "Precision", visible: false, render: function (d) { return data.Dataset.delroyFillGridCheckForNull(d); } },
-                { data: "Scale", className: "Scale", visible: false, render: function (d) { return data.Dataset.delroyFillGridCheckForNull(d); } }
+                { data: "Length", className: "Length", visible: false, render: function (d, type, row, meta)        { return data.Dataset.delroyFillGridLength(d,row); } },
+                { data: "Precision", className: "Precision", visible: false, render: function (d, type, row, meta)  { return data.Dataset.delroyFillGridPrecisionScale(d,row); } },
+                { data: "Scale", className: "Scale", visible: false, render: function (d, type, row, meta)          { return data.Dataset.delroyFillGridPrecisionScale(d,row); } }
             ],
 
             aLengthMenu: [
@@ -419,8 +420,9 @@ data.Dataset = {
     },
 
 
-    //ONLY RETURN DATA IF VALID
-    delroyFillGridCheckForNull: function (d) {
+    //LENGTH COLUMN LOGIC:  ONLY RETURN DATA IF VALID
+        //Reason we do this is so for Length Column in Grid, zero won't show up because if its zero, we don't want to see it
+    delroyFillGridLength: function (d,row) {
         if (d) {
             return d;
         }
@@ -428,6 +430,18 @@ data.Dataset = {
             return ' ';
         }
     },
+
+    //PRECISION AND SCALE LOGIC:  ONLY RETURN DATA IF VALID AND DECIMAL
+        //Reason we do this is so for Prec/Scale is so they only show up for DECIMAL datatypes since thats only datatype to have prec/scale
+    delroyFillGridPrecisionScale: function (d, row) {
+        if (d != null && row.FieldType == 'DECIMAL') {
+            return d;
+        }
+        else {
+            return ' ';
+        }
+    },
+
 
     //GENERATE QUERY BASED ON WHERE THEY ARE IN SCHEMA     
     delroyQueryGenerator: function () {
@@ -535,7 +549,7 @@ data.Dataset = {
                 if (val.ObjectStatus === 1) self.vm.DataFlows().push(item);
             });
             self.vm.DataFlows.notifySubscribers();
-
+            self.vm.SchemaId = result.SchemaId;
             //Determine last
             var d = new Date(result.DataLastUpdated);
             if (d < new Date('1990-01-01')) {
@@ -548,6 +562,8 @@ data.Dataset = {
 
             data.Dataset.UpdateColumnSchema();
             data.Dataset.delroyReloadEverything(result.DatasetId, result.SchemaId, result.SnowflakeViews);
+
+            data.Dataset.tryUpdateSchemaSearchTab();
         });
     },
 
@@ -694,7 +710,7 @@ data.Dataset = {
                 parsedRows.push(parsedCells);
             }
         });
-        if ($("#datasetRowTable_filter").length > 0) { 
+        if ($("#datasetRowTable_filter").length > 0) {
             $("#datasetRowTable").DataTable().destroy();
         }
         if (!push) {
@@ -736,14 +752,16 @@ data.Dataset = {
         self.Id = ko.observable(dataInput.Id);
         self.DetailUrl = ko.observable(dataInput.DetailUrl);
         self.Jobs = ko.observableArray();
-        self.DetailUrl = "/DataFlow/" + encodeURIComponent(self.Id()) + "/Detail";
         $.each(dataInput.RetrieverJobs, function (i, val) {
             var item = new data.Dataset.DropLocation(val);
 
             self.Jobs().push(item);
         });
         self.DataFlowDetailRedirect = function () {
-            window.open("/DataFlow/" + encodeURIComponent(this.Id()) + "/Detail");
+            data.DataFlow.DetailUrlRedirect(this.Id());
+        }
+        self.DataFlowEditRedirect = function () {
+            data.DataFlow.EditUrlRedirect(this.Id());
         }
         self.RenderJobs = ko.pureComputed(function () {
             return ko.unwrap(self.Jobs) ? "RenderJobs" : "noRenderJobs";
@@ -1386,12 +1404,46 @@ data.Dataset = {
             }
         });
 
+        $('#detailTabSchemaSearch').click(function (e) {
+            e.preventDefault();
+            var id = $('#RequestAccessButton').attr("data-id");
+
+            var url = new URL(window.location.href);
+            url.searchParams.set('tab', 'SchemaSearch');
+            window.history.pushState({}, '', url);
+
+            if ($('#tabSchemaSearch').is(':empty')) {
+                Sentry.InjectSpinner($("#tab-container"));
+                $.ajax({
+                    type: "POST",
+                    url: '/Dataset/DetailTab/' + id + '/' + 'SchemaSearch',
+                    data: datasetDetailModel,
+                    success: function (view) {
+                        $('#tabSchemaSearch').html(view);
+
+                        var metadataURL = "/api/v2/metadata/datasets/" + $('#datasetConfigList').val();
+
+                        $.get(metadataURL, function (result) {
+                            self.vm.SchemaId = result.SchemaId;
+                            data.Dataset.InitSchemaSearchTab();
+                        });
+
+                        data.RemoveSpinner('#tab-container');
+                    }
+                });
+            }
+            else {
+                $.ajax({
+                    url: '/Dataset/DetailTab/' + id + '/' + 'SchemaSearch/LogView',
+                });
+            }
+        });
 
         var url = new URL(window.location.href);
         var tab = url.searchParams.get('tab');
         if (tab == undefined) {
             tab = 'SchemaAbout';
-        }        
+        }
         $("#detailTab" + tab).trigger('click');
 
     },
@@ -2186,6 +2238,41 @@ data.Dataset = {
             $('div#DatasetFormContent #NamedEnvironmentPartial').html(result);
             data.Dataset.initNamedEnvironmentEvents();
         });
-    }
+    },
 
+    InitSchemaSearchTab() {
+        var datasetId = $('#RequestAccessButton').attr("data-id");
+        
+        $("#schemaSearchTable").DataTable({
+            "ajax": {
+                "url": "/Dataset/Detail/" + datasetId + "/SchemaSearch/" + self.vm.SchemaId + "/",
+                "type": "POST",
+                "dataSrc": ""
+            },
+            "columns": [
+                { "data": "Name" },
+                { "data": "Description" },
+                { "data": "DotNamePath" }
+            ],
+            "dom": 'lrt<"dataset-detail-datatable-information"i><"dataset-detail-datatable-pagination"p>'
+        });
+
+        //search button on change query elastic
+        $("#schemaSearchInput").change(function () {
+            data.Dataset.UpdateSchemaSearchTab();
+        });
+    },
+
+    UpdateSchemaSearchTab() {
+        var searchInput = $("#schemaSearchInput").val();
+        var schemaSearchTable = $("#schemaSearchTable").DataTable();
+        var datasetId = $('#RequestAccessButton').attr("data-id");
+        schemaSearchTable.ajax.url("/Dataset/Detail/" + datasetId + "/SchemaSearch/" + self.vm.SchemaId + "/" + searchInput).load();
+    },
+
+    tryUpdateSchemaSearchTab() {
+        if ($('#schemaSearchTable_wrapper').length) {
+            data.Dataset.UpdateSchemaSearchTab();
+        }
+    }
 };

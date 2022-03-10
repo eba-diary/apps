@@ -74,6 +74,20 @@
             public const string NOTIFICATION_DSC_TECH_DOC = "Technical Documentation";
             public const string NOTIFICATION_DSC_NEWS = "News";
 
+
+            public const string NOTIFICATION_DSC_RELEASENOTES_DSC = "DSC";
+            public const string NOTIFICATION_DSC_RELEASENOTES_CL = "CL";
+            public const string NOTIFICATION_DSC_RELEASENOTES_PL = "PL";
+            public const string NOTIFICATION_DSC_RELEASENOTES_LIFEANNUITY = "LifeAnnuity";
+            public const string NOTIFICATION_DSC_RELEASENOTES_CLAIMS = "Claims";
+            public const string NOTIFICATION_DSC_RELEASENOTES_CORPORATE = "Corporate";
+
+            public const string NOTIFICATION_DSC_NEWS_DSC = "DSC";
+            public const string NOTIFICATION_DSC_NEWS_TABLEAU = "Tableau";
+            public const string NOTIFICATION_DSC_NEWS_PYTHON = "Python";
+            public const string NOTIFICATION_DSC_NEWS_SAS = "SAS";
+            public const string NOTIFICATION_DSC_NEWS_ANALYTICS = "Analytics";
+
         }
 
         public static class Statuses
@@ -165,7 +179,8 @@
             public const string DATASET = "Dataset";
             public const string DATA_ASSET = "DataAsset";
             public const string DATASOURCE = "DataSource";
-            public const string BUSINESSAREA = "BusinessArea";
+            public const string BUSINESSAREA = "BusinessArea"; 
+            public const string ASSET = "Asset";
         }
 
         public static class PermissionCodes
@@ -178,6 +193,9 @@
             public const string CAN_MODIFY_NOTIFICATIONS = "CanModifyNotification";
             public const string CAN_USE_DATA_SOURCE = "CanUseDataSource";
             public const string CAN_MANAGE_SCHEMA = "CanManageSchema";
+            public const string S3_ACCESS = "S3Access";
+            public const string SNOWFLAKE_ACCESS = "SnowflakeAccess";
+            public const string INHERIT_PARENT_PERMISSIONS = "InheritParentPermissions";
 
             public const string USE_APP = "UseApp";
 
@@ -280,6 +298,7 @@
                 public const int VARCHAR_LENGTH_DEFAULT = 1000;
                 public const int DECIMAL_PRECISION_DEFAULT = 9;
                 public const int DECIMAL_SCALE_DEFAULT = 2;
+                public const int LENGTH_DEFAULT = 0;
             }
         }
 

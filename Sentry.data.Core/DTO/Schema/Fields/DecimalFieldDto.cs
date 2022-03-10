@@ -52,7 +52,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             {
                 Scale =  (Int32.TryParse(row.Scale, out int s)) ? s : GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT;
             }
-            
+
             if (!results.IsValid())
             {
                 throw new ValidationException(results);
@@ -68,7 +68,9 @@ namespace Sentry.data.Core.DTO.Schema.Fields
         //Properties that are not utilized by this type and are defaulted
         public override string SourceFormat { get; set; }
         public override int OrdinalPosition { get; set; }
-        public override int Length { get; set; }
+
+        private int length;
+        public override int Length { get { return GlobalConstants.Datatypes.Defaults.LENGTH_DEFAULT;} set { length = value; } }     //DEFAULT LENGTH BECAUSE ITS NOT APPLICABLE
 
         public override BaseField ToEntity(BaseField parentField, SchemaRevision parentRevision)
         {
@@ -76,7 +78,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             {
                 //Apply defaults if neccessary
                 Precision = (this.Precision == 0) ? GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT : this.Precision,
-                Scale = (this.Scale == 0) ? GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT : this.Scale
+                Scale = this.Scale
             };
             base.ToEntity(newEntityField, parentField, parentRevision);
             return newEntityField;

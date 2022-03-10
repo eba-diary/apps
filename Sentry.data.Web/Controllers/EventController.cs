@@ -32,7 +32,7 @@ namespace Sentry.data.Web.Controllers
 
                 if (IsTypeValid != null)
                 {
-                    _eventService.PublishSuccessEventByDatasetId(IsTypeValid, SharedContext.CurrentUser.AssociateId, reason, datasetId);
+                    _eventService.PublishSuccessEventByDatasetId(IsTypeValid, reason, datasetId);
                 }
                 else
                 {

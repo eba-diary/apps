@@ -458,5 +458,13 @@
             $('div#DataFlowFormContainer #NamedEnvironmentPartial').html(result);
             data.DataFlow.initNamedEnvironmentEvents();
         });
+    },
+
+    EditUrlRedirect(id) {
+        window.open("/DataFlow/Edit/" + encodeURIComponent(id));
+    },
+
+    DetailUrlRedirect(id) {
+        window.open("/DataFlow/" + encodeURIComponent(id) + "/Detail");
     }
 }

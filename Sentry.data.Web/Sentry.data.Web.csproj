@@ -1898,6 +1898,7 @@
     <Content Include="Views\Search\FilterSearch.cshtml" />
     <Content Include="Views\Search\FilterCategories.cshtml" />
     <Content Include="Views\Search\FilterShowAll.cshtml" />
+    <Content Include="Views\Dataset\Details\_SchemaSearch.cshtml" />
     <Content Include="Scripts\umd\popper.min.js.map" />
     <Content Include="Scripts\umd\popper.js.map" />
     <Content Include="Scripts\umd\popper.js.flow" />

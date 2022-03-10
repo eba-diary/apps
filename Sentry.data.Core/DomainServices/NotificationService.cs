@@ -14,13 +14,15 @@ namespace Sentry.data.Core
         private readonly ISecurityService _securityService;
         private readonly UserService _userService;
         private readonly IEventService _eventService;
+        private readonly IDataFeatures _featureFlags;
 
-        public NotificationService(IDatasetContext domainContext, ISecurityService securityService, UserService userService, IEventService eventService)
+        public NotificationService(IDatasetContext domainContext, ISecurityService securityService, UserService userService, IEventService eventService, IDataFeatures dataFeatures)
         {
             _domainContext = domainContext;
             _securityService = securityService;
             _userService = userService;
             _eventService = eventService;
+            _featureFlags = dataFeatures;
         }
 
 
@@ -98,12 +100,37 @@ namespace Sentry.data.Core
             if (!IsNotificationDSC(dto))
             {
                 notification.NotificationCategory = null;
+                notification.NotificationSubCategoryReleaseNotes = null;
+                notification.NotificationSubCategoryNews = null;
             }
             else
             {
                 notification.NotificationCategory = dto.NotificationCategory;
-            }
 
+                //NOTE: I tried to use Ternary Operators but i got an error that target-typed conditional expression' is not available in C# 7.3. Please use language version 9.0 or greater
+                if (    dto.NotificationCategory.GetDescription() == GlobalConstants.EventType.NOTIFICATION_DSC_RELEASE_NOTES
+                        && _featureFlags.CLA3882_DSC_NOTIFICATION_SUBCATEGORY.GetValue()                                            //REMOVE THIS LINE ONLY WHEN FEATURE FLAG IS NA
+                )
+                {
+                    notification.NotificationSubCategoryReleaseNotes = dto.NotificationSubCategoryReleaseNotes;
+                }
+                else
+                {
+                    notification.NotificationSubCategoryReleaseNotes = null;
+                }
+
+
+                if (    dto.NotificationCategory.GetDescription() == GlobalConstants.EventType.NOTIFICATION_DSC_NEWS
+                        && _featureFlags.CLA3882_DSC_NOTIFICATION_SUBCATEGORY.GetValue()                                            //REMOVE THIS LINE ONLY WHEN FEATURE FLAG IS NA
+                )
+                {
+                    notification.NotificationSubCategoryNews = dto.NotificationSubCategoryNews;
+                }
+                else
+                {
+                    notification.NotificationSubCategoryNews = null;
+                }
+            }
 
             _domainContext.SaveChanges();
             CreateEvent(addNotification, notification);
@@ -159,13 +186,13 @@ namespace Sentry.data.Core
                 switch (notification.MessageSeverity)
                 {
                     case NotificationSeverity.Critical:
-                        eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_CRITICAL_ADD : GlobalConstants.EventType.NOTIFICATION_CRITICAL_UPDATE;
+                        eventTypeDescription = addNotification ? GlobalConstants.EventType.NOTIFICATION_CRITICAL_ADD : GlobalConstants.EventType.NOTIFICATION_CRITICAL_UPDATE;
                         break;
                     case NotificationSeverity.Warning:
-                        eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_WARNING_ADD : GlobalConstants.EventType.NOTIFICATION_WARNING_UPDATE;
+                        eventTypeDescription = addNotification ? GlobalConstants.EventType.NOTIFICATION_WARNING_ADD : GlobalConstants.EventType.NOTIFICATION_WARNING_UPDATE;
                         break;
                     case NotificationSeverity.Info:
-                        eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_INFO_ADD : GlobalConstants.EventType.NOTIFICATION_INFO_UPDATE;
+                        eventTypeDescription = addNotification ? GlobalConstants.EventType.NOTIFICATION_INFO_ADD : GlobalConstants.EventType.NOTIFICATION_INFO_UPDATE;
                         break;
                     default:
                         Logger.Error("Notification Severity Not Found to log EventType of " + notification.MessageSeverity.ToString() + " for NotificationId = " + notification.NotificationId.ToString());
@@ -175,7 +202,7 @@ namespace Sentry.data.Core
 
 
             if (eventTypeDescription != null)
-                _eventService.PublishSuccessEventByNotificationId(eventTypeDescription, _userService.GetCurrentUser().AssociateId, eventTypeDescription, notification);
+                _eventService.PublishSuccessEventByNotificationId(eventTypeDescription, eventTypeDescription, notification);
         }
 
         public List<NotificationDto> GetNotificationsForDataAsset()

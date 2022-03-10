@@ -102,10 +102,10 @@ namespace Sentry.data.Core
                 {
                     errors.Add("Configuration Name is required.");
                 }
-                else if (dto.Name.ToUpper() == "DEFAULT")
-                {
-                    errors.Add("Configuration Name cannot be named default.");
-                }
+                //else if (dto.Name.ToUpper() == "DEFAULT")
+                //{
+                //    errors.Add("Configuration Name cannot be named default.");
+                //}
                 else if (dto.Name.Length > 100)
                 {
                     errors.Add("Configuration Name number of characters cannot be greater than 100.");
@@ -403,7 +403,9 @@ namespace Sentry.data.Core
                 FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId),
                 DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
                 //Schemas = deList,
-                ObjectStatus = dto.ObjectStatus
+                ObjectStatus = dto.ObjectStatus,
+                DeleteIssuer = null,
+                DeleteIssueDTM = DateTime.MaxValue
             };
             dfc.IsSchemaTracked = true;
             dfc.Schema = _datasetContext.GetById<FileSchema>(dto.SchemaId);
@@ -500,136 +502,243 @@ namespace Sentry.data.Core
             return string.Empty;
         }
 
-        public bool Delete(int id, bool logicalDelete = true, bool parentDriven = false)
+        /// <summary>
+        /// Config delete
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="user"></param>
+        /// <param name="logicalDelete"></param>
+        /// <returns></returns>
+        public bool Delete(int id, IApplicationUser user, bool logicalDelete)
         {
             string methodName = $"{nameof(ConfigService).ToLower()}_{nameof(Delete).ToLower()}";
             Logger.Info($"{methodName} Method Start");
 
             bool returnResult = true;
-            bool alreadyDeleted = false;
-
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
 
+            bool IsAlreadyMarked = false;
             //Do not proceed with dataset file configuration is already marked for deletion
             //TODO: CLA-2765 - Remove deleteInd filter after testing completed
             if (logicalDelete && (dfc.DeleteInd || 
                 dfc.ObjectStatus == GlobalEnums.ObjectStatusEnum.Pending_Delete || 
                 dfc.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted))
             {
-                alreadyDeleted = true;
+                IsAlreadyMarked = true;
             }
             else if (!logicalDelete && dfc.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted)
             {
-                alreadyDeleted = true;
+                IsAlreadyMarked = true;
             }
 
-            if (alreadyDeleted)
+            if (IsAlreadyMarked)
             {
-                Logger.Info($"{methodName} Object already has status {dfc.ObjectStatus}");
                 Logger.Info($"{methodName} Method End");
                 return returnResult;
             }
 
-            FileSchema scm = _datasetContext.GetById<FileSchema>(dfc.Schema.SchemaId);
+            FileSchema scm = dfc.Schema;
 
             if (logicalDelete)
             {
                 try
                 {
-                    Logger.Info($"configservice-delete-logical - configid:{id} configname:{dfc.Name}");
+                    Logger.Info($"{methodName} logical - configid:{id} configname:{dfc.Name}");
 
-                    /*  
-                        *  Legacy processing platform jobs where associated directly to datasetfileconfig object
-                        *  Disable all associated RetrieverJobs
-                    */
+                    /*************************
+                    * Legacy processing platform jobs where associated directly to datasetfileconfig object
+                    * Disable all associated RetrieverJobs
+                    *  
+                    * These deletes should be refactored out once DatasetFileConfigs is refactor out
+                    *************************/
+                    bool jobsDeletedSuccessfully = true;
                     foreach (var job in dfc.RetrieverJobs)
                     {
-                        _jobService.DeleteJob(job.Id);
+                        bool successfullJobDelete = _jobService.Delete(job.Id, user, logicalDelete);
+                        if (!successfullJobDelete)
+                        {
+                            jobsDeletedSuccessfully = successfullJobDelete;
+                        }
                     }
 
-                    /*
-                        *  Mark all dataflows, for deletion, associated with schema on new processing platform
-                        */
-                    //Disable all retriever jobs, associated with schema flow
-                    _dataFlowService.DeleteFlowsByFileSchema(scm, logicalDelete);
+                    //If any jobs failed to delete, then set returnResult = false
+                    if (!jobsDeletedSuccessfully)
+                    {
+                        returnResult = jobsDeletedSuccessfully;
+                    }
 
-                    /*  Mark objects for delete to ensure they are not displaed in UI
-                        *  WallEService, long running task within Goldeneye service, will perform delete after determined amount of time
-                    */
+
+                    /*************************
+                    *  Mark all dataflows, for deletion, associated with schema on new processing platform
+                    *************************/
+                    List<DataFlow> dataflows = new List<DataFlow>();
+                    dataflows.AddRange(GetSchemaFlowByFileSchema(scm));
+                    dataflows.AddRange(GetProducerFlowsByFileSchema(scm));
+
+                    bool allDataFlowDeletesSuccessful = _dataFlowService.Delete(dataflows.Select(s => s.Id).ToList(), user, logicalDelete);
+                    //If any dataflows failed to delete, then set returnResult = false
+                    if (!allDataFlowDeletesSuccessful)
+                    {
+                        returnResult = allDataFlowDeletesSuccessful;
+                    }
+
+
+                    /*************************
+                     * Mark objects for delete to ensure they are not displaed in UI
+                     * WallEService, long running task within Goldeneye service, will perform delete after determined amount of time
+                    *************************/
                     /* Mark dataset file config object for delete */
                     MarkForDelete(dfc);
 
                     /* Mark schema object for delete */
                     MarkForDelete(scm);
-
-                    _datasetContext.SaveChanges();
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"configservice-delete-logical-failed - configid:{id}", ex);
+                    Logger.Error($"{methodName} logical-failed - configid:{id}", ex);
                     returnResult = false;
+                    return returnResult;
                 }
 
-                if (returnResult)
+                //If there are failures, we do not want to send out consumption layer events.
+                if (!returnResult)
                 {
-                    //We do not want to fail the delete due to events not being sent
-                    try
+                    return returnResult;
+                }
+
+                //We do not want to fail the delete due to events not being sent
+                try
+                {
+                    GenerateConsumptionLayerDeleteEvent(dfc);
+                }
+                catch (AggregateException agEx)
+                {
+                    var flatArgExs = agEx.Flatten().InnerExceptions;
+                    foreach (var ex in flatArgExs)
                     {
-                        GenerateConsumptionLayerDeleteEvent(dfc);
+                        Logger.Error("Failed generating consumption layer event", ex);
                     }
-                    catch (AggregateException agEx)
-                    {
-                        var flatArgExs = agEx.Flatten().InnerExceptions;
-                        foreach (var ex in flatArgExs)
-                        {
-                            Logger.Error("Failed generating consumption layer event", ex);
-                        }
-                    }
-                }                
+                }
             }
             else
             {
-                Logger.Info($"configservice-delete-physical - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
+                Logger.Info($"{methodName} physical - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                 try
                 {
-                    //Ensure all associated RetrieverJobs are disabled
-                    //TODO: CLA-2765 - Revist adding ObjectStatus to RetrieverJobs
-                    //TODO: CLA-2765 - Revist moving Parquet files to glacier storage tier
-                    //TODO: CLA-2765 - Revist moving raw data files to glacier storage tier
-                    //TODO: CLA-2765 - Do Datasetfile records need an objectstatus?
-
-                    ////Delete associated dataflows\steps
-                    //Logger.Info($"configservice-delete-dataflowmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                    //_dataFlowService.DeleteByFileSchema(scm);
-
-
                     //Mark DatasetFileConfig record deleted
                     dfc.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
                     dfc.Schema.ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted;
 
-                    /*
-                        *  Mark all dataflows, for deletion, associated with schema on new processing platform
-                        */
-                    //Disable all retriever jobs, associated with schema flow
-                    _dataFlowService.DeleteFlowsByFileSchema(scm, logicalDelete);
 
-                    //Logger.Info($"configservice-delete-configmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
-                    //if (!parentDriven)
-                    //{
-                    //    _datasetContext.Remove(dfc);
-                    //}
+                    /*************************
+                     * RetrieverJob associated with datasetfileconfigs are legacy jobs
+                     * These deletes should be refactored out once DatasetFileConfigs is 
+                     *   refactor out
+                    **************************/
+                    //Issue deletes for any retriever jobs associated with datasetfileconfig object                    
+                    bool jobsDeletedSuccessfully = true;
+                    foreach (var job in dfc.RetrieverJobs)
+                    {
+                        bool successfullJobDelete = _jobService.Delete(job.Id, user, logicalDelete);
+                        if (!successfullJobDelete)
+                        {
+                            jobsDeletedSuccessfully = successfullJobDelete;
+                        }
+                    }
 
-                    _datasetContext.SaveChanges();
+                    //If any jobs failed to delete, then set returnResult = false
+                    if (!jobsDeletedSuccessfully)
+                    {
+                        returnResult = jobsDeletedSuccessfully;
+                    }
 
+
+                    /*************************
+                     * Issue deletes for associated dataflows
+                    *************************/
+                    List<DataFlow> dataflows = new List<DataFlow>();
+                    dataflows.AddRange(GetSchemaFlowByFileSchema(scm));
+                    dataflows.AddRange(GetProducerFlowsByFileSchema(scm));
+
+                    bool allDataFlowDeletesSuccessful = _dataFlowService.Delete(dataflows.Select(s => s.Id).ToList(), user, logicalDelete);
+                    //If any dataflows failed to delete, then set returnResult = false
+                    if (!allDataFlowDeletesSuccessful)
+                    {
+                        returnResult = allDataFlowDeletesSuccessful;
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"configservice-delete-permanant-failed - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}", ex);
-                    returnResult = false;
+                    Logger.Error($"{methodName} physical-failed - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}", ex);
+                    return false;
                 }
             }
 
+            Logger.Info($"{methodName} Method End");
             return returnResult;
+        }
+
+        private IEnumerable<DataFlow> GetProducerFlowsByFileSchema(FileSchema scm)
+        {
+            List<DataFlow> producerFlowIdList = new List<DataFlow>();
+            /* Get producer flow Ids which map to schema that are active*/
+            List<Tuple<int, DataFlow>> producerSchemaMapIds = _datasetContext.SchemaMap.Where(w =>
+                                            w.MappedSchema.SchemaId == scm.SchemaId
+                                            && !w.DataFlowStepId.DataFlow.Name.Contains("FileSchemaFlow")
+                                            && w.DataFlowStepId.DataFlow.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted
+                                            ).Select(s => new Tuple<int, DataFlow>(s.DataFlowStepId.Id, s.DataFlowStepId.DataFlow)).ToList();
+
+            foreach (Tuple<int, DataFlow> item in producerSchemaMapIds)
+            {
+                /*  Add producer dataflow id to list if the
+                 *  dataflow does not map to any other schema
+                 *  
+                 *  Or add producer dataflow id to list if all
+                 *  other mapped schema are NOT Active    
+                 */
+                if (!_datasetContext.SchemaMap.Any(w => w.DataFlowStepId.Id == item.Item1 && w.MappedSchema != scm))
+                {
+                    producerFlowIdList.Add(item.Item2);
+                }
+                else if (!_datasetContext.SchemaMap.Any(w => w.DataFlowStepId.Id == item.Item1 && w.MappedSchema != scm && w.MappedSchema.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active))
+                {
+                    producerFlowIdList.Add(item.Item2);
+                }
+            }
+
+            return producerFlowIdList;
+        }
+
+        private List<DataFlow> GetSchemaFlowByFileSchema(FileSchema scm)
+        {
+            List<DataFlow> dataflowList = new List<DataFlow>();
+            var schemaflowName = _dataFlowService.GetDataFlowNameForFileSchema(scm);
+            DataFlow schemaFlow = _datasetContext.DataFlow.FirstOrDefault(w => w.Name == schemaflowName);
+
+            //some legacy dataset\schema may not have associated schema flow
+            if (schemaFlow == null)
+            {
+                Logger.Debug($"Schema Flow not found by name, attempting to detect by id...");
+
+                SchemaMap mappedStep = _datasetContext.SchemaMap.SingleOrDefault(w => w.MappedSchema.SchemaId == scm.SchemaId && w.DataFlowStepId.Action.Name == "Schema Load" && w.DataFlowStepId.DataFlow.Name.StartsWith("FileSchema"));
+                if (mappedStep != null)
+                {
+                    Logger.Debug($"detected schema flow by Id");
+                    schemaFlow = mappedStep.DataFlowStepId.DataFlow;
+                    dataflowList.Add(schemaFlow);
+                }
+                else
+                {
+                    Logger.Debug($"schema flow not detected by id");
+                    Logger.Debug($"no schema flow associated with schema");
+                }
+            }
+            else
+            {
+                dataflowList.Add(schemaFlow);
+            }
+
+            return dataflowList;
         }
 
         public UserSecurity GetUserSecurityForConfig(int id)
@@ -695,11 +804,11 @@ namespace Sentry.data.Core
                 //Write success event
                 if (RefreshAllSchema)
                 {
-                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.SYNC_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, "Sync all schemas for dataset", datasetId);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.SYNC_DATASET_SCHEMA, "Sync all schemas for dataset", datasetId);
                 }
                 else
                 {
-                    _eventService.PublishSuccessEventByConfigId(GlobalConstants.EventType.SYNC_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, "Sync specific schema", configList.First().ConfigId);
+                    _eventService.PublishSuccessEventByConfigId(GlobalConstants.EventType.SYNC_DATASET_SCHEMA, "Sync specific schema", configList.First().ConfigId);
                 }
                                 
                 return true;

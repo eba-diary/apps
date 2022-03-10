@@ -77,4 +77,10 @@ DECLARE @ErrorState INT;
 :r ..\Post-Deploy\SupportingScripts\Release_02_00_03\CLA3606_Move_CLA3240_UseDropLocationV2_to_LaunchDarkly.sql
 :r ..\Post-Deploy\SupportingScripts\Release_02_00_07\CLA-3729-HISTORY-FIX-EVENT-Reason.sql
 :r ..\Post-Deploy\SupportingScripts\Release_02_00_07\CLA-3729-HISTORY-FIX-EVENT-IsProcessed.sql
-
+:r ..\post-deploy\supportingscripts\sprint_22_02_01\historyfix_cla3790saidassetdataflow.sql
+:r ..\post-deploy\supportingscripts\sprint_22_02_01\historyfix_cla3790saidassetdatasets.sql
+:r ..\post-deploy\supportingscripts\sprint_22_02_02\HISTORYFIX_CLA3407_Initialize_PreProcesingOption_Where_Null.sql
+:r ..\post-deploy\supportingscripts\sprint_22_02_02\HISTORYFIX_CLA3789_Initialize_DeleteIssueDTM_on_DatasetFileConfig.sql
+:r ..\post-deploy\supportingscripts\sprint_22_02_02\HISTORYFIX_CLA3789_Cleanup_RetrieverJobs_Not_Fully_Deleted.sql
+:r ..\post-deploy\supportingscripts\sprint_22_02_02\HISTORYFIX_CLA3789_Incorrect_Dataflow_Delete_Metadata.sql
+:r ..\post-deploy\supportingscripts\Release_03_00_03\CLA3722_TransitionToAsset.sql

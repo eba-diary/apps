@@ -26,6 +26,10 @@
     font-feature-settings: "lnum";
 }
 
+    #DatasetItemList .pagination > .active > a {
+        background-color: #00a3e0 !important;
+    }
+
 #DatasetItemList {
     width: 100%;
 }
@@ -42,9 +46,10 @@
     cursor: pointer;
     text-decoration: underline;
 }
-.detailNameLink:hover {
-    opacity: 0.7;
-}
+
+    .detailNameLink:hover {
+        opacity: 0.7;
+    }
 
 .dataset-list-content {
     width: 90%;
@@ -73,15 +78,15 @@
     padding-top: 6px;
 }
 
-.dataset-detail-content-info-row .info-detail{
-    padding-left: 0px;
-}
+    .dataset-detail-content-info-row .info-detail {
+        padding-left: 0px;
+    }
 
-.dataset-detail-content-info-row a {
-    font-weight: bold;
-    float: right;
-    font-size: 16px;
-}
+    .dataset-detail-content-info-row a {
+        font-weight: bold;
+        float: right;
+        font-size: 16px;
+    }
 
 .moreContacts {
     color: gray;
@@ -99,6 +104,21 @@
 
 #datasetDetailTabs {
     position: relative;
+}
+
+.inputGroupCenter {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.dataset-detail-datatable-pagination {
+    display: inline-block;
+    float: right;
+}
+
+.dataset-detail-datatable-information {
+    display: inline-block;
+}
 }
 
 .datasetMetadataBoxHr {

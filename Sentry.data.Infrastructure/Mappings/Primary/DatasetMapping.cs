@@ -38,7 +38,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.DeleteInd, (m) => m.Column("DeleteInd"));
             this.Property((x) => x.DeleteIssuer, (m) => m.Column("DeleteIssuer"));
             this.Property((x) => x.DeleteIssueDTM, (m) => m.Column("DeleteIssueDTM"));
-            this.Property((x) => x.SAIDAssetKeyCode, (m) => m.Column("SaidKeyCode"));
             this.Property(x => x.NamedEnvironment);
             this.Property(x => x.NamedEnvironmentType, attr => attr.Type<EnumStringType<NamedEnvironmentType>>());
 
@@ -177,6 +176,13 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 });
             }, map => map.OneToMany(a => a.Class(typeof(Image))));
 
+            ManyToOne(x => x.Asset, m =>
+            {
+                m.Column("Asset_ID");
+                m.ForeignKey("FK_Dataset_Asset");
+                m.Class(typeof(Asset));
+                m.Cascade(Cascade.All);
+            });
 
             //ISecurable Mapping
             this.Property((x) => x.IsSecured, (m) => m.Column("IsSecured_IND"));

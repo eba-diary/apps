@@ -96,3 +96,17 @@ a.create-link:focus {
     text-decoration: underline;
     cursor: pointer;
 }
+
+#edit-dataflow-icon{
+    margin-left: 10px;
+}
+
+.detailContainer #edit-dataflow-icon {
+    font-size: 23px;
+    margin-top: 20px;
+}
+
+.jobHeader #edit-dataflow-icon {
+    font-size: 16px;
+    margin-top: 10px;
+}

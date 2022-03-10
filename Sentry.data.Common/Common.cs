@@ -368,9 +368,6 @@ namespace Sentry.data.Common
                     {
                         EventType = _dscontext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault(),
                         Status = _dscontext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                        TimeCreated = DateTime.Now,
-                        TimeNotified = DateTime.Now,
-                        IsProcessed = false,
                         UserWhoStartedEvent = response.RequestInitiatorId,
                         Dataset = response.DatasetID,
                         DataConfig = response.DatasetFileConfigId,
@@ -558,9 +555,6 @@ namespace Sentry.data.Common
                             {
                                 EventType = _dscontext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault(),
                                 Status = _dscontext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                                TimeCreated = DateTime.Now,
-                                TimeNotified = DateTime.Now,
-                                IsProcessed = false,
                                 UserWhoStartedEvent = response.RequestInitiatorId,
                                 Dataset = response.DatasetID,
                                 DataConfig = response.DatasetFileConfigId,
@@ -661,9 +655,6 @@ namespace Sentry.data.Common
                             {
                                 EventType = _dscontext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault(),
                                 Status = _dscontext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                                TimeCreated = DateTime.Now,
-                                TimeNotified = DateTime.Now,
-                                IsProcessed = false,
                                 UserWhoStartedEvent = response.RequestInitiatorId,
                                 Dataset = response.DatasetID,
                                 DataConfig = response.DatasetFileConfigId,
@@ -720,9 +711,6 @@ namespace Sentry.data.Common
                                 {
                                     EventType = _dscontext.EventTypes.Where(w => w.Description == "Current File Created").FirstOrDefault(),
                                     Status = _dscontext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                                    TimeCreated = DateTime.Now,
-                                    TimeNotified = DateTime.Now,
-                                    IsProcessed = false,
                                     UserWhoStartedEvent = response.RequestInitiatorId,
                                     Dataset = response.DatasetID,
                                     DataConfig = response.DatasetFileConfigId,
@@ -739,9 +727,6 @@ namespace Sentry.data.Common
                                 {
                                     EventType = _dscontext.EventTypes.Where(w => w.Description == "Current File Created").FirstOrDefault(),
                                     Status = _dscontext.EventStatus.Where(w => w.Description == "Error").FirstOrDefault(),
-                                    TimeCreated = DateTime.Now,
-                                    TimeNotified = DateTime.Now,
-                                    IsProcessed = false,
                                     UserWhoStartedEvent = response.RequestInitiatorId,
                                     Dataset = response.DatasetID,
                                     DataConfig = response.DatasetFileConfigId,

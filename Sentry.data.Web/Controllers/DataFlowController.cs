@@ -64,6 +64,7 @@ namespace Sentry.data.Web.Controllers
             DataFlowDetailDto dto = _dataFlowService.GetDataFlowDetailDto(id);
             DataFlowDetailModel model = new DataFlowDetailModel(dto);
 
+            model.DisplayDataflowEdit = _dataFeatures.Value.CLA1656_DataFlowEdit_ViewEditPage.GetValue();
             model.UserSecurity = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
 
             return View(model);
@@ -152,6 +153,10 @@ namespace Sentry.data.Web.Controllers
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType),namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
 
             model.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
+            foreach (SchemaMapModel smm in model.SchemaMaps)
+            {
+                smm.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
+            }
 
             return View("DataFlowForm", model);
 
@@ -351,7 +356,9 @@ namespace Sentry.data.Web.Controllers
                 ObjectStatus = dto.ObjectStatus,
                 StorageCode = dto.FlowStorageCode,
                 SelectedDataset = dto.DatasetId,
-                SelectedSchema = dto.SchemaId
+                SelectedSchema = dto.SchemaId,
+                NamedEnvironment = dto.NamedEnvironment,
+                NamedEnvironmentType = dto.NamedEnvironmentType
             };
 
             if (dto.SchemaMap.Any())
@@ -756,7 +763,11 @@ namespace Sentry.data.Web.Controllers
                     case RetrieverJob.ValidationErrors.ftpPatternNotSelected:
                         ModelState.AddModelError("RetrieverJob.FtpPattern", vr.Description);
                         break;
-
+                    case RetrieverJob.ValidationErrors.relativeUriNotSpecified:
+                        ModelState.AddModelError("RetrieverJob.RelativeUri", vr.Description);
+                        break;
+                    case RetrieverJob.ValidationErrors.scheduleIsNull:
+                        ModelState.AddModelError("RetrieverJob.SchedulePicker", vr.Description);
                         break;
                     case DataFlow.ValidationErrors.stepsContainsAtLeastOneSchemaMap:
                     default:

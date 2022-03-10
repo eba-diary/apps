@@ -23,7 +23,7 @@ namespace Sentry.data.Core
             DaleResultDto dtoResult = _daleSearchProvider.GetSearchResults(dtoSearch);
 
             string queryBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtoResult.DaleEvent);
-            _eventService.PublishSuccessEvent("DaleQuery", _userService.GetCurrentUser().AssociateId, "Dale Query Executed", search: queryBlob);
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.DALE_SEARCH, "Dale Query Executed", queryBlob);
 
             return dtoResult;
         }
@@ -33,15 +33,14 @@ namespace Sentry.data.Core
             FilterSearchDto dtoResult = _daleSearchProvider.GetSearchFilters(dtoSearch);
             
             string queryBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtoResult.DaleEvent);
-            _eventService.PublishSuccessEvent("DaleQuery", _userService.GetCurrentUser().AssociateId, "Data Inventory Filter Query Executed", search: queryBlob);
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.DALE_SEARCH, "Data Inventory Filter Query Executed", queryBlob);
 
             return dtoResult;
         }
 
         public bool UpdateIsSensitive(List<DaleSensitiveDto> dtos)
         {
-            string sensitiveBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtos);
-            return _daleSearchProvider.SaveSensitive(sensitiveBlob);
+            return _daleSearchProvider.SaveSensitive(dtos);
         }
 
         public DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dtoSearch)

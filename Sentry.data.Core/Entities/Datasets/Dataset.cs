@@ -20,8 +20,6 @@ namespace Sentry.data.Core
 
         public virtual string DatasetName { get; set; }
 
-        public virtual string SAIDAssetKeyCode { get; set; }
-
         public virtual string DatasetDesc { get; set; }
 
         public virtual string DatasetInformation { get; set; }
@@ -79,6 +77,7 @@ namespace Sentry.data.Core
         public virtual IList<Image> Images { get; set; }
         public virtual string NamedEnvironment { get; set; }
         public virtual NamedEnvironmentType NamedEnvironmentType { get; set; }
+        public virtual Asset Asset { get; set; }
 
 
         //ISecurable Impl.
@@ -92,6 +91,7 @@ namespace Sentry.data.Core
                 return DataClassification == DataClassificationType.HighlySensitive;
             }
         }
+        public virtual ISecurable Parent { get => Asset; }
 
         //Delete Implementation
         public virtual ObjectStatusEnum ObjectStatus { get; set; }
@@ -113,7 +113,7 @@ namespace Sentry.data.Core
             {
                 vr.Add(ValidationErrors.datasetCategoryRequired, "The Dataset Category is required");
             }
-            if (string.IsNullOrWhiteSpace(SAIDAssetKeyCode))
+            if (Asset == null)
             {
                 vr.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "The SAID Asset is required");
             }
