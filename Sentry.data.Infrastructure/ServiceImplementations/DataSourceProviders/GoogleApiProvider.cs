@@ -53,7 +53,7 @@ namespace Sentry.data.Infrastructure
                 baseUri = baseUri.Remove(place, Find.Length).Insert(place, Replace);
             }
 
-            ICredentials proxyCredentials;
+            NetworkCredential proxyCredentials;
             string proxyUrl;
 
             if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
@@ -70,6 +70,8 @@ namespace Sentry.data.Infrastructure
                 proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
                 proxyCredentials = CredentialCache.DefaultNetworkCredentials;
             }
+
+            Logger.Debug($"{methodName} proxyUser: {proxyCredentials.UserName}");
 
             _client = new RestClient
             {
@@ -266,9 +268,14 @@ namespace Sentry.data.Infrastructure
 
         protected override string GetOAuthAccessToken(HTTPSSource source)
         {
+            string methodName = $"{nameof(GoogleApiProvider).ToLower()}_{nameof(GetOAuthAccessToken).ToLower()}";
+            Logger.Debug($"{methodName} Method Start");
+
+            string oAuthToken;
+
             if (source.CurrentToken == null || source.CurrentTokenExp == null || source.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
             {
-                ICredentials proxyCredentials;
+                NetworkCredential proxyCredentials;
                 string proxyUrl;
 
                 if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
@@ -283,6 +290,8 @@ namespace Sentry.data.Infrastructure
                     proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
                     proxyCredentials = CredentialCache.DefaultNetworkCredentials;
                 }
+
+                Logger.Debug($"{methodName} proxyUser: {proxyCredentials.UserName}");
 
                 var httpHandler = new System.Net.Http.HttpClientHandler()
                 {
@@ -310,12 +319,15 @@ namespace Sentry.data.Infrastructure
                 DateTime newTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(double.Parse(expires_in.ToString()))).TotalSeconds);
                 _ = ConfigService.UpdateandSaveOAuthToken(source, accessToken.ToString(), newTokenExp);
 
-                return accessToken.ToString();
+                oAuthToken = accessToken.ToString();
             }
             else
             {
-                return EncryptionService.DecryptString(source.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+                oAuthToken = EncryptionService.DecryptString(source.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
             }
+
+            Logger.Debug($"{methodName} Method End");
+            return oAuthToken;
         }
 
         protected override void AddOAuthGrantType(List<KeyValuePair<string, string>> list, HTTPSSource source)

@@ -207,7 +207,8 @@ namespace Sentry.data.Infrastructure
             Logger.Debug($"{methodName} Method Start");
 
             string baseUri = _job.DataSource.BaseUri.ToString();
-            ICredentials proxyCredentials;
+
+            NetworkCredential proxyCredentials;
             string proxyUrl;
 
             if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
@@ -224,6 +225,8 @@ namespace Sentry.data.Infrastructure
                 proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
                 proxyCredentials = CredentialCache.DefaultNetworkCredentials;
             }
+
+            Logger.Debug($"{methodName} proxyUser: {proxyCredentials.UserName}");
 
             _client = new RestClient
             {
