@@ -2,7 +2,6 @@
 using Nest;
 using System;
 using System.Linq;
-using System.Linq.Expressions;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core.Tests
