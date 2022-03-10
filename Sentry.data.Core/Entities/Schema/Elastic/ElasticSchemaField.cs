@@ -9,6 +9,27 @@ namespace Sentry.data.Core.Entities.Schema.Elastic
 {
     public class ElasticSchemaField
     {
+        public ElasticSchemaField()
+        {
+
+        }
+
+        public ElasticSchemaField(BaseField field, int schemaId, int datasetId)
+        {
+            FieldGuid = field.FieldGuid.ToString();
+            Name = field.Name;
+            FieldType = field.FieldType.ToString();
+            IsArray = field.IsArray;
+            Nullable = field.NullableIndicator;
+            OrdinalPosition = field.OrdinalPosition;
+            Description = field.Description;
+            Length = field.FieldLength;
+            DotNamePath = field.DotNamePath;
+            SchemaId = schemaId;
+            DatasetId = datasetId;
+        }
+
+
         [PropertyName("FieldGuid")]
         string FieldGuid { get; set; }
         [PropertyName("Name")]
@@ -41,5 +62,16 @@ namespace Sentry.data.Core.Entities.Schema.Elastic
         public int DatasetId { get; set; }
         [PropertyName("SchemaId")]
         public int SchemaId { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            ElasticSchemaField field = obj as ElasticSchemaField;
+            return field != null && FieldGuid.Equals(field.FieldGuid); 
+        }
+
+        public override int GetHashCode()
+        {
+            return this.FieldGuid.GetHashCode();
+        }
     }
 }

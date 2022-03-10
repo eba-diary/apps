@@ -30,6 +30,7 @@ namespace Sentry.data.Core.Tests
             //add in the infrastructure implementations using MockRepository so we don't actually initalize contexts or services.
             registry.For<IDatasetContext>().Use(() => MockRepository.GenerateStub<IDatasetContext>());
             registry.For<IBaseTicketProvider>().Use(() => MockRepository.GenerateStub<ICherwellProvider>());
+            registry.For<IDataFeatures>().Use(new MockDataFeatures());
             //set the container
             _container = new StructureMap.Container(registry);
 
@@ -91,6 +92,8 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<string> CLA3707_DataInventorySource => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3553_SchemaSearch => throw new NotImplementedException();
+
+            public IFeatureFlag<bool> CLA3861_RefactorGetUserSecurity { get; } = new MockBooleanFeatureFlag(true);
         }
     }
 }

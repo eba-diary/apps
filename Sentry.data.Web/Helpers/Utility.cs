@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Mvc;
-using System.Web.Script.Serialization;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Web.Helpers
@@ -483,25 +482,29 @@ namespace Sentry.data.Web.Helpers
         {
             List<SelectListItem> patterns = new List<SelectListItem>();
 
-            if (selectedType == FtpPattern.NoPattern)
+            if (selectedType == FtpPattern.None)
             {
                 patterns.Add(new SelectListItem()
                 {
                     Text = "Pick a ftp pattern",
-                    Value = "0",
+                    Value = ((int)FtpPattern.None).ToString(),
                     Selected = true,
-                    Disabled = true
+                    Disabled = false
                 });
             }
 
             foreach (FtpPattern item in Enum.GetValues(typeof(FtpPattern)))
             {
+                if (item == FtpPattern.None) 
+                { 
+                    continue; 
+                }
                 patterns.Add(new SelectListItem()
                 {
                     Text = item.GetDescription(),
                     Value = ((int)item).ToString(),
                     Selected = selectedType == item
-                });
+                });              
             }
 
             return patterns;
@@ -573,7 +576,7 @@ namespace Sentry.data.Web.Helpers
             {
                 Text = "Pick a Schedule",
                 Value = "0",
-                Selected = String.IsNullOrEmpty(schedule),
+                Selected = (String.IsNullOrEmpty(schedule) || schedule == "0"),
                 Disabled = true
             });
 
