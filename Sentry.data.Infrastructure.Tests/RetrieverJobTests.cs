@@ -42,9 +42,9 @@ namespace Sentry.data.Infrastructure.Tests
             Lazy<IConfigService> mockConfigService = MockRepository.GenerateMock<Lazy<IConfigService>>();
             Lazy<IEncryptionService> mockEncryptionService = MockRepository.GenerateMock<Lazy<IEncryptionService>>();
             Lazy<IJobService> mockJobService = MockRepository.GenerateMock<Lazy<IJobService>>();
-            BaseHttpsProvider baseProvider = MockRepository.GenerateMock<BaseHttpsProvider>(mockDatasetContext, mockConfigService, mockEncryptionService, stubRestClient);
+            BaseHttpsProvider baseProvider = MockRepository.GenerateMock<BaseHttpsProvider>(mockDatasetContext, mockConfigService, mockEncryptionService, stubRestClient, null);
 
-            GoogleApiProvider googleApiProvider = new GoogleApiProvider(mockDatasetContext, mockConfigService, mockEncryptionService, mockJobService, policyRegistry, stubRestClient);
+            GoogleApiProvider googleApiProvider = new GoogleApiProvider(mockDatasetContext, mockConfigService, mockEncryptionService, mockJobService, policyRegistry, stubRestClient, null);
             baseProvider.Stub(a => a.Request).Return(req);
 
             ////
@@ -88,9 +88,9 @@ namespace Sentry.data.Infrastructure.Tests
             Lazy<IConfigService> mockConfigService = MockRepository.GenerateMock<Lazy<IConfigService>>();
             Lazy<IEncryptionService> mockEncryptionService = MockRepository.GenerateMock<Lazy<IEncryptionService>>();
             Lazy<IJobService> mockJobService = MockRepository.GenerateMock<Lazy<IJobService>>();
-            BaseHttpsProvider baseProvider = MockRepository.GenerateMock<BaseHttpsProvider>(mockDatasetContext, mockConfigService, mockEncryptionService, stubRestClient);
+            BaseHttpsProvider baseProvider = MockRepository.GenerateMock<BaseHttpsProvider>(mockDatasetContext, mockConfigService, mockEncryptionService, stubRestClient, null);
 
-            GoogleApiProvider googleApiProvider = new GoogleApiProvider(mockDatasetContext, mockConfigService, mockEncryptionService, mockJobService, policyRegistry, stubRestClient);
+            GoogleApiProvider googleApiProvider = new GoogleApiProvider(mockDatasetContext, mockConfigService, mockEncryptionService, mockJobService, policyRegistry, stubRestClient, null);
             baseProvider.Stub(a => a.Request).Return(req);
 
             ////
@@ -130,9 +130,9 @@ namespace Sentry.data.Infrastructure.Tests
             Lazy<IConfigService> mockConfigService = MockRepository.GenerateMock<Lazy<IConfigService>>();
             Lazy<IEncryptionService> mockEncryptionService = MockRepository.GenerateMock<Lazy<IEncryptionService>>();
             Lazy<IJobService> mockJobService = MockRepository.GenerateMock<Lazy<IJobService>>();
-            BaseHttpsProvider baseProvider = MockRepository.GenerateMock<BaseHttpsProvider>(mockDatasetContext, mockConfigService, mockEncryptionService, stubRestClient);
+            BaseHttpsProvider baseProvider = MockRepository.GenerateMock<BaseHttpsProvider>(mockDatasetContext, mockConfigService, mockEncryptionService, stubRestClient, null);
 
-            GenericHttpsProvider genericHttpsProvider = new GenericHttpsProvider(mockDatasetContext, mockConfigService, mockEncryptionService, mockJobService, policyRegistry, stubRestClient);
+            GenericHttpsProvider genericHttpsProvider = new GenericHttpsProvider(mockDatasetContext, mockConfigService, mockEncryptionService, mockJobService, policyRegistry, stubRestClient, null);
             baseProvider.Stub(a => a.Request).Return(req);
 
             ////
@@ -194,7 +194,7 @@ namespace Sentry.data.Infrastructure.Tests
 
 
 
-            GenericHttpsProvider genericHttpsProvider = new GenericHttpsProvider(mockDatasetContext, mockConfigService, mockEncryptionService, mockJobService, policyRegistry, stubRestClient);
+            GenericHttpsProvider genericHttpsProvider = new GenericHttpsProvider(mockDatasetContext, mockConfigService, mockEncryptionService, mockJobService, policyRegistry, stubRestClient, null);
             baseProvider.Stub(a => a.Request).Return(req);
 
             ////

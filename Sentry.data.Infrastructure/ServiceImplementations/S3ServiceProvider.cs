@@ -25,7 +25,6 @@ namespace Sentry.data.Infrastructure
         private static string versionId;
         private static string _bucket;
         private static string _awsRegion;
-        private static string _useAws2_0;
 
         public S3ServiceProvider() { }
 
@@ -33,10 +32,7 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                if (_bucket == null)
-                {
-                    _bucket = Config.GetHostSetting("AWS2_0RootBucket");
-                }
+                _bucket = _bucket ?? Config.GetHostSetting("AWS2_0RootBucket");
                 return _bucket;
             }
         }
@@ -44,36 +40,11 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                if (_awsRegion == null)
-                {
-                    _awsRegion = Config.GetHostSetting("AWS2_0Region");
-                }
+                _awsRegion = _awsRegion ?? Config.GetHostSetting("AWS2_0Region");
                 return _awsRegion;
             }
         }
 
-        private static string GetProxyHost()
-        {            
-            if (string.IsNullOrWhiteSpace(Config.GetHostSetting("WebProxyUrl")))
-            {
-                throw new S3ServiceProviderException("WebProxyUrl cannot be found");
-            }
-            else
-            {
-                return new Uri(Config.GetHostSetting("WebProxyUrl")).Host;
-            }
-        }
-        private static int GetProxyPort() 
-        {            
-            if (string.IsNullOrWhiteSpace(Config.GetHostSetting("WebProxyUrl")))
-            {
-                throw new S3ServiceProviderException("WebProxyUrl cannot be found");
-            }
-            else
-            {
-                return new Uri(Config.GetHostSetting("WebProxyUrl")).Port;
-            }
-        }
         private static string GetAwsAccessKey()
         {
             if (string.IsNullOrWhiteSpace(Config.GetHostSetting("AWSAccessKey")))
@@ -123,10 +94,7 @@ namespace Sentry.data.Infrastructure
             {
                 lock (padlock)
                 {
-                    if(instance == null)
-                    {
-                        instance = new S3ServiceProvider();
-                    }
+                    instance = instance ?? new S3ServiceProvider();
                     return instance;
                 }
             }
@@ -147,7 +115,6 @@ namespace Sentry.data.Infrastructure
                     AmazonS3Config s3config = new AmazonS3Config();
                     s3config.RegionEndpoint = RegionEndpoint.GetBySystemName(AwsRegion);
                     //proxy only needed when not running on AWS.  Calling code expected to pass empty value if proxy host not needed.
-                    SetAwsClientProxy(s3config);
 
                     AmazonS3Client client;
                     /*
@@ -212,21 +179,6 @@ namespace Sentry.data.Infrastructure
             string awsSecretKey = GetAwsSecretKey();
             client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);
             return client;
-        }
-
-        private static void SetAwsClientProxy(AmazonS3Config s3config)
-        {
-            Logger.Debug($"<s3serviceprovider> AWSUseProxy : {Config.GetHostSetting("AWSUseProxy")}");
-            if (bool.Parse(Config.GetHostSetting("AWSUseProxy")))
-            {
-                s3config.ProxyHost = GetProxyHost();
-                Logger.Debug($"<s3serviceprovider> WebProxyUrl Host: {GetProxyHost()}");
-
-                s3config.ProxyPort = GetProxyPort();
-                Logger.Debug($"<s3serviceprovider> WebProxyUrl Port: {GetProxyPort()}");
-
-                s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
-            }
         }
 
         /// <summary>
@@ -1299,15 +1251,6 @@ namespace Sentry.data.Infrastructure
             key.Key = input.key;
             key.VersionId = input.versionId;
             return key;
-        }
-        private List<List<string>> GetPartList(List<string> sourceKeys)
-        {
-            throw new NotImplementedException();
-        }
-
-        private int GetObjectSize(string key)
-        {
-            throw new NotImplementedException();
         }
 
         private Dictionary<string, string> ConvertObjectMetadataResponse(GetObjectMetadataResponse resp)
