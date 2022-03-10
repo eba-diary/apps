@@ -20,23 +20,10 @@ namespace Sentry.data.Core
 
             foreach (PropertyInfo property in GetPropertiesWithAttribute<T, FilterSearchField>())
             {
-                Field field;
-                if (property.PropertyType == typeof(string))
-                {
-                    ParameterExpression parameter = Expression.Parameter(typeof(T));
-                    Expression<Func<T, object>> expression = Expression.Lambda<Func<T, object>>(Expression.Property(parameter, property.Name), parameter);
-
-                    field = Infer.Field(expression.AppendSuffix("keyword"));
-                }
-                else
-                {
-                    field = Infer.Field(property);
-                }
-
                 FilterSearchField filterAttribute = property.GetCustomAttribute<FilterSearchField>();
                 aggregations.Add(filterAttribute.FilterCategoryName, new TermsAggregation(filterAttribute.FilterCategoryName)
                 {
-                    Field = field,
+                    Field = GetFilterCategoryField<T>(property),
                     Size = filterAttribute.IsPinnedFilter ? 10000 : 15
                 });
             }
@@ -44,7 +31,7 @@ namespace Sentry.data.Core
             return aggregations;
         }
 
-        public static Field GetFilterCategoryField<T>(string categoryName)
+        public static Field GetFilterCategoryField<T>(string categoryName) where T : class
         {
             PropertyInfo property = GetPropertiesWithAttribute<T, FilterSearchField>().FirstOrDefault(x => x.GetCustomAttribute<FilterSearchField>().FilterCategoryName == categoryName);
 
@@ -53,12 +40,25 @@ namespace Sentry.data.Core
                 throw new InvalidOperationException($"Filter category name: {categoryName} does not match any category names registered to type of: {typeof(T).Name}");
             }
 
-            return Infer.Field(property);
+            return GetFilterCategoryField<T>(property);            
         }
 
         private static IEnumerable<PropertyInfo> GetPropertiesWithAttribute<T, attrT>()
         {
             return typeof(T).GetProperties().Where(p => Attribute.IsDefined(p, typeof(attrT)));
+        }
+
+        private static Field GetFilterCategoryField<T>(PropertyInfo property) where T : class
+        {
+            if (property.PropertyType == typeof(string))
+            {
+                ParameterExpression parameter = Expression.Parameter(typeof(T));
+                Expression<Func<T, object>> expression = Expression.Lambda<Func<T, object>>(Expression.Property(parameter, property.Name), parameter);
+
+                return Infer.Field(expression.AppendSuffix("keyword"));
+            }
+
+            return Infer.Field(property);
         }
     }
 }
