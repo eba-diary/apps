@@ -1,7 +1,6 @@
 ﻿using Polly;
 using Polly.Registry;
 using Sentry.Common.Logging;
-using Sentry.Common.Extensions;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using System;
@@ -69,7 +68,7 @@ namespace Sentry.data.Infrastructure
 
             Logger.Debug($"{methodName} externalUser: {creds.UserName}");
 
-            req.AddBasicAuthenticationHeaders(creds);
+            req.Credentials = creds;
             req.ReadWriteTimeout = Timeout.Infinite;
 
             Logger.Debug($"{methodName} Method End");
