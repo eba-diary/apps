@@ -987,4 +987,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[PreProcessingOption]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="5222bc53-8c02-4190-a108-6a5b564f199c" ChangeDateTime="03/11/2022 16:21:50">
+    <Property Name="ElementName" Value="[dbo].[DatasetFile].[Create_DTM]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFile]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[Created_DTM]" />
+  </Operation>
 </Operations>

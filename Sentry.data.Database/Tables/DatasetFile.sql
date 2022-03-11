@@ -4,7 +4,7 @@
     [File_NME] VARCHAR(250) NOT NULL, 
     [Dataset_ID] INT NOT NULL, 
     [UploadUser_NME] VARCHAR(100) NOT NULL, 
-    [Create_DTM] DATETIME NULL, 
+    [Created_DTM] DATETIME NULL, 
     [Modified_DTM] DATETIME NULL, 
     [FileLocation] VARCHAR(250) NOT NULL, 
     [DatasetFileConfig_ID] INT NULL, 
