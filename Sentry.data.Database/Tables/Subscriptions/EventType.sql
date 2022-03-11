@@ -5,5 +5,6 @@
 	[Severity] INT NOT NULL, 
     [Display_IND] BIT NOT NULL,
 	[Group_CDE] [varchar](60) NULL,
-	[DisplayName] [varchar](150) NULL
+	[DisplayName] [varchar](150) NULL,
+	[ParentDescription]  [varchar] (1024) NULL
 )
