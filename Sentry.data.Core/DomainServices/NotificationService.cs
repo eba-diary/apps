@@ -374,10 +374,7 @@ namespace Sentry.data.Core
 
         public List<BusinessAreaSubscription> GetAllUserSubscriptionsFromDatabase(EventTypeGroup group)
         {
-            List<BusinessAreaSubscription> businessAreaSubscriptions = _domainContext.GetAllUserSubscriptionsByEventTypeGroup(_userService.GetCurrentUser().AssociateId, group);
-            
-            
-            return businessAreaSubscriptions;
+            return _domainContext.GetAllUserSubscriptionsByEventTypeGroup(_userService.GetCurrentUser().AssociateId, group);
         }
 
         public IEnumerable<EventType> GetEventTypes(EventTypeGroup group)
