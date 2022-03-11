@@ -617,7 +617,7 @@ namespace Sentry.data.Infrastructure
 
         public int GetLatestDatasetFileIdForDataset(int id)
         {
-            int d = Query<DatasetFile>().Where(w => w.Dataset.DatasetId == id && !w.IsBundled).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreateDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
+            int d = Query<DatasetFile>().Where(w => w.Dataset.DatasetId == id && !w.IsBundled).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreatedDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
             return d;
         }
 
@@ -644,7 +644,7 @@ namespace Sentry.data.Infrastructure
                 .Where(w => ((targetFileName != null && w.FileName == targetFileName) || (targetFileName == null)) && ((schemaRevision != null && w.Schema == schemaRevision.ParentSchema) || (schemaRevision == null)))
                 .GroupBy(x => x.Dataset.DatasetId)
                 .ToList()
-                .Select(s => s.OrderByDescending(g => g.CreateDTM).Take(1))
+                .Select(s => s.OrderByDescending(g => g.CreatedDTM).Take(1))
                 .Select(i => i.First().DatasetFileId)
                 .FirstOrDefault();
 

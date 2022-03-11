@@ -32,7 +32,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(DatasetFile.SchemaRevision.SchemaRevision_Id, dto.SchemaRevision);
             Assert.AreEqual(DatasetFile.DatasetFileConfig.ConfigId, dto.DatasetFileConfig);
             Assert.AreEqual(DatasetFile.UploadUserName, dto.UploadUserName);
-            Assert.AreEqual(DatasetFile.CreateDTM, dto.CreateDTM);
+            Assert.AreEqual(DatasetFile.CreatedDTM, dto.CreateDTM);
             Assert.AreEqual(DatasetFile.ModifiedDTM, dto.ModifiedDTM);
             Assert.AreEqual(DatasetFile.FileLocation, dto.FileLocation);
             Assert.AreEqual(DatasetFile.ParentDatasetFileId, dto.ParentDatasetFileId);
@@ -448,7 +448,7 @@ namespace Sentry.data.Core.Tests
             datasetFile.Size = 123456;
 
             DateTime dtm = DateTime.Now;
-            datasetFile.CreateDTM = dtm;
+            datasetFile.CreatedDTM = dtm;
             datasetFile.ModifiedDTM = dtm;
             datasetFile.DatasetFileConfig.ConfigId = 193;
             datasetFile.FlowExecutionGuid = "12340945576";
@@ -466,7 +466,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(98, datasetFile.DatasetFileId);
             Assert.AreEqual("location.zip", datasetFile.FileName);
             Assert.AreEqual(82, datasetFile.Dataset.DatasetId);
-            Assert.AreEqual(dtm, datasetFile.CreateDTM);
+            Assert.AreEqual(dtm, datasetFile.CreatedDTM);
             Assert.AreEqual(dtm, datasetFile.ModifiedDTM);
             Assert.AreEqual(193, datasetFile.DatasetFileConfig.ConfigId);
             Assert.AreEqual(false, datasetFile.IsBundled);
