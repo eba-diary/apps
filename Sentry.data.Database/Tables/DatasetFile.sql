@@ -14,7 +14,7 @@
     [FlowExecutionGuid] VARCHAR(100) NULL, 
     [RunInstanceGuid] VARCHAR(100) NULL, 
     [ParentDatasetFile_ID] INT NULL,
-    [UploadUser_NME] VARCHAR(100) NOT NULL, 
+    [UploadUser_NME] VARCHAR(100) NULL, 
     [isBundled_IND] BIT NOT NULL, 
     [Information_DSC] NVARCHAR(MAX) NULL, 
     [Size_AMT] BIGINT NULL, 
