@@ -22,6 +22,10 @@ namespace Sentry.data.Infrastructure
 
         public List<ElasticSchemaField> Search(string toSearch)
         {
+            if (!String.IsNullOrEmpty(toSearch))
+            {
+                toSearch = '*' + toSearch.ToLower() + '*';
+            }
             Task<ElasticResult<ElasticSchemaField>> result = _context.SearchAsync<ElasticSchemaField>(s => s
                 .Query(q => q
                     .Bool(b => b
@@ -30,10 +34,13 @@ namespace Sentry.data.Infrastructure
                             bm => bm.Term(p => p.SchemaId, SchemaId)
                         )
                         .Should(
-                            bs => bs.Term(p => p.Name, toSearch),
-                            bs => bs.Term(p => p.Description, toSearch),
-                            bs => bs.Term(p => p.DotNamePath, toSearch)
-                        ).MinimumShouldMatch(String.IsNullOrEmpty(toSearch) ? 0 : 1) //If we are searching, we need something to match on (exclusing the dataset id or schema id).
+                            bs => bs.Wildcard(w => w
+                                .Field(f => f.Name).Value(toSearch)),
+                            bs => bs.Wildcard(w => w
+                                .Field(f => f.Description).Value(toSearch)),
+                            bs => bs.Wildcard(w => w
+                                .Field(f => f.DotNamePath).Value(toSearch))
+                            ).MinimumShouldMatch(String.IsNullOrEmpty(toSearch) ? 0 : 1) //If we are searching, we need something to match on (excluding the dataset id or schema id).
                     )
                 )
                 .Size(2000)
