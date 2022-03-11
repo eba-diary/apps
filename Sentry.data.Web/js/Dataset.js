@@ -869,6 +869,11 @@ data.Dataset = {
             $("#saidAsset").materialSelect();
             $("#OriginationID").materialSelect();
             $("#DataClassification").materialSelect();
+            if ($("#NamedEnvironment").hasClass("mdb-select")) {
+                $("#NamedEnvironment").materialSelect();
+            };
+            $("#NamedEnvironmentType").materialSelect();
+
         });
 
 

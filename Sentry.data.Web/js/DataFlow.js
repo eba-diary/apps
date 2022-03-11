@@ -74,6 +74,10 @@
         $(document).ready(function () {
             $("#SAIDAssetKeyCode").materialSelect();
             $("#IsCompressed").materialSelect();
+            $("#IsPreProcessingRequired").materialSelect();
+            $("#PreProcessingSelection").materialSelect();
+            $("#schemaMapPanel select").materialSelect();
+
         });
         
         data.DataFlow.InitSchemaMaps(datasetId, schemaId);
@@ -335,6 +339,9 @@
                 else {
                     $(targetElement).val(curVal);
                 }
+
+                $("#schemaMapPanel select").materialSelect();
+
             });
             createSchemaLink.show();
         }

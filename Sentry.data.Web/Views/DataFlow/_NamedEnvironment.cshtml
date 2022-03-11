@@ -25,7 +25,7 @@
     }
     else
     {
-        @Html.DropDownListFor(x => x.NamedEnvironmentType, Model.NamedEnvironmentTypeDropDown, new { @class = "form-control" })
+        @Html.DropDownListFor(x => x.NamedEnvironmentType, Model.NamedEnvironmentTypeDropDown, new { @class = "mdb-select" })
     }
     @Html.ValidationMessageFor(model => Model.NamedEnvironmentType, "", new { @class = "text-danger" })
 </div>
