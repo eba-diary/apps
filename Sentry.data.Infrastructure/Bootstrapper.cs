@@ -1,22 +1,21 @@
-﻿using System.Linq;
-using NHibernate;
-using NHibernate.Mapping.ByCode;
-using Sentry.data.Core;
-using NHibernate.Dialect;
-using NHibernate.Cfg;
-using Sentry.data.Infrastructure.Mappings.Primary;
-using System.Net.Http;
-using Sentry.data.Core.Interfaces.SAIDRestClient;
-using Sentry.Messaging.Common;
-using System.Net;
-using Sentry.data.Core.Interfaces;
-using Polly.Registry;
-using Sentry.data.Infrastructure.PollyPolicies;
-using System;
-using Hangfire;
+﻿using Hangfire;
 using Nest;
-using static Sentry.data.Core.GlobalConstants;
+using NHibernate;
+using NHibernate.Cfg;
+using NHibernate.Dialect;
+using NHibernate.Mapping.ByCode;
+using Polly.Registry;
+using Sentry.data.Core;
 using Sentry.data.Core.Entities.Schema.Elastic;
+using Sentry.data.Core.Interfaces;
+using Sentry.data.Core.Interfaces.SAIDRestClient;
+using Sentry.data.Infrastructure.Mappings.Primary;
+using Sentry.data.Infrastructure.PollyPolicies;
+using Sentry.Messaging.Common;
+using System;
+using System.Linq;
+using System.Net.Http;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
 {
@@ -187,6 +186,8 @@ namespace Sentry.data.Infrastructure
 
             // Polly Policy providers
             _container.GetAllInstances<IPollyPolicy>().ToList().ForEach(p => p.Register());
+
+
         }
 
         /// <summary>

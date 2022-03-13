@@ -70,7 +70,7 @@ namespace Sentry.data.Core.Tests
         public void FilterCategoryFields_DataInventory_AssetCode_FilterSearchField()
         {
             Field field = NestHelper.GetFilterCategoryField<DataInventory>(FilterCategoryNames.ASSET);            
-            Assert.AreEqual("AssetCode", field.Property.Name);
+            Assert.IsNotNull(field.Expression);
         }
 
         [TestMethod]

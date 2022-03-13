@@ -20,5 +20,7 @@ namespace Sentry.data.Core
         
         public virtual BusinessAreaType BusinessAreaType { get; set; }
 
+        public virtual List<BusinessAreaSubscription> childBusinessAreaSubscriptions { get; set; }
+
     }
 }

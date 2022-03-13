@@ -27,7 +27,7 @@ namespace Sentry.data.Infrastructure
         public GoogleApiProvider(Lazy<IDatasetContext> datasetContext,
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService, 
             Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry,
-            IRestClient restClient) : base(datasetContext, configService, encryptionService, restClient)
+            IRestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
         {
             _jobService = jobService;
             _providerPolicy = policyRegistry.Get<ISyncPolicy>(PollyPolicyKeys.GoogleAPiProviderPolicy);
@@ -40,6 +40,9 @@ namespace Sentry.data.Infrastructure
 
         protected override void ConfigureClient()
         {
+            string methodName = $"{nameof(GoogleApiProvider).ToLower()}_{nameof(ConfigureClient).ToLower()}";
+            Logger.Debug($"{methodName} Method Start");
+
             string baseUri = _job.DataSource.BaseUri.ToString();
 
             string Find = "/";
@@ -48,16 +51,38 @@ namespace Sentry.data.Infrastructure
             if (place != -1)
             {
                 baseUri = baseUri.Remove(place, Find.Length).Insert(place, Replace);
-            }                
+            }
+
+            NetworkCredential proxyCredentials;
+            string proxyUrl;
+
+            if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
+            {
+                Logger.Debug($"{methodName} using edge proxy: true");
+                string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
+                string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
+                proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
+                proxyCredentials = new NetworkCredential(userName, password);
+            }
+            else
+            {
+                Logger.Debug($"{methodName} using edge proxy: false");
+                proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
+                proxyCredentials = CredentialCache.DefaultNetworkCredentials;
+            }
+
+            Logger.Debug($"{methodName} proxyUser: {proxyCredentials.UserName}");
 
             _client = new RestClient
             {
                 BaseUrl = new Uri(baseUri),
-                Proxy = new WebProxy(Configuration.Config.GetHostSetting("WebProxyUrl"))
+                Proxy = new WebProxy(proxyUrl)
                 {
-                    Credentials = CredentialCache.DefaultNetworkCredentials
+                    Credentials = proxyCredentials
                 }
             };
+
+            Logger.Debug($"{methodName} Method End");
         }
 
         protected override void ConfigureRequest()
@@ -100,9 +125,6 @@ namespace Sentry.data.Infrastructure
             ConfigureClient();
             ConfigureRequest();
 
-            //TODO: Revisit when GOOGLEAPI data source needs paging implemented
-            //do
-            //{
             ConfigurePaging();                
 
             IRestResponse resp = SendRequest();
@@ -149,17 +171,9 @@ namespace Sentry.data.Infrastructure
                 //Need to handle both a retrieverjob target (legacy platform) and 
                 //  S3Drop or ProducerS3Drop (new processing platform) data flow steps
                 //  as targets.
-                if (_targetStep != null)
-                {
-                    /******************************************************************************
-                     * Utilizing Trigger bucket since we want to trigger the targetStep identified
-                     ******************************************************************************/
-                    versionId = s3Service.UploadDataFile(tempFile, _targetStep.TriggerBucket, targetkey);
-                }
-                else
-                {
-                   versionId = s3Service.UploadDataFile(tempFile, targetkey);
-                }
+                //If _targetStep is no null
+                //   Utilizing Trigger bucket since we want to trigger the targetStep identified
+                versionId = _targetStep != null ? s3Service.UploadDataFile(tempFile, _targetStep.TriggerBucket, targetkey) : s3Service.UploadDataFile(tempFile, targetkey);
 
                 _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
 
@@ -203,9 +217,6 @@ namespace Sentry.data.Infrastructure
                     }
                 }
             }
-                
-            //TODO: Revisit when GOOGLEAPI data source needs paging implemented
-            //} while (_hasNext);
         }
 
         public override void Execute(RetrieverJob job, string filePath)
@@ -257,13 +268,36 @@ namespace Sentry.data.Infrastructure
 
         protected override string GetOAuthAccessToken(HTTPSSource source)
         {
+            string methodName = $"{nameof(GoogleApiProvider).ToLower()}_{nameof(GetOAuthAccessToken).ToLower()}";
+            Logger.Debug($"{methodName} Method Start");
+
+            string oAuthToken;
+
             if (source.CurrentToken == null || source.CurrentTokenExp == null || source.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
             {
-               var httpHandler = new System.Net.Http.HttpClientHandler()
+                NetworkCredential proxyCredentials;
+                string proxyUrl;
+
+                if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
                 {
-                    Proxy = new WebProxy(Configuration.Config.GetHostSetting("WebProxyUrl"))
+                    string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
+                    string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
+                    proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
+                    proxyCredentials = new NetworkCredential(userName, password);
+                }
+                else
+                {
+                    proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
+                    proxyCredentials = CredentialCache.DefaultNetworkCredentials;
+                }
+
+                Logger.Debug($"{methodName} proxyUser: {proxyCredentials.UserName}");
+
+                var httpHandler = new System.Net.Http.HttpClientHandler()
+                {
+                    Proxy = new WebProxy(proxyUrl)
                     {
-                        Credentials = CredentialCache.DefaultNetworkCredentials
+                        Credentials = proxyCredentials
                     }
                 };
 
@@ -283,15 +317,17 @@ namespace Sentry.data.Infrastructure
                 Logger.Info($"recieved_oauth_access_token - source:{source.Name} sourceId:{source.Id} expires_in:{expires_in} token_type:{token_type}");
 
                 DateTime newTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(double.Parse(expires_in.ToString()))).TotalSeconds);
+                _ = ConfigService.UpdateandSaveOAuthToken(source, accessToken.ToString(), newTokenExp);
 
-                bool result = ConfigService.UpdateandSaveOAuthToken(source, accessToken.ToString(), newTokenExp);
-
-                return accessToken.ToString();
+                oAuthToken = accessToken.ToString();
             }
             else
             {
-                return EncryptionService.DecryptString(source.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+                oAuthToken = EncryptionService.DecryptString(source.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
             }
+
+            Logger.Debug($"{methodName} Method End");
+            return oAuthToken;
         }
 
         protected override void AddOAuthGrantType(List<KeyValuePair<string, string>> list, HTTPSSource source)
@@ -326,7 +362,7 @@ namespace Sentry.data.Infrastructure
 
             byte[] bytesToSign = Encoding.UTF8.GetBytes(stringToSign);
 
-            string x = EncryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+            _ = EncryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
 
             byte[] keyBytes = Convert.FromBase64String(EncryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey));
 
@@ -344,7 +380,11 @@ namespace Sentry.data.Infrastructure
             return string.Join(".", segments.ToArray());
         }
 
+        //Leaving method logic for when Paging is needed for GoogleApi
+#pragma warning disable S1144 // Unused private types or members should be removed
+#pragma warning disable IDE0051 // Remove unused private members
         private string AddPageToken(string body)
+#pragma warning restore IDE0051 // Remove unused private members
         {
             JObject x = JObject.Parse(body);
             JArray reportReqeusts = (JArray)x["reportRequests"];
@@ -353,8 +393,13 @@ namespace Sentry.data.Infrastructure
 
             return x.ToString();
         }
+#pragma warning restore S1144 // Unused private types or members should be removed
 
+        //Leaving method logic for when Paging is needed for GoogleApi
+#pragma warning disable S1144 // Unused private types or members should be removed
+#pragma warning disable IDE0051 // Remove unused private members
         private string AddPageSize(string body)
+#pragma warning restore IDE0051 // Remove unused private members
         {
             JObject x = JObject.Parse(body);
             JArray reportReqeusts = (JArray)x["reportRequests"];
@@ -363,6 +408,7 @@ namespace Sentry.data.Infrastructure
 
             return x.ToString();
         }
+#pragma warning restore S1144 // Unused private types or members should be removed
 
         //TODO: Revisit when GOOGLEAPI data source needs paging implemented
         private void ConfigurePaging()
@@ -372,7 +418,9 @@ namespace Sentry.data.Infrastructure
                 string requestBody = _job.JobOptions.HttpOptions.Body;
 
             //    if (((GoogleApiSource)_job.DataSource).PagingEnabled)
-            //    {
+            
+#pragma warning disable S125 // Sections of code should not be commented out
+//    {
             //        ConfigurePaging();
             //        requestBody = AddPageSize(requestBody);
             //        if (_nextVal != "0")
@@ -381,6 +429,7 @@ namespace Sentry.data.Infrastructure
             //        };
             //    }
                 _request.AddJsonBody(requestBody);
+#pragma warning restore S125 // Sections of code should not be commented out
             }
         }
 

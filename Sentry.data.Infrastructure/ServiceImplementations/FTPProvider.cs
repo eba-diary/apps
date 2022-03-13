@@ -1,5 +1,6 @@
 ﻿using Polly;
 using Polly.Registry;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using System;
@@ -18,10 +19,12 @@ namespace Sentry.data.Infrastructure
         private Stream _streamResult;
         private NetworkCredential _creds;
         private readonly ISyncPolicy _providerPolicy;
+        private readonly IDataFeatures _dataFeatures;
 
-        public FtpProvider(IReadOnlyPolicyRegistry<string> registry)
+        public FtpProvider(IReadOnlyPolicyRegistry<string> registry, IDataFeatures dataFeatures)
         {
             _providerPolicy = registry.Get<ISyncPolicy>(PollyPolicyKeys.FtpProviderPolicy);
+            _dataFeatures = dataFeatures;
         }
         
         public void SetCredentials(NetworkCredential creds)
@@ -31,19 +34,53 @@ namespace Sentry.data.Infrastructure
 
         private FtpWebRequest CreateDwnldRequest(string url, NetworkCredential creds)
         {
+            string methodName = $"{nameof(FtpProvider).ToLower()}_{nameof(CreateDwnldRequest).ToLower()}";
+            Logger.Debug($"{methodName} Method Start");
+
+            
+
             FtpWebRequest req = (FtpWebRequest)WebRequest.Create(url);
-            req.Proxy = new WebProxy(Configuration.Config.GetHostSetting("WebProxyUrl"))
+
+            NetworkCredential proxyCredentials;
+            string proxyUrl;
+
+            if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
             {
-                Credentials = System.Net.CredentialCache.DefaultNetworkCredentials
+                Logger.Debug($"{methodName} using edge proxy: true");
+                string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
+                string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
+                proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
+                proxyCredentials = new NetworkCredential(userName, password);
+            }
+            else
+            {
+                Logger.Debug($"{methodName} using edge proxy: false");
+                proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
+                proxyCredentials = CredentialCache.DefaultNetworkCredentials;
+            }
+
+            Logger.Debug($"{methodName} proxyUser: {proxyCredentials.UserName}");
+
+            req.Proxy = new WebProxy(proxyUrl)
+            {
+                Credentials = proxyCredentials
             };
+
+            Logger.Debug($"{methodName} externalUser: {creds.UserName}");
+
             req.Credentials = creds;
             req.ReadWriteTimeout = Timeout.Infinite;
+
+            Logger.Debug($"{methodName} Method End");
             return req;
         }
 
         public void Dispose()
         {
-            if (_streamResult != null) _streamResult.Dispose();
+            if (_streamResult != null)
+            {
+                _streamResult.Dispose();
+            }
         }
 
         public Stream GetFileStream(string url)
@@ -86,7 +123,7 @@ namespace Sentry.data.Infrastructure
             {
                 throw new ArgumentException("Set provider credentials");
             }
-
+            
             FtpWebRequest request = CreateDwnldRequest(url, _creds);
             request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
 
@@ -158,7 +195,7 @@ namespace Sentry.data.Infrastructure
             FtpWebRequest request = CreateDwnldRequest(url, _creds);
             request.Proxy = null;
             request.Method = WebRequestMethods.Ftp.MakeDirectory;
-            FtpWebResponse resp = (FtpWebResponse)request.GetResponse();
+            _ = (FtpWebResponse)request.GetResponse();
         }
 
         public void RenameFile(string sourceUrl, string targetUrl)
@@ -173,67 +210,8 @@ namespace Sentry.data.Infrastructure
             FtpWebRequest request = CreateDwnldRequest(sourceUrl, _creds);
             request.Method = WebRequestMethods.Ftp.Rename;
             request.RenameTo = targetUrl;
-            FtpWebResponse resp = (FtpWebResponse)request.GetResponse();
+            _ = (FtpWebResponse)request.GetResponse();
         }
-
-        #region WinSCPImplementation
-
-        //public FtpProvider (string hostName, int portNumber, NetworkCredential creds)
-        //{
-        //    CreateSessionOptions(hostName, portNumber, creds);
-        //    session = new Session();
-        //    var d = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
-        //    session.DebugLogPath = "C:\\Temp\\AppLogs\\WinSCP\\Debuglog_"+ d + ".txt";
-        //    session.SessionLogPath = "C:\\Temp\\AppLogs\\WinSCP\\Sessionlog\\Sessionlog_" + d + ".txt";
-
-        //    //session.Open(_sessionOptions);
-
-        //}
-
-        //private void CreateSessionOptions(string hostname, int portNumber, NetworkCredential creds)
-        //{
-        //    _sessionOptions = new SessionOptions
-        //    {
-        //        Protocol = Protocol.Ftp,
-        //        //HostName = hostname,
-        //        //UserName = creds.UserName,
-        //        //Password = creds.Password,
-        //        HostName = "ftp.ncdc.noaa.gov",
-        //        UserName = "ftp",
-        //        Password = "janeDoe@Sentry.com",
-        //        PortNumber = portNumber,
-        //        Timeout = TimeSpan.FromSeconds(120),
-        //        FtpMode = FtpMode.Passive
-
-        //    };
-        //    _sessionOptions.AddRawSettings("ProxyHost", "webproxy.sentry.com");
-        //    _sessionOptions.AddRawSettings("ProxyPort", "80");
-        //    _sessionOptions.AddRawSettings("ProxyMethod", "3");
-        //    _sessionOptions.AddRawSettings("ProxyUsername", Configuration.Config.GetHostSetting("ServiceAccountID"));
-        //    _sessionOptions.AddRawSettings("ProxyPassword", Configuration.Config.GetHostSetting("ServiceAccountPass"));
-
-        //    _sessionOptions.AddRawSettings("FtpForcePasvIp2", "0");
-
-        //    //_sessionOptions.AddRawSettings("ProxyMethod", "4");
-        //    //_sessionOptions.AddRawSettings("FtpProxyLogonType", "5");
-        //}
-
-        //public RemoteDirectoryInfo ListFiles()
-        //{
-        //    RemoteDirectoryInfo dirInfo = session.ListDirectory(remotePath);
-        //    return dirInfo;
-        //}
-
-        //public void GetFile(string fileName, string targetPath)
-        //{
-        //    if (String.IsNullOrWhiteSpace(remotePath))
-        //    {
-        //        throw new ArgumentNullException("remotePath", "remotePath is required to be set.");
-        //    }
-
-        //    session.GetFiles(RemotePath.EscapeFileMask(remotePath + "/" + fileName), targetPath).Check();
-        //}        
-        #endregion
     }
 
 }

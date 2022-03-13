@@ -2,6 +2,7 @@
 using Polly;
 using Polly.Registry;
 using RestSharp;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using System;
@@ -19,7 +20,8 @@ namespace Sentry.data.Infrastructure
 
         public GenericHttpsProvider(Lazy<IDatasetContext> datasetContext,
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService,
-            Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry, IRestClient restClient) : base(datasetContext, configService, encryptionService, restClient)
+            Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry, 
+            IRestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
         {
             _jobService = jobService;
             _providerPolicy = policyRegistry.Get<ISyncPolicy>(PollyPolicyKeys.GenericHttpProviderPolicy);
@@ -31,7 +33,6 @@ namespace Sentry.data.Infrastructure
 
         public override void Execute(RetrieverJob job)
         {
-            string targetFullPath;
 
             //Set Job
             _job = job;
@@ -108,17 +109,9 @@ namespace Sentry.data.Infrastructure
                     //Need to handle both a retrieverjob target (legacy platform) and 
                     //  S3Drop or ProducerS3Drop (new processing platform) data flow steps
                     //  as targets.
-                    if (_targetStep != null)
-                    {
-                        /******************************************************************************
-                        * Utilizing Trigger bucket since we want to trigger the targetStep identified
-                        ******************************************************************************/
-                        versionId = s3Service.UploadDataFile(tempFile, _targetStep.TriggerBucket, targetkey);
-                    }
-                    else
-                    {
-                        versionId = s3Service.UploadDataFile(tempFile, targetkey);
-                    }
+                    // If _targetStep not null,
+                    //    Utilizing Trigger bucket since we want to trigger the targetStep identified
+                    versionId = _targetStep != null ? s3Service.UploadDataFile(tempFile, _targetStep.TriggerBucket, targetkey) : s3Service.UploadDataFile(tempFile, targetkey);
 
                     _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
 
@@ -210,16 +203,41 @@ namespace Sentry.data.Infrastructure
 
         protected override void ConfigureClient()
         {
+            string methodName = $"{nameof(GenericHttpsDataFlowProvider).ToLower()}_{nameof(ConfigureClient).ToLower()}";
+            Logger.Debug($"{methodName} Method Start");
+
             string baseUri = _job.DataSource.BaseUri.ToString();
-            
+
+            NetworkCredential proxyCredentials;
+            string proxyUrl;
+
+            if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
+            {
+                Logger.Debug($"{methodName} using edge proxy: true");
+                string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
+                string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
+                proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
+                proxyCredentials = new NetworkCredential(userName, password);
+            }
+            else
+            {
+                Logger.Debug($"{methodName} using edge proxy: false");
+                proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
+                proxyCredentials = CredentialCache.DefaultNetworkCredentials;
+            }
+
+            Logger.Debug($"{methodName} proxyUser: {proxyCredentials.UserName}");
+
             _client = new RestClient
             {
                 BaseUrl = new Uri(baseUri),
-                Proxy = new WebProxy(Configuration.Config.GetHostSetting("WebProxyUrl"))
+                Proxy = new WebProxy(proxyUrl)
                 {
-                    Credentials = CredentialCache.DefaultNetworkCredentials
+                    Credentials = proxyCredentials
                 }
             };
+
+            Logger.Debug($"{methodName} Method End");
         }
 
         protected override void ConfigureOAuth(IRestRequest req, RetrieverJob job)
@@ -229,10 +247,10 @@ namespace Sentry.data.Infrastructure
 
         protected override void ConfigureRequest()
         {
+#pragma warning disable IDE0017 // Simplify object initialization
             _request = new RestRequest();
-
+#pragma warning restore IDE0017 // Simplify object initialization
             _request.Method = Method.GET;
-
             _request.Resource = _job.GetUri().ToString();
 
             //Add datasource specific headers to request

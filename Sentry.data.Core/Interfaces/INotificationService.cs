@@ -19,7 +19,7 @@ namespace Sentry.data.Core
         string RequestAccess(AccessRequest request);
         List<KeyValuePair<string, string>> GetApproversByBusinessArea(int businessAreaId);
 
-        List<BusinessAreaSubscription> GetAllUserSubscriptions(EventTypeGroup group);
+        List<BusinessAreaSubscription> GetAllUserSubscriptionsFromDatabase(EventTypeGroup group);
         IEnumerable<EventType> GetEventTypes(EventTypeGroup group);
         List<Interval> GetAllIntervals();
         Interval GetInterval(string description);
