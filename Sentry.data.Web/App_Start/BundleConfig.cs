@@ -33,10 +33,9 @@ namespace Sentry.data.Web
 
             //This bundle contains basic bootstrap stuff and some common plugins specific to bootstrap
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").
-                        Include("~/Scripts/MDB/mdb.min.js").
+                        Include("~/Scripts/MDB/mdb.js").
                         Include("~/Scripts/bootstrap.bundle.js").
                         Include("~/Scripts/respond.js").
-                        Include(dataTablesScriptsDirectory + "/moment.js").
                         Include("~/Scripts/typeahead.bundle.js").
                         Include("~/Scripts/sentry.associates.js").
                         Include("~/Scripts/sentry.common.js"));
@@ -62,6 +61,7 @@ namespace Sentry.data.Web
                         Include(dataTablesScriptsDirectory + "/dataTables.rowGroup.js").
                         Include(dataTablesScriptsDirectory + "/dataTables.fixedHeader.js").
                         Include(dataTablesScriptsDirectory + "/dataTables.select.js").
+                        Include(dataTablesScriptsDirectory + "/moment.js").
                         Include("~/Scripts/jquery.dataTables.yadcf.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/prettyCron").
