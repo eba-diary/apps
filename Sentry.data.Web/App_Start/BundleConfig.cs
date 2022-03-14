@@ -80,8 +80,8 @@ namespace Sentry.data.Web
 
             //This bundle contains styles that are used commonly across the site, including bootstrap and jquery plugins
             bundles.Add(new StyleBundle("~/bundles/css/main").
-                        Include("~/Content/bootstrap.min.css", new CssRewriteUrlTransform()).
-                        Include("~/Content/sentry-styles.min.css", new CssRewriteUrlTransform()).
+                        Include("~/Content/bootstrap.css", new CssRewriteUrlTransform()).
+                        Include("~/Content/sentry-styles.css", new CssRewriteUrlTransform()).
 
                         Include("~/Content/font-awesome.css", new CssRewriteUrlTransform()).
                         Include("~/Content/css/select2.css", new CssRewriteUrlTransform()).
