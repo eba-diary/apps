@@ -44,7 +44,7 @@ namespace Sentry.data.Core
                 Schema = file.Schema.SchemaId,
                 DatasetFileConfig = (file.DatasetFileConfig != null) ? file.DatasetFileConfig.ConfigId : 0,
                 UploadUserName = file.UploadUserName,
-                CreateDTM = file.CreateDTM,
+                CreateDTM = file.CreatedDTM,
                 ModifiedDTM = file.ModifiedDTM,
                 FileLocation = file.FileLocation,
                 ParentDatasetFileId = file.ParentDatasetFileId,

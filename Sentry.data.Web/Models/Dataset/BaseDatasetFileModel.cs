@@ -18,7 +18,7 @@ namespace Sentry.data.Web
             this.FileName = dsf.FileName;
             this.Dataset = dsf.Dataset;
             this.UploadUserName = dsf.UploadUserName;
-            this.CreateDTM = dsf.CreateDTM;
+            this.CreateDTM = dsf.CreatedDTM;
             this.ModifiedDTM = dsf.ModifiedDTM;
             this.FileLocation = dsf.FileLocation;
         }
