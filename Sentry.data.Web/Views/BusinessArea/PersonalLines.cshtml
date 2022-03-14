@@ -11,8 +11,14 @@
             <div class="col-sm-12 col-md-12 col-lg-12">
                 <img id="dairyland-logo" alt="Dairyland Logo" src="~/Images/dairyland_logo.png" width="220" />
 
-                <div class="btn-group dataset-operation-button hamburger-man" data-toggle="tooltip" data-placement="top" title="Additional Actions" style="float: right;">
 
+
+                <div class="btn-group dataset-operation-button hamburger-man" style="float: right;">
+                    <button class="btn btn-default borderdk_gray borderdk_blueGray dropdown">
+                        @Html.Partial("~/Views/BusinessArea/_LibertyBell.cshtml")
+                    </button>
+                    <button class="btn btn-default borderdk_gray borderdk_blueGray icon-envelope" type="button" onclick="location.href = 'mailto:BusinessInformationTeam@sentry.com?Subject=Contact%20%20-%20BusinessInformationTeam';" id="EnvelopeMan">
+                    </button>
                     <button type="button"
                             class="btn btn-default borderdk_gray borderdk_blueGray dropdown"
                             data-toggle="dropdown">
@@ -20,19 +26,14 @@
                     </button>
                     <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
                         <li id="SubscribeModal" style="cursor: pointer;" data-id="1" data-placement="top" title="Subscribe">
-                            <a>
+                            <a class="dropdown-item">
                                 Subscribe
                             </a>
                         </li>
                     </ul>
                 </div>
 
-                @Html.Partial("~/Views/BusinessArea/_LibertyBell.cshtml")
 
-             <div style="float: right; margin-right: 0.4em; font-size: 28px;" >
-                 <button type="button" onclick="location.href = 'mailto:BusinessInformationTeam@sentry.com?Subject=Contact%20%20-%20BusinessInformationTeam';" id="EnvelopeMan" class="icon-envelope" >
-                 </button>
-             </div>   
 
             </div>
         </div>

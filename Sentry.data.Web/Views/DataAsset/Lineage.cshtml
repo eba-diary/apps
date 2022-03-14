@@ -49,7 +49,7 @@
         @if (ViewBag.IsLine == false)
         {
         <div class="ml-auto">
-            <ul class="nav nav-pills mt-3">
+            <ul class="nav nav-pills mt-4">
                 <li class="nav-item"><a class="nav-link" href="~/DataAsset/@dataAsset.Name">Home</a></li>
 
                 @{ disabled = (dataAsset.DisplayName == "SERA PL" || dataAsset.DisplayName == "PL Policy ODS") ? "" : "disabled"; }

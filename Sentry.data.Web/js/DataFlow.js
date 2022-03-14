@@ -11,10 +11,7 @@
 
         data.DataFlow.InitIngestionType();
 
-
-        $("#PreprocessingOptions").select2({
-            placeholder: "Select Options"
-        });
+        $("#PreprocessingOptions").materialSelect();
 
         //init preprocessing panel
         if ($("#IsCompressed").val() === "true") {

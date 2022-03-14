@@ -12,6 +12,14 @@
             $('.dataSourceInfoPanel').hide();
             var val = $(selectBox).val();
 
+            $("#RetrieverJob_SelectedSourceType").materialSelect();
+            $("#RetrieverJob_SelectedDataSource").materialSelect();
+            $("#RetrieverJob_SelectedRequestMethod").materialSelect();
+            $("#RetrieverJob_SelectedRequestDataFormat").materialSelect();
+            $("#RetrieverJob_FtpPattern").materialSelect();
+            $("#RetrieverJob_SchedulePicker").materialSelect();
+
+
             $.getJSON("/Config/SourcesByType", { sourceType: val }, function (data) {
                 var subItems = "";
                 $.each(data, function (index, item) {

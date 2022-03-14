@@ -1,13 +1,14 @@
 ﻿@model Sentry.data.Web.BusinessAreaLandingPageModel
 
+<div class="align-bottom">
+    @if (Model.Notifications.NotificationCount > 0)
+    {
+        <span class="liberty-badge liberty-badge-small liberty-badge-red">@Model.Notifications.NotificationCount</span>
+    }
+    else
+    {
+        <span class="liberty-badge liberty-badge-small liberty-badge-white">@Model.Notifications.NotificationCount</span>
+    }
 
-@if (Model.Notifications.NotificationCount > 0)
-{
-    <span class="liberty-badge liberty-badge-small liberty-badge-red" style="float: right; margin-right: 0.7em;">@Model.Notifications.NotificationCount</span>
-}
-else
-{
-    <span class="liberty-badge liberty-badge-small liberty-badge-white" style="float: right; margin-right: 0.7em;">@Model.Notifications.NotificationCount</span>
-}
-
-<i id="libertyBell" title="Notifications" data-placement="bottom" class="liberty-bell icon-bell" data-toggle="tooltip"> </i>
+    <i id="libertyBell" title="Notifications" data-placement="bottom" class="liberty-bell icon-bell" data-toggle="tooltip"> </i>
+</div>
