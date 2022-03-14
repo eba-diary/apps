@@ -12,7 +12,6 @@ namespace Sentry.data.Web
             //This bundle contains basic jquery stuff and some common plugins
             bundles.Add(new ScriptBundle("~/bundles/jquery").
                         Include("~/Scripts/jquery-{version}.js").
-                        Include("~/Scripts/jquery-ui.js").
                         Include("~/Scripts/jquery.unobtrusive-ajax.js").
                         Include("~/Scripts/jquery.placeholder.js").
                         Include("~/Scripts/select2.js").
@@ -31,9 +30,11 @@ namespace Sentry.data.Web
                         Include("~/Scripts/toastr.min.js").
                         Include("~/Scripts/thenBy.min.js"));
 
+
             //This bundle contains basic bootstrap stuff and some common plugins specific to bootstrap
-            bundles.Add(new ScriptBundle("~/bundles/bootstrap").
+            bundles.Add(new Bundle("~/bundles/bootstrap").
                         Include("~/Scripts/bootstrap.bundle.js").
+                        Include("~/Scripts/MDB/mdb.js").
                         Include("~/Scripts/respond.js").
                         Include("~/Scripts/typeahead.bundle.js").
                         Include("~/Scripts/sentry.associates.js").
