@@ -33,7 +33,6 @@ namespace Sentry.data.Web
 
             //This bundle contains basic bootstrap stuff and some common plugins specific to bootstrap
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").
-                        Include("~/Scripts/MDB/mdb.js").
                         Include("~/Scripts/bootstrap.bundle.js").
                         Include("~/Scripts/respond.js").
                         Include("~/Scripts/typeahead.bundle.js").
