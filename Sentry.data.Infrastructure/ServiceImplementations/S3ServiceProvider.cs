@@ -188,11 +188,12 @@ namespace Sentry.data.Infrastructure
         /// <param name="key"></param>
         /// <param name="versionId"></param>
         /// <returns></returns>
-        public string GetDatasetDownloadURL(string key, string versionId = null, string fileName = null)
+        public string GetDatasetDownloadURL(string key, string bucket = null, string versionId = null, string fileName = null)
         {
+            string s3Bucket = bucket?? RootBucket; 
             GetPreSignedUrlRequest req = new GetPreSignedUrlRequest()
             {
-                BucketName = RootBucket,
+                BucketName = s3Bucket,
                 Key = key,
                 VersionId = versionId,
                 Expires = DateTime.Now.AddMinutes(2)

@@ -735,10 +735,11 @@ namespace Sentry.data.Web.Controllers
             try
             {
                 //Testing if object exists in S3, response is not used.
-                _s3Service.GetObjectMetadata(null, df.FileLocation, null);
+                string objectKey = (df.FileKey) ?? df.FileLocation;
+                _s3Service.GetObjectMetadata(df.FileBucket, objectKey, null);
 
                 JsonResult jr = new JsonResult();
-                jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation);
+                jr.Data = _s3Service.GetDatasetDownloadURL(objectKey, df.FileBucket);
                 jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
 
                 e.Reason = "Successfully Downloaded Data File";
