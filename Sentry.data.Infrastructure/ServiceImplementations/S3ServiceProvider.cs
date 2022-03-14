@@ -188,7 +188,7 @@ namespace Sentry.data.Infrastructure
         /// <param name="key"></param>
         /// <param name="versionId"></param>
         /// <returns></returns>
-        public string GetDatasetDownloadURL(string key, string bucket = null, string versionId = null, string fileName = null)
+        public string GetDatasetDownloadUrl(string key, string bucket = null, string versionId = null, string fileName = null)
         {
             string s3Bucket = bucket?? RootBucket; 
             GetPreSignedUrlRequest req = new GetPreSignedUrlRequest()
@@ -270,11 +270,9 @@ namespace Sentry.data.Infrastructure
         /// <returns></returns>
         public string UploadDataFile(Stream inputstream, string targetKey)
         {
-            string versionId = null;
+            string fileVersionId = PutObject(inputstream, targetKey);
 
-                versionId = PutObject(inputstream, targetKey);
-
-            return versionId;
+            return fileVersionId;
         }
 
         public void TransferUtlityUploadStream(string folder, string fileName, Stream stream)
@@ -362,7 +360,7 @@ namespace Sentry.data.Infrastructure
         public string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey)
         {
             List<UploadPartResponse> uploadResponses = new List<UploadPartResponse>();
-            string versionId = null;
+            string fileVersionId = null;
             
             string uploadId = StartUpload(targetBucket, targetKey);
 
@@ -410,7 +408,7 @@ namespace Sentry.data.Infrastructure
                 }
 
                 //Complete successful Multipart Upload so we do not continue to get chared for upload storage
-                versionId = StopUpload(targetBucket, targetKey, uploadId, uploadResponses);
+                fileVersionId = StopUpload(targetBucket, targetKey, uploadId, uploadResponses);
 
             }
             catch (Exception ex)
@@ -429,7 +427,7 @@ namespace Sentry.data.Infrastructure
                 throw new Exception("Error attempting to upload dataset to S3: " + ex.Message);
             }
 
-            return versionId;
+            return fileVersionId;
         }
 
         /// <summary>
@@ -489,7 +487,6 @@ namespace Sentry.data.Infrastructure
 
             Sentry.Common.Logging.Logger.Debug($"Completed MultipartUpload UploadID: {uploadId}, with response status {mRsp.HttpStatusCode}");
 
-            //return mRsp.ETag;
             return mRsp.VersionId;
         }
 
@@ -625,7 +622,7 @@ namespace Sentry.data.Infrastructure
 
         private string PutObject(Stream filestream, string targetKey)
         {
-            string versionId = null;
+            string fileVersionId = null;
             try
             {
                 PutObjectRequest poReq = new PutObjectRequest();
@@ -642,7 +639,7 @@ namespace Sentry.data.Infrastructure
 
                 Sentry.Common.Logging.Logger.Debug($"Completed PutObject Request: Key: {targetKey}, Version_ID:{poRsp.VersionId}, ETag:{poRsp.ETag}, Lenght(bytes):{poRsp.ContentLength}");
 
-                versionId = poRsp.VersionId;
+                fileVersionId = poRsp.VersionId;
             }
             catch (AmazonS3Exception amazonS3Exception)
             {
@@ -658,12 +655,12 @@ namespace Sentry.data.Infrastructure
                     throw new Exception("Error attempting to upload dataset to S3: " + amazonS3Exception.Message);
                 }
             }
-            return versionId;
+            return fileVersionId;
         }
 
         private string PutObject(string sourceFilePath, string targetBucket, string targetKey)
         {
-            string versionId = null;
+            string fileVersionId = null;
             try
             {
                 PutObjectRequest poReq = new PutObjectRequest();
@@ -679,7 +676,7 @@ namespace Sentry.data.Infrastructure
 
                 Sentry.Common.Logging.Logger.Debug($"Completed PutObject Request: Key: {targetKey}, Version_ID:{poRsp.VersionId}, ETag:{poRsp.ETag}, Lenght(bytes):{poRsp.ContentLength}");
 
-                versionId = poRsp.VersionId;
+                fileVersionId = poRsp.VersionId;
             }
             catch (AmazonS3Exception amazonS3Exception)
             {
@@ -695,7 +692,7 @@ namespace Sentry.data.Infrastructure
                     throw new Exception("Error attempting to upload dataset to S3: " + amazonS3Exception.Message);
                 }
             }
-            return versionId;
+            return fileVersionId;
         }
 
         #endregion
@@ -762,7 +759,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public void DeleteMultipleS3keys(List<ObjectKeyVersion> keyversionids)
+        public void DeleteMultipleS3Keys(List<ObjectKeyVersion> keyversionids)
         {
             List<KeyVersion> objects = new List<KeyVersion>();
             List<ObjectKeyVersion> deletedObjects = new List<ObjectKeyVersion>();
@@ -819,7 +816,7 @@ namespace Sentry.data.Infrastructure
             }
         }
         #endregion
-        public void DeleteMulitpleS3keys(List<string> keys)
+        public void DeleteMulitpleS3Keys(List<string> keys)
         {
             List<ObjectKeyVersion> keyList = new List<ObjectKeyVersion>();
             foreach (string key in keys)
@@ -831,7 +828,7 @@ namespace Sentry.data.Infrastructure
                 });
             }
 
-            DeleteMultipleS3keys(keyList);
+            DeleteMultipleS3Keys(keyList);
         }
         /// <summary>
         /// Get list of datasets currently on S3, within the given parentDir
@@ -839,7 +836,7 @@ namespace Sentry.data.Infrastructure
         /// <param name="parentDir"></param>
         /// <param name="includeSubDirectories"></param>
         /// <returns></returns>
-        public IDictionary<string, string> GetDatasetList(string parentDir = "sentry-dataset-management", bool includeSubDirectories = true)
+        public IDictionary<string, string> GetDatasetList(string parentDir = null, bool includeSubDirectories = true)
         {
             // this will include folders in addition to data sets...
 
@@ -901,10 +898,6 @@ namespace Sentry.data.Infrastructure
                     throw new Exception($"Failed GetObjectMetadata - {amazonS3Exception.Message}");
                 }
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
 
             return ConvertObjectMetadataResponse(resp);
         }
@@ -913,28 +906,6 @@ namespace Sentry.data.Infrastructure
         {
             return GetObjectMetadata(RootBucket, key, versionId);
         }
-
-        //public string GetObject(string key, string versionId)
-        //{
-        //    throw new NotImplementedException();
-
-        //    //GetObjectRequest req = new GetObjectRequest();
-        //    //string contents = null;
-
-        //    //req.BucketName = RootBucket;
-        //    //req.Key = key;
-        //    //req.VersionId = versionId;
-
-        //    //using (GetObjectResponse response = S3Client.GetObject(req))
-        //    //{
-        //    //    using (StreamReader reader = new StreamReader(response.ResponseStream))
-        //    //    {
-        //    //        contents = reader.ReadToEnd();
-        //    //    }
-        //    //}
-
-        //    //return contents;
-        //}
 
         /// <summary>
         /// Returns an S3 object as a Stream.  By default versionID is null, therefore, will
@@ -1232,7 +1203,7 @@ namespace Sentry.data.Infrastructure
             else
             {
                 Logger.Info($"deleteS3Prefix-detectedfiles - prefix:{prefix} count:{s3Keys.Count.ToString()}");
-                DeleteMultipleS3keys(s3Keys);
+                DeleteMultipleS3Keys(s3Keys);
             }
         }
 
