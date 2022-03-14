@@ -6,6 +6,9 @@ namespace Sentry.data.Core
     {
         public int DatasetFileId { get; set; }
         public string FileName { get; set; }
+        public string FileKey { get; set; }
+        public string FileBucket { get; set; }
+        public string ETag { get; set; }
         public int Dataset { get; set; }
         public int SchemaRevision { get; set; }
         public int Schema { get; set; }

@@ -38,7 +38,10 @@ namespace Sentry.data.Web
                 Size = dto.Size,
                 FlowExecutionGuid = dto.FlowExecutionGuid,
                 RunInstanceGuid = dto.RunInstanceGuid,
-                FileExtension = dto.FileExtension
+                FileExtension = dto.FileExtension,
+                FileKey = dto.FileKey,
+                FileBucket = dto.FileBucket,
+                ETag = dto.ETag
             };
 
             return model;
@@ -64,7 +67,10 @@ namespace Sentry.data.Web
                 Size = model.Size,
                 FlowExecutionGuid = model.FlowExecutionGuid,
                 RunInstanceGuid = model.RunInstanceGuid,
-                FileExtension = model.FileExtension
+                FileExtension = model.FileExtension,
+                FileKey= model.FileKey,
+                FileBucket= model.FileBucket,
+                ETag= model.ETag
             };
 
             return dto;

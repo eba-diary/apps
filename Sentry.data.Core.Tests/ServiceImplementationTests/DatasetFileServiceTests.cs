@@ -431,6 +431,9 @@ namespace Sentry.data.Core.Tests
             var datasetFileDto = MockClasses.MockDatasetFileDto();
             datasetFileDto.FileLocation = "target/location.txt";
             datasetFileDto.VersionId = "New_versionid12312445";
+            datasetFileDto.FileKey = "target/key/location.txt";
+            datasetFileDto.FileBucket = "bucket_name";
+            datasetFileDto.ETag = "etag_string";
 
             Dataset ds = MockClasses.MockDataset();
             DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
@@ -462,7 +465,7 @@ namespace Sentry.data.Core.Tests
             datasetFileService.UpdateDataFile(datasetFileDto, datasetFile);
 
             // Assert
-            Assert.AreEqual("target/location.txt", datasetFile.FileLocation);
+            //These properties values should remaing intact
             Assert.AreEqual(98, datasetFile.DatasetFileId);
             Assert.AreEqual("location.zip", datasetFile.FileName);
             Assert.AreEqual(82, datasetFile.Dataset.DatasetId);
@@ -471,13 +474,19 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(193, datasetFile.DatasetFileConfig.ConfigId);
             Assert.AreEqual(false, datasetFile.IsBundled);
             Assert.AreEqual(23, datasetFile.ParentDatasetFileId);
-            Assert.AreEqual("New_versionid12312445", datasetFile.VersionId);
             Assert.AreEqual("Austin is the Man!", datasetFile.Information);
             Assert.AreEqual(123456, datasetFile.Size);
             Assert.AreEqual("12340945576", datasetFile.FlowExecutionGuid);
             Assert.AreEqual("12345697853", datasetFile.RunInstanceGuid);
             Assert.AreEqual("csv", datasetFile.FileExtension);
             Assert.AreEqual(264, datasetFile.Schema.SchemaId);
+            Assert.AreEqual("test/key/file.txt", datasetFile.FileKey);
+            Assert.AreEqual("etag-string-value", datasetFile.ETag);
+
+            //These values should be updated to value of incoming Dto Object
+            Assert.AreEqual("target/location.txt", datasetFile.FileLocation);
+            Assert.AreEqual("bucket_name", datasetFile.FileBucket);
+            Assert.AreEqual("New_versionid12312445", datasetFile.VersionId);
 
         }
     }
