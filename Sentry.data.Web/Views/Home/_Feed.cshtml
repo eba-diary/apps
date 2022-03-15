@@ -31,7 +31,7 @@
 
     @if (item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.NOTIFICATION)
     {
-        <h6 class="@color" data-toggle="tooltip" data-placement="top" title="">@item.NotificationTitle</h6>
+        <h6 class="@color pt-0" data-toggle="tooltip" data-placement="top" title="">@item.NotificationTitle</h6>
     }
     else if (item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.DATASET || item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.SCHEMA || item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.BUSINESS_INTELLIGENCE)
     {

@@ -2948,3 +2948,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
     border-bottom: 1px solid #ced4da !important;
     box-shadow: none !important;
 }
+
+.tableContent {
+    display: grid !important;
+}

@@ -256,10 +256,10 @@
             else if (c == 2)
             {
                 <div class="row">
-                    <div class="col-sm-6 clcCardWide border_@Model.Components[0].Type.Color">
+                    <div class="col clcCardWide border_@Model.Components[0].Type.Color">
                         @Html.Partial("_ConsumptionLayerComponent", Model.Components[0])
                     </div>
-                    <div class="col-sm-6 clcCardWide border_@Model.Components[1].Type.Color">
+                    <div class="col clcCardWide border_@Model.Components[1].Type.Color">
                         @Html.Partial("_ConsumptionLayerComponent", Model.Components[1])
                     </div>
                 </div>
@@ -270,13 +270,13 @@
                     @for (int i = 0; i < c; i++)
                     {
                         <div class="row">
-                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[i].Type.Color">
+                            <div class="col clcCard border_@Model.Components[i].Type.Color">
                                 @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
                             </div>
-                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                            <div class="col clcCard border_@Model.Components[++i].Type.Color">
                                 @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
                             </div>
-                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                            <div class="col clcCard border_@Model.Components[++i].Type.Color">
                                 @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
                             </div>
                         </div>
@@ -284,18 +284,18 @@
                         <div class="row">
                             @if (i + 1 == c - 1)
                             {
-                                <div class="col-md-4"></div>
-                                <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                <div class="col"></div>
+                                <div class="col clcCard border_@Model.Components[++i].Type.Color">
                                     @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
                                 </div>
                             }
                             @if (i + 2 == c - 1)
                             {
-                                <div class="col-md-2"></div>
-                                <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                <div class="col"></div>
+                                <div class="col clcCard border_@Model.Components[++i].Type.Color">
                                     @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
                                 </div>
-                                <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                <div class="col clcCard border_@Model.Components[++i].Type.Color">
                                     @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
                                 </div>
                             }
