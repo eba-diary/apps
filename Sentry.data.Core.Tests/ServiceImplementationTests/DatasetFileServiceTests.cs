@@ -428,66 +428,55 @@ namespace Sentry.data.Core.Tests
         public void DatasetFileService_UpdateDataFile()
         {
             // Arrage
-            var datasetFileDto = MockClasses.MockDatasetFileDto();
-            datasetFileDto.FileLocation = "target/location.txt";
-            datasetFileDto.VersionId = "New_versionid12312445";
-            datasetFileDto.FileKey = "target/key/location.txt";
-            datasetFileDto.FileBucket = "bucket_name";
-            datasetFileDto.ETag = "etag_string";
+            DatasetFileDto datasetFileDto = MockClasses.MockDatasetFileDto();
+            datasetFileDto.FileLocation = "my/target/location.txt";
+            datasetFileDto.VersionId = "my_New_versionid_12312445";
+            datasetFileDto.FileKey = "my/target/key/location.txt";
+            datasetFileDto.FileBucket = "my-bucket-name";
+            datasetFileDto.ETag = "my-etag-string";
 
             Dataset ds = MockClasses.MockDataset();
             DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
-            var user1 = new Mock<IApplicationUser>();
+            Mock<IApplicationUser> user1 = new Mock<IApplicationUser>();
             user1.Setup(f => f.AssociateId).Returns("123456");
 
-            var datasetFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
-
-            datasetFile.DatasetFileId = 98;
-            datasetFile.FileLocation = "original/location.zip";
-            datasetFile.Dataset.DatasetId = 82;
-            datasetFile.FileName = "location.zip";
-            datasetFile.VersionId = "qwerty-asdf9320123n90afs";
-            datasetFile.Information = "Austin is the Man!";
-            datasetFile.Size = 123456;
-
             DateTime dtm = DateTime.Now;
-            datasetFile.CreatedDTM = dtm;
-            datasetFile.ModifiedDTM = dtm;
-            datasetFile.DatasetFileConfig.ConfigId = 193;
-            datasetFile.FlowExecutionGuid = "12340945576";
-            datasetFile.RunInstanceGuid = "12345697853";
-            datasetFile.FileExtension = "csv";
-            datasetFile.Schema.SchemaId = 264;
+            DatasetFile datasetFile_To_Update = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            datasetFile_To_Update.CreatedDTM = dtm;
+            datasetFile_To_Update.ModifiedDTM = dtm;
 
-            var datasetFileService = new DatasetFileService(null, null, null);
+            DatasetFile datasetFile_Original_Values = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            datasetFile_Original_Values.CreatedDTM = dtm;
+            datasetFile_Original_Values.ModifiedDTM = dtm;
+
+            DatasetFileService datasetFileService = new DatasetFileService(null, null, null);
 
             // Act
-            datasetFileService.UpdateDataFile(datasetFileDto, datasetFile);
+            datasetFileService.UpdateDataFile(datasetFileDto, datasetFile_To_Update);
 
             // Assert
             //These properties values should remaing intact
-            Assert.AreEqual(98, datasetFile.DatasetFileId);
-            Assert.AreEqual("location.zip", datasetFile.FileName);
-            Assert.AreEqual(82, datasetFile.Dataset.DatasetId);
-            Assert.AreEqual(dtm, datasetFile.CreatedDTM);
-            Assert.AreEqual(dtm, datasetFile.ModifiedDTM);
-            Assert.AreEqual(193, datasetFile.DatasetFileConfig.ConfigId);
-            Assert.AreEqual(false, datasetFile.IsBundled);
-            Assert.AreEqual(23, datasetFile.ParentDatasetFileId);
-            Assert.AreEqual("Austin is the Man!", datasetFile.Information);
-            Assert.AreEqual(123456, datasetFile.Size);
-            Assert.AreEqual("12340945576", datasetFile.FlowExecutionGuid);
-            Assert.AreEqual("12345697853", datasetFile.RunInstanceGuid);
-            Assert.AreEqual("csv", datasetFile.FileExtension);
-            Assert.AreEqual(264, datasetFile.Schema.SchemaId);
-            Assert.AreEqual("test/key/file.txt", datasetFile.FileKey);
-            Assert.AreEqual("etag-string-value", datasetFile.ETag);
+            Assert.AreEqual(datasetFile_Original_Values.DatasetFileId,              datasetFile_To_Update.DatasetFileId);
+            Assert.AreEqual(datasetFile_Original_Values.FileName,                   datasetFile_To_Update.FileName);
+            Assert.AreEqual(datasetFile_Original_Values.Dataset.DatasetId,          datasetFile_To_Update.Dataset.DatasetId);
+            Assert.AreEqual(datasetFile_Original_Values.CreatedDTM,                 datasetFile_To_Update.CreatedDTM);
+            Assert.AreEqual(datasetFile_Original_Values.ModifiedDTM,                datasetFile_To_Update.ModifiedDTM);
+            Assert.AreEqual(datasetFile_Original_Values.DatasetFileConfig.ConfigId, datasetFile_To_Update.DatasetFileConfig.ConfigId);
+            Assert.AreEqual(datasetFile_Original_Values.IsBundled,                  datasetFile_To_Update.IsBundled);
+            Assert.AreEqual(datasetFile_Original_Values.ParentDatasetFileId,        datasetFile_To_Update.ParentDatasetFileId);
+            Assert.AreEqual(datasetFile_Original_Values.Information,                datasetFile_To_Update.Information);
+            Assert.AreEqual(datasetFile_Original_Values.Size,                       datasetFile_To_Update.Size);
+            Assert.AreEqual(datasetFile_Original_Values.FlowExecutionGuid,          datasetFile_To_Update.FlowExecutionGuid);
+            Assert.AreEqual(datasetFile_Original_Values.RunInstanceGuid,            datasetFile_To_Update.RunInstanceGuid);
+            Assert.AreEqual(datasetFile_Original_Values.FileExtension,              datasetFile_To_Update.FileExtension);
+            Assert.AreEqual(datasetFile_Original_Values.Schema.SchemaId,            datasetFile_To_Update.Schema.SchemaId);
+            Assert.AreEqual(datasetFile_Original_Values.ETag,                       datasetFile_To_Update.ETag);
 
             //These values should be updated to value of incoming Dto Object
-            Assert.AreEqual("target/location.txt", datasetFile.FileLocation);
-            Assert.AreEqual("bucket_name", datasetFile.FileBucket);
-            Assert.AreEqual("New_versionid12312445", datasetFile.VersionId);
-
+            Assert.AreEqual(datasetFileDto.FileLocation,    datasetFile_To_Update.FileLocation);
+            Assert.AreEqual(datasetFileDto.FileKey,         datasetFile_To_Update.FileKey);
+            Assert.AreEqual(datasetFileDto.FileBucket,      datasetFile_To_Update.FileBucket);
+            Assert.AreEqual(datasetFileDto.VersionId,       datasetFile_To_Update.VersionId);
         }
     }
 }
