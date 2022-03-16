@@ -26,6 +26,6 @@ data.DataAsset = {
 
         $(newClass).slideToggle();
 
-        $(arrow).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
+        $(arrow).toggleClass("icon-chevron-down icon-chevron-up");
     }
 }

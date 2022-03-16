@@ -5,10 +5,10 @@
         // click event to toggle the display of the datasets selector
         $('#datasetsHeader').click(function () {
 
-            if ($(this).children('.tracker-menu-icon').hasClass('glyphicon-menu-down')) {
-                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
+            if ($(this).children('.tracker-menu-icon').hasClass('icon-chevron-down')) {
+                $(this).children('.tracker-menu-icon').switchClass('icon-chevron-down', 'icon-chevron-up');
             } else {
-                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-up', 'glyphicon-menu-down');
+                $(this).children('.tracker-menu-icon').switchClass('icon-chevron-up', 'icon-chevron-down');
             }
             $(this).next('#datasetsContainer').toggle();
 
@@ -78,7 +78,7 @@
         // click event to toggle the display of the Job Status window
         $('.tracker-header').click(function () {
 
-            $('#tracker-menu-icon').switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
+            $('#tracker-menu-icon').switchClass('icon-chevron-down', 'icon-chevron-up');
             $('.tracker-content').toggle();
 
         });

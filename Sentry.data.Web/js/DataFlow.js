@@ -84,10 +84,10 @@
 
     DataFlowDetailInit: function (dataflowId) {
         $('body').on('click', '.jobHeader', function () {
-            if ($(this).children('.tracker-menu-icon').hasClass('glyphicon-menu-down')) {
-                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
+            if ($(this).children('.tracker-menu-icon').hasClass('icon-chevron-down')) {
+                $(this).children('.tracker-menu-icon').switchClass('icon-chevron-down', 'icon-chevron-up');
             } else {
-                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-up', 'glyphicon-menu-down');
+                $(this).children('.tracker-menu-icon').switchClass('icon-chevron-up', 'icon-chevron-down');
             }
             $(this).next('.jobContainer').toggle();
 
@@ -351,11 +351,8 @@
         }
 
         $('#CreateSchema').click(function () {
-            var curRow = $(this).parent().parent();
-            var datasetSelectionDropDown = curRow.find("[id$=__SelectedDataset]");
-            var createSchemaDatasetId = datasetSelectionDropDown.val();
             $('#DataFlowFormContainer').hide();
-            data.DataFlow.RenderSchemaCreatePage(createSchemaDatasetId);
+            data.DataFlow.RenderSchemaCreatePage($(".dataset-select select").val());
         });
     },
 

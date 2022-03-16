@@ -33,10 +33,10 @@ data.Config = {
         });
 
         $('body').on('click', '.tracker-menu-icon', function () {
-            if ($(this).hasClass('glyphicon-menu-down')) {
-                $(this).switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
+            if ($(this).hasClass('icon-chevron-down')) {
+                $(this).switchClass('icon-chevron-down', 'icon-chevron-up');
             } else {
-                $(this).switchClass('glyphicon-menu-up', 'glyphicon-menu-down');
+                $(this).switchClass('icon-chevron-up', 'icon-chevron-down');
             }
             var parentElement = $(this).parent();
             var detailContainer = parentElement.next('div');

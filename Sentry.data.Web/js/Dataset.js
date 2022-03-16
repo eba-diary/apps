@@ -873,7 +873,8 @@ data.Dataset = {
                 $("#NamedEnvironment").materialSelect();
             };
             $("#NamedEnvironmentType").materialSelect();
-
+            $("#DatasetScopeTypeId").materialSelect();
+            $("#FileExtensionId").materialSelect();
         });
 
 
@@ -1032,7 +1033,7 @@ data.Dataset = {
             var icon = "#icon_" + id;
 
             $(category).slideToggle();
-            $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
+            $(icon).toggleClass("icon-chevron-down icon-chevron-up");
         });
 
         var Id = $('#datasetConfigList').val();
@@ -1728,7 +1729,7 @@ data.Dataset = {
                 { data: "ConfigFileName", className: "ConfigFileName" }
             ],
             language: {
-                search: "<div class='input-group'><span class='input-group-addon'><i class='glyphicon glyphicon-search'></i></span>_INPUT_</div>",
+                search: "<div class='input-group'><span class='input-group-addon'><i class='icon-search'></i></span>_INPUT_</div>",
                 searchPlaceholder: "Search",
                 processing: ""
             },
@@ -1921,7 +1922,7 @@ data.Dataset = {
                 { data: "ConfigFileName", className: "ConfigFileName" }
             ],
             language: {
-                search: "<div class='input-group'><span class='input-group-addon'><i class='glyphicon glyphicon-search'></i></span>_INPUT_</div>",
+                search: "<div class='input-group'><span class='input-group-addon'><i class='icon-search'></i></span>_INPUT_</div>",
                 searchPlaceholder: "Search",
                 processing: ""
             },

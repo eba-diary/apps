@@ -38,7 +38,7 @@ data.Search = {
             var icon = "#icon_" + id;
 
             $(category).slideToggle();
-            $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
+            $(icon).toggleClass("icon-chevron-down icon-chevron-up");
         });
 
         $(document).on("click", "[id^='filterMore_']", function (e) {
@@ -50,7 +50,7 @@ data.Search = {
             var txt = "#txt_" + id;
 
             $(show).slideToggle();
-            $(icon).toggleClass("glyphicon-plus-sign glyphicon-minus-sign");
+            $(icon).toggleClass("icon-plus icon-minus");
 
             if ($(txt).text() === "Show Less") {
                 $(txt).text("Show More");
@@ -66,7 +66,7 @@ data.Search = {
             var button = $(this);
             var id = button.attr("data");
 
-            if (button.hasClass("glyphicon-star")) {
+            if (button.hasClass("icon-filled-star")) {
 
                 $.ajax({
                     url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent(id),
@@ -79,7 +79,7 @@ data.Search = {
                     }
                 });
             }
-            else if (button.hasClass("glyphicon-star-empty")) {
+            else if (button.hasClass("icon-star")) {
 
                 $.ajax({
                     url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent(id),
@@ -93,7 +93,7 @@ data.Search = {
                 });
             }
 
-            $(this).toggleClass("glyphicon-star glyphicon-star-empty");
+            $(this).toggleClass("icon-filled-star icon-star");
 
         });
 
@@ -258,7 +258,7 @@ data.Search = {
         $(".select2-container--default").css('width', '100%');
 
         // have the first filter section expanded by default
-        $("#filterColumn .panel:first-child .filterViewIcon").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
+        $("#filterColumn .panel:first-child .filterViewIcon").removeClass("icon-chevron-down").addClass("icon-chevron-up");
         $("#filterColumn .panel:first-child .dataset-list-filter-category").show();
 
         // set the height of the filters <div> dynamically

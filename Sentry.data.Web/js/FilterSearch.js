@@ -173,7 +173,7 @@
         $(".filter-search-apply").prop("disabled", true);
 
         $(".modal").modal("hide");
-        $(".glyphicon-search").hide();
+        $(".icon-search").hide();
         $(".filter-search-results-container").hide();
         $(".filter-search-results-none").hide();
         $(".filter-search-result-count-container").hide();
@@ -189,7 +189,7 @@
         $(".fa-spin").hide();
         $(".filter-search-result-sentry-spinner").hide();
 
-        $(".glyphicon-search").show();
+        $(".icon-search").show();
 
         if (totalResultCount > 0) {
             $(".filter-search-results-container").slideDown();
