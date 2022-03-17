@@ -53,7 +53,10 @@ namespace Sentry.data.Core
                 Size = file.Size,
                 FlowExecutionGuid = file.FlowExecutionGuid,
                 RunInstanceGuid = file.RunInstanceGuid,
-                FileExtension = file.FileExtension
+                FileExtension = file.FileExtension,
+                FileKey = file.FileKey,
+                FileBucket = file.FileBucket,
+                ETag = file.ETag
             };
 
             return dto;

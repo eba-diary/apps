@@ -42,23 +42,23 @@ namespace Sentry.data.Core
         #region Object Deletes
         ObjectKeyVersion MarkDeleted(string key);
 
-        void DeleteS3Key(ObjectKeyVersion keyversion);
+        void DeleteS3Key(ObjectKeyVersion keyVersion);
 
         /// <summary>
         /// Deletes all s3 object keys in list.  Uses specific version id if specified
         /// </summary>
         /// <param name="keyversionids"></param>
-        void DeleteMultipleS3keys(List<ObjectKeyVersion> keyversionids);
+        void DeleteMultipleS3Keys(List<ObjectKeyVersion> keyversionids);
         /// <summary>
         /// Deletes all s3 object keys in list.  Will specify null for version id.  In versioned bucket, this will delete all versions of s3 object key.
         /// </summary>
         /// <param name="keys"></param>
         #endregion
-        void DeleteMulitpleS3keys(List<string> keys);
+        void DeleteMulitpleS3Keys(List<string> keys);
 
         string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey);
 
-        string GetDatasetDownloadURL(string key, string versionId = null, string fileName = null);
+        string GetDatasetDownloadUrl(string key, string bucket = null, string versionId = null, string fileName = null);
 
         /// <summary>
         /// Returns object metadata for S3 object.

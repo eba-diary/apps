@@ -280,7 +280,10 @@ namespace Sentry.data.Core.Tests
                 RunInstanceGuid = "20211210143750",
                 FileExtension = "csv",
                 Schema = MockFileSchema(),
-                SchemaRevision = MockSchemaRevision()
+                SchemaRevision = MockSchemaRevision(),
+                FileKey = "test/key/file.txt",
+                FileBucket = "test-bucket-name",
+                ETag = "etag-string-value"
             };
 
             return df;
