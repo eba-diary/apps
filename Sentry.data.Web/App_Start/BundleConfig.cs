@@ -12,6 +12,7 @@ namespace Sentry.data.Web
             //This bundle contains basic jquery stuff and some common plugins
             bundles.Add(new ScriptBundle("~/bundles/jquery").
                         Include("~/Scripts/jquery-{version}.js").
+                        Include("~/Scripts/jquery-ui.js").
                         Include("~/Scripts/jquery.unobtrusive-ajax.js").
                         Include("~/Scripts/jquery.placeholder.js").
                         Include("~/Scripts/select2.js").
@@ -131,7 +132,7 @@ namespace Sentry.data.Web
             https://stackoverflow.com/questions/21270834/asp-net-mvc-bundle-not-rendering-script-files-on-staging-server-it-works-on-dev
             BundleTable.EnableOptimizations = false;
             */
-            
+
 
         }
     }

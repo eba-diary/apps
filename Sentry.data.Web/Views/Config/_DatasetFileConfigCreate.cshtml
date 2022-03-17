@@ -40,14 +40,14 @@
                     ConfigFileName
                     *************************************************************************************************************************************@
                 <div class="md-form">
-                    @Html.LabelFor(model => model.ConfigFileName, htmlAttributes: new { @class = "control-label col-md-2" })
-                    @Html.TextBoxFor(model => model.ConfigFileName, new { @value = "", @class = "form-control edit-dataset-row" })
+                    @Html.LabelFor(model => model.ConfigFileName, htmlAttributes: new { @class = "" })
+                    @Html.TextBoxFor(model => model.ConfigFileName, new { @value = "", @class = "form-control" })
                     @Html.ValidationMessageFor(model => model.ConfigFileName, "", new { @class = "text-danger" })
                 </div>
 
                 <div class="md-form">
-                    @Html.LabelFor(model => model.ConfigFileDesc, htmlAttributes: new { @class = "control-label col-md-2" })
-                    @Html.TextBoxFor(model => model.ConfigFileDesc, new { @value = "", @class = "form-control edit-dataset-row" })
+                    @Html.LabelFor(model => model.ConfigFileDesc, htmlAttributes: new { @class = "control-label" })
+                    @Html.TextBoxFor(model => model.ConfigFileDesc, new { @value = "", @class = "form-control" })
                     @Html.ValidationMessageFor(model => model.ConfigFileDesc, "", new { @class = "text-danger" })
                 </div>
 
@@ -85,9 +85,7 @@
                         @Html.LabelFor((model) => model.SchemaRootPath, new { @class = "control-label" })
                         @Html.TextBoxFor(model => model.SchemaRootPath, new { @class = "form-control" })
 
-                        <div class="col-md-5 col-md-offset-6">
-                            <span class="text-muted">Specify schema root element path (<a href="@Sentry.data.Core.GlobalConstants.DocumentationLinks.SCHEMA_ROOT_PATH_USAGE" target="_blank">usage documentation</a>)</span>
-                        </div>
+                        <span class="text-muted">Specify schema root element path (<a href="@Sentry.data.Core.GlobalConstants.DocumentationLinks.SCHEMA_ROOT_PATH_USAGE" target="_blank">usage documentation</a>)</span>
                     </div>
 
                     <div class="delimiterPanel">
