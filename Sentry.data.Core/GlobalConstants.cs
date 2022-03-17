@@ -74,6 +74,20 @@
             public const string NOTIFICATION_DSC_TECH_DOC = "Technical Documentation";
             public const string NOTIFICATION_DSC_NEWS = "News";
 
+
+            public const string NOTIFICATION_DSC_RELEASENOTES_DSC = "DSC";
+            public const string NOTIFICATION_DSC_RELEASENOTES_CL = "CL";
+            public const string NOTIFICATION_DSC_RELEASENOTES_PL = "PL";
+            public const string NOTIFICATION_DSC_RELEASENOTES_LIFEANNUITY = "LifeAnnuity";
+            public const string NOTIFICATION_DSC_RELEASENOTES_CLAIMS = "Claims";
+            public const string NOTIFICATION_DSC_RELEASENOTES_CORPORATE = "Corporate";
+
+            public const string NOTIFICATION_DSC_NEWS_DSC = "DSC";
+            public const string NOTIFICATION_DSC_NEWS_TABLEAU = "Tableau";
+            public const string NOTIFICATION_DSC_NEWS_PYTHON = "Python";
+            public const string NOTIFICATION_DSC_NEWS_SAS = "SAS";
+            public const string NOTIFICATION_DSC_NEWS_ANALYTICS = "Analytics";
+
         }
 
         public static class Statuses

@@ -26,6 +26,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.NotificationType, m => m.Column("NotificationType"));
             this.Property(w => w.Title, m => m.Column("Title"));
             this.Property(w => w.NotificationCategory);
+            this.Property(w => w.NotificationSubCategoryReleaseNotes);
+            this.Property(w => w.NotificationSubCategoryNews);
         }
     }
 }

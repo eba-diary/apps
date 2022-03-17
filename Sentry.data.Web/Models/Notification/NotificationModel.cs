@@ -24,6 +24,9 @@ namespace Sentry.data.Web
         [DisplayName("Message")] public string Message { get; set; }
         [DisplayName("Title")] public string Title { get; set; }
         [DisplayName("Category")] public NotificationCategory NotificationCategory { get; set; }
+        [DisplayName("Release Notes Category")] public NotificationSubCategoryReleaseNotes NotificationSubCategoryReleaseNotes { get; set; }
+        [DisplayName("News Category")] public NotificationSubCategoryNews NotificationSubCategoryNews { get; set; }
+
 
         public Boolean IsActive { get; set; }
         public string ObjectName { get; set; }
@@ -34,6 +37,12 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> AllDataAssets { get; set; }
         public IEnumerable<SelectListItem> AllSeverities { get; set; }
         public IEnumerable<SelectListItem> AllNotificationCategories { get; set; }
+
+        public IEnumerable<SelectListItem> AllNotificationSubCategoriesReleaseNotes { get; set; }
+        public IEnumerable<SelectListItem> AllNotificationSubCategoriesNews { get; set; }
+
+        public Boolean CLA3882_DSC_NOTIFICATION_SUBCATEGORY { get; set; }
+
 
 
 

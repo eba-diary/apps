@@ -41,10 +41,5 @@ namespace Sentry.data.Infrastructure.PollyPolicies
 
             return asyncRetryPolicy;
         }
-
-        //private void FallBackMethod()
-        //{
-
-        //}
     }
 }

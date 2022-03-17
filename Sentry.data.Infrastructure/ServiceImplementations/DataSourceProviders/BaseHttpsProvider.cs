@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Polly;
 using RestSharp;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using System;
@@ -24,16 +25,18 @@ namespace Sentry.data.Infrastructure
         protected DataFlowStep _targetStep;
         protected IAsyncPolicy _providerPolicyAsync;
         protected ISyncPolicy _providerPolicy;
+        protected readonly IDataFeatures _dataFeatures;
         #endregion
 
         protected BaseHttpsProvider(Lazy<IDatasetContext> datasetContext, 
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService,
-            IRestClient restClient)
+            IRestClient restClient, IDataFeatures dataFeatures)
         {
             _dsContext = datasetContext;
             _configService = configService;
             _encryptionService = encryptionService;
             _client = restClient;
+            _dataFeatures = dataFeatures;
         }
 
         protected IDatasetContext DatasetContext
@@ -108,17 +111,41 @@ namespace Sentry.data.Infrastructure
 
         public void CopyToStream(Stream targetStream)
         {
+            string methodName = $"{nameof(BaseHttpsProvider).ToLower()}_{nameof(ConfigureClient).ToLower()}";
+            Logger.Debug($"{methodName} Method Start");
+
+            NetworkCredential proxyCredentials;
+            string proxyUrl;
+
+            if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
+            {
+                Logger.Debug($"{methodName} using edge proxy: true");
+                string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
+                string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
+                proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
+                proxyCredentials = new NetworkCredential(userName, password);
+            }
+            else
+            {
+                Logger.Debug($"{methodName} using edge proxy: false");
+                proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
+                proxyCredentials = CredentialCache.DefaultNetworkCredentials;
+            }
+            Logger.Debug($"{methodName} proxyUser: {proxyCredentials.UserName}");
+
             RestClient client = new RestClient
             {
-                Proxy = new WebProxy(Configuration.Config.GetHostSetting("WebProxyUrl"))
+                Proxy = new WebProxy(proxyUrl)
                 {
-                    Credentials = CredentialCache.DefaultNetworkCredentials
+                    Credentials = proxyCredentials
                 }
             };
 
             _request.ResponseWriter = (responseStream) => responseStream.CopyTo(targetStream);
 
-            client.DownloadData(_request);            
+            client.DownloadData(_request);
+
+            Logger.Debug($"{methodName} Method End");
         }
 
         public abstract List<IRestResponse> SendPagingRequest();

@@ -16,11 +16,13 @@ namespace Sentry.data.Web.Controllers
 
         private readonly INotificationService _notificationService;
         private readonly UserService _userService;
+        private readonly IDataFeatures _featureFlags;
 
-        public NotificationController(INotificationService notificationService, UserService userService)
+        public NotificationController(INotificationService notificationService, UserService userService, IDataFeatures featureFlags)
         {
             _notificationService = notificationService;
             _userService = userService;
+            _featureFlags = featureFlags;
         }
 
         public ActionResult ManageNotification()
@@ -38,6 +40,7 @@ namespace Sentry.data.Web.Controllers
             if (_notificationService.CanUserModifyNotifications())
             {
                 NotificationModel model = _notificationService.GetNotificationModelForModify(notificationId).ToWeb();
+                model.CLA3882_DSC_NOTIFICATION_SUBCATEGORY = _featureFlags.CLA3882_DSC_NOTIFICATION_SUBCATEGORY.GetValue();
                 return View(model);
             }
             return View("NotFound");
@@ -90,6 +93,10 @@ namespace Sentry.data.Web.Controllers
             model.AllSeverities = default(NotificationSeverity).ToEnumSelectList();
             model.AllDataAssets = AreaList;
             model.AllNotificationCategories = default(NotificationCategory).ToEnumSelectList();
+            model.AllNotificationSubCategoriesReleaseNotes = default(NotificationSubCategoryReleaseNotes).ToEnumSelectList();
+            model.AllNotificationSubCategoriesNews = default(NotificationSubCategoryNews).ToEnumSelectList();
+
+
             return View("ModifyNotification",model);
         }
 
@@ -195,6 +202,7 @@ namespace Sentry.data.Web.Controllers
         public JsonResult GetQuillContents(int notificationId)
         {
             NotificationModel model = _notificationService.GetNotificationModelForModify(notificationId).ToWeb();
+            model.CLA3882_DSC_NOTIFICATION_SUBCATEGORY = _featureFlags.CLA3882_DSC_NOTIFICATION_SUBCATEGORY.GetValue();
             JsonResult result = Json(new { message = model.Message, title = model.Title }, JsonRequestBehavior.AllowGet);
             return result;
         }

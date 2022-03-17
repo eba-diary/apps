@@ -7,7 +7,8 @@ BEGIN TRAN
 									('CLA2671_RefactoredDataFlows','0000315,0000314',NULL,'Dataflows used for dark launch testing of refactored events end to end'),
 									('CLA2671_RefactorEventsToJava','sentry-data-nrdev-dataset-ae2||temp-file/uncompresszip/',NULL,'Dataflows used for dark launch testing of refactored events end to end'),
 									('CLA3241_DisableDfsDropLocation','False','CLA3241_DisableDfsDropLocation','If true, DSC will no longer create the DFS drop location. If false, DSC will continue to create the DFS drop location.'),
-									('CLA3048_StandardizeOnUTCTime','False','CLA3048_StandardizeOnUTCTime','Flag for selecting UTC time')
+									('CLA3048_StandardizeOnUTCTime','False','CLA3048_StandardizeOnUTCTime','Flag for selecting UTC time'),
+									('CLA3819_EgressEdgeMigration','False','CLA3819_EgressEdgeMigration','If true, will use new Edge Egress proxy.  If false, will use sentry proxy.')
 								)
 								AS Source (KeyCol, [Value], [Name], [Description]) 
 
