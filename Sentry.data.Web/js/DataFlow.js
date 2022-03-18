@@ -74,7 +74,8 @@
             $("#IsPreProcessingRequired").materialSelect();
             $("#PreProcessingSelection").materialSelect();
             $("#schemaMapPanel select").materialSelect();
-
+            $("#NamedEnvironmentPartial select").materialSelect();
+            $("#retrieverJobPanel select").materialSelect();
         });
         
         data.DataFlow.InitSchemaMaps(datasetId, schemaId);
@@ -402,7 +403,6 @@
 
             $('[id$=__SelectedDataset]').each(function (index) {
                 var cur = $(this);
-                var dsSpinner = cur.parent().find('.datasetSpinner');
                 if (data.DataFlow.CLA3332_ConsolidatedDataFlows) {
                     var curVal = datasetId;
                 }
@@ -410,8 +410,6 @@
                     var curVal = parseInt(cur.val());
                 }
 
-
-                dsSpinner.html('');
                 cur.html(newSubItems);
 
                 var curRow = cur.parent().parent();
@@ -423,6 +421,8 @@
                     cur.val(curVal);
                     data.DataFlow.PopulateSchemas(curVal, schemaId, curRow.find("[id$=__SelectedSchema]"));
                 }
+
+                $(".datasetSpinner").hide();
             });
 
 
@@ -458,6 +458,7 @@
         $.get("/DataFlow/NamedEnvironment?assetKeyCode=" + assetKeyCode + "&namedEnvironment=" + selectedEnvironment, function (result) {
             $('div#DataFlowFormContainer #NamedEnvironmentPartial').html(result);
             data.DataFlow.initNamedEnvironmentEvents();
+            $("#NamedEnvironmentPartial select").materialSelect();
         });
     },
 
