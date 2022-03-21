@@ -12,7 +12,7 @@
     <!-- Removed Status and Last Updated goes here -->
 
     <div class="row">
-        <h2 class="@textColor col-xs-12 clcName text-center pt-3 pl-3">
+        <h2 class="@textColor col clcName text-center pt-3 pl-3">
             @d.Type.Name
 
             @*@if (d.Type.Tool != null)
@@ -29,7 +29,7 @@
         Model.ComponentElements = Model.ComponentElements.OrderBy(x => x.Name).ToList();
 
         <div class="row tableHeader row_@color">
-            <div class="element @textColor">@d.Type.ChildDescription</div>
+            <div class="col element @textColor">@d.Type.ChildDescription</div>
         </div>
     }
     else

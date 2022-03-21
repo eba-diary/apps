@@ -41,14 +41,14 @@
     else if (ce.Link == null)
     {
         <div class="row tableRow @link">
-            <div class="element @color">@ce.Name</div>
+            <div class="col element @color">@ce.Name</div>
         </div>
     }
     else if (clcType == "CUBE")
     {
         <a href="@Url.Action("ODCFile", "ExternalFile", Model)" class="noHover" data-toggle="tooltip" data-placement="top" title="" data-original-title="Open @ce.Name ODC file">
             <div class="row tableRow @link">
-                <div class="element">@ce.Name</div>
+                <div class="col element">@ce.Name</div>
             </div>
         </a>
     }
@@ -56,7 +56,7 @@
     {
         <a href="@ce.Link" target="_blank" class="noHover" data-toggle="tooltip" data-placement="top" title="" data-original-title="Go to @clcTool">
             <div class="row tableRow @link">
-                <div class="element">@ce.Name</div>
+                <div class="col element">@ce.Name</div>
             </div>
         </a>
     }
@@ -64,7 +64,7 @@
     {
         <a href="@ce.Link" target="_blank" class="noHover">
             <div class="row tableRow @link">
-                <div class="element">@ce.Name</div>
+                <div class="col element">@ce.Name</div>
             </div>
         </a>
     }
