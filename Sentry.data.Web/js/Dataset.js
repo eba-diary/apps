@@ -624,6 +624,7 @@ data.Dataset = {
                         self.vm.DataLoading(false);
                         self.vm.DataTableExists(true);
 
+                        //this is a trick to know if datatable has been generated before we modify it
                         if ($("#datasetRowTable_filter").length > 0) {
                             $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
                         }
