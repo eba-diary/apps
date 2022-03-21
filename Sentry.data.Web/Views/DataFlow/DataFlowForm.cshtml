@@ -54,9 +54,9 @@
         <div class="compressionPanel" style="display:none;">
             <div class="md-form">
                 <h4>Is Your incoming data compressed?</h4>
-                <div data-toggle="tooltip" data-placement="right" title="Yes, if the file ends in .zip or .gzip.">
+                <a data-toggle="tooltip" class="material-tooltip-main" title="Yes, if the file ends in .zip or .gzip.">
                     @Html.DropDownListFor((m) => m.IsCompressed, Model.CompressionDropdown, new { @class = "mdb-select" })
-                </div>
+                </a>
             </div>
             <div class="md-form compressionJobPanel" style="display:none">
                 <div id="compressionJobPanel">
@@ -79,9 +79,9 @@
         <div class="preProcessingPanel" style="display:none;">
             <div class="md-form">
                 <h4>Does your data require Preprocessing?</h4>
-                <div data-toggle="tooltip" data-placement="right" title="Yes, if the file has a unique delimiter ( ex. ||, ^ ), a non-standard file encoding (ex. combine 1252 and UTF-8), or a heavily nested .json layout.">
+                <a class="material-tooltip-main" data-toggle="tooltip" title="Yes, if the file has a unique delimiter ( ex. ||, ^ ), a non-standard file encoding (ex. combine 1252 and UTF-8), or a heavily nested .json layout.">
                     @Html.DropDownListFor((m) => m.IsPreProcessingRequired, Model.PreProcessingRequiredDropdown, new { @class = "mdb-select" })
-                </div>
+                </a>
             </div>
             <div class="md-form preProcessingJobPanel" style="display:none;">
                 @* PreProcessing Options *@
@@ -90,7 +90,7 @@
                         @Html.DropDownListFor(
                             x => x.PreProcessingSelection,
                             Model.PreProcessingOptionsDropdown,
-                            new { @class = "mdb-select", @placeholder = "Selec option" })
+                            new { @class = "mdb-select", @placeholder = "Select option" })
                 </div>
             </div>
         </div>

@@ -82,22 +82,19 @@
                 @************************************************************************************************************************************
         SAID ASSET
         *************************************************************************************************************************************@
-                <div class="md-form">
-                    @if (Model.DatasetId == 0)
-                    {
-                        @Html.DropDownListFor(x => x.SAIDAssetKeyCode, Model.SAIDAssetDropDown, new { @id = "saidAsset", @class = "mdb-select", searchable = "SAID Asset..." })
-                        @Html.LabelFor((model) => model.SAIDAssetKeyCode, new { @class = "mdb-main-label" })
-                        @Html.ValidationMessageFor((model) => model.SAIDAssetKeyCode, "", new { @class = "text-danger" })
-                    }
-                    else
-                    {
-                        @Html.LabelFor((model) => model.SAIDAssetKeyCode, new { @class = "mdb-main-label" })
-                        <div class="textReadOnly">
-                            @Html.HiddenFor(model => model.SAIDAssetKeyCode)
-                            <a target="_blank" rel="noopener noreferrer" href="https://said.sentry.com/ViewAsset.aspx?ID=@Model.SAIDAssetKeyCode">@Model.SAIDAssetKeyCode</a>
-                        </div>
-                    }
-                </div>
+            <div class="md-form">
+                @if (Model.DatasetId == 0)
+                {
+                    @Html.DropDownListFor(x => x.SAIDAssetKeyCode, Model.SAIDAssetDropDown, new { @id = "saidAsset", @class = "mdb-select", searchable = "SAID Asset..." })
+                    @Html.LabelFor((model) => model.SAIDAssetKeyCode, new { @class = "mdb-main-label" })
+                    @Html.ValidationMessageFor((model) => model.SAIDAssetKeyCode, "", new { @class = "text-danger" })
+                }
+                else
+                {
+                    @Html.DropDownListFor(x => x.SAIDAssetKeyCode, Model.SAIDAssetDropDown, new { @id = "saidAsset", @class = "mdb-select disabled", @disabled="disabled"})
+                    @Html.LabelFor((model) => model.SAIDAssetKeyCode, new { @class = "mdb-main-label disabled" })
+                }
+            </div>
 
                 @************************************************************************************************************************************
                 NAMED ENVIRONMENT

@@ -76,6 +76,7 @@
             $("#schemaMapPanel select").materialSelect();
             $("#NamedEnvironmentPartial select").materialSelect();
             $("#retrieverJobPanel select").materialSelect();
+            $("#compressionJobQuestion select").materialSelect();
         });
         
         data.DataFlow.InitSchemaMaps(datasetId, schemaId);
