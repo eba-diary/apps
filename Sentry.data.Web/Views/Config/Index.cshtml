@@ -13,14 +13,12 @@
     <div class="relative hidden-sm hidden-xs">
         <div>
             <div class="no-overflow">
-                <h1 class="detailName leftFloat @color">
+                <h1 class="detailName leftFloat @color pt-3">
                     @Model.DatasetName
                 </h1>
             </div>
         </div>
     </div>
-
-    <br />
 
     @*<div class="hidden-md hidden-lg">
             <h1 class="detailName leftFloat @color">
@@ -85,8 +83,6 @@
 
 </div>
 
-
-<br />
 <p>Click any section header to begin:</p>
 
 @{
@@ -105,11 +101,11 @@
                         <div class="configHeader categoryBanner-@Model.CategoryColor">
                             @if (item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
                             {
-                                <h1 class="@color">@item.ConfigFileName <strong><i>(@Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete.ToString())</i></strong></h1>
+                                <h1 class="@color pt-3">@item.ConfigFileName <strong><i>(@Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete.ToString())</i></strong></h1>
                             }
                             else
                             {
-                                <h1 class="@color">@item.ConfigFileName</h1>
+                                <h1 class="@color pt-3">@item.ConfigFileName</h1>
                             }
                             <i class="icon-chevron-up tracker-menu-icon"></i>
                         </div>
@@ -129,7 +125,7 @@
 
                 <div class="configContainer" style="display: none;">
 
-                    <h4 class="@color">Configuration Metadata</h4>
+                    <h4 class="@color pt-1">Configuration Metadata</h4>
 
                     <div class="col-md-12">
                         <div class="col-md-1">Description:</div>
@@ -224,7 +220,7 @@
                     @if (item.Schema != null)
                     {
                         <hr />
-                        <h4 class="@color">Columns Metadata (name, datatype, is array, etc.)</h4>
+                        <h4 class="@color pt-1">Columns Metadata (name, datatype, is array, etc.)</h4>
                         <div class="columnsContainer col-md-12">
                             @if (item.Schema.Revisions.Count() == 0)
                             {
@@ -247,7 +243,7 @@
                     @if (Model.DisplayDataflowMetadata || Model.Security.ShowAdminControls)
                     {
                         <hr />
-                        <h4 class="@color">Producer DataFlow</h4>
+                        <h4 class="@color pt-1">Producer DataFlow</h4>
 
                         @* Loop through each external dataflow *@
                         if (!item.ExternalDataFlowJobs.Any())
@@ -313,7 +309,7 @@
                             <strong><p style="color:red">This section is visible to Admins only</p></strong>
                             @if (item.DataFlowJobs == null)
                             {
-                                <h4 class="gray">Schema DataFlow</h4>
+                                <h4 class="gray pt-1">Schema DataFlow</h4>
                                 <p>This schema does not have any associated dataflows yet.</p>
                             }
                             else

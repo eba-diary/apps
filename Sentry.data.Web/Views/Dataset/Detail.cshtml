@@ -103,7 +103,7 @@
                                     <a class="dropdown-item" href="@Model.MailtoLink">Share Dataset</a>
                                     @if (Model.Security.CanViewFullDataset)
                                     {
-                                        <a class="dropdown-item">
+                                        <a id="SubscribeModal" class="dropdown-item" data-id="@Model.DatasetId">
                                             Subscribe
                                         </a>
                                     }
@@ -187,9 +187,9 @@
                         <div class="col-lg-12" style="margin-left: 20px">
                             <select class="form-control" style="margin:1em !important;"
                                     id="datasetConfigList" name="filterSelector">
-                                @foreach (var a in Model.DatasetFileConfigNames)
+                                @foreach (var schema in Model.DatasetFileConfigNames)
                                 {
-                                    <option value="@a.Key">@a.Value</option>
+                                    <option value="@schema.Key">@schema.Value</option>
                                 }
                             </select>
                         </div>

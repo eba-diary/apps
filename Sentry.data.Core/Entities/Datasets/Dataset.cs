@@ -150,6 +150,7 @@ namespace Sentry.data.Core
         public static class ValidationErrors
         {
             public const string datasetNameDuplicate = "datasetNameDuplicate";
+            public const string datasetNameRequired = "datasetNameRequired";
             public const string datasetDescriptionRequired = "datasetDescriptionRequired";
             public const string datasetOwnerRequired = "datasetOwnerRequired";
             public const string datasetOwnerInvalid = "datasetOwnerInvalid";

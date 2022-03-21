@@ -85,18 +85,16 @@
         @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "" })
             @Html.EditorFor(model => model.Location, new { htmlAttributes = new { @class = "form-control" } })
     </div>
-    <div class="form-group urlDescription">
-        <label class="control-label col-md-2"></label>
-        <div class="col-md-10">
-            <span class="text-muted">
-                <em>If the report has a url (Tableau and Sharepoint locations), specify the URL to the report. See example below</em><br />
-                <em>     (i.e. https://tableau.sentry.com/#/site/SentryInsurance/views/WorkflowPayloads/WorkflowPayloads?:iid=1 )</em><br />
-                <br />
-                <em>If the report resides on a network location, please specify the UNC path.  See examples below</em><br />
-                <em>     N: Drive location - (\\Sentry.com\Share\O_IS\... instead of N:\O_IS\...)</em><br />
-                <em>     DFS location - (\\Sentry.com\appfs\...)</em>
-            </span>
-        </div>
+    <div class="md-form urlDescription">
+        <label class="control-label"></label>
+        <span class="text-muted">
+            <em>If the report has a url (Tableau and Sharepoint locations), specify the URL to the report. See example below</em><br />
+            <em>     (i.e. https://tableau.sentry.com/#/site/SentryInsurance/views/WorkflowPayloads/WorkflowPayloads?:iid=1 )</em><br />
+            <br />
+            <em>If the report resides on a network location, please specify the UNC path.  See examples below</em><br />
+            <em>     N: Drive location - (\\Sentry.com\Share\O_IS\... instead of N:\O_IS\...)</em><br />
+            <em>     DFS location - (\\Sentry.com\appfs\...)</em>
+        </span>
     </div>
     <div id="BOGetLatestPanel" class="hidden">
         <div class="form-check">
@@ -159,10 +157,10 @@
     </div>
 
     <br />
-    <div class="form-group">
+    <div class="md-form">
         <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
     </div>
-    <div class="form-group">
+    <div class="md-form">
         <div>
             <input type="submit" value="Submit" class="btn btn-primary" />
             <a id="CancelButton" class="btn btn-warning" data-id="@Model.DatasetId" href="">Cancel</a>
