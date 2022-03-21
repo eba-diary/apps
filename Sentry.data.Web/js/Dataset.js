@@ -623,8 +623,10 @@ data.Dataset = {
                         $('#dataSection').show();
                         self.vm.DataLoading(false);
                         self.vm.DataTableExists(true);
-                        $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
 
+                        if ($("#datasetRowTable_filter").length > 0) {
+                            $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
+                        }
                     }
                     else {
                         $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
