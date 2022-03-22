@@ -26,14 +26,13 @@
 
     <h1>Create Dataset Retrieval Job</h1>
     <p>Please fill out the following fields to configure a retrieval job.</p>
-    <div class="form-group">
+    <div class="md-form">
         <span><em>** Fields in <b>Bold</b> are Required</em></span>
     </div>
     <hr />
     <h3>Data Source Information</h3>
     <hr />
-    <div id="myTabContent" class="tab-content">
-        <div id="informationPanel" class="tab-pane fade active in form-horizontal">
+        <div id="informationPanel">
 
             <div class="form-group">
                 @Html.LabelFor((model) => model.SelectedSourceType, new { @class = "control-label col-md-2" })
@@ -414,7 +413,6 @@
                     </div>
                 </div>
         </div>
-    </div>
 
     <hr />
     <div class="form-group">

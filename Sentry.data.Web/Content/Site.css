@@ -2402,18 +2402,6 @@ tr.categoryBanner-darkgray th.sorting_desc {
     white-space: pre !important;
 }
 
-td.details-control {
-    background: url('../../Images/Icons/details_open.png') no-repeat center center;
-    width: 30px;
-    cursor: pointer;
-    background-color: #ccc;
-}
-
-tr.shown td.details-control {
-    background: url('../../Images/Icons/details_close.png') no-repeat center center;
-    background-color: #ccc;
-}
-
 .detailSection {
     margin-top: 40px;
 }

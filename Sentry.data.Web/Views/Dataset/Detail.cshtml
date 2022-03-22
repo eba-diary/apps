@@ -39,16 +39,13 @@
             <div class="row">
                 <div class="col-7 pl-0">
                     <!-- Dataset Name and Request Access-->
-                    <h2 class="@textColor p-0 mb-1">
+                    <h2 class="@textColor pt-3 mb-1">
                         @Model.DatasetName
                         @if (Model.IsSecured)
                         {
                             <span class="icon-verified lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
                         }
-                        <button id="RequestAccessButton" type="button" value="Request Access" class="btn btn-info px-3 waves-effect waves-light" data-id="@Model.DatasetId"
-                                data-toggle="tooltip" data-placement="top" title="Request Access to Dataset">
-                            Request Access
-                        </button>
+
                     </h2>
                     @if (Model.Security.CanPreviewDataset)
                     {
@@ -63,6 +60,11 @@
                     @if (Model.Security.CanPreviewDataset)
                     {
                         <div class="text-right">
+
+                            <a class="btn px-3"
+                               id="RequestAccessButton" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Request Additional Dataset Access">
+                                    <i class="icon-take-ownership @textColor mr-0 align-middle" id=""></i>
+                            </a>
 
                             <a class="btn px-3"
                                id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
@@ -302,38 +304,38 @@ else
             </ul>
         </div>
 
-            <!-- Tab panels -->
-            <div class="tab-content" id="tab-container">
-                <div class="tab-pane fade" id="panelSchemaAbout" role="tabpanel">
-                    @if (Model.Security.CanPreviewDataset)
-                    {
-                        <div id="tabSchemaAbout"></div>
-                    }
-                </div>
-                <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
-                    @if (Model.Security.CanPreviewDataset)
-                    {
-                        <div id="tabSchemaColumns"></div>
-                    }
-                </div>
-                @if (Model.Security.CanViewFullDataset)
+        <!-- Tab panels -->
+        <div class="tab-content" id="tab-container">
+            <div class="tab-pane fade" id="panelSchemaAbout" role="tabpanel">
+                @if (Model.Security.CanPreviewDataset)
                 {
-                    <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
-                        <div id="tabDataPreview"></div>
-                    </div>
-                }
-                <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
-                    <div id="tabDataFiles"></div>
-                </div>
-                @if (Model.DisplaySchemaSearch)
-                {
-                    <div class="tab-pane fade" id="panelSchemaSearch" role="tabpanel">
-                        <div id="tabSchemaSearch"></div>
-                    </div>
+                    <div id="tabSchemaAbout"></div>
                 }
             </div>
+            <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
+                @if (Model.Security.CanPreviewDataset)
+                {
+                    <div id="tabSchemaColumns"></div>
+                }
+            </div>
+            @if (Model.Security.CanViewFullDataset)
+            {
+                <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
+                    <div id="tabDataPreview"></div>
+                </div>
+            }
+            <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
+                <div id="tabDataFiles"></div>
+            </div>
+            @if (Model.DisplaySchemaSearch)
+            {
+                <div class="tab-pane fade" id="panelSchemaSearch" role="tabpanel">
+                    <div id="tabSchemaSearch"></div>
+                </div>
+            }
         </div>
-    }
+    </div>
+}
 </div>
 
 @section Scripts {
@@ -341,7 +343,7 @@ else
     @Scripts.Render("~/bundles/dataTables")
     @Styles.Render("~/bundles/css/dataTables")
 
-<script>
+    <script>
 
         $(function () {
             vm = new data.Dataset.ViewModel();
@@ -378,5 +380,5 @@ else
 
 
 
-</script>
+    </script>
 }

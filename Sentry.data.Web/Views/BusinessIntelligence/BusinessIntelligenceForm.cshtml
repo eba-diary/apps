@@ -1,7 +1,7 @@
 ﻿@model Sentry.data.Web.BusinessIntelligenceModel
 
 <h2>@ViewData["Title"]</h2>
-<div></div>
+<div id="informationPanel"></div>
 
 @using (Html.BeginForm("BusinessIntelligenceForm", "BusinessIntelligence", FormMethod.Post, new { @id = "BusinessIntelligenceForm", @enctype = "multipart/form-data" }))
 {
