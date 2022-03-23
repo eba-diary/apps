@@ -19,39 +19,37 @@
                     </h1>
                     <div class="col-md-12 text-right">
 
-                        <button type="button" class="btn borderdk_gray dataset-operation-button borderdk_@Model.CategoryColor"
-                                id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
+                        <a class="btn px-3"
+                           id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
                             @if (Model.IsFavorite)
                             {
-                                <i class="icon-filled-star @textColor" id="favoriteIcon"></i>
+                                <i class="icon-filled-star @textColor mr-0 align-middle" id="favoriteIcon"></i>
                             }
                             else
                             {
-                                <i class="icon-star @textColor" id="favoriteIcon"></i>
+                                <i class="icon-star @textColor mr-0 align-middle" id="favoriteIcon"></i>
                             }
-                        </button>
+                        </a>
+
                         @if (Model.Security.CanEditReport)
                         {
-                            <button type="button" class="btn dataset-operation-button borderdk_gray borderdk_@Model.CategoryColor"
-                                    id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Report">
-                                <i class="icon-pencil @textColor"></i>
-                            </button>
+                            <a class="btn px-3"
+                               id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Report">
+                                <i class="icon-pencil align-self-center @textColor mr-0 align-middle"></i>
+                            </a>
                         }
                         <div class="btn-group" data-toggle="tooltip" data-placement="top" title="Additional Actions">
-                            <button type="button" class="btn dataset-operation-button borderdk_gray borderdk_@Model.CategoryColor dropdown" data-toggle="dropdown">
-                                <span class="icon-hamburger @textColor"></span>
-                            </button>
-                            <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                            <a class="btn px-3" data-toggle="dropdown">
+                                <i class="icon-hamburger @textColor mr-0 align-middle"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-start">
                                 @if (Model.Security.CanEditReport)
                                 {
-                                    <li>
-                                        <a class="dropdown-item" id="deleteLink" href="" data-id="@Model.DatasetId">Delete Exhibit</a>
-                                    </li>
+                                    <a class="dropdown-item" id="deleteLink" href="" data-id="@Model.DatasetId">Delete Exhibit</a>
                                 }
-                                <li>
-                                    <a class="dropdown-item" href="@Model.MailtoLink">Share Exhibit</a>
-                                </li>
-                            </ul>
+                                <a class="dropdown-item" href="@Model.MailtoLink">Share Exhibit</a>
+
+                            </div>
                         </div>
 
                     </div>
