@@ -83,7 +83,7 @@
     @*Report Location *@
     <div class="md-form">
         @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "" })
-            @Html.EditorFor(model => model.Location, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.EditorFor(model => model.Location, new { htmlAttributes = new { @class = "form-control" } })
     </div>
     <div class="md-form urlDescription">
         <label class="control-label"></label>
@@ -105,11 +105,10 @@
     </div>
 
     @* Contact *@
-<div class="md-form">
-    <label for="ContactSearch" class="control-label active" active>Add Contact</label>
-
-    <input id="ContactSearch" type="text" class="form-control" />
-</div>
+    <div class="md-form associatePicker">
+        <label for="ContactSearch" class="control-label active">Add Contact</label>
+        <input id="ContactSearch" type="text" class="form-control w-100" />
+    </div>
 
     <div class="md-form">
         <span class="control-label">Selected Contacts</span>

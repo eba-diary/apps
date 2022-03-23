@@ -52,8 +52,8 @@
                     }
                     else //existing dataset, should be readonly
                     {
-                        @Html.DropDownListFor(m => m.DatasetCategoryIds, Model.AllCategories, new { @class = "mdb-select disabled" })
-                        @Html.LabelFor((model) => model.DatasetCategoryIds, htmlAttributes: new { @class = "mdb-main-label" })
+                        @Html.DropDownListFor(m => m.DatasetCategoryIds, Model.AllCategories, new { @class = "mdb-select disabled", @disabled = "true" })
+                        @Html.LabelFor((model) => model.DatasetCategoryIds, htmlAttributes: new { @class = "mdb-main-label disabled" })
                         @Html.ValidationMessageFor((model) => model.DatasetCategoryIds, "", new { @class = "text-danger" })
                     }
                 </div>

@@ -38,8 +38,8 @@
 .liberty-bell {
     float: right;
     width: 25px;
-    font-size: 36px;
-    color: #00a3e0;
+    font-size: 25px;
+    color: #003da5;
     top: 4px;
     z-index: 999;
     cursor: pointer;
@@ -62,7 +62,7 @@
 
 .liberty-badge-white {
     color: white;
-    background-color: white;
+    background-color: lightblue;
 }
 
 .liberty-badge-small {

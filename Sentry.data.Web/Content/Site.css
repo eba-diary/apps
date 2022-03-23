@@ -2911,6 +2911,10 @@ a.forbiddenHero:hover {
     color: gray;
 }
 
+.dsc-darkgray-text {
+    color: dimgray;
+}
+
 .dsc-darkGreen-text {
     color: #005844;
 }
@@ -2942,4 +2946,8 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
 
 .md-form label {
     padding-left: 0rem !important;
+}
+
+.dropdown-content label {
+    padding-left: 38px !important; /* Restore left padding for dropdowns (specifically multiselect dropdowns) */
 }

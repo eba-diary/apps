@@ -26,55 +26,35 @@
                     }
                 </h1>
 
-
-                <button type="button"
-                        class="btn dataset-operation-button rightFloat borderdk_gray borderdk_@color dropdown"
-                        data-toggle="dropdown" data-placement="top" title="Additional Actions">
-                    <i class="icon-hamburger @textColor"></i>
-                </button>
-
-                <ul class="dropdown-menu" x-placement="bottom-start">
-                    <li id="SubscribeModal" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
-                        <a class="dropdown-item">
-                            Subscribe
+                <div class="text-right">
+                    @if (Model.Security.CanEditDataset)
+                    {
+                        <a class="btn px-3"
+                           id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
+                            <i class="icon-pencil align-self-center @textColor mr-0 align-middle"></i>
                         </a>
-                    </li>
 
-                    @if (Model.CanQueryTool)
-                    {
-                        <li title="Query Dataset">
-                            <a class="dropdown-item" href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
-                                Query this Dataset
-                            </a>
-                        </li>
                     }
-                    @if (Model.CanEditDataset)
-                    {
-                        <li>
-                            <a class="dropdown-item" href="/Config/Dataset/@Model.DatasetId">
-                                Manage Schemas
-                            </a>
-                        </li>
-                    }
-                </ul>
+                    <div class="btn-group dropdown" data-toggle="tooltip" data-placement="top" title="Additional Actions">
 
-                @if (Model.CanUpload)
-                {
-                    <button type="button"
-                            class="btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                            id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
-                        <span class="icon-addnote @textColor"></span>
-                    </button>
-                }
-
-                @if (Model.CanEditDataset)
-                {
-                    <button type="button"
-                            class="btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                            id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                        <i class="icon-pencil @textColor"></i>
-                    </button>
-                }
+                        <a class="btn px-3"
+                           data-toggle="dropdown">
+                            <i class="icon-hamburger @textColor mr-0 align-middle"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-start">
+                            @if (Model.Security.CanManageSchema)
+                            {
+                                <a class="dropdown-item" href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>
+                            }
+                            @if (Model.Security.CanViewFullDataset)
+                            {
+                                <a id="SubscribeModal" class="dropdown-item" data-id="@Model.DatasetId">
+                                    Subscribe
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </div>
@@ -148,7 +128,7 @@
     </script>
 
     <script type="text/html" id="RowTemplate">
-        <li class="ui-sortable-handle card" data-bind="css: $root.ClickableRows(), style : { 'background-color' : RowColor }">
+        <li class="ui-sortable-handle schemaRowContainer" data-bind="css: $root.ClickableRows(), style : { 'background-color' : RowColor }">
             <div class="schemaRow" data-bind="css: Color">
                 <div class="rowDetails" data-bind="attr : {'data-id' : Position}">
                     <div class="topRow d-inline">
@@ -161,34 +141,47 @@
                         <input class="rowFieldName" data-bind="value: Name" placeholder="Field Name..." data-toggle="tooltip" data-placement="top" title="Field Name" />
                         <select class="typeSelect" data-bind="options: $root.DataTypes, optionsCaption: 'Choose Datatype', optionsValue: 'Name', optionsText: 'Name', optionsAfterRender: $root.setTagGroup, value: DataType"></select>
                         <input type="hidden" name="dataObjectField_Id" data-bind="value: DataObjectField_ID" data-toggle="tooltip" data-placement="top" title="Data Type Selection" />
-                        <div class="showPandS" data-bind="visible: ShowPandS">
-                            <div class="precisionContainer">
-                                <input class="precision" data-bind="textInput: Precision" placeholder="Prec" data-toggle="tooltip" data-placement="top" title="Precision - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT.ToString()" />
+                        <div class="showPandS d-inline-flex">
+                            <div class="fieldsFieldToggleable" data-bind="visible: ShowPandS">
+                                <div class="precisionContainer">
+                                    <input class="precision" data-bind="textInput: Precision" placeholder="Prec" data-toggle="tooltip" data-placement="top" title="Precision - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT.ToString()" />
+                                </div>
+                                <div class="scaleContainer">
+                                    <input class="scale" data-bind="textInput: Scale" placeholder="Scale" data-toggle="tooltip" data-placement="top" title="Scale - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT.ToString()" />
+                                </div>
+                                <div class="">
+                                    <span>1234.56 = Precision:6  Scale:2</span>
+                                </div>
                             </div>
-                            <div class="scaleContainer">
-                                <input class="scale" data-bind="textInput: Scale" placeholder="Scale" data-toggle="tooltip" data-placement="top" title="Scale - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT.ToString()" />
+                        </div>
+
+                        <div class="showDateFormat d-inline">
+                            <div class="fieldsFieldToggleable" data-bind="visible: ShowDateFormat">
+                                <input class="dateFormat" data-bind="value: Format" placeholder="Not Specified (default is @dateDefault)" data-toggle="tooltip" data-placement="top" title="Format - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DATE_DEFAULT" />
                             </div>
-                            <div class="">
-                                <span>1234.56 = Precision:6  Scale:2</span>
+                        </div>
+
+                        <div class="showTimestampFormat d-inline">
+                            <div class="fieldsFieldToggleable" data-bind="visible: ShowTimestampFormat">
+                                <input class="dateFormat" data-bind="value: Format" placeholder="Not Specified (default is @timestampDefault)" data-toggle="tooltip" data-placement="top" title="Format - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT" />
                             </div>
                         </div>
 
-                        <div class="showDateFormat" data-bind="visible: ShowDateFormat">
-                            <input class="dateFormat" data-bind="value: Format" placeholder="Not Specified (default is @dateDefault)" data-toggle="tooltip" data-placement="top" title="Format - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DATE_DEFAULT" />
+                        <div class="showLength d-inline">
+                            <div class="fieldsFieldToggleable" data-bind="visible: ShowFieldLength">
+                                <input class="fieldlength" data-bind="visible: ShowFieldLength && DataType() === 'VARCHAR', value: Length" placeholder="default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
+                                <input class="fieldlength" data-bind="visible: ShowFieldLength && DataType() !== 'VARCHAR', value: Length" placeholder="Specify length" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
+                            </div>
                         </div>
 
-                        <div class="showTimestampFormat" data-bind="visible: ShowTimestampFormat">
-                            <input class="dateFormat" data-bind="value: Format" placeholder="Not Specified (default is @timestampDefault)" data-toggle="tooltip" data-placement="top" title="Format - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT" />
-                        </div>
-
-                        <div class="showArray" data-bind="visible: $root.AllowArrays">
-                            <label class="arrayLabel">IsArray?</label>
-                            <input class="array" data-bind="checked: IsArray" type="checkbox" />
-                        </div>
-
-                        <div class="showLength" data-bind="visible: ShowFieldLength">
-                            <input class="fieldlength" data-bind="visible: ShowFieldLength && DataType() === 'VARCHAR', value: Length" placeholder="default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
-                            <input class="fieldlength" data-bind="visible: ShowFieldLength && DataType() !== 'VARCHAR', value: Length" placeholder="Specify length" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
+                        <div class="showArray d-inline-flex position-absolute pl-1">
+                            <div data-bind="visible: $root.AllowArrays">
+                                <label class="arrayLabel checkbox-container">
+                                    IsArray?
+                                    <input class="array" data-bind="checked: IsArray" type="checkbox" />
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
                         </div>
 
                         <div class="options">
@@ -202,7 +195,7 @@
 
 
                     <div class="descriptionContainer">
-                        <input class="" data-bind="value: Description" placeholder="Description..." data-toggle="tooltip" data-placement="top" title="Description" />
+                        <textarea class="w-75" data-bind="value: Description" placeholder="Description..." data-toggle="tooltip" data-placement="top" title="Description" />
                         <div class="rightButton float-right" data-bind="visible: $parent.Name === undefined">
 
                             <button type="button" class="btn btn-xs btn-danger p-2" data-bind='click: $parent.removeRow'>
@@ -543,7 +536,7 @@
             self.addChild = function (elem, e) {
                 var lastPosition;
                 var nextPosition;
-                var a = $(e.target).closest('.card');
+                var a = $(e.target).closest('.schemaRowContainer');
 
                 lastPosition = data.Fields.GetLastRowPositionOfSchemaRowContainer(a);
                 nextPosition = lastPosition + 1;
@@ -620,7 +613,7 @@
 
 
         function FindLastSchemaRowWithinChildinChildrenContainer(e) {
-            var lastChild = $(e).children('.card, .childrenContainer').last();
+            var lastChild = $(e).children('.schemaRowContainer, .childrenContainer').last();
 
             if ($(lastChild).hasClass('.childrenContainer')) {
                 FindLastChildinChildrenContainer(lastChild);
@@ -706,7 +699,7 @@
 
                 var lastPosition;
                 var nextPosition;
-                var a = $('.card').last();
+                var a = $('.schemaRowContainer').last();
 
                 lastPosition = data.Fields.GetLastRowPositionOfSchemaRowContainer(a);
                 nextPosition = lastPosition + 1;
@@ -801,7 +794,7 @@
                 newVal = 0;
                 //Loop through all current rows (DOM objects) on page
                 //$('.schemaRowContainer').each(function (index, elem) {
-                $('#schemaPanel').find('.card').each(function (index, elem) {
+                $('#schemaPanel').find('.schemaRowContainer').each(function (index, elem) {
                     //Store the field Id for matching against sortedRows list
                     var httpItem_old = $(this).children().children().children().children('input[name="dataObjectField_Id"]').val();
                     var httpItem = $(elem).children('.schemaRow').find('input[name="dataObjectField_Id"]').val();

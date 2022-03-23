@@ -87,6 +87,8 @@ data.Report = {
             maxResults: 10
         });
 
+        $(".associatePicker label").addClass("active");
+
         $(document).on('click', '.contactinfo-remove', function (e) {
             //e.StopPropagation();
             //e.StopImmediatePropagation();

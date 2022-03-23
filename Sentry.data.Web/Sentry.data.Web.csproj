@@ -792,7 +792,6 @@
     <Content Include="Content\DataTables\swf\flashExport.swf" />
     <Content Include="Content\favorites.css" />
     <Content Include="Content\fields.css" />
-    <Content Include="Content\fonts\icomoon.svg" />
     <Content Include="Content\home.css" />
     <Content Include="Content\icons.css" />
     <Content Include="Content\jquery.json-viewer.css" />
@@ -814,6 +813,7 @@
     <Content Include="Content\MDB\mdb.css" />
     <Content Include="Content\MDB\mdb.min.css" />
     <Content Include="Content\MDB\README.txt" />
+    <Content Include="Content\sentry-icons.css" />
     <Content Include="Content\sentry-styles.css" />
     <Content Include="Content\sentry-styles.min.css" />
     <Content Include="Content\toastr.css" />
@@ -1048,10 +1048,7 @@
     <Content Include="fonts\icomoon.ttf" />
     <Content Include="fonts\icomoon.woff" />
     <Content Include="fonts\icomoon.woff2" />
-    <Content Include="Content\fonts\icomoon.eot" />
-    <Content Include="Content\fonts\icomoon.ttf" />
-    <Content Include="Content\fonts\icomoon.woff" />
-    <Content Include="Content\fonts\icomoon.woff2" />
+    <Content Include="fonts\SourceCodePro\SourceCodePro-Regular.woff" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
