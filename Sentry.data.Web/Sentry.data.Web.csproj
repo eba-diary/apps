@@ -793,7 +793,6 @@
     <Content Include="Content\favorites.css" />
     <Content Include="Content\fields.css" />
     <Content Include="Content\home.css" />
-    <Content Include="Content\icons.css" />
     <Content Include="Content\jquery.json-viewer.css" />
     <Content Include="Content\MDB\img\lightbox\default-skin.png" />
     <Content Include="Content\MDB\img\lightbox\default-skin.svg" />
