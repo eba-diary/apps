@@ -22,7 +22,7 @@
                     <div class="panel panel-default dataset-list-filters">
                         <div class="panel-heading filterHead" data-bind="attr: { id: HeadId }">
                             <span class="filterCategoryName" data-bind="text : Name"></span>
-                            <i class="icon-chevron-down rightFloat filterViewIcon" data-bind="attr: { id: HeadIcon }"></i>
+                            <em class="icon-chevron-down rightFloat filterViewIcon" data-bind="attr: { id: HeadIcon }"></em>
                         </div>
 
                         @* foreach of the category filters *@
@@ -75,7 +75,7 @@
                             <!-- /ko -->
                             <!-- ko if: (OrderedFilters().length > 6 && ShowMore) -->
                             <a href="#" class="filterMore" data-bind="attr: { id:  HiddenId}">
-                                <i class="icon-plus inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></i>
+                                <em class="icon-plus inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></em>
                                 <div class="leftFloat txt_filterMore" data-bind="attr: {id: TxtMore}">Show More</div>
                             </a>
                             <!-- /ko -->
@@ -187,7 +187,7 @@
                                         <!-- /ko -->
                                         <span class="search-dataset-name" data-bind="text: computedDatasetName"></span>
                                         <!-- ko if: IsSecured-->
-                                        <i class="icon-verified text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></i>
+                                        <em class="icon-verified text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></em>
                                         <!-- /ko -->
                                     </div>
 

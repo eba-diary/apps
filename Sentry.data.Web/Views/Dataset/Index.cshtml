@@ -14,7 +14,7 @@
                     @{
                         using (Html.BeginForm(@"Datasets", "Search", FormMethod.Get, new { @class = "md-form input-group w-100", @id = "DatasetSearch" }))
                         {
-                            <span class="input-group-prepend sentry-blue white-text clickable" id="SearchIconAddon" onclick="$(function() {$('#SearchText').focus();});"><i class="icon-search"></i></span>
+                            <span class="input-group-prepend sentry-blue white-text clickable" id="SearchIconAddon" onclick="$(function() {$('#SearchText').focus();});"><em class="icon-search"></em></span>
                             <input type="text" id="SearchText" class="form-control ds-search-textbox" placeholder="Search from @Model.DatasetCount Exhibits and Dashboards ...">
                         }
                     }

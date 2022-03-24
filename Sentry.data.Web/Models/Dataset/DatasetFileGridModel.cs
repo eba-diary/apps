@@ -47,11 +47,11 @@ namespace Sentry.data.Web
                 string href = "";
                 if (CanViewFullDataset)
                 {
-                    href += "<a href = \"#\" onclick=\"data.Dataset.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><i class='icon-download text-primary'></i></a>";
+                    href += "<a href = \"#\" onclick=\"data.Dataset.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><em class='icon-download text-primary'></em></a>";
                 }
                 if (CanEditDataset)
                 {
-                    href += "<a href = \"#\" onclick=\"data.Dataset.EditDataFileInformation(" + Id + ")\" class=\"table-row-icon\" title=\"Edit File\"><i class='icon-pencil text-primary'></i></a>";
+                    href += "<a href = \"#\" onclick=\"data.Dataset.EditDataFileInformation(" + Id + ")\" class=\"table-row-icon\" title=\"Edit File\"><em class='icon-pencil text-primary'></em></a>";
                 }
 
                 if (CanViewFullDataset && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name)))

@@ -8,7 +8,7 @@
     string dateDefault = ViewBag.Date_Default;
     string timestampDefault = ViewBag.Timestamp_Default;
 }
-<a class="backToList" href="/Config/Dataset/@Model.DatasetId"><i class="icon-chevron-left"></i>  Back to Dataset Configuration</a>
+<a class="backToList" href="/Config/Dataset/@Model.DatasetId"><em class="icon-chevron-left"></em>  Back to Dataset Configuration</a>
 
 <div class="topBanner" style="height: 60px;
     margin-top: 20px;
@@ -31,7 +31,7 @@
                     {
                         <a class="btn px-3"
                            id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                            <i class="icon-pencil align-self-center @textColor mr-0 align-middle"></i>
+                            <em class="icon-pencil align-self-center @textColor mr-0 align-middle"></em>
                         </a>
 
                     }
@@ -39,7 +39,7 @@
 
                         <a class="btn px-3"
                            data-toggle="dropdown">
-                            <i class="icon-hamburger @textColor mr-0 align-middle"></i>
+                            <em class="icon-hamburger @textColor mr-0 align-middle"></em>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-start">
                             @if (Model.Security.CanManageSchema)
@@ -105,7 +105,7 @@
 
     <div class="col-lg-12">
         <hr />
-        <button type="button" class="btn btn-sm btn-success" data-bind='click: addRow'><i class="icon-plus"></i> Add a Field</button>
+        <button type="button" class="btn btn-sm btn-success" data-bind='click: addRow'><em class="icon-plus"></em> Add a Field</button>
         <hr />
         <button class="btn btn-success" id="saveBtn" data-bind='click: save'>Save</button>
         <div id="buttonSpinner" style="
@@ -199,13 +199,13 @@
                         <div class="rightButton float-right" data-bind="visible: $parent.Name === undefined">
 
                             <button type="button" class="btn btn-xs btn-danger p-2" data-bind='click: $parent.removeRow'>
-                                <i class="icon-close"></i>
+                                <em class="icon-close"></em>
                                 Delete
                             </button>
                         </div>
                         <div class="rightButton float-right" data-bind="visible: $parent.Name !== undefined">
                             <button type="button" class="btn btn-xs btn-danger p-2" data-bind='click: $parent.removeChild'>
-                                <i class="icon-close"></i>
+                                <em class="icon-close"></em>
                                 Delete
                             </button>
                         </div>

@@ -1729,7 +1729,7 @@ data.Dataset = {
                 { data: "ConfigFileName", className: "ConfigFileName" }
             ],
             language: {
-                search: "<div class='input-group'><span class='input-group-addon'><i class='icon-search'></i></span>_INPUT_</div>",
+                search: "<div class='input-group'><span class='input-group-addon'><em class='icon-search'></em></span>_INPUT_</div>",
                 searchPlaceholder: "Search",
                 processing: ""
             },
@@ -1922,7 +1922,7 @@ data.Dataset = {
                 { data: "ConfigFileName", className: "ConfigFileName" }
             ],
             language: {
-                search: "<div class='input-group'><span class='input-group-addon'><i class='icon-search'></i></span>_INPUT_</div>",
+                search: "<div class='input-group'><span class='input-group-addon'><em class='icon-search'></em></span>_INPUT_</div>",
                 searchPlaceholder: "Search",
                 processing: ""
             },

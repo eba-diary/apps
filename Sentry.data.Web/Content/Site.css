@@ -2951,3 +2951,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
 .dropdown-content label {
     padding-left: 38px !important; /* Restore left padding for dropdowns (specifically multiselect dropdowns) */
 }
+
+.dataTable {
+    border-spacing: inherit;
+}

@@ -7,7 +7,7 @@
         <div class="list-group-item list-inline">
         @cat.Name &nbsp;&nbsp;&nbsp;&nbsp;
         <button type="button" class="btn btn-default btn-sm" id="EditCategory_@cat.Id" data-id="@cat.Id">
-            <i class="icon-pencil text-primary"></i> Edit
+            <em class="icon-pencil text-primary"></em> Edit
         </button>
         @if (cat.IsLeaf)
         {
@@ -26,7 +26,7 @@
         }
 
         <button type="button" class="btn btn-default btn-sm" id="AddSubcategory_@cat.Id" data-id="@cat.Id">
-            <i class="icon-plus text-success"></i> Add Subcategory
+            <em class="icon-plus text-success"></em> Add Subcategory
         </button>
     </div>
     }

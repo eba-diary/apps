@@ -23,7 +23,7 @@
                 @{
                     using (Html.BeginForm(@"BusinessIntelligence", "Search", FormMethod.Get, new { @class = "md-form input-group w-100", @id = "DatasetSearch" }))
                     {
-                        <span class="input-group-prepend sentry-blue white-text clickable" id="SearchIconAddon" onclick="$(function() {$('#SearchText').focus();});"><i class="icon-search"></i></span>
+                        <span class="input-group-prepend sentry-blue white-text clickable" id="SearchIconAddon" onclick="$(function() {$('#SearchText').focus();});"><em class="icon-search"></em></span>
                         <input type="text" id="SearchText" class="form-control bi-search-textbox" placeholder="Search from @Model.DatasetCount Exhibits and Dashboards ...">
                     }
                 }
@@ -69,7 +69,7 @@
                 @if (Model.CanManageReports)
                 {
                     <button type="button" class="btn btn-default btn-lg bi-operation-button" id="CreateExhibit">
-                        <i class="icon-plus text-primary"></i> Create Exhibit
+                        <em class="icon-plus text-primary"></em> Create Exhibit
                     </button>
                 }
             </div>
