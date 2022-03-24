@@ -40,14 +40,16 @@
                     ConfigFileName
                     *************************************************************************************************************************************@
                 <div class="md-form">
-                    @Html.LabelFor(model => model.ConfigFileName, htmlAttributes: new { @class = "" })
                     @Html.TextBoxFor(model => model.ConfigFileName, new { @value = "", @class = "form-control" })
+                    @Html.LabelFor(model => model.ConfigFileName, htmlAttributes: new { @class = "" })
+
                     @Html.ValidationMessageFor(model => model.ConfigFileName, "", new { @class = "text-danger" })
                 </div>
 
                 <div class="md-form">
-                    @Html.LabelFor(model => model.ConfigFileDesc, htmlAttributes: new { @class = "control-label" })
                     @Html.TextBoxFor(model => model.ConfigFileDesc, new { @value = "", @class = "form-control" })
+                    @Html.LabelFor(model => model.ConfigFileDesc, htmlAttributes: new { @class = "control-label" })
+
                     @Html.ValidationMessageFor(model => model.ConfigFileDesc, "", new { @class = "text-danger" })
                 </div>
 

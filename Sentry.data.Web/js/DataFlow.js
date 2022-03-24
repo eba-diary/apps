@@ -256,8 +256,14 @@
             },
             error: function (obj) {
                 $('#DatasetFormContent').replaceWith(obj.responseText);
-                var hrEnv = $('#HrempServiceEnv').val()
-                var hrUrl = $('#HrempServiceUrl').val()
+                var hrEnv = $('#HrempServiceEnv').val();
+                var hrUrl = $('#HrempServiceUrl').val();
+                if ($("#DatasetDesc").val()) {
+                    $('label[for=DatasetDesc]').addClass("active");
+                }
+                if ($("#DatasetInformation").val()) {
+                    $('label[for=DatasetInformation]').addClass("active");
+                }
                 //init the form passing the submit function specific for DataFlow page
                 data.Dataset.FormInit(hrUrl, hrEnv, data.DataFlow.DatasetFormSubmitInit, data.DataFlow.DatasetFormCancelInit);
             }

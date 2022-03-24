@@ -869,10 +869,7 @@ data.Dataset = {
             $("#saidAsset").materialSelect();
             $("#OriginationID").materialSelect();
             $("#DataClassification").materialSelect();
-            if ($("#NamedEnvironment").hasClass("mdb-select")) {
-                $("#NamedEnvironment").materialSelect();
-            };
-            $("#NamedEnvironmentType").materialSelect();
+            $("#NamedEnvironmentPartial select").materialSelect();
             $("#DatasetScopeTypeId").materialSelect();
             $("#FileExtensionId").materialSelect();
         });
@@ -908,6 +905,8 @@ data.Dataset = {
             maxResults: 10
         });
 
+        $(".associatePicker label").addClass("active");
+        $(".twitter-typeahead").addClass("w-100");
 
         $("#DataClassification").change(function () {
             switch ($("#DataClassification").val()) {
@@ -2243,6 +2242,7 @@ data.Dataset = {
         $.get("/Dataset/NamedEnvironment?assetKeyCode=" + assetKeyCode + "&namedEnvironment=" + selectedEnvironment, function (result) {
             $('div#DatasetFormContent #NamedEnvironmentPartial').html(result);
             data.Dataset.initNamedEnvironmentEvents();
+            $("#NamedEnvironmentPartial select").materialSelect();
         });
     },
 

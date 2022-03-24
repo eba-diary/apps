@@ -106,8 +106,8 @@
 
                 @*Description*@
                 <div class="md-form">
-                    @Html.TextAreaFor(model => model.DatasetDesc, new { @class = "md-textarea w-100" })
-                    @Html.LabelFor(model => model.DatasetDesc, htmlAttributes: new { @class = "disabled" })
+                    @Html.TextAreaFor(model => model.DatasetDesc, new { @class = "md-textarea form-control" })
+                    @Html.LabelFor(model => model.DatasetDesc, htmlAttributes: new { @class = "" })
                     @Html.ValidationMessageFor(model => model.DatasetDesc, "", new { @class = "text-danger" })
                     <span class="text-muted">
                         <em>This description will be shown on the Dataset List and Search Page and at the top of your Dataset Detail Page.</em>
@@ -115,8 +115,8 @@
                 </div>
 
                 <div class="md-form">
-                    @Html.TextAreaFor(model => model.DatasetInformation, new { @class = "md-textarea w-100" })
-                    @Html.LabelFor(model => model.DatasetInformation, htmlAttributes: new { @class = "disabled" })
+                    @Html.TextAreaFor(model => model.DatasetInformation, new { @class = "md-textarea form-control" })
+                    @Html.LabelFor(model => model.DatasetInformation, htmlAttributes: new { @class = "", @disabled = "" })
                     @Html.ValidationMessageFor(model => model.DatasetInformation, "", new { @class = "text-danger" })
                     <span class="text-muted">
                         <em>Please roughly describe how users can use your dataset.</em>
@@ -156,9 +156,9 @@
                     <span class="text-muted"><em id="dataClassInfo"></em></span>
                 </div>
 
-                <div class="md-form">
+                <div class="md-form associatePicker">
                     @Html.LabelFor(model => model.PrimaryContactName, htmlAttributes: new { @class = "" })
-                    @Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+                    @Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control w-100", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
                     @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
                 </div>
                 <div class="md-form fieldDescription">
