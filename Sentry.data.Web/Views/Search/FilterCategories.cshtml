@@ -18,11 +18,11 @@
     foreach (FilterCategoryOptionModel option in options.ToList())
     {
         <li class="filter-search-category-option" title="@option.OptionValue">
-            <fieldset class="form-group mb-0">
+            <div class="form-group mb-0">
                 <input type="checkbox" id="@option.OptionId" class="form-check-input filter-search-category-option-checkbox">
                 <label for="@option.OptionId" class="form-check-label">@SafeValue(option.OptionValue)</label>
                 <span>(@option.ResultCount.ToString("N0"))</span>
-            </fieldset>
+            </div>
         </li>
     }
 }

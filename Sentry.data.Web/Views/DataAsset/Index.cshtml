@@ -138,7 +138,7 @@
                 <li class="@disabled nav-item"><a class="nav-link" href="@arch" target="_blank">Arch Diagrams</a></li>
 
                 @{ disabled = (Model.DataModelLink != null) ? "" : "disabled"; }
-                <li class="@disabled nav-item"><a class="nav-link" href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
+                <li class="@disabled nav-item"><a rel="noopener" class="nav-link" href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
 
                 @{ disabled = (Model.GuideLink != null) ? "" : "disabled"; }
                 <li class="@disabled nav-item"><a class="nav-link" href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>

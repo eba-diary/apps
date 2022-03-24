@@ -33,12 +33,12 @@
                                 <!-- ko foreach: OrderedFilters -->
                                 <li class="list-unstyled li-filter-disabled filterList" data-bind="css: { notAllowed: Count() == 0 }">
 
-                                    <fieldset class="form-group">
+                                    <div class="form-group">
                                         <input type="checkbox" class="form-check-input"
                                                data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
                                         <label class="form-check-label" data-bind="text : Title, attr: {for: id}"></label>
                                         <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
-                                    </fieldset>
+                                    </div>
 
                                 </li>
                                 <!-- /ko -->
@@ -46,12 +46,12 @@
                                 <!-- ko if: ShowMore -->
                                 <!-- ko foreach: OrderedFilters -->
                                 <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6, css: { notAllowed: Count() == 0 }">
-                                    <fieldset class="form-group">
+                                    <div class="form-group">
                                         <input type="checkbox" class="form-check-input"
                                                data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
                                         <label class="form-check-label" data-bind="text : Title, attr: {for: id}"></label>
                                         <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
-                                    </fieldset>
+                                    </div>
                                 </li>
                                 <!-- /ko -->
 

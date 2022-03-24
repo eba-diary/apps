@@ -59,7 +59,7 @@
                 <li class="@disabled nav-item"><a class="nav-link" href="@arch" target="_blank">Arch Diagrams</a></li>
 
                 @{ disabled = (dataAsset.DataModelLink != null) ? "" : "disabled"; }
-                <li class="@disabled nav-item"><a class="nav-link" href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = dataAsset.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
+                <li class="@disabled nav-item"><a rel="noopener" class="nav-link" href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = dataAsset.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
 
                 @{ disabled = (dataAsset.GuideLink != null) ? "" : "disabled"; }
                 <li class="@disabled nav-item"><a class="nav-link" href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
@@ -247,7 +247,7 @@
     .layer:before {
         /*Using a Bootstrap glyphicon as the bullet point*/
         content: "\e900";
-        font-family: 'icomoon';
+        font-family: 'icomoon', sans-serif;
         font-size: 14px;
         float: left;
         margin-top: 20px;

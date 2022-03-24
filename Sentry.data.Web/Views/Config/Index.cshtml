@@ -101,7 +101,7 @@
                         <div class="configHeader categoryBanner-@Model.CategoryColor">
                             @if (item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
                             {
-                                <h1 class="@color pt-3">@item.ConfigFileName <strong><i>(@Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete.ToString())</i></strong></h1>
+                                <h1 class="@color pt-3">@item.ConfigFileName <strong><em>(@Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete.ToString())</em></strong></h1>
                             }
                             else
                             {
