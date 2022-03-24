@@ -19,6 +19,8 @@
             <thead>
                 <tr class="table-header">
                     <th>Event</th>
+                    @*TODO ADD THIS WHEN FINISHING UI*@
+                    @*<th>Event Details</th>*@
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -39,16 +41,27 @@
                         cssClass = "active";
                     }
 
-                    <tr class="@cssClass">
-                        <td>
-                            @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessArea[subId].EventType.Type_ID)
-                            @Html.DisplayFor(model => model.CurrentSubscriptionsBusinessArea[subId].EventType.DisplayName)
-                        </td>
-                        <td>
-                            @Html.DropDownListFor(model => model.CurrentSubscriptionsBusinessArea[subId].Interval.Interval_ID,
-                                    new SelectList(Model.AllIntervals, "Value", "Text", Model.CurrentSubscriptionsBusinessArea[subId].Interval.Interval_ID))
-                        </td>
-                    </tr>
+                <tr class="@cssClass">
+                    <td>
+                        @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessArea[subId].EventType.Type_ID)
+                        @Html.DisplayFor(model => model.CurrentSubscriptionsBusinessArea[subId].EventType.DisplayName)
+                    </td>
+
+
+                    @*TODO: ADD MULTI DROP DOWN HERE AND FIGURE OUT WHAT TO DO WITH MAKING 
+                        model.CurrentSubscriptionsBusinessArea[subId].childBusinessAreaSubscriptions[childId].EventType.Type_ID turn into a BOOL *@
+                    @*<td>
+                        @for (var childId = 0; childId < Model.CurrentSubscriptionsBusinessArea[subId].childBusinessAreaSubscriptions.Count(); childId++)
+                        {
+                            @Html.CheckBoxFor(model => model.CurrentSubscriptionsBusinessArea[subId].childBusinessAreaSubscriptions[childId].EventType.Type_ID
+                        }
+                    </td>*@
+
+                    <td>
+                        @Html.DropDownListFor(model => model.CurrentSubscriptionsBusinessArea[subId].Interval.Interval_ID,
+                                new SelectList(Model.AllIntervals, "Value", "Text", Model.CurrentSubscriptionsBusinessArea[subId].Interval.Interval_ID))
+                    </td>
+                 </tr>
 
 
                 }

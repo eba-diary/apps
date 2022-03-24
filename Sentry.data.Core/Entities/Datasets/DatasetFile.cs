@@ -21,15 +21,18 @@ namespace Sentry.data.Core
 
         public virtual string UploadUserName { get; set; }
 
-        public virtual DateTime CreateDTM { get; set; }
+        public virtual DateTime CreatedDTM { get; set; }
 
         public virtual DateTime ModifiedDTM { get; set; }
 
         public virtual string FileLocation { get; set; }
+        public virtual string FileBucket { get; set; }
+        public virtual string FileKey { get; set; }
 
         public virtual int? ParentDatasetFileId { get; set; }
 
         public virtual string VersionId { get; set; }
+        public virtual string ETag { get; set; }
 
         public virtual Boolean IsBundled { get; set; }
 

@@ -567,7 +567,7 @@ namespace Sentry.data.Core
 
         public DatasetFile GetLatestDatasetFileBySchema(int schemaId)
         {
-            DatasetFile file = _datasetContext.DatasetFile.OrderBy(x => x.CreateDTM).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+            DatasetFile file = _datasetContext.DatasetFile.OrderBy(x => x.CreatedDTM).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
             return file;
         }
 
@@ -834,7 +834,7 @@ namespace Sentry.data.Core
             file.UploadUserName = "";
             file.DatasetFileConfig = null;
             file.FileLocation = stepEvent.StepTargetPrefix + Path.GetFileName(fileKey).Trim();
-            file.CreateDTM = DateTime.ParseExact(stepEvent.FlowExecutionGuid, GlobalConstants.DataFlowGuidConfiguration.GUID_FORMAT, null);
+            file.CreatedDTM = DateTime.ParseExact(stepEvent.FlowExecutionGuid, GlobalConstants.DataFlowGuidConfiguration.GUID_FORMAT, null);
             file.ModifiedDTM = DateTime.Now;
             file.ParentDatasetFileId = null;
             file.VersionId = fileVersionId;

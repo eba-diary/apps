@@ -570,7 +570,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 {
                     if (obj.Contains("part-00000"))
                     {
-                        return Ok(_s3Service.GetDatasetDownloadURL(obj, null, fileName));
+                        return Ok(_s3Service.GetDatasetDownloadUrl(obj, null, fileName));
                     }
                 }
 

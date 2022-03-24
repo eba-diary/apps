@@ -36,6 +36,9 @@ namespace Sentry.data.Web.Models.ApiModels.DatasetFile
 
         public string RunInstanceGuid { get; set; }
         public string FileExtension { get; set; }
+        public string FileKey { get; set; }
+        public string FileBucket { get; set; }
+        public string ETag { get; set; }
 
         public List<string> Validate()
         {

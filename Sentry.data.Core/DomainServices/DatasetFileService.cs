@@ -80,6 +80,8 @@ namespace Sentry.data.Core
         {
             dataFile.FileLocation = dto.FileLocation;
             dataFile.VersionId = dto.VersionId;
+            dataFile.FileKey = dto.FileKey;
+            dataFile.FileBucket = dto.FileBucket;
         }
         #endregion
     }

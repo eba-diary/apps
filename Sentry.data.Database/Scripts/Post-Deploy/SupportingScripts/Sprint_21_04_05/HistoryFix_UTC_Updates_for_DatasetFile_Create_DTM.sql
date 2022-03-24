@@ -6,16 +6,16 @@ IF OBJECT_ID('tempdb..#SpecialCase') IS NOT NULL DROP TABLE		#SpecialCase;
 
 select 
 DatasetFile_Id as 'F_Id',
-Create_DTM,
-SWITCHOFFSET(CAST(Create_DTM as datetime) AT TIME ZONE 'Central Standard Time', '+00:00') as 'UTC_Adjusted_CreateDTM',
+[Created_DTM],
+SWITCHOFFSET(CAST([Created_DTM] as datetime) AT TIME ZONE 'Central Standard Time', '+00:00') as 'UTC_Adjusted_CreateDTM',
 FlowExecutionGuid,
 Substring(FlowExecutionGuid, 0, 15) as 'NoMils_FlowExecutionGuid_Orig',
-CONVERT(VARCHAR(4),DATEPART(YEAR,Create_DTM)) + 
-	RIGHT('00' +	CONVERT(VARCHAR(2),DATEPART(MONTH,Create_DTM))			,2) + 
-	RIGHT('00' +	CONVERT(VARCHAR(2),DATEPART(DAY,Create_DTM))			,2) + 
-	RIGHT('00' +	CONVERT(VARCHAR(2),DATEPART(HH,Create_DTM))				,2) + 
-	RIGHT('00' +	CONVERT(VARCHAR(2),DATEPART(MINUTE,Create_DTM))			,2) + 
-	RIGHT('00' +	CONVERT(VARCHAR(2),DATEPART(SECOND,Create_DTM))			,2) /*+ 
+CONVERT(VARCHAR(4),DATEPART(YEAR,[Created_DTM])) + 
+	RIGHT('00' +	CONVERT(VARCHAR(2),DATEPART(MONTH,[Created_DTM]))			,2) + 
+	RIGHT('00' +	CONVERT(VARCHAR(2),DATEPART(DAY,[Created_DTM]))			,2) + 
+	RIGHT('00' +	CONVERT(VARCHAR(2),DATEPART(HH,[Created_DTM]))				,2) + 
+	RIGHT('00' +	CONVERT(VARCHAR(2),DATEPART(MINUTE,[Created_DTM]))			,2) + 
+	RIGHT('00' +	CONVERT(VARCHAR(2),DATEPART(SECOND,[Created_DTM]))			,2) /*+ 
 	RIGHT('000' +	CONVERT(VARCHAR(3),DATEPART(MILLISECOND,Create_DTM))	,3)*/ as 'Generated_FlowGuid'
 into #files
 from DatasetFile 
@@ -104,7 +104,7 @@ BEGIN
 	print 'Identified ' + CONVERT(VARCHAR(max), @Create_UTC_Corrections) + ' incorrect Create_DTM values in DatasetFile table'
 	
 	update Datasetfile
-	SET Create_DTM = x.UTC_Adjusted_CreateDTM
+	SET [Created_DTM] = x.UTC_Adjusted_CreateDTM
 	from #Create_Matches_UTC_FlowGuid x
 	where DatasetFile_id = x.F_Id
 END
