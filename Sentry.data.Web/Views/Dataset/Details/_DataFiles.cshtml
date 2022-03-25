@@ -1,6 +1,6 @@
 ﻿@{
     string color = "dsc-" + Model.CategoryColor + "-text";
-    string headerColor = "categoryBanner-" + Model.CategoryColor;
+    string tableColor = "dsc-" + Model.CategoryColor + "-table";
 }
 
 @if (!Model.DisplayTabSections)
@@ -18,7 +18,7 @@
 
 <div class="@(Model.DatasetFileCount != 0 ?"visible-item":"hidden-item")">
     <div id="hide_detailSectionHeader_DataFiles">
-        <table class="table table-striped table-bordered table-hover nowrap" aria-describedby="Dataset Schema Files Table" id="datasetFilesTable">
+        <table class="table @tableColor table-bordered table-hover nowrap" aria-describedby="Dataset Schema Files Table" id="datasetFilesTable">
             <thead>
                 <tr class="filter-row">
                     <td></td>

@@ -2908,11 +2908,11 @@ a.forbiddenHero:hover {
 }
 
 .dsc-gray-text {
-    color: gray;
+    color: #9E9FA1;
 }
 
 .dsc-darkgray-text {
-    color: dimgray;
+    color: #53565A;
 }
 
 .dsc-darkGreen-text {
@@ -2958,4 +2958,62 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
 
 .tt-suggestions table {
     background-color: white;
+}
+
+
+
+table.dsc-green-table th.sorting_asc, table.dsc-green-table th.sorting_desc {
+    background-color: #84BD00 !important;
+}
+
+table.dsc-green-table th {
+    background-color: #005844;
+}
+
+table.dsc-blueGray-table th.sorting_asc, table.dsc-blueGray-table th.sorting_desc {
+    background-color: #89ABE3 !important;
+}
+
+table.dsc-blueGray-table th {
+    background-color: #285780;
+}
+
+table.dsc-gray-table th.sorting_asc, table.dsc-gray-table th.sorting_desc {
+    background-color: #9E9FA1 !important;
+}
+
+table.dsc-gray-table th {
+    background-color: #53565A;
+}
+
+table.dsc-gold-table th.sorting_asc, table.dsc-gold-table th.sorting_desc {
+    background-color: #EAAA00 !important;
+}
+
+table.dsc-gold-table th {
+    background-color: #74531C;
+}
+
+table.dsc-plum-table th.sorting_asc, table.dsc-plum-table th.sorting_desc {
+    background-color: #BB85AB !important;
+}
+
+table.dsc-plum-table th {
+    background-color: #72246C;
+}
+
+table.dsc-orange-table th.sorting_asc, table.dsc-orange-table th.sorting_desc {
+    background-color: #E57200 !important;
+}
+
+table.dsc-orange-table th {
+    background-color: #683431;
+}
+
+table.dsc-blue-table th.sorting_asc, table.dsc-blue-table th.sorting_desc {
+    background-color: #00A3E0 !important;
+}
+
+table.dsc-blue-table th {
+    background-color: #003DA5;
 }

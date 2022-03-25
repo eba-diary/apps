@@ -1,6 +1,6 @@
 ﻿@{
     string color = "dsc-" + Model.CategoryColor + "-text";
-    string headerColor = "categoryBanner-" + Model.CategoryColor;
+    string tableColor = "dsc-" + Model.CategoryColor + "-table";
 }
 
 @if (!Model.DisplayTabSections)
@@ -18,12 +18,12 @@
     <div id="dataSection" data-bind="visible: DataLoading() == false">
         <div class="row">
             <div class="col">
-                <table class="table table-striped table-bordered table-hover nowrap" id="datasetRowTable" aria-describedby="Dataset Schema Preview Table">
+                <table class="table @tableColor table-bordered table-hover nowrap" id="datasetRowTable" aria-describedby="Dataset Schema Preview Table">
                     <thead>
                         <tr id="tableFirstRow" class="filter-row">
                             <th scope="col"></th>
                         </tr>
-                        <tr id="tableColumnIDs" class="table-header table-header_@color @headerColor"></tr>
+                        <tr id="tableColumnIDs" class="table-header table-header_@color"></tr>
                     </thead>
                     <tbody></tbody>
                 </table>

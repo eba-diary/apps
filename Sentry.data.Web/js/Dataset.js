@@ -840,8 +840,9 @@ data.Dataset = {
             },
             error: function (obj) {
                 $('#DatasetFormContent').replaceWith(obj.responseText);
-                var hrEnv = $('#HrempServiceEnv').val()
-                var hrUrl = $('#HrempServiceUrl').val()
+                var hrEnv = $('#HrempServiceEnv').val();
+                var hrUrl = $('#HrempServiceUrl').val();
+
                 data.Dataset.FormInit(hrUrl, hrEnv, data.Dataset.FormSubmitInit);
             }
         });
@@ -907,6 +908,13 @@ data.Dataset = {
 
         $(".associatePicker label").addClass("active");
         $(".twitter-typeahead").addClass("w-100");
+
+        if ($("#DatasetDesc").val()) {
+            $('label[for=DatasetDesc]').addClass("active");
+        }
+        if ($("#DatasetInformation").val()) {
+            $('label[for=DatasetInformation]').addClass("active");
+        }
 
         $("#DataClassification").change(function () {
             switch ($("#DataClassification").val()) {

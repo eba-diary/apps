@@ -18,6 +18,8 @@
             $("#RetrieverJob_SelectedRequestDataFormat").materialSelect();
             $("#RetrieverJob_FtpPattern").materialSelect();
             $("#RetrieverJob_SchedulePicker").materialSelect();
+            $("#RetrieverJob_cronYearlyMonthPicker").materialSelect();
+            $("#RetrieverJob_cronWeeklyDayPicker").materialSelect();
 
 
             $.getJSON("/Config/SourcesByType", { sourceType: val }, function (data) {

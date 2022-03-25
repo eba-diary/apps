@@ -1,5 +1,6 @@
 ﻿@{
     string color = "dsc-" + Model.CategoryColor + "-text";
+    string tableColor = "dsc-" + Model.CategoryColor + "-table";
 }
 <div class="" id="schemaSection">
 
@@ -16,7 +17,7 @@
             <ol class="breadcrumb mb-1" id="delroyBreadcrumb" data-page-color="@color"></ol>
             <div class="row">
                 <div class="col">
-                    <table class="table table-striped table-bordered table-hover nowrap" id="delroyTable" aria-describedby="Dataset Schema Columns Table">
+                    <table class="table @tableColor table-bordered table-hover nowrap" id="delroyTable" aria-describedby="Dataset Schema Columns Table">
                         <thead>
                             <tr>
                                 <th>Name</th>
