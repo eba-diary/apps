@@ -28,6 +28,7 @@
 
         public static class EventType
         {
+            public const string CREATED_FILE = "Created File";
             public const string VIEWED = "Viewed";
             public const string DOWNLOAD = "Downloaded Data File";
             public const string EDITED_DATA_FILE = "Edited Data File";
