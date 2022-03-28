@@ -1,10 +1,10 @@
 ﻿using Hangfire;
 using Sentry.Common.Logging;
 using Sentry.Core;
-using Sentry.Configuration;
 using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities;
+using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using Sentry.data.Infrastructure;
@@ -23,10 +23,6 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.SessionState;
-using Sentry.data.Core.Interfaces;
-using Sentry.data.Core.Entities;
-using Sentry.data.Core.GlobalEnums;
-using Sentry.data.Core.Entities.Schema.Elastic;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -735,10 +731,11 @@ namespace Sentry.data.Web.Controllers
             try
             {
                 //Testing if object exists in S3, response is not used.
-                _s3Service.GetObjectMetadata(null, df.FileLocation, null);
+                string objectKey = (df.FileKey) ?? df.FileLocation;
+                _s3Service.GetObjectMetadata(df.FileBucket, objectKey, null);
 
                 JsonResult jr = new JsonResult();
-                jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation);
+                jr.Data = _s3Service.GetDatasetDownloadUrl(objectKey, df.FileBucket);
                 jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
 
                 e.Reason = "Successfully Downloaded Data File";

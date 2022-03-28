@@ -623,8 +623,11 @@ data.Dataset = {
                         $('#dataSection').show();
                         self.vm.DataLoading(false);
                         self.vm.DataTableExists(true);
-                        $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
 
+                        //this is a trick to know if datatable has been generated before we modify it
+                        if ($("#datasetRowTable_filter").length > 0) {
+                            $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
+                        }
                     }
                     else {
                         $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");

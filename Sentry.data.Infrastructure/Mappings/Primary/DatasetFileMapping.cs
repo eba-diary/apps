@@ -30,6 +30,9 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.Size, (m) => m.Column("Size_AMT"));
             this.Property((x) => x.FlowExecutionGuid, (m) => m.Column("FlowExecutionGuid"));
             this.Property((x) => x.RunInstanceGuid, (m) => m.Column("RunInstanceGuid"));
+            this.Property((x) => x.FileBucket);
+            this.Property((x) => x.FileKey);
+            this.Property((x) => x.ETag);
 
             this.ManyToOne(x => x.Dataset, m =>
             {
