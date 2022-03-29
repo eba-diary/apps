@@ -2960,13 +2960,19 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
     background-color: white;
 }
 
-
-
 table.dsc-green-table th.sorting_asc, table.dsc-green-table th.sorting_desc {
     background-color: #84BD00 !important;
 }
 
 table.dsc-green-table th {
+    background-color: #005844;
+}
+
+table.dsc-darkGreen-table th.sorting_asc, table.dsc-darkGreen-table th.sorting_desc {
+    background-color: #84BD00 !important;
+}
+
+table.dsc-darkGreen-table th {
     background-color: #005844;
 }
 

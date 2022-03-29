@@ -12,7 +12,9 @@
             minLength: 0,
             maxResults: 10
         });
-        $("#SourceType").materialSelect();
+        if (!$("#SourceType").is("[type=hidden]")){
+            $("#SourceType").materialSelect();
+        }
         $("#AuthID").materialSelect();
 
     },

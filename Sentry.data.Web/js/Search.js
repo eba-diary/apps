@@ -60,9 +60,8 @@ data.Search = {
             }
         });
 
-        $(document).on("click", ".btnFavorite", function (e) {
+        $(document).on("click", ".btnFavoriteSearch", function (e) {
             e.preventDefault();
-
             var button = $(this);
             var id = button.attr("data");
 
@@ -72,8 +71,6 @@ data.Search = {
                     url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent(id),
                     method: "GET",
                     dataType: 'json',
-                    success: function () {
-                    },
                     error: function () {
                         Sentry.ShowModalAlert("Failed to remove favorite.");
                     }
@@ -85,14 +82,12 @@ data.Search = {
                     url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent(id),
                     method: "GET",
                     dataType: 'json',
-                    success: function () {
-                    },
                     error: function () {
                         Sentry.ShowModalAlert("Failed to set favorite.");
                     }
                 });
             }
-
+            e.stopImmediatePropagation();
             $(this).toggleClass("icon-filled-star icon-star");
 
         });
