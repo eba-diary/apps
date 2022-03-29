@@ -46,31 +46,39 @@ namespace Sentry.data.Infrastructure
 
             try
             {
-                switch (baseEvent.EventType.ToUpper())
+                if(baseEvent != null && baseEvent.EventType != null)
                 {
-                    case "SPARKCONVERTERSTATUS":
-                        SparkConverterModel sparkEvent = JsonConvert.DeserializeObject<SparkConverterModel>(msg);
-                        Logger.Info($"sparkconvertereventhandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(sparkEvent)}");
-                        if(sparkEvent.Status.ToUpper() == "SUCCESS")
-                        {
-                            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.CREATED_FILE, "SPARKCONVERTERSTATUS SUCCESS", sparkEvent.DatasetID);
-                            Logger.Info($"sparkconvertereventhandler processed {baseEvent.EventType.ToUpper()} message");
-                        }
-                        else
-                        {
-                            Logger.Info($"sparkconvertereventhandler handle {baseEvent.EventType.ToUpper()} event type was not marked success, skipping event.");
-                        }
-                        
-                        break;
-                    default:
-                        Logger.Info($"sparkconvertereventhandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");
-                        break;
-                }
+                    switch (baseEvent.EventType.ToUpper())
+                    {
+                        case "SPARKCONVERTERSTATUS":
 
+                            SparkConverterModel sparkEvent = JsonConvert.DeserializeObject<SparkConverterModel>(msg);
+                            Logger.Info($"sparkconvertereventhandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(sparkEvent)}");
+                           
+                            if (sparkEvent.Status != null && sparkEvent.Status.ToUpper() == "SUCCESS" && sparkEvent.DatasetID > 0)
+                            {
+                                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.CREATED_FILE, "SPARKCONVERTERSTATUS SUCCESS", sparkEvent.DatasetID);
+                                Logger.Info($"sparkconvertereventhandler processed {baseEvent.EventType.ToUpper()} message");
+                            }
+                            else
+                            {
+                                Logger.Info($"sparkconvertereventhandler handle {baseEvent.EventType.ToUpper()} event type was null or not marked success or empty DatasetID, skipping event.");
+                            }
+                            break;
+
+                        default:
+                            Logger.Info($"sparkconvertereventhandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");
+                            break;
+                    }
+                }
+                else
+                {
+                    Logger.Error($"sparkconvertereventhandler failed to parse baseEvent or EventType.  BaseEvent or baseEvent.EventType is null");
+                }
             }
             catch (Exception ex)
             {
-                Logger.Error($"sparkconvertereventhandler failed to process message: EventType:{baseEvent.EventType.ToUpper()} - Msg:({msg})", ex);
+                Logger.Error($"sparkconvertereventhandler failed to process message: Msg:({msg})", ex);
             }
             Logger.Info($"End method <sparkconvertereventhandler-handle>");
         }
