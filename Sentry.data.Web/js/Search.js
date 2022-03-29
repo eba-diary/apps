@@ -89,7 +89,7 @@ data.Search = {
             }
             e.stopImmediatePropagation();
             $(this).toggleClass("icon-filled-star icon-star");
-
+            return false;
         });
 
         // mouseover effect to change the background color of the search results tile
