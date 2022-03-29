@@ -372,8 +372,10 @@
     <Compile Include="ServiceImplementations\Messaging\Events\Payloads\DfsEventPayload.cs" />
     <Compile Include="ServiceImplementations\Messaging\Handlers\SnowflakeEventHandler.cs" />
     <Compile Include="ServiceImplementations\Messaging\Handlers\DfsEventHandler.cs" />
+    <Compile Include="ServiceImplementations\Messaging\Handlers\SparkConverterEventHandler.cs" />
     <Compile Include="ServiceImplementations\Messaging\S3EventService.cs" />
     <Compile Include="ServiceImplementations\Messaging\SnowflakeEventService.cs" />
+    <Compile Include="ServiceImplementations\Messaging\SparkConverterEventService.cs" />
     <Compile Include="ServiceImplementations\MetadataProcessorService.cs" />
     <Compile Include="ServiceImplementations\QuartermasterRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDRestClient.cs" />
