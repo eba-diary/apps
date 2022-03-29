@@ -105,6 +105,7 @@ namespace Sentry.data.Infrastructure
             //Register event handlers for MetadataProcessorService
             registry.For<IMessageHandler<string>>().Add<HiveMetadataService>();
             registry.For<IMessageHandler<string>>().Add<SnowflakeEventService>();
+            registry.For<IMessageHandler<string>>().Add<SparkConverterEventService>();
 
             //Wire up Obsidian provider
             Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();
