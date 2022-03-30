@@ -57,7 +57,7 @@ namespace Sentry.data.Infrastructure
                            
                             if (sparkEvent.Status != null && sparkEvent.Status.ToUpper() == "SUCCESS" && sparkEvent.DatasetID > 0)
                             {
-                                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.CREATED_FILE, "SPARKCONVERTERSTATUS SUCCESS", sparkEvent.DatasetID);
+                                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.CREATED_FILE, GlobalConstants.EventType.CREATED_FILE, sparkEvent.DatasetID);
                                 Logger.Info($"sparkconvertereventhandler processed {baseEvent.EventType.ToUpper()} message");
                             }
                             else
