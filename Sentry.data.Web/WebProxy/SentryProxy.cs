@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
+using Sentry.Common.Logging;
 
 namespace Sentry.data.Web
 {
@@ -8,13 +9,20 @@ namespace Sentry.data.Web
     {
         private static string proxyConfigScript = Sentry.Configuration.Config.GetHostSetting("WebProxyConfigFile");
         private static string[] useWebProxyList = Sentry.Configuration.Config.GetHostSetting("WebProxyUseList").Split(',');
-        private static string webProxyUrl = UseEdgeProxy ? Sentry.Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : Sentry.Configuration.Config.GetHostSetting("WebProxyUrl");
+        //private static string webProxyUrl = UseEdgeProxy ? Sentry.Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : Sentry.Configuration.Config.GetHostSetting("WebProxyUrl");
         private static ICredentials proxyCredentials = UseEdgeProxy
             ? new NetworkCredential(Sentry.Configuration.Config.GetHostSetting("ServiceAccountID"), Sentry.Configuration.Config.GetHostSetting("ServiceAccountPassword")) 
             : CredentialCache.DefaultNetworkCredentials;
 
-
         public static bool UseEdgeProxy { get; set; }
+
+        private string WebProxyUrl
+        {
+            get
+            {
+                return UseEdgeProxy ? Sentry.Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : Sentry.Configuration.Config.GetHostSetting("WebProxyUrl");
+            }
+        }
 
         public ICredentials Credentials
         {
@@ -31,15 +39,21 @@ namespace Sentry.data.Web
 
         public Uri GetProxy(Uri destination)
         {
+            Logger.Debug($"{nameof(SentryProxy)}_{nameof(GetProxy)} UseEdgeProxy:::{UseEdgeProxy}");
             if (!String.IsNullOrEmpty(proxyConfigScript))
             {
                 var proxyToUse = GetProxyForUrlUsingPac(destination.ToString(), proxyConfigScript);
                 if (!proxyToUse.StartsWith("http"))
                     proxyToUse = "http://" + proxyToUse;
+
+                Logger.Debug($"{nameof(SentryProxy)}_{nameof(GetProxy)} proxyscript:::{proxyToUse}");
+
                 return new Uri(proxyToUse);
             }
 
-            return new Uri(webProxyUrl);
+            Logger.Debug($"{nameof(SentryProxy)}_{nameof(GetProxy)} proxy:::{WebProxyUrl}");
+
+            return new Uri(WebProxyUrl);
         }
 
         /*this method is called everytime a URL is hit in the WEB app to determine if the SentryProxy should be bypassed for a given URL
