@@ -28,12 +28,12 @@
 
         <div class="md-form">
             <h4>How will the data be sent to us?</h4>
-            <select class="mdb-select" id="IngestionTypeSelection">
-                @foreach (var ingestionType in Model.IngestionTypeDropDown)
-                {
-                    <option value=@ingestionType.Value>@ingestionType.Text</option>
-                }
-            </select>
+            <div class="material-tooltip-main" data-toggle="tooltip" title="Will your process send a file to DSC (User_Push)? Or will DSC need to pick up the file from an external location (DSC_Pull)?">
+                @Html.DropDownListFor(
+                    x => x.IngestionTypeSelection,
+                    Model.IngestionTypeDropDown,
+                    new { @class = "mdb-select" })
+            </div>
         </div>
 
         <div class="namePanel" style="display:none;">

@@ -255,7 +255,7 @@ namespace Sentry.data.Web.Controllers
              * 
              */
 
-                    model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+            model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
             model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);

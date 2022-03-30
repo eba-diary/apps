@@ -15,19 +15,26 @@
 @if (Model.CLA3332_ConsolidatedDataFlows)
 {
     @Html.HiddenFor((model) => model.IsDeleted)
-    <span class="datasetSpinner"></span>
-    @Html.DropDownListFor((model) => model.SelectedDataset, Model.AllDatasets, new { @class = "mdb-select dataset-select" })
-    @Html.ValidationMessageFor((model) => model.SelectedDataset, "", new { @class = "text-danger error-over-color" })
-    <a class="small create-link" style="color: #00a3e0" id="CreateDataset">Create New Dataset</a>
+    <div class="row">
+        <div class="col">
+            <span class="datasetSpinner"></span>
+            @Html.DropDownListFor((model) => model.SelectedDataset, Model.AllDatasets, new { @class = "browser-default custom-select dataset-select" })
+            @Html.ValidationMessageFor((model) => model.SelectedDataset, "", new { @class = "text-danger error-over-color" })
+            <a class="small create-link" style="color: #00a3e0" id="CreateDataset">Create New Dataset</a>
+        </div>
+        <div class="col">
+            <span class="schemaSpinner"></span>
+            @Html.DropDownListFor((model) => model.SelectedSchema, Model.AllSchemas, new { @class = "browser-default custom-select schema-select" })
+            @Html.ValidationMessageFor((model) => model.SelectedSchema, "", new { @class = "text-danger error-over-color" })
 
-    <span class="schemaSpinner"></span>
-    @Html.DropDownListFor((model) => model.SelectedSchema, Model.AllSchemas, new { @class = "mdb-select schema-select" })
-    @Html.ValidationMessageFor((model) => model.SelectedSchema, "", new { @class = "text-danger error-over-color" })
-
-    @***************************************
+            @***************************************
             When removeing CLA3332_ConsolidatedDataflows feature flag, refactor style onto .create-link within dataflow.css
-        ***************************************@
-    <a class="small create-link" style="color: #00a3e0" id="CreateSchema">Create New Schema</a>
+            ***************************************@
+            <a class="small create-link" style="color: #00a3e0" id="CreateSchema">Create New Schema</a>
+        </div>
+    </div>
+
+
 }
 else
 {

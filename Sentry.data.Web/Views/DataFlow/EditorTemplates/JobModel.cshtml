@@ -12,7 +12,7 @@
 
 <div class="md-form">
     @Html.LabelFor((model) => model.SelectedDataSource, new { @class = "mdb-main-label" })
-    <div class="" data-toggle="tooltip" data-placement="right" title="If the required data source does not exist, please contact DSCSupport@sentry.com for assistance.">
+    <div class="material-tooltip-main" data-toggle="tooltip" title="If the required data source does not exist, please contact DSCSupport@sentry.com for assistance.">
         @Html.DropDownListFor((model) => model.SelectedDataSource, Model.SourcesForDropdown, new { @class = "mdb-select" })
         @Html.ValidationMessageFor((model) => model.SelectedDataSource, "", new { @class = "text-danger" })
     </div>

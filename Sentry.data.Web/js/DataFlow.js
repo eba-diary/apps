@@ -73,7 +73,7 @@
             $("#IsCompressed").materialSelect();
             $("#IsPreProcessingRequired").materialSelect();
             $("#PreProcessingSelection").materialSelect();
-            $("#schemaMapPanel select").materialSelect();
+            //$("#schemaMapPanel select").materialSelect();
             $("#NamedEnvironmentPartial select").materialSelect();
             $("#retrieverJobPanel select").materialSelect();
             $("#compressionJobQuestion select").materialSelect();
@@ -345,7 +345,7 @@
                     $(targetElement).val(curVal);
                 }
 
-                $("#schemaMapPanel select").materialSelect();
+                //$("#schemaMapPanel select").materialSelect();
 
             });
             createSchemaLink.show();
