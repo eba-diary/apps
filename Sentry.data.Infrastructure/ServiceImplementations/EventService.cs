@@ -116,11 +116,11 @@ namespace Sentry.data.Infrastructure
             {
                 if(schema != null)
                 {
-                    evt.Reason = $"A file was created for {schema.Name} under {ds.DatasetName} ";
+                    evt.Reason = $"Data has been added for {schema.Name} under {ds.DatasetName} ";
                 }
                 else
                 {
-                    evt.Reason = $"A file was created for {ds.DatasetName} ";
+                    evt.Reason = $"Data has been added under {ds.DatasetName} ";
                 }
                 
             }
