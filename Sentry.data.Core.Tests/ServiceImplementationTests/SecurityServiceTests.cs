@@ -52,10 +52,6 @@ namespace Sentry.data.Core.Tests
             user.Stub(x => x.IsInGroup(ticket2.AdGroupName)).Return(false).Repeat.Any();
             user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
 
-            //IDataFeatures dataFeatures = Rhino.Mocks.MockRepository.GenerateMock<IDataFeatures>();
-            //var dataFeatures = _container.GetInstance<IDataFeatures>();
-            //dataFeatures.Stub(x => x.CLA3861_RefactorGetUserSecurity.GetValue()).Return(CLA3861_flag).Repeat.Any();
-
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
             UserSecurity us = ss.GetUserSecurity(securable, user);
@@ -70,10 +66,11 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(us.CanEditDataset);
             Assert.IsTrue(us.CanEditReport);
             Assert.IsTrue(us.CanManageSchema);
+            Assert.IsTrue(us.CanViewData);
         }
 
         [TestMethod]
-        public void Security_Secured_Sensitive_NotOwner_Admin()
+        public void Security_Secured_NotOwner_Admin_ExplicitPermissions()
         {
             //ARRAGE
             Security security = BuildBaseSecurity();
@@ -103,7 +100,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsTrue(us.CanPreviewDataset);
-            Assert.IsFalse(us.CanViewFullDataset);
+            Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsTrue(us.CanQueryDataset);
             Assert.IsTrue(us.CanUploadToDataset);
             Assert.IsTrue(us.CanCreateDataset);
@@ -111,6 +108,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(us.CanEditDataset);
             Assert.IsTrue(us.CanEditReport);
             Assert.IsTrue(us.CanManageSchema);
+            Assert.IsFalse(us.CanViewData);
         }
 
         [TestMethod]
@@ -217,6 +215,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsFalse(us.CanEditDataset);
             Assert.IsFalse(us.CanEditReport);
             Assert.IsFalse(us.CanManageSchema);
+            Assert.IsTrue(us.CanViewData);
         }
 
         /// <summary>
@@ -243,6 +242,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsFalse(us.CanEditDataset);
             Assert.IsFalse(us.CanEditReport);
             Assert.IsFalse(us.CanManageSchema);
+            Assert.IsTrue(us.CanViewData);
         }
 
         /// <summary>
@@ -985,7 +985,7 @@ namespace Sentry.data.Core.Tests
         }
 
         /// <summary>
-        /// 
+        /// Tests that Admin can preview dataset, in hr category, with out permission request (implicit)
         /// </summary>
         [TestMethod]
         public void BuildOutUserSecurityForSecuredEntity_CanPreviewData_Is_True_For_Admin_When_IsHrData()
@@ -1010,7 +1010,8 @@ namespace Sentry.data.Core.Tests
         }
 
         /// <summary>
-        /// Admin does not have permission to download data files for dataset within Human Resource category
+        /// Admin does not have permission to view data for dataset within Human Resource category,
+        /// without permission request
         /// </summary>
         [TestMethod]
         public void BuildOutUserSecurityForSecuredEntity_CanViewData_False_For_Admin_When_IsHr()
@@ -1035,7 +1036,8 @@ namespace Sentry.data.Core.Tests
         }
 
         /// <summary>
-        /// Admin does not have permission to download data files for dataset within Human Resource category
+        /// Admin does not have permission to view data for dataset within Human Resource category,
+        /// without permission request
         /// </summary>
         [TestMethod]
         public void BuildOutUserSecurityForSecuredEntity_CanViewData_True_For_Admin_When_IsHrData_Is_False()
@@ -1060,7 +1062,7 @@ namespace Sentry.data.Core.Tests
         }
 
         /// <summary>
-        /// Owner has permission to download data files for dataset within Human Resource category
+        /// Owner has permission to view data for dataset within Human Resource category
         /// </summary>
         [TestMethod]
         public void BuildOutUserSecurityForSecuredEntity_CanViewData_Is_True_For_Owner_When_IsHrData_Is_True()
@@ -1085,8 +1087,7 @@ namespace Sentry.data.Core.Tests
         }
 
         /// <summary>
-        /// User is required to have CanViewFullDataset permission to download data files for dataset 
-        /// within Human Resource category
+        /// User does not have view data for dataset within Human Resources category without permission request
         /// </summary>
         [TestMethod]
         public void BuildOutUserSecurityForSecuredEntity_CanViewData_False_For_User_When_IsHrData_Is_True()
@@ -1111,8 +1112,7 @@ namespace Sentry.data.Core.Tests
         }
 
         /// <summary>
-        /// User is required to have CanViewFullDataset permission to download data files for dataset 
-        /// within Human Resource category
+        /// User can view data for dataset within Human Resources category with approved permission request
         /// </summary>
         [TestMethod]
         public void BuildOutUserSecurityForSecuredEntity_CanViewData_True_For_User_When_IsHrData_Is_True()
@@ -1128,8 +1128,6 @@ namespace Sentry.data.Core.Tests
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET
             };
             ds.DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } };
-
-            //var ss = new SecurityService(null, null, null);
 
             // Act
             SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
@@ -1199,7 +1197,7 @@ namespace Sentry.data.Core.Tests
         }
 
         /// <summary>
-        /// Tests that an non-owner of an unsecured dataset can download data files without explicit permissions
+        /// Tests that an non-owner of an unsecured dataset can download data files without permission request
         /// </summary>
         [TestMethod]
         public void BuildOutUserSecurityForUnsecuredEntity_CanDownloadDataFile_User()
@@ -1218,7 +1216,7 @@ namespace Sentry.data.Core.Tests
         }
 
         /// <summary>
-        /// Tests that an owner of an unsecured dataset can download data files without explicit permissions
+        /// Tests that an owner of an unsecured dataset can download data files without permission request
         /// </summary>
         [TestMethod]
         public void BuildOutUserSecurityForUnsecuredEntity_CanDownloadDataFile_Owner()

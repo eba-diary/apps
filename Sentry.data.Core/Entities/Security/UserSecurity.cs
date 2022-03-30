@@ -34,5 +34,6 @@ namespace Sentry.data.Core
         // Based on more than one other permission to contain logic within single property
         public bool CanCreateDataFlow { get; set; }
         public bool CanModifyDataflow { get; set; }
+        public bool CanViewData { get; set; }
     }
 }

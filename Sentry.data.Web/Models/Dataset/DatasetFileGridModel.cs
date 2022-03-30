@@ -45,16 +45,16 @@ namespace Sentry.data.Web
             get
             {
                 string href = "";
-                if (CanViewFullDataset)
+                if (HasDataAccess)
                 {
                     href += "<a href = \"#\" onclick=\"data.Dataset.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><i class='glyphicon glyphicon-cloud-download text-primary'></i></a>";
                 }
-                if (CanEditDataset)
+                if (HasDataFileEdit)
                 {
                     href += "<a href = \"#\" onclick=\"data.Dataset.EditDataFileInformation(" + Id + ")\" class=\"table-row-icon\" title=\"Edit File\"><i class='glyphicon glyphicon-edit text-primary'></i></a>";
                 }
 
-                if (CanViewFullDataset && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name)))
+                if (HasFullViewDataset && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name)))
                 {
                     href += "<a href = \"#\" onclick=\"data.Dataset.FileNameModal(" + Id + ")\" title=\"Push to SAS\">" +
                         "<img src=\"../../Images/sas_logo_min.png\" style=\" height: 15px; margin-bottom: 4px; margin-left: 5px;\"/>" +
@@ -73,10 +73,14 @@ namespace Sentry.data.Web
         public int ParentDataSetID { get; set; }
         public Boolean IsBundled { get; set; }
         public string Information { get; set; }
+        public UserSecurity Security { get; set; }
 
 
-        public bool CanPreviewDataset { get; set; }
-        public bool CanViewFullDataset { get; set; }
-        public bool CanEditDataset { get; set; }
+        #region Security
+        public bool HasDataAccess { get; set; }
+        public bool HasDataFileEdit { get; set; }
+        public bool HasFullViewDataset { get; set; }
+        #endregion
+
     }
 }
