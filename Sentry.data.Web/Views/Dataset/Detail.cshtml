@@ -272,7 +272,7 @@
         {
             @Html.Partial("Details/_SchemaColumns", Model)
         }
-        if (Model.Security.CanViewFullDataset)
+        if (Model.HasDataAccess)
         {
             @Html.Partial("Details/_DataPreview", Model)
         }
@@ -294,7 +294,7 @@
                         <a class="nav-link" data-toggle="tab" href="#panelSchemaColumns" id="detailTabSchemaColumns" role="tab">Columns</a>
                     </li>
 
-                    @if (Model.Security.CanViewFullDataset)
+                    @if (Model.HasDataAccess)
                     {
                         <li role="presentation" class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Preview</a>
@@ -326,7 +326,7 @@
                         <div id="tabSchemaColumns"></div>
                     }
                 </div>
-                @if (Model.Security.CanViewFullDataset)
+                @if (Model.HasDataAccess)
                 {
                     <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
                         <div id="tabDataPreview"></div>

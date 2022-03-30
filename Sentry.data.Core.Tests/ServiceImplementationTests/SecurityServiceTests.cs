@@ -51,6 +51,7 @@ namespace Sentry.data.Core.Tests
             user.Stub(x => x.IsInGroup(ticket1.AdGroupName)).Return(false).Repeat.Any();
             user.Stub(x => x.IsInGroup(ticket2.AdGroupName)).Return(false).Repeat.Any();
             user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
+
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
             UserSecurity us = ss.GetUserSecurity(securable, user);
@@ -65,10 +66,11 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(us.CanEditDataset);
             Assert.IsTrue(us.CanEditReport);
             Assert.IsTrue(us.CanManageSchema);
+            Assert.IsTrue(us.CanViewData);
         }
 
         [TestMethod]
-        public void Security_Secured_Sensitive_NotOwner_Admin()
+        public void Security_Secured_NotOwner_Admin_ExplicitPermissions()
         {
             //ARRAGE
             Security security = BuildBaseSecurity();
@@ -85,7 +87,7 @@ namespace Sentry.data.Core.Tests
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
             securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
             securable.Stub(x => x.Security).Return(security).Repeat.Any();
-            securable.Stub(x => x.IsSensitive).Return(true).Repeat.Any();
+            securable.Stub(x => x.AdminDataPermissionsAreExplicit).Return(true).Repeat.Any();
 
             IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
             user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
@@ -98,7 +100,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsTrue(us.CanPreviewDataset);
-            Assert.IsFalse(us.CanViewFullDataset);
+            Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsTrue(us.CanQueryDataset);
             Assert.IsTrue(us.CanUploadToDataset);
             Assert.IsTrue(us.CanCreateDataset);
@@ -106,6 +108,84 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(us.CanEditDataset);
             Assert.IsTrue(us.CanEditReport);
             Assert.IsTrue(us.CanManageSchema);
+            Assert.IsFalse(us.CanViewData);
+        }
+
+        [TestMethod]
+        public void Security_AdminDataPermissionAreExplicit_Prevents_Implicit_Admin_Access()
+        {
+            //Arrange
+            Security security = BuildBaseSecurity();
+
+            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
+            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
+            securable.Stub(x => x.AdminDataPermissionsAreExplicit).Return(true).Repeat.Any();
+            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+
+            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.AssociateId).Return("072984").Repeat.Any();
+            user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(securable, user);
+
+            //ASSERT
+            Assert.IsTrue(us.CanViewFullDataset);
+            Assert.IsFalse(us.CanViewData);
+        }
+
+        [TestMethod]
+        public void Security_AdminDataPermissionAreExplicit_Admin_Access_When_Requested()
+        {
+            //Arrange
+            Security security = BuildBaseSecurity();
+            SecurityTicket ticket1 = BuildBaseTicket(security, "MyAdGroupName1");
+            SecurityPermission viewFullDatasetPermission1 = BuildBasePermission(ticket1, CanViewFullDataset(), true);
+            ticket1.Permissions.Add(viewFullDatasetPermission1);
+            security.Tickets.Add(ticket1);
+
+            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
+            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
+            securable.Stub(x => x.AdminDataPermissionsAreExplicit).Return(true).Repeat.Any();
+            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+
+            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.AssociateId).Return("072984").Repeat.Any();
+            user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
+            user.Stub(x => x.IsInGroup(ticket1.AdGroupName)).Return(true).Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(securable, user);
+
+            //ASSERT
+            Assert.IsTrue(us.CanViewFullDataset);
+            Assert.IsTrue(us.CanViewData);
+        }
+
+        [TestMethod]
+        public void Security_AdminDataPermissionAreExplicit_Allows_Implicit_Admin_Access_When_false()
+        {
+            //Arrange
+            Security security = BuildBaseSecurity();
+
+            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
+            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
+            securable.Stub(x => x.AdminDataPermissionsAreExplicit).Return(false).Repeat.Any();
+            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+
+            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.AssociateId).Return("072984").Repeat.Any();
+            user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(securable, user);
+
+            //ASSERT
+            Assert.IsTrue(us.CanViewFullDataset);
+            Assert.IsTrue(us.CanViewData);
         }
 
         /// <summary>
@@ -135,6 +215,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsFalse(us.CanEditDataset);
             Assert.IsFalse(us.CanEditReport);
             Assert.IsFalse(us.CanManageSchema);
+            Assert.IsTrue(us.CanViewData);
         }
 
         /// <summary>
@@ -161,6 +242,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsFalse(us.CanEditDataset);
             Assert.IsFalse(us.CanEditReport);
             Assert.IsFalse(us.CanManageSchema);
+            Assert.IsTrue(us.CanViewData);
         }
 
         /// <summary>
@@ -859,8 +941,8 @@ namespace Sentry.data.Core.Tests
         }
 
         /// <summary>
-        /// Tests that DSC Admins do not have access to view the full dataset
-        /// of highly sensitive datasets, without explicitely granted permissions
+        /// Tests that DSC Admins have access to view the full dataset
+        /// of datasets within HR category
         /// </summary>
         [TestMethod]
         public void BuildOutUserSecurityForSecuredEntity_ViewFullDataset_Admin()
@@ -870,13 +952,16 @@ namespace Sentry.data.Core.Tests
             var IsOwner = false;
             var userPermissions = (new[] { PermissionCodes.CAN_PREVIEW_DATASET }).ToList();
             var us = new UserSecurity();
-            var ds = new Dataset() { DataClassification = DataClassificationType.HighlySensitive };
+            var ds = new Dataset() {
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } }
+            };
 
             // Act
             SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
 
             // Assert
-            Assert.IsFalse(us.CanViewFullDataset);
+            Assert.IsTrue(us.CanViewFullDataset);
         }
 
         /// <summary>
@@ -898,6 +983,159 @@ namespace Sentry.data.Core.Tests
             // Assert
             Assert.IsTrue(us.CanModifyNotifications);
         }
+
+        /// <summary>
+        /// Tests that Admin can preview dataset, in hr category, with out permission request (implicit)
+        /// </summary>
+        [TestMethod]
+        public void BuildOutUserSecurityForSecuredEntity_CanPreviewData_Is_True_For_Admin_When_IsHrData()
+        {
+            //Arrange
+            var IsAdmin = true;
+            var IsOwner = false;
+            var userPermissions = new List<string>();
+            var us = new UserSecurity();
+            var ds = new Dataset() 
+            { 
+                DataClassification = DataClassificationType.HighlySensitive,
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET
+            };
+            ds.DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } };
+
+            // Act
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+
+            // Assert
+            Assert.IsTrue(us.CanPreviewDataset);
+        }
+
+        /// <summary>
+        /// Admin does not have permission to view data for dataset within Human Resource category,
+        /// without permission request
+        /// </summary>
+        [TestMethod]
+        public void BuildOutUserSecurityForSecuredEntity_CanViewData_False_For_Admin_When_IsHr()
+        {
+            //Arrange
+            var IsAdmin = true;
+            var IsOwner = false;
+            var userPermissions = new List<string>();
+            var us = new UserSecurity();
+            var ds = new Dataset()
+            {
+                DataClassification = DataClassificationType.HighlySensitive,
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET
+            };
+            ds.DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } };
+
+            // Act
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+
+            // Assert
+            Assert.IsFalse(us.CanViewData);
+        }
+
+        /// <summary>
+        /// Admin does not have permission to view data for dataset within Human Resource category,
+        /// without permission request
+        /// </summary>
+        [TestMethod]
+        public void BuildOutUserSecurityForSecuredEntity_CanViewData_True_For_Admin_When_IsHrData_Is_False()
+        {
+            //Arrange
+            var IsAdmin = true;
+            var IsOwner = false;
+            var userPermissions = new List<string>();
+            var us = new UserSecurity();
+            var ds = new Dataset()
+            {
+                DataClassification = DataClassificationType.HighlySensitive,
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET
+            };
+            ds.DatasetCategories = new List<Category>() { new Category() { Name = "Claim" } };
+
+            // Act
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+
+            // Assert
+            Assert.IsTrue(us.CanViewData);
+        }
+
+        /// <summary>
+        /// Owner has permission to view data for dataset within Human Resource category
+        /// </summary>
+        [TestMethod]
+        public void BuildOutUserSecurityForSecuredEntity_CanViewData_Is_True_For_Owner_When_IsHrData_Is_True()
+        {
+            //Arrange
+            var IsAdmin = false;
+            var IsOwner = true;
+            var userPermissions = new List<string>();
+            var us = new UserSecurity();
+            var ds = new Dataset()
+            {
+                DataClassification = DataClassificationType.HighlySensitive,
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET
+            };
+            ds.DatasetCategories = new List<Category>() { new Category() { Name = "Claim" } };
+
+            // Act
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+
+            // Assert
+            Assert.IsTrue(us.CanViewData);
+        }
+
+        /// <summary>
+        /// User does not have view data for dataset within Human Resources category without permission request
+        /// </summary>
+        [TestMethod]
+        public void BuildOutUserSecurityForSecuredEntity_CanViewData_False_For_User_When_IsHrData_Is_True()
+        {
+            //Arrange
+            var IsAdmin = false;
+            var IsOwner = false;
+            var userPermissions = new List<string>();
+            var us = new UserSecurity();
+            var ds = new Dataset()
+            {
+                DataClassification = DataClassificationType.HighlySensitive,
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET
+            };
+            ds.DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } };
+
+            // Act
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+
+            // Assert
+            Assert.IsFalse(us.CanViewData);
+        }
+
+        /// <summary>
+        /// User can view data for dataset within Human Resources category with approved permission request
+        /// </summary>
+        [TestMethod]
+        public void BuildOutUserSecurityForSecuredEntity_CanViewData_True_For_User_When_IsHrData_Is_True()
+        {
+            //Arrange
+            var IsAdmin = false;
+            var IsOwner = false;
+            var userPermissions = (new[] { PermissionCodes.CAN_VIEW_FULL_DATASET }).ToList();
+            var us = new UserSecurity();
+            var ds = new Dataset()
+            {
+                DataClassification = DataClassificationType.HighlySensitive,
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET
+            };
+            ds.DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } };
+
+            // Act
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+
+            // Assert
+            Assert.IsTrue(us.CanViewData);
+        }
+
         #endregion
 
         #region "BuildOutUserSecurityForUnsecuredEntity"
@@ -956,6 +1194,44 @@ namespace Sentry.data.Core.Tests
 
             // Assert
             Assert.IsTrue(us.CanManageSchema);
+        }
+
+        /// <summary>
+        /// Tests that an non-owner of an unsecured dataset can download data files without permission request
+        /// </summary>
+        [TestMethod]
+        public void BuildOutUserSecurityForUnsecuredEntity_CanDownloadDataFile_User()
+        {
+            // Arrange
+            var IsAdmin = false;
+            var IsOwner = false;
+            var userPermissions = new List<string>();
+            var us = new UserSecurity();
+
+            // Act
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null);
+
+            // Assert
+            Assert.IsTrue(us.CanViewData);
+        }
+
+        /// <summary>
+        /// Tests that an owner of an unsecured dataset can download data files without permission request
+        /// </summary>
+        [TestMethod]
+        public void BuildOutUserSecurityForUnsecuredEntity_CanDownloadDataFile_Owner()
+        {
+            // Arrange
+            var IsAdmin = false;
+            var IsOwner = true;
+            var userPermissions = new List<string>();
+            var us = new UserSecurity();
+
+            // Act
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null);
+
+            // Assert
+            Assert.IsTrue(us.CanViewData);
         }
         #endregion
 
