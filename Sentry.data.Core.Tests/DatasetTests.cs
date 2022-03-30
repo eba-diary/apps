@@ -69,6 +69,42 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.datasetDateRequired));
         }
 
+        [TestCategory("DatasetTests")]
+        [TestMethod]
+        public void Report_Type_Returns_IsHrData_False()
+        {
+            //Arrange
+            var vr = GetMockDatasetData();
+            vr.DatasetType = GlobalConstants.DataEntityCodes.REPORT;
+
+            //Assert
+            Assert.IsFalse(vr.AdminDataPermissionsAreExplicit);
+        }
+
+        [TestCategory("DatasetTests")]
+        [TestMethod]
+        public void Dataset_Type_Returns_IsHrData_False_When_Not_HR_Category()
+        {
+            //Arrange
+            var vr = GetMockDatasetData();
+            vr.DatasetType = GlobalConstants.DataEntityCodes.DATASET;
+
+            //Assert
+            Assert.IsFalse(vr.AdminDataPermissionsAreExplicit);
+        }
+
+        [TestCategory("DatasetTests")]
+        [TestMethod]
+        public void Dataset_Type_Returns_IsHrData_True_When_HR_Category()
+        {
+            //Arrange
+            var vr = GetMockDatasetData();
+            vr.DatasetType = GlobalConstants.DataEntityCodes.DATASET;
+            vr.DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } };
+
+            //Assert
+            Assert.IsTrue(vr.AdminDataPermissionsAreExplicit);
+        }
 
         public Dataset GetMockDatasetData()
         {

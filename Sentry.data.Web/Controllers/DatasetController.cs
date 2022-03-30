@@ -593,9 +593,9 @@ namespace Sentry.data.Web.Controllers
             {
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider, _featureFlags)
                 {
-                    CanViewFullDataset = us.CanViewFullDataset,
-                    CanEditDataset = us.CanEditDataset,
-                    CanPreviewDataset = us.CanPreviewDataset
+                    HasDataAccess = us.CanViewData,
+                    HasDataFileEdit = us.CanEditDataset,
+                    HasFullViewDataset = us.CanViewFullDataset
                 };
                 files.Add(dfgm);
             }
@@ -618,9 +618,9 @@ namespace Sentry.data.Web.Controllers
             {
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider, _featureFlags)
                 {
-                    CanViewFullDataset = us.CanViewFullDataset,
-                    CanEditDataset = us.CanEditDataset,
-                    CanPreviewDataset = us.CanPreviewDataset
+                    HasDataAccess = us.CanViewData,
+                    HasDataFileEdit = us.CanEditDataset,
+                    HasFullViewDataset = us.CanViewFullDataset
                 };
                 files.Add(dfgm);
             }
@@ -646,9 +646,9 @@ namespace Sentry.data.Web.Controllers
             {
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion, _associateInfoProvider, _featureFlags)
                 {
-                    CanViewFullDataset = us.CanViewFullDataset,
-                    CanEditDataset = us.CanEditDataset,
-                    CanPreviewDataset = us.CanPreviewDataset
+                    HasDataAccess = us.CanViewData,
+                    HasDataFileEdit = us.CanEditDataset,
+                    HasFullViewDataset = us.CanViewFullDataset
                 };
                 files.Add(dfgm);
             }
@@ -657,15 +657,15 @@ namespace Sentry.data.Web.Controllers
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult GetAllDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
-        {
-            IEnumerable<DatasetFileGridModel> files = _datasetContext.DatasetFile.Where(x => x.ParentDatasetFileId == null).Fetch(x => x.DatasetFileConfig).
-                Select((f) => new DatasetFileGridModel(f, _associateInfoProvider, _featureFlags));
+        //public JsonResult GetAllDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        //{
+        //    IEnumerable<DatasetFileGridModel> files = _datasetContext.DatasetFile.Where(x => x.ParentDatasetFileId == null).Fetch(x => x.DatasetFileConfig).
+        //        Select((f) => new DatasetFileGridModel(f, _associateInfoProvider, _featureFlags));
 
-            DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
-            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+        //    DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
+        //    return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
 
-        }
+        //}
 
         [HttpGet]
         public JsonResult GetDatasetFileConfigInfo(int Id)
