@@ -750,7 +750,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
             
-            if (!us.CanPreviewDataset)
+            if (!us.CanViewData)
             {
                 return Content(System.Net.HttpStatusCode.Unauthorized, "Unauthroized Access to Dataset");
             }
