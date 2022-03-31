@@ -112,7 +112,7 @@ namespace Sentry.data.Infrastructure
                     evt.Reason += $" in {ds.DatasetCategories.First().Name}";
                 }
             }
-            else if(evt.EventType_Desc == GlobalConstants.EventType.CREATED_FILE)
+            else if(evt.EventType.Description == GlobalConstants.EventType.CREATED_FILE)
             {
                 if(schema != null)
                 {
