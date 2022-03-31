@@ -84,7 +84,7 @@ namespace Sentry.data.Core
                 {
                     DatasetId = s.Key.Dataset.DatasetId,
                     FileCount = s.Count(),
-                    Max_Created_DTM = s.Max(m => m.CreateDTM)
+                    Max_Created_DTM = s.Max(m => m.CreatedDTM)
                 }).ToList();
 
                 //pull summarized metadata from events table

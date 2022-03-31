@@ -24,7 +24,7 @@ namespace Sentry.data.Web
             this.UploadUserName = int.TryParse(f.UploadUserName, out _) ? associateInfoService.GetAssociateInfo(f.UploadUserName).FullName : f.UploadUserName;
 
             this.ModifiedDtm = (dataFeatures.CLA3048_StandardizeOnUTCTime.GetValue()) ? DateTime.SpecifyKind(f.ModifiedDTM, DateTimeKind.Utc) : f.ModifiedDTM;
-            this.CreateDtm = DateTime.SpecifyKind(f.CreateDTM, DateTimeKind.Utc);
+            this.CreateDtm = DateTime.SpecifyKind(f.CreatedDTM, DateTimeKind.Utc);
             this.S3Key = f.FileLocation;
             this.ConfigFileName = f.DatasetFileConfig.Name;
             this.ConfigFileDesc = f.DatasetFileConfig.Description;
@@ -45,16 +45,16 @@ namespace Sentry.data.Web
             get
             {
                 string href = "";
-                if (CanViewFullDataset)
+                if (HasDataAccess)
                 {
                     href += "<a href = \"#\" onclick=\"data.Dataset.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><em class='icon-download text-primary'></em></a>";
                 }
-                if (CanEditDataset)
+                if (HasDataFileEdit)
                 {
                     href += "<a href = \"#\" onclick=\"data.Dataset.EditDataFileInformation(" + Id + ")\" class=\"table-row-icon\" title=\"Edit File\"><em class='icon-pencil text-primary'></em></a>";
                 }
 
-                if (CanViewFullDataset && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name)))
+                if (HasFullViewDataset && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name)))
                 {
                     href += "<a href = \"#\" onclick=\"data.Dataset.FileNameModal(" + Id + ")\" title=\"Push to SAS\">" +
                         "<img src=\"../../Images/sas_logo_min.png\" style=\" height: 15px; margin-bottom: 4px; margin-left: 5px;\"/>" +
@@ -73,10 +73,14 @@ namespace Sentry.data.Web
         public int ParentDataSetID { get; set; }
         public Boolean IsBundled { get; set; }
         public string Information { get; set; }
+        public UserSecurity Security { get; set; }
 
 
-        public bool CanPreviewDataset { get; set; }
-        public bool CanViewFullDataset { get; set; }
-        public bool CanEditDataset { get; set; }
+        #region Security
+        public bool HasDataAccess { get; set; }
+        public bool HasDataFileEdit { get; set; }
+        public bool HasFullViewDataset { get; set; }
+        #endregion
+
     }
 }

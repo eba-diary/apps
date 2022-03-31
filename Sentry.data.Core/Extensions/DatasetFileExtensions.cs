@@ -44,7 +44,7 @@ namespace Sentry.data.Core
                 Schema = file.Schema.SchemaId,
                 DatasetFileConfig = (file.DatasetFileConfig != null) ? file.DatasetFileConfig.ConfigId : 0,
                 UploadUserName = file.UploadUserName,
-                CreateDTM = file.CreateDTM,
+                CreateDTM = file.CreatedDTM,
                 ModifiedDTM = file.ModifiedDTM,
                 FileLocation = file.FileLocation,
                 ParentDatasetFileId = file.ParentDatasetFileId,
@@ -53,7 +53,10 @@ namespace Sentry.data.Core
                 Size = file.Size,
                 FlowExecutionGuid = file.FlowExecutionGuid,
                 RunInstanceGuid = file.RunInstanceGuid,
-                FileExtension = file.FileExtension
+                FileExtension = file.FileExtension,
+                FileKey = file.FileKey,
+                FileBucket = file.FileBucket,
+                ETag = file.ETag
             };
 
             return dto;

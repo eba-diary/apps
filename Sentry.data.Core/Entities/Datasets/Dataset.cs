@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Sentry.Core;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Sentry.data.Core.GlobalEnums;
 
@@ -79,19 +78,26 @@ namespace Sentry.data.Core
         public virtual NamedEnvironmentType NamedEnvironmentType { get; set; }
         public virtual Asset Asset { get; set; }
 
+         #region Security
 
-        //ISecurable Impl.
         public virtual string PrimaryContactId { get; set; }
         public virtual bool IsSecured { get; set; }
         public virtual Security Security { get; set; }
-        public virtual bool IsSensitive
+
+        /// <summary>
+        /// AdminDataPermissionsAreExplicit is true for Datasets within 
+        /// Human Resource category
+        /// </summary>
+        public virtual bool AdminDataPermissionsAreExplicit
         {
             get
             {
-                return DataClassification == DataClassificationType.HighlySensitive;
+                return DatasetType == GlobalConstants.DataEntityCodes.DATASET && DatasetCategories.Any(z => z.Name == "Human Resources");
             }
         }
         public virtual ISecurable Parent { get => Asset; }
+
+        #endregion
 
         //Delete Implementation
         public virtual ObjectStatusEnum ObjectStatus { get; set; }

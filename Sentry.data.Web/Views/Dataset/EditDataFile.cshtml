@@ -11,14 +11,14 @@
         @*Show the custom validation summary*@
         @Html.DisplayFor((model) => ViewData.ModelState)
 
-        @Html.HiddenFor(model => model.s3Key)
+        @Html.HiddenFor(model => model.S3Key)
         @Html.HiddenFor(model => model.Name)
         @Html.HiddenFor(model => model.UploadUserName)
 
         <div class="form-group">
-            @Html.LabelFor(model => model.s3Key, htmlAttributes: new { @class = "control-label col-sm-3" })
+            @Html.LabelFor(model => model.S3Key, htmlAttributes: new { @class = "control-label col-sm-3" })
             <div class="col-sm-9">
-                @Html.TextAreaFor(model => model.s3Key, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row", @style="width: 100%" })
+                @Html.TextAreaFor(model => model.S3Key, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row", @style="width: 100%" })
                 @*@Html.ValidationMessageFor(model => model.S3Key, "", new { @class = "text-danger" })*@
             </div>
         </div>
@@ -56,18 +56,18 @@
         </div>*@
 
         <div class="form-group">
-            @Html.LabelFor(model => model.CreateDTM, htmlAttributes: new { @class = "control-label col-sm-3" })
+            @Html.LabelFor(model => model.CreateDtm, htmlAttributes: new { @class = "control-label col-sm-3" })
             <div class="col-sm-9">
-                <p class="form-control-static">@Html.DisplayFor((model) => model.CreateDTM)</p>
+                <p class="form-control-static">@Html.DisplayFor((model) => model.CreateDtm)</p>
                 @*@Html.TextBoxFor(model => model.ChangedDtm, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
                 @*@Html.ValidationMessageFor(model => model.ChangedDtm, "", new { @class = "text-danger" })*@
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.ModifiedDTM, htmlAttributes: new { @class = "control-label col-sm-3" })
+            @Html.LabelFor(model => model.ModifiedDtm, htmlAttributes: new { @class = "control-label col-sm-3" })
             <div class="col-sm-9">
-                <p class="form-control-static">@Html.DisplayFor((model) => model.ModifiedDTM)</p>
+                <p class="form-control-static">@Html.DisplayFor((model) => model.ModifiedDtm)</p>
                 @*@Html.EditorFor(model => model.ModifiedDTM, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
             @Html.ValidationMessageFor(model => model.ModifiedDTM, "", new { @class = "text-danger" })*@
             </div>

@@ -18,10 +18,7 @@ namespace Sentry.data.Web
             DistinctFileExtensions = dto.DistinctFileExtensions;
             DataClassificationDescription = dto.DataClassificationDescription;
             GroupAccessCount = dto.GroupAccessCount;
-            //foreach (var item in dto.DataFlows)
-            //{
-            //    DataFlows.Add(new Tuple<string, List<AssociatedDataFlowModel>>(item.Item1, item.Item2.ToModel()));
-            //}
+            HasDataAccess = dto.Security.CanViewData;
         }
 
         public DatasetDetailModel() { }
@@ -39,5 +36,6 @@ namespace Sentry.data.Web
         public bool DisplayTabSections { get; set; }
         public bool DisplaySchemaSearch { get; set; }
         public bool DisplayDataflowEdit { get; set; }
+        public bool HasDataAccess { get; set; }
     }
 }

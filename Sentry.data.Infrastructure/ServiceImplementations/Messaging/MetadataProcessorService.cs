@@ -29,7 +29,8 @@ namespace Sentry.data.Infrastructure
             IList<IMessageHandler<string>> handlers = new List<IMessageHandler<string>>
             {
                 new HiveMetadataService(),
-                new SnowflakeEventService()
+                new SnowflakeEventService(),
+                new SparkConverterEventService()
             };
 
             return handlers;

@@ -1,10 +1,10 @@
 ﻿using Hangfire;
 using Sentry.Common.Logging;
 using Sentry.Core;
-using Sentry.Configuration;
 using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities;
+using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using Sentry.data.Infrastructure;
@@ -23,10 +23,6 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.SessionState;
-using Sentry.data.Core.Interfaces;
-using Sentry.data.Core.Entities;
-using Sentry.data.Core.GlobalEnums;
-using Sentry.data.Core.Entities.Schema.Elastic;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -597,9 +593,9 @@ namespace Sentry.data.Web.Controllers
             {
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider, _featureFlags)
                 {
-                    CanViewFullDataset = us.CanViewFullDataset,
-                    CanEditDataset = us.CanEditDataset,
-                    CanPreviewDataset = us.CanPreviewDataset
+                    HasDataAccess = us.CanViewData,
+                    HasDataFileEdit = us.CanEditDataset,
+                    HasFullViewDataset = us.CanViewFullDataset
                 };
                 files.Add(dfgm);
             }
@@ -622,9 +618,9 @@ namespace Sentry.data.Web.Controllers
             {
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider, _featureFlags)
                 {
-                    CanViewFullDataset = us.CanViewFullDataset,
-                    CanEditDataset = us.CanEditDataset,
-                    CanPreviewDataset = us.CanPreviewDataset
+                    HasDataAccess = us.CanViewData,
+                    HasDataFileEdit = us.CanEditDataset,
+                    HasFullViewDataset = us.CanViewFullDataset
                 };
                 files.Add(dfgm);
             }
@@ -650,9 +646,9 @@ namespace Sentry.data.Web.Controllers
             {
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion, _associateInfoProvider, _featureFlags)
                 {
-                    CanViewFullDataset = us.CanViewFullDataset,
-                    CanEditDataset = us.CanEditDataset,
-                    CanPreviewDataset = us.CanPreviewDataset
+                    HasDataAccess = us.CanViewData,
+                    HasDataFileEdit = us.CanEditDataset,
+                    HasFullViewDataset = us.CanViewFullDataset
                 };
                 files.Add(dfgm);
             }
@@ -661,15 +657,15 @@ namespace Sentry.data.Web.Controllers
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult GetAllDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
-        {
-            IEnumerable<DatasetFileGridModel> files = _datasetContext.DatasetFile.Where(x => x.ParentDatasetFileId == null).Fetch(x => x.DatasetFileConfig).
-                Select((f) => new DatasetFileGridModel(f, _associateInfoProvider, _featureFlags));
+        //public JsonResult GetAllDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        //{
+        //    IEnumerable<DatasetFileGridModel> files = _datasetContext.DatasetFile.Where(x => x.ParentDatasetFileId == null).Fetch(x => x.DatasetFileConfig).
+        //        Select((f) => new DatasetFileGridModel(f, _associateInfoProvider, _featureFlags));
 
-            DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
-            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+        //    DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
+        //    return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
 
-        }
+        //}
 
         [HttpGet]
         public JsonResult GetDatasetFileConfigInfo(int Id)
@@ -735,10 +731,11 @@ namespace Sentry.data.Web.Controllers
             try
             {
                 //Testing if object exists in S3, response is not used.
-                _s3Service.GetObjectMetadata(null, df.FileLocation, null);
+                string objectKey = (df.FileKey) ?? df.FileLocation;
+                _s3Service.GetObjectMetadata(df.FileBucket, objectKey, null);
 
                 JsonResult jr = new JsonResult();
-                jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation);
+                jr.Data = _s3Service.GetDatasetDownloadUrl(objectKey, df.FileBucket);
                 jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
 
                 e.Reason = "Successfully Downloaded Data File";

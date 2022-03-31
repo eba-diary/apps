@@ -315,7 +315,7 @@ namespace Sentry.data.Common
                         builder.Append($"File_NME: {df_newParent.FileName}");
                         builder.Append($"Dataset_ID: {df_newParent.Dataset.DatasetId}");
                         builder.Append($"UploadUser_NME: {df_newParent.UploadUserName}");
-                        builder.Append($"Create_DTM: {df_newParent.CreateDTM}");
+                        builder.Append($"Create_DTM: {df_newParent.CreatedDTM}");
                         builder.Append($"Modified_DTM: {df_newParent.ModifiedDTM}");
                         builder.Append($"FileLocation: {df_newParent.FileLocation}");
                         builder.Append($"Config_ID: {df_newParent.DatasetFileConfig.ConfigId}");
@@ -493,7 +493,7 @@ namespace Sentry.data.Common
                                 builder.Append($"File_NME: {df_newParent.FileName}");
                                 builder.Append($"Dataset_ID: {df_newParent.Dataset.DatasetId}");
                                 builder.Append($"UploadUser_NME: {df_newParent.UploadUserName}");
-                                builder.Append($"Create_DTM: {df_newParent.CreateDTM}");
+                                builder.Append($"Create_DTM: {df_newParent.CreatedDTM}");
                                 builder.Append($"Modified_DTM: {df_newParent.ModifiedDTM}");
                                 builder.Append($"FileLocation: {df_newParent.FileLocation}");
                                 builder.Append($"Config_ID: {df_newParent.DatasetFileConfig.ConfigId}");
@@ -619,7 +619,7 @@ namespace Sentry.data.Common
                                 builder.Append($"File_NME: {df_newParent.FileName}");
                                 builder.Append($"Dataset_ID: {df_newParent.Dataset.DatasetId}");
                                 builder.Append($"UploadUser_NME: {df_newParent.UploadUserName}");
-                                builder.Append($"Create_DTM: {df_newParent.CreateDTM}");
+                                builder.Append($"Create_DTM: {df_newParent.CreatedDTM}");
                                 builder.Append($"Modified_DTM: {df_newParent.ModifiedDTM}");
                                 builder.Append($"FileLocation: {df_newParent.FileLocation}");
                                 builder.Append($"Config_ID: {df_newParent.DatasetFileConfig.ConfigId}");
@@ -826,7 +826,7 @@ namespace Sentry.data.Common
                UploadUserName = fileOwner,
                DatasetFileConfig = dfc,
                FileLocation = fileLocation,
-               CreateDTM = processingTime,
+               CreatedDTM = processingTime,
                ModifiedDTM = processingTime,
                ParentDatasetFileId = null,
                VersionId = null,
