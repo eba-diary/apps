@@ -34,11 +34,11 @@ else
         @Html.DropDownListFor(model => model.ObjectId, Model.AllDataAssets, new { @class = "mdb-select" })
     </div>
     <div class="md-form">
-        @Html.TextBoxFor(m => m.StartTime, new { @class = "form-control", @type = "datetime-local" })
+        <input class="form-control" data-val="true" data-val-date="The field Start Time must be a date." data-val-required="The Start Time field is required." id="StartTime" name="StartTime" type="datetime-local" value='@Model.StartTime.ToString("s")'>
         @Html.LabelFor(m => m.StartTime, htmlAttributes: new { @class = "active" })
     </div>
     <div class="md-form">
-        @Html.TextBoxFor(m => m.ExpirationTime, new { @class = "form-control", @type = "datetime-local" })
+        <input class="form-control" data-val="true" data-val-date="The field Expiration Time must be a date." data-val-required="The Expiration Time field is required." id="ExpirationTime" name="ExpirationTime" type="datetime-local" value='@Model.ExpirationTime.ToString("s")'>
         @Html.LabelFor(m => m.ExpirationTime, htmlAttributes: new { @class = "active" })
     </div>
 
