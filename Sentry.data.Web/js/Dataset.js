@@ -186,7 +186,8 @@ data.Dataset = {
     delroyTableCreate: function () {
 
         //init DataTable,
-        $("#delroyTable").DataTable({
+        var delroyTable = $("#delroyTable").DataTable({
+            orderCellsTop: true,
 
             //client side setup
             pageLength: 100,
@@ -217,9 +218,9 @@ data.Dataset = {
                 { data: "Description", className: "Description" },
                 { data: "FieldType", className: "FieldType" },
                 { data: "IsArray", className: "IsArray" },
-                { data: "Length", className: "Length", visible: false, render: function (d, type, row, meta)        { return data.Dataset.delroyFillGridLength(d,row); } },
-                { data: "Precision", className: "Precision", visible: false, render: function (d, type, row, meta)  { return data.Dataset.delroyFillGridPrecisionScale(d,row); } },
-                { data: "Scale", className: "Scale", visible: false, render: function (d, type, row, meta)          { return data.Dataset.delroyFillGridPrecisionScale(d,row); } }
+                { data: "Length", className: "Length", visible: false, render: function (d, type, row, meta) { return data.Dataset.delroyFillGridLength(d, row); } },
+                { data: "Precision", className: "Precision", visible: false, render: function (d, type, row, meta) { return data.Dataset.delroyFillGridPrecisionScale(d, row); } },
+                { data: "Scale", className: "Scale", visible: false, render: function (d, type, row, meta) { return data.Dataset.delroyFillGridPrecisionScale(d, row); } }
             ],
 
             aLengthMenu: [
@@ -264,24 +265,21 @@ data.Dataset = {
                 ]
             }
         });
-
-        /* TODO: Replace with YADCF
-        //add a filter in each column
-        $("#delroyTable").dataTable().columnFilter({
-            sPlaceHolder: "head:after",
-            aoColumns: [
-                { type: "text" },
-                { type: "text" },
-                { type: "text" },
-
-                { type: "text" },
-                { type: "text" },
-                { type: "text" },
-                { type: "text" }
-            ]
-        });
-        */
-
+        if ($("#delroyTable_length").length > 0) {
+            yadcf.init(delroyTable, [
+                { column_number: 0, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 1, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 2, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 3, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 4, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 5, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 6, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+            ],
+                {
+                    filters_tr_index: 1
+                }
+            );
+        }
     },
 
 
@@ -333,7 +331,8 @@ data.Dataset = {
 
         var index = data.Dataset.delroyFieldArray.length - 1;
         var field = data.Dataset.delroyFieldArray[index];
-
+        console.log(data.Dataset.delroyFieldArray);
+        console.trace();
         //NOTE: this is a strange concept:  but a field is either a ROOT level one (index 0) or a CHILD level (index > 0)
         //All levels > (index 0) you need too specify the Fields array which is a child property whereas the root level(index 0) the array is at that level
         //also check if field is NULL, because in that case return a null field else returning field.Fields will cause an error
@@ -352,7 +351,9 @@ data.Dataset = {
         var field = data.Dataset.delroyGetLatestField();
 
         table.clear();
-        table.rows.add(field);       //when clicking on an item, we need to specify Fields property since all chidren of ROOT use this
+        if (field) {
+            table.rows.add(field);       //when clicking on an item, we need to specify Fields property since all chidren of ROOT use this
+        }
         table.draw();
 
         //dont do anything first time since firstTime is on whole page refresh and we don't want to mess with scroll position
@@ -421,8 +422,8 @@ data.Dataset = {
 
 
     //LENGTH COLUMN LOGIC:  ONLY RETURN DATA IF VALID
-        //Reason we do this is so for Length Column in Grid, zero won't show up because if its zero, we don't want to see it
-    delroyFillGridLength: function (d,row) {
+    //Reason we do this is so for Length Column in Grid, zero won't show up because if its zero, we don't want to see it
+    delroyFillGridLength: function (d, row) {
         if (d) {
             return d;
         }
@@ -432,7 +433,7 @@ data.Dataset = {
     },
 
     //PRECISION AND SCALE LOGIC:  ONLY RETURN DATA IF VALID AND DECIMAL
-        //Reason we do this is so for Prec/Scale is so they only show up for DECIMAL datatypes since thats only datatype to have prec/scale
+    //Reason we do this is so for Prec/Scale is so they only show up for DECIMAL datatypes since thats only datatype to have prec/scale
     delroyFillGridPrecisionScale: function (d, row) {
         if (d != null && row.FieldType == 'DECIMAL') {
             return d;
@@ -1281,7 +1282,7 @@ data.Dataset = {
         //on initial load, try pulling the Id from the URL first.
 
         $('#dataLastUpdatedSpinner').show();
-        data.Dataset.UpdateMetadata();
+        //data.Dataset.UpdateMetadata();
         var url = new URL(window.location.href);
 
         Id = url.searchParams.get('configID')
@@ -1709,6 +1710,7 @@ data.Dataset = {
     DatasetFileTableInit: function (Id) {
 
         data.Dataset.DatasetFilesTable = $("#datasetFilesTable").DataTable({
+            orderCellsTop: true,
             width: "100%",
             serverSide: true,
             //responsive: true,
@@ -1744,20 +1746,21 @@ data.Dataset = {
             stateSave: true,
             "createdRow": function (row, data, dataIndex) { }
         });
-        /* TODO REPLACE WITH YADCF
-        $("#datasetFilesTable").dataTable().columnFilter({
-            sPlaceHolder: "head:after",
-            aoColumns: [
-                null,
-                null,
-                { type: "text" },
-                { type: "text" },
-                { type: "date-range" },
-                { type: "date-range" },
-                { type: "text" }
-            ]
-        });
-        */
+        if ($("#datasetFilesTable_filter").length > 0) {
+            yadcf.init($("#datasetFilesTable").dataTable(), [
+                { column_number: 0, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 1, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 2, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 3, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 4, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 5, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 6, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+            ],
+                {
+                    filters_tr_index: 1
+                }
+            );
+        }
 
         $(".dataTables_filter").parent().addClass("text-right");
         $(".dataTables_filter").parent().css("right", "3px");
@@ -1941,21 +1944,21 @@ data.Dataset = {
 
         var values = [true, false];
 
-                /* TODO REPLACE WITH YADCF
+        /* TODO REPLACE WITH YADCF
 
-        $("#bundledDatasetFilesTable").dataTable().columnFilter({
-            sPlaceHolder: "head:after",
-            aoColumns: [
-                null,
-                null,
-                { type: "text" },
-                { type: "text" },
-                { type: "date-range" },
-                { type: "date-range" },
-                { type: "text" }
-            ]
-        });
-        */
+$("#bundledDatasetFilesTable").dataTable().columnFilter({
+    sPlaceHolder: "head:after",
+    aoColumns: [
+        null,
+        null,
+        { type: "text" },
+        { type: "text" },
+        { type: "date-range" },
+        { type: "date-range" },
+        { type: "text" }
+    ]
+});
+*/
 
         $('#bundledDatasetFilesTable').on('draw.dt', function () {
             if ($("#bundledDatasetFilesTable").DataTable().page.info().recordsTotal !== 0) {
@@ -2094,22 +2097,6 @@ data.Dataset = {
             order: [6, 'desc'],
             "createdRow": function (row, data, dataIndex) { }
         });
-
-                /* TODO REPLACE WITH YADCF
-
-        $("#datasetFilesVersionsTable").dataTable().columnFilter({
-            sPlaceHolder: "head:after",
-            aoColumns: [
-                null,
-                null,
-                null,
-                { type: "text" },
-                { type: "text" },
-                { type: "text" },
-                { type: "text" }
-            ]
-        });
-        */
 
         // DataTable
         var table = $('#datasetFilesVersionsTable').DataTable();
@@ -2256,7 +2243,7 @@ data.Dataset = {
 
     InitSchemaSearchTab() {
         var datasetId = $('#RequestAccessButton').attr("data-id");
-        
+
         $("#schemaSearchTable").DataTable({
             "ajax": {
                 "url": "/Dataset/Detail/" + datasetId + "/SchemaSearch/" + self.vm.SchemaId + "/",
