@@ -8,12 +8,12 @@
 }
 <a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><em class="icon-chevron-left"></em>  Back to Dataset Information</a>
 
-<div class="topBanner" style="height: 90px;
+<div class="topBanner" style="height: 60px;
     border-bottom: 1px #DDDDDD solid;">
     <div class="relative hidden-sm hidden-xs">
         <div>
             <div class="no-overflow">
-                <h1 class="detailName leftFloat @color pt-3">
+                <h1 class="detailName leftFloat @color pt-0">
                     @Model.DatasetName
                 </h1>
             </div>
@@ -254,7 +254,7 @@
                         {
                             <div class="retJob">
                                 <div class="jobHeader categoryBanner-@color">
-                                    <h6>@ext.Name</h6>
+                                    <h6 class="pt-2">@ext.Name</h6>
                                     <em class="retJobDetails tracker-menu-icon icon-chevron-up"></em>
                                     @if (Model.DisplayDataflowEdit)
                                     {
@@ -282,7 +282,7 @@
                                     {
                                         <div class="retJob @stepModel.ActionName">
                                             <div class="jobHeader categoryBanner-@color">
-                                                <h6>@stepModel.ActionName</h6>
+                                                <h6 class="pt-1">@stepModel.ActionName</h6>
                                                 <em class="retJobDetails tracker-menu-icon icon-chevron-up"></em>
                                             </div>
                                             <div class="jobContainer" style="display:none;">
@@ -316,7 +316,7 @@
                             {
                                 <div class="retJob">
                                     <div class="jobHeader categoryBanner-gray">
-                                        <h6>Schema DataFlow (@item.DataFlowJobs.Name)</h6>
+                                        <h6 class="pt-1">Schema DataFlow (@item.DataFlowJobs.Name)</h6>
                                         <em class="retJobDetails tracker-menu-icon icon-chevron-up"></em>
                                     </div>
                                     <div class="jobContainer" style="display:none;">
@@ -340,7 +340,7 @@
                                         {
                                             <div class="retJob @stepModel.ActionName">
                                                 <div class="jobHeader categoryBanner-@color">
-                                                    <h6>@stepModel.ActionName</h6>
+                                                    <h6 class="pt-1">@stepModel.ActionName</h6>
                                                     <em class="retJobDetails tracker-menu-icon icon-chevron-up"></em>
                                                 </div>
                                                 <div class="jobContainer" style="display:none;">

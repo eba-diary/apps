@@ -12,8 +12,8 @@
         }
         else
         {
-            @Html.LabelFor((model) => model.NamedEnvironment, new { @class = "control-label" })
             @Html.TextBoxFor(x => x.NamedEnvironment, new { @class = "form-control" })
+            @Html.LabelFor((model) => model.NamedEnvironment, new { @class = "control-label active" })
         }
         @Html.ValidationMessageFor(model => Model.NamedEnvironment, "", new { @class = "text-danger" })
     </div>

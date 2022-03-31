@@ -42,30 +42,30 @@
                 @Html.HiddenFor(model => model.ObjectStatus)
 
                 @* Category *@
-            <div class="md-form">
-                @* Ensures Category cannot be changed on edit *@
-                @if (Model.DatasetId == 0) //New dataset
-                {
-                    @Html.DropDownListFor(m => m.DatasetCategoryIds, Model.AllCategories, new { @class = "mdb-select" })
-                    @Html.LabelFor((model) => model.DatasetCategoryIds, htmlAttributes: new { @class = "mdb-main-label" })
-                    @Html.ValidationMessageFor((model) => model.DatasetCategoryIds, "", new { @class = "text-danger" })
-                }
-                else //existing dataset, should be readonly
-                {
-                    for (int i = 0; i < Model.DatasetCategoryIds.Count; i++)
+                <div class="md-form">
+                    @* Ensures Category cannot be changed on edit *@
+                    @if (Model.DatasetId == 0) //New dataset
                     {
-                        <input type="hidden" name="DatasetCategoryIds" value="@Model.DatasetCategoryIds[i]" />
+                        @Html.DropDownListFor(m => m.DatasetCategoryIds, Model.AllCategories, new { @class = "mdb-select" })
+                        @Html.LabelFor((model) => model.DatasetCategoryIds, htmlAttributes: new { @class = "mdb-main-label" })
+                        @Html.ValidationMessageFor((model) => model.DatasetCategoryIds, "", new { @class = "text-danger" })
                     }
-                    <div class="textReadOnly md-form">
-                        <label for="CategoryReadonly" class="active">Category (Readonly)</label>
-                        <input id="CategoryReadonly" placeholder="@Sentry.data.Web.Helpers.Utility.FormatCategoryList(Model.CategoryNames)" disabled class="disabled form-control"/>
-                    </div>
-                    for (int i = 0; i < Model.DatasetCategoryIds.Count; i++)
+                    else //existing dataset, should be readonly
                     {
-                        @Html.HiddenFor(model => model.DatasetCategoryIds[i])
-                }
-            }
-            </div>
+                        for (int i = 0; i < Model.DatasetCategoryIds.Count; i++)
+                        {
+                            <input type="hidden" name="DatasetCategoryIds" value="@Model.DatasetCategoryIds[i]" />
+                        }
+                        <div class="textReadOnly md-form">
+                            <label for="CategoryReadonly" class="active">Category (Readonly)</label>
+                            <input id="CategoryReadonly" placeholder="@Sentry.data.Web.Helpers.Utility.FormatCategoryList(Model.CategoryNames)" disabled class="disabled form-control" />
+                        </div>
+                        for (int i = 0; i < Model.DatasetCategoryIds.Count; i++)
+                        {
+                            @Html.HiddenFor(model => model.DatasetCategoryIds[i])
+                        }
+                    }
+                </div>
 
 
                 @************************************************************************************************************************************
@@ -81,37 +81,37 @@
                     }
                     else
                     {
-                    <div class="textReadOnly md-form">
-                        <label for="DatasetNameReadonly" class="active">Name (Readonly)</label>
-                        <input id="DatasetNameReadonly" placeholder="@Model.DatasetName" disabled class="disabled form-control"/>
-                        @Html.HiddenFor(model => model.DatasetName)
-                    </div>
+                        <div class="textReadOnly md-form">
+                            <label for="DatasetNameReadonly" class="active">Name (Readonly)</label>
+                            <input id="DatasetNameReadonly" placeholder="@Model.DatasetName" disabled class="disabled form-control" />
+                            @Html.HiddenFor(model => model.DatasetName)
+                        </div>
                     }
                 </div>
 
                 @************************************************************************************************************************************
         SAID ASSET
         *************************************************************************************************************************************@
-            <div class="md-form">
-                @if (Model.DatasetId == 0)
-                {
-                    @Html.DropDownListFor(x => x.SAIDAssetKeyCode, Model.SAIDAssetDropDown, new { @id = "saidAsset", @class = "mdb-select", searchable = "SAID Asset..." })
-                    @Html.LabelFor((model) => model.SAIDAssetKeyCode, new { @class = "mdb-main-label" })
-                    @Html.ValidationMessageFor((model) => model.SAIDAssetKeyCode, "", new { @class = "text-danger" })
-                }
-                else
-                {
-                <div class="textReadOnly md-form">
-                    <label for="SAIDAssetKeyCodeReadonly" class="active">SAID Asset (Readonly)</label>
-                    <input id="SAIDAssetKeyCodeReadonly" placeholder="@Model.SAIDAssetKeyCode" disabled class="disabled form-control" />
-                    @Html.HiddenFor(model => model.SAIDAssetKeyCode)
+                <div class="md-form">
+                    @if (Model.DatasetId == 0)
+                    {
+                        @Html.DropDownListFor(x => x.SAIDAssetKeyCode, Model.SAIDAssetDropDown, new { @id = "saidAsset", @class = "mdb-select", searchable = "SAID Asset..." })
+                        @Html.LabelFor((model) => model.SAIDAssetKeyCode, new { @class = "mdb-main-label" })
+                        @Html.ValidationMessageFor((model) => model.SAIDAssetKeyCode, "", new { @class = "text-danger" })
+                    }
+                    else
+                    {
+                        <div class="textReadOnly md-form">
+                            <label for="SAIDAssetKeyCodeReadonly" class="active">SAID Asset (Readonly)</label>
+                            <input id="SAIDAssetKeyCodeReadonly" placeholder="@Model.SAIDAssetKeyCode" disabled class="disabled form-control" />
+                            @Html.HiddenFor(model => model.SAIDAssetKeyCode)
+                        </div>
+                    }
                 </div>
-                }
-            </div>
 
                 @************************************************************************************************************************************
-                NAMED ENVIRONMENT
-                *************************************************************************************************************************************@
+        NAMED ENVIRONMENT
+        *************************************************************************************************************************************@
                 <div id="NamedEnvironmentPartial">
                     @Html.Partial("_NamedEnvironment", Model)
                 </div>
@@ -159,8 +159,8 @@
                     @Html.ValidationMessageFor((model) => model.DataClassification, "", new { @class = "text-danger" })
                 </div>
 
-                <div class="md-form" style="display:none">
-                    @Html.CheckBoxFor(m => m.IsSecured, new { @class = "form-check-input" })
+                <div class="form-check">
+                    <input type="checkbox" value="true" class="form-check-input" id="IsSecured" name="IsSecured">
                     @Html.LabelFor(m => m.IsSecured, htmlAttributes: new { @class = "form-check-label" })
                 </div>
 
