@@ -10,31 +10,34 @@
         isActive = "";
         displayType = "none";
     };
-}    
+}
 
-    @if (Model.CLA3332_ConsolidatedDataFlows)
-    {
-        @Html.HiddenFor((model) => model.IsDeleted)
-        <div class="col-md-3">
+@if (Model.CLA3332_ConsolidatedDataFlows)
+{
+    @Html.HiddenFor((model) => model.IsDeleted)
+    <div class="row">
+        <div class="col">
             <span class="datasetSpinner"></span>
-            @Html.DropDownListFor((model) => model.SelectedDataset, Model.AllDatasets, new { @class = "form-control edit-dataset-row" })
+            @Html.DropDownListFor((model) => model.SelectedDataset, Model.AllDatasets, new { @class = "browser-default custom-select dataset-select" })
             @Html.ValidationMessageFor((model) => model.SelectedDataset, "", new { @class = "text-danger error-over-color" })
             <a class="small create-link" style="color: #00a3e0" id="CreateDataset">Create New Dataset</a>
         </div>
-
-        <div class="col-md-4">
+        <div class="col">
             <span class="schemaSpinner"></span>
-            @Html.DropDownListFor((model) => model.SelectedSchema, Model.AllSchemas, new { @class = "form-control edit-dataset-row" })
+            @Html.DropDownListFor((model) => model.SelectedSchema, Model.AllSchemas, new { @class = "browser-default custom-select schema-select" })
             @Html.ValidationMessageFor((model) => model.SelectedSchema, "", new { @class = "text-danger error-over-color" })
 
             @***************************************
-                When removeing CLA3332_ConsolidatedDataflows feature flag, refactor style onto .create-link within dataflow.css
+            When removeing CLA3332_ConsolidatedDataflows feature flag, refactor style onto .create-link within dataflow.css
             ***************************************@
             <a class="small create-link" style="color: #00a3e0" id="CreateSchema">Create New Schema</a>
         </div>
-    }
-    else
-    {
+    </div>
+
+
+}
+else
+{
     <div class="schemaMapLineItem form-group col-md-12 @isActive" style="display: @displayType">
         @Html.HiddenFor((model) => model.IsDeleted)
         <div class="col-md-4">
@@ -54,6 +57,6 @@
             <a class="btn btn-danger">Remove</a>
         </div>
     </div>
-    }
-    
+}
+
 

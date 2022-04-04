@@ -11,28 +11,32 @@
             <div class="col-sm-12 col-md-12 col-lg-12">
                 <img id="dairyland-logo" alt="Dairyland Logo" src="~/Images/dairyland_logo.png" width="220" />
 
-                <div class="btn-group dataset-operation-button hamburger-man" data-toggle="tooltip" data-placement="top" title="Additional Actions" style="float: right;">
 
-                    <button type="button"
-                            class="btn btn-default borderdk_gray borderdk_blueGray dropdown"
-                            data-toggle="dropdown">
-                        <span class="glyphicon glyphicon-menu-hamburger"></span>
-                    </button>
-                    <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
-                        <li id="SubscribeModal" style="cursor: pointer;" data-id="1" data-placement="top" title="Subscribe">
-                            <a>
+
+                <div class="dataset-operation-button hamburger-man" style="float: right;">
+
+                    <a class="btn px-3">
+                        @Html.Partial("~/Views/BusinessArea/_LibertyBell.cshtml")
+                    </a>
+
+                    <a class="btn px-3"
+                       onclick="location.href = 'mailto:BusinessInformationTeam@sentry.com?Subject=Contact%20%20-%20BusinessInformationTeam';" id="EnvelopeMan" data-toggle="tooltip" data-placement="top" title="Contact">
+                        <em class="icon-envelope align-self-center mr-0 align-middle dsc-blue-text"></em>
+                    </a>
+
+                    <div class="btn-group" data-toggle="tooltip" data-placement="top" title="Additional Actions">
+                        <a class="btn px-3" data-toggle="dropdown">
+                            <em class="icon-hamburger dsc-blue-text mr-0 align-middle"></em>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-start">
+                            <a class="dropdown-item" id="SubscribeModal">
                                 Subscribe
                             </a>
-                        </li>
-                    </ul>
+                        </div>
+                    </div>
                 </div>
 
-                @Html.Partial("~/Views/BusinessArea/_LibertyBell.cshtml")
 
-             <div style="float: right; margin-right: 0.4em; font-size: 28px;" >
-                 <button type="button" onclick="location.href = 'mailto:BusinessInformationTeam@sentry.com?Subject=Contact%20%20-%20BusinessInformationTeam';" id="EnvelopeMan" class="glyphicon glyphicon-envelope" >
-                 </button>
-             </div>   
 
             </div>
         </div>

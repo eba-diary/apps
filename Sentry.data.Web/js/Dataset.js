@@ -186,7 +186,8 @@ data.Dataset = {
     delroyTableCreate: function () {
 
         //init DataTable,
-        $("#delroyTable").DataTable({
+        var delroyTable = $("#delroyTable").DataTable({
+            orderCellsTop: true,
 
             //client side setup
             pageLength: 100,
@@ -204,7 +205,7 @@ data.Dataset = {
                     render: function (d, type, row, meta) {
                         var color = $('#delroyBreadcrumb').data('page-color');
                         var innerLink = "<a  class='" + color + "' style='cursor:pointer' > " + d + "</a >";                        //want cursor too turn pointer
-                        var parent = "<em class='glyphicon glyphicon-folder-close " + color + "' > " + innerLink + "</em>";
+                        var parent = "<em class=' icon-folder " + color + "' > " + innerLink + "</em>";
 
                         if (row.Fields != null) {
                             return parent;
@@ -217,9 +218,9 @@ data.Dataset = {
                 { data: "Description", className: "Description" },
                 { data: "FieldType", className: "FieldType" },
                 { data: "IsArray", className: "IsArray" },
-                { data: "Length", className: "Length", visible: false, render: function (d, type, row, meta)        { return data.Dataset.delroyFillGridLength(d,row); } },
-                { data: "Precision", className: "Precision", visible: false, render: function (d, type, row, meta)  { return data.Dataset.delroyFillGridPrecisionScale(d,row); } },
-                { data: "Scale", className: "Scale", visible: false, render: function (d, type, row, meta)          { return data.Dataset.delroyFillGridPrecisionScale(d,row); } }
+                { data: "Length", className: "Length", visible: false, render: function (d, type, row, meta) { return data.Dataset.delroyFillGridLength(d, row); } },
+                { data: "Precision", className: "Precision", visible: false, render: function (d, type, row, meta) { return data.Dataset.delroyFillGridPrecisionScale(d, row); } },
+                { data: "Scale", className: "Scale", visible: false, render: function (d, type, row, meta) { return data.Dataset.delroyFillGridPrecisionScale(d, row); } }
             ],
 
             aLengthMenu: [
@@ -230,12 +231,31 @@ data.Dataset = {
             order: [0, 'desc'],
 
             //style for columnVisibility and paging to show
-            dom: 'Blrtip',
+            //dom: 'B',
 
-            //buttons to show and customize text for them
-            buttons:
-                [
-                    { extend: 'colvis', text: 'Columns' },
+            dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>t<"d-inline-block"i><"float-right d-inline-block"p>',
+            buttons: {
+                dom: {
+                    container: {
+                        className: 'dt-buttons btn-group'
+                    },
+                    button: {
+                        className: 'btn btn-primary p-2'
+                    },
+                    collection: {
+                        //tag: 'div',
+                        className: 'dt-button-collection dropdown-menu',
+                        button: {
+                            //tag: 'a',
+                            className: 'dropdown-item'
+                        }
+                    }
+                },
+                buttons: [
+                    {
+                        extend: 'colvis',
+                        //text: "<i class='icon-onecol_twocol'></i>"
+                    },
                     {
                         text: 'Snowflake Query',
                         action: function () {
@@ -243,23 +263,23 @@ data.Dataset = {
                         }
                     }
                 ]
+            }
         });
-
-        //add a filter in each column
-        $("#delroyTable").dataTable().columnFilter({
-            sPlaceHolder: "head:after",
-            aoColumns: [
-                { type: "text" },
-                { type: "text" },
-                { type: "text" },
-
-                { type: "text" },
-                { type: "text" },
-                { type: "text" },
-                { type: "text" }
-            ]
-        });
-
+        if ($("#delroyTable_length").length > 0) {
+            yadcf.init(delroyTable, [
+                { column_number: 0, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 1, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 2, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 3, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 4, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 5, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 6, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+            ],
+                {
+                    filters_tr_index: 1
+                }
+            );
+        }
     },
 
 
@@ -311,7 +331,8 @@ data.Dataset = {
 
         var index = data.Dataset.delroyFieldArray.length - 1;
         var field = data.Dataset.delroyFieldArray[index];
-
+        console.log(data.Dataset.delroyFieldArray);
+        console.trace();
         //NOTE: this is a strange concept:  but a field is either a ROOT level one (index 0) or a CHILD level (index > 0)
         //All levels > (index 0) you need too specify the Fields array which is a child property whereas the root level(index 0) the array is at that level
         //also check if field is NULL, because in that case return a null field else returning field.Fields will cause an error
@@ -330,7 +351,9 @@ data.Dataset = {
         var field = data.Dataset.delroyGetLatestField();
 
         table.clear();
-        table.rows.add(field);       //when clicking on an item, we need to specify Fields property since all chidren of ROOT use this
+        if (field) {
+            table.rows.add(field);       //when clicking on an item, we need to specify Fields property since all chidren of ROOT use this
+        }
         table.draw();
 
         //dont do anything first time since firstTime is on whole page refresh and we don't want to mess with scroll position
@@ -354,7 +377,7 @@ data.Dataset = {
 
         //add breadcrumb to UI
         var color = $('#delroyBreadcrumb').data('page-color');
-        var h = "<li id='" + index.toString() + "' ><a  class='" + color + "' style='cursor:pointer' >" + field.Name + "</a></li>";
+        var h = "<li class='breadcrumb-item' id='" + index.toString() + "' ><a  class='" + color + "' style='cursor:pointer' >" + field.Name + "</a></li>";
         $('#delroyBreadcrumb').append(h);
 
         //add struct too tracker to hold if a query needs to be generated
@@ -399,8 +422,8 @@ data.Dataset = {
 
 
     //LENGTH COLUMN LOGIC:  ONLY RETURN DATA IF VALID
-        //Reason we do this is so for Length Column in Grid, zero won't show up because if its zero, we don't want to see it
-    delroyFillGridLength: function (d,row) {
+    //Reason we do this is so for Length Column in Grid, zero won't show up because if its zero, we don't want to see it
+    delroyFillGridLength: function (d, row) {
         if (d) {
             return d;
         }
@@ -410,7 +433,7 @@ data.Dataset = {
     },
 
     //PRECISION AND SCALE LOGIC:  ONLY RETURN DATA IF VALID AND DECIMAL
-        //Reason we do this is so for Prec/Scale is so they only show up for DECIMAL datatypes since thats only datatype to have prec/scale
+    //Reason we do this is so for Prec/Scale is so they only show up for DECIMAL datatypes since thats only datatype to have prec/scale
     delroyFillGridPrecisionScale: function (d, row) {
         if (d != null && row.FieldType == 'DECIMAL') {
             return d;
@@ -602,7 +625,7 @@ data.Dataset = {
         if ($("#datasetRowTable_filter").length > 0) {
             $("#datasetRowTable").DataTable().destroy();
         };
-        Sentry.InjectSpinner($("#tab-container"));
+        //Sentry.InjectSpinner($("#tab-container"));
 
 
 
@@ -821,8 +844,9 @@ data.Dataset = {
             },
             error: function (obj) {
                 $('#DatasetFormContent').replaceWith(obj.responseText);
-                var hrEnv = $('#HrempServiceEnv').val()
-                var hrUrl = $('#HrempServiceUrl').val()
+                var hrEnv = $('#HrempServiceEnv').val();
+                var hrUrl = $('#HrempServiceUrl').val();
+
                 data.Dataset.FormInit(hrUrl, hrEnv, data.Dataset.FormSubmitInit);
             }
         });
@@ -846,19 +870,13 @@ data.Dataset = {
 
         //CONFIGURE SAID ASSET PICKER on _DatasetCreateEdit.cshtml TO INCLUDE a filter box that comes up
         $(document).ready(function () {
-            $('.selectpicker').selectpicker({
-                liveSearch: false,
-                showSubtext: true,
-                size: '5',
-                dropupAuto: false
-            });
-
-            $(".selectpicker-filtering").selectpicker({
-                liveSearch: true,
-                showSubtext: true,
-                size: '5',
-                dropupAuto: false
-            });
+            $("#DatasetCategoryIds").materialSelect();
+            $("#saidAsset").materialSelect();
+            $("#OriginationID").materialSelect();
+            $("#DataClassification").materialSelect();
+            $("#NamedEnvironmentPartial select").materialSelect();
+            $("#DatasetScopeTypeId").materialSelect();
+            $("#FileExtensionId").materialSelect();
         });
 
 
@@ -892,6 +910,15 @@ data.Dataset = {
             maxResults: 10
         });
 
+        $(".associatePicker label").addClass("active");
+        $(".twitter-typeahead").addClass("w-100");
+
+        if ($("#DatasetDesc").val()) {
+            $('label[for=DatasetDesc]').addClass("active");
+        }
+        if ($("#DatasetInformation").val()) {
+            $('label[for=DatasetInformation]').addClass("active");
+        }
 
         $("#DataClassification").change(function () {
             switch ($("#DataClassification").val()) {
@@ -902,7 +929,7 @@ data.Dataset = {
                         'of the Information Owner, Information Security must be notified immediately.  Designating information as Restricted involves significant ' +
                         'costs to Sentry.  For this reason, Information Owners making classification decisions must balance the damage that could result from ' +
                         'unauthorized access to or disclosure of the information against the cost of additional hardware, software or services required to protect it.');
-                    $("#IsSecured").parents('.form-group').hide();
+                    $("#IsSecured").parents('.md-form').hide();
                     break;
                 case "2":
                     $('#dataClassInfo').text('“Highly Sensitive” information is highly confidential, typically includes personally ' +
@@ -915,7 +942,7 @@ data.Dataset = {
                         'numbers), and user passwords. This information must be limited to need to know ' +
                         'access. If it is shared, accessed, or altered without the permission of the ' +
                         'Information Owner, Information Security must be notified immediately.');
-                    $("#IsSecured").parents('.form-group').hide();
+                    $("#IsSecured").parents('.md-form').hide();
                     break;
                 case "3":
                     $('#dataClassInfo').text('“Internal Use Only” information can be disclosed or disseminated to Sentry ' +
@@ -923,13 +950,13 @@ data.Dataset = {
                         'non - disclosure agreement is in place and management has approved for legitimate ' +
                         'business reasons.  Examples include items such as email correspondence, internal ' +
                         'documentation that is available to all associates.');
-                    $("#IsSecured").parents('.form-group').show();
+                    $("#IsSecured").parents('.md-form').show();
                     break;
                 case "4":
                     $('#dataClassInfo').text('“Public” information can be disclosed or disseminated without any restrictions on ' +
                         'content, audience, or time of publication.  Examples are datasets that were generated by the Federal or State Governments like the Federal Motor Carrier Safety Administration or NOAA Weather Data.  ' +
                         'These datasets can be freely shared throughout Sentry.');
-                    $("#IsSecured").parents('.form-group').hide();
+                    $("#IsSecured").parents('.md-form').hide();
                     break;
             }
         }).change();
@@ -1017,7 +1044,7 @@ data.Dataset = {
             var icon = "#icon_" + id;
 
             $(category).slideToggle();
-            $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
+            $(icon).toggleClass("icon-chevron-down icon-chevron-up");
         });
 
         var Id = $('#datasetConfigList').val();
@@ -1139,7 +1166,7 @@ data.Dataset = {
                 url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent($(this).data("id")),
                 method: "GET",
                 dataType: 'json',
-                success: function () { icon.toggleClass("glyphicon-star glyphicon-star-empty"); },
+                success: function () { icon.toggleClass("icon-filled-star icon-star"); },
                 error: function () { Sentry.ShowModalAlert("Failed to toggle favorite."); }
             });
         });
@@ -1164,7 +1191,7 @@ data.Dataset = {
             Sentry.ShowModalCustom("Delete Dataset", ConfirmMessage, {
                 Confirm: {
                     label: "Confirm",
-                    className: "btn-danger",
+                    className: "btn btn-danger waves-effect waves-light",
                     callback: function () {
                         $.ajax({
                             url: "/Dataset/" + dataset.attr("data-id") + "/Delete",
@@ -1229,7 +1256,7 @@ data.Dataset = {
 
 
 
-            Sentry.InjectSpinner($("#tab-container"));
+            //Sentry.InjectSpinner($("#tab-container"));
 
 
             var url = new URL(window.location.href);
@@ -1258,7 +1285,7 @@ data.Dataset = {
         //on initial load, try pulling the Id from the URL first.
 
         $('#dataLastUpdatedSpinner').show();
-        data.Dataset.UpdateMetadata();
+        //data.Dataset.UpdateMetadata();
         var url = new URL(window.location.href);
 
         Id = url.searchParams.get('configID')
@@ -1280,7 +1307,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             if ($('#tabSchemaColumns').is(':empty')) {
-                Sentry.InjectSpinner($("#tab-container"));
+                //Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaColumns',
@@ -1311,7 +1338,7 @@ data.Dataset = {
             var id = $('#RequestAccessButton').attr("data-id");
 
             if ($('#tabSchemaAbout').is(':empty')) {
-                Sentry.InjectSpinner($("#tab-container"));
+                //Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaAbout',
@@ -1341,7 +1368,7 @@ data.Dataset = {
             var id = $('#RequestAccessButton').attr("data-id");
 
             if ($('#tabDataPreview').is(':empty')) {
-                Sentry.InjectSpinner($("#tab-container"));
+                //Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataPreview',
@@ -1371,7 +1398,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             if ($('#tabDataFiles').is(':empty')) {
-                Sentry.InjectSpinner($("#tab-container"));
+                //Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataFiles',
@@ -1686,6 +1713,7 @@ data.Dataset = {
     DatasetFileTableInit: function (Id) {
 
         data.Dataset.DatasetFilesTable = $("#datasetFilesTable").DataTable({
+            orderCellsTop: true,
             width: "100%",
             serverSide: true,
             //responsive: true,
@@ -1713,7 +1741,7 @@ data.Dataset = {
                 { data: "ConfigFileName", className: "ConfigFileName" }
             ],
             language: {
-                search: "<div class='input-group'><span class='input-group-addon'><i class='glyphicon glyphicon-search'></i></span>_INPUT_</div>",
+                search: "<div class='input-group'><span class='input-group-addon'><em class='icon-search'></em></span>_INPUT_</div>",
                 searchPlaceholder: "Search",
                 processing: ""
             },
@@ -1721,19 +1749,21 @@ data.Dataset = {
             stateSave: true,
             "createdRow": function (row, data, dataIndex) { }
         });
-
-        $("#datasetFilesTable").dataTable().columnFilter({
-            sPlaceHolder: "head:after",
-            aoColumns: [
-                null,
-                null,
-                { type: "text" },
-                { type: "text" },
-                { type: "date-range" },
-                { type: "date-range" },
-                { type: "text" }
-            ]
-        });
+        if ($("#datasetFilesTable_filter").length > 0) {
+            yadcf.init($("#datasetFilesTable").dataTable(), [
+                { column_number: 0, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 1, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 2, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 3, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 4, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 5, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 6, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+            ],
+                {
+                    filters_tr_index: 1
+                }
+            );
+        }
 
         $(".dataTables_filter").parent().addClass("text-right");
         $(".dataTables_filter").parent().css("right", "3px");
@@ -1905,7 +1935,7 @@ data.Dataset = {
                 { data: "ConfigFileName", className: "ConfigFileName" }
             ],
             language: {
-                search: "<div class='input-group'><span class='input-group-addon'><i class='glyphicon glyphicon-search'></i></span>_INPUT_</div>",
+                search: "<div class='input-group'><span class='input-group-addon'><em class='icon-search'></em></span>_INPUT_</div>",
                 searchPlaceholder: "Search",
                 processing: ""
             },
@@ -1917,18 +1947,21 @@ data.Dataset = {
 
         var values = [true, false];
 
-        $("#bundledDatasetFilesTable").dataTable().columnFilter({
-            sPlaceHolder: "head:after",
-            aoColumns: [
-                null,
-                null,
-                { type: "text" },
-                { type: "text" },
-                { type: "date-range" },
-                { type: "date-range" },
-                { type: "text" }
-            ]
-        });
+        /* TODO REPLACE WITH YADCF
+
+$("#bundledDatasetFilesTable").dataTable().columnFilter({
+    sPlaceHolder: "head:after",
+    aoColumns: [
+        null,
+        null,
+        { type: "text" },
+        { type: "text" },
+        { type: "date-range" },
+        { type: "date-range" },
+        { type: "text" }
+    ]
+});
+*/
 
         $('#bundledDatasetFilesTable').on('draw.dt', function () {
             if ($("#bundledDatasetFilesTable").DataTable().page.info().recordsTotal !== 0) {
@@ -2066,19 +2099,6 @@ data.Dataset = {
             ],
             order: [6, 'desc'],
             "createdRow": function (row, data, dataIndex) { }
-        });
-
-        $("#datasetFilesVersionsTable").dataTable().columnFilter({
-            sPlaceHolder: "head:after",
-            aoColumns: [
-                null,
-                null,
-                null,
-                { type: "text" },
-                { type: "text" },
-                { type: "text" },
-                { type: "text" }
-            ]
         });
 
         // DataTable
@@ -2220,12 +2240,13 @@ data.Dataset = {
         $.get("/Dataset/NamedEnvironment?assetKeyCode=" + assetKeyCode + "&namedEnvironment=" + selectedEnvironment, function (result) {
             $('div#DatasetFormContent #NamedEnvironmentPartial').html(result);
             data.Dataset.initNamedEnvironmentEvents();
+            $("#NamedEnvironmentPartial select").materialSelect();
         });
     },
 
     InitSchemaSearchTab() {
         var datasetId = $('#RequestAccessButton').attr("data-id");
-        
+
         $("#schemaSearchTable").DataTable({
             "ajax": {
                 "url": "/Dataset/Detail/" + datasetId + "/SchemaSearch/" + self.vm.SchemaId + "/",

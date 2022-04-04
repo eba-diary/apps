@@ -2,9 +2,21 @@
 $(function () {
     $('[data-toggle="popover"]').popover();
     $('[data-toggle="tooltip"]').tooltip();
-    $('[placeholder]').placeholder();
-    Ladda.bind('.ladda-button');
-    $(".dropdown-submenu > a").submenupicker();
+
+    //Set DataTable defaults if included
+    if ($.fn.DataTable) {
+        $.extend(true, $.fn.DataTable.defaults, {
+            language: {
+                search: "<div class='input-group'><span class='input-group-prepend sentry-blue white-text icon-search'></span>_INPUT_</div>",
+                searchPlaceholder: "Search",
+                processing: ""
+            },
+        });
+        $.extend($.fn.DataTable.ext.classes, {
+            // Prevents dataTables.boostrap4.js from adding classes to length select boxes. add our own instead
+            sLengthSelect: "dataTables_length_select"
+        });
+    }
 });
 
 // Some String extensions
@@ -23,7 +35,7 @@ if (!String.format) {
 // Most custom functions should be added to the Sentry object
 var Sentry = Sentry || new function () {
 
-    this.InjectSpinner = function (element, height) {
+    this.InjectSpinner = function (element) {
         /// <summary>
         /// Injects a spinner (loading) icon into the DOM, 
         /// centered vertically and horizontally inside the element that you pass.
@@ -31,34 +43,66 @@ var Sentry = Sentry || new function () {
         /// the content of the element when the operation is completed.
         /// </summary>
         /// <param name="element" type="HTMLElement">The element to inject the spinner into.</param>
-        /// <param name="height" type="Number">If the element that you pass has no height, pass a 
-        /// height to this function to temporarily assign it a height.</param>
-        if (element.height() > 0) {
-            height = element.height();
-        } else {
-            element.css('min-height', height);
-        };
 
-        var spinnerWrapper = document.createElement("span");
-        spinnerWrapper.style.height = "" + height + "px";
-        spinnerWrapper.className = "sentry-spinner-container";
-        element.prepend(spinnerWrapper);
+        $(element).html(
+            '<div class="text-center">' +
+            '<div class="preloader-wrapper big active">' +
+            '    <div class="spinner-layer spinner-blue-only">' +
+            '        <div class="circle-clipper left">' +
+            '            <div class="circle"></div>' +
+            '        </div><div class="gap-patch">' +
+            '            <div class="circle"></div>' +
+            '        </div><div class="circle-clipper right">' +
+            '            <div class="circle"></div>' +
+            '        </div>' +
+            '    </div>' +
+            '</div></div>');
+    };
 
-        var spinHeight = 48;
-        var spin = new Spinner({
-            color: "#005285",
-            lines: 12,
-            radius: spinHeight * .2,
-            length: spinHeight * .2 * .6,
-            width: 3,
-            zIndex: "auto",
-            top: "50%",
-            left: "50%",
-            className: "",
-            speed: .9
-        });
+    this.CreateModal = function (title, message, buttons, callback) {
+        /// <summary>
+        /// Creates a modal with an Ok button
+        /// </summary>
+        /// <param name="title">modal title</param>
+        /// <param name="message">message to display</param>
+        /// <param name="buttons">HTML buttons to put on the modal</param>
+        /// <param name="callback">Callback for the OK button</param>
+        /// <returns>modal object</returns>
 
-        spin.spin(spinnerWrapper);
+        if (buttons === undefined || buttons === null) {
+            buttons = "";
+        }
+
+        var html = '<div class="modal-dialog" role="document">' +
+            '<div class="modal-content">' +
+            '    <div class="modal-header">' +
+            '        <h5 class="modal-title" id="exampleModalLabel">' +
+            title +
+            '        </h5>' +
+            '        <button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+            '            <span aria-hidden="true">&times;</span>' +
+            '        </button>' +
+            '    </div>' +
+            '    <div class="modal-body">' +
+            message +
+            '    </div>';
+
+        if (buttons.length > 0) {
+            html += '<div class="modal-footer">' + buttons + '</div>';
+        }
+
+        html += '</div></div >';
+
+        var modal = $('<div></div>').addClass('modal fade').attr('tabindex', '-1').attr('role', 'dialog').attr('aria-hidden', 'true').html(html);
+
+        $('.ok-button', modal).on('click', callback);
+
+        modal.modal({ show: false });
+
+        //add to the page
+        modal.appendTo('body');
+
+        return modal;
     };
 
     this.ShowModalAlert = function (message, callback) {
@@ -70,11 +114,7 @@ var Sentry = Sentry || new function () {
         /// <returns type="">A modal object</returns>
         callback = callback || function () { };
 
-        var modal = bootbox.dialog({
-            message: message,
-            buttons: ModifyButtons(Sentry.ModalButtonsOK(callback)),
-            show: false
-        });
+        var modal = this.CreateModal('', message, this.ModalButtonsOK(), callback);
         modal = ShowModalCommon(modal);
         return modal;
     };
@@ -88,49 +128,26 @@ var Sentry = Sentry || new function () {
         /// <returns type="">A modal object</returns>
         callback = callback || function () { };
 
-        var modal = bootbox.dialog({
-            message: message,
-            buttons: ModifyButtons(Sentry.ModalButtonsOKCancel(callback)),
-            show: false
-        });
+        var modal = this.CreateModal('', message, this.ModalButtonsOKCancel(), callback);
         modal = ShowModalCommon(modal);
         return modal;
     };
 
-    this.ModalButtonsOK = function (callback) {
+    this.ModalButtonsOK = function () {
         /// <summary>
-        /// You can provide this function to the buttons parameter of the ShowModalCustom() method
-        /// in order to show just an "OK" button
+        /// OK button
         /// </summary>
-        /// <param name="callback">The function to call when the OK button is pressed.  This function should return false if you want the modal to stay open.</param>
-        /// <returns type="">The buttons object</returns>
-        return {
-            OK: {
-                label: "OK",
-                className: "btn-primary",
-                callback: callback
-            }
-        }
+        /// <returns type="">The buttons html</returns>
+        return '<button type="button" data-dismiss="modal" class="btn btn-primary ok-button">OK</button>';
     };
 
-    this.ModalButtonsOKCancel = function (callback) {
+    this.ModalButtonsOKCancel = function () {
         /// <summary>
-        /// You can provide this function to the buttons parameter of the ShowModalCustom() method
-        /// in order to show an "OK" and "Cancel" button
+        /// Ok and Cancel buttons
         /// </summary>
-        /// <param name="callback">The function to call when the OK button is pressed.  This function should return false if you want the modal to stay open.</param>
-        /// <returns type="">The buttons object</returns>
-        return {
-            OK: {
-                label: "OK",
-                className: "btn-primary",
-                callback: callback
-            },
-            Cancel: {
-                label: "Cancel",
-                className: "btn-link"
-            }
-        }
+        /// <returns type="">The buttons html</returns>
+        return '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>' +
+            '<button type="button" class="btn btn-primary ok-button" data-dismiss="modal">OK</button>';
     };
 
     this.ShowModalCustom = function (header, body, buttons) {
@@ -138,15 +155,10 @@ var Sentry = Sentry || new function () {
         /// Shows a modal with a custom header, body, and buttons
         /// </summary>
         /// <param name="header">The header to display on the modal</param>
-        /// <param name="body">The function to call when the OK button is pressed.  This function should return false if you want the modal to stay open.</param>
-        /// <param name="buttons">The buttons to show.  This should be in bootbox format.</param>
+        /// <param name="body">Body Content</param>
+        /// <param name="buttons">The buttons to show.  This should be in HTML format.</param>
         /// <returns type="">A modal object</returns>
-        var modal = bootbox.dialog({
-            message: body,
-            title: header,
-            buttons: ModifyButtons(buttons),
-            show: false
-        });
+        var modal = this.CreateModal(header, body, buttons, function () { });
         modal = ShowModalCommon(modal);
         return modal;
     };
@@ -158,21 +170,12 @@ var Sentry = Sentry || new function () {
         /// into the modal body via AJAX.
         /// </summary>
         /// <param name="header">The header to display on the modal</param>
-        /// <param name="buttons">The buttons to show.  This should be in bootbox format.</param>
+        /// <param name="buttons">The buttons to show.  This should be in HTML format.</param>
         /// <returns type="">A modal object</returns>
-        var modal = bootbox.dialog({
-            message: " ",
-            title: header,
-            buttons: ModifyButtons(buttons),
-            show: false
-        });
-        $(".bootbox-body").css('min-height', 200); //adjust the height of the modal body
-        modal.on("shown.bs.modal", function (e) {
-            //if the modal body is still empty once it's become visible, show the spinner
-            if ($(".bootbox-body").html().trim() == "") { 
-                Sentry.InjectSpinner($(".bootbox-body"), 200);
-            }
-        });
+        var modal = this.CreateModal(header, '', buttons, function () { });
+
+        this.InjectSpinner($('.modal-body', modal));
+
         modal = ShowModalCommon(modal);
         return modal;
     };
@@ -187,27 +190,8 @@ var Sentry = Sentry || new function () {
     //private function called after all the "ShowModal" methods create the modal
     function ShowModalCommon(modal) {
         modal = ExtendModal(modal);
-        $(".modal").on("shown.bs.modal", function (e) {
-            Ladda.bind('.ladda-button');
-        });
         modal.modal('show');
         return modal;
-    }
-
-    //gives us a chance to add additional classes to buttons
-    function ModifyButtons(buttons) {
-        for (var buttonName in buttons) {
-            if (buttons.hasOwnProperty(buttonName)) {
-                var button = buttons[buttonName];
-                // hack to get the buttons in a modal to work with ladda spinners
-                if (!button.className) {
-                    button.className = "ladda-button' data-style='zoom-in";
-                } else if (button.className.indexOf("btn-link") == -1) {
-                    button.className = button.className + " ladda-button' data-style='zoom-in"
-                }
-            }
-        }
-        return buttons;
     }
 
     //add "extension methods" to a modal object
@@ -216,7 +200,7 @@ var Sentry = Sentry || new function () {
             /// <summary>
             /// Replaces the "loading" spinner in the modal body with the html provided.
             /// </summary>
-            modal.find(".bootbox-body").html(html);
+            modal.find(".modal-body").html(html);
         };
 
         modal.SetFocus = function (selector) {

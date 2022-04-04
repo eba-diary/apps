@@ -112,15 +112,12 @@
                 { data: "ScanType", className: "ScanType", visible: false }
             ],
             aLengthMenu: [10, 20, 50, 100, 500],
-            dom: "<'row'" +
-                "<'col-xs-6'l>" +
-                "<'col-xs-6 text-right'B>>" +
-                "<'row'<'col-xs-12'tr>>" +
-                "<'row'<'col-xs-12 text-center'p>>",
+            dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>tr<"float-right d-inline-block"p>',
             buttons: [{ extend: 'colvis', text: 'Columns' }, { text: 'Save', className: 'btn btn-primary display-none di-save', action: data.DataInventory.saveUpdates }],
             initComplete: function (settings, json) {
                 data.FilterSearch.completeSearch(json.searchTotal, settings.oInit.pageLength, json.data.length);
-            }
+            },
+            "autoWidth": false
         });
     },
 

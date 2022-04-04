@@ -137,3 +137,10 @@
     display: inline-block;
     vertical-align: middle;
 }
+
+.btnFavoriteSearch {
+    font-size: 125%;
+    color: blue;
+    cursor: pointer;
+    margin-top: 0.1rem !important;
+}

@@ -65,11 +65,10 @@
     margin: 0 0 0.25em 0.5em;
     align-self: end;
     width: 100%;
+    display: inline-grid;
 }
 
 .filter-search-apply {
-    margin: 0 0 0.5em 0.5em;
-    height: fit-content;
     align-self: end;
 }
 
@@ -204,13 +203,6 @@
     width: 100%;
 }
 
-.pagination {
-    display: inline-block;
-    padding-left: 0;
-    margin: 0;
-    border-radius: 2px;
-}
-
 .bottom-border {
     border-bottom: 1px solid #ebebeb;
 }
@@ -223,4 +215,8 @@
 .filter-search-modal-option {
     display: inline-block;
     width: 33%;
+}
+
+.pagination {
+    padding-bottom: 2rem;
 }

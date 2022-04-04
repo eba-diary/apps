@@ -1,7 +1,8 @@
 ﻿@model List<Sentry.data.Core.DataFeedItem>
 
 @{
-    string color = "green";
+    string color = "sentry-dark-green-text";
+    string colorHeader = "green";
 }
 
 @foreach (Sentry.data.Core.DataFeedItem item in Model)
@@ -16,11 +17,11 @@
 
             @if (item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.NOTIFICATION)
             {
-                <div class="feedName lt_@color">@item.Feed.Category</div>
+                <div class="feedName lt_@colorHeader">@item.Feed.Category</div>
             }
             else
             {
-                <div class="feedName lt_@color">@item.Feed.Name</div>
+                <div class="feedName lt_@colorHeader">@item.Feed.Name</div>
             }
 
         </div>
@@ -30,7 +31,7 @@
 
     @if (item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.NOTIFICATION)
     {
-        <h6 class="@color" data-toggle="tooltip" data-placement="top" title="">@item.NotificationTitle</h6>
+        <h6 class="@color pt-0" data-toggle="tooltip" data-placement="top" title="">@item.NotificationTitle</h6>
     }
     else if (item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.DATASET || item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.SCHEMA || item.Feed.Name == Sentry.data.Core.GlobalConstants.DataFeedName.BUSINESS_INTELLIGENCE)
     {

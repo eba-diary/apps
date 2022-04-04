@@ -22,7 +22,7 @@ namespace Sentry.data.Infrastructure
 
         public List<ElasticSchemaField> Search(string toSearch)
         {
-            if (!String.IsNullOrEmpty(toSearch))
+            if(!String.IsNullOrEmpty(toSearch))
             {
                 toSearch = '*' + toSearch.ToLower() + '*';
             }

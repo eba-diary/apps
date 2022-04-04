@@ -171,23 +171,24 @@ namespace Sentry.data.Web.Controllers
 
             DataFlowDto dfDto = model.ToDto();
 
-            /*
-             * After CLA3332_ConsolidatedDataflows feature flag is true and conversion of all dataflows is compelted,
-             *   there will be no need for a list of schema maps since consolidated dataflows only supports 
-             *   a single schema.  Therefore, refactor dataset\schema selection to be directly on DataFlowModel
-             *   (https://jira.sentry.com/browse/CLA-3507).
-            */
-            if (DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()){
-                dfDto.DatasetId = model.SchemaMaps.FirstOrDefault().SelectedDataset;
-                dfDto.SchemaId = model.SchemaMaps.FirstOrDefault().SelectedSchema;
-            }
-
             AddCoreValidationExceptionsToModel(await _dataFlowService.Validate(dfDto));
 
             try
             {
                 if (ModelState.IsValid)
                 {
+                    /*
+                     * After CLA3332_ConsolidatedDataflows feature flag is true and conversion of all dataflows is compelted,
+                     *   there will be no need for a list of schema maps since consolidated dataflows only supports 
+                     *   a single schema.  Therefore, refactor dataset\schema selection to be directly on DataFlowModel
+                     *   (https://jira.sentry.com/browse/CLA-3507).
+                    */
+                    if (DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
+                    {
+                        dfDto.DatasetId = model.SchemaMaps.FirstOrDefault().SelectedDataset;
+                        dfDto.SchemaId = model.SchemaMaps.FirstOrDefault().SelectedSchema;
+                    }
+
                     int newFlowId = 0;
 
                     /************************************************
@@ -254,7 +255,7 @@ namespace Sentry.data.Web.Controllers
              * 
              */
 
-                    model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+            model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
             model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);

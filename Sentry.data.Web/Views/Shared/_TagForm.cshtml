@@ -10,26 +10,20 @@
     <div class="tagFormErrorBox" id="TagFormErrorBox" style="display:none"></div>
     @Html.HiddenFor(model => model.CreationUserId)
     <div class="form-horizontal">
-        <div class="form-group">
-            @Html.LabelFor(m => m.TagName, new { @class = "col-md-2 control-label" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.TagName, new { @class = "form-control edit-dataset-row" })
-            </div>
+        <div class="md-form">
+            @Html.LabelFor(m => m.TagName, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.TagName, new { @class = "form-control" })
         </div>
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-9"><span id="tagWarningText" /></div>
+        <div class="md-form">
+            <span id="tagWarningText" />
         </div>
-        <div class="form-group">
-            @Html.LabelFor((model) => model.SelectedTagGroup, new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownListFor((model) => model.SelectedTagGroup, Model.AllTagGroups, new { @class = "form-control edit-dataset-row" })
-            </div>
+        <div class="md-form">
+            @Html.LabelFor((model) => model.SelectedTagGroup, new { @class = "mdb-main-label" })
+            @Html.DropDownListFor((model) => model.SelectedTagGroup, Model.AllTagGroups, new { @class = "mdb-select" })
         </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Description, new { @class = "col-md-2 control-label" })
-            <div class="col-md-10">
-                @Html.TextAreaFor(model => model.Description, new { @class = "form-control edit-dataset-row" })
-            </div>
+        <div class="md-form">
+            @Html.LabelFor(m => m.Description, new { @class = "disabled" })
+            @Html.TextAreaFor(model => model.Description, new { @class = "md-textarea w-100" })
         </div>
 
     </div>

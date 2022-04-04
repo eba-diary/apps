@@ -17,7 +17,14 @@
                                 <li class="filter-search-category-option filter-search-modal-option" title="@option.OptionValue">
                                     <label>
                                         <input type="checkbox" class="filter-search-category-option-checkbox" id="modal_@option.OptionId" value="@option.OptionValue" checked="@option.Selected" />
-                                        <strong>@(option.OptionValue.Length > 25 ? option.OptionValue.Substring(0, 22) + "..." : option.OptionValue)</strong>
+                                        @if (option.OptionValue != null)
+                                        {
+                                            <strong>@(option.OptionValue.Length > 25 ? option.OptionValue.Substring(0, 22) + "..." : option.OptionValue)</strong>
+                                        }
+                                        else
+                                        {
+                                            <strong>@option.ParentCategoryName</strong>
+                                        }
                                         <span>(@option.ResultCount.ToString("N0"))</span>
                                     </label>
                                 </li>
@@ -26,7 +33,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary display-none filter-search-start filter-search-apply"><em class="glyphicon glyphicon-search filter-search-apply-icon"></em>Apply</button>
+                        <button type="button" class="btn btn-primary display-none filter-search-start filter-search-apply"><em class="icon-search filter-search-apply-icon"></em>Apply</button>
                     </div>
                 </div>
             </div>

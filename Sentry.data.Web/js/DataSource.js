@@ -12,7 +12,10 @@
             minLength: 0,
             maxResults: 10
         });
-
+        if (!$("#SourceType").is("[type=hidden]")){
+            $("#SourceType").materialSelect();
+        }
+        $("#AuthID").materialSelect();
 
     },
 
@@ -67,39 +70,6 @@
         $('#SourceSelector').on('select2:change', function (e) {
             $('#SourceIds').val($('#SourceSelector').val());
         });
-
-        //alert(in_val);
-
-        //$("#SourceSelector").select2({
-        //    multiple: false,
-        //    allowClear: true,
-        //    data: { sourceType: in_val },
-        //    ajax: {
-        //        url: "/Config/SourcesByType?sourceType=" + $('#SelectedSourceType :selected').val(),
-        //        dataType: 'json',
-        //        dropdownPosition: 'below',
-        //        data: function (params) {
-        //            return {
-        //                query: params.term
-        //            };
-        //        },
-        //        processResults: function (data) {
-        //            return {
-        //                results: data
-        //            };
-        //        },
-        //        cache: true
-        //    },
-        //    dropdownPosition: 'below',
-        //    templateResult: data.DataSource.formatSource,
-        //    escapeMarkup: function (markup) { return markup; },
-        //    templateSelection: data.DataSource.formatSourceSelection
-        //});
-
-        //if ($('#SourceIds').val()) {
-        //    $('#SourceSelector').val($("#SourceIds").val().split(","));
-        //    $('#SourceSelector').trigger('change');
-        //}
     },
 
     formatSource: function (source) {
