@@ -82,6 +82,11 @@ namespace Sentry.data.Core
             return dtoResult;
         }
 
+        public bool TryGetCategoryName(string category, out string categoryName)
+        {
+            return CustomAttributeHelper.TryGetFilterCategoryName<DataInventory>(category, out categoryName);
+        }
+
         private void CanDaleSensitiveView()
         {
             if (!_userService.GetCurrentUser().CanDaleSensitiveView)
