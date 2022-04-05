@@ -219,6 +219,6 @@
             cellValue = 'true';
         }
 
-        return '<input type="checkbox" value="true" class="table-element-checkbox" id="' + id + '" ' + checked + disabled + '><label class="display-none">' + cellValue + '</label>';
+        return '<input type="checkbox" value="true" class="form-check-input table-element-checkbox" id="' + id + '" ' + checked + disabled + '><label for=' + id + ' class="form-check-label"></label>';
     }
 }

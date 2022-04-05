@@ -19,7 +19,7 @@
     {
         <li class="filter-search-category-option" title="@option.OptionValue">
             <div class="form-group mb-0">
-                <input type="checkbox" id="@option.OptionId" class="form-check-input filter-search-category-option-checkbox">
+                <input type="checkbox" id="@option.OptionId" class="form-check-input filter-search-category-option-checkbox" value="@option.OptionValue" checked="@option.Selected">
                 <label for="@option.OptionId" class="form-check-label">@SafeValue(option.OptionValue)</label>
                 <span>(@option.ResultCount.ToString("N0"))</span>
             </div>
