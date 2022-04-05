@@ -3,7 +3,8 @@
     ViewBag.Title = "Subscriptions";
 }
 
-@using (Html.BeginForm("SubscribeUpdate", "Notification", FormMethod.Post))
+@*Attach class to form because Notification.js uses class here to submit form because of quill*@
+@using (Html.BeginForm("SubscribeUpdate", "Notification", FormMethod.Post, htmlAttributes: new { @class = "subscribeHeroForm" }))
 {
     @Html.AntiForgeryToken()
 
@@ -19,51 +20,81 @@
             <thead>
                 <tr class="table-header">
                     <th>Event</th>
-                    @*TODO ADD THIS WHEN FINISHING UI*@
-                    @*<th>Event Details</th>*@
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
 
-                @for (var subId = 0; subId < Model.CurrentSubscriptionsBusinessArea.Count(); subId++)
-                {
-                    @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessArea[subId].BusinessAreaType)
-                    @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessArea[subId].ID)
-
-                    string cssClass = "";
-                    if (Model.CurrentSubscriptionsBusinessArea[subId].Interval.Description.ToLower().Contains("never"))
+                @{  int subId = 0;
+                    
+                    foreach (Sentry.data.Core.BusinessAreaSubscription sub in Model.CurrentSubscriptionsBusinessArea)
+                    //@for (var subId = 0; subId < Model.CurrentSubscriptionsBusinessArea.Count(); subId++)
                     {
-                        cssClass = "unUsable";
-                    }
-                    else
-                    {
-                        cssClass = "active";
-                    }
 
-                <tr class="@cssClass">
-                    <td>
-                        @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessArea[subId].EventType.Type_ID)
-                        @Html.DisplayFor(model => model.CurrentSubscriptionsBusinessArea[subId].EventType.DisplayName)
-                    </td>
+                        @Html.HiddenFor(model => sub.BusinessAreaType)
+                        @Html.HiddenFor(model => sub.ID)
 
-
-                    @*TODO: ADD MULTI DROP DOWN HERE AND FIGURE OUT WHAT TO DO WITH MAKING 
-                        model.CurrentSubscriptionsBusinessArea[subId].childBusinessAreaSubscriptions[childId].EventType.Type_ID turn into a BOOL *@
-                    @*<td>
-                        @for (var childId = 0; childId < Model.CurrentSubscriptionsBusinessArea[subId].childBusinessAreaSubscriptions.Count(); childId++)
+                        string cssClass = "";
+                        if (sub.Interval.Description.ToLower().Contains("never"))
                         {
-                            @Html.CheckBoxFor(model => model.CurrentSubscriptionsBusinessArea[subId].childBusinessAreaSubscriptions[childId].EventType.Type_ID
+                            cssClass = "unUsable";
                         }
-                    </td>*@
+                        else
+                        {
+                            cssClass = "active";
+                        }
 
-                    <td>
-                        @Html.DropDownListFor(model => model.CurrentSubscriptionsBusinessArea[subId].Interval.Interval_ID,
-                                new SelectList(Model.AllIntervals, "Value", "Text", Model.CurrentSubscriptionsBusinessArea[subId].Interval.Interval_ID))
-                    </td>
-                 </tr>
+                        <tr class="@cssClass">
+
+                            @*COLUMN: DisplayName*@
+                            @if (sub.childBusinessAreaSubscriptions != null && sub.childBusinessAreaSubscriptions.Count > 0 )
+                            {
+                                //declare this so js can grab values
+                                string multiSelectClass = "buford" + sub.EventType.DisplayName;
+                                //EXAMPLE SYNTAX
+                                        @*<td>
+                                            <select class="select-wrapper mdb-select buford-multi-select" multiple>
+                                                <option disabled>Pick one or more</option>
+                                                <option >Mustard</option>
+                                                <option>Ketchup</option>
+                                                <option>Relish</option>
+                                            </select>
+                                        </td>*@
+
+                            <td>
+                                @Html.HiddenFor(model => sub.EventType.Type_ID)
+                                <select id=@multiSelectClass class="select-wrapper mdb-select buford-multi-select" multiple>
+
+                                    <option disabled>@sub.EventType.DisplayName</option>
+
+                                    @foreach (Sentry.data.Core.BusinessAreaSubscription childSub in sub.childBusinessAreaSubscriptions)
+                                    {
+                                        <option>@childSub.EventType.DisplayName  </option>
+                                    }
+                                </select>
+                            </td>
+
+                            }
+                            else
+                            {
+                                <td>
+                                    @Html.HiddenFor(model => sub.EventType.Type_ID)
+                                    @Html.DisplayFor(model => sub.EventType.DisplayName)
+                                </td>
+                            }
 
 
+                            @*COLUMN: Interval_ID SELECTION DROP DOWN*@
+                            <td>
+                                @*There is something magical about how MVC interprets the model where I have to use model. notation below instead of the foreeach sub.  TODO: is to figure out what is happening behind the scenes*@
+                                @Html.DropDownListFor(model => model.CurrentSubscriptionsBusinessArea[subId].Interval.Interval_ID,
+                                        new SelectList(Model.AllIntervals, "Value", "Text", Model.CurrentSubscriptionsBusinessArea[subId].Interval.Interval_ID),
+                                        new {@class= "mdb-select buford-multi-select" })
+                            </td>
+                        </tr>
+
+                        subId++;
+                    }
                 }
 
             </tbody>
@@ -72,21 +103,12 @@
 
         <div class="modal-footer">
             <div style="margin-left: 15px;">
-                <input type="submit" value="Update Subscriptions" class="btn btn-primary" />
+
+                <!-- Submit button triggers js function -->
+                <input type="submit" value="Update Subscriptions" class="btn btn-primary" onclick="data.Subscription.submitChanges()" />
                 <input type="submit" class="btn btn-warning" data-dismiss="modal" value="Cancel" />
             </div>
         </div>
 
     </div>
-}
-
-
-
-
-@section Scripts {
-    <script>
-        $(function () {
-
-        });
-    </script>
 }
