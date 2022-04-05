@@ -17,14 +17,7 @@
                                 <li class="filter-search-category-option filter-search-modal-option" title="@option.OptionValue">
                                     <label>
                                         <input type="checkbox" class="filter-search-category-option-checkbox" id="modal_@option.OptionId" value="@option.OptionValue" checked="@option.Selected" />
-                                        @if (option.OptionValue != null)
-                                        {
-                                            <strong>@(option.OptionValue.Length > 25 ? option.OptionValue.Substring(0, 22) + "..." : option.OptionValue)</strong>
-                                        }
-                                        else
-                                        {
-                                            <strong>@option.ParentCategoryName</strong>
-                                        }
+                                        <strong>@(option.OptionValue.Length > 25 ? option.OptionValue.Substring(0, 22) + "..." : option.OptionValue)</strong>
                                         <span>(@option.ResultCount.ToString("N0"))</span>
                                     </label>
                                 </li>
