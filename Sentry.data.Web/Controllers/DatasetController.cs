@@ -316,6 +316,7 @@ namespace Sentry.data.Web.Controllers
                 model.DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue();
                 model.DisplaySchemaSearch = _featureFlags.CLA3553_SchemaSearch.GetValue();
                 model.DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue();
+                model.ShowManagePermissionsLink = _featureFlags.CLA3718_Authorization.GetValue();
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Detail Page", dto.DatasetId);
 
                 return View(model);
@@ -702,6 +703,19 @@ namespace Sentry.data.Web.Controllers
 
             DataTablesQueryableAdapter<DatasetFileConfigsModel> dtqa = new DataTablesQueryableAdapter<DatasetFileConfigsModel>(files.AsQueryable(), dtRequest);
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion
+
+        #region "Manage Permissions"
+
+        [Route("Dataset/Detail/{datasetId}/Permissions")]
+        [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        public ActionResult ManagePermissions(int datasetId)
+        {
+            var model = new ManagePermissionsModel();
+            return View("ManagePermissions", model);
         }
 
         #endregion
