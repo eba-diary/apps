@@ -76,7 +76,7 @@ namespace Sentry.data.Web.Controllers
                         {
                             new FilterCategoryOptionModel()
                             {
-                                OptionValue = "P",
+                                OptionValue = FilterCategoryOptions.ENVIRONMENT_PROD,
                                 ParentCategoryName = FilterCategoryNames.ENVIRONMENT,
                                 Selected = true
                             }
