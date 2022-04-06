@@ -625,8 +625,7 @@ data.Dataset = {
         if ($("#datasetRowTable_filter").length > 0) {
             $("#datasetRowTable").DataTable().destroy();
         };
-        //Sentry.InjectSpinner($("#tab-container"));
-
+        $("#tab-spinner").show();
 
 
         $.ajax({
@@ -667,7 +666,7 @@ data.Dataset = {
                 $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
             },
             complete: function () {
-                data.RemoveSpinner("#tab-container");
+                $("#tab-spinner").hide();
             }
         }).fail(function () {
             $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
@@ -1256,7 +1255,7 @@ data.Dataset = {
 
 
 
-            //Sentry.InjectSpinner($("#tab-container"));
+            $("#tab-spinner").show();
 
 
             var url = new URL(window.location.href);
@@ -1275,7 +1274,7 @@ data.Dataset = {
 
             data.Dataset.UpdateMetadata();
 
-            data.RemoveSpinner('#tab-container');
+            $("#tab-spinner").hide();
 
         });
         Id = $('#datasetConfigList').val();
@@ -1307,7 +1306,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             if ($('#tabSchemaColumns').is(':empty')) {
-                //Sentry.InjectSpinner($("#tab-container"));
+                $("#tab-spinner").show();
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaColumns',
@@ -1317,7 +1316,7 @@ data.Dataset = {
                         data.Dataset.delroyInit();
                         data.Dataset.UpdateMetadata();
                         $('#delroySpinner').hide();
-                        data.RemoveSpinner('#tab-container');
+                        $("#tab-spinner").hide();
                     }
                 });
             }
@@ -1338,7 +1337,7 @@ data.Dataset = {
             var id = $('#RequestAccessButton').attr("data-id");
 
             if ($('#tabSchemaAbout').is(':empty')) {
-                //Sentry.InjectSpinner($("#tab-container"));
+                $("#tab-spinner").show();
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaAbout',
@@ -1347,7 +1346,7 @@ data.Dataset = {
                         $('#tabSchemaAbout').html(view);
                         ko.applyBindings(self.vm, $("#tabSchemaAbout")[0]);
                         data.Dataset.UpdateMetadata();
-                        data.RemoveSpinner('#tab-container');
+                        $("#tab-spinner").hide();
                     }
                 });
             }
@@ -1368,7 +1367,7 @@ data.Dataset = {
             var id = $('#RequestAccessButton').attr("data-id");
 
             if ($('#tabDataPreview').is(':empty')) {
-                //Sentry.InjectSpinner($("#tab-container"));
+                $("#tab-spinner").show();
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataPreview',
@@ -1378,7 +1377,7 @@ data.Dataset = {
                         if (self.vm.ShowDataFileTable()) {
                             data.Dataset.renderDataPreview();
                         }
-                        data.RemoveSpinner('#tab-container');
+                        $("#tab-spinner").hide();
                     }
                 });
             }
@@ -1398,7 +1397,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             if ($('#tabDataFiles').is(':empty')) {
-                //Sentry.InjectSpinner($("#tab-container"));
+                $("#tab-spinner").show();
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataFiles',
@@ -1410,7 +1409,7 @@ data.Dataset = {
                             data.Dataset.DatasetFileTableInit(configId);
                             data.Dataset.DatasetBundingFileTableInit(configId);
                         }
-                        data.RemoveSpinner('#tab-container');
+                        $("#tab-spinner").hide();
                     }
                 });
             }
@@ -1430,7 +1429,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             if ($('#tabSchemaSearch').is(':empty')) {
-                //Sentry.InjectSpinner($("#tab-container"));
+                $("#tab-spinner").show();
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaSearch',
@@ -1445,7 +1444,7 @@ data.Dataset = {
                             data.Dataset.InitSchemaSearchTab();
                         });
 
-                        data.RemoveSpinner('#tab-container');
+                        $("#tab-spinner").hide();
                     }
                 });
             }
