@@ -12,8 +12,8 @@ namespace Sentry.data.Core
             { 
                 FilterCategoryNames.ENVIRONMENT, new Dictionary<string, string>()
                 {
-                    { "P", "Prod" },
-                    { "D", "NonProd" }
+                    { FilterCategoryOptions.ENVIRONMENT_PROD, "Prod" },
+                    { FilterCategoryOptions.ENVIRONMENT_NONPROD, "NonProd" }
                 }
             }
         });
