@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Sentry.data.Core.GlobalEnums;
 using System;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
@@ -84,6 +85,11 @@ namespace Sentry.data.Core
 
         public bool TryGetCategoryName(string category, out string categoryName)
         {
+            if (string.Equals(category, "said", StringComparison.OrdinalIgnoreCase))
+            {
+                category = FilterCategoryNames.ASSET;
+            }
+            
             return CustomAttributeHelper.TryGetFilterCategoryName<DataInventory>(category, out categoryName);
         }
 
