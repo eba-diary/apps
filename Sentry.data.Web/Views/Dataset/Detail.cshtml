@@ -47,13 +47,6 @@
                         }
 
                     </h2>
-                    @if (Model.Security.CanPreviewDataset)
-                    {
-                        foreach (string item in Model.DistinctFileExtensions)
-                        {
-                            <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
-                        }
-                    }
                 </div>
 
                 <div class="col-5 pr-0">
@@ -290,17 +283,23 @@ else
         <div class="tabs-wrapper">
             <ul class="nav classic-tabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#panelSchemaAbout" id="detailTabSchemaAbout" role="tab">About this Schema</a>
+                    <a class="nav-link" data-toggle="tab" href="#panelSchemaAbout" id="detailTabSchemaAbout" role="tab">About</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#panelSchemaColumns" id="detailTabSchemaColumns" role="tab">Columns</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Data Preview (Top 20 Rows)</a>
+                    <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Preview (Top 20 Rows)</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#panelDataFiles" id="detailTabDataFiles" role="tab">Data Files</a>
+                    <a class="nav-link" data-toggle="tab" href="#panelDataFiles" id="detailTabDataFiles" role="tab">Files</a>
                 </li>
+                @if (Model.DisplaySchemaSearch)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#panelSchemaSearch" id="detailTabSchemaSearch" role="tab">Search Columns</a>
+                    </li>
+                }
             </ul>
         </div>
 

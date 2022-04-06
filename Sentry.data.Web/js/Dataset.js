@@ -817,7 +817,7 @@ data.Dataset = {
             localStorage.setItem("searchText", $('#SearchText')[0].value);
         });
 
-        $('.input-group-addon').click(function (e) {
+        $('.input-group-prepend').click(function (e) {
             $('#DatasetSearch').submit();
         });
 
@@ -1430,7 +1430,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             if ($('#tabSchemaSearch').is(':empty')) {
-                Sentry.InjectSpinner($("#tab-container"));
+                //Sentry.InjectSpinner($("#tab-container"));
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaSearch',
