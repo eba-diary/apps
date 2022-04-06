@@ -6,7 +6,7 @@
    <teiHeader>
       <fileDesc>
          <titleStmt>
-            <title>Diary of Mrs. Emma B. Andrews. Volume 17 1912-1913</title> <!-- replace with correct volume -->
+            <title>Diary of Mrs. Emma B. Andrews. Volume 9 1901-1902</title>
             <author>
                <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
             </author>
@@ -30,10 +30,11 @@
                <resp>proofreading and tagging</resp>
                <persName ref="#SK">Sarah Ketchley</persName>
                <persName ref="#HB">Hannah Burrows</persName>
+               <persName ref="#SF">Sabrina Fang</persName>
             </respStmt>
             <respStmt>
-                    <resp>biographical research and writing</resp>
-                    <persName ref="#XX">name name</persName> <!-- replace with correct names -->
+               <resp>biographical research and writing</resp>
+               <persName ref="#XX">name name</persName> <!-- replace with correct names -->
             </respStmt>
          </titleStmt>
          <publicationStmt>
@@ -90,7 +91,7 @@
             </normalization>
          </editorialDecl>
       </encodingDesc>
-      <revisionDesc> <!-- update this with major revision list-->
+      <revisionDesc>
          <list>
             <item>
                <date when="2021-08-02">2 August 2021</date> create XML update header by SLK</item>
@@ -105,6 +106,9 @@
             <item>
                <date when="2021-10-31">31 October 2021</date> HB finished separating entries and
                adding date tags
+            </item>
+            <item>
+               <date when="2022-03-31">31 March 2022</date> HB and SF finished initial tagging.
             </item>
          </list>
       </revisionDesc>
@@ -1216,7 +1220,6 @@
             <date when="1902-02-12">Ash-Wednesday, Feb. 12</date>.
          </dateline>
          <p>
-         <!-- who would Hassan be? many hassan's in the master indicies, none mention a mother -->
             Not of the boat today. Breakfasted at 8 - and <persName ref="#Davis_Theodore_M">Theodore</persName>
              and <persName ref="#Buttles_Jeanette">Nettie</persName> crossed to the <name type="hotel" ref="#Cataract_Hotel">Cataract
              Hotel</name>, and took one of the sand carriages to the "barrage". They came home
@@ -1224,7 +1227,7 @@
              face the glare and heat. <persName ref="#Christian_Henry">Henry Christian</persName> came again
              to lunch, and to play chess - and after <persName ref="#Christian_George_Henry #Christian_Leonara">Mr. and
              Mrs. Christian</persName>, bringing me some flowers. Poor
-             <persName>Hassan</persName>'s mother came, attended by the old man, and her
+             <persName ref="#Hassan_mother">Hassan's mother</persName> came, attended by the old man, and her
              nephew. We would like to have had the former kicked off the boat; but knew that he
              would only make it harder for her after. We gave her 3 pounds which is all she will
              have to live on for 6 months - even if she succeeds in keeping it out of his
@@ -1248,10 +1251,9 @@
             <date when="1902-02-13">Thursday, Feb. 13</date>.
          </dateline>
          <p>
-            <!-- Getty has a mount Grenfell but it's in Australia -->
             A strong north wind was blowing as usual this morning - and we had quite given up
              starting, when just after lunch it dropped so much that we started - but had only got
-             opposite the <placeName>Grenfell Mt.</placeName> when we had to tie up to a little
+             opposite the <placeName ref="#Grenfell_Mountain">Grenfell Mt.</placeName> when we had to tie up to a little
              sand island just opposite the <name type="hotel" ref="#Savoy_Hotel">Savoy Hotel</name> where we are now lying, with
              little squalls breaking over us now and then. But the night is so wonderful - the air
              so warm and perfectly dry, - that we were on deck all the evening, star gazing - the
@@ -1470,7 +1472,6 @@
              stayed all night.
          </p>
       </div>
-      <!-- sabrina start -->
       <div xml:id="EBA-1902-03-01" type="entry">
          <dateline>
             <date when="1902-03-01">Saturday, March 1st</date>.
@@ -2274,7 +2275,6 @@
              Tomorrow we go over to <persName ref="#Lucero">Lucerno</persName>.
          </p>
       </div>
-      <!-- is G&#246;sechnen a typo? -->
       <div xml:id="EBA-1902-05-06" type="entry">
          <dateline>
             <name>Hotel National</name> - <placeName>Lucerno</placeName> -<date when="1902-05-06">May 6</date>.
