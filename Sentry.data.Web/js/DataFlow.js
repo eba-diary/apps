@@ -255,7 +255,6 @@
                 }
             },
             error: function (obj) {
-                console.log(obj.responseText)
                 $('#DatasetFormContainer').html(obj.responseText);
                 var hrEnv = $('#HrempServiceEnv').val();
                 var hrUrl = $('#HrempServiceUrl').val();
