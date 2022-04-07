@@ -213,6 +213,10 @@
             disabled = 'disabled ';
         }
 
+        if (isChecked) {
+            checked = 'checked ';
+        }
+
         return '<input type="checkbox" value="true" class="form-check-input table-element-checkbox" id="' + id + '" ' + checked + disabled + '><label for=' + id + ' class="form-check-label"></label>';
     }
 }
