@@ -151,11 +151,13 @@
                             <tbody>
                                 <tr>
                                     <td class="borderMeta_@color colOneMeta">
-                                        <a class="float-l" data-bind="attr: { href:DetailUrl, target: '_blank' }, click: DataFlowDetailRedirect, text: Name()"></a>
-                                        @if (Model.DisplayDataflowEdit)
-                                        {
-                                            <div id="edit-dataflow-icon" class="float-l clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" data-bind="click: DataFlowEditRedirect"><span class="icon-pencil"></span></div>
-                                        }
+                                        <div class="row pl-3">
+                                            <a class="float-l" data-bind="attr: { href:DetailUrl, target: '_blank' }, click: DataFlowDetailRedirect, text: Name()"></a>
+                                            @if (Model.DisplayDataflowEdit)
+                                            {
+                                                <div id="edit-dataflow-icon" class="float-l clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" data-bind="click: DataFlowEditRedirect"><span class="icon-pencil"></span></div>
+                                            }
+                                        </div>
                                     </td>
                                     <!-- ko if: RenderJobs() == "noRenderJobs" -->
                                     <td style="padding:0px; border-top-width:0px">There are no retriever jobs associated with this dataflow</td>

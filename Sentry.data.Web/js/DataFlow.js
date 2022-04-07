@@ -251,11 +251,12 @@
                     data.DataFlow.InitSchemaMaps(obj.dataset_id, null);
                 }
                 else {
-                    $('#DatasetFormContent').replaceWith(obj);
+                    $('#DatasetFormContainer').html(obj);
                 }
             },
             error: function (obj) {
-                $('#DatasetFormContent').replaceWith(obj.responseText);
+                console.log(obj.responseText)
+                $('#DatasetFormContainer').html(obj.responseText);
                 var hrEnv = $('#HrempServiceEnv').val();
                 var hrUrl = $('#HrempServiceUrl').val();
                 if ($("#DatasetDesc").val()) {
@@ -360,7 +361,7 @@
 
         $('#CreateSchema').click(function () {
             $('#DataFlowFormContainer').hide();
-            data.DataFlow.RenderSchemaCreatePage($(".dataset-select select").val());
+            data.DataFlow.RenderSchemaCreatePage($(".dataset-select").val());
         });
     },
 
