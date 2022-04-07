@@ -331,8 +331,6 @@ data.Dataset = {
 
         var index = data.Dataset.delroyFieldArray.length - 1;
         var field = data.Dataset.delroyFieldArray[index];
-        console.log(data.Dataset.delroyFieldArray);
-        console.trace();
         //NOTE: this is a strange concept:  but a field is either a ROOT level one (index 0) or a CHILD level (index > 0)
         //All levels > (index 0) you need too specify the Fields array which is a child property whereas the root level(index 0) the array is at that level
         //also check if field is NULL, because in that case return a null field else returning field.Fields will cause an error
@@ -1748,14 +1746,13 @@ data.Dataset = {
             stateSave: true,
             "createdRow": function (row, data, dataIndex) { }
         });
+
         if ($("#datasetFilesTable_filter").length > 0) {
-            yadcf.init($("#datasetFilesTable").dataTable(), [
-                { column_number: 0, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
-                { column_number: 1, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+            yadcf.init(data.Dataset.DatasetFilesTable, [
                 { column_number: 2, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
                 { column_number: 3, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
-                { column_number: 4, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },
-                { column_number: 5, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },
+               // { column_number: 4, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },  SEE CLA-4004
+               // { column_number: 5, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },
                 { column_number: 6, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
             ],
                 {
