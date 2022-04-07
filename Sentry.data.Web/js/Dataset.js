@@ -1738,8 +1738,6 @@ data.Dataset = {
                 { data: "ConfigFileName", className: "ConfigFileName" }
             ],
             language: {
-                search: "<div class='input-group'><span class='input-group-addon'><em class='icon-search'></em></span>_INPUT_</div>",
-                searchPlaceholder: "Search",
                 processing: ""
             },
             order: [5, 'desc'],
