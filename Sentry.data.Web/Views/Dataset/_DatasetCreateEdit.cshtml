@@ -217,8 +217,7 @@
 
                         <div class="md-form">
                             @Html.LabelFor((model) => model.FileExtensionId, new { @class = "mdb-main-label" })
-                            @Html.DropDownListFor((model) => model.FileExtensionId, Model.AllExtensions, new { @class = "mdb-select" })
-                            @Html.ValidationMessageFor((model) => model.FileExtensionId, "", new { @class = "text-danger" })
+                            @Html.DropDownListFor(model => model.FileExtensionId, Model.AllExtensions, new { @class = "mdb-select" })
                         </div>
 
                         <div class="schemaRootPathPanel md-form">
