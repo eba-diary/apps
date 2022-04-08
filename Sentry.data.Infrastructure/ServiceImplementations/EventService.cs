@@ -112,6 +112,18 @@ namespace Sentry.data.Infrastructure
                     evt.Reason += $" in {ds.DatasetCategories.First().Name}";
                 }
             }
+            else if(evt.EventType.Description == GlobalConstants.EventType.CREATED_FILE)
+            {
+                if(schema != null)
+                {
+                    evt.Reason = $"Data has been added for {schema.Name} under {ds.DatasetName} ";
+                }
+                else
+                {
+                    evt.Reason = $"Data has been added under {ds.DatasetName} ";
+                }
+                
+            }
         }
     }
 }
