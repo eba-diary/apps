@@ -367,24 +367,20 @@
       </div>
       <div xml:id="EBA-1908-01-30" type = "entry">
         <dateline><date when="1908-01-30">Jan. 30. Thursday</date>.</dateline>
-        <p>A lot of people on the boat today - among them <persName>Mr. and Mrs. Smith</persName> <!--who?--> of <placeName ref="#New_York">New York</placeName> - he is something at the <placeName ref="#Metropolitan_Museum">Met. Museum</placeName>, <choice><sic>wand</sic><corr>and</corr></choice> with them <persName>Mr. and Mrs. Patterson</persName> <!--who?--> of <placeName ref="Chicago">Chicago</placeName>. <persName ref="#Loret_M">M. Loret</persName> also called - a pleasant and charming personage. <persName ref="#Dalison_Max">Mr. Dalison</persName> dined here.</p>
+        <p>A lot of people on the boat today - among them <persName>Mr. and Mrs. Smith</persName> of <placeName ref="#New_York">New York</placeName> - he is something at the <placeName ref="#Metropolitan_Museum">Met. Museum</placeName>, and with them <persName>Mr. and Mrs. Patterson</persName> of <placeName ref="Chicago">Chicago</placeName>. <persName ref="#Loret_M">M. Loret</persName> also called - a pleasant and charming personage. <persName ref="#Dalison_Max">Mr. Dalison</persName> dined here.</p>
       </div>
       <div xml:id="EBA-1908-01-31" type = "entry">
         <dateline><date when="1908-01-31">Jan. 31. Friday</date>.</dateline>
-        <p><persName ref="#Davis_Theodore_M">Theo</persName> as usual in the <placeName ref="#Bībān al-Mulūk">Valley</placeName> with <persName ref="#Lythgoe_Albert">Lythgoe</persName> and <persName>Harold</persName> <!--who?-->. <persName ref="#Villiers_Eric">Mr. Eric Villiers</persName> called this afternoon.</p>
+        <p><persName ref="#Davis_Theodore_M">Theo</persName> as usual in the <placeName ref="#Bībān al-Mulūk">Valley</placeName> with <persName ref="#Lythgoe_Albert">Lythgoe</persName> and <persName ref="Jones_Harold">Harold</persName>. <persName ref="#Villiers_Eric">Mr. Eric Villiers</persName> called this afternoon.</p>
       </div>
-      <!-- The Smiths just arrived the day before, so is this Harold Jones or Harold Smith? -->
       <div xml:id="EBA-1908-02-01" type = "entry">
         <dateline><date when="1908-01-01">Feb. 1. Saturday</date>.</dateline>
         <p>A day at home. <persName ref="#Cassel_Ernest">Sir Ernest Cassel</persName> and his daughter <persName ref="#Maud_Amalia">Mrs. Ashley</persName> and the <persName ref="#Di_Teano_Princess">Princess Teano</persName> of <placeName ref="#Rome">Rome</placeName> came to tea also <persName>Mr. and Mrs. Schiff</persName> <!--who?--> of New York, <persName ref="#Villiers_Eric">Mr. Villiers</persName>, <persName ref="#Weigall_Arthur">Weigall</persName> and others.</p>
       </div>
-      <!-- Corrected misspelling: Cassal -> Cassel -->
-      <!-- Ernest Cassel did not have a daughter named Mrs. Ashley. His daughter was Amalia Mary Maud (nee Cassel). Oddly, the EBA Indices page does mention a Mrs. Ashley Maud, but this wasn't her name either. Maybe, because her name was Prussian, she took on an English name as a kind of nickname?-->
       <div xml:id="EBA-1908-02-02" type = "entry">
         <dateline><date when="1908-02-02">Feb. 2. 4th after <name type="event" ref="#Epiphany">Epiphany</name></date>.</dateline>
         <p>In all day. <persName ref="#Davis_Theodore_M">Theo</persName>, <persName ref="#Ransom_Williams_Caroline">Carrie</persName> and <persName ref="#Jones_Harold">Harold</persName> visited the interesting tombs in <placeName ref="#Sheikh_Abd_el-Qurna">Sheik Abdul Gurnah</placeName>. <persName ref="#Maspero_Gaston #Maspero_Louise">M. and Mme. Maspero</persName> and <persName ref="#Loret_M">M. Loret</persName> dined with us. Very warm this afternoon.</p>
       </div>
-      <!-- Harold Jones or Harold Smith? -->
       <div xml:id="EBA-1908-02-03" type = "entry">
         <dateline><date when="1908-02-03">Feb. 3rd. Monday</date>.</dateline>
         <p>In <placeName ref="#Luxor">Luxor</placeName> this morning. Beautiful warm day.</p>
