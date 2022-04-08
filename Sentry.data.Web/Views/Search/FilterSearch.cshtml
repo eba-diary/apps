@@ -10,40 +10,39 @@
     <div class="search-head">
         <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" alt="Source icon" /></div>
         <div class="search-head-item">
-            <h1 class="datasetHeader pt-2">@Model.PageTitle</h1>
+            <h1 class="filter-search-page-title">@Model.PageTitle</h1>
         </div>
 
-        <a target="_blank" rel="noopener noreferrer" href="@Url.Content(Model.InfoLink)">
+        <a class="filter-search-page-info" target="_blank" rel="noopener noreferrer" href="@Url.Content(Model.InfoLink)">
             <em class="icon-info-solid dsc-blue-text"></em>
         </a>
+    </div>
 
-        <div id="search-box" class="md-form input-group has-feedback has-feedback-left">
-            <span class="input-group-prepend sentry-blue white-text icon-search" id="SearchBoxAddon"></span>
-            <input type="text" class="form-control text-box single-line" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled>
-            <span class="form-control-feedback fa fa-circle-o-notch fa-spin"></span>
-        </div>
-
+    <div id="search-box" class="md-form input-group has-feedback has-feedback-left filter-search-box">
+        <input type="text" class="form-control text-box single-line" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled>
+        <span class="input-group-append sentry-blue white-text icon-search clickable filter-search-start" id="SearchBoxAddon"></span>
     </div>
 </div>
 
 <div class="filter-search-body">
     <div class="filter-search-container">
         <div class="filter-search-result-count-container display-none">
-            <h2 class="filter-search-total-results"><span id="filter-search-total"></span> Total Results</h2>
+            <div class="filter-search-total-results"><span id="filter-search-total"></span> Total Results</div>
             <div>Showing <span id="filter-search-page-size"></span> of <span id="filter-search-returned-total"></span></div>
         </div>
 
         <div class="filter-search-title-container bottom-border">
-            <h4 class="filter-search-title pt-1">Filter</h4>
+            <h4 class="filter-search-title">Filter</h4>
+            <span class="filter-search-clear-container">
+                <button class="btn btn-warning display-none filter-search-option-button" id="filter-search-clear">Clear All</button>
+            </span>
+            <span class="filter-search-clear-container">
+                <button class="btn btn-primary display-none filter-search-option-button filter-search-start filter-search-apply"><em class="icon-search filter-search-apply-icon"></em>Apply</button>
+            </span>
         </div>
 
-        <div class="bottom-border">
-            <span class="filter-search-clear-container"><a href="#" class="display-none btn btn-warning p-2" id="filter-search-clear">Clear All</a></span>
-            <span class="filter-search-clear-container"><a href="#" class="btn btn-primary display-none filter-search-start filter-search-apply p-2"><em class="icon-search filter-search-apply-icon"></em>Apply</a></span>
-        </div>
-
-        <div class="filter-search-categories-sentry-spinner">
-            <span class="sentry-spinner"></span>
+        <div class="progress md-progress sentry-dark-blue filter-search-categories-progress">
+            <div class="indeterminate"></div>
         </div>
 
         <div class="filter-search-categories-container display-none">
@@ -51,8 +50,8 @@
         </div>
     </div>
 
-    <div class="filter-search-result-sentry-spinner">
-        <span class="sentry-spinner"></span>
+    <div class="progress md-progress sentry-dark-blue filter-search-result-progress">
+        <div class="indeterminate"></div>
     </div>
 
     <div class="filter-search-results-none display-none">
