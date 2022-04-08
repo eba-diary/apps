@@ -1185,31 +1185,28 @@ data.Dataset = {
                 "this is needed, dataset and schema(s) will need to be recreated along with all files resent from source."
 
 
-            Sentry.ShowModalCustom("Delete Dataset", ConfirmMessage, {
-                Confirm: {
-                    label: "Confirm",
-                    className: "btn btn-danger waves-effect waves-light",
-                    callback: function () {
-                        $.ajax({
-                            url: "/Dataset/" + dataset.attr("data-id") + "/Delete",
-                            method: "DELETE",
-                            dataType: 'json',
-                            success: function (obj) {
-                                Sentry.ShowModalAlert(obj.Message, function () {
-                                    window.location = "/Dataset";
-                                })
-                            },
-                            failure: function (obj) {
-                                Sentry.ShowModalAlert(
-                                    obj.Message, function () { })
-                            },
-                            error: function (obj) {
-                                Sentry.ShowModalAlert(
-                                    obj.Message, function () { })
-                            }
-                        });
+            Sentry.ShowModalCustom("Delete Dataset", ConfirmMessage,
+                '<button type="button" id="datasetDeleteBtn" data-dismiss="modal" class="btn btn-danger waves-effect waves-light">Delete</button>'
+            );
+            $("#datasetDeleteBtn").click(function () {
+                $.ajax({
+                    url: "/Dataset/" + dataset.attr("data-id") + "/Delete",
+                    method: "DELETE",
+                    dataType: 'json',
+                    success: function (obj) {
+                        Sentry.ShowModalAlert(obj.Message, function () {
+                            window.location = "/Dataset";
+                        })
+                    },
+                    failure: function (obj) {
+                        Sentry.ShowModalAlert(
+                            obj.Message, function () { })
+                    },
+                    error: function (obj) {
+                        Sentry.ShowModalAlert(
+                            obj.Message, function () { })
                     }
-                }
+                });
             });
         });
 
