@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
+
+
 namespace Sentry.data.Core
 {
     public class BusinessAreaSubscription : Subscription
@@ -20,7 +23,9 @@ namespace Sentry.data.Core
         
         public virtual BusinessAreaType BusinessAreaType { get; set; }
 
-        public virtual List<BusinessAreaSubscription> childBusinessAreaSubscriptions { get; set; }
 
+        public virtual List<BusinessAreaSubscription> Children { get; set; }
+
+        public virtual IEnumerable<int> ChildrenSelections { get; set; }
     }
 }

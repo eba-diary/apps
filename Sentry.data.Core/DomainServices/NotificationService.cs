@@ -458,9 +458,9 @@ namespace Sentry.data.Core
                 }
 
                 //IF CHILDREN EXIST ON SUBSCRIPTION THEN RESURSIVELY CALL THIS FUNCTION AGAIN TO ADD NEW SUBSCRIPTIONS IF REQUIRED
-                if (newItem.childBusinessAreaSubscriptions != null)
+                if (newItem.Children != null)
                 {
-                    UpdateSubscriptionsSmartly(ref dbList, newItem.childBusinessAreaSubscriptions);
+                    UpdateSubscriptionsSmartly(ref dbList, newItem.Children);
                 }
             }
         }

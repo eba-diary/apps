@@ -227,6 +227,7 @@
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\SparkConverterModel.cs" />
     <Compile Include="Entities\Schema\Elastic\ElasticSchemaField.cs" />
+    <Compile Include="GlobalEnums\IntervalType.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryNews.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryReleaseNotes.cs" />
     <Compile Include="Helpers\FilterCategoryOptionNormalizer.cs" />

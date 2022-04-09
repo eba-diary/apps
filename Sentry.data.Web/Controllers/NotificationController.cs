@@ -174,6 +174,8 @@ namespace Sentry.data.Web.Controllers
 
                 //STEP 6:  UPDATE CURRENT SUBCRIPTIONS
                 model.CurrentSubscriptionsBusinessArea = dbSubscriptions.OrderBy(o => o.EventType.Type_ID).ToList();
+
+                model.CurrentSubscriptionsBusinessAreaModels = model.CurrentSubscriptionsBusinessArea.ToWeb();
             }
 
             return PartialView("_SubscribeHero", model);
@@ -204,30 +206,76 @@ namespace Sentry.data.Web.Controllers
                     newSubscription.Interval = _notificationService.GetInterval("Never");
                     newSubscription.ID = 0;
 
-                    if(et.ChildEventTypes != null)
+                    if (et.ChildEventTypes != null && et.ChildEventTypes.Count > 0)
                     {
-                        tempChildren = newSubscription.childBusinessAreaSubscriptions;                          //NOTE: CANT PASS ANY PARENT.Property AS REF in C#, so make a new var and UPDATE LATER
+                        tempChildren = newSubscription.Children;                          //NOTE: CANT PASS ANY PARENT.Property AS REF in C#, so make a new var and UPDATE LATER
                         UpdateSubscriptions(et.ChildEventTypes, ref tempChildren, businessAreaType);
-                        newSubscription.childBusinessAreaSubscriptions = tempChildren;
+                        newSubscription.Children = tempChildren;
                     }
                     dbSubscriptions.Add(newSubscription);
                 }
                 else if (et.ChildEventTypes != null && et.ChildEventTypes.Count > 0)                            //UPDATE SCENARIO:  SUBSCRIPTION EXISTS BUT NEED TO CHECK IF THEY HAVE ALL CHILDREN
                 {
-                    tempChildren = dbSubscription.childBusinessAreaSubscriptions;
+                    tempChildren = dbSubscription.Children;
                     UpdateSubscriptions(et.ChildEventTypes, ref tempChildren, businessAreaType);
-                    dbSubscription.childBusinessAreaSubscriptions = tempChildren;
+                    dbSubscription.Children = tempChildren;
+
+                    if (dbSubscription.ChildrenSelections == null)                        //ONLY UPDATE IF NULL, IF MODEL HAS PREFILLED KEEP THEM SINCE THIS MAY BE COMING FROM SubscribeUpdate()
+                    {
+                        dbSubscription.ChildrenSelections = GetChildBusinessAreaSubscriptionSelections(dbSubscription.Children);
+                    }
+                    
                 }
             }
+        }
+
+        private List<int> GetChildBusinessAreaSubscriptionSelections(List<BusinessAreaSubscription> subs)
+        {
+            List<int> myList = subs.Where(w => w.Interval.Interval_ID != (int)IntervalType.Never).Select(s => s.Interval.Interval_ID).ToList();
+            return myList;
         }
 
         [HttpPost]
         public ActionResult SubscribeUpdate(SubscriptionModel sm)
         {
+            //REBUILD ChildBusinessAreaSubscriptions based on ChildBusinessAreaSubscriptionSelections because model binding in MVC doesn't work on complex objects
+
+            //1: CONVERT MODELS TO DTOS
+            List<BusinessAreaSubscription> newList = sm.CurrentSubscriptionsBusinessAreaModels.ToDto();
+
+            //2:REBUILD ALL CHILD SUBSCRIPTIONS BECAUSE MVC HAS NO COMPLEX DATA STRUCTURE MODEL BINDING, EXISTING PARENT SUBSCRIPTIONS WILL NOT BE REPLACED
+            IEnumerable<EventType> eventTypes = _notificationService.GetEventTypes(sm.group);
+            UpdateSubscriptions(eventTypes.ToList(), ref newList, (BusinessAreaType)sm.businessAreaID);
+
+            //3:ANY CHILD SUBCRIPTION SELECTED, ASSIGN PARENT's INTERVAL TYPE
+            UpdateChildIntervals(ref newList);
+
+            //4:UPDATE MODEL TO INCLUDE NEW CHILDREN
+            sm.CurrentSubscriptionsBusinessArea = newList;
+
             SubscriptionDto dto = sm.ToDto();
             _notificationService.CreateUpdateSubscription(dto);
             return Redirect(Request.UrlReferrer.PathAndQuery);
         }
+
+        //UPDATE CHILD INTERVALS TO PARENTS IF CHILD EXISTS IN ChildBusinessAreaSubscriptionSelections
+        private void UpdateChildIntervals(ref List<BusinessAreaSubscription> dbSubscriptions)
+        {
+            foreach(BusinessAreaSubscription parent in dbSubscriptions)
+            {
+                if(parent.ChildrenSelections != null && parent.ChildrenSelections.Count() > 0)
+                {
+                    List<BusinessAreaSubscription> children = parent.Children.Where(w => parent.ChildrenSelections.Contains(w.EventType.Type_ID)).ToList();
+                    foreach (BusinessAreaSubscription child in children)
+                    {
+                        child.Interval = parent.Interval;
+                    }
+                }
+
+            }
+
+        }
+
 
         [HttpGet]
         //method called by Notification.js to get notification title and message from DB so JS can decode it and load Quill

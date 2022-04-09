@@ -434,6 +434,7 @@
     <Compile Include="Models\Search\FilterCategoryOptionModel.cs" />
     <Compile Include="Models\Search\FilterSearchConfigModel.cs" />
     <Compile Include="Models\Search\FilterSearchModel.cs" />
+    <Compile Include="Models\Subscription\BusinessAreaSubscriptionModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
     <Compile Include="WebProxy\Win32Api.cs" />
