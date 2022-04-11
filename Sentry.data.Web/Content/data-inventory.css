@@ -23,7 +23,7 @@
     left: 0;
 }
 
-.di-sentry-spinner {
+.di-sentry-progress {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
