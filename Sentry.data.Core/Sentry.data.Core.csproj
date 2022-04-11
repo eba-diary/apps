@@ -230,6 +230,7 @@
     <Compile Include="GlobalEnums\IntervalType.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryNews.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryReleaseNotes.cs" />
+    <Compile Include="Helpers\CustomAttributeHelper.cs" />
     <Compile Include="Helpers\FilterCategoryOptionNormalizer.cs" />
     <Compile Include="Helpers\NestExtensions.cs" />
     <Compile Include="Helpers\NestHelper.cs" />

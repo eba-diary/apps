@@ -15,33 +15,15 @@ namespace Sentry.data.Web.Controllers
             _service = service;
         }
 
-        public ActionResult Search()
-        {
+        public ActionResult Search(string target = null, string search = null)
+        {        
             FilterSearchConfigModel model = new FilterSearchConfigModel()
             {
                 PageTitle = "Data Inventory",
                 IconPath = "~/Images/Dale/DataInventoryIcon.png",
                 ResultView = "SearchResult",
                 InfoLink = "https://confluence.sentry.com/display/CLA/Data+Inventory+-+Elastic",
-                DefaultSearch = new FilterSearchModel()
-                {
-                    FilterCategories = new List<FilterCategoryModel>()
-                    {
-                        new FilterCategoryModel()
-                        {
-                            CategoryName = FilterCategoryNames.ENVIRONMENT,
-                            CategoryOptions = new List<FilterCategoryOptionModel>()
-                            {
-                                new FilterCategoryOptionModel()
-                                {
-                                    OptionValue = "P",
-                                    ParentCategoryName = FilterCategoryNames.ENVIRONMENT,
-                                    Selected = true
-                                }
-                            }
-                        }
-                    }
-                }
+                DefaultSearch = BuildDefaultSearch(target, search)
             };
 
             return View("~/Views/Search/FilterSearch.cshtml", model);
@@ -81,6 +63,49 @@ namespace Sentry.data.Web.Controllers
         }
 
         #region Methods
+        private FilterSearchModel BuildDefaultSearch(string category, string option)
+        {
+            FilterSearchModel filterSearchModel = new FilterSearchModel()
+            {
+                FilterCategories = new List<FilterCategoryModel>()
+                {
+                    new FilterCategoryModel()
+                    {
+                        CategoryName = FilterCategoryNames.ENVIRONMENT,
+                        CategoryOptions = new List<FilterCategoryOptionModel>()
+                        {
+                            new FilterCategoryOptionModel()
+                            {
+                                OptionValue = FilterCategoryOptions.ENVIRONMENT_PROD,
+                                ParentCategoryName = FilterCategoryNames.ENVIRONMENT,
+                                Selected = true
+                            }
+                        }
+                    }
+                }
+            };
+
+            //ability to deep link with a filter, link from SAID passes in asset and code
+            if (!string.IsNullOrWhiteSpace(category) && !string.IsNullOrWhiteSpace(option) && _service.TryGetCategoryName(category, out string categoryName))
+            {
+                filterSearchModel.FilterCategories.Add(new FilterCategoryModel()
+                {
+                    CategoryName = categoryName,
+                    CategoryOptions = new List<FilterCategoryOptionModel>()
+                    {
+                        new FilterCategoryOptionModel()
+                        {
+                            OptionValue = option,
+                            ParentCategoryName = categoryName,
+                            Selected = true
+                        }
+                    }
+                });
+            }
+
+            return filterSearchModel;
+        }
+        
         private void ValidateSearchModel(FilterSearchModel searchModel)
         {
             if (!CanViewSensitive())

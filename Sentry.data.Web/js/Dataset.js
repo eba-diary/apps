@@ -331,8 +331,6 @@ data.Dataset = {
 
         var index = data.Dataset.delroyFieldArray.length - 1;
         var field = data.Dataset.delroyFieldArray[index];
-        console.log(data.Dataset.delroyFieldArray);
-        console.trace();
         //NOTE: this is a strange concept:  but a field is either a ROOT level one (index 0) or a CHILD level (index > 0)
         //All levels > (index 0) you need too specify the Fields array which is a child property whereas the root level(index 0) the array is at that level
         //also check if field is NULL, because in that case return a null field else returning field.Fields will cause an error
@@ -625,8 +623,7 @@ data.Dataset = {
         if ($("#datasetRowTable_filter").length > 0) {
             $("#datasetRowTable").DataTable().destroy();
         };
-        //Sentry.InjectSpinner($("#tab-container"));
-
+        $("#tab-spinner").show();
 
 
         $.ajax({
@@ -667,7 +664,7 @@ data.Dataset = {
                 $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
             },
             complete: function () {
-                data.RemoveSpinner("#tab-container");
+                $("#tab-spinner").hide();
             }
         }).fail(function () {
             $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
@@ -817,7 +814,7 @@ data.Dataset = {
             localStorage.setItem("searchText", $('#SearchText')[0].value);
         });
 
-        $('.input-group-addon').click(function (e) {
+        $('.input-group-prepend').click(function (e) {
             $('#DatasetSearch').submit();
         });
 
@@ -1188,31 +1185,28 @@ data.Dataset = {
                 "this is needed, dataset and schema(s) will need to be recreated along with all files resent from source."
 
 
-            Sentry.ShowModalCustom("Delete Dataset", ConfirmMessage, {
-                Confirm: {
-                    label: "Confirm",
-                    className: "btn btn-danger waves-effect waves-light",
-                    callback: function () {
-                        $.ajax({
-                            url: "/Dataset/" + dataset.attr("data-id") + "/Delete",
-                            method: "DELETE",
-                            dataType: 'json',
-                            success: function (obj) {
-                                Sentry.ShowModalAlert(obj.Message, function () {
-                                    window.location = "/Dataset";
-                                })
-                            },
-                            failure: function (obj) {
-                                Sentry.ShowModalAlert(
-                                    obj.Message, function () { })
-                            },
-                            error: function (obj) {
-                                Sentry.ShowModalAlert(
-                                    obj.Message, function () { })
-                            }
-                        });
+            Sentry.ShowModalCustom("Delete Dataset", ConfirmMessage,
+                '<button type="button" id="datasetDeleteBtn" data-dismiss="modal" class="btn btn-danger waves-effect waves-light">Delete</button>'
+            );
+            $("#datasetDeleteBtn").click(function () {
+                $.ajax({
+                    url: "/Dataset/" + dataset.attr("data-id") + "/Delete",
+                    method: "DELETE",
+                    dataType: 'json',
+                    success: function (obj) {
+                        Sentry.ShowModalAlert(obj.Message, function () {
+                            window.location = "/Dataset";
+                        })
+                    },
+                    failure: function (obj) {
+                        Sentry.ShowModalAlert(
+                            obj.Message, function () { })
+                    },
+                    error: function (obj) {
+                        Sentry.ShowModalAlert(
+                            obj.Message, function () { })
                     }
-                }
+                });
             });
         });
 
@@ -1256,7 +1250,7 @@ data.Dataset = {
 
 
 
-            //Sentry.InjectSpinner($("#tab-container"));
+            $("#tab-spinner").show();
 
 
             var url = new URL(window.location.href);
@@ -1275,7 +1269,7 @@ data.Dataset = {
 
             data.Dataset.UpdateMetadata();
 
-            data.RemoveSpinner('#tab-container');
+            $("#tab-spinner").hide();
 
         });
         Id = $('#datasetConfigList').val();
@@ -1307,7 +1301,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             if ($('#tabSchemaColumns').is(':empty')) {
-                //Sentry.InjectSpinner($("#tab-container"));
+                $("#tab-spinner").show();
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaColumns',
@@ -1317,7 +1311,7 @@ data.Dataset = {
                         data.Dataset.delroyInit();
                         data.Dataset.UpdateMetadata();
                         $('#delroySpinner').hide();
-                        data.RemoveSpinner('#tab-container');
+                        $("#tab-spinner").hide();
                     }
                 });
             }
@@ -1338,7 +1332,7 @@ data.Dataset = {
             var id = $('#RequestAccessButton').attr("data-id");
 
             if ($('#tabSchemaAbout').is(':empty')) {
-                //Sentry.InjectSpinner($("#tab-container"));
+                $("#tab-spinner").show();
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaAbout',
@@ -1347,7 +1341,7 @@ data.Dataset = {
                         $('#tabSchemaAbout').html(view);
                         ko.applyBindings(self.vm, $("#tabSchemaAbout")[0]);
                         data.Dataset.UpdateMetadata();
-                        data.RemoveSpinner('#tab-container');
+                        $("#tab-spinner").hide();
                     }
                 });
             }
@@ -1368,7 +1362,7 @@ data.Dataset = {
             var id = $('#RequestAccessButton').attr("data-id");
 
             if ($('#tabDataPreview').is(':empty')) {
-                //Sentry.InjectSpinner($("#tab-container"));
+                $("#tab-spinner").show();
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataPreview',
@@ -1378,7 +1372,7 @@ data.Dataset = {
                         if (self.vm.ShowDataFileTable()) {
                             data.Dataset.renderDataPreview();
                         }
-                        data.RemoveSpinner('#tab-container');
+                        $("#tab-spinner").hide();
                     }
                 });
             }
@@ -1398,7 +1392,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             if ($('#tabDataFiles').is(':empty')) {
-                //Sentry.InjectSpinner($("#tab-container"));
+                $("#tab-spinner").show();
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataFiles',
@@ -1410,7 +1404,7 @@ data.Dataset = {
                             data.Dataset.DatasetFileTableInit(configId);
                             data.Dataset.DatasetBundingFileTableInit(configId);
                         }
-                        data.RemoveSpinner('#tab-container');
+                        $("#tab-spinner").hide();
                     }
                 });
             }
@@ -1430,7 +1424,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             if ($('#tabSchemaSearch').is(':empty')) {
-                Sentry.InjectSpinner($("#tab-container"));
+                $("#tab-spinner").show();
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'SchemaSearch',
@@ -1445,7 +1439,7 @@ data.Dataset = {
                             data.Dataset.InitSchemaSearchTab();
                         });
 
-                        data.RemoveSpinner('#tab-container');
+                        $("#tab-spinner").hide();
                     }
                 });
             }
@@ -1741,22 +1735,19 @@ data.Dataset = {
                 { data: "ConfigFileName", className: "ConfigFileName" }
             ],
             language: {
-                search: "<div class='input-group'><span class='input-group-addon'><em class='icon-search'></em></span>_INPUT_</div>",
-                searchPlaceholder: "Search",
                 processing: ""
             },
             order: [5, 'desc'],
             stateSave: true,
             "createdRow": function (row, data, dataIndex) { }
         });
+
         if ($("#datasetFilesTable_filter").length > 0) {
-            yadcf.init($("#datasetFilesTable").dataTable(), [
-                { column_number: 0, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
-                { column_number: 1, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+            yadcf.init(data.Dataset.DatasetFilesTable, [
                 { column_number: 2, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
                 { column_number: 3, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
-                { column_number: 4, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },
-                { column_number: 5, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },
+               // { column_number: 4, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },  SEE CLA-4004
+               // { column_number: 5, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },
                 { column_number: 6, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
             ],
                 {

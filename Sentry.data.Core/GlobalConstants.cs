@@ -419,5 +419,11 @@
             public const string SOURCETYPE = "Source Type";
             public const string COLLECTIONTYPE = "Collection Type";
         }
+
+        public static class FilterCategoryOptions
+        {
+            public const string ENVIRONMENT_PROD = "P";
+            public const string ENVIRONMENT_NONPROD = "D";
+        }
     }
 }
