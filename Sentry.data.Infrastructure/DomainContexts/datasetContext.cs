@@ -353,6 +353,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<UserFavorite> UserFavorites
+        {
+            get
+            {
+                return Query<UserFavorite>();
+            }
+        }
+
         public IQueryable<BusinessAreaTileRow> BusinessAreaTileRows
         {
             get

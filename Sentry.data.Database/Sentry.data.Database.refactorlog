@@ -994,4 +994,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[Created_DTM]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="6b8b09ec-18de-42d3-b9c9-9de6427403f6" ChangeDateTime="04/11/2022 18:21:56">
+    <Property Name="ElementName" Value="[dbo].[UserFavorite].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[UserFavorite]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="UserFavoriteId" />
+  </Operation>
 </Operations>
