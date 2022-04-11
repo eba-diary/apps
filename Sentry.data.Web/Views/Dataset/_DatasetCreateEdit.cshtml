@@ -75,8 +75,8 @@
                 <div class="md-form">
                     @if (Model.DatasetId == 0)
                     {
-                        @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = "" })
+                        @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control"  } })
+                        @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.DatasetName) ? "active" : ""})
                         @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })
                     }
                     else
@@ -139,8 +139,8 @@
 
 
                 <div class="md-form">
+                    @Html.LabelFor(model => model.CreationUserId, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.CreationUserId) ? "active" : "" })
                     @Html.EditorFor(model => model.CreationUserId, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.LabelFor(model => model.CreationUserId, htmlAttributes: new { @class = "" })
                     @Html.ValidationMessageFor(model => model.CreationUserId, "", new { @class = "text-danger" })
                     <span class="text-muted">
                         <em>This is the original creator of the data. For Example: External data sources like Mitchell or Internal Data Sources like CustomerOne.</em>
@@ -204,14 +204,14 @@
                         </div>
 
                         <div class="md-form">
+                            @Html.LabelFor(model => model.ConfigFileName, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.ConfigFileName) ? "active" : "" })
                             @Html.EditorFor(model => model.ConfigFileName, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.LabelFor(model => model.ConfigFileName, htmlAttributes: new { @class = "" })
                             @Html.ValidationMessageFor(model => model.ConfigFileName, "", new { @class = "text-danger" })
                         </div>
 
                         <div class="md-form">
+                            @Html.LabelFor(model => model.ConfigFileDesc, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.ConfigFileDesc) ? "active" : "" })
                             @Html.EditorFor(model => model.ConfigFileDesc, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.LabelFor(model => model.ConfigFileDesc, htmlAttributes: new { @class = "" })
                             @Html.ValidationMessageFor(model => model.ConfigFileDesc, "", new { @class = "text-danger" })
                         </div>
 
@@ -227,7 +227,7 @@
                         </div>
 
                         <div class="delimiterPanel md-form">
-                            @Html.LabelFor((model) => model.Delimiter, new { @class = "optional" })
+                            @Html.LabelFor((model) => model.Delimiter, new { @class = "active" })
                             @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control" })
                             @Html.ValidationMessageFor(model => model.Delimiter, "", new { @class = "text-danger" })
 

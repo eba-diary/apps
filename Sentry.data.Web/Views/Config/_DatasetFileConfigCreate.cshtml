@@ -48,7 +48,7 @@
 
                 <div class="md-form">
                     @Html.TextBoxFor(model => model.ConfigFileDesc, new { @value = "", @class = "form-control" })
-                    @Html.LabelFor(model => model.ConfigFileDesc, htmlAttributes: new { @class = "control-label" })
+                    @Html.LabelFor(model => model.ConfigFileDesc, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.ConfigFileDesc) ? "active" : "" })
 
                     @Html.ValidationMessageFor(model => model.ConfigFileDesc, "", new { @class = "text-danger" })
                 </div>
@@ -92,7 +92,7 @@
 
                     <div class="delimiterPanel">
                         <div class="md-form delimiter">
-                            @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label" })
+                            @Html.LabelFor((model) => model.Delimiter, new { @class = "active" })
                             @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control" })
                             @Html.ValidationMessageFor(model => model.Delimiter, "", new { @class = "text-danger" })
                         </div>
