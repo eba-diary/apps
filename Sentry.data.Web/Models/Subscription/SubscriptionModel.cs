@@ -21,9 +21,9 @@ namespace Sentry.data.Web
 
         public List<DatasetSubscription> CurrentSubscriptions { get; set; }
        
-        public List<BusinessAreaSubscription> CurrentSubscriptionsBusinessArea { get; set; }
+        public List<BusinessAreaSubscription> SubscriptionsBusinessAreas { get; set; }
 
-        public List<BusinessAreaSubscriptionModel> CurrentSubscriptionsBusinessAreaModels { get; set; }
+        public List<BusinessAreaSubscriptionModel> SubscriptionsBusinessAreaModels { get; set; }
 
         public IEnumerable<SelectListItem> AllIntervals { get; set; }
     }

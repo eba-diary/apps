@@ -17,7 +17,7 @@ namespace Sentry.data.Web
             dto.businessAreaID = model.businessAreaID;
             dto.SentryOwnerName = model.SentryOwnerName;
             dto.CurrentSubscriptions = model.CurrentSubscriptions;
-            dto.CurrentSubscriptionsBusinessArea = model.CurrentSubscriptionsBusinessArea;
+            dto.CurrentSubscriptionsBusinessArea = model.SubscriptionsBusinessAreas;
             
             return dto;
         }
@@ -44,7 +44,7 @@ namespace Sentry.data.Web
             Core.BusinessAreaSubscription dto = new Core.BusinessAreaSubscription(model.BusinessAreaType, model.EventType, model.Interval, model.SentryOwnerName);
             dto.ID = model.ID;
             dto.ChildrenSelections = model.ChildrenSelections;
-            dto.Children = model.CurrentSubscriptionsBusinessAreaModels.ToDto();
+            dto.Children = model.SubscriptionsBusinessAreaModels.ToDto();
             return dto;
         }
 

@@ -25,19 +25,19 @@
         </thead>
         <tbody>
 
-            @for (var subId = 0; subId < Model.CurrentSubscriptionsBusinessAreaModels.Count(); subId++)
+            @for (var subId = 0; subId < Model.SubscriptionsBusinessAreaModels.Count(); subId++)
             {
 
-                @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].BusinessAreaType)
-                @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].ID)
-                @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].SentryOwnerName)
-                @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.Type_ID)
-                @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.DisplayName)
-                @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.Description)
-                @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.ParentDescription)
+                @Html.HiddenFor(model => model.SubscriptionsBusinessAreaModels[subId].BusinessAreaType)
+                @Html.HiddenFor(model => model.SubscriptionsBusinessAreaModels[subId].ID)
+                @Html.HiddenFor(model => model.SubscriptionsBusinessAreaModels[subId].SentryOwnerName)
+                @Html.HiddenFor(model => model.SubscriptionsBusinessAreaModels[subId].EventType.Type_ID)
+                @Html.HiddenFor(model => model.SubscriptionsBusinessAreaModels[subId].EventType.DisplayName)
+                @Html.HiddenFor(model => model.SubscriptionsBusinessAreaModels[subId].EventType.Description)
+                @Html.HiddenFor(model => model.SubscriptionsBusinessAreaModels[subId].EventType.ParentDescription)
 
                 string cssClass = "";
-                if (Model.CurrentSubscriptionsBusinessAreaModels[subId].Interval.Description.ToLower().Contains("never"))
+                if (Model.SubscriptionsBusinessAreaModels[subId].Interval.Description.ToLower().Contains("never"))
                 {
                     cssClass = "unUsable";
                 }
@@ -49,21 +49,21 @@
                 <tr class="@cssClass">
 
                     @*COLUMN: DisplayName*@
-                    @if (Model.CurrentSubscriptionsBusinessAreaModels[subId].Children != null && Model.CurrentSubscriptionsBusinessAreaModels[subId].Children.Count > 0)
+                    @if (Model.SubscriptionsBusinessAreaModels[subId].Children != null && Model.SubscriptionsBusinessAreaModels[subId].Children.Count > 0)
                     {
                         //declare this so js can grab values
-                        string multiSelectClass = "buford" + Model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.DisplayName.Replace(" ", string.Empty);
+                        string multiSelectClass = "buford" + Model.SubscriptionsBusinessAreaModels[subId].EventType.DisplayName.Replace(" ", string.Empty);
                         <td>
-                            @Html.DisplayFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.DisplayName)
-                            @Html.ListBoxFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].ChildrenSelections,
-                                                new MultiSelectList(Model.CurrentSubscriptionsBusinessAreaModels[subId].AllChildrenSelections, "Value", "Text", Model.CurrentSubscriptionsBusinessAreaModels[subId].ChildrenSelections),
+                            @Html.DisplayFor(model => model.SubscriptionsBusinessAreaModels[subId].EventType.DisplayName)
+                            @Html.ListBoxFor(model => model.SubscriptionsBusinessAreaModels[subId].ChildrenSelections,
+                                                new MultiSelectList(Model.SubscriptionsBusinessAreaModels[subId].AllChildrenSelections, "Value", "Text", Model.SubscriptionsBusinessAreaModels[subId].ChildrenSelections),
                                                 new { @Id = @multiSelectClass, @class = "select-wrapper mdb-select buford-multi-select", multiple = "" })
                         </td>
                     }
                     else
                     {
                         <td>
-                            @Html.DisplayFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.DisplayName)
+                            @Html.DisplayFor(model => model.SubscriptionsBusinessAreaModels[subId].EventType.DisplayName)
                         </td>
                     }
 
@@ -71,8 +71,8 @@
                     @*COLUMN: Interval_ID SELECTION DROP DOWN*@
                     <td>
                         @*There is something magical about how MVC interprets the model where I have to use model. notation below instead of the foreeach sub.  TODO: is to figure out what is happening behind the scenes*@
-                        @Html.DropDownListFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].Interval.Interval_ID,
-                                new SelectList(Model.AllIntervals, "Value", "Text", Model.CurrentSubscriptionsBusinessAreaModels[subId].Interval.Interval_ID),
+                        @Html.DropDownListFor(model => model.SubscriptionsBusinessAreaModels[subId].Interval.Interval_ID,
+                                new SelectList(Model.AllIntervals, "Value", "Text", Model.SubscriptionsBusinessAreaModels[subId].Interval.Interval_ID),
                                 new { @class = "select-wrapper1 mdb-select1 buford-multi-select1" })
                     </td>
                 </tr>
