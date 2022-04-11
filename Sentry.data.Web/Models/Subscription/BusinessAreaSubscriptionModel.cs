@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using Sentry.data.Core;
 
@@ -31,6 +30,19 @@ namespace Sentry.data.Web
 
         public virtual IEnumerable<int> ChildrenSelections { get; set; }
 
+        
+        //CREATE WHICH ITEMS IN Html.ListBoxFor WILL BE DISABLED WHICH IS REQUIRED BY ListBoxFor
+        public virtual IEnumerable<int> ChildrenDisabledSelections 
+        {
+            get { return GetAllChildrenDisabledSelections(); } 
+        }
+        public virtual IEnumerable<int> GetAllChildrenDisabledSelections()
+        {
+            List<int> list = new List<int>();
+            list.Add(EventType.Type_ID);
+            return list;
+        }
+
 
         public virtual IEnumerable<SelectListItem> AllChildrenSelections 
         { 
@@ -39,17 +51,15 @@ namespace Sentry.data.Web
 
         public virtual IEnumerable<SelectListItem> GetAllChildrenSelections()
         {
-            //SelectListItem bogusItem = new SelectListItem() { Text = EventType.DisplayName, Value = EventType.Type_ID.ToString(), Disabled = true };
-            //List<SelectListItem> items = new List<SelectListItem>() { bogusItem };
-            //List<SelectListItem> items2 = ChildBusinessAreaSubscriptions.Select(c => new SelectListItem { Text = c.EventType.DisplayName, Value = c.EventType.Type_ID.ToString() }).ToList();
-            //items.AddRange(items2);
+            //FIRST ITEM IS JUST THE NAME OF THE PARENT AS A PLACEHOLDER
+            SelectListItem bogusItem = new SelectListItem() { Text = EventType.DisplayName, Value = EventType.Type_ID.ToString(), Disabled = true };
+            List<SelectListItem> items = new List<SelectListItem>() { bogusItem };
+            
+            //REST OF ITEMS ARE ACTUAL CHILDREN EVENTTYPES
+            List<SelectListItem> items2 = Children.Select(c => new SelectListItem { Text = c.EventType.DisplayName, Value = c.EventType.Type_ID.ToString() }).ToList();
+            items.AddRange(items2);
 
-            IEnumerable<SelectListItem> real = Children.Select(c => new SelectListItem { Text = c.EventType.DisplayName, Value = c.EventType.Type_ID.ToString()});
-
-                      
-
-            return real;
+            return items;
         }
-
     }
 }

@@ -54,9 +54,8 @@
                         //declare this so js can grab values
                         string multiSelectClass = "buford" + Model.SubscriptionsBusinessAreaModels[subId].EventType.DisplayName.Replace(" ", string.Empty);
                         <td>
-                            @Html.DisplayFor(model => model.SubscriptionsBusinessAreaModels[subId].EventType.DisplayName)
                             @Html.ListBoxFor(model => model.SubscriptionsBusinessAreaModels[subId].ChildrenSelections,
-                                                new MultiSelectList(Model.SubscriptionsBusinessAreaModels[subId].AllChildrenSelections, "Value", "Text", Model.SubscriptionsBusinessAreaModels[subId].ChildrenSelections),
+                                                new MultiSelectList(Model.SubscriptionsBusinessAreaModels[subId].AllChildrenSelections, "Value", "Text", Model.SubscriptionsBusinessAreaModels[subId].ChildrenSelections, Model.SubscriptionsBusinessAreaModels[subId].ChildrenDisabledSelections),
                                                 new { @Id = @multiSelectClass, @class = "select-wrapper mdb-select buford-multi-select", multiple = "" })
                         </td>
                     }
