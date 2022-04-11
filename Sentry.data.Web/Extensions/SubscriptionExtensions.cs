@@ -18,7 +18,7 @@ namespace Sentry.data.Web
             dto.SentryOwnerName = model.SentryOwnerName;
             dto.CurrentSubscriptions = model.CurrentSubscriptions;
             dto.CurrentSubscriptionsBusinessArea = model.CurrentSubscriptionsBusinessArea;
-                        
+            
             return dto;
         }
 

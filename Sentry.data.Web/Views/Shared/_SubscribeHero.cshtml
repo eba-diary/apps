@@ -15,7 +15,6 @@
     @Html.HiddenFor(model => model.group)
     @Html.DisplayFor((model) => ViewData.ModelState)
 
-    
 
     <table class="table table-striped table-bordered">
         <thead>
@@ -32,6 +31,10 @@
                 @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].BusinessAreaType)
                 @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].ID)
                 @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].SentryOwnerName)
+                @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.Type_ID)
+                @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.DisplayName)
+                @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.Description)
+                @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.ParentDescription)
 
                 string cssClass = "";
                 if (Model.CurrentSubscriptionsBusinessAreaModels[subId].Interval.Description.ToLower().Contains("never"))
@@ -45,18 +48,12 @@
 
                 <tr class="@cssClass">
 
-
-
-
-
                     @*COLUMN: DisplayName*@
                     @if (Model.CurrentSubscriptionsBusinessAreaModels[subId].Children != null && Model.CurrentSubscriptionsBusinessAreaModels[subId].Children.Count > 0)
                     {
                         //declare this so js can grab values
                         string multiSelectClass = "buford" + Model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.DisplayName.Replace(" ", string.Empty);
                         <td>
-
-                            @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.Type_ID)
                             @Html.DisplayFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.DisplayName)
                             @Html.ListBoxFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].ChildrenSelections,
                                                 new MultiSelectList(Model.CurrentSubscriptionsBusinessAreaModels[subId].AllChildrenSelections, "Value", "Text", Model.CurrentSubscriptionsBusinessAreaModels[subId].ChildrenSelections),
@@ -66,7 +63,6 @@
                     else
                     {
                         <td>
-                            @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.Type_ID)
                             @Html.DisplayFor(model => model.CurrentSubscriptionsBusinessAreaModels[subId].EventType.DisplayName)
                         </td>
                     }

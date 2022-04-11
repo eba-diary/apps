@@ -164,21 +164,36 @@ namespace Sentry.data.Web.Controllers
             {
                 //STEP 3:  GET ALL SUBSCRIPTIONS USER HAS CURRENTLY
                 List<BusinessAreaSubscription> dbSubscriptions = _notificationService.GetAllUserSubscriptionsFromDatabase(model.group).OrderBy(o => o.EventType.Type_ID).ToList();
+                List<BusinessAreaSubscription> parents = AssignChildren(dbSubscriptions);
+                
 
                 //STEP 4:  GET ALL EVENTTYPES IN GROUP 
                 IEnumerable<EventType> eventTypes = _notificationService.GetEventTypes(model.group);
 
                 
                 //STEP 5:   UPDATE SUBSCRIPTIONS
-                UpdateSubscriptions(eventTypes.ToList(), ref dbSubscriptions, (BusinessAreaType)model.businessAreaID);
+                UpdateSubscriptions(eventTypes.ToList(), ref parents, (BusinessAreaType)model.businessAreaID);
 
                 //STEP 6:  UPDATE CURRENT SUBCRIPTIONS
-                model.CurrentSubscriptionsBusinessArea = dbSubscriptions.OrderBy(o => o.EventType.Type_ID).ToList();
+                model.CurrentSubscriptionsBusinessArea = parents.OrderBy(o => o.EventType.Type_ID).ToList();
 
                 model.CurrentSubscriptionsBusinessAreaModels = model.CurrentSubscriptionsBusinessArea.ToWeb();
             }
 
             return PartialView("_SubscribeHero", model);
+        }
+
+        private List<BusinessAreaSubscription> AssignChildren(List<BusinessAreaSubscription> subs)
+        {
+            List<BusinessAreaSubscription> parents = subs.Where(w => w.EventType.ParentDescription == null).ToList();
+
+            foreach (BusinessAreaSubscription parent in parents)
+            {
+                //grab subs that match eventtype except itself
+                parent.Children = subs.Where(w => w.EventType.ParentDescription == parent.EventType.Description && w.ID != parent.ID).ToList();
+            }
+
+            return parents;
         }
 
 
@@ -231,24 +246,22 @@ namespace Sentry.data.Web.Controllers
 
         private List<int> GetChildBusinessAreaSubscriptionSelections(List<BusinessAreaSubscription> subs)
         {
-            List<int> myList = subs.Where(w => w.Interval.Interval_ID != (int)IntervalType.Never).Select(s => s.Interval.Interval_ID).ToList();
+            List<int> myList = subs.Where(w => w.Interval.Interval_ID != (int)IntervalType.Never).Select(s => s.EventType.Type_ID).ToList();
             return myList;
         }
 
         [HttpPost]
         public ActionResult SubscribeUpdate(SubscriptionModel sm)
         {
-            //REBUILD ChildBusinessAreaSubscriptions based on ChildBusinessAreaSubscriptionSelections because model binding in MVC doesn't work on complex objects
-
             //1: CONVERT MODELS TO DTOS
             List<BusinessAreaSubscription> newList = sm.CurrentSubscriptionsBusinessAreaModels.ToDto();
 
-            //2:REBUILD ALL CHILD SUBSCRIPTIONS BECAUSE MVC HAS NO COMPLEX DATA STRUCTURE MODEL BINDING, EXISTING PARENT SUBSCRIPTIONS WILL NOT BE REPLACED
+            //2: REBUILD ALL CHILD SUBSCRIPTIONS PROPERTIES BECAUSE MVC HAS NO COMPLEX DATA STRUCTURE MODEL BINDING, EXISTING PARENT SUBSCRIPTIONS WILL NOT BE REPLACED
             IEnumerable<EventType> eventTypes = _notificationService.GetEventTypes(sm.group);
             UpdateSubscriptions(eventTypes.ToList(), ref newList, (BusinessAreaType)sm.businessAreaID);
 
-            //3:ANY CHILD SUBCRIPTION SELECTED, ASSIGN PARENT's INTERVAL TYPE
-            UpdateChildIntervals(ref newList);
+            //3: ANY CHILD SUBCRIPTION SELECTED, ASSIGN PARENT's INTERVAL TYPE
+            UpdateChildIntervalsAndPrimaryKey(sm.group, ref newList);
 
             //4:UPDATE MODEL TO INCLUDE NEW CHILDREN
             sm.CurrentSubscriptionsBusinessArea = newList;
@@ -259,9 +272,12 @@ namespace Sentry.data.Web.Controllers
         }
 
         //UPDATE CHILD INTERVALS TO PARENTS IF CHILD EXISTS IN ChildBusinessAreaSubscriptionSelections
-        private void UpdateChildIntervals(ref List<BusinessAreaSubscription> dbSubscriptions)
+        //ALSO UPDATE the ID OF CHILD SINCE MVC RAZOR CAN'T BIND AND SAVE NESTED CHILDREN IN MODEL
+        private void UpdateChildIntervalsAndPrimaryKey(EventTypeGroup group, ref List<BusinessAreaSubscription> newList)
         {
-            foreach(BusinessAreaSubscription parent in dbSubscriptions)
+            List<BusinessAreaSubscription> dbSubscriptions = _notificationService.GetAllUserSubscriptionsFromDatabase(group).OrderBy(o => o.EventType.Type_ID).ToList();
+
+            foreach (BusinessAreaSubscription parent in newList)
             {
                 if(parent.ChildrenSelections != null && parent.ChildrenSelections.Count() > 0)
                 {
@@ -269,12 +285,19 @@ namespace Sentry.data.Web.Controllers
                     foreach (BusinessAreaSubscription child in children)
                     {
                         child.Interval = parent.Interval;
+
+                        BusinessAreaSubscription dbChild = dbSubscriptions.FirstOrDefault(w => w.BusinessAreaType == child.BusinessAreaType && w.EventType == child.EventType && w.SentryOwnerName == child.SentryOwnerName);
+                        if(dbChild != null)
+                        {
+                            child.ID = dbChild.ID;
+                        }
                     }
                 }
-
             }
-
         }
+
+        
+
 
 
         [HttpGet]

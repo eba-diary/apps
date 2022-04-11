@@ -37,7 +37,6 @@ namespace Sentry.data.Web
             get { return GetAllChildrenSelections(); } 
         }
 
-
         public virtual IEnumerable<SelectListItem> GetAllChildrenSelections()
         {
             //SelectListItem bogusItem = new SelectListItem() { Text = EventType.DisplayName, Value = EventType.Type_ID.ToString(), Disabled = true };
