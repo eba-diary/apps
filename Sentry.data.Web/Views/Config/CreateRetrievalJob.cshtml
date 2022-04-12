@@ -323,7 +323,6 @@
                         <div id="schedulePanel">
                             <div class="form-group configQuestion">
                                 <div class="col-md-12">
-                                    <hr />
                                     <h6>How often is your Data Generated?</h6>
                                 </div>
                             </div>
@@ -369,12 +368,12 @@
                                 </div>
                             </div>
 
-                            <div class="form-group scheduler" id="monthlyPicker">
-                                <label class="control-label col-md-2">Every Month on</label>
-                                <div class="col-md-10">
+                            <div class="md-form scheduler" id="monthlyPicker">
+                                <label class="control-label">Every Month on</label>
+                                <div class="row">
                                     <input id="cronMonthlyDayPicker" type="number" max="31" min="1" class="form-control" style="width:20%; display: inline-block;" placeholder="Day of the Month" />
                                     at
-                                    <input class="timepicker timepicker-with-dropdown text-center form-control edit-dataset-row" id="cronMonthlyJobTimePicker" style="width:15%; display: inline-block;" />
+                                    <input class="form-control timepicker" placeholder="Time..." id="cronMonthlyJobTimePicker" />
                                     CST
                                 </div>
                             </div>

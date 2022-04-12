@@ -195,14 +195,20 @@
             <input id="cronHourlyTimePicker" type="number" max="59" min="0" class="form-control" placeholder="Minute" />
         </div>
 
-        <div class="md-form scheduler" id="dailyPicker">
-            <label class="">Every Day at</label>
-            <input class="timepicker timepicker-with-dropdown text-center" id="cronDailyJobTimePicker" />
-            <span>CST</span>
+        <div class="md-form scheduler input-group" id="dailyPicker">
+            <div class="input-group-prepend">
+                <span class="input-group-text md-addon">Every Day at</span>
+            </div>
+            <input class="form-control timepicker" placeholder="Time" id="cronDailyJobTimePicker" />
+            <div class="input-group-append">
+                <span class="input-group-text md-addon">CST</span>
+            </div>
         </div>
 
-        <div class="md-form scheduler" id="weeklyPicker">
-            <label class="mdb-main-label">Every Week on</label>
+        <div class="md-form scheduler input-group" id="weeklyPicker">
+            <div class="input-group-prepend">
+                <span class="input-group-text md-addon">Every Week on</span>
+            </div>
             <select id="cronWeeklyDayPicker" class="mdb-select">
                 <option selected disabled>Day of the Week</option>
                 <option value="0">Sunday</option>
@@ -213,21 +219,27 @@
                 <option value="5">Friday</option>
                 <option value="6">Saturday</option>
             </select>
-            at
-            <input class="timepicker timepicker-with-dropdown text-center form-control" id="cronWeeklyJobTimePicker" />
-            CST
+            <input class="form-control timepicker" placeholder="Time" id="cronWeeklyJobTimePicker" />
+            <div class="input-group-append">
+                <span class="input-group-text md-addon">CST</span>
+            </div>
         </div>
 
-        <div class="md-form scheduler" id="monthlyPicker">
-            <label class="control-label">Every Month on</label>
-            <input id="cronMonthlyDayPicker" type="number" max="31" min="1" class="form-control" placeholder="Day of the Month" />
-            at
-            <input class="timepicker timepicker-with-dropdown text-center form-control" id="cronMonthlyJobTimePicker" />
-            CST
+        <div class="md-form scheduler input-group" id="monthlyPicker">
+            <div class="input-group-prepend">
+                <span class="input-group-text md-addon">Day and Time</span>
+            </div>
+            <input id="cronMonthlyDayPicker" type="number" max="31" min="1" class="form-control" placeholder="Day of the Month (1-31)" />
+            <input class="form-control timepicker" placeholder="Time" id="cronMonthlyJobTimePicker" aria-describedby="cronMonthlyTimeAddOn" />
+            <div class="input-group-append">
+                <span class="input-group-text md-addon">CST</span>
+            </div>
         </div>
 
-        <div class="md-form scheduler" id="yearlyPicker">
-            <label class="mdb-main-label">Every Year on</label>
+        <div class="md-form scheduler input-group" id="yearlyPicker">
+            <div class="input-group-prepend">
+                <span class="input-group-text md-addon">Month, Day, and Time</span>
+            </div>
             <select id="cronYearlyMonthPicker" class="mdb-select">
                 <option selected disabled>Month</option>
                 <option value="1">January</option>
@@ -243,10 +255,11 @@
                 <option value="11">November</option>
                 <option value="12">December</option>
             </select>
-            <input id="cronYearlyDayPicker" type="number" max="31" min="1" class="form-control" placeholder="Day of the Month" />
-            at
-            <input class="timepicker timepicker-with-dropdown text-center form-control" id="cronYearlyJobTimePicker" />
-            CST
+            <input id="cronYearlyDayPicker" type="number" max="31" min="1" class="form-control" placeholder="Day of the Month (1-31)" />
+            <input class="form-control timepicker" placeholder="Time" id="cronYearlyJobTimePicker" />
+            <div class="input-group-append">
+                <span class="input-group-text md-addon">CST</span>
+            </div>
         </div>
 
         <div id="scheduleRow" class="form-group" style="display: none;">

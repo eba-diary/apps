@@ -98,7 +98,7 @@
     </div>
     <div id="BOGetLatestPanel" class="hidden">
         <div class="form-check">
-            <input type="checkbox" value="true" class="form-check-input" id="GetLatest" name="GetLatest">
+            <input type="checkbox" value="true" class="form-check-input" id="GetLatest" name="GetLatest" checked="@Model.GetLatest">
             @Html.LabelFor((model) => model.GetLatest, new { @class = "form-check-label" })
             @Html.Label("This will ensure users are linked to the latest revision of the report specified above. This flag is only applicable for Business Objects scheduled reports.", new { @class = "text-muted" })
         </div>

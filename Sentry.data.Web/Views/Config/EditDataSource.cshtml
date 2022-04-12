@@ -61,7 +61,7 @@
         </div>
 
         <div class="form-check">
-            <input type="checkbox" value="true" class="form-check-input" id="IsSecured" name="IsSecured">
+            <input type="checkbox" value="true" class="form-check-input" id="IsSecured" name="IsSecured" checked="@Model.IsSecured">
             @Html.LabelFor((model) => model.IsSecured, new { @class = "form-check-label" })
         </div>
 
