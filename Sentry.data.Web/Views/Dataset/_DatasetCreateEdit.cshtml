@@ -160,7 +160,7 @@
                 </div>
 
                 <div class="form-check">
-                    <input type="checkbox" value="true" class="form-check-input" id="IsSecured" name="IsSecured">
+                    <input type="checkbox" value="true" class="form-check-input" id="IsSecured" name="IsSecured" checked="@Model.IsSecured">
                     @Html.LabelFor(m => m.IsSecured, htmlAttributes: new { @class = "form-check-label" })
                 </div>
 
@@ -239,13 +239,13 @@
                         </div>
 
                         <div class="form-check">
-                            <input type="checkbox" value="true" class="form-check-input" id="HasHeader" name="HasHeader">
+                            <input type="checkbox" value="true" class="form-check-input" id="HasHeader" name="HasHeader" checked="@Model.HasHeader">
                             @Html.LabelFor((model) => model.HasHeader, new { @class = "form-check-label" })
                             @Html.Label("Do incoming files contain a header row?", new { @class = "text-muted" })
                         </div>
 
                         <div class="form-check">
-                            <input type="checkbox" value="true" class="form-check-input" id="CreateCurrentView" name="CreateCurrentView">
+                            <input type="checkbox" value="true" class="form-check-input" id="CreateCurrentView" name="CreateCurrentView" checked="@Model.CreateCurrentView">
                             @Html.LabelFor((model) => model.CreateCurrentView, new { @class = "form-check-label" })
                             @Html.Label("A view will be created filtering to data within latest file loaded into this schema", new { @class = "text-muted" })
                         </div>

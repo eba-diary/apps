@@ -289,7 +289,8 @@
                 }
             },
             error: function (obj) {
-                $('#DatasetFileConfigFormContent').replaceWith(obj.responseText);
+                $('#DatasetFileConfigFormContainer').html(obj.responseText);
+                console.log(obj.responseText)
                 //init the form passing the submit function specific for DataFlow page
                 data.Config.CreateFormSubmitInit(data.DataFlow.DatasetFileConfigFormSubmitInit, data.DataFlow.DatasetFileConfigFormCancelInit);
             }

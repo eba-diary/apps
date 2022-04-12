@@ -119,13 +119,13 @@
 
 
         <div class="form-check">
-            <input type="checkbox" value="true" class="form-check-input" id="HasHeader" name="HasHeader">
+            <input type="checkbox" value="true" class="form-check-input" id="HasHeader" name="HasHeader" checked="@Model.HasHeader">
             @Html.LabelFor((model) => model.HasHeader, new { @class = "form-check-label" })
             @Html.Label("Do incoming files contain a header row?", new { @class = "text-muted" })
         </div>
 
         <div class="form-check">
-            <input type="checkbox" value="true" class="form-check-input" id="CreateCurrentView" name="CreateCurrentView">
+            <input type="checkbox" value="true" class="form-check-input" id="CreateCurrentView" name="CreateCurrentView" checked="@Model.CreateCurrentView">
             @Html.LabelFor((model) => model.CreateCurrentView, new { @class = "form-check-label" })
             @Html.Label("A view will be created filtering to data within latest file loaded into this schema", new { @class = "text-muted" })
         </div>
@@ -136,31 +136,31 @@
                 <strong><p style="color:red">This section is visible to Admins only</p></strong>
 
                 <div class="form-check">
-                    <input type="checkbox" value="true" class="form-check-input" id="CLA1396_NewEtlColumns" name="CLA1396_NewEtlColumns">
+                    <input type="checkbox" value="true" class="form-check-input" id="CLA1396_NewEtlColumns" name="CLA1396_NewEtlColumns" checked="@Model.CLA1396_NewEtlColumns">
                     @Html.LabelFor((model) => model.CLA1396_NewEtlColumns, new { @class = "form-check-label" })
                     @Html.Label("Will trigger new ETL columns in consumption layer after syncing", new { @class = "text-muted" })
                 </div>
 
                 <div class="form-check">
-                    <input type="checkbox" value="true" class="form-check-input" id="CLA1580_StructureHive" name="CLA1580_StructureHive">
+                    <input type="checkbox" value="true" class="form-check-input" id="CLA1580_StructureHive" name="CLA1580_StructureHive" checked="@Model.CLA1580_StructureHive">
                     @Html.LabelFor((model) => model.CLA1580_StructureHive, new { @class = "form-check-label" })
                     @Html.Label("Will allow JSON structures to be created in parquet vs using string based datatypes", new { @class = "text-muted" })
                 </div>
 
                 <div class="form-check">
-                    <input type="checkbox" value="true" class="form-check-input" id="CLA2472_EMRSend" name="CLA2472_EMRSend">
+                    <input type="checkbox" value="true" class="form-check-input" id="CLA2472_EMRSend" name="CLA2472_EMRSend" checked="@Model.CLA2472_EMRSend">
                     @Html.LabelFor((model) => model.CLA2472_EMRSend, new { @class = "form-check-label" })
                     @Html.Label("Send data to EMR", new { @class = "text-muted" })
                 </div>
 
                 <div class="form-check">
-                    <input type="checkbox" value="true" class="form-check-input" id="CLA1286_KafkaFlag" name="CLA1286_KafkaFlag">
+                    <input type="checkbox" value="true" class="form-check-input" id="CLA1286_KafkaFlag" name="CLA1286_KafkaFlag" checked="@Model.CLA1286_KafkaFlag">
                     @Html.LabelFor((model) => model.CLA1286_KafkaFlag, new { @class = "form-check-label" })
                     @Html.Label("Kafka Flag", new { @class = "text-muted" })
                 </div>
 
                 <div class="form-check">
-                    <input type="checkbox" value="true" class="form-check-input" id="CLA3014_LoadDataToSnowflake" name="CLA3014_LoadDataToSnowflake">
+                    <input type="checkbox" value="true" class="form-check-input" id="CLA3014_LoadDataToSnowflake" name="CLA3014_LoadDataToSnowflake" checked="@Model.CLA3014_LoadDataToSnowflake"} >
                     @Html.LabelFor((model) => model.CLA3014_LoadDataToSnowflake, new { @class = "form-check-label" })
                     @Html.Label("Kafka Flag", new { @class = "text-muted" })
                 </div>
