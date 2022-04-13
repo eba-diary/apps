@@ -83,7 +83,7 @@ namespace Sentry.data.Web
             bundles.Add(new StyleBundle("~/bundles/css/main").
                         Include("~/Content/bootstrap.css", new CssRewriteUrlTransform()).
                         Include("~/Content/sentry-styles.css", new CssRewriteUrlTransform()).
-
+                        Include("~/Content/sentry-icons.css", new CssRewriteUrlTransform()).
                         Include("~/Content/font-awesome.css", new CssRewriteUrlTransform()).
                         Include("~/Content/css/select2.css", new CssRewriteUrlTransform()).
                         Include("~/Content/ladda-themeless.css"));
@@ -96,7 +96,6 @@ namespace Sentry.data.Web
                     Include(dataTablesStylesDirectory + "/dataTables.bootstrap4.css").
                     Include(dataTablesStylesDirectory + "/dataTables.responsive.css").
                     Include(dataTablesStylesDirectory + "/buttons.bootstrap4.css").
-                    Include(dataTablesStylesDirectory + "/dataTables.fontAwesome.css").
                     Include(dataTablesStylesDirectory + "/buttons.dataTables.css"));
 
 

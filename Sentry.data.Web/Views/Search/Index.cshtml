@@ -22,7 +22,7 @@
                     <div class="panel panel-default dataset-list-filters">
                         <div class="panel-heading filterHead" data-bind="attr: { id: HeadId }">
                             <span class="filterCategoryName" data-bind="text : Name"></span>
-                            <em class="icon-chevron-down rightFloat filterViewIcon" data-bind="attr: { id: HeadIcon }"></em>
+                            <em class="fas fa-chevron-down rightFloat filterViewIcon" data-bind="attr: { id: HeadIcon }"></em>
                         </div>
 
                         @* foreach of the category filters *@
@@ -75,7 +75,7 @@
                             <!-- /ko -->
                             <!-- ko if: (OrderedFilters().length > 6 && ShowMore) -->
                             <a href="#" class="filterMore" data-bind="attr: { id:  HiddenId}">
-                                <em class="icon-plus inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></em>
+                                <em class="fas fa-plus inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></em>
                                 <div class="leftFloat txt_filterMore" data-bind="attr: {id: TxtMore}">Show More</div>
                             </a>
                             <!-- /ko -->
@@ -172,8 +172,8 @@
                                 <div>
                                     <div data-bind="if: $index > 20"></div>
                                     <div class="category-type-wrap">
-                                        <div class="icon-filled-star btnFavoriteSearch disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId, title: FavoriteTitle}, visible: IsFavorite, enable: ObjectStatus === 'Active'" style="display: none"></div>
-                                        <div class="icon-star btnFavoriteSearch disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId, title: FavoriteTitle}, visible: IsFavorite == false, enable: ObjectStatus === 'Active'" style="display: none"></div>
+                                        <div class="fas fa-star btnFavoriteSearch disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId, title: FavoriteTitle}, visible: IsFavorite, enable: ObjectStatus === 'Active'" style="display: none"></div>
+                                        <div class="far fa-star btnFavoriteSearch disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId, title: FavoriteTitle}, visible: IsFavorite == false, enable: ObjectStatus === 'Active'" style="display: none"></div>
                                         <div class="category-type" data-bind="css: BannerColor, attr: {title: AbbreviatedCategory}">
                                             <span data-bind="text: AbbreviatedCategory" />
                                         </div>
