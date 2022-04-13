@@ -6,6 +6,7 @@
 @using (Html.BeginForm("SubmitAccessRequest", "Dataset", FormMethod.Post, new { @id = "AccessRequestForm" }))
 {
     @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.SecurableObjectId)
 
     <div class="accessRequestModelText" style="width:auto">
         <p>A short delay in permission implementation can be expected as Sentry service management system (external to DSC) is used for approvals.</p>
