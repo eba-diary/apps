@@ -21,5 +21,6 @@ namespace Sentry.data.Core
         List<Dataset> GetDatasetsForQueryTool();
         List<Dataset> GetDatasetMarkedDeleted();
         List<DatasetSummaryMetadataDTO> GetDatasetSummaryMetadataDTO();
+        string SetDatasetFavorite(int datasetId, string associateId);
     }
 }

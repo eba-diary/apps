@@ -42,5 +42,21 @@ namespace Sentry.data.Web
                 Email = fav.UserEmail
             };
         }
+
+        public static FavoriteItemModel ToModel(this Core.FavoriteItem core)
+        {
+            return new FavoriteItemModel()
+            {
+                Id = core.Id,
+                FeedId = core.FeedId,
+                FeedName = core.FeedName,
+                FeedUrl = core.FeedUrl,
+                FeedUrlType = core.FeedUrlType,
+                Img = core.Img,
+                Sequence = core.Sequence,
+                Title = core.Title,
+                Url = core.Url
+            };
+        }
     }
 }

@@ -20,7 +20,7 @@ namespace Sentry.data.Web.Controllers
             FilterSearchConfigModel model = new FilterSearchConfigModel()
             {
                 PageTitle = "Data Inventory",
-                IconPath = "~/Images/Dale/DataInventoryIcon.png",
+                IconPath = "~/Images/DataInventory/DataInventoryIcon.png",
                 ResultView = "SearchResult",
                 InfoLink = "https://confluence.sentry.com/display/CLA/Data+Inventory+-+Elastic",
                 DefaultSearch = BuildDefaultSearch(target, search)

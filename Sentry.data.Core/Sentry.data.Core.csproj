@@ -228,6 +228,7 @@
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\SparkConverterModel.cs" />
     <Compile Include="Entities\Schema\Elastic\ElasticSchemaField.cs" />
+    <Compile Include="Entities\Search\SavedSearch.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryNews.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryReleaseNotes.cs" />
     <Compile Include="Helpers\CustomAttributeHelper.cs" />
@@ -333,6 +334,7 @@
     <Compile Include="Interfaces\DataProcessing\ISchemaMapProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
+    <Compile Include="Interfaces\Entities\IFavorable.cs" />
     <Compile Include="Interfaces\IApacheLivyProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IXMLAction.cs" />
     <Compile Include="Interfaces\IDataApplicationService.cs" />
@@ -362,7 +364,6 @@
     <Compile Include="Interfaces\ICherwellProvider.cs" />
     <Compile Include="Interfaces\IEncryptionService.cs" />
     <Compile Include="Interfaces\ITrackableSchema.cs" />
-    <Compile Include="Interfaces\Repositories\IUserFavoriteRepository.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IHttpsProvider.cs" />
     <Compile Include="Extensions\JobExtensions.cs" />
     <Compile Include="Entities\MessageFormats\HszDropLocationCreateModel.cs" />

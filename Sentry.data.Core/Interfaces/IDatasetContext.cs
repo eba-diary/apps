@@ -71,6 +71,7 @@ namespace Sentry.data.Core
         IQueryable<JsonFlatteningAction> JsonFlatteningAction { get; }
         IQueryable<SchemaMap> SchemaMap { get; }
         IQueryable<ClaimIQAction> ClaimIQAction { get; }
+        IQueryable<SavedSearch> SavedSearches { get; }
         /** Datasets **/
 
         Dataset GetById(int id);

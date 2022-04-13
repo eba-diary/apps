@@ -425,5 +425,10 @@
             public const string ENVIRONMENT_PROD = "P";
             public const string ENVIRONMENT_NONPROD = "D";
         }
+
+        public static class UserFavoriteTypes
+        {
+            public const string SAVEDSEARCH = "SavedSearch";
+        }
     }
 }

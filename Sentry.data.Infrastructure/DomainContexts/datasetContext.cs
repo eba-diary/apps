@@ -553,6 +553,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<SavedSearch> SavedSearches
+        {
+            get
+            {
+                return Query<SavedSearch>();
+            }
+        }
+
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {
             return Query<Dataset>().Where(w => w.DatasetCategories.Any(y=> y.Id == id)).Where(x => x.CanDisplay).AsEnumerable();

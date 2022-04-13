@@ -446,6 +446,41 @@ namespace Sentry.data.Core
             return dsList;
         }
 
+        public string SetDatasetFavorite(int datasetId, string associateId)
+        {
+            try
+            {
+                Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+
+                if (!ds.Favorities.Any(w => w.UserId == associateId))
+                {
+                    Favorite f = new Favorite()
+                    {
+                        DatasetId = ds.DatasetId,
+                        UserId = associateId,
+                        Created = DateTime.Now
+                    };
+
+                    _datasetContext.Merge(f);
+                    _datasetContext.SaveChanges();
+
+                    return "Successfully added favorite.";
+                }
+                else
+                {
+                    _datasetContext.Remove(ds.Favorities.First(w => w.UserId == associateId));
+                    _datasetContext.SaveChanges();
+
+                    return "Successfully removed favorite.";
+                }
+            }
+            catch (Exception)
+            {
+                _datasetContext.Clear();
+                throw;
+            }
+        }
+
         #region "private functions"
         private void MarkForDelete(Dataset ds, IApplicationUser user)
         {

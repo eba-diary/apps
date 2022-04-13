@@ -15,35 +15,17 @@
             <img src="@item.Img" />
         </div>
         <div class="display-tablecell text-middle">
-            @if (item.Title.Length > 50)
+            @if (item.FeedName == "Business Intelligence" && item.FeedUrlType == "file")
             {
-                if (item.FeedName == "Business Intelligence" && item.FeedUrlType == "file")
-                {
-                    <a class="favorite-file" onclick='GetFile("@item.FeedUrl.Replace(@"\",@"\\")", @item.FeedId);event.preventDefault();' href="#" data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle</a>
-                }
-                else if (item.FeedName == "Business Intelligence" && item.FeedUrlType != "file")
-                {
-                    <a class="favorite-link" data-id="@item.FeedId" data-type="@item.FeedUrlType" href="@item.FeedUrl" target="_blank" data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle</a>
-                }
-                else
-                {
-                    <a class="favorite-link" data-id="@item.FeedId" data-type="@item.FeedUrlType" href="@item.Url" target="_blank" data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle</a>
-                }
+                <a class="favorite-file" onclick='GetFile("@item.FeedUrl.Replace(@"\",@"\\")", @item.FeedId);event.preventDefault();' href="#" data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle</a>
+            }
+            else if (item.FeedName == "Business Intelligence" && item.FeedUrlType != "file")
+            {
+                <a class="favorite-link" data-id="@item.FeedId" data-type="@item.FeedUrlType" href="@item.FeedUrl" target="_blank" data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle</a>
             }
             else
             {
-                if (item.FeedName == "Business Intelligence" && item.FeedUrlType == "file")
-                {
-                    <a class="favorite-file" onclick='GetFile("@item.FeedUrl.Replace(@"\",@"\\")", @item.FeedId);event.preventDefault();' href="#">@item.DisplayTitle</a>
-                }
-                else if (item.FeedName == "Business Intelligence" && item.FeedUrlType != "file")
-                {
-                    <a class="favorite-link" data-id="@item.FeedId" data-type="@item.FeedUrlType" href="@item.FeedUrl" target="_blank">@item.DisplayTitle</a>
-                }
-                else
-                {
-                    <a class="favorite-link" data-id="@item.FeedId" data-type="@item.FeedUrlType" href="@item.Url" target="_blank">@item.DisplayTitle</a>
-                }
+                <a class="favorite-link" data-id="@item.FeedId" data-type="@item.FeedUrlType" href="@item.Url" target="_blank" data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle</a>
             }
         </div>
     </div>

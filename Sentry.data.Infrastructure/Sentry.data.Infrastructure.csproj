@@ -311,6 +311,7 @@
     <Compile Include="Mappings\Primary\Retriever\RetrieverJobArchiveMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\RetrieverJobMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\SubmissionMapping.cs" />
+    <Compile Include="Mappings\Primary\SavedSearchMapping.cs" />
     <Compile Include="Mappings\Primary\Schema\BaseFieldMapping.cs" />
     <Compile Include="Mappings\Primary\Schema\SchemaMapping.cs" />
     <Compile Include="Mappings\Primary\Schema\SchemaRevisionMapping.cs" />
@@ -379,7 +380,6 @@
     <Compile Include="ServiceImplementations\Messaging\SparkConverterEventService.cs" />
     <Compile Include="ServiceImplementations\MetadataProcessorService.cs" />
     <Compile Include="ServiceImplementations\QuartermasterRestClient.cs" />
-    <Compile Include="ServiceImplementations\Repositories\UserFavoriteRepository.cs" />
     <Compile Include="ServiceImplementations\SAIDRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDService.cs" />
     <Compile Include="ServiceImplementations\SnowProvider.cs" />
