@@ -130,3 +130,7 @@
 table {
     width: 100% !important;
 }
+
+div.dataTables_wrapper div.dataTables_filter input {
+    margin-left: 0 !important;
+}

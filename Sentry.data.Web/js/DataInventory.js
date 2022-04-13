@@ -59,7 +59,7 @@
 
     initDataTable: function (obj) {
         $("#di-result-table").DataTable({
-            pageLength: 20,
+            pageLength: 10,
             deferRender: true,
             ordering: false,
             ajax: {
@@ -112,8 +112,8 @@
                 { data: "ScanType", className: "ScanType", visible: false }
             ],
             aLengthMenu: [10, 20, 50, 100, 500],
-            dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>tr<"float-right d-inline-block"p>',
-            buttons: [{ extend: 'colvis', text: 'Columns' }, { text: 'Save', className: 'btn btn-primary display-none di-save', action: data.DataInventory.saveUpdates }],
+            dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>tr<p>',
+            buttons: [{ extend: 'colvis', text: 'Columns' }, { text: 'Save', className: 'display-none di-save', action: data.DataInventory.saveUpdates }],
             initComplete: function (settings, json) {
                 data.FilterSearch.completeSearch(json.searchTotal, settings.oInit.pageLength, json.data.length);
             },
@@ -208,7 +208,6 @@
     getTableElementCheckbox: function (isDisabled, isChecked, id) {
         var disabled = '';
         var checked = '';
-        var cellValue = 'false';
 
         if (isDisabled) {
             disabled = 'disabled ';
@@ -216,9 +215,8 @@
 
         if (isChecked) {
             checked = 'checked ';
-            cellValue = 'true';
         }
 
-        return '<input type="checkbox" value="true" class="table-element-checkbox" id="' + id + '" ' + checked + disabled + '><label class="display-none">' + cellValue + '</label>';
+        return '<div class="text-center"><input type="checkbox" value="true" class="form-check-input table-element-checkbox" id="' + id + '" ' + checked + disabled + '><label for=' + id + ' class="form-check-label"></label></div>';
     }
 }

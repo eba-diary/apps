@@ -483,38 +483,37 @@
             }
         }
 
-        $('#cronDailyJobTimePicker').timepicker({
-            timeFormat: 'h:mm p',
-            interval: 60,
-            minTime: '0',
-            maxTime: '23:59',
-            defaultTime: '11',
-            startTime: '0',
-            dynamic: false,
-            dropdown: true,
-            scrollbar: true,
-            change: function () {
+        $('#cronDailyJobTimePicker').pickatime({});
 
-                if ($(this).timepicker('getTime')) {
-                    var d = new Date($(this).timepicker('getTime'));
-                    var h = d.getHours();
-                    var m = d.getMinutes();
-
-                    $("[id$='Schedule']").val(m + ' ' + h + ' * * *');
+        function changeDay() {
+            if ($('#cronDailyJobTimePicker').val()) {
+                var time = $("#cronDailyJobTimePicker").val();
+                var timeSplit = time.split(':');
+                if (timeSplit.length > 1) {
+                    var h = timeSplit[0]
+                    var m = timeSplit[1]
                 }
-                updateFutureTimes();
+                $("[id$='Schedule']").val(m + ' ' + h + ' * * *');
             }
+            updateFutureTimes();
+        }
+
+        $('#cronDailyJobTimePicker').change(function () {
+            changeDay();
         });
 
-        $('#cronWeeklyDayPicker').bind('input', function () {
+        $('#cronWeeklyDayPicker').bind('change', function () {
             changeWeek();
         });
 
         function changeWeek() {
-            if ($('#cronWeeklyJobTimePicker').timepicker('getTime')) {
-                var d = new Date($('#cronWeeklyJobTimePicker').timepicker('getTime'));
-                var h = d.getHours();
-                var m = d.getMinutes();
+            if ($('#cronWeeklyJobTimePicker').val()) {
+                var time = $("#cronWeeklyJobTimePicker").val();
+                var timeSplit = time.split(':');
+                if (timeSplit.length > 1) {
+                    var h = timeSplit[0]
+                    var m = timeSplit[1]
+                }
                 var d = $('#cronWeeklyDayPicker').val();
 
 
@@ -523,19 +522,11 @@
             updateFutureTimes();
         }
 
-        $('#cronWeeklyJobTimePicker').timepicker({
-            timeFormat: 'h:mm p',
-            interval: 60,
-            minTime: '0',
-            maxTime: '23:59',
-            defaultTime: '11',
-            startTime: '0',
-            dynamic: false,
-            dropdown: true,
-            scrollbar: true,
-            change: function () {
-                changeWeek();
-            }
+        $('#cronWeeklyJobTimePicker').pickatime({
+        });
+
+        $('#cronWeeklyJobTimePicker').change(function () {
+            changeWeek();
         });
 
         $('#cronMonthlyDayPicker').bind('input', function () {
@@ -543,10 +534,13 @@
         });
 
         function changeMonth() {
-            if ($('#cronMonthlyJobTimePicker').timepicker('getTime')) {
-                var d = new Date($('#cronMonthlyJobTimePicker').timepicker('getTime'));
-                var h = d.getHours();
-                var m = d.getMinutes();
+            if ($('#cronMonthlyJobTimePicker').val()) {
+                var time = $("#cronMonthlyJobTimePicker").val();
+                var timeSplit = time.split(':');
+                if (timeSplit.length > 1) {
+                    var h = timeSplit[0]
+                    var m = timeSplit[1]
+                }
                 var d = $('#cronMonthlyDayPicker').val();
 
 
@@ -555,34 +549,35 @@
             updateFutureTimes();
         }
 
-        $('#cronMonthlyJobTimePicker').timepicker({
-            timeFormat: 'h:mm p',
-            interval: 60,
-            minTime: '0',
-            maxTime: '23:59',
-            defaultTime: '11',
-            startTime: '0',
-            dynamic: false,
-            dropdown: true,
-            scrollbar: true,
-            change: function () {
-                changeMonth();
-            }
+        $('#cronMonthlyJobTimePicker').pickatime({});
+
+        $('#cronMonthlyJobTimePicker').change(function () {
+            changeMonth();
+        });
+
+        $('#cronYearlyJobTimePicker').pickatime({
+        }); 
+
+        $('#cronYearlyJobTimePicker').change(function () {
+            changeYear();
         });
 
         $('#cronYearlyDayPicker').bind('input', function () {
             changeYear();
         });
 
-        $('#cronYearlyMonthPicker').bind('input', function () {
+        $('#cronYearlyMonthPicker').bind('change', function () {
             changeYear();
         });
 
         function changeYear() {
-            if ($('#cronYearlyJobTimePicker').timepicker('getTime')) {
-                var d = new Date($('#cronYearlyJobTimePicker').timepicker('getTime'));
-                var hour = d.getHours();
-                var minute = d.getMinutes();
+            if ($('#cronYearlyJobTimePicker').val()) {
+                var time = $("#cronYearlyJobTimePicker").val();
+                var timeSplit = time.split(':');
+                if (timeSplit.length > 1) {
+                    var hour = timeSplit[0]
+                    var minute = timeSplit[1]
+                }
                 var day = $('#cronYearlyDayPicker').val();
                 var month = $('#cronYearlyMonthPicker').val();
 
@@ -603,22 +598,8 @@
             updateFutureTimes();
         }
 
-        $('#cronYearlyJobTimePicker').timepicker({
-            timeFormat: 'h:mm p',
-            interval: 60,
-            minTime: '0',
-            maxTime: '23:59',
-            defaultTime: '11',
-            startTime: '0',
-            dynamic: false,
-            dropdown: true,
-            scrollbar: true,
-            change: function (ev) {
-                changeYear();
-            }
-        });
 
-        $("#cronJobDatePicker").datepicker();
+        $("#cronJobDatePicker").pickatime({});
 
         var d = new Date();
         d.setHours(a[1], a[0]);
