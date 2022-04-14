@@ -83,7 +83,7 @@ namespace Sentry.data.Web
             bundles.Add(new StyleBundle("~/bundles/css/main").
                         Include("~/Content/bootstrap.css", new CssRewriteUrlTransform()).
                         Include("~/Content/sentry-styles.css", new CssRewriteUrlTransform()).
-
+                        Include("~/Content/sentry-icons.css", new CssRewriteUrlTransform()).
                         Include("~/Content/font-awesome.css", new CssRewriteUrlTransform()).
                         Include("~/Content/css/select2.css", new CssRewriteUrlTransform()).
                         Include("~/Content/ladda-themeless.css"));
@@ -96,35 +96,35 @@ namespace Sentry.data.Web
                     Include(dataTablesStylesDirectory + "/dataTables.bootstrap4.css").
                     Include(dataTablesStylesDirectory + "/dataTables.responsive.css").
                     Include(dataTablesStylesDirectory + "/buttons.bootstrap4.css").
-                    Include(dataTablesStylesDirectory + "/dataTables.fontAwesome.css").
                     Include(dataTablesStylesDirectory + "/buttons.dataTables.css"));
 
 
 
             //This bundle contains styles that override everything else, and must come after all other css includes
             bundles.Add(new StyleBundle("~/bundles/css/site").
-                 Include("~/Content/bootstrap-datetimepicker.css", new CssRewriteUrlTransform()).
-                        Include("~/Content/toastr.min.css").
-                        Include("~/Content/query-builder.default.min.css").
-                        Include("~/Content/query-tool.css").
-                        Include("~/Content/datasets.css").
-                        Include("~/Content/dataset-detail.css").
-                        Include("~/Content/favorites.css").
-                        Include("~/Content/fields.css").
-                        Include("~/Content/home.css").
-                        Include("~/Content/search.css").
-                        Include("~/Content/business-area.css").
-                        Include("~/Content/system-notifications.css").
-                        Include("~/Content/checkbox.css").
-                        Include("~/Content/business-intelligence.css").
-                        Include("~/Content/dataflow.css").
-                        Include("~/Content/site.css").
-                        Include("~/Content/dale.css").
-                        Include("~/Content/filter-search.css").
-                        Include("~/Content/data-inventory.css").
-                        Include("~/Content/jquery.json-viewer.css").
-                        Include("~/scripts/quill/quill.snow.css")
-                        );
+                Include("~/Content/bootstrap-datetimepicker.css", new CssRewriteUrlTransform()).
+                Include("~/Content/all.min.css", new CssRewriteUrlTransform()).
+                Include("~/Content/toastr.min.css").
+                Include("~/Content/query-builder.default.min.css").
+                Include("~/Content/query-tool.css").
+                Include("~/Content/datasets.css").
+                Include("~/Content/dataset-detail.css").
+                Include("~/Content/favorites.css").
+                Include("~/Content/fields.css").
+                Include("~/Content/home.css").
+                Include("~/Content/search.css").
+                Include("~/Content/business-area.css").
+                Include("~/Content/system-notifications.css").
+                Include("~/Content/checkbox.css").
+                Include("~/Content/business-intelligence.css").
+                Include("~/Content/dataflow.css").
+                Include("~/Content/site.css").
+                Include("~/Content/dale.css").
+                Include("~/Content/filter-search.css").
+                Include("~/Content/data-inventory.css").
+                Include("~/Content/jquery.json-viewer.css").
+                Include("~/scripts/quill/quill.snow.css")
+            );
 
             /* If you want to see content bundled/minimized when running locally, uncomment the EnableOptimizations 
                line below.  Otherwise, bundling/optimization will be driven by the compilation debug property.

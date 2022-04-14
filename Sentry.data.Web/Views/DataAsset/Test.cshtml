@@ -57,7 +57,7 @@
     <li data-bind="css: LayerInfo" style="display: none;">
         <div class="lineageRow" data-bind="css: Color">
             <button type="button" class="btn btn-xs btn-success btnShowChildren" style="display: inline-block;  margin-bottom: 6px;" data-bind="enable: HasChildren">
-                <span id="icon_" class="icon-plus"></span>
+                <span id="icon_" class="fas fa-plus"></span>
             </button>
             <div class="Source">
                 <span class="SourceElement_NME" data-bind="text : DataElement_NME"></span>
@@ -225,16 +225,16 @@
 
         function ShowAllRows() {
             $('.layer').parent().show();
-            $($('.btnShowChildren').children('span')).removeClass("icon-plus");
-            $($('.btnShowChildren').children('span')).addClass("icon-minus");
+            $($('.btnShowChildren').children('span')).removeClass("fa-plus");
+            $($('.btnShowChildren').children('span')).addClass("fa-minus");
 
             ToggleHiddenRows(true);
         }
         function HideAllRows() {
             $('.layer').parent().hide();
 
-            $($('.btnShowChildren').children('span')).addClass("icon-plus");
-            $($('.btnShowChildren').children('span')).removeClass("icon-minus");
+            $($('.btnShowChildren').children('span')).addClass("fa-plus");
+            $($('.btnShowChildren').children('span')).removeClass("fa-minus");
 
             ToggleHiddenRows(true);
         }
@@ -373,7 +373,7 @@
 
         $(document).on('click', '.btnShowChildren', function () {
             console.log(this);
-            $($(this).children('span')).toggleClass("icon-plus icon-minus");
+            $($(this).children('span')).toggleClass("fa-plus fa-minus");
             $(this).parent().parent().children("ul").children("li").toggle();
 
 

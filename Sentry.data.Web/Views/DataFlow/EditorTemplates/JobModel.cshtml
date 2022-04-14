@@ -17,8 +17,8 @@
         @Html.ValidationMessageFor((model) => model.SelectedDataSource, "", new { @class = "text-danger" })
     </div>
     <div class="securityPanel" style="display:none;">
-        <div class="md-form">
-            <span class="icon-verified lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
+        <div class="">
+            <span class="fas fa-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
         </div>
         <span>
             <input id="RequestAccessButton" type="button" value="Request Access" class="btn btn-primary"
@@ -35,8 +35,8 @@
     </div>
 </div>
 
-<div class="md-form fieldDescription">
-    <label class="md-form"></label>
+<div class="fieldDescription">
+    <label class=""></label>
     <div class="">
         <span class="text-muted">
             <em id="dataSourceDescription"></em>
@@ -47,7 +47,7 @@
 <div class="editDataSourceLink" style="display:none;">
     <label class=""></label>
     <div class="">
-        <a id="editDataSource" class="backToList" href="/Config/Source/Edit"><span class="icon-chevron-right"></span>Edit Data Source</a>
+        <a id="editDataSource" class="backToList" href="/Config/Source/Edit"><span class="fas fa-chevron-right"></span>Edit Data Source</a>
     </div>
 </div>
 
@@ -67,21 +67,25 @@
         <hr />*@
 
     <div class="jobquestion sourceLocation">
-        <div class="md-form configQuestion">
+        <div class="configQuestion">
             <h5>Where will we find the data?</h5>
         </div>
 
-        <div class="md-form questionDescription">
+        <div class="questionDescription">
             <span class="text-muted">
                 <em id="baseURL"></em>
             </span>
         </div>
 
-        <div class="md-form">
-            @Html.LabelFor(model => model.RelativeUri, htmlAttributes: new { @class = "control-label" })
-            <input type="text" id="baseURLTextBox" readonly="readonly" disabled="disabled" class="" />
-            @Html.TextBoxFor(model => model.RelativeUri, new { @class = "w-50", @placeholder = "Do not include starting forward slash (/)" })
-            @Html.ValidationMessageFor(model => model.RelativeUri, "", new { @class = "text-danger" })
+        <div class="md-form row">
+            <div class="col">
+                <input type="text" id="baseURLTextBox" readonly="readonly" disabled="disabled" class="w-100" />
+            </div>
+            <div class="col">
+                @Html.LabelFor(model => model.RelativeUri, htmlAttributes: new { @class = "control-label ml-3" })
+                @Html.TextBoxFor(model => model.RelativeUri, new { @class = "w-100", @placeholder = "Do not include starting forward slash (/)" })
+                @Html.ValidationMessageFor(model => model.RelativeUri, "", new { @class = "text-danger" })
+            </div>
         </div>
 
         <div class="httpSourcePanel" style="display:none;">
@@ -122,12 +126,11 @@
 
 
     <div class="jobquestion searchCriteria">
-        <div class="form-group configQuestion">
-            <hr />
+        <div class="configQuestion">
             <h5>Should selective files be processed?</h5>
         </div>
 
-        <div class="md-form questionDescription">
+        <div class="questionDescription">
             <span class="text-muted">
                 <em>All searches are performed on full file name (including file extension).&nbsp;&nbsp;</em>
                 <em>A regular expression search of \. is the least restrictive and will match anything with a period.</em>
@@ -135,9 +138,9 @@
         </div>
 
         <div class="searchCriteria searchCriteriaIsRegex">
-            <div class="md-form">
-                @Html.LabelFor(model => model.IsRegexSearch, htmlAttributes: new { @class = "control-label" })
-                @Html.CheckBoxFor(model => model.IsRegexSearch, new { @class = "" })
+            <div class="form-check">
+                <input type="checkbox" value="true" class="form-check-input" id="RetrieverJob_IsRegexSearch" name="RetrieverJob_IsRegexSearch" checked="@Model.IsRegexSearch">
+                @Html.LabelFor(model => model.IsRegexSearch, htmlAttributes: new { @class = "form-check-label" })
                 @Html.ValidationMessageFor(model => model.IsRegexSearch, "", new { @class = "text-danger" })
             </div>
         </div>

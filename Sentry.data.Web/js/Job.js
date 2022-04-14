@@ -30,6 +30,7 @@
                 
                 $("[id$='SelectedDataSource']").html(subItems);
                 $("[id$='SelectedDataSource'] select").val("0");
+                $("#RetrieverJob_SelectedDataSource").materialSelect();
             });
 
             data.Job.RequestMethodDropdownPopulate();
@@ -118,7 +119,7 @@
         });
         
         $("[id$='FtpPattern']").change(function () {
-            data.Job.SetFtpPatternDefaults($("[id$='FtpPattern']").val());
+            data.Job.SetFtpPatternDefaults($("#RetrieverJob_FtpPattern").val());
         });
 
         $('#IsSourceCompressed').on('change', function () {
@@ -156,7 +157,7 @@
                     data.Job.targetFileNameDescUpdate();
                     
                     if ($("[id$='SelectedSourceType']").val().toLowerCase() === "ftp") {
-                        data.Job.SetFtpPatternDefaults($('#FtpPattern').val());
+                        data.Job.SetFtpPatternDefaults($('#RetrieverJob_FtpPattern').val());
                     };
                 }
             });            
@@ -430,7 +431,7 @@
             $('#schedulePanel').show();
         }
 
-        $("[id$='SchedulePicker']").change(function () {
+        $("[id$='RetrieverJob_SchedulePicker']").change(function () {
 
             $('#hourlyPicker').hide();
             $('#dailyPicker').hide();
@@ -600,41 +601,38 @@
 
 
         $("#cronJobDatePicker").pickatime({});
-
+        
         var d = new Date();
         d.setHours(a[1], a[0]);
-        switch ($("[id$='SchedulePicker']").val()) {
+        switch ($("#RetrieverJob_SchedulePicker").val()) {
             case "1":
                 $('#hourlyPicker').show();
                 $('#cronHourlyTimePicker').val(a[0]);
+                updateFutureTimes();
                 break;
             case "2":
                 $('#dailyPicker').show();
                 $('#cronDailyJobTimePicker').val(a[1] + ":" + a[0]);
-                $('#cronDailyJobTimePicker').timepicker('setTime', d);
-                $("#cronDailyJobTimePicker").trigger(e);
+                $("#cronDailyJobTimePicker").change();
                 break;
             case "3":
                 $('#weeklyPicker').show();
                 $('#cronWeeklyDayPicker').val(a[4]);
                 $("#cronWeeklyJobTimePicker").val(a[1] + ":" + a[0]);
-                $('#cronWeeklyJobTimePicker').timepicker('setTime', d);
-                $("#cronWeeklyJobTimePicker").trigger(e);
+                $("#cronWeeklyJobTimePicker").change();
                 break;
             case "4":
                 $('#monthlyPicker').show();
                 $('#cronMonthlyDayPicker').val(a[2]);
-                //$('#cronMonthlyJobTimePicker').val(a[1] + ":" + a[0]);
-                $('#cronMonthlyJobTimePicker').timepicker('setTime', d);
-                $("#cronMonthlyJobTimePicker").trigger(e);
+                $('#cronMonthlyJobTimePicker').val(a[1] + ":" + a[0]);
+                $("#cronMonthlyJobTimePicker").change();
                 break;
             case "5":
                 $('#yearlyPicker').show();
                 $('#cronYearlyMonthPicker').val(a[3]);
                 $('#cronYearlyDayPicker').val(a[2]);
-                //$('#cronYearlyJobTimePicker').val(a[1] + ":" + a[0]);
-                $('#cronYearlyJobTimePicker').timepicker('setTime', d);
-                $("#cronYearlyJobTimePicker").trigger(e);
+                $('#cronYearlyJobTimePicker').val(a[1] + ":" + a[0]);
+                $("#cronYearlyJobTimePicker").change();
                 break;
         }
     }

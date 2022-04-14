@@ -20,7 +20,7 @@
 
 <div class="topBanner">
     <div>
-        <a class="backToList" href="/"><em class="icon-chevron-left"></em>Back to Previous Page</a>
+        <a class="backToList" href="/"><em class="fas fa-chevron-left pr-3"></em>Back to Previous Page</a>
     </div>
 
 </div>
@@ -164,16 +164,16 @@
 
     <div id="requestHeaderPanel">
         <div class="md-form">
-            @Html.LabelFor((model) => model.Headers, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div id="requestHeader">
-                <div class="md-form headerEntry">
-                    <a class="addHeader" style="display: inline-block; margin-left: 10px;"><em class="icon-plus"></em> Add Header</a>
+            @Html.LabelFor((model) => model.Headers, htmlAttributes: new { @class = "control-label" })
+            <div id="requestHeader" class="row">
+                <div class="md-form headerEntry col">
+                    <a class="addHeader" style="display: inline-block; margin-left: 10px;"><em class="fas fa-plus pr-3"></em> Add Header</a>
                 </div>
-                <div class="headerEntryLabel">
-                    @Html.Label("Header Name", new { @value = "", @class = "col-md-5 headerEntryLabel" })
+                <div class="headerEntryLabel col">
+                    @Html.Label("Header Name", new { @value = "", @class = "headerEntryLabel" })
                 </div>
-                <div class="headerEntryLabel">
-                    @Html.Label("Header Value", new { @value = "", @class = "col-md-5 headerEntryLabel" })
+                <div class="headerEntryLabel col">
+                    @Html.Label("Header Value", new { @value = "", @class = "headerEntryLabel" })
                 </div>
                 @*This approach is described at the site http://ivanz.com/2011/06/16/editing-variable-length-reorderable-collections-in-asp-net-mvc-part-1/*@
                 @foreach (RequestHeader header in Model.Headers)

@@ -75,7 +75,7 @@
     {
         <div class="visible-xs">
             <button type="button" class="btn btn-lg btn-default daHamburger" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                <em class="icon-hamburger"></em>
+                <em class="fas fa-bars"></em>
             </button>
         </div>
 
@@ -481,7 +481,7 @@
 
         $(document).on('click', '.btnShowChildren', function () {
             console.log(this);
-            $($(this).children('span')).toggleClass("icon-plus icon-minus");
+            $($(this).children('span')).toggleClass("fa-plus fa-minus");
 
             var row = $(this).parent().parent();
 
@@ -604,9 +604,9 @@
 
             self.ButtonSpanClass = ko.computed(function () {
                 if (self.Toggled() || vm.ShowAllLayers() || self.ShowChildren()) {
-                     return 'icon-minus';
+                     return 'fa-minus';
                 } else {
-                    return 'icon-plus';
+                    return 'fa-plus';
                 }
             });
 
