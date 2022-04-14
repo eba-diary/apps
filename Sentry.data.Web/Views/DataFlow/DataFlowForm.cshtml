@@ -4,7 +4,7 @@
     ViewBag.Title = "Data Flow Form";
 }
 @*This DIV tag is used to scope JQuery element selectors in DataFlow.js to just this view*@
-<div id="DataFlowFormContainer" class="md-form">
+<div id="DataFlowFormContainer">
     @using (Html.BeginForm("DataFlowForm", "DataFlow", FormMethod.Post))
     {
         @Html.AntiForgeryToken()
@@ -71,7 +71,7 @@
                 </div>
             </div>
         </div>
-        <div class="md-form retrieverPanel" style="display:none">
+        <div class="retrieverPanel" style="display:none">
             <div id="retrieverJobPanel">
                 @Html.EditorFor(model => Model.RetrieverJob)
             </div>
