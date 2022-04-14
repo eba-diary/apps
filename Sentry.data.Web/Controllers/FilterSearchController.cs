@@ -1,11 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core;
+using System;
+using System.Collections.Generic;
 using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
 {
-    public class FilterSearchController : Controller
+    public class FilterSearchController : BaseController
     {
+        private readonly IFilterSearchService _filterSearchService;
+
+        public FilterSearchController(IFilterSearchService filterSearchService)
+        {
+            _filterSearchService = filterSearchService;
+        }
+
         [HttpPost]
         public ActionResult FilterCategories(List<FilterCategoryModel> filterCategories)
         {
@@ -16,6 +25,25 @@ namespace Sentry.data.Web.Controllers
         public ActionResult FilterShowAll(List<FilterCategoryModel> filterCategories)
         {
             return PartialView("~/Views/Search/FilterShowAll.cshtml", filterCategories ?? new List<FilterCategoryModel>());
+        }
+
+        [HttpPost]
+        public JsonResult SaveSearch(SavedSearchModel searchModel)
+        {
+            try
+            {
+                SavedSearchDto savedSearchDto = searchModel.ToDto();
+                savedSearchDto.AssociateId = SharedContext.CurrentUser.AssociateId;
+                
+                _filterSearchService.SaveSearch(savedSearchDto);
+
+                return Json(new { Success = true });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error saving search", ex);
+                return Json(new { Success = false });
+            }
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using static Sentry.data.Core.GlobalConstants;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Sentry.data.Web
 {

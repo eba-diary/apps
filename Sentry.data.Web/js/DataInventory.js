@@ -17,7 +17,7 @@
     },
 
     buildFilter: function () {
-        $.post("/DataInventory/SearchFilters/", data.DataInventory.buildRequest(), (x) => data.FilterSearch.completeFilterRetrieval(x));
+        $.post("/DataInventory/SearchFilters/", data.FilterSearch.buildSearchRequest(), (x) => data.FilterSearch.completeFilterRetrieval(x));
     },
 
     initDataInventory: function () {
@@ -65,7 +65,7 @@
             ajax: {
                 url: "/DataInventory/SearchResult/",
                 type: "POST",
-                data: data.DataInventory.buildRequest
+                data: data.FilterSearch.buildSearchRequest
             },
             columns: [
                 {
@@ -196,13 +196,6 @@
     updatePageInfo: function () {
         var tableInfo = $("#di-result-table").DataTable().page.info();
         data.FilterSearch.setPageInfo(++tableInfo.start, tableInfo.end);
-    },
-
-    buildRequest: function () {
-        return {
-            SearchText: $.trim($("#filter-search-text").val()),
-            FilterCategories: data.FilterSearch.getSelectedCategoryOptions()
-        }
     },
 
     getTableElementCheckbox: function (isDisabled, isChecked, id) {

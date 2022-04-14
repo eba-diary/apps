@@ -3,5 +3,6 @@
 	[SavedSearchId] INT NOT NULL PRIMARY KEY IDENTITY, 
     [SearchName] VARCHAR(50) NOT NULL, 
     [SearchText] VARCHAR(4096) NULL, 
-    [FilterCategoriesJson] NVARCHAR(MAX) NULL
+    [FilterCategoriesJson] NVARCHAR(MAX) NULL, 
+    [AssociateId] CHAR(6) NOT NULL
 )

@@ -1,4 +1,6 @@
-﻿using Sentry.data.Core;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,14 +16,13 @@ namespace Sentry.data.Infrastructure
         }
         
         public IList<FavoriteItem> GetUserFavoriteItems(string associateId)
-        {
-            List<FavoriteItem> favoriteItems = new List<FavoriteItem>();
-            
+        {            
             List<UserFavorite> userFavorites = _datasetContext.UserFavorites.Where(f => f.AssociateId == associateId).ToList();
-
+            List<FavoriteItem> favoriteItems = CreateFavoriteItems(userFavorites);
 
             //Get favorites from legacy favorites until refactored
-            favoriteItems.AddRange(GetLegacyFavoriteItems(associateId));
+            List<Favorite> legacyFavorites = _datasetContext.Favorites.Where(w => w.UserId == associateId).ToList();
+            favoriteItems.AddRange(CreateLegacyFavoriteItems(legacyFavorites));
 
             return favoriteItems;
         }
@@ -33,6 +34,7 @@ namespace Sentry.data.Infrastructure
 
             if (userFavorite != null)
             {
+                Logger.Info($"Found User Favorite {userFavoriteId} to remove for {associateId}");
                 _datasetContext.Remove(userFavorite);
                 _datasetContext.SaveChanges();
             }
@@ -42,6 +44,7 @@ namespace Sentry.data.Infrastructure
 
             if (legacyFavorite != null)
             {
+                Logger.Info($"Found Legacy Favorite {userFavoriteId} to remove for {associateId}");
                 _datasetContext.Remove(legacyFavorite);
                 _datasetContext.SaveChanges();
             }
@@ -69,6 +72,8 @@ namespace Sentry.data.Infrastructure
                         legacyFavorite.Sequence = i;
                     }
                 }
+
+                i++;
             }
 
             _datasetContext.SaveChanges();
@@ -77,6 +82,31 @@ namespace Sentry.data.Infrastructure
             favoriteItems.AddRange(CreateLegacyFavoriteItems(legacyFavorites));
 
             return favoriteItems;
+        }
+
+        public void AddUserFavorite(IFavorable favorite, string associateId)
+        {
+            int favoriteEntityId = favorite.GetFavoriteEntityId();
+            string favoriteType = favorite.GetFavoriteType();
+
+            //check if favorite already exists
+            UserFavorite existing = _datasetContext.UserFavorites.FirstOrDefault(x => x.AssociateId == associateId && x.FavoriteEntityId == favoriteEntityId && x.FavoriteType == favoriteType);
+
+            if (existing == null)
+            {
+                //create new UserFavorite
+                UserFavorite userFavorite = new UserFavorite()
+                {
+                    AssociateId = associateId,
+                    FavoriteType = favoriteType,
+                    FavoriteEntityId = favoriteEntityId,
+                    CreateDate = DateTime.Now
+                };
+
+                //save UserFavorite
+                _datasetContext.Add(userFavorite);
+                _datasetContext.SaveChanges();
+            }
         }
 
         private List<FavoriteItem> CreateFavoriteItems(List<UserFavorite> userFavorites)
@@ -88,7 +118,13 @@ namespace Sentry.data.Infrastructure
                 IFavorable favoriteEntity = GetFavoriteEntity(userFavorite);
                 if (favoriteEntity != null)
                 {
-                    favoriteItems.Add(favoriteEntity.CreateFavoriteItem(userFavorite));
+                    FavoriteItem favoriteItem = new FavoriteItem() 
+                    { 
+                        Id = userFavorite.UserFavoriteId,
+                        Sequence = userFavorite.Sequence 
+                    };
+                    favoriteEntity.SetFavoriteItem(favoriteItem);
+                    favoriteItems.Add(favoriteItem);
                 }
             }
 
@@ -100,16 +136,10 @@ namespace Sentry.data.Infrastructure
             switch (userFavorite.FavoriteType)
             {
                 case GlobalConstants.UserFavoriteTypes.SAVEDSEARCH:
-                    return _datasetContext.SavedSearches.FirstOrDefault(x => userFavorite.FavoriteEntityId == x.SavedSearchId) as IFavorable;
+                    return _datasetContext.SavedSearches.FirstOrDefault(x => userFavorite.FavoriteEntityId == x.SavedSearchId);
                 default:
                     return null;
             }
-        }
-
-        private List<FavoriteItem> GetLegacyFavoriteItems(string associateId)
-        {
-            List<Favorite> favsList = _datasetContext.Favorites.Where(w => w.UserId == associateId).ToList();
-            return CreateLegacyFavoriteItems(favsList);
         }
 
         private List<FavoriteItem> CreateLegacyFavoriteItems(List<Favorite> favorites)

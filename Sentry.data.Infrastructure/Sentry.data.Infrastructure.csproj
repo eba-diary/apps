@@ -366,6 +366,7 @@
     <Compile Include="ServiceImplementations\DataSourceProviders\GoogleAPIDataFlowProvider.cs" />
     <Compile Include="ServiceImplementations\ElasticDataInventorySearchProvider.cs" />
     <Compile Include="ServiceImplementations\ElasticSchemaSearchProvider.cs" />
+    <Compile Include="ServiceImplementations\FilterSearchService.cs" />
     <Compile Include="ServiceImplementations\HiveOdbcProvider.cs" />
     <Compile Include="ServiceImplementations\HttpClientProvider.cs" />
     <Compile Include="ServiceImplementations\Messaging\DataStepProcessorService.cs" />

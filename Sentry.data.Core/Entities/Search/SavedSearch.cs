@@ -8,17 +8,25 @@ namespace Sentry.data.Core
         public virtual string SearchName { get; set; }
         public virtual string SearchText { get; set; }
         public virtual string FilterCategoriesJson { get; set; }
+        public virtual string AssociateId { get; set; }
 
-        public FavoriteItem CreateFavoriteItem(UserFavorite userFavorite)
+        #region IFavorable
+        public virtual int GetFavoriteEntityId()
         {
-            return new FavoriteItem()
-            {
-                Id = userFavorite.UserFavoriteId,
-                Title = SearchName,
-                Sequence = userFavorite.Sequence,
-                Url = $"DataInventory/Search?savedSearch={HttpUtility.UrlEncode(SearchName)}",
-                Img = "/Images/DataInventory/DataInventoryIcon.png"
-            };
+            return SavedSearchId;
         }
+
+        public virtual string GetFavoriteType()
+        {
+            return GlobalConstants.UserFavoriteTypes.SAVEDSEARCH;
+        }
+
+        public virtual void SetFavoriteItem(FavoriteItem favoriteItem)
+        {
+            favoriteItem.Title = SearchName;
+            favoriteItem.Url = $"DataInventory/Search?savedSearch={HttpUtility.UrlEncode(SearchName)}";
+            favoriteItem.Img = "/Images/DataInventory/DataInventoryIcon.png";
+        }
+        #endregion
     }
 }

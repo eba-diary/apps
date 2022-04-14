@@ -121,6 +121,14 @@
             e.preventDefault();
             data.FilterSearch.search();
         });
+
+        //save search parameters
+        $(document).on("click", ".filter-search-save", function (e) {
+            e.preventDefault();
+
+            //open modal to enter the name of the search
+            console.log("save search");
+        });
     },
 
     setOptionCheckbox: function (id, checked) {
@@ -282,5 +290,12 @@
 
     setPageInfo: function (start, end) {
         $("#filter-search-page-size").text(start.toLocaleString("en-US") + ' - ' + end.toLocaleString("en-US"));
+    },
+
+    buildSearchRequest: function () {
+        return {
+            SearchText: $.trim($("#filter-search-text").val()),
+            FilterCategories: data.FilterSearch.getSelectedCategoryOptions()
+        }
     }
 }

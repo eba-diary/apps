@@ -180,6 +180,7 @@
     <Compile Include="DTO\Search\FilterCategoryDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryOptionDto.cs" />
     <Compile Include="DTO\Search\FilterSearchDto.cs" />
+    <Compile Include="DTO\Search\SavedSearchDto.cs" />
     <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
@@ -229,6 +230,7 @@
     <Compile Include="Entities\MessageFormats\SparkConverterModel.cs" />
     <Compile Include="Entities\Schema\Elastic\ElasticSchemaField.cs" />
     <Compile Include="Entities\Search\SavedSearch.cs" />
+    <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryNews.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryReleaseNotes.cs" />
     <Compile Include="Helpers\CustomAttributeHelper.cs" />
@@ -355,6 +357,7 @@
     <Compile Include="Interfaces\IHiveOdbcProvider.cs" />
     <Compile Include="Interfaces\ISAIDRestClient.cs" />
     <Compile Include="Interfaces\ISAIDService.cs" />
+    <Compile Include="Interfaces\IFilterSearchService.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
     <Compile Include="Interfaces\ISnowProvider.cs" />
