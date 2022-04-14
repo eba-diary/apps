@@ -184,15 +184,14 @@ namespace Sentry.data.Core
                     parentSecurity = GetUserSecurity(securable.Parent, user);
                 }
 
-                //build a adGroupName and List(of permissionCode) dictionary
-                var adGroups = GetSecurityTicketsForGroups(securable);
-                //loop through the dictionary to see if the user is part of the group, if so grab the permissions.
-                userPermissions.AddRange(adGroups.Where(g => user.IsInGroup(g.Key)).SelectMany(g => g.Value).Select(p => p.Permission.PermissionCode));
-
-                //build a userId and List(of permissionCode) dictionary
-                var userGroups = GetSecurityTicketsForUserIds(securable);
-                //loop through the dictionary to see if the user is the user on the ticket, if so grab the permissions.
-                userPermissions.AddRange(userGroups.Where(g => g.Key == user.AssociateId).SelectMany(g => g.Value).Select(p => p.Permission.PermissionCode));
+                //get all enabled security tickets for this ISecurable
+                var tickets = GetSecurityTicketsForSecurable(securable);
+                //filter the list down to only those that apply to this user (either by group membership or by direct ID)
+                userPermissions.AddRange(
+                    tickets.Where(t => user.IsInGroup(t.AdGroupName) || t.GrantPermissionToUserId == user.AssociateId)
+                        .SelectMany(g => g.Permissions)
+                        .Select(p => p.Permission.PermissionCode)
+                );
             }
 
             //if it is not secure, it should be wide open except for upload and notifications
@@ -218,27 +217,15 @@ namespace Sentry.data.Core
         }
 
         /// <summary>
-        /// Gets a dictionary of all AD Group permissions that have been granted to an <see cref="ISecurable"/>
+        /// Gets a list of all permissions that have been granted to an <see cref="ISecurable"/>
         /// </summary>
         /// <param name="securable">The <see cref="ISecurable"/> that we want to get permissions for</param>
         /// <param name="includePending">If true, will include permissions that haven't been approved yet (but still won't included deleted permissions)</param>
-        private static Dictionary<string, List<SecurityPermission>> GetSecurityTicketsForGroups(ISecurable securable, bool includePending = false)
+        private static IEnumerable<SecurityTicket> GetSecurityTicketsForSecurable(ISecurable securable, bool includePending = false)
         {
             var whereClause = includePending ? (Func<SecurityPermission, bool>)(y => y.RemovedDate == null) : (y => y.IsEnabled);
-            return securable.Security.Tickets.Select(x => new { Identity = x.AdGroupName, Permissions = x.Permissions.Where(whereClause).ToList() }).Where(x => x.Identity != null)
-                .ToDictionary(p => p.Identity, p => p.Permissions, StringComparer.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Gets a dictionary of all individual ID permissions that have been granted to an <see cref="ISecurable"/>
-        /// </summary>
-        /// <param name="securable">The <see cref="ISecurable"/> that we want to get permissions for</param>
-        /// <param name="includePending">If true, will include permissions that haven't been approved yet (but still won't included deleted permissions)</param>
-        private static Dictionary<string, List<SecurityPermission>> GetSecurityTicketsForUserIds(ISecurable securable, bool includePending = false)
-        {
-            var whereClause = includePending ? (Func<SecurityPermission, bool>)(y => y.RemovedDate == null) : (y => y.IsEnabled);
-            return securable.Security.Tickets.Select(x => new { Identity = x.GrantPermissionToUserId, Permissions = x.Permissions.Where(whereClause).ToList() }).Where(x => x.Identity != null)
-                .ToDictionary(p => p.Identity, p => p.Permissions, StringComparer.OrdinalIgnoreCase);
+            var tickets = securable.Security.Tickets.Select(t => { t.Permissions = t.Permissions.Where(whereClause).ToList(); return t; });
+            return tickets;
         }
 
         /// <summary>
@@ -256,17 +243,20 @@ namespace Sentry.data.Core
                 {
                     parentSecurity = GetSecurablePermissions(securable.Parent);
                 }
-                var adGroups = GetSecurityTicketsForGroups(securable, true);
-                var userGroups = GetSecurityTicketsForUserIds(securable, true);
+                var tickets = GetSecurityTicketsForSecurable(securable, true);
 
                 results.AddRange(
-                    adGroups.SelectMany(g => g.Value.Select(p => new SecurablePermission { Scope = SecurablePermissionScope.Self, ScopeSecurity = securable.Security, Identity = g.Key, Permission = p.Permission }))
+                    tickets
+                    .Where(t => !t.Permissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS))
+                    .SelectMany(t => t.Permissions.Select(p => new SecurablePermission 
+                    { 
+                        Scope = SecurablePermissionScope.Self, 
+                        ScopeSecurity = securable.Security, 
+                        Identity = t.AdGroupName ?? t.GrantPermissionToUserId, SecurityPermission = p 
+                    }))
                 );
                 results.AddRange(
-                    userGroups.SelectMany(g => g.Value.Select(p => new SecurablePermission { Scope = SecurablePermissionScope.Self, ScopeSecurity = securable.Security, Identity = g.Key, Permission = p.Permission }))
-                );
-                results.AddRange(
-                    parentSecurity.Select(s => new SecurablePermission() { Scope = SecurablePermissionScope.Inherited, ScopeSecurity = s.ScopeSecurity, Identity = s.Identity, Permission = s.Permission })
+                    parentSecurity.Select(s => new SecurablePermission() { Scope = SecurablePermissionScope.Inherited, ScopeSecurity = s.ScopeSecurity, Identity = s.Identity, SecurityPermission = s.SecurityPermission })
                 );
             }
 

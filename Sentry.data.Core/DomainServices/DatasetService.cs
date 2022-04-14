@@ -146,6 +146,7 @@ namespace Sentry.data.Core
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault();
             result.DatasetId = ds.DatasetId;
             result.DatasetName = ds.DatasetName;
+            result.DatasetSaidKeyCode = ds.Asset.SaidKeyCode;
             result.Permissions = _securityService.GetSecurablePermissions(ds);
             return result;
         }
