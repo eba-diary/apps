@@ -40,9 +40,7 @@
 
     <script>
         $(function () {
-            if ($("#AccessRequestForm").attr("action") == "/Notification/SubmitAccessRequest") {
-                $("#SecurableObjectId").materialSelect();
-            }
+            $("select#SecurableObjectId").materialSelect();
             $("#SelectedApprover").materialSelect();
         });
 
