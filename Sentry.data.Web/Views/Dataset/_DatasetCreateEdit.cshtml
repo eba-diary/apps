@@ -10,11 +10,10 @@
     <div id="DatasetFormContent">
         @Html.AntiForgeryToken()
 
-        <p>Please fill out the following fields describing your dataset.  Before starting check to see if your dataset is not already on this site by using our <a href="~/Search/Datasets">search tool.</a></p>
+        <p class="pt-3">Please fill out the following fields describing your dataset.  Before starting check to see if your dataset is not already on this site by using our <a href="~/Search/Datasets">search tool.</a></p>
 
         @*Show the custom validation summary*@
-        @Html.DisplayFor((model) => ViewData.ModelState)
-
+        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
         <div id="myTabContent">
             <div id="informationPanel" class="form-horizontal">
@@ -22,12 +21,12 @@
                 <br />
                 <div class="container">
                     <div class="pl-0 row">
-                        <div class="col-md-8 pl-0">
-                            <h4>Dataset Metadata</h4>
+                        <div class="col pl-0">
+                            <h4 class="pt-3">Dataset Metadata</h4>
                         </div>
-                        <div class="col-md-4 text-right">
+                        <div class="col text-right">
                             <a href="https://confluence.sentry.com/pages/viewpage.action?spaceKey=CLA&title=Send+Data+to+DSC" target="_blank" class="btn btn-info">
-                                <span class="icon-help"></span>  Help
+                                <span class="fas fa-question"></span>  Help
                             </a>
                         </div>
                     </div>
@@ -75,8 +74,8 @@
                 <div class="md-form">
                     @if (Model.DatasetId == 0)
                     {
-                        @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control"  } })
-                        @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.DatasetName) ? "active" : ""})
+                        @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.DatasetName) ? "active" : "" })
                         @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })
                     }
                     else
@@ -174,6 +173,7 @@
                     @Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control w-100", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
                     @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
                 </div>
+
                 <div class="md-form fieldDescription">
                     <span class="text-muted">
                         <p>

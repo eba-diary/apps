@@ -6,7 +6,7 @@
     string textColor = "dsc-" + Model.CategoryColor + "-text";
 }
 
-<a href="@Url.Action("BusinessIntelligence", "Search")" class="backToList" id="linkReturnToBusinessIntelligenceList"><em class="icon-chevron-left"></em>Back to list</a>
+<a href="@Url.Action("BusinessIntelligence", "Search")" class="backToList" id="linkReturnToBusinessIntelligenceList"><em class="fas fa-chevron-left pr-3"></em>Back to list</a>
 
 <div style="font-feature-settings: 'lnum';">
     <div class="topBanner" style="height: 60px;border-bottom: 1px #DDDDDD solid;">
@@ -23,11 +23,11 @@
                            id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
                             @if (Model.IsFavorite)
                             {
-                                <em class="icon-filled-star @textColor mr-0 align-middle" id="favoriteIcon"></em>
+                                <em class="fas fa-star dsc-icon-button @textColor mr-0 align-middle" id="favoriteIcon"></em>
                             }
                             else
                             {
-                                <em class="icon-star @textColor mr-0 align-middle" id="favoriteIcon"></em>
+                                <em class="far fa-star dsc-icon-button @textColor mr-0 align-middle" id="favoriteIcon"></em>
                             }
                         </a>
 
@@ -35,12 +35,12 @@
                         {
                             <a class="btn px-3"
                                id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Report">
-                                <em class="icon-pencil align-self-center @textColor mr-0 align-middle"></em>
+                                <em class="far fa-edit dsc-icon-button align-self-center @textColor mr-0 align-middle"></em>
                             </a>
                         }
                         <div class="btn-group" data-toggle="tooltip" data-placement="top" title="Additional Actions">
                             <a class="btn px-3" data-toggle="dropdown">
-                                <em class="icon-hamburger @textColor mr-0 align-middle"></em>
+                                <em class="fas fa-bars dsc-icon-button @textColor mr-0 align-middle"></em>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-start">
                                 @if (Model.Security.CanEditReport)
