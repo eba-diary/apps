@@ -2269,5 +2269,9 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         if ($('#schemaSearchTable_wrapper').length) {
             data.Dataset.UpdateSchemaSearchTab();
         }
+    },
+
+    managePermissionsInit() {
+        $('#permissionsTable').DataTable();
     }
 };

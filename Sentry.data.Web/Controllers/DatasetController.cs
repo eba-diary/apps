@@ -711,10 +711,11 @@ namespace Sentry.data.Web.Controllers
 
         [Route("Dataset/Detail/{datasetId}/Permissions")]
         [HttpGet]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult ManagePermissions(int datasetId)
         {
-            var model = new ManagePermissionsModel();
+            var perms = _datasetService.GetDatasetPermissions(datasetId);
+            var model = new ManagePermissionsModel(perms);
+
             return View("ManagePermissions", model);
         }
 

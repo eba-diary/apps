@@ -179,21 +179,20 @@ namespace Sentry.data.Core
             if (securable?.Security?.Tickets != null && securable.Security.Tickets.Count > 0)
             {
                 //does this securable have the "Inherit Parent Permissions" permission?
-                var inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.Permissions.Any(p => p.IsEnabled && p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS));
-                if (inheritanceTicket != null && securable.Parent != null)
+                if (DoesSecurableInheritFromParent(securable))
                 {
                     parentSecurity = GetUserSecurity(securable.Parent, user);
                 }
 
-                //build a adGroupName and List(of permissionCode) anonymous obj.
-                var adGroups = securable.Security.Tickets.Select(x => new { adGroup = x.AdGroupName, permissions = x.Permissions.Where(y => y.IsEnabled).ToList() }).Where(x => x.adGroup != null).ToList();
+                //build a adGroupName and List(of permissionCode) dictionary
+                var adGroups = GetSecurityTicketsForGroups(securable);
                 //loop through the dictionary to see if the user is part of the group, if so grab the permissions.
-                userPermissions.AddRange(adGroups.Where(g => user.IsInGroup(g.adGroup)).SelectMany(g => g.permissions).Select(p => p.Permission.PermissionCode));
+                userPermissions.AddRange(adGroups.Where(g => user.IsInGroup(g.Key)).SelectMany(g => g.Value).Select(p => p.Permission.PermissionCode));
 
-                //build a userId and List(of permissionCode) anonymous obj.
-                var userGroups = securable.Security.Tickets.Select(x => new { userId = x.GrantPermissionToUserId, permissions = x.Permissions.Where(y => y.IsEnabled).ToList() }).Where(x => x.userId != null).ToList();
+                //build a userId and List(of permissionCode) dictionary
+                var userGroups = GetSecurityTicketsForUserIds(securable);
                 //loop through the dictionary to see if the user is the user on the ticket, if so grab the permissions.
-                userPermissions.AddRange(userGroups.Where(g => g.userId == user.AssociateId).SelectMany(g => g.permissions).Select(p => p.Permission.PermissionCode));
+                userPermissions.AddRange(userGroups.Where(g => g.Key == user.AssociateId).SelectMany(g => g.Value).Select(p => p.Permission.PermissionCode));
             }
 
             //if it is not secure, it should be wide open except for upload and notifications
@@ -206,6 +205,72 @@ namespace Sentry.data.Core
                 BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, parentSecurity, securable);
             }
             return us;
+        }
+
+        /// <summary>
+        /// Predicate function to determine if an <see cref="ISecurable"/> has an active 
+        /// permission that allows it to inherit security from its parent
+        /// </summary>
+        private bool DoesSecurableInheritFromParent(ISecurable securable)
+        {
+            var inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.Permissions.Any(p => p.IsEnabled && p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS));
+            return (inheritanceTicket != null && securable.Parent != null);
+        }
+
+        /// <summary>
+        /// Gets a dictionary of all AD Group permissions that have been granted to an <see cref="ISecurable"/>
+        /// </summary>
+        /// <param name="securable">The <see cref="ISecurable"/> that we want to get permissions for</param>
+        /// <param name="includePending">If true, will include permissions that haven't been approved yet (but still won't included deleted permissions)</param>
+        private static Dictionary<string, List<SecurityPermission>> GetSecurityTicketsForGroups(ISecurable securable, bool includePending = false)
+        {
+            var whereClause = includePending ? (Func<SecurityPermission, bool>)(y => y.RemovedDate == null) : (y => y.IsEnabled);
+            return securable.Security.Tickets.Select(x => new { Identity = x.AdGroupName, Permissions = x.Permissions.Where(whereClause).ToList() }).Where(x => x.Identity != null)
+                .ToDictionary(p => p.Identity, p => p.Permissions, StringComparer.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Gets a dictionary of all individual ID permissions that have been granted to an <see cref="ISecurable"/>
+        /// </summary>
+        /// <param name="securable">The <see cref="ISecurable"/> that we want to get permissions for</param>
+        /// <param name="includePending">If true, will include permissions that haven't been approved yet (but still won't included deleted permissions)</param>
+        private static Dictionary<string, List<SecurityPermission>> GetSecurityTicketsForUserIds(ISecurable securable, bool includePending = false)
+        {
+            var whereClause = includePending ? (Func<SecurityPermission, bool>)(y => y.RemovedDate == null) : (y => y.IsEnabled);
+            return securable.Security.Tickets.Select(x => new { Identity = x.GrantPermissionToUserId, Permissions = x.Permissions.Where(whereClause).ToList() }).Where(x => x.Identity != null)
+                .ToDictionary(p => p.Identity, p => p.Permissions, StringComparer.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Retrieve all the permissions granted to the provided <see cref="ISecurable"/>.
+        /// </summary>
+        public IList<SecurablePermission> GetSecurablePermissions(ISecurable securable)
+        {
+            var results = new List<SecurablePermission>();
+
+            if (securable?.Security?.Tickets != null && securable.Security.Tickets.Count > 0)
+            {
+                //does this securable have the "Inherit Parent Permissions" permission?
+                IList<SecurablePermission> parentSecurity = new List<SecurablePermission>();
+                if (DoesSecurableInheritFromParent(securable))
+                {
+                    parentSecurity = GetSecurablePermissions(securable.Parent);
+                }
+                var adGroups = GetSecurityTicketsForGroups(securable, true);
+                var userGroups = GetSecurityTicketsForUserIds(securable, true);
+
+                results.AddRange(
+                    adGroups.SelectMany(g => g.Value.Select(p => new SecurablePermission { Scope = SecurablePermissionScope.Self, ScopeSecurity = securable.Security, Identity = g.Key, Permission = p.Permission }))
+                );
+                results.AddRange(
+                    userGroups.SelectMany(g => g.Value.Select(p => new SecurablePermission { Scope = SecurablePermissionScope.Self, ScopeSecurity = securable.Security, Identity = g.Key, Permission = p.Permission }))
+                );
+                results.AddRange(
+                    parentSecurity.Select(s => new SecurablePermission() { Scope = SecurablePermissionScope.Inherited, ScopeSecurity = s.ScopeSecurity, Identity = s.Identity, Permission = s.Permission })
+                );
+            }
+
+            return results;
         }
 
         /// <summary>

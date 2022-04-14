@@ -433,6 +433,7 @@
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
     <Compile Include="Models\Dale\DaleAdvancedCriteriaModel.cs" />
+    <Compile Include="Models\Dataset\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\ManagePermissionsModel.cs" />
     <Compile Include="Models\Search\FilterCategoryModel.cs" />
     <Compile Include="Models\Search\FilterCategoryOptionModel.cs" />
