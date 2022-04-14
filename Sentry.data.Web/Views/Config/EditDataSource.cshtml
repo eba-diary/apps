@@ -100,10 +100,9 @@
         </div>
 
         <div id="userPassPanel">
-            <div class="md-form">
-                @Html.LabelFor((model) => model.IsUserPassRequired, new { @class = "control-label" })
-                @Html.CheckBoxFor((model) => model.IsUserPassRequired, new { @class = "edit-dataset-row" })
-                @Html.ValidationMessageFor((model) => model.IsUserPassRequired, "", new { @class = "text-danger" })
+            <div class="form-check">
+                <input type="checkbox" value="true" class="form-check-input" id="IsUserPassRequired" name="IsUserPassRequired" checked="@Model.IsUserPassRequired">
+                @Html.LabelFor((model) => model.IsUserPassRequired, new { @class = "form-check-label" })
                 <div id="userPassNotificationPanel" class="credentialWarning">
                     <em>Work with data.sentry.com administrators to configure credentials.  The data source will not operate until credentials are configured.</em>
                 </div>

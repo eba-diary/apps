@@ -12,22 +12,11 @@
             $('.dataSourceInfoPanel').hide();
             var val = $(selectBox).val();
 
-            $("#RetrieverJob_SelectedSourceType").materialSelect();
-            $("#RetrieverJob_SelectedDataSource").materialSelect();
-            $("#RetrieverJob_SelectedRequestMethod").materialSelect();
-            $("#RetrieverJob_SelectedRequestDataFormat").materialSelect();
-            $("#RetrieverJob_FtpPattern").materialSelect();
-            $("#RetrieverJob_SchedulePicker").materialSelect();
-            $("#RetrieverJob_cronYearlyMonthPicker").materialSelect();
-            $("#RetrieverJob_cronWeeklyDayPicker").materialSelect();
-
-
             $.getJSON("/Config/SourcesByType", { sourceType: val }, function (data) {
                 var subItems = "";
                 $.each(data, function (index, item) {
                     subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
                 });
-                
                 $("[id$='SelectedDataSource']").html(subItems);
                 $("[id$='SelectedDataSource'] select").val("0");
                 $("#RetrieverJob_SelectedDataSource").materialSelect();
