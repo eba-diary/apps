@@ -165,6 +165,12 @@ namespace Sentry.data.Core
              **********************************************************************************/
             int newId = UpdateandSaveDataFlow(dto, false);
 
+            // Disable retriever job if exist
+            if (dto.IngestionType == (int)IngestionType.DSC_Pull)
+            {
+                _jobService.DisableJob(dto.RetrieverJob.JobId);
+            }
+
             Logger.Info($"{methodName} Completed dataflow upgrade (original:{producerDataFlowId}:::new:{newId}");
 
 
@@ -935,6 +941,11 @@ namespace Sentry.data.Core
                 }
             }
             dto.SchemaMap = scmMapDtoList;
+
+            if (dto.IngestionType == (int)IngestionType.DSC_Pull)
+            {
+                dto.RetrieverJob = GetAssociatedRetrieverJobDto(dto.Id);
+            }
 
             dto.DatasetId = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() && df.DatasetId != 0) ? df.DatasetId : dto.SchemaMap.FirstOrDefault().DatasetId;
             dto.SchemaId = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() && df.SchemaId != 0) ? df.SchemaId : dto.SchemaMap.FirstOrDefault().SchemaId;
