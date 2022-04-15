@@ -12,7 +12,9 @@ namespace Sentry.data.Core
                 SearchName = entity.SearchName,
                 SearchText = entity.SearchText,
                 AssociateId = entity.AssociateId,
-                FilterCategories = JsonConvert.DeserializeObject<List<FilterCategoryDto>>(entity.FilterCategoriesJson)
+                FilterCategories = !string.IsNullOrWhiteSpace(entity.FilterCategoriesJson) ? 
+                                   JsonConvert.DeserializeObject<List<FilterCategoryDto>>(entity.FilterCategoriesJson) : 
+                                   new List<FilterCategoryDto>()
             };
         }
 
@@ -23,7 +25,7 @@ namespace Sentry.data.Core
                 SearchName = dto.SearchName,
                 SearchText = dto.SearchText,
                 AssociateId = dto.AssociateId,
-                FilterCategoriesJson = JsonConvert.SerializeObject(dto.FilterCategories)
+                FilterCategoriesJson = dto.FilterCategories != null ? JsonConvert.SerializeObject(dto.FilterCategories) : null
             };
         }
     }

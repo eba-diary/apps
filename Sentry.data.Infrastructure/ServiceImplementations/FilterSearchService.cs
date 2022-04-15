@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Sentry.data.Core;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Sentry.data.Infrastructure
@@ -19,6 +20,11 @@ namespace Sentry.data.Infrastructure
         {
             SavedSearch savedSearch = _datasetContext.SavedSearches.FirstOrDefault(s => s.SearchName == savedSearchName && s.AssociateId == associateId);
             return savedSearch?.ToDto();
+        }
+
+        public List<string> GetSavedSearchNames(string associateId)
+        {
+            return _datasetContext.SavedSearches.Where(s => s.AssociateId == associateId).Select(s => s.SearchName).ToList();
         }
 
         public void SaveSearch(SavedSearchDto savedSearchDto)

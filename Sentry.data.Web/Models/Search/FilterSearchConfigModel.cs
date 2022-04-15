@@ -1,4 +1,6 @@
-﻿namespace Sentry.data.Web
+﻿using System.Collections.Generic;
+
+namespace Sentry.data.Web
 {
     public class FilterSearchConfigModel
     {
@@ -7,5 +9,6 @@
         public string ResultView { get; set; }
         public string InfoLink { get; set; }
         public FilterSearchModel DefaultSearch { get; set; }
+        public List<string> SavedSearchNames { get; set; }
     }
 }

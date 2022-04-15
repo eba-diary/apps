@@ -123,11 +123,19 @@
         });
 
         //save search parameters
-        $(document).on("click", ".filter-search-save", function (e) {
+        $(document).on("click", "#save-search", function (e) {
             e.preventDefault();
 
             //open modal to enter the name of the search
             console.log("save search");
+
+            var request = data.FilterSearch.buildSearchRequest();
+            request.SearchName = $("#save-search-name").val();
+            request.AddToFavorites = $("#save-search-favorite").is(":checked");
+
+            console.log(request);            
+
+            //$.post("/FilterSearch/SaveSearch", request, (x) => console.log(x));
         });
     },
 
@@ -181,11 +189,14 @@
         $(".filter-search-apply").prop("disabled", true);
 
         $(".modal").modal("hide");
+        $(".filter-search-save-search-wrapper").addClass("display-none");
+        
         $(".icon-search").hide();
         $(".filter-search-results-container").hide();
         $(".filter-search-results-none").hide();
         $(".filter-search-result-count-container").hide();
 
+        $(".filter-search-spinner").show();
         $(".filter-search-result-progress").show();
     },
 
@@ -194,8 +205,10 @@
         $(".filter-search-apply").prop("disabled", false);
 
         $(".filter-search-result-progress").hide();
+        $(".filter-search-spinner").hide();
 
         $(".icon-search").show();
+        $(".filter-search-save-search-wrapper").removeClass("display-none");
 
         if (totalResultCount > 0) {
             $(".filter-search-results-container").slideDown();

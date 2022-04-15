@@ -3,11 +3,12 @@
 @{
     ViewBag.Fluid = true;
     ViewBag.Title = Model.PageTitle;
-    string controllerName = "data." + Model.PageTitle.Replace(" ", "");
+    string controllerName = Model.PageTitle.Replace(" ", "");
+    string jsControllerName = "data." + controllerName;
 }
 
-<div class="search-horizontal-center">
-    <div class="search-head">
+<div class="search-head-wrapper">
+    <div class="text-center">
         <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" alt="Source icon" /></div>
         <div class="search-head-item">
             <h1 class="filter-search-page-title">@Model.PageTitle</h1>
@@ -18,18 +19,22 @@
         </a>
     </div>
 
-    <div id="search-box" class="md-form input-group has-feedback has-feedback-left filter-search-box">
-        <input type="text" class="form-control text-box single-line" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled>
-        <span class="input-group-append sentry-blue white-text icon-search clickable filter-search-start" id="SearchBoxAddon"></span>
-    </div>
-    
-    <div class="btn-group">
-        <button class="btn btn-outline-default waves-effect icon-save"></button>
-        <button class="btn btn-outline-default dropdown-toggle dropdown-toggle-split waves-effect" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-        <div class="dropdown-menu">
-            <a class="dropdown-item" href="#">Saved 1</a>
-            <a class="dropdown-item" href="#">Saved 2</a>
-            <a class="dropdown-item" href="#">Saved 3</a>
+    <div class="filter-search-box-and-save">
+        <div id="search-box" class="md-form input-group has-feedback has-feedback-left filter-search-box">
+            <span class="input-group-prepend filter-search-start text-primary icon-search clickable filter-search-icon display-none"></span>
+            <span class="input-group-prepend text-primary spinner-border filter-search-spinner mr-2"></span>
+            <input type="text" class="form-control text-box single-line" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled>
+        </div>
+
+        <div class="btn-group filter-search-save-search-wrapper ml-2 display-none">
+            <button class="btn btn-primary waves-effect waves-light filter-search-save" data-toggle="modal" data-target="#filter-search-save-modal">Save Search</button>
+            <button class="btn btn-primary dropdown-toggle dropdown-toggle-split waves-effect waves-light" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+            <div class="dropdown-menu dropdown-menu-right">
+                @foreach (string name in Model.SavedSearchNames)
+                {
+                    <a class="dropdown-item @(name == Request.Params["savedSearch"] ? "active" : "") filter-search-saved-search-option" href="@Url.Action("Search", controllerName, new { savedSearch = name })">@name</a>
+                }
+            </div>
         </div>
     </div>
 </div>
@@ -76,6 +81,32 @@
 
 </div>
 
+<div class="modal fade" id="filter-search-save-modal" tabindex="-1" aria-labelledby="filter-search-save-modal-label" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Save Search</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body ml-3 mr-3">
+                <div class="md-form">
+                    <input type="text" id="save-search-name" class="form-control">
+                    <label for="save-search-name" class="">Search Name</label>
+                </div>
+
+                <fieldset class="form-group">
+                    <input type="checkbox" id="save-search-favorite" class="form-check-input">
+                    <label for="save-search-favorite" class="form-check-label filter-search-category-option-label">Add To Favorites</label>
+                </fieldset>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal">Cancel</button>
+                <button type="button" id="save-search" class="btn btn-primary waves-effect waves-light">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="filter-search-show-all-container">
 
 </div>
@@ -86,8 +117,8 @@
     <script type="text/javascript">
 
         $(function () {
-                @(controllerName).init();
-                data.FilterSearch.init(@(controllerName).executeSearch, @(controllerName).buildFilter);
+                @(jsControllerName).init();
+                data.FilterSearch.init(@(jsControllerName).executeSearch, @(jsControllerName).buildFilter);
             });
 
     </script>

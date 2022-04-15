@@ -87,14 +87,16 @@ namespace Sentry.data.Web.Controllers
         #region Methods
         private ActionResult GetView(FilterSearchModel searchModel)
         {
-            
+            List<string> savedSearchNames = _filterSearchService.GetSavedSearchNames(SharedContext.CurrentUser.AssociateId);
+
             FilterSearchConfigModel model = new FilterSearchConfigModel()
             {
                 PageTitle = "Data Inventory",
                 IconPath = "~/Images/DataInventory/DataInventoryIcon.png",
                 ResultView = "SearchResult",
                 InfoLink = "https://confluence.sentry.com/display/CLA/Data+Inventory+-+Elastic",
-                DefaultSearch = searchModel
+                DefaultSearch = searchModel,
+                SavedSearchNames = savedSearchNames
             };
 
             return View("~/Views/Search/FilterSearch.cshtml", model);
