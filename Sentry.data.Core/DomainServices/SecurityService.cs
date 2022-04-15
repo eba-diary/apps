@@ -210,21 +210,21 @@ namespace Sentry.data.Core
         /// Predicate function to determine if an <see cref="ISecurable"/> has an active 
         /// permission that allows it to inherit security from its parent
         /// </summary>
-        private bool DoesSecurableInheritFromParent(ISecurable securable)
+        internal static bool DoesSecurableInheritFromParent(ISecurable securable)
         {
             var inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.Permissions.Any(p => p.IsEnabled && p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS));
             return (inheritanceTicket != null && securable.Parent != null);
         }
 
         /// <summary>
-        /// Gets a list of all permissions that have been granted to an <see cref="ISecurable"/>
+        /// Gets a list of all SecurityTickets / SecurityPermissions that have been granted to an <see cref="ISecurable"/>
         /// </summary>
         /// <param name="securable">The <see cref="ISecurable"/> that we want to get permissions for</param>
         /// <param name="includePending">If true, will include permissions that haven't been approved yet (but still won't included deleted permissions)</param>
-        private static IEnumerable<SecurityTicket> GetSecurityTicketsForSecurable(ISecurable securable, bool includePending = false)
+        internal static IEnumerable<SecurityTicket> GetSecurityTicketsForSecurable(ISecurable securable, bool includePending = false)
         {
             var whereClause = includePending ? (Func<SecurityPermission, bool>)(y => y.RemovedDate == null) : (y => y.IsEnabled);
-            var tickets = securable.Security.Tickets.Select(t => { t.Permissions = t.Permissions.Where(whereClause).ToList(); return t; });
+            var tickets = securable.Security.Tickets.Select(t => { t.Permissions = t.Permissions.Where(whereClause).ToList(); return t; }).Where(t => t.Permissions.Any());
             return tickets;
         }
 
@@ -237,14 +237,18 @@ namespace Sentry.data.Core
 
             if (securable?.Security?.Tickets != null && securable.Security.Tickets.Count > 0)
             {
-                //does this securable have the "Inherit Parent Permissions" permission?
+                //if this securable have the "Inherit Parent Permissions" permission, get the parent's permissions
                 IList<SecurablePermission> parentSecurity = new List<SecurablePermission>();
                 if (DoesSecurableInheritFromParent(securable))
                 {
                     parentSecurity = GetSecurablePermissions(securable.Parent);
                 }
+
+                //get this securable's tickets
                 var tickets = GetSecurityTicketsForSecurable(securable, true);
 
+                //map this securable's tickets to SecurablePermission classes
+                //exclude the "Inherit Parent" permission
                 results.AddRange(
                     tickets
                     .Where(t => !t.Permissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS))
@@ -252,11 +256,20 @@ namespace Sentry.data.Core
                     { 
                         Scope = SecurablePermissionScope.Self, 
                         ScopeSecurity = securable.Security, 
-                        Identity = t.AdGroupName ?? t.GrantPermissionToUserId, SecurityPermission = p 
+                        Identity = t.AdGroupName ?? t.GrantPermissionToUserId, 
+                        SecurityPermission = p 
                     }))
                 );
+
+                //add in the parent permissions
                 results.AddRange(
-                    parentSecurity.Select(s => new SecurablePermission() { Scope = SecurablePermissionScope.Inherited, ScopeSecurity = s.ScopeSecurity, Identity = s.Identity, SecurityPermission = s.SecurityPermission })
+                    parentSecurity.Select(s => new SecurablePermission() 
+                    { 
+                        Scope = SecurablePermissionScope.Inherited, 
+                        ScopeSecurity = s.ScopeSecurity, 
+                        Identity = s.Identity, 
+                        SecurityPermission = s.SecurityPermission 
+                    })
                 );
             }
 

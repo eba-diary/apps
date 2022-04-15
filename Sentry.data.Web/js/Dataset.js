@@ -2272,6 +2272,6 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     managePermissionsInit() {
-        
+        //This method will be used for future functionality on the Manage Permissions page
     }
 };
