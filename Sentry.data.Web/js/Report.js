@@ -196,7 +196,7 @@ data.Report = {
                 url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent($(this).data("id")),
                 method: "GET",
                 dataType: 'json',
-                success: function () { icon.toggleClass("icon-filled-star icon-star"); },
+                success: function () { icon.toggleClass("fas far"); },
                 error: function () { Sentry.ShowModalAlert("Failed to toggle favorite.");}
             });
             

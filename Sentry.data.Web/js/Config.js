@@ -33,10 +33,10 @@ data.Config = {
         });
 
         $('body').on('click', '.tracker-menu-icon', function () {
-            if ($(this).hasClass('icon-chevron-down')) {
-                $(this).switchClass('icon-chevron-down', 'icon-chevron-up');
+            if ($(this).hasClass('fa-chevron-down')) {
+                $(this).switchClass('fa-chevron-down', 'fa-chevron-up');
             } else {
-                $(this).switchClass('icon-chevron-up', 'icon-chevron-down');
+                $(this).switchClass('fa-chevron-up', 'fa-chevron-down');
             }
             var parentElement = $(this).parent();
             var detailContainer = parentElement.next('div');

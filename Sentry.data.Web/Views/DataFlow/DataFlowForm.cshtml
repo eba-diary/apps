@@ -4,7 +4,7 @@
     ViewBag.Title = "Data Flow Form";
 }
 @*This DIV tag is used to scope JQuery element selectors in DataFlow.js to just this view*@
-<div id="DataFlowFormContainer" class="md-form">
+<div id="DataFlowFormContainer">
     @using (Html.BeginForm("DataFlowForm", "DataFlow", FormMethod.Post))
     {
         @Html.AntiForgeryToken()
@@ -18,7 +18,7 @@
                 <span>Do you have data that you want to use and share with others? <br /> We can help. First, you'll need to tell us about your data.</span>
                 <h4>Let's Get Started</h4>
                 <a rel="noopener" href="https://confluence.sentry.com/pages/viewpage.action?spaceKey=CLA&title=Send+Data+to+DSC" target="_blank" class="btn btn-info p-2">
-                    <em class="icon-help"></em>  Help
+                    Help <em class="fas fa-question"></em>
                 </a>
             </div>
         </div>
@@ -71,7 +71,7 @@
                 </div>
             </div>
         </div>
-        <div class="md-form retrieverPanel" style="display:none">
+        <div class="retrieverPanel" style="display:none">
             <div id="retrieverJobPanel">
                 @Html.EditorFor(model => Model.RetrieverJob)
             </div>

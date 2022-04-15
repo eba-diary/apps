@@ -205,7 +205,7 @@ data.Dataset = {
                     render: function (d, type, row, meta) {
                         var color = $('#delroyBreadcrumb').data('page-color');
                         var innerLink = "<a  class='" + color + "' style='cursor:pointer' > " + d + "</a >";                        //want cursor too turn pointer
-                        var parent = "<em class=' icon-folder " + color + "' > " + innerLink + "</em>";
+                        var parent = "<em class='far fa-folder-open " + color + "' > " + innerLink + "</em>";
 
                         if (row.Fields != null) {
                             return parent;
@@ -1041,7 +1041,7 @@ data.Dataset = {
             var icon = "#icon_" + id;
 
             $(category).slideToggle();
-            $(icon).toggleClass("icon-chevron-down icon-chevron-up");
+            $(icon).toggleClass("fa-chevron-down fa-chevron-up");
         });
 
         var Id = $('#datasetConfigList').val();
@@ -1163,7 +1163,7 @@ data.Dataset = {
                 url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent($(this).data("id")),
                 method: "GET",
                 dataType: 'json',
-                success: function () { icon.toggleClass("icon-filled-star icon-star"); },
+                success: function () { icon.toggleClass("fas far"); },
                 error: function () { Sentry.ShowModalAlert("Failed to toggle favorite."); }
             });
         });

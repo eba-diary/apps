@@ -8,7 +8,7 @@
     string dateDefault = ViewBag.Date_Default;
     string timestampDefault = ViewBag.Timestamp_Default;
 }
-<a class="backToList" href="/Config/Dataset/@Model.DatasetId"><em class="icon-chevron-left"></em>  Back to Dataset Configuration</a>
+<a class="backToList" href="/Config/Dataset/@Model.DatasetId"><em class="fas fa-chevron-left pr-3"></em>  Back to Dataset Configuration</a>
 
 <div class="topBanner" style="height: 60px;
     border-bottom: 1px #DDDDDD solid;">
@@ -21,7 +21,7 @@
 
                     @if (Model.IsSecured)
                     {
-                        <span class="icon-verified lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
+                        <span class="fas fa-lock dsc-icon-button lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
                     }
                 </h1>
 
@@ -30,7 +30,7 @@
                     {
                         <a class="btn px-3"
                            id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                            <em class="icon-pencil align-self-center @textColor mr-0 align-middle"></em>
+                            <em class="far fa-edit dsc-icon-button align-self-center @textColor mr-0 align-middle"></em>
                         </a>
 
                     }
@@ -38,7 +38,7 @@
 
                         <a class="btn px-3"
                            data-toggle="dropdown">
-                            <em class="icon-hamburger @textColor mr-0 align-middle"></em>
+                            <em class="fas fa-bars dsc-icon-button @textColor mr-0 align-middle"></em>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-start">
                             @if (Model.Security.CanManageSchema)
@@ -104,7 +104,7 @@
 
     <div class="col-lg-12">
         <hr />
-        <button type="button" class="btn btn-sm btn-success" data-bind='click: addRow'><em class="icon-plus"></em> Add a Field</button>
+        <button type="button" class="btn btn-sm btn-success" data-bind='click: addRow'><em class="fas fa-plus"></em> Add a Field</button>
         <hr />
         <button class="btn btn-success" id="saveBtn" data-bind='click: save'>Save</button>
         <div id="buttonSpinner" style="
@@ -198,13 +198,13 @@
                         <div class="rightButton float-right" data-bind="visible: $parent.Name === undefined">
 
                             <button type="button" class="btn btn-xs btn-danger p-2" data-bind='click: $parent.removeRow'>
-                                <em class="icon-close"></em>
+                                <em class="fas fa-times"></em>
                                 Delete
                             </button>
                         </div>
                         <div class="rightButton float-right" data-bind="visible: $parent.Name !== undefined">
                             <button type="button" class="btn btn-xs btn-danger p-2" data-bind='click: $parent.removeChild'>
-                                <em class="icon-close"></em>
+                                <em class="fas fa-times"></em>
                                 Delete
                             </button>
                         </div>
@@ -509,9 +509,9 @@
 
             self.ButtonSpanClass = ko.computed(function () {
                 if (self.Toggled()) {
-                    return 'icon-minus';
+                    return 'fas fa-minus';
                 } else {
-                    return 'icon-plus';
+                    return 'fas fa-plus';
                 }
             });
 

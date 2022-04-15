@@ -10,7 +10,7 @@
         <h2 class="pt-1"> @Model.Name</h2>
         @if (Model.DisplayDataflowEdit)
         {
-            <div id="edit-dataflow-icon" class="clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" onclick="data.DataFlow.EditUrlRedirect(@Model.Id)"><span class="icon-pencil"></span></div>
+            <div id="edit-dataflow-icon" class="clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" onclick="data.DataFlow.EditUrlRedirect(@Model.Id)"><span class="far fa-edit"></span></div>
         }
     </div>
     @if (Model.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete)
@@ -48,7 +48,7 @@
                 <div class="jobHeader categoryBanner-blue">
                     <h6 class="pt-2">@step.ExecutionOrder.ToString()</h6>
                     <h6 class="pt-2">@step.ActionName</h6>
-                    <em class="retJobDetails tracker-menu-icon icon-chevron-up"></em>
+                    <em class="retJobDetails tracker-menu-icon fas fa-chevron-up"></em>
                 </div>
                 <div class="jobContainer" style="display:none;">
                     <div>@step.ActionDescription</div>

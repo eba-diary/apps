@@ -394,7 +394,7 @@ namespace Sentry.data.Core
             }
             else //if name, make sure it is not duplicate
             {
-                if (dto.DatasetId == 0 && _datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
+                if (dto.DatasetId == 0 && dto.DatasetCategoryIds != null && _datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
                                                              w.DatasetCategories.Any(x => dto.DatasetCategoryIds.Contains(x.Id)) &&
                                                              w.DatasetType == GlobalConstants.DataEntityCodes.DATASET).Count() > 0)
                 {

@@ -384,8 +384,7 @@ namespace Sentry.data.Web.Controllers
 
             if (dto.IngestionType == (int)IngestionType.DSC_Pull)
             {
-                RetrieverJobDto jobDto = _dataFlowService.GetAssociatedRetrieverJobDto(dto.Id);
-                model.RetrieverJob = ToJobModel(jobDto);
+                model.RetrieverJob = ToJobModel(dto.RetrieverJob);
             }
 
             return model;
