@@ -86,6 +86,10 @@
                                     <em class="fas fa-bars dsc-icon-button @textColor mr-0 align-middle"></em>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-start">
+                                    @if (Model.ShowManagePermissionsLink)
+                                    {
+                                        @Html.ActionLink("Manage Permissions", nameof(Sentry.data.Web.Controllers.DatasetController.ManagePermissions), new { datasetId=Model.DatasetId }, new { @class = "dropdown-item" })
+                                    }
                                     @if (Model.Security.CanManageSchema)
                                     {
                                         <a class="dropdown-item" href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>

@@ -30,5 +30,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA3861_RefactorGetUserSecurity { get; }
         IFeatureFlag<bool> CLA3819_EgressEdgeMigration { get; }
         IFeatureFlag<bool> CLA3882_DSC_NOTIFICATION_SUBCATEGORY { get; }
+        IFeatureFlag<bool> CLA3718_Authorization { get; }
     }
 }

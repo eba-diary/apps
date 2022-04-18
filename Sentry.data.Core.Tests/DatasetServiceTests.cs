@@ -231,6 +231,7 @@ namespace Sentry.data.Core.Tests
         }
 
 
+        [TestCategory("Core DatasetService")]
         [TestMethod]
         public void DatasetService_GetAsset_ExistingAsset()
         {
@@ -248,6 +249,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(expected, actual);
         }
 
+        [TestCategory("Core DatasetService")]
         [TestMethod]
         public void DatasetService_GetAsset_NewAsset()
         {
@@ -293,6 +295,24 @@ namespace Sentry.data.Core.Tests
 
             // Assert
             configService.Verify(v => v.Delete(It.IsAny<int>(), null, false), Times.Once);
+        }
+
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public void GetDatasetPermissions_Test()
+        {
+            // Arrange
+            var ds = MockClasses.MockDataset(null, true, false);
+            var context = new Mock<IDatasetContext>();
+            context.Setup(c => c.Datasets).Returns((new[] { ds }).AsQueryable());
+            var datasetService = new DatasetService(context.Object, new Mock<ISecurityService>().Object, null, null, null, null, null, null);
+
+            // Act
+            var actual = datasetService.GetDatasetPermissions(ds.DatasetId);
+
+            // Assert
+            Assert.AreEqual(ds.DatasetId, actual.DatasetId);
         }
     }
 }
