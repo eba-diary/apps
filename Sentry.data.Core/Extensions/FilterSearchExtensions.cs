@@ -9,6 +9,7 @@ namespace Sentry.data.Core
         {
             return new SavedSearchDto()
             {
+                SearchType = entity.SearchType,
                 SearchName = entity.SearchName,
                 SearchText = entity.SearchText,
                 AssociateId = entity.AssociateId,
@@ -22,6 +23,7 @@ namespace Sentry.data.Core
         {
             return new SavedSearch()
             {
+                SearchType = dto.SearchType,
                 SearchName = dto.SearchName,
                 SearchText = dto.SearchText,
                 AssociateId = dto.AssociateId,

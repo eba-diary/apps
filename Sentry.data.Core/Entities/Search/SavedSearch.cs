@@ -5,6 +5,7 @@ namespace Sentry.data.Core
     public class SavedSearch : IFavorable
     {
         public virtual int SavedSearchId { get; set; }
+        public virtual string SearchType { get; set; }
         public virtual string SearchName { get; set; }
         public virtual string SearchText { get; set; }
         public virtual string FilterCategoriesJson { get; set; }
@@ -24,8 +25,32 @@ namespace Sentry.data.Core
         public virtual void SetFavoriteItem(FavoriteItem favoriteItem)
         {
             favoriteItem.Title = SearchName;
-            favoriteItem.Url = $"DataInventory/Search?savedSearch={HttpUtility.UrlEncode(SearchName)}";
-            favoriteItem.Img = "/Images/DataInventory/DataInventoryIcon.png";
+            favoriteItem.Url = $"{GetUrl()}?savedSearch={HttpUtility.UrlEncode(SearchName)}";
+            favoriteItem.Img = GetImgPath();
+        }
+        #endregion
+
+        #region Methods
+        private string GetUrl()
+        {
+            switch (SearchType)
+            {
+                case GlobalConstants.SearchType.DATA_INVENTORY:
+                    return "DataInventory/Search";
+                default:
+                    return "";
+            }
+        }
+        
+        private string GetImgPath()
+        {
+            switch (SearchType)
+            {
+                case GlobalConstants.SearchType.DATA_INVENTORY:
+                    return "/Images/DataInventory/DataInventoryIcon.svg";
+                default:
+                    return "";
+            }
         }
         #endregion
     }

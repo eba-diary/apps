@@ -1,5 +1,6 @@
 ﻿data.FilterSearch = {
 
+    searchType: "",
     lastSelectedOptionIds: [],
 
     executeSearch: function () {
@@ -9,13 +10,17 @@
         console.log('Must pass filterRetriever parameter to data.FilterSearch.init')
     },
 
-    init: function (searchExecuter, filterRetriever) {
+    init: function (searchExecuter, filterRetriever, searchTypeName) {
+        this.initToast();
+        
         this.executeSearch = searchExecuter;
         this.retrieveFilterOptions = filterRetriever;
+        this.searchType = searchTypeName;
 
         this.initEvents();
-
-        $(".filter-search-container").show();
+        
+        var urlParams = new URLSearchParams(window.location.search);
+        this.loadSavedSearches(urlParams.get('savedSearch'));
     },
 
     initEvents: function () {
@@ -76,7 +81,7 @@
                 //making sure both modal and filter checkbox gets checked
                 data.FilterSearch.setOptionCheckbox(id, true);
 
-                badge.removeClass("display-none")
+                badge.removeClass("display-none");
                 data.FilterSearch.showBadgeContainer();
             }
             else {
@@ -98,12 +103,13 @@
 
             $("[id^='clearOption_']:visible").each(function () {
                 $(this).addClass("display-none");
-            })
-
+            });
+            
             $('.filter-search-category-option-checkbox:checkbox:checked').each(function () {
                 $(this).prop('checked', false);
-            })
+            });
 
+            data.FilterSearch.clearActiveSavedSearch();
             data.FilterSearch.showHideApplyFilter();
         });
 
@@ -122,20 +128,27 @@
             data.FilterSearch.search();
         });
 
+        $(document).on("click", ".filter-search-save", function (e) {
+            $("#save-search-name").val('');
+            $(".save-search-name-label").removeClass('active');
+            $("#save-search-favorite").prop('checked', false);
+        })
+
         //save search parameters
-        $(document).on("click", "#save-search", function (e) {
+        $(document).on("submit", "#save-search", function (e) {
             e.preventDefault();
-
-            //open modal to enter the name of the search
-            console.log("save search");
-
+            
+            $('#save-search').addClass('disabled');
+            $('#cancel-save-search').addClass('display-none');
+            $('.filter-search-save-search-modal-text').addClass('display-none');
+            $('.filter-search-save-search-modal-spinner').removeClass('display-none');
+            
             var request = data.FilterSearch.buildSearchRequest();
+            request.SearchType = data.FilterSearch.searchType;
             request.SearchName = $("#save-search-name").val();
             request.AddToFavorites = $("#save-search-favorite").is(":checked");
 
-            console.log(request);            
-
-            //$.post("/FilterSearch/SaveSearch", request, (x) => console.log(x));
+            $.post("/FilterSearch/SaveSearch", request, (x) => data.FilterSearch.completeSaveSearch(x, request.SearchName));
         });
     },
 
@@ -189,12 +202,14 @@
         $(".filter-search-apply").prop("disabled", true);
 
         $(".modal").modal("hide");
-        $(".filter-search-save-search-wrapper").addClass("display-none");
+        $(".filter-search-save-search-container").addClass("display-none");
         
         $(".icon-search").hide();
         $(".filter-search-results-container").hide();
         $(".filter-search-results-none").hide();
         $(".filter-search-result-count-container").hide();
+
+        data.FilterSearch.clearActiveSavedSearch();
 
         $(".filter-search-spinner").show();
         $(".filter-search-result-progress").show();
@@ -208,7 +223,7 @@
         $(".filter-search-spinner").hide();
 
         $(".icon-search").show();
-        $(".filter-search-save-search-wrapper").removeClass("display-none");
+        $(".filter-search-save-search-container").removeClass("display-none");
 
         if (totalResultCount > 0) {
             $(".filter-search-results-container").slideDown();
@@ -270,6 +285,41 @@
         });
     },
 
+    loadSavedSearches: function (activeSearchName) {
+        var params = "searchType=" + data.FilterSearch.searchType;
+        if (activeSearchName) {
+            params += "&activeSearchName=" + encodeURIComponent(activeSearchName);
+        }
+        
+        $('.filter-search-save-search-container').load("/FilterSearch/SavedSearches?" + params, data.FilterSearch.completeSaveSearchModal);
+    },
+
+    completeSaveSearch: function (result, searchName) {
+        
+        if (result.Success) {
+            data.FilterSearch.loadSavedSearches(searchName);
+        }
+        else {
+            data.FilterSearch.showToast("error", "There was an issue saving your search. Please try again or reach out to DSCSupport@sentry.com.")
+            data.FilterSearch.completeSaveSearchModal();
+        }
+    },
+
+    completeSaveSearchModal: function () {
+        $("#filter-search-save-modal").modal("hide");
+
+        $('#save-search').removeClass('disabled');
+        $('#cancel-save-search').removeClass('display-none');
+        $('.filter-search-save-search-modal-text').removeClass('display-none');
+        $('.filter-search-save-search-modal-spinner').addClass('display-none');
+    },
+
+    clearActiveSavedSearch: function () {
+        $('.filter-search-saved-search-option').each(function () {
+            $(this).removeClass('active');
+        });
+    },
+
     getSelectedCategoryOptions: function () {
 
         var categories = [];
@@ -310,5 +360,29 @@
             SearchText: $.trim($("#filter-search-text").val()),
             FilterCategories: data.FilterSearch.getSelectedCategoryOptions()
         }
+    },
+
+    initToast: function () {
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "1000",
+            "hideDuration": "1000",
+            "timeOut": "8000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+    },
+
+    showToast: function (level, message) {        
+        toastr[level](message);
     }
 }

@@ -84,9 +84,9 @@ data.Home = {
                     success: function (obj) {
                     }
                 });
-
-                window.open(link.attr("href"));
             }
+
+            window.open(link.attr("href"));
 
             return false;
         });

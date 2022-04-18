@@ -14,10 +14,11 @@ namespace Sentry.data.Web
             };
         }
         
-        public static SavedSearchDto ToDto(this SavedSearchModel model)
+        public static SavedSearchDto ToDto(this SaveSearchModel model)
         {
             SavedSearchDto dto = new SavedSearchDto()
             {
+                SearchType = model.SearchType,
                 SearchName = model.SearchName,
                 AddToFavorites = model.AddToFavorites
             };

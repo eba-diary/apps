@@ -226,6 +226,7 @@
         {
             public const string BUSINESS_INTELLIGENCE_SEARCH = "BusinessIntelligence";
             public const string DATASET_SEARCH = "Datasets";
+            public const string DATA_INVENTORY = "DataInventory";
         }
 
         public static class StoragePrefixes

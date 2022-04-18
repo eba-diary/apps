@@ -21,7 +21,7 @@ namespace Sentry.data.Web.Controllers
         {
             if (!string.IsNullOrEmpty(savedSearch))
             {
-                SavedSearchDto savedSearchDto = _filterSearchService.GetSavedSearch(savedSearch, SharedContext.CurrentUser.AssociateId);
+                SavedSearchDto savedSearchDto = _filterSearchService.GetSavedSearch(SearchType.DATA_INVENTORY, savedSearch, SharedContext.CurrentUser.AssociateId);
                 if (savedSearchDto != null)
                 {
                     return GetView(savedSearchDto.ToModel());
@@ -87,16 +87,14 @@ namespace Sentry.data.Web.Controllers
         #region Methods
         private ActionResult GetView(FilterSearchModel searchModel)
         {
-            List<string> savedSearchNames = _filterSearchService.GetSavedSearchNames(SharedContext.CurrentUser.AssociateId);
-
             FilterSearchConfigModel model = new FilterSearchConfigModel()
             {
                 PageTitle = "Data Inventory",
-                IconPath = "~/Images/DataInventory/DataInventoryIcon.png",
+                SearchType = SearchType.DATA_INVENTORY,
+                IconPath = "~/Images/DataInventory/DataInventoryIconBlue.svg",
                 ResultView = "SearchResult",
                 InfoLink = "https://confluence.sentry.com/display/CLA/Data+Inventory+-+Elastic",
-                DefaultSearch = searchModel,
-                SavedSearchNames = savedSearchNames
+                DefaultSearch = searchModel
             };
 
             return View("~/Views/Search/FilterSearch.cshtml", model);

@@ -27,8 +27,21 @@ namespace Sentry.data.Web.Controllers
             return PartialView("~/Views/Search/FilterShowAll.cshtml", filterCategories ?? new List<FilterCategoryModel>());
         }
 
+        [HttpGet]
+        public ActionResult SavedSearches(string searchType, string activeSearchName)
+        {
+            SavedSearchesModel model = new SavedSearchesModel()
+            {
+                SearchType = searchType,
+                SavedSearchNames = _filterSearchService.GetSavedSearchNames(searchType, SharedContext.CurrentUser.AssociateId),
+                ActiveSearchName = activeSearchName
+            };
+
+            return PartialView("~/Views/Search/SavedSearches.cshtml", model);
+        }
+
         [HttpPost]
-        public JsonResult SaveSearch(SavedSearchModel searchModel)
+        public JsonResult SaveSearch(SaveSearchModel searchModel)
         {
             try
             {

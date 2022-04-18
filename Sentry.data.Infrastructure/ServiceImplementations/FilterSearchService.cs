@@ -16,20 +16,20 @@ namespace Sentry.data.Infrastructure
             _userFavoriteService = userFavoriteService;
         }
 
-        public SavedSearchDto GetSavedSearch(string savedSearchName, string associateId)
+        public SavedSearchDto GetSavedSearch(string searchType, string savedSearchName, string associateId)
         {
-            SavedSearch savedSearch = _datasetContext.SavedSearches.FirstOrDefault(s => s.SearchName == savedSearchName && s.AssociateId == associateId);
+            SavedSearch savedSearch = _datasetContext.SavedSearches.FirstOrDefault(s => s.SearchType == searchType && s.SearchName == savedSearchName && s.AssociateId == associateId);
             return savedSearch?.ToDto();
         }
 
-        public List<string> GetSavedSearchNames(string associateId)
+        public List<string> GetSavedSearchNames(string searchType, string associateId)
         {
-            return _datasetContext.SavedSearches.Where(s => s.AssociateId == associateId).Select(s => s.SearchName).ToList();
+            return _datasetContext.SavedSearches.Where(s => s.SearchType == searchType && s.AssociateId == associateId).Select(s => s.SearchName).ToList();
         }
 
         public void SaveSearch(SavedSearchDto savedSearchDto)
-{
-            SavedSearch savedSearch = _datasetContext.SavedSearches.FirstOrDefault(s => s.SearchName == savedSearchDto.SearchName && s.AssociateId == savedSearchDto.AssociateId);
+        {
+            SavedSearch savedSearch = _datasetContext.SavedSearches.FirstOrDefault(s => s.SearchType == savedSearchDto.SearchType && s.SearchName == savedSearchDto.SearchName && s.AssociateId == savedSearchDto.AssociateId);
             
             if (savedSearch != null)
             {

@@ -229,6 +229,12 @@
     width: 33%;
 }
 
+.filter-search-save-search-modal-spinner {
+    font-size: x-small;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
 .pagination {
     padding-bottom: 2rem;
 }

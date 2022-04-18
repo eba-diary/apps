@@ -16,6 +16,11 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 x.Column("SavedSearchId");
                 x.Generator(Generators.Identity);
             });
+            Property(x => x.SearchType, x =>
+            {
+                x.Column("SearchType");
+                x.NotNullable(true);
+            });
             Property(x => x.SearchName, x => 
             {
                 x.Column("SearchName");
