@@ -354,7 +354,7 @@ namespace Sentry.data.Core
         /// <param name="dto"></param>
         /// <param name="schema"></param>
         /// <returns> Returns list of properties that have changed.</returns>
-        private JObject UpdateSchema(FileSchemaDto dto, FileSchema schema)
+        internal JObject UpdateSchema(FileSchemaDto dto, FileSchema schema)
         {
             IList<bool> changes = new List<bool>();
             JObject whatPropertiesChanged = new JObject();
@@ -400,6 +400,12 @@ namespace Sentry.data.Core
                     {
                         schema.ParquetStoragePrefix = x;
                         whatPropertiesChanged.Add("parquetstorageprefix", string.IsNullOrEmpty(x) ? null : x.ToLower());
+                    }));
+                changes.Add(TryUpdate(() => schema.SnowflakeStage, () => dto.SnowflakeStage,
+                    (x) =>
+                    {
+                        schema.SnowflakeStage = x;
+                        whatPropertiesChanged.Add(nameof(schema.SnowflakeStage).ToLower(), string.IsNullOrEmpty(x) ? null : x.ToLower());
                     }));
             }
 
