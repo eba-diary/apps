@@ -17,8 +17,8 @@
         @Html.ValidationMessageFor((model) => model.SelectedDataSource, "", new { @class = "text-danger" })
     </div>
     <div class="securityPanel" style="display:none;">
-        <div class="md-form">
-            <span class="icon-verified lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
+        <div class="">
+            <span class="fas fa-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
         </div>
         <span>
             <input id="RequestAccessButton" type="button" value="Request Access" class="btn btn-primary"
@@ -35,8 +35,8 @@
     </div>
 </div>
 
-<div class="md-form fieldDescription">
-    <label class="md-form"></label>
+<div class="fieldDescription">
+    <label class=""></label>
     <div class="">
         <span class="text-muted">
             <em id="dataSourceDescription"></em>
@@ -47,7 +47,7 @@
 <div class="editDataSourceLink" style="display:none;">
     <label class=""></label>
     <div class="">
-        <a id="editDataSource" class="backToList" href="/Config/Source/Edit"><span class="icon-chevron-right"></span>Edit Data Source</a>
+        <a id="editDataSource" class="backToList" href="/Config/Source/Edit"><span class="fas fa-chevron-right"></span>Edit Data Source</a>
     </div>
 </div>
 
@@ -67,21 +67,25 @@
         <hr />*@
 
     <div class="jobquestion sourceLocation">
-        <div class="md-form configQuestion">
+        <div class="configQuestion">
             <h5>Where will we find the data?</h5>
         </div>
 
-        <div class="md-form questionDescription">
+        <div class="questionDescription">
             <span class="text-muted">
                 <em id="baseURL"></em>
             </span>
         </div>
 
-        <div class="md-form">
-            @Html.LabelFor(model => model.RelativeUri, htmlAttributes: new { @class = "control-label" })
-            <input type="text" id="baseURLTextBox" readonly="readonly" disabled="disabled" class="" />
-            @Html.TextBoxFor(model => model.RelativeUri, new { @class = "w-50", @placeholder = "Do not include starting forward slash (/)" })
-            @Html.ValidationMessageFor(model => model.RelativeUri, "", new { @class = "text-danger" })
+        <div class="md-form row">
+            <div class="col">
+                <input type="text" id="baseURLTextBox" readonly="readonly" disabled="disabled" class="w-100" />
+            </div>
+            <div class="col">
+                @Html.LabelFor(model => model.RelativeUri, htmlAttributes: new { @class = "control-label ml-3" })
+                @Html.TextBoxFor(model => model.RelativeUri, new { @class = "w-100", @placeholder = "Do not include starting forward slash (/)" })
+                @Html.ValidationMessageFor(model => model.RelativeUri, "", new { @class = "text-danger" })
+            </div>
         </div>
 
         <div class="httpSourcePanel" style="display:none;">
@@ -122,12 +126,11 @@
 
 
     <div class="jobquestion searchCriteria">
-        <div class="form-group configQuestion">
-            <hr />
+        <div class="configQuestion">
             <h5>Should selective files be processed?</h5>
         </div>
 
-        <div class="md-form questionDescription">
+        <div class="questionDescription">
             <span class="text-muted">
                 <em>All searches are performed on full file name (including file extension).&nbsp;&nbsp;</em>
                 <em>A regular expression search of \. is the least restrictive and will match anything with a period.</em>
@@ -135,9 +138,9 @@
         </div>
 
         <div class="searchCriteria searchCriteriaIsRegex">
-            <div class="md-form">
-                @Html.LabelFor(model => model.IsRegexSearch, htmlAttributes: new { @class = "control-label" })
-                @Html.CheckBoxFor(model => model.IsRegexSearch, new { @class = "" })
+            <div class="form-check">
+                <input type="checkbox" value="true" class="form-check-input" id="RetrieverJob_IsRegexSearch" name="RetrieverJob_IsRegexSearch" checked="@Model.IsRegexSearch">
+                @Html.LabelFor(model => model.IsRegexSearch, htmlAttributes: new { @class = "form-check-label" })
                 @Html.ValidationMessageFor(model => model.IsRegexSearch, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -195,14 +198,20 @@
             <input id="cronHourlyTimePicker" type="number" max="59" min="0" class="form-control" placeholder="Minute" />
         </div>
 
-        <div class="md-form scheduler" id="dailyPicker">
-            <label class="">Every Day at</label>
-            <input class="timepicker timepicker-with-dropdown text-center" id="cronDailyJobTimePicker" />
-            <span>CST</span>
+        <div class="md-form scheduler input-group" id="dailyPicker">
+            <div class="input-group-prepend">
+                <span class="input-group-text md-addon">Every Day at</span>
+            </div>
+            <input class="form-control timepicker" placeholder="Time" id="cronDailyJobTimePicker" />
+            <div class="input-group-append">
+                <span class="input-group-text md-addon">CST</span>
+            </div>
         </div>
 
-        <div class="md-form scheduler" id="weeklyPicker">
-            <label class="mdb-main-label">Every Week on</label>
+        <div class="md-form scheduler input-group" id="weeklyPicker">
+            <div class="input-group-prepend">
+                <span class="input-group-text md-addon">Every Week on</span>
+            </div>
             <select id="cronWeeklyDayPicker" class="mdb-select">
                 <option selected disabled>Day of the Week</option>
                 <option value="0">Sunday</option>
@@ -213,21 +222,27 @@
                 <option value="5">Friday</option>
                 <option value="6">Saturday</option>
             </select>
-            at
-            <input class="timepicker timepicker-with-dropdown text-center form-control" id="cronWeeklyJobTimePicker" />
-            CST
+            <input class="form-control timepicker" placeholder="Time" id="cronWeeklyJobTimePicker" />
+            <div class="input-group-append">
+                <span class="input-group-text md-addon">CST</span>
+            </div>
         </div>
 
-        <div class="md-form scheduler" id="monthlyPicker">
-            <label class="control-label">Every Month on</label>
-            <input id="cronMonthlyDayPicker" type="number" max="31" min="1" class="form-control" placeholder="Day of the Month" />
-            at
-            <input class="timepicker timepicker-with-dropdown text-center form-control" id="cronMonthlyJobTimePicker" />
-            CST
+        <div class="md-form scheduler input-group" id="monthlyPicker">
+            <div class="input-group-prepend">
+                <span class="input-group-text md-addon">Day and Time</span>
+            </div>
+            <input id="cronMonthlyDayPicker" type="number" max="31" min="1" class="form-control" placeholder="Day of the Month (1-31)" />
+            <input class="form-control timepicker" placeholder="Time" id="cronMonthlyJobTimePicker" aria-describedby="cronMonthlyTimeAddOn" />
+            <div class="input-group-append">
+                <span class="input-group-text md-addon">CST</span>
+            </div>
         </div>
 
-        <div class="md-form scheduler" id="yearlyPicker">
-            <label class="mdb-main-label">Every Year on</label>
+        <div class="md-form scheduler input-group" id="yearlyPicker">
+            <div class="input-group-prepend">
+                <span class="input-group-text md-addon">Month, Day, and Time</span>
+            </div>
             <select id="cronYearlyMonthPicker" class="mdb-select">
                 <option selected disabled>Month</option>
                 <option value="1">January</option>
@@ -243,10 +258,11 @@
                 <option value="11">November</option>
                 <option value="12">December</option>
             </select>
-            <input id="cronYearlyDayPicker" type="number" max="31" min="1" class="form-control" placeholder="Day of the Month" />
-            at
-            <input class="timepicker timepicker-with-dropdown text-center form-control" id="cronYearlyJobTimePicker" />
-            CST
+            <input id="cronYearlyDayPicker" type="number" max="31" min="1" class="form-control" placeholder="Day of the Month (1-31)" />
+            <input class="form-control timepicker" placeholder="Time" id="cronYearlyJobTimePicker" />
+            <div class="input-group-append">
+                <span class="input-group-text md-addon">CST</span>
+            </div>
         </div>
 
         <div id="scheduleRow" class="form-group" style="display: none;">

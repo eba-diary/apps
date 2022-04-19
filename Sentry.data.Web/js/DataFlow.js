@@ -86,10 +86,10 @@
 
     DataFlowDetailInit: function (dataflowId) {
         $('body').on('click', '.jobHeader', function () {
-            if ($(this).children('.tracker-menu-icon').hasClass('icon-chevron-down')) {
-                $(this).children('.tracker-menu-icon').switchClass('icon-chevron-down', 'icon-chevron-up');
+            if ($(this).children('.tracker-menu-icon').hasClass('fa-chevron-down')) {
+                $(this).children('.tracker-menu-icon').switchClass('fa-chevron-down', 'fa-chevron-up');
             } else {
-                $(this).children('.tracker-menu-icon').switchClass('icon-chevron-up', 'icon-chevron-down');
+                $(this).children('.tracker-menu-icon').switchClass('fa-chevron-up', 'fa-chevron-down');
             }
             $(this).next('.jobContainer').toggle();
 
@@ -289,7 +289,7 @@
                 }
             },
             error: function (obj) {
-                $('#DatasetFileConfigFormContent').replaceWith(obj.responseText);
+                $('#DatasetFileConfigFormContainer').html(obj.responseText);
                 //init the form passing the submit function specific for DataFlow page
                 data.Config.CreateFormSubmitInit(data.DataFlow.DatasetFileConfigFormSubmitInit, data.DataFlow.DatasetFileConfigFormCancelInit);
             }
