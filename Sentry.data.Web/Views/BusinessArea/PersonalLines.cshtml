@@ -7,7 +7,7 @@
 
     <div id="pl-landing-pg-wrapper">
 
-        <div class="row">
+        <div class="row pt-3">
             <div class="col-sm-12 col-md-12 col-lg-12">
                 <img id="dairyland-logo" alt="Dairyland Logo" src="~/Images/dairyland_logo.png" width="220" />
 
@@ -18,6 +18,15 @@
                     <a class="btn px-3">
                         @Html.Partial("~/Views/BusinessArea/_LibertyBell.cshtml")
                     </a>
+
+                    @if (Model.Notifications.NotificationCount > 0)
+                    {
+                        <span class="counter liberty-badge liberty-badge-small liberty-badge-red">@Model.Notifications.NotificationCount</span>
+                    }
+                    else
+                    {
+                        <span class="counter liberty-badge liberty-badge-small liberty-badge-white">@Model.Notifications.NotificationCount</span>
+                    }
 
                     <a class="btn px-3"
                        onclick="location.href = 'mailto:BusinessInformationTeam@sentry.com?Subject=Contact%20%20-%20BusinessInformationTeam';" id="EnvelopeMan" data-toggle="tooltip" data-placement="top" title="Contact">
