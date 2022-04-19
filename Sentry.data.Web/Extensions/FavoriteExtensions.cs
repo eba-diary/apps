@@ -55,7 +55,8 @@ namespace Sentry.data.Web
                 Img = core.Img,
                 Sequence = core.Sequence,
                 Title = core.Title,
-                Url = core.Url
+                Url = core.Url,
+                IsLegacyFavorite = core.IsLegacyFavorite
             };
         }
     }

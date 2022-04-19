@@ -20,23 +20,22 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult EditFavorites()
         {
-            return View(BuildFavoritesModel());
+            return View(BuildFavorites());
         }
 
-        public ActionResult Delete(int favId)
+        public ActionResult Delete(int favId, bool isLegacyFavorite)
         {
             // fetch the Favorite from the database
-            //Associate Id only needed until legacy favorites are refactored
-            _userFavoriteService.RemoveUserFavorite(favId, SharedContext.CurrentUser.AssociateId);
-            return PartialView("_FavoritesList", BuildFavoritesModel());
+            //isLegacyFavorite only needed until legacy favorites are converted
+            _userFavoriteService.RemoveUserFavorite(favId, isLegacyFavorite);
+            return PartialView("_FavoritesList", BuildFavorites());
         }
 
-        public ActionResult Sort(FavoritesModel model)
+        public ActionResult Sort(List<KeyValuePair<int, bool>> orderedFavoriteIds)
         {
-            // create a list of integers that contain the Ids of the Favorites in the specified order
-            List<int> orderedIds = model.OrderedFavoriteIds.Split(',').Select(int.Parse).ToList();
-            IList<FavoriteItem> favoriteItems = _userFavoriteService.SetUserFavoritesOrder(orderedIds, SharedContext.CurrentUser.AssociateId);
-            return PartialView("_FavoritesList", BuildFavoritesModel(favoriteItems));
+            //key value pairs only needed until legacy favorites are converted
+            IList<FavoriteItem> favoriteItems = _userFavoriteService.SetUserFavoritesOrder(orderedFavoriteIds);
+            return PartialView("_FavoritesList", BuildFavorites(favoriteItems));
         }
 
         public JsonResult SetFavorite(int datasetId)
@@ -54,24 +53,16 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        private FavoritesModel BuildFavoritesModel()
+        private List<FavoriteItemModel> BuildFavorites()
         {
             // fetch the user's Favorites; sorted by Sequence, then Title
             IList<FavoriteItem> favList = _userFavoriteService.GetUserFavoriteItems(SharedContext.CurrentUser.AssociateId);
-            return BuildFavoritesModel(favList);
+            return BuildFavorites(favList);
         }
 
-        private FavoritesModel BuildFavoritesModel(IList<FavoriteItem> favoriteItems)
+        private List<FavoriteItemModel> BuildFavorites(IList<FavoriteItem> favoriteItems)
         {
-            FavoritesModel model = new FavoritesModel
-            {
-                Favorites = favoriteItems.Select(x => x.ToModel()).OrderBy(x => x.Sequence).ThenBy(y => y.Title).ToList()
-            };
-
-            // add each favorite Id (in order) to the model collection
-            model.OrderedFavoriteIds = string.Join(",", model.Favorites.Select(x => x.Id).ToList());
-
-            return model;
+            return favoriteItems.Select(x => x.ToModel()).OrderBy(x => x.Sequence).ThenBy(y => y.Title).ToList();
         }
     }
 }

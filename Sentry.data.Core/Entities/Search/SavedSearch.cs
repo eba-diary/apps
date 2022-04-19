@@ -27,6 +27,7 @@ namespace Sentry.data.Core
             favoriteItem.Title = SearchName;
             favoriteItem.Url = $"{GetUrl()}?savedSearch={HttpUtility.UrlEncode(SearchName)}";
             favoriteItem.Img = GetImgPath();
+            favoriteItem.FeedUrlType = "WEB";
         }
         #endregion
 

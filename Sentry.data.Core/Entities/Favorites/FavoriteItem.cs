@@ -4,7 +4,7 @@
     {
         public FavoriteItem() 
         {
-        
+            IsLegacyFavorite = false;
         }
         
         public FavoriteItem(int favId, string datasetId, string title, DataFeed feed, int sequence)
@@ -16,6 +16,7 @@
             FeedUrlType = feed.UrlType;
             FeedUrl = feed.Url;
             FeedId = feed.Id;
+            IsLegacyFavorite = true;
 
             Img = Helpers.DataFeedHelper.GetImage(feed.Type);
             Url = Helpers.DataFeedHelper.GetUrl(feed);
@@ -30,5 +31,6 @@
         public string FeedUrlType { get; set; }
         public string FeedUrl { get; set; }
         public int FeedId { get; set; }
+        public bool IsLegacyFavorite { get; set; }
     }
 }

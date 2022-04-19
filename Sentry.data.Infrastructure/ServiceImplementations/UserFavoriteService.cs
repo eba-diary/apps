@@ -1,4 +1,6 @@
-﻿using Sentry.Common.Logging;
+﻿using Nest;
+using Sentry.Associates;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
@@ -27,49 +29,60 @@ namespace Sentry.data.Infrastructure
             return favoriteItems;
         }
 
-        public void RemoveUserFavorite(int userFavoriteId, string associateId)
+        public void RemoveUserFavorite(int userFavoriteId, bool isLegacyFavorite)
         {
-            //associate id only used until legacy favorites are refactored to help prevent incorrect favorite from being deleted
-            UserFavorite userFavorite = _datasetContext.UserFavorites.FirstOrDefault(f => f.UserFavoriteId == userFavoriteId && f.AssociateId == associateId);
-
-            if (userFavorite != null)
-            {
-                Logger.Info($"Found User Favorite {userFavoriteId} to remove for {associateId}");
-                _datasetContext.Remove(userFavorite);
-                _datasetContext.SaveChanges();
-            }
-
             //remove from legacy favorites until refactored
-            Favorite legacyFavorite = _datasetContext.Favorites.FirstOrDefault(f => f.FavoriteId == userFavoriteId && f.UserId == associateId);
-
-            if (legacyFavorite != null)
+            if (isLegacyFavorite)
             {
-                Logger.Info($"Found Legacy Favorite {userFavoriteId} to remove for {associateId}");
-                _datasetContext.Remove(legacyFavorite);
-                _datasetContext.SaveChanges();
+                Favorite legacyFavorite = _datasetContext.Favorites.FirstOrDefault(f => f.FavoriteId == userFavoriteId);
+
+                if (legacyFavorite != null)
+                {
+                    Logger.Info($"Found Legacy Favorite {userFavoriteId} to remove");
+                    _datasetContext.Remove(legacyFavorite);
+                    _datasetContext.SaveChanges();
+                }
             }
-        }
-        
-        public IList<FavoriteItem> SetUserFavoritesOrder(List<int> orderedIds, string associateId)
-        {
-            //associate id only used until legacy favorites are refactored to help prevent ordering incorrect favorites
-            List<UserFavorite> userFavorites = _datasetContext.UserFavorites.Where(f => orderedIds.Contains(f.UserFavoriteId) && f.AssociateId == associateId).ToList();
-            List<Favorite> legacyFavorites = _datasetContext.Favorites.Where(f => orderedIds.Contains(f.FavoriteId) && f.UserId == associateId).ToList();
-
-            int i = 0;
-            foreach (int id in orderedIds)
+            else
             {
-                UserFavorite userFavorite = userFavorites.FirstOrDefault(f => f.UserFavoriteId == id);
+                UserFavorite userFavorite = _datasetContext.UserFavorites.FirstOrDefault(f => f.UserFavoriteId == userFavoriteId);
+
                 if (userFavorite != null)
                 {
-                    userFavorite.Sequence = i;
+                    Logger.Info($"Found User Favorite {userFavoriteId} to remove");
+                    _datasetContext.Remove(userFavorite);
+                    _datasetContext.SaveChanges();
                 }
-                else
+            }            
+        }
+        
+        public IList<FavoriteItem> SetUserFavoritesOrder(List<KeyValuePair<int, bool>> orderedIds)
+        {
+            List<int> favoriteIds = orderedIds.Where(x => !x.Value).Select(x => x.Key).ToList();
+            List<UserFavorite> userFavorites = _datasetContext.UserFavorites.Where(f => favoriteIds.Contains(f.UserFavoriteId)).ToList();
+
+            List<int> legacyFavoriteIds = orderedIds.Where(x => x.Value).Select(x => x.Key).ToList();
+            List<Favorite> legacyFavorites = _datasetContext.Favorites.Where(f => legacyFavoriteIds.Contains(f.FavoriteId)).ToList();
+
+            int i = 0;
+            foreach (KeyValuePair<int, bool> kvp in orderedIds)
+            {
+                if (kvp.Value)
                 {
-                    Favorite legacyFavorite = legacyFavorites.FirstOrDefault(f => f.FavoriteId == id);
+                    //is legacy favorite
+                    Favorite legacyFavorite = legacyFavorites.FirstOrDefault(f => f.FavoriteId == kvp.Key);
                     if (legacyFavorite != null)
                     {
                         legacyFavorite.Sequence = i;
+                    }
+                }
+                else
+                {
+                    //is user favorite
+                    UserFavorite userFavorite = userFavorites.FirstOrDefault(f => f.UserFavoriteId == kvp.Key);
+                    if (userFavorite != null)
+                    {
+                        userFavorite.Sequence = i;
                     }
                 }
 
