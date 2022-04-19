@@ -952,7 +952,8 @@ namespace Sentry.data.Core.Tests
             var IsOwner = false;
             var userPermissions = (new[] { PermissionCodes.CAN_PREVIEW_DATASET }).ToList();
             var us = new UserSecurity();
-            var ds = new Dataset() {
+            var ds = new Dataset()
+            {
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
                 DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } }
             };
@@ -995,8 +996,8 @@ namespace Sentry.data.Core.Tests
             var IsOwner = false;
             var userPermissions = new List<string>();
             var us = new UserSecurity();
-            var ds = new Dataset() 
-            { 
+            var ds = new Dataset()
+            {
                 DataClassification = DataClassificationType.HighlySensitive,
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET
             };
@@ -1275,6 +1276,136 @@ namespace Sentry.data.Core.Tests
             // Assert
             Assert.IsTrue(us.CanEditDataset);
         }
+        #endregion
+
+        #region DoesSecurableInheritFromParent
+
+        [TestMethod]
+        public void DoesSecurableInheritFromParent_True()
+        {
+            // Arrange
+            var security = MockClasses.MockSecurity(new[] { PermissionCodes.INHERIT_PARENT_PERMISSIONS });
+            var securable = new Mock<ISecurable>();
+            securable.Setup(s => s.Security).Returns(security);
+            securable.Setup(s => s.Parent).Returns(new Mock<ISecurable>().Object);
+
+            // Act
+            var actual = SecurityService.DoesSecurableInheritFromParent(securable.Object);
+
+            // Assert
+            Assert.IsTrue(actual);
+        }
+
+        [TestMethod]
+        public void DoesSecurableInheritFromParent_False()
+        {
+            // Arrange
+            var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA });
+            var securable = new Mock<ISecurable>();
+            securable.Setup(s => s.Security).Returns(security);
+
+            // Act
+            var actual = SecurityService.DoesSecurableInheritFromParent(securable.Object);
+
+            // Assert
+            Assert.IsFalse(actual);
+        }
+
+        #endregion
+
+        #region GetSecurityTicketsForSecurable
+
+        [TestMethod]
+        public void GetSecurityTicketsForSecurable_IncludePending()
+        {
+            // Arrange
+            var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS });
+            security.Tickets.First().Permissions.First().IsEnabled = false;
+            var securable = new Mock<ISecurable>();
+            securable.Setup(s => s.Security).Returns(security);
+
+            // Act
+            var actual = SecurityService.GetSecurityTicketsForSecurable(securable.Object, true);
+
+            // Assert
+            Assert.AreEqual(2, actual.Count());
+        }
+
+        [TestMethod]
+        public void GetSecurityTicketsForSecurable_NoPending()
+        {
+            // Arrange
+            var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS });
+            security.Tickets.First().Permissions.First().IsEnabled = false;
+            var securable = new Mock<ISecurable>();
+            securable.Setup(s => s.Security).Returns(security);
+
+            // Act
+            var actual = SecurityService.GetSecurityTicketsForSecurable(securable.Object, false);
+
+            // Assert
+            Assert.AreEqual(1, actual.Count());
+        }
+
+        [TestMethod]
+        public void GetSecurityTicketsForSecurable_NoRemoved()
+        {
+            // Arrange
+            var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS });
+            security.Tickets.First().Permissions.First().IsEnabled = false;
+            security.Tickets.First().Permissions.First().RemovedDate = DateTime.Now;
+            var securable = new Mock<ISecurable>();
+            securable.Setup(s => s.Security).Returns(security);
+
+            // Act
+            var actual = SecurityService.GetSecurityTicketsForSecurable(securable.Object, true);
+
+            // Assert
+            Assert.AreEqual(1, actual.Count());
+        }
+
+        #endregion
+
+        #region GetSecurablePermissions
+
+        [TestMethod]
+        public void GetSecurablePermissions_ParentButNoInheritance()
+        {
+            // Arrange
+            var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS });
+            var securable = new Mock<ISecurable>();
+            securable.Setup(s => s.Security).Returns(security);
+            var parentSecurable = new Mock<ISecurable>();
+            parentSecurable.Setup(s => s.Security).Returns(security);
+            securable.Setup(s => s.Parent).Returns(parentSecurable.Object);
+            var securityService = new SecurityService(null, null, null);
+
+            // Act
+            var actual = securityService.GetSecurablePermissions(securable.Object);
+
+            // Assert
+            Assert.AreEqual(2,actual.Count());
+        }
+
+        [TestMethod]
+        public void GetSecurablePermissions_Inheritance()
+        {
+            // Arrange
+            var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS, PermissionCodes.INHERIT_PARENT_PERMISSIONS });
+            var securable = new Mock<ISecurable>();
+            securable.Setup(s => s.Security).Returns(security);
+            var parentSecurable = new Mock<ISecurable>();
+            parentSecurable.Setup(s => s.Security).Returns(security);
+            securable.Setup(s => s.Parent).Returns(parentSecurable.Object);
+            var securityService = new SecurityService(null, null, null);
+
+            // Act
+            var actual = securityService.GetSecurablePermissions(securable.Object);
+
+            // Assert
+            Assert.AreEqual(4, actual.Count()); //2 from parent and 2 from itself
+        }
+
         #endregion
 
         #region "Private helpers"

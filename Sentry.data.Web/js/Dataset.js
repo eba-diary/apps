@@ -833,14 +833,14 @@ data.Dataset = {
                     window.location.href = "/Dataset/Detail/" + obj.dataset_id;
                 }
                 else {
-                    $('#DatasetFormContent').replaceWith(obj);
+                    $('#DatasetFormContent').html(obj);
                 }
             },
             failure: function () {
                 alert('An error occured submiting your request.  Please try again.');
             },
             error: function (obj) {
-                $('#DatasetFormContent').replaceWith(obj.responseText);
+                $('#DatasetFormContent').html(obj.responseText);
                 var hrEnv = $('#HrempServiceEnv').val();
                 var hrUrl = $('#HrempServiceUrl').val();
 
@@ -2269,5 +2269,9 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         if ($('#schemaSearchTable_wrapper').length) {
             data.Dataset.UpdateSchemaSearchTab();
         }
+    },
+
+    managePermissionsInit() {
+        //This method will be used for future functionality on the Manage Permissions page
     }
 };

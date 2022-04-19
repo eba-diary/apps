@@ -137,6 +137,20 @@ namespace Sentry.data.Core
             return _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
         }
 
+        /// <summary>
+        /// Retrieve all the permissions granted to the dataset with the given <paramref name="datasetId"/>.
+        /// </summary>
+        public DatasetPermissionsDto GetDatasetPermissions(int datasetId)
+        {
+            var result = new DatasetPermissionsDto();
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault();
+            result.DatasetId = ds.DatasetId;
+            result.DatasetName = ds.DatasetName;
+            result.DatasetSaidKeyCode = ds.Asset.SaidKeyCode;
+            result.Permissions = _securityService.GetSecurablePermissions(ds);
+            return result;
+        }
+
         public UserSecurity GetUserSecurityForConfig(int configId)
         {
             DatasetFileConfig dfc = _datasetContext.DatasetFileConfigs.Where(x => x.ConfigId == configId).FetchSecurityTree(_datasetContext).FirstOrDefault();
