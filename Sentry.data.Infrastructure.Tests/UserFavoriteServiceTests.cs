@@ -49,7 +49,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             datasetContext.VerifyAll();
 
-            Assert.AreEqual(1, favoriteItems.Count);
+            Assert.AreEqual(2, favoriteItems.Count);
 
             FavoriteItem favoriteItem = favoriteItems.First();
             Assert.AreEqual(1, favoriteItem.Id);
@@ -61,6 +61,18 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(2, favoriteItem.FeedId);
             Assert.AreEqual(GlobalConstants.DataFeedName.DATASET, favoriteItem.FeedName);
             Assert.AreEqual("/Datasets/Detail/2", favoriteItem.FeedUrl);
+            Assert.IsTrue(favoriteItem.IsLegacyFavorite);
+
+            favoriteItem = favoriteItems.Last();
+            Assert.AreEqual(2, favoriteItem.Id);
+            Assert.AreEqual(1, favoriteItem.Sequence);
+            Assert.AreEqual("DatasetName2", favoriteItem.Title);
+            Assert.AreEqual("/BusinessIntelligence/Detail/3", favoriteItem.Url);
+            Assert.AreEqual("/Images/Icons/Business Intelligence.svg", favoriteItem.Img);
+            Assert.IsNull(favoriteItem.FeedUrlType);
+            Assert.AreEqual(3, favoriteItem.FeedId);
+            Assert.AreEqual(GlobalConstants.DataFeedName.BUSINESS_INTELLIGENCE, favoriteItem.FeedName);
+            Assert.IsNull(favoriteItem.FeedUrl);
             Assert.IsTrue(favoriteItem.IsLegacyFavorite);
         }
 
@@ -122,6 +134,7 @@ namespace Sentry.data.Infrastructure.Tests
             List<KeyValuePair<int, bool>> kvps = new List<KeyValuePair<int, bool>>()
             {
                 new KeyValuePair<int, bool>(1, false),
+                new KeyValuePair<int, bool>(2, true),
                 new KeyValuePair<int, bool>(1, true)
             };
 
@@ -129,7 +142,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             datasetContext.VerifyAll();
 
-            Assert.AreEqual(2, favoriteItems.Count);
+            Assert.AreEqual(3, favoriteItems.Count);
 
             FavoriteItem favoriteItem = favoriteItems.First();
             Assert.AreEqual(1, favoriteItem.Id);
@@ -140,9 +153,9 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("WEB", favoriteItem.FeedUrlType);
             Assert.IsFalse(favoriteItem.IsLegacyFavorite);
 
-            favoriteItem = favoriteItems.Last();
+            favoriteItem = favoriteItems[1];
             Assert.AreEqual(1, favoriteItem.Id);
-            Assert.AreEqual(1, favoriteItem.Sequence);
+            Assert.AreEqual(2, favoriteItem.Sequence);
             Assert.AreEqual("DatasetName", favoriteItem.Title);
             Assert.AreEqual("/Dataset/Detail/2", favoriteItem.Url);
             Assert.AreEqual("/Images/Icons/Datasets.svg", favoriteItem.Img);
@@ -150,6 +163,18 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(2, favoriteItem.FeedId);
             Assert.AreEqual(GlobalConstants.DataFeedName.DATASET, favoriteItem.FeedName);
             Assert.AreEqual("/Datasets/Detail/2", favoriteItem.FeedUrl);
+            Assert.IsTrue(favoriteItem.IsLegacyFavorite);
+
+            favoriteItem = favoriteItems.Last();
+            Assert.AreEqual(2, favoriteItem.Id);
+            Assert.AreEqual(1, favoriteItem.Sequence);
+            Assert.AreEqual("DatasetName2", favoriteItem.Title);
+            Assert.AreEqual("/BusinessIntelligence/Detail/3", favoriteItem.Url);
+            Assert.AreEqual("/Images/Icons/Business Intelligence.svg", favoriteItem.Img);
+            Assert.IsNull(favoriteItem.FeedUrlType);
+            Assert.AreEqual(3, favoriteItem.FeedId);
+            Assert.AreEqual(GlobalConstants.DataFeedName.BUSINESS_INTELLIGENCE, favoriteItem.FeedName);
+            Assert.IsNull(favoriteItem.FeedUrl);
             Assert.IsTrue(favoriteItem.IsLegacyFavorite);
         }
 
@@ -200,6 +225,14 @@ namespace Sentry.data.Infrastructure.Tests
                     DatasetId = 2,
                     UserId = "000000",
                     Sequence = 1
+                },
+                new Favorite()
+                {
+                    FavoriteId = 2,
+                    DatasetId = 3,
+                    UserId = "000000",
+                    Sequence = 1,
+
                 }
             }.AsQueryable();
         }
@@ -227,6 +260,14 @@ namespace Sentry.data.Infrastructure.Tests
                     ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
                     DatasetName = "DatasetName",
                     DatasetType = GlobalConstants.DataEntityCodes.DATASET
+                },
+                new Dataset()
+                {
+                    DatasetId = 3,
+                    ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
+                    DatasetName = "DatasetName2",
+                    DatasetType = GlobalConstants.DataEntityCodes.REPORT,
+                    Metadata = new DatasetMetadata() { ReportMetadata = new ReportMetadata() }
                 }
             }.AsQueryable();
         }

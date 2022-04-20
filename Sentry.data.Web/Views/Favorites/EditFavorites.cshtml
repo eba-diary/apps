@@ -14,9 +14,7 @@
 <div id="favorites-wrapper">
     <p>Drag and drop to reorder favorites</p>
 
-    <ul id="sortable-favorites" class="sortable-ul">
-        @{ Html.RenderPartial("_FavoritesList", Model); }
-    </ul>
+    @{Html.RenderPartial("_FavoritesList", Model);}
 </div>
 <div id="spinner-wrapper" class="hidden"><span class="sentry-spinner"></span></div>
 

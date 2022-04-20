@@ -2,6 +2,7 @@
 using Moq;
 using Sentry.Core;
 using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -376,6 +377,21 @@ namespace Sentry.data.Core.Tests
             datasetContext.VerifyAll();
             
             Assert.AreEqual("Successfully removed favorite.", result);
+        }
+
+        [TestMethod]
+        public void SetDatasetFavorite_1_000000_ThrowException()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+
+            datasetContext.Setup(x => x.GetById<Dataset>(1)).Throws(new Exception("foo"));
+            datasetContext.Setup(x => x.Clear());
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, null);
+
+            Assert.ThrowsException<Exception>(() => datasetService.SetDatasetFavorite(1, "000000"), "foo");
+
+            datasetContext.VerifyAll();
         }
     }
 }
