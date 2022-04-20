@@ -101,13 +101,13 @@
                         <div class="configHeader categoryBanner-@Model.CategoryColor">
                             @if (item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
                             {
-                                <h1 class="@color pt-3">@item.ConfigFileName <strong><em>(@Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete.ToString())</em></strong></h1>
+                                <h2 class="@color pt-3">@item.ConfigFileName<strong><em>(@Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete.ToString())</em></strong><em class="fas fa-chevron-up tracker-menu-icon fa-sm"></em></h2>
                             }
                             else
                             {
-                                <h1 class="@color pt-3">@item.ConfigFileName</h1>
+                                <h2 class="@color pt-3">@item.ConfigFileName<em class="fas fa-chevron-up tracker-menu-icon fa-sm"></em></h2>
                             }
-                            <em class="fas fa-chevron-up tracker-menu-icon"></em>
+                            
                         </div>
                         @*if (item.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
                         {
@@ -437,7 +437,7 @@
     }
 
 
-        .configHeader h1 {
+        .configHeader h2 {
             color: white;
             padding-left: 15px;
             display: inline-block;

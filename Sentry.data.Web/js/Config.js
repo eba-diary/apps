@@ -38,7 +38,7 @@ data.Config = {
             } else {
                 $(this).switchClass('fa-chevron-up', 'fa-chevron-down');
             }
-            var parentElement = $(this).parent();
+            var parentElement = $(this).parent().parent();
             var detailContainer = parentElement.next('div');
             detailContainer.toggle();
 
