@@ -28,15 +28,6 @@ namespace Sentry.data.Web
             return dto;
         }
 
-        public static FilterSearchDto ToDto(this FilterSearchModel model)
-        {
-            return new FilterSearchDto()
-            {
-                SearchText = model.SearchText,
-                FilterCategories = model.FilterCategories?.Select(x => x.ToDto()).ToList()
-            };
-        }
-
         public static FilterCategoryDto ToDto(this FilterCategoryModel model)
         {
             return new FilterCategoryDto()

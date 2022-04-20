@@ -31,11 +31,6 @@
     align-items: flex-start;
 }
 
-.filter-search-icon {
-    font-weight: bold;
-    font-size: large;
-}
-
 .filter-search-box {
     width: 50em;
 }

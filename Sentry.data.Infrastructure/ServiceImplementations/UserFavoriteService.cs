@@ -1,6 +1,4 @@
-﻿using Nest;
-using Sentry.Associates;
-using Sentry.Common.Logging;
+﻿using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
@@ -57,7 +55,7 @@ namespace Sentry.data.Infrastructure
         }
         
         public IList<FavoriteItem> SetUserFavoritesOrder(List<KeyValuePair<int, bool>> orderedIds)
-        {
+        {        
             List<int> favoriteIds = orderedIds.Where(x => !x.Value).Select(x => x.Key).ToList();
             List<UserFavorite> userFavorites = _datasetContext.UserFavorites.Where(f => favoriteIds.Contains(f.UserFavoriteId)).ToList();
 

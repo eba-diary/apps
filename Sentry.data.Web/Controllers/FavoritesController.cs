@@ -30,11 +30,19 @@ namespace Sentry.data.Web.Controllers
             _userFavoriteService.RemoveUserFavorite(favId, isLegacyFavorite);
             return PartialView("_FavoritesList", BuildFavorites());
         }
-
-        public ActionResult Sort(List<KeyValuePair<int, bool>> orderedFavoriteIds)
+        
+        public ActionResult Sort(List<string> orderedFavoriteIds)
         {
             //key value pairs only needed until legacy favorites are converted
-            IList<FavoriteItem> favoriteItems = _userFavoriteService.SetUserFavoritesOrder(orderedFavoriteIds);
+            List<KeyValuePair<int, bool>> kvps = new List<KeyValuePair<int, bool>>();
+            
+            foreach (string id in orderedFavoriteIds)
+            {
+                string[] parts = id.Split('_');
+                kvps.Add(new KeyValuePair<int, bool>(int.Parse(parts.First()), bool.Parse(parts.Last())));
+            }
+            
+            IList<FavoriteItem> favoriteItems = _userFavoriteService.SetUserFavoritesOrder(kvps);
             return PartialView("_FavoritesList", BuildFavorites(favoriteItems));
         }
 

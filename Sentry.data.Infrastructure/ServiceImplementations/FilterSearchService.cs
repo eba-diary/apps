@@ -35,7 +35,7 @@ namespace Sentry.data.Infrastructure
             {
                 //update existing
                 savedSearch.SearchText = savedSearchDto.SearchText;
-                savedSearch.FilterCategoriesJson = JsonConvert.SerializeObject(savedSearchDto.FilterCategories);
+                savedSearch.FilterCategoriesJson = savedSearchDto.FilterCategories != null ? JsonConvert.SerializeObject(savedSearchDto.FilterCategories) : null;
             }
             else
             {

@@ -34,7 +34,7 @@ data.Favorites = {
 
         $(".fav-delete").click(function () {
             // capture the Id of the Favorite to delete
-            $("#hidDeleteFavoriteId").val("favId="$(this).data("favid") + "&isLegacyFavorite=" + $(this).data("legacy"));
+            $("#hidDeleteFavoriteId").val("favId=" + $(this).data("favid") + "&isLegacyFavorite=" + $(this).data("legacy"));
         });
 
     },
@@ -45,14 +45,8 @@ data.Favorites = {
         var i = 1;
 
         // loop through each of the <li> elements in the favorites <ul>
-        $("#sortable-favorites li").each(function () {
-            var isLegacy = $(this).data("legacy");
-            var id = $(this).data("favid");
-
-            var kvp = {};
-            kvp[id] = isLegacy;
-
-            favItems.push(kvp);
+        $("#sortable-favorites li").each(function () {            
+            favItems.push($(this).data("favid") + "_" + $(this).data("legacy"));
 
             // set the html of the <span> that is displaying the order of the Favorites
             $(this).find(".fav-sort-order").html(i.toString());
@@ -65,20 +59,8 @@ data.Favorites = {
 
         console.log(favItems);
 
-        // ajax form post
-        $.ajax({
-            type: 'POST',
-            data: JSON.stringify({ orderedFavoriteIds: favItems }),
-            url: '/Favorites/Sort',
-            success: function (data) {
-                // do nothing; screen shows the new order, user does not need to see any confirmation
-            },
-            error: function (data) {
-                $("#favorites-wrapper").html("<br /><br /><div class='alert alert-danger'><strong>Error!</strong> There was a problem re-ordering Favorites.</div>");
-            },
-            complete: function () {
-                data.Favorites.ShowFavorites();
-            }
+        $.post("/Favorites/Sort", { orderedFavoriteIds: favItems }, data.Favorites.ShowFavorites).fail(function () {
+            $("#favorites-wrapper").html("<br /><br /><div class='alert alert-danger'><strong>Error!</strong> There was a problem re-ordering Favorites.</div>");
         });
     },
 

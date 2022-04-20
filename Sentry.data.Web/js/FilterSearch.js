@@ -168,13 +168,13 @@
     hideBadgeContainer: function (clearAll) {
         if ($("[id^='clearOption_']:visible").length === 1 || clearAll) {
             $(".filter-search-active-options-container").slideUp();
-            $("#filter-search-clear").hide();
+            $("#filter-search-clear").addClass("display-none");
         }
     },
 
     showBadgeContainer: function () {
         $(".filter-search-active-options-container").slideDown();
-        $("#filter-search-clear").show();
+        $("#filter-search-clear").removeClass("display-none");
     },
 
     showHideApplyFilter: function () {
@@ -190,10 +190,10 @@
 
         //hide apply button if filters are same as initial search, show if filters are different
         if (selectedOptions.length === data.FilterSearch.lastSelectedOptionIds.length && hasSameValues) {
-            $(".filter-search-apply").hide();
+            $(".filter-search-apply").addClass("display-none");
         }
         else {
-            $(".filter-search-apply").show();
+            $(".filter-search-apply").removeClass("display-none");
         }
     },
 
@@ -202,27 +202,26 @@
         $(".filter-search-apply").prop("disabled", true);
 
         $(".modal").modal("hide");
-        $(".filter-search-save-search-container").addClass("display-none");
-        
-        $(".icon-search").hide();
+
         $(".filter-search-results-container").hide();
-        $(".filter-search-results-none").hide();
-        $(".filter-search-result-count-container").hide();
+
+        $(".filter-search-save-search-container").addClass("display-none");        
+        $(".filter-search-start").addClass("display-none");
+        $(".filter-search-results-none").addClass("display-none");
+        $(".filter-search-result-count-container").addClass("display-none");
 
         data.FilterSearch.clearActiveSavedSearch();
 
-        $(".filter-search-spinner").show();
-        $(".filter-search-result-progress").show();
+        $(".filter-search-result-progress").removeClass("display-none");
     },
 
     completeSearch: function (totalResultCount, pageSize, returnedResultCount) {
         $("#filter-search-text").prop("disabled", false);
         $(".filter-search-apply").prop("disabled", false);
 
-        $(".filter-search-result-progress").hide();
-        $(".filter-search-spinner").hide();
+        $(".filter-search-result-progress").addClass("display-none");
 
-        $(".icon-search").show();
+        $(".icon-search").removeClass("display-none");
         $(".filter-search-save-search-container").removeClass("display-none");
 
         if (totalResultCount > 0) {
@@ -234,15 +233,15 @@
             $(".filter-search-result-count-container").slideDown();
         }
         else {
-            $(".filter-search-results-none").show();
+            $(".filter-search-results-none").removeClass("display-none");
         }
     },
 
     filterRetrivalPrep: function () {
-        $(".filter-search-categories-container").hide();
-        $(".filter-search-categories-progress").show();
-        $("#filter-search-clear").hide();
-        $(".filter-search-apply").hide();
+        $(".filter-search-categories-container").addClass("display-none");
+        $(".filter-search-categories-progress").removeClass("display-none");
+        $("#filter-search-clear").addClass("display-none");
+        $(".filter-search-apply").addClass("display-none");
     },
 
     completeFilterRetrieval: function (filters) {
@@ -260,8 +259,8 @@
         $('.filter-search-show-all-container').load("/FilterSearch/FilterShowAll/", categories);
         $('.filter-search-categories-container').load("/FilterSearch/FilterCategories/", categories, function () {
 
-            $(".filter-search-categories-progress").hide();
-            $(".filter-search-categories-container").show();
+            $(".filter-search-categories-progress").addClass("display-none");
+            $(".filter-search-categories-container").removeClass("display-none");
 
             var selectedOptions = $('.filter-search-category-option-checkbox:checkbox:checked');
 
@@ -270,7 +269,7 @@
             //open all filter categories with a selected option
             selectedOptions.closest('.filter-search-category-options').each(function () {
                 $("#" + this.id.replace("hide", "icon")).removeClass("fa-chevron-down").addClass("fa-chevron-up");
-                $(this).show();
+                $(this).removeClass("display-none");
             });
 
             //show selected option badges
