@@ -222,10 +222,11 @@ data.Config = {
     },
 
     SetDatasetScopeTypeDescription: function (id) {
-        if (id === undefined) {
+        if (id === undefined || id == null) {
             $(".DatasetScopeTypeDescription span").text("");
         }
         else {
+            console.log(id);
             $.ajax({
                 type: "GET",
                 url: '/Config/GetDataScopeTypeDescription/' + encodeURIComponent(id),
