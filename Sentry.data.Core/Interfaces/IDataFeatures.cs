@@ -10,8 +10,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> Remove_ClaimIQ_mock_logic_CLA_758 { get; }
         IFeatureFlag<bool> Dale_Expose_EditOwnerVerified_CLA_1911 { get; }
         IFeatureFlag<bool> Expose_Dataflow_Metadata_CLA_2146 { get; }
-        IFeatureFlag<string> CLA2671_RefactorEventsToJava { get; }
-        IFeatureFlag<string> CLA2671_RefactoredDataFlows { get; }
         IFeatureFlag<bool> CLA3240_UseDropLocationV2 { get; }
         IFeatureFlag<bool> CLA3241_DisableDfsDropLocation { get; }
         IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; }

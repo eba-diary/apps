@@ -430,7 +430,7 @@ data.Notification = {
                 //only show popover intitally if critical notifications exist
                 if (obj.CriticalNotifications.length > 0)
                 {
-                    $(".liberty-bell").popover('show');
+                    $(".liberty-bell").click();
                 }
 
             },
