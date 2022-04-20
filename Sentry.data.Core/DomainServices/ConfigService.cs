@@ -227,14 +227,18 @@ namespace Sentry.data.Core
             {
                 Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
 
-                //remove any schemas which are marked for deletion
                 if (dto.Name != null)
                 {
-                    if (parent.DatasetFileConfigs.Any(x => !x.DeleteInd && x.Name.ToLower() == dto.Name.ToLower()))
+                    if (dto.Name.Length > 100)
+                    {
+                        errors.Add("Configuration Name number of characters cannot be greater than 100.");
+                    }
+                    if (parent.DatasetFileConfigs.Any(x => !x.DeleteInd && x.Name.ToLower() == dto.Name.ToLower())) //remove any schemas which are marked for deletion
                     {
                         errors.Add("Dataset config with that name already exists within dataset");
                     }
                 }
+
             }
 
             var currentFileExtension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Id == dto.FileExtensionId).Name.ToLower();
