@@ -37,11 +37,12 @@ namespace Sentry.data.Infrastructure
                             bs => bs.Wildcard(w => w
                                 .Field(f => f.Name).Value(toSearch)),
                             bs => bs.Wildcard(w => w
-                                .Field(f => f.Description).Value(toSearch)),
+                                .Field(f => f.Description.Suffix("keyword")).Value(toSearch)),
                             bs => bs.Wildcard(w => w
                                 .Field(f => f.DotNamePath).Value(toSearch))
                             ).MinimumShouldMatch(String.IsNullOrEmpty(toSearch) ? 0 : 1) //If we are searching, we need something to match on (excluding the dataset id or schema id).
                     )
+                    
                 )
                 .Size(2000)
             );
