@@ -1269,6 +1269,8 @@ data.Dataset = {
 
             data.Dataset.UpdateMetadata();
 
+            $("#schemaSearchInput").val("")
+
             $("#tab-spinner").hide();
 
         });
@@ -1295,6 +1297,7 @@ data.Dataset = {
         $('#detailTabSchemaColumns').click(function (e) {
             e.preventDefault();
             var id = $('#RequestAccessButton').attr("data-id");
+            $("#schemaSearchInput").val("")
 
             var url = new URL(window.location.href);
             url.searchParams.set('tab', 'SchemaColumns');
@@ -1330,6 +1333,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             var id = $('#RequestAccessButton').attr("data-id");
+            $("#schemaSearchInput").val("")
 
             if ($('#tabSchemaAbout').is(':empty')) {
                 $("#tab-spinner").show();
@@ -1360,6 +1364,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             var id = $('#RequestAccessButton').attr("data-id");
+            $("#schemaSearchInput").val("")
 
             if ($('#tabDataPreview').is(':empty')) {
                 $("#tab-spinner").show();
@@ -1386,6 +1391,7 @@ data.Dataset = {
         $('#detailTabDataFiles').click(function (e) {
             e.preventDefault();
             var id = $('#RequestAccessButton').attr("data-id");
+            $("#schemaSearchInput").val("")
 
             var url = new URL(window.location.href);
             url.searchParams.set('tab', 'DataFiles');
