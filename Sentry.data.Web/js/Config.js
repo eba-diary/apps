@@ -33,12 +33,12 @@ data.Config = {
         });
 
         $('body').on('click', '.tracker-menu-icon', function () {
-            if ($(this).hasClass('icon-chevron-down')) {
-                $(this).switchClass('icon-chevron-down', 'icon-chevron-up');
+            if ($(this).hasClass('fa-chevron-down')) {
+                $(this).switchClass('fa-chevron-down', 'fa-chevron-up');
             } else {
-                $(this).switchClass('icon-chevron-up', 'icon-chevron-down');
+                $(this).switchClass('fa-chevron-up', 'fa-chevron-down');
             }
-            var parentElement = $(this).parent();
+            var parentElement = $(this).parent().parent();
             var detailContainer = parentElement.next('div');
             detailContainer.toggle();
 
@@ -222,10 +222,11 @@ data.Config = {
     },
 
     SetDatasetScopeTypeDescription: function (id) {
-        if (id === undefined) {
+        if (id === undefined || id == null) {
             $(".DatasetScopeTypeDescription span").text("");
         }
         else {
+            console.log(id);
             $.ajax({
                 type: "GET",
                 url: '/Config/GetDataScopeTypeDescription/' + encodeURIComponent(id),

@@ -1,10 +1,10 @@
 ﻿@model Sentry.data.Web.DatasetModel
 <div class="md-form">
+    <label class="active" for="">Named Environment</label> <!-- Not using helper for this because it causes duplicate labels and MDB select snatches it from text box -->
     <div class="dropdown-container">
         <span id="namedEnvironmentSpinner"></span>
         @if (Model.NamedEnvironmentDropDown.Any())
         {
-            @Html.LabelFor((model) => model.NamedEnvironment, new { @class = "mdb-main-label" })
             @Html.DropDownListFor(x =>
                  x.NamedEnvironment,
                  Model.NamedEnvironmentDropDown,
@@ -13,7 +13,6 @@
         else
         {
             @Html.TextBoxFor(x => x.NamedEnvironment, new { @class = "form-control" })
-            @Html.LabelFor((model) => model.NamedEnvironment, new { @class = "control-label active" })
         }
         @Html.ValidationMessageFor(model => Model.NamedEnvironment, "", new { @class = "text-danger" })
     </div>

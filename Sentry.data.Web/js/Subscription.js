@@ -24,10 +24,11 @@
             $.get("/Notification/SubscribeDisplay/?group=" + group, function (e)
             {
                 modal.ReplaceModalBody(e);
+                $("select").materialSelect();
 
                 //NEED THIS FOR mdb-select multi dropdown bootstrap 4 to show proper multi drop down html
                 $('.buford-multi-select').materialSelect();
             });
         }        
-    },
+    }
 };   

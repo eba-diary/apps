@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Core.Tests
@@ -34,7 +35,8 @@ namespace Sentry.data.Core.Tests
                 DatasetFiles = new List<DatasetFile>(),
                 DatasetFileConfigs = new List<DatasetFileConfig>(),
                 Favorities = new List<Favorite>(),
-                IsSecured = isSecured
+                IsSecured = isSecured,
+                Asset = new Asset() { SaidKeyCode = "ABCD" }
             };
 
             if (addConfig)
@@ -803,6 +805,33 @@ namespace Sentry.data.Core.Tests
             return df;
         }
 
-        
+        public static Security MockSecurity(IList<string> permissions)
+        {
+            var security = new Security()
+            {
+                Tickets = new List<SecurityTicket>()
+            };
+
+            foreach (var perm in permissions)
+            {
+                security.Tickets.Add(
+                    new SecurityTicket()
+                    {
+                        Permissions = new List<SecurityPermission>()
+                        {
+                            new SecurityPermission()
+                            {
+                                IsEnabled = true,
+                                Permission = new Permission() {
+                                    PermissionCode = perm
+                                }
+                            }
+                        }
+                    }
+                );
+            }
+            return security;
+        }
+
     }
 }

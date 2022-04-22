@@ -205,7 +205,7 @@ data.Dataset = {
                     render: function (d, type, row, meta) {
                         var color = $('#delroyBreadcrumb').data('page-color');
                         var innerLink = "<a  class='" + color + "' style='cursor:pointer' > " + d + "</a >";                        //want cursor too turn pointer
-                        var parent = "<em class=' icon-folder " + color + "' > " + innerLink + "</em>";
+                        var parent = "<em class='far fa-folder-open " + color + "' > " + innerLink + "</em>";
 
                         if (row.Fields != null) {
                             return parent;
@@ -833,14 +833,14 @@ data.Dataset = {
                     window.location.href = "/Dataset/Detail/" + obj.dataset_id;
                 }
                 else {
-                    $('#DatasetFormContent').replaceWith(obj);
+                    $('#DatasetFormContent').html(obj);
                 }
             },
             failure: function () {
                 alert('An error occured submiting your request.  Please try again.');
             },
             error: function (obj) {
-                $('#DatasetFormContent').replaceWith(obj.responseText);
+                $('#DatasetFormContent').html(obj.responseText);
                 var hrEnv = $('#HrempServiceEnv').val();
                 var hrUrl = $('#HrempServiceUrl').val();
 
@@ -1041,7 +1041,7 @@ data.Dataset = {
             var icon = "#icon_" + id;
 
             $(category).slideToggle();
-            $(icon).toggleClass("icon-chevron-down icon-chevron-up");
+            $(icon).toggleClass("fa-chevron-down fa-chevron-up");
         });
 
         var Id = $('#datasetConfigList').val();
@@ -1163,7 +1163,7 @@ data.Dataset = {
                 url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent($(this).data("id")),
                 method: "GET",
                 dataType: 'json',
-                success: function () { icon.toggleClass("icon-filled-star icon-star"); },
+                success: function () { icon.toggleClass("fas far"); },
                 error: function () { Sentry.ShowModalAlert("Failed to toggle favorite."); }
             });
         });
@@ -1269,6 +1269,8 @@ data.Dataset = {
 
             data.Dataset.UpdateMetadata();
 
+            $("#schemaSearchInput").val("")
+
             $("#tab-spinner").hide();
 
         });
@@ -1295,6 +1297,7 @@ data.Dataset = {
         $('#detailTabSchemaColumns').click(function (e) {
             e.preventDefault();
             var id = $('#RequestAccessButton').attr("data-id");
+            $("#schemaSearchInput").val("")
 
             var url = new URL(window.location.href);
             url.searchParams.set('tab', 'SchemaColumns');
@@ -1330,6 +1333,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             var id = $('#RequestAccessButton').attr("data-id");
+            $("#schemaSearchInput").val("")
 
             if ($('#tabSchemaAbout').is(':empty')) {
                 $("#tab-spinner").show();
@@ -1360,6 +1364,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             var id = $('#RequestAccessButton').attr("data-id");
+            $("#schemaSearchInput").val("")
 
             if ($('#tabDataPreview').is(':empty')) {
                 $("#tab-spinner").show();
@@ -1386,6 +1391,7 @@ data.Dataset = {
         $('#detailTabDataFiles').click(function (e) {
             e.preventDefault();
             var id = $('#RequestAccessButton').attr("data-id");
+            $("#schemaSearchInput").val("")
 
             var url = new URL(window.location.href);
             url.searchParams.set('tab', 'DataFiles');
@@ -2269,5 +2275,9 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         if ($('#schemaSearchTable_wrapper').length) {
             data.Dataset.UpdateSchemaSearchTab();
         }
+    },
+
+    managePermissionsInit() {
+        //This method will be used for future functionality on the Manage Permissions page
     }
 };

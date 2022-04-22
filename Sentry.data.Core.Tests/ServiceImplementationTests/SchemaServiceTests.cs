@@ -2289,6 +2289,49 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("Root.Middle.Child", fields[2].DotNamePath);
         }
 
+        [TestMethod]
+        [DataRow(true)]
+        [DataRow(false)]
+        public void UpdateSchema_SnowflakeStage(bool AllowUpdateFlag)
+        {
+            FileSchemaDto dto = new FileSchemaDto()
+            {
+                Name = "Name-NewValue",
+                SnowflakeStage = "SnowflakeStage-NewValue",
+                FileExtensionId = 1
+            };
+
+            FileSchema schema = new FileSchema()
+            {
+                SnowflakeStage = "SnowflakeStage-OriginalValue",
+                Extension = new FileExtension() { Id = 2 }
+            };
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
+            appUser.Setup(x => x.AssociateId).Returns("123456");
+
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object).Verifiable();
+
+            Mock<IDataFeatures> flags = mr.Create<IDataFeatures>();
+            flags.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(AllowUpdateFlag);
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(x => x.GetById<FileExtension>(It.IsAny<int>())).Returns(new FileExtension() { Id = 1 });
+
+            SchemaService schemaService = new SchemaService(context.Object, userService.Object, null, null, null, null, flags.Object, null, null, null, null);
+
+            //ACT
+            schemaService.UpdateSchema(dto, schema);
+
+            var snowstage = dto.SnowflakeStage == schema.SnowflakeStage;
+
+            //ASSERT
+            Assert.AreEqual(snowstage, AllowUpdateFlag);
+        }
+
         #region Private Methods
         private JsonSchema BuildMockJsonSchemaWithDecimalField()
         {

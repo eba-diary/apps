@@ -19,7 +19,7 @@
 
 <div class="topBanner">
     <div>
-        <a class="backToList" href="/"><em class="icon-chevron-left"></em>Back to Previous Page</a>
+        <a class="backToList" href="/"><em class="fas fa-chevron-left pr-3"></em>Back to Previous Page</a>
     </div>
 
 </div>
@@ -61,7 +61,7 @@
         </div>
 
         <div class="form-check">
-            <input type="checkbox" value="true" class="form-check-input" id="IsSecured" name="IsSecured">
+            <input type="checkbox" value="true" class="form-check-input" id="IsSecured" name="IsSecured" checked="@Model.IsSecured">
             @Html.LabelFor((model) => model.IsSecured, new { @class = "form-check-label" })
         </div>
 
@@ -100,10 +100,9 @@
         </div>
 
         <div id="userPassPanel">
-            <div class="md-form">
-                @Html.LabelFor((model) => model.IsUserPassRequired, new { @class = "control-label" })
-                @Html.CheckBoxFor((model) => model.IsUserPassRequired, new { @class = "edit-dataset-row" })
-                @Html.ValidationMessageFor((model) => model.IsUserPassRequired, "", new { @class = "text-danger" })
+            <div class="form-check">
+                <input type="checkbox" value="true" class="form-check-input" id="IsUserPassRequired" name="IsUserPassRequired" checked="@Model.IsUserPassRequired">
+                @Html.LabelFor((model) => model.IsUserPassRequired, new { @class = "form-check-label" })
                 <div id="userPassNotificationPanel" class="credentialWarning">
                     <em>Work with data.sentry.com administrators to configure credentials.  The data source will not operate until credentials are configured.</em>
                 </div>
@@ -172,7 +171,7 @@
                 @Html.LabelFor((model) => model.Headers, new { @class = "control-label col-md-2" })
                 <div id="requestHeader" class="col-md-10">
                     <div class="md-form col-md-10 headerEntry">
-                        <a class="addHeader" style="display: inline-block; margin-left: 10px;"><em class="icon-plus"></em> Add Header</a>
+                        <a class="addHeader" style="display: inline-block; margin-left: 10px;"><em class="fas fa-plus"></em> Add Header</a>
                     </div>
                     <div class="col-md-5 headerEntryLabel">
                         @Html.Label("Header Name", new { @value = "", @class = "col-md-5 headerEntryLabel" })

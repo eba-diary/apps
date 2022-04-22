@@ -10,11 +10,10 @@
     <div id="DatasetFormContent">
         @Html.AntiForgeryToken()
 
-        <p>Please fill out the following fields describing your dataset.  Before starting check to see if your dataset is not already on this site by using our <a href="~/Search/Datasets">search tool.</a></p>
+        <p class="pt-3">Please fill out the following fields describing your dataset.  Before starting check to see if your dataset is not already on this site by using our <a href="~/Search/Datasets">search tool.</a></p>
 
         @*Show the custom validation summary*@
-        @Html.DisplayFor((model) => ViewData.ModelState)
-
+        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
         <div id="myTabContent">
             <div id="informationPanel" class="form-horizontal">
@@ -22,12 +21,12 @@
                 <br />
                 <div class="container">
                     <div class="pl-0 row">
-                        <div class="col-md-8 pl-0">
-                            <h4>Dataset Metadata</h4>
+                        <div class="col pl-0">
+                            <h4 class="pt-3">Dataset Metadata</h4>
                         </div>
-                        <div class="col-md-4 text-right">
+                        <div class="col text-right">
                             <a href="https://confluence.sentry.com/pages/viewpage.action?spaceKey=CLA&title=Send+Data+to+DSC" target="_blank" class="btn btn-info">
-                                <span class="icon-help"></span>  Help
+                                <span class="fas fa-question"></span>  Help
                             </a>
                         </div>
                     </div>
@@ -76,7 +75,7 @@
                     @if (Model.DatasetId == 0)
                     {
                         @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = "" })
+                        @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.DatasetName) ? "active" : "" })
                         @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })
                     }
                     else
@@ -139,8 +138,8 @@
 
 
                 <div class="md-form">
+                    @Html.LabelFor(model => model.CreationUserId, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.CreationUserId) ? "active" : "" })
                     @Html.EditorFor(model => model.CreationUserId, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.LabelFor(model => model.CreationUserId, htmlAttributes: new { @class = "" })
                     @Html.ValidationMessageFor(model => model.CreationUserId, "", new { @class = "text-danger" })
                     <span class="text-muted">
                         <em>This is the original creator of the data. For Example: External data sources like Mitchell or Internal Data Sources like CustomerOne.</em>
@@ -160,7 +159,7 @@
                 </div>
 
                 <div class="form-check">
-                    <input type="checkbox" value="true" class="form-check-input" id="IsSecured" name="IsSecured">
+                    <input type="checkbox" value="true" class="form-check-input" id="IsSecured" name="IsSecured" checked="@Model.IsSecured">
                     @Html.LabelFor(m => m.IsSecured, htmlAttributes: new { @class = "form-check-label" })
                 </div>
 
@@ -174,6 +173,7 @@
                     @Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control w-100", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
                     @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
                 </div>
+
                 <div class="md-form fieldDescription">
                     <span class="text-muted">
                         <p>
@@ -203,15 +203,21 @@
                             @Html.ValidationMessageFor((model) => model.DatasetScopeTypeId, "", new { @class = "text-danger" })
                         </div>
 
+                        <div class="md-form DatasetScopeTypeDescription">
+                            <label class="control-label"></label>
+                            <span class="text-muted">
+                            </span>
+                        </div>
+
                         <div class="md-form">
+                            @Html.LabelFor(model => model.ConfigFileName, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.ConfigFileName) ? "active" : "" })
                             @Html.EditorFor(model => model.ConfigFileName, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.LabelFor(model => model.ConfigFileName, htmlAttributes: new { @class = "" })
                             @Html.ValidationMessageFor(model => model.ConfigFileName, "", new { @class = "text-danger" })
                         </div>
 
                         <div class="md-form">
+                            @Html.LabelFor(model => model.ConfigFileDesc, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.ConfigFileDesc) ? "active" : "" })
                             @Html.EditorFor(model => model.ConfigFileDesc, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.LabelFor(model => model.ConfigFileDesc, htmlAttributes: new { @class = "" })
                             @Html.ValidationMessageFor(model => model.ConfigFileDesc, "", new { @class = "text-danger" })
                         </div>
 
@@ -227,7 +233,7 @@
                         </div>
 
                         <div class="delimiterPanel md-form">
-                            @Html.LabelFor((model) => model.Delimiter, new { @class = "optional" })
+                            @Html.LabelFor((model) => model.Delimiter, new { @class = "active" })
                             @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control" })
                             @Html.ValidationMessageFor(model => model.Delimiter, "", new { @class = "text-danger" })
 
@@ -239,13 +245,13 @@
                         </div>
 
                         <div class="form-check">
-                            <input type="checkbox" value="true" class="form-check-input" id="HasHeader" name="HasHeader">
+                            <input type="checkbox" value="true" class="form-check-input" id="HasHeader" name="HasHeader" checked="@Model.HasHeader">
                             @Html.LabelFor((model) => model.HasHeader, new { @class = "form-check-label" })
                             @Html.Label("Do incoming files contain a header row?", new { @class = "text-muted" })
                         </div>
 
                         <div class="form-check">
-                            <input type="checkbox" value="true" class="form-check-input" id="CreateCurrentView" name="CreateCurrentView">
+                            <input type="checkbox" value="true" class="form-check-input" id="CreateCurrentView" name="CreateCurrentView" checked="@Model.CreateCurrentView">
                             @Html.LabelFor((model) => model.CreateCurrentView, new { @class = "form-check-label" })
                             @Html.Label("A view will be created filtering to data within latest file loaded into this schema", new { @class = "text-muted" })
                         </div>
