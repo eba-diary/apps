@@ -2250,6 +2250,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                 "type": "POST",
                 "dataSrc": ""
             },
+            "sort": false,
             "columns": [
                 { "data": "Name" },
                 { "data": "Description" },
