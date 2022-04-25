@@ -146,6 +146,8 @@
     <Compile Include="ElasticDataInventorySearchProviderTests.cs" />
     <Compile Include="EventServiceTests.cs" />
     <Compile Include="SparkConverterStatusEventHandlerTests.cs" />
+    <Compile Include="FilterSearchServiceTests.cs" />
+    <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\DefaultSettings\defaultSettings.config">

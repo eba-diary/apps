@@ -3,11 +3,11 @@
 @{
     ViewBag.Fluid = true;
     ViewBag.Title = Model.PageTitle;
-    string controllerName = "data." + Model.PageTitle.Replace(" ", "");
+    string jsControllerName = "data." + Model.SearchType;
 }
 
-<div class="search-horizontal-center">
-    <div class="search-head">
+<div class="search-head-wrapper">
+    <div class="text-center">
         <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" alt="Source icon" /></div>
         <div class="search-head-item">
             <h1 class="filter-search-page-title">@Model.PageTitle</h1>
@@ -18,9 +18,15 @@
         </a>
     </div>
 
-    <div id="search-box" class="md-form input-group has-feedback has-feedback-left filter-search-box">
-        <input type="text" class="form-control text-box single-line" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled>
-        <span class="input-group-append sentry-blue white-text icon-search clickable filter-search-start" id="SearchBoxAddon"></span>
+    <div class="filter-search-box-and-save">
+        <div id="search-box" class="md-form input-group has-feedback has-feedback-left filter-search-box">
+            <span class="input-group-prepend filter-search-start sentry-blue white-text icon-search clickable display-none"></span>
+            <input type="text" class="form-control text-box single-line" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled>
+        </div>
+
+        <div class="filter-search-save-search-container display-none">
+
+        </div>
     </div>
 </div>
 
@@ -66,19 +72,50 @@
 
 </div>
 
+<div class="modal fade" id="filter-search-save-modal" tabindex="-1" aria-labelledby="filter-search-save-modal-label" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Save Search</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <form id="save-search">
+                <div class="modal-body ml-3 mr-3">
+                    <div class="md-form">
+                        <input type="text" id="save-search-name" class="form-control" required maxlength="250" pattern="^[\w _-]+$" title="Special characters not allowed except '-' and '_'">
+                        <label for="save-search-name" class="save-search-name-label">Search Name</label>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="checkbox" id="save-search-favorite" class="form-check-input">
+                        <label for="save-search-favorite" class="form-check-label">Add To Favorites</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancel-save-search" class="btn btn-default waves-effect waves-light" data-dismiss="modal">Cancel</button>
+                    <button type="submit" value="Submit" class="btn btn-primary waves-effect waves-light">
+                        <span class="filter-search-save-search-modal-text">Save</span>
+                        <span class="spinner-border spinner-border filter-search-save-search-modal-spinner display-none" role="status" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="filter-search-show-all-container">
 
 </div>
 
 @section Scripts
 {
-    @Scripts.Render("~/bundles/dataTables")
-    <script type="text/javascript">
+@Scripts.Render("~/bundles/dataTables")
+<script type="text/javascript">
 
         $(function () {
-                @(controllerName).init();
-                data.FilterSearch.init(@(controllerName).executeSearch, @(controllerName).buildFilter);
+                data.FilterSearch.init(@(jsControllerName).executeSearch, @(jsControllerName).buildFilter, "@Model.SearchType");
+                @(jsControllerName).init();
             });
 
-    </script>
+</script>
 }

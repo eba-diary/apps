@@ -311,6 +311,7 @@
     <Compile Include="Mappings\Primary\Retriever\RetrieverJobArchiveMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\RetrieverJobMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\SubmissionMapping.cs" />
+    <Compile Include="Mappings\Primary\SavedSearchMapping.cs" />
     <Compile Include="Mappings\Primary\Schema\BaseFieldMapping.cs" />
     <Compile Include="Mappings\Primary\Schema\SchemaMapping.cs" />
     <Compile Include="Mappings\Primary\Schema\SchemaRevisionMapping.cs" />
@@ -318,6 +319,7 @@
     <Compile Include="Mappings\Primary\Security\SecurityMapping.cs" />
     <Compile Include="Mappings\Primary\Security\SecurityPermissionMapping.cs" />
     <Compile Include="Mappings\Primary\Security\SecurityTicketMapping.cs" />
+    <Compile Include="Mappings\Primary\UserFavoriteMapping.cs" />
     <Compile Include="Mappings\Subscriptions\BusinessAreaSubscriptionMapping.cs" />
     <Compile Include="Mappings\Subscriptions\DataAssetSubscriptionMapping.cs" />
     <Compile Include="Mappings\Subscriptions\DatasetSubscriptionMapping.cs" />
@@ -364,6 +366,7 @@
     <Compile Include="ServiceImplementations\DataSourceProviders\GoogleAPIDataFlowProvider.cs" />
     <Compile Include="ServiceImplementations\ElasticDataInventorySearchProvider.cs" />
     <Compile Include="ServiceImplementations\ElasticSchemaSearchProvider.cs" />
+    <Compile Include="ServiceImplementations\FilterSearchService.cs" />
     <Compile Include="ServiceImplementations\HiveOdbcProvider.cs" />
     <Compile Include="ServiceImplementations\HttpClientProvider.cs" />
     <Compile Include="ServiceImplementations\Messaging\DataStepProcessorService.cs" />
@@ -422,6 +425,7 @@
     <Compile Include="ServiceImplementations\SASProvider.cs" />
     <Compile Include="ServiceImplementations\SASServiceProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\TicketMonitorService.cs" />
+    <Compile Include="ServiceImplementations\UserFavoriteService.cs" />
     <Compile Include="ServiceImplementations\WallEService.cs" />
   </ItemGroup>
   <ItemGroup>

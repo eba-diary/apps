@@ -226,6 +226,7 @@
         {
             public const string BUSINESS_INTELLIGENCE_SEARCH = "BusinessIntelligence";
             public const string DATASET_SEARCH = "Datasets";
+            public const string DATA_INVENTORY = "DataInventory";
         }
 
         public static class StoragePrefixes
@@ -424,6 +425,17 @@
         {
             public const string ENVIRONMENT_PROD = "P";
             public const string ENVIRONMENT_NONPROD = "D";
+        }
+
+        public static class UserFavoriteTypes
+        {
+            public const string SAVEDSEARCH = "SavedSearch";
+        }
+
+        public static class SaveSearchResults
+        {
+            public const string NEW = "New";
+            public const string UPDATE = "Update";
         }
     }
 }

@@ -439,6 +439,8 @@
     <Compile Include="Models\Search\FilterCategoryOptionModel.cs" />
     <Compile Include="Models\Search\FilterSearchConfigModel.cs" />
     <Compile Include="Models\Search\FilterSearchModel.cs" />
+    <Compile Include="Models\Search\SavedSearchesModel.cs" />
+    <Compile Include="Models\Search\SaveSearchModel.cs" />
     <Compile Include="Models\Subscription\BusinessAreaSubscriptionModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
@@ -602,7 +604,6 @@
     <Compile Include="Models\Dataset\DatasetModel.cs" />
     <Compile Include="Models\Dataset\_DatasetMetadataModel.cs" />
     <Compile Include="Models\Favorites\FavoriteItemModel.cs" />
-    <Compile Include="Models\Favorites\FavoritesModel.cs" />
     <Compile Include="Models\Feed\DataFeedItemModel.cs" />
     <Compile Include="Models\Layout\HomeModel.cs" />
     <Compile Include="Models\Layout\FooterModel.cs" />
@@ -844,10 +845,12 @@
     <Content Include="Images\Category\hr.png" />
     <Content Include="Images\Category\hr.svg" />
     <Content Include="Images\Category\investment.svg" />
-    <Content Include="Images\Dale\DataInventoryHomePage.jpg" />
-    <Content Include="Images\Dale\DataInventoryIcon.png" />
+    <Content Include="Images\DataInventory\DataInventoryHomePage.jpg" />
+    <Content Include="Images\DataInventory\DataInventoryIconBlue.svg" />
+    <Content Include="Images\DataInventory\DataInventoryIcon.png" />
     <Content Include="Images\DataFlow\ConceptTeamwork1.jpg" />
     <Content Include="Images\DataFlow\Conversation12.jpg" />
+    <Content Include="Images\DataInventory\DataInventoryIcon.svg" />
     <Content Include="Images\excel_active.png" />
     <Content Include="Images\logo.png" />
     <Content Include="Images\logo2x.png" />
@@ -1196,6 +1199,8 @@
     <Content Include="webfonts\fa-brands-400.ttf" />
     <Content Include="webfonts\fa-brands-400.eot" />
     <Content Include="Views\Dataset\ManagePermissions.cshtml" />
+    <Content Include="Views\Search\SavedSearches.cshtml" />
+    <Content Include="Views\Search\FilterSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
@@ -1941,7 +1946,6 @@
     <Content Include="Views\Dataset\Details\_DataFiles.cshtml" />
     <Content Include="Views\Home\_FeedEmpty.cshtml" />
     <Content Include="Views\DataInventory\SearchResult.cshtml" />
-    <Content Include="Views\Search\FilterSearch.cshtml" />
     <Content Include="Views\Search\FilterCategories.cshtml" />
     <Content Include="Views\Search\FilterShowAll.cshtml" />
     <Content Include="Views\Dataset\Details\_SchemaSearch.cshtml" />

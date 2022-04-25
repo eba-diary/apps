@@ -2,6 +2,7 @@
 using Moq;
 using Sentry.Core;
 using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -313,6 +314,84 @@ namespace Sentry.data.Core.Tests
 
             // Assert
             Assert.AreEqual(ds.DatasetId, actual.DatasetId);
+        }
+
+        [TestMethod]
+        public void SetDatasetFavorite_1_000000_Add()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+
+            Dataset ds = new Dataset()
+            {
+                DatasetId = 1,
+                Favorities = new List<Favorite>()
+            };
+
+            datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(ds);
+            datasetContext.Setup(x => x.Merge(It.IsAny<Favorite>())).Returns<Favorite>(null).Callback<Favorite>(x =>
+            {
+                Assert.AreEqual(1, x.DatasetId);
+                Assert.AreEqual("000000", x.UserId);
+            });
+            datasetContext.Setup(x => x.SaveChanges(true));
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, null);
+
+            string result = datasetService.SetDatasetFavorite(1, "000000");
+
+            datasetContext.VerifyAll();
+            
+            Assert.AreEqual("Successfully added favorite.", result);
+        }
+
+        [TestMethod]
+        public void SetDatasetFavorite_1_000000_Remove()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+
+            Dataset ds = new Dataset()
+            {
+                DatasetId = 1,
+                Favorities = new List<Favorite>()
+                {
+                    new Favorite()
+                    {
+                        DatasetId = 1,
+                        UserId = "000000"
+                    }
+                }
+            };
+
+            datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(ds);
+            datasetContext.Setup(x => x.Remove(It.IsAny<Favorite>())).Callback<Favorite>(x =>
+            {
+                Assert.AreEqual(1, x.DatasetId);
+                Assert.AreEqual("000000", x.UserId);
+            });
+            datasetContext.Setup(x => x.SaveChanges(true));
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, null);
+
+            string result = datasetService.SetDatasetFavorite(1, "000000");
+
+            datasetContext.VerifyAll();
+            
+            Assert.AreEqual("Successfully removed favorite.", result);
+        }
+
+        [TestMethod]
+        public void SetDatasetFavorite_1_000000_ThrowException()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+
+            datasetContext.Setup(x => x.GetById<Dataset>(1)).Throws(new Exception("foo"));
+            datasetContext.Setup(x => x.Clear());
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, null);
+
+            Assert.ThrowsException<Exception>(() => datasetService.SetDatasetFavorite(1, "000000"), "foo");
+
+            datasetContext.VerifyAll();
         }
     }
 }

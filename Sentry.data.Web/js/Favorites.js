@@ -19,7 +19,7 @@ data.Favorites = {
             });
 
             $("#btnDeleteFav").click(function () {
-                data.Favorites.DeleteFavorite($("#hidDeleteFavoriteId").val());
+                data.Favorites.DeleteFavorite();
             });
 
             // when the modal window closes, clear out the value in the hidden field that holds the Id of the Favorite to delete
@@ -34,20 +34,19 @@ data.Favorites = {
 
         $(".fav-delete").click(function () {
             // capture the Id of the Favorite to delete
-            $("#hidDeleteFavoriteId").val($(this).data("favid"));
+            $("#hidDeleteFavoriteId").val("favId=" + $(this).data("favid") + "&isLegacyFavorite=" + $(this).data("legacy"));
         });
 
     },
 
     SetFavoritesOrder: function () {
 
-        var favItems = new Array();
+        var favItems = [];
         var i = 1;
 
         // loop through each of the <li> elements in the favorites <ul>
-        $("#sortable-favorites li").each(function () {
-            // add the Id of the Favorite to the array
-            favItems.push($(this).data("favid"));
+        $("#sortable-favorites li").each(function () {            
+            favItems.push($(this).data("favid") + "_" + $(this).data("legacy"));
 
             // set the html of the <span> that is displaying the order of the Favorites
             $(this).find(".fav-sort-order").html(i.toString());
@@ -56,14 +55,18 @@ data.Favorites = {
             i += 1;
         });
 
-        // place the list of ordered Favorite Ids into the hidden form field
-        $("#hidFavoriteIds").val(favItems);
+        data.Favorites.HideFavorites();
 
-        // save the new order
-        data.Favorites.SaveOrder();
+        console.log(favItems);
+
+        $.post("/Favorites/Sort", { orderedFavoriteIds: favItems }, data.Favorites.ShowFavorites).fail(function () {
+            $("#favorites-wrapper").html("<br /><br /><div class='alert alert-danger'><strong>Error!</strong> There was a problem re-ordering Favorites.</div>");
+        });
     },
 
-    DeleteFavorite: function (favId) {
+    DeleteFavorite: function () {
+
+        //CADEN - is legacy indicator will get here somehow and will need to send that as a parameter to the delete controller action
 
         // close the modal window
         $("#fav-delete-confirmation").modal("hide");
@@ -73,7 +76,7 @@ data.Favorites = {
 
         // ajax call to delete the favorite and re-populate the list of Favorites
         $.ajax({
-            url: '/Favorites/Delete?favId=' + favId,
+            url: '/Favorites/Delete?' + $("#hidDeleteFavoriteId").val(),
             method: 'GET',
             dataType: 'html',
             success: function (html) {
@@ -90,28 +93,6 @@ data.Favorites = {
             complete: function () {
                 // make sure the delete Favorite click event is wired up
                 data.Favorites.InitDeleteClick();
-            }
-        });
-
-    },
-
-    SaveOrder: function () {
-
-        data.Favorites.HideFavorites();
-
-        // ajax form post
-        $.ajax({
-            type: 'POST',
-            data: $("#frmSubmitOrderedIds").serialize(),
-            url: '/Favorites/Sort',
-            success: function (data) {
-                // do nothing; screen shows the new order, user does not need to see any confirmation
-            },
-            error: function (data) {
-                $("#favorites-wrapper").html("<br /><br /><div class='alert alert-danger'><strong>Error!</strong> There was a problem re-ordering Favorites.</div>");
-            },
-            complete: function () {
-                data.Favorites.ShowFavorites();
             }
         });
 

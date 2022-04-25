@@ -306,6 +306,8 @@
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_22_02_02\HISTORYFIX_CLA3789_Cleanup_RetrieverJobs_Not_Fully_Deleted.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_22_02_02\HISTORYFIX_CLA3789_Incorrect_Dataflow_Delete_Metadata.sql" />
     <Build Include="Tables\Asset.sql" />
+    <Build Include="Tables\UserFavorite.sql" />
+    <Build Include="Tables\SavedSearch.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_01\CLA3920_Auto_Subscribe.sql" />
   </ItemGroup>
   <ItemGroup>

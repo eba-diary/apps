@@ -15,7 +15,7 @@ namespace Sentry.data.Core
             Title = shortDesc;
             Description = longDesc;
             Feed = dataFeed;
-            Img = Helpers.DataFeedHelper.GetImage(dataFeed);
+            Img = Helpers.DataFeedHelper.GetImage(dataFeed.Type);
             Url = Helpers.DataFeedHelper.GetUrl(dataFeed);
         }
 
