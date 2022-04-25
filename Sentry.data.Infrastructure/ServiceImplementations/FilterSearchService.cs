@@ -27,8 +27,9 @@ namespace Sentry.data.Infrastructure
             return _datasetContext.SavedSearches.Where(s => s.SearchType == searchType && s.AssociateId == associateId).Select(s => s.SearchName).ToList();
         }
 
-        public void SaveSearch(SavedSearchDto savedSearchDto)
+        public string SaveSearch(SavedSearchDto savedSearchDto)
         {
+            string result;
             SavedSearch savedSearch = _datasetContext.SavedSearches.FirstOrDefault(s => s.SearchType == savedSearchDto.SearchType && s.SearchName == savedSearchDto.SearchName && s.AssociateId == savedSearchDto.AssociateId);
             
             if (savedSearch != null)
@@ -36,12 +37,14 @@ namespace Sentry.data.Infrastructure
                 //update existing
                 savedSearch.SearchText = savedSearchDto.SearchText;
                 savedSearch.FilterCategoriesJson = savedSearchDto.FilterCategories != null ? JsonConvert.SerializeObject(savedSearchDto.FilterCategories) : null;
+                result = GlobalConstants.SaveSearchResults.UPDATE;
             }
             else
             {
                 //create new
                 savedSearch = savedSearchDto.ToEntity();
                 _datasetContext.Add(savedSearch);
+                result = GlobalConstants.SaveSearchResults.NEW;
             }
 
             _datasetContext.SaveChanges();
@@ -50,6 +53,8 @@ namespace Sentry.data.Infrastructure
             {
                 _userFavoriteService.AddUserFavorite(savedSearch, savedSearchDto.AssociateId);
             }
+
+            return result;
         }
     }
 }

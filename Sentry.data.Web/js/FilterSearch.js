@@ -295,12 +295,19 @@
 
     completeSaveSearch: function (result, searchName) {
         
-        if (result.Success) {
-            data.FilterSearch.loadSavedSearches(searchName);
+        if (result.Result === "Failure") {
+            data.FilterSearch.showToast("error", "There was an issue saving your search. Please try again or reach out to DSCSupport@sentry.com.")
         }
         else {
-            data.FilterSearch.showToast("error", "There was an issue saving your search. Please try again or reach out to DSCSupport@sentry.com.")
             data.FilterSearch.completeSaveSearchModal();
+            data.FilterSearch.loadSavedSearches(searchName);
+
+            if (result.Result === "New") {
+                data.FilterSearch.showToast("success", "The search '" + searchName + "' has been saved.")
+            }
+            else if (result.Result === "Update") {
+                data.FilterSearch.showToast("success", "The saved search '" + searchName + "' already existed and has been updated.")
+            }
         }
     },
 

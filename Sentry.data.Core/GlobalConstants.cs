@@ -431,5 +431,11 @@
         {
             public const string SAVEDSEARCH = "SavedSearch";
         }
+
+        public static class SaveSearchResults
+        {
+            public const string NEW = "New";
+            public const string UPDATE = "Update";
+        }
     }
 }

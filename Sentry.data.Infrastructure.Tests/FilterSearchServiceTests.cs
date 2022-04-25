@@ -127,9 +127,11 @@ namespace Sentry.data.Infrastructure.Tests
                 }
             };
 
-            service.SaveSearch(dto);
+            string result = service.SaveSearch(dto);
 
             mockRepository.VerifyAll();
+
+            Assert.AreEqual(GlobalConstants.SaveSearchResults.NEW, result);
         }
 
         [TestMethod]
@@ -179,10 +181,11 @@ namespace Sentry.data.Infrastructure.Tests
                 }
             };
 
-            service.SaveSearch(dto);
+            string result = service.SaveSearch(dto);
 
             mockRepository.VerifyAll();
 
+            Assert.AreEqual(GlobalConstants.SaveSearchResults.UPDATE, result);
             Assert.AreEqual("new search", savedSearch.SearchText);
             Assert.AreEqual(@"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""D"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}]}]", savedSearch.FilterCategoriesJson);
         }

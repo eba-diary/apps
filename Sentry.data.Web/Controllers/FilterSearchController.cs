@@ -48,14 +48,14 @@ namespace Sentry.data.Web.Controllers
                 SavedSearchDto savedSearchDto = searchModel.ToDto();
                 savedSearchDto.AssociateId = SharedContext.CurrentUser.AssociateId;
                 
-                _filterSearchService.SaveSearch(savedSearchDto);
+                string result = _filterSearchService.SaveSearch(savedSearchDto);
 
-                return Json(new { Success = true });
+                return Json(new { Result = result });
             }
             catch (Exception ex)
             {
                 Logger.Error("Error saving search", ex);
-                return Json(new { Success = false });
+                return Json(new { Result = "Failure" });
             }
         }
     }
