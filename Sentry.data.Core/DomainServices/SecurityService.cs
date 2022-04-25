@@ -188,7 +188,7 @@ namespace Sentry.data.Core
                 var tickets = GetSecurityTicketsForSecurable(securable);
                 //filter the list down to only those that apply to this user (either by group membership or by direct ID)
                 userPermissions.AddRange(
-                    tickets.Where(t => user.IsInGroup(t.AdGroupName) || t.GrantPermissionToUserId == user.AssociateId)
+                    tickets.Where(t => (t.AdGroupName != null && user.IsInGroup(t.AdGroupName)) || t.GrantPermissionToUserId == user.AssociateId)
                         .SelectMany(g => g.Permissions)
                         .Select(p => p.Permission.PermissionCode)
                 );

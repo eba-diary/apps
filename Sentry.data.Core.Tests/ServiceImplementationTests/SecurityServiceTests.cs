@@ -880,6 +880,40 @@ namespace Sentry.data.Core.Tests
         }
         #endregion
 
+        #region CanModifyNotifications
+        /// <summary>
+        /// This method tests that if there are only user-specific permission tickets, GetUserSecurity still functions properly
+        /// </summary>
+        [TestMethod]
+        public void Security_UserOnlyPermissions_CanModifyNotifications()
+        {
+            //ARRAGE
+            Security security = BuildBaseSecurity();
+            SecurityTicket ticket1 = BuildBaseTicket(security, "MyAdGroupName1");
+            ticket1.AdGroupName = null;
+            ticket1.GrantPermissionToUserId = "999999";
+            SecurityPermission previewPermission1 = BuildBasePermission(ticket1, new Permission() { PermissionCode = PermissionCodes.CAN_MODIFY_NOTIFICATIONS }, true);
+
+            ticket1.Permissions.Add(previewPermission1);
+            security.Tickets.Add(ticket1);
+
+            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
+            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
+            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+
+            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.IsInGroup(null)).Throw(new NullReferenceException()); //The real service throws an exception if a null group name is passed in
+            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(securable, user);
+
+            //ASSERT
+            Assert.IsTrue(us.CanModifyNotifications);
+        }
+        #endregion
+
         #region "MergeParentSecurity"
         /// <summary>
         /// Tests that when no parent security is provided to the MergeParentSecurity,
