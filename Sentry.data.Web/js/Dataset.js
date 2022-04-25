@@ -650,7 +650,7 @@ data.Dataset = {
                         }
                     }
                     else {
-                        $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+                        $("#dataSection").replaceWith("<p> No rows returned </p>");
                         $('#dataSection').hide();
                     }
                 }
@@ -661,7 +661,7 @@ data.Dataset = {
                     $('#dataSection').hide();
                 }
 
-                $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+                $("#dataSection").replaceWith("<p> No rows returned </p>");
             },
             complete: function () {
                 $("#tab-spinner").hide();
