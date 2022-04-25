@@ -71,8 +71,7 @@
                     <td>
                         @*There is something magical about how MVC interprets the model where I have to use model. notation below instead of the foreeach sub.  TODO: is to figure out what is happening behind the scenes*@
                         @Html.DropDownListFor(model => model.SubscriptionsBusinessAreaModels[subId].Interval.Interval_ID,
-                                new SelectList(Model.AllIntervals, "Value", "Text", Model.SubscriptionsBusinessAreaModels[subId].Interval.Interval_ID),
-                                new { @class = "select-wrapper1 mdb-select1 buford-multi-select1" })
+                                new SelectList(Model.AllIntervals, "Value", "Text", Model.SubscriptionsBusinessAreaModels[subId].Interval.Interval_ID))
                     </td>
                 </tr>
             }
@@ -83,12 +82,9 @@
 
 
     <div class="modal-footer">
-        <div style="margin-left: 15px;">
-
-            <!-- Submit button triggers js function -->
-            <input type="submit" value="Update Subscriptions" class="btn btn-primary"/>
-            <input type="submit" class="btn btn-warning" data-dismiss="modal" value="Cancel" />
-        </div>
+        <!-- Submit button triggers js function -->
+        <input type="submit" value="Update Subscriptions" class="btn btn-primary"/>
+        <input type="submit" class="btn btn-warning" data-dismiss="modal" value="Cancel" />
     </div>
 
 </div>
