@@ -571,19 +571,15 @@ data.Dataset = {
 
         var schemaURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/columns";
 
-        //remove any children from DOM before injecting spinner
-        $("div.dataPreviewSpinner").empty();
-        //Inject spinner into DOM
-        Sentry.InjectSpinner($(".dataPreviewSpinner"));
-
         self.vm.DataLoading(true);
         $('#dataSection').hide();
 
         //If no data files exist, 1.) do not query table, 2.) do not show Data Preview section
         if (!self.vm.ShowDataFileTable()) {
-            $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+            showDataPreviewError();
         }
-        else {
+        else
+        {
             this.renderDataPreview();
         }
 
@@ -650,7 +646,7 @@ data.Dataset = {
                         }
                     }
                     else {
-                        $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+                        showDataPreviewError();
                         $('#dataSection').hide();
                     }
                 }
@@ -661,13 +657,13 @@ data.Dataset = {
                     $('#dataSection').hide();
                 }
 
-                $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+                showDataPreviewError();
             },
             complete: function () {
                 $("#tab-spinner").hide();
             }
         }).fail(function () {
-            $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+            showDataPreviewError();
         });
 
     },
@@ -1247,12 +1243,7 @@ data.Dataset = {
         //CONFIG DROP DOWN CHANGE
         //*****************************************************************************************************
         $('#datasetConfigList').on('select2:select', function (e) {
-
-
-
             $("#tab-spinner").show();
-
-
             var url = new URL(window.location.href);
             url.searchParams.set('configID', $('#datasetConfigList').val());
             window.history.pushState({}, '', url);
@@ -1265,6 +1256,11 @@ data.Dataset = {
             if ($("#datasetFilesTable_filter").length > 0) {
                 var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + $('#datasetConfigList').val();
                 $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
+            }
+
+            if (!$("#DataPreviewNoRows").hasClass("d-none"))
+            { 
+                $("#DataPreviewNoRows").addClass("d-none"); //Hide no rows returned div if it is shown, preview code should show it again if necessary
             }
 
             data.Dataset.UpdateMetadata();
@@ -2282,5 +2278,10 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     managePermissionsInit() {
         //This method will be used for future functionality on the Manage Permissions page
+    },
+
+    showDataPreviewError() {
+        $("#DataPreviewNoRows").html("<p> No rows returned </p>");
+        $("#DataPreviewNoRows").removeClass("d-none");
     }
 };
