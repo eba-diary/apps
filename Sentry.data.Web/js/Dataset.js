@@ -576,8 +576,7 @@ data.Dataset = {
 
         //If no data files exist, 1.) do not query table, 2.) do not show Data Preview section
         if (!self.vm.ShowDataFileTable()) {
-            $("#DataPreviewNoRows").html("<p> No rows returned </p>");
-            $("#DataPreviewNoRows").removeClass("d-none");
+            showDataPreviewError();
         }
         else
         {
@@ -647,8 +646,7 @@ data.Dataset = {
                         }
                     }
                     else {
-                        $("#DataPreviewNoRows").html("<p> No rows returned </p>");
-                        $("#DataPreviewNoRows").removeClass("d-none");
+                        showDataPreviewError();
                         $('#dataSection').hide();
                     }
                 }
@@ -659,15 +657,13 @@ data.Dataset = {
                     $('#dataSection').hide();
                 }
 
-                $("#DataPreviewNoRows").html("<p> No rows returned </p>");
-                $("#DataPreviewNoRows").removeClass("d-none");
+                showDataPreviewError();
             },
             complete: function () {
                 $("#tab-spinner").hide();
             }
         }).fail(function () {
-            $("#DataPreviewNoRows").html("<p> No rows returned </p>");
-            $("#DataPreviewNoRows").removeClass("d-none");
+            showDataPreviewError();
         });
 
     },
@@ -2279,5 +2275,10 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     managePermissionsInit() {
         //This method will be used for future functionality on the Manage Permissions page
+    },
+
+    showDataPreviewError() {
+        $("#DataPreviewNoRows").html("<p> No rows returned </p>");
+        $("#DataPreviewNoRows").removeClass("d-none");
     }
 };
