@@ -650,7 +650,7 @@ data.Dataset = {
                         }
                     }
                     else {
-                        $("#DataPreviewNoRows").replaceWith("<p> No rows returned </p>");
+                        $("#DataPreviewNoRows").html("<p> No rows returned </p>");
                         $("#DataPreviewNoRows").removeClass("d-none");
                         $('#dataSection').hide();
                     }
@@ -662,7 +662,7 @@ data.Dataset = {
                     $('#dataSection').hide();
                 }
 
-                $("#DataPreviewNoRows").replaceWith("<p> No rows returned </p>");
+                $("#DataPreviewNoRows").html("<p> No rows returned </p>");
                 $("#DataPreviewNoRows").removeClass("d-none");
             },
             complete: function () {
