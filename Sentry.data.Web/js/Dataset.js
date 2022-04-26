@@ -650,7 +650,8 @@ data.Dataset = {
                         }
                     }
                     else {
-                        $("#dataSection").replaceWith("<p> No rows returned </p>");
+                        $("#DataPreviewNoRows").replaceWith("<p> No rows returned </p>");
+                        $("#DataPreviewNoRows").removeClass("d-none");
                         $('#dataSection').hide();
                     }
                 }
@@ -661,7 +662,8 @@ data.Dataset = {
                     $('#dataSection').hide();
                 }
 
-                $("#dataSection").replaceWith("<p> No rows returned </p>");
+                $("#DataPreviewNoRows").replaceWith("<p> No rows returned </p>");
+                $("#DataPreviewNoRows").removeClass("d-none");
             },
             complete: function () {
                 $("#tab-spinner").hide();
@@ -1247,12 +1249,7 @@ data.Dataset = {
         //CONFIG DROP DOWN CHANGE
         //*****************************************************************************************************
         $('#datasetConfigList').on('select2:select', function (e) {
-
-
-
             $("#tab-spinner").show();
-
-
             var url = new URL(window.location.href);
             url.searchParams.set('configID', $('#datasetConfigList').val());
             window.history.pushState({}, '', url);
@@ -1265,6 +1262,11 @@ data.Dataset = {
             if ($("#datasetFilesTable_filter").length > 0) {
                 var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + $('#datasetConfigList').val();
                 $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
+            }
+
+            if (!$("#DataPreviewNoRows").hasClass("d-none"))
+            { 
+                $("#DataPreviewNoRows").addClass("d-none"); //Hide no rows returned div if it is shown, preview code should show it again if necessary
             }
 
             data.Dataset.UpdateMetadata();
