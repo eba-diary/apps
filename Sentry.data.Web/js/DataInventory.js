@@ -3,7 +3,6 @@
     updateHash: {},
 
     init: function () {
-        this.initToast();
         this.initDataInventory();
         this.buildFilter();
         this.initEvents();
@@ -17,7 +16,7 @@
     },
 
     buildFilter: function () {
-        $.post("/DataInventory/SearchFilters/", data.DataInventory.buildRequest(), (x) => data.FilterSearch.completeFilterRetrieval(x));
+        $.post("/DataInventory/SearchFilters/", data.FilterSearch.buildSearchRequest(), (x) => data.FilterSearch.completeFilterRetrieval(x));
     },
 
     initDataInventory: function () {
@@ -29,32 +28,12 @@
                 data.DataInventory.initDataTable(obj);
 
                 if (!obj.canDaleSensitiveView) {
-                    toastr['error']("All results may not be displayed. " +
+                    data.FilterSearch.showToast("error", "All results may not be displayed. " +
                         "Additional permission is needed to view columns marked " +
                         "as sensitive. Please click the Data Inventory info icon for more information.");
                 }                
             }
         });
-    },
-
-    initToast: function () {
-        toastr.options = {
-            "closeButton": false,
-            "debug": false,
-            "newestOnTop": false,
-            "progressBar": false,
-            "positionClass": "toast-top-right",
-            "preventDuplicates": false,
-            "onclick": null,
-            "showDuration": "1000",
-            "hideDuration": "1000",
-            "timeOut": "8000",
-            "extendedTimeOut": "1000",
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        };
     },
 
     initDataTable: function (obj) {
@@ -65,7 +44,7 @@
             ajax: {
                 url: "/DataInventory/SearchResult/",
                 type: "POST",
-                data: data.DataInventory.buildRequest
+                data: data.FilterSearch.buildSearchRequest
             },
             columns: [
                 {
@@ -186,7 +165,7 @@
                 data.DataInventory.updateHash = {};
             }
             else {
-                toastr['error']("Something went wrong trying to save changes. Please try again or reach out to DSCSupport@sentry.com.");
+                data.FilterSearch.showToast("error", "Something went wrong trying to save changes. Please try again or reach out to DSCSupport@sentry.com.");
             }
 
             $(".di-update-overlay").hide();
@@ -196,13 +175,6 @@
     updatePageInfo: function () {
         var tableInfo = $("#di-result-table").DataTable().page.info();
         data.FilterSearch.setPageInfo(++tableInfo.start, tableInfo.end);
-    },
-
-    buildRequest: function () {
-        return {
-            SearchText: $.trim($("#filter-search-text").val()),
-            FilterCategories: data.FilterSearch.getSelectedCategoryOptions()
-        }
     },
 
     getTableElementCheckbox: function (isDisabled, isChecked, id) {

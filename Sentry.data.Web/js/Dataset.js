@@ -1437,7 +1437,6 @@ data.Dataset = {
                     data: datasetDetailModel,
                     success: function (view) {
                         $('#tabSchemaSearch').html(view);
-
                         var metadataURL = "/api/v2/metadata/datasets/" + $('#datasetConfigList').val();
 
                         $.get(metadataURL, function (result) {
@@ -2250,6 +2249,10 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                 "type": "POST",
                 "dataSrc": ""
             },
+            "processing": true,
+            "language": {
+                "processing": "Searching..."
+            },
             "sort": false,
             "columns": [
                 { "data": "Name" },
@@ -2276,5 +2279,9 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         if ($('#schemaSearchTable_wrapper').length) {
             data.Dataset.UpdateSchemaSearchTab();
         }
+    },
+
+    managePermissionsInit() {
+        //This method will be used for future functionality on the Manage Permissions page
     }
 };

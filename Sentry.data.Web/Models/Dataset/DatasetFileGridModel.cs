@@ -49,10 +49,6 @@ namespace Sentry.data.Web
                 {
                     href += "<a href = \"#\" onclick=\"data.Dataset.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><em class='fas fa-cloud-download-alt text-primary'></em></a>";
                 }
-                if (HasDataFileEdit)
-                {
-                    href += "<a href = \"#\" onclick=\"data.Dataset.EditDataFileInformation(" + Id + ")\" class=\"table-row-icon\" title=\"Edit File\"><em class='far fa-edit text-primary'></em></a>";
-                }
 
                 if (HasFullViewDataset && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name)))
                 {

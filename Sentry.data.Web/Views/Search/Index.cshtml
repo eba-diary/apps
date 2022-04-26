@@ -22,7 +22,7 @@
                     <div class="panel panel-default dataset-list-filters">
                         <div class="panel-heading filterHead" data-bind="attr: { id: HeadId }">
                             <span class="filterCategoryName" data-bind="text : Name"></span>
-                            <em class="fas fa-chevron-down rightFloat filterViewIcon" data-bind="attr: { id: HeadIcon }"></em>
+                            <em class="fas fa-chevron-down rightFloat filterViewIcon pr-3 pt-1" data-bind="attr: { id: HeadIcon }"></em>
                         </div>
 
                         @* foreach of the category filters *@
@@ -59,12 +59,12 @@
                                     <!-- ko foreach: OrderedFilters -->
                                     <ul class="notNested">
                                         <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6, css: { notAllowed: Count() == 0 }">
-                                            <label data-bind="attr: { id: id }">
-                                                <input type="checkbox" class="filterChbx"
+                                            <div class="form-group">
+                                                <input type="checkbox" class="form-check-input"
                                                        data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
-                                                <strong data-bind="text : Title"></strong>
+                                                <label class="form-check-label" data-bind="text : Title, attr: {for: id}"></label>
                                                 <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
-                                            </label>
+                                            </div>
                                         </li>
                                     </ul>
                                     <!-- /ko -->

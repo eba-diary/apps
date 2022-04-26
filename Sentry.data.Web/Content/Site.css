@@ -1957,7 +1957,7 @@ tr.categoryBanner-darkgray th.sorting_desc {
     }
 
 .unUsable {
-    background-color: #ffd1d1 !important;
+    background-color: #8080806b !important;
 }
 
 /* remove extra space before the comma */
@@ -3030,4 +3030,8 @@ table.dsc-blue-table th {
 
 .dsc-icon-button {
     font-size: 1.25rem;
+}
+
+.dataTables_processing {
+    z-index: 999;
 }

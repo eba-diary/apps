@@ -159,6 +159,7 @@
     <Compile Include="JsonStructureTests.cs" />
     <Compile Include="HelperTests\NestHelperTests.cs" />
     <Compile Include="FilterCategoryOptionNormalizerTests.cs" />
+    <Compile Include="FilterSearchExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

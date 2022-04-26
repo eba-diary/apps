@@ -1,5 +1,4 @@
-﻿using LazyCache;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using Sentry.Configuration;
 using Sentry.data.Common;
 using Sentry.data.Core;
@@ -20,15 +19,15 @@ namespace Sentry.data.Web.Controllers
     {
         private readonly IDataFeedContext _feedContext;
         private readonly IDatasetContext _dsContext;
-        private readonly IAppCache cache;
         private readonly IDataFeatures _featureFlags;
+        private readonly IUserFavoriteService _userFavoriteService;
 
-        public HomeController(IDataFeedContext feedContext, IDatasetContext datasetContext, IDataAssetContext dataAssetContext, IDataFeatures featureFlags)
+        public HomeController(IDataFeedContext feedContext, IDatasetContext datasetContext, IDataFeatures featureFlags, IUserFavoriteService userFavoriteService)
         {
             _feedContext = feedContext;
             _dsContext = datasetContext;
             _featureFlags = featureFlags;
-            cache = new CachingService();
+            _userFavoriteService = userFavoriteService;
         }
 
         public ActionResult Index()
@@ -160,26 +159,8 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult GetFavorites()
         {
-            List<FavoriteItem> favList = _feedContext.GetUserFavorites(SharedContext.CurrentUser.AssociateId).OrderBy(x => x.Sequence).ThenBy(y => y.Title).ToList();
-            List<FavoriteItemModel> favItems = new List<FavoriteItemModel>();
-
-            // convert the list of FavoriteItem to a list of FavoriteItemModel
-            foreach (FavoriteItem fi in favList)
-            {
-                favItems.Add(new FavoriteItemModel()
-                {
-                    Id = fi.Id,
-                    FeedId = fi.FeedId,
-                    FeedName = fi.FeedName,
-                    FeedUrl = fi.FeedUrl,
-                    FeedUrlType = fi.FeedUrlType,
-                    Img = fi.Img,
-                    Sequence = fi.Sequence,
-                    Title = fi.Title,
-                    Url = fi.Url
-                });
-            }
-
+            IList<FavoriteItem> favList = _userFavoriteService.GetUserFavoriteItems(SharedContext.CurrentUser.AssociateId);
+            List<FavoriteItemModel> favItems = favList.Select(x => x.ToModel()).OrderBy(x => x.Sequence).ThenBy(y => y.Title).ToList();
             ViewBag.CanEditDataset = SharedContext.CurrentUser.CanModifyDataset;
             return PartialView("_Favorites", favItems);
         }

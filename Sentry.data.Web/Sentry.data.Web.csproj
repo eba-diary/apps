@@ -17,7 +17,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44371</IISExpressSSLPort>
+    <IISExpressSSLPort>44321</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -166,6 +166,9 @@
     </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.5.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=3.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Extensions.DependencyInjection, Version=5.0.0.2, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
@@ -430,10 +433,15 @@
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
     <Compile Include="Models\Dale\DaleAdvancedCriteriaModel.cs" />
+    <Compile Include="Models\Dataset\ManagePermissionModel.cs" />
+    <Compile Include="Models\Dataset\ManagePermissionsModel.cs" />
     <Compile Include="Models\Search\FilterCategoryModel.cs" />
     <Compile Include="Models\Search\FilterCategoryOptionModel.cs" />
     <Compile Include="Models\Search\FilterSearchConfigModel.cs" />
     <Compile Include="Models\Search\FilterSearchModel.cs" />
+    <Compile Include="Models\Search\SavedSearchesModel.cs" />
+    <Compile Include="Models\Search\SaveSearchModel.cs" />
+    <Compile Include="Models\Subscription\BusinessAreaSubscriptionModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
     <Compile Include="WebProxy\Win32Api.cs" />
@@ -596,7 +604,6 @@
     <Compile Include="Models\Dataset\DatasetModel.cs" />
     <Compile Include="Models\Dataset\_DatasetMetadataModel.cs" />
     <Compile Include="Models\Favorites\FavoriteItemModel.cs" />
-    <Compile Include="Models\Favorites\FavoritesModel.cs" />
     <Compile Include="Models\Feed\DataFeedItemModel.cs" />
     <Compile Include="Models\Layout\HomeModel.cs" />
     <Compile Include="Models\Layout\FooterModel.cs" />
@@ -838,10 +845,12 @@
     <Content Include="Images\Category\hr.png" />
     <Content Include="Images\Category\hr.svg" />
     <Content Include="Images\Category\investment.svg" />
-    <Content Include="Images\Dale\DataInventoryHomePage.jpg" />
-    <Content Include="Images\Dale\DataInventoryIcon.png" />
+    <Content Include="Images\DataInventory\DataInventoryHomePage.jpg" />
+    <Content Include="Images\DataInventory\DataInventoryIconBlue.svg" />
+    <Content Include="Images\DataInventory\DataInventoryIcon.png" />
     <Content Include="Images\DataFlow\ConceptTeamwork1.jpg" />
     <Content Include="Images\DataFlow\Conversation12.jpg" />
+    <Content Include="Images\DataInventory\DataInventoryIcon.svg" />
     <Content Include="Images\excel_active.png" />
     <Content Include="Images\logo.png" />
     <Content Include="Images\logo2x.png" />
@@ -1189,6 +1198,9 @@
     <Content Include="webfonts\fa-brands-400.woff" />
     <Content Include="webfonts\fa-brands-400.ttf" />
     <Content Include="webfonts\fa-brands-400.eot" />
+    <Content Include="Views\Dataset\ManagePermissions.cshtml" />
+    <Content Include="Views\Search\SavedSearches.cshtml" />
+    <Content Include="Views\Search\FilterSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
@@ -1934,7 +1946,6 @@
     <Content Include="Views\Dataset\Details\_DataFiles.cshtml" />
     <Content Include="Views\Home\_FeedEmpty.cshtml" />
     <Content Include="Views\DataInventory\SearchResult.cshtml" />
-    <Content Include="Views\Search\FilterSearch.cshtml" />
     <Content Include="Views\Search\FilterCategories.cshtml" />
     <Content Include="Views\Search\FilterShowAll.cshtml" />
     <Content Include="Views\Dataset\Details\_SchemaSearch.cshtml" />
@@ -2034,6 +2045,13 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

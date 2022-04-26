@@ -65,7 +65,7 @@ data.Home = {
             var reason = "";
             var sendEvent = false;
 
-            if (type.toUpperCase()  === "DS") {
+            if (type.toUpperCase() === "DS") {
                 eventType = "Viewed Dataset";
                 reason = 'Viewed dataset from favorite link';
                 sendEvent = true;
@@ -74,7 +74,7 @@ data.Home = {
                 eventType = 'Viewed Report';
                 reason = 'Viewed report from favorite link';
                 sendEvent = true;
-            }           
+            }
 
             if (sendEvent) {
                 $.ajax({
@@ -84,7 +84,9 @@ data.Home = {
                     success: function (obj) {
                     }
                 });
+            }
 
+            if (sendEvent || type.toUpperCase() === "WEB") {
                 window.open(link.attr("href"));
             }
 

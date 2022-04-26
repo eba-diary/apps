@@ -65,10 +65,6 @@ namespace Sentry.data.Core.Tests
 
             public IFeatureFlag<bool> Expose_Dataflow_Metadata_CLA_2146 => throw new NotImplementedException();
 
-            public IFeatureFlag<string> CLA2671_RefactorEventsToJava => throw new NotImplementedException();
-
-            public IFeatureFlag<string> CLA2671_RefactoredDataFlows => throw new NotImplementedException();
-
             public IFeatureFlag<bool> CLA3329_Expose_HR_Category => throw new NotImplementedException();
 
             public IFeatureFlag<bool> CLA1656_DataFlowEdit_ViewEditPage => throw new NotImplementedException();
@@ -97,6 +93,8 @@ namespace Sentry.data.Core.Tests
 
             public IFeatureFlag<bool> CLA3819_EgressEdgeMigration => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3882_DSC_NOTIFICATION_SUBCATEGORY => throw new NotImplementedException();
+
+            public IFeatureFlag<bool> CLA3718_Authorization => throw new NotImplementedException();
         }
     }
 }

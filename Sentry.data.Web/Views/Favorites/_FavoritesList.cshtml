@@ -1,4 +1,4 @@
-﻿@model FavoritesModel
+﻿@model List<FavoriteItemModel>
 
 
 @* variable used to keep track of iteration in the loop *@
@@ -6,17 +6,20 @@
 
 
 @* loop through each favorite, creating a <li> element *@
-@foreach (FavoriteItemModel fav in Model.Favorites)
-{
-    <li class="clickable" data-favid="@fav.Id">
-        <span class="fav-sort-order">@i.ToString()</span>
-        <span class="fav-sort-image"><img src="@fav.Img" alt="" /></span>
-        <span class="fav-sort-item">@fav.Title</span>
-        <a class="float-r fav-delete" href="#fav-delete-confirmation" data-toggle="modal" data-favid="@fav.Id">
-            <span class="fas fa-times" data-toggle="tooltip" data-placement="top" data-original-title="Delete Favorite"></span>
-        </a>
-    </li>
 
-    @* increment the count *@
-    i += 1;
-}
+<ul id="sortable-favorites" class="sortable-ul">
+    @foreach (FavoriteItemModel fav in Model)
+    {
+        <li class="clickable" data-favid="@fav.Id" data-legacy="@fav.IsLegacyFavorite">
+            <span class="fav-sort-order">@i.ToString()</span>
+            <span class="fav-sort-image"><img src="@fav.Img" alt="" /></span>
+            <span class="fav-sort-item">@fav.Title</span>
+            <a class="float-r fav-delete" href="#fav-delete-confirmation" data-toggle="modal" data-favid="@fav.Id" data-legacy="@fav.IsLegacyFavorite">
+                <span class="fas fa-times" data-toggle="tooltip" data-placement="top" data-original-title="Delete Favorite"></span>
+            </a>
+        </li>
+
+        @* increment the count *@
+        i += 1;
+    }
+</ul>

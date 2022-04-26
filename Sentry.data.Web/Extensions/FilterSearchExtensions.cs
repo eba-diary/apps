@@ -1,18 +1,31 @@
 ﻿using Sentry.data.Core;
 using System.Linq;
-using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web
 {
     public static class FilterSearchExtensions
     {
-        public static DaleSearchDto ToDto(this FilterSearchModel model)
+        public static DaleSearchDto ToDaleDto(this FilterSearchModel model)
         {
             return new DaleSearchDto()
             {
                 Criteria = model.SearchText,
                 FilterCategories = model.FilterCategories?.Select(x => x.ToDto()).ToList()
             };
+        }
+        
+        public static SavedSearchDto ToDto(this SaveSearchModel model)
+        {
+            SavedSearchDto dto = new SavedSearchDto()
+            {
+                SearchType = model.SearchType,
+                SearchName = model.SearchName,
+                AddToFavorites = model.AddToFavorites
+            };
+
+            MapToParentDto(model, dto);
+
+            return dto;
         }
 
         public static FilterCategoryDto ToDto(this FilterCategoryModel model)
@@ -39,6 +52,7 @@ namespace Sentry.data.Web
         {
             return new FilterSearchModel()
             {
+                SearchText = dto.SearchText,
                 FilterCategories = dto.FilterCategories?.Select(x => x.ToModel()).ToList()
             };
         }
@@ -61,6 +75,12 @@ namespace Sentry.data.Web
                 ParentCategoryName = dto.ParentCategoryName,
                 Selected = dto.Selected
             };
+        }
+
+        private static void MapToParentDto(FilterSearchModel model, FilterSearchDto dto)
+        {
+            dto.SearchText = model.SearchText;
+            dto.FilterCategories = model.FilterCategories?.Select(x => x.ToDto()).ToList();
         }
     }
 }
