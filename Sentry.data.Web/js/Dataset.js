@@ -2249,6 +2249,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             "language": {
                 "processing": "Searching..."
             },
+            "sort": false,
             "columns": [
                 { "data": "Name" },
                 { "data": "Description" },
