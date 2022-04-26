@@ -571,19 +571,16 @@ data.Dataset = {
 
         var schemaURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/columns";
 
-        //remove any children from DOM before injecting spinner
-        $("div.dataPreviewSpinner").empty();
-        //Inject spinner into DOM
-        Sentry.InjectSpinner($(".dataPreviewSpinner"));
-
         self.vm.DataLoading(true);
         $('#dataSection').hide();
 
         //If no data files exist, 1.) do not query table, 2.) do not show Data Preview section
         if (!self.vm.ShowDataFileTable()) {
-            $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+            $("#DataPreviewNoRows").html("<p> No rows returned </p>");
+            $("#DataPreviewNoRows").removeClass("d-none");
         }
-        else {
+        else
+        {
             this.renderDataPreview();
         }
 
@@ -669,7 +666,8 @@ data.Dataset = {
                 $("#tab-spinner").hide();
             }
         }).fail(function () {
-            $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+            $("#DataPreviewNoRows").html("<p> No rows returned </p>");
+            $("#DataPreviewNoRows").removeClass("d-none");
         });
 
     },
