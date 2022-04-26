@@ -3031,3 +3031,7 @@ table.dsc-blue-table th {
 .dsc-icon-button {
     font-size: 1.25rem;
 }
+
+.dataTables_processing {
+    z-index: 999;
+}
