@@ -179,7 +179,7 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public void AddUserFavorite_Favorite_000000_Add()
+        public void AddUserFavorite_SavedSearch_2_000000_Add()
         {
             Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
             datasetContext.SetupGet(x => x.UserFavorites).Returns(new List<UserFavorite>().AsQueryable());
@@ -194,7 +194,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             UserFavoriteService userFavoriteService = new UserFavoriteService(datasetContext.Object);
 
-            userFavoriteService.AddUserFavorite(GetSavedSearches().First(), "000000");
+            userFavoriteService.AddUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, 2, "000000");
 
             datasetContext.VerifyAll();
         }

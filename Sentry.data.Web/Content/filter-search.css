@@ -39,6 +39,16 @@
     padding: 0 1em !important;
 }
 
+.saved-search-option-container {
+    display: flex;
+    align-items: center;
+}
+
+.saved-search-option-icon {
+    padding: 0.5rem;
+    color: #003DA5 !important;
+}
+
 .filter-search-body {
     display: flex;
     clear: both;

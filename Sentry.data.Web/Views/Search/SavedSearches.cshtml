@@ -1,14 +1,18 @@
-﻿@model SavedSearchesModel
+﻿@model SavedSearchDropdownModel
     
 <div class="btn-group ml-2">
     <button class="btn btn-primary waves-effect waves-light filter-search-save" data-toggle="modal" data-target="#filter-search-save-modal">Save Search</button>
     <button class="btn btn-primary dropdown-toggle dropdown-toggle-split waves-effect waves-light" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
     <div class="dropdown-menu">
-        @if (Model.SavedSearchNames.Any())
+        @if (Model.SavedSearchOptions.Any())
         {
-            foreach (string name in Model.SavedSearchNames)
+            foreach (SavedSearchOptionModel option in Model.SavedSearchOptions)
             {
-                <a class="dropdown-item @(name == Model.ActiveSearchName ? "active" : "") filter-search-saved-search-option" href="@Url.Action("Search", Model.SearchType, new { savedSearch = name })">@name</a>
+            <div class="saved-search-option-container">
+                <a class="dropdown-item @(option.SavedSearchName == Model.ActiveSearchName ? "active" : "")" href="@Url.Action("Search", Model.SearchType, new { savedSearch = option.SavedSearchName })">@option.SavedSearchName</a>
+                <a class="@(option.IsFavorite ? "fas" : "far") fa-star saved-search-favorite saved-search-option-icon" id="@option.SavedSearchId"></a>
+                <a class="far fa-edit saved-search-option-icon saved-search-edit" data-id="@option.SavedSearchId" data-name="@option.SavedSearchName" data-favorite="@option.IsFavorite"></a>
+            </div>                
             }
         }
         else

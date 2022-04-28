@@ -77,6 +77,16 @@ namespace Sentry.data.Web
             };
         }
 
+        public static SavedSearchOptionModel ToModel(this SavedSearchOptionDto dto)
+        {
+            return new SavedSearchOptionModel
+            {
+                SavedSearchId = dto.SavedSearchId,
+                SavedSearchName = dto.SavedSearchName,
+                IsFavorite = dto.IsFavorite
+            };
+        }
+
         private static void MapToParentDto(FilterSearchModel model, FilterSearchDto dto)
         {
             dto.SearchText = model.SearchText;

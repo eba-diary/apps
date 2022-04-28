@@ -110,5 +110,19 @@ data.Favorites = {
         // show the sortable <ul> and not the spinner
         $("#favorites-wrapper").addClass("hidden");
         $("#spinner-wrapper").removeClass("hidden");
+    },
+
+    toggleFavorite: function (element, type, toastFunction) {
+        
+        if ($(element).hasClass("fas")) {
+            $.post("/Favorites/AddFavorite", { favoriteType: type, entityId: this.id }, function () {
+                $(element).toggleClass("fas far");
+            }).fail(function () {
+                toastFunction("error", "There was an issue adding the saved search as a favorite. Please try again or reach out to DSCSupport@sentry.com.")
+            });
+        }
+        else {
+            console.log("remove favorite");
+        }
     }
 };

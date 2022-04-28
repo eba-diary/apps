@@ -95,13 +95,10 @@ namespace Sentry.data.Infrastructure
             return favoriteItems;
         }
 
-        public void AddUserFavorite(IFavorable favorite, string associateId)
+        public void AddUserFavorite(string favoriteType, int entityId, string associateId)
         {
-            int favoriteEntityId = favorite.GetFavoriteEntityId();
-            string favoriteType = favorite.GetFavoriteType();
-
             //check if favorite already exists
-            UserFavorite existing = _datasetContext.UserFavorites.FirstOrDefault(x => x.AssociateId == associateId && x.FavoriteEntityId == favoriteEntityId && x.FavoriteType == favoriteType);
+            UserFavorite existing = _datasetContext.UserFavorites.FirstOrDefault(x => x.AssociateId == associateId && x.FavoriteEntityId == entityId && x.FavoriteType == favoriteType);
 
             if (existing == null)
             {
@@ -110,7 +107,7 @@ namespace Sentry.data.Infrastructure
                 {
                     AssociateId = associateId,
                     FavoriteType = favoriteType,
-                    FavoriteEntityId = favoriteEntityId,
+                    FavoriteEntityId = entityId,
                     CreateDate = DateTime.Now
                 };
 
@@ -120,6 +117,12 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public UserFavorite GetUserFavoriteByEntity(int entityId, string associateId)
+        {
+            return _datasetContext.UserFavorites.FirstOrDefault(f => f.AssociateId == associateId && f.FavoriteEntityId == entityId);
+        }
+
+        #region Methods
         private List<FavoriteItem> CreateFavoriteItems(List<UserFavorite> userFavorites)
         {
             List<FavoriteItem> favoriteItems = new List<FavoriteItem>();
@@ -193,5 +196,6 @@ namespace Sentry.data.Infrastructure
                 Type = GlobalConstants.DataFeedType.Datasets
             };
         }
+        #endregion
     }
 }

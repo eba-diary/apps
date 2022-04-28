@@ -2,6 +2,7 @@
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
@@ -30,10 +31,12 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public ActionResult SavedSearches(string searchType, string activeSearchName)
         {
-            SavedSearchesModel model = new SavedSearchesModel()
+            List<SavedSearchOptionDto> savedSearchOptions = _filterSearchService.GetSavedSearchOptions(searchType, SharedContext.CurrentUser.AssociateId);
+            
+            SavedSearchDropdownModel model = new SavedSearchDropdownModel()
             {
                 SearchType = searchType,
-                SavedSearchNames = _filterSearchService.GetSavedSearchNames(searchType, SharedContext.CurrentUser.AssociateId),
+                SavedSearchOptions = savedSearchOptions.Select(x => x.ToModel()).ToList(),
                 ActiveSearchName = activeSearchName
             };
 

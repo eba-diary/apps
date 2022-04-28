@@ -46,6 +46,12 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_FavoritesList", BuildFavorites(favoriteItems));
         }
 
+        public JsonResult AddFavorite(string favoriteType, int entityId)
+        {
+            _userFavoriteService.AddUserFavorite(favoriteType, entityId, SharedContext.CurrentUser.AssociateId);
+            return Json(new { Success = true });
+        }
+
         public JsonResult SetFavorite(int datasetId)
         {
             try

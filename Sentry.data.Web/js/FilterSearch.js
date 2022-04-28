@@ -150,6 +150,16 @@
 
             $.post("/FilterSearch/SaveSearch", request, (x) => data.FilterSearch.completeSaveSearch(x, request.SearchName));
         });
+
+        $(document).on("click", ".saved-search-favorite", function (e) {
+            e.stopPropagation();
+
+            data.Favorites.toggleFavorite(this, "SavedSearch", data.FilterSearch.showToast);
+        });
+
+        $(document).on("click", ".saved-search-edit", function (e) {
+            console.log("edit");
+        });
     },
 
     setOptionCheckbox: function (id, checked) {

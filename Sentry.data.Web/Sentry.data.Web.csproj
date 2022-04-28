@@ -17,7 +17,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44321</IISExpressSSLPort>
+    <IISExpressSSLPort>44371</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -439,7 +439,8 @@
     <Compile Include="Models\Search\FilterCategoryOptionModel.cs" />
     <Compile Include="Models\Search\FilterSearchConfigModel.cs" />
     <Compile Include="Models\Search\FilterSearchModel.cs" />
-    <Compile Include="Models\Search\SavedSearchesModel.cs" />
+    <Compile Include="Models\Search\SavedSearchOptionModel.cs" />
+    <Compile Include="Models\Search\SavedSearchDropdownModel.cs" />
     <Compile Include="Models\Search\SaveSearchModel.cs" />
     <Compile Include="Models\Subscription\BusinessAreaSubscriptionModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
@@ -1973,7 +1974,6 @@
     <Folder Include="Views\Alert\" />
     <Folder Include="Views\BaseDataInventory\" />
     <Folder Include="Views\ExternalFile\" />
-    <Folder Include="Views\FilterSearch\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Security\" />
     <Folder Include="Views\Subscription\" />

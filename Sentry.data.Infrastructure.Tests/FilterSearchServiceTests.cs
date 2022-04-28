@@ -50,12 +50,14 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public void GetSavedSearchNames_DataInventory_000000_SearchNames()
+        public void GetSavedSearchOptions_DataInventory_000000_SavedSearchOptions()
         {
-            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+            Mock<IDatasetContext> datasetContext = mockRepository.Create<IDatasetContext>();
 
             SavedSearch savedSearch = new SavedSearch()
             {
+                SavedSearchId = 1,
                 SearchType = GlobalConstants.SearchType.DATA_INVENTORY,
                 SearchName = "SearchName",
                 AssociateId = "000000"
@@ -63,14 +65,21 @@ namespace Sentry.data.Infrastructure.Tests
 
             datasetContext.SetupGet(x => x.SavedSearches).Returns(new List<SavedSearch>() { savedSearch }.AsQueryable());
 
-            FilterSearchService service = new FilterSearchService(datasetContext.Object, null);
+            Mock<IUserFavoriteService> userFavoriteService = mockRepository.Create<IUserFavoriteService>();
+            userFavoriteService.Setup(x => x.GetUserFavoriteByEntity(1, "000000")).Returns(new UserFavorite());
 
-            List<string> result = service.GetSavedSearchNames(GlobalConstants.SearchType.DATA_INVENTORY, "000000");
+            FilterSearchService service = new FilterSearchService(datasetContext.Object, userFavoriteService.Object);
 
-            datasetContext.VerifyAll();
+            List<SavedSearchOptionDto> results = service.GetSavedSearchOptions(GlobalConstants.SearchType.DATA_INVENTORY, "000000");
 
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("SearchName", result.First());
+            mockRepository.VerifyAll();
+
+            Assert.AreEqual(1, results.Count);
+
+            SavedSearchOptionDto result = results.First();
+            Assert.AreEqual("SearchName", result.SavedSearchName);
+            Assert.AreEqual(1, result.SavedSearchId);
+            Assert.IsTrue(result.IsFavorite);
         }
 
         [TestMethod]
@@ -92,12 +101,7 @@ namespace Sentry.data.Infrastructure.Tests
             datasetContext.Setup(x => x.SaveChanges(true));
 
             Mock<IUserFavoriteService> userFavoriteService = mockRepository.Create<IUserFavoriteService>();
-            userFavoriteService.Setup(x => x.AddUserFavorite(It.IsAny<SavedSearch>(), "000000")).Callback<IFavorable, string>((savedSearch, userId) =>
-            {
-                Assert.AreEqual("000000", userId);
-                Assert.AreEqual(1, savedSearch.GetFavoriteEntityId());
-                Assert.AreEqual(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, savedSearch.GetFavoriteType());
-            });
+            userFavoriteService.Setup(x => x.AddUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, 1, "000000"));
 
             FilterSearchService service = new FilterSearchService(datasetContext.Object, userFavoriteService.Object);
 
