@@ -507,7 +507,7 @@ namespace Sentry.data.Web.Controllers
             return View("Configuration", model);
         }
 
-        [Route("Dataset/Detail/{datasetId}/SchemaSearch/{schemaId}/{search?}")]
+        [Route("Dataset/Detail/{datasetId}/SchemaSearch/{schemaId}")]
         [HttpPost]
         public JsonResult SchemaSearch(int datasetId, int schemaId, string search = null)
         {

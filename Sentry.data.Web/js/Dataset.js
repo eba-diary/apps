@@ -576,7 +576,7 @@ data.Dataset = {
 
         //If no data files exist, 1.) do not query table, 2.) do not show Data Preview section
         if (!self.vm.ShowDataFileTable()) {
-            showDataPreviewError();
+            data.Dataset.showDataPreviewError();
         }
         else
         {
@@ -646,7 +646,7 @@ data.Dataset = {
                         }
                     }
                     else {
-                        showDataPreviewError();
+                        data.Dataset.showDataPreviewError();
                         $('#dataSection').hide();
                     }
                 }
@@ -657,13 +657,13 @@ data.Dataset = {
                     $('#dataSection').hide();
                 }
 
-                showDataPreviewError();
+                data.Dataset.showDataPreviewError();
             },
             complete: function () {
                 $("#tab-spinner").hide();
             }
         }).fail(function () {
-            showDataPreviewError();
+            data.Dataset.showDataPreviewError();
         });
 
     },
@@ -2241,9 +2241,14 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
         $("#schemaSearchTable").DataTable({
             "ajax": {
-                "url": "/Dataset/Detail/" + datasetId + "/SchemaSearch/" + self.vm.SchemaId + "/",
+                "url": "/Dataset/Detail/" + datasetId + "/SchemaSearch/" + self.vm.SchemaId,
                 "type": "POST",
-                "dataSrc": ""
+                "dataSrc": "",
+                "data": function (d) {
+                    var searchObject = {};
+                    searchObject.search = $("#schemaSearchInput").val();
+                    return $.extend(d, searchObject)
+                }
             },
             "processing": true,
             "language": {
@@ -2265,10 +2270,9 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     UpdateSchemaSearchTab() {
-        var searchInput = $("#schemaSearchInput").val();
         var schemaSearchTable = $("#schemaSearchTable").DataTable();
         var datasetId = $('#RequestAccessButton').attr("data-id");
-        schemaSearchTable.ajax.url("/Dataset/Detail/" + datasetId + "/SchemaSearch/" + self.vm.SchemaId + "/" + searchInput).load();
+        schemaSearchTable.ajax.url("/Dataset/Detail/" + datasetId + "/SchemaSearch/" + self.vm.SchemaId).load();
     },
 
     tryUpdateSchemaSearchTab() {
