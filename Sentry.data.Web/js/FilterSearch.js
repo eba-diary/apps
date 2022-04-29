@@ -23,7 +23,7 @@
         this.loadSavedSearches(urlParams.get('savedSearch'));
     },
 
-    initEvents: function () {
+    initEvents: function () {        
         //open category options
         $(document).on("click", "[id^='categoryType_']", function (e) {
             e.preventDefault();
@@ -129,9 +129,11 @@
         });
 
         $(document).on("click", ".filter-search-save", function (e) {
+            $("#save-search-id").val('0');
             $("#save-search-name").val('');
             $(".save-search-name-label").removeClass('active');
             $("#save-search-favorite").prop('checked', false);
+            $("#save-search-name").removeClass("is-invalid");
         })
 
         //save search parameters
@@ -144,21 +146,66 @@
             $('.filter-search-save-search-modal-spinner').removeClass('display-none');
             
             var request = data.FilterSearch.buildSearchRequest();
+            request.Id = $("#save-search-id").val();
             request.SearchType = data.FilterSearch.searchType;
-            request.SearchName = $("#save-search-name").val();
+            request.SearchName = $.trim($("#save-search-name").val());
             request.AddToFavorites = $("#save-search-favorite").is(":checked");
 
-            $.post("/FilterSearch/SaveSearch", request, (x) => data.FilterSearch.completeSaveSearch(x, request.SearchName));
+            $.post("/FilterSearch/SaveSearch", request, (x) => data.FilterSearch.completeSaveSearch(x, request.SearchName)).
+                fail(() => data.FilterSearch.showToast("error", "There was an issue saving the search. Please try again or reach out to DSCSupport@sentry.com."));
         });
 
         $(document).on("click", ".saved-search-favorite", function (e) {
             e.stopPropagation();
 
-            data.Favorites.toggleFavorite(this, "SavedSearch", data.FilterSearch.showToast);
+            var id = this.id;
+            var element = this;
+            
+            $(element).addClass("display-none");
+            $("#favoriteSpinner_" + id).removeClass("display-none");
+            
+            data.Favorites.toggleFavorite(element, "SavedSearch", function () {
+                $(element).removeClass("display-none");
+                $("#favoriteSpinner_" + id).addClass("display-none");
+            }, data.FilterSearch.showToast);
         });
 
         $(document).on("click", ".saved-search-edit", function (e) {
-            console.log("edit");
+            var id = $(this).data("id")
+            
+            $("#save-search-id").val(id);            
+            $("#save-search-name").val($(this).data("name"));
+            $(".save-search-name-label").addClass('active');
+            $("#save-search-favorite").prop('checked', $("#" + id).hasClass("fas"));
+            
+            $("#filter-search-save-modal").modal("show");
+        });
+
+        $(document).on("click", ".saved-search-delete", function (e) {
+            e.stopPropagation();
+
+            var element = this;
+            var id = $(element).data("id");
+            
+            $(element).addClass("display-none");
+            $("#deleteSpinner_" + id).removeClass("display-none");
+            
+            $.ajax({
+                url: '/FilterSearch/RemoveSearch?savedSearchId=' + id,
+                type: 'DELETE',
+                success: function () {
+                    $("#saved_" + id).remove();
+
+                    if (!($(".saved-search-option-container").length)) {
+                        $(".saved-search-menu").append('<a class="dropdown-item disabled" href="#">No Saved Searches</a>')
+                    }
+                },
+                fail: function () {
+                    data.FilterSearch.showToast("error", "There was an issue deleting the saved search. Please try again or reach out to DSCSupport@sentry.com.")
+                    $(element).removeClass("display-none");
+                    $("#deleteSpinner_" + id).addClass("display-none");
+                }
+            });
         });
     },
 
@@ -300,30 +347,36 @@
             params += "&activeSearchName=" + encodeURIComponent(activeSearchName);
         }
         
-        $('.filter-search-save-search-container').load("/FilterSearch/SavedSearches?" + params, data.FilterSearch.completeSaveSearchModal);
+        $('.filter-search-save-search-container').load("/FilterSearch/SavedSearches?" + params, data.FilterSearch.closeSaveSearchModal);
     },
 
     completeSaveSearch: function (result, searchName) {
         
-        if (result.Result === "Failure") {
-            data.FilterSearch.showToast("error", "There was an issue saving your search. Please try again or reach out to DSCSupport@sentry.com.")
+        if (result.Result === "Exists") {
+            $("#save-search-name").addClass("is-invalid");
+            data.FilterSearch.completeSaveSearchModal();
         }
         else {
-            data.FilterSearch.completeSaveSearchModal();
+            data.FilterSearch.closeSaveSearchModal();
             data.FilterSearch.loadSavedSearches(searchName);
+            data.FilterSearch.search();
 
             if (result.Result === "New") {
-                data.FilterSearch.showToast("success", "The search '" + searchName + "' has been saved.")
+                data.FilterSearch.showToast("success", "'" + searchName + "' has been saved.")
             }
             else if (result.Result === "Update") {
-                data.FilterSearch.showToast("success", "The saved search '" + searchName + "' already existed and has been updated.")
+                data.FilterSearch.showToast("success", "'" + searchName + "' has been updated.")
             }
         }
     },
 
-    completeSaveSearchModal: function () {
+    closeSaveSearchModal: function () {
         $("#filter-search-save-modal").modal("hide");
+        data.FilterSearch.completeSaveSearchModal();
+    },
 
+    completeSaveSearchModal: function () {
+        
         $('#save-search').removeClass('disabled');
         $('#cancel-save-search').removeClass('display-none');
         $('.filter-search-save-search-modal-text').removeClass('display-none');

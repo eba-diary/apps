@@ -1,5 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Nest;
+using Newtonsoft.Json;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,48 +21,110 @@ namespace Sentry.data.Infrastructure
 
         public SavedSearchDto GetSavedSearch(string searchType, string savedSearchName, string associateId)
         {
-            SavedSearch savedSearch = _datasetContext.SavedSearches.FirstOrDefault(s => s.SearchType == searchType && s.SearchName == savedSearchName && s.AssociateId == associateId);
-            return savedSearch?.ToDto();
+            try
+            {
+                SavedSearch savedSearch = _datasetContext.SavedSearches.FirstOrDefault(s => s.SearchType == searchType && s.SearchName == savedSearchName && s.AssociateId == associateId);
+                return savedSearch?.ToDto();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error retrieving Saved Search of type {searchType} named {savedSearchName} for {associateId}", ex);
+                throw;
+            }
         }
 
         public List<SavedSearchOptionDto> GetSavedSearchOptions(string searchType, string associateId)
         {
-            List<SavedSearchOptionDto> savedSearchOptions = new List<SavedSearchOptionDto>();
-            
-            List<SavedSearch> savedSearches = _datasetContext.SavedSearches.Where(s => s.SearchType == searchType && s.AssociateId == associateId).ToList();
-
-            foreach (SavedSearch savedSearch in savedSearches)
+            try
             {
-                savedSearchOptions.Add(new SavedSearchOptionDto()
-                {
-                    SavedSearchId = savedSearch.SavedSearchId,
-                    SavedSearchName = savedSearch.SearchName,
-                    IsFavorite = _userFavoriteService.GetUserFavoriteByEntity(savedSearch.SavedSearchId, associateId) != null
-                });
-            }
+                List<SavedSearchOptionDto> savedSearchOptions = new List<SavedSearchOptionDto>();
 
-            return savedSearchOptions;
+                List<SavedSearch> savedSearches = _datasetContext.SavedSearches.Where(s => s.SearchType == searchType && s.AssociateId == associateId).ToList();
+
+                foreach (SavedSearch savedSearch in savedSearches)
+                {
+                    savedSearchOptions.Add(new SavedSearchOptionDto()
+                    {
+                        SavedSearchId = savedSearch.SavedSearchId,
+                        SavedSearchName = savedSearch.SearchName,
+                        IsFavorite = _userFavoriteService.GetUserFavoriteByEntity(savedSearch.SavedSearchId, associateId) != null
+                    });
+                }
+
+                return savedSearchOptions;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error retrieving Saved Search Options of type {searchType} for {associateId}", ex);
+                throw;
+            }
+        }
+
+        public void RemoveSavedSearch(int savedSearchId, string associateId)
+        {
+            try
+            {
+                SavedSearch savedSearch = _datasetContext.SavedSearches.FirstOrDefault(s => s.SavedSearchId == savedSearchId && s.AssociateId == associateId);
+
+                if (savedSearch != null)
+                {
+                    Logger.Info($"Found Saved Search {savedSearchId} to remove for user {associateId}");
+                    _datasetContext.Remove(savedSearch);
+                    _datasetContext.SaveChanges();
+
+                    _userFavoriteService.RemoveUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, savedSearchId, associateId);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error removing Saved Search {savedSearchId} for {associateId}", ex);
+                throw;
+            }
         }
 
         public string SaveSearch(SavedSearchDto savedSearchDto)
         {
-            string result;
-            SavedSearch savedSearch = _datasetContext.SavedSearches.FirstOrDefault(s => s.SearchType == savedSearchDto.SearchType && s.SearchName == savedSearchDto.SearchName && s.AssociateId == savedSearchDto.AssociateId);
-            
-            if (savedSearch != null)
+            try
             {
-                //update existing
-                savedSearch.SearchText = savedSearchDto.SearchText;
-                savedSearch.FilterCategoriesJson = savedSearchDto.FilterCategories != null ? JsonConvert.SerializeObject(savedSearchDto.FilterCategories) : null;
-                result = GlobalConstants.SaveSearchResults.UPDATE;
+                return savedSearchDto.SavedSearchId == 0 ? SaveNewSearch(savedSearchDto) : UpdateSavedSearch(savedSearchDto);
             }
-            else
+            catch (Exception ex)
             {
-                //create new
+                Logger.Error("Error Saving Search", ex);
+                throw;
+            }
+        }
+
+        #region Methods
+        private string SaveNewSearch(SavedSearchDto savedSearchDto)
+        {            
+            //check if saved search already exists
+            SavedSearch savedSearch = _datasetContext.SavedSearches.FirstOrDefault(s => s.SearchType == savedSearchDto.SearchType && s.SearchName == savedSearchDto.SearchName && s.AssociateId == savedSearchDto.AssociateId);
+
+            if (savedSearch == null)
+            {
                 savedSearch = savedSearchDto.ToEntity();
                 _datasetContext.Add(savedSearch);
-                result = GlobalConstants.SaveSearchResults.NEW;
+                _datasetContext.SaveChanges();
+
+                if (savedSearchDto.AddToFavorites)
+                {
+                    _userFavoriteService.AddUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, savedSearch.SavedSearchId, savedSearchDto.AssociateId);
+                }
+
+                return GlobalConstants.SaveSearchResults.NEW;
             }
+            
+            return GlobalConstants.SaveSearchResults.EXISTS;
+        }
+
+        private string UpdateSavedSearch(SavedSearchDto savedSearchDto)
+        {
+            SavedSearch savedSearch = _datasetContext.SavedSearches.FirstOrDefault(s => s.SavedSearchId == savedSearchDto.SavedSearchId);
+            
+            savedSearch.SearchName = savedSearchDto.SearchName;
+            savedSearch.SearchText = savedSearchDto.SearchText;
+            savedSearch.FilterCategoriesJson = savedSearchDto.FilterCategories != null ? JsonConvert.SerializeObject(savedSearchDto.FilterCategories) : null;
 
             _datasetContext.SaveChanges();
 
@@ -67,8 +132,13 @@ namespace Sentry.data.Infrastructure
             {
                 _userFavoriteService.AddUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, savedSearch.SavedSearchId, savedSearchDto.AssociateId);
             }
-
-            return result;
+            else
+            {
+                _userFavoriteService.RemoveUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, savedSearch.SavedSearchId, savedSearchDto.AssociateId);
+            }
+            
+            return GlobalConstants.SaveSearchResults.UPDATE;
         }
+        #endregion
     }
 }

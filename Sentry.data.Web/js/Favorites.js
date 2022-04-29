@@ -112,17 +112,27 @@ data.Favorites = {
         $("#spinner-wrapper").removeClass("hidden");
     },
 
-    toggleFavorite: function (element, type, toastFunction) {
+    toggleFavorite: function (element, type, successFunction, toastFunction) {
+
+        var path;
         
-        if ($(element).hasClass("fas")) {
-            $.post("/Favorites/AddFavorite", { favoriteType: type, entityId: this.id }, function () {
-                $(element).toggleClass("fas far");
-            }).fail(function () {
-                toastFunction("error", "There was an issue adding the saved search as a favorite. Please try again or reach out to DSCSupport@sentry.com.")
-            });
+        if ($(element).hasClass("far")) {
+            path = "/Favorites/AddFavorite";
         }
         else {
-            console.log("remove favorite");
+            path = "/Favorites/RemoveFavorite";
         }
+
+        var request = {
+            favoriteType: type,
+            entityId: element.id
+        };
+
+        $.post(path, request, function () {
+            $(element).toggleClass("fas far");
+            successFunction();
+        }).fail(function () {
+            toastFunction("error", "There was an issue setting favorite for the saved search. Please try again or reach out to DSCSupport@sentry.com.")
+        });
     }
 };

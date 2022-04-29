@@ -18,6 +18,7 @@ namespace Sentry.data.Web
         {
             SavedSearchDto dto = new SavedSearchDto()
             {
+                SavedSearchId = model.Id,
                 SearchType = model.SearchType,
                 SearchName = model.SearchName,
                 AddToFavorites = model.AddToFavorites

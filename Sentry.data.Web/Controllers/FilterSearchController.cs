@@ -46,20 +46,19 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public JsonResult SaveSearch(SaveSearchModel searchModel)
         {
-            try
-            {
-                SavedSearchDto savedSearchDto = searchModel.ToDto();
-                savedSearchDto.AssociateId = SharedContext.CurrentUser.AssociateId;
-                
-                string result = _filterSearchService.SaveSearch(savedSearchDto);
+            SavedSearchDto savedSearchDto = searchModel.ToDto();
+            savedSearchDto.AssociateId = SharedContext.CurrentUser.AssociateId;
 
-                return Json(new { Result = result });
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error saving search", ex);
-                return Json(new { Result = "Failure" });
-            }
+            string result = _filterSearchService.SaveSearch(savedSearchDto);
+
+            return Json(new { Result = result });
+        }
+
+        [HttpDelete]
+        public JsonResult RemoveSearch(int savedSearchId)
+        {
+            _filterSearchService.RemoveSavedSearch(savedSearchId, SharedContext.CurrentUser.AssociateId);
+            return Json(new { Success = true });
         }
     }
 }

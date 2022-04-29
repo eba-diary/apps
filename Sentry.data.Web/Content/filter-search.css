@@ -28,15 +28,26 @@
     margin-left: auto;
     margin-right: auto;
     display: flex;
-    align-items: flex-start;
+    align-items: flex-end;
 }
 
 .filter-search-box {
     width: 50em;
+    margin-top: 0;
+    margin-bottom: 0.375rem;
 }
 
 .filter-search-save {
     padding: 0 1em !important;
+    font-size: 1rem;
+}
+
+.filter-search-save-dropdown {
+    height: 2.5rem;
+    padding-top: 0;
+    padding-bottom: 0;
+    display: flex;
+    align-items: center;
 }
 
 .saved-search-option-container {
@@ -44,9 +55,28 @@
     align-items: center;
 }
 
+.saved-search-option-name {
+    padding-left: 1rem;
+    padding-right: 0.5rem;
+}
+
 .saved-search-option-icon {
     padding: 0.5rem;
     color: #003DA5 !important;
+}
+.saved-search-delete {
+    color: #B3140B !important;
+    margin-right: 0.5rem;
+}
+
+.saved-search-option-spinner {
+    padding: 0.35rem;
+    margin: 0 0.5rem;
+    color: #003DA5 !important;
+}
+
+[id^=deleteSpinner_] {
+    margin-right: 1rem;
 }
 
 .filter-search-body {

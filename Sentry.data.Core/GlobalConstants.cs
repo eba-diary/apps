@@ -435,6 +435,7 @@
         public static class SaveSearchResults
         {
             public const string NEW = "New";
+            public const string EXISTS = "Exists";
             public const string UPDATE = "Update";
         }
     }
