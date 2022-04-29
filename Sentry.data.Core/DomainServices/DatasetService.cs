@@ -594,7 +594,6 @@ namespace Sentry.data.Core
             dto.IsFavorite = ds.Favorities.Any(w => w.UserId == user.AssociateId);
             dto.DatasetFileConfigNames = ds.DatasetFileConfigs.Where(w => w.DeleteInd == false).ToDictionary(x => x.ConfigId.ToString(), y => y.Name);
             dto.DatasetScopeTypeNames = ds.DatasetScopeType.ToDictionary(x => x.Name, y => y.Description);
-            dto.DistinctFileExtensions = ds.DatasetFiles.Select(x => Path.GetExtension(x.FileName).TrimStart('.').ToLower()).Distinct().ToList();
             dto.DatasetFileCount = ds.DatasetFiles.Count();
             dto.OriginationCode = ds.OriginationCode;
             dto.DataClassificationDescription = ds.DataClassification.GetDescription();
