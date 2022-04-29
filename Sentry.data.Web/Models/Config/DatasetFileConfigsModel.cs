@@ -113,7 +113,7 @@ namespace Sentry.data.Web
             get
             {
                 string href = null;
-                href = $"<a href=\"Config\\Dataset\\{DatasetId}\\Edit\\{ConfigId}\" class=\"table-row-icon\" title=\"Edit Config File\"><i class='glyphicon glyphicon-edit text-primary'></i></a>";
+                href = $"<a href=\"Config\\Dataset\\{DatasetId}\\Edit\\{ConfigId}\" class=\"table-row-icon\" title=\"Edit Config File\"><em class='far fa-edit text-primary'></em></a>";
                 return href;
             }
         }

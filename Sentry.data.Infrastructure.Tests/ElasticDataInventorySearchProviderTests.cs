@@ -145,7 +145,7 @@ namespace Sentry.data.Infrastructure.Tests
                         {
                             new FilterCategoryOptionDto()
                             {
-                                OptionValue = "P",
+                                OptionValue = FilterCategoryOptions.ENVIRONMENT_PROD,
                                 ParentCategoryName = FilterCategoryNames.ENVIRONMENT,
                                 Selected = true
                             }
@@ -169,13 +169,13 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(2, category.CategoryOptions.Count);
 
             FilterCategoryOptionDto option = category.CategoryOptions.First();
-            Assert.AreEqual("P", option.OptionValue);
+            Assert.AreEqual(FilterCategoryOptions.ENVIRONMENT_PROD, option.OptionValue);
             Assert.AreEqual(5, option.ResultCount);
             Assert.IsTrue(option.Selected);
             Assert.AreEqual(FilterCategoryNames.ENVIRONMENT, option.ParentCategoryName);
 
             option = category.CategoryOptions.Last();
-            Assert.AreEqual("D", option.OptionValue);
+            Assert.AreEqual(FilterCategoryOptions.ENVIRONMENT_NONPROD, option.OptionValue);
             Assert.AreEqual(3, option.ResultCount);
             Assert.IsFalse(option.Selected);
             Assert.AreEqual(FilterCategoryNames.ENVIRONMENT, option.ParentCategoryName);
@@ -217,13 +217,13 @@ namespace Sentry.data.Infrastructure.Tests
                         {
                             new FilterCategoryOptionDto()
                             {
-                                OptionValue = "P",
+                                OptionValue = FilterCategoryOptions.ENVIRONMENT_PROD,
                                 ParentCategoryName = FilterCategoryNames.ENVIRONMENT,
                                 Selected = true
                             },
                             new FilterCategoryOptionDto()
                             {
-                                OptionValue = "D",
+                                OptionValue = FilterCategoryOptions.ENVIRONMENT_NONPROD,
                                 ParentCategoryName = FilterCategoryNames.ENVIRONMENT,
                                 Selected = true
                             }
@@ -483,7 +483,7 @@ namespace Sentry.data.Infrastructure.Tests
                         TypeDescription = "Table",
                         ColumnName = "column_nme",
                         IsSensitive = false,
-                        ProdType = "P",
+                        ProdType = FilterCategoryOptions.ENVIRONMENT_PROD,
                         ColumnType = "Type",
                         MaxLength = 100,
                         Precision = 7,
@@ -515,7 +515,7 @@ namespace Sentry.data.Infrastructure.Tests
                         TypeDescription = "Table",
                         ColumnName = "column_nme",
                         IsSensitive = false,
-                        ProdType = "P",
+                        ProdType = FilterCategoryOptions.ENVIRONMENT_PROD,
                         ColumnType = "Type",
                         MaxLength = 100,
                         Precision = 7,
@@ -537,7 +537,7 @@ namespace Sentry.data.Infrastructure.Tests
                         TypeDescription = "Table2",
                         ColumnName = "column_nme2",
                         IsSensitive = true,
-                        ProdType = "P",
+                        ProdType = FilterCategoryOptions.ENVIRONMENT_PROD,
                         ColumnType = "Type",
                         MaxLength = 10,
                         Precision = 0,
@@ -567,12 +567,12 @@ namespace Sentry.data.Infrastructure.Tests
                             new KeyedBucket<object>(new Dictionary<string, IAggregate>())
                             {
                                 DocCount = 5,
-                                Key = "P"
+                                Key = FilterCategoryOptions.ENVIRONMENT_PROD
                             },
                             new KeyedBucket<object>(new Dictionary<string, IAggregate>())
                             {
                                 DocCount = 3,
-                                Key = "D"
+                                Key = FilterCategoryOptions.ENVIRONMENT_NONPROD
                             }
                         }.AsReadOnly()
                     },

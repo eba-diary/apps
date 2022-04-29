@@ -1,8 +1,8 @@
 ﻿@using Sentry.data.Core
 
-<table class="table table-striped table-bordered blue" id="di-result-table" aria-labelledby="Data Inventory search results">
+<table class="table table-striped table-bordered table-hover nowrap dataTable no-footer w-100" id="di-result-table" aria-labelledby="Data Inventory search results">
     <thead>
-        <tr class="table-header_blue categoryBanner-blue">
+        <tr>
             <th scope="col">@GlobalConstants.FilterCategoryNames.ASSET</th>
             <th scope="col">@GlobalConstants.FilterCategoryNames.SERVER</th>
             <th scope="col">@GlobalConstants.FilterCategoryNames.DATABASE</th>
@@ -26,7 +26,7 @@
 </table>
 
 <div class="di-update-overlay display-none">
-    <div class="di-sentry-spinner">
-        <span class="sentry-spinner"></span>
+    <div class="progress md-progress sentry-dark-blue di-sentry-progress">
+        <div class="indeterminate"></div>
     </div>
 </div>

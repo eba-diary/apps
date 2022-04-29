@@ -3,26 +3,6 @@
     margin-right: 100px; 
 }
 
-/*these are added so dale datatable can find sorting images, future move these where all datatables can find*/
-table.dataTable thead .sorting {
-    background: url('/Content/DataTables/images/sort_both.png') no-repeat center right;
-}
-
-table.dataTable thead .sorting_asc {
-    background: url('/Content/DataTables/images/sort_asc.png') no-repeat center right;
-}
-
-table.dataTable thead .sorting_desc {
-    background: url('/Content/DataTables/images/sort_desc.png') no-repeat center right;
-}
-
-table.dataTable thead .sorting_asc_disabled {
-    background: url('/Content/DataTables/images/sort_asc_disabled.png') no-repeat center right;
-}
-
-table.dataTable thead .sorting_desc_disabled {
-    background: url('/Content/DataTables/images/sort_desc_disabled.png') no-repeat center right;
-}
 
 /*used to disable controls on screen while search in progress*/
 .dale-disable-stuff{

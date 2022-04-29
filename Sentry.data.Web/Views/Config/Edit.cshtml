@@ -4,228 +4,186 @@
 }
 
 <div>
-    <a class="backToList" href="/Config/Dataset/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>Back to Dataset Configuration</a>
+    <a class="backToList" href="/Config/Dataset/@Model.DatasetId"><em class="fas fa-chevron-left pr-3"></em>Back to Dataset Configuration</a>
 </div>
 
 
-<h4>Schema Configuration Metadata</h4>
-<br />
+<h4 class="pt-3">Schema Configuration Metadata</h4>
 
 @{using (Html.BeginForm("DatasetFileConfigForm", "Config", FormMethod.Post))
-{
+    {
         @Html.AntiForgeryToken()
 
-        <style>
-        </style>
+        @Html.DisplayFor((model) => ViewData.ModelState)
 
-        <div class="form-horizontal">
-            @Html.DisplayFor((model) => ViewData.ModelState)
+        @Html.HiddenFor(model => model.ConfigId, new { @name = "configId" })
+        @Html.HiddenFor(model => model.ConfigFileName)
+        @Html.HiddenFor(model => model.DatasetId)
+        @Html.HiddenFor(model => model.SchemaId)
+        @Html.HiddenFor(model => model.ParquetStorageBucket)
+        @Html.HiddenFor(model => model.ParquetStoragePrefix)
 
-            @Html.HiddenFor(model => model.ConfigId, new { @name = "configId" })
-            @Html.HiddenFor(model => model.ConfigFileName)
-            @Html.HiddenFor(model => model.DatasetId)
-            @Html.HiddenFor(model => model.SchemaId)
-            @Html.HiddenFor(model => model.ParquetStorageBucket)
-            @Html.HiddenFor(model => model.ParquetStoragePrefix)
+        <div class="md-form">
+            @Html.EditorFor(m => m.ConfigFileName, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
+            @Html.LabelFor(m => m.ConfigFileName, htmlAttributes: new { @class = "control-label" })
+        </div>
 
-            <div class="form-group">
-                @Html.LabelFor(m => m.ConfigFileName, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-sm-4">
-                    @Html.DisplayFor(m => m.ConfigFileName, new { htmlAttributes = new { @class = "from-control-static" } })
-                </div>
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(m => m.ConfigFileDesc, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-sm-9">
-                    @Html.TextAreaFor(m => m.ConfigFileDesc, new { @class = "form-control ConfigFileDesc" })
-                </div>
-            </div>
+        <div class="md-form">
+            @Html.TextAreaFor(m => m.ConfigFileDesc, new { @class = "md-textarea form-control" })
+            @Html.LabelFor(m => m.ConfigFileDesc, htmlAttributes: new { @class = "disabled" })
+        </div>
 
-            <div class="form-group">
-                @Html.LabelFor(model => model.FileType, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-sm-4">
-                    @if (Model.Security.ShowAdminControls)
-                    {
-                        @Html.DropDownListFor((model) => model.FileType, Model.AllDataFileTypes, new { @class = "form-control" })
-                    }
-                    else
-                    {
-                        @Html.HiddenFor(model => model.FileTypeId)
-                        @Html.DropDownListFor(model => model.FileType, new SelectList(Model.AllDataFileTypes, "Text", "Text", Model.FileType), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control " })
-
-                    }
-                </div>
-            </div>
+        <div class="md-form">
+            @Html.LabelFor(model => model.FileType, htmlAttributes: new { @class = "mdb-main-label" })
             @if (Model.Security.ShowAdminControls)
             {
-                <div class="form-group">
-                    @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-sm-4">
-                        @Html.DropDownListFor(model => model.DatasetScopeTypeID,
-                   new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new { @class = "form-control" })
-                    </div>
-                </div>
+                @Html.DropDownListFor((model) => model.FileType, Model.AllDataFileTypes, new { @class = "mdb-select" })
             }
             else
             {
-                @Html.HiddenFor(model => model.DatasetScopeTypeID)
-                <div class="form-group">
-                    @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-sm-4">
-                        @Html.DropDownListFor(model => model.DatasetScopeTypeID,
-                   new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
-                    </div>
-                </div>
+                @Html.HiddenFor(model => model.FileTypeId)
+                @Html.DropDownListFor(model => model.FileType, new SelectList(Model.AllDataFileTypes, "Text", "Text", Model.FileType), new { @disabled = "disabled", @readonly = "readonly", @class = "mdb-select" })
             }
-
-            <div class="form-group DatasetScopeTypeDescription">
-                <label class="control-label col-md-2"></label>
-                <div class="col-md-10">
-                    <span class="text-muted">
-                    </span>
-                </div>
+        </div>
+        if (Model.Security.ShowAdminControls)
+        {
+            <div class="md-form pb-0">
+                @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "mdb-main-label" })
+                @Html.DropDownListFor(model => model.DatasetScopeTypeID,
+           new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new { @class = "mdb-select" })
             </div>
-            <div class="form-group">
-                @if (Model.Security.ShowAdminControls)
-                {
-                    @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
-                    <div class="col-md-2">
-                        @Html.DropDownListFor(model => model.FileExtensionID,
-                    new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @class = "form-control" })
-                    </div>
-                }
-                else
-                {
-                    @Html.HiddenFor(model => model.FileExtensionID)
-
-                    @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
-                    <div class="col-md-2">
-                        @Html.DropDownListFor(model => model.FileExtensionID,
-                    new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
-                    </div>
-                }
-                <div class="schemaRootPathPanel">
-                    @if (Model.Security.ShowAdminControls)
-                    {
-                        @Html.LabelFor((model) => model.SchemaRootPath, new { @class = "control-label col-md-2 optional" })
-                        <div class="col-md-4">
-                            @Html.TextBoxFor(model => model.SchemaRootPath, new { @class = "form-control edit-dataset-row" })
-                        </div>
-                    }
-                    else
-                    {
-                        @Html.HiddenFor(model => model.SchemaRootPath)
-                        @Html.LabelFor((model) => model.SchemaRootPath, new { @class = "control-label col-md-2 optional" })
-                        <div class="col-md-4">
-                            @Html.TextBoxFor(model => model.SchemaRootPath, new { @disabled = "disabled", @readonly = "readonly", @class = "form-control edit-dataset-row" })
-                        </div>
-                    }
-
-                    <div class="col-md-5 col-md-offset-6">
-                        <span class="text-muted">Specify schema root element path (<a href="@Sentry.data.Core.GlobalConstants.DocumentationLinks.SCHEMA_ROOT_PATH_USAGE" target="_blank">usage documentation</a>)</span>
-                    </div>
-                </div>
-
-                <div class="delimiterPanel">
-                    <div class="form-group delimiter">
-                        @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
-                        <div class="col-md-4">
-                            @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
-                            @Html.ValidationMessageFor( model => model.Delimiter, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-
-                    <div class="col-md-5 col-md-offset-6">
-                        <span class="text-muted">
-                            <em id="fileTypeInfo"></em>The character or set of characters used to delimit a file.
-                            <br />Common delimiters include; tab (\t), pipe (|), tilda (~).
-                            <br />Note: If your file is comma (,) delimited please choose the CSV file extension option. 
-                        </span>
-                    </div>
-                </div>
+        }
+        else
+        {
+            <div class="md-form pb-0">
+                @Html.HiddenFor(model => model.DatasetScopeTypeID)
+                @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "mdb-main-label" })
+                @Html.DropDownListFor(model => model.DatasetScopeTypeID,
+                    new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new { @disabled = "disabled", @readonly = "readonly", @class = "mdb-select" })
             </div>
+        }
 
-
-
-
-            <div class="form-group fileHasHeader">
-                @Html.LabelFor((model) => model.HasHeader, new { @class = "control-label col-md-2 optional" })
-                <div class="col-md-10">
-                    @Html.CheckBoxFor((model) => model.HasHeader, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                </div>
-            </div>
-
-            <div class="form-group">
-                @Html.LabelFor(model => model.CreateCurrentView, new { @class = "control-label col-md-2 optional" })
-                <div class="col-md-1">
-                    @Html.CheckBoxFor(model => model.CreateCurrentView, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                </div>
-                @Html.Label("A view will be created filtering to data within latest file loaded into this schema", new { @class = "control-label col-md-9 optional text-muted", @style = "text-align: left" })
-            </div>
-
+        <div class="form-group DatasetScopeTypeDescription">
+            <label class="control-label"></label>
+            <span class="text-muted"></span>
+        </div>
+        <div class="md-form">
             @if (Model.Security.ShowAdminControls)
             {
-                <div class="adminContainer">
-                    <strong><p style="color:red">This section is visible to Admins only</p></strong>
-                    <div class="form-group">
-                        @Html.LabelFor((model) => model.CLA1396_NewEtlColumns, new { @class = "control-label col-md-2 optional" })
-                        <div class="col-md-1">
-                            @Html.CheckBoxFor(model => model.CLA1396_NewEtlColumns, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                        </div>
-                        @Html.Label("Will trigger new ETL columns in consumption layer after syncing", new { @class = "control-label col-md-6 optional text-muted", @style = "text-align: left" })
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor((model) => model.CLA1580_StructureHive, new { @class = "control-label col-md-2 optional" })
-                        <div class="col-md-1">
-                            @Html.CheckBoxFor(model => model.CLA1580_StructureHive, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                        </div>
-                        @Html.Label("Will allow JSON structures to be created in parquet vs using string based datatypes", new { @class = "control-label col-md-6 optional text-muted", @style = "text-align: left" })
-                    </div>
+                @Html.LabelFor((model) => model.FileExtensionID, new { @class = "mdb-main-label" })
+                @Html.DropDownListFor(model => model.FileExtensionID,
+                    new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @class = "mdb-select" })
+            }
+            else
+            {
+                @Html.HiddenFor(model => model.FileExtensionID)
 
-                    <div class="form-group">
-                        @Html.LabelFor((model) => model.CLA2472_EMRSend, new { @class = "control-label col-md-2 optional" })
-                        <div class="col-md-1">
-                            @Html.CheckBoxFor(model => model.CLA2472_EMRSend, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                        </div>
-                        @Html.Label("Send data to EMR", new { @class = "control-label col-md-6 optional text-muted", @style = "text-align: left" })
-                    </div>
-
-                    <div class="form-group">
-                        @Html.LabelFor((model) => model.CLA1286_KafkaFlag, new { @class = "control-label col-md-2 optional" })
-                        <div class="col-md-1">
-                            @Html.CheckBoxFor(model => model.CLA1286_KafkaFlag, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                        </div>
-                        @Html.Label("Kafka Flag", new { @class = "control-label col-md-6 optional text-muted", @style = "text-align: left" })
-                    </div>
-
-                    <div class="form-group">
-                        @Html.LabelFor((model) => model.CLA3014_LoadDataToSnowflake, new { @class = "control-label col-md-2 optional" })
-                        <div class="col-md-1">
-                            @Html.CheckBoxFor(model => model.CLA3014_LoadDataToSnowflake, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                        </div>
-                        @Html.Label("Kafka Flag", new { @class = "control-label col-md-6 optional text-muted", @style = "text-align: left" })
-                    </div>
-                </div>
+                @Html.LabelFor((model) => model.FileExtensionID, new { @class = "mdb-main-label" })
+                @Html.DropDownListFor(model => model.FileExtensionID,
+                    new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @disabled = "disabled", @readonly = "readonly", @class = "mdb-select" })
+            }
+        </div>
+        <div class="schemaRootPathPanel md-form">
+            @if (Model.Security.ShowAdminControls)
+            {
+                @Html.LabelFor((model) => model.SchemaRootPath, new { @class = "control-label optional" })
+                @Html.TextBoxFor(model => model.SchemaRootPath, new { @class = "form-control" })
+            }
+            else
+            {
+                @Html.HiddenFor(model => model.SchemaRootPath)
+                @Html.LabelFor((model) => model.SchemaRootPath, new { @class = "control-label optional" })
+                @Html.TextBoxFor(model => model.SchemaRootPath, new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
             }
 
-            <hr />
-            <div class="form-group">
-                <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
+            <span class="text-muted">Specify schema root element path (<a href="@Sentry.data.Core.GlobalConstants.DocumentationLinks.SCHEMA_ROOT_PATH_USAGE" target="_blank">usage documentation</a>)</span>
+        </div>
+
+        <div class="delimiterPanel">
+            <div class="md-form delimiter">
+                @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label optional" })
+                @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Delimiter, "", new { @class = "text-danger" })
             </div>
-            <div class="form-group">
-                <div>
-                    <input type="submit" value="Save" class="btn btn-primary" />
-                    <a class="btn btn-warning" href="/Config/Dataset/@Model.DatasetId">Cancel</a>
-                </div>
+
+            <div class="col-md-5 col-md-offset-6">
+                <span class="text-muted">
+                    <em id="fileTypeInfo"></em>The character or set of characters used to delimit a file.
+                    <br />Common delimiters include; tab (\t), pipe (|), tilda (~).
+                    <br />Note: If your file is comma (,) delimited please choose the CSV file extension option. 
+                </span>
             </div>
         </div>
-        }
+
+
+
+
+        <div class="form-check">
+            <input type="checkbox" value="true" class="form-check-input" id="HasHeader" name="HasHeader" checked="@Model.HasHeader">
+            @Html.LabelFor((model) => model.HasHeader, new { @class = "form-check-label" })
+            @Html.Label("Do incoming files contain a header row?", new { @class = "text-muted" })
+        </div>
+
+        <div class="form-check">
+            <input type="checkbox" value="true" class="form-check-input" id="CreateCurrentView" name="CreateCurrentView" checked="@Model.CreateCurrentView">
+            @Html.LabelFor((model) => model.CreateCurrentView, new { @class = "form-check-label" })
+            @Html.Label("A view will be created filtering to data within latest file loaded into this schema", new { @class = "text-muted" })
+        </div>
+
+        if (Model.Security.ShowAdminControls)
+        {
+            <div class="adminContainer">
+                <strong><p style="color:red">This section is visible to Admins only</p></strong>
+
+                <div class="form-check">
+                    <input type="checkbox" value="true" class="form-check-input" id="CLA1396_NewEtlColumns" name="CLA1396_NewEtlColumns" checked="@Model.CLA1396_NewEtlColumns">
+                    @Html.LabelFor((model) => model.CLA1396_NewEtlColumns, new { @class = "form-check-label" })
+                    @Html.Label("Will trigger new ETL columns in consumption layer after syncing", new { @class = "text-muted" })
+                </div>
+
+                <div class="form-check">
+                    <input type="checkbox" value="true" class="form-check-input" id="CLA1580_StructureHive" name="CLA1580_StructureHive" checked="@Model.CLA1580_StructureHive">
+                    @Html.LabelFor((model) => model.CLA1580_StructureHive, new { @class = "form-check-label" })
+                    @Html.Label("Will allow JSON structures to be created in parquet vs using string based datatypes", new { @class = "text-muted" })
+                </div>
+
+                <div class="form-check">
+                    <input type="checkbox" value="true" class="form-check-input" id="CLA2472_EMRSend" name="CLA2472_EMRSend" checked="@Model.CLA2472_EMRSend">
+                    @Html.LabelFor((model) => model.CLA2472_EMRSend, new { @class = "form-check-label" })
+                    @Html.Label("Send data to EMR", new { @class = "text-muted" })
+                </div>
+
+                <div class="form-check">
+                    <input type="checkbox" value="true" class="form-check-input" id="CLA1286_KafkaFlag" name="CLA1286_KafkaFlag" checked="@Model.CLA1286_KafkaFlag">
+                    @Html.LabelFor((model) => model.CLA1286_KafkaFlag, new { @class = "form-check-label" })
+                    @Html.Label("Kafka Flag", new { @class = "text-muted" })
+                </div>
+
+                <div class="form-check">
+                    <input type="checkbox" value="true" class="form-check-input" id="CLA3014_LoadDataToSnowflake" name="CLA3014_LoadDataToSnowflake" checked="@Model.CLA3014_LoadDataToSnowflake"} >
+                    @Html.LabelFor((model) => model.CLA3014_LoadDataToSnowflake, new { @class = "form-check-label" })
+                    @Html.Label("Kafka Flag", new { @class = "text-muted" })
+                </div>
+            </div>
         }
 
-        @section Scripts {
-            <script>
-                $(function () {
-                    data.Config.CreateInit();
-                });
-            </script>
-        }
+        <hr />
+        <div class="form-group">
+            <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
+        </div>
+        <div class="form-group">
+            <div>
+                <input type="submit" value="Save" class="btn btn-primary" />
+                <a class="btn btn-warning" href="/Config/Dataset/@Model.DatasetId">Cancel</a>
+            </div>
+        </div>
+    }
+}
+
+@section Scripts {
+    <script>
+        $(function () {
+            data.Config.CreateInit();
+        });
+    </script>
+}

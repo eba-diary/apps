@@ -4,29 +4,31 @@
     @foreach (FilterCategoryModel category in Model.Where(x => x.CategoryOptions.Count > 15).ToList())
     {
         <div class="modal fade" id="categoryModal_@category.CategoryName.Replace(" ", "_").Replace("/", "_")">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-lg filter-search-category-modal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
                         <h4 class="modal-title">@category.CategoryName</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
                     <div class="modal-body filter-search-modal-body">
                         <ul class="list-unstyled">
                             @foreach (FilterCategoryOptionModel option in category.CategoryOptions.OrderBy(x => x.OptionValue).ToList())
                             {
                                 <li class="filter-search-category-option filter-search-modal-option" title="@option.OptionValue">
-                                    <label>
-                                        <input type="checkbox" class="filter-search-category-option-checkbox" id="modal_@option.OptionId" value="@option.OptionValue" checked="@option.Selected" />
-                                        <strong>@(option.OptionValue.Length > 25 ? option.OptionValue.Substring(0, 22) + "..." : option.OptionValue)</strong>
-                                        <span>(@option.ResultCount.ToString("N0"))</span>
-                                    </label>
+                                    <div class="form-group mb-0">
+                                        <input type="checkbox" id="modal_@option.OptionId" class="form-check-input filter-search-category-option-checkbox" value="@option.OptionValue" checked="@option.Selected">
+                                        <label for="@option.OptionId" class="form-check-label filter-search-category-option-label">
+                                            @(option.OptionValue.Length > 25 ? option.OptionValue.Substring(0, 22) + "..." : option.OptionValue)
+                                            <span class="filter-search-category-option-count">(@option.ResultCount.ToString("N0"))</span>
+                                        </label>
+                                    </div>
                                 </li>
                             }
                         </ul>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary display-none filter-search-start filter-search-apply"><em class="glyphicon glyphicon-search filter-search-apply-icon"></em>Apply</button>
+                        <button type="button" class="btn btn-primary display-none filter-search-start filter-search-apply"><em class="icon-search filter-search-apply-icon"></em>Apply</button>
                     </div>
                 </div>
             </div>

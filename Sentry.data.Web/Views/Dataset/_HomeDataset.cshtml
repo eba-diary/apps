@@ -15,7 +15,7 @@
         {
                 <div class="searchBox">
                     <input type="text" class="form-control searchText" id="SearchText" name="searchPhrase" placeholder="Search from @dsCount Datasets">
-                    <button type="submit" class="btn btn-primary searchBtn"><span class="glyphicon glyphicon-search"></span></button>
+                    <button type="submit" class="btn btn-primary searchBtn"><span class="icon-search"></span></button>
                 </div>
         }
     }
@@ -141,13 +141,13 @@
                 @if (CanEditDataset)
                 {
                     <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="CreateDataset">
-                        <span class="glyphicon glyphicon-plus text-primary"></span> Create Dataset
+                        <span class="fas fa-plus text-primary"></span> Create Dataset
                     </button>
                 }
                 @if (CanUpload)
                 {
                     <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="UploadDatafile">
-                        <span class="glyphicon glyphicon-cloud-upload text-primary"></span> Upload Datafile
+                        <span class="fas fa-file-upload text-primary"></span> Upload Datafile
                     </button>
                 }
             </div>

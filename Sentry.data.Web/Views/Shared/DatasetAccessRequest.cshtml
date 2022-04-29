@@ -6,32 +6,25 @@
 @using (Html.BeginForm("SubmitAccessRequest", "Dataset", FormMethod.Post, new { @id = "AccessRequestForm" }))
 {
     @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.SecurableObjectId)
 
     <div class="accessRequestModelText" style="width:auto">
         <p>A short delay in permission implementation can be expected as Sentry service management system (external to DSC) is used for approvals.</p>
     </div>
-    <br />
 
     <div class="accessRequestErrorBox" id="AccessRequesrErrorBox" style="display:none">
 
     </div>
 
-    <div class="form-horizontal">
-        @Html.HiddenFor(model => model.SecurableObjectId)
-        <div class="form-group">
-            <label class="col-md-2 control-label">Dataset</label>
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.SecurableObjectName, new { @disabled = "disabled", @class = "form-control edit-dataset-row" })
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.AdGroupName, new { @class = "col-md-2 control-label" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.AdGroupName, new { @class = "form-control edit-dataset-row" })
-            </div>
-        </div>
-
-
-        @Html.Partial("_AccessRequest", Model)
+    <div class="md-form">
+        @Html.TextBoxFor(model => model.SecurableObjectName, new { @disabled = "disabled", @class = "form-control disabled" })
+        <label for="SecurableObjectName" class="active">Dataset</label>
     </div>
+    <div class="md-form">
+        @Html.LabelFor(m => m.AdGroupName, new { @class = "" })
+        @Html.TextBoxFor(model => model.AdGroupName, new { @class = "form-control" })
+    </div>
+
+
+    @Html.Partial("_AccessRequest", Model)
 }

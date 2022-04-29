@@ -4,147 +4,61 @@
     ViewBag.Title = "Fields";
     Sentry.data.Core.FileSchema schema = ViewBag.Schema;
     string color = Model.DatasetCategory.Color;
+    string textColor = "dsc-" + color + "-text";
     string dateDefault = ViewBag.Date_Default;
     string timestampDefault = ViewBag.Timestamp_Default;
 }
-<a class="backToList" href="/Config/Dataset/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>  Back to Dataset Configuration</a>
+<a class="backToList" href="/Config/Dataset/@Model.DatasetId"><em class="fas fa-chevron-left pr-3"></em>  Back to Dataset Configuration</a>
 
 <div class="topBanner" style="height: 60px;
-    margin-top: 20px;
     border-bottom: 1px #DDDDDD solid;">
-    <div class="relative hidden-sm hidden-xs">
+    <div class="relative">
         <div>
 
             <div class="no-overflow">
-                <h1 class="detailName leftFloat @color">
+                <h1 class="detailName leftFloat @textColor pt-0">
                     @Model.DatasetName
 
                     @if (Model.IsSecured)
                     {
-                        <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
+                        <span class="fas fa-lock dsc-icon-button lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
                     }
                 </h1>
 
+                <div class="text-right">
+                    @if (Model.Security.CanEditDataset)
+                    {
+                        <a class="btn px-3"
+                           id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
+                            <em class="far fa-edit dsc-icon-button align-self-center @textColor mr-0 align-middle"></em>
+                        </a>
 
-                <div style="margin-top:-29px;">
-                    <div class="btn-group rightFloat dataset-operation-button">
-                        <button type="button"
-                                class="btn btn-default borderdk_gray borderdk_@color dropdown"
-                                data-toggle="dropdown" data-placement="top" title="Additional Actions">
-                            <span class="glyphicon glyphicon-menu-hamburger @color"></span>
-                        </button>
+                    }
+                    <div class="btn-group dropdown" data-toggle="tooltip" data-placement="top" title="Additional Actions">
 
-                        <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
-                            <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
-                                <a>
+                        <a class="btn px-3"
+                           data-toggle="dropdown">
+                            <em class="fas fa-bars dsc-icon-button @textColor mr-0 align-middle"></em>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-start">
+                            @if (Model.Security.CanManageSchema)
+                            {
+                                <a class="dropdown-item" href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>
+                            }
+                            @if (Model.Security.CanViewFullDataset)
+                            {
+                                <a id="SubscribeModal" class="dropdown-item" data-id="@Model.DatasetId">
                                     Subscribe
                                 </a>
-                            </li>
-
-                            @if (Model.CanQueryTool)
-                            {
-                                <li title="Query Dataset">
-                                    <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
-                                        Query this Dataset
-                                    </a>
-                                </li>
                             }
-                            @if (Model.CanEditDataset)
-                            {
-                                <li>
-                                    <a href="/Config/Dataset/@Model.DatasetId">
-                                        Manage Schemas
-                                    </a>
-                                </li>
-                            }
-                        </ul>
+                        </div>
                     </div>
-
-                    @if (Model.CanUpload)
-                    {
-                        <button type="button"
-                                class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                                id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
-                            <span class="glyphicon glyphicon-cloud-upload @color"></span>
-                        </button>
-                    }
-
-                    @if (Model.CanEditDataset)
-                    {
-                        <button type="button"
-                                class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                                id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                            <span class="glyphicon glyphicon-edit @color"></span>
-                        </button>
-                    }
-
                 </div>
+
             </div>
         </div>
     </div>
 
-    <br />
-
-    <div class="hidden-md hidden-lg">
-        <h1 class="detailName leftFloat @color">
-            @Model.DatasetName
-
-            @if (Model.IsSecured)
-            {
-                <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
-            }
-        </h1>
-
-        <div>
-            <div class="btn-group rightFloat dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions" style="margin-top: 5px;">
-                <button type="button"
-                        class="btn btn-default borderdk_gray borderdk_@color dropdown"
-                        data-toggle="dropdown">
-                    <span class="glyphicon glyphicon-menu-hamburger @color"></span>
-                </button>
-
-                <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
-                    <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
-                        <a>
-                            Subscribe
-                        </a>
-                    </li>
-
-                    @if (Model.CanQueryTool)
-                    {
-                        <li title="Query Dataset">
-                            <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
-                                Query this Dataset
-                            </a>
-                        </li>
-                    }
-                    @if (Model.CanEditDataset)
-                    {
-                        <li>
-                            <a href="/Config/Dataset/@Model.DatasetId">
-                                Manage Schemas
-                            </a>
-                        </li>
-                    }
-
-                    @if (Model.CanUpload)
-                    {
-                        <li id="UploadModal" data-id="@Model.DatasetId">
-                            <a>Upload Files</a>
-                        </li>
-                    }
-
-                    @if (Model.CanEditDataset)
-                    {
-                        <li id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId">
-                            <a>Edit Dataset</a>
-                        </li>
-                    }
-                </ul>
-            </div>
-        </div>
-
-    </div>
 
 </div>
 
@@ -156,11 +70,11 @@
     @Html.AntiForgeryToken()
 
     <div data-bind="visible: Errors().length >= 1" style="display: none;">
-        <h6 style="color: red;">Errors:</h6>
+        <h6 style="color: red;" class="pt-1">Errors:</h6>
         <ul data-bind="template: {name: 'ErrorTemplate' , foreach: Errors()}"></ul>
     </div>
 
-    <h2 class="@color">Fields for @schema.Name</h2>
+    <h2 class="@textColor pt-1">Fields for @schema.Name</h2>
 
     @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
@@ -173,7 +87,7 @@
     </div>
 
     <div data-bind="visible: HiveDatabaseName() !== null" style="display:none;">
-        <h6 class="@color">This schema is currently tied to the Hive Table named <span data-bind="text: HiveDatabaseName"></span>.<span data-bind="text: HiveTableName"></span> with <span data-bind="text: RowCount"></span> rows.  <b>You cannot edit it.</b></h6>
+        <h6 class="@textColor">This schema is currently tied to the Hive Table named <span data-bind="text: HiveDatabaseName"></span>.<span data-bind="text: HiveTableName"></span> with <span data-bind="text: RowCount"></span> rows.  <strong>You cannot edit it.</strong></h6>
     </div>
 
     <div id="panelSpinner">
@@ -188,9 +102,9 @@
     </div>
 
 
-    <div style="margin-top: 10px;" class="col-lg-12">
+    <div class="col-lg-12">
         <hr />
-        <button type="button" class="btn btn-sm btn-success" data-bind='click: addRow' style="margin-bottom: 8px;"><i class="glyphicon glyphicon-plus"></i> Add a Field</button>
+        <button type="button" class="btn btn-sm btn-success" data-bind='click: addRow'><em class="fas fa-plus"></em> Add a Field</button>
         <hr />
         <button class="btn btn-success" id="saveBtn" data-bind='click: save'>Save</button>
         <div id="buttonSpinner" style="
@@ -213,73 +127,84 @@
     </script>
 
     <script type="text/html" id="RowTemplate">
-        <li class="schemaRowContainer ui-sortable-handle" data-bind="css: $root.ClickableRows()">
-            <div class="col-lg-12 schemaRow" data-bind="css: Color, style : { 'background-color' : RowColor }">
+        <li class="ui-sortable-handle schemaRowContainer" data-bind="css: $root.ClickableRows(), style : { 'background-color' : RowColor }">
+            <div class="schemaRow" data-bind="css: Color">
                 <div class="rowDetails" data-bind="attr : {'data-id' : Position}">
-                    <div class="rowNumberIdentifier">
-                        <b><span data-bind="text: Position"></span></b>
-                    </div>
-                    <button type="button" class="btn btn-xs btnExpandChildren" style="display: inline-block;  margin-bottom: 6px;" data-bind="click: ToggleChildren, visible: HasChildren, css : ButtonClass">
-                        <span id="icon_" class="glyphicon" data-bind="css : ButtonSpanClass"></span>
-                    </button>
-                    <h6 style="float: left; margin-right: 6px; line-height: 0.5; width: 15px; display:none;" data-bind="text: Position"></h6>
-                    <div class="col-lg-2">
-                        <input class="col-lg-12 rowFieldName" data-bind="value: Name" placeholder="Field Name..." data-toggle="tooltip" data-placement="top" title="Field Name" />
-                    </div>
-                    <div class="col-lg-2">
-                        <select class="typeSelect col-lg-12" data-bind="options: $root.DataTypes, optionsCaption: 'Choose Datatype', optionsValue: 'Name', optionsText: 'Name', optionsAfterRender: $root.setTagGroup, value: DataType"></select>
+                    <div class="topRow d-inline">
+                        <div class="rowNumberIdentifier">
+                            <b><span data-bind="text: Position"></span></b>
+                        </div>
+                        <button type="button" class="btn btn-xs btnExpandChildren p-2" data-bind="click: ToggleChildren, visible: HasChildren, css : ButtonClass">
+                            <span id="icon_" class="" data-bind="css : ButtonSpanClass"></span>
+                        </button>
+                        <input class="rowFieldName" data-bind="value: Name" placeholder="Field Name..." data-toggle="tooltip" data-placement="top" title="Field Name" />
+                        <select class="typeSelect" data-bind="options: $root.DataTypes, optionsCaption: 'Choose Datatype', optionsValue: 'Name', optionsText: 'Name', optionsAfterRender: $root.setTagGroup, value: DataType"></select>
                         <input type="hidden" name="dataObjectField_Id" data-bind="value: DataObjectField_ID" data-toggle="tooltip" data-placement="top" title="Data Type Selection" />
-                    </div>
-                    <div class="showPandS col-lg-4" data-bind="visible: ShowPandS">
-                        <div class="precisionContainer col-lg-2">
-                            <input class="precision col-lg-12" data-bind="textInput: Precision" placeholder="Prec" data-toggle="tooltip" data-placement="top" title="Precision - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT.ToString()" />
+                        <div class="showPandS d-inline-flex">
+                            <div class="fieldsFieldToggleable" data-bind="visible: ShowPandS">
+                                <div class="precisionContainer">
+                                    <input class="precision" data-bind="textInput: Precision" placeholder="Prec" data-toggle="tooltip" data-placement="top" title="Precision - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DECIMAL_PRECISION_DEFAULT.ToString()" />
+                                </div>
+                                <div class="scaleContainer">
+                                    <input class="scale" data-bind="textInput: Scale" placeholder="Scale" data-toggle="tooltip" data-placement="top" title="Scale - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT.ToString()" />
+                                </div>
+                                <div class="">
+                                    <span>1234.56 = Precision:6  Scale:2</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="scaleContainer col-lg-2">
-                            <input class="scale col-lg-12" data-bind="textInput: Scale" placeholder="Scale" data-toggle="tooltip" data-placement="top" title="Scale - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT.ToString()" />
+
+                        <div class="showDateFormat d-inline">
+                            <div class="fieldsFieldToggleable" data-bind="visible: ShowDateFormat">
+                                <input class="dateFormat w-50" data-bind="value: Format" placeholder="Not Specified (default is @dateDefault)" data-toggle="tooltip" data-placement="top" title="Format - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DATE_DEFAULT" />
+                            </div>
                         </div>
-                        <div class="col-lg-8">
-                            <span>1234.56 = Precision:6  Scale:2</span>
+
+                        <div class="showTimestampFormat d-inline">
+                            <div class="fieldsFieldToggleable" data-bind="visible: ShowTimestampFormat">
+                                <input class="dateFormat w-50" data-bind="value: Format" placeholder="Not Specified (default is @timestampDefault)" data-toggle="tooltip" data-placement="top" title="Format - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT" />
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="showDateFormat col-lg-4" data-bind="visible: ShowDateFormat">
-                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Not Specified (default is @dateDefault)" data-toggle="tooltip" data-placement="top" title="Format - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DATE_DEFAULT" />
-                    </div>
+                        <div class="showLength d-inline">
+                            <div class="fieldsFieldToggleable" data-bind="visible: ShowFieldLength">
+                                <input class="fieldlength" data-bind="visible: ShowFieldLength && DataType() === 'VARCHAR', value: Length" placeholder="default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
+                                <input class="fieldlength" data-bind="visible: ShowFieldLength && DataType() !== 'VARCHAR', value: Length" placeholder="Specify length" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
+                            </div>
+                        </div>
 
-                    <div class="showTimestampFormat col-lg-4" data-bind="visible: ShowTimestampFormat">
-                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Not Specified (default is @timestampDefault)" data-toggle="tooltip" data-placement="top" title="Format - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT" />
-                    </div>
+                        <div class="showArray d-inline-flex position-absolute pl-1">
+                            <div data-bind="visible: $root.AllowArrays">
+                                <label class="arrayLabel checkbox-container">
+                                    IsArray?
+                                    <input class="array" data-bind="checked: IsArray" type="checkbox" />
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                        </div>
 
-                    <div class="showArray col-lg-2" data-bind="visible: $root.AllowArrays">
-                        <label class="arrayLabel">IsArray?</label>
-                        <input class="array col-lg-2" data-bind="checked: IsArray" type="checkbox" />
-                    </div>
-
-                    <div class="showLength col-lg-2" data-bind="visible: ShowFieldLength">
-                        <input class="fieldlength col-lg-12" data-bind="visible: ShowFieldLength && DataType() === 'VARCHAR', value: Length" placeholder="default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
-                        <input class="fieldlength col-lg-12" data-bind="visible: ShowFieldLength && DataType() !== 'VARCHAR', value: Length" placeholder="Specify length" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
-                    </div>
-
-                    <div class="options col-lg-4">
-                        <div class="col-lg-12" data-bind="if: ShowAddChild">
-                            <div class="col-lg-offset-2 col-lg-7" data-bind="visible: ShowAddChild">
-                                <button class="rightButton" data-bind='click: addChild.bind(1)'>Add a Child</button>
+                        <div class="options">
+                            <div class="" data-bind="if: ShowAddChild">
+                                <div class="" data-bind="visible: ShowAddChild">
+                                    <button class="rightButton" data-bind='click: addChild.bind(1)'>Add a Child</button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="descriptionContainer col-lg-12">
-                        <input class="col-lg-10" data-bind="value: Description" placeholder="Description..." data-toggle="tooltip" data-placement="top" title="Description" />
-                        <div class="rightButton col-lg-1 col-lg-offset-1" data-bind="visible: $parent.Name === undefined">
 
-                            <button type="button" class="btn btn-xs btn-danger" data-bind='click: $parent.removeRow'>
-                                <i class="glyphicon glyphicon-remove"></i>
+                    <div class="descriptionContainer">
+                        <textarea class="w-75" data-bind="value: Description" placeholder="Description..." data-toggle="tooltip" data-placement="top" title="Description" />
+                        <div class="rightButton float-right" data-bind="visible: $parent.Name === undefined">
+
+                            <button type="button" class="btn btn-xs btn-danger p-2" data-bind='click: $parent.removeRow'>
+                                <em class="fas fa-times"></em>
                                 Delete
                             </button>
                         </div>
-                        <div class="rightButton col-lg-1 col-lg-offset-1" data-bind="visible: $parent.Name !== undefined">
-                            <button type="button" class="btn btn-xs btn-danger" data-bind='click: $parent.removeChild'>
-                                <i class="glyphicon glyphicon-remove"></i>
+                        <div class="rightButton float-right" data-bind="visible: $parent.Name !== undefined">
+                            <button type="button" class="btn btn-xs btn-danger p-2" data-bind='click: $parent.removeChild'>
+                                <em class="fas fa-times"></em>
                                 Delete
                             </button>
                         </div>
@@ -293,9 +218,6 @@
         </li>
     </script>
 }
-
-<style>
-</style>
 
 
 @section Scripts {
@@ -380,7 +302,7 @@
             self.ChildRows = ko.observableArray(ko.utils.arrayMap(indata.ChildRows, function (rowInfo) {
                 currentMax++;
                 return new Row(currentMax, rowInfo, parentvm, thisLevel, self);
-            }));            
+            }));
             self.SortedChildRows = ko.observableArray();
             self.RowColor = ko.observable()
 
@@ -411,7 +333,7 @@
                     dataType: "json",
                     contentType: "application/json",
                     success: function (returnedData) {
-                        if (Sentry.WasAjaxSuccessful(returnedData)) {                            
+                        if (Sentry.WasAjaxSuccessful(returnedData)) {
                            ////No errors for field so remove any existing errors displayed
                            // parentvm.Errors.remove(function (item) {
                            //     return item.Id === self.Position().toString();
@@ -587,9 +509,9 @@
 
             self.ButtonSpanClass = ko.computed(function () {
                 if (self.Toggled()) {
-                    return 'glyphicon-minus';
+                    return 'fas fa-minus';
                 } else {
-                    return 'glyphicon-plus';
+                    return 'fas fa-plus';
                 }
             });
 
@@ -619,12 +541,12 @@
                 nextPosition = lastPosition + 1;
 
                 var cr = new Row(nextPosition, { DataObjectField_ID: "new" + data.Utils.GenerateRandomString(6), Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, parent, thisLevel, self);
-                
+
                 self.ChildRows.push(cr);
                 if (!self.Toggled()) {
                     self.ToggleChildren();
                 }
-                
+
                 self.UpdateRow();
                 parentvm.Rows.valueHasMutated();
                 //vm.SortRows();
@@ -681,12 +603,12 @@
                         item.SortChildRows(index, httpItem, httpPosition);
                     }
                 })
-            };    
+            };
 
             self.UpdateRow();
         };
 
-        
+
 
 
         function FindLastSchemaRowWithinChildinChildrenContainer(e) {
@@ -710,7 +632,7 @@
         var viewModel = function (incomingJson) {
             var self = this;
 
-            
+
             //Observables
             //self.ErrorsCopy = ko.observableArray();
             self.Errors = ko.observableArray().extend({ notify: 'always' });
@@ -750,7 +672,7 @@
                         row.ChildRowSorter();
                         return true;
                     }
-                    else {                        
+                    else {
                         return false;
                     }
                     //return (row.DeleteInd() === false)
@@ -781,7 +703,7 @@
                 lastPosition = data.Fields.GetLastRowPositionOfSchemaRowContainer(a);
                 nextPosition = lastPosition + 1;
 
-                var r = new Row(nextPosition, { DataObjectField_ID: "new" + data.Utils.GenerateRandomString(6), Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, self, 0);                
+                var r = new Row(nextPosition, { DataObjectField_ID: "new" + data.Utils.GenerateRandomString(6), Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, self, 0);
                 self.Rows.push(r);
                 //self.SortRows();
             };
@@ -821,7 +743,7 @@
                     dataType: "json",
                     contentType: "application/json",
                     success: function (returnedData) {
-                        if (Sentry.WasAjaxSuccessful(returnedData)) {                            
+                        if (Sentry.WasAjaxSuccessful(returnedData)) {
                             $('#buttonSpinner').hide();
                             window.location.href = "/Config/Dataset/@Model.DatasetId";
                         }
@@ -906,7 +828,7 @@
                         vm.SortRows();
                     }
                 });
-            }            
+            }
 
             $.ajax({
                 type: "GET",

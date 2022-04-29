@@ -2,6 +2,7 @@
 
 @{
     ViewBag.Fluid = true;
+    ViewBag.Title = Model.PageTitle;
     string controllerName = "data." + Model.PageTitle.Replace(" ", "");
 }
 
@@ -9,36 +10,39 @@
     <div class="search-head">
         <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" alt="Source icon" /></div>
         <div class="search-head-item">
-            <h1 class="datasetHeader">@Model.PageTitle</h1>
+            <h1 class="filter-search-page-title">@Model.PageTitle</h1>
         </div>
 
-        <a target="_blank" rel="noopener noreferrer" href="@Url.Content(Model.InfoLink)">
-            <em class="glyphicon glyphicon-info-sign blue"></em>
+        <a class="filter-search-page-info" target="_blank" rel="noopener noreferrer" href="@Url.Content(Model.InfoLink)">
+            <em class="icon-info-solid dsc-blue-text"></em>
         </a>
+    </div>
 
-        <div id="search-box" class="has-feedback has-feedback-left">
-            <input class="form-control searchTextDS text-box single-line" type="text" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled />
-            <em class="form-control-feedback glyphicon glyphicon-search clickable filter-search-start display-none"></em>
-            <em class="form-control-feedback fa fa-circle-o-notch fa-spin"></em>
-        </div>
+    <div id="search-box" class="md-form input-group has-feedback has-feedback-left filter-search-box">
+        <input type="text" class="form-control text-box single-line" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled>
+        <span class="input-group-append sentry-blue white-text icon-search clickable filter-search-start" id="SearchBoxAddon"></span>
     </div>
 </div>
 
 <div class="filter-search-body">
     <div class="filter-search-container">
         <div class="filter-search-result-count-container display-none">
-            <h2 class="filter-search-total-results"><span id="filter-search-total"></span> Total Results</h2>
+            <div class="filter-search-total-results"><span id="filter-search-total"></span> Total Results</div>
             <div>Showing <span id="filter-search-page-size"></span> of <span id="filter-search-returned-total"></span></div>
         </div>
 
         <div class="filter-search-title-container bottom-border">
-            <h1 class="filter-search-title">Filter</h1>
-            <span class="filter-search-clear-container"><a href="#" class="display-none" id="filter-search-clear">Clear All</a></span>
-            <button type="button" class="btn btn-primary display-none filter-search-start filter-search-apply" disabled><em class="glyphicon glyphicon-search filter-search-apply-icon"></em>Apply</button>
+            <h4 class="filter-search-title">Filter</h4>
+            <span class="filter-search-clear-container">
+                <button class="btn btn-warning display-none filter-search-option-button" id="filter-search-clear">Clear All</button>
+            </span>
+            <span class="filter-search-clear-container">
+                <button class="btn btn-primary display-none filter-search-option-button filter-search-start filter-search-apply"><em class="icon-search filter-search-apply-icon"></em>Apply</button>
+            </span>
         </div>
 
-        <div class="filter-search-categories-sentry-spinner">
-            <span class="sentry-spinner"></span>
+        <div class="progress md-progress sentry-dark-blue filter-search-categories-progress">
+            <div class="indeterminate"></div>
         </div>
 
         <div class="filter-search-categories-container display-none">
@@ -46,12 +50,12 @@
         </div>
     </div>
 
-    <div class="filter-search-result-sentry-spinner">
-        <span class="sentry-spinner"></span>
+    <div class="progress md-progress sentry-dark-blue filter-search-result-progress">
+        <div class="indeterminate"></div>
     </div>
 
     <div class="filter-search-results-none display-none">
-        <span class="glyphicon glyphicon-alert"></span>
+        <span class="fas fa-exclamation-triangle"></span>
         <div>No results found.</div>
         <div>Try modifying your search.</div>
     </div>
@@ -59,6 +63,7 @@
     <div class="filter-search-results-container display-none">
         @Html.Partial(Model.ResultView)
     </div>
+
 </div>
 
 <div class="filter-search-show-all-container">

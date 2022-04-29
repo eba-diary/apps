@@ -427,7 +427,7 @@ div[id*="filterType_"]:hover {
 
 .li-filter-disabled {
     width: 100%;
-    padding: 2px 2px 2px 12px;
+    padding: 0px 2px 0px 12px;
 }
 
 .filter-disabled-glyph {
@@ -1467,11 +1467,12 @@ tr.categoryBanner-darkgray th.sorting_desc {
 }
 
 .assetImg {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     margin-left: 1em;
-    margin-top: 0.5em;
+    margin-top: 1em;
 }
+
 
 .daArrow {
     padding-top: 0.5em;
@@ -1489,13 +1490,6 @@ tr.categoryBanner-darkgray th.sorting_desc {
 
 .daCollapse {
     text-align: right;
-}
-
-.daNav {
-    font-size: larger;
-    margin-top: 0.75em;
-    float: right;
-    margin-right: 0.75em;
 }
 
 .desc {
@@ -1533,7 +1527,6 @@ tr.categoryBanner-darkgray th.sorting_desc {
 
 .tableHeader {
     margin: 0;
-    height: 25px;
 }
 
 .tableRow {
@@ -2409,18 +2402,6 @@ tr.categoryBanner-darkgray th.sorting_desc {
     white-space: pre !important;
 }
 
-td.details-control {
-    background: url('../../Images/Icons/details_open.png') no-repeat center center;
-    width: 30px;
-    cursor: pointer;
-    background-color: #ccc;
-}
-
-tr.shown td.details-control {
-    background: url('../../Images/Icons/details_close.png') no-repeat center center;
-    background-color: #ccc;
-}
-
 .detailSection {
     margin-top: 40px;
 }
@@ -2859,4 +2840,194 @@ a.forbiddenHero:hover {
 
 .display-none {
     display: none;
+}
+
+.multi-level-dropdown .dropdown-item a:active, .multi-level-dropdown .dropdown-item a:hover, .dropdown-submenu a:active, .dropdown-submenu a:hover {
+    color: #fff !important;
+    text-decoration: none !important;
+    background-color: #00A3E0 !important;
+    box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+}
+
+.multi-level-dropdown .dropdown-item a, .multi-level-dropdown .dropdown-submenu a {
+    width: 100% !important;
+    font-size: .9rem !important;
+    padding: 0.5rem !important;
+}
+
+.dropdown-submenu {
+    display: block;
+    width: 100%;
+    padding: 0 !important;
+    margin: 0 !important;
+    clear: both;
+    font-weight: 400;
+    color: #212529;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+    float: left ;
+}
+
+.dropdown-submenu .dropdown-item, .multi-level-dropdown .dropdown-item {
+    padding: 0 !important;
+    background-color: transparent !important;
+}
+
+.multi-level-dropdown .dropdown-header {
+    display: inline !important;
+}
+
+.modal-title {
+    padding-top: 0px !important;
+}
+
+.dsc-blueGray-text {
+    color: #285780;
+}
+
+.dsc-orange-text {
+    color: #683431;
+}
+
+.dsc-gold-text {
+    color: #74531c;
+}
+
+.dsc-green-text {
+    color: #005844;
+}
+
+.dsc-plum-text {
+    color: #72246c;
+}
+
+.dsc-blue-text {
+    color: #003da5;
+}
+
+.dsc-gray-text {
+    color: #9E9FA1;
+}
+
+.dsc-darkgray-text {
+    color: #53565A;
+}
+
+.dsc-darkGreen-text {
+    color: #005844;
+}
+
+div.dataTables_wrapper {
+    width: 100% !important;
+}
+
+div.dataTables_wrapper div.dataTables_paginate {
+    margin: 0;
+    white-space: nowrap;
+    text-align: right;
+}
+
+div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+    margin: 2px 0;
+    white-space: nowrap;
+    justify-content: flex-end;
+}
+
+.md-form input:not([type]).valid, .dataTables_wrapper .filter-row input:not([type]).valid, .md-form input:not([type]):focus.valid, .dataTables_wrapper .filter-row input:not([type]):focus.valid, .md-form input[type="text"]:not(.browser-default).valid, .dataTables_wrapper .filter-row input[type="text"]:not(.browser-default).valid, .md-form input[type="text"]:not(.browser-default):focus.valid, .dataTables_wrapper .filter-row input[type="text"]:not(.browser-default):focus.valid, .md-form input[type="password"]:not(.browser-default).valid, .dataTables_wrapper .filter-row input[type="password"]:not(.browser-default).valid, .md-form input[type="password"]:not(.browser-default):focus.valid, .dataTables_wrapper .filter-row input[type="password"]:not(.browser-default):focus.valid, .md-form input[type="email"]:not(.browser-default).valid, .dataTables_wrapper .filter-row input[type="email"]:not(.browser-default).valid, .md-form input[type="email"]:not(.browser-default):focus.valid, .dataTables_wrapper .filter-row input[type="email"]:not(.browser-default):focus.valid, .md-form input[type="url"]:not(.browser-default).valid, .dataTables_wrapper .filter-row input[type="url"]:not(.browser-default).valid, .md-form input[type="url"]:not(.browser-default):focus.valid, .dataTables_wrapper .filter-row input[type="url"]:not(.browser-default):focus.valid, .md-form input[type="time"]:not(.browser-default).valid, .dataTables_wrapper .filter-row input[type="time"]:not(.browser-default).valid, .md-form input[type="time"]:not(.browser-default):focus.valid, .dataTables_wrapper .filter-row input[type="time"]:not(.browser-default):focus.valid, .md-form input[type="date"]:not(.browser-default).valid, .dataTables_wrapper .filter-row input[type="date"]:not(.browser-default).valid, .md-form input[type="date"]:not(.browser-default):focus.valid, .dataTables_wrapper .filter-row input[type="date"]:not(.browser-default):focus.valid, .md-form input[type="datetime"]:not(.browser-default).valid, .dataTables_wrapper .filter-row input[type="datetime"]:not(.browser-default).valid, .md-form input[type="datetime"]:not(.browser-default):focus.valid, .dataTables_wrapper .filter-row input[type="datetime"]:not(.browser-default):focus.valid, .md-form input[type="datetime-local"]:not(.browser-default).valid, .dataTables_wrapper .filter-row input[type="datetime-local"]:not(.browser-default).valid, .md-form input[type="datetime-local"]:not(.browser-default):focus.valid, .dataTables_wrapper .filter-row input[type="datetime-local"]:not(.browser-default):focus.valid, .md-form input[type="tel"]:not(.browser-default).valid, .dataTables_wrapper .filter-row input[type="tel"]:not(.browser-default).valid, .md-form input[type="tel"]:not(.browser-default):focus.valid, .dataTables_wrapper .filter-row input[type="tel"]:not(.browser-default):focus.valid, .md-form input[type="number"]:not(.browser-default).valid, .dataTables_wrapper .filter-row input[type="number"]:not(.browser-default).valid, .md-form input[type="number"]:not(.browser-default):focus.valid, .dataTables_wrapper .filter-row input[type="number"]:not(.browser-default):focus.valid, .md-form input[type="search"]:not(.browser-default).valid, .dataTables_wrapper .filter-row input[type="search"]:not(.browser-default).valid, .md-form input[type="search"]:not(.browser-default):focus.valid, .dataTables_wrapper .filter-row input[type="search"]:not(.browser-default):focus.valid, .md-form input[type="phone"]:not(.browser-default).valid, .dataTables_wrapper .filter-row input[type="phone"]:not(.browser-default).valid, .md-form input[type="phone"]:not(.browser-default):focus.valid, .dataTables_wrapper .filter-row input[type="phone"]:not(.browser-default):focus.valid, .md-form input[type="search-md"].valid, .dataTables_wrapper .filter-row input[type="search-md"].valid, .md-form input[type="search-md"]:focus.valid, .dataTables_wrapper .filter-row input[type="search-md"]:focus.valid, .md-form textarea.md-textarea.valid, .dataTables_wrapper .filter-row textarea.md-textarea.valid, .md-form textarea.md-textarea:focus.valid, .dataTables_wrapper .filter-row textarea.md-textarea:focus.valid {
+    border-bottom: 1px solid #ced4da !important;
+    box-shadow: none !important;
+}
+
+.tableContent {
+    display: grid !important;
+}
+
+.md-form label {
+    padding-left: 0rem !important;
+}
+
+.dropdown-content label {
+    padding-left: 38px !important; /* Restore left padding for dropdowns (specifically multiselect dropdowns) */
+}
+
+.dataTable {
+    border-spacing: inherit;
+}
+
+.tt-suggestions table {
+    background-color: white;
+}
+
+table.dsc-green-table th.sorting_asc, table.dsc-green-table th.sorting_desc {
+    background-color: #84BD00 !important;
+}
+
+table.dsc-green-table th {
+    background-color: #005844;
+}
+
+table.dsc-darkGreen-table th.sorting_asc, table.dsc-darkGreen-table th.sorting_desc {
+    background-color: #84BD00 !important;
+}
+
+table.dsc-darkGreen-table th {
+    background-color: #005844;
+}
+
+table.dsc-blueGray-table th.sorting_asc, table.dsc-blueGray-table th.sorting_desc {
+    background-color: #89ABE3 !important;
+}
+
+table.dsc-blueGray-table th {
+    background-color: #285780;
+}
+
+table.dsc-gray-table th.sorting_asc, table.dsc-gray-table th.sorting_desc {
+    background-color: #9E9FA1 !important;
+}
+
+table.dsc-gray-table th {
+    background-color: #53565A;
+}
+
+table.dsc-gold-table th.sorting_asc, table.dsc-gold-table th.sorting_desc {
+    background-color: #EAAA00 !important;
+}
+
+table.dsc-gold-table th {
+    background-color: #74531C;
+}
+
+table.dsc-plum-table th.sorting_asc, table.dsc-plum-table th.sorting_desc {
+    background-color: #BB85AB !important;
+}
+
+table.dsc-plum-table th {
+    background-color: #72246C;
+}
+
+table.dsc-orange-table th.sorting_asc, table.dsc-orange-table th.sorting_desc {
+    background-color: #E57200 !important;
+}
+
+table.dsc-orange-table th {
+    background-color: #683431;
+}
+
+table.dsc-blue-table th.sorting_asc, table.dsc-blue-table th.sorting_desc {
+    background-color: #00A3E0 !important;
+}
+
+table.dsc-blue-table th {
+    background-color: #003DA5;
+}
+
+.input-group .mdb-select {
+    padding-top: 0.375rem;
+}
+
+.dsc-icon-button {
+    font-size: 1.25rem;
 }

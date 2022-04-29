@@ -46,29 +46,13 @@ data.Report = {
         // Initialize Images for thumbnails
         data.Images.InitImages();
 
-        $("#DatasetCategoryIds").select2({
-            placeholder:"Select Categories"
-        });
-        $("#DatasetBusinessUnitIds").select2({
-            placeholder: "Select Business Units"
-        });
-        $("#DatasetFunctionIds").select2({
-            placeholder: "Select Functions"
-        });
-        $("#DatasetFileTypeId").select2({
-            placeholder: "Select Exhibit Type",
-            allowClear: true
-        });
-        $("#FileTypeId").select2({
-            placeholder: "Select Exhibit Type",
-            allowClear: true,
-            minimumResultsForSearch: 10
-        });
-        $("#FrequencyId").select2({
-            placeholder: "Select Frequency",
-            allowClear: true,
-            minimumResultsForSearch: 10
-        });
+        $("#DatasetCategoryIds").materialSelect(); //multi
+        $("#DatasetBusinessUnitIds").materialSelect(); //multi 
+        $("#DatasetFunctionIds").materialSelect(); //multi
+        $("#DatasetFileTypeId").materialSelect();
+        $("#FileTypeId").materialSelect();
+        $("#FrequencyId").materialSelect();
+
         $("#ContactSearch").attr("placeholder", "Add Associate by name or ID");
 
         /// Initialize the Create Exhibit view
@@ -102,6 +86,8 @@ data.Report = {
             minLength: 0,
             maxResults: 10
         });
+
+        $(".associatePicker label").addClass("active");
 
         $(document).on('click', '.contactinfo-remove', function (e) {
             //e.StopPropagation();
@@ -210,7 +196,7 @@ data.Report = {
                 url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent($(this).data("id")),
                 method: "GET",
                 dataType: 'json',
-                success: function () { icon.toggleClass("glyphicon-star glyphicon-star-empty"); },
+                success: function () { icon.toggleClass("fas far"); },
                 error: function () { Sentry.ShowModalAlert("Failed to toggle favorite.");}
             });
             

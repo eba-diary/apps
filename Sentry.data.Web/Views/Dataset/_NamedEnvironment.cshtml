@@ -1,39 +1,35 @@
 ﻿@model Sentry.data.Web.DatasetModel
-<div class="form-group">
-    @Html.LabelFor((model) => model.NamedEnvironment, new { @class = "control-label col-md-2" })
-    <div class="col-md-10">
-        <div class="dropdown-container">
-            <span id="namedEnvironmentSpinner"></span>
-            @if (Model.NamedEnvironmentDropDown.Any())
-            {
-                @Html.DropDownListFor(x =>
-                     x.NamedEnvironment,
-                     Model.NamedEnvironmentDropDown,
-                     new { @class = "form-control" })
-            }
-            else
-            {
-                @Html.TextBoxFor(x => x.NamedEnvironment, new { @class = "form-control edit-dataset-row" })
-            }
-            @Html.ValidationMessageFor(model => Model.NamedEnvironment, "", new { @class = "text-danger" })
-        </div>
+<div class="md-form">
+    <label class="active" for="">Named Environment</label> <!-- Not using helper for this because it causes duplicate labels and MDB select snatches it from text box -->
+    <div class="dropdown-container">
+        <span id="namedEnvironmentSpinner"></span>
+        @if (Model.NamedEnvironmentDropDown.Any())
+        {
+            @Html.DropDownListFor(x =>
+                 x.NamedEnvironment,
+                 Model.NamedEnvironmentDropDown,
+                 new { @class = "mdb-select" })
+        }
+        else
+        {
+            @Html.TextBoxFor(x => x.NamedEnvironment, new { @class = "form-control" })
+        }
+        @Html.ValidationMessageFor(model => Model.NamedEnvironment, "", new { @class = "text-danger" })
     </div>
 </div>
-<div class="form-group">
-    @Html.LabelFor((model) => model.NamedEnvironmentType, new { @class = "control-label col-md-2" })
-    <div class="col-md-10">
-        <div class="dropdown-container">
-            <span id="namedEnvironmentTypeSpinner"></span>
-            @if (Model.NamedEnvironmentDropDown.Any())
-            {
-                @Html.DropDownListFor(x => x.NamedEnvironmentType, Model.NamedEnvironmentTypeDropDown, new { @class = "form-control", @disabled = "true" })
-                @Html.HiddenFor(x => x.NamedEnvironmentType)
-            }
-            else
-            {
-                @Html.DropDownListFor(x => x.NamedEnvironmentType, Model.NamedEnvironmentTypeDropDown, new { @class = "form-control" })
-            }
-            @Html.ValidationMessageFor(model => Model.NamedEnvironmentType, "", new { @class = "text-danger" })
-        </div>
+<div class="md-form">
+    @Html.LabelFor((model) => model.NamedEnvironmentType, new { @class = "mdb-main-label" })
+    <div class="dropdown-container">
+        <span id="namedEnvironmentTypeSpinner"></span>
+        @if (Model.NamedEnvironmentDropDown.Any())
+        {
+            @Html.DropDownListFor(x => x.NamedEnvironmentType, Model.NamedEnvironmentTypeDropDown, new { @class = "mdb-select", @disabled = "true" })
+            @Html.HiddenFor(x => x.NamedEnvironmentType)
+        }
+        else
+        {
+            @Html.DropDownListFor(x => x.NamedEnvironmentType, Model.NamedEnvironmentTypeDropDown, new { @class = "mdb-select" })
+        }
+        @Html.ValidationMessageFor(model => Model.NamedEnvironmentType, "", new { @class = "text-danger" })
     </div>
 </div>

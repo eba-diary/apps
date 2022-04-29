@@ -1,40 +1,32 @@
 ﻿@model Sentry.data.Web.DataFlowModel
-<div class="form-group col-md-12">
-    <div class="col-md-5"><h4>What Named Environment will be sending data?</h4></div>
-    <div class="col-md-4">
-        <div class="dropdown-container">
-            <span id="namedEnvironmentSpinner"></span>
-            @if (Model.NamedEnvironmentDropDown.Any())
-            {
-                @Html.DropDownListFor(x =>
-                     x.NamedEnvironment,
-                     Model.NamedEnvironmentDropDown,
-                     new { @class = "form-control" })
-            }
-            else
-            {
-                @Html.TextBoxFor(x => x.NamedEnvironment, new { @class = "form-control edit-dataset-row" })
-            }
-            @Html.ValidationMessageFor(model => Model.NamedEnvironment, "", new { @class = "text-danger" })
-        </div>
-    </div>
+<div class="md-form">
+    <h4>What Named Environment will be sending data?</h4>
+        <span id="namedEnvironmentSpinner"></span>
+        @if (Model.NamedEnvironmentDropDown.Any())
+        {
+            @Html.DropDownListFor(x =>
+                    x.NamedEnvironment,
+                    Model.NamedEnvironmentDropDown,
+                    new { @class = "mdb-select" })
+        }
+        else
+        {
+            @Html.TextBoxFor(x => x.NamedEnvironment, new { @class = "form-control" })
+        }
+        @Html.ValidationMessageFor(model => Model.NamedEnvironment, "", new { @class = "text-danger" })
 </div>
-<div class="form-group col-md-12">
-    <div class="col-md-5"><h4>What type of environment is this?</h4></div>
-    <div class="col-md-4">
-        <div class="dropdown-container">
-            <span id="namedEnvironmentTypeSpinner"></span>
-            @if (Model.NamedEnvironmentDropDown.Any())
-            {
-                @Html.DropDownListFor(x => x.NamedEnvironmentType, Model.NamedEnvironmentTypeDropDown, new { @class = "form-control", @disabled = "true" })
-                @Html.HiddenFor(x => x.NamedEnvironmentType)
-            }
-            else
-            {
-                @Html.DropDownListFor(x => x.NamedEnvironmentType, Model.NamedEnvironmentTypeDropDown, new { @class = "form-control" })
-            }
-            @Html.ValidationMessageFor(model => Model.NamedEnvironmentType, "", new { @class = "text-danger" })
-        </div>
-    </div>
+<div class="md-form">
+    <h4>What type of environment is this?</h4>
+    <span id="namedEnvironmentTypeSpinner"></span>
+    @if (Model.NamedEnvironmentDropDown.Any())
+    {
+        @Html.DropDownListFor(x => x.NamedEnvironmentType, Model.NamedEnvironmentTypeDropDown, new { @class = "mdb-select", @disabled = "true" })
+        @Html.HiddenFor(x => x.NamedEnvironmentType)
+    }
+    else
+    {
+        @Html.DropDownListFor(x => x.NamedEnvironmentType, Model.NamedEnvironmentTypeDropDown, new { @class = "mdb-select" })
+    }
+    @Html.ValidationMessageFor(model => Model.NamedEnvironmentType, "", new { @class = "text-danger" })
 </div>
 

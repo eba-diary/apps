@@ -38,7 +38,7 @@ data.Search = {
             var icon = "#icon_" + id;
 
             $(category).slideToggle();
-            $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
+            $(icon).toggleClass("fa-chevron-down fa-chevron-up");
         });
 
         $(document).on("click", "[id^='filterMore_']", function (e) {
@@ -50,7 +50,7 @@ data.Search = {
             var txt = "#txt_" + id;
 
             $(show).slideToggle();
-            $(icon).toggleClass("glyphicon-plus-sign glyphicon-minus-sign");
+            $(icon).toggleClass("fa-plus fa-minus");
 
             if ($(txt).text() === "Show Less") {
                 $(txt).text("Show More");
@@ -60,41 +60,36 @@ data.Search = {
             }
         });
 
-        $(document).on("click", ".btnFavorite", function (e) {
+        $(document).on("click", ".btnFavoriteSearch", function (e) {
             e.preventDefault();
-
             var button = $(this);
             var id = button.attr("data");
 
-            if (button.hasClass("glyphicon-star")) {
+            if (button.hasClass("fas")) {
 
                 $.ajax({
                     url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent(id),
                     method: "GET",
                     dataType: 'json',
-                    success: function () {
-                    },
                     error: function () {
                         Sentry.ShowModalAlert("Failed to remove favorite.");
                     }
                 });
             }
-            else if (button.hasClass("glyphicon-star-empty")) {
+            else if (button.hasClass("far")) {
 
                 $.ajax({
                     url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent(id),
                     method: "GET",
                     dataType: 'json',
-                    success: function () {
-                    },
                     error: function () {
                         Sentry.ShowModalAlert("Failed to set favorite.");
                     }
                 });
             }
-
-            $(this).toggleClass("glyphicon-star glyphicon-star-empty");
-
+            e.stopImmediatePropagation();
+            $(this).toggleClass("fas far");
+            return false;
         });
 
         // mouseover effect to change the background color of the search results tile
@@ -258,7 +253,7 @@ data.Search = {
         $(".select2-container--default").css('width', '100%');
 
         // have the first filter section expanded by default
-        $("#filterColumn .panel:first-child .filterViewIcon").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
+        $("#filterColumn .panel:first-child .filterViewIcon").removeClass("fa-chevron-down").addClass("fa-chevron-up");
         $("#filterColumn .panel:first-child .dataset-list-filter-category").show();
 
         // set the height of the filters <div> dynamically

@@ -39,45 +39,46 @@
         }
     }
 }
-<div class="row page-header indexHeader">
-    <div class="row">
+<div class="page-header indexHeader">
+    <div class="row ml-1">
         <img src="~/Images/Icons/DataAssetsBlue.svg" class="assetImg leftFloat hidden-xs" />
         <div class="indexName">
-            <h1 class="daName">@DisplayName</h1>
+            <h2 class="pt-3 daName">@DisplayName</h2>
         </div>
 
         @if (ViewBag.IsLine == false)
         {
-            <div class="visible-xs">
-                <button type="button" class="btn btn-lg btn-default daHamburger" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                    <span class="glyphicon glyphicon-menu-hamburger"></span>
-                </button>
-            </div>
+        <div class="ml-auto">
+            <ul class="nav nav-pills mt-4">
+                <li class="nav-item"><a class="nav-link" href="~/DataAsset/@dataAsset.Name">Home</a></li>
 
-            <div class="daNav row">
-                <ul class="nav nav-pills hidden-xs">
-                    <li><a href="~/DataAsset/@dataAsset.Name">Home</a></li>
+                @{ disabled = (dataAsset.DisplayName == "SERA PL" || dataAsset.DisplayName == "PL Policy ODS") ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="/Lineage/Personal Lines/@dataAsset.Name">Lineage</a></li>
 
-                    @{ disabled = (dataAsset.DisplayName == "SERA PL" || dataAsset.DisplayName == "PL Policy ODS") ? "" : "disabled"; }
-                    <li class="@disabled"><a href="/Lineage/Personal Lines/@dataAsset.Name">Lineage</a></li>
+                @{ disabled = (dataAsset.ArchLink != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="@arch" target="_blank">Arch Diagrams</a></li>
 
-                    @{ disabled = (dataAsset.ArchLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
+                @{ disabled = (dataAsset.DataModelLink != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a rel="noopener" class="nav-link" href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = dataAsset.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
 
-                    @{ disabled = (dataAsset.DataModelLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = dataAsset.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
+                @{ disabled = (dataAsset.GuideLink != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
 
-                    @{ disabled = (dataAsset.GuideLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
+                @{ disabled = (dataAsset.Contact != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="mailto:@Model.Contact">Contact Us</a></li>
+            </ul>
+        </div>
 
-                    @{ disabled = (dataAsset.Contact != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
-                </ul>
-            </div>
         }
     </div>
-    @if (ViewBag.IsLine == false)
+    @if (ViewBag.IsLine == true)
     {
+        <div class="visible-xs">
+            <button type="button" class="btn btn-lg btn-default daHamburger" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                <em class="fas fa-bars"></em>
+            </button>
+        </div>
+
         <div class="visible-xs daCollapse">
             <div class="navbar-collapse collapse navbar-responsive-collapse">
                 <ul class="nav navbar-nav">
@@ -171,8 +172,8 @@
 <script type="text/html" id="TopTemplate">
     <li data-bind="css: LayerInfo">
         <div class="lineageRow" data-bind="css: Color">
-            <button type="button" class="btn btn-xs" style="display: inline-block;  margin-bottom: 6px;" data-bind="click: ToggleChildren, visible: HasChildren, css : ButtonClass">
-                <span id="icon_" class="glyphicon"  data-bind="css : ButtonSpanClass"></span>
+            <button type="button" class="btn btn-xs p-1 h-50 align-self-center" style="display: inline-block;  margin-bottom: 6px;" data-bind="click: ToggleChildren, visible: HasChildren, css : ButtonClass">
+                <span id="icon_" class=""  data-bind="css : ButtonSpanClass"></span>
             </button>
             <span style="margin-left: 25px;" data-bind="visible: HasChildren() === false"> </span>
 
@@ -185,7 +186,7 @@
                 <span class="SourceObject_NME" data-bind="text : DataObject_NME"></span>
                 <span class="SourceField_NME" data-bind="text : DataObjectField_NME"></span>
                 <span class="LayerCount" data-bind="text : Layer" style="display: inline-block; margin-right: 10px; float:right;"></span>
-                <input type="button" value="Show Details" class="btn btnShowDetails btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;">
+                <input type="button" value="Show Details" class="btn p-1 px-3 m-1 btnShowDetails btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;">
                 <div class="extension bg_gray csv" data-bind="visible: HasTransform" style="display: inline-block; margin-right: 10px; float:right;">
                     <span>Transformation Available</span>
                 </div>
@@ -245,8 +246,8 @@
 
     .layer:before {
         /*Using a Bootstrap glyphicon as the bullet point*/
-        content: "\e095";
-        font-family: 'Glyphicons Halflings';
+        content: "\e900";
+        font-family: 'icomoon', sans-serif;
         font-size: 14px;
         float: left;
         margin-top: 20px;
@@ -480,7 +481,7 @@
 
         $(document).on('click', '.btnShowChildren', function () {
             console.log(this);
-            $($(this).children('span')).toggleClass("glyphicon-plus glyphicon-minus");
+            $($(this).children('span')).toggleClass("fa-plus fa-minus");
 
             var row = $(this).parent().parent();
 
@@ -603,9 +604,9 @@
 
             self.ButtonSpanClass = ko.computed(function () {
                 if (self.Toggled() || vm.ShowAllLayers() || self.ShowChildren()) {
-                     return 'glyphicon-minus';
+                     return 'fa fa-minus';
                 } else {
-                    return 'glyphicon-plus';
+                    return 'fa fa-plus';
                 }
             });
 

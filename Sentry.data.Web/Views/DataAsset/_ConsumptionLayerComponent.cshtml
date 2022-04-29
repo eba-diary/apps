@@ -4,6 +4,7 @@
     Sentry.data.Core.ConsumptionLayerComponent d = Model;
     string dName = d.Type.Name.Split(' ').First();
     string color = Model.Type.Color;
+    string textColor = "dsc-" + color + "-text";
     int visibleNum = 3;
     int dummyHt = (50*visibleNum) + 106;
     string height = dummyHt + "px";
@@ -11,7 +12,7 @@
     <!-- Removed Status and Last Updated goes here -->
 
     <div class="row">
-        <h2 class="@color col-xs-12 clcName text-center">
+        <h2 class="@textColor col clcName text-center pt-3 pl-3">
             @d.Type.Name
 
             @*@if (d.Type.Tool != null)
@@ -28,7 +29,7 @@
         Model.ComponentElements = Model.ComponentElements.OrderBy(x => x.Name).ToList();
 
         <div class="row tableHeader row_@color">
-            <div class="element @color">@d.Type.ChildDescription</div>
+            <div class="col element @textColor">@d.Type.ChildDescription</div>
         </div>
     }
     else
@@ -61,7 +62,7 @@
 
     if (d.ComponentElements.Count > visibleNum)
     {
-        <button type="button" class="btn btn-link viewMoreBtn @color more_@dName">
+        <button type="button" class="btn btn-link viewMoreBtn @textColor more_@dName">
             View More
         </button>
     }

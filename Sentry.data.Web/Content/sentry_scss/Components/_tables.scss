@@ -1,0 +1,81 @@
+﻿
+// Tables
+
+table.table {
+
+    a {
+        color: $link-color;
+
+        &:hover,
+        &:focus {
+            color: $link-hover-color;
+        }
+    }
+
+    th {
+        background-color: $sentry-dark-blue;
+        color: $sentry-white;
+    }
+    // DataTables
+    tr.filter-row th {
+        background-color: $sentry-white;
+        color: black;
+    }
+
+    .dataTables_length select {
+        height: calc(2.25rem + 2px) !important;
+    }
+
+    th.sorting_asc, th.sorting_desc {
+        background-color: $sentry-blue !important;
+    }
+
+    div.dt-button-collection {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    div.dt-button-collection a.dt-button {
+        background-color: transparent !important;
+        background-image: none !important;
+        border: 0 !important;
+    }
+
+    div.dt-button-collection a.dt-button.active {
+        padding-left: 1rem;
+        background: $sentry-dark-blue !important;
+        color: $sentry-white !important;
+        box-shadow: 0 0 0 0 !important;
+
+        &:hover {
+            background-color: $sentry-blue !important;
+            color: $sentry-white !important;
+        }
+    }
+
+    td.details-control {
+        cursor: pointer;
+
+        &::before {
+            border-radius: 50%;
+            font-family: icomoon;
+            content: "\e93a";
+            background-color: $sentry-dark-blue;
+            color: $sentry-white;
+            margin-right: 1rem;
+        }
+    }
+
+    tr.shown td.details-control {
+        cursor: pointer;
+
+        &::before {
+            border-radius: 50%;
+            font-family: icomoon;
+            content: "\e939";
+            background-color: $sentry-blue;
+            color: $sentry-white;
+            margin-right: 1rem;
+        }
+    }
+}

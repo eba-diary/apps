@@ -24,6 +24,7 @@
             $.get("/Notification/SubscribeDisplay/?group=" + group, function (e)
             {
                 modal.ReplaceModalBody(e);
+                $("select").materialSelect();
             });
         }        
     }

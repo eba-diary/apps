@@ -26,7 +26,7 @@
 
                     <div style="float:left; margin-left: 2px;">
                         <a target="_blank" rel="noopener noreferrer" href="https://confluence.sentry.com/display/CLA/Data+Inventory">
-                            <em class="glyphicon glyphicon-info-sign" style="color:#003da5;"></em>
+                            <em class="fas fa-info-circle" style="color:#003da5;"></em>
                         </a>
                     </div>
 
@@ -43,7 +43,7 @@
                     <input type="text" id="daleSearchCriteria" name="searchPhrase" class="form-control daleSearchInput" style="width:492px" value="@Model.Criteria" />
 
                     <span id="daleSearchClickBasic" class="input-group-addon clickable" style="width: 50px;height:30px;" onclick="$(function() {$('#daleSearchCriteria').focus();});">
-                        <em class="glyphicon glyphicon-search"></em>
+                        <em class="icon-search"></em>
                     </span>
 
                     <span id="daleSearchClickSpinnerBasic" class="input-group-addon" style="width: 50px;height:30px; display:none;" disabled onclick="$(function() {$('#daleSearchCriteria').focus();}); ">
@@ -64,7 +64,7 @@
                         <input type="text" id="daleSourceType" name="searchSourceType" class="form-control daleSearchInput" style="width:492px; " placeholder="Source Type" />
 
                         <span id="daleSearchClickAdvanced" class="input-group-addon clickable" style="width: 50px;height:30px;" onclick="$(function() {$('#daleSearchCriteria').focus();});">
-                            <em class="glyphicon glyphicon-search"></em>
+                            <em class="icon-search"></em>
                         </span>
 
                         <span id="daleSearchClickSpinnerAdvanced" class="input-group-addon" style="width: 50px;height:30px; display:none;" disabled onclick="$(function() {$('#daleSearchCriteria').focus();}); ">
@@ -100,14 +100,14 @@
                         @if (Model.CanDaleSensitiveView)
                         {
                             <span style="align-items: flex-end;display: flex;">
-                                <em class="glyphicon glyphicon-warning-sign pull-right" style="color:#003da5;margin-bottom: 4px; margin-right:1px;"></em>
+                                <em class="fas fa-exclamation-circle pull-right" style="color:#003da5;margin-bottom: 4px; margin-right:1px;"></em>
                                 <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500;">Show Sensitive Columns</a>
                             </span>
                         }
                         else
                         {
                             <span style="align-items: flex-end;display: flex;" data-toggle="tooltip" data-placement="right" title="Please request the App_DATA_DINV_Sens_View entitlement via MyAccess to view sensitive column information on the Data Inventory site.">
-                                <em class="glyphicon glyphicon-warning-sign" style="color:#003da5;margin-bottom: 4px; margin-right:1px;"></em>
+                                <em class="fas fa-exclamation-circle" style="color:#003da5;margin-bottom: 4px; margin-right:1px;"></em>
                                 <a href="#" id="sensitiveSearchLink" style="color:#003da5;font-weight: 500; pointer-events:none;">Show Sensitive Columns</a>
                             </span>
                         }

@@ -90,11 +90,7 @@ data.Tags = {
     },
 
     CreateInit: function () {
-        $("#SelectedTagGroup").select2({
-            placeholder: "Select Group",
-            //allowClear: true,
-            minimumResultsForSearch: 10
-        });
+        $("#SelectedTagGroup").materialSelect();
 
         $('body').on('change', '#TagName', function () {
             $.ajax({

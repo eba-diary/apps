@@ -8,7 +8,7 @@
 @{if(validationSummaryErrors.Count() > 0) {
     <div class="validation-summary-errors panel panel-danger" data-valmsg-summary="true">
         <div class="panel-heading">
-            <span class="glyphicon glyphicon-warning-sign text-danger"></span> Please correct the following errors.
+            <span class="fas fa-exclamation-circle text-danger"></span> Please correct the following errors.
         </div>
         <div class="panel-body">
             <ul>
@@ -23,7 +23,7 @@
 else
 {
     <div class="validation-summary-valid alert alert-danger @(Model.IsValid ? "collapse" : "")" data-valmsg-summary="true">
-        <span class="glyphicon glyphicon-warning-sign text-danger"></span> Please correct the highlighted fields below.
+        <span class="fas fa-exclamation-circle text-danger"></span> Please correct the highlighted fields below.
     </div>
 }
 }

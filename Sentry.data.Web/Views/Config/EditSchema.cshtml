@@ -7,7 +7,7 @@
 
 <div class="topBanner">
     <div>
-        <a class="backToList" href="/Config/Dataset/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>Back to Dataset Configuration</a>
+        <a class="backToList" href="/Config/Dataset/@Model.DatasetId"><em class="fas fa-chevron-left pr-3"></em>Back to Dataset Configuration</a>
     </div>
 </div>
 
@@ -29,20 +29,16 @@
     <h1>Edit Schema Revision</h1>
     <hr />
     <div id="myTabContent" class="tab-content">
-        <div class="form-group">
-            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.Name, new { @readonly = true, @value = "", @class = "form-control edit-dataset-row" })
-                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
-            </div>
+        <div class="md-form">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.Name, new { @readonly = true, @value = "", @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
         </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.Description, new { @value = "", @class = "form-control edit-dataset-row" })
-                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
-            </div>
+        <div class="md-form">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.Description, new { @value = "", @class = "form-control " })
+            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
         </div>
 
         @*<div class="form-group">

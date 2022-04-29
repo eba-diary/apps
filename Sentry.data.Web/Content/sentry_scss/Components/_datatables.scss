@@ -1,0 +1,49 @@
+﻿.dataTables_wrapper {
+    .dataTables_length {
+        .dataTables_length_select {
+            display: inline-block;
+            width: 80px;
+            margin: 0 10px;
+
+            .initialized {
+                display: none;
+            }
+        }
+    }
+
+    .filter-row {
+        /* add styles for .md-form here since we can't alter the YADCF parent classes*/
+        @extend .md-form;
+
+        .select2 .select2-selection {
+            margin-bottom: 8px;
+
+            input {
+                border: none;
+            }
+        }
+    }
+}
+
+.dt-button-collection {
+    border-radius: 0.25rem;
+}
+
+.yadcf-filter-range {
+    @extend .form-control;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    margin-right: 5px;
+    float: none;
+
+    &:focus:not([readonly]) {
+        border-bottom: 1px solid #4285F4;
+        outline: none;
+        box-shadow: 0 1px 0 0 #4285F4;
+    }
+}
+
+.yadcf-filter-range-number, .yadcf-filter-range-date {
+    width: 5rem;
+}

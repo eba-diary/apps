@@ -2,15 +2,15 @@
 
 @{
     ViewBag.Title = "View Dataset Details";
-    string color = Model.CategoryColor;
     string headerColor = "categoryBanner-" + Model.CategoryColor;
+    string textColor = "dsc-" + Model.CategoryColor + "-text";
     var mailTo = "mailto:" + Model.PrimaryContactEmail + "?Subject=Dataset%20Inquiry%20-%20" + Model.DatasetName;
 }
 
 @if (@Model.DatasetFileCount == 0)
 {
     <div>
-        <div id="alertInfoBanner" class="alert alert-dismissable alert-info">
+        <div id="alertInfoBanner" class="alert alert-dismissable alert-info mt-3">
             <button type="button" class="close" data-dismiss="alert">×</button>
             <div>
                 @if (Model.Security.CanUploadToDataset)
@@ -28,329 +28,342 @@
     </div>
 }
 
-<a href="@Url.Action("Datasets", "Search")" class="backToList" id="linkReturnToDatasetList"><span class="glyphicon glyphicon-chevron-left"></span>Back to list</a>
+<div class="mt-3">
+    <a href="@Url.Action("Datasets", "Search")" id="linkReturnToDatasetList"><span class="fas fa-chevron-left pr-3"></span>Back to list</a>
+</div>
 
 <div style="font-feature-settings: 'lnum';">
-    <div class="topBanner" style="height: 60px;border-bottom: 1px #DDDDDD solid;">
+    <div class="topBanner" style="border-bottom: 1px #DDDDDD solid;">
 
-        <div class="relative hidden-sm hidden-xs">
-            <div>
-                <div class="no-overflow">
-                    <h1 class="detailName leftFloat @color">
+        <div class="container">
+            <div class="row">
+                <div class="col-7 pl-0">
+                    <!-- Dataset Name and Request Access-->
+                    <h2 class="@textColor pt-3 mb-1">
                         @Model.DatasetName
-                    </h1>
-
-                    @if (Model.IsSecured)
-                    {
-                        <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
-                    }
-                    <span>
-                        <input id="RequestAccessButton" type="button" value="Request Access" class="btn btn-primary" data-id="@Model.DatasetId"
-                               data-toggle="tooltip" data-placement="top" title="Request Access to Dataset" style="margin-left:40px;margin-top:10px;" />
-                    </span>
-
-                    @if (Model.Security.CanPreviewDataset)
-                    {
-                        foreach (string item in Model.DistinctFileExtensions)
+                        @if (Model.IsSecured)
                         {
-                            <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
+                            <span class="fas fa-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
                         }
 
-                        <div style="margin-top:-30px;" class="text-right">
+                    </h2>
+                </div>
 
-                            <button type="button" class="btn btn-default borderdk_gray borderdk_@Model.CategoryColor"
-                                    id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
+                <div class="col-5 pr-0">
+                    @if (Model.Security.CanPreviewDataset)
+                    {
+                        <div class="text-right">
+
+                            <a class="btn px-3"
+                               id="RequestAccessButton" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Request Additional Dataset Access">
+                                <em class="fas fa-user-plus dsc-icon-button @textColor mr-0 align-middle" id=""></em>
+                            </a>
+
+                            <a class="btn px-3"
+                               id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
                                 @if (Model.IsFavorite)
                                 {
-                                    <span class="glyphicon glyphicon-star @Model.CategoryColor" id="favoriteIcon"></span>
+                                    <em class="fas fa-star dsc-icon-button @textColor mr-0 align-middle" id="favoriteIcon"></em>
                                 }
                                 else
                                 {
-                                    <span class="glyphicon glyphicon-star-empty @Model.CategoryColor" id="favoriteIcon"></span>
+                                    <em class="far fa-star dsc-icon-button @textColor mr-0 align-middle" id="favoriteIcon"></em>
                                 }
-                            </button>
+                            </a>
 
                             @if (Model.Security.CanEditDataset)
                             {
-                                <button type="button"
-                                        class="btn btn-default dataset-operation-button borderdk_gray borderdk_@color"
-                                        id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                                    <span class="glyphicon glyphicon-edit @color"></span>
-                                </button>
-                            }
-                            <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
+                                <a class="btn px-3"
+                                   id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
+                                    <em class="far fa-edit dsc-icon-button align-self-center @textColor mr-0 align-middle"></em>
+                                </a>
 
-                                <button type="button"
-                                        class="btn btn-default borderdk_gray borderdk_@color dropdown"
-                                        data-toggle="dropdown">
-                                    <span class="glyphicon glyphicon-menu-hamburger @color"></span>
-                                </button>
-                                <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                            }
+                            <div class="btn-group dropdown" data-toggle="tooltip" data-placement="top" title="Additional Actions">
+
+                                <a class="btn px-3"
+                                   data-toggle="dropdown">
+                                    <em class="fas fa-bars dsc-icon-button @textColor mr-0 align-middle"></em>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-start">
                                     @if (Model.Security.CanManageSchema)
                                     {
-                                        <li>
-                                            <a href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>
-                                            <a class="btn" id="btnSyncConsumptionLayers" data-id="@Model.DatasetId" style="text-align: left">Sync All Consumption Layers</a>
-                                            @if (Model.Security.CanEditDataset)
-                                            {
-                                                <a class="btn" id="btnDeleteDataset" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured" style="text-align: left">Delete Dataset</a>
-                                            }
-                                        </li>
+                                        <a class="dropdown-item" href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>
+                                        <a class="dropdown-item" id="btnSyncConsumptionLayers" data-id="@Model.DatasetId">Sync All Consumption Layers</a>
+                                        if (Model.Security.CanEditDataset)
+                                        {
+                                            <a class="dropdown-item" id="btnDeleteDataset" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured">Delete Dataset</a>
+                                        }
                                     }
-                                    <li>
-                                        <a href="@Model.MailtoLink">Share Dataset</a>
-                                    </li>
+                                    <a class="dropdown-item" href="@Model.MailtoLink">Share Dataset</a>
                                     @if (Model.Security.CanViewFullDataset)
                                     {
-                                        <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
-                                            <a>
-                                                Subscribe
-                                            </a>
-                                        </li>
+                                        <a id="SubscribeModal" class="dropdown-item" data-id="@Model.DatasetId">
+                                            Subscribe
+                                        </a>
                                     }
-                                </ul>
+                                </div>
                             </div>
                         </div>
-
                     }
                 </div>
             </div>
         </div>
     </div>
 
-    <br />
 
-    <div>
-        <div>
-            <div class="row">
-                <div class="col-lg-8 col-sm-6">
-                    <div>
-                        @if (!String.IsNullOrWhiteSpace(Model.DatasetDesc))
-                        {
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div>
-                                        <h4 class="@color">Description:</h4>
-                                        @if (Model.DatasetDesc.Length >= 500)
-                                        {
-
-                                            int last = Model.DatasetDesc.Substring(0, 500).LastIndexOf(" ");
-                                            <p class="spanContainer">
-                                                <span>@Model.DatasetDesc.Substring(0, last)</span>
-                                                <span id="descSeeMoreEllipsis">...&nbsp;</span>
-                                                <span id="descSeeMorePanel" style="display: none;">@Model.DatasetDesc.Substring(last) </span>
-                                                <span id="descSeeMoreButton" style="cursor: pointer;"><a onclick="$('#descSeeMorePanel').show(); $(this).parent().hide(); $('#descShowLessButton').show(); $('#descSeeMoreEllipsis').hide();">See More</a></span>
-                                                <span id="descShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#descSeeMorePanel').hide(); $(this).parent().hide(); $('#descSeeMoreButton').show(); $('#descSeeMoreEllipsis').show();">Show Less</a></span>
-                                            </p>
-                                        }
-                                        else
-                                        {
-                                            <p>@Model.DatasetDesc</p>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-
-                        }
-
-                        @if (!String.IsNullOrWhiteSpace(Model.DatasetInformation) && Model.Security.CanPreviewDataset)
-                        {
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="spanContainer">
-                                        <h4 class="@color">Usage Information:</h4>
-                                        @if (Model.DatasetInformation.Length >= 300)
-                                        {
-
-                                            int lastInfo = Model.DatasetInformation.Substring(0, 300).LastIndexOf(" ");
-                                            <span>@Model.DatasetInformation.Substring(0, lastInfo)</span>
-                                            <span id="usageSeeMoreEllipsis">...&nbsp;</span>
-                                            <span id="usageSeeMorePanel" style="display: none;">@Model.DatasetInformation.Substring(lastInfo)</span>
-                                            <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
-                                            <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
-                                        }
-                                        else
-                                        {
-                                            <span>@Model.DatasetInformation</span>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                    @if (Model.Security.CanPreviewDataset)
-                    {
-                        <hr />
-                        <div>
-                            <h4 class="@color">
-                                Schemas:
-                            </h4>
-                        </div>
-
-                        <div>
-                            <div class="row">
-                                <div class="col-lg-12" style="margin-left: 20px">
-                                    <select class="form-control" style="margin:1em !important;"
-                                            id="datasetConfigList" name="filterSelector">
-                                        @foreach (var a in Model.DatasetFileConfigNames)
-                                        {
-                                            <option value="@a.Key">@a.Value</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div style="margin-left: 35px;" data-bind="visible: Description() != null" class="spanContainer">
-                                        <h6 class="@color">Schema Description:</h6>
-                                        <span data-bind="text: LessDescription"></span>
-                                        <span id="schemaHasMoreDescription">
-                                            <span id="schemaSeeMoreEllipsis">&nbsp;...</span>
-                                            <span id="schemaSeeMorePanel" style="display: none; padding-left: 4px;" data-bind="text: MoreDescription"></span>
-                                            <span id="schemaSeeMoreButton" style="cursor: pointer;"><a onclick="$('#schemaSeeMorePanel').show(); $(this).parent().hide(); $('#schemaShowLessButton').show(); $('#schemaSeeMoreEllipsis').hide();">See More</a></span>
-                                            <span id="schemaShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#schemaSeeMorePanel').hide(); $(this).parent().hide(); $('#schemaSeeMoreButton').show(); $('#schemaSeeMoreEllipsis').show();">Show Less</a></span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-
-                <div class="col-lg-4">
-                    <div class="row" style="border: 1px #DDDDDD solid; background: white; padding: 20px;">
-
-                        <div class="row" style="min-height: 60px;">
-                            <div class="col-lg-6">
-                                <h5 class="@color">Last Activity Date</h5>
-                                <p>@Model.ChangedDtm.ToString("MMMM d, yyyy")</p>
-                            </div>
-                            <div class="col-lg-6">
-                                <h5 class="@color">Date Created</h5>
-                                <p>@Model.DatasetDtm.ToString("MMMM d, yyyy")</p>
-                            </div>
-                        </div>
-                        <hr />
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <h5 class="@color">SAID Asset</h5>
-                                <a target="_blank" rel="noopener noreferrer" href="https://said.sentry.com/ViewAsset.aspx?ID=@Model.SAIDAssetKeyCode">@Model.SAIDAssetKeyCode</a>
-                            </div>
-                            <div class="col-lg-6">
-                                <h5 class="@color">Contact</h5>
-                                <p><a href="@mailTo">@Model.PrimaryContactName</a></p>
-                            </div>
-                        </div>
-                        <hr />
-
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <h5 class="@color">Data Classification</h5>
-                                <p>@Model.DataClassificationDescription</p>
-                            </div>
-                            <div class="col-lg-6">
-                                <h5 class="@color">Environment</h5>
-                                <p>@Model.NamedEnvironment</p>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <hr />
-
-    @if (!Model.DisplayTabSections)
-    {
-        if (Model.Security.CanPreviewDataset)
-        {
-            @Html.Partial("Details/_SchemaAbout", Model)
-        }
-        if (Model.Security.CanPreviewDataset)
-        {
-            @Html.Partial("Details/_SchemaColumns", Model)
-        }
-        if (Model.HasDataAccess)
-        {
-            @Html.Partial("Details/_DataPreview", Model)
-        }
-        if (Model.Security.CanViewFullDataset)
-        {
-            @Html.Partial("Details/_DataFiles", Model)
-        }
-    }
-    else
-    {
-        <h5>Schema Details:</h5>
-        <div id="datasetDetailTabs">
-            <div class="tabs-wrapper">
-                <ul class="nav nav-tabs">
-                    <li role="presentation" class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#panelSchemaAbout" id="detailTabSchemaAbout" role="tab">About</a>
-                    </li>
-                    <li role="presentation" class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#panelSchemaColumns" id="detailTabSchemaColumns" role="tab">Columns</a>
-                    </li>
-
-                    @if (Model.HasDataAccess)
-                    {
-                        <li role="presentation" class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Preview</a>
-                        </li>
-                    }
-                    <li role="presentation" class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#panelDataFiles" id="detailTabDataFiles" role="tab">Files</a>
-                    </li>
-                    @if (Model.DisplaySchemaSearch)
-                    {
-                        <li role="presentation" class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#panelSchemaSearch" id="detailTabSchemaSearch" role="tab">Search</a>
-                        </li>
-                    }
-                </ul>
-            </div>
-
-            <!-- Tab panels -->
-            <div class="tab-content" id="tab-container">
-                <div class="tab-pane fade" id="panelSchemaAbout" role="tabpanel">
-                    @if (Model.Security.CanPreviewDataset)
-                    {
-                        <div id="tabSchemaAbout"></div>
-                    }
-                </div>
-                <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
-                    @if (Model.Security.CanPreviewDataset)
-                    {
-                        <div id="tabSchemaColumns"></div>
-                    }
-                </div>
-                @if (Model.HasDataAccess)
+    <div class="row pt-3">
+        <div class="col-lg-7">
+            <div>
+                @if (!String.IsNullOrWhiteSpace(Model.DatasetDesc))
                 {
-                    <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
-                        <div id="tabDataPreview"></div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div>
+                                <h4 class="@textColor pt-1">Description:</h4>
+                                @if (Model.DatasetDesc.Length >= 500)
+                                {
+
+                                    int last = Model.DatasetDesc.Substring(0, 500).LastIndexOf(" ");
+                                    <p class="spanContainer">
+                                        <span>@Model.DatasetDesc.Substring(0, last)</span>
+                                        <span id="descSeeMoreEllipsis">...&nbsp;</span>
+                                        <span id="descSeeMorePanel" style="display: none;">@Model.DatasetDesc.Substring(last) </span>
+                                        <span id="descSeeMoreButton" style="cursor: pointer;"><a onclick="$('#descSeeMorePanel').show(); $(this).parent().hide(); $('#descShowLessButton').show(); $('#descSeeMoreEllipsis').hide();">See More</a></span>
+                                        <span id="descShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#descSeeMorePanel').hide(); $(this).parent().hide(); $('#descSeeMoreButton').show(); $('#descSeeMoreEllipsis').show();">Show Less</a></span>
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p>@Model.DatasetDesc</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                }
+
+                @if (!String.IsNullOrWhiteSpace(Model.DatasetInformation) && Model.Security.CanPreviewDataset)
+                {
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="spanContainer">
+                                <h4 class="@textColor pt-1">Usage Information:</h4>
+                                @if (Model.DatasetInformation.Length >= 300)
+                                {
+
+                                    int lastInfo = Model.DatasetInformation.Substring(0, 300).LastIndexOf(" ");
+                                    <span>@Model.DatasetInformation.Substring(0, lastInfo)</span>
+                                    <span id="usageSeeMoreEllipsis">...&nbsp;</span>
+                                    <span id="usageSeeMorePanel" style="display: none;">@Model.DatasetInformation.Substring(lastInfo)</span>
+                                    <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
+                                    <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
+                                }
+                                else
+                                {
+                                    <span>@Model.DatasetInformation</span>
+                                }
+                            </div>
+                        </div>
                     </div>
                 }
-                <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
-                    <div id="tabDataFiles"></div>
+            </div>
+            @if (Model.Security.CanPreviewDataset)
+            {
+                <hr />
+                <div>
+                    <h4 class="@textColor pt-1">
+                        Schemas:
+                    </h4>
                 </div>
+
+                <div>
+                    <div class="row">
+                        <div class="col-lg-12" style="margin-left: 20px">
+                            <select class="form-control" style="margin:1em !important;"
+                                    id="datasetConfigList" name="filterSelector">
+                                @foreach (var schema in Model.DatasetFileConfigNames)
+                                {
+                                    <option value="@schema.Key">@schema.Value</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div style="margin-left: 35px;" data-bind="visible: Description() != null" class="spanContainer">
+                                <h6 class="@textColor pt-2 mb-1">Schema Description:</h6>
+                                <span data-bind="text: LessDescription"></span>
+                                <span id="schemaHasMoreDescription">
+                                    <span id="schemaSeeMoreEllipsis">&nbsp;...</span>
+                                    <span id="schemaSeeMorePanel" style="display: none; padding-left: 4px;" data-bind="text: MoreDescription"></span>
+                                    <span id="schemaSeeMoreButton" style="cursor: pointer;"><a onclick="$('#schemaSeeMorePanel').show(); $(this).parent().hide(); $('#schemaShowLessButton').show(); $('#schemaSeeMoreEllipsis').hide();">See More</a></span>
+                                    <span id="schemaShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#schemaSeeMorePanel').hide(); $(this).parent().hide(); $('#schemaSeeMoreButton').show(); $('#schemaSeeMoreEllipsis').show();">Show Less</a></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-lg-5">
+            <div class="container">
+                <div class="row" style="border: 1px #DDDDDD solid; padding: 20px;">
+
+                    <div class="row w-100">
+                        <div class="col">
+                            <h5 class="@textColor pt-1">Last Activity Date</h5>
+                            <p>@Model.ChangedDtm.ToString("MMMM d, yyyy")</p>
+                        </div>
+                        <div class="col">
+                            <h5 class="@textColor pt-1">Date Created</h5>
+                            <p>@Model.DatasetDtm.ToString("MMMM d, yyyy")</p>
+                        </div>
+                    </div>
+
+                    <hr class="datasetMetadataBoxHr" />
+
+                    <div class="row w-100">
+                        <div class="col">
+                            <h5 class="@textColor pt-1">SAID Asset</h5>
+                            <a target="_blank" rel="noopener noreferrer" href="https://said.sentry.com/ViewAsset.aspx?ID=@Model.SAIDAssetKeyCode">@Model.SAIDAssetKeyCode</a>
+                        </div>
+                        <div class="col">
+                            <h5 class="@textColor pt-1">Contact</h5>
+                            <p><a href="@mailTo">@Model.PrimaryContactName</a></p>
+                        </div>
+                    </div>
+
+                    <hr class="datasetMetadataBoxHr" />
+
+                    <div class="row w-100">
+                        <div class="col">
+                            <h5 class="@textColor pt-1">Data Classification</h5>
+                            <p>@Model.DataClassificationDescription</p>
+                        </div>
+                        <div class="col">
+                            <h5 class="@textColor pt-1">Environment</h5>
+                            <p>@Model.NamedEnvironment</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<hr />
+
+@if (!Model.DisplayTabSections)
+{
+    if (Model.Security.CanPreviewDataset)
+    {
+        @Html.Partial("Details/_SchemaAbout", Model)
+    }
+    if (Model.Security.CanPreviewDataset)
+    {
+        @Html.Partial("Details/_SchemaColumns", Model)
+    }
+    if (Model.HasDataAccess)
+    {
+        @Html.Partial("Details/_DataPreview", Model)
+    }
+    if (Model.Security.CanViewFullDataset)
+    {
+        @Html.Partial("Details/_DataFiles", Model)
+    }
+}
+else
+{
+    <div id="datasetDetailTabs">
+        <div class="tabs-wrapper">
+            <ul class="nav classic-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#panelSchemaAbout" id="detailTabSchemaAbout" role="tab">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#panelSchemaColumns" id="detailTabSchemaColumns" role="tab">Columns</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Preview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#panelDataFiles" id="detailTabDataFiles" role="tab">Files</a>
+                </li>
                 @if (Model.DisplaySchemaSearch)
                 {
-                    <div class="tab-pane fade" id="panelSchemaSearch" role="tabpanel">
-                        <div id="tabSchemaSearch"></div>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#panelSchemaSearch" id="detailTabSchemaSearch" role="tab">Search Columns</a>
+                    </li>
+                }
+            </ul>
+        </div>
+
+
+
+        <!-- Tab panels -->
+        <div class="tab-content" id="tab-container">
+            <div class="text-center" id="tab-spinner">
+                <div class="preloader-wrapper big active">
+                    <div class="spinner-layer spinner-blue-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle">
+                            </div>
+                        </div>
+
                     </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="panelSchemaAbout" role="tabpanel">
+                @if (Model.Security.CanPreviewDataset)
+                {
+                    <div id="tabSchemaAbout"></div>
                 }
             </div>
+
+            <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
+                @if (Model.Security.CanPreviewDataset)
+                {
+                    <div id="tabSchemaColumns"></div>
+                }
+            </div>
+            @if (Model.HasDataAccess)
+            {
+                <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
+                    <div id="tabDataPreview"></div>
+                </div>
+            }
+            <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
+                <div id="tabDataFiles"></div>
+            </div>
+            @if (Model.DisplaySchemaSearch)
+            {
+                <div class="tab-pane fade" id="panelSchemaSearch" role="tabpanel">
+                    <div id="tabSchemaSearch"></div>
+                </div>
+            }
         </div>
-    }
+    </div>
+}
 </div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/prettyCron")
     @Scripts.Render("~/bundles/dataTables")
+    @Styles.Render("~/bundles/css/dataTables")
 
-<script>
+    <script>
 
         $(function () {
             vm = new data.Dataset.ViewModel();
@@ -387,5 +400,5 @@
 
 
 
-</script>
+    </script>
 }

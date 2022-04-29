@@ -4,6 +4,9 @@
     InitForDataset: function (datasetId) {
 
         var modal = Sentry.ShowModalWithSpinner("Request Dataset Access");
+
+        $("select").materialSelect();
+
         var createRequestUrl = "/Dataset/AccessRequest/?datasetId=" + encodeURI(datasetId);
 
         $.get(createRequestUrl, function (e) {
@@ -78,6 +81,8 @@
     InitForNotification: function () {
 
         var modal = Sentry.ShowModalWithSpinner("Request Notification Access");
+
+        $("select").materialSelect();
 
         $.get('/Notification/AccessRequest', function (e) {
             modal.ReplaceModalBody(e);

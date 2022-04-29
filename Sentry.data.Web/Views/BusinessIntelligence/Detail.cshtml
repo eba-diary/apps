@@ -3,54 +3,53 @@
 @{
     ViewBag.Title = "View Report Details";
     var mailTo = "mailto:" + Model.PrimaryContactEmail + "?Subject=Exhibit%20Inquiry%20-%20" + Model.DatasetName;
+    string textColor = "dsc-" + Model.CategoryColor + "-text";
 }
 
-<a href="@Url.Action("BusinessIntelligence", "Search")" class="backToList" id="linkReturnToBusinessIntelligenceList"><span class="glyphicon glyphicon-chevron-left"></span>Back to list</a>
+<a href="@Url.Action("BusinessIntelligence", "Search")" class="backToList" id="linkReturnToBusinessIntelligenceList"><em class="fas fa-chevron-left pr-3"></em>Back to list</a>
 
 <div style="font-feature-settings: 'lnum';">
-    <div class="topBanner" style="height: 60px;margin-top: 20px;border-bottom: 1px #DDDDDD solid;">
+    <div class="topBanner" style="height: 60px;border-bottom: 1px #DDDDDD solid;">
 
         <div class="relative hidden-sm hidden-xs">
             <div>
                 <div class="no-overflow">
-                    <h1 class="detailName detailNameLink leftFloat @Model.CategoryColor" data-ArtifactLink="@Model.ReportLink" data-LocationType="@Model.LocationType">
+                    <h1 class="detailName detailNameLink leftFloat @textColor pt-0" data-ArtifactLink="@Model.ReportLink" data-LocationType="@Model.LocationType">
                         @Model.DatasetName
                     </h1>
-                    <div style="margin-top:-30px;" class="col-md-12 text-right">
+                    <div class="col-md-12 text-right">
 
-                        <button type="button" class="btn btn-default borderdk_gray borderdk_@Model.CategoryColor"
-                                id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
+                        <a class="btn px-3"
+                           id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
                             @if (Model.IsFavorite)
                             {
-                                <span class="glyphicon glyphicon-star @Model.CategoryColor" id="favoriteIcon"></span>
+                                <em class="fas fa-star dsc-icon-button @textColor mr-0 align-middle" id="favoriteIcon"></em>
                             }
                             else
                             {
-                                <span class="glyphicon glyphicon-star-empty @Model.CategoryColor" id="favoriteIcon"></span>
+                                <em class="far fa-star dsc-icon-button @textColor mr-0 align-middle" id="favoriteIcon"></em>
                             }
-                        </button>
+                        </a>
+
                         @if (Model.Security.CanEditReport)
                         {
-                            <button type="button" class="btn btn-default dataset-operation-button borderdk_gray borderdk_@Model.CategoryColor"
-                                    id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Report">
-                                <span class="glyphicon glyphicon-edit @Model.CategoryColor"></span>
-                            </button>
+                            <a class="btn px-3"
+                               id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Report">
+                                <em class="far fa-edit dsc-icon-button align-self-center @textColor mr-0 align-middle"></em>
+                            </a>
                         }
-                        <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
-                            <button type="button" class="btn btn-default borderdk_gray borderdk_@Model.CategoryColor dropdown" data-toggle="dropdown">
-                                <span class="glyphicon glyphicon-menu-hamburger @Model.CategoryColor"></span>
-                            </button>
-                            <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                        <div class="btn-group" data-toggle="tooltip" data-placement="top" title="Additional Actions">
+                            <a class="btn px-3" data-toggle="dropdown">
+                                <em class="fas fa-bars dsc-icon-button @textColor mr-0 align-middle"></em>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-start">
                                 @if (Model.Security.CanEditReport)
                                 {
-                                    <li>
-                                        <a id="deleteLink" href="" data-id="@Model.DatasetId">Delete Exhibit</a>
-                                    </li>
+                                    <a class="dropdown-item" id="deleteLink" href="" data-id="@Model.DatasetId">Delete Exhibit</a>
                                 }
-                                <li>
-                                    <a href="@Model.MailtoLink">Share Exhibit</a>
-                                </li>
-                            </ul>
+                                <a class="dropdown-item" href="@Model.MailtoLink">Share Exhibit</a>
+
+                            </div>
                         </div>
 
                     </div>
@@ -59,25 +58,24 @@
         </div>
     </div>
 
-    <br />
 
-    <div class="row" style="margin-top: 15px;">
+    <div class="row pt-3">
         <div class="col-lg-12">
             <div class="row">
-                <div class="col-lg-8 col-sm-6">
-                    <div style="margin-top: 15px;">
+                <div class="col-lg-8">
+                    <div>
                         @if (!String.IsNullOrWhiteSpace(Model.DatasetDesc))
                         {
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div>
-                                        <h6 class="@Model.CategoryColor">Description:</h6><br />
+                                        <h6 class="@textColor pt-2">Description:</h6><br />
 
                                         @if (Model.DatasetDesc.Length >= 500)
                                         {
                                             int last = Model.DatasetDesc.Substring(0, 500).LastIndexOf(" ");
                                             <p class="spanContainer">
-                                                <span style="margin-top: 15px;">@Model.DatasetDesc.Substring(0, last)</span>
+                                                <span>@Model.DatasetDesc.Substring(0, last)</span>
                                                 <span id="descSeeMoreEllipsis">...&nbsp;</span>
                                                 <span id="descSeeMorePanel" style="display: none;">@Model.DatasetDesc.Substring(last) </span>
                                                 <span id="descSeeMoreButton" style="cursor: pointer;"><a onclick="$('#descSeeMorePanel').show(); $(this).parent().hide(); $('#descShowLessButton').show(); $('#descSeeMoreEllipsis').hide();">See More</a></span>
@@ -117,36 +115,37 @@
                 </div>
 
                 <div class="col-lg-4">
-                    <div class="row" style="border: 1px #DDDDDD solid; background: white; padding: 20px;">
+                    <div class="" style="border: 1px #DDDDDD solid; background: white;">
 
-                        <div class="row" style="min-height: 60px;">
-                            <div class="col-lg-6">
-                                <h5 class="@Model.CategoryColor">Refresh Frequency</h5>
-                                <h6 class="@Model.CategoryColor">@Model.FrequencyDescription</h6>
+                        <div class="row pl-3">
+                            <div class="col">
+                                <h5 class="@textColor pt-3">Refresh Frequency</h5>
+                                <p class="@textColor">@Model.FrequencyDescription</p>
                             </div>
                         </div>
 
                         <hr />
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <h5 class="@Model.CategoryColor">Contact</h5>
+                        <div class="row pl-3">
+                            <div class="col">
+                                <h5 class="@textColor pt-3">Contact</h5>
                                 @foreach (var contact in Model.ContactDetails)
                                 {
-                                    <h6 class="@Model.CategoryColor col-lg-6"><a href="mailto:@contact.Email?Subject=Exhibit%20Inquiry%20- @Model.DatasetName">@contact.Name</a></h6>
+                                    <p class="@textColor col-lg-6"><a href="mailto:@contact.Email?Subject=Exhibit%20Inquiry%20- @Model.DatasetName">@contact.Name</a></p>
                                 }
 
                             </div>
                         </div>
 
                         <hr />
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <h5 class="@Model.CategoryColor">Exhibit Views</h5>
-                                <h6 class="@Model.CategoryColor" style="font-feature-settings: 'lnum';">@Model.Views</h6>
+                        <div class="row pl-3">
+                            <div class="col">
+                                <h5 class="@textColor pt-3">Exhibit Views</h5>
+                                <p class="@textColor" style="font-feature-settings: 'lnum';">@Model.Views</p>
                             </div>
                         </div>
 
                     </div>
+
                 </div>
             </div>
         </div>
@@ -157,30 +156,30 @@
     <div class="row">
         <div class="col-lg-12">
             <div id="aboutThisSchema" class="metadataHeader">
-                <h3 class="@Model.CategoryColor">About this Exhibit</h3>
+                <h3 class="@textColor">About this Exhibit</h3>
             </div>
             <div class="metadataBody container row" style="border: 1px #DDDDDD solid; background: white; padding: 10px;">
                 <div class="col-lg-4">
-                    <h5 class="@Model.CategoryColor">Tags:</h5>
+                    <h5 class="@textColor">Tags:</h5>
                     @foreach (var item in Model.TagNames)
                     {
                         <div class="tags-block htCenter tag_@item">@item</div>
                     }
 
-                    <h5 class="@Model.CategoryColor">Categories:</h5>
+                    <h5 class="@textColor">Categories:</h5>
                     @foreach (var item in Model.CategoryNames)
                     {
                         <div class="tags-block htCenter tag_@item">@item</div>
                     }
                 </div>
                 <div class="col-lg-4">
-                    <h5 class="@Model.CategoryColor">Functions:</h5>
+                    <h5 class="@textColor">Functions:</h5>
                     @foreach (var item in Model.FunctionNames)
                     {
                         <div class="tags-block htCenter tag_@item">@item</div>
                     }
 
-                    <h5 class="@Model.CategoryColor">Business Units:</h5>
+                    <h5 class="@textColor">Business Units:</h5>
                     @foreach (var item in Model.BusinessUnitNames)
                     {
                         <div class="tags-block htCenter tag_@item">@item</div>
@@ -189,7 +188,7 @@
                 @if (Model.Security.CanEditReport)
                 {
                     <div class="col-lg-4">
-                        <h5 class="@Model.CategoryColor">Exhibit Creator: @Model.UploadUserName</h5>
+                        <h5 class="@textColor">Exhibit Creator: @Model.UploadUserName</h5>
                     </div>
                 }
             </div>

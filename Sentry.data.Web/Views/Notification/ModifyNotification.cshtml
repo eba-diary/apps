@@ -5,22 +5,22 @@
 
 <div class="topBanner">
     <div>
-        <a class="backToList" href="/Notification/ManageNotification"><span class="glyphicon glyphicon-chevron-left"></span>Back to Previous Page</a>
+        <a class="backToList" href="/Notification/ManageNotification"><em class="fas fa-chevron-left pr-3"></em>Back to Previous Page</a>
     </div>
 </div>
 
 @if (Model.NotificationId == 0)
 {
-    <h1>Create Notification</h1>
+    <h1 class="pt-1">Create Notification</h1>
 }
 else
 {
-    <h1>Edit Notification</h1>
+    <h1 class="pt-1">Edit Notification</h1>
 }
 
 <hr />
 @*Attach class to form because Notification.js uses class here to submit form because of quill*@
-@using (Html.BeginForm("SubmitNotification", "Notification", FormMethod.Post,htmlAttributes: new { @class = "modifyNotificationForm" }))
+@using (Html.BeginForm("SubmitNotification", "Notification", FormMethod.Post, htmlAttributes: new { @class = "modifyNotificationForm" }))
 {
     @Html.AntiForgeryToken()
     @Html.HiddenFor(m => m.CreateUser)
@@ -29,95 +29,65 @@ else
 <div class="form-horizontal">
     @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
-
-
-    <br />
-
-    <div class="form-group">
-        @Html.LabelFor((model) => model.ObjectId, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.DropDownListFor(model => model.ObjectId, Model.AllDataAssets, new { @class = "form-control" })
-        </div>
+    <div class="md-form">
+        @Html.LabelFor((model) => model.ObjectId, htmlAttributes: new { @class = "mdb-main-label" })
+        @Html.DropDownListFor(model => model.ObjectId, Model.AllDataAssets, new { @class = "mdb-select" })
     </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.StartTime, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(m => m.StartTime, new { @class = "form-control edit-dataset-row", @style = "width: 92%; display: inline-block;" })
-            <span class="input-group-addon" style="display: inline-block;">
-                <span class="glyphicon glyphicon-calendar"></span>
-            </span>
-        </div>
+    <div class="md-form">
+        <input class="form-control" data-val="true" data-val-date="The field Start Time must be a date." data-val-required="The Start Time field is required." id="StartTime" name="StartTime" type="datetime-local" value='@Model.StartTime.ToString("s")'>
+        @Html.LabelFor(m => m.StartTime, htmlAttributes: new { @class = "active" })
     </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.ExpirationTime, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(m => m.ExpirationTime, new { @class = "form-control edit-dataset-row", @style = "width: 92%; display: inline-block;" })
-            <span class="input-group-addon" style="display: inline-block;">
-                <span class="glyphicon glyphicon-calendar"></span>
-            </span>
-        </div>
+    <div class="md-form">
+        <input class="form-control" data-val="true" data-val-date="The field Expiration Time must be a date." data-val-required="The Expiration Time field is required." id="ExpirationTime" name="ExpirationTime" type="datetime-local" value='@Model.ExpirationTime.ToString("s")'>
+        @Html.LabelFor(m => m.ExpirationTime, htmlAttributes: new { @class = "active" })
     </div>
 
-
-    <div class="form-group" id="notificationCategoryContainer">
-        @Html.LabelFor((model) => model.NotificationCategory, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.DropDownListFor(model => model.NotificationCategory, Model.AllNotificationCategories, new { @class = "form-control edit-dataset-row" })
-        </div>
+    <div class="md-form" id="notificationCategoryContainer">
+        @Html.LabelFor((model) => model.NotificationCategory, htmlAttributes: new { @class = "mdb-main-label" })
+        @Html.DropDownListFor(model => model.NotificationCategory, Model.AllNotificationCategories, new { @class = "mdb-select" })
     </div>
 
-    <div class="form-group" id="notificationSubCategoryReleaseNotesContainer">
-        @Html.LabelFor((model) => model.NotificationSubCategoryReleaseNotes, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.DropDownListFor(model => model.NotificationSubCategoryReleaseNotes, Model.AllNotificationSubCategoriesReleaseNotes, new { @class = "form-control edit-dataset-row" })
-        </div>
+    <div class="md-form" id="notificationSubCategoryReleaseNotesContainer">
+        @Html.LabelFor((model) => model.NotificationSubCategoryReleaseNotes, htmlAttributes: new { @class = "mdb-main-label" })
+        @Html.DropDownListFor(model => model.NotificationSubCategoryReleaseNotes, Model.AllNotificationSubCategoriesReleaseNotes, new { @class = "mdb-select" })
     </div>
 
-    <div class="form-group" id="notificationSubCategoryNewsContainer">
-        @Html.LabelFor((model) => model.NotificationSubCategoryNews, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.DropDownListFor(model => model.NotificationSubCategoryNews, Model.AllNotificationSubCategoriesNews, new { @class = "form-control edit-dataset-row" })
-        </div>
+    <div class="md-form" id="notificationSubCategoryNewsContainer">
+        @Html.LabelFor((model) => model.NotificationSubCategoryNews, htmlAttributes: new { @class = "mdb-main-label" })
+        @Html.DropDownListFor(model => model.NotificationSubCategoryNews, Model.AllNotificationSubCategoriesNews, new { @class = "mdb-select" })
     </div>
 
 
     <div class="form-group">
-        @Html.LabelFor((model) => model.MessageSeverity, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.DropDownListFor(model => model.MessageSeverity, Model.AllSeverities, new { @class = "form-control edit-dataset-row" })
-        </div>
+        @Html.LabelFor((model) => model.MessageSeverity, htmlAttributes: new { @class = "mdb-main-label" })
+        @Html.DropDownListFor(model => model.MessageSeverity, Model.AllSeverities, new { @class = "mdb-select" })
     </div>
 
     <div class="form-group">
 
-        @Html.LabelFor((model) => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+        @Html.LabelFor((model) => model.Title, htmlAttributes: new { @class = "control-label" })
 
 
-        <div class="col-md-10">
+        <!-- Quill editor container -->
+        <div id="quillEditorTitle"> </div>
 
-            <!-- Quill editor container -->
-            <div id="quillEditorTitle"> </div>
+        <!-- Bogus TextArea to store Title which will be the encoded version saved to DB, notification.js will copy an encoded version here upon submit button -->
+        @Html.TextAreaFor((model) => model.Title, htmlAttributes: new { @class = "quillTitleEncoded", @style = "display:none" })
 
-            <!-- Bogus TextArea to store Title which will be the encoded version saved to DB, notification.js will copy an encoded version here upon submit button -->
-            @Html.TextAreaFor((model) => model.Title, htmlAttributes: new { @class = "quillTitleEncoded", @style = "display:none" })
-
-        </div>
 
     </div>
 
     <div class="form-group" id="messageContainer">
-        @Html.LabelFor((model) => model.Message, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            <!-- Quill editor container -->
-            <div id="quillEditorMessage"> </div>
+        @Html.LabelFor((model) => model.Message, htmlAttributes: new { @class = "control-label" })
+        <!-- Quill editor container -->
+        <div id="quillEditorMessage"> </div>
 
-            <!-- Bogus TextArea which will hold encoded message too be saved to DB, notification.js will copy an encoded version here upon submit button -->
-            @Html.TextAreaFor((model) => model.Message, htmlAttributes: new { @class = "quillMessageEncoded", @style = "display:none" })
+        <!-- Bogus TextArea which will hold encoded message too be saved to DB, notification.js will copy an encoded version here upon submit button -->
+        @Html.TextAreaFor((model) => model.Message, htmlAttributes: new { @class = "quillMessageEncoded", @style = "display:none" })
 
-        </div>
     </div>
 
-    <div class="form-group">
+    <div class="md-form">
         <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
     </div>
     <br />
@@ -125,11 +95,13 @@ else
     <div class="form-group">
         <div>
             <!-- Submit button triggers JS function -->
-            <input value="Submit" class="btn btn-primary" onclick="data.Notification.submitChanges() " />
+            <input value="Submit" type="button" class="btn btn-primary waves-effect waves-light" onclick="data.Notification.submitChanges() " />
             <a class="btn btn-warning" href="/Notification/ManageNotification">Cancel</a>
         </div>
     </div>
+
 </div>
+
 }
 @section Scripts {
 
@@ -138,8 +110,12 @@ else
 <script type="text/javascript">
 
         $(function () {
-            $('#StartTime').datetimepicker();
-            $('#ExpirationTime').datetimepicker();
+
+            $('#ObjectId').materialSelect();
+            $('#NotificationCategory').materialSelect();
+            $('#NotificationSubCategoryReleaseNotes').materialSelect();
+            $('#NotificationSubCategoryNews').materialSelect();
+            $('#MessageSeverity').materialSelect();
 
             data.Notification.CLA3882_DSC_NOTIFICATION_SUBCATEGORY = @Model.CLA3882_DSC_NOTIFICATION_SUBCATEGORY.ToString().ToLower();
             data.Notification.initQuill();      //init Quill RTF editor and fill it with notification message

@@ -2,23 +2,24 @@
 @{ViewBag.Title = "Datasets at Sentry";}
 
 <div id="ds-page-wrapper" class="text-center">
-    <h2 id="ds-welcome-text">Welcome to the Sentry Dataset Portal. Please type below to search or choose a category.</h2>
+    <h4 id="ds-welcome-text">Welcome to the Sentry Dataset Portal. Please type below to search or choose a category.</h4>
     @{
         var category = Model.Categories.ToList();
     }
     <div class="container">
         <div id="ds-search-wrapper" class="ds-grid col-md-12">
             <div class="row">
-                @{
-                    using (Html.BeginForm(@"Datasets", "Search", FormMethod.Get, new { @class = "navbar-form navbar-center", @id = "DatasetSearch" }))
-                    {
-                    <div id="ds-search-input-wrapper" class="input-group">
-                        <span class="input-group-addon clickable ds-search-icon" onclick="$(function() {$('#SearchText').focus();});"><i class="glyphicon glyphicon-search"></i></span>
-
-                        <input type="text" id="SearchText" name="searchPhrase" class="form-control ds-search-textbox" placeholder="Search from @Model.DatasetCount Datasets ..." />
-                    </div>
+                <div class="col-md-3"></div>
+                <div class="col-md-6">
+                    @{
+                        using (Html.BeginForm(@"Datasets", "Search", FormMethod.Get, new { @class = "md-form input-group w-100", @id = "DatasetSearch" }))
+                        {
+                            <span class="input-group-prepend sentry-blue white-text clickable" id="SearchIconAddon" onclick="$(function() {$('#SearchText').submit();});"><em class="icon-search"></em></span>
+                            <input type="text" id="SearchText" class="form-control ds-search-textbox" placeholder="Search from @Model.DatasetCount Datasets ...">
+                        }
                     }
-                }
+                </div>
+                <div class="col-md-3"></div>
             </div>
         </div>
         <div id="ds-tile-wrapper" class="ds-grid col-md-12">
@@ -26,7 +27,7 @@
             {
                 if (i % 3 == 0)
                 {
-                    @:<div class="row text-center">
+                    @:<div class="row text-center d-block">
                 }
                 var tileName = category[i].Name.ToLower() + "Tile";
                 var color = category[i].Color;
@@ -54,7 +55,7 @@
                 }
             }
 
-            <div class="row text-center">
+            <div class="row text-center d-inline-block">
                 <div class="ds-upload-row">
                     @if (Model.CanEditDataset)
                     {
@@ -65,7 +66,7 @@
                         else
                         {
                             <button type="button" class="btn btn-default btn-lg ds-operation-button" id="CreateDataset">
-                                <span class="glyphicon glyphicon-plus text-primary"></span> Create Dataset
+                                <span class="fas fa-plus text-primary"></span> Create Dataset
                             </button>
                         }
                     }

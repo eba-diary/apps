@@ -9,5 +9,6 @@ namespace Sentry.data.Core
         bool UpdateIsSensitive(List<DaleSensitiveDto> dtos);
         DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dtoSearch);
         DaleCategoryResultDto GetCategoriesByAsset(string search);
+        bool TryGetCategoryName(string category, out string categoryName);
     }
 }

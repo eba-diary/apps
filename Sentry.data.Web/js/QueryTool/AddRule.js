@@ -47,7 +47,7 @@
         "</select>" +
         "<div class=\"btn-group pull-right rule-actions\">" +
         "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
-        "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
+        "<i class=\"icon-close\"></i> Delete" +
         "</button>" +
         "</div>" +
         "</div>");
@@ -110,7 +110,7 @@ function addJoinFromTable() {
 
         "<div class=\"btn-group pull-right rule-actions\">" +
         "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
-        "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
+        "<i class=\"icon-close\"></i> Delete" +
         "</button>" +
         "</div>" +
         "</div>");
@@ -155,7 +155,7 @@ function addOnClause() {
             "</select>" +
             "<div class=\"btn-group pull-right rule-actions\">" +
                 "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
-                "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
+                "<i class=\"icon-close\"></i> Delete" +
                 "</button>" +
             "</div>" +
         "</div>");
@@ -185,7 +185,7 @@ function addOrRemoveColumnRename(text, selected) {
             "<input class=\"form-control ruleController\" style=\"width: 45%; display:inline-block;\" placeholder=\"Renamed As... \">" +
             "<div class=\"btn-group pull-right rule-actions\">" +
             "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
-            "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
+            "<i class=\"icon-close\"></i> Delete" +
             "</button>" +
             "</div>" +
             "</div>");
@@ -212,7 +212,7 @@ function addOrderByRule() {
         "</select>" +
         "<div class=\"btn-group pull-right rule-actions\">" +
         "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
-        "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
+        "<i class=\"icon-close\"></i> Delete" +
         "</button>" +
         "</div>" +
         "</div>");
@@ -264,7 +264,7 @@ function addHavingRule() {
         "<input class=\"form-control\" style= \"width: 18.4%; display: inline-block;\" />" +
         "<div class=\"btn-group pull-right rule-actions\">" +
         "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
-        "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
+        "<i class=\"icon-close\"></i> Delete" +
         "</button>" +
         "</div>" +
         "</div>");
@@ -300,7 +300,7 @@ function addGroupByRule() {
         "<select id=\"" + id + "\" class=\"form-control groupBySelector\" name=\"builder-basic_rule_0_filter\" style=\"width: 90%; display: inline-block;\"></select>" +
         "<div class=\"btn-group pull-right rule-actions\">" +
         "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
-        "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
+        "<i class=\"icon-close\"></i> Delete" +
         "</button>" +
         "</div>" +
         "</div>");
@@ -344,7 +344,7 @@ function addAggregateRule() {
         "<input class=\"form-control\" style= \"width: 18.4%; display: inline-block;\" placeholder=\"Renamed As ... (Leave blank if wanted)\" />" +
         "<div class=\"btn-group pull-right rule-actions\">" +
         "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
-        "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
+        "<i class=\" icon-close\"></i> Delete" +
         "</button>" +
         "</div>" +
         "</div>");

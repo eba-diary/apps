@@ -30,7 +30,7 @@
                 <div class="col-xs-12 col-sm-1 col-md-1 col-lg-1"></div>
 
                 <div id="ds-wrapper" class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
-                    <a href="/Dataset"><h2 class="home-tile-link-bi green">Datasets</h2></a>
+                    <a href="/Dataset"><h2 class="home-tile-link-bi sentry-dark-green-text">Datasets</h2></a>
                     <div class="home-photo bg-photo-ds border-btm-green"></div>
                     <div id="ds-content-wrapper" class="home-tile">
                         <p>
@@ -48,7 +48,7 @@
             <div class="row">
 
                 <div id="ds-wrapper" class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
-                    <a href="/DataInventory/Search"><h2 class="home-tile-link-di-large yellow">Data Inventory</h2></a>
+                    <a href="/DataInventory/Search"><h2 class="home-tile-link-di-large ">Data Inventory</h2></a>
                     <div class="home-photo bg-photo-di border-btm-yellow"></div>
                     <div id="ds-content-wrapper" class="home-tile">
                         <p>
@@ -61,7 +61,7 @@
                 <div class="col-xs-12 col-sm-1 col-md-1 col-lg-1"></div>
 
                 <div id="da-wrapper" class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
-                    <a href="/DataAsset/Index"><h2 class="home-tile-link-bi plum">Data Assets</h2></a>
+                    <a href="/DataAsset/Index"><h2 class="home-tile-link-bi sentry-dark-plum-text">Data Assets</h2></a>
                     <div class="home-photo bg-photo-da border-btm-plum"></div>
                     <div id="da-conent-wrapper" class="home-tile">
                         <p>
@@ -81,11 +81,11 @@
         @if (Model.CLA2838_DSC_ANOUNCEMENTS)
         {
             @*VERSION WITH DSC ANNOUNCEMENTS*@
-            <div class="col-xs-12 col-sm-5 col-md-3 col-lg-3">
+            <div class="col-md-3">
 
                 @*FAVORITES SECTION*@
-                <h2 class="float-l">My Favorites</h2>
-                <div id="edit-favorites-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Edit Favorites"><span class="glyphicon glyphicon-pencil"></span></div>
+                <h4 class="float-l">My Favorites</h4>
+                <div id="edit-favorites-icon" class="float-r clickable pt-3" data-toggle="tooltip" data-placement="top" title="Edit Favorites"><em class="far fa-edit"></em></div>
                 <div class="border-btm-blue clearFloat"></div>
 
                 <div id="favoritePanel" class="favorite-add-scroll">
@@ -95,9 +95,9 @@
                 </div>
 
                 @*ANNOUNCEMENTS SECTION*@
-                <h2 class="float-l">Announcements</h2>
-                <div id="edit-Feed-icon"      class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Create Announcement" onclick="location.href = 'Notification/ManageNotification';">     <span class="glyphicon glyphicon-pencil">   </span>       </div>
-                <div id="subscribe-Feed-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Subscribe">                                                                            <span class="glyphicon glyphicon-envelope"> </span>       </div>
+                <h4 class="float-l">Announcements</h4>
+                <div id="edit-Feed-icon" class="float-r clickable pt-3" data-toggle="tooltip" data-placement="top" title="Create Announcement" onclick="location.href = 'Notification/ManageNotification';">     <em class="far fa-edit">   </em>       </div>
+                <div id="subscribe-Feed-icon" class="float-r clickable pt-3" data-toggle="tooltip" data-placement="top" title="Subscribe">                                                                            <em class="far fa-envelope"> </em>       </div>
                 <div class="border-btm-blue clearFloat"></div>
 
                 <div id="feed" class="feedBox">
@@ -110,10 +110,10 @@
         else
         {
             @*VERSION WITHOUT DSC ANNOUNCEMENTS.  NOTE! DELETE THIS ENTIRE SECTION WHEN Model.CLA2838_DSC_ANOUNCEMENTS IS TRUE*@
-            <div class="col-xs-12 col-sm-5 col-md-3 col-lg-3">
+            <div class="col-md-3">
 
                 <h2 class="float-l">My Favorites</h2>
-                <div id="edit-favorites-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Edit Favorites"><span class="glyphicon glyphicon-pencil"></span></div>
+                <div id="edit-favorites-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Edit Favorites"><em class="far fa-edit"></em></div>
                 <div class="border-btm-blue clearFloat"></div>
 
                 <div id="favoritePanel">

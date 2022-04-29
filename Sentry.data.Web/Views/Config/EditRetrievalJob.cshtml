@@ -7,7 +7,7 @@
 
 <div class="topBanner">
     <div>
-        <a class="backToList" href="/Config/Dataset/@Model.DatasetID"><span class="glyphicon glyphicon-chevron-left"></span>Back to Dataset Configuration</a>
+        <a class="backToList" href="/Config/Dataset/@Model.DatasetID"><em class="fas fa-chevron-left pr-3"></em>Back to Dataset Configuration</a>
     </div>
 </div>
 
@@ -87,7 +87,7 @@
             <div class="form-group editDataSourceLink" style="display:none;">
                 <label class="control-label col-md-2"></label>
                 <div class="col-md-10">
-                    <a id="editDataSource" class="backToList" href="/Config/Source/Edit"><span class="glyphicon glyphicon-chevron-right"></span>Edit Data Source</a>
+                    <a id="editDataSource" class="backToList" href="/Config/Source/Edit"><em class="fas fa-chevron-right"></em>Edit Data Source</a>
                 </div>
             </div>
 
@@ -96,7 +96,7 @@
                 <div class="form-group">
                     <label class="control-label col-md-2"></label>
                     <div class="col-md-10">
-                        <a class="backToList" href="/Config/Source/Create"><span class="glyphicon glyphicon-plus"></span>Create new Data Source</a>
+                        <a class="backToList" href="/Config/Source/Create"><em class="fas fa-plus"></em>Create new Data Source</a>
                     </div>
                 </div>
             }
@@ -298,13 +298,13 @@
                                     {
                                         <div>
                                             <input class="form-control edit-dataset-row fileNameExclusion" style="display: inline-block; width: 80%;" value="@a" />
-                                            <a class="removeFileName" style="display: inline-block; margin-left: 10px;"><span class="glyphicon glyphicon-minus"></span> Remove File Name</a>
+                                            <a class="removeFileName" style="display: inline-block; margin-left: 10px;"><em class="fas fa-minus"></em> Remove File Name</a>
                                         </div>
                                     }
 
                                     <div>
                                         <input class="form-control edit-dataset-row fileNameExclusion" style="display: inline-block; width: 80%;" />
-                                        <a class="removeFileName" style="display: inline-block; margin-left: 10px;"><span class="glyphicon glyphicon-minus"></span> Remove File Name</a>
+                                        <a class="removeFileName" style="display: inline-block; margin-left: 10px;"><em class="fas fa-minus"></em> Remove File Name</a>
                                     </div>
                                 </div>
                             </div>
@@ -321,7 +321,7 @@
                             <div class="form-group">
                                 <label class="control-label col-md-2"></label>
                                 <div class="col-md-10">
-                                    <a class="addFileName"><span class="glyphicon glyphicon-plus"></span> Add File to Exclude</a>
+                                    <a class="addFileName"><em class="fas fa-plus"></em> Add File to Exclude</a>
                                 </div>
                             </div>
                         </div>
@@ -479,7 +479,7 @@
         $('.addFileName').click(function () {
             $('#fileNamePanel').append("<div>" +
                 "<input class= \"form-control edit-dataset-row fileNameExclusion\" style = \"display: inline-block; width: 80%;\" />" +
-                "<a class=\"removeFileName\" style=\"display: inline-block; margin-left: 10px;\" ><span class=\"glyphicon glyphicon-minus\"></span> Remove File Name</a>" +
+                "<a class=\"removeFileName\" style=\"display: inline-block; margin-left: 10px;\" ><em class=\"fas fa-minus\"></i> Remove File Name</a>" +
                 "</div>");
         });
 

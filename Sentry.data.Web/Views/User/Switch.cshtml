@@ -12,7 +12,7 @@
 @Html.AntiForgeryToken()
 
 <div class="">
-    <div class="form-group">
+    <div class="md-form">
         Hello @(Model.CurrentRealUserName).
         @{if (!String.IsNullOrEmpty(Model.CurrentImpersonatedUserName))
             {
@@ -64,13 +64,12 @@
 
                 @Html.DisplayFor(((model) => ViewData.ModelState))
 
-                <div class="form-group">
-                    @Html.LabelFor(((model) => model.OwnerID), "Enter the user id you wish to switch to", new { @class = "control-label" })
-                    <div class="">
-                        @Html.Editor("OwnerPicker", new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.HiddenFor(((model) => model.OwnerID), new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(((model) => model.OwnerID), "", new { @class = "text-danger" })
-                    </div>
+                <div class="md-form associatePicker">
+                    @Html.Editor("OwnerPicker", new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.Label("Enter the user id you wish to switch to", new { @class = "control-label active", @for = "OwnerPicker" })
+
+                    @Html.HiddenFor(((model) => model.OwnerID), new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(((model) => model.OwnerID), "", new { @class = "text-danger" })
                 </div>
 
 
@@ -98,6 +97,8 @@
                     $('#OwnerID').val(associate.Id);
                 }
             });
+
+            $(".associatePicker label").addClass("active");
 
             $("p").each(function (a, b) { if (b.innerHTML.indexOf('True') !== -1) { $(b).css('font-weight', 'bold'); } });
         });

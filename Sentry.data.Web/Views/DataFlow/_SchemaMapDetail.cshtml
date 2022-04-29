@@ -2,8 +2,13 @@
 <ul class="schemaMappingList">
     @foreach (SchemaMapDetailModel map in Model)
     {
-        <li class="col-md-12">
-            <div class="col-md-6"><a href="@map.DatasetDetailUrl"><span>@map.DatasetName</span></a></div> <div class="col-md-6"><span>@map.SchemaName</span></div>
+        <li class="row">
+            <div class="col">
+                Dataset: <a href="@map.DatasetDetailUrl"><span>@map.DatasetName</span></a>
+            </div> 
+            <div class="col">
+                Schema: <span>@map.SchemaName</span>
+            </div>
         </li>            
     }
 </ul>

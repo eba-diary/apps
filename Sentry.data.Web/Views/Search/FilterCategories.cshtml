@@ -8,6 +8,7 @@
 {
     public string SafeValue(string value)
     {
+        if(value == null) { return ""; }
         return value.Length > 25 ? value.Substring(0, 22) + "..." : value;
     }
 }
@@ -17,11 +18,13 @@
     foreach (FilterCategoryOptionModel option in options.ToList())
     {
         <li class="filter-search-category-option" title="@option.OptionValue">
-            <label>
-                <input type="checkbox" class="filter-search-category-option-checkbox" id="@option.OptionId" value="@option.OptionValue" checked="@option.Selected" />
-                <strong>@SafeValue(option.OptionValue)</strong>
-                <span>(@option.ResultCount.ToString("N0"))</span>
-            </label>
+            <div class="form-group mb-0">
+                <input type="checkbox" id="@option.OptionId" class="form-check-input filter-search-category-option-checkbox" value="@option.OptionValue" checked="@option.Selected">
+                <label for="@option.OptionId" class="form-check-label filter-search-category-option-label">
+                    @SafeValue(option.OptionValue)
+                    <span class="filter-search-category-option-count">(@option.ResultCount.ToString("N0"))</span>
+                </label>                
+            </div>
         </li>
     }
 }
@@ -29,9 +32,9 @@
 <div class="filter-search-active-options-container bottom-border display-none">
     @foreach (FilterCategoryOptionModel option in orderedModel.SelectMany(x => x.CategoryOptions.OrderByDescending(o => o.ResultCount).ToList()))
     {
-        <button type="button" class="btn btn-default filter-search-active-option-close display-none" id="clearOption_@option.OptionId">
+        <button type="button" class="btn btn-default btn-sm filter-search-active-option-close display-none" id="clearOption_@option.OptionId" title="@option.ParentCategoryName">
             <span class="active-option-close-symbol">&#x2715</span>
-            <span><strong>@option.ParentCategoryName</strong>: @SafeValue(option.OptionValue)</span>
+            <span>@SafeValue(option.OptionValue)</span>
         </button>
     }
 </div>
@@ -50,7 +53,7 @@
             <div class="filter-search-category-container bottom-border">
                 <div class="filter-search-category-head" id="@categoryTypeId">
                     <span>@category.CategoryName</span>
-                    <span class="glyphicon glyphicon-chevron-down" id="icon_@categoryTypeId"></span>
+                    <em class="fas fa-chevron-down" id="icon_@categoryTypeId"></em>
                 </div>
 
                 <div class="filter-search-category-options display-none" id="hide_@categoryTypeId">
@@ -79,7 +82,7 @@
     else
     {
         <div class="filter-search-categories-none">
-            <span class="glyphicon glyphicon-alert"></span>
+            <span class="fas fa-exclamation-triangle"></span>
             <div>No filters available for current search</div>
         </div>
     }

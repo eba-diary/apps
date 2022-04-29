@@ -7,7 +7,7 @@
 
 <div class="topBanner">
     <div>
-        <a class="backToList" href="/Config/Dataset/@Model.DatasetID"><span class="glyphicon glyphicon-chevron-left"></span>Back to Dataset Configuration</a>
+        <a class="backToList" href="/Config/Dataset/@Model.DatasetID"><em class="fas fa-chevron-left pr-3"></em>Back to Dataset Configuration</a>
     </div>
 </div>
 
@@ -26,14 +26,13 @@
 
     <h1>Create Dataset Retrieval Job</h1>
     <p>Please fill out the following fields to configure a retrieval job.</p>
-    <div class="form-group">
+    <div class="md-form">
         <span><em>** Fields in <b>Bold</b> are Required</em></span>
     </div>
     <hr />
     <h3>Data Source Information</h3>
     <hr />
-    <div id="myTabContent" class="tab-content">
-        <div id="informationPanel" class="tab-pane fade active in form-horizontal">
+        <div id="informationPanel">
 
             <div class="form-group">
                 @Html.LabelFor((model) => model.SelectedSourceType, new { @class = "control-label col-md-2" })
@@ -51,7 +50,7 @@
                 </div>
                 <div class="securityPanel col-md-5" style="display:none;">
                     <div class="form-group col-md-1">
-                        <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
+                        <span class="fas fa-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
                     </div>
                     <div class="col-md-4">
                         <span>
@@ -81,7 +80,7 @@
             <div class="form-group editDataSourceLink" style="display:none;">
                 <label class="control-label col-md-2"></label>
                 <div class="col-md-10">
-                    <a id="editDataSource" class="backToList" href="/Config/Source/Edit"><span class="glyphicon glyphicon-chevron-right"></span>Edit Data Source</a>
+                    <a id="editDataSource" class="backToList" href="/Config/Source/Edit"><em class="fas fa-chevron-right"></em>Edit Data Source</a>
                 </div>
             </div>
 
@@ -90,7 +89,7 @@
                 <div class="form-group">
                     <label class="control-label col-md-2"></label>
                     <div class="col-md-10">
-                        <a class="backToList" href="/Config/Source/Create"><span class="glyphicon glyphicon-plus"></span>Create new Data Source</a>
+                        <a class="backToList" href="/Config/Source/Create"><em class="fas fa-plus pr-3"></em>Create new Data Source</a>
                     </div>
                 </div>
             }
@@ -264,13 +263,13 @@
                                     {
                                         <div>
                                             <input class="form-control edit-dataset-row fileNameExclusion" style="display: inline-block; width: 80%;" value="@a" />
-                                            <a class="removeFileName" style="display: inline-block; margin-left: 10px;"><span class="glyphicon glyphicon-minus"></span> Remove File Name</a>
+                                            <a class="removeFileName" style="display: inline-block; margin-left: 10px;"><em class="fas fa-minus pr-3"></em> Remove File Name</a>
                                         </div>
                                     }
 
                                     <div>
                                         <input class="form-control edit-dataset-row fileNameExclusion" style="display: inline-block; width: 80%;" />
-                                        <a class="removeFileName" style="display: inline-block; margin-left: 10px;"><span class="glyphicon glyphicon-minus"></span> Remove File Name</a>
+                                        <a class="removeFileName" style="display: inline-block; margin-left: 10px;"><em class="fas fa-minus pr-3"></em> Remove File Name</a>
                                     </div>
                                 </div>
                             </div>
@@ -287,7 +286,7 @@
                             <div class="form-group">
                                 <label class="control-label col-md-2"></label>
                                 <div class="col-md-10">
-                                    <a class="addFileName"><span class="glyphicon glyphicon-plus"></span> Add File to Exclude</a>
+                                    <a class="addFileName"><em class="fas fa-plus pr-3"></em> Add File to Exclude</a>
                                 </div>
                             </div>
                         </div>
@@ -324,7 +323,6 @@
                         <div id="schedulePanel">
                             <div class="form-group configQuestion">
                                 <div class="col-md-12">
-                                    <hr />
                                     <h6>How often is your Data Generated?</h6>
                                 </div>
                             </div>
@@ -370,12 +368,12 @@
                                 </div>
                             </div>
 
-                            <div class="form-group scheduler" id="monthlyPicker">
-                                <label class="control-label col-md-2">Every Month on</label>
-                                <div class="col-md-10">
+                            <div class="md-form scheduler" id="monthlyPicker">
+                                <label class="control-label">Every Month on</label>
+                                <div class="row">
                                     <input id="cronMonthlyDayPicker" type="number" max="31" min="1" class="form-control" style="width:20%; display: inline-block;" placeholder="Day of the Month" />
                                     at
-                                    <input class="timepicker timepicker-with-dropdown text-center form-control edit-dataset-row" id="cronMonthlyJobTimePicker" style="width:15%; display: inline-block;" />
+                                    <input class="form-control timepicker" placeholder="Time..." id="cronMonthlyJobTimePicker" />
                                     CST
                                 </div>
                             </div>
@@ -414,7 +412,6 @@
                     </div>
                 </div>
         </div>
-    </div>
 
     <hr />
     <div class="form-group">
@@ -485,7 +482,7 @@
             $('.addFileName').click(function () {
                 $('#fileNamePanel').append("<div>" +
                     "<input class= \"form-control edit-dataset-row fileNameExclusion\" style = \"display: inline-block; width: 80%;\" />" +
-                    "<a class=\"removeFileName\" style=\"display: inline-block; margin-left: 10px;\" ><span class=\"glyphicon glyphicon-minus\"></span> Remove File Name</a>" +
+                    "<a class=\"removeFileName\" style=\"display: inline-block; margin-left: 10px;\" ><i class=\"fas fa-minus\"></i> Remove File Name</a>" +
                     "</div>");
             });
 

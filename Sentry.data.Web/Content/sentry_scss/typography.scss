@@ -1,0 +1,148 @@
+﻿/// <reference path="variables.scss" />
+
+// Source code fonts
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Source Sans Pro'), local('SourceSansPro-Regular'), url('#{$font-path}SourceCodePro/SourceSansPro-Regular.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-style: normal;
+    font-weight: 700;
+    src: local('Source Sans Pro Bold'), local('SourceSansPro-Bold'), url('#{$font-path}SourceCodePro/SourceSansPro-Bold.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-style: italic;
+    font-weight: 400;
+    src: local('Source Sans Pro Italic'), local('SourceSansPro-It'), url('#{$font-path}SourceCodePro/SourceSansPro-Italic.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-style: italic;
+    font-weight: 700;
+    src: local('Source Sans Pro Bold Italic'), local('SourceSansPro-BoldIt'), url('#{$font-path}SourceCodePro/SourceSansPro-BoldItalic.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Source Serif Pro';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Source Serif Pro'), local('SourceSerifPro-Regular'), url('#{$font-path}SourceCodePro/SourceSerifPro-Regular.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Source Serif Pro';
+    font-style: normal;
+    font-weight: 700;
+    src: local('Source Serif Pro Bold'), local('SourceSerifPro-Bold'), url('#{$font-path}SourceCodePro/SourceSerifPro-Bold.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Source Code Pro';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Source Code Pro'), local('SourceCodePro-Regular'), url('#{$font-path}SourceCodePro/SourceCodePro-Regular.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Source Code Pro';
+    font-style: normal;
+    font-weight: 700;
+    src: local('Source Code Pro Bold'), local('SourceCodePro-Bold'), url('#{$font-path}SourceCodePro/SourceCodePro-Bold.woff') format('woff');
+}
+
+// Kievit Standard
+@font-face {
+    font-family: "KievitWeb W03";
+    src: url("#{$font-path}Kievit/e74786d0-4129-4ee0-9fbf-ac89ad34c79f.eot?#iefix");
+    src: url("#{$font-path}Kievit/e74786d0-4129-4ee0-9fbf-ac89ad34c79f.eot?#iefix") format("eot"), url("#{$font-path}Kievit/6d74b788-0576-4423-9c00-3a7e1076f974.woff2") format("woff2"), url("#{$font-path}Kievit/a0e0d17f-ccd2-48ef-a503-348bebc1799d.woff") format("woff"), url("#{$font-path}Kievit/a8d9e4ac-b9f6-485d-bcd4-3d349982e19c.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "KievitWeb W03";
+    src: url("#{$font-path}Kievit/c1b39343-a2f0-4ae3-b881-826140ee5f67.eot?#iefix");
+    src: url("#{$font-path}Kievit/c1b39343-a2f0-4ae3-b881-826140ee5f67.eot?#iefix") format("eot"), url("#{$font-path}Kievit/ade77e5a-3ca7-4e76-80c3-194f0fc0124a.woff2") format("woff2"), url("#{$font-path}Kievit/e68ad6f9-e607-4bcb-9601-6b8017653331.woff") format("woff"), url("#{$font-path}Kievit/47567af7-8745-4a89-8d12-0603b825bbb3.ttf") format("truetype");
+    font-style: italic;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "KievitWeb W03";
+    src: url("#{$font-path}Kievit/2a203b1a-9b6d-4b4c-9465-da5adbd64303.eot?#iefix");
+    src: url("#{$font-path}Kievit/2a203b1a-9b6d-4b4c-9465-da5adbd64303.eot?#iefix") format("eot"), url("#{$font-path}Kievit/6111a3c3-8891-4abd-ab61-c786139e0ba3.woff2") format("woff2"), url("#{$font-path}Kievit/56c57025-d225-4399-b820-776d49f59b36.woff") format("woff"), url("#{$font-path}Kievit/67960b09-90fa-42a8-93ee-ef48c0ec23e6.ttf") format("truetype");
+    font-style: normal;
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "KievitWeb W03";
+    src: url("#{$font-path}Kievit/0ed27687-0803-436f-a185-016b56ef6b19.eot?#iefix");
+    src: url("#{$font-path}Kievit/0ed27687-0803-436f-a185-016b56ef6b19.eot?#iefix") format("eot"), url("#{$font-path}Kievit/d7af402a-7ff0-45ff-b994-982e4b75e37d.woff2") format("woff2"), url("#{$font-path}Kievit/02d624ec-7da6-4048-b3ef-b5e5a8289ef1.woff") format("woff"), url("#{$font-path}Kievit/c68b7c86-02ed-408b-b53d-341e68fbd8e0.ttf") format("truetype");
+    font-style: italic;
+    font-weight: bold;
+}
+
+
+// Kievit Slab
+@font-face {
+    font-family: "KievitSlabWeb W03";
+    font-weight: normal;
+    font-style: normal;
+    src: url("#{$font-path}Kievit/adb164c5-3803-4928-b9e6-dfeb14889da2.eot?#iefix");
+    src: url("#{$font-path}Kievit/adb164c5-3803-4928-b9e6-dfeb14889da2.eot?#iefix") format("eot"),url("#{$font-path}Kievit/e7323ba9-a705-4df2-afed-ab9ff45f6dc4.woff2") format("woff2"),url("#{$font-path}Kievit/d40efef6-b5f0-40fc-a733-126b96dcbf3d.woff") format("woff"),url("#{$font-path}Kievit/3e935c36-da52-4e06-ae39-8e655d232075.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "KievitSlabWeb W03";
+    font-weight: bold;
+    font-style: normal;
+    src: url("#{$font-path}Kievit/19ef62e5-ffe7-4f75-a8b3-7a0d5a7acf72.eot?#iefix");
+    src: url("#{$font-path}Kievit/19ef62e5-ffe7-4f75-a8b3-7a0d5a7acf72.eot?#iefix") format("eot"),url("#{$font-path}Kievit/718e29d8-e728-4864-aec2-e33491fad4de.woff2") format("woff2"),url("#{$font-path}Kievit/7572c5f5-f340-4c34-8c1d-6976f5526eed.woff") format("woff"),url("#{$font-path}Kievit/7f2134d8-f536-405b-a41b-33dcade6fe46.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "KievitSlabWeb W03";
+    font-weight: normal;
+    font-style: italic;
+    src: url("#{$font-path}Kievit/39edb20f-d902-465e-8b81-a710844fa252.eot?#iefix");
+    src: url("#{$font-path}Kievit/39edb20f-d902-465e-8b81-a710844fa252.eot?#iefix") format("eot"),url("#{$font-path}Kievit/0af27397-977a-4e67-bdb3-e538616bc83c.woff2") format("woff2"),url("#{$font-path}Kievit/bc5d65ba-2fff-4434-afe8-803c4d2e65cf.woff") format("woff"),url("#{$font-path}Kievit/fe3422cf-d329-4791-9b81-c0439903d07f.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "KievitSlabWeb W03";
+    font-weight: bold;
+    font-style: italic;
+    src: url("#{$font-path}Kievit/9acebaf2-c4dc-46b0-8cc3-61d2b4378740.eot?#iefix");
+    src: url("#{$font-path}Kievit/9acebaf2-c4dc-46b0-8cc3-61d2b4378740.eot?#iefix") format("eot"),url("#{$font-path}Kievit/1e1f5c74-51f7-4e72-ab86-04f373e99498.woff2") format("woff2"),url("#{$font-path}Kievit/18e51ff5-0ad7-4108-82fc-4d2c6a363ac3.woff") format("woff"),url("#{$font-path}Kievit/9d1bd10f-602a-4a6e-a252-6e1876f17a06.ttf") format("truetype");
+}
+
+body, input, textarea, select, button, p {
+    font-family: $font-family-sans-serif !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: $sentry-dark-blue;
+    font-family: $font-family-serif;
+}
+
+pre {
+    display: block;
+    padding: 9.5px;
+    margin: 0 0 10px;
+    font-size: 13px;
+    line-height: 1.42857143;
+    color: #333;
+    word-break: break-all;
+    word-wrap: break-word;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}

@@ -7,36 +7,29 @@
 {
     @Html.AntiForgeryToken()
     <div class="form-horizontal">
-        <div class="form-group">
-            @Html.LabelFor(m => m.BusinessReason, new { @class = "col-md-2 control-label" })
-            <div class="col-md-10">
-                @Html.TextAreaFor(model => model.BusinessReason, new { @class = "form-control edit-dataset-row" })
-            </div>
+        <div class="md-form">
+            @Html.LabelFor(m => m.BusinessReason, new { @class = "disabled" })
+            @Html.TextAreaFor(model => model.BusinessReason, new { @class = "md-textarea w-100" })
         </div>
-        <div class="form-group">
-            @Html.LabelFor((model) => model.SelectedApprover, new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownListFor((model) => model.SelectedApprover, Model.AllApprovers, new { @class = "form-control edit-dataset-row" })
-            </div>
+        <div class="md-form">
+            @Html.LabelFor((model) => model.SelectedApprover, new { @class = "mdb-main-label" })
+            @Html.DropDownListFor((model) => model.SelectedApprover, Model.AllApprovers, new { @class = "mdb-select" })
         </div>
-    
+
         <br />
         @Html.HiddenFor(model => model.SelectedPermissions)
-        @Html.LabelFor((model) => model.SelectedPermissions, new { @class = "col-md-10" }) <br /><br />
-        <div style="margin-left:30px">
-            @foreach (var item in Model.AllPermissions)
-            {
-                <div class="form-group">
-                    <label class="col-sm-10 checkbox-container">
-                        @item.PermissionDescription
-                        <input type="checkbox" value="@item.PermissionName" data-code="@item.PermissionCode" />
-                        <span class="checkmark"></span>
-                    </label>
+        @Html.LabelFor((model) => model.SelectedPermissions)
+        @foreach (var item in Model.AllPermissions)
+        {
+            <div class="form-group">
+                <label class="checkbox-container">
+                    @item.PermissionDescription
+                    <input type="checkbox" value="@item.PermissionName" data-code="@item.PermissionCode" />
+                    <span class="checkmark"></span>
+                </label>
 
-                </div>
-            }
-        </div>
-
+            </div>
+        }
 
         <div class="modal-footer">
             <div id="accessRequestSpinner"></div>
@@ -44,4 +37,12 @@
             <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
         </div>
     </div>
+
+    <script>
+        $(function () {
+            $("select#SecurableObjectId").materialSelect();
+            $("#SelectedApprover").materialSelect();
+        });
+
+    </script>
 }

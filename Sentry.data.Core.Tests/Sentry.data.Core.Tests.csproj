@@ -138,6 +138,7 @@
     <Compile Include="ConfigServiceTests.cs" />
     <Compile Include="DataApplicationServiceTests.cs" />
     <Compile Include="DatasetTests.cs" />
+    <Compile Include="HelperTests\CustomAttributeHelperTests.cs" />
     <Compile Include="JobServiceTests.cs" />
     <Compile Include="Mockups\MockClasses\MockClasses.cs" />
     <Compile Include="Mockups\MockExtensions.cs" />
@@ -154,9 +155,9 @@
     <Compile Include="DataFlowServiceTests.cs" />
     <Compile Include="QuartermasterServiceTests.cs" />
     <Compile Include="DatasetServiceTests.cs" />
-    <Compile Include="EnumHelperTests.cs" />
+    <Compile Include="HelperTests\EnumHelperTests.cs" />
     <Compile Include="JsonStructureTests.cs" />
-    <Compile Include="NestHelperTests.cs" />
+    <Compile Include="HelperTests\NestHelperTests.cs" />
     <Compile Include="FilterCategoryOptionNormalizerTests.cs" />
   </ItemGroup>
   <ItemGroup>

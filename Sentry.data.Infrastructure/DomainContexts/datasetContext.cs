@@ -562,8 +562,7 @@ namespace Sentry.data.Infrastructure
 
         public Dataset GetById(int id)
         {
-            Dataset ds = Query<Dataset>().Where((x) => x.DatasetId == id && x.CanDisplay).FirstOrDefault();
-            return ds;
+            return Query<Dataset>().Where((x) => x.DatasetId == id && x.CanDisplay).FirstOrDefault();
         }
 
         public Boolean isDatasetNameDuplicate(string datasetName, string category)

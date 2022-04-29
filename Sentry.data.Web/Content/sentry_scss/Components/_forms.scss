@@ -1,0 +1,17 @@
+﻿.md-form {
+    label {
+        padding-left: .5rem;
+
+        &.active {
+            padding-left: 0;
+        }
+    }
+    // Icon Prefix
+    .prefix {
+        font-size: 25px;
+    }
+}
+
+input.form-control {
+    padding-left: 5px;
+}

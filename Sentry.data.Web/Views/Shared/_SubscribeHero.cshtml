@@ -59,7 +59,7 @@
 
                     <td>
                         @Html.DropDownListFor(model => model.CurrentSubscriptionsBusinessArea[subId].Interval.Interval_ID,
-                                new SelectList(Model.AllIntervals, "Value", "Text", Model.CurrentSubscriptionsBusinessArea[subId].Interval.Interval_ID))
+                            new SelectList(Model.AllIntervals, "Value", "Text", Model.CurrentSubscriptionsBusinessArea[subId].Interval.Interval_ID), new {@class = "mdb-select"})
                     </td>
                  </tr>
 
@@ -86,7 +86,6 @@
 @section Scripts {
     <script>
         $(function () {
-
         });
     </script>
 }

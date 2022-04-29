@@ -11,7 +11,7 @@
     file included in the template that makes working with modals from Javascript a cinch.
     Check out the AddCategory() function in the Category.js file to see how this is accomplished.
 </p>
-<div class="text-right"><a href="/Admin/ManageUsers" id="next">Next <i class="fa fa-angle-right"></i></a></div>
+<div class="text-right"><a href="/Admin/ManageUsers" id="next">Next <em class="fa fa-angle-right"></em></a></div>
 }
 
 <div class="page-header">
@@ -23,7 +23,7 @@
 
         <div class="col-md-6">
             <p>
-                <a href="#" id="AddRootCategory"><span class="text-success small glyphicon glyphicon-plus"></span>Add New Root Category</a>
+                <a href="#" id="AddRootCategory"><em class="text-success small icon-plus"></em>Add New Root Category</a>
             </p>
             <ul class="list-no-decoration list-unstyled list-group">
                 @Html.Partial("_CategoryTreeNode", new FullCategoryModel {Id = 0, Name = "", SubCategories = Model.ToList()})

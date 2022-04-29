@@ -1,18 +1,22 @@
 ﻿.search-horizontal-center {
     display: flex;
     justify-content: center;
-    padding: 0.5em 0;
+    padding: 1em 0 0.5em 0;
+    flex-wrap: wrap;
+    align-content: center;
+    flex-direction: column;
 }
 
 .search-head {
     display: inline-block;
-    width:40%;
+    width: 40%;
     min-width: 500px;
+    text-align: center;
 }
 
-    .search-head a {
-        vertical-align: super;
-    }
+.filter-search-page-info {
+    vertical-align: super;
+}
 
 .search-head-item {
     display: inline-block;
@@ -20,13 +24,22 @@
     margin-bottom: 0.25em;
 }
 
+.filter-search-page-title {
+    padding: 0;
+    margin: 0;
+    padding-left: 5px;
+}
+
 .search-head-img {
     width: 50px;
     float: left;
 }
 
-#search-box a {
-    color: inherit;
+.filter-search-box {
+    margin: 0.5em 0;
+    width: 40%;
+    min-width: 500px;
+    display: flex;
 }
 
 .filter-search-body {
@@ -34,7 +47,6 @@
 }
 
 .filter-search-container {
-    margin-right: 1em;
     width: 300px;
 }
 
@@ -51,25 +63,29 @@
 .filter-search-total-results {
     font-size: 1.25em;
     margin: 0;
+    color: #003da5;
+    font-weight: bold;
 }
 
 .filter-search-title-container {
     display: flex;
+    align-items: flex-end;
+    width: 100%;
 }
 
 .filter-search-title {
     margin-bottom: 0.25em;
+    width: 100%;
+    padding-top: 1em !important;
 }
 
-.filter-search-clear-container {
-    margin: 0 0 0.25em 0.5em;
-    align-self: end;
-    width: 100%;
+.filter-search-option-button {
+    font-size: 1em;
+    padding: 0.5em 1em !important;
+    white-space: nowrap;
 }
 
 .filter-search-apply {
-    margin: 0 0 0.5em 0.5em;
-    height: fit-content;
     align-self: end;
 }
 
@@ -80,15 +96,19 @@
 
 .filter-search-active-options-container {
     text-align: center;
-    padding: 1em 0 0.7em 0;
 }
 
 .filter-search-active-option-close {
-    margin: 0 0 0.3em 0.2em;
+    padding: 0.75em !important;
+    font-size: 0.8em !important;
 }
 
 .active-option-close-symbol {
-    font-size: 12px;
+    margin-right: 0.25em;
+}
+
+.active-option-category-label {
+    font-weight: normal;
 }
 
 .filter-search-category-container {
@@ -119,10 +139,9 @@
         line-height: inherit;
     }
 
-
-.filter-search-categories-sentry-spinner {
-    display: flex;
-    margin-top: 10em;
+.filter-search-categories-progress {
+    width: 70%;
+    margin: 10em auto 0 auto;
 }
 
 .filter-search-category-options {
@@ -132,37 +151,23 @@
 .filter-search-category-option {
     font-size: 14px;
     cursor: pointer;
-    width: 100%;
-    padding: 0.5em 1em;
-    list-style: none;
+    padding: 0.3em 0.8em;
 }
 
     .filter-search-category-option:hover {
         background-color: #DDDDDD;
     }
 
-    .filter-search-category-option label {
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-    }
+.filter-search-category-option-label {
+    width: 100%;
+    padding-left: 2em !important;
+}
 
-    .filter-search-category-option input {
-        cursor: pointer;
-        min-width: 16px;
-        min-height: 16px;
-        margin: 0 0.5em 0 0 !important;
-    }
-
-    .filter-search-category-option strong {
-        width: 100%;
-    }
-
-    .filter-search-category-option span {
-        font-size: 12px;
-        margin-left: 0.25em;
-        font-family: sans-serif;
-    }
+.filter-search-category-option-count {
+    font-size: 12px;
+    margin-left: 0.25em;
+    font-family: sans-serif;
+}
 
 .filter-search-category-more {
     display: block;
@@ -183,10 +188,9 @@
         font-size: 1.5em;
     }
 
-.filter-search-result-sentry-spinner {
-    width: 100%;
-    display: flex;
-    margin-top: 8em;
+.filter-search-result-progress {
+    width: 50%;
+    margin: 20em auto 0 auto;
 }
 
 .filter-search-results-none {
@@ -204,15 +208,12 @@
     width: 100%;
 }
 
-.pagination {
-    display: inline-block;
-    padding-left: 0;
-    margin: 0;
-    border-radius: 2px;
-}
-
 .bottom-border {
     border-bottom: 1px solid #ebebeb;
+}
+
+.filter-search-category-modal {
+    max-width: 900px !important;
 }
 
 .filter-search-modal-body {
@@ -223,4 +224,8 @@
 .filter-search-modal-option {
     display: inline-block;
     width: 33%;
+}
+
+.pagination {
+    padding-bottom: 2rem;
 }

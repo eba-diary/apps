@@ -1,14 +1,20 @@
 ﻿@using Sentry.data.Web;
 @model BusinessAreaTileRowModel
+@{
+    string textColor;
+}
 
 <div class="row">
 
     @foreach (BusinessAreaTileModel tile in Model.Tiles)
     {
+        { 
+            textColor = "dsc-" + tile.TileColor + "-text";
+        }
         <div class="col-sm-12 col-md-@tile.BootstrapSpan col-lg-@tile.BootstrapSpan">
-            <p class="landing-pg-tile-title @tile.TileColor">@tile.Title</p>
+            <p class="landing-pg-tile-title @textColor">@tile.Title</p>
             <div class="landing-pg-image" style="background-image: url('/Images/BusinessAreaTiles/@tile.ImageName');"></div>
-            <p class="landing-pg-hyperlink"><a target="_blank" href="@tile.Hyperlink" class="@tile.TileColor">@tile.LinkText &gt;</a></p>
+            <p class="landing-pg-hyperlink"><a target="_blank" href="@tile.Hyperlink" class="@textColor">@tile.LinkText &gt;</a></p>
         </div>
     }
 

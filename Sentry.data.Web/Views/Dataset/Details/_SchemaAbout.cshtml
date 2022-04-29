@@ -1,5 +1,5 @@
 ﻿@{
-    string color = Model.CategoryColor;
+    string color = "dsc-" + Model.CategoryColor + "-text";
 }
 
 <div class="row">
@@ -7,28 +7,26 @@
         @if (!Model.DisplayTabSections)
         {
             <div id="aboutThisSchema">
-                <h3 class="@color">About this Schema</h3>
+                <h3 class="@color pt-1">About this Schema</h3>
             </div>
         }
-
-        <br />
         <div class="metadataBody container row">
             <div class="col-lg-4">
                 <div class="row">
                     <div class="col-lg-12">
-                        <h5 class="@color">Last Updated:</h5>
+                        <h5 class="@color pt-1">Last Updated:</h5>
                     </div>
                 </div>
-                <div class="row" style="margin-bottom:15px;">
-                    <div class="col-lg-6">
-                        <h5 class="@color">Data</h5>
+                <div class="row">
+                    <div class="col-lg-6 pt-1">
+                        <h5 class="@color pt-1">Data</h5>
                         <p data-bind="text: DataLastUpdated"></p>
                         <p id="dataLastUpdatedSpinner" class="mini-sentry-spinner-container sentry-spinner-container" style="display:none;">
                             <span class="sentry-spinner" style="background-size: 25px 25px; margin-left: 290px;"></span>
                         </p>
                     </div>
                     <div class="col-lg-6">
-                        <h5 class="@color">Metadata</h5>
+                        <h5 class="@color pt-1">Metadata</h5>
                         <p data-bind="text: MetadataLastDT"></p>
                         <p id="sessionSpinner" class="mini-sentry-spinner-container sentry-spinner-container" style="display:none;">
                             <span class="sentry-spinner" style="background-size: 25px 25px; margin-left: 290px;"></span>
@@ -37,33 +35,33 @@
                 </div>
 
                 <div class="row" data-bind="visible: SchemaRows().length > 0">
-                    <hr />
+                    <hr class="datasetMetadataBoxHr" />
                     <div class="col-lg-12">
-                        <h5 class="@color">In this Schema:</h5>
+                        <h5 class="@color pt-1">In this Schema:</h5>
                     </div>
                 </div>
 
                 <div class="row" data-bind="visible: SchemaRows().length > 0">
                     <div class="col-lg-6">
-                        <h5 class="@color">Rows</h5>
+                        <h5 class="@color pt-1">Rows</h5>
                         <p id="rowCount" data-bind="text: RowCount"></p>
                     </div>
                     <div class="col-lg-6">
-                        <h5 class="@color">Columns</h5>
+                        <h5 class="@color pt-1">Columns</h5>
                         <p data-bind="text: SchemaRows().length"></p>
                     </div>
                 </div>
 
                 <div class="row" data-bind="visible: SchemaRows().length > 0">
-                    <hr />
+                    <hr class="datasetMetadataBoxHr" />
                     <div class="col-lg-12">
-                        <h5 class="@color">Consumption Layer:</h5>
+                        <h5 class="@color pt-1">Consumption Layer:</h5>
                     </div>
                 </div>
 
                 <div class="row" data-bind="visible: SchemaRows().length > 0">
                     <div class="col-lg-12">
-                        <h5 class="@color">Snowflake</h5>
+                        <h5 class="@color pt-1">Snowflake</h5>
                         <!-- ko foreach: FullyQualifiedSnowflakeViews() -->
                         <p><span class="hideOverflow" data-bind="text: $data"></span></p>
                         <!-- /ko -->
@@ -72,7 +70,7 @@
             </div>
 
             <div class="col-lg-8">
-                <h5 class="@color">Data Ownership:</h5>
+                <h5 class="@color pt-1">Data Ownership:</h5>
                 <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
                     <tbody>
                         <tr class="borderMeta_@color">
@@ -85,9 +83,8 @@
                         </tr>
                     </tbody>
                 </table>
-                <br />
                 <div>
-                    <h5 class="@color">Refresh Frequency:</h5>
+                    <h5 class="@color pt-1">Refresh Frequency:</h5>
                     <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
                         <tbody>
                             <tr>
@@ -147,19 +144,20 @@
                 @if (Model.Security.ShowAdminControls || Model.DisplayDataflowMetadata)
                 {
                     <div>
-                        <br />
-                        <h5 class="@color float-l">DataFlow:</h5>
+                        <h5 class="@color pt-1 float-l">DataFlows:</h5>
                         <!-- ko if: RenderDataFlows -->
                         <!-- ko foreach: DataFlows -->
                         <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
                             <tbody>
                                 <tr>
                                     <td class="borderMeta_@color colOneMeta">
-                                        <a class="float-l" data-bind="attr: { href:DetailUrl, target: '_blank' }, click: DataFlowDetailRedirect, text: Name()"></a>
-                                        @if (Model.DisplayDataflowEdit)
-                                        {
-                                            <div id="edit-dataflow-icon" class="float-l clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" data-bind="click: DataFlowEditRedirect"><span class="glyphicon glyphicon-pencil"></span></div>
-                                        }
+                                        <div class="row pl-3">
+                                            <a class="float-l" data-bind="attr: { href:DetailUrl, target: '_blank' }, click: DataFlowDetailRedirect, text: Name()"></a>
+                                            @if (Model.DisplayDataflowEdit)
+                                            {
+                                                <div id="edit-dataflow-icon" class="float-l clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" data-bind="click: DataFlowEditRedirect"><span class="far fa-edit"></span></div>
+                                            }
+                                        </div>
                                     </td>
                                     <!-- ko if: RenderJobs() == "noRenderJobs" -->
                                     <td style="padding:0px; border-top-width:0px">There are no retriever jobs associated with this dataflow</td>

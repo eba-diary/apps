@@ -28,7 +28,7 @@
             var icon = "#icon_" + id;
 
             $(category).slideToggle();
-            $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
+            $(icon).toggleClass("fa-chevron-down fa-chevron-up");
         });
 
         //open additional hidden category options
@@ -59,7 +59,7 @@
             data.FilterSearch.setOptionCheckbox(optionId, false);
 
             //hide the clicked badge
-            $(this).hide();
+            $(this).addClass("display-none");
 
             data.FilterSearch.showHideApplyFilter();
         });
@@ -76,7 +76,7 @@
                 //making sure both modal and filter checkbox gets checked
                 data.FilterSearch.setOptionCheckbox(id, true);
 
-                badge.show()
+                badge.removeClass("display-none")
                 data.FilterSearch.showBadgeContainer();
             }
             else {
@@ -84,7 +84,7 @@
                 data.FilterSearch.setOptionCheckbox(id, false);
 
                 data.FilterSearch.hideBadgeContainer(false);
-                badge.hide();
+                badge.addClass("display-none");
             }
 
             data.FilterSearch.showHideApplyFilter();
@@ -97,7 +97,7 @@
             data.FilterSearch.hideBadgeContainer(true);
 
             $("[id^='clearOption_']:visible").each(function () {
-                $(this).hide();
+                $(this).addClass("display-none");
             })
 
             $('.filter-search-category-option-checkbox:checkbox:checked').each(function () {
@@ -173,23 +173,21 @@
         $(".filter-search-apply").prop("disabled", true);
 
         $(".modal").modal("hide");
-        $(".glyphicon-search").hide();
+        $(".icon-search").hide();
         $(".filter-search-results-container").hide();
         $(".filter-search-results-none").hide();
         $(".filter-search-result-count-container").hide();
 
-        $(".fa-spin").show();
-        $(".filter-search-result-sentry-spinner").show();
+        $(".filter-search-result-progress").show();
     },
 
     completeSearch: function (totalResultCount, pageSize, returnedResultCount) {
         $("#filter-search-text").prop("disabled", false);
         $(".filter-search-apply").prop("disabled", false);
 
-        $(".fa-spin").hide();
-        $(".filter-search-result-sentry-spinner").hide();
+        $(".filter-search-result-progress").hide();
 
-        $(".glyphicon-search").show();
+        $(".icon-search").show();
 
         if (totalResultCount > 0) {
             $(".filter-search-results-container").slideDown();
@@ -206,7 +204,7 @@
 
     filterRetrivalPrep: function () {
         $(".filter-search-categories-container").hide();
-        $(".filter-search-categories-sentry-spinner").show();
+        $(".filter-search-categories-progress").show();
         $("#filter-search-clear").hide();
         $(".filter-search-apply").hide();
     },
@@ -226,7 +224,7 @@
         $('.filter-search-show-all-container').load("/FilterSearch/FilterShowAll/", categories);
         $('.filter-search-categories-container').load("/FilterSearch/FilterCategories/", categories, function () {
 
-            $(".filter-search-categories-sentry-spinner").hide();
+            $(".filter-search-categories-progress").hide();
             $(".filter-search-categories-container").show();
 
             var selectedOptions = $('.filter-search-category-option-checkbox:checkbox:checked');
@@ -235,13 +233,13 @@
 
             //open all filter categories with a selected option
             selectedOptions.closest('.filter-search-category-options').each(function () {
-                $("#" + this.id.replace("hide", "icon")).removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
+                $("#" + this.id.replace("hide", "icon")).removeClass("fa-chevron-down").addClass("fa-chevron-up");
                 $(this).show();
             });
 
             //show selected option badges
             selectedOptions.each(function () {
-                $('#clearOption_' + this.id).show();
+                $('#clearOption_' + this.id).removeClass("display-none");
             });
 
             //show active options container if there are active options

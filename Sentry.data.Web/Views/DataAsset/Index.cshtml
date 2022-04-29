@@ -20,7 +20,7 @@
         <span href="#" class="assetHeader list-group-item active">
             Data Assets
             <span class="pull-right" id="slide-submenu">
-                <i class="fa glyphicon glyphicon-minus"></i>
+                <em class="fas fa-minus"></em>
             </span>
         </span>
         @foreach (Sentry.data.Web.Models.AssetUIModel da in assets)
@@ -101,23 +101,23 @@
              }
      }
 
-    <div class="row page-header indexHeader">
-        <div class="row">
-            <img src="~/Images/Icons/DataAssetsBlue.svg" class="assetImg leftFloat hidden-xs" />
-            <div class="indexName">
-                <h1 class="daName">@Model.DisplayName</h1>
-                @*<a href="#" class="btn btn-primary dropdown-toggle daDD" data-toggle="dropdown" aria-expanded="false"><span class="glyphicon glyphicon-chevron-down daArrow"></span></a>*@
-                @*<ul class="dropdown-menu">
+<div class="page-header indexHeader">
+    <div class="row">
+        <img src="~/Images/Icons/DataAssetsBlue.svg" class="assetImg leftFloat hidden-xs" />
+        <div class="indexName">
+            <h2 class="daName pt-3">@Model.DisplayName</h2>
+            @*<a href="#" class="btn btn-primary dropdown-toggle daDD" data-toggle="dropdown" aria-expanded="false"><span class="glyphicon glyphicon-chevron-down daArrow"></span></a>*@
+            @*<ul class="dropdown-menu">
                     @foreach (Sentry.data.Core.DataAsset da in assets)
                         {
                             string active = (da.DisplayName.Equals(Model.DisplayName)) ? "active" : "";
                         <li class="@active"><a href="@Url.Action("Index", "DataAsset", new { id = da.Id })">@da.DisplayName</a></li>
                     }
                 </ul>*@
-            </div>
+        </div>
 
-            <!-- Removed Status and Last Updated goes here -->
-            @*@{
+        <!-- Removed Status and Last Updated goes here -->
+        @*@{
                 if (!Model.HealthIncludesSourceSystems)
                 {
                     <div>
@@ -125,57 +125,31 @@
                     </div>
                 }
             }*@
-         
 
-            <div class="visible-xs">
-                <button type="button" class="btn btn-lg btn-default daHamburger" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                    <span class="glyphicon glyphicon-menu-hamburger"></span>
-                </button>
-            </div>
 
-            <div class="daNav row">
-                <ul class="nav nav-pills hidden-xs">
-                    <li><a href="~/DataAsset/@Model.Name">Home</a></li>
+        <div class="ml-auto">
+            <ul class="nav nav-pills mt-4">
+                <li class="nav-item"><a class="nav-link" href="~/DataAsset/@Model.Name">Home</a></li>
 
-                    @{ disabled = ((Model.DisplayName == "SERA PL" || Model.DisplayName == "PL Policy ODS")) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="/Lineage/Personal Lines/@Model.Name">Lineage</a></li>
+                @{ disabled = ((Model.DisplayName == "SERA PL" || Model.DisplayName == "PL Policy ODS")) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="/Lineage/Personal Lines/@Model.Name">Lineage</a></li>
 
-                    @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
+                @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="@arch" target="_blank">Arch Diagrams</a></li>
 
-                    @{ disabled = (Model.DataModelLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
+                @{ disabled = (Model.DataModelLink != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a rel="noopener" class="nav-link" href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
 
-                    @{ disabled = (Model.GuideLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
+                @{ disabled = (Model.GuideLink != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
 
-                    @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="mailto:@Model.Contact">Contact the @Model.DisplayName Team</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="visible-xs daCollapse">
-            <div class="navbar-collapse collapse navbar-responsive-collapse">
-                <ul class="nav navbar-nav">
-                    @{ disabled = ((Model.DisplayName == "SERA PL" || Model.DisplayName == "PL Policy ODS")) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="/Lineage/Personal Lines/@Model.Name/">Lineage</a></li>
-
-                    @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
-
-                    @{ disabled = (Model.DataModelLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
-
-                    @{ disabled = (Model.GuideLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@Model.GuideLink" target="_blank">Consumer Guide</a></li>
-
-                    @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="mailto:@Model.Contact">Contact the @Model.DisplayName Team</a></li>
-                </ul>
-            </div>
+                @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
+                <li class="@disabled nav-item"><a class="nav-link" href="mailto:@Model.Contact">Contact the @Model.DisplayName Team</a></li>
+            </ul>
         </div>
     </div>
+
+</div>
 
     <style>
         .disabled {
@@ -204,7 +178,7 @@
             }
             
 
-            <h2 class="@color text-center">@title</h2>
+            <h2 class="@color text-center col pt-3">@title</h2>
         </div>
         <div class="row tableHeader row_@color hidden-xs">
             <div></div>
@@ -282,10 +256,10 @@
             else if (c == 2)
             {
                 <div class="row">
-                    <div class="col-sm-6 clcCardWide border_@Model.Components[0].Type.Color">
+                    <div class="col clcCardWide border_@Model.Components[0].Type.Color">
                         @Html.Partial("_ConsumptionLayerComponent", Model.Components[0])
                     </div>
-                    <div class="col-sm-6 clcCardWide border_@Model.Components[1].Type.Color">
+                    <div class="col clcCardWide border_@Model.Components[1].Type.Color">
                         @Html.Partial("_ConsumptionLayerComponent", Model.Components[1])
                     </div>
                 </div>
@@ -296,13 +270,13 @@
                     @for (int i = 0; i < c; i++)
                     {
                         <div class="row">
-                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[i].Type.Color">
+                            <div class="col clcCard border_@Model.Components[i].Type.Color">
                                 @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
                             </div>
-                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                            <div class="col clcCard border_@Model.Components[++i].Type.Color">
                                 @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
                             </div>
-                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                            <div class="col clcCard border_@Model.Components[++i].Type.Color">
                                 @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
                             </div>
                         </div>
@@ -310,46 +284,22 @@
                         <div class="row">
                             @if (i + 1 == c - 1)
                             {
-                                <div class="col-md-4"></div>
-                                <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                <div class="col"></div>
+                                <div class="col clcCard border_@Model.Components[++i].Type.Color">
                                     @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
                                 </div>
                             }
                             @if (i + 2 == c - 1)
                             {
-                                <div class="col-md-2"></div>
-                                <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                <div class="col"></div>
+                                <div class="col clcCard border_@Model.Components[++i].Type.Color">
                                     @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
                                 </div>
-                                <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                <div class="col clcCard border_@Model.Components[++i].Type.Color">
                                     @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
                                 </div>
                             }
                         </div>
-                    }
-                </div>
-
-                <div class="visible-sm">
-                    @for (int i = 0; i < c; i++)
-                    {
-                        <div class="row">
-                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[i].Type.Color">
-                                @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
-                            </div>
-                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
-                                @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
-                            </div>
-                        </div>
-
-                        if (i + 1 == c - 1)
-                        {
-                            <div class="row">
-                                <div class="col-sm-3"></div>
-                                <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
-                                    @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
-                                </div>
-                            </div>
-                        }
                     }
                 </div>
             }

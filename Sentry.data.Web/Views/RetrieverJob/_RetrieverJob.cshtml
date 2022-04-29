@@ -6,21 +6,8 @@
 }
     <div class="retJob @Model.DataSource.SourceType">
         <div class="jobHeader categoryBanner-@color">
-            <h6>@Model.DataSource.Name</h6>
-            <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
-            @if (enableJobControls && Model.DataSource.SourceType != "S3Basic" && Model.DataSource.SourceType != "DFSBasic")
-            {
-                <button style="float:right; margin-top:3px;" class="btn btn-default on-demand-run" id="@Model.Id">On-Demand Run</button>
-
-                if (Model.IsEnabled)
-                {
-                    <button style="float:right; margin-top:3px;" class="btn btn-default jobstatus jobstatus_enabled" id="@Model.Id">Disable</button>
-                }
-                else
-                {
-                    <button style="float:right; margin-top:3px;" class="btn btn-default jobstatus jobstatus_disabled" id="@Model.Id"> Enable</button>
-                }
-            }
+            <h6 class="pt-3">@Model.DataSource.Name</h6>
+            <em class="retJobDetails tracker-menu-icon fas fa-chevron-up"></em>
         </div>
         <div class="jobContainer" style="display:none;">
             <p>@Model.DataSource.Description</p>

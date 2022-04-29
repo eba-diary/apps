@@ -338,7 +338,7 @@ data.Notification = {
                 (
                     {
                         container: 'body',
-                        html: 'true',
+                        html: true,
                         content: obj,
                         template: '<div class="popover liberty-popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
                     }
@@ -401,7 +401,7 @@ data.Notification = {
                     dataType: 'html',
                     success: function (obj)
                     {
-                        $(".liberty-bell").data("bs.popover").options.content = obj;
+                        $(".liberty-popover-medium .popover-inner").html(obj);
                         $(".liberty-bell").popover('show');     //i had to include this for some reason to show refreshed popover, the cost is a flicker of reload
                         data.Notification.updateBadgeContent(businessAreaType);
                     },
@@ -430,7 +430,7 @@ data.Notification = {
                 //only show popover intitally if critical notifications exist
                 if (obj.CriticalNotifications.length > 0)
                 {
-                    $(".liberty-bell").popover('show');
+                    $(".liberty-bell").click();
                 }
 
             },
@@ -459,7 +459,7 @@ data.Notification = {
                         dataType: 'html',
                         success: function (obj)
                         {
-                            $(".liberty-bell").data("bs.popover").options.content = obj;
+                            $(".liberty-popover-medium .popover-inner").html(obj);
                             $(".liberty-bell").popover('show');
                             $(".showing-expired-notifications").removeClass("showing-expired-notifications").addClass("showing-active-notifications");
                         },
@@ -490,7 +490,7 @@ data.Notification = {
                         dataType: 'html',
                         success: function (obj) {
 
-                            $(".liberty-bell").data("bs.popover").options.content = obj;
+                            $(".liberty-popover-medium .popover-inner").html(obj);
                             $(".liberty-bell").popover('show');
                             $(".showing-active-notifications").removeClass("showing-active-notifications").addClass("showing-expired-notifications");
                         },

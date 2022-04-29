@@ -5,7 +5,7 @@
 }
 
 <div id="bi-page-wrapper" class="text-center">
-    <h2 id="bi-welcome-text">Welcome to the Sentry Business Intelligence Portal. Please type below to search or choose a category.</h2>
+    <h4 id="bi-welcome-text">Welcome to the Sentry Business Intelligence Portal. Please type below to search or choose a category.</h4>
     
     @{
         var category = Model.Categories.ToList();
@@ -13,27 +13,30 @@
         string[] colors = new string[] { "blue", "green", "gold", "plum", "orange", "blueGray" };
     }
 
-    <div class="container">
-        <div id="bi-search-wrapper" class="ds-grid col-md-12">
-            <div class="row">
-                @{
-                    using (Html.BeginForm(@"BusinessIntelligence", "Search", FormMethod.Get, new { @class = "navbar-form navbar-center", @id = "DatasetSearch" }))
-                    {
-                    <div id="bi-search-input-wrapper" class="input-group">
-                        <span class="input-group-addon clickable bi-search-icon" onclick="$(function() {$('#SearchText').focus();});"><i class="glyphicon glyphicon-search"></i></span>
+<div class="container">
 
-                        <input type="text" id="SearchText" name="searchPhrase" class="form-control bi-search-textbox" placeholder="Search from @Model.DatasetCount Exhibits and Dashboards ..." />
-                    </div>
+    <div id="bi-search-wrapper" class="ds-grid col-md-12 ">
+
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                @{
+                    using (Html.BeginForm(@"BusinessIntelligence", "Search", FormMethod.Get, new { @class = "md-form input-group w-100", @id = "DatasetSearch" }))
+                    {
+                        <span class="input-group-prepend sentry-blue white-text clickable" id="SearchIconAddon" onclick="$(function() {$('#SearchText').focus();});"><em class="icon-search"></em></span>
+                        <input type="text" id="SearchText" class="form-control bi-search-textbox" placeholder="Search from @Model.DatasetCount Exhibits and Dashboards ...">
                     }
                 }
             </div>
+            <div class="col-md-3"></div>
         </div>
-        <div id="bi-tile-wrapper" class="ds-grid col-md-12">
-            @for (int i = 0; i < c; i++)
+    </div>
+    <div id="bi-tile-wrapper" class="ds-grid col-md-12">
+        @for (int i = 0; i < c; i++)
+        {
+            if (i % 3 == 0)
             {
-                if (i % 3 == 0)
-                {
-                    @:<div class="row text-center">
+                @:<div class="row text-center d-block">
                 }
 
                 var color = "";
@@ -57,22 +60,22 @@
                 </div>
                 if (i % 3 == 2 || i + 1 == c)
                 {
-                    @:</div>
-                }
+                @:</div>
             }
+        }
 
-            <div class="row text-center">
-                <div class="bi-upload-row">
-                    @if (Model.CanManageReports)
-                    {
-                        <button type="button" class="btn btn-default btn-lg bi-operation-button" id="CreateExhibit">
-                            <span class="glyphicon glyphicon-plus text-primary"></span> Create Exhibit
-                        </button>
-                    }        
-                </div>
+        <div class="row text-center d-inline-block">
+            <div class="bi-upload-row">
+                @if (Model.CanManageReports)
+                {
+                    <button type="button" class="btn btn-default btn-lg bi-operation-button" id="CreateExhibit">
+                        <em class="fas fa-plus pr-3 text-primary"></em> Create Exhibit
+                    </button>
+                }
             </div>
         </div>
     </div>
+</div>
 </div>
 
 

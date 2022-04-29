@@ -78,8 +78,6 @@ namespace Sentry.data.Core
         {
             List<string> errors = new List<string>();
 
-            //NOTE: if you have more then 2 times where validation errors are found the _datasetContext.FileExtensions.FirstOrDefault(x => x.Id == dto.FileExtensionId).Name will be null
-            //and when currentFileExtension is evaluated it will blow up because its null, will add an item to address this because this has been a hidden bug for a long time probably
             var currentFileExtension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Id == dto.FileExtensionId).Name.ToLower();
             
             if (currentFileExtension == "csv" && dto.Delimiter != ",")
@@ -230,9 +228,12 @@ namespace Sentry.data.Core
                 Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
 
                 //remove any schemas which are marked for deletion
-                if (parent.DatasetFileConfigs.Any(x => !x.DeleteInd && x.Name.ToLower() == dto.Name.ToLower()))
+                if (dto.Name != null)
                 {
-                    errors.Add("Dataset config with that name already exists within dataset");
+                    if (parent.DatasetFileConfigs.Any(x => !x.DeleteInd && x.Name.ToLower() == dto.Name.ToLower()))
+                    {
+                        errors.Add("Dataset config with that name already exists within dataset");
+                    }
                 }
             }
 

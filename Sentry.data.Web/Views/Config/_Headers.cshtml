@@ -2,17 +2,15 @@
 
 @using (Html.BeginCollectionItem("Headers"))
 {    
-    <div class="form-group">
-        <div class="col-md-12">
-            <div class="col-md-5 headerEntry">
-                @Html.TextBoxFor(m => m.Key, new { @value = "", @class = "form-control edit-dataset-row col-md-3" })
-                @Html.ValidationMessageFor(model => model, "", new { @class = "text-danger" })
-            </div>
-            <div class="col-md-5 headerEntry">
-                @Html.TextBoxFor(m => m.Value, new { @value = "", @class = "form-control edit-dataset-row col-md-3" })
-                @Html.ValidationMessageFor(model => model, "", new { @class = "text-danger" })
-            </div>
-            <div class="col-md-2"><a class="removeHeader" style="display: inline-block; margin-left: 10px;"><span class="glyphicon glyphicon-minus"></span> Remove Header</a></div>
-        </div>        
+    <div class="container">
+        <div class="md-form headerEntry">
+            @Html.TextBoxFor(m => m.Key, new { @value = "", @class = "form-control" })
+            @Html.ValidationMessageFor(model => model, "", new { @class = "text-danger" })
+        </div>
+        <div class="md-form headerEntry">
+            @Html.TextBoxFor(m => m.Value, new { @value = "", @class = "form-control" })
+            @Html.ValidationMessageFor(model => model, "", new { @class = "text-danger" })
+        </div>
+        <a class="removeHeader" style="display: inline-block; margin-left: 10px;"><em class="fas fa-minus pr-3"></em>Remove Header</a>
     </div>
 }

@@ -240,7 +240,7 @@ var Associates = {
         },
  
         _createCardHeader: function (name, id) {
-            return "<b>" + name + "</b><span style='float: right; cursor: pointer;' id='" + id + "' class='glyphicon glyphicon-remove'></span>";
+            return "<b>" + name + "</b><span style='float: right; cursor: pointer;' id='" + id + "' class='glyphicon glyphicon-remove'></span>";;
         },
 
         createPresence: function (assoc) {
@@ -334,7 +334,7 @@ var Associates = {
                 } else if (idProp !== null) {
                     var assocId = $this.data(idProp);
                     if (assocId) {
-                        if (elements[assocId] === undefined)
+                        if (elements[assocId] == undefined)
                             elements[assocId] = [];
                         elements[assocId].push($this);
                         if ($.inArray(assocId, assocIds) < 0)
@@ -409,7 +409,7 @@ var Associates = {
         this.selection = null;
 
         this.hasSelection = function () {
-            if (self.selection !== null) {
+            if (self.selection != null) {
                 return true;
             } else {
                 return false;
@@ -431,14 +431,14 @@ var Associates = {
             // TODO: check cache?
             var self = this;
             searchAssociates(request, function (associateList) {
-                if (typeof options.filter === 'function') {
+                if (typeof options.filter == 'function') {
                     associateList = options.filter(associateList);
                 }
 
                 var mapped = $.map(associateList, function (item) {
                     return {
-                        label: (item.FamiliarName !== "" ? item.FamiliarName + " " + item.LastName : item.FirstName + " " + item.LastName),
-                        value: (item.FamiliarName !== "" ? item.FamiliarName + " " + item.LastName : item.FirstName + " " + item.LastName),
+                        label: item.FullName,
+                        value: item.FullName,
                         key: item
                     };
                 });
@@ -454,7 +454,7 @@ var Associates = {
         }
 
         function createAutocompleteItem(item) {
-            if (item.key === _autocompleteMore) {
+            if (item.key == _autocompleteMore) {
                 return _createAutocompleteMoreItem();
             }
             var assoc = item.key;
@@ -513,16 +513,16 @@ var Associates = {
 
             //Handle selection
             $(self).on('typeahead:selected typeahead:autocompleted', function (event, obj, dataSetName) {
-                if (obj.key === _autocompleteMore)
+                if (obj.key == _autocompleteMore)
                     self.selection = null;
                 else
                     self.selection = obj.key;
-                if (typeof options.associateSelected === 'function') options.associateSelected(self.selection);
+                if (typeof options.associateSelected == 'function') options.associateSelected(self.selection);
             });
 
             //Handle close
             $(self).on('typeahead:closed', function (event, obj, dataSetName) {
-                if (typeof options.close === 'function') options.close();
+                if (typeof options.close == 'function') options.close();
             });
         }
        

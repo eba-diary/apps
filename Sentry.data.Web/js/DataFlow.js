@@ -11,10 +11,7 @@
 
         data.DataFlow.InitIngestionType();
 
-
-        $("#PreprocessingOptions").select2({
-            placeholder: "Select Options"
-        });
+        $("#PreprocessingOptions").materialSelect();
 
         //init preprocessing panel
         if ($("#IsCompressed").val() === "true") {
@@ -72,19 +69,14 @@
         data.DataFlow.initNamedEnvironmentEvents();
 
         $(document).ready(function () {
-            $('.selectpicker').selectpicker({
-                liveSearch: false,
-                showSubtext: true,
-                size: '5',
-                dropupAuto: false
-            });
-
-            $(".selectpicker-filtering").selectpicker({
-                liveSearch: true,
-                showSubtext: true,
-                size: '5',
-                dropupAuto: false
-            });
+            $("#SAIDAssetKeyCode").materialSelect();
+            $("#IsCompressed").materialSelect();
+            $("#IsPreProcessingRequired").materialSelect();
+            $("#PreProcessingSelection").materialSelect();
+            //$("#schemaMapPanel select").materialSelect();
+            $("#NamedEnvironmentPartial select").materialSelect();
+            $("#retrieverJobPanel select").materialSelect();
+            $("#compressionJobQuestion select").materialSelect();
         });
         
         data.DataFlow.InitSchemaMaps(datasetId, schemaId);
@@ -94,10 +86,10 @@
 
     DataFlowDetailInit: function (dataflowId) {
         $('body').on('click', '.jobHeader', function () {
-            if ($(this).children('.tracker-menu-icon').hasClass('glyphicon-menu-down')) {
-                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
+            if ($(this).children('.tracker-menu-icon').hasClass('fa-chevron-down')) {
+                $(this).children('.tracker-menu-icon').switchClass('fa-chevron-down', 'fa-chevron-up');
             } else {
-                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-up', 'glyphicon-menu-down');
+                $(this).children('.tracker-menu-icon').switchClass('fa-chevron-up', 'fa-chevron-down');
             }
             $(this).next('.jobContainer').toggle();
 
@@ -119,7 +111,8 @@
     },
 
     InitIngestionType() {
-        var selection = $("[id$=IngestionTypeSelection]").val();
+        $("#IngestionTypeSelection").materialSelect();
+        var selection = $("#IngestionTypeSelection").val();
 
         if (selection === "2") {
             $('.namePanel').show();
@@ -156,7 +149,7 @@
             $('.formSubmitButtons').show();
         }            
 
-        $("[id$=IngestionTypeSelection]").on('change', function () {
+        $("#IngestionTypeSelection").on('change', function () {
             var ingestionSelection = $(this).val();
             //if changing to Pull
             if (ingestionSelection === "2") {
@@ -258,13 +251,19 @@
                     data.DataFlow.InitSchemaMaps(obj.dataset_id, null);
                 }
                 else {
-                    $('#DatasetFormContent').replaceWith(obj);
+                    $('#DatasetFormContainer').html(obj);
                 }
             },
             error: function (obj) {
-                $('#DatasetFormContent').replaceWith(obj.responseText);
-                var hrEnv = $('#HrempServiceEnv').val()
-                var hrUrl = $('#HrempServiceUrl').val()
+                $('#DatasetFormContainer').html(obj.responseText);
+                var hrEnv = $('#HrempServiceEnv').val();
+                var hrUrl = $('#HrempServiceUrl').val();
+                if ($("#DatasetDesc").val()) {
+                    $('label[for=DatasetDesc]').addClass("active");
+                }
+                if ($("#DatasetInformation").val()) {
+                    $('label[for=DatasetInformation]').addClass("active");
+                }
                 //init the form passing the submit function specific for DataFlow page
                 data.Dataset.FormInit(hrUrl, hrEnv, data.DataFlow.DatasetFormSubmitInit, data.DataFlow.DatasetFormCancelInit);
             }
@@ -290,7 +289,7 @@
                 }
             },
             error: function (obj) {
-                $('#DatasetFileConfigFormContent').replaceWith(obj.responseText);
+                $('#DatasetFileConfigFormContainer').html(obj.responseText);
                 //init the form passing the submit function specific for DataFlow page
                 data.Config.CreateFormSubmitInit(data.DataFlow.DatasetFileConfigFormSubmitInit, data.DataFlow.DatasetFileConfigFormCancelInit);
             }
@@ -345,6 +344,9 @@
                 else {
                     $(targetElement).val(curVal);
                 }
+
+                //$("#schemaMapPanel select").materialSelect();
+
             });
             createSchemaLink.show();
         }
@@ -357,11 +359,8 @@
         }
 
         $('#CreateSchema').click(function () {
-            var curRow = $(this).parent().parent();
-            var datasetSelectionDropDown = curRow.find("[id$=__SelectedDataset]");
-            var createSchemaDatasetId = datasetSelectionDropDown.val();
             $('#DataFlowFormContainer').hide();
-            data.DataFlow.RenderSchemaCreatePage(createSchemaDatasetId);
+            data.DataFlow.RenderSchemaCreatePage($(".dataset-select").val());
         });
     },
 
@@ -411,7 +410,6 @@
 
             $('[id$=__SelectedDataset]').each(function (index) {
                 var cur = $(this);
-                var dsSpinner = cur.parent().find('.datasetSpinner');
                 if (data.DataFlow.CLA3332_ConsolidatedDataFlows) {
                     var curVal = datasetId;
                 }
@@ -419,8 +417,6 @@
                     var curVal = parseInt(cur.val());
                 }
 
-
-                dsSpinner.html('');
                 cur.html(newSubItems);
 
                 var curRow = cur.parent().parent();
@@ -432,6 +428,8 @@
                     cur.val(curVal);
                     data.DataFlow.PopulateSchemas(curVal, schemaId, curRow.find("[id$=__SelectedSchema]"));
                 }
+
+                $(".datasetSpinner").hide();
             });
 
 
@@ -467,6 +465,7 @@
         $.get("/DataFlow/NamedEnvironment?assetKeyCode=" + assetKeyCode + "&namedEnvironment=" + selectedEnvironment, function (result) {
             $('div#DataFlowFormContainer #NamedEnvironmentPartial').html(result);
             data.DataFlow.initNamedEnvironmentEvents();
+            $("#NamedEnvironmentPartial select").materialSelect();
         });
     },
 

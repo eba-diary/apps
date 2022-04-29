@@ -33,10 +33,10 @@ data.Config = {
         });
 
         $('body').on('click', '.tracker-menu-icon', function () {
-            if ($(this).hasClass('glyphicon-menu-down')) {
-                $(this).switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
+            if ($(this).hasClass('fa-chevron-down')) {
+                $(this).switchClass('fa-chevron-down', 'fa-chevron-up');
             } else {
-                $(this).switchClass('glyphicon-menu-up', 'glyphicon-menu-down');
+                $(this).switchClass('fa-chevron-up', 'fa-chevron-down');
             }
             var parentElement = $(this).parent();
             var detailContainer = parentElement.next('div');
@@ -142,32 +142,30 @@ data.Config = {
                 var ConfirmMessage = "<p>Are you sure</p><p><h3><b><font color=\"red\">THIS IS NOT A REVERSIBLE ACTION!</font></b></h3></p> </br>Deleting the schema will remove all associated data files and hive consumption layers.  </br>If at a later point " +
                     "this needs to be recreated, all files will need to be resent from source."
 
-                Sentry.ShowModalCustom("Delete Schema", ConfirmMessage, {
-                    Confirm: {
-                        label: "Confirm",
-                        className: "btn-danger",
-                        callback: function () {
-                            $.ajax({
-                                url: "/Config/" + config.attr("data-id"),
-                                method: "DELETE",
-                                dataType: 'json',
-                                success: function (obj) {
-                                    Sentry.ShowModalAlert(obj.Message, function () {
-                                        location.reload();
-                                    })
-                                },
-                                failure: function (obj) {
-                                    alert("failure");
-                                    Sentry.ShowModalAlert(
-                                        obj.Message, function () { })
-                                },
-                                error: function (obj) {
-                                    Sentry.ShowModalAlert(
-                                        obj.Message, function () { })
-                                }
-                            });
+                Sentry.ShowModalCustom("Delete Schema", ConfirmMessage, 
+                    '<button type="button" id="SchemeDeleteModalBtn" data-dismiss="modal" class="btn btn-danger waves-effect waves-light">Delete</button>'
+                );
+
+                $("#SchemeDeleteModalBtn").click(function () {
+                    $.ajax({
+                        url: "/Config/" + config.attr("data-id"),
+                        method: "DELETE",
+                        dataType: 'json',
+                        success: function (obj) {
+                            Sentry.ShowModalAlert(obj.Message, function () {
+                                location.reload();
+                            })
+                        },
+                        failure: function (obj) {
+                            alert("failure");
+                            Sentry.ShowModalAlert(
+                                obj.Message, function () { })
+                        },
+                        error: function (obj) {
+                            Sentry.ShowModalAlert(
+                                obj.Message, function () { })
                         }
-                    }
+                    });
                 });
 
                 //Sentry.ShowModalConfirmation(ConfirmMessage, function () {
@@ -208,6 +206,10 @@ data.Config = {
         });
 
         data.Config.DatasetScopeTypeInit($("#DatasetScopeTypeID"));
+
+        $("#FileType").materialSelect();
+        $("#DatasetScopeTypeID").materialSelect();
+        $("#FileExtensionID").materialSelect();
     },
 
     DatasetScopeTypeInit: function (element) {

@@ -387,11 +387,19 @@ namespace Sentry.data.Core
         public async Task<ValidationException> Validate(DatasetDto dto)
         {
             ValidationResults results = new ValidationResults();
-            if (dto.DatasetId == 0 && _datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
-                                                                         w.DatasetCategories.Any(x => dto.DatasetCategoryIds.Contains(x.Id)) &&
-                                                                         w.DatasetType == GlobalConstants.DataEntityCodes.DATASET).Count() > 0)
+
+            if (String.IsNullOrEmpty(dto.DatasetName)) //if no name, add error
             {
-                results.Add(Dataset.ValidationErrors.datasetNameDuplicate,"Dataset name already exists within category");
+                results.Add(Dataset.ValidationErrors.datasetNameRequired, "Dataset Name is required");
+            }
+            else //if name, make sure it is not duplicate
+            {
+                if (dto.DatasetId == 0 && dto.DatasetCategoryIds != null && _datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
+                                                             w.DatasetCategories.Any(x => dto.DatasetCategoryIds.Contains(x.Id)) &&
+                                                             w.DatasetType == GlobalConstants.DataEntityCodes.DATASET).Count() > 0)
+                {
+                    results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists within category");
+                }
             }
 
             if (String.IsNullOrWhiteSpace(dto.PrimaryContactId))
@@ -399,9 +407,16 @@ namespace Sentry.data.Core
                 results.Add(Dataset.ValidationErrors.datasetContactRequired, "Contact is required.");
             }
 
-            if (dto.DatasetCategoryIds.Count == 1 && dto.DatasetCategoryIds[0].Equals(0))
+            if(dto.DatasetCategoryIds == null)
             {
                 results.Add(Dataset.ValidationErrors.datasetCategoryRequired, "Category is required");
+            }
+            else
+            {
+                if (dto.DatasetCategoryIds.Count == 1 && dto.DatasetCategoryIds[0].Equals(0))
+                {
+                    results.Add(Dataset.ValidationErrors.datasetCategoryRequired, "Category is required");
+                }
             }
 
             if (dto.DatasetId == 0 && dto.DatasetScopeTypeId == 0)

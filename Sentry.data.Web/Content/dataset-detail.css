@@ -119,3 +119,18 @@
 .dataset-detail-datatable-information {
     display: inline-block;
 }
+
+.datasetMetadataBoxHr {
+    display: block;
+    width: 100%;
+    clear: both;
+    border-top: 1px solid #e6e6e6;
+}
+
+table {
+    width: 100% !important;
+}
+
+div.dataTables_wrapper div.dataTables_filter input {
+    margin-left: 0 !important;
+}

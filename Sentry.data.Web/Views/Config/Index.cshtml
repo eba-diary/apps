@@ -2,38 +2,23 @@
 
 @{
     ViewBag.Title = "View Dataset Configuration Details";
-    string color = Model.CategoryColor;
+    string color = "dsc-" + Model.CategoryColor + "-text";
+
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>  Back to Dataset Information</a>
+<a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><em class="fas fa-chevron-left pr-3"></em>  Back to Dataset Information</a>
 
 <div class="topBanner" style="height: 60px;
-    margin-top: 20px;
     border-bottom: 1px #DDDDDD solid;">
     <div class="relative hidden-sm hidden-xs">
         <div>
-
             <div class="no-overflow">
-                <h1 class="detailName leftFloat @color">
+                <h1 class="detailName leftFloat @color pt-0">
                     @Model.DatasetName
-
-                    @*@if (Model.IsSecured)
-                        {
-                            <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
-                        }*@
                 </h1>
-
-                @*@{
-                        foreach (string item in Model.DistinctFileExtensions())
-                        {
-                            <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
-                        }
-                    }*@
             </div>
         </div>
     </div>
-
-    <br />
 
     @*<div class="hidden-md hidden-lg">
             <h1 class="detailName leftFloat @color">
@@ -98,8 +83,6 @@
 
 </div>
 
-
-<br />
 <p>Click any section header to begin:</p>
 
 @{
@@ -115,16 +98,16 @@
                     @* Only show ACTIVE objects to users.  Administrators can see ACTIVE\PENDING DELETE objects *@
                     @if ((item.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active && !Model.Security.ShowAdminControls) || (Model.Security.ShowAdminControls && item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Deleted))
                     {
-                        <div class="configHeader categoryBanner-@color">
+                        <div class="configHeader categoryBanner-@Model.CategoryColor">
                             @if (item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
                             {
-                                <h1 class="@color">@item.ConfigFileName <strong><i>(@Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete.ToString())</i></strong></h1>
+                                <h1 class="@color pt-3">@item.ConfigFileName <strong><em>(@Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete.ToString())</em></strong></h1>
                             }
                             else
                             {
-                                <h1 class="@color">@item.ConfigFileName</h1>
+                                <h1 class="@color pt-3">@item.ConfigFileName</h1>
                             }
-                            <i class="glyphicon glyphicon-menu-up tracker-menu-icon"></i>
+                            <em class="fas fa-chevron-up tracker-menu-icon"></em>
                         </div>
                         @*if (item.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
                         {
@@ -142,7 +125,7 @@
 
                 <div class="configContainer" style="display: none;">
 
-                    <h4 class="@color">Configuration Metadata</h4>
+                    <h4 class="@color pt-1">Configuration Metadata</h4>
 
                     <div class="col-md-12">
                         <div class="col-md-1">Description:</div>
@@ -237,7 +220,7 @@
                     @if (item.Schema != null)
                     {
                         <hr />
-                        <h4 class="@color">Columns Metadata (name, datatype, is array, etc.)</h4>
+                        <h4 class="@color pt-1">Columns Metadata (name, datatype, is array, etc.)</h4>
                         <div class="columnsContainer col-md-12">
                             @if (item.Schema.Revisions.Count() == 0)
                             {
@@ -260,7 +243,7 @@
                     @if (Model.DisplayDataflowMetadata || Model.Security.ShowAdminControls)
                     {
                         <hr />
-                        <h4 class="@color">Producer DataFlow</h4>
+                        <h4 class="@color pt-1">Producer DataFlow</h4>
 
                         @* Loop through each external dataflow *@
                         if (!item.ExternalDataFlowJobs.Any())
@@ -271,11 +254,11 @@
                         {
                             <div class="retJob">
                                 <div class="jobHeader categoryBanner-@color">
-                                    <h6>@ext.Name</h6>
-                                    <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
+                                    <h6 class="pt-2">@ext.Name</h6>
+                                    <em class="retJobDetails tracker-menu-icon fas fa-chevron-up"></em>
                                     @if (Model.DisplayDataflowEdit)
                                     {
-                                        <div id="edit-dataflow-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" onclick="data.DataFlow.EditUrlRedirect(@ext.Id)"><span class="glyphicon glyphicon-pencil"></span></div>
+                                        <div id="edit-dataflow-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" onclick="data.DataFlow.EditUrlRedirect(@ext.Id)"><span class="far fa-edit"></span></div>
                                     }
                                 </div>
                                 <div class="jobContainer" style="display:none;">
@@ -299,8 +282,8 @@
                                     {
                                         <div class="retJob @stepModel.ActionName">
                                             <div class="jobHeader categoryBanner-@color">
-                                                <h6>@stepModel.ActionName</h6>
-                                                <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
+                                                <h6 class="pt-1">@stepModel.ActionName</h6>
+                                                <em class="retJobDetails tracker-menu-icon fas fa-chevron-up"></em>
                                             </div>
                                             <div class="jobContainer" style="display:none;">
                                                 <div><span>We are watching for files dropped in this AWS S3 url:</span></div>
@@ -326,15 +309,15 @@
                             <strong><p style="color:red">This section is visible to Admins only</p></strong>
                             @if (item.DataFlowJobs == null)
                             {
-                                <h4 class="gray">Schema DataFlow</h4>
+                                <h4 class="gray pt-1">Schema DataFlow</h4>
                                 <p>This schema does not have any associated dataflows yet.</p>
                             }
                             else
                             {
                                 <div class="retJob">
                                     <div class="jobHeader categoryBanner-gray">
-                                        <h6>Schema DataFlow (@item.DataFlowJobs.Name)</h6>
-                                        <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
+                                        <h6 class="pt-1">Schema DataFlow (@item.DataFlowJobs.Name)</h6>
+                                        <em class="retJobDetails tracker-menu-icon fas fa-chevron-up"></em>
                                     </div>
                                     <div class="jobContainer" style="display:none;">
                                         @if (item.DataFlowJobs.Step.Any(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map" || w.ActionName != "Producer S3 Drop"))
@@ -357,8 +340,8 @@
                                         {
                                             <div class="retJob @stepModel.ActionName">
                                                 <div class="jobHeader categoryBanner-@color">
-                                                    <h6>@stepModel.ActionName</h6>
-                                                    <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
+                                                    <h6 class="pt-1">@stepModel.ActionName</h6>
+                                                    <em class="retJobDetails tracker-menu-icon fas fa-chevron-up"></em>
                                                 </div>
                                                 <div class="jobContainer" style="display:none;">
                                                     <div><span>We are watching for files dropped in this AWS S3 url:</span></div>
@@ -407,16 +390,16 @@
     <div>
         @if (HttpContext.Current.IsDebuggingEnabled)
         {
-            <a class="btn btn-success btnCreateDirectory"><span class="glyphicon glyphicon-plus"></span>  Create Directories</a>
+            <a class="btn btn-success btnCreateDirectory"><em class="fas fa-plus"></em>  Create Directories</a>
             <hr />
         }
-        <a class="btn btn-success" href="/Config/Dataset/@Model.DatasetId/Create"><span class="glyphicon glyphicon-plus"></span>  Create new Data File Configuration</a>
+        <a class="btn btn-success" href="/Config/Dataset/@Model.DatasetId/Create"><em class="fas fa-plus"></em>  Create new Data File Configuration</a>
     </div>
     <hr />
 }
 
 <div>
-    <a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>  Back to Dataset Information</a>
+    <a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><em class="fas fa-chevron-left pr-3"></em>  Back to Dataset Information</a>
 </div>
 
 <style>

@@ -1,8 +1,7 @@
 ﻿@{
-    string color = Model.CategoryColor;
-    string headerColor = "categoryBanner-" + Model.CategoryColor;
+    string color = "dsc-" + Model.CategoryColor + "-text";
+    string tableColor = "dsc-" + Model.CategoryColor + "-table";
 }
-<br />
 <div class="" id="schemaSection">
 
     @if (!Model.DisplayTabSections)
@@ -13,34 +12,35 @@
     }
 
 
-    <div id="delroyBorder">
+    <div id="">
         <div id="delroyFriends">
-            <ol class="breadcrumb orange" id="delroyBreadcrumb" data-page-color="@color">   </ol>
-
-            <table class="table table-striped table-bordered table-hover nowrap dataTable no-footer @color" id="delroyTable" style="width:100%; overflow-x:auto;">
-                <thead>
-                    <tr class="filter-row">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-
-                    <tr class="table-header_@color @headerColor">
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Type</th>
-                        <th>Is Array</th>
-                        <th>Length</th>
-                        <th>Precision</th>
-                        <th>Scale</th>
-                    </tr>
-                </thead>
-            </table>
+            <ol class="breadcrumb mb-1" id="delroyBreadcrumb" data-page-color="@color"></ol>
+            <div class="row">
+                <div class="col">
+                    <table class="table @tableColor table-bordered table-hover table-striped nowrap" id="delroyTable" aria-describedby="Dataset Schema Columns Table">
+                        <thead>
+                            <tr role="row">
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Type</th>
+                                <th>Is Array</th>
+                                <th>Length</th>
+                                <th>Precision</th>
+                                <th>Scale</th>
+                            </tr>
+                            <tr class="filter-row" role="row">
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
         </div>
-
     </div>
 </div>

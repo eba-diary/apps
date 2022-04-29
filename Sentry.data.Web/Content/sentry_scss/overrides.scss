@@ -1,0 +1,258 @@
+﻿/// <reference path="variables.scss" />
+/// <reference path="../MDBPro/sass/mdb/free/data/_variables.scss" />
+
+
+html {
+    font-size: 15px;
+}
+
+// Use flexbox to make the footer stick to the bottom no matter how big the page is
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+.page-content {
+    flex: 1 0 auto;
+    min-height: 600px;
+}
+
+
+// Headers
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    padding-top: 35px;
+}
+
+// Numbers
+* {
+    font-feature-settings: "lnum";
+}
+
+// Remove all drop shadows
+.z-depth-0, .z-depth-1, .z-depth-1-half, .z-depth-2, .z-depth-3, .z-depth-4, .z-depth-5 {
+    box-shadow: none !important;
+}
+
+// Remove all text-transform: uppercase
+.btn,
+footer.page-footer .title,
+.section-title,
+.btn-flat,
+.cart-modal .table .total,
+.classic-tabs li a,
+.picker__button--today,
+.picker__button--clear,
+.picker__button--close,
+.picker__month-display,
+.picker--time .picker__button--clear {
+    text-transform: none;
+}
+
+// Fix icon path
+.carousel .carousel-control-prev-icon {
+    background-image: url(../Images/arrow_left.svg) !important;
+}
+
+.carousel .carousel-control-next-icon {
+    background-image: url(../Images/arrow_right.svg) !important;
+}
+
+
+// Color Classes
+@each $color_name, $color in $sentry-colors {
+    .#{$color_name} {
+        background-color: $color !important;
+    }
+
+    .#{$color_name}-text {
+        color: $color !important;
+    }
+}
+
+// Select2
+.select2-container--default .select2-selection--multiple {
+    border-top: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid #ccc !important;
+    border-radius: 0 !important;
+    margin-bottom: 1rem;
+}
+
+.select2-search__field:focus {
+    border: 0 !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: $sentry-white !important;
+    border: 2px solid $sentry-blue !important;
+    border-radius: 24px !important;
+    color: $sentry-dark-blue !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: $sentry-dark-blue !important;
+
+    &:hover {
+        color: $sentry-dark-blue !important;
+    }
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: $sentry-blue !important;
+}
+
+// Error Pages
+h1.error-icon::before {
+    //font-size: 3em;
+    font-family: icomoon;
+    content: "\e948";
+    color: $sentry-danger;
+    margin-right: 0.5rem;
+}
+
+// Success Pages
+h1.success-icon::before {
+    //font-size: 3em;
+    font-family: icomoon;
+    content: "\e91d";
+    color: $sentry-success;
+    margin-right: 0.5rem;
+}
+
+// Popover
+.popover-header {
+    border-bottom: 0;
+}
+
+.popover {
+    border: 1px solid #ccc !important;
+}
+
+// Bulleted Lists
+ul.bulleted, ul.bulleted li {
+    list-style-type: disc;
+}
+
+ul.bulleted, ol.bulleted, ul.bulleted ul, ol.bulleted ul {
+    padding-left: 1rem;
+}
+
+ul.bulleted ul li, ol.bulleted ul li {
+    list-style-type: circle;
+}
+
+ol.bulleted ol li {
+    list-style-type: upper-alpha;
+}
+
+// List Groups
+.list-group > a.active h5 {
+    color: $sentry-white;
+}
+
+// Navbar
+.nav-item.active {
+    background-color: $sentry-blue !important;
+}
+
+.navbar .nav-item {
+    .dropdown-menu.dropdown a {
+        color: #212121;
+
+        &:hover,
+        &:focus,
+        &:active {
+            color: #fff;
+            @extend .z-depth-1;
+        }
+    }
+}
+
+// Tabs
+.classic-tabs li a {
+    color: #000;
+    font-size: 1rem;
+
+    &:hover {
+        border-bottom: 3px solid $sentry-blue;
+    }
+}
+
+.classic-tabs li a.active {
+    color: $sentry-dark-blue;
+    border-bottom: 3px solid $sentry-blue;
+}
+
+
+// Breadcrumbs
+.breadcrumb .breadcrumb-item.active {
+    color: #777;
+}
+
+// Time Picker
+.clockpicker-display {
+    color: $sentry-blue;
+}
+
+.clockpicker-span-am-pm {
+    color: $sentry-blue;
+}
+
+.btn-floating.btn-flat {
+    background: $sentry-blue;
+
+    &:hover,
+    &:focus {
+        background-color: $sentry-dark-blue !important;
+    }
+
+    &.active {
+        background-color: $sentry-dark-blue !important;
+        @extend .z-depth-1-half;
+    }
+}
+
+.clockpicker-canvas-bearing {
+    stroke: none;
+    fill: rgba(0, 163, 224, 0.75);
+}
+
+.clockpicker-canvas-fg {
+    stroke: none;
+    fill: rgba(0, 163, 224, 0);
+}
+
+.clockpicker-canvas-fg.active {
+    fill: rgba(0, 163, 224, 0.5);
+}
+
+.clockpicker-canvas-bg {
+    stroke: none;
+    fill: rgba(0, 163, 224, 0.25);
+}
+
+.clockpicker-canvas-bg-trans {
+    fill: rgba(0, 163, 224, 0.25);
+}
+
+.clockpicker-canvas line {
+    stroke: rgba(0, 163, 224, 0.25);
+    stroke-width: 1;
+    stroke-linecap: round;
+    /*shape-rendering: crispEdges;*/
+}
+
+.picker__footer .clockpicker-button {
+    cursor: pointer;
+}
+
+.picker__footer .clockpicker-button:active {
+    background-color: rgba(0, 163, 224, 0.25);
+}
+
+// Jumbotron
+.jumbotron {
+    background-color: $sentry-blue-tint-20;
+}

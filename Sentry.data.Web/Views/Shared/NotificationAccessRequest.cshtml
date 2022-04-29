@@ -18,11 +18,9 @@
 
     <div class="form-horizontal">
 
-        <div class="form-group">
-            <label class="col-md-2 control-label">Notification Area</label>
-            <div class="col-md-10">
-                @Html.DropDownListFor((model) => model.SecurableObjectId, Model.AllSecurableObjects, new { @class = "form-control edit-dataset-row" })
-            </div>
+        <div class="md-form">
+            <label class="mdb-main-label" for="SecurableObjectId">Notification Area</label>
+            @Html.DropDownListFor((model) => model.SecurableObjectId, Model.AllSecurableObjects, new { @class = "mdb-select" })
         </div>
 
 

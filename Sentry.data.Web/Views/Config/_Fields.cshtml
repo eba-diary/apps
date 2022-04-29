@@ -16,7 +16,7 @@
             <div class="col-md-3">
                 @Html.DropDownListFor(m => m.Type, new SelectList(Model.HiveTypes, "Value", "Text", Model != null ? Model.Type : "0"), "Please select a Data Type")
             </div>
-            <div class="col-md-2"><a class="removeField" style="display: inline-block; margin-left: 10px;"><span class="glyphicon glyphicon-minus"></span> Remove Field</a></div>
+            <div class="col-md-2"><a class="removeField" style="display: inline-block; margin-left: 10px;"><em class="fas fa-minus pr-3"></em>Remove Field</a></div>
         </div>
     </div>
 }

@@ -3,14 +3,15 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Data Source Form";
 }
 
-<div id="alertRow" class="row" style="position: relative; z-index: 999">
+<div id="alertRow" class="row pt-2" style="position: relative; z-index: 999">
     <div class="col-lg-12">
         <div id="alertContainer" class="bs-component">
             <div id="configWarningAlert" class="alert" style="display: none;">
                 <button type="button" class="close" data-dismiss="alert">×</button>
-                <h4 id="configWarningHeader">Warning!</h4>
+                <h4 class="pt-0" id="configWarningHeader">Warning!</h4>
                 <p id="configWarningText"></p>
             </div>
         </div>
@@ -19,7 +20,7 @@
 
 <div class="topBanner">
     <div>
-        <a class="backToList" href="/"><span class="glyphicon glyphicon-chevron-left"></span>Back to Previous Page</a>
+        <a class="backToList" href="/"><em class="fas fa-chevron-left pr-3"></em>Back to Previous Page</a>
     </div>
 
 </div>
@@ -33,205 +34,160 @@
     @Html.HiddenFor(model => model.ReturnUrl)
     @Html.HiddenFor(model => model.PrimaryContactId)
 
-    <h1>Create Data Source</h1>
-    <hr />
+    <h1 class="pt-0">Create Data Source</h1>
 
-    <div id="myTabContent" class="tab-content">
-        <div id="informationPanel" class="tab-pane fade active in form-horizontal">
-            <div class="form-group">
-                @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.TextBoxFor(model => model.Name, new { @value = "", @class = "form-control edit-dataset-row" })
-                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
-                </div>
-            </div>
+    <div class="md-form">
+        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+        @Html.TextBoxFor(model => model.Name, new { @value = "", @class = "form-control edit-dataset-row" })
+        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+    </div>
 
-            <div class="form-group">
-                @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2 optional" })
-                <div class="col-md-10">
-                    @Html.TextBoxFor(model => model.Description, new { @value = "", @class = "form-control edit-dataset-row" })
-                    @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
-                </div>
-            </div>
+    <div class="md-form">
+        @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label" })
+        @Html.TextBoxFor(model => model.Description, new { @value = "", @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+    </div>
 
-            <div class="form-group">
-                @Html.LabelFor(model => model.PrimaryContactName, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
-                    @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
-                </div>
-            </div>
+    <div class="md-form">
+        @Html.LabelFor(model => model.PrimaryContactName, htmlAttributes: new { @class = "control-label" })
+        @Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control w-100", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+        @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
+    </div>
 
-            <div class="form-group">
-                @Html.LabelFor(m => m.IsSecured, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.CheckBoxFor(m => m.IsSecured)
-                </div>
-            </div>
+    <div class="form-check">
+        <input type="checkbox" value="true" class="form-check-input" id="IsSecured" name="IsSecured" data-val-required="The Restrict Data Source field is required." checked="@Model.IsSecured">
+        @Html.LabelFor(m => m.IsSecured, htmlAttributes: new { @class = "form-check-label" })
+    </div>
 
-            <div class="form-group">
-                @Html.LabelFor((model) => model.SourceType, new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.DropDownListFor((model) => model.SourceType, Model.SourceTypesDropdown, new { @class = "form-control edit-dataset-row" })
-                    @Html.ValidationMessageFor((model) => model.SourceType, "", new { @class = "text-danger" })
-                </div>
-            </div>
+    <div class="md-form">
+        @Html.LabelFor((model) => model.SourceType, new { @class = "mdb-main-label" })
+        @Html.DropDownListFor((model) => model.SourceType, Model.SourceTypesDropdown, new { @class = "mdb-select" })
+        @Html.ValidationMessageFor((model) => model.SourceType, "", new { @class = "text-danger" })
+    </div>
 
-            <div class="form-group fieldDescription">
-                <label class="control-label col-md-2"></label>
-                <div class="col-md-10">
-                    <span class="text-muted">
-                        <em id="sourceDescription"></em>
-                    </span>
-                </div>
-            </div>
+    <div class="md-form fieldDescription">
+        <label class="control-label"></label>
+        <span class="text-muted">
+            <em id="sourceDescription"></em>
+        </span>
+    </div>
 
-            <div class="form-group">
-                @Html.LabelFor(model => model.BaseUri, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.TextBoxFor(model => model.BaseUri, new { @value = "", @class = "form-control edit-dataset-row " })
-                    @Html.ValidationMessageFor(model => model.BaseUri, "", new { @class = "text-danger" })
-                </div>
-            </div>
-            <div id="authPanel">
-                <div class="form-group">
-                    @Html.LabelFor((model) => model.AuthID, new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.DropDownListFor((model) => model.AuthID, Model.AuthTypesDropdown, new { @class = "form-control edit-dataset-row" })
-                        @Html.ValidationMessageFor((model) => model.AuthID, "", new { @class = "text-danger" })
-                    </div>
-                </div>
+    <div class="md-form">
+        @Html.LabelFor(model => model.BaseUri, htmlAttributes: new { @class = "control-label col-md-2" })
+        @Html.TextBoxFor(model => model.BaseUri, new { @value = "", @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.BaseUri, "", new { @class = "text-danger" })
+    </div>
+    <div id="authPanel">
+        <div class="md-form">
+            @Html.LabelFor((model) => model.AuthID, new { @class = "mdb-main-label" })
+            @Html.DropDownListFor((model) => model.AuthID, Model.AuthTypesDropdown, new { @class = "mdb-select" })
+            @Html.ValidationMessageFor((model) => model.AuthID, "", new { @class = "text-danger" })
+        </div>
 
-                <div class="form-group fieldDescription">
-                    <label class="control-label col-md-2"></label>
-                    <div class="col-md-10">
-                        <span class="text-muted">
-                            <em id="authDescription"></em>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div id="userPassPanel">
-                <div class="form-group">
-                    @Html.LabelFor((model) => model.IsUserPassRequired, new { @class = "control-label col-md-2" })
-                    <div class="col-md-1">
-                        @Html.CheckBoxFor((model) => model.IsUserPassRequired, new { @class = "edit-dataset-row" })
-                        @Html.ValidationMessageFor((model) => model.IsUserPassRequired, "", new { @class = "text-danger" })
-                    </div>
-                    <div id="userPassNotificationPanel" class="credentialWarning">
-                        <div class="col-md-9">
-                            <em>Work with data.sentry.com administrators to configure credentials.  The data source will not operate until credentials are configured.</em>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tokenAuthPanel">
-                <div class="form-group">
-                    @Html.Label("Authorization Header", new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        <div class="col-md-5 headerEntry">
-                            @Html.Label("Token Header Name", new { @class = "col-md-5 headerEntryLabel" })
-                            @Html.TextBoxFor(m => m.TokenAuthHeader, new { @value = "", @class = "form-control edit-dataset-row col-md-3" })
-                            @Html.ValidationMessageFor((model) => model.TokenAuthHeader, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="col-md-5 headerEntry">
-                            @Html.Label("Token Value", new { @class = "col-md-5 headerEntryLabel" })
-                            @Html.TextBoxFor(m => m.TokenAuthValue, new { @value = "", @class = "form-control edit-dataset-row col-md-3" })
-                            @Html.ValidationMessageFor((model) => model.TokenAuthValue, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="OAuthPanel">
-                <div class="form-group">
-                    @Html.LabelFor(m => m.ClientId, new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.TextBoxFor((model) => model.ClientId, new { @class = "form-control edit-dataset-row" })
-                        @Html.ValidationMessageFor((model) => model.ClientId, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.ClientPrivateId, new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.TextBoxFor((model) => model.ClientPrivateId, new { @class = "form-control edit-dataset-row" })
-                        @Html.ValidationMessageFor((model) => model.ClientPrivateId, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.TokenUrl, new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.TextBoxFor((model) => model.TokenUrl, new { @class = "form-control edit-dataset-row" })
-                        @Html.ValidationMessageFor((model) => model.TokenUrl, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.TokenExp, new { @class = "control-label col-md-2" })
-                    <div class="col-md-2">
-                        @Html.EditorFor((model) => model.TokenExp, new { @class = "form-control edit-dataset-row" })
-                        @Html.ValidationMessageFor((model) => model.TokenExp, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Scope, new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.TextBoxFor((model) => model.Scope, new { @class = "form-control edit-dataset-row" })
-                        @Html.ValidationMessageFor((model) => model.Scope, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-            </div>
-
-            <div id="portNumberPanel">
-                <div class="form-group">
-                    @Html.LabelFor(model => model.PortNumber, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.PortNumber, new { @value = "", @class = "form-control edit-dataset-row" })
-                        @Html.ValidationMessageFor(model => model.PortNumber, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-                <div class="form-group fieldDescription">
-                    <label class="control-label col-md-2"></label>
-                    <div class="col-md-10 text-muted">
-                        <em>Industry statandard default port values:</em>
-                        <ul>
-                            <li><em>FTP : 21</em></li>
-                            <li><em>SSH\SFTP : 22</em></li>
-                            <li><em>HTTPS : 443</em></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div id="requestHeaderPanel">
-                <div class="form-group">
-                    @Html.LabelFor((model) => model.Headers, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div id="requestHeader" class="col-md-10">
-                        <div class="form-group col-md-10 headerEntry">
-                            <a class="addHeader" style="display: inline-block; margin-left: 10px;"><span class="glyphicon glyphicon-plus"></span> Add Header</a>
-                        </div>
-                        <div class="col-md-5 headerEntryLabel">
-                            @Html.Label("Header Name", new { @value = "", @class = "col-md-5 headerEntryLabel" })
-                        </div>
-                        <div class="col-md-5 headerEntryLabel">
-                            @Html.Label("Header Value", new { @value = "", @class = "col-md-5 headerEntryLabel" })
-                        </div>
-                        @*This approach is described at the site http://ivanz.com/2011/06/16/editing-variable-length-reorderable-collections-in-asp-net-mvc-part-1/*@
-                        @foreach (RequestHeader header in Model.Headers)
-                        {
-                            Html.RenderPartial("_Headers", header);
-                        }
-                    </div>
-                </div>
+        <div class="md-form fieldDescription">
+            <label class="control-label"></label>
+            <span class="text-muted">
+                <em id="authDescription"></em>
+            </span>
+        </div>
+    </div>
+    <div id="userPassPanel">
+        <div class="form-check">
+            <input type="checkbox" value="true" class="form-check-input" id="IsUserPassRequired" name="IsUserPassRequired" checked="@Model.IsUserPassRequired">
+            @Html.LabelFor((model) => model.IsUserPassRequired, new { @class = "form-check-label" })
+            <div id="userPassNotificationPanel" class="credentialWarning">
+                <em>Work with data.sentry.com administrators to configure credentials.  The data source will not operate until credentials are configured.</em>
             </div>
         </div>
     </div>
 
-    <div class="form-group">
+    <div id="tokenAuthPanel">
+        @Html.Label("Authorization Header", new { @class = "control-label" })
+        <div class="md-form input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text md-addon">Token Header and Value</span>
+            </div>
+            @Html.TextBoxFor(m => m.TokenAuthHeader, new { @value = "", @class = "form-control", @placeholder = "Token Header Name" })
+            @Html.ValidationMessageFor((model) => model.TokenAuthHeader, "", new { @class = "text-danger" })
+            @Html.TextBoxFor(m => m.TokenAuthValue, new { @value = "", @class = "form-control",  @placeholder = "Token Value" })
+            @Html.ValidationMessageFor((model) => model.TokenAuthValue, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div id="OAuthPanel">
+        <div class="md-form">
+            @Html.LabelFor(m => m.ClientId, new { @class = "control-label" })
+            @Html.TextBoxFor((model) => model.ClientId, new { @class = "form-control" })
+            @Html.ValidationMessageFor((model) => model.ClientId, "", new { @class = "text-danger" })
+        </div>
+        <div class="md-form">
+            @Html.LabelFor(m => m.ClientPrivateId, new { @class = "control-label" })
+            @Html.TextBoxFor((model) => model.ClientPrivateId, new { @class = "form-control " })
+            @Html.ValidationMessageFor((model) => model.ClientPrivateId, "", new { @class = "text-danger" })
+        </div>
+        <div class="md-form">
+            @Html.LabelFor(m => m.TokenUrl, new { @class = "control-label" })
+            @Html.TextBoxFor((model) => model.TokenUrl, new { @class = "form-control" })
+            @Html.ValidationMessageFor((model) => model.TokenUrl, "", new { @class = "text-danger" })
+        </div>
+        <div class="md-form">
+            @Html.LabelFor(m => m.TokenExp, new { @class = "control-label" })
+            @Html.EditorFor((model) => model.TokenExp, new { @class = "form-control" })
+            @Html.ValidationMessageFor((model) => model.TokenExp, "", new { @class = "text-danger" })
+        </div>
+        <div class="md-form">
+            @Html.LabelFor(m => m.Scope, new { @class = "control-label" })
+            @Html.TextBoxFor((model) => model.Scope, new { @class = "form-control" })
+            @Html.ValidationMessageFor((model) => model.Scope, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div id="portNumberPanel">
+        <div class="md-form">
+            @Html.LabelFor(model => model.PortNumber, htmlAttributes: new { @class = "control-label" })
+            @Html.EditorFor(model => model.PortNumber, new { @value = "", @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.PortNumber, "", new { @class = "text-danger" })
+        </div>
+        <div class="md-form fieldDescription">
+            <label class="control-label"></label>
+            <div class="text-muted">
+                <em>Industry statandard default port values:</em>
+                <ul>
+                    <li><em>FTP : 21</em></li>
+                    <li><em>SSH\SFTP : 22</em></li>
+                    <li><em>HTTPS : 443</em></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="requestHeaderPanel">
+        <div class="md-form">
+            @Html.LabelFor((model) => model.Headers, htmlAttributes: new { @class = "control-label" })
+            <div id="requestHeader" class="row">
+                <div class="md-form headerEntry col">
+                    <a class="addHeader" style="display: inline-block; margin-left: 10px;"><em class="fas fa-plus pr-3"></em> Add Header</a>
+                </div>
+                <div class="headerEntryLabel col">
+                    @Html.Label("Header Name", new { @value = "", @class = "headerEntryLabel" })
+                </div>
+                <div class="headerEntryLabel col">
+                    @Html.Label("Header Value", new { @value = "", @class = "headerEntryLabel" })
+                </div>
+                @*This approach is described at the site http://ivanz.com/2011/06/16/editing-variable-length-reorderable-collections-in-asp-net-mvc-part-1/*@
+                @foreach (RequestHeader header in Model.Headers)
+                {
+                    Html.RenderPartial("_Headers", header);
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="md-form">
         <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
     </div>
 
-    <div class="form-group">
+    <div class="md-form">
         <div>
             <input type="submit" id="btnCreateDataSource" value="Create Data Source" class="btn btn-primary" />
         </div>
