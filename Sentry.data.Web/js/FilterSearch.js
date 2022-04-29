@@ -158,7 +158,7 @@
         $(document).on("click", ".saved-search-favorite", function (e) {
             e.stopPropagation();
 
-            var id = this.id;
+            var id = $(this).data("id");
             var element = this;
             
             $(element).addClass("display-none");
@@ -176,7 +176,7 @@
             $("#save-search-id").val(id);            
             $("#save-search-name").val($(this).data("name"));
             $(".save-search-name-label").addClass('active');
-            $("#save-search-favorite").prop('checked', $("#" + id).hasClass("fas"));
+            $("#save-search-favorite").prop('checked', $("#savedFavorite_" + id).hasClass("fas"));
             
             $("#filter-search-save-modal").modal("show");
         });
@@ -200,7 +200,7 @@
                         $(".saved-search-menu").append('<a class="dropdown-item disabled" href="#">No Saved Searches</a>')
                     }
                 },
-                fail: function () {
+                error: function () {
                     data.FilterSearch.showToast("error", "There was an issue deleting the saved search. Please try again or reach out to DSCSupport@sentry.com.")
                     $(element).removeClass("display-none");
                     $("#deleteSpinner_" + id).addClass("display-none");

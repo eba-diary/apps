@@ -76,7 +76,7 @@
 }
 
 [id^=deleteSpinner_] {
-    margin-right: 1rem;
+    margin-right: 0.75rem;
 }
 
 .filter-search-body {

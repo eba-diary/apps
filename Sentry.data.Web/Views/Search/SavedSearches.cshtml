@@ -11,7 +11,7 @@
                 <div class="saved-search-option-container" id="saved_@option.SavedSearchId">
                     <a class="dropdown-item @(option.SavedSearchName == Model.ActiveSearchName ? "active" : "") saved-search-option-name" href="@Url.Action("Search", Model.SearchType, new { savedSearch = option.SavedSearchName })">@option.SavedSearchName</a>
                     
-                    <a class="@(option.IsFavorite ? "fas" : "far") fa-star saved-search-favorite saved-search-option-icon" id="@option.SavedSearchId"></a>
+                    <a class="@(option.IsFavorite ? "fas" : "far") fa-star saved-search-favorite saved-search-option-icon" id="savedFavorite_@option.SavedSearchId" data-id="@option.SavedSearchId"></a>
                     <span class="spinner-border spinner-border-sm saved-search-option-spinner display-none" id="favoriteSpinner_@option.SavedSearchId"></span>
                     
                     <a class="far fa-edit saved-search-option-icon saved-search-edit" data-id="@option.SavedSearchId" data-name="@option.SavedSearchName"></a>

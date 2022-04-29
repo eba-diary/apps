@@ -125,7 +125,7 @@ data.Favorites = {
 
         var request = {
             favoriteType: type,
-            entityId: element.id
+            entityId: $(element).data("id")
         };
 
         $.post(path, request, function () {

@@ -57,8 +57,10 @@ namespace Sentry.data.Web.Controllers
         [HttpDelete]
         public JsonResult RemoveSearch(int savedSearchId)
         {
-            _filterSearchService.RemoveSavedSearch(savedSearchId, SharedContext.CurrentUser.AssociateId);
-            return Json(new { Success = true });
+            System.Threading.Thread.Sleep(5000);
+            throw new Exception("error");
+            //_filterSearchService.RemoveSavedSearch(savedSearchId, SharedContext.CurrentUser.AssociateId);
+            //return Json(new { Success = true });
         }
     }
 }
