@@ -9,7 +9,6 @@ namespace Sentry.data.Core
         public int Downloads { get; set; }
         public Dictionary<string,string> DatasetFileConfigNames { get; set; }
         public Dictionary<string,string> DatasetScopeTypeNames { get; set; }
-        public List<string> DistinctFileExtensions { get; set; }
         public int DatasetFileCount { get; set; }
         public string OriginationCode { get; set; }
         public string DataClassificationDescription { get; set; }
