@@ -40,7 +40,7 @@ namespace Sentry.data.Infrastructure
             try
             {
                 //check if favorite already exists
-                UserFavorite existing = _datasetContext.UserFavorites.FirstOrDefault(x => x.AssociateId == associateId && x.FavoriteEntityId == entityId && x.FavoriteType == favoriteType);
+                UserFavorite existing = GetUserFavorite(favoriteType, entityId, associateId);
 
                 if (existing == null)
                 {
@@ -98,7 +98,7 @@ namespace Sentry.data.Infrastructure
         {
             try
             {
-                UserFavorite userFavorite = _datasetContext.UserFavorites.FirstOrDefault(f => f.AssociateId == associateId && f.FavoriteEntityId == entityId && f.FavoriteType == favoriteType);
+                UserFavorite userFavorite = GetUserFavorite(favoriteType, entityId, associateId);
                 RemoveUserFavorite(userFavorite);
             }
             catch (Exception ex)
@@ -157,9 +157,9 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public UserFavorite GetUserFavoriteByEntity(int entityId, string associateId)
+        public UserFavorite GetUserFavorite(string favoriteType, int entityId, string associateId)
         {
-            return _datasetContext.UserFavorites.FirstOrDefault(f => f.AssociateId == associateId && f.FavoriteEntityId == entityId);
+            return _datasetContext.UserFavorites.FirstOrDefault(x => x.AssociateId == associateId && x.FavoriteEntityId == entityId && x.FavoriteType == favoriteType);
         }
 
         #region Methods

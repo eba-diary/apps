@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Sentry.data.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -77,6 +78,19 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
+        public void GetUserFavoriteItems_ThrowsException()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.SetupGet(x => x.UserFavorites).Throws<Exception>();
+
+            UserFavoriteService userFavoriteService = new UserFavoriteService(datasetContext.Object);
+
+            Assert.ThrowsException<Exception>(() => userFavoriteService.GetUserFavoriteItems("000000"));
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
         public void RemoveUserFavorite_1_False_Deleted()
         {
             Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
@@ -115,6 +129,54 @@ namespace Sentry.data.Infrastructure.Tests
             UserFavoriteService userFavoriteService = new UserFavoriteService(datasetContext.Object);
 
             userFavoriteService.RemoveUserFavorite(1, true);
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void RemoveUserFavorite_ThrowsException()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.SetupGet(x => x.UserFavorites).Throws<Exception>();
+
+            UserFavoriteService userFavoriteService = new UserFavoriteService(datasetContext.Object);
+
+            Assert.ThrowsException<Exception>(() => userFavoriteService.RemoveUserFavorite(1, false));
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void RemoveUserFavorite_ByEntity_SavedSearch_2_000000_Deleted()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.SetupGet(x => x.UserFavorites).Returns(GetUserFavorites());
+            datasetContext.Setup(x => x.Remove(It.IsAny<UserFavorite>())).Callback<UserFavorite>(x =>
+            {
+                Assert.AreEqual(1, x.UserFavoriteId);
+                Assert.AreEqual("000000", x.AssociateId);
+                Assert.AreEqual(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, x.FavoriteType);
+                Assert.AreEqual(2, x.FavoriteEntityId);
+                Assert.AreEqual(1, x.Sequence);
+            });
+            datasetContext.Setup(x => x.SaveChanges(true));
+
+            UserFavoriteService userFavoriteService = new UserFavoriteService(datasetContext.Object);
+
+            userFavoriteService.RemoveUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, 2, "000000");
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void RemoveUserFavorite_ByEntity_ThrowsException()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.SetupGet(x => x.UserFavorites).Throws<Exception>();
+
+            UserFavoriteService userFavoriteService = new UserFavoriteService(datasetContext.Object);
+
+            Assert.ThrowsException<Exception>(() => userFavoriteService.RemoveUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, 2, "000000"));
 
             datasetContext.VerifyAll();
         }
@@ -179,6 +241,19 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
+        public void SetUserFavoritesOrder_ThrowsException()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.SetupGet(x => x.UserFavorites).Throws<Exception>();
+
+            UserFavoriteService userFavoriteService = new UserFavoriteService(datasetContext.Object);
+
+            Assert.ThrowsException<Exception>(() => userFavoriteService.SetUserFavoritesOrder(new List<KeyValuePair<int, bool>>()));
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
         public void AddUserFavorite_SavedSearch_2_000000_Add()
         {
             Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
@@ -197,6 +272,53 @@ namespace Sentry.data.Infrastructure.Tests
             userFavoriteService.AddUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, 2, "000000");
 
             datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void AddUserFavorite_ThrowsException()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.SetupGet(x => x.UserFavorites).Throws<Exception>();
+
+            UserFavoriteService userFavoriteService = new UserFavoriteService(datasetContext.Object);
+
+            Assert.ThrowsException<Exception>(() => userFavoriteService.AddUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, 2, "000000"));
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetUserFavorite_SavedSearch_2_000000_Success()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.SetupGet(x => x.UserFavorites).Returns(GetUserFavorites());
+
+            UserFavoriteService userFavoriteService = new UserFavoriteService(datasetContext.Object);
+
+            UserFavorite userFavorite = userFavoriteService.GetUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, 2, "000000");
+
+            datasetContext.VerifyAll();
+
+            Assert.AreEqual(1, userFavorite.UserFavoriteId);
+            Assert.AreEqual(1, userFavorite.Sequence);
+            Assert.AreEqual(2, userFavorite.FavoriteEntityId);
+            Assert.AreEqual(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, userFavorite.FavoriteType);
+            Assert.AreEqual("000000", userFavorite.AssociateId);
+        }
+
+        [TestMethod]
+        public void GetUserFavorite_SavedSearch_1_000000_NotFound()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.SetupGet(x => x.UserFavorites).Returns(GetUserFavorites());
+
+            UserFavoriteService userFavoriteService = new UserFavoriteService(datasetContext.Object);
+
+            UserFavorite userFavorite = userFavoriteService.GetUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, 1, "000000");
+
+            datasetContext.VerifyAll();
+
+            Assert.IsNull(userFavorite);
         }
 
         #region Helpers

@@ -47,7 +47,7 @@ namespace Sentry.data.Infrastructure
                     {
                         SavedSearchId = savedSearch.SavedSearchId,
                         SavedSearchName = savedSearch.SearchName,
-                        IsFavorite = _userFavoriteService.GetUserFavoriteByEntity(savedSearch.SavedSearchId, associateId) != null
+                        IsFavorite = _userFavoriteService.GetUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, savedSearch.SavedSearchId, associateId) != null
                     });
                 }
 
