@@ -54,7 +54,13 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public JsonResult SearchResult(FilterSearchModel searchModel)
         {
+            //FOR COLUMN SAVE: add SearchName parameter as optional
+
             ValidateSearchModel(searchModel);
+
+            //FOR COLUMN SAVE: update GetSearchResults to be async
+            //Will add additional call to get saved search ResultConfiguration using SearchName if populated async
+            //pass back the ResultConfiguration as visible columns
 
             DaleResultDto resultDto = _dataInventoryService.GetSearchResults(searchModel.ToDaleDto());
 

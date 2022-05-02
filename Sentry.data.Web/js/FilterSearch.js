@@ -1,5 +1,6 @@
 ﻿data.FilterSearch = {
 
+    //FOR COLUMN SAVE: take out global searchType
     searchType: "",
     lastSelectedOptionIds: [],
 
@@ -18,7 +19,8 @@
         this.searchType = searchTypeName;
 
         this.initEvents();
-        
+
+        //FOR COLUMN SAVE: Take this out because search name will get passed with FilterSearchModel and partial view will get added directly in FilterSearch.cshtml
         var urlParams = new URLSearchParams(window.location.search);
         this.loadSavedSearches(urlParams.get('savedSearch'));
     },
@@ -147,6 +149,8 @@
             
             var request = data.FilterSearch.buildSearchRequest();
             request.Id = $("#save-search-id").val();
+
+            //FOR COLUMN SAVE: get rid of global variable and add to get SearchType from hidden input on modal
             request.SearchType = data.FilterSearch.searchType;
             request.SearchName = $.trim($("#save-search-name").val());
             request.AddToFavorites = $("#save-search-favorite").is(":checked");
@@ -341,6 +345,7 @@
         });
     },
 
+    //FOR COLUMN SAVE: move this into completeSaveSearch where it is called from, will no longer be calling from multiple spots
     loadSavedSearches: function (activeSearchName) {
         var params = "searchType=" + data.FilterSearch.searchType;
         if (activeSearchName) {
@@ -351,12 +356,15 @@
     },
 
     completeSaveSearch: function (result, searchName) {
-        
+
         if (result.Result === "Exists") {
             $("#save-search-name").addClass("is-invalid");
             data.FilterSearch.completeSaveSearchModal();
         }
         else {
+            //FOR COLUMN SAVE: https://www.carlrippon.com/accessing-browser-query-parameters-in-javascript/
+            //update the query parameters so that it makes sense new saved search is being searched
+
             data.FilterSearch.closeSaveSearchModal();
             data.FilterSearch.loadSavedSearches(searchName);
             data.FilterSearch.search();

@@ -25,7 +25,7 @@
         </div>
 
         <div class="filter-search-save-search-container display-none">
-
+            @* FOR COLUMN SAVE: use html RenderAction to load saved search cshtml, pass Model.SearchType as searchType Model.DefaultSearch.SearchName as activeSearchName to controller (may be null) *@
         </div>
     </div>
 </div>
@@ -82,8 +82,9 @@
             
             <form class="needs-validation" id="save-search">
                 <div class="modal-body ml-3 mr-3">
+                    @* FOR COLUMN SAVE: Add hidden input for the Model.SearchType *@
                     <input id="save-search-id" type="hidden" />
-                    
+
                     <div class="md-form">
                         <input type="text" id="save-search-name" class="form-control" required maxlength="250" pattern="^[\w _.-]+$" title="Special characters not allowed except '-' and '_'">
                         <label for="save-search-name" class="save-search-name-label">Search Name</label>
@@ -116,7 +117,8 @@
 @Scripts.Render("~/bundles/dataTables")
 <script type="text/javascript">
 
-        $(function () {
+    $(function () {
+                //FOR COLUMN SAVE: take out passing SearchType to init()
                 data.FilterSearch.init(@(jsControllerName).executeSearch, @(jsControllerName).buildFilter, "@Model.SearchType");
                 @(jsControllerName).init();
             });
