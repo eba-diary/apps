@@ -15,7 +15,6 @@ namespace Sentry.data.Web
             DatasetFileConfigNames = dto.DatasetFileConfigNames;
             DatasetScopeTypeNames = dto.DatasetScopeTypeNames;
             OriginationCode = dto.OriginationCode;
-            DistinctFileExtensions = dto.DistinctFileExtensions;
             DataClassificationDescription = dto.DataClassificationDescription;
             GroupAccessCount = dto.GroupAccessCount;
             HasDataAccess = dto.Security.CanViewData;
@@ -29,7 +28,6 @@ namespace Sentry.data.Web
         public int DatasetFileCount { get; set; }
         public Dictionary<string, string> DatasetFileConfigNames { get; set; }
         public Dictionary<string, string> DatasetScopeTypeNames { get; set; }
-        public List<string> DistinctFileExtensions { get; set; }
         public string DataClassificationDescription { get; set; }
         public List<Tuple<string, List<AssociatedDataFlowModel>>> DataFlows { get; set; }
         public bool DisplayDataflowMetadata { get; set; }
