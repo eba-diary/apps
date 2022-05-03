@@ -3035,3 +3035,8 @@ table.dsc-blue-table th {
 .dataTables_processing {
     z-index: 999;
 }
+
+.buford-multi-select input.select-dropdown {
+    font-size: inherit !important;
+    color: #212529;
+}
