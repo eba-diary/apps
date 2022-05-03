@@ -443,5 +443,22 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(2, model.FeedId);
             Assert.IsTrue(model.IsLegacyFavorite);
         }
+
+        [TestMethod]
+        public void ToModel_SavedSearchOptionDto_SavedSearchOptionModel()
+        {
+            SavedSearchOptionDto dto = new SavedSearchOptionDto()
+            {
+                SavedSearchId = 1,
+                SavedSearchName = "SearchName",
+                IsFavorite = true
+            };
+
+            SavedSearchOptionModel model = dto.ToModel();
+
+            Assert.AreEqual(1, model.SavedSearchId);
+            Assert.AreEqual("SearchName", model.SavedSearchName);
+            Assert.IsTrue(model.IsFavorite);
+        }
     }
 }

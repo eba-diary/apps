@@ -6,6 +6,7 @@ namespace Sentry.data.Core
     {
         string SaveSearch(SavedSearchDto savedSearchDto);
         SavedSearchDto GetSavedSearch(string searchType, string savedSearchName, string associateId);
-        List<string> GetSavedSearchNames(string searchType, string associateId);
+        List<SavedSearchOptionDto> GetSavedSearchOptions(string searchType, string associateId);
+        void RemoveSavedSearch(int savedSearchId, string associateId);
     }
 }

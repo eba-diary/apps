@@ -2,6 +2,7 @@
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
@@ -30,10 +31,12 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public ActionResult SavedSearches(string searchType, string activeSearchName)
         {
-            SavedSearchesModel model = new SavedSearchesModel()
+            List<SavedSearchOptionDto> savedSearchOptions = _filterSearchService.GetSavedSearchOptions(searchType, SharedContext.CurrentUser.AssociateId);
+            
+            SavedSearchDropdownModel model = new SavedSearchDropdownModel()
             {
                 SearchType = searchType,
-                SavedSearchNames = _filterSearchService.GetSavedSearchNames(searchType, SharedContext.CurrentUser.AssociateId),
+                SavedSearchOptions = savedSearchOptions.Select(x => x.ToModel()).ToList(),
                 ActiveSearchName = activeSearchName
             };
 
@@ -43,20 +46,19 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public JsonResult SaveSearch(SaveSearchModel searchModel)
         {
-            try
-            {
-                SavedSearchDto savedSearchDto = searchModel.ToDto();
-                savedSearchDto.AssociateId = SharedContext.CurrentUser.AssociateId;
-                
-                string result = _filterSearchService.SaveSearch(savedSearchDto);
+            SavedSearchDto savedSearchDto = searchModel.ToDto();
+            savedSearchDto.AssociateId = SharedContext.CurrentUser.AssociateId;
 
-                return Json(new { Result = result });
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error saving search", ex);
-                return Json(new { Result = "Failure" });
-            }
+            string result = _filterSearchService.SaveSearch(savedSearchDto);
+
+            return Json(new { Result = result });
+        }
+
+        [HttpDelete]
+        public JsonResult RemoveSearch(int savedSearchId)
+        {
+            _filterSearchService.RemoveSavedSearch(savedSearchId, SharedContext.CurrentUser.AssociateId);
+            return Json(new { Success = true });
         }
     }
 }

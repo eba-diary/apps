@@ -18,6 +18,7 @@ namespace Sentry.data.Web
         {
             SavedSearchDto dto = new SavedSearchDto()
             {
+                SavedSearchId = model.Id,
                 SearchType = model.SearchType,
                 SearchName = model.SearchName,
                 AddToFavorites = model.AddToFavorites
@@ -74,6 +75,16 @@ namespace Sentry.data.Web
                 ResultCount = dto.ResultCount,
                 ParentCategoryName = dto.ParentCategoryName,
                 Selected = dto.Selected
+            };
+        }
+
+        public static SavedSearchOptionModel ToModel(this SavedSearchOptionDto dto)
+        {
+            return new SavedSearchOptionModel
+            {
+                SavedSearchId = dto.SavedSearchId,
+                SavedSearchName = dto.SavedSearchName,
+                IsFavorite = dto.IsFavorite
             };
         }
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Sentry.data.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -50,12 +51,28 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public void GetSavedSearchNames_DataInventory_000000_SearchNames()
+        public void GetSavedSearch_ThrowsException()
         {
             Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
 
+            datasetContext.SetupGet(x => x.SavedSearches).Throws<Exception>();
+
+            FilterSearchService service = new FilterSearchService(datasetContext.Object, null);
+
+            Assert.ThrowsException<Exception>(() => service.GetSavedSearch(GlobalConstants.SearchType.DATA_INVENTORY, "SearchName", "000000"));
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetSavedSearchOptions_DataInventory_000000_SavedSearchOptions()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+            Mock<IDatasetContext> datasetContext = mockRepository.Create<IDatasetContext>();
+
             SavedSearch savedSearch = new SavedSearch()
             {
+                SavedSearchId = 1,
                 SearchType = GlobalConstants.SearchType.DATA_INVENTORY,
                 SearchName = "SearchName",
                 AssociateId = "000000"
@@ -63,18 +80,39 @@ namespace Sentry.data.Infrastructure.Tests
 
             datasetContext.SetupGet(x => x.SavedSearches).Returns(new List<SavedSearch>() { savedSearch }.AsQueryable());
 
-            FilterSearchService service = new FilterSearchService(datasetContext.Object, null);
+            Mock<IUserFavoriteService> userFavoriteService = mockRepository.Create<IUserFavoriteService>();
+            userFavoriteService.Setup(x => x.GetUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, 1, "000000")).Returns(new UserFavorite());
 
-            List<string> result = service.GetSavedSearchNames(GlobalConstants.SearchType.DATA_INVENTORY, "000000");
+            FilterSearchService service = new FilterSearchService(datasetContext.Object, userFavoriteService.Object);
 
-            datasetContext.VerifyAll();
+            List<SavedSearchOptionDto> results = service.GetSavedSearchOptions(GlobalConstants.SearchType.DATA_INVENTORY, "000000");
 
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("SearchName", result.First());
+            mockRepository.VerifyAll();
+
+            Assert.AreEqual(1, results.Count);
+
+            SavedSearchOptionDto result = results.First();
+            Assert.AreEqual("SearchName", result.SavedSearchName);
+            Assert.AreEqual(1, result.SavedSearchId);
+            Assert.IsTrue(result.IsFavorite);
         }
 
         [TestMethod]
-        public void SaveSearch_SavedSearchDto_AddNew()
+        public void GetSavedSearchOptions_ThrowsException()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+
+            datasetContext.SetupGet(x => x.SavedSearches).Throws<Exception>();
+
+            FilterSearchService service = new FilterSearchService(datasetContext.Object, null);
+
+            Assert.ThrowsException<Exception>(() => service.GetSavedSearchOptions(GlobalConstants.SearchType.DATA_INVENTORY, "000000"));
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void SaveSearch_SavedSearchDto_Add()
         {
             MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -92,17 +130,13 @@ namespace Sentry.data.Infrastructure.Tests
             datasetContext.Setup(x => x.SaveChanges(true));
 
             Mock<IUserFavoriteService> userFavoriteService = mockRepository.Create<IUserFavoriteService>();
-            userFavoriteService.Setup(x => x.AddUserFavorite(It.IsAny<SavedSearch>(), "000000")).Callback<IFavorable, string>((savedSearch, userId) =>
-            {
-                Assert.AreEqual("000000", userId);
-                Assert.AreEqual(1, savedSearch.GetFavoriteEntityId());
-                Assert.AreEqual(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, savedSearch.GetFavoriteType());
-            });
+            userFavoriteService.Setup(x => x.AddUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, 1, "000000"));
 
             FilterSearchService service = new FilterSearchService(datasetContext.Object, userFavoriteService.Object);
 
             SavedSearchDto dto = new SavedSearchDto()
             {
+                SavedSearchId = 0,
                 SearchType = GlobalConstants.SearchType.DATA_INVENTORY,
                 SearchName = "SearchName",
                 AssociateId = "000000",
@@ -135,7 +169,7 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public void SaveSearch_SavedSearchDto_UpdateExisting()
+        public void SaveSearch_SavedSearchDto_Update()
         {
             MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -154,10 +188,14 @@ namespace Sentry.data.Infrastructure.Tests
             datasetContext.SetupGet(x => x.SavedSearches).Returns(new List<SavedSearch>() { savedSearch }.AsQueryable());
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            FilterSearchService service = new FilterSearchService(datasetContext.Object, null);
+            Mock<IUserFavoriteService> userFavoriteService = mockRepository.Create<IUserFavoriteService>();
+            userFavoriteService.Setup(x => x.RemoveUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, 1, "000000"));
+
+            FilterSearchService service = new FilterSearchService(datasetContext.Object, userFavoriteService.Object);
 
             SavedSearchDto dto = new SavedSearchDto()
             {
+                SavedSearchId = 1,
                 SearchType = GlobalConstants.SearchType.DATA_INVENTORY,
                 SearchName = "SearchName",
                 AssociateId = "000000",
@@ -188,6 +226,99 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(GlobalConstants.SaveSearchResults.UPDATE, result);
             Assert.AreEqual("new search", savedSearch.SearchText);
             Assert.AreEqual(@"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""D"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}]}]", savedSearch.FilterCategoriesJson);
+        }
+
+        [TestMethod]
+        public void SaveSearch_SavedSearchDto_Exists()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> datasetContext = mockRepository.Create<IDatasetContext>();
+
+            SavedSearch savedSearch = new SavedSearch()
+            {   
+                SavedSearchId = 1,
+                SearchType = GlobalConstants.SearchType.DATA_INVENTORY,
+                SearchName = "SearchName",
+                AssociateId = "000000"
+            };
+
+            datasetContext.SetupGet(x => x.SavedSearches).Returns(new List<SavedSearch>() { savedSearch }.AsQueryable());
+
+            FilterSearchService service = new FilterSearchService(datasetContext.Object, null);
+
+            SavedSearchDto dto = new SavedSearchDto()
+            {
+                SavedSearchId = 0,
+                SearchType = GlobalConstants.SearchType.DATA_INVENTORY,
+                SearchName = "SearchName",
+                AssociateId = "000000"
+            };
+
+            string result = service.SaveSearch(dto);
+
+            mockRepository.VerifyAll();
+
+            Assert.AreEqual(GlobalConstants.SaveSearchResults.EXISTS, result);
+        }
+
+        [TestMethod]
+        public void SaveSearch_ThrowsException()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+
+            datasetContext.SetupGet(x => x.SavedSearches).Throws<Exception>();
+
+            FilterSearchService service = new FilterSearchService(datasetContext.Object, null);
+
+            Assert.ThrowsException<Exception>(() => service.SaveSearch(new SavedSearchDto()));
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void RemoveSavedSearch_1_000000_Success()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> datasetContext = mockRepository.Create<IDatasetContext>();
+
+            SavedSearch savedSearch = new SavedSearch()
+            {
+                SavedSearchId = 1,
+                AssociateId = "000000"
+            };
+
+            datasetContext.SetupGet(x => x.SavedSearches).Returns(new List<SavedSearch>() { savedSearch }.AsQueryable());
+            datasetContext.Setup(x => x.Remove(It.IsAny<SavedSearch>())).Callback<SavedSearch>(x =>
+            {
+                Assert.AreEqual(1, x.SavedSearchId);
+                Assert.AreEqual("000000", x.AssociateId);
+            });
+            datasetContext.Setup(x => x.SaveChanges(true));
+
+            Mock<IUserFavoriteService> userFavoriteService = mockRepository.Create<IUserFavoriteService>();
+            userFavoriteService.Setup(x => x.RemoveUserFavorite(GlobalConstants.UserFavoriteTypes.SAVEDSEARCH, 1, "000000"));
+
+            FilterSearchService service = new FilterSearchService(datasetContext.Object, userFavoriteService.Object);
+
+            service.RemoveSavedSearch(1, "000000");
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void RemoveSavedSearch_ThrowsException()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+
+            datasetContext.SetupGet(x => x.SavedSearches).Throws<Exception>();
+
+            FilterSearchService service = new FilterSearchService(datasetContext.Object, null);
+
+            Assert.ThrowsException<Exception>(() => service.RemoveSavedSearch(1, "000000"));
+
+            datasetContext.VerifyAll();
         }
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Sentry.data.Web
 {
-    public class SavedSearchesModel
+    public class SavedSearchDropdownModel
     {
         public string SearchType { get; set; }
-        public List<string> SavedSearchNames { get; set; }
+        public List<SavedSearchOptionModel> SavedSearchOptions { get; set; }
         public string ActiveSearchName { get; set; }
     }
 }
