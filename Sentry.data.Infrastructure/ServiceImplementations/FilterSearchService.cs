@@ -1,10 +1,10 @@
-﻿using Nest;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
@@ -17,6 +17,11 @@ namespace Sentry.data.Infrastructure
         {
             _datasetContext = datasetContext;
             _userFavoriteService = userFavoriteService;
+        }
+
+        public async Task<SavedSearchDto> GetSavedSearchAsync(string searchType, string savedSearchName, string associateId)
+        {
+            return await Task.Run(() => GetSavedSearch(searchType, savedSearchName, associateId));
         }
 
         public SavedSearchDto GetSavedSearch(string searchType, string savedSearchName, string associateId)

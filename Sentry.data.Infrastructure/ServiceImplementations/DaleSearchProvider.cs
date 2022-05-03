@@ -5,12 +5,13 @@ using Sentry.data.Core;
 using Sentry.Common.Logging;
 using Sentry.data.Core.GlobalEnums;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
     public class DaleSearchProvider : IDaleSearchProvider
     {
-        public DaleResultDto GetSearchResults(DaleSearchDto dto)
+        public Task<DaleResultDto> GetSearchResults(DaleSearchDto dto)
         {
             DaleResultDto daleResult = new DaleResultDto();
             daleResult.DaleResults = new List<DaleResultRowDto>();
@@ -65,7 +66,7 @@ namespace Sentry.data.Infrastructure
                 Logger.Info("DaleSearchProvider.GetSearchResults()  Row Count:" + daleResult.DaleResults.Count + " Elapsed Seconds:" + ts.Seconds + " Query:" + q);
             }
 
-            return daleResult;
+            return Task.FromResult(daleResult);
         }
 
         public FilterSearchDto GetSearchFilters(DaleSearchDto dto)

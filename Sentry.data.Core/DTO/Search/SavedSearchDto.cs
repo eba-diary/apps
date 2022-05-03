@@ -1,4 +1,6 @@
-﻿namespace Sentry.data.Core
+﻿using Newtonsoft.Json.Linq;
+
+namespace Sentry.data.Core
 {
     public class SavedSearchDto : FilterSearchDto
     {
@@ -7,5 +9,6 @@
         public string SearchName { get; set; }
         public string AssociateId { get; set; }
         public bool AddToFavorites { get; set; }
+        public JObject ResultConfiguration { get; set; }
     }
 }

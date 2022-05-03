@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using static Sentry.data.Core.GlobalConstants;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -19,12 +20,12 @@ namespace Sentry.data.Core
             _daleSearchProvider = daleSearchProvider;
         }
 
-        public DaleResultDto GetSearchResults(DaleSearchDto dtoSearch)
+        public async Task<DaleResultDto> GetSearchResults(DaleSearchDto dtoSearch)
         {
-            DaleResultDto dtoResult = _daleSearchProvider.GetSearchResults(dtoSearch);
+            DaleResultDto dtoResult = await _daleSearchProvider.GetSearchResults(dtoSearch);
 
             string queryBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtoResult.DaleEvent);
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.DALE_SEARCH, "Dale Query Executed", queryBlob);
+            _ = _eventService.PublishSuccessEvent(GlobalConstants.EventType.DALE_SEARCH, "Dale Query Executed", queryBlob);
 
             return dtoResult;
         }

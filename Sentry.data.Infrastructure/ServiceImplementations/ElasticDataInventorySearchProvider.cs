@@ -21,14 +21,14 @@ namespace Sentry.data.Infrastructure
         }
 
         #region IDaleSearchProvider Implementation
-        public DaleResultDto GetSearchResults(DaleSearchDto dto)
+        public async Task<DaleResultDto> GetSearchResults(DaleSearchDto dto)
         {
             DaleResultDto resultDto = new DaleResultDto();
 
             SearchRequest<DataInventory> searchRequest = BuildTextSearchRequest(dto, 1000);
             searchRequest.TrackTotalHits = true;
 
-            ElasticResult<DataInventory> result = GetElasticResult(dto, resultDto, searchRequest);
+            ElasticResult<DataInventory> result = await GetElasticResult(dto, resultDto, searchRequest);
 
             if (result.Documents?.Any() == true)
             {
@@ -47,7 +47,7 @@ namespace Sentry.data.Infrastructure
             //get aggregation results
             FilterSearchDto resultDto = new FilterSearchDto();
 
-            AggregateDictionary aggResults = GetElasticResult(dto, resultDto, request).Aggregations;
+            AggregateDictionary aggResults = GetElasticResult(dto, resultDto, request).Result.Aggregations;
 
             //translate results to dto
             foreach (string categoryName in request.Aggregations.Select(x => x.Key).ToList())
@@ -90,7 +90,7 @@ namespace Sentry.data.Infrastructure
             };
 
             DaleContainSensitiveResultDto resultDto = new DaleContainSensitiveResultDto();
-            resultDto.DoesContainSensitiveResults = GetElasticResult(dto, resultDto, request).Documents?.Any() == true;
+            resultDto.DoesContainSensitiveResults = GetElasticResult(dto, resultDto, request).Result.Documents?.Any() == true;
 
             return resultDto;
         }
@@ -188,7 +188,7 @@ namespace Sentry.data.Infrastructure
         #endregion
 
         #region Methods
-        private ElasticResult<DataInventory> GetElasticResult(DaleSearchDto dto, DaleEventableDto resultDto, SearchRequest<DataInventory> searchRequest)
+        private async Task<ElasticResult<DataInventory>> GetElasticResult(DaleSearchDto dto, DaleEventableDto resultDto, SearchRequest<DataInventory> searchRequest)
         {
             resultDto.DaleEvent = new DaleEventDto()
             {
@@ -200,7 +200,7 @@ namespace Sentry.data.Infrastructure
 
             try
             {
-                return _context.SearchAsync(searchRequest).Result;
+                return await _context.SearchAsync(searchRequest);
             }
             catch (AggregateException ex)
             {

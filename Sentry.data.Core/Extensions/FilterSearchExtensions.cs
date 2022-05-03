@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace Sentry.data.Core
@@ -15,7 +16,10 @@ namespace Sentry.data.Core
                 AssociateId = entity.AssociateId,
                 FilterCategories = !string.IsNullOrWhiteSpace(entity.FilterCategoriesJson) ? 
                                    JsonConvert.DeserializeObject<List<FilterCategoryDto>>(entity.FilterCategoriesJson) : 
-                                   new List<FilterCategoryDto>()
+                                   new List<FilterCategoryDto>(),
+                ResultConfiguration = !string.IsNullOrWhiteSpace(entity.ResultConfigurationJson) ?
+                                      JObject.Parse(entity.ResultConfigurationJson) :
+                                      null
             };
         }
 
@@ -27,7 +31,8 @@ namespace Sentry.data.Core
                 SearchName = dto.SearchName,
                 SearchText = dto.SearchText,
                 AssociateId = dto.AssociateId,
-                FilterCategoriesJson = dto.FilterCategories != null ? JsonConvert.SerializeObject(dto.FilterCategories) : null
+                FilterCategoriesJson = dto.FilterCategories != null ? JsonConvert.SerializeObject(dto.FilterCategories) : null,
+                ResultConfigurationJson = dto.ResultConfiguration != null ? dto.ResultConfiguration.ToString() : null
             };
         }
     }
