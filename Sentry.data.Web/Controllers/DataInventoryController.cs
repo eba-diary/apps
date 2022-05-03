@@ -1,4 +1,7 @@
-﻿using Sentry.data.Core;
+﻿using Nest;
+using Newtonsoft.Json.Linq;
+using Sentry.Common.Logging;
+using Sentry.data.Core;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -53,21 +56,34 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult SearchResult(FilterSearchModel searchModel, string searchName = null)
+        public JsonResult SearchResult(FilterSearchModel searchModel)
         {
             ValidateSearchModel(searchModel);
 
-            //FOR COLUMN SAVE: update GetSearchResults to be async
-            //Will add additional call to get saved search ResultConfiguration using SearchName if populated async
-            //pass back the ResultConfiguration as visible columns
+            DaleResultDto resultDto = _dataInventoryService.GetSearchResults(searchModel.ToDaleDto());
 
-            Task<DaleResultDto> resultDto = _dataInventoryService.GetSearchResults(searchModel.ToDaleDto());
-            Task<SavedSearchDto> savedSearchDto = _filterSearchService.GetSavedSearchAsync(SearchType.DATA_INVENTORY, searchName, SharedContext.CurrentUser.AssociateId); 
+            List<string> visibleColumns = null;
             
+            if (!string.IsNullOrEmpty(searchModel.SearchName))
+            {
+                try
+                {
+                    SavedSearchDto savedSearchDto = _filterSearchService.GetSavedSearch(SearchType.DATA_INVENTORY, searchModel.SearchName, SharedContext.CurrentUser.AssociateId);
+                    if (savedSearchDto.ResultConfiguration != null)
+                    {
+                        visibleColumns = savedSearchDto.ResultConfiguration["VisibleColumns"].ToObject<List<string>>();
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Logger.Error("Error getting visible columns for saved search", ex);
+                }
+            }
+
             return Json(new { 
-                data = resultDto.Result.DaleResults.Select(x => x.ToWeb()).ToList(),
-                searchTotal = resultDto.Result.SearchTotal,
-                visibleColumns = { }
+                data = resultDto.DaleResults.Select(x => x.ToWeb()).ToList(),
+                searchTotal = resultDto.SearchTotal,
+                visibleColumns
             });
         }
 

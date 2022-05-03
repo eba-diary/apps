@@ -19,11 +19,6 @@ namespace Sentry.data.Infrastructure
             _userFavoriteService = userFavoriteService;
         }
 
-        public async Task<SavedSearchDto> GetSavedSearchAsync(string searchType, string savedSearchName, string associateId)
-        {
-            return await Task.Run(() => GetSavedSearch(searchType, savedSearchName, associateId));
-        }
-
         public SavedSearchDto GetSavedSearch(string searchType, string savedSearchName, string associateId)
         {
             try

@@ -11,7 +11,7 @@ namespace Sentry.data.Infrastructure
 {
     public class DaleSearchProvider : IDaleSearchProvider
     {
-        public Task<DaleResultDto> GetSearchResults(DaleSearchDto dto)
+        public DaleResultDto GetSearchResults(DaleSearchDto dto)
         {
             DaleResultDto daleResult = new DaleResultDto();
             daleResult.DaleResults = new List<DaleResultRowDto>();
@@ -66,7 +66,7 @@ namespace Sentry.data.Infrastructure
                 Logger.Info("DaleSearchProvider.GetSearchResults()  Row Count:" + daleResult.DaleResults.Count + " Elapsed Seconds:" + ts.Seconds + " Query:" + q);
             }
 
-            return Task.FromResult(daleResult);
+            return daleResult;
         }
 
         public FilterSearchDto GetSearchFilters(DaleSearchDto dto)

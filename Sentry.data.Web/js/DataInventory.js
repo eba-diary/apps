@@ -9,14 +9,7 @@
     },
 
     executeSearch: function () {
-        $("#di-result-table").DataTable().ajax.reload(function (json) {
-            var tableInfo = $("#di-result-table").DataTable().page.info();
-
-            //FOR COLUMN SAVE: create new function that completeSearch will be moved to called completeDataInventorySearch
-            //clear all current visible columns
-            //use visible columns from json response to set columns().visible() 
-            data.FilterSearch.completeSearch(json.searchTotal, tableInfo.length, json.data.length);
-        });
+        $("#di-result-table").DataTable().ajax.reload(json => data.DataInventory.completeDataInventorySearch(json));
     },
 
     buildFilter: function () {
@@ -48,17 +41,10 @@
             ajax: {
                 url: "/DataInventory/SearchResult/",
                 type: "POST",
-                //FOR COLUMN SAVE: update data to be a function that gets buildSearchRequest and adds SearchName to the request to SearchResult
-                //will look like { searchModel: buildSearchRequest(), searchName: "SearchName" }
-                //get search name from url because if we get from "active" dropdown item, it is possible that there is a timing issue of new "active" isn't loaded by time this request is built
-                //var urlParams = new URLSearchParams(window.location.search);
-                //this.loadSavedSearches(urlParams.get('savedSearch'));
-
                 data: data.FilterSearch.buildSearchRequest
             },
             columns: [
                 {
-                    //FOR COLUMN SAVE: set all columns to visible: false to init, on init complete, the visible columns will be set based on result
                     data: null, className: "Asset", searchable: true, render: function (data) {
                         //the following render func is called for every single row column and passes in data as the specific value.  our func body below will insert our list of assets as links
                         if (data.AssetList != null) {
@@ -104,12 +90,7 @@
             aLengthMenu: [10, 20, 50, 100, 500],
             dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>tr<p>',
             buttons: [{ extend: 'colvis', text: 'Columns' }, { text: 'Save', className: 'display-none di-save', action: data.DataInventory.saveUpdates }],
-            initComplete: function (settings, json) {
-                //FOR COLUMN SAVE: once completeDataInventorySearch is created, use that to call completeSearch
-                //need to verify using table info like it does in the reload works for initComplete as well
-                //if it does, just add the pagelength as a parameter to the function
-                data.FilterSearch.completeSearch(json.searchTotal, settings.oInit.pageLength, json.data.length);
-            },
+            initComplete: (settings, json) => data.DataInventory.completeDataInventorySearch(json),
             "autoWidth": false
         });
     },
@@ -158,6 +139,25 @@
                 $(".di-save").hide();
             }
         });
+    },
+
+    completeDataInventorySearch: function (json) {
+
+        //FOR COLUMN SAVE: create new function that completeSearch will be moved to called completeDataInventorySearch
+        //clear all current visible columns
+        //use visible columns from json response to set columns().visible() 
+        //https://datatables.net/reference/api/columns().visible()
+        
+        var table = $("#di-result-table").DataTable()
+        var tableInfo = table.page.info();
+        
+        if (json.visibleColumns) {
+            console.log(json.visibleColumns);
+        }
+
+        console.log(table.columns().visible());
+        
+        data.FilterSearch.completeSearch(json.searchTotal, tableInfo.length, json.data.length);
     },
 
     saveUpdates: function () {

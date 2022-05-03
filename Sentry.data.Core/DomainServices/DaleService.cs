@@ -20,12 +20,12 @@ namespace Sentry.data.Core
             _daleSearchProvider = daleSearchProvider;
         }
 
-        public async Task<DaleResultDto> GetSearchResults(DaleSearchDto dtoSearch)
+        public DaleResultDto GetSearchResults(DaleSearchDto dtoSearch)
         {
-            DaleResultDto dtoResult = await _daleSearchProvider.GetSearchResults(dtoSearch);
+            DaleResultDto dtoResult = _daleSearchProvider.GetSearchResults(dtoSearch);
 
             string queryBlob = Newtonsoft.Json.JsonConvert.SerializeObject(dtoResult.DaleEvent);
-            _ = _eventService.PublishSuccessEvent(GlobalConstants.EventType.DALE_SEARCH, "Dale Query Executed", queryBlob);
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.DALE_SEARCH, "Dale Query Executed", queryBlob);
 
             return dtoResult;
         }

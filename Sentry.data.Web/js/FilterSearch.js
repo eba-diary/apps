@@ -1,7 +1,5 @@
 ﻿data.FilterSearch = {
 
-    //FOR COLUMN SAVE: take out global searchType
-    searchType: "",
     lastSelectedOptionIds: [],
 
     executeSearch: function () {
@@ -11,18 +9,13 @@
         console.log('Must pass filterRetriever parameter to data.FilterSearch.init')
     },
 
-    init: function (searchExecuter, filterRetriever, searchTypeName) {
+    init: function (searchExecuter, filterRetriever) {
         this.initToast();
         
         this.executeSearch = searchExecuter;
         this.retrieveFilterOptions = filterRetriever;
-        this.searchType = searchTypeName;
 
         this.initEvents();
-
-        //FOR COLUMN SAVE: Take this out because search name will get passed with FilterSearchModel and partial view will get added directly in FilterSearch.cshtml
-        var urlParams = new URLSearchParams(window.location.search);
-        this.loadSavedSearches(urlParams.get('savedSearch'));
     },
 
     initEvents: function () {        
@@ -120,6 +113,7 @@
             var keycode = (e.keyCode ? e.keyCode : e.which);
 
             if (keycode == '13') {
+                data.FilterSearch.clearActiveSavedSearch();
                 data.FilterSearch.search();
             }
         });
@@ -127,6 +121,7 @@
         //search when apply filters
         $(document).on("click", ".filter-search-start", function (e) {
             e.preventDefault();
+            data.FilterSearch.clearActiveSavedSearch();
             data.FilterSearch.search();
         });
 
@@ -149,9 +144,7 @@
             
             var request = data.FilterSearch.buildSearchRequest();
             request.Id = $("#save-search-id").val();
-
-            //FOR COLUMN SAVE: get rid of global variable and add to get SearchType from hidden input on modal
-            request.SearchType = data.FilterSearch.searchType;
+            request.SearchType = $("#save-search-type").val();
             request.SearchName = $.trim($("#save-search-name").val());
             request.AddToFavorites = $("#save-search-favorite").is(":checked");
 
@@ -198,7 +191,13 @@
                 url: '/FilterSearch/RemoveSearch?savedSearchId=' + id,
                 type: 'DELETE',
                 success: function () {
-                    $("#saved_" + id).remove();
+                    var container = $("#saved_" + id);
+                    
+                    if (container.closest(".saved-search-option-name.active")) {
+                        window.history.replaceState({}, "", location.pathname);
+                    }
+                    
+                    container.remove();
 
                     if (!($(".saved-search-option-container").length)) {
                         $(".saved-search-menu").append('<a class="dropdown-item disabled" href="#">No Saved Searches</a>')
@@ -258,7 +257,7 @@
         }
     },
 
-    searchPrep: function () {
+    searchPrep: function () {        
         $("#filter-search-text").prop("disabled", true);
         $(".filter-search-apply").prop("disabled", true);
 
@@ -270,8 +269,6 @@
         $(".filter-search-start").addClass("display-none");
         $(".filter-search-results-none").addClass("display-none");
         $(".filter-search-result-count-container").addClass("display-none");
-
-        data.FilterSearch.clearActiveSavedSearch();
 
         $(".filter-search-result-progress").removeClass("display-none");
     },
@@ -345,46 +342,34 @@
         });
     },
 
-    //FOR COLUMN SAVE: move this into completeSaveSearch where it is called from, will no longer be calling from multiple spots
-    loadSavedSearches: function (activeSearchName) {
-        var params = "searchType=" + data.FilterSearch.searchType;
-        if (activeSearchName) {
-            params += "&activeSearchName=" + encodeURIComponent(activeSearchName);
-        }
-        
-        $('.filter-search-save-search-container').load("/FilterSearch/SavedSearches?" + params, data.FilterSearch.closeSaveSearchModal);
-    },
-
     completeSaveSearch: function (result, searchName) {
 
         if (result.Result === "Exists") {
             $("#save-search-name").addClass("is-invalid");
-            data.FilterSearch.completeSaveSearchModal();
+            data.FilterSearch.resetSaveSearchModal();
         }
         else {
-            //FOR COLUMN SAVE: https://www.carlrippon.com/accessing-browser-query-parameters-in-javascript/
-            //update the query parameters so that it makes sense new saved search is being searched
+            var encodedSearchName = encodeURIComponent(searchName);
+            var params = "?searchType=" + $("#save-search-type").val() + "&activeSearchName=" + encodedSearchName;
 
-            data.FilterSearch.closeSaveSearchModal();
-            data.FilterSearch.loadSavedSearches(searchName);
-            data.FilterSearch.search();
+            $('.filter-search-save-search-container').load("/FilterSearch/SavedSearches" + params, function () {
+                window.history.replaceState({}, "", location.pathname + "?savedSearch=" + encodedSearchName);
+                data.FilterSearch.search();
+                
+                if (result.Result === "New") {
+                    data.FilterSearch.showToast("success", "'" + searchName + "' has been saved.")
+                }
+                else if (result.Result === "Update") {
+                    data.FilterSearch.showToast("success", "'" + searchName + "' has been updated.")
+                }
 
-            if (result.Result === "New") {
-                data.FilterSearch.showToast("success", "'" + searchName + "' has been saved.")
-            }
-            else if (result.Result === "Update") {
-                data.FilterSearch.showToast("success", "'" + searchName + "' has been updated.")
-            }
+                data.FilterSearch.resetSaveSearchModal();
+            });
         }
+
     },
 
-    closeSaveSearchModal: function () {
-        $("#filter-search-save-modal").modal("hide");
-        data.FilterSearch.completeSaveSearchModal();
-    },
-
-    completeSaveSearchModal: function () {
-        
+    resetSaveSearchModal: function () {
         $('#save-search').removeClass('disabled');
         $('#cancel-save-search').removeClass('display-none');
         $('.filter-search-save-search-modal-text').removeClass('display-none');
@@ -392,9 +377,8 @@
     },
 
     clearActiveSavedSearch: function () {
-        $('.filter-search-saved-search-option').each(function () {
-            $(this).removeClass('active');
-        });
+        $('.saved-search-option-name.active').removeClass('active');
+        window.history.replaceState({}, "", location.pathname);
     },
 
     getSelectedCategoryOptions: function () {
@@ -434,6 +418,7 @@
 
     buildSearchRequest: function () {
         return {
+            SearchName: $(".saved-search-option-name.active").text(),
             SearchText: $.trim($("#filter-search-text").val()),
             FilterCategories: data.FilterSearch.getSelectedCategoryOptions()
         }

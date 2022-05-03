@@ -5,7 +5,7 @@ namespace Sentry.data.Core
 {
     public interface IDaleService
     {
-        Task<DaleResultDto> GetSearchResults(DaleSearchDto dtoSearch);
+        DaleResultDto GetSearchResults(DaleSearchDto dtoSearch);
         FilterSearchDto GetSearchFilters(DaleSearchDto dtoSearch);
         bool UpdateIsSensitive(List<DaleSensitiveDto> dtos);
         DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dtoSearch);

@@ -4,7 +4,6 @@
     {
         public int Id { get; set; }
         public string SearchType { get; set; }
-        public string SearchName { get; set; }
         public bool AddToFavorites { get; set; }
     }
 }
