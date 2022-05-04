@@ -1,6 +1,4 @@
-﻿using Sentry.Common.Logging;
-using Sentry.data.Core;
-using System;
+﻿using Sentry.data.Core;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;

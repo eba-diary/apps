@@ -5,5 +5,6 @@
     [SearchName] VARCHAR(250) NOT NULL, 
     [SearchText] VARCHAR(4096) NULL, 
     [FilterCategoriesJson] NVARCHAR(MAX) NULL, 
-    [AssociateId] CHAR(6) NOT NULL
+    [AssociateId] CHAR(6) NOT NULL, 
+    [ResultConfigurationJson] NVARCHAR(MAX) NULL
 )

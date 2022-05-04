@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,7 +17,8 @@ namespace Sentry.data.Core.Tests
                 SearchName = "SearchName",
                 SearchText = "SearchText",
                 AssociateId = "000000",
-                FilterCategoriesJson = GetFilterCategoriesJson()
+                FilterCategoriesJson = GetFilterCategoriesJson(),
+                ResultConfigurationJson = GetResultConfigurationJson()
             };
 
             SavedSearchDto dto = savedSearch.ToDto();
@@ -36,6 +38,11 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(GlobalConstants.FilterCategoryNames.ENVIRONMENT, optionDto.ParentCategoryName);
             Assert.IsTrue(optionDto.Selected);
             Assert.AreEqual(0, optionDto.ResultCount);
+
+            Assert.IsTrue(dto.ResultConfiguration.ContainsKey("VisibleColumns"));
+
+            List<int> visibleColumns = dto.ResultConfiguration["VisibleColumns"].ToObject<List<int>>();
+            Assert.AreEqual(3, visibleColumns.Count);
         }
 
         [TestMethod]
@@ -63,6 +70,10 @@ namespace Sentry.data.Core.Tests
                             }
                         }
                     }
+                },
+                ResultConfiguration = new JObject()
+                {
+                    { "VisibleColumns", new JArray() { 1, 2, 3 } }
                 }
             };
 
@@ -73,12 +84,18 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("SearchText", savedSearch.SearchText);
             Assert.AreEqual("000000", savedSearch.AssociateId);
             Assert.AreEqual(GetFilterCategoriesJson(), savedSearch.FilterCategoriesJson);
+            Assert.AreEqual(GetResultConfigurationJson(), savedSearch.ResultConfigurationJson);
         }
 
         #region Helpers
         private string GetFilterCategoriesJson()
         {
             return @"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""P"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}]}]";
+        }
+
+        private string GetResultConfigurationJson()
+        {
+            return @"{""VisibleColumns"":[1,2,3]}";
         }
         #endregion
     }

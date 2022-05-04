@@ -1,5 +1,4 @@
-﻿using Nest;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System;
@@ -125,6 +124,7 @@ namespace Sentry.data.Infrastructure
             savedSearch.SearchName = savedSearchDto.SearchName;
             savedSearch.SearchText = savedSearchDto.SearchText;
             savedSearch.FilterCategoriesJson = savedSearchDto.FilterCategories != null ? JsonConvert.SerializeObject(savedSearchDto.FilterCategories) : null;
+            savedSearch.ResultConfigurationJson = savedSearchDto.ResultConfiguration != null ? savedSearchDto.ResultConfiguration.ToString(Formatting.None) : null;
 
             _datasetContext.SaveChanges();
 

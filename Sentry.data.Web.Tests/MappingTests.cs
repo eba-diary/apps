@@ -386,7 +386,8 @@ namespace Sentry.data.Web.Tests
                             }
                         }
                     }
-                }
+                },
+                ResultConfigurationJson = @"{""VisibleColumns"": [1,2,3]}"
             };
 
             SavedSearchDto dto = model.ToDto();
@@ -411,6 +412,11 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(4, optionDto.ResultCount);
             Assert.AreEqual("Category", optionDto.ParentCategoryName);
             Assert.IsFalse(optionDto.Selected);
+
+            Assert.IsTrue(dto.ResultConfiguration.ContainsKey("VisibleColumns"));
+
+            List<int> visibleColumns = dto.ResultConfiguration["VisibleColumns"].ToObject<List<int>>();
+            Assert.AreEqual(3, visibleColumns.Count);
         }
 
         [TestMethod]

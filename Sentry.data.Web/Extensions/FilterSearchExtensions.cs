@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core;
+﻿using Newtonsoft.Json.Linq;
+using Sentry.data.Core;
 using System.Linq;
 
 namespace Sentry.data.Web
@@ -20,8 +21,8 @@ namespace Sentry.data.Web
             {
                 SavedSearchId = model.Id,
                 SearchType = model.SearchType,
-                SearchName = model.SearchName,
-                AddToFavorites = model.AddToFavorites
+                AddToFavorites = model.AddToFavorites,
+                ResultConfiguration = !string.IsNullOrEmpty(model.ResultConfigurationJson) ? JObject.Parse(model.ResultConfigurationJson) : null
             };
 
             MapToParentDto(model, dto);
@@ -53,6 +54,7 @@ namespace Sentry.data.Web
         {
             return new FilterSearchModel()
             {
+                SearchName = dto.SearchName,
                 SearchText = dto.SearchText,
                 FilterCategories = dto.FilterCategories?.Select(x => x.ToModel()).ToList()
             };
@@ -89,7 +91,8 @@ namespace Sentry.data.Web
         }
 
         private static void MapToParentDto(FilterSearchModel model, FilterSearchDto dto)
-        {
+{
+            dto.SearchName = model.SearchName;
             dto.SearchText = model.SearchText;
             dto.FilterCategories = model.FilterCategories?.Select(x => x.ToDto()).ToList();
         }

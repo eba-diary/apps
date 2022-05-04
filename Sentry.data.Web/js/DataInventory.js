@@ -9,14 +9,23 @@
     },
 
     executeSearch: function () {
-        $("#di-result-table").DataTable().ajax.reload(function(json) {
-            var tableInfo = $("#di-result-table").DataTable().page.info();
-            data.FilterSearch.completeSearch(json.searchTotal, tableInfo.length, json.data.length);
-        });
+        $("#di-result-table").DataTable().ajax.reload(json => data.DataInventory.completeDataInventorySearch(json));
     },
 
     buildFilter: function () {
         $.post("/DataInventory/SearchFilters/", data.FilterSearch.buildSearchRequest(), (x) => data.FilterSearch.completeFilterRetrieval(x));
+    },
+
+    retrieveResultConfig: function () {
+        var visibleColumns = [];
+
+        $("#di-result-table").DataTable().columns().every(function () {
+            if (this.visible()) {
+                visibleColumns.push(this.index());
+            }
+        });
+
+        return JSON.stringify({ VisibleColumns: visibleColumns });
     },
 
     initDataInventory: function () {
@@ -93,9 +102,7 @@
             aLengthMenu: [10, 20, 50, 100, 500],
             dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>tr<p>',
             buttons: [{ extend: 'colvis', text: 'Columns' }, { text: 'Save', className: 'display-none di-save', action: data.DataInventory.saveUpdates }],
-            initComplete: function (settings, json) {
-                data.FilterSearch.completeSearch(json.searchTotal, settings.oInit.pageLength, json.data.length);
-            },
+            initComplete: (settings, json) => data.DataInventory.completeDataInventorySearch(json),
             "autoWidth": false
         });
     },
@@ -144,6 +151,24 @@
                 $(".di-save").hide();
             }
         });
+    },
+
+    completeDataInventorySearch: function (json) {
+
+        //FOR COLUMN SAVE: create new function that completeSearch will be moved to called completeDataInventorySearch
+        //clear all current visible columns
+        //use visible columns from json response to set columns().visible() 
+        //https://datatables.net/reference/api/columns().visible()
+        
+        var table = $("#di-result-table").DataTable()
+        var tableInfo = table.page.info();
+        
+        if (json.visibleColumns) {            
+            table.columns().visible(false, false);
+            table.columns(json.visibleColumns).visible(true);
+        }
+        
+        data.FilterSearch.completeSearch(json.searchTotal, tableInfo.length, json.data.length);
     },
 
     saveUpdates: function () {
