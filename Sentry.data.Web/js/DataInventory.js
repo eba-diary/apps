@@ -16,6 +16,18 @@
         $.post("/DataInventory/SearchFilters/", data.FilterSearch.buildSearchRequest(), (x) => data.FilterSearch.completeFilterRetrieval(x));
     },
 
+    retrieveResultConfig: function () {
+        var visibleColumns = [];
+
+        $("#di-result-table").DataTable().columns().every(function () {
+            if (this.visible()) {
+                visibleColumns.push(this.index());
+            }
+        });
+
+        return JSON.stringify({ VisibleColumns: visibleColumns });
+    },
+
     initDataInventory: function () {
         $.ajax({
             url: "/DataInventory/GetCanDaleSensitive/",
@@ -151,11 +163,10 @@
         var table = $("#di-result-table").DataTable()
         var tableInfo = table.page.info();
         
-        if (json.visibleColumns) {
-            console.log(json.visibleColumns);
+        if (json.visibleColumns) {            
+            table.columns().visible(false, false);
+            table.columns(json.visibleColumns).visible(true);
         }
-
-        console.log(table.columns().visible());
         
         data.FilterSearch.completeSearch(json.searchTotal, tableInfo.length, json.data.length);
     },

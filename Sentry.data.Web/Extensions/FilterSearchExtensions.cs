@@ -1,4 +1,5 @@
 ﻿using Nest;
+using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
 using System.Linq;
 
@@ -21,7 +22,8 @@ namespace Sentry.data.Web
             {
                 SavedSearchId = model.Id,
                 SearchType = model.SearchType,
-                AddToFavorites = model.AddToFavorites
+                AddToFavorites = model.AddToFavorites,
+                ResultConfiguration = !string.IsNullOrEmpty(model.ResultConfigurationJson) ? JObject.Parse(model.ResultConfigurationJson) : null
             };
 
             MapToParentDto(model, dto);

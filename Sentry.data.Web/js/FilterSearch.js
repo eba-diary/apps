@@ -8,12 +8,16 @@
     retrieveFilterOptions: function () {
         console.log('Must pass filterRetriever parameter to data.FilterSearch.init')
     },
+    retrieveResultConfig: function () {
+        console.log('Must pass filterRetriever parameter to data.FilterSearch.init')
+    },
 
-    init: function (searchExecuter, filterRetriever) {
+    init: function (searchExecuter, filterRetriever, resultConfigRetriever) {
         this.initToast();
         
         this.executeSearch = searchExecuter;
         this.retrieveFilterOptions = filterRetriever;
+        this.retrieveResultConfig = resultConfigRetriever;
 
         this.initEvents();
     },
@@ -147,9 +151,13 @@
             request.SearchType = $("#save-search-type").val();
             request.SearchName = $.trim($("#save-search-name").val());
             request.AddToFavorites = $("#save-search-favorite").is(":checked");
+            request.ResultConfigurationJson = data.FilterSearch.retrieveResultConfig();
 
             $.post("/FilterSearch/SaveSearch", request, (x) => data.FilterSearch.completeSaveSearch(x, request.SearchName)).
-                fail(() => data.FilterSearch.showToast("error", "There was an issue saving the search. Please try again or reach out to DSCSupport@sentry.com."));
+                fail(function () {
+                    data.FilterSearch.resetSaveSearchModal();
+                    data.FilterSearch.showToast("error", "There was an issue saving the search. Please try again or reach out to DSCSupport@sentry.com.")
+                });
         });
 
         $(document).on("click", ".saved-search-favorite", function (e) {

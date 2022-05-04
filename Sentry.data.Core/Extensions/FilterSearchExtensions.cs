@@ -32,7 +32,7 @@ namespace Sentry.data.Core
                 SearchText = dto.SearchText,
                 AssociateId = dto.AssociateId,
                 FilterCategoriesJson = dto.FilterCategories != null ? JsonConvert.SerializeObject(dto.FilterCategories) : null,
-                ResultConfigurationJson = dto.ResultConfiguration != null ? dto.ResultConfiguration.ToString() : null
+                ResultConfigurationJson = dto.ResultConfiguration != null ? dto.ResultConfiguration.ToString(Formatting.None) : null
             };
         }
     }

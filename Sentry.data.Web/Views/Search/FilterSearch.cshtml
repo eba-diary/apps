@@ -120,9 +120,9 @@
 <script type="text/javascript">
 
     $(function () {
-                data.FilterSearch.init(@(jsControllerName).executeSearch, @(jsControllerName).buildFilter);
-                @(jsControllerName).init();
-            });
+        data.FilterSearch.init(@(jsControllerName).executeSearch, @(jsControllerName).buildFilter, @(jsControllerName).retrieveResultConfig);
+        @(jsControllerName).init();
+    });
 
 </script>
 }

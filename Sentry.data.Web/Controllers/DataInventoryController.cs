@@ -62,7 +62,7 @@ namespace Sentry.data.Web.Controllers
 
             DaleResultDto resultDto = _dataInventoryService.GetSearchResults(searchModel.ToDaleDto());
 
-            List<string> visibleColumns = null;
+            List<int> visibleColumns = null;
             
             if (!string.IsNullOrEmpty(searchModel.SearchName))
             {
@@ -71,7 +71,7 @@ namespace Sentry.data.Web.Controllers
                     SavedSearchDto savedSearchDto = _filterSearchService.GetSavedSearch(SearchType.DATA_INVENTORY, searchModel.SearchName, SharedContext.CurrentUser.AssociateId);
                     if (savedSearchDto.ResultConfiguration != null)
                     {
-                        visibleColumns = savedSearchDto.ResultConfiguration["VisibleColumns"].ToObject<List<string>>();
+                        visibleColumns = savedSearchDto.ResultConfiguration["VisibleColumns"].ToObject<List<int>>();
                     }
                 }
                 catch (System.Exception ex)

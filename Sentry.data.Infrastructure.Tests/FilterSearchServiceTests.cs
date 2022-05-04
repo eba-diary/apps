@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,8 @@ namespace Sentry.data.Infrastructure.Tests
                 SearchName = "SearchName",
                 SearchText = "text search",
                 FilterCategoriesJson = @"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""P"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}]}]",
-                AssociateId = "000000"
+                AssociateId = "000000",
+                ResultConfigurationJson = @"{""VisibleColumns"":[1,2,3]}"
             };
 
             datasetContext.SetupGet(x => x.SavedSearches).Returns(new List<SavedSearch>() { savedSearch }.AsQueryable());
@@ -48,6 +50,11 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(GlobalConstants.FilterCategoryNames.ENVIRONMENT, optionDto.ParentCategoryName);
             Assert.IsTrue(optionDto.Selected);
             Assert.AreEqual(0, optionDto.ResultCount);
+
+            Assert.IsTrue(result.ResultConfiguration.ContainsKey("VisibleColumns"));
+
+            List<int> visibleColumns = result.ResultConfiguration["VisibleColumns"].ToObject<List<int>>();
+            Assert.AreEqual(3, visibleColumns.Count);
         }
 
         [TestMethod]
@@ -126,6 +133,7 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual(GlobalConstants.SearchType.DATA_INVENTORY, x.SearchType);
                 Assert.AreEqual("000000", x.AssociateId);
                 Assert.AreEqual(@"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""P"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}]}]", x.FilterCategoriesJson);
+                Assert.AreEqual(@"{""VisibleColumns"":[1,2,3]}", x.ResultConfigurationJson);
             });
             datasetContext.Setup(x => x.SaveChanges(true));
 
@@ -158,6 +166,10 @@ namespace Sentry.data.Infrastructure.Tests
                             }
                         }
                     }
+                },
+                ResultConfiguration = new JObject()
+                {
+                    { "VisibleColumns", new JArray() { 1, 2, 3 } }
                 }
             };
 
@@ -182,7 +194,8 @@ namespace Sentry.data.Infrastructure.Tests
                 SearchName = "SearchName",
                 SearchText = "text search",
                 FilterCategoriesJson = @"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""P"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}]}]",
-                AssociateId = "000000"
+                AssociateId = "000000",
+                ResultConfigurationJson = @"{""VisibleColumns"":[1,2,3]}"
             };
             
             datasetContext.SetupGet(x => x.SavedSearches).Returns(new List<SavedSearch>() { savedSearch }.AsQueryable());
@@ -216,6 +229,10 @@ namespace Sentry.data.Infrastructure.Tests
                             }
                         }
                     }
+                },
+                ResultConfiguration = new JObject()
+                {
+                    { "VisibleColumns", new JArray() { 2, 3 } }
                 }
             };
 
@@ -226,6 +243,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(GlobalConstants.SaveSearchResults.UPDATE, result);
             Assert.AreEqual("new search", savedSearch.SearchText);
             Assert.AreEqual(@"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""D"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}]}]", savedSearch.FilterCategoriesJson);
+            Assert.AreEqual(@"{""VisibleColumns"":[2,3]}", savedSearch.ResultConfigurationJson);
         }
 
         [TestMethod]
