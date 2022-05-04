@@ -1,9 +1,8 @@
 ﻿using Sentry.data.Core.Exceptions;
-using System.Collections.Generic;
 using Sentry.data.Core.GlobalEnums;
 using System;
+using System.Collections.Generic;
 using static Sentry.data.Core.GlobalConstants;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {

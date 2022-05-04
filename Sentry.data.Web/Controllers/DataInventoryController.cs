@@ -1,10 +1,7 @@
-﻿using Nest;
-using Newtonsoft.Json.Linq;
-using Sentry.Common.Logging;
+﻿using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Web.Mvc;
 using static Sentry.data.Core.GlobalConstants;
 
