@@ -1,5 +1,4 @@
-﻿using Nest;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
 using System.Linq;
 

@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using Sentry.data.Core;
-using Sentry.Common.Logging;
-using Sentry.data.Core.GlobalEnums;
 using System.Diagnostics;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
