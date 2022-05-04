@@ -66,7 +66,6 @@ namespace Sentry.data.Core
         public NotificationDto GetNotificationModelForModify(int notificationId)
         {
             NotificationDto model = GetNotificationModelForDisplay(notificationId);
-            model.AllDataAssets = GetAssetsForUserSecurity();
             model.AllBusinessAreas = GetBusinessAreasForUserSecurity();
             return model;
         }
