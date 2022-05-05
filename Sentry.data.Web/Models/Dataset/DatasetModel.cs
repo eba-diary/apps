@@ -35,7 +35,7 @@ namespace Sentry.data.Web
         [DisplayName("Dataset Scope")]
         public int DatasetScopeTypeId { get; set; }
 
-        [Required]
+        [MaxLength(100)]
         [DisplayName("Configuration Name")]
         public string ConfigFileName { get; set; }
 
