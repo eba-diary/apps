@@ -1,6 +1,6 @@
 ﻿namespace Sentry.data.Core
 {
-    public class DaleEventDto
+    public class DataInventoryEventDto
     {
         public string Criteria { get; set; }
         public string Destiny { get; set; }

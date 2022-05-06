@@ -228,7 +228,7 @@ namespace Sentry.data.Web.Tests
                 }
             };
 
-            DaleSearchDto dto = model.ToDaleDto();
+            DaleSearchDto dto = model.ToDto();
 
             Assert.AreEqual("Search", dto.Criteria);
             Assert.AreEqual(2, dto.FilterCategories.Count);

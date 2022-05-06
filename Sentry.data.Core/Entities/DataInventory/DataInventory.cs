@@ -132,9 +132,9 @@ namespace Sentry.data.Core
         #endregion
 
         #region Mappings
-        public DaleResultRowDto ToDto()
+        public DataInventorySearchResultRowDto ToDto()
         {
-            return new DaleResultRowDto()
+            return new DataInventorySearchResultRowDto()
             {
                 Asset = AssetCode,
                 Server = ServerName,

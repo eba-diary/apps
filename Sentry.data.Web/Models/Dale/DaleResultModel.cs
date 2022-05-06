@@ -6,8 +6,8 @@ namespace Sentry.data.Web
 {
     public class DaleResultModel
     {
-        public List<DaleResultRowModel> DaleResults { get; set; }
-        public DaleEventDto DaleEvent { get; set; }
+        public List<DataInventorySearchResultRowModel> DaleResults { get; set; }
+        public DataInventoryEventDto DaleEvent { get; set; }
 
     }
 }

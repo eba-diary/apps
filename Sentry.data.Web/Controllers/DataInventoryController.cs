@@ -7,15 +7,17 @@ using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Controllers
 {
-    public class DataInventoryController : BaseDataInventoryController
+    public class DataInventoryController : BaseController
     {
-        private readonly IDaleService _dataInventoryService;
+        private readonly IDataInventoryService _dataInventoryService;
         private readonly IFilterSearchService _filterSearchService;
+        private readonly IDataFeatures _featureFlags;
 
-        public DataInventoryController(IDaleService dataInventoryService, IFilterSearchService filterSearchService, IDataFeatures featureFlags) : base(featureFlags)
+        public DataInventoryController(IDataInventoryService dataInventoryService, IFilterSearchService filterSearchService, IDataFeatures featureFlags)
         {
             _dataInventoryService = dataInventoryService;
             _filterSearchService = filterSearchService;
+            _featureFlags = featureFlags;
         }
         
         public ActionResult Search(string target = null, string search = null, string savedSearch = null)
@@ -57,7 +59,7 @@ namespace Sentry.data.Web.Controllers
         {
             ValidateSearchModel(searchModel);
 
-            DaleResultDto resultDto = _dataInventoryService.GetSearchResults(searchModel.ToDaleDto());
+            DataInventorySearchResultDto resultDto = _dataInventoryService.GetSearchResults(searchModel.ToDto());
 
             List<int> visibleColumns = null;
             
@@ -78,7 +80,7 @@ namespace Sentry.data.Web.Controllers
             }
 
             return Json(new { 
-                data = resultDto.DaleResults.Select(x => x.ToWeb()).ToList(),
+                data = resultDto.DataInventoryResults.ToWeb(),
                 searchTotal = resultDto.SearchTotal,
                 visibleColumns
             });
@@ -88,7 +90,7 @@ namespace Sentry.data.Web.Controllers
         public JsonResult SearchFilters(FilterSearchModel searchModel)
         {
             ValidateSearchModel(searchModel);
-            FilterSearchModel filterResult = _dataInventoryService.GetSearchFilters(searchModel.ToDaleDto()).ToModel();
+            FilterSearchModel filterResult = _dataInventoryService.GetSearchFilters(searchModel.ToDto()).ToModel();
             
             if (!CanViewSensitive())
             {
@@ -99,9 +101,21 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult Update(List<DaleSensitiveModel> models)
+        public ActionResult Update(List<DataInventorySensitiveUpdateModel> models)
         {
-            return Json(new { success = _dataInventoryService.UpdateIsSensitive(models.ToDto()) });
+            bool result = _dataInventoryService.UpdateIsSensitive(models.ToDto());
+            return Json(new { success = result });
+        }
+
+        [HttpGet]
+        public JsonResult GetCanDaleSensitive()
+        {
+            return Json(new
+            {
+                canDaleSensitiveEdit = SharedContext.CurrentUser.CanDaleSensitiveEdit || SharedContext.CurrentUser.IsAdmin,
+                canDaleOwnerVerifiedEdit = (_featureFlags.Dale_Expose_EditOwnerVerified_CLA_1911.GetValue() && SharedContext.CurrentUser.CanDaleOwnerVerifiedEdit) || SharedContext.CurrentUser.IsAdmin,
+                canDaleSensitiveView = CanViewSensitive()
+            }, JsonRequestBehavior.AllowGet);
         }
 
         #region Methods
@@ -159,6 +173,11 @@ namespace Sentry.data.Web.Controllers
         private void RemoveSensitive(FilterSearchModel searchModel)
         {
             searchModel.FilterCategories.RemoveAll(x => x.CategoryName == FilterCategoryNames.SENSITIVE);
+        }
+
+        protected bool CanViewSensitive()
+        {
+            return SharedContext.CurrentUser.CanDaleSensitiveView;
         }
         #endregion
     }

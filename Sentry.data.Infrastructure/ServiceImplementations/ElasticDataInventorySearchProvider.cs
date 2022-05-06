@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
-    public class ElasticDataInventorySearchProvider : IDaleSearchProvider
+    public class ElasticDataInventorySearchProvider : IDataInventorySearchProvider
     {
         private readonly IElasticContext _context;
         private readonly IDbExecuter _dbExecuter;
@@ -21,9 +21,9 @@ namespace Sentry.data.Infrastructure
         }
 
         #region IDaleSearchProvider Implementation
-        public DaleResultDto GetSearchResults(DaleSearchDto dto)
+        public DataInventorySearchResultDto GetSearchResults(FilterSearchDto dto)
         {
-            DaleResultDto resultDto = new DaleResultDto();
+            DataInventorySearchResultDto resultDto = new DataInventorySearchResultDto();
 
             SearchRequest<DataInventory> searchRequest = BuildTextSearchRequest(dto, 1000);
             searchRequest.TrackTotalHits = true;
@@ -32,14 +32,14 @@ namespace Sentry.data.Infrastructure
 
             if (result.Documents?.Any() == true)
             {
-                resultDto.DaleResults = result.Documents.Select(x => x.ToDto()).ToList();
+                resultDto.DataInventoryResults = result.Documents.Select(x => x.ToDto()).ToList();
                 resultDto.SearchTotal = result.SearchTotal;
             }
 
             return resultDto;
         }
 
-        public FilterSearchDto GetSearchFilters(DaleSearchDto dto)
+        public FilterSearchDto GetSearchFilters(FilterSearchDto dto)
         {           
             SearchRequest<DataInventory> request = BuildTextSearchRequest(dto, 0);
             request.Aggregations = NestHelper.GetFilterAggregations<DataInventory>();
@@ -62,22 +62,22 @@ namespace Sentry.data.Infrastructure
             return resultDto;
         }
 
-        public DaleContainSensitiveResultDto DoesItemContainSensitive(DaleSearchDto dto)
+        public DataInventorySensitiveDto DoesItemContainSensitive(DataInventorySensitiveSearchDto dto)
         {
             List<QueryContainer> must = new List<QueryContainer>();
             must.AddMatch<DataInventory>(x => x.IsSensitive, "true");
 
-            switch (dto.Destiny)
+            if (string.Equals(dto.SearchTarget, GlobalConstants.DataInventorySearchTargets.SAID, StringComparison.OrdinalIgnoreCase))
             {
-                case Core.GlobalEnums.DaleDestiny.SAID:
-                    must.AddMatch<DataInventory>(x => x.AssetCode, dto.Criteria);
-                    break;
-                case Core.GlobalEnums.DaleDestiny.Server:
-                    must.AddMatch<DataInventory>(x => x.ServerName, dto.Criteria);
-                    break;
-                default:
-                    must.AddMatch<DataInventory>(x => x.DatabaseName, dto.Criteria);
-                    break;
+                must.AddMatch<DataInventory>(x => x.AssetCode, dto.SearchText);
+            }
+            else if (string.Equals(dto.SearchTarget, GlobalConstants.DataInventorySearchTargets.SERVER, StringComparison.OrdinalIgnoreCase))
+            {
+                must.AddMatch<DataInventory>(x => x.ServerName, dto.SearchText);
+            }
+            else
+            {
+                must.AddMatch<DataInventory>(x => x.DatabaseName, dto.SearchText);
             }
 
             BoolQuery boolQuery = GetBaseBoolQuery();
@@ -89,18 +89,18 @@ namespace Sentry.data.Infrastructure
                 Query = boolQuery
             };
 
-            DaleContainSensitiveResultDto resultDto = new DaleContainSensitiveResultDto();
-            resultDto.DoesContainSensitiveResults = GetElasticResult(dto, resultDto, request).Documents?.Any() == true;
+            DataInventorySensitiveDto resultDto = new DataInventorySensitiveDto();
+            resultDto.HasSensitive = GetElasticResult(dto, resultDto, request).Documents?.Any() == true;
 
             return resultDto;
         }
 
-        public DaleCategoryResultDto GetCategoriesByAsset(string search)
+        public DataInventoryAssetCategoriesDto GetCategoriesByAsset(string search)
         {
-            DaleCategoryResultDto resultDto = new DaleCategoryResultDto()
+            DataInventoryAssetCategoriesDto resultDto = new DataInventoryAssetCategoriesDto()
             {
-                DaleCategories = new List<DaleCategoryDto>(),
-                DaleEvent = new DaleEventDto()
+                DataInventoryCategories = new List<DataInventoryCategoryDto>(),
+                DataInventoryEvent = new DataInventoryEventDto()
                 {
                     Criteria = search,
                     QuerySuccess = true
@@ -123,7 +123,7 @@ namespace Sentry.data.Infrastructure
                 List<string> allNames = ExtractAggregationBucketKeys(allCategoriesTask);
                 List<string> assetNames = ExtractAggregationBucketKeys(assetCategoriesTask);
 
-                resultDto.DaleCategories = allNames.Select(x => new DaleCategoryDto()
+                resultDto.DataInventoryCategories = allNames.Select(x => new DataInventoryCategoryDto()
                 {
                     Category = x,
                     IsSensitive = assetNames.Contains(x)
@@ -131,13 +131,13 @@ namespace Sentry.data.Infrastructure
             }
             catch (AggregateException ex)
             {
-                HandleAggregateException(ex, resultDto.DaleEvent);
+                HandleAggregateException(ex, resultDto.DataInventoryEvent);
             }
 
             return resultDto;
         }
 
-        public bool SaveSensitive(List<DaleSensitiveDto> dtos)
+        public bool SaveSensitive(List<DataInventorySensitiveUpdateDto> dtos)
         {
             try
             {
@@ -158,7 +158,7 @@ namespace Sentry.data.Infrastructure
                     //submit async update requests per document to update
                     foreach (DataInventory di in diToUpdate)
                     {
-                        DaleSensitiveDto dto = dtos.FirstOrDefault(x => x.BaseColumnId == di.Id);
+                        DataInventorySensitiveUpdateDto dto = dtos.FirstOrDefault(x => x.BaseColumnId == di.Id);
                         di.IsSensitive = dto.IsSensitive;
                         di.IsOwnerVerified = dto.IsOwnerVerified;
 
@@ -188,14 +188,12 @@ namespace Sentry.data.Infrastructure
         #endregion
 
         #region Methods
-        private ElasticResult<DataInventory> GetElasticResult(DaleSearchDto dto, DaleEventableDto resultDto, SearchRequest<DataInventory> searchRequest)
+        private ElasticResult<DataInventory> GetElasticResult(FilterSearchDto dto, DataInventoryEventableDto resultDto, SearchRequest<DataInventory> searchRequest)
         {
-            resultDto.DaleEvent = new DaleEventDto()
+            resultDto.DataInventoryEvent = new DataInventoryEventDto()
             {
-                Criteria = dto.CriteriaToString(),
-                Destiny = dto.Destiny.GetDescription(),
-                QuerySuccess = true,
-                Sensitive = dto.Sensitive.GetDescription()
+                Criteria = dto.ToString(),
+                QuerySuccess = true
             };
 
             try
@@ -204,23 +202,23 @@ namespace Sentry.data.Infrastructure
             }
             catch (AggregateException ex)
             {
-                HandleAggregateException(ex, resultDto.DaleEvent);
+                HandleAggregateException(ex, resultDto.DataInventoryEvent);
             }
 
             return new ElasticResult<DataInventory>();
         }
 
-        private SearchRequest<DataInventory> BuildTextSearchRequest(DaleSearchDto dto, int size)
+        private SearchRequest<DataInventory> BuildTextSearchRequest(FilterSearchDto dto, int size)
         {
             BoolQuery boolQuery = GetBaseBoolQuery();
 
-            if (!string.IsNullOrWhiteSpace(dto.Criteria))
+            if (!string.IsNullOrWhiteSpace(dto.SearchText))
             {
                 //broad search for criteria across all searchable fields
                 Nest.Fields fields = NestHelper.GetSearchFields<DataInventory>();
 
                 //split search terms regardless of amount of spaces between words
-                List<string> terms = dto.Criteria.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                List<string> terms = dto.SearchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
                 //perform cross field search when multiple words in search criteria
                 if (terms.Count > 1)
@@ -310,7 +308,7 @@ namespace Sentry.data.Infrastructure
             };
         }
 
-        private void HandleAggregateException(AggregateException ex, DaleEventDto eventDto)
+        private void HandleAggregateException(AggregateException ex, DataInventoryEventDto eventDto)
         {
             eventDto.QuerySuccess = false;
             eventDto.QueryErrorMessage = $"Data Inventory Elasticsearch query failed. Exception: {ex.Message}";
