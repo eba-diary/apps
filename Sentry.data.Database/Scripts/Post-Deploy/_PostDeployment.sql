@@ -85,3 +85,4 @@ DECLARE @ErrorState INT;
 :r ..\post-deploy\supportingscripts\sprint_22_02_02\HISTORYFIX_CLA3789_Incorrect_Dataflow_Delete_Metadata.sql
 :r ..\post-deploy\supportingscripts\Release_03_00_03\CLA3722_TransitionToAsset.sql
 :r ..\post-deploy\supportingscripts\Release_03_01_01\CLA3920_Auto_Subscribe.sql
+:r ..\Post-Deploy\SupportingScripts\Release_03_01_02\CLA4099-Remove_New_Permissions_Accidentally_Available.sql
