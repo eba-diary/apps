@@ -41,7 +41,7 @@ namespace Sentry.data.Core
 
         public bool DoesItemContainSensitive(DataInventorySensitiveSearchDto dtoSearch)
         {
-            DataInventorySensitiveDto dtoResult;
+            DataInventorySensitiveSearchResultDto dtoResult;
 
             CanDaleSensitiveView();
 

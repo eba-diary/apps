@@ -7,7 +7,7 @@ namespace Sentry.data.Core
         DataInventorySearchResultDto GetSearchResults(FilterSearchDto dto);
         FilterSearchDto GetSearchFilters(FilterSearchDto dto);
         bool SaveSensitive(List<DataInventorySensitiveUpdateDto> dtos);
-        DataInventorySensitiveDto DoesItemContainSensitive(DataInventorySensitiveSearchDto dto);
+        DataInventorySensitiveSearchResultDto DoesItemContainSensitive(DataInventorySensitiveSearchDto dto);
         DataInventoryAssetCategoriesDto GetCategoriesByAsset(string search);
     }
 }

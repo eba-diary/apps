@@ -1,6 +1,6 @@
 ﻿namespace Sentry.data.Core
 {
-    public class DataInventorySensitiveDto : DataInventoryEventableDto
+    public class DataInventorySensitiveSearchResultDto : DataInventoryEventableDto
     {
         public bool HasSensitive { get; set; }
     }

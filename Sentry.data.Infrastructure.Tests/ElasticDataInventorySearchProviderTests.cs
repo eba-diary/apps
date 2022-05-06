@@ -111,7 +111,7 @@ namespace Sentry.data.Infrastructure.Tests
                 Criteria = "DATA"
             };
 
-            DataInventorySensitiveDto result = searchProvider.DoesItemContainSensitive(searchDto);
+            DataInventorySensitiveSearchResultDto result = searchProvider.DoesItemContainSensitive(searchDto);
 
             elasticContext.VerifyAll();
 

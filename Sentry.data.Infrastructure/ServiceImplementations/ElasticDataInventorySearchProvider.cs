@@ -62,7 +62,7 @@ namespace Sentry.data.Infrastructure
             return resultDto;
         }
 
-        public DataInventorySensitiveDto DoesItemContainSensitive(DataInventorySensitiveSearchDto dto)
+        public DataInventorySensitiveSearchResultDto DoesItemContainSensitive(DataInventorySensitiveSearchDto dto)
         {
             List<QueryContainer> must = new List<QueryContainer>();
             must.AddMatch<DataInventory>(x => x.IsSensitive, "true");
@@ -89,7 +89,7 @@ namespace Sentry.data.Infrastructure
                 Query = boolQuery
             };
 
-            DataInventorySensitiveDto resultDto = new DataInventorySensitiveDto();
+            DataInventorySensitiveSearchResultDto resultDto = new DataInventorySensitiveSearchResultDto();
             resultDto.HasSensitive = GetElasticResult(dto, resultDto, request).Documents?.Any() == true;
 
             return resultDto;
