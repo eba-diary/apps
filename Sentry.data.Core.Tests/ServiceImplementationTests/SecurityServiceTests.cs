@@ -880,6 +880,40 @@ namespace Sentry.data.Core.Tests
         }
         #endregion
 
+        #region CanModifyNotifications
+        /// <summary>
+        /// This method tests that if there are only user-specific permission tickets, GetUserSecurity still functions properly
+        /// </summary>
+        [TestMethod]
+        public void Security_UserOnlyPermissions_CanModifyNotifications()
+        {
+            //ARRAGE
+            Security security = BuildBaseSecurity();
+            SecurityTicket ticket1 = BuildBaseTicket(security, "MyAdGroupName1");
+            ticket1.AdGroupName = null;
+            ticket1.GrantPermissionToUserId = "999999";
+            SecurityPermission previewPermission1 = BuildBasePermission(ticket1, new Permission() { PermissionCode = PermissionCodes.CAN_MODIFY_NOTIFICATIONS }, true);
+
+            ticket1.Permissions.Add(previewPermission1);
+            security.Tickets.Add(ticket1);
+
+            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
+            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
+            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+
+            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.IsInGroup(null)).Throw(new NullReferenceException()); //The real service throws an exception if a null group name is passed in
+            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(securable, user);
+
+            //ASSERT
+            Assert.IsTrue(us.CanModifyNotifications);
+        }
+        #endregion
+
         #region "MergeParentSecurity"
         /// <summary>
         /// Tests that when no parent security is provided to the MergeParentSecurity,
@@ -952,7 +986,8 @@ namespace Sentry.data.Core.Tests
             var IsOwner = false;
             var userPermissions = (new[] { PermissionCodes.CAN_PREVIEW_DATASET }).ToList();
             var us = new UserSecurity();
-            var ds = new Dataset() {
+            var ds = new Dataset()
+            {
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
                 DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } }
             };
@@ -995,8 +1030,8 @@ namespace Sentry.data.Core.Tests
             var IsOwner = false;
             var userPermissions = new List<string>();
             var us = new UserSecurity();
-            var ds = new Dataset() 
-            { 
+            var ds = new Dataset()
+            {
                 DataClassification = DataClassificationType.HighlySensitive,
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET
             };
@@ -1275,6 +1310,136 @@ namespace Sentry.data.Core.Tests
             // Assert
             Assert.IsTrue(us.CanEditDataset);
         }
+        #endregion
+
+        #region DoesSecurableInheritFromParent
+
+        [TestMethod]
+        public void DoesSecurableInheritFromParent_True()
+        {
+            // Arrange
+            var security = MockClasses.MockSecurity(new[] { PermissionCodes.INHERIT_PARENT_PERMISSIONS });
+            var securable = new Mock<ISecurable>();
+            securable.Setup(s => s.Security).Returns(security);
+            securable.Setup(s => s.Parent).Returns(new Mock<ISecurable>().Object);
+
+            // Act
+            var actual = SecurityService.DoesSecurableInheritFromParent(securable.Object);
+
+            // Assert
+            Assert.IsTrue(actual);
+        }
+
+        [TestMethod]
+        public void DoesSecurableInheritFromParent_False()
+        {
+            // Arrange
+            var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA });
+            var securable = new Mock<ISecurable>();
+            securable.Setup(s => s.Security).Returns(security);
+
+            // Act
+            var actual = SecurityService.DoesSecurableInheritFromParent(securable.Object);
+
+            // Assert
+            Assert.IsFalse(actual);
+        }
+
+        #endregion
+
+        #region GetSecurityTicketsForSecurable
+
+        [TestMethod]
+        public void GetSecurityTicketsForSecurable_IncludePending()
+        {
+            // Arrange
+            var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS });
+            security.Tickets.First().Permissions.First().IsEnabled = false;
+            var securable = new Mock<ISecurable>();
+            securable.Setup(s => s.Security).Returns(security);
+
+            // Act
+            var actual = SecurityService.GetSecurityTicketsForSecurable(securable.Object, true);
+
+            // Assert
+            Assert.AreEqual(2, actual.Count());
+        }
+
+        [TestMethod]
+        public void GetSecurityTicketsForSecurable_NoPending()
+        {
+            // Arrange
+            var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS });
+            security.Tickets.First().Permissions.First().IsEnabled = false;
+            var securable = new Mock<ISecurable>();
+            securable.Setup(s => s.Security).Returns(security);
+
+            // Act
+            var actual = SecurityService.GetSecurityTicketsForSecurable(securable.Object, false);
+
+            // Assert
+            Assert.AreEqual(1, actual.Count());
+        }
+
+        [TestMethod]
+        public void GetSecurityTicketsForSecurable_NoRemoved()
+        {
+            // Arrange
+            var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS });
+            security.Tickets.First().Permissions.First().IsEnabled = false;
+            security.Tickets.First().Permissions.First().RemovedDate = DateTime.Now;
+            var securable = new Mock<ISecurable>();
+            securable.Setup(s => s.Security).Returns(security);
+
+            // Act
+            var actual = SecurityService.GetSecurityTicketsForSecurable(securable.Object, true);
+
+            // Assert
+            Assert.AreEqual(1, actual.Count());
+        }
+
+        #endregion
+
+        #region GetSecurablePermissions
+
+        [TestMethod]
+        public void GetSecurablePermissions_ParentButNoInheritance()
+        {
+            // Arrange
+            var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS });
+            var securable = new Mock<ISecurable>();
+            securable.Setup(s => s.Security).Returns(security);
+            var parentSecurable = new Mock<ISecurable>();
+            parentSecurable.Setup(s => s.Security).Returns(security);
+            securable.Setup(s => s.Parent).Returns(parentSecurable.Object);
+            var securityService = new SecurityService(null, null, null);
+
+            // Act
+            var actual = securityService.GetSecurablePermissions(securable.Object);
+
+            // Assert
+            Assert.AreEqual(2,actual.Count());
+        }
+
+        [TestMethod]
+        public void GetSecurablePermissions_Inheritance()
+        {
+            // Arrange
+            var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS, PermissionCodes.INHERIT_PARENT_PERMISSIONS });
+            var securable = new Mock<ISecurable>();
+            securable.Setup(s => s.Security).Returns(security);
+            var parentSecurable = new Mock<ISecurable>();
+            parentSecurable.Setup(s => s.Security).Returns(security);
+            securable.Setup(s => s.Parent).Returns(parentSecurable.Object);
+            var securityService = new SecurityService(null, null, null);
+
+            // Act
+            var actual = securityService.GetSecurablePermissions(securable.Object);
+
+            // Assert
+            Assert.AreEqual(4, actual.Count()); //2 from parent and 2 from itself
+        }
+
         #endregion
 
         #region "Private helpers"

@@ -54,6 +54,8 @@ namespace Sentry.data.Core.Entities.Schema.Elastic
         int OrdinalPosition { get; set; }
         [PropertyName("Description")]
         public string Description { get; set; }
+        [PropertyName("FlattenedDescription")]
+        public string FlattenedDescription => !string.IsNullOrEmpty(Description) ? Description.ToLower() : "";
         [PropertyName("Length")]
         int Length { get; set; }
         [PropertyName("DotNamePath")]

@@ -978,6 +978,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
+        [Route("Config/IsHttpSource/")]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public JsonResult IsHttpSource(int dataSourceId)
         {

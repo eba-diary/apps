@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
-using System.Web;
 
 namespace Sentry.data.Web
 {
@@ -40,6 +37,23 @@ namespace Sentry.data.Web
             {
                 UserName = fav.UserDisplayName,
                 Email = fav.UserEmail
+            };
+        }
+
+        public static FavoriteItemModel ToModel(this Core.FavoriteItem core)
+        {
+            return new FavoriteItemModel()
+            {
+                Id = core.Id,
+                FeedId = core.FeedId,
+                FeedName = core.FeedName,
+                FeedUrl = core.FeedUrl,
+                FeedUrlType = core.FeedUrlType,
+                Img = core.Img,
+                Sequence = core.Sequence,
+                Title = core.Title,
+                Url = core.Url,
+                IsLegacyFavorite = core.IsLegacyFavorite
             };
         }
     }

@@ -22,10 +22,39 @@ namespace Sentry.data.Infrastructure
 
         public List<ElasticSchemaField> Search(string toSearch)
         {
-            if(!String.IsNullOrEmpty(toSearch))
+            if (!String.IsNullOrEmpty(toSearch))
             {
                 toSearch = '*' + toSearch.ToLower() + '*';
+                if (toSearch.Split(' ').Length > 1)
+                {
+                    return SearchWithSpaces(toSearch);
+                }
             }
+            return SearchSingleWord(toSearch);
+        }
+
+        private List<ElasticSchemaField> SearchWithSpaces(string toSearch)
+        {
+            Task<ElasticResult<ElasticSchemaField>> result = _context.SearchAsync<ElasticSchemaField>(s => s
+                .Query(q => q
+                    .Bool(b => b
+                        .Filter(
+                            bm => bm.Term(p => p.DatasetId, DatasetId),
+                            bm => bm.Term(p => p.SchemaId, SchemaId)
+                        )
+                        .Should(
+                            bs => bs.Wildcard(w => w
+                                .Field(f => f.FlattenedDescription.Suffix("keyword")).Value(toSearch))
+                            ).MinimumShouldMatch(String.IsNullOrEmpty(toSearch) ? 0 : 1) //If we are searching, we need something to match on (excluding the dataset id or schema id).
+                    )
+                )
+                .Size(2000)
+            );
+            return (List<ElasticSchemaField>)result.Result.Documents;
+        }
+
+        private List<ElasticSchemaField> SearchSingleWord(string toSearch)
+        {
             Task<ElasticResult<ElasticSchemaField>> result = _context.SearchAsync<ElasticSchemaField>(s => s
                 .Query(q => q
                     .Bool(b => b

@@ -160,6 +160,7 @@
     <Compile Include="DTO\DataProcessing\NamedEnvironmentDto.cs" />
     <Compile Include="DTO\DataProcessing\SchemaMapDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\SchemaMapDto.cs" />
+    <Compile Include="DTO\Dataset\DatasetPermissionsDto.cs" />
     <Compile Include="DTO\Dataset\DatasetSummaryMetadataDTO.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
@@ -180,6 +181,7 @@
     <Compile Include="DTO\Search\FilterCategoryDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryOptionDto.cs" />
     <Compile Include="DTO\Search\FilterSearchDto.cs" />
+    <Compile Include="DTO\Search\SavedSearchDto.cs" />
     <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
@@ -211,6 +213,7 @@
     <Compile Include="Entities\Datasets\DatasetFileParquet.cs" />
     <Compile Include="Entities\Datasets\DatasetFileReply.cs" />
     <Compile Include="Entities\Elastic\ElasticResult.cs" />
+    <Compile Include="Entities\Favorites\UserFavorite.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\Authentications\OAuthAuthentication.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DfsDataFlowBasic.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleAPISource.cs" />
@@ -227,6 +230,11 @@
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\SparkConverterModel.cs" />
     <Compile Include="Entities\Schema\Elastic\ElasticSchemaField.cs" />
+    <Compile Include="Entities\Security\SecurablePermission.cs" />
+    <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
+    <Compile Include="Entities\Search\SavedSearch.cs" />
+    <Compile Include="Extensions\FilterSearchExtensions.cs" />
+    <Compile Include="GlobalEnums\IntervalType.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryNews.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryReleaseNotes.cs" />
     <Compile Include="Helpers\CustomAttributeHelper.cs" />
@@ -332,6 +340,7 @@
     <Compile Include="Interfaces\DataProcessing\ISchemaMapProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
+    <Compile Include="Interfaces\Entities\IFavorable.cs" />
     <Compile Include="Interfaces\IApacheLivyProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IXMLAction.cs" />
     <Compile Include="Interfaces\IDataApplicationService.cs" />
@@ -352,6 +361,7 @@
     <Compile Include="Interfaces\IHiveOdbcProvider.cs" />
     <Compile Include="Interfaces\ISAIDRestClient.cs" />
     <Compile Include="Interfaces\ISAIDService.cs" />
+    <Compile Include="Interfaces\IFilterSearchService.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
     <Compile Include="Interfaces\ISnowProvider.cs" />
@@ -537,6 +547,7 @@
     <Compile Include="Interfaces\Retriever\IRetrieverJob.cs" />
     <Compile Include="Interfaces\IJobService.cs" />
     <Compile Include="DTO\TagGroupDto.cs" />
+    <Compile Include="Interfaces\IUserFavoriteService.cs" />
     <Compile Include="PollyPolicyKeys.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entities\User\ApplicationUser.cs" />

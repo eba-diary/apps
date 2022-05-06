@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Sentry.data.Core;
-
-namespace Sentry.data.Web
+﻿namespace Sentry.data.Web
 {
     public class FavoriteItemModel
     {
-        public FavoriteItemModel()
-        {
-
-        }
-
         public string DisplayTitle
         {
             get
@@ -30,5 +19,6 @@ namespace Sentry.data.Web
         public string FeedUrlType { get; set; }
         public string FeedUrl { get; set; }
         public int FeedId { get; set; }
+        public bool IsLegacyFavorite { get; set; }
     }
 }

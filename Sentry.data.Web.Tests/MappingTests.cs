@@ -228,7 +228,7 @@ namespace Sentry.data.Web.Tests
                 }
             };
 
-            DaleSearchDto dto = model.ToDto();
+            DaleSearchDto dto = model.ToDaleDto();
 
             Assert.AreEqual("Search", dto.Criteria);
             Assert.AreEqual(2, dto.FilterCategories.Count);
@@ -353,6 +353,95 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(9, optionModel.ResultCount);
             Assert.AreEqual("Category2", optionModel.ParentCategoryName);
             Assert.IsFalse(optionModel.Selected);
+        }
+
+        [TestMethod]
+        public void ToDto_SaveSearchModel_SavedSearchDto()
+        {
+            SaveSearchModel model = new SaveSearchModel()
+            {
+                SearchType = GlobalConstants.SearchType.DATA_INVENTORY,
+                SearchName = "Search",
+                AddToFavorites = true,
+                FilterCategories = new List<FilterCategoryModel>()
+                {
+                    new FilterCategoryModel()
+                    {
+                        CategoryName = "Category",
+                        CategoryOptions = new List<FilterCategoryOptionModel>()
+                        {
+                            new FilterCategoryOptionModel()
+                            {
+                                OptionValue = "Value",
+                                ResultCount = 10,
+                                ParentCategoryName = "Category",
+                                Selected = true
+                            },
+                            new FilterCategoryOptionModel()
+                            {
+                                OptionValue = "Value2",
+                                ResultCount = 4,
+                                ParentCategoryName = "Category",
+                                Selected = false
+                            }
+                        }
+                    }
+                }
+            };
+
+            SavedSearchDto dto = model.ToDto();
+
+            Assert.AreEqual(GlobalConstants.SearchType.DATA_INVENTORY, dto.SearchType);
+            Assert.AreEqual("Search", dto.SearchName);
+            Assert.IsTrue(dto.AddToFavorites);
+            Assert.AreEqual(1, dto.FilterCategories.Count);
+
+            FilterCategoryDto categoryDto = dto.FilterCategories.First();
+            Assert.AreEqual("Category", categoryDto.CategoryName);
+            Assert.AreEqual(2, categoryDto.CategoryOptions.Count);
+
+            FilterCategoryOptionDto optionDto = categoryDto.CategoryOptions.First();
+            Assert.AreEqual("Value", optionDto.OptionValue);
+            Assert.AreEqual(10, optionDto.ResultCount);
+            Assert.AreEqual("Category", optionDto.ParentCategoryName);
+            Assert.IsTrue(optionDto.Selected);
+
+            optionDto = categoryDto.CategoryOptions.Last();
+            Assert.AreEqual("Value2", optionDto.OptionValue);
+            Assert.AreEqual(4, optionDto.ResultCount);
+            Assert.AreEqual("Category", optionDto.ParentCategoryName);
+            Assert.IsFalse(optionDto.Selected);
+        }
+
+        [TestMethod]
+        public void ToModel_FavoriteItem_FavoriteItemModel()
+        {
+            FavoriteItem favoriteItem = new FavoriteItem()
+            {
+                Id = 1,
+                Title = "Title",
+                Url = "Url",
+                Sequence = 1,
+                Img = "Img",
+                FeedName = "FeedName",
+                FeedUrl = "FeedUrl",
+                FeedUrlType = "FeedUrlType",
+                FeedId = 2,
+                IsLegacyFavorite = true
+            };
+
+            FavoriteItemModel model = favoriteItem.ToModel();
+
+            Assert.AreEqual(1, model.Id);
+            Assert.AreEqual("Title", model.Title);
+            Assert.AreEqual("Url", model.Url);
+            Assert.AreEqual(1, model.Sequence);
+            Assert.AreEqual("Img", model.Img);
+            Assert.AreEqual("FeedName", model.FeedName);
+            Assert.AreEqual("FeedUrl", model.FeedUrl);
+            Assert.AreEqual("FeedUrlType", model.FeedUrlType);
+            Assert.AreEqual(2, model.FeedId);
+            Assert.IsTrue(model.IsLegacyFavorite);
         }
     }
 }

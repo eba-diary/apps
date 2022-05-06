@@ -293,8 +293,11 @@ namespace Sentry.data.Web.Controllers
             }
 
             Utility.SetupLists(_datasetContext, model);
+            if(model.DatasetCategoryIds != null)
+            {
+                model.CategoryNames = model.AllCategories.Where(cat => model.DatasetCategoryIds.Contains(int.Parse(cat.Value))).Select(cat => cat.Text).ToList();
+            }
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
-
             var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
@@ -316,6 +319,7 @@ namespace Sentry.data.Web.Controllers
                 model.DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue();
                 model.DisplaySchemaSearch = _featureFlags.CLA3553_SchemaSearch.GetValue();
                 model.DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue();
+                model.ShowManagePermissionsLink = _featureFlags.CLA3718_Authorization.GetValue();
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Detail Page", dto.DatasetId);
 
                 return View(model);
@@ -503,7 +507,7 @@ namespace Sentry.data.Web.Controllers
             return View("Configuration", model);
         }
 
-        [Route("Dataset/Detail/{datasetId}/SchemaSearch/{schemaId}/{search?}")]
+        [Route("Dataset/Detail/{datasetId}/SchemaSearch/{schemaId}")]
         [HttpPost]
         public JsonResult SchemaSearch(int datasetId, int schemaId, string search = null)
         {
@@ -702,6 +706,20 @@ namespace Sentry.data.Web.Controllers
 
             DataTablesQueryableAdapter<DatasetFileConfigsModel> dtqa = new DataTablesQueryableAdapter<DatasetFileConfigsModel>(files.AsQueryable(), dtRequest);
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion
+
+        #region "Manage Permissions"
+
+        [Route("Dataset/Detail/{datasetId}/Permissions")]
+        [HttpGet]
+        public ActionResult ManagePermissions(int datasetId)
+        {
+            var perms = _datasetService.GetDatasetPermissions(datasetId);
+            var model = new ManagePermissionsModel(perms);
+
+            return View("ManagePermissions", model);
         }
 
         #endregion

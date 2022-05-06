@@ -81,10 +81,6 @@ namespace Sentry.data.Web.Controllers
             }
 
             List<SelectListItem> AreaList = new List<SelectListItem>();
-            foreach (var item in _notificationService.GetAssetsForUserSecurity())
-            {
-                AreaList.Add(new SelectListItem { Text = item.DisplayName, Value = Core.GlobalConstants.Notifications.DATAASSET_TYPE + "_" + item.Id });
-            }
             foreach (var item in _notificationService.GetBusinessAreasForUserSecurity())
             {
                 AreaList.Add(new SelectListItem { Text = item.Name, Value = Core.GlobalConstants.Notifications.BUSINESSAREA_TYPE + "_" + item.Id });
@@ -164,25 +160,40 @@ namespace Sentry.data.Web.Controllers
             {
                 //STEP 3:  GET ALL SUBSCRIPTIONS USER HAS CURRENTLY
                 List<BusinessAreaSubscription> dbSubscriptions = _notificationService.GetAllUserSubscriptionsFromDatabase(model.group).OrderBy(o => o.EventType.Type_ID).ToList();
-
-                //STEP 4:  GET ALL EVENTTYPES IN GROUP 
-                IEnumerable<EventType> eventTypes = _notificationService.GetEventTypes(model.group);
-
+                List<BusinessAreaSubscription> parents = BuildAllParentsWithAssignedChildren(dbSubscriptions);
                 
-                //STEP 5:   UPDATE SUBSCRIPTIONS
-                UpdateSubscriptions(eventTypes.ToList(), ref dbSubscriptions, (BusinessAreaType)model.businessAreaID);
+                //STEP 5:   UPDATE SUBSCRIPTIONS FROM ALL CURRENT EVENTTYPES
+                UpdateUserSubscriptionsFromAllEventTypes(_notificationService.GetEventTypes(model.group).ToList(), ref parents, (BusinessAreaType)model.businessAreaID);
 
                 //STEP 6:  UPDATE CURRENT SUBCRIPTIONS
-                model.CurrentSubscriptionsBusinessArea = dbSubscriptions.OrderBy(o => o.EventType.Type_ID).ToList();
+                model.SubscriptionsBusinessAreas = parents.OrderBy(o => o.EventType.Type_ID).ToList();
+
+                //STEP 7:   CREATE MODEL VERSION FOR VIEW TO USE
+                model.SubscriptionsBusinessAreaModels = model.SubscriptionsBusinessAreas.ToWeb();
             }
 
             return PartialView("_SubscribeHero", model);
         }
 
+        private List<BusinessAreaSubscription> BuildAllParentsWithAssignedChildren(List<BusinessAreaSubscription> subs)
+        {
+            //GRAB PARENTS ONLY
+            List<BusinessAreaSubscription> parents = subs.Where(w => w.EventType.ParentDescription == null).ToList();
 
-        //THIS METHOD IS A RECURSIVE METHOD THAT ITERATES THROUGH ALL EVENTTYPES AND ENSURES THAT USER HAS A SUBCRIPTION TO EACH ONE
-        //IF A EVENTTYPE HAS CHILDREN, MAKE SURE TO ADD THAT TO BusinessAreaSubscription.childBusinessAreaSubscriptions
-        private void UpdateSubscriptions(List<EventType> eventTypes, ref List<BusinessAreaSubscription> dbSubscriptions, BusinessAreaType businessAreaType )
+            //ASSIGN CHILDREN TO EACH PARENT
+            foreach (BusinessAreaSubscription parent in parents)
+            {
+                //grab subs that match eventtype except itself
+                parent.Children = subs.Where(w => w.EventType.ParentDescription == parent.EventType.Description && w.ID != parent.ID).ToList();
+            }
+
+            return parents;
+        }
+
+
+        //THIS METHOD IS A RECURSIVE METHOD THAT ITERATES THROUGH ALL LATEST EVENTTYPES AND ENSURES THAT USER HAS A SUBCRIPTION TO EACH ONE
+        //IF A EVENTTYPE HAS CHILDREN, ENSURE CHILDREN ARE LOADED PROPERLY ALONG WITH WHICH ONES ARE SELECTED AKA HAVE INTERVAL != Never
+        private void UpdateUserSubscriptionsFromAllEventTypes(List<EventType> eventTypes, ref List<BusinessAreaSubscription> dbSubscriptions, BusinessAreaType businessAreaType )
         {
             //LOOP THROUGH EVENTTYPES
             foreach(EventType et in eventTypes)
@@ -204,29 +215,111 @@ namespace Sentry.data.Web.Controllers
                     newSubscription.Interval = _notificationService.GetInterval("Never");
                     newSubscription.ID = 0;
 
-                    if(et.ChildEventTypes != null)
+                    if (et.ChildEventTypes != null && et.ChildEventTypes.Count > 0)
                     {
-                        tempChildren = newSubscription.childBusinessAreaSubscriptions;                          //NOTE: CANT PASS ANY PARENT.Property AS REF in C#, so make a new var and UPDATE LATER
-                        UpdateSubscriptions(et.ChildEventTypes, ref tempChildren, businessAreaType);
-                        newSubscription.childBusinessAreaSubscriptions = tempChildren;
+                        tempChildren = newSubscription.Children;                          //NOTE: CANT PASS ANY PARENT.Property AS REF in C#, so make a new var and UPDATE LATER
+                        UpdateUserSubscriptionsFromAllEventTypes(et.ChildEventTypes, ref tempChildren, businessAreaType);
+                        newSubscription.Children = tempChildren;
                     }
                     dbSubscriptions.Add(newSubscription);
                 }
                 else if (et.ChildEventTypes != null && et.ChildEventTypes.Count > 0)                            //UPDATE SCENARIO:  SUBSCRIPTION EXISTS BUT NEED TO CHECK IF THEY HAVE ALL CHILDREN
                 {
-                    tempChildren = dbSubscription.childBusinessAreaSubscriptions;
-                    UpdateSubscriptions(et.ChildEventTypes, ref tempChildren, businessAreaType);
-                    dbSubscription.childBusinessAreaSubscriptions = tempChildren;
+                    tempChildren = dbSubscription.Children;
+                    UpdateUserSubscriptionsFromAllEventTypes(et.ChildEventTypes, ref tempChildren, businessAreaType);
+                    dbSubscription.Children = tempChildren;
+
+                    if (dbSubscription.ChildrenSelections == null)                        //ONLY UPDATE IF NULL, IF MODEL HAS PREFILLED KEEP THEM SINCE THIS MAY BE COMING FROM SubscribeUpdate()
+                    {
+                        dbSubscription.ChildrenSelections = GetChildBusinessAreaSubscriptionSelections(dbSubscription.Children);
+                    }
+                    
                 }
             }
+        }
+
+        private List<int> GetChildBusinessAreaSubscriptionSelections(List<BusinessAreaSubscription> subs)
+        {
+            List<int> myList = subs.Where(w => w.Interval.Interval_ID != (int)IntervalType.Never).Select(s => s.EventType.Type_ID).ToList();
+            return myList;
         }
 
         [HttpPost]
         public ActionResult SubscribeUpdate(SubscriptionModel sm)
         {
+            //1: CONVERT MODELS TO DTOS
+            List<BusinessAreaSubscription> newList = sm.SubscriptionsBusinessAreaModels.ToDto();
+
+            //2: REBUILD ALL CHILD SUBSCRIPTIONS PROPERTIES BECAUSE MVC HAS NO COMPLEX DATA STRUCTURE MODEL BINDING, EXISTING PARENT SUBSCRIPTIONS WILL NOT BE REPLACED
+            UpdateUserSubscriptionsFromAllEventTypes(_notificationService.GetEventTypes(sm.group).ToList(), ref newList, (BusinessAreaType)sm.businessAreaID);
+
+            //3: ANY CHILD SUBCRIPTION SELECTED, ASSIGN PARENT's INTERVAL TYPE
+            UpdateChildIntervalsAndPrimaryKey(sm.group, ref newList);
+
+            //4:UPDATE MODEL TO INCLUDE NEW CHILDREN
+            sm.SubscriptionsBusinessAreas = newList;
+
             SubscriptionDto dto = sm.ToDto();
             _notificationService.CreateUpdateSubscription(dto);
             return Redirect(Request.UrlReferrer.PathAndQuery);
+        }
+
+        //UPDATE CHILD INTERVALS TO PARENTS IF CHILD EXISTS IN ChildBusinessAreaSubscriptionSelections
+        //ALSO UPDATE the ID OF CHILD SINCE MVC RAZOR CAN'T BIND AND SAVE NESTED CHILDREN IN MODEL
+        //UPDATE NON SELECTED CHILDREN TO NEVER
+        private void UpdateChildIntervalsAndPrimaryKey(EventTypeGroup group, ref List<BusinessAreaSubscription> newList)
+        {
+            List<BusinessAreaSubscription> dbSubscriptions = _notificationService.GetAllUserSubscriptionsFromDatabase(group).OrderBy(o => o.EventType.Type_ID).ToList();
+            
+            //CREATE NEVER INTERVAL
+            Interval neverInterval = new Interval();
+            neverInterval.Interval_ID = (int)IntervalType.Never;
+
+            //LOOP THROUGH EACH PARENT IN LIST AND ADJUST CHILDREN
+            foreach (BusinessAreaSubscription parent in newList)
+            {
+                //PROCESS PARENTS WITH CHILDREN ONLY, PARENTS WITHOUT CHILDREN KEEP EXISTING SELECTION
+                if(parent.Children != null && parent.Children.Count > 0)
+                {
+                    //IF CHILDREN SELECTED, MARK THOSE WITH PARENT INTERVAL, MARK REST WITH NEVER INTERVAL
+                    if(parent.ChildrenSelections != null && parent.ChildrenSelections.Any())
+                    {
+                        //UPDATE ALL SELECTED CHILDREN TO HAVE PARENTS INTERVAL
+                        List<BusinessAreaSubscription> childrenWithParentsInterval = parent.Children.Where(w => parent.ChildrenSelections.Contains(w.EventType.Type_ID)).ToList();
+                        UpdateChildrenToHaveInterval(dbSubscriptions, ref childrenWithParentsInterval, parent.Interval);
+
+                        //UPDATE NON SELECTED CHILDREN TO HAVE NEVER INTERVAL SINCE THEY WERENT SELECTED
+                        List<BusinessAreaSubscription> childrenWithNeverInterval = parent.Children.Where(w => !parent.ChildrenSelections.Contains(w.EventType.Type_ID)).ToList();
+                        UpdateChildrenToHaveInterval(dbSubscriptions, ref childrenWithNeverInterval, neverInterval);
+                    }
+                    else    //NO SELECTIONS EXISTED SO BASICALY MARK EVERYTHING WITH INTERVAL = NEVER
+                    {
+                        //UPDATE PARENT INTERVAL
+                        parent.Interval = neverInterval;                                     
+
+                        //UPDATE ALL CHILDREN TO HAVE NEVER INTERVAL
+                        List<BusinessAreaSubscription> tempChildren = parent.Children;
+                        UpdateChildrenToHaveInterval(dbSubscriptions, ref tempChildren, neverInterval);
+                        parent.Children = tempChildren;
+                    }
+                }
+            }
+        }
+
+        //UPDATE CHILDREN WITH PASSED IN INTERVAL, CALL DB TO FIND ID
+        private void UpdateChildrenToHaveInterval(List<BusinessAreaSubscription> dbSubscriptions, ref List<BusinessAreaSubscription> children, Interval interval)
+        {
+            foreach (BusinessAreaSubscription child in children)     //UPDATE CHILDREN INTERVALS SINCE NOTHING WAS SELECTED
+            {
+                child.Interval = interval;
+
+                BusinessAreaSubscription dbChild = dbSubscriptions.FirstOrDefault(w => w.BusinessAreaType == child.BusinessAreaType && w.EventType == child.EventType && w.SentryOwnerName == child.SentryOwnerName);
+                if (dbChild != null)
+                {
+                    child.ID = dbChild.ID;
+                }
+            }
+
         }
 
         [HttpGet]

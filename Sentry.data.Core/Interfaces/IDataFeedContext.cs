@@ -8,8 +8,6 @@ namespace Sentry.data.Core
     {
         IList<DataFeedItem> GetAllFeedItems();
         IList<DataFeedItem> GoGetItems(List<DataFeed> dataFeeds);
-        IList<FavoriteItem> GetUserFavorites(string associateId);
-        FavoriteItem GetFavorite(int favoriteId);
     }
 
 }

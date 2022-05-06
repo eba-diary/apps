@@ -38,7 +38,7 @@ data.Config = {
             } else {
                 $(this).switchClass('fa-chevron-up', 'fa-chevron-down');
             }
-            var parentElement = $(this).parent();
+            var parentElement = $(this).parent().parent();
             var detailContainer = parentElement.next('div');
             detailContainer.toggle();
 
@@ -222,10 +222,11 @@ data.Config = {
     },
 
     SetDatasetScopeTypeDescription: function (id) {
-        if (id === undefined) {
+        if (id === undefined || id == null) {
             $(".DatasetScopeTypeDescription span").text("");
         }
         else {
+            console.log(id);
             $.ajax({
                 type: "GET",
                 url: '/Config/GetDataScopeTypeDescription/' + encodeURIComponent(id),

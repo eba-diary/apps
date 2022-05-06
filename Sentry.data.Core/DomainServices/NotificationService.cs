@@ -66,7 +66,6 @@ namespace Sentry.data.Core
         public NotificationDto GetNotificationModelForModify(int notificationId)
         {
             NotificationDto model = GetNotificationModelForDisplay(notificationId);
-            model.AllDataAssets = GetAssetsForUserSecurity();
             model.AllBusinessAreas = GetBusinessAreasForUserSecurity();
             return model;
         }
@@ -179,7 +178,21 @@ namespace Sentry.data.Core
             //BusinessAreaType == DSC has different EventTypes
             if(notification.ParentObject == (int)BusinessAreaType.DSC)
             {
-                eventTypeDescription = notification.NotificationCategory.GetDescription();
+                if (notification.NotificationCategory == NotificationCategory.ReleaseNotes && notification.NotificationSubCategoryReleaseNotes != null)
+                {
+                    EventType eventTypeReleaseNotes = _domainContext.EventTypes.FirstOrDefault(w => w.ParentDescription == notification.NotificationCategory.GetDescription() && w.DisplayName == notification.NotificationSubCategoryReleaseNotes.GetDescription() );
+                    eventTypeDescription = eventTypeReleaseNotes.Description;
+                }
+                else if (notification.NotificationCategory == NotificationCategory.News && notification.NotificationSubCategoryNews != null)
+                {
+                    EventType eventTypeNews = _domainContext.EventTypes.FirstOrDefault(w => w.ParentDescription == notification.NotificationCategory.GetDescription() && w.DisplayName == notification.NotificationSubCategoryNews.GetDescription());
+                    eventTypeDescription = eventTypeNews.Description;
+                }
+                else
+                {
+                    eventTypeDescription = notification.NotificationCategory.GetDescription();
+                }
+                
             }
             else
             {
@@ -374,7 +387,8 @@ namespace Sentry.data.Core
 
         public List<BusinessAreaSubscription> GetAllUserSubscriptionsFromDatabase(EventTypeGroup group)
         {
-            return _domainContext.GetAllUserSubscriptionsByEventTypeGroup(_userService.GetCurrentUser().AssociateId, group);
+            List<BusinessAreaSubscription> subs = _domainContext.GetAllUserSubscriptionsByEventTypeGroup(_userService.GetCurrentUser().AssociateId, group);
+            return subs;
         }
 
         public IEnumerable<EventType> GetEventTypes(EventTypeGroup group)
@@ -383,7 +397,10 @@ namespace Sentry.data.Core
             foreach (EventType et in eventTypes)
             {
                 IQueryable<EventType> children = _domainContext.EventTypes.Where(w => w.ParentDescription == et.Description);
-                et.ChildEventTypes = children.ToList();
+                if(children != null)
+                {
+                    et.ChildEventTypes = children.ToList();
+                }
             }
 
             return eventTypes;
@@ -458,9 +475,9 @@ namespace Sentry.data.Core
                 }
 
                 //IF CHILDREN EXIST ON SUBSCRIPTION THEN RESURSIVELY CALL THIS FUNCTION AGAIN TO ADD NEW SUBSCRIPTIONS IF REQUIRED
-                if (newItem.childBusinessAreaSubscriptions != null)
+                if (newItem.Children != null)
                 {
-                    UpdateSubscriptionsSmartly(ref dbList, newItem.childBusinessAreaSubscriptions);
+                    UpdateSubscriptionsSmartly(ref dbList, newItem.Children);
                 }
             }
         }

@@ -994,4 +994,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[Created_DTM]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="6b8b09ec-18de-42d3-b9c9-9de6427403f6" ChangeDateTime="04/11/2022 18:21:56">
+    <Property Name="ElementName" Value="[dbo].[UserFavorite].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[UserFavorite]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="UserFavoriteId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c323f0a3-fc80-45a8-aa60-d5e0e26cb646" ChangeDateTime="04/13/2022 20:27:14">
+    <Property Name="ElementName" Value="[dbo].[SavedSearch].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SavedSearch]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SavedSearchId" />
+  </Operation>
 </Operations>

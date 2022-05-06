@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<AnalysisInput xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<AnalysisInput xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Settings>
     <Setting>
       <Key>sonar.cs.analyzeGeneratedCode</Key>
@@ -20,24 +20,6 @@
   </Settings>
   <Rules>
     <Rule>
-      <Key>S104</Key>
-      <Parameters>
-        <Parameter>
-          <Key>maximumFileLocThreshold</Key>
-          <Value>1000</Value>
-        </Parameter>
-      </Parameters>
-    </Rule>
-    <Rule>
-      <Key>S1067</Key>
-      <Parameters>
-        <Parameter>
-          <Key>max</Key>
-          <Value>4</Value>
-        </Parameter>
-      </Parameters>
-    </Rule>
-    <Rule>
       <Key>S107</Key>
       <Parameters>
         <Parameter>
@@ -56,15 +38,6 @@
       </Parameters>
     </Rule>
     <Rule>
-      <Key>S134</Key>
-      <Parameters>
-        <Parameter>
-          <Key>max</Key>
-          <Value>4</Value>
-        </Parameter>
-      </Parameters>
-    </Rule>
-    <Rule>
       <Key>S1479</Key>
       <Parameters>
         <Parameter>
@@ -74,20 +47,15 @@
       </Parameters>
     </Rule>
     <Rule>
-      <Key>S1541</Key>
+      <Key>S2342</Key>
       <Parameters>
         <Parameter>
-          <Key>maximumFunctionComplexityThreshold</Key>
-          <Value>15</Value>
+          <Key>flagsAttributeFormat</Key>
+          <Value>^([A-Z]{1,3}[a-z0-9]+)*([A-Z]{2})?s$</Value>
         </Parameter>
-      </Parameters>
-    </Rule>
-    <Rule>
-      <Key>S2068</Key>
-      <Parameters>
         <Parameter>
-          <Key>credentialWords</Key>
-          <Value>password, passwd, pwd</Value>
+          <Key>format</Key>
+          <Value>^([A-Z]{1,3}[a-z0-9]+)*([A-Z]{2})?$</Value>
         </Parameter>
       </Parameters>
     </Rule>

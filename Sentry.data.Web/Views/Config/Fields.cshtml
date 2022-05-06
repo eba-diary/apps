@@ -225,6 +225,7 @@
     <script>
         data.Fields.Init();
 
+        var initLoadComplete = false;
         var currentMax = 0;
         var errorList = [];
 
@@ -325,37 +326,38 @@
                 //since we do not need example.com
                 url_parts.shift();
 
-                //ajax
-                $.ajax({
-                    type: "POST",
-                    url: "/Config/Schema/" + url_parts[5] + "/ValidateField",
-                    data: a,
-                    dataType: "json",
-                    contentType: "application/json",
-                    success: function (returnedData) {
-                        if (Sentry.WasAjaxSuccessful(returnedData)) {
-                           ////No errors for field so remove any existing errors displayed
-                           // parentvm.Errors.remove(function (item) {
-                           //     return item.Id === self.Position().toString();
-                           // });
+                if (initLoadComplete) {
+                    //ajax
+                    $.ajax({
+                        type: "POST",
+                        url: "/Config/Schema/" + url_parts[5] + "/ValidateField",
+                        data: a,
+                        dataType: "json",
+                        contentType: "application/json",
+                        success: function (returnedData) {
+                            if (Sentry.WasAjaxSuccessful(returnedData)) {
+                                ////No errors for field so remove any existing errors displayed
+                                // parentvm.Errors.remove(function (item) {
+                                //     return item.Id === self.Position().toString();
+                                // });
 
-                            //remove associated errors
-                            parentvm.Errors.remove(function (err) {
-                                return err.DataObjectField_ID == self.DataObjectField_ID();
-                            });
+                                //remove associated errors
+                                parentvm.Errors.remove(function (err) {
+                                    return err.DataObjectField_ID == self.DataObjectField_ID();
+                                });
 
-                            //Remove error color from row
-                            self.RowColor('');
+                                //Remove error color from row
+                                self.RowColor('');
 
-                            //If there are no errors on page, show save button
-                            if (parentvm.Errors !== undefined && parentvm.Errors().length === 0) {
-                                $('#saveBtn').show();
+                                //If there are no errors on page, show save button
+                                if (parentvm.Errors !== undefined && parentvm.Errors().length === 0) {
+                                    $('#saveBtn').show();
+                                }
                             }
-                        }
-                        else {
-                            var previousId = 0;
-                            for (var i = 0; i < returnedData.Errors.length; i++) {
-                                if (previousId !== returnedData.Errors[i].Id) {
+                            else {
+                                var previousId = 0;
+                                for (var i = 0; i < returnedData.Errors.length; i++) {
+                                    if (previousId !== returnedData.Errors[i].Id) {
                                         ////Remove all associated errors with this Id
                                         //parentvm.Errors.remove(function (item) {
                                         //    return item.Id === returnedData.Errors[i].Id;
@@ -365,24 +367,25 @@
                                         parentvm.Errors.remove(function (err) {
                                             return err.DataObjectField_ID == self.DataObjectField_ID();
                                         });
-                                    previousId = returnedData.Errors[i].Id;
+                                        previousId = returnedData.Errors[i].Id;
+                                    }
+                                    parentvm.Errors.push({ 'Id': returnedData.Errors[i].Id, 'ErrorType': 'Type', 'Description': returnedData.Errors[i].Description, 'DataObjectField_ID': self.DataObjectField_ID() });
                                 }
-                                parentvm.Errors.push({ 'Id': returnedData.Errors[i].Id, 'ErrorType': 'Type', 'Description': returnedData.Errors[i].Description, 'DataObjectField_ID': self.DataObjectField_ID() });
+
+                                //Adjust color of row
+                                self.RowColor('rgba(255, 0, 0, 0.8)');
+
+                                //Hide save button
+                                $('#saveBtn').hide();
                             }
-
-                            //Adjust color of row
-                            self.RowColor('rgba(255, 0, 0, 0.8)');
-
-                            //Hide save button
-                            $('#saveBtn').hide();
-                        }
-                    },
-                    error: function (error) {
-                        console.log(error);
-                        //$('#buttonSpinner').hide();
-                    },
-                    async: false
-                });
+                        },
+                        error: function (error) {
+                            console.log(error);
+                            //$('#buttonSpinner').hide();
+                        },
+                        async: false
+                    });
+                }
             }
 
             self.ChildRowSorter = function () {
@@ -722,6 +725,7 @@
 
                 row.DeleteInd(true);
                 self.SortRows();
+                self.Rows.remove(row);
                 //self.Rows.valueHasMutated();
             };
 
@@ -924,6 +928,7 @@
                         $("select").prop("disabled", true);
                         $("input").prop("disabled", true);
                     }
+                    initLoadComplete = true;
                 },
                 async: false
             });

@@ -353,6 +353,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<UserFavorite> UserFavorites
+        {
+            get
+            {
+                return Query<UserFavorite>();
+            }
+        }
+
         public IQueryable<BusinessAreaTileRow> BusinessAreaTileRows
         {
             get
@@ -542,6 +550,14 @@ namespace Sentry.data.Infrastructure
             get
             {
                 return Query<JsonFlatteningAction>();
+            }
+        }
+
+        public IQueryable<SavedSearch> SavedSearches
+        {
+            get
+            {
+                return Query<SavedSearch>();
             }
         }
 

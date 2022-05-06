@@ -1,154 +1,76 @@
-﻿using System;
+﻿using Sentry.data.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using Sentry.data.Core;
 
 namespace Sentry.data.Web.Controllers
 {
     public class FavoritesController : BaseController
     {
-        private readonly IDataFeedContext _feedContext;
-        private readonly IDatasetContext _datasetContext;
+        private readonly IDatasetService _datasetService;
+        private readonly IUserFavoriteService _userFavoriteService;
 
-        public FavoritesController(IDataFeedContext feedContext, IDatasetContext datasetContext)
+        public FavoritesController(IDatasetService datasetService, IUserFavoriteService userFavoriteService)
         {
-            _feedContext = feedContext;
-            _datasetContext = datasetContext;
+            _datasetService = datasetService;
+            _userFavoriteService = userFavoriteService;
         }
 
         public ActionResult EditFavorites()
         {
-            return View(BuildFavoritesModel());
+            return View(BuildFavorites());
         }
 
-        public ActionResult Delete(int favId)
+        public ActionResult Delete(int favId, bool isLegacyFavorite)
         {
             // fetch the Favorite from the database
-            Favorite fav = _datasetContext.GetFavorite(favId);
-
-            _datasetContext.Remove(fav);
-            _datasetContext.SaveChanges();
-
-            return PartialView("_FavoritesList", BuildFavoritesModel());
+            //isLegacyFavorite only needed until legacy favorites are converted
+            _userFavoriteService.RemoveUserFavorite(favId, isLegacyFavorite);
+            return PartialView("_FavoritesList", BuildFavorites());
         }
-
-        public ActionResult Sort(FavoritesModel model)
+        
+        public ActionResult Sort(List<string> orderedFavoriteIds)
         {
-            // create a list of integers that contain the Ids of the Favorites in the specified order
-            List<int> sortedIds = model.OrderedFavoriteIds.Split(',').Select(Int32.Parse).ToList();
-
-            // get the Favorites from the database
-            List<Favorite> favItems = _datasetContext.GetFavorites(sortedIds);
-
-            // variable used to set the order while iterating through the list of sorted Favorite Ids
-            int i = 1;
-
-            // loop through the list of sorted Favorite Ids, finding the matching Favorite
-            foreach (int favId in sortedIds)
+            //key value pairs only needed until legacy favorites are converted
+            List<KeyValuePair<int, bool>> kvps = new List<KeyValuePair<int, bool>>();
+            
+            foreach (string id in orderedFavoriteIds)
             {
-                Favorite fav = favItems.Single(x => x.FavoriteId == favId);
-
-                // assign the new sequence
-                fav.Sequence = i;
-
-                // increment i
-                i += 1;
+                string[] parts = id.Split('_');
+                kvps.Add(new KeyValuePair<int, bool>(int.Parse(parts.First()), bool.Parse(parts.Last())));
             }
-
-            // save the changes
-            _datasetContext.SaveChanges();
-
-            return PartialView("_FavoritesList", BuildFavoritesModel());
+            
+            IList<FavoriteItem> favoriteItems = _userFavoriteService.SetUserFavoritesOrder(kvps);
+            return PartialView("_FavoritesList", BuildFavorites(favoriteItems));
         }
 
         public JsonResult SetFavorite(int datasetId)
         {
             try
             {
-                Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
-
-                if (!ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId))
-                {
-                    Favorite f = new Favorite()
-                    {
-                        DatasetId = ds.DatasetId,
-                        UserId = SharedContext.CurrentUser.AssociateId,
-                        Created = DateTime.Now
-                    };
-
-                    _datasetContext.Merge(f);
-                    _datasetContext.SaveChanges();
-
-                    Response.StatusCode = (int)HttpStatusCode.OK;
-                    return Json(new { message = "Successfully added favorite." }, JsonRequestBehavior.AllowGet);
-                }
-                else
-                {
-                    _datasetContext.Remove(ds.Favorities.First(w => w.UserId == SharedContext.CurrentUser.AssociateId));
-                    _datasetContext.SaveChanges();
-
-                    Response.StatusCode = (int)HttpStatusCode.OK;
-                    return Json(new { message = "Successfully removed favorite." }, JsonRequestBehavior.AllowGet);
-                }
+                string result = _datasetService.SetDatasetFavorite(datasetId, SharedContext.CurrentUser.AssociateId);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { message = result }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception)
             {
-                _datasetContext.Clear();
                 Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 return Json(new { message = "Failed to modify favorite." }, JsonRequestBehavior.AllowGet);
             }
-
         }
 
-        // 
-        private FavoritesModel BuildFavoritesModel()
+        private List<FavoriteItemModel> BuildFavorites()
         {
             // fetch the user's Favorites; sorted by Sequence, then Title
-            List<FavoriteItem> favItems = _feedContext.GetUserFavorites(SharedContext.CurrentUser.AssociateId).OrderBy(x => x.Sequence).ThenBy(y => y.Title).ToList();
-
-            FavoritesModel model = new FavoritesModel
-            {
-                Favorites = ToWeb(favItems)
-            };
-
-            // add each favorite Id (in order) to the model collection
-            model.OrderedFavoriteIds = String.Join(",",model.Favorites.Select(x => x.Id).ToList());
-
-            return model;
+            IList<FavoriteItem> favList = _userFavoriteService.GetUserFavoriteItems(SharedContext.CurrentUser.AssociateId);
+            return BuildFavorites(favList);
         }
 
-
-        // TODO: these methods should really be an extension class so they can be reusable. will look into converting to one if there is time
-        private List<FavoriteItemModel> ToWeb(List<FavoriteItem> favItems)
+        private List<FavoriteItemModel> BuildFavorites(IList<FavoriteItem> favoriteItems)
         {
-            List<FavoriteItemModel> favorites = new List<FavoriteItemModel>();
-
-            // convert the Core object to a Web object
-            foreach (FavoriteItem fi in favItems)
-            {
-                favorites.Add(ToWeb(fi));
-            }
-
-            return favorites;
-        }
-
-        private FavoriteItemModel ToWeb(FavoriteItem favItem)
-        {
-            return new FavoriteItemModel
-            {
-                Id = favItem.Id,
-                FeedId = favItem.FeedId,
-                FeedName = favItem.FeedName,
-                FeedUrl = favItem.FeedUrl,
-                FeedUrlType = favItem.FeedUrlType,
-                Img = favItem.Img,
-                Sequence = favItem.Sequence,
-                Title = favItem.Title,
-                Url = favItem.Url
-            };
+            return favoriteItems.Select(x => x.ToModel()).OrderBy(x => x.Sequence).ThenBy(y => y.Title).ToList();
         }
     }
 }

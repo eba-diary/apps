@@ -203,6 +203,12 @@
                             @Html.ValidationMessageFor((model) => model.DatasetScopeTypeId, "", new { @class = "text-danger" })
                         </div>
 
+                        <div class="md-form DatasetScopeTypeDescription">
+                            <label class="control-label"></label>
+                            <span class="text-muted">
+                            </span>
+                        </div>
+
                         <div class="md-form">
                             @Html.LabelFor(model => model.ConfigFileName, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.ConfigFileName) ? "active" : "" })
                             @Html.EditorFor(model => model.ConfigFileName, new { htmlAttributes = new { @class = "form-control" } })

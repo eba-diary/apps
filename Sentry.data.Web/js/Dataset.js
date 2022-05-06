@@ -571,19 +571,15 @@ data.Dataset = {
 
         var schemaURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/columns";
 
-        //remove any children from DOM before injecting spinner
-        $("div.dataPreviewSpinner").empty();
-        //Inject spinner into DOM
-        Sentry.InjectSpinner($(".dataPreviewSpinner"));
-
         self.vm.DataLoading(true);
         $('#dataSection').hide();
 
         //If no data files exist, 1.) do not query table, 2.) do not show Data Preview section
         if (!self.vm.ShowDataFileTable()) {
-            $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+            data.Dataset.showDataPreviewError();
         }
-        else {
+        else
+        {
             this.renderDataPreview();
         }
 
@@ -650,7 +646,7 @@ data.Dataset = {
                         }
                     }
                     else {
-                        $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+                        data.Dataset.showDataPreviewError();
                         $('#dataSection').hide();
                     }
                 }
@@ -661,13 +657,13 @@ data.Dataset = {
                     $('#dataSection').hide();
                 }
 
-                $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+                data.Dataset.showDataPreviewError();
             },
             complete: function () {
                 $("#tab-spinner").hide();
             }
         }).fail(function () {
-            $("div.dataPreviewSpinner span.sentry-spinner-container").replaceWith("<p> No rows returned </p>");
+            data.Dataset.showDataPreviewError();
         });
 
     },
@@ -1247,12 +1243,7 @@ data.Dataset = {
         //CONFIG DROP DOWN CHANGE
         //*****************************************************************************************************
         $('#datasetConfigList').on('select2:select', function (e) {
-
-
-
             $("#tab-spinner").show();
-
-
             var url = new URL(window.location.href);
             url.searchParams.set('configID', $('#datasetConfigList').val());
             window.history.pushState({}, '', url);
@@ -1267,7 +1258,14 @@ data.Dataset = {
                 $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
             }
 
+            if (!$("#DataPreviewNoRows").hasClass("d-none"))
+            { 
+                $("#DataPreviewNoRows").addClass("d-none"); //Hide no rows returned div if it is shown, preview code should show it again if necessary
+            }
+
             data.Dataset.UpdateMetadata();
+
+            $("#schemaSearchInput").val("")
 
             $("#tab-spinner").hide();
 
@@ -1295,6 +1293,7 @@ data.Dataset = {
         $('#detailTabSchemaColumns').click(function (e) {
             e.preventDefault();
             var id = $('#RequestAccessButton').attr("data-id");
+            $("#schemaSearchInput").val("")
 
             var url = new URL(window.location.href);
             url.searchParams.set('tab', 'SchemaColumns');
@@ -1330,6 +1329,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             var id = $('#RequestAccessButton').attr("data-id");
+            $("#schemaSearchInput").val("")
 
             if ($('#tabSchemaAbout').is(':empty')) {
                 $("#tab-spinner").show();
@@ -1360,6 +1360,7 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             var id = $('#RequestAccessButton').attr("data-id");
+            $("#schemaSearchInput").val("")
 
             if ($('#tabDataPreview').is(':empty')) {
                 $("#tab-spinner").show();
@@ -1386,6 +1387,7 @@ data.Dataset = {
         $('#detailTabDataFiles').click(function (e) {
             e.preventDefault();
             var id = $('#RequestAccessButton').attr("data-id");
+            $("#schemaSearchInput").val("")
 
             var url = new URL(window.location.href);
             url.searchParams.set('tab', 'DataFiles');
@@ -1431,7 +1433,6 @@ data.Dataset = {
                     data: datasetDetailModel,
                     success: function (view) {
                         $('#tabSchemaSearch').html(view);
-
                         var metadataURL = "/api/v2/metadata/datasets/" + $('#datasetConfigList').val();
 
                         $.get(metadataURL, function (result) {
@@ -2240,10 +2241,20 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
         $("#schemaSearchTable").DataTable({
             "ajax": {
-                "url": "/Dataset/Detail/" + datasetId + "/SchemaSearch/" + self.vm.SchemaId + "/",
+                "url": "/Dataset/Detail/" + datasetId + "/SchemaSearch/" + self.vm.SchemaId,
                 "type": "POST",
-                "dataSrc": ""
+                "dataSrc": "",
+                "data": function (d) {
+                    var searchObject = {};
+                    searchObject.search = $("#schemaSearchInput").val();
+                    return $.extend(d, searchObject)
+                }
             },
+            "processing": true,
+            "language": {
+                "processing": "Searching..."
+            },
+            "sort": false,
             "columns": [
                 { "data": "Name" },
                 { "data": "Description" },
@@ -2259,15 +2270,23 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     UpdateSchemaSearchTab() {
-        var searchInput = $("#schemaSearchInput").val();
         var schemaSearchTable = $("#schemaSearchTable").DataTable();
         var datasetId = $('#RequestAccessButton').attr("data-id");
-        schemaSearchTable.ajax.url("/Dataset/Detail/" + datasetId + "/SchemaSearch/" + self.vm.SchemaId + "/" + searchInput).load();
+        schemaSearchTable.ajax.url("/Dataset/Detail/" + datasetId + "/SchemaSearch/" + self.vm.SchemaId).load();
     },
 
     tryUpdateSchemaSearchTab() {
         if ($('#schemaSearchTable_wrapper').length) {
             data.Dataset.UpdateSchemaSearchTab();
         }
+    },
+
+    managePermissionsInit() {
+        //This method will be used for future functionality on the Manage Permissions page
+    },
+
+    showDataPreviewError() {
+        $("#DataPreviewNoRows").html("<p> No rows returned </p>");
+        $("#DataPreviewNoRows").removeClass("d-none");
     }
 };

@@ -137,6 +137,20 @@ namespace Sentry.data.Core
             return _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
         }
 
+        /// <summary>
+        /// Retrieve all the permissions granted to the dataset with the given <paramref name="datasetId"/>.
+        /// </summary>
+        public DatasetPermissionsDto GetDatasetPermissions(int datasetId)
+        {
+            var result = new DatasetPermissionsDto();
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault();
+            result.DatasetId = ds.DatasetId;
+            result.DatasetName = ds.DatasetName;
+            result.DatasetSaidKeyCode = ds.Asset.SaidKeyCode;
+            result.Permissions = _securityService.GetSecurablePermissions(ds);
+            return result;
+        }
+
         public UserSecurity GetUserSecurityForConfig(int configId)
         {
             DatasetFileConfig dfc = _datasetContext.DatasetFileConfigs.Where(x => x.ConfigId == configId).FetchSecurityTree(_datasetContext).FirstOrDefault();
@@ -444,6 +458,41 @@ namespace Sentry.data.Core
         {
             List<Dataset> dsList = _datasetContext.Datasets.Where(w => w.DeleteInd && w.DeleteIssueDTM < DateTime.Now.AddDays(Double.Parse(Configuration.Config.GetHostSetting("DatasetDeleteWaitDays")))).ToList();
             return dsList;
+        }
+
+        public string SetDatasetFavorite(int datasetId, string associateId)
+        {
+            try
+            {
+                Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+
+                if (!ds.Favorities.Any(w => w.UserId == associateId))
+                {
+                    Favorite f = new Favorite()
+                    {
+                        DatasetId = ds.DatasetId,
+                        UserId = associateId,
+                        Created = DateTime.Now
+                    };
+
+                    _datasetContext.Merge(f);
+                    _datasetContext.SaveChanges();
+
+                    return "Successfully added favorite.";
+                }
+                else
+                {
+                    _datasetContext.Remove(ds.Favorities.First(w => w.UserId == associateId));
+                    _datasetContext.SaveChanges();
+
+                    return "Successfully removed favorite.";
+                }
+            }
+            catch (Exception)
+            {
+                _datasetContext.Clear();
+                throw;
+            }
         }
 
         #region "private functions"

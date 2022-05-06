@@ -1,4 +1,4 @@
-﻿@model FavoritesModel
+﻿@model List<FavoriteItemModel>
 
 @{
     ViewBag.Title = "Favorites";
@@ -14,9 +14,7 @@
 <div id="favorites-wrapper">
     <p>Drag and drop to reorder favorites</p>
 
-    <ul id="sortable-favorites" class="sortable-ul">
-        @{ Html.RenderPartial("_FavoritesList", Model); }
-    </ul>
+    @{Html.RenderPartial("_FavoritesList", Model);}
 </div>
 <div id="spinner-wrapper" class="hidden"><span class="sentry-spinner"></span></div>
 
@@ -38,20 +36,12 @@
     </div>
 </div>
 
-@* simple form needed to post the list of ordered Favorite Ids to the server *@
-@using (Html.BeginForm("Sort", "Favorites", FormMethod.Post, new { @id = "frmSubmitOrderedIds" }))
-{
-    @Html.AntiForgeryToken()
-
-    @Html.HiddenFor(model => model.OrderedFavoriteIds, new { @id = "hidFavoriteIds"})
-}
-
 @section Scripts {
- 
+
     <script type="text/javascript">
 
         data.Favorites.Init();
 
     </script>
-    
+
 }

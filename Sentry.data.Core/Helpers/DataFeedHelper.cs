@@ -3,71 +3,46 @@ namespace Sentry.data.Core.Helpers
 {
     public static class DataFeedHelper
     {
-        public static string GetImage(DataFeed df)
+        public static string GetImage(string type)
         {
-            string feedImg = "";
-
-            switch (df.Type)
+            switch (type)
             {
                 case GlobalConstants.DataFeedType.SAS:
-                    feedImg = "/Images/sas_logo_min.png";
-                    break;
+                    return "/Images/sas_logo_min.png";
                 case GlobalConstants.DataFeedType.Tab:
-                    feedImg = "/Images/tableau-icon_min.png";
-                    break;
+                    return "/Images/tableau-icon_min.png";
                 case GlobalConstants.DataFeedType.Datasets:
-                    feedImg = "/Images/Icons/Datasets.svg";
-                    break;
+                    return "/Images/Icons/Datasets.svg";
                 case GlobalConstants.DataFeedType.DataAssets:
-                    feedImg = "/Images/Icons/DataAssets.svg";
-                    break;
+                    return "/Images/Icons/DataAssets.svg";
                 case GlobalConstants.DataFeedType.Exhibits:
-                    feedImg = "/Images/Icons/Business Intelligence.svg";
-                    break;
+                    return "/Images/Icons/Business Intelligence.svg";
                 case GlobalConstants.DataFeedType.Notifications:
-                    feedImg = "/Images/Icons/Blogs.png";
-                    break;
+                    return "/Images/Icons/Blogs.png";
                 case GlobalConstants.DataFeedType.Schemas:
-                    feedImg = "/Images/Icons/Metadata.png";
-                    break;
+                    return "/Images/Icons/Metadata.png";
                 default:
-                    feedImg = "/Images/Icons/Metadata.png";
-                    break;
+                    return "/Images/Icons/Metadata.png";
             }
-
-            return feedImg;
         }
 
         public static string GetUrl(DataFeed df)
         {
-            string feedUrl = "";
-
             switch (df.Type)
             {
                 case GlobalConstants.DataFeedType.SAS:
-                    feedUrl = df.Id.ToString();
-                    break;
                 case GlobalConstants.DataFeedType.Tab:
-                    feedUrl = df.Id.ToString();
-                    break;
-                case GlobalConstants.DataFeedType.Datasets:
-                    feedUrl = "/Dataset/Detail/" + df.Id.ToString();
-                    break;
                 case GlobalConstants.DataFeedType.DataAssets:
-                    feedUrl = df.Id.ToString();
-                    break;
+                    return df.Id.ToString();
+                case GlobalConstants.DataFeedType.Datasets:
+                    return $"/Dataset/Detail/{df.Id}";
                 case GlobalConstants.DataFeedType.Exhibits:
-                    feedUrl = "/BusinessIntelligence/Detail/" + df.Id.ToString();
-                    break;
+                    return $"/BusinessIntelligence/Detail/{df.Id}";
                 case GlobalConstants.DataFeedType.Schemas:
-                    feedUrl = "/Dataset/Detail/" + df.Id.ToString() + "?configID=" + df.Id2.ToString();
-                    break;
+                    return $"/Dataset/Detail/{df.Id}?configID={df.Id2}";
                 default:
-                    feedUrl = string.Empty;
-                    break;
+                    return string.Empty;
             }
-
-            return feedUrl;
         }
     }
 }

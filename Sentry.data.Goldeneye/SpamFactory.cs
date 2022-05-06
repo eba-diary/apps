@@ -93,6 +93,16 @@ namespace Sentry.data.Goldeneye
             return (e.EventType.Group == EventTypeGroup.BusinessAreaDSC.GetDescription() && e.Notification != null);
         }
 
+        //DETERMINE IF BUSINESSAREA DSC CHILDREN EVENT TYPES
+        private static bool IsBusinessAreaDSCReleaseNotesNews(Event e)
+        {
+
+            return (    (   e.EventType.Group == EventTypeGroup.BusinessAreaDSCReleaseNotes.GetDescription() ||
+                            e.EventType.Group == EventTypeGroup.BusinessAreaDSCNews.GetDescription()
+                        )
+                        && e.Notification != null);
+        }
+
         //DETERMINE IF BUSINESSAREA DSC : these will have a group = BUSINESSAREA_DSC but will be EventTypes related to DATASET Events
         private static bool IsBusinessArea_DSC_Dataset(Event e)
         {
@@ -233,6 +243,11 @@ namespace Sentry.data.Goldeneye
                                ).ToList()
                            );
 
+                        }
+                        else if (IsBusinessAreaDSCReleaseNotesNews(_event))
+                        {
+                            List<Subscription> subs = _datasetContext.GetAllSubscriptionsForReal();
+                            subsThatMatch.AddRange( subs.Where(w => w.EventType == _event.EventType && w.Interval == _datasetContext.GetInterval(interval)).ToList() );
                         }
 
 

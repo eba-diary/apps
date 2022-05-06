@@ -4,7 +4,7 @@
     @foreach (FilterCategoryModel category in Model.Where(x => x.CategoryOptions.Count > 15).ToList())
     {
         <div class="modal fade" id="categoryModal_@category.CategoryName.Replace(" ", "_").Replace("/", "_")">
-            <div class="modal-dialog modal-lg filter-search-category-modal">
+            <div class="modal-dialog filter-search-category-modal">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h4 class="modal-title">@category.CategoryName</h4>
@@ -27,8 +27,8 @@
                         </ul>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary display-none filter-search-start filter-search-apply"><em class="icon-search filter-search-apply-icon"></em>Apply</button>
+                        <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary waves-effect display-none filter-search-start filter-search-apply"><em class="icon-search filter-search-apply-icon"></em>Apply</button>
                     </div>
                 </div>
             </div>

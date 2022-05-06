@@ -84,3 +84,4 @@ DECLARE @ErrorState INT;
 :r ..\post-deploy\supportingscripts\sprint_22_02_02\HISTORYFIX_CLA3789_Cleanup_RetrieverJobs_Not_Fully_Deleted.sql
 :r ..\post-deploy\supportingscripts\sprint_22_02_02\HISTORYFIX_CLA3789_Incorrect_Dataflow_Delete_Metadata.sql
 :r ..\post-deploy\supportingscripts\Release_03_00_03\CLA3722_TransitionToAsset.sql
+:r ..\post-deploy\supportingscripts\Release_03_01_01\CLA3920_Auto_Subscribe.sql

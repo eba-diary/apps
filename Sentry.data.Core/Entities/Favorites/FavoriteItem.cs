@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Sentry.data.Core
+﻿namespace Sentry.data.Core
 {
     public class FavoriteItem
     {
+        public FavoriteItem() 
+        {
+            IsLegacyFavorite = false;
+        }
+        
         public FavoriteItem(int favId, string datasetId, string title, DataFeed feed, int sequence)
         {
             Id = favId;
@@ -17,8 +16,9 @@ namespace Sentry.data.Core
             FeedUrlType = feed.UrlType;
             FeedUrl = feed.Url;
             FeedId = feed.Id;
+            IsLegacyFavorite = true;
 
-            Img = Helpers.DataFeedHelper.GetImage(feed);
+            Img = Helpers.DataFeedHelper.GetImage(feed.Type);
             Url = Helpers.DataFeedHelper.GetUrl(feed);
         }
 
@@ -31,5 +31,6 @@ namespace Sentry.data.Core
         public string FeedUrlType { get; set; }
         public string FeedUrl { get; set; }
         public int FeedId { get; set; }
+        public bool IsLegacyFavorite { get; set; }
     }
 }

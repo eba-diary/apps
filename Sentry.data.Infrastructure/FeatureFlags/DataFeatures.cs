@@ -35,6 +35,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA3553_SchemaSearch { get; }
         public IFeatureFlag<bool> CLA3861_RefactorGetUserSecurity { get; }
         public IFeatureFlag<bool> CLA3882_DSC_NOTIFICATION_SUBCATEGORY { get; }
+        public IFeatureFlag<bool> CLA3718_Authorization { get; }
 
 
         public DataFeatures(UserService userService)
@@ -58,6 +59,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA3553_SchemaSearch = new BooleanFeatureFlagAmbientContext("CLA3553_SchemaSearch", false, LdClient, () => LdUser);
             CLA3882_DSC_NOTIFICATION_SUBCATEGORY = new BooleanFeatureFlagAmbientContext("CLA3882_DSC_NOTIFICATION_SUBCATEGORY", false, LdClient, () => LdUser);
             CLA3861_RefactorGetUserSecurity = new BooleanFeatureFlagAmbientContext("CLA3861_RefactorGetUserSecurity", false, LdClient, () => LdUser);
+            CLA3718_Authorization = new BooleanFeatureFlagAmbientContext("CLA3718_Authorization", false, LdClient, () => LdUser);
         }
 
         /// <summary>
@@ -101,8 +103,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         /* 
             Database feature flags
         */
-        public IFeatureFlag<string> CLA2671_RefactorEventsToJava { get; } = new StringFeatureFlag("CLA2671_RefactorEventsToJava", databaseRepo_longCache);
-        public IFeatureFlag<string> CLA2671_RefactoredDataFlows { get; } = new StringFeatureFlag("CLA2671_RefactoredDataFlows", databaseRepo_longCache);
         public IFeatureFlag<bool> CLA3241_DisableDfsDropLocation { get; } = new BooleanFeatureFlag("CLA3241_DisableDfsDropLocation", databaseRepo_longCache);
         public IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime { get; } = new BooleanFeatureFlag("CLA3048_StandardizeOnUTCTime", databaseRepo_longCache);
         public IFeatureFlag<bool> CLA3819_EgressEdgeMigration { get; } = new BooleanFeatureFlag("CLA3819_EgressEdgeMigration", databaseRepo_longCache);

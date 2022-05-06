@@ -78,9 +78,12 @@ namespace Sentry.data.Infrastructure
                                                     && w.EventType.Description != GlobalConstants.EventType.CREATED_DATASET
                                                     && w.EventType.Description != GlobalConstants.EventType.CREATE_DATASET_SCHEMA
                                                     && w.EventType.Description != GlobalConstants.EventType.CREATED_REPORT
+                                                    
+                                                    //DSC EVENTS RELEASE NOTES OR NEWS
+                                                    || w.EventType.Group == EventTypeGroup.BusinessAreaDSCReleaseNotes.GetDescription()
+                                                    || w.EventType.Group == EventTypeGroup.BusinessAreaDSCNews.GetDescription() 
+                                                    
                                                 ).Distinct().OrderBy(o => o.TimeCreated).ToList();
-
-
             string header = String.Empty;
             //DATASET
             if (dsEvents.Any())

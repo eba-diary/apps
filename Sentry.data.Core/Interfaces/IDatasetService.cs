@@ -21,5 +21,11 @@ namespace Sentry.data.Core
         List<Dataset> GetDatasetsForQueryTool();
         List<Dataset> GetDatasetMarkedDeleted();
         List<DatasetSummaryMetadataDTO> GetDatasetSummaryMetadataDTO();
+
+        /// <summary>
+        /// Retrieve all the permissions granted to the dataset with the given <paramref name="datasetId"/>.
+        /// </summary>
+        DatasetPermissionsDto GetDatasetPermissions(int datasetId);
+        string SetDatasetFavorite(int datasetId, string associateId);
     }
 }
