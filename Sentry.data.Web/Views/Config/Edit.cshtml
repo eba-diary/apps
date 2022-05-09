@@ -22,6 +22,11 @@
         @Html.HiddenFor(model => model.SchemaId)
         @Html.HiddenFor(model => model.ParquetStorageBucket)
         @Html.HiddenFor(model => model.ParquetStoragePrefix)
+        @Html.HiddenFor(model => model.SnowflakeStage)
+        @Html.HiddenFor(model => model.SnowflakeWarehouse)
+        @Html.HiddenFor(model => model.SnowflakeDatabase)
+        @Html.HiddenFor(model => model.SnowflakeSchema)
+        @Html.HiddenFor(model => model.SnowflakeTable)
 
         <div class="md-form">
             @Html.EditorFor(m => m.ConfigFileName, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
@@ -160,7 +165,7 @@
                 </div>
 
                 <div class="form-check">
-                    <input type="checkbox" value="true" class="form-check-input" id="CLA3014_LoadDataToSnowflake" name="CLA3014_LoadDataToSnowflake" checked="@Model.CLA3014_LoadDataToSnowflake"} >
+                    <input type="checkbox" value="true" class="form-check-input" id="CLA3014_LoadDataToSnowflake" name="CLA3014_LoadDataToSnowflake" checked="@Model.CLA3014_LoadDataToSnowflake" }>
                     @Html.LabelFor((model) => model.CLA3014_LoadDataToSnowflake, new { @class = "form-check-label" })
                     @Html.Label("Kafka Flag", new { @class = "text-muted" })
                 </div>
