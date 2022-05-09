@@ -857,7 +857,7 @@ data.Dataset = {
         $('#SubmitDatasetForm').click(function (e) {
 
             //disable submit button so they cannot click more than once
-            $('#SubmitDatasetForm').addClass("dale-disable-stuff");
+            $('#SubmitDatasetForm').addClass("dataset-disable-stuff");
         });
 
 

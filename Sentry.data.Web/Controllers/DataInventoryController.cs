@@ -1,7 +1,6 @@
 ﻿using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web.Mvc;
 using static Sentry.data.Core.GlobalConstants;
 
@@ -101,20 +100,20 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult Update(List<DataInventorySensitiveUpdateModel> models)
+        public ActionResult Update(List<DataInventoryUpdateModel> models)
         {
             bool result = _dataInventoryService.UpdateIsSensitive(models.ToDto());
             return Json(new { success = result });
         }
 
         [HttpGet]
-        public JsonResult GetCanDaleSensitive()
+        public JsonResult GetDataInventoryAccess()
         {
             return Json(new
             {
-                canDaleSensitiveEdit = SharedContext.CurrentUser.CanDaleSensitiveEdit || SharedContext.CurrentUser.IsAdmin,
-                canDaleOwnerVerifiedEdit = (_featureFlags.Dale_Expose_EditOwnerVerified_CLA_1911.GetValue() && SharedContext.CurrentUser.CanDaleOwnerVerifiedEdit) || SharedContext.CurrentUser.IsAdmin,
-                canDaleSensitiveView = CanViewSensitive()
+                canEditSensitive = SharedContext.CurrentUser.CanEditSensitiveDataInventory || SharedContext.CurrentUser.IsAdmin,
+                canEditOwnerVerified = SharedContext.CurrentUser.CanEditOwnerVerifiedDataInventory || SharedContext.CurrentUser.IsAdmin,
+                canViewSensitive = CanViewSensitive()
             }, JsonRequestBehavior.AllowGet);
         }
 
@@ -177,7 +176,7 @@ namespace Sentry.data.Web.Controllers
 
         protected bool CanViewSensitive()
         {
-            return SharedContext.CurrentUser.CanDaleSensitiveView;
+            return SharedContext.CurrentUser.CanViewSensitiveDataInventory;
         }
         #endregion
     }

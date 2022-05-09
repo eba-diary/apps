@@ -430,7 +430,6 @@
     <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
-    <Compile Include="Models\Dale\DaleAdvancedCriteriaModel.cs" />
     <Compile Include="Models\Dataset\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\ManagePermissionsModel.cs" />
     <Compile Include="Models\Search\FilterCategoryModel.cs" />
@@ -537,7 +536,7 @@
     <Compile Include="Helpers\TimeSpanFormattingExtensions.cs" />
     <Compile Include="Helpers\WebCurrentUserIdProvider.cs" />
     <Compile Include="HttpExceptions\NotAuthorizedException.cs" />
-    <Compile Include="Models\ApiModels\Dale\DaleCategory.cs" />
+    <Compile Include="Models\ApiModels\DataInventory\DaleCategoryModel.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetDetailModel.cs" />
     <Compile Include="Models\ApiModels\Config\ConfigInfoModel.cs" />
     <Compile Include="Models\ApiModels\Job\DfsMonitorModel.cs" />
@@ -566,10 +565,8 @@
     <Compile Include="Models\Config\ValidDatatypesModel.cs" />
     <Compile Include="Models\Config\ManageConfigsModel.cs" />
     <Compile Include="Models\ContactInfoModel.cs" />
-    <Compile Include="Models\Dale\DaleEventModel.cs" />
-    <Compile Include="Models\Dale\DaleResultModel.cs" />
-    <Compile Include="Models\Dale\DataInventorySearchResultRowModel.cs" />
-    <Compile Include="Models\Dale\DataInventorySensitiveUpdateModel.cs" />
+    <Compile Include="Models\DataInventory\DataInventorySearchResultRowModel.cs" />
+    <Compile Include="Models\DataInventory\DataInventoryUpdateModel.cs" />
     <Compile Include="Models\DataAsset\AssetUIModel.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetInfoModel.cs" />
     <Compile Include="Models\DataProcessing\AssociatedDataFlowModel.cs" />
@@ -633,7 +630,6 @@
     <Content Include="Content\bootstrap-datetimepicker.css" />
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.min.css" />
-    <Content Include="Content\dale.css" />
     <Content Include="Content\data-inventory.css" />
     <Content Include="Content\filter-search.css" />
     <Content Include="Content\dataflow.css" />

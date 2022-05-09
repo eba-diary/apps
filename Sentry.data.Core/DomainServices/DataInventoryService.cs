@@ -34,7 +34,7 @@ namespace Sentry.data.Core
             return dtoResult;
         }
 
-        public bool UpdateIsSensitive(List<DataInventorySensitiveUpdateDto> dtos)
+        public bool UpdateIsSensitive(List<DataInventoryUpdateDto> dtos)
         {
             return _dataInventorySearchProvider.SaveSensitive(dtos);
         }
@@ -43,7 +43,7 @@ namespace Sentry.data.Core
         {
             DataInventorySensitiveSearchResultDto dtoResult;
 
-            CanDaleSensitiveView();
+            CanViewSensitive();
 
             //validate for white space only, null, empty string in criteria
             if (string.IsNullOrWhiteSpace(dtoSearch.SearchText) || string.IsNullOrWhiteSpace(dtoSearch.SearchTarget))
@@ -65,7 +65,7 @@ namespace Sentry.data.Core
         {
             DataInventoryAssetCategoriesDto dtoResult;
 
-            CanDaleSensitiveView();
+            CanViewSensitive();
 
             if (string.IsNullOrWhiteSpace(search))
             {
@@ -92,9 +92,9 @@ namespace Sentry.data.Core
             return CustomAttributeHelper.TryGetFilterCategoryName<DataInventory>(category, out categoryName);
         }
 
-        private void CanDaleSensitiveView()
+        private void CanViewSensitive()
         {
-            if (!_userService.GetCurrentUser().CanDaleSensitiveView)
+            if (!_userService.GetCurrentUser().CanViewSensitiveDataInventory)
             {
                 throw new DataInventoryUnauthorizedAccessException();
             }

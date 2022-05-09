@@ -176,10 +176,11 @@ namespace Sentry.data.Web.Tests
         }
 
         [TestMethod]
-        public void ToDto_FilterSearchModel_DaleSearchDto()
+        public void ToDto_FilterSearchModel_FilterSearchDto()
         {
             FilterSearchModel model = new FilterSearchModel()
             {
+                SearchName = "SearchName",
                 SearchText = "Search",
                 FilterCategories = new List<FilterCategoryModel>()
                 {
@@ -227,10 +228,11 @@ namespace Sentry.data.Web.Tests
                     }
                 }
             };
+            
+            FilterSearchDto dto = model.ToDto();
 
-            DaleSearchDto dto = model.ToDto();
-
-            Assert.AreEqual("Search", dto.Criteria);
+            Assert.AreEqual("SearchName", dto.SearchName);
+            Assert.AreEqual("Search", dto.SearchText);
             Assert.AreEqual(2, dto.FilterCategories.Count);
 
             FilterCategoryDto categoryDto = dto.FilterCategories.First();

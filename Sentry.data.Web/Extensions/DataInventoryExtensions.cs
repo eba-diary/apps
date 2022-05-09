@@ -60,14 +60,14 @@ namespace Sentry.data.Web
             return models;
         }
 
-        public static DataInventorySensitiveUpdateDto ToDto(this DataInventorySensitiveUpdateModel model)
+        public static DataInventoryUpdateDto ToDto(this DataInventoryUpdateModel model)
         {
             if (model == null)
             {
-                return new DataInventorySensitiveUpdateDto();
+                return new DataInventoryUpdateDto();
             }
 
-            return new DataInventorySensitiveUpdateDto()
+            return new DataInventoryUpdateDto()
             {
                 BaseColumnId = model.BaseColumnId,
                 IsSensitive = model.IsSensitive,
@@ -75,9 +75,9 @@ namespace Sentry.data.Web
             };
         }       
 
-        public static List<DataInventorySensitiveUpdateDto> ToDto(this List<DataInventorySensitiveUpdateModel> models)
+        public static List<DataInventoryUpdateDto> ToDto(this List<DataInventoryUpdateModel> models)
         {
-            List<DataInventorySensitiveUpdateDto> dtos = new List<DataInventorySensitiveUpdateDto>();
+            List<DataInventoryUpdateDto> dtos = new List<DataInventoryUpdateDto>();
             models.ForEach(x => dtos.Add(x.ToDto()));
             return dtos;
         }

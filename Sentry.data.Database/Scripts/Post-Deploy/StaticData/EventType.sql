@@ -7,6 +7,7 @@
 				,@GroupBUSINESSAREA_DSC VARCHAR(25)					= 'BUSINESSAREA_DSC'
 				,@GroupBUSINESSAREA_DSC_RELEASENOTES VARCHAR(60)	= 'BUSINESSAREA_DSC_RELEASENOTES'
 				,@GroupBUSINESSAREA_DSC_NEWS VARCHAR(60)			= 'BUSINESSAREA_DSC_NEWS'
+				,@GroupDATA_INVENTORY VARCHAR(60)			= 'DATA_INVENTORY'
 		
 		MERGE INTO EventType AS Target 
 		USING (VALUES 
@@ -77,12 +78,9 @@
 									(49, 'News Tableau'					,1,1,@GroupBUSINESSAREA_DSC_NEWS				,'Tableau'				,'News'),
 									(50, 'News Python'					,1,1,@GroupBUSINESSAREA_DSC_NEWS				,'Python'				,'News'),
 									(51, 'News SAS'						,1,1,@GroupBUSINESSAREA_DSC_NEWS				,'SAS'					,'News'),
-									(52, 'News Analytics'				,1,1,@GroupBUSINESSAREA_DSC_NEWS				,'Analytics'			,'News')
+									(52, 'News Analytics'				,1,1,@GroupBUSINESSAREA_DSC_NEWS				,'Analytics'			,'News'),
 
-
-
-
-
+									(53, 'DataInventoryQuery'			,3,0,@GroupDATA_INVENTORY				,'DataInventoryQuery'							,null)
 								)
 								AS Source ([Type_ID], [Description], Severity, Display_IND, [Group_CDE], [DisplayName], [ParentDescription]) 
 

@@ -30,13 +30,13 @@
 
     initDataInventory: function () {
         $.ajax({
-            url: "/DataInventory/GetCanDaleSensitive/",
+            url: "/DataInventory/GetDataInventoryAccess/",
             method: "GET",
             dataType: 'json',
             success: function (obj) {
                 data.DataInventory.initDataTable(obj);
 
-                if (!obj.canDaleSensitiveView) {
+                if (!obj.canViewSensitive) {
                     data.FilterSearch.showToast("error", "All results may not be displayed. " +
                         "Additional permission is needed to view columns marked " +
                         "as sensitive. Please click the Data Inventory info icon for more information.");
@@ -85,9 +85,9 @@
                 //the key piece here is including a label with text to indicate whether IsSensitive column is true or false so the filtering works
                 //Since I did not want user to see label text and still have a filter.  My cheat to this was to style label with display:none while still keeping the filtering ability
                 //later on when they check/uncheck the box my editRow() function will refresh the data associated with the grid which changes the label hidden text to the opposite so filtering can refresh
-                { data: null, className: "IsSensitive", visible: false, render: (d) => data.DataInventory.getTableElementCheckbox(!obj.canDaleSensitiveEdit || (obj.canDaleSensitiveEdit && !obj.canDaleOwnerVerifiedEdit && d.IsOwnerVerified), d.IsSensitive, "sensitive_" + d.BaseColumnId) },
+                { data: null, className: "IsSensitive", visible: false, render: (d) => data.DataInventory.getTableElementCheckbox(!obj.canEditSensitive || (obj.canEditSensitive && !obj.canEditOwnerVerified && d.IsOwnerVerified), d.IsSensitive, "sensitive_" + d.BaseColumnId) },
                 //OWNER VERIFIED CHECKBOX
-                { data: null, className: "IsOwnerVerified", visible: false, render: (d) => data.DataInventory.getTableElementCheckbox(!obj.canDaleOwnerVerifiedEdit, d.IsOwnerVerified, "owner_" + d.BaseColumnId) },
+                { data: null, className: "IsOwnerVerified", visible: false, render: (d) => data.DataInventory.getTableElementCheckbox(!obj.canEditOwnerVerified, d.IsOwnerVerified, "owner_" + d.BaseColumnId) },
                 { data: "ProdType", className: "ProdType", visible: false },
                 { data: "ColumnType", className: "ColumnType", visible: false },
                 { data: "MaxLength", className: "MaxLength", visible: false },

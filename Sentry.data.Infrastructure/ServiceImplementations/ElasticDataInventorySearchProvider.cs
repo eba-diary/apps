@@ -20,7 +20,7 @@ namespace Sentry.data.Infrastructure
             _dbExecuter = dbExecuter;
         }
 
-        #region IDaleSearchProvider Implementation
+        #region IDataInventorySearchProvider Implementation
         public DataInventorySearchResultDto GetSearchResults(FilterSearchDto dto)
         {
             DataInventorySearchResultDto resultDto = new DataInventorySearchResultDto();
@@ -102,7 +102,7 @@ namespace Sentry.data.Infrastructure
                 DataInventoryCategories = new List<DataInventoryCategoryDto>(),
                 DataInventoryEvent = new DataInventoryEventDto()
                 {
-                    Criteria = search,
+                    SearchCriteria = search,
                     QuerySuccess = true
                 }
             };
@@ -137,7 +137,7 @@ namespace Sentry.data.Infrastructure
             return resultDto;
         }
 
-        public bool SaveSensitive(List<DataInventorySensitiveUpdateDto> dtos)
+        public bool SaveSensitive(List<DataInventoryUpdateDto> dtos)
         {
             try
             {
@@ -158,7 +158,7 @@ namespace Sentry.data.Infrastructure
                     //submit async update requests per document to update
                     foreach (DataInventory di in diToUpdate)
                     {
-                        DataInventorySensitiveUpdateDto dto = dtos.FirstOrDefault(x => x.BaseColumnId == di.Id);
+                        DataInventoryUpdateDto dto = dtos.FirstOrDefault(x => x.BaseColumnId == di.Id);
                         di.IsSensitive = dto.IsSensitive;
                         di.IsOwnerVerified = dto.IsOwnerVerified;
 
@@ -192,7 +192,7 @@ namespace Sentry.data.Infrastructure
         {
             resultDto.DataInventoryEvent = new DataInventoryEventDto()
             {
-                Criteria = dto.ToString(),
+                SearchCriteria = dto.ToString(),
                 QuerySuccess = true
             };
 
