@@ -710,7 +710,7 @@ namespace Sentry.data.Web.Controllers
 
         #endregion
 
-        #region "Manage Permissions"
+        #region Manage Permissions
 
         [Route("Dataset/Detail/{datasetId}/Permissions")]
         [HttpGet]
@@ -718,10 +718,38 @@ namespace Sentry.data.Web.Controllers
         {
             var perms = _datasetService.GetDatasetPermissions(datasetId);
             var model = new ManagePermissionsModel(perms);
-
-            return View("ManagePermissions", model);
+            return View("Permission/ManagePermissions", model);
         }
 
+        [HttpPost]
+        public ActionResult SubmitInheritanceRequest(RequestPermissionInheritanceModel model)
+        {
+            AccessRequest ar = model.ToCore();
+            string ticketId = _datasetService.RequestAccessToDataset(ar);
+
+            if (string.IsNullOrEmpty(ticketId))
+            {
+                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
+            }
+            {
+                return PartialView("_Success", new SuccessModel("Dataset permission inheritance change was successfully requested.", "Change Id: " + ticketId, true));
+            }
+        }
+
+        [HttpPost]
+        public ActionResult GetLatestInheritanceTicket(int datasetId)
+        {
+            //SecurityTicket ticket = new SecurityTicket();
+            //ticket.TicketStatus = "PENDING";
+            //ticket.TicketId = "123456789";
+            //return Json(ticket, JsonRequestBehavior.AllowGet);
+            var ticket = _datasetService.GetLatestInheritanceTicket(datasetId);
+            if(ticket == null)
+            {
+                ticket = new SecurityTicket();
+            }
+            return Json(ticket, JsonRequestBehavior.AllowGet);
+        }
         #endregion
 
         #region Helpers

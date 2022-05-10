@@ -1,4 +1,5 @@
 ﻿
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 
@@ -16,5 +17,6 @@ namespace Sentry.data.Core
         /// Retrieve all the permissions granted to the provided <see cref="ISecurable"/>.
         /// </summary>
         IList<SecurablePermission> GetSecurablePermissions(ISecurable securable);
+        SecurityTicket GetSecurableInheritanceTicket(ISecurable securable);
     }
 }

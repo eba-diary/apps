@@ -1,4 +1,6 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.Entities;
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +33,8 @@ namespace Sentry.data.Web
                 }
                 permissionCollection.Add(new ManagePermissionModel(permission, DatasetName, DatasetSaidKeyCode));
             }
+            InheritanceRequest = new RequestPermissionInheritanceModel(permissions);
+            InheritanceTicket = new SecurityTicket();//permissions.InheritanceTicket;
         }
 
         public int DatasetId { get; set; }
@@ -39,6 +43,8 @@ namespace Sentry.data.Web
         public IList<ManagePermissionModel> DscPermissions { get; set; } = new List<ManagePermissionModel>();
         public IList<ManagePermissionModel> AwsIamPermissions { get; set; } = new List<ManagePermissionModel>();
         public IList<ManagePermissionModel> AdPermissions { get; set; } = new List<ManagePermissionModel>();
+        public RequestPermissionInheritanceModel InheritanceRequest { get; set; }
+        public SecurityTicket InheritanceTicket { get; set; }
 
     }
 }

@@ -16,7 +16,6 @@ namespace Sentry.data.Web
         [DisplayName("Dataset")]
         public string DatasetName { get; set; }
 
-        [Required]
         [MaxLength(64)]
         [DisplayName("AD Group")]
         public string AdGroupName { get; set; }
@@ -37,6 +36,7 @@ namespace Sentry.data.Web
         public List<PermissionModel> AllPermissions { get; set; }
         public List<SelectListItem> AllApprovers { get; set; }
 
+        public string SaidKeyCode { get; set; }
 
     }
 }

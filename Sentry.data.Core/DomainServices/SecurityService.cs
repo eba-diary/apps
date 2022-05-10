@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Sentry.data.Core.GlobalConstants;
@@ -37,7 +38,7 @@ namespace Sentry.data.Core
                     RequestedDate = model.RequestedDate,
                     IsAddingPermission = true,
                     ParentSecurity = security,
-                    Permissions = new List<SecurityPermission>()
+                    Permissions = new List<SecurityPermission>(),
                 };
 
                 foreach (Permission perm in model.Permissions)
@@ -204,6 +205,17 @@ namespace Sentry.data.Core
                 BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, parentSecurity, securable);
             }
             return us;
+        }
+
+        public SecurityTicket GetSecurableInheritanceTicket(ISecurable securable)
+        {
+            var inheritanceTicket = securable.Security.Tickets.LastOrDefault(t => t.Permissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS));
+            if(inheritanceTicket != null && String.Equals(inheritanceTicket.TicketStatus, "PENDING"))
+            {
+                return inheritanceTicket;
+            }
+            inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.Permissions.Any(p => p.IsEnabled && p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS));
+            return inheritanceTicket;
         }
 
         /// <summary>

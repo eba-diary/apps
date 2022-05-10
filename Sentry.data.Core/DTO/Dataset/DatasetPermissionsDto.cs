@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Sentry.data.Core.Entities;
+using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,5 +17,7 @@ namespace Sentry.data.Core
         public string DatasetName { get; set; }    
         public string DatasetSaidKeyCode { get; set; }
         public IList<SecurablePermission> Permissions { get; set; }
+        public IList<SAIDRole> Approvers { get; set; }
+        public SecurityTicket InheritanceTicket { get; set; }
     }
 }

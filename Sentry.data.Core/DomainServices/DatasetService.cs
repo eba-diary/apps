@@ -148,7 +148,14 @@ namespace Sentry.data.Core
             result.DatasetName = ds.DatasetName;
             result.DatasetSaidKeyCode = ds.Asset.SaidKeyCode;
             result.Permissions = _securityService.GetSecurablePermissions(ds);
+            result.Approvers = _saidService.GetAllProdCustByKeyCode(ds.Asset.SaidKeyCode).Result;
+            result.InheritanceTicket = _securityService.GetSecurableInheritanceTicket(ds);
             return result;
+        }
+
+        public SecurityTicket GetLatestInheritanceTicket(int datasetId)
+        {
+            return _securityService.GetSecurableInheritanceTicket(_datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault());
         }
 
         public UserSecurity GetUserSecurityForConfig(int configId)

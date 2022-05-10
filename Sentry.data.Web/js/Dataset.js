@@ -2282,7 +2282,61 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     managePermissionsInit() {
-        //This method will be used for future functionality on the Manage Permissions page
+        //Code to init inheritance switch
+        // -Call controller to get current status
+        //Init modal (form init, etc)
+        $("#SelectedApprover").materialSelect();
+        $("#inheritanceSwitch label").click(function () {
+            $("#inheritanceModal").modal('show');
+        });
+        data.Dataset.permissionInheritanceSwitchInit();
+        //Event to refresh inheritance switch on modal close
+        $("#inheritanceModal").on('hide.bs.modal', function () {
+            var request = new Object();
+            request.datasetId = $("#DatasetHeader").attr("value");
+            $.ajax({
+                type: "POST",
+                url: '/Dataset/GetLatestInheritanceTicket',
+                data: request,
+                success: function (result) {
+                    $("#inheritanceSwitch").attr("value", result.TicketStatus);
+                    data.Dataset.permissionInheritanceSwitchInit(result);
+                }
+            });
+        });
+        $("#inheritanceModalSubmit").click(function () {
+            console.log($("#InheritanceRequestForm").serialize());
+            $.ajax({
+                type: 'POST',
+                data: $("#InheritanceRequestForm").serialize(),
+                url: '/Dataset/SubmitInheritanceRequest',
+                success: function (data) {
+                    //handle result data
+                    $("#inheritanceModal").modal('hide');
+                }
+            });
+        });
+    },
+
+    permissionInheritanceSwitchInit(result) {
+        var inheritance = $("#inheritanceSwitch").attr("value");
+        switch (inheritance) {
+            case "ACTIVE":
+                $('#inheritanceSwitchInput').prop('checked', true);
+                break;
+            case "PENDING":
+                $("#inheritanceSwitch").html('<p>Inheritance change pending. See ticket ' + result.TicketId + '.</p>')
+                break;
+            case "DISABLED":
+                $('#inheritanceSwitchInput').prop('checked', false);
+                break;
+            default:
+                $('#inheritanceSwitchInput').prop('checked', false);
+        }
+        //if off, switch off ready for request
+        //if on, switch on ready for off request
+        //if pending, lock up control with ticket info 
+        //if can't determine, lock up control with info 
     },
 
     showDataPreviewError() {

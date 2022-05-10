@@ -31,7 +31,7 @@ namespace Sentry.data.Core
 
         public virtual IList<SecurityPermission> Permissions { get; set; }
 
-
+        public virtual string SaidKeyCode { get; set; }
 
 
         public virtual ValidationResults ValidateForDelete()

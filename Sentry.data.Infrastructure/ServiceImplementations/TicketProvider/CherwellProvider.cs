@@ -484,6 +484,11 @@ namespace Sentry.data.Infrastructure
             StringBuilder sb = new StringBuilder();
             sb.Append($"Please grant the {requestDescription} the following permissions to {model.SecurableObjectName} within Data.sentry.com. <br>");
             sb.Append($"<br>");
+            if (string.IsNullOrEmpty(model.SaidKeyCode))
+            {
+                sb.Append($"Said Asset: {model.SaidKeyCode} <br>");
+                sb.Append($"<br>");
+            }
             sb.Append($"<ul>");
             foreach (Permission item in model.Permissions)
             {
