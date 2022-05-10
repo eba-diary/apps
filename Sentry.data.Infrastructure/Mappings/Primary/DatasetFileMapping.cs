@@ -1,6 +1,7 @@
 ﻿using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
 using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
 {
@@ -33,6 +34,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.FileBucket);
             this.Property((x) => x.FileKey);
             this.Property((x) => x.ETag);
+            this.Property((x) => x.ObjectStatus);
+
 
             this.ManyToOne(x => x.Dataset, m =>
             {

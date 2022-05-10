@@ -79,7 +79,15 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public IQueryable<DatasetFile> DatasetFile
+        public IQueryable<DatasetFile> DatasetFile_ActiveStatus
+        {
+            get
+            {
+                return Query<DatasetFile>().Where(w => w.ObjectStatus != Core.GlobalEnums.ObjectStatusEnum.Deleted);
+            }
+        }
+
+        public IQueryable<DatasetFile> DatasetFile_AllStatus
         {
             get
             {
@@ -600,8 +608,8 @@ namespace Sentry.data.Infrastructure
         /// <returns></returns>
         public IEnumerable<DatasetFile> GetDatasetFilesForDataset(int datasetId, Func<DatasetFile, bool> where)
         {
-            IEnumerable<DatasetFile> list = 
-                Query<DatasetFile>().Where
+            IEnumerable<DatasetFile> list =
+                DatasetFile_ActiveStatus.Where
                 (
                     x => x.Dataset.DatasetId == datasetId && 
                     x.ParentDatasetFileId == null
@@ -620,7 +628,7 @@ namespace Sentry.data.Infrastructure
         public IEnumerable<DatasetFile> GetDatasetFilesForDatasetFileConfig(int configId, Func<DatasetFile, bool> where)
         {
             IEnumerable<DatasetFile> list =
-                Query<DatasetFile>().Where
+                DatasetFile_ActiveStatus.Where
                 (
                     x => x.DatasetFileConfig.ConfigId == configId &&
                     x.ParentDatasetFileId == null
@@ -632,7 +640,7 @@ namespace Sentry.data.Infrastructure
 
         public int GetLatestDatasetFileIdForDataset(int id)
         {
-            int d = Query<DatasetFile>().Where(w => w.Dataset.DatasetId == id && !w.IsBundled).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreatedDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
+            int d = DatasetFile_ActiveStatus.Where(w => w.Dataset.DatasetId == id && !w.IsBundled).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreatedDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
             return d;
         }
 

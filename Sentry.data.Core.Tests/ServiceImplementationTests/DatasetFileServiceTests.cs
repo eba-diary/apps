@@ -77,7 +77,7 @@ namespace Sentry.data.Core.Tests
                 file.Schema = schema;
                 datasetFileArray.Add(file);
             }
-            context.Setup(f => f.DatasetFile).Returns(datasetFileArray.AsQueryable());
+            context.Setup(f => f.DatasetFile_ActiveStatus).Returns(datasetFileArray.AsQueryable());
 
             IQueryable<DatasetFileConfig> configQueryable = new List<DatasetFileConfig>() { dfc }.AsQueryable();
             context.Setup(f => f.DatasetFileConfigs).Returns(configQueryable);
@@ -126,7 +126,7 @@ namespace Sentry.data.Core.Tests
             var context = new Mock<IDatasetContext>();
             var datasetFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
             datasetFile.Schema = schema;
-            context.Setup(f => f.DatasetFile).Returns(new List<DatasetFile>() { datasetFile }.AsQueryable());
+            context.Setup(f => f.DatasetFile_ActiveStatus).Returns(new List<DatasetFile>() { datasetFile }.AsQueryable());
 
             IQueryable<DatasetFileConfig> configQueryable = new List<DatasetFileConfig>() { dfc }.AsQueryable();
             context.Setup(f => f.DatasetFileConfigs).Returns(configQueryable);
@@ -217,7 +217,7 @@ namespace Sentry.data.Core.Tests
 
             var datasetFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
             datasetFile.Schema = schema;
-            context.Setup(f => f.DatasetFile).Returns(new List<DatasetFile>() { datasetFile }.AsQueryable());
+            context.Setup(f => f.DatasetFile_ActiveStatus).Returns(new List<DatasetFile>() { datasetFile }.AsQueryable());
 
             PageParameters pageParams = new PageParameters(1, 5);
 

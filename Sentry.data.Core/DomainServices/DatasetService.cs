@@ -79,7 +79,7 @@ namespace Sentry.data.Core
                 policy.AbsoluteExpiration = new DateTimeOffset(DateTime.UtcNow.AddHours(24));
 
                 //Pull summarized metadata from datasetfile table
-                summaryResults = _datasetContext.DatasetFile.GroupBy(g => new { g.Dataset })
+                summaryResults = _datasetContext.DatasetFile_ActiveStatus.GroupBy(g => new { g.Dataset })
                 .Select(s => new DatasetSummaryMetadataDTO
                 {
                     DatasetId = s.Key.Dataset.DatasetId,
