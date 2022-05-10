@@ -79,7 +79,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public IQueryable<DatasetFile> DatasetFile_ActiveStatus
+        public IQueryable<DatasetFile> DatasetFileStatusActive
         {
             get
             {
@@ -87,7 +87,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public IQueryable<DatasetFile> DatasetFile_AllStatus
+        public IQueryable<DatasetFile> DatasetFileStatusAll
         {
             get
             {
@@ -609,7 +609,7 @@ namespace Sentry.data.Infrastructure
         public IEnumerable<DatasetFile> GetDatasetFilesForDataset(int datasetId, Func<DatasetFile, bool> where)
         {
             IEnumerable<DatasetFile> list =
-                DatasetFile_ActiveStatus.Where
+                DatasetFileStatusActive.Where
                 (
                     x => x.Dataset.DatasetId == datasetId && 
                     x.ParentDatasetFileId == null
@@ -628,7 +628,7 @@ namespace Sentry.data.Infrastructure
         public IEnumerable<DatasetFile> GetDatasetFilesForDatasetFileConfig(int configId, Func<DatasetFile, bool> where)
         {
             IEnumerable<DatasetFile> list =
-                DatasetFile_ActiveStatus.Where
+                DatasetFileStatusActive.Where
                 (
                     x => x.DatasetFileConfig.ConfigId == configId &&
                     x.ParentDatasetFileId == null
@@ -640,7 +640,7 @@ namespace Sentry.data.Infrastructure
 
         public int GetLatestDatasetFileIdForDataset(int id)
         {
-            int d = DatasetFile_ActiveStatus.Where(w => w.Dataset.DatasetId == id && !w.IsBundled).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreatedDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
+            int d = DatasetFileStatusActive.Where(w => w.Dataset.DatasetId == id && !w.IsBundled).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreatedDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
             return d;
         }
 

@@ -285,7 +285,7 @@ namespace Sentry.data.Common
                     //If datafiles exist for this DatasetFileConfig
                     if (df_id != 0)
                     {
-                        df_Orig = _dscontext.DatasetFile_ActiveStatus.Where(x => x.DatasetFileId == df_id).Fetch(x => x.DatasetFileConfig).FirstOrDefault();
+                        df_Orig = _dscontext.DatasetFileStatusActive.Where(x => x.DatasetFileId == df_id).Fetch(x => x.DatasetFileConfig).FirstOrDefault();
                         df_newParent = CreateParentDatasetFile(ds, dfc, uplduser, targetFileName, df_Orig, isBundled, startTime);
                     }
                     //If there are no datafiles for this DatasetFileConfig
@@ -418,7 +418,7 @@ namespace Sentry.data.Common
                             //If datafiles exist for this DatasetFileConfig
                             if (df_id != 0)
                             {
-                                df_Orig = _dscontext.DatasetFile_ActiveStatus.Where(x => x.DatasetFileId == df_id).Fetch(x => x.DatasetFileConfig).FirstOrDefault();
+                                df_Orig = _dscontext.DatasetFileStatusActive.Where(x => x.DatasetFileId == df_id).Fetch(x => x.DatasetFileConfig).FirstOrDefault();
                                 df_newParent = CreateParentDatasetFile(ds, job.DatasetConfig, uplduser, targetFileName, df_Orig, isBundled, startTime);
                             }
                             //If there are no datafiles for this DatasetFileConfig

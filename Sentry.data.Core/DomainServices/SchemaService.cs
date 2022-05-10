@@ -557,7 +557,7 @@ namespace Sentry.data.Core
 
         public List<DatasetFile> GetDatasetFilesBySchema(int schemaId)
         {
-            List<DatasetFile> fileList = _datasetContext.DatasetFile_ActiveStatus.Where(w => w.Schema.SchemaId == schemaId).ToList();
+            List<DatasetFile> fileList = _datasetContext.DatasetFileStatusActive.Where(w => w.Schema.SchemaId == schemaId).ToList();
             return fileList;
         }
         
@@ -573,7 +573,7 @@ namespace Sentry.data.Core
 
         public DatasetFile GetLatestDatasetFileBySchema(int schemaId)
         {
-            DatasetFile file = _datasetContext.DatasetFile_ActiveStatus.OrderBy(x => x.CreatedDTM).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+            DatasetFile file = _datasetContext.DatasetFileStatusActive.OrderBy(x => x.CreatedDTM).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
             return file;
         }
 
@@ -699,7 +699,7 @@ namespace Sentry.data.Core
                 if (stepEvent.RunInstanceGuid != null || stepEvent.RunInstanceGuid != string.Empty)
                 {
                     List<DatasetFile> previousFileList = new List<DatasetFile>();
-                    previousFileList = _datasetContext.DatasetFile_ActiveStatus.Where(w => w.Schema.SchemaId == stepEvent.SchemaId && w.FileName == file.FileName && w.ParentDatasetFileId == null && w.DatasetFileId != file.DatasetFileId).ToList();
+                    previousFileList = _datasetContext.DatasetFileStatusActive.Where(w => w.Schema.SchemaId == stepEvent.SchemaId && w.FileName == file.FileName && w.ParentDatasetFileId == null && w.DatasetFileId != file.DatasetFileId).ToList();
 
                     if (previousFileList.Any())
                     {
