@@ -7,7 +7,7 @@ namespace Sentry.data.Infrastructure
     {
         public void ExecuteCommand(object parameter)
         {
-            using (SqlConnection connection = new SqlConnection(Configuration.Config.GetHostSetting("DaleConnectionString")))
+            using (SqlConnection connection = new SqlConnection(Configuration.Config.GetHostSetting("DataInventoryConnectionString")))
             {
                 SqlCommand command = new SqlCommand("exec usp_DALE_BaseScanAction_UPDATE @sensitiveBlob", connection);
 

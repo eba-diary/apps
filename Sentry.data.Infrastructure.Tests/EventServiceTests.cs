@@ -272,7 +272,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             Mock<IDatasetContext> context = mockRepository.Create<IDatasetContext>();
 
-            EventType eventType = new EventType() { Description = GlobalConstants.EventType.DALE_SEARCH };
+            EventType eventType = new EventType() { Description = GlobalConstants.EventType.DATA_INVENTORY_SEARCH };
             context.SetupGet(x => x.EventTypes).Returns(new List<EventType>() { eventType }.AsQueryable());
 
             Status status = new Status() { Description = GlobalConstants.Statuses.SUCCESS };
@@ -307,7 +307,7 @@ namespace Sentry.data.Infrastructure.Tests
             contextGenerator.Setup(x => x.GenerateInstance<IDatasetContext>()).Returns(context.Object);
 
             EventService eventService = new EventService(contextGenerator.Object, userService.Object);
-            eventService.PublishSuccessEvent(GlobalConstants.EventType.DALE_SEARCH, "Reason", "SearchText").Wait();
+            eventService.PublishSuccessEvent(GlobalConstants.EventType.DATA_INVENTORY_SEARCH, "Reason", "SearchText").Wait();
 
             mockRepository.VerifyAll();
         }

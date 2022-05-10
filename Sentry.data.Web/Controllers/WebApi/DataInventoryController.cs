@@ -14,43 +14,41 @@ namespace Sentry.data.Web.WebApi.Controllers
     public class DataInventoryController : BaseWebApiController
     {
 
-        private readonly IDaleService _daleService;
+        private readonly IDataInventoryService _dataInventoryService;
 
 
-        public DataInventoryController(IDaleService daleService)
+        public DataInventoryController(IDataInventoryService dataInventoryService)
         {
-            _daleService = daleService;
+            _dataInventoryService = dataInventoryService;
         }
 
         [HttpGet]
-        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [ApiVersionBegin(WebAPI.Version.v2)]
         [Route("DoesItemContainSensitive")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(bool))]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> DoesItemContainSensitive(string target, string search)
         {
-            DaleContainSensitiveResultModel resultModel ;
-
             try
             {
-                DaleSearchModel searchModel = new DaleSearchModel();
-                searchModel.Criteria = search;
-                searchModel.Destiny = target.ToDaleDestiny();
-                searchModel.Sensitive = Core.GlobalEnums.DaleSensitive.SensitiveAll;
+                DataInventorySensitiveSearchDto dto = new DataInventorySensitiveSearchDto()
+                {
+                    SearchText = search,
+                    SearchTarget = target
+                };
 
-                resultModel = _daleService.DoesItemContainSensitive(searchModel.ToDto()).ToWeb();
-
-                return Ok(resultModel.DoesContainSensitiveResults);
+                bool containsSensitive = _dataInventoryService.DoesItemContainSensitive(dto);
+                return Ok(containsSensitive);
             }
-            catch (DaleUnauthorizedAccessException)
+            catch (DataInventoryUnauthorizedAccessException)
             {
                 return Content(System.Net.HttpStatusCode.Forbidden, "Not Authorized.");
             }
-            catch (DaleQueryException)
+            catch (DataInventoryQueryException)
             {
                 return Content(System.Net.HttpStatusCode.InternalServerError, "DB Query Failure.");
             }
-            catch (DaleInvalidSearchException)
+            catch (DataInventoryInvalidSearchException)
             {
                 return Content(System.Net.HttpStatusCode.BadRequest, "Invalid target or search parameters");
             }
@@ -58,29 +56,26 @@ namespace Sentry.data.Web.WebApi.Controllers
         }
 
         [HttpGet]
-        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [ApiVersionBegin(WebAPI.Version.v2)]
         [Route("GetCategoriesByAsset")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<DaleCategoryModel>))]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> GetCategoriesByAsset(string search)
         {
-            DaleCategoryResultModel result;
-
             try
             {
-                result = _daleService.GetCategoriesByAsset(search).ToWeb();
-
-                return Ok(result.DaleCategories);
+                List<DaleCategoryModel> result = _dataInventoryService.GetCategoriesByAsset(search).ToWeb();
+                return Ok(result);
             }
-            catch (DaleUnauthorizedAccessException)
+            catch (DataInventoryUnauthorizedAccessException)
             {
                 return Content(System.Net.HttpStatusCode.Forbidden, "Not Authorized.");
             }
-            catch (DaleQueryException)
+            catch (DataInventoryQueryException)
             {
                 return Content(System.Net.HttpStatusCode.InternalServerError, "DB Query Failure.");
             }
-            catch (DaleInvalidSearchException)
+            catch (DataInventoryInvalidSearchException)
             {
                 return Content(System.Net.HttpStatusCode.BadRequest, "Invalid target or search parameters");
             }

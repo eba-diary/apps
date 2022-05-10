@@ -137,7 +137,7 @@ namespace Sentry.data.Core
             }
         }
 
-        public virtual bool CanDaleSensitiveView
+        public virtual bool CanViewSensitiveDataInventory
         {
             get
             {
@@ -145,7 +145,7 @@ namespace Sentry.data.Core
             }
         }
 
-        public virtual bool CanDaleView
+        public virtual bool CanViewDataInventory
         {
             get
             {
@@ -153,7 +153,7 @@ namespace Sentry.data.Core
             }
         }
 
-        public virtual bool CanDaleSensitiveEdit
+        public virtual bool CanEditSensitiveDataInventory
         {
             get
             {
@@ -161,7 +161,7 @@ namespace Sentry.data.Core
             }
         }
 
-        public virtual bool CanDaleOwnerVerifiedEdit
+        public virtual bool CanEditOwnerVerifiedDataInventory
         {
             get
             {
