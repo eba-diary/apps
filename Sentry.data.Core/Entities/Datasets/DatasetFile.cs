@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core.GlobalEnums;
+using System;
 
 namespace Sentry.data.Core
 {
@@ -44,6 +45,8 @@ namespace Sentry.data.Core
 
         public virtual string RunInstanceGuid { get; set; }
         public virtual string FileExtension { get; set; }
+
+        public virtual ObjectStatusEnum ObjectStatus { get; set; }
     }
 
 }

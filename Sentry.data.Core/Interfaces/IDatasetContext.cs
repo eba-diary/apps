@@ -28,7 +28,9 @@ namespace Sentry.data.Core
         IQueryable<EventType> EventTypes { get; }
         IQueryable<Event> Events { get; }
         IQueryable<Status> EventStatus { get; }
-        IQueryable<DatasetFile> DatasetFile { get; }
+        IQueryable<DatasetFile> DatasetFileStatusActive { get; }
+        IQueryable<DatasetFile> DatasetFileStatusAll { get; }
+
         IQueryable<FileExtension> FileExtensions { get; }
         IQueryable<Category> Categories { get; }
         IQueryable<BusinessUnit> BusinessUnits { get; }
