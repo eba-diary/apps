@@ -102,6 +102,36 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             return changed;
         }
 
+        public override ValidationResults Validate(string extension)
+        {
+            ValidationResults results = base.Validate(extension);
+
+            //Decimal Precision
+            if (Precision < 1 || Precision > 38)
+            {
+                results.Add(OrdinalPosition.ToString(), $"({Name}) Precision ({Precision}) is required to be between 1 and 38");
+            }
+
+            //Decimal Scale
+            if (Scale < 0 || Scale > 38)
+            {
+                results.Add(OrdinalPosition.ToString(), $"({Name}) Scale ({Scale}) is required to be between 0 and 38");
+            }
+
+            //Decimal Scale and Precision dependency
+            if (Scale > Precision)
+            {
+                results.Add(OrdinalPosition.ToString(), $"({Name}) Scale ({Scale}) needs to be less than or equal to Precision ({Precision})");
+            }
+
+            if (extension == GlobalConstants.ExtensionNames.FIXEDWIDTH && Length != 0 && Length < Precision)
+            {
+                results.Add(OrdinalPosition.ToString(), $"({Name}) Length ({Length}) needs to be equal or greater than specified precision for FIXEDWIDTH schema");
+            }
+
+            return results;
+        }
+
         private void SetPrecisionScale(IDictionary<string, object> extensionData)
         {
             if (extensionData != null && extensionData.Any(w => w.Key == "dsc-precision"))

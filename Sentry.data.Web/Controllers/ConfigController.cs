@@ -1044,22 +1044,22 @@ namespace Sentry.data.Web.Controllers
 
             switch (fe.Name)
             {
-                case "CSV":
+                case GlobalConstants.ExtensionNames.CSV:
                     model.IsPositional = true;
                     model.IsFixedWidth = false;
                     break;
-                case "ANY":
-                case "DELIMITED":
-                case "TXT":
+                case GlobalConstants.ExtensionNames.ANY:
+                case GlobalConstants.ExtensionNames.DELIMITED:
+                case GlobalConstants.ExtensionNames.TXT:
                     model.IsPositional = false;
                     model.IsFixedWidth = false;
                     break;
-                case "FIXEDWIDTH":
+                case GlobalConstants.ExtensionNames.FIXEDWIDTH:
                     model.IsPositional = true;
                     model.IsFixedWidth = true;
                     break;
-                case "JSON":
-                case "XML":
+                case GlobalConstants.ExtensionNames.JSON:
+                case GlobalConstants.ExtensionNames.XML:
                     model.IsPositional = false;
                     model.IsFixedWidth = false;
                     model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A struct", "Complex Data Types"));

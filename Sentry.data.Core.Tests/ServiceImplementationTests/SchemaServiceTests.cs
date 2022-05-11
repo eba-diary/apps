@@ -2585,24 +2585,24 @@ namespace Sentry.data.Core.Tests
             {
 
                 case "json":
-                    ext.Name = "JSON";
+                    ext.Name = GlobalConstants.ExtensionNames.JSON;
                     ext.Id = 2;
                     break;
                 case "txt":
-                    ext.Name = "TXT";
+                    ext.Name = GlobalConstants.ExtensionNames.TXT;
                     ext.Id = 3;
                     break;
                 case "any":
-                    ext.Name = "ANY";
+                    ext.Name = GlobalConstants.ExtensionNames.ANY;
                     ext.Id = 4;
                     break;
                 case "delimited":
-                    ext.Name = "DELIMITED";
+                    ext.Name = GlobalConstants.ExtensionNames.DELIMITED;
                     ext.Id = 5;
                     break;
                 case "csv":
                 default:
-                    ext.Name = "CSV";
+                    ext.Name = GlobalConstants.ExtensionNames.CSV;
                     ext.Id = 1;
                     break;
             }

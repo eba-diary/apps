@@ -68,6 +68,19 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             return changed;
         }
 
+        public override ValidationResults Validate(string extension)
+        {
+            ValidationResults results = base.Validate(extension);
+
+            //Varchar Length
+            if (Length < 1 || Length > 16000000) //true max is 16777216
+            {
+                results.Add(OrdinalPosition.ToString(), $"({Name}) VARCHAR length ({Length}) is required to be between 1 and 16000000");
+            }
+
+            return results;
+        }
+
         public override BaseField ToEntity(BaseField parentField, SchemaRevision parentRevision)
         {
             BaseField newEntityField = new VarcharField()
