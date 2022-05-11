@@ -108,7 +108,12 @@ namespace Sentry.data.Web
                 ObjectStatus = model.ObjectStatus,
                 SchemaRootPath = model.SchemaRootPath,
                 ParquetStorageBucket = model.ParquetStorageBucket,
-                ParquetStoragePrefix = model.ParquetStoragePrefix
+                ParquetStoragePrefix = model.ParquetStoragePrefix,
+                SnowflakeStage = model.SnowflakeStage,
+                SnowflakeDatabase = model.SnowflakeDatabase,
+                SnowflakeWarehouse = model.SnowflakeWarehouse,
+                SnowflakeSchema = model.SnowflakeSchema,
+                SnowflakeTable = model.SnowflakeTable
             };
         }
 
@@ -134,7 +139,12 @@ namespace Sentry.data.Web
                 ObjectStatus = model.ObjectStatus,
                 SchemaRootPath = model.SchemaRootPath,
                 ParquetStorageBucket = model.ParquetStorageBucket,
-                ParquetStoragePrefix = model.ParquetStoragePrefix
+                ParquetStoragePrefix = model.ParquetStoragePrefix,
+                SnowflakeStage = model.SnowflakeStage,
+                SnowflakeWarehouse = model.SnowflakeWarehouse,
+                SnowflakeDatabase = model.SnowflakeDatabase,
+                SnowflakeSchema = model.SnowflakeSchema,
+                SnowflakeTable = model.SnowflakeTable
             };
         }
 
