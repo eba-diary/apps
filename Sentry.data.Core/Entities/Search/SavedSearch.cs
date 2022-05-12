@@ -10,18 +10,9 @@ namespace Sentry.data.Core
         public virtual string SearchText { get; set; }
         public virtual string FilterCategoriesJson { get; set; }
         public virtual string AssociateId { get; set; }
+        public virtual string ResultConfigurationJson { get; set; }
 
         #region IFavorable
-        public virtual int GetFavoriteEntityId()
-        {
-            return SavedSearchId;
-        }
-
-        public virtual string GetFavoriteType()
-        {
-            return GlobalConstants.UserFavoriteTypes.SAVEDSEARCH;
-        }
-
         public virtual void SetFavoriteItem(FavoriteItem favoriteItem)
         {
             favoriteItem.Title = SearchName;

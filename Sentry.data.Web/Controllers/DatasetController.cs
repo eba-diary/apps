@@ -394,9 +394,9 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult AccessRequest(int datasetId)
+        public async Task<ActionResult> AccessRequest(int datasetId)
         {
-            DatasetAccessRequestModel model = _datasetService.GetAccessRequestAsync(datasetId).Result.ToDatasetModel();
+            DatasetAccessRequestModel model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
             model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
             return PartialView("DatasetAccessRequest", model);
         }

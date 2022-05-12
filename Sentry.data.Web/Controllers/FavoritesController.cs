@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,6 +45,20 @@ namespace Sentry.data.Web.Controllers
             
             IList<FavoriteItem> favoriteItems = _userFavoriteService.SetUserFavoritesOrder(kvps);
             return PartialView("_FavoritesList", BuildFavorites(favoriteItems));
+        }
+
+        [HttpPost]
+        public JsonResult AddFavorite(string favoriteType, int entityId)
+        {
+            _userFavoriteService.AddUserFavorite(favoriteType, entityId, SharedContext.CurrentUser.AssociateId);
+            return Json(new { Success = true });
+        }
+
+        [HttpPost]
+        public JsonResult RemoveFavorite(string favoriteType, int entityId)
+        {
+            _userFavoriteService.RemoveUserFavorite(favoriteType, entityId, SharedContext.CurrentUser.AssociateId);
+            return Json(new { Success = true });
         }
 
         public JsonResult SetFavorite(int datasetId)

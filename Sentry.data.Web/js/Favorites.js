@@ -110,5 +110,29 @@ data.Favorites = {
         // show the sortable <ul> and not the spinner
         $("#favorites-wrapper").addClass("hidden");
         $("#spinner-wrapper").removeClass("hidden");
+    },
+
+    toggleFavorite: function (element, type, successFunction, toastFunction) {
+
+        var path;
+        
+        if ($(element).hasClass("far")) {
+            path = "/Favorites/AddFavorite";
+        }
+        else {
+            path = "/Favorites/RemoveFavorite";
+        }
+
+        var request = {
+            favoriteType: type,
+            entityId: $(element).data("id")
+        };
+
+        $.post(path, request, function () {
+            $(element).toggleClass("fas far");
+            successFunction();
+        }).fail(function () {
+            toastFunction("error", "There was an issue setting favorite for the saved search. Please try again or reach out to DSCSupport@sentry.com.")
+        });
     }
 };

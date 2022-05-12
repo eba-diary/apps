@@ -6,7 +6,9 @@ namespace Sentry.data.Core
     {
         IList<FavoriteItem> GetUserFavoriteItems(string associateId);
         void RemoveUserFavorite(int userFavoriteId, bool isLegacyFavorite);
+        void RemoveUserFavorite(string favoriteType, int entityId, string associateId);
         IList<FavoriteItem> SetUserFavoritesOrder(List<KeyValuePair<int, bool>> orderedIds);
-        void AddUserFavorite(IFavorable favorite, string associateId);
+        void AddUserFavorite(string favoriteType, int entityId, string associateId);
+        UserFavorite GetUserFavorite(string favoriteType, int entityId, string associateId);
     }
 }

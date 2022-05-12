@@ -1,6 +1,5 @@
 ﻿data.FilterSearch = {
 
-    searchType: "",
     lastSelectedOptionIds: [],
 
     executeSearch: function () {
@@ -9,21 +8,21 @@
     retrieveFilterOptions: function () {
         console.log('Must pass filterRetriever parameter to data.FilterSearch.init')
     },
+    retrieveResultConfig: function () {
+        console.log('Must pass filterRetriever parameter to data.FilterSearch.init')
+    },
 
-    init: function (searchExecuter, filterRetriever, searchTypeName) {
+    init: function (searchExecuter, filterRetriever, resultConfigRetriever) {
         this.initToast();
         
         this.executeSearch = searchExecuter;
         this.retrieveFilterOptions = filterRetriever;
-        this.searchType = searchTypeName;
+        this.retrieveResultConfig = resultConfigRetriever;
 
         this.initEvents();
-        
-        var urlParams = new URLSearchParams(window.location.search);
-        this.loadSavedSearches(urlParams.get('savedSearch'));
     },
 
-    initEvents: function () {
+    initEvents: function () {        
         //open category options
         $(document).on("click", "[id^='categoryType_']", function (e) {
             e.preventDefault();
@@ -118,6 +117,7 @@
             var keycode = (e.keyCode ? e.keyCode : e.which);
 
             if (keycode == '13') {
+                data.FilterSearch.clearActiveSavedSearch();
                 data.FilterSearch.search();
             }
         });
@@ -125,13 +125,16 @@
         //search when apply filters
         $(document).on("click", ".filter-search-start", function (e) {
             e.preventDefault();
+            data.FilterSearch.clearActiveSavedSearch();
             data.FilterSearch.search();
         });
 
         $(document).on("click", ".filter-search-save", function (e) {
+            $("#save-search-id").val('0');
             $("#save-search-name").val('');
             $(".save-search-name-label").removeClass('active');
             $("#save-search-favorite").prop('checked', false);
+            $("#save-search-name").removeClass("is-invalid");
         })
 
         //save search parameters
@@ -144,11 +147,76 @@
             $('.filter-search-save-search-modal-spinner').removeClass('display-none');
             
             var request = data.FilterSearch.buildSearchRequest();
-            request.SearchType = data.FilterSearch.searchType;
-            request.SearchName = $("#save-search-name").val();
+            request.Id = $("#save-search-id").val();
+            request.SearchType = $("#save-search-type").val();
+            request.SearchName = $.trim($("#save-search-name").val());
             request.AddToFavorites = $("#save-search-favorite").is(":checked");
+            request.ResultConfigurationJson = data.FilterSearch.retrieveResultConfig();
 
-            $.post("/FilterSearch/SaveSearch", request, (x) => data.FilterSearch.completeSaveSearch(x, request.SearchName));
+            $.post("/FilterSearch/SaveSearch", request, (x) => data.FilterSearch.completeSaveSearch(x, request.SearchName)).
+                fail(function () {
+                    data.FilterSearch.resetSaveSearchModal();
+                    data.FilterSearch.showToast("error", "There was an issue saving the search. Please try again or reach out to DSCSupport@sentry.com.")
+                });
+        });
+
+        $(document).on("click", ".saved-search-favorite", function (e) {
+            e.stopPropagation();
+
+            var id = $(this).data("id");
+            var element = this;
+            
+            $(element).addClass("display-none");
+            $("#favoriteSpinner_" + id).removeClass("display-none");
+            
+            data.Favorites.toggleFavorite(element, "SavedSearch", function () {
+                $(element).removeClass("display-none");
+                $("#favoriteSpinner_" + id).addClass("display-none");
+            }, data.FilterSearch.showToast);
+        });
+
+        $(document).on("click", ".saved-search-edit", function (e) {
+            var id = $(this).data("id")
+            
+            $("#save-search-id").val(id);            
+            $("#save-search-name").val($(this).data("name"));
+            $(".save-search-name-label").addClass('active');
+            $("#save-search-favorite").prop('checked', $("#savedFavorite_" + id).hasClass("fas"));
+            
+            $("#filter-search-save-modal").modal("show");
+        });
+
+        $(document).on("click", ".saved-search-delete", function (e) {
+            e.stopPropagation();
+
+            var element = this;
+            var id = $(element).data("id");
+            
+            $(element).addClass("display-none");
+            $("#deleteSpinner_" + id).removeClass("display-none");
+            
+            $.ajax({
+                url: '/FilterSearch/RemoveSearch?savedSearchId=' + id,
+                type: 'DELETE',
+                success: function () {
+                    var container = $("#saved_" + id);
+                    
+                    if (container.closest(".saved-search-option-name.active")) {
+                        window.history.replaceState({}, "", location.pathname);
+                    }
+                    
+                    container.remove();
+
+                    if (!($(".saved-search-option-container").length)) {
+                        $(".saved-search-menu").append('<a class="dropdown-item disabled" href="#">No Saved Searches</a>')
+                    }
+                },
+                error: function () {
+                    data.FilterSearch.showToast("error", "There was an issue deleting the saved search. Please try again or reach out to DSCSupport@sentry.com.")
+                    $(element).removeClass("display-none");
+                    $("#deleteSpinner_" + id).addClass("display-none");
+                }
+            });
         });
     },
 
@@ -197,7 +265,7 @@
         }
     },
 
-    searchPrep: function () {
+    searchPrep: function () {        
         $("#filter-search-text").prop("disabled", true);
         $(".filter-search-apply").prop("disabled", true);
 
@@ -209,8 +277,6 @@
         $(".filter-search-start").addClass("display-none");
         $(".filter-search-results-none").addClass("display-none");
         $(".filter-search-result-count-container").addClass("display-none");
-
-        data.FilterSearch.clearActiveSavedSearch();
 
         $(".filter-search-result-progress").removeClass("display-none");
     },
@@ -284,36 +350,34 @@
         });
     },
 
-    loadSavedSearches: function (activeSearchName) {
-        var params = "searchType=" + data.FilterSearch.searchType;
-        if (activeSearchName) {
-            params += "&activeSearchName=" + encodeURIComponent(activeSearchName);
-        }
-        
-        $('.filter-search-save-search-container').load("/FilterSearch/SavedSearches?" + params, data.FilterSearch.completeSaveSearchModal);
-    },
-
     completeSaveSearch: function (result, searchName) {
-        
-        if (result.Result === "Failure") {
-            data.FilterSearch.showToast("error", "There was an issue saving your search. Please try again or reach out to DSCSupport@sentry.com.")
+
+        if (result.Result === "Exists") {
+            $("#save-search-name").addClass("is-invalid");
+            data.FilterSearch.resetSaveSearchModal();
         }
         else {
-            data.FilterSearch.completeSaveSearchModal();
-            data.FilterSearch.loadSavedSearches(searchName);
+            var encodedSearchName = encodeURIComponent(searchName);
+            var params = "?searchType=" + $("#save-search-type").val() + "&activeSearchName=" + encodedSearchName;
 
-            if (result.Result === "New") {
-                data.FilterSearch.showToast("success", "The search '" + searchName + "' has been saved.")
-            }
-            else if (result.Result === "Update") {
-                data.FilterSearch.showToast("success", "The saved search '" + searchName + "' already existed and has been updated.")
-            }
+            $('.filter-search-save-search-container').load("/FilterSearch/SavedSearches" + params, function () {
+                window.history.replaceState({}, "", location.pathname + "?savedSearch=" + encodedSearchName);
+                data.FilterSearch.search();
+                
+                if (result.Result === "New") {
+                    data.FilterSearch.showToast("success", "'" + searchName + "' has been saved.")
+                }
+                else if (result.Result === "Update") {
+                    data.FilterSearch.showToast("success", "'" + searchName + "' has been updated.")
+                }
+
+                data.FilterSearch.resetSaveSearchModal();
+            });
         }
+
     },
 
-    completeSaveSearchModal: function () {
-        $("#filter-search-save-modal").modal("hide");
-
+    resetSaveSearchModal: function () {
         $('#save-search').removeClass('disabled');
         $('#cancel-save-search').removeClass('display-none');
         $('.filter-search-save-search-modal-text').removeClass('display-none');
@@ -321,9 +385,8 @@
     },
 
     clearActiveSavedSearch: function () {
-        $('.filter-search-saved-search-option').each(function () {
-            $(this).removeClass('active');
-        });
+        $('.saved-search-option-name.active').removeClass('active');
+        window.history.replaceState({}, "", location.pathname);
     },
 
     getSelectedCategoryOptions: function () {
@@ -363,6 +426,7 @@
 
     buildSearchRequest: function () {
         return {
+            SearchName: $(".saved-search-option-name.active").text(),
             SearchText: $.trim($("#filter-search-text").val()),
             FilterCategories: data.FilterSearch.getSelectedCategoryOptions()
         }

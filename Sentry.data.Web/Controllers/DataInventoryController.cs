@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
@@ -58,9 +59,28 @@ namespace Sentry.data.Web.Controllers
 
             DaleResultDto resultDto = _dataInventoryService.GetSearchResults(searchModel.ToDaleDto());
 
+            List<int> visibleColumns = null;
+            
+            if (!string.IsNullOrEmpty(searchModel.SearchName))
+            {
+                try
+                {
+                    SavedSearchDto savedSearchDto = _filterSearchService.GetSavedSearch(SearchType.DATA_INVENTORY, searchModel.SearchName, SharedContext.CurrentUser.AssociateId);
+                    if (savedSearchDto.ResultConfiguration != null)
+                    {
+                        visibleColumns = savedSearchDto.ResultConfiguration["VisibleColumns"].ToObject<List<int>>();
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Logger.Error("Error getting visible columns for saved search", ex);
+                }
+            }
+
             return Json(new { 
                 data = resultDto.DaleResults.Select(x => x.ToWeb()).ToList(),
-                searchTotal = resultDto.SearchTotal
+                searchTotal = resultDto.SearchTotal,
+                visibleColumns
             });
         }
 

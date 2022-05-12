@@ -34,7 +34,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, quartermasterService.Object, null);
+            var datasetService = new DatasetService(context.Object, null, null, null, null, null, quartermasterService.Object, null, null);
             var dataset = new DatasetDto()
             {
                 DatasetName = "Foo",
@@ -74,7 +74,7 @@ namespace Sentry.data.Core.Tests
             configService.Setup(s => s.Delete(ds.DatasetFileConfigs[0].ConfigId, user.Object, true)).Returns(true);
 
             var datasetService = new DatasetService(context.Object, securityService.Object, userService.Object, configService.Object, 
-                                                    null, null, null, null);
+                                                    null, null, null, null, null);
 
             //Act
             datasetService.Delete(ds.DatasetId, user.Object, true);
@@ -97,7 +97,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null);
+            var datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null, null);
 
             // Act
             bool IsSuccessful = datasetService.Delete(ds.DatasetId, user.Object, true);
@@ -123,7 +123,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
             context.Setup(x => x.SaveChanges(It.IsAny<bool>()));
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null);
+            var datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null, null);
 
             // Act
             datasetService.Delete(ds.DatasetId, user.Object, true);
@@ -146,7 +146,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null);
+            var datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null, null);
 
             // Act
             bool IsSuccessful = datasetService.Delete(ds.DatasetId, user.Object, false);
@@ -169,7 +169,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null);
+            var datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null, null);
 
             // Act
             bool IsSuccessful = datasetService.Delete(ds.DatasetId, user.Object, true);
@@ -195,7 +195,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
             context.Setup(x => x.SaveChanges(It.IsAny<bool>()));
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null);
+            var datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null, null);
 
             // Act
             datasetService.Delete(ds.DatasetId, user.Object, false);
@@ -222,7 +222,7 @@ namespace Sentry.data.Core.Tests
             Mock<IConfigService> configService = mr.Create<IConfigService>();
             configService.Setup(s => s.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
 
-            var datasetService = new DatasetService(context.Object, null, null, configService.Object, null, null, null, null);
+            var datasetService = new DatasetService(context.Object, null, null, configService.Object, null, null, null, null, null);
 
             // Act
             datasetService.Delete(ds.DatasetId, user.Object, false);
@@ -241,7 +241,7 @@ namespace Sentry.data.Core.Tests
             var expected = new Asset() { AssetId = 1, SaidKeyCode = "ABCD" };
             var assets = new[] { expected };
             context.Setup(c => c.Assets).Returns(assets.AsQueryable());
-            var service = new DatasetService(context.Object, null, null, null, null, null, null, null);
+            var service = new DatasetService(context.Object, null, null, null, null, null, null, null, null);
 
             // Act
             var actual = service.GetAsset("ABCD");
@@ -265,7 +265,7 @@ namespace Sentry.data.Core.Tests
             var userService = new Mock<IUserService>();
             userService.Setup(u => u.GetCurrentUser()).Returns(user.Object);
 
-            var service = new DatasetService(context.Object, null, userService.Object, null, null, null, null, null);
+            var service = new DatasetService(context.Object, null, userService.Object, null, null, null, null, null, null);
 
             // Act
             var actual = service.GetAsset("EFGH");
@@ -289,7 +289,7 @@ namespace Sentry.data.Core.Tests
             Mock<IConfigService> configService = mr.Create<IConfigService>();
             configService.Setup(s => s.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
 
-            var datasetService = new DatasetService(context.Object, null, null, configService.Object, null, null, null, null);
+            var datasetService = new DatasetService(context.Object, null, null, configService.Object, null, null, null, null, null);
 
             // Act
             datasetService.Delete(ds.DatasetId, null, false);
@@ -307,7 +307,7 @@ namespace Sentry.data.Core.Tests
             var ds = MockClasses.MockDataset(null, true, false);
             var context = new Mock<IDatasetContext>();
             context.Setup(c => c.Datasets).Returns((new[] { ds }).AsQueryable());
-            var datasetService = new DatasetService(context.Object, new Mock<ISecurityService>().Object, null, null, null, null, null, null);
+            var datasetService = new DatasetService(context.Object, new Mock<ISecurityService>().Object, null, null, null, null, null, null, null);
 
             // Act
             var actual = datasetService.GetDatasetPermissions(ds.DatasetId);
@@ -335,7 +335,7 @@ namespace Sentry.data.Core.Tests
             });
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, null);
+            DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, null, null);
 
             string result = datasetService.SetDatasetFavorite(1, "000000");
 
@@ -370,7 +370,7 @@ namespace Sentry.data.Core.Tests
             });
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, null);
+            DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, null, null);
 
             string result = datasetService.SetDatasetFavorite(1, "000000");
 
@@ -387,7 +387,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.Setup(x => x.GetById<Dataset>(1)).Throws(new Exception("foo"));
             datasetContext.Setup(x => x.Clear());
 
-            DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, null);
+            DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, null, null);
 
             Assert.ThrowsException<Exception>(() => datasetService.SetDatasetFavorite(1, "000000"), "foo");
 

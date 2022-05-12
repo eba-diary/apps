@@ -40,6 +40,11 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 x.Column("AssociateId");
                 x.NotNullable(true);
             });
+            Property(x => x.ResultConfigurationJson, x =>
+            {
+                x.Column("ResultConfigurationJson");
+                x.Type(NHibernateUtil.StringClob);
+            });
         }
     }
 }
