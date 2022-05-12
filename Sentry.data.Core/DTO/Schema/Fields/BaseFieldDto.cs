@@ -2,14 +2,13 @@
 using Sentry.Core;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Sentry.data.Core
 {
     public abstract class BaseFieldDto
     {
-        public BaseFieldDto(BaseField field)
+        protected BaseFieldDto(BaseField field)
         {
             FieldId = field.FieldId;
             FieldGuid = field.FieldGuid;
@@ -24,7 +23,7 @@ namespace Sentry.data.Core
             DotNamePath = field.DotNamePath;
         }
 
-        public BaseFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, int position, bool array)
+        protected BaseFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, int position, bool array)
         {
             FieldId = 0;
             FieldGuid = Guid.Empty;
@@ -37,7 +36,7 @@ namespace Sentry.data.Core
             OrdinalPosition = position;
         }
 
-        public BaseFieldDto(SchemaRow row)
+        protected BaseFieldDto(SchemaRow row)
         {
             FieldId = row.DataObjectField_ID;
             FieldGuid = row.FieldGuid;
@@ -48,7 +47,7 @@ namespace Sentry.data.Core
             Description = row.Description;
             ChildFields = new List<BaseFieldDto>();
             OrdinalPosition = row.Position;
-            Length = (Int32.TryParse(row.Length, out int x) ? x : 0);
+            Length = (int.TryParse(row.Length, out int x) ? x : 0);
             DeleteInd = row.DeleteInd;
             DotNamePath = row.DotNamePath;
         }

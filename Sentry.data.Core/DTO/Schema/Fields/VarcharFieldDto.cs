@@ -24,21 +24,21 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             Length = field.FieldLength;
             OrdinalPosition = field.OrdinalPosition;
         }
-
+        
         public VarcharFieldDto(SchemaRow row) : base(row)
         {
             ValidationResults results = new ValidationResults();
-            if (String.IsNullOrWhiteSpace(row.Length))
+            if (string.IsNullOrWhiteSpace(row.Length))
             {
                 Length = GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT;
             }
-            else if (!Int32.TryParse(row.Length, out int x))
+            else if (!int.TryParse(row.Length, out int x))
             {
                 results.Add(OrdinalPosition.ToString(), $"({Name}) VARCHAR Length must be non-negative integer value");
             }
             else
             {
-                Length = Int32.Parse(row.Length);
+                Length = int.Parse(row.Length);
             }
 
             if (!results.IsValid())

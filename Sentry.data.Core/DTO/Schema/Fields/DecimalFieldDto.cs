@@ -126,7 +126,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
             if (extension == GlobalConstants.ExtensionNames.FIXEDWIDTH && Length != 0 && Length < Precision)
             {
-                results.Add(OrdinalPosition.ToString(), $"({Name}) Length ({Length}) needs to be equal or greater than specified precision for FIXEDWIDTH schema");
+                results.Add(OrdinalPosition.ToString(), $"({Name}) Length ({Length}) needs to be equal or greater than specified precision ({Precision}) for FIXEDWIDTH schema");
             }
 
             return results;
