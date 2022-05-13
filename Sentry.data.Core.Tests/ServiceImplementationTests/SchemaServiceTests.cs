@@ -13,6 +13,7 @@ using Sentry.data.Core.Helpers;
 using Sentry.data.Core.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Sentry.Core;
 
 namespace Sentry.data.Core.Tests
 {
@@ -2330,6 +2331,142 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.AreEqual(snowstage, AllowUpdateFlag);
+        }
+
+        [TestMethod]
+        public void Validate_1_BaseFieldDtos_Success()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            FileSchema fileSchema = new FileSchema()
+            {
+                SchemaId = 1,
+                Extension = new FileExtension() { Name = GlobalConstants.ExtensionNames.JSON }
+            };
+
+            datasetContext.Setup(x => x.GetById<FileSchema>(1)).Returns(fileSchema);
+
+            SchemaService service = new SchemaService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null);
+
+            List<BaseFieldDto> dtos = new List<BaseFieldDto>()
+            {
+                new VarcharFieldDto(new SchemaRow()
+                {
+                    Name = "VarcharField",
+                    Position = 1,
+                    Length = "10"
+                }),
+                new StructFieldDto(new SchemaRow()
+                {
+                    Name = "StructField",
+                    Position = 2
+                }) 
+                { 
+                    HasChildren = true, 
+                    ChildFields = new List<BaseFieldDto>() 
+                    { 
+                        new VarcharFieldDto(new SchemaRow()
+                        {
+                            Name = "ChildVarcharField",
+                            Position = 1,
+                            Length = "10"
+                        }) 
+                    } 
+                }
+            };
+            
+            //verifying that exception does not get thrown
+            service.Validate(1, dtos);
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void Validate_1_BaseFieldDtos_Duplicates_ValidationResults()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            FileSchema fileSchema = new FileSchema()
+            {
+                SchemaId = 1,
+                Extension = new FileExtension() { Name = GlobalConstants.ExtensionNames.JSON }
+            };
+
+            datasetContext.Setup(x => x.GetById<FileSchema>(1)).Returns(fileSchema);
+
+            SchemaService service = new SchemaService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null);
+
+            List<BaseFieldDto> dtos = new List<BaseFieldDto>()
+            {
+                new VarcharFieldDto(new SchemaRow()
+                {
+                    Name = "VarcharField",
+                    Position = 1,
+                    Length = "10"
+                }),
+                new VarcharFieldDto(new SchemaRow()
+                {
+                    Name = "VarcharField",
+                    Position = 2,
+                    Length = "10"
+                })
+            };
+
+            //verifying that exception does not get thrown
+            ValidationException exception = Assert.ThrowsException<ValidationException>(() => service.Validate(1, dtos));
+
+            Assert.AreEqual("Validation errors occurred: (VarcharField) cannot be duplicated, (VarcharField) cannot be duplicated", exception.Message);
+            Assert.AreEqual(2, exception.ValidationResults.GetAll().Count);
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void Validate_1_BaseFieldDtos_DtoValidations_ValidationResults()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            FileSchema fileSchema = new FileSchema()
+            {
+                SchemaId = 1,
+                Extension = new FileExtension() { Name = GlobalConstants.ExtensionNames.JSON }
+            };
+
+            datasetContext.Setup(x => x.GetById<FileSchema>(1)).Returns(fileSchema);
+
+            SchemaService service = new SchemaService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null);
+
+            List<BaseFieldDto> dtos = new List<BaseFieldDto>()
+            {
+                new VarcharFieldDto(new SchemaRow()
+                {
+                    Name = "1Varchar Field",
+                    Position = 1,
+                    Length = "10"
+                }),
+                new StructFieldDto(new SchemaRow()
+                {
+                    Name = "StructField",
+                    Position = 2
+                })
+                {
+                    HasChildren = true,
+                    ChildFields = new List<BaseFieldDto>()
+                    {
+                        new VarcharFieldDto(new SchemaRow()
+                        {
+                            Name = "Child Varchar Field",
+                            Position = 1,
+                            Length = "10"
+                        })
+                    }
+                }
+            };
+
+            //verifying that exception does not get thrown
+            ValidationException exception = Assert.ThrowsException<ValidationException>(() => service.Validate(1, dtos));
+
+            Assert.AreEqual("Validation errors occurred: Field name (1Varchar Field) must start with a letter or underscore, Field name (1Varchar Field) can only contain letters, underscores, digits (0-9), and dollar signs (\"$\"), Field name (Child Varchar Field) can only contain letters, underscores, digits (0-9), and dollar signs (\"$\")", exception.Message);
+            Assert.AreEqual(3, exception.ValidationResults.GetAll().Count);
+
+            datasetContext.VerifyAll();
         }
 
         #region Private Methods
