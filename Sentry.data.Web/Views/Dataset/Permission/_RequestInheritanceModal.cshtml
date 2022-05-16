@@ -7,12 +7,12 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Manage Inheritance from @Model.SaidKeyCode</h5>
+                    <h4 class="modal-title" id="exampleModalLabel">Manage Inheritance from @Model.SaidKeyCode</h4><em class="icon-info-solid dsc-blue-text" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Permission inheritance allows a dataset to 'inherit' permissions from the owning SAID asset. A user with consume access to a SAID asset would be able to query inheritance-enabled datasets under that asset."></em>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body pt-0">
                     @Html.HiddenFor(model => model.SecurableObjectId)
                     @Html.HiddenFor(model => model.SaidKeyCode)
                     <div class="md-form">
