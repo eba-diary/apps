@@ -74,6 +74,7 @@
                     $("#AccessRequesrErrorBox").html(errors).show();
                 }
             });
+            data.Dataset.initRequestAccessWorkflow();
         });
        
     },

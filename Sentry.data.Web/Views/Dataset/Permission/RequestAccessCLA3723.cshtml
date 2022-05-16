@@ -1,0 +1,40 @@
+﻿@model Sentry.data.Web.AccessRequestModel
+
+@using (Html.BeginForm("SubmitAccessRequest", "Dataset", FormMethod.Post, new { @id = "AccessRequestForm" }))
+{
+
+    <ol class="breadcrumb p-0" id="RequestAccessBreadcrumb">
+    </ol>
+    <div id="RequestAccessToSection" class="requestAccessStage">
+        <button id="RequestAccessToDatasetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" value="@Model.SecurableObjectId">Request Access to <i id="RequestAccessDatasetName" class="font-style-normal">@Model.DatasetName Dataset</i></button>
+        <button id="RequestAccessToAssetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" value="@Model.SaidKeyCode">Request Access to all @Model.SaidKeyCode Datasets</button>
+    </div>
+    <div id="RequestAccessTypeSection" class="d-none requestAccessStage">
+        <button id="RequestAccessTypeConsumeBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Consumer/Query Access</button>
+        <button id="RequestAccessTypeManageBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Producer/Admin Access</button>
+    </div>
+    <div id="RequestAccessConsumerTypeSection" class="d-none requestAccessStage">
+        <h6 class="pt-1">To Query in Snowflake UI, DSC, Tableau, or Superset:</h6>
+        <button id="RequestAccessConsumeMyAccessBtn" type="button" onclick="window.open('https://myaccess.sentry.com/identityiq/accessRequest/accessRequest.jsf#/accessRequest/selectUser?quickLink=Request%20Access','_blank')" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Use MyAccess to Request <em id="RequestAccessEntitlement" class="font-style-normal"></em></button>
+        <h6 class="pt-1">To Request Access for Snowflake Accounts:</h6>
+        <button id="RequestAccessConsumeSnowflakeBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Snowflake Account Access</button>
+        <h6 class="pt-1">To Query from SageMaker or other AWS services:</h6>
+        <button id="RequestAccessConsumeAwsBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request AWS IAM Access</button>
+    </div>
+    <div id="RequestAccessFormSection" class="d-none requestAccessStage">
+        <div class="md-form d-none" id="AccessGranteeForm">
+            <input type="text" id="AccessGrantee" class="form-control">
+            <label for="AccessGrantee" class="" id="AccessGranteeLabel"></label>
+        </div>
+        <div class="md-form">
+            @Html.LabelFor(model => model.BusinessReason, new { @class = "disabled" })
+            @Html.TextAreaFor(model => model.BusinessReason, new { @class = "md-textarea w-100" })
+        </div>
+        <div class="md-form">
+            @Html.LabelFor((model) => model.SelectedApprover, new { @class = "mdb-main-label" })
+            @Html.DropDownListFor((model) => model.SelectedApprover, Model.AllApprovers, new { @class = "mdb-select" })
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary d-none float-right" id="RequestAccessSubmit">Save changes</button>
+    <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
+}

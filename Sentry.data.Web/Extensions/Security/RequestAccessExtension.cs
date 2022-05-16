@@ -64,7 +64,9 @@ namespace Sentry.data.Web
                 SecurableObjectId = core.SecurableObjectId,
                 SecurableObjectName = core.SecurableObjectName,
                 AllPermissions = core.Permissions.ToModel(),
-                AllApprovers = Utility.BuildSelectListitem(core.ApproverList, "Select an approver")
+                AllApprovers = Utility.BuildSelectListitem(core.ApproverList, "Select an approver"),
+                DatasetName = core.SecurableObjectName,
+                SaidKeyCode = core.SaidKeyCode
             };
         }
 

@@ -398,6 +398,10 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetAccessRequestModel model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
             model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
+            if (_featureFlags.CLA3718_Authorization.GetValue())
+            {
+                return PartialView("Permission/RequestAccessCLA3723", model);
+            }
             return PartialView("DatasetAccessRequest", model);
         }
 

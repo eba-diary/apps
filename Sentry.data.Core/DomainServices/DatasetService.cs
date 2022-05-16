@@ -207,7 +207,8 @@ namespace Sentry.data.Core
             {
                 ApproverList = new List<KeyValuePair<string, string>>(),
                 SecurableObjectId = ds.DatasetId,
-                SecurableObjectName = ds.DatasetName
+                SecurableObjectName = ds.DatasetName,
+                SaidKeyCode = ds.Asset.SaidKeyCode
             };
 
             Expression<Func<Permission, bool>> featureFlagPermissionRestrictions;
