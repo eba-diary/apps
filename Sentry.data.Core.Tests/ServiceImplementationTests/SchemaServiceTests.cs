@@ -2413,7 +2413,7 @@ namespace Sentry.data.Core.Tests
             //verifying that exception does not get thrown
             ValidationException exception = Assert.ThrowsException<ValidationException>(() => service.Validate(1, dtos));
 
-            Assert.AreEqual("Validation errors occurred: (VarcharField) cannot be duplicated, (VarcharField) cannot be duplicated", exception.Message);
+            Assert.AreEqual("Validation errors occurred: (VarcharField) cannot be duplicated. , (VarcharField) cannot be duplicated. ", exception.Message);
             Assert.AreEqual(2, exception.ValidationResults.GetAll().Count);
 
             datasetContext.VerifyAll();
