@@ -421,6 +421,7 @@
     </AdditionalFiles>
     <Compile Include="Controllers\DataInventoryController.cs" />
     <Compile Include="Controllers\FilterSearchController.cs" />
+    <Compile Include="Controllers\FilterSearchController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
@@ -430,9 +431,6 @@
     <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
-    <Compile Include="Models\Dataset\ManagePermissionModel.cs" />
-    <Compile Include="Models\Dataset\ManagePermissionsModel.cs" />
-    <Compile Include="Models\Dale\DaleAdvancedCriteriaModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
     <Compile Include="Models\Dataset\Permission\RequestPermissionInheritanceModel.cs" />
