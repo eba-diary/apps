@@ -47,6 +47,8 @@ namespace Sentry.data.Core
         public virtual string FileExtension { get; set; }
 
         public virtual ObjectStatusEnum ObjectStatus { get; set; }
+
+        public virtual string OriginalFileName { get; set; }
     }
 
 }
