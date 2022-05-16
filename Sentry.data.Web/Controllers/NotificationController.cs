@@ -81,10 +81,6 @@ namespace Sentry.data.Web.Controllers
             }
 
             List<SelectListItem> AreaList = new List<SelectListItem>();
-            foreach (var item in _notificationService.GetAssetsForUserSecurity())
-            {
-                AreaList.Add(new SelectListItem { Text = item.DisplayName, Value = Core.GlobalConstants.Notifications.DATAASSET_TYPE + "_" + item.Id });
-            }
             foreach (var item in _notificationService.GetBusinessAreasForUserSecurity())
             {
                 AreaList.Add(new SelectListItem { Text = item.Name, Value = Core.GlobalConstants.Notifications.BUSINESSAREA_TYPE + "_" + item.Id });

@@ -9,25 +9,34 @@
     },
 
     executeSearch: function () {
-        $("#di-result-table").DataTable().ajax.reload(function(json) {
-            var tableInfo = $("#di-result-table").DataTable().page.info();
-            data.FilterSearch.completeSearch(json.searchTotal, tableInfo.length, json.data.length);
-        });
+        $("#di-result-table").DataTable().ajax.reload(json => data.DataInventory.completeDataInventorySearch(json));
     },
 
     buildFilter: function () {
         $.post("/DataInventory/SearchFilters/", data.FilterSearch.buildSearchRequest(), (x) => data.FilterSearch.completeFilterRetrieval(x));
     },
 
+    retrieveResultConfig: function () {
+        var visibleColumns = [];
+
+        $("#di-result-table").DataTable().columns().every(function () {
+            if (this.visible()) {
+                visibleColumns.push(this.index());
+            }
+        });
+
+        return JSON.stringify({ VisibleColumns: visibleColumns });
+    },
+
     initDataInventory: function () {
         $.ajax({
-            url: "/DataInventory/GetCanDaleSensitive/",
+            url: "/DataInventory/GetDataInventoryAccess/",
             method: "GET",
             dataType: 'json',
             success: function (obj) {
                 data.DataInventory.initDataTable(obj);
 
-                if (!obj.canDaleSensitiveView) {
+                if (!obj.canViewSensitive) {
                     data.FilterSearch.showToast("error", "All results may not be displayed. " +
                         "Additional permission is needed to view columns marked " +
                         "as sensitive. Please click the Data Inventory info icon for more information.");
@@ -76,9 +85,9 @@
                 //the key piece here is including a label with text to indicate whether IsSensitive column is true or false so the filtering works
                 //Since I did not want user to see label text and still have a filter.  My cheat to this was to style label with display:none while still keeping the filtering ability
                 //later on when they check/uncheck the box my editRow() function will refresh the data associated with the grid which changes the label hidden text to the opposite so filtering can refresh
-                { data: null, className: "IsSensitive", visible: false, render: (d) => data.DataInventory.getTableElementCheckbox(!obj.canDaleSensitiveEdit || (obj.canDaleSensitiveEdit && !obj.canDaleOwnerVerifiedEdit && d.IsOwnerVerified), d.IsSensitive, "sensitive_" + d.BaseColumnId) },
+                { data: null, className: "IsSensitive", visible: false, render: (d) => data.DataInventory.getTableElementCheckbox(!obj.canEditSensitive || (obj.canEditSensitive && !obj.canEditOwnerVerified && d.IsOwnerVerified), d.IsSensitive, "sensitive_" + d.BaseColumnId) },
                 //OWNER VERIFIED CHECKBOX
-                { data: null, className: "IsOwnerVerified", visible: false, render: (d) => data.DataInventory.getTableElementCheckbox(!obj.canDaleOwnerVerifiedEdit, d.IsOwnerVerified, "owner_" + d.BaseColumnId) },
+                { data: null, className: "IsOwnerVerified", visible: false, render: (d) => data.DataInventory.getTableElementCheckbox(!obj.canEditOwnerVerified, d.IsOwnerVerified, "owner_" + d.BaseColumnId) },
                 { data: "ProdType", className: "ProdType", visible: false },
                 { data: "ColumnType", className: "ColumnType", visible: false },
                 { data: "MaxLength", className: "MaxLength", visible: false },
@@ -93,9 +102,7 @@
             aLengthMenu: [10, 20, 50, 100, 500],
             dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>tr<p>',
             buttons: [{ extend: 'colvis', text: 'Columns' }, { text: 'Save', className: 'display-none di-save', action: data.DataInventory.saveUpdates }],
-            initComplete: function (settings, json) {
-                data.FilterSearch.completeSearch(json.searchTotal, settings.oInit.pageLength, json.data.length);
-            },
+            initComplete: (settings, json) => data.DataInventory.completeDataInventorySearch(json),
             "autoWidth": false
         });
     },
@@ -144,6 +151,24 @@
                 $(".di-save").hide();
             }
         });
+    },
+
+    completeDataInventorySearch: function (json) {
+
+        //FOR COLUMN SAVE: create new function that completeSearch will be moved to called completeDataInventorySearch
+        //clear all current visible columns
+        //use visible columns from json response to set columns().visible() 
+        //https://datatables.net/reference/api/columns().visible()
+        
+        var table = $("#di-result-table").DataTable()
+        var tableInfo = table.page.info();
+        
+        if (json.visibleColumns) {            
+            table.columns().visible(false, false);
+            table.columns(json.visibleColumns).visible(true);
+        }
+        
+        data.FilterSearch.completeSearch(json.searchTotal, tableInfo.length, json.data.length);
     },
 
     saveUpdates: function () {

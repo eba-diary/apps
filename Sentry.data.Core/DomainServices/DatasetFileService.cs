@@ -33,7 +33,7 @@ namespace Sentry.data.Core
                 throw new DatasetUnauthorizedAccessException();
             }
 
-            PagedList<DatasetFile> files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFile
+            PagedList<DatasetFile> files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFileStatusActive
                                                 .Where(x => x.Schema == config.Schema)
                                                 .OrderBy(o => o.DatasetFileId),
                                                 pageParameters.PageNumber, pageParameters.PageSize);            

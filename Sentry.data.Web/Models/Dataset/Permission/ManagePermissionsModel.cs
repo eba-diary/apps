@@ -22,7 +22,7 @@ namespace Sentry.data.Web
                 switch (permission.SecurityPermission.Permission.PermissionCode)
                 {
                     case PermissionCodes.SNOWFLAKE_ACCESS:
-                        permissionCollection = AdPermissions;
+                        permissionCollection = SnowflakePermissions;
                         break;
                     case PermissionCodes.S3_ACCESS:
                         permissionCollection = AwsIamPermissions;
@@ -42,6 +42,7 @@ namespace Sentry.data.Web
         public string DatasetSaidKeyCode { get; set; }
         public IList<ManagePermissionModel> DscPermissions { get; set; } = new List<ManagePermissionModel>();
         public IList<ManagePermissionModel> AwsIamPermissions { get; set; } = new List<ManagePermissionModel>();
+        public IList<ManagePermissionModel> SnowflakePermissions { get; set; } = new List<ManagePermissionModel>();
         public IList<ManagePermissionModel> AdPermissions { get; set; } = new List<ManagePermissionModel>();
         public RequestPermissionInheritanceModel InheritanceRequest { get; set; }
         public SecurityTicket InheritanceTicket { get; set; }

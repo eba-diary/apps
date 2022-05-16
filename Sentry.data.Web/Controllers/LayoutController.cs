@@ -39,7 +39,7 @@ namespace Sentry.data.Web.Controllers
             headerModel.CanViewReports = SharedContext.CurrentUser.CanViewReports;
             headerModel.CanManageReports = SharedContext.CurrentUser.CanManageReports;
             headerModel.CanViewBusinessArea = true;
-            headerModel.CanViewDale = true;
+            headerModel.CanViewDataInventory = true;
             headerModel.DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue();
 
             if (SharedContext.CurrentUser.GetType() == typeof(ImpersonatedApplicationUser))

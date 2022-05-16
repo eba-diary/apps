@@ -47,17 +47,17 @@ namespace Sentry.data.Infrastructure
 
         public void DeleteMany<T>(List<T> toDelete) where T : class
         {
-            _client.DeleteMany<T>(toDelete);
+            _client.DeleteMany(toDelete);
         }
 
         public void IndexMany<T>(List<T> toIndex) where T : class
         {
-            _client.IndexMany<T>(toIndex);
+            _client.IndexMany(toIndex);
         }
 
         public void  DeleteByQuery<T>(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> query) where T : class
         {
-           _client.DeleteByQuery<T>(query);
+           _client.DeleteByQuery(query);
         }    
         #endregion
 

@@ -1,20 +1,22 @@
-﻿using Sentry.data.Core;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web.Mvc;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Controllers
 {
-    public class DataInventoryController : BaseDataInventoryController
+    public class DataInventoryController : BaseController
     {
-        private readonly IDaleService _dataInventoryService;
+        private readonly IDataInventoryService _dataInventoryService;
         private readonly IFilterSearchService _filterSearchService;
+        private readonly IDataFeatures _featureFlags;
 
-        public DataInventoryController(IDaleService dataInventoryService, IFilterSearchService filterSearchService, IDataFeatures featureFlags) : base(featureFlags)
+        public DataInventoryController(IDataInventoryService dataInventoryService, IFilterSearchService filterSearchService, IDataFeatures featureFlags)
         {
             _dataInventoryService = dataInventoryService;
             _filterSearchService = filterSearchService;
+            _featureFlags = featureFlags;
         }
         
         public ActionResult Search(string target = null, string search = null, string savedSearch = null)
@@ -56,11 +58,30 @@ namespace Sentry.data.Web.Controllers
         {
             ValidateSearchModel(searchModel);
 
-            DaleResultDto resultDto = _dataInventoryService.GetSearchResults(searchModel.ToDaleDto());
+            DataInventorySearchResultDto resultDto = _dataInventoryService.GetSearchResults(searchModel.ToDto());
+
+            List<int> visibleColumns = null;
+            
+            if (!string.IsNullOrEmpty(searchModel.SearchName))
+            {
+                try
+                {
+                    SavedSearchDto savedSearchDto = _filterSearchService.GetSavedSearch(SearchType.DATA_INVENTORY, searchModel.SearchName, SharedContext.CurrentUser.AssociateId);
+                    if (savedSearchDto.ResultConfiguration != null)
+                    {
+                        visibleColumns = savedSearchDto.ResultConfiguration["VisibleColumns"].ToObject<List<int>>();
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Logger.Error("Error getting visible columns for saved search", ex);
+                }
+            }
 
             return Json(new { 
-                data = resultDto.DaleResults.Select(x => x.ToWeb()).ToList(),
-                searchTotal = resultDto.SearchTotal
+                data = resultDto.DataInventoryResults.ToWeb(),
+                searchTotal = resultDto.SearchTotal,
+                visibleColumns
             });
         }
 
@@ -68,7 +89,7 @@ namespace Sentry.data.Web.Controllers
         public JsonResult SearchFilters(FilterSearchModel searchModel)
         {
             ValidateSearchModel(searchModel);
-            FilterSearchModel filterResult = _dataInventoryService.GetSearchFilters(searchModel.ToDaleDto()).ToModel();
+            FilterSearchModel filterResult = _dataInventoryService.GetSearchFilters(searchModel.ToDto()).ToModel();
             
             if (!CanViewSensitive())
             {
@@ -79,9 +100,21 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult Update(List<DaleSensitiveModel> models)
+        public ActionResult Update(List<DataInventoryUpdateModel> models)
         {
-            return Json(new { success = _dataInventoryService.UpdateIsSensitive(models.ToDto()) });
+            bool result = _dataInventoryService.UpdateIsSensitive(models.ToDto());
+            return Json(new { success = result });
+        }
+
+        [HttpGet]
+        public JsonResult GetDataInventoryAccess()
+        {
+            return Json(new
+            {
+                canEditSensitive = SharedContext.CurrentUser.CanEditSensitiveDataInventory || SharedContext.CurrentUser.IsAdmin,
+                canEditOwnerVerified = SharedContext.CurrentUser.CanEditOwnerVerifiedDataInventory || SharedContext.CurrentUser.IsAdmin,
+                canViewSensitive = CanViewSensitive()
+            }, JsonRequestBehavior.AllowGet);
         }
 
         #region Methods
@@ -139,6 +172,11 @@ namespace Sentry.data.Web.Controllers
         private void RemoveSensitive(FilterSearchModel searchModel)
         {
             searchModel.FilterCategories.RemoveAll(x => x.CategoryName == FilterCategoryNames.SENSITIVE);
+        }
+
+        protected bool CanViewSensitive()
+        {
+            return SharedContext.CurrentUser.CanViewSensitiveDataInventory;
         }
         #endregion
     }

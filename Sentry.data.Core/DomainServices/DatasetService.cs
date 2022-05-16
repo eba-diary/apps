@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 
@@ -24,11 +25,13 @@ namespace Sentry.data.Core
         private readonly IQuartermasterService _quartermasterService;
         private readonly ObjectCache cache = MemoryCache.Default;
         private readonly ISAIDService _saidService;
+        private readonly IDataFeatures _featureFlags;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
                             IUserService userService, IConfigService configService, 
                             ISchemaService schemaService, IAWSLambdaProvider awsLambdaProvider,
-                            IQuartermasterService quartermasterService, ISAIDService saidService)
+                            IQuartermasterService quartermasterService, ISAIDService saidService,
+                            IDataFeatures featureFlags)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -38,6 +41,7 @@ namespace Sentry.data.Core
             _awsLambdaProvider = awsLambdaProvider;
             _quartermasterService = quartermasterService;
             _saidService = saidService;
+            _featureFlags = featureFlags;
         }
 
         public DatasetDto GetDatasetDto(int id)
@@ -79,7 +83,7 @@ namespace Sentry.data.Core
                 policy.AbsoluteExpiration = new DateTimeOffset(DateTime.UtcNow.AddHours(24));
 
                 //Pull summarized metadata from datasetfile table
-                summaryResults = _datasetContext.DatasetFile.GroupBy(g => new { g.Dataset })
+                summaryResults = _datasetContext.DatasetFileStatusActive.GroupBy(g => new { g.Dataset })
                 .Select(s => new DatasetSummaryMetadataDTO
                 {
                     DatasetId = s.Key.Dataset.DatasetId,
@@ -206,10 +210,22 @@ namespace Sentry.data.Core
                 SecurableObjectName = ds.DatasetName
             };
 
+            Expression<Func<Permission, bool>> featureFlagPermissionRestrictions;
+            if (!_featureFlags.CLA3718_Authorization.GetValue())
+            {
+                //These permissions have been added as part of CLA-3718, but we don't want them visible on the existing UI when the feature flag is disabled
+                featureFlagPermissionRestrictions = x => x.PermissionCode != GlobalConstants.PermissionCodes.S3_ACCESS
+                    && x.PermissionCode != GlobalConstants.PermissionCodes.SNOWFLAKE_ACCESS
+                    && x.PermissionCode != GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS;
+            } else
+            {
+                featureFlagPermissionRestrictions = x => true;
+            }
+
             //Set permission list based on if Dataset is secured (restricted)
             ar.Permissions = !ds.IsSecured
                 ? _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET && x.PermissionCode == GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA).ToList()
-                : _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
+                : _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).Where(featureFlagPermissionRestrictions).ToList();
 
             List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCode(ds.Asset.SaidKeyCode).ConfigureAwait(false);
             foreach(SAIDRole prodCust in prodCusts)

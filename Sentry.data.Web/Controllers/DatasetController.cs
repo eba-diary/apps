@@ -394,9 +394,9 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult AccessRequest(int datasetId)
+        public async Task<ActionResult> AccessRequest(int datasetId)
         {
-            DatasetAccessRequestModel model = _datasetService.GetAccessRequestAsync(datasetId).Result.ToDatasetModel();
+            DatasetAccessRequestModel model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
             model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
             return PartialView("DatasetAccessRequest", model);
         }
@@ -637,12 +637,12 @@ namespace Sentry.data.Web.Controllers
 
         public JsonResult GetVersionsOfDatasetFileForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
-            DatasetFile df = _datasetContext.DatasetFile.Where(x => x.DatasetFileId == Id).Fetch(x => x.DatasetFileConfig).FirstOrDefault();
+            DatasetFile df = _datasetContext.DatasetFileStatusActive.Where(x => x.DatasetFileId == Id).Fetch(x => x.DatasetFileConfig).FirstOrDefault();
 
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
 
             UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
-            List<DatasetFile> datasetFiles = _datasetContext.DatasetFile.Where(x => x.Dataset.DatasetId == df.Dataset.DatasetId &&
+            List<DatasetFile> datasetFiles = _datasetContext.DatasetFileStatusActive.Where(x => x.Dataset.DatasetId == df.Dataset.DatasetId &&
                                                                                                                         x.DatasetFileConfig.ConfigId == df.DatasetFileConfig.ConfigId &&
                                                                                                                         x.FileName == df.FileName).
                                                                                                     Fetch(x => x.DatasetFileConfig).ToList();
@@ -757,7 +757,7 @@ namespace Sentry.data.Web.Controllers
         [HttpGet()]
         public JsonResult GetDatasetFileDownloadURL(int id)
         {
-            DatasetFile df = _datasetContext.DatasetFile.Where(x => x.DatasetFileId == id).Fetch(x => x.DatasetFileConfig).FirstOrDefault();
+            DatasetFile df = _datasetContext.DatasetFileStatusActive.Where(x => x.DatasetFileId == id).Fetch(x => x.DatasetFileConfig).FirstOrDefault();
 
             UserSecurity us = _datasetService.GetUserSecurityForDataset(df.Dataset.DatasetId);
             if (!us.CanViewFullDataset)

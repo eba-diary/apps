@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    @foreach (var pair in new Dictionary<string, IList<ManagePermissionModel>> { { "DSC Permissions", Model.DscPermissions }, { "AWS IAM Permissions (S3 Access)", Model.AwsIamPermissions }, { "Active Directory Permissions (Snowflake Access)", Model.AdPermissions } })
+    @foreach (var pair in new Dictionary<string, IList<ManagePermissionModel>> { { "DSC Permissions", Model.DscPermissions }, { "Snowflake Permissions", Model.SnowflakePermissions }, { "S3 Permissions", Model.AwsIamPermissions } })
     {
         <div class="row">
             <h6 class="pt-3">@pair.Key</h6>

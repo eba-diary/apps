@@ -43,8 +43,7 @@
             public const string DELETE_DATASET = "Deleted Dataset";
 
             public const string DELETE_DATASET_SCHEMA = "Deleted Dataset Schema";
-            public const string SYNC_DATASET_SCHEMA = "Sync Schema";
-            
+            public const string SYNC_DATASET_SCHEMA = "Sync Schema";            
 
             public const string CREATED_TAG = "Created Tag";
             public const string UPDATED_TAG = "Updated Tag";
@@ -64,8 +63,7 @@
             public const string NOTIFICATION_WARNING_UPDATE = "Warning Notification Update";
             public const string NOTIFICATION_INFO_UPDATE = "Info Notification Update";
 
-            public const string DALE_SEARCH = "DaleQuery";
-
+            public const string DATA_INVENTORY_SEARCH = "DataInventoryQuery";
 
             //DSC NOTIFICATION FEED EVENTS
             public const string CREATED_REPORT = "Created Report";
@@ -74,7 +72,6 @@
             public const string NOTIFICATION_DSC_RELEASE_NOTES = "Release Notes";
             public const string NOTIFICATION_DSC_TECH_DOC = "Technical Documentation";
             public const string NOTIFICATION_DSC_NEWS = "News";
-
 
             public const string NOTIFICATION_DSC_RELEASENOTES_DSC = "DSC";
             public const string NOTIFICATION_DSC_RELEASENOTES_CL = "CL";
@@ -88,7 +85,6 @@
             public const string NOTIFICATION_DSC_NEWS_PYTHON = "Python";
             public const string NOTIFICATION_DSC_NEWS_SAS = "SAS";
             public const string NOTIFICATION_DSC_NEWS_ANALYTICS = "Analytics";
-
         }
 
         public static class Statuses
@@ -435,7 +431,14 @@
         public static class SaveSearchResults
         {
             public const string NEW = "New";
+            public const string EXISTS = "Exists";
             public const string UPDATE = "Update";
+        }
+
+        public static class DataInventorySearchTargets
+        {
+            public const string SAID = "SAID";
+            public const string SERVER = "SERVER";
         }
     }
 }

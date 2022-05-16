@@ -410,7 +410,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
-    <Compile Include="App_Start\DataInventoryRouteConstraint.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\MiniProfilerConfig.cs" />
     <Compile Include="App_Start\ProfilingViewEngine.cs" />
@@ -420,7 +419,6 @@
     <AdditionalFiles Include="..\.sonarlint\data_data.sentry.com\CSharp\SonarLint.xml">
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
-    <Compile Include="Controllers\BaseDataInventoryController.cs" />
     <Compile Include="Controllers\DataInventoryController.cs" />
     <Compile Include="Controllers\FilterSearchController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
@@ -432,6 +430,8 @@
     <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
+    <Compile Include="Models\Dataset\ManagePermissionModel.cs" />
+    <Compile Include="Models\Dataset\ManagePermissionsModel.cs" />
     <Compile Include="Models\Dale\DaleAdvancedCriteriaModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
@@ -440,7 +440,8 @@
     <Compile Include="Models\Search\FilterCategoryOptionModel.cs" />
     <Compile Include="Models\Search\FilterSearchConfigModel.cs" />
     <Compile Include="Models\Search\FilterSearchModel.cs" />
-    <Compile Include="Models\Search\SavedSearchesModel.cs" />
+    <Compile Include="Models\Search\SavedSearchOptionModel.cs" />
+    <Compile Include="Models\Search\SavedSearchDropdownModel.cs" />
     <Compile Include="Models\Search\SaveSearchModel.cs" />
     <Compile Include="Models\Subscription\BusinessAreaSubscriptionModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
@@ -465,7 +466,6 @@
     <Compile Include="Controllers\DataFlowController.cs" />
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\FavoritesController.cs" />
-    <Compile Include="Controllers\DaleController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\WebApi\AssetController.cs" />
     <Compile Include="Controllers\DataAssetController.cs" />
@@ -488,7 +488,7 @@
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Extensions\BusinessIntelligenceExtensions.cs" />
     <Compile Include="Extensions\ConfigExtension.cs" />
-    <Compile Include="Extensions\DaleExtensions.cs" />
+    <Compile Include="Extensions\DataInventoryExtensions.cs" />
     <Compile Include="Extensions\DataFlowExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
     <Compile Include="Extensions\FavoriteExtensions.cs" />
@@ -540,9 +540,7 @@
     <Compile Include="Helpers\TimeSpanFormattingExtensions.cs" />
     <Compile Include="Helpers\WebCurrentUserIdProvider.cs" />
     <Compile Include="HttpExceptions\NotAuthorizedException.cs" />
-    <Compile Include="Models\ApiModels\Dale\DaleCategoryResultModel.cs" />
-    <Compile Include="Models\ApiModels\Dale\DaleCategory.cs" />
-    <Compile Include="Models\ApiModels\Dale\DaleContainSensitiveResultModel.cs" />
+    <Compile Include="Models\ApiModels\DataInventory\DaleCategoryModel.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetDetailModel.cs" />
     <Compile Include="Models\ApiModels\Config\ConfigInfoModel.cs" />
     <Compile Include="Models\ApiModels\Job\DfsMonitorModel.cs" />
@@ -571,11 +569,8 @@
     <Compile Include="Models\Config\ValidDatatypesModel.cs" />
     <Compile Include="Models\Config\ManageConfigsModel.cs" />
     <Compile Include="Models\ContactInfoModel.cs" />
-    <Compile Include="Models\Dale\DaleEventModel.cs" />
-    <Compile Include="Models\Dale\DaleResultModel.cs" />
-    <Compile Include="Models\Dale\DaleResultRowModel.cs" />
-    <Compile Include="Models\Dale\DaleSearchModel.cs" />
-    <Compile Include="Models\Dale\DaleSensitiveModel.cs" />
+    <Compile Include="Models\DataInventory\DataInventorySearchResultRowModel.cs" />
+    <Compile Include="Models\DataInventory\DataInventoryUpdateModel.cs" />
     <Compile Include="Models\DataAsset\AssetUIModel.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetInfoModel.cs" />
     <Compile Include="Models\DataProcessing\AssociatedDataFlowModel.cs" />
@@ -639,7 +634,6 @@
     <Content Include="Content\bootstrap-datetimepicker.css" />
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.min.css" />
-    <Content Include="Content\dale.css" />
     <Content Include="Content\data-inventory.css" />
     <Content Include="Content\filter-search.css" />
     <Content Include="Content\dataflow.css" />
@@ -858,7 +852,6 @@
     <Content Include="Images\logo_blue.svg" />
     <Content Include="Images\presence.png" />
     <Content Include="js\BusinessArea.js" />
-    <Content Include="js\Dale.js" />
     <Content Include="js\DataFlow.js" />
     <Content Include="js\DataInventory.js" />
     <Content Include="js\FilterSearch.js" />
@@ -1929,8 +1922,6 @@
     <Content Include="Views\BusinessArea\_LibertyBell.cshtml" />
     <Content Include="Views\BusinessArea\_LibertyBellPopover.cshtml" />
     <Content Include="Views\BusinessArea\_LibertyBellPopoverItem.cshtml" />
-    <Content Include="Views\Dale\DaleSearch.cshtml" />
-    <Content Include="Views\Dale\DaleResult.cshtml" />
     <Content Include="Views\DataFlow\_AjaxMakeSchemaMap.cshtml" />
     <Content Include="Views\RetrieverJob\_RetrieverJob.cshtml" />
     <Content Include="Scripts\quill\quill.bubble.min.css.map" />
@@ -1975,7 +1966,6 @@
     <Folder Include="Views\Alert\" />
     <Folder Include="Views\BaseDataInventory\" />
     <Folder Include="Views\ExternalFile\" />
-    <Folder Include="Views\FilterSearch\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Security\" />
     <Folder Include="Views\Subscription\" />

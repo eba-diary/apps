@@ -176,10 +176,11 @@ namespace Sentry.data.Web.Tests
         }
 
         [TestMethod]
-        public void ToDto_FilterSearchModel_DaleSearchDto()
+        public void ToDto_FilterSearchModel_FilterSearchDto()
         {
             FilterSearchModel model = new FilterSearchModel()
             {
+                SearchName = "SearchName",
                 SearchText = "Search",
                 FilterCategories = new List<FilterCategoryModel>()
                 {
@@ -227,10 +228,11 @@ namespace Sentry.data.Web.Tests
                     }
                 }
             };
+            
+            FilterSearchDto dto = model.ToDto();
 
-            DaleSearchDto dto = model.ToDaleDto();
-
-            Assert.AreEqual("Search", dto.Criteria);
+            Assert.AreEqual("SearchName", dto.SearchName);
+            Assert.AreEqual("Search", dto.SearchText);
             Assert.AreEqual(2, dto.FilterCategories.Count);
 
             FilterCategoryDto categoryDto = dto.FilterCategories.First();
@@ -386,7 +388,8 @@ namespace Sentry.data.Web.Tests
                             }
                         }
                     }
-                }
+                },
+                ResultConfigurationJson = @"{""VisibleColumns"": [1,2,3]}"
             };
 
             SavedSearchDto dto = model.ToDto();
@@ -411,6 +414,11 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(4, optionDto.ResultCount);
             Assert.AreEqual("Category", optionDto.ParentCategoryName);
             Assert.IsFalse(optionDto.Selected);
+
+            Assert.IsTrue(dto.ResultConfiguration.ContainsKey("VisibleColumns"));
+
+            List<int> visibleColumns = dto.ResultConfiguration["VisibleColumns"].ToObject<List<int>>();
+            Assert.AreEqual(3, visibleColumns.Count);
         }
 
         [TestMethod]
@@ -442,6 +450,23 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("FeedUrlType", model.FeedUrlType);
             Assert.AreEqual(2, model.FeedId);
             Assert.IsTrue(model.IsLegacyFavorite);
+        }
+
+        [TestMethod]
+        public void ToModel_SavedSearchOptionDto_SavedSearchOptionModel()
+        {
+            SavedSearchOptionDto dto = new SavedSearchOptionDto()
+            {
+                SavedSearchId = 1,
+                SavedSearchName = "SearchName",
+                IsFavorite = true
+            };
+
+            SavedSearchOptionModel model = dto.ToModel();
+
+            Assert.AreEqual(1, model.SavedSearchId);
+            Assert.AreEqual("SearchName", model.SavedSearchName);
+            Assert.IsTrue(model.IsFavorite);
         }
     }
 }

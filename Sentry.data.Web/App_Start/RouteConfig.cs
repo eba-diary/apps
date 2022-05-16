@@ -17,13 +17,6 @@ namespace Sentry.data.Web
             routes.MapMvcAttributeRoutes();
 
             routes.MapRoute(
-                   name: "DataInventorySearchFeature",
-                   url: "DataInventory/Search",
-                   defaults: new { controller = "Dale", action = "DaleSearch" },
-                   constraints: new { feature = new DataInventoryRouteConstraint() }
-               );
-
-            routes.MapRoute(
                 name: "DataAssetIndex",
                 url: "DataAsset/Index",
                 defaults: new { controller = "DataAsset", action = "Index", id = 0 }            

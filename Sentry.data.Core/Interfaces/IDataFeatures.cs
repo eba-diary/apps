@@ -8,7 +8,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> Remove_ConvertToParquet_Logic_CLA_747 { get; }
         IFeatureFlag<bool> Remove_Mock_GoogleAPI_Logic_CLA_1679 { get; }
         IFeatureFlag<bool> Remove_ClaimIQ_mock_logic_CLA_758 { get; }
-        IFeatureFlag<bool> Dale_Expose_EditOwnerVerified_CLA_1911 { get; }
         IFeatureFlag<bool> Expose_Dataflow_Metadata_CLA_2146 { get; }
         IFeatureFlag<bool> CLA3240_UseDropLocationV2 { get; }
         IFeatureFlag<bool> CLA3241_DisableDfsDropLocation { get; }
@@ -22,7 +21,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA3550_DATA_INVENTORY_NEW_COLUMNS { get; }
         IFeatureFlag<bool> CLA3541_Dataset_Details_Tabs { get; }
         IFeatureFlag<bool> CLA3605_AllowSchemaParquetUpdate { get; }
-        IFeatureFlag<string> CLA3707_DataInventorySource { get; }
         IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY { get; }
         IFeatureFlag<bool> CLA3553_SchemaSearch { get; }
         IFeatureFlag<bool> CLA3861_RefactorGetUserSecurity { get; }
