@@ -1,1 +1,672 @@
-<!-- VOLUME 8 PLACEHOLDER -->
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml"
+	schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader>
+      <fileDesc>
+         <titleStmt>
+            <title>Diary of Mrs. Emma B. Andrews. Volume 8 1900-1901</title>
+            <author>
+               <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
+            </author>
+            <respStmt>
+               <resp>Originally prepared by</resp>
+               <persName ref="#SLK">Sarah L. Ketchley</persName>
+            </respStmt>
+            <respStmt>
+               <resp>TEIPublisher development</resp>
+               <persName ref="#EF">Emma Fritzberg</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Historical Markup Tool development</resp>
+               <persName ref="#AH">Audrey Holmes</persName>
+            </respStmt>
+            <respStmt>
+               <resp>transcription</resp>
+               <persName>name name</persName> <!-- replace with correct names -->
+            </respStmt>
+            <respStmt>
+               <resp>proofreading and tagging</resp>
+               <persName ref="#XXXX">name name</persName> <!-- replace with correct names -->
+            </respStmt>
+            <respStmt>
+                    <resp>biographical research and writing</resp> 
+                    <persName ref="#XX">name name</persName> <!-- replace with correct names -->
+            </respStmt>
+         </titleStmt>
+         <publicationStmt>
+            <publisher>
+               <orgName ref="#EBA_Diary_Project">Emma B. Andrews Diary Project</orgName>
+            </publisher>
+            <address>
+               <addrLine>University of Washington, Seattle, WA</addrLine>
+            </address>
+            <availability>
+               <licence target="https://creativecommons.org/licenses/by-nc/4.0/">This work is
+                  licensed under a Creative Commons Attribution-NonCommercial 4.0 International
+                  License.</licence>
+            </availability>
+            <date>08-2020</date>
+         </publicationStmt>
+         <sourceDesc>
+            <p><orgName ref="#American_Philosophical_Society">American Philosophical
+               Society</orgName>,<placeName ref="#Philadelphia">Philadelphia</placeName></p>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <projectDesc>
+            <p>Established in 2010, the goals of the <orgName ref="#EBA_Diary_Project">Emma B.
+               Andrews Diary Project</orgName> include the transcription and digitization of a
+               wide range of primary historical material from the 'Golden Age' of Egyptian
+               archaeology at the end of the 19th and beginning of the 20th centuries. A founding
+               partner of <orgName ref="#Newbook_Digital_Texts">Newbook Digital Texts</orgName>
+               (www.newbookdigitaltexts.org), the <orgName ref="#EBA_Diary_Project">EBA Diary
+                  Project</orgName> offers undergraduate and graduate digital humanities education
+               and internships at the <orgName ref="#University_of_Washington">University of
+                  Washington</orgName>.
+               <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName> is best remembered for her
+               association with the millionaire lawyer turned archaeologist/art and antiquities
+               collector, <persName ref="#Davis_Theodore_M">Theodore M. Davis</persName>. Traveling
+               to <placeName ref="#Egypt">Egypt</placeName> with him between 1889 and 1913, she kept
+               detailed journals of these voyages along the <placeName ref="#Nile">Nile</placeName>,
+               including his important yet under-reported excavations of over 20 significant tombs
+               in the <placeName ref="#Bībān al-Mulūk">Valley of the Kings</placeName>.
+               <persName ref="#Andrews_Emma_B">Emma</persName> provides a vital commentary on the
+               archaeology and pioneering Egyptologists of the time, painting a revealing picture of
+               the lives of the colonial gentry and the cultural and scientific literati in at the
+               dawn of the twentieth century. Analysis of the content of her diaries, along with a
+               broad range of additional primary source material, will afford scholars information
+               about important historical resources for the first time.</p>
+         </projectDesc>
+         <editorialDecl>
+            <correction>
+               <p>Obvious misspellings (eg place names and people's names) which are misreadings of original handwritten diary are corrected
+                  with choice, sic and corr.</p>
+            </correction>
+            <normalization>
+               <p>Original spelling and typography is otherwise retained.</p>
+            </normalization>
+         </editorialDecl>
+      </encodingDesc>
+      <revisionDesc> <!-- update this with major revision list-->
+         <list>
+            <item>
+               <date when="2021-05-08">8 May 2021</date> Last checked by SLK. Updated header, fixed
+               placeName and name tags.</item>
+         </list>
+      </revisionDesc>
+   </teiHeader>
+<text>
+<body>
+<div>
+    Page 10
+<!---IS part 1 start-->
+    <div xml:id="EBA-1900-11-27" type="entry">
+        <dateline><name type="boat" ref="#SS_Furst_Bismarck">S.S. Fürst Bismarck</name>.
+            <date when="1900-11-27">Nov. 27, 1900</date>.
+        </dateline>
+            <p>This is the last day of quite a remarkable voyage, so far as lovely, soft weather and a tranquil sea go. I have been indoors however much of the time with a bad cold, but amusing myself very well with books in my pleasant little sitting room. This is the second time I have occupied the Captain’s room - and I feel much at home here. It is the third time we have made this southern voyage in this comfortable ship - and once we crossed from <placeName>Southampton</placeName> to <placeName>New York</placeName> in her. We passed the Azores last Thursday, having sailed from <placeName>New York</placeName> the Saturday before, the 17 Nov. and stopped for 4 hours at Gibraltar on Sunday. Just now, we have Sardinia in view - and are due tomorrow morning early at Naples. We were expecting to leave Naples tomorrow evening on the N.G. Lloyd, “Preussen” - but from letters received at Gibraltar, are in doubt as to what kind of rooms we will get in her - and if we do not like them will wait in Naples for another steamer.</p></div>
+    
+    <div>Shepheards Hotel.
+        Cairo, Egypt. Dec. 7.
+            It is ten days now, that I have not had the chance to write. We landed at Naples early on the morning of the 28th, and went at once to the Grand Hotel for breakfast, which we had in the familiar corner sitting room on the 1st floor; leaving Jones to struggle with the 
+    
+    Page 2
+    
+    luggage, and wait for the arrival of the steamer. After reading our letters, we drove out over the heights, and home by the Posillipo way and saw the Preussen just steaming in, and the Fürst Bismarck out on her way to Genoa. After lunch, the girls went to the Aquarium, and Theodore and I did a little shopping and business. It was almost dark before we reached the landing place - and there we waited in the Custom House a long time before the tender came for us - so that we were just in time for dinner. We were pleased with our comfortable rooms, and with the steamer - and the dinner was a great improvement on those of the Bismarck. The Preussen is an old fashioned roomy boat lately made over and much enlarged - everything was very clean, and the wide deck, almost free of steamer chairs was delightful. But how hard the beds! they were like planks, and the first morning I felt actually bruised. She was very slow too. There was a lot of German soldiers, Red Cross people principally, with some smart German officers, all bound for China. Poor Polly was again very suffering - we had some heavy weather, and on one lovely, afternoon we laid by for 5 hours, doing something to the machinery, so that we did not reach Port Said until the evening of Dec. 3d and were obliged to stay in that forbidding town over night. We found the U.S. Transport which we saw at Gibraltar just arrived, and one of our big white war vessels came along behind us - but we did not learn her name. The former was bound for Manilla, and the latter for China. At Naples, we fell in with Mr. and Mrs. Thomas Nelson Page, of Washington, friends of Daisy’s - they were bound for Egypt, and crossed with us - we find them charming. He, especially is one of 
+    
+    Page 3
+    
+    the most genuine and attractive men I ever met, with a touch of old world Virginian breeding. He is so interesting, and is outlook upon everything so keen and delightful. They are going up the river next week in the Nitrocis. So, at Port Said, on that miserable evening, we all went ashore, and having once spent two or three uncomfortable hours at the Continental, we decided to try this time the Exchange Hotel. So we all marched through the little streets with their big, cheap looking houses, brilliantly lighted, all gambling dens or dance houses, to our hotel, a tall structure with verandahs all about it on each storey. The two lower floors are dirty and unattractive - and the night proved hideous with hundreds of cats and dogs crying and howling - the talking and shouting of people in the streets, the noise of the natives down on the wharf coaling the steamers and the hoarse whistle of arriving and departing steamers. We were a weary crowd as we presented ourselves for breakfast, and thought of our 8 hours railway ride to Cairo! Cairo is not very full - and the weather warmer than I have ever known it at this time of the year. We are in the same pleasant apartment we had last year - on the 2d floor overlooking the garden. Our dear people from the boat were so overjoyed to see us - they are all well - and the Beduin almost ready for us - they long to take possession of her - and I long to begin our quiet life. Yesterday I spent the morning there. Today I have been in the house, resting and writing letters. It has been very foggy for 2 days - and this afternoon it has rained hard for about half an hour.</div>
+    
+<div>Page 4
+    
+    Dahabeah Beduin. 
+        Wednesday, Dec. 12.
+            We took possession of this charming little home this morning and delighted I was to give up life even in Shepheard’s Hotel! There have been for 3 days, 4 dahabeahs lying here at the Museum landing waiting for the south wind to stop blowing. The Farnhams from New Haven on the Zenet-el-Nil, are just behind us. Baron v. Bissing lunched with us. The week in Cairo was a busy one - we saw a great deal of the Pages. They found on their arrival in Cairo, Mr. Bryah Lathrop of Chicago and his wife, he is a brother of Mrs. Page - waiting for them, just from Greece, where they have spent some weeks. They were to be with them on the Nitocris. But two days after our arrival Mrs. Lathrop developed fever, and soon after, Mr. Lathrop - and they were taken to Miss James’s private hospital 3 days before we left. The Pages most anxious and unhappy, have given up the Nitocris, and are waiting in great uncertainty. There were 4 cases of typhoid fever in Cairo, coming from the hotel d’Angleterre in Athens. We found letters waiting for us from Mr. Newberry giving very interesting accounts of his work already. He has cleared the courtyard of Rek ma’ra and found amongst the debris 3 exquisite little copper gilt bowls of beautiful workmanship, each containing a model of a little bull - one of them having a gold lotus flower hung about his neck, with a fine gold wire. We are so much interested in all of it, and hope he may find what he thinks he may, the tomb and mummy of Rek’ma’ra himself. Dr. Sandwith lunched with us one day, and Mr. and Mrs. Quiball dined 
+    
+    Page 5
+    
+    with us the night before we left. She is a charming, bright Scotch woman. They were married last summer. Went to the races today, Mr. and Mrs. Page came back to tea.</div>
+    
+<div>Thursday, Dec. 13.
+        We spent the morning at the Museum. Baron v. Bissing came to lunch. Soon after the wind being slight, but almost favorable, we started, and made about 5 miles - sometimes hardly seeming to move, in the light wind. Crowds of gyassas in the river.</div>
+    
+<div>Friday, Dec. 14.
+        Started about 8 o’clock with very little wind, and sailing and tracking for some time, finally sailed briskly along in a fine N. wind, bringing up here at the landing at Sakkarah at 4:30. We intend going out tomorrow. Thermometer on cabana 65 at 4:30.</div>
+    
+<div>Saturday, Dec. 15.	
+        This has been one of the golden days of life - air, sky and earth perfect. We started early for Saqqara, - I in my new chair, with 2 good donkeys - and it was enchanting - through the splendid palm forests, and out on the dyke to the village, then again into the palms, which are always so rich and graceful, though the towering beauty of the stem is missed. I have never seen such magnificent palms - then again on to the dyke stretching over those wide and fertile plains until we came to the desert plateau, with its tombs and pyramids. We 
+    
+    Page 6
+    
+    went directly to the pyramid of Oonas which I had never seen - and crawled down the narrow sloping way to the tomb chamber, where rests the massive basalt sarcophagus, ages ago rifled of its occupant. Then to the charmingly interesting tomb of Assa or Esse (depending upon whether you are English or German) discovered or rather cleared within the last 3 or 4 years - a king of the V dynasty with the delicate verve and elegance of the sculptures of that far away time. Lunched on the terrace of Mariette’s house - and shared it with 2 lean and hungry dogs and one cat, and various pigeons and sparrows. The girls under Amelies care went with the guide to the Serapeum, and afterwards we all went into the tomb of Kera - very beautiful. The ride home, enchanting. The young grain is up two of three inches, giving a soft green carpet to the wide fields - and the young alfalfa crop under the palms, about an inch or two above the ground, with the soft light of the westering sun on it, made a picture almost too exquisite for peace of mind! We got off about 4:30 and made about 5 miles above bedrashȇn before we stopped at 6:30.</div>
+    
+<div>Third Sunday in Advent. Dec. 16.
+        We began sailing at 7:20 this morning, and went on until 6 P.M. wind favorable - but not strong. We are 9 miles blow Beni soef having made 45 miles - the day fresh and perfect.</div>
+    
+<div>Monday, Dec. 17.
+        A cool day with calms and fitful wind - heavy clouds, bursts 
+    
+    Page 7
+    
+    of sunshine, and squalls of light rain - have sailed a little, tracked, pulled to the anchor, and have made 10 miles. I am now reading aloud for half an hour after each meal, while I am doing my “standing up”, Gregerovius’s History of Rome - quite fascinating.</div>
+    
+<div>Tuesday, Dec. 18.
+        Practically we are where we were last night - having only tracked 1 mile.	A strong cold head wind all day with occasional sprinkles of rain - and one sharp shower about 7 o’clock.</div> 
+    
+<div>Wednesday, Dec. 19.
+        Another disappointing day - with cold head wind, and sometimes a little rain. Sailed for a time however and made 5 miles. Rameses passed up on her first trip of the season.</div>
+    
+<div>Thursday, Dec. 20.
+        The same old story - I might copy the entry for last night - the conditions and distance we have made being the same - 5 miles. Elizabeth and I spent some time with Chammy in his kitchen this morning giving him instructions about pastry, in which he does not succeed. It was something of a venture when we promoted him this year to head cook. He has been with us 2 winters as 2d cook, and we knew he made all the good bread and coffee we had - and being thoroughly tired of the claims and shortcomings of the Nile “head cook” we decided to try Chammy, who is one of the cleanest, most smiling and docile Arab
+    
+    Page 8
+    
+    I have ever known. We have always been fond of him. The “Osiris” passed up under convoy of a tug.</div>
+    
+<div>Friday, Dec. 21.
+        Again the same experience, only that we have made one less mile - 4 miles. This is discouraging - I always wish Theodore would take a tug at Cairo, and go straight away for Minia - giving us in this way all our time for the best parts of the river. The day has been lovely - cool and bright - thermometer at 9 A.M. - 61.</div>
+    
+<div>Saturday, Dec. 22.
+        2 miles.	One of the most perfect days ever seen - but no wind or contrary wind. The morning began with a heavy mist - and 45° was registered - at noon 61° - we tracked about 2 miles and are within a mile of Fashen. Lying all day in a nice clean spot, with a little beach - on which we turned out all our fowls for the day. It was a pleasure to see the poor things released. An unbroken line of gyassas have been tracking past us today.</div>
+    
+<div>Fourth Sunday in Advent.	Dec. 23.
+        30 miles. 	A very remarkable day - we began sailing at a few minutes past 7 o’clock this morning, and soon a fine rain began to fall, which lasted without intermission until 6 o’clock this evening. A fair north wind all day - and are tonight opposite Abu Girgeh. It has been a wretched day for the men. Anything more comfort-
+    
+    Page 9
+    
+    less than those Arabs in the rain, with their clinging cotton garments I have never seen. We have never had such an experience as this before on the Nile - a long, rainy day, like one in any northern climate. I had my little stove lighted for the first time - and as soon as we had tied up, and the men had stretched their canvass over the lower deck - they were served with hot tea, and Jones took out the larger stove, so that they might dry themselves. The stars are now shining. Ramadan began last night.</div>
+    
+<div>Monday, Dec. 24.
+        Lying all day where we pulled up last night - drying our sails and wet rugs - the deck a scene of dire confusion, so that we have had to stay down below all day. A cold, wind - with bright sun and heavy clouds. Theodore and Elizabeth took a long walk - and said they found the country most beautiful - all the dusty foliage washed clean, the rain drops twinkling on every blade of grass, and the air full of fresh perfumes. Poor Polly cannot walk, because of her bad foot. We had a big washing done - and turned out our fowls.</div>
+    
+<div>Tuesday, Dec. 25. Christmas.
+        4 miles.	A beautiful bright clear day - cool. Have only made 4 miles by tracking. 
+    We had our usual Xmas merrymaking this morning. Jones had decorated the saloon and decks with palm branches - after breakfast, we had the men in, and distributed our gifts.</div>
+    
+<div>Page 10
+    Wednesday, Dec. 26.
+        I was awakened this morning very early by the continued whistle of one of Cook’s steamers, and lifting a corner of my curtain saw so dense a fog, that it was like a solid substance. Towards noon we got a light wind and made we think about 8-1/2 miles. Cold - the thermometer went down to 41 last night - we have an enchanting new moon.</div>
+    
+<div>Thursday, Dec. 27.
+        We think we have made by tracking, pulling to the anchor, and a sail in a light wind about 10 miles. The day has been beautiful, and so is the night. Mercury last night 44 - we are very impatient to reach Minia, where out mail has been accumulating ever since we left Cairo, and we are in need of fresh butter which is also waiting for us there and fresh yeast cakes, and supplies of meat and vegetables.</div>
+    
+<div>Friday, Dec. 28th.
+        Pulled up at Minia about 5 o’clock, having made 12 miles, - sailing, tracking and polling. Every one went into the town except myself - bringing back heaps of letters and overshelming stocks of newspapers. Happily good news from every quarter - and a charming little Christmas box from the good Florentines.</div>
+    
+<div>Saturday, Dec. 29th.
+        A very heavy fog this morning - and cold and chill - the 
+    
+    Page 11
+    
+    papers brought news of tremendous storms on sea and land. We have worked our way along making14 miles - and pulled up at a lovely, palm crowned beach, in the bright moonlight, just opposite Beni Hasan.</div>
+    
+<div>Sunday, Dec. 30.
+        Theodore and the girls went over to the tombs this morning - getting back for lunch. Polly’s donkey fell with her, and Bessie riding fast just behind her, collided with the donkey - and there were two girls and two donkeys prostrate - they were lucky to escape with nothing but slight strains. We have made about 2 miles above Beni Hasan - in one of the stillest afternoons I have ever seen - and a wonderfully beautiful sunset, which stained the placid water crimson and gold and delicate pink - making an almost too lovely scene.</div>
+    
+<div>Monday, Dec. 31.
+        It blew so hard all day, that we could not sail until 5 o’clock, when we gladly took advantage of a light wind and sailed until 6 o’clock, making 4 miles. It has been cold but bright.</div>
+    
+<div>Tuesday, Jan. 1, 1901.
+        The first day of the New Year dawned brilliantly - no wind - the water like a mirror. Occasional light winds encouraged us to hope that at last the long wished for north wind was beginning to stir - then the beautiful calm would come again - we have made 9 miles - passing Rhodah early.</div>
+    
+<div>Page 12
+    
+    Wednesday, Jan 2.
+        Another day of utter, beautiful calm. We have tracked a short distance - about a mile - and have been lying where we now are at a very high mud bank, within sight of Melâwi. A cold wind from the South occasionally stirring. I have never seen a more beautiful evening. The pink and mauve tints over the desert and the mountains and the cliffs, with now and then the tender green of the new crops - and as an occasional gyassa would drop down the stream, its sail would be dyed a golden red by the sun, all reflected in the still water. The Cheeps with a tug passed up this morning - and is not yet taken possession of.</div>
+    
+<div>Thursday - Jan. 3d.
+        Our men began tracking this morning and kept at it until noon with a short rest. Then they pulled us to an anchor, when the north wind began, and we were able to sail until 7 o’clock - though the wind was light all the time. We lay a mile below Melâwi this morning - passed Haggi Kandil about 3 - and are now above the village of Ed Der, at the beginning of the Abufeda chain - having made as we think 19 miles. The day has been deliciously beautiful, and we have a radiant night, with a full moon. I was wakened at 2:30 last night by the hoarse whistles of a Cook’s steamer - and looking out of my window discovered one of the big ones going up. It was too dark to distinguish the name.</div>
+    
+<div>Page 13
+    
+    Friday, Jan. 4th.
+        The same story of calm weather - our sailors have had a hard day of it - getting us about 5 miles along on our way - we are at the difficult Abufeda chain of Mountains - of which the sailors are always so afraid.</div>
+    
+    <div>Saturday, Jan. 5.
+        All day tracking and polling along the Abufeda chain - have made  5 miles, - a hard day for the men - but a day of perfect, exquisite beauty - and the moon is now full, and of wondrous beauty.</div>
+    
+   <div>Sunday, Jan. 6.  Epiphany.
+        We began the day as usual, and tracked painfully along until noon when a light north wind began - and it increased - passed Monfalut at 2 o’clock - and have made 20 miles, and are about 15 miles from Asiut. We were bowling along in fine style, at 6 o’clock, when I left the deck and went to my room to rest. I had just dropped asleep when with a crash and bang we went upon the sand, and did not get off for 2 hours - now we are lying anchored in the river - the night is cloudy - and dry - with a most delicious sweet air, filled with the fragrance of some blossoming crop.</div>
+    
+    <div>Monday, Jan. 7. 25 miles - Assiut.
+        We sailed in a light wind from 7 o’clock this morning until 
+    
+    Page 14
+    
+    1 o’clock when we pulled up at Assiut, having made the great turns of the river before reaching Assiut in easier manner than we have ever done. We, the girls and I, drove into and through the town, which never seemed so uninteresting to me. It looks very progressive in the region towards the river, where many new buildings, well and solidly built are going up -especially I noticed the new Hospital building of the American Mission. The great weir in process of construction would seem almost finished - but there is no work going on now - as it is necessary to wait for the fall of the river. It is a fine, solid, imposing work, and we were greatly interested in it. We left Assiut in a good, strong wind, which lasted until 7 o’clock - when we stopped 4 miles below Aboutig. Lots of letters and papers we found waiting for us - no bad news from anybody - I had a letter from Mrs. Page, saying she and her husband and the Lathrops would soon start on the Ammon Ra with a tug for Luxor - where they hope the air will restore Mr. Lathrop, yet weak with fever. A letter from Mr. Newberry reporting good progress with his diggings at Abd el Kurnah.</div>
+    
+    <div>Tuesday, Jan. 8.	40 miles.
+        One of our best days - in fact our second best - passed Aboutig at 7:30, having sailed early in a fair wind, then Gou and Tahtah, tying up 10 miles above Tahtah.</div> 
+    
+    <div>Wednesday, Jan. 9.
+        Strong head wind all day - we have not moved. The wind too 
+    
+    Page 15
+    
+    cold to be much on deck. Our fowls were the only members of our family who enjoyed the day - they had their freedom - as we have been lying by a nice little sandy beach, bordered by palm and scent trees.</div>
+    
+    <div>Thursday, Jan. 10th. 34 miles.
+        We began the day with the heaviest mist I have ever seen on the Nile - and it was not until after 9 that it began to lift before a good north wind which has stayed with us all day. We stopped for 2 hours at Sohag - and are now lying about 4 miles below Girgeh.</div>
+    
+    <div>Friday, Jan. 11.  13 miles - Balliana.
+        Arrived here at one o’clock - too late to go to Abydos - besides, there are 2 steamers lying here, and there was no chance for donkeys. We had a wash - and turned out the fowls. Letters again - a nice one from Mary at Florence, giving news of the Berenson-Castello wedding - and a thrillingly interesting one from Mr. Newberry telling of the two new tombs he has found - and a splendid mummy which he is waiting to unwrap, until we come - and he darkly hints that he may have a wonderful surprise for us. So Theodore is plucking up his impatience and beginning to feel in a hurry. I am reading one of the most wonderful books of travel that ever fell into my hands - a record of amazing courage and endurance - written with a spirit altogether delightful, and with a charming style - “Travels in West Africa” by Mary Kingsley.</div> 
+    
+    <div>Page 16
+    
+    Saturday, Jan. 12.
+        We have had a beautiful day at Abydos - I went in my chair which has never been so comfortable. There were 2 other parties of tourists besides ourselves, but we did not find them offensive - and I was greatly amused at the explanations of the big, fat dragoman of the Mayflower, which were listened to with much seriousness by his crowd. I heard him say, “dere, ladies and gentlemen, you see the great Horus, and ze back of his fazzar Osiris,” and other naive explanations, deliciously funny, but not worth the writing. All that country through which we pass going to Abydos, is so very rich - and the crops of the gulbân now in flower, so very fragrant, - and the endless meadows of alfalfa and wheat and barley now 2 ft. high. The roads were almost crowded with fellaheen  going and coming with laden camels and donkeys. It was a lovely scene - but it is a long ride, as the temples lie 9 miles back from the river, almost at the foot of splendid desert mts.</div>
+    
+    <div>Jan. 13. 1st Sunday after Epiphany. 5 miles.
+        We have tracked almost all the distance we have made - it has been hot on deck and cold below.</div>
+    
+    <div>Jan. 14. Monday. 13 miles.
+        Starting at 7 o’clock, in a fair wind which increased to a strong intermittent one, we reached Nagh Hamadi at 2 o’clock, just in time to see the Cheops go through the bridge with her tug, and it close behind her. There was nothing for it but to wait with what ill concealed
+    
+    Page 17
+    patience we could until tomorrow at 6 A.M. when the bridge will open. Cold.</div>
+    
+    <div>Jan. 15. Tuesday, 38 miles.
+        Another best day to pay for our disappointment of yesterday. We went through the bridge very quietly a little before 7 o’clock - and with a find wind most of the time brought up at Denderah at 4:20 - just too late to visit the temple. We made out 38 miles in 8-1/2 hours.</div>
+    
+    <div>January. 16. Wednesday. 20 miles.
+        Theodore and the girls went to the Temple this morning and were back by 11 o’clock - and we were off in a strong wind bringing up at 6:30, 2 miles below Nagada. A cold, cloudy day. This evening a man brought some antiques on board, and we bought some curious beads - slate tablets - etc.</div>
+    
+    <div>Thursday, Jan. 17.    14-1/2 miles.
+        It has been a cold day - and with all kinds of winds, and tracking we have come within 10 miles of Luxor - tying up at 6 o’clock.</div>
+    
+    <div>Triday, Jan. 18. 10 miles. Luxor.
+        We started at 7 o’clock and our men tracked from that hour until 3 o’clock - with just one rest. Then a very light and fitful wind brought us to Luxor about 5 o’clock - and finding our usual place near the Castle vacant, we gladly pulled into it. We have been a month
+    
+    Page 18
+    
+    and 3 days getting here from Cairo. The day has been cold.</div>
+    
+    <div>Luxor. Saturday, Jan. 19.
+        This has been a very cold day - mercury showed 38 for the limit of cold. Theodore and I went into town this morning - and the girls to Karnak. Mr. Newberry came over this afternoon and brought me one of the 3 copper gilt vases he found in the courtyard of Rek-ma-ra’s tomb. A most interesting and entirely unique find. Each contained a Hathor cow in the center of the broad shallow dish. Mine, has the headdress of the 2 feathers between the horns. M. Maspero kept the other two for the museum - one of which has the cow with a little gold chain and lotus flower about the neck. We persuaded Mr. Newberry to stay for dinner - and having met Baron v. Bissing this morning, I had asked him to dine.</div>
+    
+    <div>2 Sunday after Epiphany.
+        Jan. 20. Luxor.
+            We had a very cold night - mercury showed 36 this morning - a bright sun however. The girls and I went to church. Mr. Newberry came to lunch. The Ammon-Ra with her tug arrived just as we sat down to table - the Pages came over at once and reported the Lathrops quite well. After lunch, Mr. Wallace, a well known artist and collector from London came in and stayed a long time. He was most amusing with his harmless conceits. Baron v. Bissing dined with us.</div>
+    
+    <div>Page 19
+    
+    Monday, Jan. 21.
+        A cold morning - we spent most of it, Theodore and I, with Newberry and v. Bissing at Mr. Murches, looking at his fine collection of scarabs. Newberry came back with us to lunch - immediately after Mr. Quibell and Bob Tytus joined us, and Mr. Page, and we all started over to Mr. Newberry’s house to see a mummy he had found near one of the tombs, and which he had been waiting to unwrap until we came. It was the mummy of one Pau-au-mut, the chief of the metal workers in the reign of Shishank I of the XXII dynasty. When we reached the house we found the elaborately decorated case lying on the dining table; and as we all filed into the room I felt rather as if I were attending a funeral. Mr. Newberry and Mr. Quibell then opened the case by chiseling along its sides and then lifted the mummy out. The case was laced up all along the back like a corset - and the cartonnage must have been pliable when put on. A little wad of soft cloth between the head and case, seemed to me one of the most impressive things about it, but one did not realize that the stiffly envelopped form had ever been a living being - hundreds of yards of cloth were unwound, all most skillfully adjusted - and then the body was revealed sewn in something that looked like a brown felt; it was saturated with bitumen, and when cut away, there still remained countless wrappings of mummy cloth. Then one little flower was found just above the ankles, then a band of something like leather bordered with a crimson edge, passing around the neck and crossing over the breast, with enlarged ends on which were stamped the name of the person and that of the king, - between the bands as they crossed the breast,
+    
+    Page 20
+    
+    was the most valuable thing about the mummy, a fine, large hard stone scarab, beautifully inscribed. Under the right arm pit was a well modelled ibis in wax - about 2-3 in. long - the Ibis god or Thet, being the god who ushered the soul into the judgment hall; and last of all was found a papyrus roll between his knees, with his name, titles, and the extracts from the “Book of the Dead” with the necessary directions and formulas to use against the enemies that beset the soul in its passage to the other world. Then having robbed this ancient Egyptian of his spiritual equipment, judging that after the lapse of nearly 3000 years he had not further use for them, his body was consigned to a decent burial in the sand - and we went outside into the hall of the house until the tea table should be prepared. The ladies took us up stairs to see their rooms, which were very pleasant and comfortable; looking very different from what they did winter before last, when Newberry occupied them with Spiegelberg. The evening was beautiful as we came home - and we were just in time to dress for dinner. Baron and Baroness v. Trantennberg, and v. Bissing dining with us.</div>
+    
+    <div>Tuesday, Jan. 22.
+        Theodore and I went to some shops this morning, the rest to Medinet Habu this afternoon. Mrs. Tytus and her son, Baron v. Bissing Mr. Quibell dining with us.</div>
+    
+    <div>Wednesday, Jan. 23.
+        At home this morning. This afternoon we went over to see the 
+    
+    Page 21
+    
+    tombs Mr. Newberry has cleared. First to that of Yi-ma-dun, chief of the scribes of the temple of Amon-Ra. We were obliged to leave our donkeys below, and clamber over the loose debris of broken stone which lead up to the tomb. A large plateau in front had been cleared and on that was a rude couch on which was Mrs. Sedgwick with books and papers, and inside the tomb were Miss Benson and Miss Gourlay busy with their tracings. It had been a beautiful tomb - and colours and designs still bright and distinct. These private tombs, with their walls covered with descriptions of almost every phase of the life of the deceased, are real revelations of that far away past, of its manners and life. There was one pretty scene of the Scribe seated on his chair in his garden, with some dancing girls with their musical instruments before him, on his knee was a little princess, her hands full of flowers, her crown upon her head and all her titles written above it; behind the chair; was her governess with her fan, and some flowers, and the whole scene was described as “making a pleasant day for the young princess”. We afterwards climbed quite perpendicularly to another plateau surrounded by tombs, 2 of which we looked at - very interesting - then sat down to admire the wonderful view - that wide, green, Theban plain, with the 2 great colossi in its midst - and the grand sweep of the eastern hills behind Luxor - to the south Erment could be plainly seen - it was fascinating to think and talk of all that view once held of life and history - but the declining sun warned us we must scramble down to our donkeys again - and home as fast as possible for dinner.</div>
+    
+    <div>Page 22
+    Thursday, Jan. 24.
+        It has been bitterly cold today with no sun - at noon the thermometer marked 52°. I stayed at home, and was busy and comfortable. Theodore and the girls with young Tytus went over to Medinet Habu this afternoon. I said I was too tired and would stay at home and rest. I had just delightedly embarked on the study of a lot of new scarabs, when a card from Mr. Nathaniel Emmons and a friend was brought, and I felt I must receive them. They stayed a long time, and I showed the boat, antiquities etc. and did the honours generally. Then I decided after they had gone, I would take my book and establish myself on my lounge, when another card was brought, and 3 young women, whom Theodore had met and invited to come and see the dehabeah had to be received - and the same process gone through with. They were just going, when M. Maspero and his wife came - followed soon by Theodore and the girls, and tea - and it was time to dress for dinner when they went away. It began to rain about 6 o’clock and is still raining quietly and steadily. Yesterday the news came of the death of the Queen of England! For 3 days now this has been expected, as she has been fast failing. How strange it will seem not see her familiar name, and to feel that she is not living. I have always had a great admiration for her - and a keen sympathy - and I have always believed that she possessed great qualities, quite outside of the beauty of her character as a woman. Edward the VII is the title the Prince of Wales has taken. It sounds very historical.</div>
+    
+    <div>Page 23
+    
+    Friday, Jan. 25.
+        The rain continued without a break during the night, and has continued all day long; a steady fall of rain, such as we have in our northern climates. There begins to be something ominous about it, it is so unusual. None of us have gone off the boat. Our poor men have been huddled together on the lower deck, until this afternoon Theodore went up with Jones, and all the furniture was moved to the stern end, and a place arranged there for them where they were to stay and sleep. They were most thankful. We had asked young Tytus and Mr. Carter to lunch - but we knew the latter could not get across the river. Tytus however came - having nearly fallen into the river - he said the rain on the Nile mud was worse than ice. He had to be literally scraped before he could come in. He represented the hotel as wofully dismal - with corridors and rooms filled with bath tubs and wash basins to catch the rain - and said the poor people were sounding drums and tom-toms, and shrieking, to frighten the evil spirit away. How the wretched creatures must suffer, with their thin cotton garments, and their mud hovels dissolving about them. Nothing looks happy but the trees and crops.</div> 
+    
+    <div>Saturday, Jan. 26.
+        The rain continued until almost 5 o’clock this morning when the wind began violently raging - and there was no more sleep to be had. Fortunately it came from the west, and we were blown more or less on shore. The Zenet-el-Nil was lying just behind us, and the stir all 
+    
+    Page 24
+    her crew made, added to the noise of our own. I lighted my candles, and just kept quiet - sleep not to be thought of - at 6:30 it had ceased and happily the rain with it - but so cold and dark the day has been. I only went out this afternoon with Theodore to the Castle, to visit the Insingers. Theodore went into the town this morning, and said many places were impossible. We feel well satisfied that not a leak showed on the boat.</div> 
+    
+    <div>Sunday - 3 after Epiphany. Jan. 27.
+        This has been like a very early spring day at home - cold - with dark clouds, and brilliant sunshine. The effects of light and shade on the mts. this morning was quite beautiful. The girls went to church - and after lunch, they all went across the river to Der el Bahri. Mr. Newberry came in about 4 o’clock - and stayed to tea, such a pleasant visit. This evening old Mohammed Mohassib came in - what a fine old fellow he is - we are glad to claim him as a friend.</div>
+    
+    <div>Monday, Jan. 28.
+        A cool, perfect day. The girls and I went to Josef’s garden and got some flowers - as we rode through the streets we found everything swimming in mud - and the smells were everywhere bad. I came home at once to arrange my flowers, and the girls went on for a ride in the country. Monsieur and Madame Maspero, and Mr. Prince from the dahabea Nephtys, and Mr. Newberry dined with us. Maspero was as usual, interesting, delightful and learned. In the afternoon we rode over to 
+    
+    Page 25
+    see Mr. Newberry - thence to Der el Medinet, and stopped to have tea with Mr. Carter. It was so pleasant. I was very much impressed by a large, seated statue, which was the only thing he found in a big tomb he opened at Der el Bahari - a statue of Mentuhotep I unlike anything found before, - the stone was coloured - the face, arms, legs and feet black, the dress white, the crown of Upper Egypt which he wore on his head red - and the whole thing a remarkable for its energy and force. It was found wrapped round and round in very fine mummy shawls - 50 ft. in length.</div> 
+    
+    <div>Tuesday, Jan. 29.
+        In the house all the morning - we went over to Sheik Abd-el-Gurnah this afternoon and had tea - having asked Mrs. Tytus and Bob Tytus to join us over there. Mr. Newberry also joined us, and we went up to the Beyt Wilkinson - where Sir Gardiner Wilkinson lived for 12 years; during which time he was lost to the world, and quite given up as Mr. Newberry told us, by his family and friends. It was quite a plateau in front of a tomb - and he built a house of mud bricks, a corner tower of which still remains. It was during these years that he gathered together the knowledge and material for his great and valuable book on the “Manners and Customs of the Ancient Egyptians”. It was afterwards occupied by Lepsius. It was a fascinating spot - and we all hated to come away.  Mr. and Mrs. Murch and Jimmy - and Mr. Carter lunched with us.</div>
+    
+    <div>Page 26
+    
+    Wednesday, Jan. 30.
+        We began the day by having Mr. and Mrs. Huhatt at breakfast. Then Mr. Murch came in by appointment with me, and we went down to Nubia’s village some little distance beyond the Castle. But we did not find her or her sister at home. She afterwards came to the boat, and Mr. Murch talked with her. I am trying to do something for these girls - one of whom was married two years ago when only 10 years of age - and has been divorced by her husband and left with a baby of 15 months! This was the afternoon appointed for the Memorial Service for the Queen. I had intended going, but not feeling very well, decided to stay at home. Mr. Newberry and Mrs. Sidgwick who came over to the service, came here afterwards to tea. We are having heavenly beautiful nights now.</div>
+    
+    <div>Thursday, Jan. 31.
+        A perfect day - neither hot or cold - stayed at home all the morning. Gwynne Andrews appeared about 11:30, having arrived the night before. Mr. Huhatt was playing chess all the morning with Theodore. Gwynne stayed to lunch - and in the afternoon we all went over to the other side - met Mr. Newberry, who took us to see Sen Nefer’s tomb - and that of Amenemhab.</div>
+    
+     <div>Friday, Feb. 1.
+        Very warm today - at home all the morning. Theodore and Gwynne went to Karnak. O. came back to lunch, and we all went over to Carter’s 
+    
+    Page 27
+    
+    house to tea, and to see the mummy unwrapped. It proved a troublesome business - as it was so saturated with bitumen, that it adhered fast to the case, and could not be moved. It proved to be a very ordinary mummy with no amulets or inscriptions. Gwynne remained to dinner. Very warm tonight.</div>
+    
+    <div>Saturday, Feb. 2.
+        We joined Gwynne at his hotel this morning, and rode out to Karnak - I photographed the beautiful bust of Konsu, recently found there - one of the most lovely things I have ever seen in Egyptian art - also I tried to photograph some of the pretty flowers and birds in the side room of Thothmes III’s temple. Gwynne came back to lunch, and in the afternoon he and Theodore went to Medinet Habu, and stopped for tea at Carter’s. Gwynne to dinner. We have had our flag at half mast for 2 days - because of the Queen’s funeral - and we have telegraphic description of the imposing progress from Osborn where she died, to London - and thence to windsor - a splendidly royal, solemn progress.</div>
+    
+    <div>Friday, Feb. 3.
+        While I was dressing this morning, a note was brought me from Mr. Carter, asking if 5 of us would dine with him this evening, and go to see the beautiful little tomb of Sen Nezem - which he has only shown to the 5 or 6 people - and which will never be shown to the public - because of the perfect but fragile decorations. Of course we accepted with avidity. I promised myself a whole day of rest at home - although
+    
+    Page 28
+    Mr. Newberry was expected to lunch - Theodore took Gwynne to Karnak with him, the girls and Amelie went to church - and I wrote and read. We had a pleasant day - such a nice one with Newberry - who stayed for tea and rode over with us to Medinet Habu. Gwynne came to tea - as did also Mrs. Tytus and Bob - with their friends Mrs. and Miss Trust of Baltimore, and young Richard Ely of New York. As soon as they left, we started across the river, and just as we pulled away from the boat, the full moon arose behind the scent trees above the boat - looking enormously big - and our ride was charming in that brilliant soft light. We reached Carter’s little house in time, and had an excellent dinner - then sat on his verandah while the men smoked, and the moon looked down upon us. The air so deliciously warm and soft. Then I got on my donkey, and the rest walking we went for about 15 minutes to the tomb, which is quite close to Der el Medinet. What a beautiful experience it was! how pure and delicious the air - and how solemn the silence! As we neared the tomb, Carter blew a whistle, the guard at the tomb fired a revolver, and there we were! we slipped down quite a perpendicular staircase and through a low, short passage and found ourselves in the brilliant little tomb - about the size of my room on the boat - colour, drawing, surface as perfect as if it were done yesterday; the style of ornament quite peculiar and very graceful. Our ride home was entrancing - and especially that part over the desert from Der el Medinet to the cultivated land - where at once you begin to feel the cold air, so different from the warm desert air.</div>
+    
+    <div>Page 29
+    
+    Monday, Feb. 4.
+        This morning we took Gwynne, and started for the tombs of the Kings - having an appointment with Carter to show us that of Amenhotep II again at 11 o’clock. I went in my donkey chair which did not go very well, as the hind donkey was difficult - and after he had fallen down 3 times, Jones dismounted and put his donkey in the shafts - and then we went on very well. I always enjoy the splendid devastation of the rocks in that desert valley. Carter came to lunch with us in one of the unfinished tombs, and I stayed quietly in the shade until the rest had visited the other tombs. Then we started home - the rest turning up a valley to see a tomb, or rather its site which Carter is opening for Theodore. I waited in the shade of some great rocks, with Amelie and Jones and with all my entourage, until the sun should get a little lower - and enjoyed the wonderful air and the utter desolation. Then not waiting for the others started on - soon a fox crossed the road, pausing a moment to look at us. Near the Gurneh temple which the fields and trees make such a pretty scene, Bob Tytus met me, and rode home with me for tea - and the others soon followed - Theodore is spending the evening with M. Maspero.</div>
+    
+        <!---IS part 1 end-->
+        <!---IW part 2 start-->
+    Tuesday, Feb. 5.
+        Left Luxor this morning at 10:30 in a very light wind. Bob Tytus to see us off - Gwynne did not turn up. The usual send off on the bank from natives, blind, poor etc. Hardly any wind - a little polling brought us to Erment, 9 miles at 7 o’clock - where we are 
+    
+    Page 30
+    
+    lying. The hottest day we have had.
+    
+    Wednesday, Feb. 6.
+        25-1/2 miles we have made, and are now lying opposite Esneh. Very hot day - but deliciously cool now - very busy all day. We are all a little lonely for Luxor but are too glad to get back to pleasant quiet occupations.
+    
+    Thursday, Feb. 7.
+        We are lying tonight about 3 miles from Edfou - having made 34 miles. The wind has been steady but light and the day very hot. We stopped at El Kab at 3 o’clock to speak to Mr. Somers-Clarke, and to give the shawl and clothes to my old woman - whom I was quite looking forward to seeing again, but she was not there, and when Abdul asked about her, they told me she had died - a happy end to a miserable existence! and yet I felt half sorry, in a selfish way. The dogs raced to meet us as we drew near - and seemed to look upon us as old friends. Mr. Somers-Clarke, and Mr. Carter, who we knew was here, came over at once - and after a little visit, the wind having come bravely up, we sailed away - and after tea, we described the Istar coming down. We spoke as we passed - Mr. Sayce saying that he would be at El Kab until the 19th - where we will see him. We did not stop at Edfou as the wind was so good but we went on the sand just this side of it for a few minutes, and sailed until 7:30. Warm and very dry tonight. 
+    
+    Page 31
+    
+    Friday, Feb. 8.
+        We have made 38 miles today - in spite of a morning of perfect calm - we tracked a good deal - in the afternoon the wind increased - very hot - we find our new dark green awning strips most comfortable - making a protection when we cannot have the big awning, and a most grateful shade for the eyes. We passed Silsilis at 4 o’clock - soon after Cook’s steamer Hatasoo, which had been slowly gaining on us for some time passed us - but the wind growing strong, we caught up with her, as she is slow, and was laden with passengers and freight, and kept ahead of her until we tied up at 10 minutes past seven. Our sailing was really splendid - and exciting - the air indescribably fine - and dry - we did not come down from deck until 7:15. Passed 2 dahabeahs, bound down this evening. 
+    
+    Saturday, Feb. 9. Assuan.
+        We arrived this evening about 8 o’clock - having started early this morning, from a mile below Kom Ombo. The light wind however quite died out as we reached Kom Ombo - and Theodore decided to take the girls across to the Temple - I declined to go, the sun was so hot. At 10 o’clock we started with wind very light, and have with some difficulty made the distance of 27 miles. It has been hottest day we have had. The thermometer this morning outside registered for it lowest point 56, and at 10 o’clock it was 65. This afternoon the heat was great - but in the boat, the shade and coolness was delightful. I was on deck however all the afternoon - the air so warm, pure and dry - and I wanted to get 
+    
+    Page 32
+    
+    all of the last of our sailing with the big boom and sail. We arrived so late, that we pulled up just where we did last year for a night and day - opposite the big Sycamore at the foot of the cliff where Grenvalle’s tombs are. A strong wind is now blowing.
+    
+    Sexigesima Sunday, Feb. 10.
+        The girls and I went over to church this morning - the church is quite near the Cataract Hotel, and we landed there and walked up those interminable steps in the broiling sun, through the hotel, and out along the top of the hill - a truly fiery passage. Mr. Somers-Clarke is the architect, and it was the first time I had seen it. I liked the exterior and the interior too - although a little heavy. A large congregation, we were obliged to go quite to the front - and the clergyman expounded the mystery of the temptation in the Garden of Eden to us, in a truly infantile manner that was astounding. It was the first time I had heard the prayer for “Our Majesty the King” - and how strange it seemed! We moved along past Kitchener’s Island this morning, and are lying where the Gazelle did last year. Very hot today - mercury at 86.
+    
+    Monday, Feb. 11.
+        A warm night, and again very hot this morning - just as we were preparing to row over to Aswan, Mr. Varley, the artist, arrived. Theodore and I went to the Cataract Hotel afterwards to see his pictures and the girls went on to the Bazaar. We were charmed with his work - and Theodore bought 3 of them - one for Mrs. Berenson - there was a long 
+    
+    Page 33
+    
+    time to wait for the girls; but found that delightful enclosed terrace very comfortable - and decided we would go there for dinner - which we did, and are just home - a good dinner well served - and a rather attractive house, with its wide view of the rocks, river and mts. But how dismal is any hotel! Hot tonight - air deliciously dry - we are now beginning to receive accounts of the Queen’s funeral - indescribably imposing and touching.
+    
+    Tuesday, Feb. 12.
+        We walked on the island this morning, it being a little cooler - but hot enough - at 9:30 mercury at 72. Our big boom came down today - and all hands have been busy for we hope to get away tomorrow. I have never seen Aswan so unattractive. The heat - the hotels - all the changed surroundings, seem to make another place of it. In spite of the heat, the girls, with Jones to take care of then, went over to Philae this afternoon - in a carriage, Heaven save the mark! a road has been made - they reported it awful. We went to the Savoy Hotel for dinner tonight - the dinner good, but cold and badly served. The house is much more attractive than the Cataract - cheerful and well furnished - and the palms and garden about it are really good. I should much prefer it to the Cataract hotel. But we all decided that we think the Beduin the best of all. We had a long row - and the north wind which has been blowing hard all day, was still going - but we hope it will blow itself out tonight. The only dahabeahs now here are the Hathor and Nephtys - waiting for their people from the 2d cataract. I have never
+    
+    Page 34
+    
+    seen Aswan so quiet before.
+    
+    Wednesday, Feb. 13.
+        It is just 3 months since we left home! what an age it seems! The wind is still blowing hard from the north - I have not been off the boat. I have much amused myself with the little Idris, or Hassoun as we generally call him - he is such a delicious little black or brown baby - every one loves the child - I am afraid his little heart will be sad when we leave. Theodore and the girls crossed the river this afternoon, and went up to the convent. This north wind has brought 3 dahabeahs up - one is at the steamer landing - Sesostris - another beyond us - the old Hope - another the Neb-het, at Kitchener’s island. Much cooler today - are in sailing order and hope to get away tomorrow.
+    
+    Thursday, Feb. 14.
+        In spite of the north wind still blowing, we started down this morning about 11 o’clock - and right glad I was to get away from Aswân which no longer possesses much attraction for me - so much have the big hotels and the building of the great dam changed its features. The delicious colouring, the pure, dry air - and those avalanches of golden red sand - all these are still there - and these I am always sorry to leave. The day has been cool - we have made 10 miles. 
+    
+    Friday, Feb. 15.
+        The men began rowing at 6 o’clock’ this morning at which time 
+    
+    Page 35
+    
+    it was quite calm - but a wind from the north began soon after - and has much delayed us. We are now about 6 miles below Kom Ombo - having made 22 miles. A perfect day - we had tea on deck - and it was like a day in July. The air was dry, and so pure - each breath was a pleasure - the sunset colouring so quiet and yet so brilliant - with all the yellow desert mountains touched into light crimson - and everywhere such delicate gradations from pink to yellow. On a sand bank near us, were several enormous storks with long bills - who watched us without moving. I was much interested in a large village I saw quite on the top of one of the hills opposite - the houses built in clusters, with great enclosing walls - in excellent style - with vaulted roofs - and many of them with stepped gables - quite Dutch. It was so superior to anything I had seen on the river, for a country town. I asked Mattar what town it was he said El-Minya, and I afterwards found it on the map.
+    
+    Saturday, Feb. 16.
+        One of the hottest and most uncomfortable days I have ever known on the river. A light north wind all the time against which we struggled all day, making 17 miles and tieing up about 6 miles below Silsileh.
+    
+    Sunday - Quinquagesima - Feb. 17.
+        Another very hot day - mercury at 89 - light north wind again and slow progress - have made 32 miles, and are within a mile or so of El Kab, and can see the lights of the Antar and Istar. This afternoon
+    
+    Page 36
+    
+    when we were all in undress and trying to be cool, we saw the steamer the little Philae bearing down on us, with the British flag flying, and we knew it was the Shaw-Safes. They came on board and made a call - and said they had been looking out for us all the way up the river - they were on their way to Assuan, but will be in Luxor soon.
+    
+    Monday, Feb. 18.
+        The same story to be told over again of hot weather and contrary wind. We have made 29 miles - and are at Matara 10 miles below Esna, where is a big sugar manufactory. Very hot tonight. We passed Cook’s steamer the Cleopatra hard aground the other side of Esna. She had some of her cargo out, and many men working at her.
+    
+    Tuesday, Feb. 19. 24 miles.
+        Somewhat cooler today - but struggling as usual against the north wind - and pulled up at 7:30 to the bank less than a mile above Luxor.
+    
+    Ash-Wednesday, Feb. 20.
+        We wound around the Castle before breakfast, found our usual place vacant, and went there. Theodore went to town and the girls to Karnak. Bob Tytus turned up after breakfast, and he and his mother dined with us tonight. About 4 o’clock we went across the river to the tomb of Rekmara, and found Newberry - and heard that Mr. Carter has been called to Wady Halfa - no developments - Newberry is rather discouraged
+    
+    Page 37
+    
+    about finding the body of Rekmara. I am sorry for his sake.
+    
+    Thursday, Feb. 21.
+        At home this morning - in the afternoon again across the river and had our tea again at Beyt Wilkinson’s.
+    
+    Friday, Feb. 22.
+        A cool delightful day - we all went over to the tomb where Newberry is working at the wall tracings, and spent the day there. Mrs. Sidgwick and Miss Gourlay there. The big tomb was delightfully cool - and there were few flies - and we had a very nice dinner or rather lunch and in the afternoon tea on the broad plateau in front of the tomb, with the great plains below us, and Luxor in the distance. I was in my carrying chair, and coming home rather late among the big crops of wheat and barley in ear, with the light of the young moon was delightful.
+    
+    Saturday, Feb. 23d.
+        Busy this morning paying visits, and with a host of little arrangements. At 3 o’clock this afternoon Bob Tytus went with us, by appointment with Newberry, Mrs. Sidgwick and Miss Gourlay to Medinet Habu where we gave them tea, and then all rode out into the desert where stood the Palace of Amenhotep III - which Newberry is going to clear next year. It is an extended mass of rubbish - no structure visible. It was in a charming position - and we rode home by a new road - or an old one, that was new to us - along a big dyke - past 2 or 3 little
+    
+    Page 38
+    
+    villages, and among the rustling grain fields - the moon was quite bright before we reached the river. Mr. and Mrs. Shaw-Safe who arrived on the Philae at 5 P.M. came to dine.
+    
+    First Sunday in Lent - Feb. 24.
+        Mr. Newberry and Bob Tytus came to breakfast. The morning was calm and warm - and at 10:30 we had said goodbye to our many friends and started down the river; but now a little north wind has begun which has continued all day. We passed the Gazelle about 6 miles below Luxor - they must have started quite early. We have made 18 miles.
+    
+    Monday, Feb. 25.
+        I have had a busy day. We have had a north wind - it has been hot - the sailors have worked hard - we have made 30 miles, and are 4 miles below Keneh - just where we laid one night going up - Jan. 15. - about 6 weeks ago. The Horus passed us this morning going up - with the American flag.
+    
+    Tuesday, Feb. 26. 34 miles.
+        A very light favorable wind most of the day. We reached Nagh Hamadi about 4 o’clock - too late to get through the bridge, which as we turned around a bend of the river, we saw just closing. So we had to tie up for the night as the bridge does not open again until 7 A.M. The Philae with the Shaw-Safes overtook us just before we tied up. Mr. S.S. came over and asked us to go to tea, which we did. Then they started on, as they could go under the bridge. Very hot.
+    
+    Page 39
+    
+    Wednesday, Feb. 27. 20 miles.
+        We got through the bridge by 7:30 this morning - and are tied up to an ill smelling bank 2 miles below Balliana. The day has been very hot - 90º under the deck awning. Very cloudy too, and looks as if we might have a touch of Kamseen. Our mails lately have been flooded with criticisms of the Queen, and descriptions of her funeral. It seems to me that the whole world has felt her death as a personal loss - and as one of the greatest lessons of the worth of high character and faithful performance of duty. Never has a Queen or Empress been more mourned - never was a woman so universally loved and respected. Her long reign - her many sorrows - her sympathetic and loving nature - made her unique. The world has never seen any tribute equal to that paid to her. And the funeral was as unique, in its solemn, grand pageantry. I have made a collection of all the criticisms and descriptions that I have seen.
+    
+    Thursday, Feb. 28. 30-1/2 miles.
+        We started early with a suspicion of a light wind - which increased as the morning went on - but which died away towards noon. Excessively hot - and still - the whole land in a shimmering haze of heat - I sat on deck for an hour or more - for I love that effect - the mountains so etherial in their tints of pale yellow and mauve - the flocks and inhabitants all down at the rivers side - the buffaloes in the water, with just their heads and big round backs protruding from it - and everywhere the melancholy sustained minor any of the
+    
+    Page 40
+    
+    shadoof workers. We reached Sohag at 3 o’clock, got our mail and put off, expecting to cover many miles before dark, but hardly had we passed the town, when we were driven to the bank of the river by a sudden and violent storm of wind and sand - but no rain fall. It was so violent, that we had great difficulty in making a landing - and so dropped our anchors in a jiffy - and waited until the wind eased a little. We had been expecting a storm all day - the head and the clouded skies threatening a khamseen. It has effectually broken the long heat - and it is cold tonight - a great change.
+    
+    Friday, March 1st.
+        We are lying where we stopped last night. The wind raged all night and continued all day. We hope for better luck tomorrow.
+    
+    Saturday, March 2d.
+        Still lying near Sohag - though we made about half a mile early this morning, but were forced to shore by the wind. A fine day - delicious air, but high winds - we are against a low pretty green slope which extends some distance along the river. We had a charming walk this evening along it, and looked at the Anglo-American steamer Victoria aground - a heavenly moon tonight. 
+    
+    2d Sunday in Lent. March 3d.
+        The same gale and the same spot - this evening a little cloudy
+    
+    Page 41
+    and warmer. I have finished reading aloud today, the “History of Rome in the Middle Ages” by Gregorovins. Of course in a translation. What a ghastly account it is of everything that is hideous in life. War, strife, rapine, murder, cruelty, unholy ambition, almost inconceivable! 
+    
+    Monday, March 4th.
+        The gale continued unbroken until about 6 o’clock it grew lighter, and we pushed off from the bank hoping to have an hour or so of rowing, and as the moon is almost full, to be able perhaps to row late, but soon it redoubled its fury, and sent us to the bank not far from our old place. Theodore wrote to Cook for a tug - I have begun reading aloud the “History of Italian Unity” by Bolton King - which I find excellent reading.
+    
+    Tuesday, March 5th.
+        The wind not blowing so hard this morning we started after 6 o’clock, and kept afloat until 10 o’clock when we had to go to the bank - which was a lovely stretch of a sand island from which the river had lately receded - inhabited by many birds. We have made about 4 miles. The full moon sailed up above the palm trees in the most wonderful manner this evening! slightly warmer.
+    
+    Wednesday, March 6th.
+        In spite of a howling gale from the north we have made about 
+    
+    Page 42
+    
+    18 or 19 miles and are within 2 or 3 days or Tahtah. We were driven to a low sand bank this afternoon just as we were making the first turn to the Gebal Abufeda chain. It was so violent that we could not put our bow up the stream - and the strong current and the wind drove against the stern making a hideous noise in my room. I thought I should not be able to sleep, with the water slapping and banging under my head - but I did sleep unusually well - we hope for our tug tomorrow - the Hope passed down with a tug this morning.
+    
+    Thursday, March 7.
+        The wind was raging and the water still dashing against the stern this morning when I wakened. But as I went into the bath room I saw our tug bearing down upon us - and immediately there was a great rejoicing. We reached Assiut at 3:30 and are now 14 miles below Assiut, having made 60 miles.
+    
+    Friday, March 8.
+        In spite of continued high wind, we have made 79 miles and are lying at Minieh - next the Hope and her tug, which we met at Beni Hasan. The day was lovely, but the cinders and smoke made the deck disagreeable.
+    
+    Saturday, March 9th.
+        This has been the stormiest day we have ever known on the river, but the tug has carried us along in the teeth of this hostile 
+    
+    Page 43
+    
+    northern gale, except when she stuck on the sand. At one time she was nearly an hour - and this afternoon when this performance was repeated for the fifth time, and our men’s patience was well nigh exhausted, and they had worked hard to get her off, Rais Fuli went over himself with 4 of our best men - and steered her himself. We brought up at bibba where we are lying, having made 70 miles. The wind is still raging - the heavens are wonderfully fine - the Zodiacal light very bright - we are within 83 miles of Cairo.
+    
+    Third Sunday in Lent.  March 10.
+        Another stormy day - even worse than yesterday - the waves ran high - the water sometimes dashing on the windows - the tug was several times on the sand - the last time about 5 o’clock, near the Ramesis, also aground. Finally the Ramses got off, only to give her place to the Memphis. Our men worked until after 8 o’clock with the tug and finally got her free - but we all lay in the middle of the river anchored, afraid to move. It was impossible to stay on deck - the wind, the smoke and the sand being unbearable. We have made 41 miles.
+    
+    Monday, Mar. 11.
+        The day has been a little better. We did not get underway until 8 o’clock - as the tug again stuck - but the wind was tremendous. Came in sight of Cairo at 4 o’clock - and are at the Museum landing. Found Salah waiting with a bunch of flowers - and another bunch with note from Mrs. Page.
+    
+    Page 44
+    
+    Tuesday, Mar. 12.
+        Home all day - north wind still. Mr. and Mrs. Quibell and their friend Miss Jones dined with us.
+    
+    Wednesday, Mar. 13.
+        Home all day - Bob Tytus here to lunch. Theodore and I went into Shepheards and dined with the Pages and the Lathrops. Saw the Shaw-Safes. They go to Greece tomorrow.
+    
+    Thursday, Mar. 14.
+        Drove out to the Mena House and lunched with Mrs. Tytus. The girls rode on camels around the Pyramids and Sphinx. Stayed to tea - quite cool coming home. Theodore rode out and back.
+    
+    Friday, March 15.
+        A dense fog this morning on the river - Mrs. Lathrop made a pleasant call. North wind, but hot.
+    
+    Saturday, Mar. 16.
+        Strong north wind - sun hot - Theodore and I spent a pleasant morning at the Museum. Mrs. Tytus and Bob to lunch.
+    
+    Fourth Sunday in Lent. March 17.
+        Theodore and I went to lunch with the Sandwiths and had a nice visit. Then to tea with the Quibells - who are charmingly situated 
+    
+    Page 45
+    
+    in a house they have concocted out of one of the former bath appartments of the Gizeh Palace - are just next the Masperos. 
+    
+    Monday, Mar. 18.
+        An uncomfortable day of packing and unrest. We leave the boat and go to Shepheard’s tomorrow, not being able to get in at the Gezireh.
+    
+    Tuesday, Mar. 19th.
+        We are once more established in our former appartments at Shepheards. It is warm - very warm, and threatens a khamseen.
+    
+    Friday, Mar. 22.
+        It has been intolerably hot for 2 days - mercury at 93-95. All the electric fans going - a little visiting and shopping. The Tytus’s have been here all the week and we have enjoyed seeing them. This afternoon Mr. and Mrs. Quibell and Baron v. Bissing came to tea and we had it on the garden terrace - v. Bissing looks poorly - we are off tomorrow.
+    
+    Florence, Hotel Grande Bretagne.
+        April 23 - Tuesday.
+            A far away cry to a month ago, when in the heat of Cairo I made my last entry. We sailed from Alexandria the 23d on the Hapsburg, and landed at Brindisi the morning of the 26 - reaching Rome the same 
+    
+    Page 46
+    
+    evening, and established in our familiar rooms at the Bristol. Amelie took a very bad cold on the steamer, and met the infection of influenza somewhere, was ill in Rome. I promptly took it from her, and was only able to go out one day there. On the 1st April we came on here - Amelie again went to bed, and so did I, from which I only emerged a few days ago, having for the first time that detestable malady influenza. I was really very ill - but fell into the hands of an intelligent homopathic doctor who brought me out very well, and I now go out each day. Theodore and I are now enjoying an unwonted quiet as Eleanor Knagmlychen and her husband who met us here, went on the 18th to Venice, taking Bessie and Polly with them. My dear Mary Rogers was here when I first came, and constituted herself  my nurse day and night; as no nurse could be found for me and so with the help of Mary and Nettie, I pulled through the weary days of illness. Eleanor and her 3 boys will sail with us on the Deutschland the 31st May. She take the steamer at Hamburg. How vexing it has been to have thus wasted all these weeks in Florence in bed and in the house, I do not like to think!
+    
+    Friday, April 26.
+        Our four weeks here will come to an end tomorrow, as we start for Milan. I have been out these two last days - lunching at Lizzie’s today. The weather has been uncertain. Florence is a great caravansery on the world highway - where you meet almost every one you know; we have had a constant succession of people each day - to lunch and to tea and to dinner. This afternoon I was just lying down to rest after my 
+    
+    Page 47
+    
+    return from Lizzie’s when Mr. and Mrs. Shaw-Safe arrived - and after that, Mrs. Lathrop - and Mrs. Tytus and Bob came to dinner with us - Theodore is going off with 2 or 3 treasures found here. One of them an important painting by the Venetian Catena, a portrait of the Doge a magnificent picture in colour and technique, and strongly suggestive of the knight in that beautiful picture of Catena’s at the National Gallery in London, of the “Warrior adoring the Infant Christ”. He has also a lovely bit of old French carving in ivory.
+    
+    Hotel Cavour - Milan.
+        Wednesday, May 1st.
+            We came over from Florence on Saturday - the 27 - Theodore had engaged 2 compartments, so that I was most comfortable, and not troubled by tobacco smoke. Nettie came with us fortunately. It rained persistently most of the way - the train was very heavy - and we were 2 hours behind time, arriving here at midnight. The next day Sunday was very wet and stormy. The rest went to galleries and churches. Monday was almost as bad. I took the air from from our nice big balcony, and sat and walked sometime there. Tuesday, was the same - and today has been absolutely cold - the rest have gone to Pavia, to see the famous Certosa - and Amelie and I were just preparing to go over to the park for a walk, when a thunder storm came up, and though it did not last long, made everything so damp that I could not go out. But in spite of all my disappointments about seeing my precious pictures, and architecture - the days have not dragged much in this most comfort-
+    
+    Page 48
+    table of all hostelries - in our usual favourite appartment, with the big windows looking out on the Park - the season is wonderfully backward - we were shocked this morning to read in the Herald of the sudden death of Mrs. Bronson at Rome. It is hardly more than a month ago that Theodore was lunching with her!
+    
+    
+    Hotel National.
+        Lucerne - May 3d - Friday.
+            Left Milan yesterday at 11:30 - and had a beautiful journey over the St. Gotthard. As we reached the northern side, and drew near Lucerne, the effects were charming - as the sky was filled with heavy clouds, through which the sun shone vividly from time to time giving lovely effects on lake, mountains, meadows, chalets, and quiet hamlets. Rain began to fall. The season greatly delayed - the cherry trees just coming into bloom - we are settled in the new part of the house, in luxurious rooms, furnished charmingly well. I have been out but little, the winds being cold, with frequent showers. The girls took a boat down the lake this afternoon. We go off tomorrow to Basle for the night.
+    
+    Westminster Hotel.
+        Paris, May 6th.
+            Left Lucerne at 2 o’clock on Saturday the 4th arriving at Basle at 4:30 - went as usual to our old rooms at the “Trois Rois” . Baron v. Overbeck came over from Freibourg to dine with us, and we were off the next morning at 10 o’clock for Paris. A long, tiring ride as 
+    
+    Page 49
+    
+    usual, arrived at 6:30 - and are settled in our usual appartment here. Weather cold and rainy. The girls and I started upon our shopping expeditions though my efforts only went as far as a visit to Moreie and Blossier in the next street. Mary Parsons came in this morning.
+    
+    Tuesday, May 7.
+        A horrid day of rain - in doors all day - Mary Parsons came to dine.
+    
+    Wednesday, May 8.
+        The same story of bad weather - absolutely wintry - and constant rain. Theodore went to see the Kerbs at the Chatham Hotel. I dared not venture.
+    
+    Thursday, May 9.
+        The same kind of a day, but colder. Theodore and Mary Parsons went to the Louvre, and Mary came to lunch. Later the sun came out so brilliantly it really seemed as if it might permanently have cleared - and Theodore proposed that I should go for a drive to the Bois. We have such a comfortable coupè that I went - but before we entered the Bois, the clouds were again upon us, and the rain fell gently until we reached home. Miss Kerbs came in to tea, and was as nice and wonderful as ever.
+    
+    Page 50
+    
+    Saturday, May 11, 1901.
+        Yesterday and today have been given up to fripperies like most of the days in Paris, alas! I am not allowed to go to any galleries. This morning I took Amelie and went for a drive in the Bois. I never saw it looking so pleasant - and so many riding - with that happy look people have when galloping along under trees - so many smart people too driving, and walking up and down. Everyone this evening has gone off to the Circus! a French circus is not amusing to me - and I been sitting alone in a comfortable chair, reading that most amusing book, “Elizabeth’s Visits”.
+    
+    Saturday, May 18.
+        A week of fussing. My daily drives have been my only solace. Weather has been, and is, cold - with high winds. Thursday being Ascension day, and a holiday, we went out to Chantilly to lunch - Mary Parsons with us. It was wintry - and sombre. The place full of people so that our lunch was a difficult affair. We had only time for the Chateau and its art treasures - and I spent much time looking from the windows on the wonderful park and pleasure grounds. A truly royal Chateau. We are off tomorrow for London - and my spirits are rising all the time.
+    
+    Monday, May 20.
+        London, Bristol Hotel.
+            Established once more in our old quarters - which we have occupied for many years. We had a good journey from Paris yesterday - 
+    
+    Page 51
+    
+    and a beautiful crossing to Folkestone. Every one stayed on deck, except myself - and I stayed below in a comfortable stateroom, and slept all the way over. Have been out driving today - and doing a little shopping. Last evening Gaspard Farrer called.
+    
+    Tuesday, May 21.
+        Out most of the day. An invitation from Sir William Farrer this morning asking Theodore, Nettie and me to Sandhurst for the Whitsuntide holidays. It seemed impossible to accept it without leaving the girls in the lurch so I wrote and declined. Directly after lunch Miss Farrer herself came to say they did not know our party was so large, and insisting that we should all go out to Sandhurst. She was so very nice and hospitable that I could not refuse - though it seems indecent to accept for all five of us. I so much want to go - as this is my third invitation - and I have never before been able to accept. Mr. Rathbone called this afternoon - he told us of Mr. Lidderdale’s illness - and of his serious condition. We left cards there this afternoon. 
+    
+    Wednesday, May 22.
+        Nettie and I out this morning - Mr. Newberry to lunch - Bessie and I went to the Temple Flower Show - although we were early, it was crowded - the tents very warm - and the violent cold east wind surging into every opening, and making frightful draughts - lovely, wonderful flowers - things to dream of wish for - Mr. Lelfe Leonard of Guildford
+    
+    Page 52
+    
+    lunched here, yesterday, and we spent the afternoon talking gardening - gardeners lists - etc. The rest have gone to the theatre this evening. The evening papers being accounts of the trial of the two Shamrocks - the challenging yachts - the Shamrock II on which King Edward and Sir Thomas Lipton were, just as she was preparing for the start, was struck by a heavy squall, and her mast, and sails were completely carried away. The King and Sir Thomas escaped all injury. The other yacht was also damaged. 
+    
+    Thursday, May 23.
+        Busy all day - drove in the Park with Daisy - Mr. Newberry came in for a moment, and we arranged to drive out to Kew and meet him there this afternoon. It was heavenly beautiful - the azaleas in fine bloom - I was much interested in the rock garden - I had a chair, and an old man to pull me, who might have posed as old Father Time - so that I did not get tired. We had tea and buns, and bad they were. Dined with the Rathbones.
+    
+    Sandhurst Lodge - Hants.
+        Sunday, May 26. Whitsunday.
+            We came out here yesterday afternoon. The place is not a grand one, or even old or picturesque, - the house is modern, large and comfortable. I have a bed in my room about 6 ft. wide - and the enormous window looks out on the park in front of the house, and the carriage approach. We were 18 at dinner last night. Sir William took me out, 
+    
+    Page 53
+    
+    and was as agreeable as he always is - or rather I took him out, as he walks with two sticks and leans on somebody’s arm - and my friends were aghast to see me walking over those slippery floors, leading infirmity! Frank Farrer is the only one of the Farrer boys here - and is quite a host in himself. Mrs. Rowstorne, one of the married daughters, I especially like - she has less of that cold, uncertain English manner, and is besides interesting. We all marched up stairs with our bed room candles at 11 o’clock leaving the patient men to go at last to the liberty of the smoking room. I have been out of doors all day - the weather is good - and the air of these high, piney downs, most delicious. Mrs. Rowstorne took me through the gardens, and through charming walks among the pines - Sir William is devoted to his garden - and wants to send me a lot of English plants which we already have in profusion - and which I found quite difficult to make him comprehend. There are enormous trees on the lawns - and many especially fine Spanish chestnuts - beautiful trees - the windows of the big drawing room, library and dining room all open to the ground on the lawn - or rather on the verandah - giving such a pleasant look of all out of doors in the house. 
+    
+    Monday, May 27.
+        This has been a most perfect day - almost hot - I have enjoyed every moment. Theodore and I this morning, with one of the visitors, walked over the place - and I took some photographs - especially of the Rowstorne baby - playing on the lawn with a peacock - his tail splendidly displayed. In the afternoon Miss Farrer drove the Pagets, Theodore and 
+    
+    Page 54
+    
+    myself to the neighboring estate of Bramshire - a fine example of the 11-12th century architecture - now, alas, so ruined as to be almost beyond repair. The family, still live in it, and are proud to show it and its treasures Sir Anthony Cope is now the possessor. It is melancholy to see such a splendid fragment going to decay - but there is no money in the family. They were most hospitable, and gave us tea. We had a charming drive home - passing through Eversley, Charles Kingsley’s village - where he spent so many noble, useful years. We saw the wretched little Rectory and the quiet churchyard where he lies. After we got home, we walked out to the place where the young pheasants were breeding - and the keeper told us all about their management and care. They were pretty little chicks - all the eggs being hatched out by the ordinary hen. Poor Sir William did not appear at dinner - as he has been seized by an attack of the gout. We go back to London in the morning. 
+    
+    S.S. Deutchland.
+        June 5 - Wednesday.
+            We had 3 busy days in London before we left on the 31st. Newberry and his wife dined with us on Tuesday - Mr. and Mrs. Breasted, who I had never met before on Wednesday - and Prof. Sayce lunched with us on Thursday. He has bought a house in Edinboro where he is going to live and talks of selling his dahabeah and buying a small one. Fielding arrived from the country at last, rather late for lunch - very much distressed at a telegram he had found waiting for him from Lady Herbert of 
+    
+    Page 55
+    
+    Tea, at Rome, with whom his mother has been staying, saying she was very ill with pneumonia, and to come at once - and he went on at 5 o’clock. Nettie left for Paris and Florence on Thursday morning - and in the afternoon Theodore and I went to Regents Park to see the Dog Show. It was cold and damp - Newberry came in to bring the papyrus found on our mummy last winter and Theodore went to dine with Miss Luling. In the morning, Friday, we were off early for Southampton - found Eleanor and the children on the boat, eagerly waiting for us. Left Cherbourg at 5 o’clock. We have had a very quiet voyage. This enormous boat is very comfortable and handsome, - the weather has been and is perfect - quite warm now. We ought to reach Sandy Hook tomorrow at 10 o’clock A.M. and our dock at 12. How long the days have been and how blessed it is to feel that all this weary pull towards home, is almost finished - and that in 3 days I shall be with Toby, in my blessed garden once more!
+    
+    June 7 - Friday.
+        New York - Holland House.
+            We reached our pier yesterday about 11 o’clock - and were a long time getting off the boat. The heat was tremendous - Mr. and Mrs. Wilson, with Alice and Clarence came to meet Eleanor, but only Mr. Wilson was allowed on the boat. He stayed to see us all through the Custom House troubles - which were trifling but tiresome - and it was nearly 4 o’clock when we got up here. Bessie and I were out all day - each evening we have had many visitors - and tomorrow we get off for Newport 
+    
+    Page 56
+    
+    by 10 o’clock train. Katy has telegraphed “all well” from there.
+    
+    Sunday evening,   June 9 - Home.
+        Arrived at 4 P.M. yesterday - Toby and Max crazed with delight at seeing us again - Toby so well and frisky - but growing sadly deaf, and a little blind, poor darling. How happy we are to be here again after all our wanderings - and how beautiful this most charming house is - and the garden more interesting and perfect than ever before! 
+    11
+    <!--IW part 2 end-->
+     
+</div>
+</body>
+</text>
+</TEI>
