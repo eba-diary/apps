@@ -9,6 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web
 {
@@ -25,7 +26,8 @@ namespace Sentry.data.Web
                 approverIdsNames.Add(new KeyValuePair<string, string>(prodCust.AssociateId, prodCust.Name));
             }
             AllApprovers = Utility.BuildSelectListitem(approverIdsNames, "Select an approver");
-            SaidKeyCode = permissions.DatasetSaidKeyCode; 
+            SaidKeyCode = permissions.DatasetSaidKeyCode;
+            SelectedPermissions = PermissionCodes.INHERIT_PARENT_PERMISSIONS; //Only permission we are working with, so we can default it
         }
     }
 }

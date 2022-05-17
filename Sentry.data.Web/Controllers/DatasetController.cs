@@ -739,10 +739,6 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public ActionResult GetLatestInheritanceTicket(int datasetId)
         {
-            //SecurityTicket ticket = new SecurityTicket();
-            //ticket.TicketStatus = "PENDING";
-            //ticket.TicketId = "123456789";
-            //return Json(ticket, JsonRequestBehavior.AllowGet);
             var ticket = _datasetService.GetLatestInheritanceTicket(datasetId);
             if(ticket == null)
             {

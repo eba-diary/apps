@@ -2282,9 +2282,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     managePermissionsInit() {
-        //Code to init inheritance switch
-        // -Call controller to get current status
-        //Init modal (form init, etc)
+
         $("#SelectedApprover").materialSelect();
         $("#inheritanceSwitch label").click(function () {
             $("#inheritanceModal").modal('show');
@@ -2305,16 +2303,20 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             });
         });
         $("#inheritanceModalSubmit").click(function () {
-            console.log($("#InheritanceRequestForm").serialize());
-            $.ajax({
-                type: 'POST',
-                data: $("#InheritanceRequestForm").serialize(),
-                url: '/Dataset/SubmitInheritanceRequest',
-                success: function (data) {
-                    //handle result data
-                    $("#inheritanceModal").modal('hide');
-                }
-            });
+            if (data.Dataset.validateInheritanceModal()) {
+                $.ajax({
+                    type: 'POST',
+                    data: $("#InheritanceRequestForm").serialize(),
+                    url: '/Dataset/SubmitInheritanceRequest',
+                    success: function (data) {
+                        //handle result data
+                        $("#inheritanceModal").modal('hide');
+                    }
+                });
+            }
+            else {
+                $("#inheritanceValidationMessage").removeClass("d-none");
+            }
         });
     },
 
@@ -2323,20 +2325,19 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         switch (inheritance) {
             case "ACTIVE":
                 $('#inheritanceSwitchInput').prop('checked', true);
+                $("#addRemoveInheritanceMessage").text("Request Remove Inheritance");
                 break;
             case "PENDING":
-                $("#inheritanceSwitch").html('<p>Inheritance change pending. See ticket ' + result.TicketId + '.</p>')
-                break;
-            case "DISABLED":
-                $('#inheritanceSwitchInput').prop('checked', false);
-                break;
-            default:
+                $("#inheritanceSwitch").html('<p>Inheritance change pending. See ticket ' + result.TicketId + '.</p>');
+                break
+            default: //we treat default the same as "DISABLED"
+                $("#addRemoveInheritanceMessage").text("Request Add Inheritance");
                 $('#inheritanceSwitchInput').prop('checked', false);
         }
-        //if off, switch off ready for request
-        //if on, switch on ready for off request
-        //if pending, lock up control with ticket info 
-        //if can't determine, lock up control with info 
+    },
+
+    validateInheritanceModal() {
+        return ($("#BusinessReason").val() != '' && $("#SelectedApprover").val != '')
     },
 
     showDataPreviewError() {
