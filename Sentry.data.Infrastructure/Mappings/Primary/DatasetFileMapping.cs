@@ -35,6 +35,9 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.FileKey);
             this.Property((x) => x.ETag);
             this.Property((x) => x.ObjectStatus);
+            this.Property((x) => x.OriginalFileName);
+
+
 
 
             this.ManyToOne(x => x.Dataset, m =>
