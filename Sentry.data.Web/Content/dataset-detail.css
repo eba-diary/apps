@@ -134,3 +134,7 @@ table {
 div.dataTables_wrapper div.dataTables_filter input {
     margin-left: 0 !important;
 }
+
+#inheritanceSwitch {
+    padding-top: 0.1rem;
+}
