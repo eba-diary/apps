@@ -25,6 +25,7 @@ namespace Sentry.data.Web
             SAIDAssetKeyCode = dto.SAIDAssetKeyCode;
             NamedEnvironment = dto.NamedEnvironment;
             NamedEnvironmentType = dto.NamedEnvironmentType;
+            ShortName = dto.ShortName;
         }
 
 
@@ -70,6 +71,13 @@ namespace Sentry.data.Web
         [Required]
         [DisplayName("SAID Asset")]
         public string SAIDAssetKeyCode { get; set; }
+
+        [Required]
+        [DisplayName("Short Name")]
+        [Description("A unique alphanumeric code name for this dataset that is 12 characters or less")]
+        [MaxLength(12, ErrorMessage = "Short Name must be 12 characters or less")]
+        [RegularExpression("^[0-9a-zA-Z]*$", ErrorMessage = "Only alphanumeric characters are allowed in the Dataset Short Name")]
+        public string ShortName { get; set; }
 
         /// <summary>
         /// Named Environment naming conventions from https://confluence.sentry.com/x/eQNvAQ

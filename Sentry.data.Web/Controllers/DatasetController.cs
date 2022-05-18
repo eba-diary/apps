@@ -1376,6 +1376,11 @@ namespace Sentry.data.Web.Controllers
                     case GlobalConstants.ValidationErrors.NAME_IS_BLANK:
                         ModelState.AddModelError(nameof(DatasetModel.DatasetName), vr.Description);
                         break;
+                    case Dataset.ValidationErrors.datasetShortNameRequired:
+                    case Dataset.ValidationErrors.datasetShortNameInvalid:
+                    case Dataset.ValidationErrors.datasetShortNameDuplicate:
+                        ModelState.AddModelError(nameof(DatasetModel.ShortName), vr.Description);
+                        break;
                     case Dataset.ValidationErrors.datasetDescriptionRequired:
                         ModelState.AddModelError(nameof(DatasetModel.DatasetDesc), vr.Description);
                         break;

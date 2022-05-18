@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Caching;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
@@ -273,6 +274,28 @@ namespace Sentry.data.Core
         {
             Dataset ds = _datasetContext.GetById<Dataset>(dto.DatasetId);
 
+            //Verify that certain idempotent fields have not been changed
+            if (ds.DatasetName != dto.DatasetName)
+            {
+                throw new ValidationException(GlobalConstants.ValidationErrors.NAME_IS_IDEMPOTENT, "Dataset Name cannot be changed");
+            }
+            if (ds.ShortName != dto.ShortName)
+            {
+                throw new ValidationException(Dataset.ValidationErrors.datasetShortNameIdempotent, "Dataset Short Name cannot be changed");
+            }
+            if (ds.Asset.SaidKeyCode != dto.SAIDAssetKeyCode)
+            {
+                throw new ValidationException(GlobalConstants.ValidationErrors.SAID_ASSET_IDEMPOTENT, "Dataset Asset cannot be changed");
+            }
+            if (ds.NamedEnvironment != dto.NamedEnvironment)
+            {
+                throw new ValidationException(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_IDEMPOTENT, "Dataset Named Environment cannot be changed");
+            }
+            if (ds.NamedEnvironmentType != dto.NamedEnvironmentType)
+            {
+                throw new ValidationException(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_TYPE_IDEMPOTENT, "Dataset Named Environment Type cannot be changed");
+            }
+
             ds.DatasetInformation = dto.DatasetInformation;
             ds.OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), dto.OriginationId);
             ds.ChangedDtm = DateTime.Now;
@@ -424,11 +447,30 @@ namespace Sentry.data.Core
             }
             else //if name, make sure it is not duplicate
             {
-                if (dto.DatasetId == 0 && dto.DatasetCategoryIds != null && _datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
-                                                             w.DatasetCategories.Any(x => dto.DatasetCategoryIds.Contains(x.Id)) &&
-                                                             w.DatasetType == GlobalConstants.DataEntityCodes.DATASET).Count() > 0)
+                if (dto.DatasetId == 0 && dto.DatasetCategoryIds != null && _datasetContext.Datasets.Any(w => w.DatasetName == dto.DatasetName &&
+                                                             w.DatasetType == GlobalConstants.DataEntityCodes.DATASET))
                 {
-                    results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists within category");
+                    results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists");
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.ShortName))
+            {
+                results.Add(Dataset.ValidationErrors.datasetShortNameRequired, "Short Name is required");
+            }
+            else
+            {
+                if (new Regex(@"[^0-9a-zA-Z]").Match(dto.ShortName).Success)
+                {
+                    results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, "Short Name can only contain alphanumeric characters");
+                }
+                if (dto.ShortName.Length > 12)
+                {
+                    results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, "Short Name must be 12 characters or less");
+                }
+                if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName && d.DatasetType == GlobalConstants.DataEntityCodes.DATASET))
+                {
+                    results.Add(Dataset.ValidationErrors.datasetShortNameDuplicate, "That Short Name is already in use by another Dataset");
                 }
             }
 
@@ -530,6 +572,7 @@ namespace Sentry.data.Core
                 DatasetId = dto.DatasetId,
                 DatasetCategories = _datasetContext.Categories.Where(x => x.Id == dto.DatasetCategoryIds.First()).ToList(),
                 DatasetName = dto.DatasetName,
+                ShortName = dto.ShortName,
                 DatasetDesc = dto.DatasetDesc,
                 DatasetInformation = dto.DatasetInformation,
                 CreationUserName = dto.CreationUserId,
@@ -612,6 +655,7 @@ namespace Sentry.data.Core
             dto.DatasetId = ds.DatasetId;
             dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
             dto.DatasetName = ds.DatasetName;
+            dto.ShortName = ds.ShortName;
             dto.DatasetDesc = ds.DatasetDesc;
             dto.DatasetInformation = ds.DatasetInformation;
             dto.DatasetType = ds.DatasetType;
