@@ -124,7 +124,7 @@ namespace Sentry.data.Web.Tests
             FileExtension fe = new FileExtension()
             {
                 Id = 2,
-                Name = "CSV",
+                Name = GlobalConstants.ExtensionNames.CSV,
                 Created = System.DateTime.Now.AddYears(-13),
                 CreatedUser = "072984"
             };

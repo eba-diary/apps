@@ -23,7 +23,7 @@ namespace Sentry.data.Web.Tests
                 Name = "SchemaName",
                 Description = "Schema Description",
                 StorageCode = "SC",
-                Format = "CSV",
+                Format = GlobalConstants.ExtensionNames.CSV,
                 CurrentView = true,
                 Delimiter = ",",
                 HasHeader = false,
@@ -62,7 +62,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(false, dto.CLA1580_StructureHive);
             Assert.AreEqual(false, dto.CLA2472_EMRSend);
             Assert.AreEqual(1, dto.FileExtensionId);
-            Assert.AreEqual("CSV", dto.FileExtensionName);
+            Assert.AreEqual(GlobalConstants.ExtensionNames.CSV, dto.FileExtensionName);
             Assert.AreEqual(",", dto.Delimiter);
             Assert.AreEqual(false, dto.HasHeader);
             Assert.AreEqual(true, dto.CreateCurrentView);
