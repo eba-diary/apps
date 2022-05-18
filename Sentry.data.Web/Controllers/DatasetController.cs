@@ -737,6 +737,7 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
+        [Route("Dataset/Detail/{datasetId}/Permissions/GetLatestInheritanceTicket")]
         [HttpGet]
         public ActionResult GetLatestInheritanceTicket(int datasetId)
         {

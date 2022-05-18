@@ -2290,12 +2290,9 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         data.Dataset.permissionInheritanceSwitchInit();
         //Event to refresh inheritance switch on modal close
         $("#inheritanceModal").on('hide.bs.modal', function () {
-            var request = new Object();
-            request.datasetId = $("#DatasetHeader").attr("value");
             $.ajax({
                 type: "GET",
-                url: '/Dataset/GetLatestInheritanceTicket',
-                data: request,
+                url: '/Dataset/Detail/' + $("#DatasetHeader").attr("value") + '/Permissions/GetLatestInheritanceTicket',
                 success: function (result) {
                     $("#inheritanceSwitch").attr("value", result.TicketStatus);
                     data.Dataset.permissionInheritanceSwitchInit(result);
