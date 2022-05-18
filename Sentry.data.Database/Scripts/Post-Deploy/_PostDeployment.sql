@@ -86,3 +86,4 @@ DECLARE @ErrorState INT;
 :r ..\post-deploy\supportingscripts\Release_03_00_03\CLA3722_TransitionToAsset.sql
 :r ..\post-deploy\supportingscripts\Release_03_01_01\CLA3920_Auto_Subscribe.sql
 :r ..\Post-Deploy\SupportingScripts\Release_03_01_02\CLA4099-Remove_New_Permissions_Accidentally_Available.sql
+:r ..\Post-Deploy\SupportingScripts\Release_03_01_04\CLA-4140-HISTORY-FIX-DatasetFile-OriginalFileName.sql
