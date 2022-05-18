@@ -2293,7 +2293,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             var request = new Object();
             request.datasetId = $("#DatasetHeader").attr("value");
             $.ajax({
-                type: "POST",
+                type: "GET",
                 url: '/Dataset/GetLatestInheritanceTicket',
                 data: request,
                 success: function (result) {

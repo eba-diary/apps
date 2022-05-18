@@ -737,7 +737,7 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpGet]
         public ActionResult GetLatestInheritanceTicket(int datasetId)
         {
             var ticket = _datasetService.GetLatestInheritanceTicket(datasetId);
