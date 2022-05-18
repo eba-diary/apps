@@ -410,7 +410,7 @@ namespace Sentry.data.Web.Controllers
         {
             AccessRequest ar = model.ToCore();
             string ticketId = _datasetService.RequestAccessToDataset(ar);
-
+            
             if (string.IsNullOrEmpty(ticketId))
             {
                 return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
@@ -735,18 +735,16 @@ namespace Sentry.data.Web.Controllers
             {
                 return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
             }
+            else
             {
                 return PartialView("_Success", new SuccessModel("Dataset permission inheritance change was successfully requested.", "Change Id: " + ticketId, true));
             }
         }
 
-        [HttpPost]
+        [Route("Dataset/Detail/{datasetId}/Permissions/GetLatestInheritanceTicket")]
+        [HttpGet]
         public ActionResult GetLatestInheritanceTicket(int datasetId)
         {
-            //SecurityTicket ticket = new SecurityTicket();
-            //ticket.TicketStatus = "PENDING";
-            //ticket.TicketId = "123456789";
-            //return Json(ticket, JsonRequestBehavior.AllowGet);
             var ticket = _datasetService.GetLatestInheritanceTicket(datasetId);
             if(ticket == null)
             {

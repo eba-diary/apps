@@ -27,5 +27,6 @@ namespace Sentry.data.Core
         public List<string> SelectedPermissionCodes { get; set; }
         public string SelectedApprover { get; set; }
         public string SaidKeyCode { get; set; }
+        public bool IsAddingPermission { get; set; }
     }
 }

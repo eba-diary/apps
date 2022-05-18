@@ -332,6 +332,7 @@ namespace Sentry.data.Core
                 request.ApproverId = request.SelectedApprover;
                 request.Permissions = _domainContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
                                                                                                                 x.SecurableObject == GlobalConstants.SecurableEntityName.BUSINESSAREA).ToList();
+                request.IsAddingPermission = true;
                 return _securityService.RequestPermission(request);
             }
 

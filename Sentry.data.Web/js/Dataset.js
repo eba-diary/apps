@@ -2282,9 +2282,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     managePermissionsInit() {
-        //Code to init inheritance switch
-        // -Call controller to get current status
-        //Init modal (form init, etc)
+
         $("#SelectedApprover").materialSelect();
         $("#inheritanceSwitch label").click(function () {
             $("#inheritanceModal").modal('show');
@@ -2292,12 +2290,9 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         data.Dataset.permissionInheritanceSwitchInit();
         //Event to refresh inheritance switch on modal close
         $("#inheritanceModal").on('hide.bs.modal', function () {
-            var request = new Object();
-            request.datasetId = $("#DatasetHeader").attr("value");
             $.ajax({
-                type: "POST",
-                url: '/Dataset/GetLatestInheritanceTicket',
-                data: request,
+                type: "GET",
+                url: '/Dataset/Detail/' + $("#DatasetHeader").attr("value") + '/Permissions/GetLatestInheritanceTicket',
                 success: function (result) {
                     $("#inheritanceSwitch").attr("value", result.TicketStatus);
                     data.Dataset.permissionInheritanceSwitchInit(result);
@@ -2305,16 +2300,20 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             });
         });
         $("#inheritanceModalSubmit").click(function () {
-            console.log($("#InheritanceRequestForm").serialize());
-            $.ajax({
-                type: 'POST',
-                data: $("#InheritanceRequestForm").serialize(),
-                url: '/Dataset/SubmitInheritanceRequest',
-                success: function (data) {
-                    //handle result data
-                    $("#inheritanceModal").modal('hide');
-                }
-            });
+            if (data.Dataset.validateInheritanceModal()) {
+                $.ajax({
+                    type: 'POST',
+                    data: $("#InheritanceRequestForm").serialize(),
+                    url: '/Dataset/SubmitInheritanceRequest',
+                    success: function (data) {
+                        //handle result data
+                        $("#inheritanceModal").modal('hide');
+                    }
+                });
+            }
+            else {
+                $("#inheritanceValidationMessage").removeClass("d-none");
+            }
         });
     },
 
@@ -2323,20 +2322,21 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         switch (inheritance) {
             case "ACTIVE":
                 $('#inheritanceSwitchInput').prop('checked', true);
+                $("#addRemoveInheritanceMessage").text("Request Remove Inheritance");
+                $("#IsAddingPermission").val(false);
                 break;
             case "PENDING":
-                $("#inheritanceSwitch").html('<p>Inheritance change pending. See ticket <a href="https://cherwell.sentry.com/CherwellPortal/" target="_blank">' + result.TicketId + '</a>.</p>')
-                break;
-            case "DISABLED":
+                $("#inheritanceSwitch").html('<p>Inheritance change pending. See ticket ' + result.TicketId + '.</p>');
+                break
+            default: //we treat default the same as "DISABLED"
+                $("#addRemoveInheritanceMessage").text("Request Add Inheritance");
                 $('#inheritanceSwitchInput').prop('checked', false);
-                break;
-            default:
-                $('#inheritanceSwitchInput').prop('checked', false);
+                $("#IsAddingPermission").val(true);
         }
-        //if off, switch off ready for request
-        //if on, switch on ready for off request
-        //if pending, lock up control with ticket info 
-        //if can't determine, lock up control with info 
+    },
+
+    validateInheritanceModal() {
+        return ($("#BusinessReason").val() != '' && $("#SelectedApprover").val != '')
     },
 
     initRequestAccessWorkflow() {
