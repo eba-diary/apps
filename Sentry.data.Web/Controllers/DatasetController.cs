@@ -731,6 +731,7 @@ namespace Sentry.data.Web.Controllers
             {
                 return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
             }
+            else
             {
                 return PartialView("_Success", new SuccessModel("Dataset permission inheritance change was successfully requested.", "Change Id: " + ticketId, true));
             }
