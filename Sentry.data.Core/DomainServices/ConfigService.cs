@@ -490,7 +490,7 @@ namespace Sentry.data.Core
                 request.ApproverId = request.SelectedApprover;
                 request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
                                                                                                                 x.SecurableObject == GlobalConstants.SecurableEntityName.DATASOURCE).ToList();
-
+                request.IsAddingPermission = true;
                 
                 //Format the business reason here.
                 StringBuilder sb = new StringBuilder();

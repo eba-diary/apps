@@ -35,8 +35,7 @@ namespace Sentry.data.Web
 
         public List<PermissionModel> AllPermissions { get; set; }
         public List<SelectListItem> AllApprovers { get; set; }
-
         public string SaidKeyCode { get; set; }
-
+        public bool IsAddingPermission { get; set; }
     }
 }

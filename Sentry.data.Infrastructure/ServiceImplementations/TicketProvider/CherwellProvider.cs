@@ -482,7 +482,14 @@ namespace Sentry.data.Infrastructure
             SetFieldValue(response.Fields, "Title", $"Access Request for {requestDescription}");
 
             StringBuilder sb = new StringBuilder();
-            sb.Append($"Please grant the {requestDescription} the following permissions to {model.SecurableObjectName} within Data.sentry.com. <br>");
+            if (model.IsAddingPermission)
+            {
+                sb.Append($"Please grant the {requestDescription} the following permissions to {model.SecurableObjectName} within Data.sentry.com. <br>");
+            }
+            else
+            {
+                sb.Append($"Please remove the following permissions to {model.SecurableObjectName} within Data.sentry.com. <br>");
+            }
             sb.Append($"<br>");
             if (string.IsNullOrEmpty(model.SaidKeyCode))
             {

@@ -17,7 +17,8 @@
                     <div class="alert alert-danger d-none" id="inheritanceValidationMessage" role="alert">
                         Business Reason and Approver are required.
                     </div>
-                    @Html.HiddenFor(m => m.SelectedPermissions)
+                    @Html.HiddenFor(model => model.IsAddingPermission)
+                    @Html.HiddenFor(model => model.SelectedPermissions)
                     @Html.HiddenFor(model => model.SecurableObjectId)
                     @Html.HiddenFor(model => model.SaidKeyCode)
                     <div class="md-form">

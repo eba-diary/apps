@@ -2326,6 +2326,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             case "ACTIVE":
                 $('#inheritanceSwitchInput').prop('checked', true);
                 $("#addRemoveInheritanceMessage").text("Request Remove Inheritance");
+                $("#IsAddingPermission").val(false);
                 break;
             case "PENDING":
                 $("#inheritanceSwitch").html('<p>Inheritance change pending. See ticket ' + result.TicketId + '.</p>');
@@ -2333,6 +2334,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             default: //we treat default the same as "DISABLED"
                 $("#addRemoveInheritanceMessage").text("Request Add Inheritance");
                 $('#inheritanceSwitchInput').prop('checked', false);
+                $("#IsAddingPermission").val(true);
         }
     },
 

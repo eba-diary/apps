@@ -36,7 +36,8 @@ namespace Sentry.data.Core
                     TicketStatus = GlobalConstants.HpsmTicketStatus.PENDING,
                     RequestedById = model.RequestorsId,
                     RequestedDate = model.RequestedDate,
-                    IsAddingPermission = true,
+                    IsAddingPermission = model.IsAddingPermission,
+                    IsRemovingPermission = !model.IsAddingPermission,
                     ParentSecurity = security,
                     Permissions = new List<SecurityPermission>(),
                 };

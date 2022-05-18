@@ -406,7 +406,7 @@ namespace Sentry.data.Web.Controllers
         {
             AccessRequest ar = model.ToCore();
             string ticketId = _datasetService.RequestAccessToDataset(ar);
-
+            
             if (string.IsNullOrEmpty(ticketId))
             {
                 return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));

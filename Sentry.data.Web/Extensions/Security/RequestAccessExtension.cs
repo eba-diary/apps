@@ -17,7 +17,8 @@ namespace Sentry.data.Web
                 AdGroupName = model.AdGroupName,
                 BusinessReason = model.BusinessReason,
                 SelectedPermissionCodes = model.SelectedPermissions != null ? model.SelectedPermissions.Split(',').ToList() : new List<string>(),
-                SelectedApprover = model.SelectedApprover
+                SelectedApprover = model.SelectedApprover,
+                IsAddingPermission = true
             };
         }
 
@@ -41,7 +42,8 @@ namespace Sentry.data.Web
                 BusinessReason = model.BusinessReason,
                 SelectedPermissionCodes = model.SelectedPermissions != null ? model.SelectedPermissions.Split(',').ToList() : new List<string>(),
                 SelectedApprover = model.SelectedApprover,
-                SaidKeyCode = model.SaidKeyCode
+                SaidKeyCode = model.SaidKeyCode,
+                IsAddingPermission = model.IsAddingPermission
             };
         }
 
