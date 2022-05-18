@@ -127,7 +127,7 @@ namespace Sentry.data.Web.Helpers
                 dFileExtensions = _datasetContext.FileExtensions
                     .Select((c) => new SelectListItem
                     {
-                        Selected = c.Name.Contains("ANY"),
+                        Selected = c.Name.Contains(GlobalConstants.ExtensionNames.ANY),
                         Text = c.Name.Trim(),
                         Value = c.Id.ToString()
                     });
@@ -270,7 +270,7 @@ namespace Sentry.data.Web.Helpers
                 dFileExtensions = _datasetContext.FileExtensions
                     .Select((c) => new SelectListItem
                     {
-                        Selected = c.Name.Contains("ANY") ? true : false,
+                        Selected = c.Name.Contains(GlobalConstants.ExtensionNames.ANY) ? true : false,
                         Text = c.Name.Trim(),
                         Value = c.Id.ToString()
                     });

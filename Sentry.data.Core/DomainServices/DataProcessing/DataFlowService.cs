@@ -1316,15 +1316,15 @@ namespace Sentry.data.Core
 
         private void MapPreProcessingSteps(FileSchema scm, DataFlowDto dto, DataFlow df)
         {
-            if (scm.Extension.Name.ToUpper() == "FIXEDWIDTH")
+            if (scm.Extension.Name.ToUpper() == GlobalConstants.ExtensionNames.FIXEDWIDTH)
             {
                 AddDataFlowStep(dto, df, DataActionType.FixedWidth);
             }
-            else if (scm.Extension.Name.ToUpper() == "XML")
+            else if (scm.Extension.Name.ToUpper() == GlobalConstants.ExtensionNames.XML)
             {
                 AddDataFlowStep(dto, df, DataActionType.XML);
             }
-            else if (scm.Extension.Name.ToUpper() == "JSON" && !String.IsNullOrWhiteSpace(scm.SchemaRootPath))
+            else if (scm.Extension.Name.ToUpper() == GlobalConstants.ExtensionNames.JSON && !String.IsNullOrWhiteSpace(scm.SchemaRootPath))
             {
                 AddDataFlowStep(dto, df, DataActionType.JsonFlattening);
             }

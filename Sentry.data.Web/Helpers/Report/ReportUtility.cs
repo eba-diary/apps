@@ -252,7 +252,7 @@ namespace Sentry.data.Web.Helpers
                 dFileExtensions = _datasetContext.FileExtensions
                     .Select((c) => new SelectListItem
                     {
-                        Selected = c.Name.Contains("ANY"),
+                        Selected = c.Name.Contains(GlobalConstants.ExtensionNames.ANY),
                         Text = c.Name.Trim(),
                         Value = c.Id.ToString()
                     });

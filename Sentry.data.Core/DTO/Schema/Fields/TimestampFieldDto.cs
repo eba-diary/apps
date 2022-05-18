@@ -1,4 +1,5 @@
 ﻿using NJsonSchema;
+using Sentry.Core;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -57,6 +58,26 @@ namespace Sentry.data.Core.DTO.Schema.Fields
                 changed = true;
             }
             return changed;
+        }
+
+        public override ValidationResults Validate(string extension)
+        {
+            ValidationResults results = base.Validate(extension);
+            
+            if (extension == GlobalConstants.ExtensionNames.FIXEDWIDTH)
+            {
+                if (SourceFormat != null && Length < SourceFormat.Length)
+                {
+                    results.Add(OrdinalPosition.ToString(), $"({Name}) Length ({Length}) needs to be equal or greater than specified format for FIXEDWIDTH schema");
+                }
+
+                if (SourceFormat == null && Length < GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT.Length)
+                {
+                    results.Add(OrdinalPosition.ToString(), $"({Name}) Length ({Length}) needs to be equal or greater than default format length ({GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT.Length}) for FIXEDWIDTH schema");
+                }
+            }            
+
+            return results;
         }
 
         public override BaseField ToEntity(BaseField parentField, SchemaRevision parentRevision)

@@ -27,5 +27,6 @@ namespace Sentry.data.Core
         /// </summary>
         DatasetPermissionsDto GetDatasetPermissions(int datasetId);
         string SetDatasetFavorite(int datasetId, string associateId);
+        SecurityTicket GetLatestInheritanceTicket(int datasetId);
     }
 }

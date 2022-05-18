@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Nest;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.Configuration;
@@ -1102,8 +1103,7 @@ namespace Sentry.data.Core
             ValidationResults results = new ValidationResults();
 
             //STEP 1:  Find duplicates at the current level passed in
-            var clones = fieldDtoList.Where(w => w.DeleteInd == false).GroupBy(x => x.Name).Where(x => x.Count() > 1)
-              .Select(y => y.Key);
+            var clones = fieldDtoList.Where(w => !w.DeleteInd).GroupBy(x => x.Name).Where(x => x.Count() > 1).Select(y => y.Key);
 
             //STEP 2:  IF ANY CLONES EXIST: Grab all clones that match distinct name list
             //this step is here because i need ALL duplicates and ordinal position to send error message
@@ -1117,7 +1117,7 @@ namespace Sentry.data.Core
                 //ADD ALL CLONE ERRORS to ValidationResults class, ValidationResults is what gets returned from Validate() and is used to display errors
                 //NOTE: this code uses linq ToList() extension method on my cloneDetails IEnumerable to essentially go through each cloneDetail and call results.Add()
                 //we are adding each errors to ValidationResults, this way I don't need to create a seperate hardened list but can add to the existing ValidationResults
-                cloneDetails.ToList().ForEach(x => results.Add(x.OrdinalPosition.ToString(), $"({x.Name}) cannot be duplicated.  "));
+                cloneDetails.ToList().ForEach(x => results.Add(x.OrdinalPosition.ToString(), $"({x.Name}) cannot be duplicated. "));
             }
 
             return results;
@@ -1125,66 +1125,14 @@ namespace Sentry.data.Core
 
         private ValidationResults Validate(FileSchema scm, List<BaseFieldDto> fieldDtoList)
         {
-            ValidationResults results = new ValidationResults();
-
             //STEP 1:  Look for clones (duplicates) and add to results
-            results.MergeInResults(CloneWars(fieldDtoList));
+            ValidationResults results = CloneWars(fieldDtoList);
 
-
-            //STEP 2:   go through all fields and look for validation errors
+            //STEP 2:  go through all fields and look for validation errors
             foreach (BaseFieldDto fieldDto in fieldDtoList)
             {
-                //Field name cannot be blank
-                if (string.IsNullOrWhiteSpace(fieldDto.Name))
-                {
-                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Name cannot be empty string");
-                }
-
-                //Field name cannot contain spaces
-                if (fieldDto.Name != null && fieldDto.Name.Any(char.IsWhiteSpace))
-                {
-                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Name cannot contain spaces");
-                }
-
-                //Field name cannot contain special characters
-                string specialCharacters = @"-:,;{}()";
-                string specialCharPattern = $"[{specialCharacters}]";
-                if (fieldDto.Name != null && Regex.IsMatch(fieldDto.Name, specialCharPattern))
-                {
-                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Name cannot contain special characters ({specialCharacters})");
-                }
-
-                //Struct has children
-                if (fieldDto.FieldType == GlobalConstants.Datatypes.STRUCT && !fieldDto.HasChildren)
-                {
-                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) STRUCTs are required to have children");
-                }
-
-                //Varchar Length
-                if (fieldDto.FieldType == GlobalConstants.Datatypes.VARCHAR && (fieldDto.Length < 1 || fieldDto.Length > 16000000)) //true max is 16777216
-                {
-                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) VARCHAR length ({fieldDto.Length}) is required to be between 1 and 16000000");
-                }
-
-                //Decimal Precision
-                if (fieldDto.FieldType == GlobalConstants.Datatypes.DECIMAL && (fieldDto.Precision < 1 || fieldDto.Precision > 38))
-                {
-                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Precision ({fieldDto.Precision}) is required to be between 1 and 38");
-                }
-
-                //Decimal Scale
-                if (fieldDto.FieldType == GlobalConstants.Datatypes.DECIMAL && (fieldDto.Scale < 0 || fieldDto.Scale > 38))
-                {
-                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Scale ({fieldDto.Scale}) is required to be between 0 and 38");
-                }
-
-                //Decimal Scale and Precision dependency
-                if (fieldDto.FieldType == GlobalConstants.Datatypes.DECIMAL && fieldDto.Scale > fieldDto.Precision)
-                {
-                    results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Scale ({fieldDto.Scale}) needs to be less than or equal to Precision ({fieldDto.Precision})");
-                }
-
-                results.MergeInResults(ValidateFieldtoFileSchema(scm, fieldDto));
+                ValidationResults fieldValidationResults = fieldDto.Validate(scm.Extension.Name);
+                results.MergeInResults(fieldValidationResults);
 
                 //recursively call validate again to validate all child fields of parent
                 if (fieldDto.ChildFields.Any())
@@ -1192,43 +1140,7 @@ namespace Sentry.data.Core
                     results.MergeInResults(Validate(scm, fieldDto.ChildFields));
                 }
             }
-            return results;
-        }
-
-        private ValidationResults ValidateFieldtoFileSchema(FileSchema scm, BaseFieldDto fieldDto)
-        {
-            ValidationResults results = new ValidationResults();
-            string extension = scm.Extension.Name;
-            if (extension == "FIXEDWIDTH" && fieldDto.Length == 0)
-            {
-                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be greater than zero for FIXEDWIDTH schema");
-            }
-
-            if (extension == "FIXEDWIDTH" && fieldDto.FieldType == GlobalConstants.Datatypes.DECIMAL && fieldDto.Length != 0 && fieldDto.Length < fieldDto.Precision)
-            {
-                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be equal or greater than specified precision for FIXEDWIDTH schema");
-            }
-
-            if (extension == "FIXEDWIDTH" && (fieldDto.FieldType == GlobalConstants.Datatypes.TIMESTAMP || fieldDto.FieldType == GlobalConstants.Datatypes.DATE) && fieldDto.SourceFormat != null && fieldDto.Length < fieldDto.SourceFormat.Length)
-            {
-                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be equal or greater than specified format for FIXEDWIDTH schema");
-            }
-
-            if (extension == "FIXEDWIDTH" && (fieldDto.FieldType == GlobalConstants.Datatypes.TIMESTAMP) && fieldDto.SourceFormat == null && fieldDto.Length < GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT.Length)
-            {
-                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be equal or greater than default format length ({GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT.Length}) for FIXEDWIDTH schema");
-            }
-
-            if (extension == "FIXEDWIDTH" && (fieldDto.FieldType == GlobalConstants.Datatypes.DATE) && fieldDto.SourceFormat == null && fieldDto.Length < GlobalConstants.Datatypes.Defaults.DATE_DEFAULT.Length)
-            {
-                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be equal or greater than default format length ({GlobalConstants.Datatypes.Defaults.DATE_DEFAULT.Length}) for FIXEDWIDTH schema");
-            }
-
-            if (extension == "FIXEDWIDTH" && fieldDto.FieldType == GlobalConstants.Datatypes.VARCHAR && fieldDto.Length == 0)
-            {
-                results.Add(fieldDto.OrdinalPosition.ToString(), $"({fieldDto.Name}) Length ({fieldDto.Length}) needs to be equal or greater than specified precision for FIXEDWIDTH schema");
-            }
-
+            
             return results;
         }
     }
