@@ -20,6 +20,8 @@
     [Size_AMT] BIGINT NULL, 
     [Modified_DTM] DATETIME NULL, 
     [Created_DTM] DATETIME NULL, 
+    [ObjectStatus] INT NOT NULL DEFAULT 1,
     CONSTRAINT [FK_DatasetFile_Dataset] FOREIGN KEY (Dataset_ID) REFERENCES Dataset(Dataset_ID), 
-    CONSTRAINT [FK_DatasetFile_DatasetFileConfigs] FOREIGN KEY ([DatasetFileConfig_ID]) REFERENCES [DatasetFileConfigs]([Config_ID])
+    CONSTRAINT [FK_DatasetFile_DatasetFileConfigs] FOREIGN KEY ([DatasetFileConfig_ID]) REFERENCES [DatasetFileConfigs]([Config_ID]),
+    CONSTRAINT [FK_DatasetFile_ObjectStatus] FOREIGN KEY (ObjectStatus) REFERENCES ObjectStatus(ObjectStatus_Id)
 )

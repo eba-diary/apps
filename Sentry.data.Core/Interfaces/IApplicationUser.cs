@@ -32,9 +32,9 @@ namespace Sentry.data.Core
         bool IsInGroup(string group);
         //Calculated values - may come from external data sources and/or our domain User object
         DomainUser DomainUser { get; }
-        Boolean CanDaleSensitiveView { get; }
-        Boolean CanDaleView { get; }
-        Boolean CanDaleSensitiveEdit { get; }
-        Boolean CanDaleOwnerVerifiedEdit { get; }
+        Boolean CanViewSensitiveDataInventory { get; }
+        Boolean CanViewDataInventory { get; }
+        Boolean CanEditSensitiveDataInventory { get; }
+        Boolean CanEditOwnerVerifiedDataInventory { get; }
     }
 }

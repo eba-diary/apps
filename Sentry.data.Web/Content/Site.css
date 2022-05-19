@@ -3040,3 +3040,7 @@ table.dsc-blue-table th {
     font-size: inherit !important;
     color: #212529;
 }
+
+.dataset-disable-stuff {
+    pointer-events: none;
+}

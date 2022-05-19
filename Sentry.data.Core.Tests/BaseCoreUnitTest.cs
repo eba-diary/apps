@@ -61,8 +61,6 @@ namespace Sentry.data.Core.Tests
 
             public IFeatureFlag<bool> Remove_ClaimIQ_mock_logic_CLA_758 => throw new NotImplementedException();
 
-            public IFeatureFlag<bool> Dale_Expose_EditOwnerVerified_CLA_1911 => throw new NotImplementedException();
-
             public IFeatureFlag<bool> Expose_Dataflow_Metadata_CLA_2146 => throw new NotImplementedException();
 
             public IFeatureFlag<bool> CLA3329_Expose_HR_Category => throw new NotImplementedException();

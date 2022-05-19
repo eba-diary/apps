@@ -16,27 +16,27 @@ namespace Sentry.data.Infrastructure.Tests
     {
         #region Tests
         [TestMethod]
-        public void GetSearchResults_BasicSearch_DaleResultDto()
+        public void GetSearchResults_BasicSearch_DataInventorySearchResultDto()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetDataInventoryList());
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
-            DaleResultDto result = searchProvider.GetSearchResults(new DaleSearchDto() { Criteria = "Table" });
+            DataInventorySearchResultDto result = searchProvider.GetSearchResults(new FilterSearchDto() { SearchText = "Table" });
 
             elasticContext.VerifyAll();
 
-            Assert.IsNotNull(result.DaleEvent);
-            Assert.IsTrue(result.DaleEvent.QuerySuccess);
-            Assert.AreEqual("Table", result.DaleEvent.Criteria);
-            Assert.IsTrue(string.IsNullOrEmpty(result.DaleEvent.QueryErrorMessage));
+            Assert.IsNotNull(result.DataInventoryEvent);
+            Assert.IsTrue(result.DataInventoryEvent.QuerySuccess);
+            Assert.AreEqual("Table", result.DataInventoryEvent.SearchCriteria);
+            Assert.IsTrue(string.IsNullOrEmpty(result.DataInventoryEvent.QueryErrorMessage));
 
             Assert.AreEqual(1, result.SearchTotal);
-            Assert.IsTrue(result.DaleResults.Any());
+            Assert.IsTrue(result.DataInventoryResults.Any());
 
             //assert dto mapping
-            DaleResultRowDto rowDto = result.DaleResults.First();
+            DataInventorySearchResultRowDto rowDto = result.DataInventoryResults.First();
             Assert.AreEqual("CODE", rowDto.Asset);
             Assert.AreEqual("server.sentry.com", rowDto.Server);
             Assert.AreEqual("DBName", rowDto.Database);
@@ -59,23 +59,23 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public void GetSearchResults_NoResultsSearch_EmptyDaleResultDto()
+        public void GetSearchResults_NoResultsSearch_EmptyDataInventorySearchResultDto()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Returns(Task.FromResult(new ElasticResult<DataInventory>()));
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
-            DaleResultDto result = searchProvider.GetSearchResults(new DaleSearchDto());
+            DataInventorySearchResultDto result = searchProvider.GetSearchResults(new FilterSearchDto());
 
             elasticContext.VerifyAll();
 
             Assert.AreEqual(0, result.SearchTotal);
-            Assert.IsFalse(result.DaleResults.Any());
+            Assert.IsFalse(result.DataInventoryResults.Any());
         }
 
         [TestMethod]
-        public void GetSearchResults_ErrorSearch_QueryFailDaleEvent()
+        public void GetSearchResults_ErrorSearch_QueryFailDataInventoryEvent()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
@@ -83,46 +83,43 @@ namespace Sentry.data.Infrastructure.Tests
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
-            DaleResultDto result = searchProvider.GetSearchResults(new DaleSearchDto() { Criteria = "Table" });
+            DataInventorySearchResultDto result = searchProvider.GetSearchResults(new FilterSearchDto() { SearchText = "Table" });
 
             elasticContext.VerifyAll();
 
-            Assert.IsNotNull(result.DaleEvent);
-            Assert.IsFalse(result.DaleEvent.QuerySuccess);
-            Assert.AreEqual("Table", result.DaleEvent.Criteria);
-            Assert.AreEqual("Data Inventory Elasticsearch query failed. Exception: One or more errors occurred.", result.DaleEvent.QueryErrorMessage);
+            Assert.IsNotNull(result.DataInventoryEvent);
+            Assert.IsFalse(result.DataInventoryEvent.QuerySuccess);
+            Assert.AreEqual("Table", result.DataInventoryEvent.SearchCriteria);
+            Assert.AreEqual("Data Inventory Elasticsearch query failed. Exception: One or more errors occurred.", result.DataInventoryEvent.QueryErrorMessage);
 
             Assert.AreEqual(0, result.SearchTotal);
-            Assert.IsFalse(result.DaleResults.Any());
+            Assert.IsFalse(result.DataInventoryResults.Any());
         }
 
         [TestMethod]
-        public void DoesItemContainSensitive_DaleSearchDto_True()
+        public void DoesItemContainSensitive_FilterSearchDto_True()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetDataInventoryList());
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
-            DaleSearchDto searchDto = new DaleSearchDto()
+            DataInventorySensitiveSearchDto dto = new DataInventorySensitiveSearchDto()
             {
-                Destiny = Core.GlobalEnums.DaleDestiny.SAID,
-                Sensitive = Core.GlobalEnums.DaleSensitive.SensitiveAll,
-                Criteria = "DATA"
+                SearchText = "DATA",
+                SearchTarget = DataInventorySearchTargets.SAID
             };
 
-            DaleContainSensitiveResultDto result = searchProvider.DoesItemContainSensitive(searchDto);
+            DataInventorySensitiveSearchResultDto result = searchProvider.DoesItemContainSensitive(dto);
 
             elasticContext.VerifyAll();
 
-            Assert.IsNotNull(result.DaleEvent);
-            Assert.IsTrue(result.DaleEvent.QuerySuccess);
-            Assert.AreEqual("DATA", result.DaleEvent.Criteria);
-            Assert.AreEqual("SAID", result.DaleEvent.Destiny);
-            Assert.AreEqual("SensitiveAll", result.DaleEvent.Sensitive);
-            Assert.IsTrue(string.IsNullOrEmpty(result.DaleEvent.QueryErrorMessage));
+            Assert.IsNotNull(result.DataInventoryEvent);
+            Assert.IsTrue(result.DataInventoryEvent.QuerySuccess);
+            Assert.AreEqual("DATA", result.DataInventoryEvent.SearchCriteria);
+            Assert.IsTrue(string.IsNullOrEmpty(result.DataInventoryEvent.QueryErrorMessage));
 
-            Assert.IsTrue(result.DoesContainSensitiveResults);
+            Assert.IsTrue(result.HasSensitive);
         }
 
         [TestMethod]
@@ -133,9 +130,9 @@ namespace Sentry.data.Infrastructure.Tests
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
-            FilterSearchDto result = searchProvider.GetSearchFilters(new DaleSearchDto() 
+            FilterSearchDto result = searchProvider.GetSearchFilters(new FilterSearchDto() 
             {
-                Criteria = "Table",
+                SearchText = "Table",
                 FilterCategories = new List<FilterCategoryDto>()
                 {
                     new FilterCategoryDto()
@@ -156,10 +153,10 @@ namespace Sentry.data.Infrastructure.Tests
 
             elasticContext.VerifyAll();
 
-            Assert.IsNotNull(result.DaleEvent);
-            Assert.IsTrue(result.DaleEvent.QuerySuccess);
-            Assert.AreEqual("Table AND Environment:P", result.DaleEvent.Criteria);
-            Assert.IsTrue(string.IsNullOrEmpty(result.DaleEvent.QueryErrorMessage));
+            Assert.IsNotNull(result.DataInventoryEvent);
+            Assert.IsTrue(result.DataInventoryEvent.QuerySuccess);
+            Assert.AreEqual("Table AND Environment:P", result.DataInventoryEvent.SearchCriteria);
+            Assert.IsTrue(string.IsNullOrEmpty(result.DataInventoryEvent.QueryErrorMessage));
 
             Assert.AreEqual(2, result.FilterCategories.Count);
 
@@ -198,7 +195,7 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public void GetSearchFilters_ErrorSearch_QueryFailDaleEvent()
+        public void GetSearchFilters_ErrorSearch_QueryFailDataInventoryEvent()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
@@ -206,7 +203,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
-            FilterSearchDto result = searchProvider.GetSearchFilters(new DaleSearchDto()
+            FilterSearchDto result = searchProvider.GetSearchFilters(new FilterSearchDto()
             {
                 FilterCategories = new List<FilterCategoryDto>()
                 {
@@ -247,16 +244,16 @@ namespace Sentry.data.Infrastructure.Tests
 
             elasticContext.VerifyAll();
 
-            Assert.IsNotNull(result.DaleEvent);
-            Assert.IsFalse(result.DaleEvent.QuerySuccess);
-            Assert.AreEqual("Environment:P OR D AND Sensitive:true", result.DaleEvent.Criteria);
-            Assert.AreEqual("Data Inventory Elasticsearch query failed. Exception: One or more errors occurred.", result.DaleEvent.QueryErrorMessage);
+            Assert.IsNotNull(result.DataInventoryEvent);
+            Assert.IsFalse(result.DataInventoryEvent.QuerySuccess);
+            Assert.AreEqual("Environment:P OR D AND Sensitive:true", result.DataInventoryEvent.SearchCriteria);
+            Assert.AreEqual("Data Inventory Elasticsearch query failed. Exception: One or more errors occurred.", result.DataInventoryEvent.QueryErrorMessage);
 
             Assert.IsFalse(result.FilterCategories.Any());
         }
 
         [TestMethod]
-        public void GetCategoriesByAsset_AssetHasSensitive_DaleCategoryResultDto()
+        public void GetCategoriesByAsset_AssetHasSensitive_DataInventoryAssetCategoriesDto()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.SetupSequence(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
@@ -265,37 +262,37 @@ namespace Sentry.data.Infrastructure.Tests
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
-            DaleCategoryResultDto result = searchProvider.GetCategoriesByAsset("DATA");
+            DataInventoryAssetCategoriesDto result = searchProvider.GetCategoriesByAsset("DATA");
 
             elasticContext.VerifyAll();
 
-            Assert.IsNotNull(result.DaleEvent);
-            Assert.IsTrue(result.DaleEvent.QuerySuccess);
-            Assert.AreEqual("DATA", result.DaleEvent.Criteria);
-            Assert.IsTrue(string.IsNullOrEmpty(result.DaleEvent.QueryErrorMessage));
+            Assert.IsNotNull(result.DataInventoryEvent);
+            Assert.IsTrue(result.DataInventoryEvent.QuerySuccess);
+            Assert.AreEqual("DATA", result.DataInventoryEvent.SearchCriteria);
+            Assert.IsTrue(string.IsNullOrEmpty(result.DataInventoryEvent.QueryErrorMessage));
 
-            Assert.AreEqual(4, result.DaleCategories.Count);
+            Assert.AreEqual(4, result.DataInventoryCategories.Count);
 
             //assert dto mapping
-            DaleCategoryDto category = result.DaleCategories.FirstOrDefault(x => x.Category == "PCI");
+            DataInventoryCategoryDto category = result.DataInventoryCategories.FirstOrDefault(x => x.Category == "PCI");
             Assert.IsNotNull(category);
             Assert.IsTrue(category.IsSensitive);
 
-            category = result.DaleCategories.FirstOrDefault(x => x.Category == "User Setting");
+            category = result.DataInventoryCategories.FirstOrDefault(x => x.Category == "User Setting");
             Assert.IsNotNull(category);
             Assert.IsTrue(category.IsSensitive);
 
-            category = result.DaleCategories.FirstOrDefault(x => x.Category == "Financial Personal Information");
+            category = result.DataInventoryCategories.FirstOrDefault(x => x.Category == "Financial Personal Information");
             Assert.IsNotNull(category);
             Assert.IsFalse(category.IsSensitive);
 
-            category = result.DaleCategories.FirstOrDefault(x => x.Category == "Authentication Verifier");
+            category = result.DataInventoryCategories.FirstOrDefault(x => x.Category == "Authentication Verifier");
             Assert.IsNotNull(category);
             Assert.IsFalse(category.IsSensitive);
         }
 
         [TestMethod]
-        public void GetCategoriesByAsset_AssetNotFound_DaleCategoryResultDto()
+        public void GetCategoriesByAsset_AssetNotFound_DataInventoryAssetCategoriesDto()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.SetupSequence(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
@@ -304,37 +301,37 @@ namespace Sentry.data.Infrastructure.Tests
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
-            DaleCategoryResultDto result = searchProvider.GetCategoriesByAsset("DATA");
+            DataInventoryAssetCategoriesDto result = searchProvider.GetCategoriesByAsset("DATA");
 
             elasticContext.VerifyAll();
 
-            Assert.IsNotNull(result.DaleEvent);
-            Assert.IsTrue(result.DaleEvent.QuerySuccess);
-            Assert.AreEqual("DATA", result.DaleEvent.Criteria);
-            Assert.IsTrue(string.IsNullOrEmpty(result.DaleEvent.QueryErrorMessage));
+            Assert.IsNotNull(result.DataInventoryEvent);
+            Assert.IsTrue(result.DataInventoryEvent.QuerySuccess);
+            Assert.AreEqual("DATA", result.DataInventoryEvent.SearchCriteria);
+            Assert.IsTrue(string.IsNullOrEmpty(result.DataInventoryEvent.QueryErrorMessage));
 
-            Assert.AreEqual(4, result.DaleCategories.Count);
+            Assert.AreEqual(4, result.DataInventoryCategories.Count);
 
             //assert dto mapping
-            DaleCategoryDto category = result.DaleCategories.FirstOrDefault(x => x.Category == "PCI");
+            DataInventoryCategoryDto category = result.DataInventoryCategories.FirstOrDefault(x => x.Category == "PCI");
             Assert.IsNotNull(category);
             Assert.IsFalse(category.IsSensitive);
 
-            category = result.DaleCategories.FirstOrDefault(x => x.Category == "User Setting");
+            category = result.DataInventoryCategories.FirstOrDefault(x => x.Category == "User Setting");
             Assert.IsNotNull(category);
             Assert.IsFalse(category.IsSensitive);
 
-            category = result.DaleCategories.FirstOrDefault(x => x.Category == "Financial Personal Information");
+            category = result.DataInventoryCategories.FirstOrDefault(x => x.Category == "Financial Personal Information");
             Assert.IsNotNull(category);
             Assert.IsFalse(category.IsSensitive);
 
-            category = result.DaleCategories.FirstOrDefault(x => x.Category == "Authentication Verifier");
+            category = result.DataInventoryCategories.FirstOrDefault(x => x.Category == "Authentication Verifier");
             Assert.IsNotNull(category);
             Assert.IsFalse(category.IsSensitive);
         }
 
         [TestMethod]
-        public void GetCategoriesByAsset_Error_DaleCategoryResultDto()
+        public void GetCategoriesByAsset_Error_DataInventoryAssetCategoriesDto()
         {
             Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
             elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
@@ -342,20 +339,20 @@ namespace Sentry.data.Infrastructure.Tests
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
 
-            DaleCategoryResultDto result = searchProvider.GetCategoriesByAsset("DATA");
+            DataInventoryAssetCategoriesDto result = searchProvider.GetCategoriesByAsset("DATA");
 
             elasticContext.VerifyAll();
 
-            Assert.IsNotNull(result.DaleEvent);
-            Assert.IsFalse(result.DaleEvent.QuerySuccess);
-            Assert.AreEqual("DATA", result.DaleEvent.Criteria);
-            Assert.AreEqual("Data Inventory Elasticsearch query failed. Exception: One or more errors occurred.", result.DaleEvent.QueryErrorMessage);
+            Assert.IsNotNull(result.DataInventoryEvent);
+            Assert.IsFalse(result.DataInventoryEvent.QuerySuccess);
+            Assert.AreEqual("DATA", result.DataInventoryEvent.SearchCriteria);
+            Assert.AreEqual("Data Inventory Elasticsearch query failed. Exception: One or more errors occurred.", result.DataInventoryEvent.QueryErrorMessage);
 
-            Assert.IsFalse(result.DaleCategories.Any());
+            Assert.IsFalse(result.DataInventoryCategories.Any());
         }
 
         [TestMethod]
-        public void SaveSensitive_DaleSensitiveDtos_True()
+        public void SaveSensitive_DataInventoryUpdateDtos_True()
         {
             MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -377,10 +374,10 @@ namespace Sentry.data.Infrastructure.Tests
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, dbExecuter.Object);
 
-            List<DaleSensitiveDto> dtos = new List<DaleSensitiveDto>()
+            List<DataInventoryUpdateDto> dtos = new List<DataInventoryUpdateDto>()
             {
-                new DaleSensitiveDto() { BaseColumnId = 1, IsSensitive = true, IsOwnerVerified = false },
-                new DaleSensitiveDto() { BaseColumnId = 2, IsSensitive = false, IsOwnerVerified = true }
+                new DataInventoryUpdateDto() { BaseColumnId = 1, IsSensitive = true, IsOwnerVerified = false },
+                new DataInventoryUpdateDto() { BaseColumnId = 2, IsSensitive = false, IsOwnerVerified = true }
             };
 
             Assert.IsTrue(searchProvider.SaveSensitive(dtos));
@@ -389,7 +386,7 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public void SaveSensitive_DaleSensitiveDtos_SqlFail_False()
+        public void SaveSensitive_DataInventoryUpdateDtos_SqlFail_False()
         {
             MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -398,10 +395,10 @@ namespace Sentry.data.Infrastructure.Tests
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(null, dbExecuter.Object);
 
-            List<DaleSensitiveDto> dtos = new List<DaleSensitiveDto>()
+            List<DataInventoryUpdateDto> dtos = new List<DataInventoryUpdateDto>()
             {
-                new DaleSensitiveDto() { BaseColumnId = 1, IsSensitive = true, IsOwnerVerified = false },
-                new DaleSensitiveDto() { BaseColumnId = 2, IsSensitive = false, IsOwnerVerified = true }
+                new DataInventoryUpdateDto() { BaseColumnId = 1, IsSensitive = true, IsOwnerVerified = false },
+                new DataInventoryUpdateDto() { BaseColumnId = 2, IsSensitive = false, IsOwnerVerified = true }
             };
 
             Assert.IsFalse(searchProvider.SaveSensitive(dtos));
@@ -410,7 +407,7 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public void SaveSensitive_DaleSensitiveDtos_ElasticSearchFail_False()
+        public void SaveSensitive_DataInventoryUpdateDtos_ElasticSearchFail_False()
         {
             MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -423,10 +420,10 @@ namespace Sentry.data.Infrastructure.Tests
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, dbExecuter.Object);
 
-            List<DaleSensitiveDto> dtos = new List<DaleSensitiveDto>()
+            List<DataInventoryUpdateDto> dtos = new List<DataInventoryUpdateDto>()
             {
-                new DaleSensitiveDto() { BaseColumnId = 1, IsSensitive = true, IsOwnerVerified = false },
-                new DaleSensitiveDto() { BaseColumnId = 2, IsSensitive = false, IsOwnerVerified = true }
+                new DataInventoryUpdateDto() { BaseColumnId = 1, IsSensitive = true, IsOwnerVerified = false },
+                new DataInventoryUpdateDto() { BaseColumnId = 2, IsSensitive = false, IsOwnerVerified = true }
             };
 
             Assert.IsFalse(searchProvider.SaveSensitive(dtos));
@@ -435,7 +432,7 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public void SaveSensitive_DaleSensitiveDtos_ElasticUpdateFail_False()
+        public void SaveSensitive_DataInventoryUpdateDtos_ElasticUpdateFail_False()
         {
             MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -453,10 +450,10 @@ namespace Sentry.data.Infrastructure.Tests
 
             ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, dbExecuter.Object);
 
-            List<DaleSensitiveDto> dtos = new List<DaleSensitiveDto>()
+            List<DataInventoryUpdateDto> dtos = new List<DataInventoryUpdateDto>()
             {
-                new DaleSensitiveDto() { BaseColumnId = 1, IsSensitive = true, IsOwnerVerified = false },
-                new DaleSensitiveDto() { BaseColumnId = 2, IsSensitive = false, IsOwnerVerified = true }
+                new DataInventoryUpdateDto() { BaseColumnId = 1, IsSensitive = true, IsOwnerVerified = false },
+                new DataInventoryUpdateDto() { BaseColumnId = 2, IsSensitive = false, IsOwnerVerified = true }
             };
 
             Assert.IsFalse(searchProvider.SaveSensitive(dtos));

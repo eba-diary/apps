@@ -165,7 +165,7 @@ data.Dataset = {
             if (result.status === 404) {
                 $('#delroySpinner').hide();
                 data.Dataset.delroyAddBreadCrumb(data.Dataset.delroyCreateBogusField("No Columns Exist"), -1);       //PASS -1 which indicates this is a FAKE breadcrumb
-                data.Dale.makeToast("success", "No columns Exist.");
+                data.Dataset.makeToast("success", "No columns Exist.");
             }
         });
     },
@@ -451,7 +451,7 @@ data.Dataset = {
 
         //if field is null, means no columns to generate a query so hide spinner and create a toastr
         if (field == null) {
-            data.Dale.makeToast("warning", "No columns Exist, Query not Generated.  Please select a schema with columns to see a query.");
+            data.Dataset.makeToast("warning", "No columns Exist, Query not Generated.  Please select a schema with columns to see a query.");
             $('#delroySpinner').hide();
         }
         else {
@@ -468,11 +468,11 @@ data.Dataset = {
                     $('#delroySpinner').hide();
                 },
                 failure: function () {
-                    data.Dale.makeToast("error", "Error creating Snowflake Query.");
+                    data.Dataset.makeToast("error", "Error creating Snowflake Query.");
                     $('#delroySpinner').hide();
                 },
                 error: function () {
-                    data.Dale.makeToast("error", "Error creating Snowflake Query.");
+                    data.Dataset.makeToast("error", "Error creating Snowflake Query.");
                     $('#delroySpinner').hide();
                 }
             });
@@ -857,7 +857,7 @@ data.Dataset = {
         $('#SubmitDatasetForm').click(function (e) {
 
             //disable submit button so they cannot click more than once
-            $('#SubmitDatasetForm').addClass("dale-disable-stuff");
+            $('#SubmitDatasetForm').addClass("dataset-disable-stuff");
         });
 
 
@@ -2288,5 +2288,49 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     showDataPreviewError() {
         $("#DataPreviewNoRows").html("<p> No rows returned </p>");
         $("#DataPreviewNoRows").removeClass("d-none");
+    },
+
+    makeToast: function (severity, message) {
+
+        if (severity === 'success') {
+            toastr.options = {
+                "closeButton": false,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+        }
+        else {
+            toastr.options = {
+                "closeButton": false,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "1000",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+        }
+
+        toastr[severity](message);
     }
 };
