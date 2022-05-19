@@ -25,6 +25,7 @@
     [NamedEnvironment] VARCHAR(25) NULL, 
     [NamedEnvironmentType] VARCHAR(25) NULL, 
     [Asset_ID] INT NULL, 
+    [Short_NME] VARCHAR(12) NULL, 
     PRIMARY KEY CLUSTERED 
 (
 	[Dataset_ID] ASC
@@ -59,3 +60,12 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level1name = N'Dataset',
     @level2type = N'COLUMN',
     @level2name = N'Asset_ID'
+GO
+EXEC sp_addextendedproperty @name = N'MS_Description',
+    @value = N'A unique "codename" for this dataset. This name will be used in AD group names and Infrastructure Events to unique identify the dataset.',
+    @level0type = N'SCHEMA',
+    @level0name = N'dbo',
+    @level1type = N'TABLE',
+    @level1name = N'Dataset',
+    @level2type = N'COLUMN',
+    @level2name = N'Short_NME'

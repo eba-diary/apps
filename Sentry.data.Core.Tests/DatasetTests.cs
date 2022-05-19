@@ -71,6 +71,36 @@ namespace Sentry.data.Core.Tests
 
         [TestCategory("DatasetTests")]
         [TestMethod]
+        public void Can_prevent_dataset_with_no_ShortName()
+        {
+            Dataset dataset1 = GetMockDatasetData();
+            dataset1.ShortName = null;
+            var vr = dataset1.ValidateForSave();
+            Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.datasetShortNameRequired));
+        }
+
+        [TestCategory("DatasetTests")]
+        [TestMethod]
+        public void Can_prevent_dataset_with_invalid_chars_in_ShortName()
+        {
+            Dataset dataset1 = GetMockDatasetData();
+            dataset1.ShortName = "Cool dataset";
+            var vr = dataset1.ValidateForSave();
+            Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.datasetShortNameInvalid));
+        }
+
+        [TestCategory("DatasetTests")]
+        [TestMethod]
+        public void Can_prevent_dataset_with_long_ShortName()
+        {
+            Dataset dataset1 = GetMockDatasetData();
+            dataset1.ShortName = "ThisShortDatasetNameIsTooLong";
+            var vr = dataset1.ValidateForSave();
+            Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.datasetShortNameInvalid));
+        }
+
+        [TestCategory("DatasetTests")]
+        [TestMethod]
         public void Report_Type_Returns_IsHrData_False()
         {
             //Arrange
@@ -113,6 +143,7 @@ namespace Sentry.data.Core.Tests
                 DatasetId = 0,
                 DatasetCategories = new List<Category>() { new Category() { Name = "Claim" } },
                 DatasetName = "Claim Dataset",
+                ShortName = "ClaimDataset",
                 DatasetDesc = "Test Claim Datasaet",
                 DatasetInformation = "Specific Information regarding datasetfile consumption",
                 CreationUserName = "Creater_User",

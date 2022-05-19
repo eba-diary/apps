@@ -872,6 +872,13 @@ data.Dataset = {
             $("#FileExtensionId").materialSelect();
         });
 
+        $("#DatasetName").on('keyup', function () {
+            let datasetNameWoSpecialChars = $("#DatasetName")[0].value.replace(/[^0-9a-zA-Z]/g, "");
+            if (datasetNameWoSpecialChars.length <= 12) {
+                $("#ShortName")[0].value = datasetNameWoSpecialChars;
+                $("label[for=ShortName]").addClass("active");
+            }
+        })
 
         //saidAsset onChange needs to update #PrimaryOwnerName and #PrimaryOwnerId based on saidAsset picked
         $("#saidAsset").change(function () {

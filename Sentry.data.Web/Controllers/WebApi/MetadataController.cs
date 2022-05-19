@@ -125,8 +125,6 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <summary>
         /// List of all datasets
         /// </summary>
-        /// <param name="DatasetConfigID"></param>
-        /// <returns></returns>
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset")]
