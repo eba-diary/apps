@@ -1008,4 +1008,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="SavedSearchId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="75b2f3c5-acb3-4cdd-a8ed-440f5564063a" ChangeDateTime="05/18/2022 15:44:46">
+    <Property Name="ElementName" Value="[dbo].[DatasetFile].[IX_DatasetFile_Column]" />
+    <Property Name="ElementType" Value="SqlIndex" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFile]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[IX_DatasetFile_FlowExecutionGuid]" />
+  </Operation>
 </Operations>
