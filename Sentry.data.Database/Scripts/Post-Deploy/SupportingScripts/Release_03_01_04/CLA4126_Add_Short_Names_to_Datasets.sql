@@ -7,8 +7,8 @@ BEGIN TRY
     PRINT 'Running script "' + @ScriptVersion + '"...'
     -- BEGIN POST-DEPLOY SCRIPT --
 
-    DECLARE @ENV VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
-    IF @ENV = 'PROD'
+    DECLARE @ENV4126 VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
+    IF @ENV4126 = 'PROD'
 	BEGIN
         update dataset set short_nme = 'AccountInstr' where dataset_id = 395
         update dataset set short_nme = 'ActiveDirect' where dataset_id = 381
@@ -155,7 +155,7 @@ BEGIN TRY
         update dataset set short_nme = 'Zipcodes' where dataset_id = 236
         update dataset set short_nme = 'ZZZTestData' where dataset_id = 324
     END
-    ELSE IF @ENV = 'QUAL'
+    ELSE IF @ENV4126 = 'QUAL'
     BEGIN
         update dataset set short_nme = 'Unknown' where dataset_id = 519
         update dataset set short_nme = '9292021' where dataset_id = 406
@@ -439,7 +439,7 @@ BEGIN TRY
         update dataset set short_nme = 'zzzzJCG002' where dataset_id = 562
 
     END
-    ELSE IF @ENV = 'TEST'
+    ELSE IF @ENV4126 = 'TEST'
     BEGIN
         update dataset set short_nme = '9292021' where dataset_id = 283
         update dataset set short_nme = '10262021Test' where dataset_id = 294
