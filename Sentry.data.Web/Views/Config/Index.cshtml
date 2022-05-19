@@ -1,5 +1,7 @@
 ﻿@model Sentry.data.Web.ManageConfigsModel
 
+@using Sentry.data.Core
+
 @{
     ViewBag.Title = "View Dataset Configuration Details";
     string color = "dsc-" + Model.CategoryColor + "-text";
@@ -162,7 +164,7 @@
                         <div class="col-md-3">Configuration classification: <b>@item.FileType</b></div>
                         <div class="col-md-3">File type: <b>@item.FileExtension.Name</b></div>
                     </div>
-                    @if (item.FileExtension.Name.Trim() == "ANY" || item.FileExtension.Name.Trim() == "DELIMITED" || item.FileExtension.Name.Trim() == "CSV")
+                    @if (item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.ANY || item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.DELIMITED || item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.CSV)
                     {
                         <div class="col-md-12 configDetailRow">
                             <div class="col-md-3">This schema's current Delimiter is ( <b>@item.Delimiter</b> )</div>
@@ -178,7 +180,7 @@
                         </div>
                     }
 
-                    @if (item.FileExtension.Name.Trim() == "XML" || item.FileExtension.Name.Trim() == "JSON")
+                    @if (item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.XML || item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.JSON)
                     {
                         <div class="col-md-12 configDetailRow">
                             @if (String.IsNullOrWhiteSpace(item.SchemaRootPath))
@@ -193,7 +195,7 @@
                     }
 
                     <div class="col-md-12 configDetailRow">
-                        @if (item.FileExtension.Name.Trim() == "ANY" || item.FileExtension.Name.Trim() == "DELIMITED" || item.FileExtension.Name.Trim() == "FIXEDWIDTH")
+                        @if (item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.ANY || item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.DELIMITED || item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.FIXEDWIDTH)
                         {<div class="col-md-12">This configuration will allow <b>all</b> file extensions.</div>}
                         else
                         {<div class="col-md-12">This configuration will only allow files with <b>.@item.FileExtension.Name.ToLower()</b> extension</div>}

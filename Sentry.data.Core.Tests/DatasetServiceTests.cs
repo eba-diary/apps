@@ -2,6 +2,7 @@
 using Moq;
 using Sentry.Core;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -454,7 +455,7 @@ namespace Sentry.data.Core.Tests
             var ds = MockClasses.MockDataset(null, true, false);
             var context = new Mock<IDatasetContext>();
             context.Setup(c => c.Datasets).Returns((new[] { ds }).AsQueryable());
-            var datasetService = new DatasetService(context.Object, new Mock<ISecurityService>().Object, null, null, null, null, null, null, null);
+            var datasetService = new DatasetService(context.Object, new Mock<ISecurityService>().Object, null, null, null, null, null, new Mock<ISAIDService>().Object, null);
 
             // Act
             var actual = datasetService.GetDatasetPermissions(ds.DatasetId);

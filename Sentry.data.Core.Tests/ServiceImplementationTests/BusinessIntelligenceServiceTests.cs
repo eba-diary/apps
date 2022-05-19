@@ -1020,28 +1020,28 @@ namespace Sentry.data.Core.Tests
                 new FileExtension
                 {
                     Id = 1,
-                    Name = "JSON",
+                    Name = GlobalConstants.ExtensionNames.JSON,
                     Created = DateTime.Today.AddDays(-22),
                     CreatedUser = "096644"
                 },
                 new FileExtension
                 {
                     Id = 2,
-                    Name = "CSV",
+                    Name = GlobalConstants.ExtensionNames.CSV,
                     Created = DateTime.Today.AddDays(-38),
                     CreatedUser = "096644"
                 },
                 new FileExtension
                 {
                     Id = 3,
-                    Name = "TXT",
+                    Name = GlobalConstants.ExtensionNames.TXT,
                     Created = DateTime.Today.AddDays(-32),
                     CreatedUser = "096644"
                 },
                 new FileExtension
                 {
                     Id = 4,
-                    Name = "XML",
+                    Name = GlobalConstants.ExtensionNames.XML,
                     Created = DateTime.Today.AddDays(-9),
                     CreatedUser = "096644"
                 }

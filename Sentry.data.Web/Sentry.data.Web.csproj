@@ -430,8 +430,9 @@
     <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
-    <Compile Include="Models\Dataset\ManagePermissionModel.cs" />
-    <Compile Include="Models\Dataset\ManagePermissionsModel.cs" />
+    <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
+    <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
+    <Compile Include="Models\Dataset\Permission\RequestPermissionInheritanceModel.cs" />
     <Compile Include="Models\Search\FilterCategoryModel.cs" />
     <Compile Include="Models\Search\FilterCategoryOptionModel.cs" />
     <Compile Include="Models\Search\FilterSearchConfigModel.cs" />
@@ -1188,9 +1189,10 @@
     <Content Include="webfonts\fa-brands-400.woff" />
     <Content Include="webfonts\fa-brands-400.ttf" />
     <Content Include="webfonts\fa-brands-400.eot" />
-    <Content Include="Views\Dataset\ManagePermissions.cshtml" />
+    <Content Include="Views\Dataset\Permission\ManagePermissions.cshtml" />
     <Content Include="Views\Search\SavedSearches.cshtml" />
     <Content Include="Views\Search\FilterSearch.cshtml" />
+    <Content Include="Views\Dataset\Permission\_RequestInheritanceModal.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />

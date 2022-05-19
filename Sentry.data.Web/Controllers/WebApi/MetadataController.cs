@@ -278,7 +278,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     throw new SchemaNotFoundException();
                 }
 
-                Logger.Debug($"{nameof(MetadataController)}_{nameof(AddSchemaRevision)} - datasetid:{datasetId}:::schemaId:{schemaId}:::incomingjson:{schemaStructure.ToString()}");
+                Logger.Debug($"{nameof(MetadataController)}_{nameof(AddSchemaRevision)} - datasetid:{datasetId}:::schemaId:{schemaId}:::incomingjson:{schemaStructure}");
 
                 JsonSchema schema_v3;
                 schema_v3 = deserializeJSONStringtoJsonSchema().GetAwaiter().GetResult();

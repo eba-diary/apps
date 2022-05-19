@@ -444,5 +444,16 @@
             public const string SAID = "SAID";
             public const string SERVER = "SERVER";
         }
+
+        public static class ExtensionNames
+        {
+            public const string FIXEDWIDTH = "FIXEDWIDTH";
+            public const string XML = "XML";
+            public const string JSON = "JSON";
+            public const string DELIMITED = "DELIMITED";
+            public const string ANY = "ANY";
+            public const string CSV = "CSV";
+            public const string TXT = "TXT";
+        }
     }
 }

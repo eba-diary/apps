@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Sentry.data.Core.GlobalConstants;
@@ -35,9 +36,10 @@ namespace Sentry.data.Core
                     TicketStatus = GlobalConstants.HpsmTicketStatus.PENDING,
                     RequestedById = model.RequestorsId,
                     RequestedDate = model.RequestedDate,
-                    IsAddingPermission = true,
+                    IsAddingPermission = model.IsAddingPermission,
+                    IsRemovingPermission = !model.IsAddingPermission,
                     ParentSecurity = security,
-                    Permissions = new List<SecurityPermission>()
+                    Permissions = new List<SecurityPermission>(),
                 };
 
                 foreach (Permission perm in model.Permissions)
@@ -204,6 +206,24 @@ namespace Sentry.data.Core
                 BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, parentSecurity, securable);
             }
             return us;
+        }
+
+        /// <summary>
+        /// Gets inheritance SecurityTicket for a securable.
+        /// Checks to see if there is a PENDING ticket first, and returns that.
+        /// Otherwise, return enabled ticket for permission. 
+        /// </summary>
+        /// <param name="securable">The securable entity we're going to check for permissions</param>
+        /// <returns></returns>
+        public SecurityTicket GetSecurableInheritanceTicket(ISecurable securable)
+        {
+            SecurityTicket inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.Permissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) && t.TicketStatus.Equals(HpsmTicketStatus.PENDING));
+            if(inheritanceTicket != null && inheritanceTicket.TicketId != null)
+            {
+                return inheritanceTicket;
+            }
+            inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.Permissions.Any(p => p.IsEnabled && p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS));
+            return inheritanceTicket;
         }
 
         /// <summary>
