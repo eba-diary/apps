@@ -625,10 +625,10 @@ BEGIN TRY
     END
 
     --catch-all in case any additional datasets get added before this script is run
-    update dataset set short_nme = left(replace(replace(replace(dataset_nme,'-',''),'_',''),' ',''),12) where short_nme is null
+    update dataset set short_nme = left(replace(replace(replace(dataset_nme,'-',''),'_',''),' ',''),12) where dataset_typ='DS' and ObjectStatus=1 AND short_nme is null
     --throw exception if any duplicate short_nme exist 
     --ignore datasets starting with ACLM and CCIS because in Qual there are duplicate "TEST" and "QUAL" versions of the Insurance Concepts datasets
-    if (exists(select short_nme, count(*) from dataset where left(dataset_nme,4) <> 'ACLM' and left(dataset_nme,4) <> 'CCIS' group by short_nme having count(*)>1)) THROW 50001, 'Duplicate Short_NME detected - please manually update the values in Dataset.Short_NME to be unique', 1 
+    if (exists(select short_nme, count(*) from dataset where dataset_typ='DS' and ObjectStatus=1 AND left(dataset_nme,4) <> 'ACLM' and left(dataset_nme,4) <> 'CCIS' group by short_nme having count(*)>1)) THROW 50001, 'Duplicate Short_NME detected - please manually update the values in Dataset.Short_NME to be unique', 1 
 
     -- END POST-DEPLOY SCRIPT --
     INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
