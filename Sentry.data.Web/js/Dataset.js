@@ -1740,7 +1740,8 @@ data.Dataset = {
                 { data: "UploadUserName", className: "UploadUserName" },
                 { data: "CreateDtm", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "ModifiedDtm", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
-                { data: "ConfigFileName", className: "ConfigFileName" }
+                { data: "ConfigFileName", className: "ConfigFileName" },
+                { data: null, className: "deleteFile", render: data.Dataset.renderDeleteFileOption }
             ],
             language: {
                 processing: ""
@@ -1864,6 +1865,11 @@ data.Dataset = {
                 $('#bundle_selected').attr("disabled", false);
             }
         });
+    },
+
+    renderDeleteFileOption: function (d) {
+        console.log(d);
+        return '<div>Delete Me</div>';
     },
 
     formatDatasetFileDetails: function (d) {
