@@ -1741,7 +1741,7 @@ data.Dataset = {
                 { data: "CreateDtm", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "ModifiedDtm", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "ConfigFileName", className: "ConfigFileName" },
-                { data: null, className: "deleteFile", render: data.Dataset.renderDeleteFileOption }
+                { data: null, className: "deleteFile", render: data.Dataset.renderDeleteFileOption, searchable: false, orderable: false }
             ],
             language: {
                 processing: ""
