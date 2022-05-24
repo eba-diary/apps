@@ -154,13 +154,8 @@
     },
 
     completeDataInventorySearch: function (json) {
-
-        //FOR COLUMN SAVE: create new function that completeSearch will be moved to called completeDataInventorySearch
-        //clear all current visible columns
-        //use visible columns from json response to set columns().visible() 
-        //https://datatables.net/reference/api/columns().visible()
         
-        var table = $("#di-result-table").DataTable()
+        var table = $("#di-result-table").DataTable();
         var tableInfo = table.page.info();
         
         if (json.visibleColumns) {            

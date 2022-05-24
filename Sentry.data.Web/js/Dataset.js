@@ -1292,7 +1292,7 @@ data.Dataset = {
             Id = $('#datasetConfigList').val();
         }
 
-        data.Dataset.DatasetFileTableInit(Id);
+        data.Dataset.DatasetFileTableInit(Id, datasetDetailModel.DisplayDatasetFileDelete);
         data.Dataset.DatasetBundingFileTableInit(Id);
 
         //Hook up handlers for tabbed sections
@@ -1410,7 +1410,7 @@ data.Dataset = {
                         $('#tabDataFiles').html(view);
                         if (self.vm.ShowDataFileTable()) {
                             var configId = $('#datasetConfigList').val();
-                            data.Dataset.DatasetFileTableInit(configId);
+                            data.Dataset.DatasetFileTableInit(configId, datasetDetailModel.DisplayDatasetFileDelete);
                             data.Dataset.DatasetBundingFileTableInit(configId);
                         }
                         $("#tab-spinner").hide();
@@ -1712,7 +1712,7 @@ data.Dataset = {
         });
     },
 
-    DatasetFileTableInit: function (Id) {
+    DatasetFileTableInit: function (Id, displayDelete) {
 
         data.Dataset.DatasetFilesTable = $("#datasetFilesTable").DataTable({
             orderCellsTop: true,
@@ -1741,13 +1741,17 @@ data.Dataset = {
                 { data: "CreateDtm", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "ModifiedDtm", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "ConfigFileName", className: "ConfigFileName" },
-                { data: null, className: "deleteFile", render: data.Dataset.renderDeleteFileOption, searchable: false, orderable: false }
+                { data: null, name: "deleteFile", className: "deleteFile", render: data.Dataset.renderDeleteFileOption, searchable: false, orderable: false }
             ],
             language: {
                 processing: ""
             },
             order: [5, 'desc'],
             stateSave: true,
+            initComplete: function () {                
+                var table = $("#datasetFilesTable").DataTable();
+                table.column(".deleteFile").visible(displayDelete);
+            },
             "createdRow": function (row, data, dataIndex) { }
         });
 
@@ -1869,7 +1873,7 @@ data.Dataset = {
 
     renderDeleteFileOption: function (d) {
         console.log(d);
-        return '<div>Delete Me</div>';
+        return '<div><i class="fa-solid fa-trash-can-plus"></i><div>'
     },
 
     formatDatasetFileDetails: function (d) {
