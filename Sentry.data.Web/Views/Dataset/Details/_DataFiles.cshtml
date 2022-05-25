@@ -10,8 +10,6 @@
     </div>
 }
 
-<div><i class="fa-solid fa-trash-can-plus"></i></div>
-
 <div class="@(Model.DatasetFileCount == 0 ?"visible-item":"hidden-item")">
     <h5 class="@color pt-1">No Data Files Available</h5>
 </div>
@@ -38,7 +36,12 @@
                     <th></th>
                     <th></th>
                     <th></th>
-                    <th>Checkbox Here</th>
+                    <th class="data-file-delete-all-filter">
+                        <fieldset class="form-group data-file-delete-fieldset">
+                            <input type="checkbox" id="data-file-delete-all-checkbox" class="form-check-input">
+                            <label for="data-file-delete-all-checkbox" class="form-check-label p-0"></label>
+                        </fieldset>
+                    </th>
                 </tr>
             </thead>
             <tbody></tbody>

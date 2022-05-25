@@ -1873,7 +1873,12 @@ data.Dataset = {
 
     renderDeleteFileOption: function (d) {
         console.log(d);
-        return '<div><i class="fa-solid fa-trash-can-plus"></i><div>'
+        var checkboxId = 'data-file-delete-' + d.Id;
+        
+        return '<fieldset class="form-group mb-0 data-file-delete-fieldset">' +
+            '<input type="checkbox" id="' + checkboxId + '" data-id="' + d.Id + '" class="form-check-input data-file-delete-checkbox" >' +
+            '<label for="' + checkboxId + '" class="form-check-label p-0"></label>' +
+        '</fieldset >';
     },
 
     formatDatasetFileDetails: function (d) {

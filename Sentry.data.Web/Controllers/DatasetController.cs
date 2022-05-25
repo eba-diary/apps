@@ -320,7 +320,7 @@ namespace Sentry.data.Web.Controllers
                 model.DisplaySchemaSearch = _featureFlags.CLA3553_SchemaSearch.GetValue();
                 model.DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue();
                 model.ShowManagePermissionsLink = _featureFlags.CLA3718_Authorization.GetValue();
-                model.DisplayDatasetFileDelete = SharedContext.CurrentUser.CanModifyDataset /*&& _featureFlags.CLA3554_DatasetFileDelete.GetValue()*/;
+                model.DisplayDatasetFileDelete = SharedContext.CurrentUser.CanModifyDataset && _featureFlags.CLA4049_ALLOW_S3_FILES_DELETE.GetValue();
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Detail Page", dto.DatasetId);
 
                 return View(model);
@@ -354,7 +354,6 @@ namespace Sentry.data.Web.Controllers
                     _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Detail Data Preview Tab", id);
                     return PartialView("Details/_DataPreview", data);
                 case ("DataFiles"):
-                    data.DisplayDatasetFileDelete = true;
                     _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Detail Data Files Tab", id);
                     return PartialView("Details/_DataFiles", data);
                 case ("SchemaSearch"):

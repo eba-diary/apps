@@ -1,5 +1,6 @@
 ﻿using Sentry.data.Common;
 using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.IO;
 
@@ -32,6 +33,7 @@ namespace Sentry.data.Web
             this.ParentDataSetID = f.Dataset.DatasetId;
             this.IsBundled = f.IsBundled;
             this.Information = f.Information;
+            this.ObjectStatus = f.ObjectStatus;
         }
         public int Id { get; set; }
         public string Name { get; set; }
@@ -70,6 +72,7 @@ namespace Sentry.data.Web
         public Boolean IsBundled { get; set; }
         public string Information { get; set; }
         public UserSecurity Security { get; set; }
+        public ObjectStatusEnum ObjectStatus { get; set; }
 
 
         #region Security

@@ -138,3 +138,11 @@ div.dataTables_wrapper div.dataTables_filter input {
 #inheritanceSwitch {
     padding-top: 0.1rem;
 }
+
+.data-file-delete-all-filter {
+    vertical-align: baseline !important;
+}
+
+.data-file-delete-fieldset {
+    width: 18px;
+}
