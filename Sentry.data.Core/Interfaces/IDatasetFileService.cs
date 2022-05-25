@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core.Helpers.Paginate;
+using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
@@ -18,5 +19,8 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="dto"></param>
         void UpdateAndSave(DatasetFileDto dto);
+
+        List<DatasetFile> GetDatasetFileList(string[] fileNameList);
+        List<DatasetFile> GetDatasetFileList(int[] datasetFileIdList);
     }
 }

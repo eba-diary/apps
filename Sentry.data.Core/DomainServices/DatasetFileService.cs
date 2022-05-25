@@ -1,5 +1,6 @@
 ﻿using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Helpers.Paginate;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Sentry.data.Core
@@ -21,7 +22,7 @@ namespace Sentry.data.Core
         public PagedList<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
         {
             DatasetFileConfig config = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId);
-            
+
             if (config == null)
             {
                 throw new SchemaNotFoundException();
@@ -36,7 +37,7 @@ namespace Sentry.data.Core
             PagedList<DatasetFile> files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFileStatusActive
                                                 .Where(x => x.Schema == config.Schema)
                                                 .OrderBy(o => o.DatasetFileId),
-                                                pageParameters.PageNumber, pageParameters.PageSize);            
+                                                pageParameters.PageNumber, pageParameters.PageSize);
 
             return new PagedList<DatasetFileDto>(files.ToDto().ToList(), files.TotalCount, files.CurrentPage, files.PageSize);
         }
@@ -74,6 +75,25 @@ namespace Sentry.data.Core
             _datasetContext.SaveChanges();
 
         }
+
+        
+        public List<DatasetFile> GetDatasetFileList(string[] fileNameList)
+        {
+            List<DatasetFile> dbList = _datasetContext.DatasetFile.Where(w => fileNameList.Contains(w.OriginalFileName)).ToList();
+            return dbList;
+        }
+
+        public List<DatasetFile> GetDatasetFileList(int[] datasetFileIdList)
+        {
+            List<DatasetFile> dbList = _datasetContext.DatasetFile.Where(w => datasetFileIdList.Contains(w.DatasetFileId)).ToList();
+            return dbList;
+        }
+
+        public void UpdateDatasetFileObjectStatus(List<DatasetFile> files)
+        {
+            //UPDATE ObjectStatus
+        }
+
 
         #region PrivateMethods
         internal void UpdateDataFile(DatasetFileDto dto, DatasetFile dataFile)
