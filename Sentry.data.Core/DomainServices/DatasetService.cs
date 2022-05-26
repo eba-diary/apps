@@ -534,7 +534,8 @@ namespace Sentry.data.Core
                 {
                     results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, "Short Name must be 12 characters or less");
                 }
-                if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName && d.DatasetType == GlobalConstants.DataEntityCodes.DATASET))
+                if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName && 
+                    d.DatasetType == GlobalConstants.DataEntityCodes.DATASET && dto.DatasetId != d.DatasetId))
                 {
                     results.Add(Dataset.ValidationErrors.datasetShortNameDuplicate, "That Short Name is already in use by another Dataset");
                 }
