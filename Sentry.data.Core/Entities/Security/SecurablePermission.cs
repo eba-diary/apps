@@ -14,6 +14,7 @@ namespace Sentry.data.Core
         public SecurablePermissionScope Scope { get; set; }
         public Security ScopeSecurity { get; set; }
         public string Identity { get; set; }
+        public string IdentityType { get; set; }
         public SecurityPermission SecurityPermission { get; set; }
     }
 }

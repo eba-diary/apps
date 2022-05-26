@@ -368,6 +368,9 @@
     <Compile Include="ServiceImplementations\FilterSearchService.cs" />
     <Compile Include="ServiceImplementations\HiveOdbcProvider.cs" />
     <Compile Include="ServiceImplementations\HttpClientProvider.cs" />
+    <Compile Include="ServiceImplementations\InfrastructureEventing\InevRestClient.cs" />
+    <Compile Include="ServiceImplementations\InfrastructureEventing\InevService.cs" />
+    <Compile Include="ServiceImplementations\InfrastructureEventing\DatasetPermissionsUpdatedDto.cs" />
     <Compile Include="ServiceImplementations\Messaging\DataStepProcessorService.cs" />
     <Compile Include="ServiceImplementations\Messaging\DfsEventService.cs" />
     <Compile Include="ServiceImplementations\Messaging\Events\DfsEvent.cs" />
@@ -389,8 +392,6 @@
     <Compile Include="ServiceImplementations\TicketProvider\CherwellService.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\GenericHttpsProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\GoogleApiProvider.cs" />
-    <Compile Include="ServiceImplementations\HpsmMonitoringService.cs" />
-    <Compile Include="ServiceImplementations\HpsmProvider.cs" />
     <Compile Include="ServiceImplementations\CubeProvider.cs" />
     <Compile Include="ServiceImplementations\DatafileBundleProvider.cs" />
     <Compile Include="ServiceImplementations\EncryptionService.cs" />
@@ -456,6 +457,8 @@
     </None>
     <None Include="RestServiceGenerators\DownloadNSwag.bat" />
     <None Include="RestServiceGenerators\DownloadNSwag.ps1" />
+    <None Include="RestServiceGenerators\InevRestServiceGen.bat" />
+    <None Include="RestServiceGenerators\InevRestServiceGen.ps1" />
     <None Include="RestServiceGenerators\QuartermasterRestServiceGen.bat" />
     <None Include="RestServiceGenerators\QuartermasterRestServiceGen.ps1" />
     <None Include="RestServiceGenerators\SAIDRestServiceGen.bat" />

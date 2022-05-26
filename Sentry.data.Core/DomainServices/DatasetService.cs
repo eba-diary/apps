@@ -246,6 +246,7 @@ namespace Sentry.data.Core
                 IApplicationUser user = _userService.GetCurrentUser();
                 request.SecurableObjectName = ds.DatasetName;
                 request.SecurityId = ds.Security.SecurityId;
+                request.SaidKeyCode = ds.Asset.SaidKeyCode;
                 request.RequestorsId = user.AssociateId;
                 request.RequestorsName = user.DisplayName;
                 request.IsProd = bool.Parse(Configuration.Config.GetHostSetting("RequireApprovalHPSMTickets"));

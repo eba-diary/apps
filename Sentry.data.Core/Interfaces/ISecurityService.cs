@@ -2,6 +2,7 @@
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -10,7 +11,7 @@ namespace Sentry.data.Core
         string RequestPermission(AccessRequest model);
         UserSecurity GetUserSecurity(ISecurable securable, IApplicationUser user);
         int GetGroupAccessCount(ISecurable securable);
-        void ApproveTicket(SecurityTicket ticket, string approveId);
+        Task ApproveTicket(SecurityTicket ticket, string approveId);
         void CloseTicket(SecurityTicket ticket, string RejectorId, string rejectedReason, string status);
 
         /// <summary>

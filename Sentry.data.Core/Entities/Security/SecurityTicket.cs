@@ -33,6 +33,54 @@ namespace Sentry.data.Core
 
         public virtual string SaidKeyCode { get; set; }
 
+        /// <summary>
+        /// Retrieves the Identity (user/group/role) that this SecurityTicket applies to
+        /// </summary>
+        public virtual string Identity
+        { 
+            get
+            {
+                if (AdGroupName != null)
+                {
+                    return AdGroupName;
+                }
+                else if (GrantPermissionToUserId != null)
+                {
+                    return GrantPermissionToUserId;
+                }
+                else if (AwsArn != null)
+                {
+                    return AwsArn;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the Identity Type of the Identity
+        /// (one of <see cref="GlobalConstants.IdentityType"/>) that this SecurityTicket applies to
+        /// </summary>
+        public virtual string IdentityType
+        {
+            get
+            {
+                if (AdGroupName != null || GrantPermissionToUserId != null)
+                {
+                    return GlobalConstants.IdentityType.AD;
+                }
+                else if (AwsArn != null)
+                {
+                    return GlobalConstants.IdentityType.AWS_IAM;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
         public virtual ValidationResults ValidateForDelete()
         {
