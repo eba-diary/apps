@@ -1292,7 +1292,7 @@ data.Dataset = {
             Id = $('#datasetConfigList').val();
         }
 
-        data.Dataset.DatasetFileTableInit(Id, datasetDetailModel.DisplayDatasetFileDelete);
+        data.Dataset.DatasetFileTableInit(Id, datasetDetailModel);
         data.Dataset.DatasetBundingFileTableInit(Id);
 
         //Hook up handlers for tabbed sections
@@ -1410,7 +1410,7 @@ data.Dataset = {
                         $('#tabDataFiles').html(view);
                         if (self.vm.ShowDataFileTable()) {
                             var configId = $('#datasetConfigList').val();
-                            data.Dataset.DatasetFileTableInit(configId, datasetDetailModel.DisplayDatasetFileDelete);
+                            data.Dataset.DatasetFileTableInit(configId, datasetDetailModel);
                             data.Dataset.DatasetBundingFileTableInit(configId);
                         }
                         $("#tab-spinner").hide();
@@ -1458,13 +1458,56 @@ data.Dataset = {
             }
         });
 
+        $(document).on("change", "#data-file-delete-all-checkbox", function (e) {
+            e.preventDefault();
+            //var id = $(this).data("id");
+            $('.data-file-delete-checkbox').prop('checked', this.checked);
+            data.Dataset.toggleDeleteButton();
+            
+        });
+
+        $(document).on("change", ".data-file-delete-checkbox", this.toggleDeleteButton);
+
+        $(document).on("click", "#data-file-delete", function (e) {
+            //display the datatables processing bar
+            $('.dataTables_processing', $('#datasetFilesTable').closest('.dataTables_wrapper')).show();
+
+            //get all ids to delete
+            var ids = [];
+
+            $('.data-file-delete-checkbox:checkbox:checked').each(function () {
+                ids.push($(this).data("id"));
+            });
+
+            //delete
+            $.ajax({
+                type: "DELETE",
+                url: '../../api/v2/datafile/dataset/' + 1 + '/schema/' + 1 + '?' + $.param({ 'userFileIdList': ids }),
+                success: function (result) {
+                    $("#datasetFilesTable").DataTable().ajax.reload();
+                },
+                error: function (result) {
+                    $('.dataTables_processing', $('#datasetFilesTable').closest('.dataTables_wrapper')).hide();
+                    data.Dataset.makeToast("error", "Something went wrong deleting file(s). Please try again or reach out to DSCSupport@sentry.com.");
+                }
+            });            
+        });
+
         var url = new URL(window.location.href);
         var tab = url.searchParams.get('tab');
         if (tab == undefined) {
             tab = 'SchemaAbout';
         }
         $("#detailTab" + tab).trigger('click');
+    },
 
+    toggleDeleteButton: function () {
+        if ($('.data-file-delete-checkbox:checkbox:checked').length > 0) {
+            $("#data-file-delete").removeClass("display-none");
+        }
+        else {
+            $("#data-file-delete").addClass("display-none");
+        }
     },
 
     CancelLink: function (id) {
@@ -1712,13 +1755,12 @@ data.Dataset = {
         });
     },
 
-    DatasetFileTableInit: function (Id, displayDelete) {
+    DatasetFileTableInit: function (Id, datasetDetailModel) {
 
         data.Dataset.DatasetFilesTable = $("#datasetFilesTable").DataTable({
             orderCellsTop: true,
             width: "100%",
             serverSide: true,
-            //responsive: true,
             processing: true,
             searching: true,
             paging: true,
@@ -1741,18 +1783,21 @@ data.Dataset = {
                 { data: "CreateDtm", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "ModifiedDtm", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "ConfigFileName", className: "ConfigFileName" },
-                { data: null, name: "deleteFile", className: "deleteFile", render: data.Dataset.renderDeleteFileOption, searchable: false, orderable: false }
+                { data: null, name: "deleteFile", className: "deleteFile text-center", render: (d) => data.Dataset.renderDeleteFileOption(d, datasetDetailModel.CategoryColor), searchable: false, orderable: false }
             ],
             language: {
-                processing: ""
+                processing: '<div class="progress md-progress sentry-dark-blue data-file-table-loading"><div class="indeterminate"></div></div>'
             },
             order: [5, 'desc'],
             stateSave: true,
             initComplete: function () {                
                 var table = $("#datasetFilesTable").DataTable();
-                table.column(".deleteFile").visible(displayDelete);
+                table.column(".deleteFile").visible(datasetDetailModel.DisplayDatasetFileDelete);
             },
-            "createdRow": function (row, data, dataIndex) { }
+            drawCallback: function () {
+                $('#data-file-delete-all-checkbox').prop('checked', false);
+                data.Dataset.toggleDeleteButton();
+            }
         });
 
         if ($("#datasetFilesTable_filter").length > 0) {
@@ -1769,8 +1814,9 @@ data.Dataset = {
             );
         }
 
-        $(".dataTables_filter").parent().addClass("text-right");
-        $(".dataTables_filter").parent().css("right", "3px");
+        $(".dataTables_filter").parent().parent().css("align-items", "end");
+        $(".dataTables_filter").css({ "display": "flex", "justify-content": "flex-end", "align-items": "flex-end" });
+        $(".dataTables_filter").append('<button type="button" id="data-file-delete" class="btn btn-icon btn-danger waves-effect waves-light display-none"><i class="far fa-trash-alt"></i>Delete</button>');
 
         var table = $('#datasetFilesTable').DataTable();
 
@@ -1871,14 +1917,22 @@ data.Dataset = {
         });
     },
 
-    renderDeleteFileOption: function (d) {
-        console.log(d);
-        var checkboxId = 'data-file-delete-' + d.Id;
+    renderDeleteFileOption: function (d, color) {
+        if (d.ObjectStatus === 1) { //is active
+            var checkboxId = 'data-file-delete-' + d.Id;
+
+            return '<fieldset class="form-group mb-0 text-left data-file-delete-fieldset">' +
+                '<input type="checkbox" id="' + checkboxId + '" data-id="' + d.Id + '" class="form-check-input data-file-delete-checkbox" >' +
+                '<label for="' + checkboxId + '" class="form-check-label p-0"></label>' +
+            '</fieldset >';
+        }
+        else {
+            return '<i class="far fa-clock text-center dsc-' + color +'-text" title="Pending delete"></i>';
+        }
+    },
+
+    deleteFiles: function () {
         
-        return '<fieldset class="form-group mb-0 data-file-delete-fieldset">' +
-            '<input type="checkbox" id="' + checkboxId + '" data-id="' + d.Id + '" class="form-check-input data-file-delete-checkbox" >' +
-            '<label for="' + checkboxId + '" class="form-check-label p-0"></label>' +
-        '</fieldset >';
     },
 
     formatDatasetFileDetails: function (d) {

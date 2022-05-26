@@ -146,3 +146,13 @@ div.dataTables_wrapper div.dataTables_filter input {
 .data-file-delete-fieldset {
     width: 18px;
 }
+
+#data-file-delete {
+    float: right;
+    margin: 0 0 0.5rem 1rem;
+}
+
+.data-file-table-loading {
+    margin: 0.5rem 1rem;
+    width: auto;
+}
