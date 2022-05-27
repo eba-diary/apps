@@ -67,6 +67,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(us.CanEditReport);
             Assert.IsTrue(us.CanManageSchema);
             Assert.IsTrue(us.CanViewData);
+            Assert.IsTrue(us.CanDeleteDatasetFile);
         }
 
         [TestMethod]
@@ -109,6 +110,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(us.CanEditReport);
             Assert.IsTrue(us.CanManageSchema);
             Assert.IsFalse(us.CanViewData);
+            Assert.IsTrue(us.CanDeleteDatasetFile);
         }
 
         [TestMethod]
@@ -216,6 +218,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsFalse(us.CanEditReport);
             Assert.IsFalse(us.CanManageSchema);
             Assert.IsTrue(us.CanViewData);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
 
         /// <summary>
@@ -243,6 +246,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsFalse(us.CanEditReport);
             Assert.IsFalse(us.CanManageSchema);
             Assert.IsTrue(us.CanViewData);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
 
         /// <summary>
@@ -265,6 +269,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsFalse(us.CanEditDataset);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
 
         /// <summary>
@@ -287,6 +292,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsFalse(us.CanEditDataset);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
 
         #endregion
@@ -312,6 +318,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsFalse(us.CanManageSchema);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
         /// <summary>
         /// Even though the user has the Modify Dataset permission, they should not be able to manage schema because did not request the permission and are not owner.
@@ -333,6 +340,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsFalse(us.CanManageSchema);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
 
         /// <summary>
@@ -357,6 +365,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsFalse(us.CanManageSchema);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
 
         [TestMethod]
@@ -402,6 +411,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsTrue(us.CanManageSchema);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
 
         }
 
@@ -447,6 +457,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsTrue(us.CanManageSchema);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
 
         #endregion

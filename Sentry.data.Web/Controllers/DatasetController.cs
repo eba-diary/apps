@@ -322,7 +322,7 @@ namespace Sentry.data.Web.Controllers
                 model.ShowManagePermissionsLink = _featureFlags.CLA3718_Authorization.GetValue();
 
                 UserSecurity userSecurity = _datasetService.GetUserSecurityForDataset(id);
-                model.DisplayDatasetFileDelete = userSecurity.CanEditDataset && userSecurity.CanManageSchema && _featureFlags.CLA4049_ALLOW_S3_FILES_DELETE.GetValue();
+                model.DisplayDatasetFileDelete = userSecurity.CanDeleteDatasetFile;
                 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Detail Page", dto.DatasetId);
 
