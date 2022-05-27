@@ -92,17 +92,19 @@ namespace Sentry.data.Infrastructure.InfrastructureEvents
 
         public Dictionary<string, string> ToDictionary()
         {
-            var dict = new Dictionary<string, string>();
-            dict.Add(nameof(RequestId), RequestId);
-            dict.Add(nameof(DatasetId), DatasetId);
-            dict.Add(nameof(DatasetName), DatasetName);
-            dict.Add(nameof(DatasetSaidKey), DatasetSaidKey);
-            dict.Add(nameof(DatasetNamedEnvironment), DatasetNamedEnvironment);
-            dict.Add(nameof(DatasetNamedEnvironmentType), DatasetNamedEnvironmentType);
-            dict.Add(nameof(Snowflake), JsonSerializer.Serialize(Snowflake));
-            dict.Add(nameof(Permissions), JsonSerializer.Serialize(Permissions));
-            dict.Add(nameof(Changes), JsonSerializer.Serialize(Changes));
-            return dict;
+            var serializerOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            return new Dictionary<string, string>
+            {
+                { nameof(RequestId).ToLowerFirstChar(), RequestId },
+                { nameof(DatasetId).ToLowerFirstChar(), DatasetId },
+                { nameof(DatasetName).ToLowerFirstChar(), DatasetName },
+                { nameof(DatasetSaidKey).ToLowerFirstChar(), DatasetSaidKey },
+                { nameof(DatasetNamedEnvironment).ToLowerFirstChar(), DatasetNamedEnvironment },
+                { nameof(DatasetNamedEnvironmentType).ToLowerFirstChar(), DatasetNamedEnvironmentType },
+                { nameof(Snowflake).ToLowerFirstChar(), JsonSerializer.Serialize(Snowflake, serializerOptions) },
+                { nameof(Permissions).ToLowerFirstChar(), JsonSerializer.Serialize(Permissions, serializerOptions) },
+                { nameof(Changes).ToLowerFirstChar(), JsonSerializer.Serialize(Changes, serializerOptions) }
+            };
         }
     }
 

@@ -431,8 +431,14 @@ namespace Sentry.data.Core
                 x.EnabledDate = DateTime.Now;
             });
 
+            await PublishDatasetPermissionsUpdatedInfrastructureEvent(ticket);
+
+        }
+
+        private async Task PublishDatasetPermissionsUpdatedInfrastructureEvent(SecurityTicket ticket)
+        {
             //If the SecurityTicket just approved includes dataset permissions
-            if (_dataFeatures.CLA3718_Authorization.GetValue() && 
+            if (_dataFeatures.CLA3718_Authorization.GetValue() &&
                 ticket.Permissions.Any(p => p.Permission.SecurableObject == SecurableEntityName.DATASET))
             {
                 //lookup the dataset this ticket is for
@@ -444,7 +450,6 @@ namespace Sentry.data.Core
                 //publish an Infrastructure Event that dataset permissions have changed
                 await _inevService.PublishDatasetPermissionsUpdated(dataset, ticket, GetSecurablePermissions(dataset));
             }
-
         }
 
 
