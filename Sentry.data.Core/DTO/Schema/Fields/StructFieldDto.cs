@@ -14,7 +14,6 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
         public override string FieldType => GlobalConstants.Datatypes.STRUCT;
         public override bool Nullable { get; set; }
-        public override int Length { get; set; }
 
 
         //Properties that are not utilized by this type and are defaulted

@@ -32,13 +32,13 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             {
                 Length = GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT;
             }
-            else if (!int.TryParse(row.Length, out int x))
+            else if (int.TryParse(row.Length, out int x))
             {
-                results.Add(OrdinalPosition.ToString(), $"({Name}) VARCHAR Length must be non-negative integer value");
+                Length = x;
             }
             else
             {
-                Length = int.Parse(row.Length);
+                results.Add(OrdinalPosition.ToString(), $"({Name}) VARCHAR Length must be non-negative integer value");
             }
 
             if (!results.IsValid())
@@ -48,10 +48,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
         }
 
         public override string FieldType => GlobalConstants.Datatypes.VARCHAR;
-        public override bool Nullable { get; set; }
-        public override int Length { get; set; }
-
-        
+        public override bool Nullable { get; set; }        
         //Properties that are not utilized by this type and are defaulted
         public override int Precision { get; set; }
         public override int Scale { get; set; }

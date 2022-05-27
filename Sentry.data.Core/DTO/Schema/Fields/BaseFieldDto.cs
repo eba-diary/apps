@@ -47,7 +47,7 @@ namespace Sentry.data.Core
             Description = row.Description;
             ChildFields = new List<BaseFieldDto>();
             OrdinalPosition = row.Position;
-            Length = (int.TryParse(row.Length, out int x) ? x : 0);
+            Length = int.TryParse(row.Length, out int x) ? x : GlobalConstants.Datatypes.Defaults.LENGTH_DEFAULT;
             DeleteInd = row.DeleteInd;
             DotNamePath = row.DotNamePath;
         }
@@ -63,6 +63,7 @@ namespace Sentry.data.Core
         public bool IsArray { get; set; }
         public bool HasChildren { get; set; }
         public string DotNamePath { get; set; }
+        public int Length { get; set; }
 
 
         public abstract string FieldType { get; }
@@ -71,7 +72,6 @@ namespace Sentry.data.Core
         public abstract string SourceFormat { get; set; }
         public abstract bool Nullable { get; set; }
         public abstract int OrdinalPosition { get; set; }
-        public abstract int Length { get; set; }
         public abstract BaseField ToEntity(BaseField parentField, SchemaRevision parentRevision);
         public abstract bool CompareToEntity(BaseField field);
 
