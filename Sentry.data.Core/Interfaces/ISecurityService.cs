@@ -8,7 +8,7 @@ namespace Sentry.data.Core
 {
     public interface ISecurityService
     {
-        string RequestPermission(AccessRequest model);
+        Task<string> RequestPermission(AccessRequest model);
         UserSecurity GetUserSecurity(ISecurable securable, IApplicationUser user);
         int GetGroupAccessCount(ISecurable securable);
         Task ApproveTicket(SecurityTicket ticket, string approveId);

@@ -237,7 +237,7 @@ namespace Sentry.data.Core
             return ar;
         }
 
-        public string RequestAccessToDataset(AccessRequest request)
+        public async Task<string> RequestAccessToDataset(AccessRequest request)
         {
 
             Dataset ds = _datasetContext.GetById<Dataset>(request.SecurableObjectId);
@@ -254,7 +254,7 @@ namespace Sentry.data.Core
                 request.ApproverId = request.SelectedApprover;
                 request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
                                                                                                                 x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
-                return _securityService.RequestPermission(request);
+                return await _securityService.RequestPermission(request);
             }
 
             return string.Empty;

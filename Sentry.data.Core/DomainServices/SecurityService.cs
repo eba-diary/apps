@@ -26,7 +26,7 @@ namespace Sentry.data.Core
             _inevService = inevService;
         }
 
-        public string RequestPermission(AccessRequest model)
+        public async Task<string> RequestPermission(AccessRequest model)
         {
             string ticketId = _baseTicketProvider.CreateChangeTicket(model);
             if (!string.IsNullOrWhiteSpace(ticketId))
@@ -59,6 +59,9 @@ namespace Sentry.data.Core
                 }
 
                 security.Tickets.Add(ticket);
+
+                await PublishDatasetPermissionsUpdatedInfrastructureEvent(ticket);
+
                 _datasetContext.SaveChanges();
 
                 return ticketId;
