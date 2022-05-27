@@ -283,7 +283,8 @@ namespace Sentry.data.Core
                         ScopeSecurity = securable.Security,
                         Identity = t.Identity,
                         IdentityType = t.IdentityType,
-                        SecurityPermission = p
+                        SecurityPermission = p,
+                        TicketId = t.TicketId
                     }))
                 );
 
@@ -294,7 +295,9 @@ namespace Sentry.data.Core
                         Scope = SecurablePermissionScope.Inherited,
                         ScopeSecurity = s.ScopeSecurity,
                         Identity = s.Identity,
-                        SecurityPermission = s.SecurityPermission
+                        IdentityType = s.IdentityType,
+                        SecurityPermission = s.SecurityPermission,
+                        TicketId = s.TicketId
                     })
                 );
             }

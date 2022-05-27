@@ -71,6 +71,9 @@ namespace Sentry.data.Infrastructure.InfrastructureEvents
 
         public class PermissionDto
         {
+            public const string STATUS_ACTIVE = "active";
+            public const string STATUS_REQUESTED = "requested";
+
             public string Identity { get; set; }
             public string IdentityType { get; set; }
             public string PermissionCode { get; set; }
@@ -79,6 +82,9 @@ namespace Sentry.data.Infrastructure.InfrastructureEvents
 
         public class ChangesDto
         {
+            public const string ACTION_ADD = "add";
+            public const string ACTION_REMOVE = "remove";
+
             public string Action { get; set; }
             public string RequestedBy { get; set; }
             public IList<PermissionDto> Permissions { get; set; }
