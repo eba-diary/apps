@@ -1460,17 +1460,23 @@ data.Dataset = {
 
         $(document).on("change", "#data-file-delete-all-checkbox", function (e) {
             e.preventDefault();
-            //var id = $(this).data("id");
             $('.data-file-delete-checkbox').prop('checked', this.checked);
-            data.Dataset.toggleDeleteButton();
-            
+            data.Dataset.toggleDeleteButton();            
         });
 
         $(document).on("change", ".data-file-delete-checkbox", this.toggleDeleteButton);
 
+        $(document).on("click", "#data-file-delete-open-modal", function (e) {
+            $("#data-file-delete-count").text($(".data-file-delete-checkbox:checked").length);
+        });
+
         $(document).on("click", "#data-file-delete", function (e) {
-            //display the datatables processing bar
-            $('.dataTables_processing', $('#datasetFilesTable').closest('.dataTables_wrapper')).show();
+            e.preventDefault();            
+
+            $("#data-file-delete-close").hide();
+            $("#data-file-delete-cancel").hide();
+            $("#data-file-delete").hide();
+            $(".data-file-delete-spinner").removeClass("d-none");
 
             //get all ids to delete
             var ids = [];
@@ -1483,12 +1489,18 @@ data.Dataset = {
             $.ajax({
                 type: "DELETE",
                 url: '../../api/v2/datafile/dataset/' + 1 + '/schema/' + 1 + '?' + $.param({ 'userFileIdList': ids }),
-                success: function (result) {
+                success: function () {
                     $("#datasetFilesTable").DataTable().ajax.reload();
                 },
-                error: function (result) {
-                    $('.dataTables_processing', $('#datasetFilesTable').closest('.dataTables_wrapper')).hide();
+                error: function () {
                     data.Dataset.makeToast("error", "Something went wrong deleting file(s). Please try again or reach out to DSCSupport@sentry.com.");
+                },
+                complete: function () {
+                    $("#data-file-delete-modal").modal("hide");
+                    $("#data-file-delete-close").show();
+                    $("#data-file-delete-cancel").show();
+                    $("#data-file-delete").show();
+                    $(".data-file-delete-spinner").addClass("d-none");
                 }
             });            
         });
@@ -1503,10 +1515,10 @@ data.Dataset = {
 
     toggleDeleteButton: function () {
         if ($('.data-file-delete-checkbox:checkbox:checked').length > 0) {
-            $("#data-file-delete").removeClass("display-none");
+            $("#data-file-delete-open-modal").removeClass("display-none");
         }
         else {
-            $("#data-file-delete").addClass("display-none");
+            $("#data-file-delete-open-modal").addClass("display-none");
         }
     },
 
@@ -1790,9 +1802,15 @@ data.Dataset = {
             },
             order: [5, 'desc'],
             stateSave: true,
-            initComplete: function () {                
+            initComplete: function () {
                 var table = $("#datasetFilesTable").DataTable();
                 table.column(".deleteFile").visible(datasetDetailModel.DisplayDatasetFileDelete);
+
+                if (datasetDetailModel.DisplayDatasetFileDelete) {
+                    $(".dataTables_filter").parent().parent().css("align-items", "end");
+                    $(".dataTables_filter").css({ "display": "flex", "justify-content": "flex-end", "align-items": "flex-end" });
+                    $(".dataTables_filter").append('<button type="button" id="data-file-delete-open-modal" data-toggle="modal" data-target="#data-file-delete-modal" class="btn btn-danger waves-effect waves-light display-none"><i class="far fa-trash-alt"></i>Delete</button>');
+                }
             },
             drawCallback: function () {
                 $('#data-file-delete-all-checkbox').prop('checked', false);
@@ -1813,10 +1831,6 @@ data.Dataset = {
                 }
             );
         }
-
-        $(".dataTables_filter").parent().parent().css("align-items", "end");
-        $(".dataTables_filter").css({ "display": "flex", "justify-content": "flex-end", "align-items": "flex-end" });
-        $(".dataTables_filter").append('<button type="button" id="data-file-delete" class="btn btn-icon btn-danger waves-effect waves-light display-none"><i class="far fa-trash-alt"></i>Delete</button>');
 
         var table = $('#datasetFilesTable').DataTable();
 
