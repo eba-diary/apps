@@ -8,6 +8,6 @@ namespace Sentry.data.Core
 {
     public interface ITicketMonitorService
     {
-        void CheckTicketStatus();
+        Task CheckTicketStatus();
     }
 }

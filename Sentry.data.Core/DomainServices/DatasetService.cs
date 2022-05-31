@@ -237,7 +237,7 @@ namespace Sentry.data.Core
             return ar;
         }
 
-        public string RequestAccessToDataset(AccessRequest request)
+        public async Task<string> RequestAccessToDataset(AccessRequest request)
         {
 
             Dataset ds = _datasetContext.GetById<Dataset>(request.SecurableObjectId);
@@ -246,6 +246,7 @@ namespace Sentry.data.Core
                 IApplicationUser user = _userService.GetCurrentUser();
                 request.SecurableObjectName = ds.DatasetName;
                 request.SecurityId = ds.Security.SecurityId;
+                request.SaidKeyCode = ds.Asset.SaidKeyCode;
                 request.RequestorsId = user.AssociateId;
                 request.RequestorsName = user.DisplayName;
                 request.IsProd = bool.Parse(Configuration.Config.GetHostSetting("RequireApprovalHPSMTickets"));
@@ -253,7 +254,7 @@ namespace Sentry.data.Core
                 request.ApproverId = request.SelectedApprover;
                 request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
                                                                                                                 x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
-                return _securityService.RequestPermission(request);
+                return await _securityService.RequestPermission(request);
             }
 
             return string.Empty;
@@ -534,7 +535,8 @@ namespace Sentry.data.Core
                 {
                     results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, "Short Name must be 12 characters or less");
                 }
-                if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName && d.DatasetType == GlobalConstants.DataEntityCodes.DATASET))
+                if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName && 
+                    d.DatasetType == GlobalConstants.DataEntityCodes.DATASET && dto.DatasetId != d.DatasetId))
                 {
                     results.Add(Dataset.ValidationErrors.datasetShortNameDuplicate, "That Short Name is already in use by another Dataset");
                 }

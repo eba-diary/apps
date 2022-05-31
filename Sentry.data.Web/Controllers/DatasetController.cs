@@ -402,10 +402,10 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult SubmitAccessRequest(DatasetAccessRequestModel model)
+        public async Task<ActionResult> SubmitAccessRequest(DatasetAccessRequestModel model)
         {
             AccessRequest ar = model.ToCore();
-            string ticketId = _datasetService.RequestAccessToDataset(ar);
+            string ticketId = await _datasetService.RequestAccessToDataset(ar);
             
             if (string.IsNullOrEmpty(ticketId))
             {
@@ -722,10 +722,10 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult SubmitInheritanceRequest(RequestPermissionInheritanceModel model)
+        public async Task<ActionResult> SubmitInheritanceRequest(RequestPermissionInheritanceModel model)
         {
             AccessRequest ar = model.ToCore();
-            string ticketId = _datasetService.RequestAccessToDataset(ar);
+            string ticketId = await _datasetService.RequestAccessToDataset(ar);
 
             if (string.IsNullOrEmpty(ticketId))
             {
