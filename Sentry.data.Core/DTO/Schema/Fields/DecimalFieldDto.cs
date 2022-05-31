@@ -129,6 +129,11 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             return results;
         }
 
+        public override void Clean(string extension)
+        {
+            DefaultNonFixedWidthLength(extension);
+        }
+
         private void SetPrecisionScale(IDictionary<string, object> extensionData)
         {
             if (extensionData != null && extensionData.Any(w => w.Key == "dsc-precision"))

@@ -88,5 +88,10 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             base.ToEntity(newEntityField, parentField, parentRevision);
             return newEntityField;
         }
+
+        public override void Clean(string extension)
+        {
+            //Nothing to clean
+        }
     }
 }
