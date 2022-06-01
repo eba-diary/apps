@@ -20,7 +20,11 @@ namespace Sentry.data.Core
         /// <param name="dto"></param>
         void UpdateAndSave(DatasetFileDto dto);
 
-        List<DatasetFile> GetDatasetFileList(string[] fileNameList);
-        List<DatasetFile> GetDatasetFileList(int[] datasetFileIdList);
+        List<DatasetFile> GetDatasetFileList(int datasetId, int schemaId, string[] fileNameList);
+        List<DatasetFile> GetDatasetFileList(int datasetId, int schemaId, int[] datasetFileIdList);
+
+        void UpdateMetadata(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status);
+        void DeleteS3(int datasetId, int schemaId, List<DatasetFile> dbList);
+        UserSecurity GetUserSecurityForDatasetFile(int datasetId);
     }
 }

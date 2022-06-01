@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 using Sentry.data.Core.Helpers.Paginate;
+using Sentry.data.Web.Models.ApiModels;
 using Sentry.data.Web.Models.ApiModels.DatasetFile;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
-using Sentry.data.Web.Models.ApiModels;
 
 namespace Sentry.data.Web.WebApi.Controllers
 {
@@ -112,19 +111,29 @@ namespace Sentry.data.Web.WebApi.Controllers
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK)]
-        public async Task<IHttpActionResult> DeleteDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] string[] userFileNameList=null, [FromUri] string[] userFileIdList=null)
+        [SwaggerResponse(System.Net.HttpStatusCode.NotAcceptable)]
+        public IHttpActionResult DeleteDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] string[] userFileNameList=null, [FromUri] string[] userFileIdList=null)
         {
-            //FEATURE FLAG CHECK:  REMOVE LATER
-            if (!_dataFeatures.CLA4049_ALLOW_S3_FILES_DELETE.GetValue())
+
+            //SECURITY CHECK
+            UserSecurity us = _datafileService.GetUserSecurityForDatasetFile(datasetId);
+            if (!_dataFeatures.CLA4049_ALLOW_S3_FILES_DELETE.GetValue()
+                || !us.CanEditDataset 
+                || !us.CanManageSchema)
             {
-                return Content(System.Net.HttpStatusCode.Unauthorized, "Feature not available to this user.");
+                return Content(System.Net.HttpStatusCode.NotAcceptable, "Feature not available to this user.");
             }
             
-            //STEP 1:  DETERMINE WHAT WAS PASSED IN
+            //STEP 1:   VALIDATIONS:  datasetId/schemaId
+            if(datasetId < 1 || schemaId < 1)
+            {
+                return Content(System.Net.HttpStatusCode.NotAcceptable, nameof(datasetId) + " AND " + nameof(schemaId) + " must be greater than 0");
+            }
+
+
+            //STEP 2:  VALIDATIONS:    DETERMINE WHAT WAS PASSED IN
             bool userFileNameListPassed = (userFileNameList != null && userFileNameList.Length > 0) ? true : false;
             bool userIdListPassed = (userFileIdList != null && userFileIdList.Length > 0) ? true : false;
-
-            //STEP 2:  VALIDATIONS TO ENSURE THEY DON'T PASS BOTH datasetFileIdList AND datasetFileIdList
             if (userFileNameListPassed && userIdListPassed)    
             {
                 return Content(System.Net.HttpStatusCode.NotAcceptable, "Cannot pass " + nameof(userFileNameList) + " AND " + nameof(userFileIdList) + " at the same time.  Please include only " + nameof(userFileNameList) + " OR " + nameof(userFileIdList));
@@ -132,16 +141,21 @@ namespace Sentry.data.Web.WebApi.Controllers
 
 
             //STEP 3:  TURN USER LIST INTO DBLIST
-            List<DatasetFile> dbList = new List<DatasetFile>();
+            List<DatasetFile> dbList;
             if (userFileNameListPassed)
             {
-                dbList = _datafileService.GetDatasetFileList(userFileNameList);
+                dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, userFileNameList);
 
                 //VALIDATE FILE COUNT
                 if (dbList.Count > userFileNameList.Length)
                 {
                     return Content(System.Net.HttpStatusCode.NotAcceptable, "No Files were deleted. " + nameof(userFileNameList) + " contained a file that would delete more than one file.  Please only pass filenames that would delete a single file.");
                 }
+                else if(dbList.Count < userFileNameList.Length)
+                {
+                    return Content(System.Net.HttpStatusCode.NotAcceptable, "No Files were deleted. " + nameof(userFileNameList) + " contained a file that could not be found.  Please only pass filenames that exist.");
+                }
+
             }
             else
             {
@@ -153,13 +167,26 @@ namespace Sentry.data.Web.WebApi.Controllers
                     return Content(System.Net.HttpStatusCode.NotAcceptable, nameof(userFileIdList) + " contains non integers.  Please pass all integers.");
                 }
 
-                dbList = _datafileService.GetDatasetFileList(idListINT);
+                dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, idListINT);
             }
 
 
+            //VALIDATE: ANYTHING TO DELETE
+            if(dbList != null && dbList.Count == 0)
+            {
+                return Content(System.Net.HttpStatusCode.NotAcceptable, "No matching files found to delete.");
+            }
 
-            return Ok("Thanks for using DSC!");
+
+            //STEP 4:  CALL SERVICE TO DELETE METADATA AND DPP TO DELETE
+            _datafileService.UpdateMetadata(dbList, Core.GlobalEnums.ObjectStatusEnum.Deleted);
+            _datafileService.DeleteS3(datasetId,schemaId,dbList);
+
+
+            return Ok("Delete Successful.  Thanks for using DSC!");
         }
+
+
 
     }
 }
