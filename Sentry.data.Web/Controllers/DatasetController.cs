@@ -718,6 +718,7 @@ namespace Sentry.data.Web.Controllers
         {
             var perms = _datasetService.GetDatasetPermissions(datasetId);
             var model = new ManagePermissionsModel(perms);
+            model.RemovePermissionRequest.DatasetNamesForAsset = _datasetService.GetDatasetNamesForAsset(perms.DatasetSaidKeyCode);
             return View("Permission/ManagePermissions", model);
         }
 

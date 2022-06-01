@@ -2289,7 +2289,11 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     managePermissionsInit() {
+        data.Dataset.manageInheritanceInit();
+        data.Dataset.removePermissionModalInit();
+    },
 
+    manageInheritanceInit() {
         $("#SelectedApprover").materialSelect();
         $("#inheritanceSwitch label").click(function () {
             $("#inheritanceModal").modal('show');
@@ -2343,6 +2347,54 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     validateInheritanceModal() {
+        return ($("#BusinessReason").val() != '' && $("#SelectedApprover").val != '')
+    },
+
+    removePermissionModalInit() {
+        $(".removePermissionIcon").click(function (e) {
+            var cells = $(e.target).parent().parent().children();
+            var scope = $(cells[0]).text();
+            var identity = $(cells[1]).text();
+            var permission = $(cells[2]).text();
+            var status = $(cells[3]).text();
+            data.Dataset.removePermissionModalOnOpen(scope, identity, permission);
+            $("#removePermissionModal").modal('show');
+        });
+        $("#removePermissionModal").on('hide.bs.modal', function () {
+            data.Dataset.removePermissionModalOnClose();
+        });
+        $(".removePermissionApprover").materialSelect();
+        $("#removePermissionModalSubmit").click(function () {
+            $("#removePermissionModal").modal('hide');
+
+        });
+    },
+
+    removePermissionModalOnClose() {
+        $("#Identity").val("");
+        $("#Scope").val("");
+        $("#Permission").val("");
+        $("#identityLabel").removeClass("active");
+        $("#scopeLabel").removeClass("active");
+        $("#permissionLabel").removeClass("active");
+    },
+
+    removePermissionModalOnOpen(scope, identity, permission) {
+        $("#Identity").val(identity);
+        $("#Scope").val(scope);
+        $("#Permission").val(permission);
+        $("#identityLabel").addClass("active");
+        $("#scopeLabel").addClass("active");
+        $("#permissionLabel").addClass("active");
+        if (scope == $("#ManagePermissionDatasetName").text()) {
+            $("#RemovePermissionScopeContainer").addClass("d-none");
+        }
+        else {
+            $("#RemovePermissionScopeContainer").removeClass("d-none");
+        }
+    },
+
+    validateRemovePermissionModal() {
         return ($("#BusinessReason").val() != '' && $("#SelectedApprover").val != '')
     },
 

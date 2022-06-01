@@ -1,4 +1,7 @@
 ﻿@model Sentry.data.Web.RequestPermissionInheritanceModel
+@{
+    ViewData.TemplateInfo.HtmlFieldPrefix = "Inheritance";
+}
 
 @using (Html.BeginForm("SubmitInheritanceRequest", "Dataset", FormMethod.Post, new { @id = "InheritanceRequestForm" }))
 {

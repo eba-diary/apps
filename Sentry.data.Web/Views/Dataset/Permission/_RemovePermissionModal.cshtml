@@ -1,0 +1,64 @@
+﻿@model Sentry.data.Web.RemovePermissionModel
+@{ 
+    ViewData.TemplateInfo.HtmlFieldPrefix = "RemovePermission";
+}
+
+@using (Html.BeginForm("SubmitremovePermissionRequest", "Dataset", FormMethod.Post, new { @id = "removePermissionRequestForm" }))
+{
+    <div class="modal fade" id="removePermissionModal" tabindex="-1" role="dialog" aria-labelledby="removePermissionModalTitle"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="removePermissionModalTitle">Remove Permission</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body pt-0">
+                    <h6 class="pt-0" id="addRemoveremovePermissionMessage"></h6>
+                    <div class="alert alert-danger d-none" id="removePermissionValidationMessage" role="alert">
+                        Business Reason and Approver are required.
+                    </div>
+                    @Html.HiddenFor(model => model.SecurableObjectId)
+                    @Html.HiddenFor(model => model.SaidKeyCode)
+                    <div class="md-form pt-0 mt-0">
+                        <input type="text" id="Identity" class="form-control disabled">
+                        <label for="Identity" class="" id="identityLabel">Identity (Readonly)</label>
+                    </div>
+                    <div class="md-form">
+                        <input type="text" id="Scope" class="form-control disabled">
+                        <label for="Scope" class="" id="scopeLabel">Scope (Readonly)</label>
+                    </div>
+                    <div class="md-form">
+                        <input type="text" id="Permission" class="form-control disabled">
+                        <label for="Permission" class="" id="permissionLabel">Permission (Readonly)</label>
+                    </div>
+                    <div class="md-form">
+                        @Html.LabelFor(model => model.BusinessReason, new { @class = "disabled"})
+                        @Html.TextAreaFor(model => model.BusinessReason, new { @class = "md-textarea w-100" })
+                    </div>
+                    <div class="md-form">
+                        @Html.LabelFor((model) => model.SelectedApprover, new { @class = "mdb-main-label" })
+                        @Html.DropDownListFor((model) => model.SelectedApprover, Model.AllApprovers, new { @class = "mdb-select removePermissionApprover" })
+                    </div>
+                    <div id="RemovePermissionScopeContainer">
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-triangle pr-2"></i>This will remove access to the following datasets:
+                        </div>
+                        <ul>
+                            @foreach (string datasetName in Model.DatasetNamesForAsset)
+                            {
+                                <li>@datasetName</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="removePermissionModalSubmit">Create Ticket</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

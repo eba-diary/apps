@@ -16,6 +16,8 @@ namespace Sentry.data.Web
             PermissionStatus = securablePermission.SecurityPermission.IsEnabled ? "Active" : "Pending";
         }
 
+        public ManagePermissionModel() { }
+
         public string Scope { get; set; }
         public string Identity { get; set; }
         public string PermissionDescription { get; set; }
