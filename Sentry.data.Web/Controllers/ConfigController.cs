@@ -227,6 +227,7 @@ namespace Sentry.data.Web.Controllers
                 dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, dfcm.DatasetScopeTypeID);
                 dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
                 dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, dfcm.FileExtensionID);
+                dfcm.DatasetScopeReadonly = dfcm.AllDatasetScopeTypes.Where(s => s.Value == dfcm.DatasetScopeTypeID.ToString()).Select(n => n.Text).FirstOrDefault();
 
                 //ViewBag.ModifyType = "Edit";
 
@@ -257,7 +258,7 @@ namespace Sentry.data.Web.Controllers
             edfc.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
             edfc.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, edfc.FileExtensionID);
-
+            edfc.DatasetScopeReadonly = edfc.AllDatasetScopeTypes.Where(s => s.Value == edfc.DatasetScopeTypeID.ToString()).Select(n => n.Text).FirstOrDefault();
             ViewBag.ModifyType = "Edit";
 
             return PartialView("_EditConfigFile", edfc);
