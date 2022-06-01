@@ -781,7 +781,7 @@ namespace Sentry.data.Web.Controllers
             {
                 List<BaseFieldDto> schemaRowsDto = schemaRows.ToDto();
 
-                _schemaService.Validate(schemaId, schemaRowsDto);
+                _schemaService.ValidateCleanedFields(schemaId, schemaRowsDto);
                 _schemaService.CreateAndSaveSchemaRevision(schemaId, schemaRowsDto, "blah");
 
             }
@@ -791,7 +791,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (ValidationException vEx)
             {
-                return Json(new { Success = false, Message = "Failed schema validation.  ", Errors = vEx.ValidationResults.GetAll() }, JsonRequestBehavior.AllowGet);
+                return Json(new { Success = false, Message = "Failed schema validation. ", Errors = vEx.ValidationResults.GetAll() }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
@@ -811,7 +811,7 @@ namespace Sentry.data.Web.Controllers
                 List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
                 dtoList.Add(schemaRow.ToDto(false));
 
-                _schemaService.Validate(schemaId, dtoList);
+                _schemaService.ValidateCleanedFields(schemaId, dtoList);
 
                 return Json(new { Success = true }, JsonRequestBehavior.AllowGet);
             }
