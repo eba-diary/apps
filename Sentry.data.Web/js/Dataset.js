@@ -1718,9 +1718,8 @@ data.Dataset = {
             orderCellsTop: true,
             width: "100%",
             serverSide: true,
-            //responsive: true,
             processing: true,
-            searching: true,
+            searching: false,
             paging: true,
             destroy: true,
             rowId: 'Id',
@@ -1734,8 +1733,8 @@ data.Dataset = {
                 [10, 25, 50, 100, 200, "All"]
             ],
             columns: [
-                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px", searchable: false },
-                { data: "ActionLinks", className: "downloadFile", width: "100px", searchable: false, orderable: false },
+                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
+                { data: "ActionLinks", className: "downloadFile", width: "100px", orderable: false },
                 { data: "Name", className: "Name" },
                 { data: "UploadUserName", className: "UploadUserName" },
                 { data: "CreateDtm", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
@@ -1746,8 +1745,7 @@ data.Dataset = {
                 processing: ""
             },
             order: [5, 'desc'],
-            stateSave: true,
-            "createdRow": function (row, data, dataIndex) { }
+            stateSave: true
         });
 
         if ($("#datasetFilesTable_filter").length > 0) {

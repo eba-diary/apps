@@ -8,12 +8,14 @@ using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using Sentry.data.Infrastructure;
+using Sentry.data.Infrastructure.FeatureFlags;
 using Sentry.data.Web.Helpers;
 using Sentry.DataTables.Mvc;
 using Sentry.DataTables.QueryableAdapter;
 using Sentry.DataTables.Shared;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Dynamic;
@@ -482,7 +484,7 @@ namespace Sentry.data.Web.Controllers
         public PartialViewResult EditDatasetFile(int id)
         {
             DatasetFile df = _datasetContext.GetById<DatasetFile>(id);
-            DatasetFileGridModel item = new DatasetFileGridModel(df, _associateInfoProvider, _featureFlags);
+            DatasetFileGridModel item = new DatasetFileGridModel(df, _associateInfoProvider, _featureFlags.CLA3048_StandardizeOnUTCTime.GetValue());
 
             return PartialView("EditDataFile", item);
 
@@ -584,29 +586,29 @@ namespace Sentry.data.Web.Controllers
         }
 
         public JsonResult GetDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
-        {
-            //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
-
-            List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
-
+       {            
             UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
 
+            bool CLA3048_StandardizeOnUTCTime = _featureFlags.CLA3048_StandardizeOnUTCTime.GetValue();
 
-            //Query the Dataset for the following information:
-            foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDatasetFileConfig(Id, x => !x.IsBundled).ToList())
-            {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider, _featureFlags)
+            IEnumerable<DatasetFileGridModel> datasetFiles = _datasetContext.GetDatasetFilesForDatasetFileConfig(Id, x => !x.IsBundled).
+                Select(x => new DatasetFileGridModel(x, _associateInfoProvider, CLA3048_StandardizeOnUTCTime)
                 {
                     HasDataAccess = us.CanViewData,
                     HasDataFileEdit = us.CanEditDataset,
                     HasFullViewDataset = us.CanViewFullDataset
-                };
-                files.Add(dfgm);
-            }
+                });
 
-            DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
 
-            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+            DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(datasetFiles.AsQueryable(), dtRequest);
+            DataTablesResponse dataTablesResponse = dtqa.GetDataTablesResponse();
+
+            sw.Stop();
+            Logger.Info($"GetDatasetFileInfoForGrid - Id: {Id} - Time to get data tables response: {sw.ElapsedMilliseconds}");
+
+            return Json(dataTablesResponse, JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult GetBundledFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
@@ -620,7 +622,7 @@ namespace Sentry.data.Web.Controllers
 
             foreach (DatasetFile df in bundledList)
             {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider, _featureFlags)
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider, _featureFlags.CLA3048_StandardizeOnUTCTime.GetValue())
                 {
                     HasDataAccess = us.CanViewData,
                     HasDataFileEdit = us.CanEditDataset,
@@ -648,7 +650,7 @@ namespace Sentry.data.Web.Controllers
                                                                                                     Fetch(x => x.DatasetFileConfig).ToList();
             foreach (DatasetFile dfversion in datasetFiles)
             {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion, _associateInfoProvider, _featureFlags)
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion, _associateInfoProvider, _featureFlags.CLA3048_StandardizeOnUTCTime.GetValue())
                 {
                     HasDataAccess = us.CanViewData,
                     HasDataFileEdit = us.CanEditDataset,
