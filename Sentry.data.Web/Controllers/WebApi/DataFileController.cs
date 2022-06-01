@@ -112,6 +112,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("dataset/{datasetId}/schema/{schemaId}")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK)]
         [SwaggerResponse(System.Net.HttpStatusCode.NotAcceptable)]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound)]
         public IHttpActionResult DeleteDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] string[] userFileNameList=null, [FromUri] string[] userFileIdList=null)
         {
 
@@ -145,17 +146,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             if (userFileNameListPassed)
             {
                 dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, userFileNameList);
-
-                //VALIDATE FILE COUNT
-                if (dbList.Count > userFileNameList.Length)
-                {
-                    return Content(System.Net.HttpStatusCode.NotAcceptable, "No Files were deleted. " + nameof(userFileNameList) + " contained a file that would delete more than one file.  Please only pass filenames that would delete a single file.");
-                }
-                else if(dbList.Count < userFileNameList.Length)
-                {
-                    return Content(System.Net.HttpStatusCode.NotAcceptable, "No Files were deleted. " + nameof(userFileNameList) + " contained a file that could not be found.  Please only pass filenames that exist.");
-                }
-
             }
             else
             {
@@ -166,7 +156,6 @@ namespace Sentry.data.Web.WebApi.Controllers
                 {
                     return Content(System.Net.HttpStatusCode.NotAcceptable, nameof(userFileIdList) + " contains non integers.  Please pass all integers.");
                 }
-
                 dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, idListINT);
             }
 
@@ -174,7 +163,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             //VALIDATE: ANYTHING TO DELETE
             if(dbList != null && dbList.Count == 0)
             {
-                return Content(System.Net.HttpStatusCode.NotAcceptable, "No matching files found to delete.");
+                return Content(System.Net.HttpStatusCode.NotFound, "Nothing found to delete.");
             }
 
 

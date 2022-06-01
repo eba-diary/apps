@@ -92,6 +92,7 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA3882_DSC_NOTIFICATION_SUBCATEGORY => throw new NotImplementedException();
 
             public IFeatureFlag<bool> CLA3718_Authorization => throw new NotImplementedException();
+            public IFeatureFlag<bool> CLA4049_ALLOW_S3_FILES_DELETE => throw new NotImplementedException();
         }
     }
 }
