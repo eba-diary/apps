@@ -125,8 +125,6 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <summary>
         /// List of all datasets
         /// </summary>
-        /// <param name="DatasetConfigID"></param>
-        /// <returns></returns>
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset")]
@@ -280,7 +278,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     throw new SchemaNotFoundException();
                 }
 
-                Logger.Debug($"{nameof(MetadataController)}_{nameof(AddSchemaRevision)} - datasetid:{datasetId}:::schemaId:{schemaId}:::incomingjson:{schemaStructure.ToString()}");
+                Logger.Debug($"{nameof(MetadataController)}_{nameof(AddSchemaRevision)} - datasetid:{datasetId}:::schemaId:{schemaId}:::incomingjson:{schemaStructure}");
 
                 JsonSchema schema_v3;
                 schema_v3 = deserializeJSONStringtoJsonSchema().GetAwaiter().GetResult();

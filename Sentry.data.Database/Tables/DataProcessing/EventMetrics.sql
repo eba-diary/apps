@@ -37,3 +37,6 @@ GO
 create index IDX_EventMetricsNeedsValidation on EventMetrics (DataFlowStepId) with(online =on)
 GO
 
+
+
+CREATE INDEX [IX_EventMetrics_CreatedDTM] ON [dbo].[EventMetrics] ([CreatedDTM])

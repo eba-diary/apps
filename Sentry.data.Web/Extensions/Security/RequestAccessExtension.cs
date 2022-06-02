@@ -17,9 +17,11 @@ namespace Sentry.data.Web
                 AdGroupName = model.AdGroupName,
                 BusinessReason = model.BusinessReason,
                 SelectedPermissionCodes = model.SelectedPermissions != null ? model.SelectedPermissions.Split(',').ToList() : new List<string>(),
-                SelectedApprover = model.SelectedApprover
+                SelectedApprover = model.SelectedApprover,
+                IsAddingPermission = true
             };
         }
+
         public static Core.AccessRequest ToCore(this NotificationAccessRequestModel model)
         {
             return new Core.AccessRequest()
@@ -29,6 +31,19 @@ namespace Sentry.data.Web
                 BusinessReason = model.BusinessReason,
                 SelectedPermissionCodes = model.SelectedPermissions != null ? model.SelectedPermissions.Split(',').ToList() : new List<string>(),
                 SelectedApprover = model.SelectedApprover
+            };
+        }
+
+        public static Core.AccessRequest ToCore(this RequestPermissionInheritanceModel model)
+        {
+            return new Core.AccessRequest()
+            {
+                SecurableObjectId = model.SecurableObjectId,
+                BusinessReason = model.BusinessReason,
+                SelectedPermissionCodes = model.SelectedPermissions != null ? model.SelectedPermissions.Split(',').ToList() : new List<string>(),
+                SelectedApprover = model.SelectedApprover,
+                SaidKeyCode = model.SaidKeyCode,
+                IsAddingPermission = model.IsAddingPermission
             };
         }
 
@@ -54,6 +69,7 @@ namespace Sentry.data.Web
                 AllApprovers = Utility.BuildSelectListitem(core.ApproverList, "Select an approver")
             };
         }
+
         public static DataSourceAccessRequestModel ToDataSourceModel(this Core.AccessRequest core)
         {
             return new DataSourceAccessRequestModel()

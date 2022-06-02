@@ -4,6 +4,7 @@ using System.Linq;
 using Sentry.Core;
 using Newtonsoft.Json;
 using Sentry.data.Core.GlobalEnums;
+using System.Text.RegularExpressions;
 
 namespace Sentry.data.Core
 {
@@ -18,6 +19,8 @@ namespace Sentry.data.Core
         public virtual string S3Key { get; set; }
 
         public virtual string DatasetName { get; set; }
+
+        public virtual string ShortName { get; set; }
 
         public virtual string DatasetDesc { get; set; }
 
@@ -127,6 +130,18 @@ namespace Sentry.data.Core
             {
                 vr.Add(GlobalConstants.ValidationErrors.NAME_IS_BLANK, "The Dataset Name is required");
             }
+            if (string.IsNullOrWhiteSpace(ShortName))
+            {
+                vr.Add(ValidationErrors.datasetShortNameRequired, "Short Name is required");
+            }
+            if (ShortName != null && new Regex(@"[^0-9a-zA-Z]").Match(ShortName).Success)
+            {
+                vr.Add(ValidationErrors.datasetShortNameInvalid, "Short Name can only contain alphanumeric characters");
+            }
+            if (ShortName != null && ShortName.Length > 12)
+            {
+                vr.Add(ValidationErrors.datasetShortNameInvalid, "Short Name must be 12 characters or less");
+            }
             if (string.IsNullOrWhiteSpace(CreationUserName))
             {
                 vr.Add(ValidationErrors.datasetCreatedByRequired, "The Dataset Creation User Name is required");
@@ -157,6 +172,11 @@ namespace Sentry.data.Core
         {
             public const string datasetNameDuplicate = "datasetNameDuplicate";
             public const string datasetNameRequired = "datasetNameRequired";
+            public const string datasetNameIdempotent = "datasetNameIdempotent";
+            public const string datasetShortNameRequired = "datasetShortNameIsBlank";
+            public const string datasetShortNameInvalid = "datasetShortNameIsInvalid";
+            public const string datasetShortNameDuplicate = "datasetShortNameIsDuplicate";
+            public const string datasetShortNameIdempotent = "datasetShortNameIsIdempotent";
             public const string datasetDescriptionRequired = "datasetDescriptionRequired";
             public const string datasetOwnerRequired = "datasetOwnerRequired";
             public const string datasetOwnerInvalid = "datasetOwnerInvalid";

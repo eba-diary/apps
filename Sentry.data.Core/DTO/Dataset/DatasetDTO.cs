@@ -20,5 +20,6 @@ namespace Sentry.data.Core
         public string SAIDAssetKeyCode { get; set; }
         public string NamedEnvironment { get; set; }
         public NamedEnvironmentType NamedEnvironmentType { get; set; }
+        public string ShortName { get; set; }
     }
 }

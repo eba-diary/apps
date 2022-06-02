@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Caching;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
@@ -152,7 +153,14 @@ namespace Sentry.data.Core
             result.DatasetName = ds.DatasetName;
             result.DatasetSaidKeyCode = ds.Asset.SaidKeyCode;
             result.Permissions = _securityService.GetSecurablePermissions(ds);
+            result.Approvers = _saidService.GetAllProdCustByKeyCode(ds.Asset.SaidKeyCode).Result;
+            result.InheritanceTicket = _securityService.GetSecurableInheritanceTicket(ds);
             return result;
+        }
+
+        public SecurityTicket GetLatestInheritanceTicket(int datasetId)
+        {
+            return _securityService.GetSecurableInheritanceTicket(_datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault());
         }
 
         public UserSecurity GetUserSecurityForConfig(int configId)
@@ -245,7 +253,6 @@ namespace Sentry.data.Core
                 request.ApproverId = request.SelectedApprover;
                 request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
                                                                                                                 x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
-
                 return _securityService.RequestPermission(request);
             }
 
@@ -272,6 +279,9 @@ namespace Sentry.data.Core
         public void UpdateAndSaveDataset(DatasetDto dto)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(dto.DatasetId);
+
+            //Verify that certain idempotent fields have not been changed
+            ValidateIdempotentFields(dto, ds);
 
             ds.DatasetInformation = dto.DatasetInformation;
             ds.OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), dto.OriginationId);
@@ -324,9 +334,9 @@ namespace Sentry.data.Core
             }
 
             if (!ds.IsSecured && dto.IsSecured)
-            {      
+            {
                 ds.Security.EnabledDate = DateTime.Now;
-                ds.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;                
+                ds.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
             }
             else if (ds.IsSecured && !dto.IsSecured)
             {
@@ -338,6 +348,33 @@ namespace Sentry.data.Core
 
 
             _datasetContext.SaveChanges();
+        }
+
+        /// <summary>
+        /// Verify that certain idempotent fields have not been changed
+        /// </summary>
+        private static void ValidateIdempotentFields(DatasetDto dto, Dataset ds)
+        {
+            if (ds.DatasetName != dto.DatasetName)
+            {
+                throw new ValidationException(GlobalConstants.ValidationErrors.NAME_IS_IDEMPOTENT, "Dataset Name cannot be changed");
+            }
+            if (ds.ShortName != dto.ShortName)
+            {
+                throw new ValidationException(Dataset.ValidationErrors.datasetShortNameIdempotent, "Dataset Short Name cannot be changed");
+            }
+            if (ds.Asset.SaidKeyCode != dto.SAIDAssetKeyCode)
+            {
+                throw new ValidationException(GlobalConstants.ValidationErrors.SAID_ASSET_IDEMPOTENT, "Dataset Asset cannot be changed");
+            }
+            if (ds.NamedEnvironment != dto.NamedEnvironment)
+            {
+                throw new ValidationException(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_IDEMPOTENT, "Dataset Named Environment cannot be changed");
+            }
+            if (ds.NamedEnvironmentType != dto.NamedEnvironmentType)
+            {
+                throw new ValidationException(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_TYPE_IDEMPOTENT, "Dataset Named Environment Type cannot be changed");
+            }
         }
 
         public bool Delete(int id, IApplicationUser user, bool logicalDelete)
@@ -418,36 +455,16 @@ namespace Sentry.data.Core
         {
             ValidationResults results = new ValidationResults();
 
-            if (String.IsNullOrEmpty(dto.DatasetName)) //if no name, add error
-            {
-                results.Add(Dataset.ValidationErrors.datasetNameRequired, "Dataset Name is required");
-            }
-            else //if name, make sure it is not duplicate
-            {
-                if (dto.DatasetId == 0 && dto.DatasetCategoryIds != null && _datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
-                                                             w.DatasetCategories.Any(x => dto.DatasetCategoryIds.Contains(x.Id)) &&
-                                                             w.DatasetType == GlobalConstants.DataEntityCodes.DATASET).Count() > 0)
-                {
-                    results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists within category");
-                }
-            }
+            ValidateDatasetName(dto, results);
+
+            ValidateDatasetShortName(dto, results);
 
             if (String.IsNullOrWhiteSpace(dto.PrimaryContactId))
             {
                 results.Add(Dataset.ValidationErrors.datasetContactRequired, "Contact is required.");
             }
 
-            if(dto.DatasetCategoryIds == null)
-            {
-                results.Add(Dataset.ValidationErrors.datasetCategoryRequired, "Category is required");
-            }
-            else
-            {
-                if (dto.DatasetCategoryIds.Count == 1 && dto.DatasetCategoryIds[0].Equals(0))
-                {
-                    results.Add(Dataset.ValidationErrors.datasetCategoryRequired, "Category is required");
-                }
-            }
+            ValidateDatasetCategories(dto, results);
 
             if (dto.DatasetId == 0 && dto.DatasetScopeTypeId == 0)
             {
@@ -459,7 +476,7 @@ namespace Sentry.data.Core
                 results.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "SAID Asset is required.");
             }
 
-            if(dto.OriginationId == 0)
+            if (dto.OriginationId == 0)
             {
                 results.Add(Dataset.ValidationErrors.datasetOriginationRequired, "Dataset Origination is required");
             }
@@ -468,6 +485,61 @@ namespace Sentry.data.Core
             results.MergeInResults(await _quartermasterService.VerifyNamedEnvironmentAsync(dto.SAIDAssetKeyCode, dto.NamedEnvironment, dto.NamedEnvironmentType).ConfigureAwait(false));
 
             return new ValidationException(results);
+        }
+
+        private static void ValidateDatasetCategories(DatasetDto dto, ValidationResults results)
+        {
+            if (dto.DatasetCategoryIds == null)
+            {
+                results.Add(Dataset.ValidationErrors.datasetCategoryRequired, "Category is required");
+            }
+            else
+            {
+                if (dto.DatasetCategoryIds.Count == 1 && dto.DatasetCategoryIds[0].Equals(0))
+                {
+                    results.Add(Dataset.ValidationErrors.datasetCategoryRequired, "Category is required");
+                }
+            }
+        }
+
+        private void ValidateDatasetName(DatasetDto dto, ValidationResults results)
+        {
+            if (String.IsNullOrEmpty(dto.DatasetName)) //if no name, add error
+            {
+                results.Add(Dataset.ValidationErrors.datasetNameRequired, "Dataset Name is required");
+            }
+            else //if name, make sure it is not duplicate
+            {
+                if (dto.DatasetId == 0 && dto.DatasetCategoryIds != null && _datasetContext.Datasets.Any(w => w.DatasetName == dto.DatasetName &&
+                                                             w.DatasetType == GlobalConstants.DataEntityCodes.DATASET))
+                {
+                    results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists");
+                }
+            }
+        }
+
+        private void ValidateDatasetShortName(DatasetDto dto, ValidationResults results)
+        {
+            if (string.IsNullOrWhiteSpace(dto.ShortName))
+            {
+                results.Add(Dataset.ValidationErrors.datasetShortNameRequired, "Short Name is required");
+            }
+            else
+            {
+                if (new Regex(@"[^0-9a-zA-Z]").Match(dto.ShortName).Success)
+                {
+                    results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, "Short Name can only contain alphanumeric characters");
+                }
+                if (dto.ShortName.Length > 12)
+                {
+                    results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, "Short Name must be 12 characters or less");
+                }
+                if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName && 
+                    d.DatasetType == GlobalConstants.DataEntityCodes.DATASET && dto.DatasetId != d.DatasetId))
+                {
+                    results.Add(Dataset.ValidationErrors.datasetShortNameDuplicate, "That Short Name is already in use by another Dataset");
+                }
+            }
         }
 
         public List<Dataset> GetDatasetMarkedDeleted()
@@ -530,6 +602,7 @@ namespace Sentry.data.Core
                 DatasetId = dto.DatasetId,
                 DatasetCategories = _datasetContext.Categories.Where(x => x.Id == dto.DatasetCategoryIds.First()).ToList(),
                 DatasetName = dto.DatasetName,
+                ShortName = dto.ShortName,
                 DatasetDesc = dto.DatasetDesc,
                 DatasetInformation = dto.DatasetInformation,
                 CreationUserName = dto.CreationUserId,
@@ -612,6 +685,7 @@ namespace Sentry.data.Core
             dto.DatasetId = ds.DatasetId;
             dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
             dto.DatasetName = ds.DatasetName;
+            dto.ShortName = ds.ShortName;
             dto.DatasetDesc = ds.DatasetDesc;
             dto.DatasetInformation = ds.DatasetInformation;
             dto.DatasetType = ds.DatasetType;

@@ -4,7 +4,7 @@
 }
 
 <div class="mt-2">
-    <a href="@Url.Action("Detail", "Dataset", new {id=Model.DatasetId})" id="linkReturnToDatasetDetails"><span class="icon-chevron-left"></span>Back to Dataset Details</a>
+    <a href="@Url.Action("Detail", "Dataset", new {id=Model.DatasetId})" id="linkReturnToDatasetDetails"><span class="icon-chevron-left pr-3"></span>Back to Dataset Details</a>
 </div>
 
 
@@ -12,16 +12,29 @@
     <div class="row">
         <div class="col-12 pl-0">
             <!-- Dataset Name and Request Access-->
-            <h2 class="pt-3 mb-1">
+            <h2 class="pt-2 mb-1" value="@Model.DatasetId" id="DatasetHeader">
                 @Model.DatasetName - Manage Permissions
             </h2>
+            
+        </div>
+    </div>
+
+    <div class="row">
+        <h5 class="pt-0">Permission Inheritance from @Model.DatasetSaidKeyCode: </h5>
+        <div class="switch pl-2" id="inheritanceSwitch" value="@Model.InheritanceTicket.TicketStatus">
+            <label class="pb-0">
+                Off
+                <input type="checkbox" id="inheritanceSwitchInput">
+                <span class="lever" id="inheritanceLever"></span>
+                On
+            </label>
         </div>
     </div>
 
     @foreach (var pair in new Dictionary<string, IList<ManagePermissionModel>> { { "DSC Permissions", Model.DscPermissions }, { "Snowflake Permissions", Model.SnowflakePermissions }, { "S3 Permissions", Model.AwsIamPermissions } })
     {
         <div class="row">
-            <h6>@pair.Key</h6>
+            <h6 class="pt-3">@pair.Key</h6>
         </div>
         <div class="row">
             <table class="table dsc-blue-table table-bordered table-hover nowrap" id="permissionsTable" aria-label="@pair.Key">
@@ -58,6 +71,10 @@
             </table>
         </div>
     }
+
+    <!-- Request Inheritance Modal -->
+    @Html.Partial("Permission/_RequestInheritanceModal", Model.InheritanceRequest)
+
 </div>
 
 @section Scripts {

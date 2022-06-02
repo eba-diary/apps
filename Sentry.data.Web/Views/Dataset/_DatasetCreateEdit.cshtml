@@ -88,6 +88,28 @@
                     }
                 </div>
 
+
+                @************************************************************************************************************************************
+         ShortName
+        *************************************************************************************************************************************@
+
+                <div class="md-form">
+                    @if (Model.DatasetId == 0)
+                    {
+                        @Html.EditorFor(model => model.ShortName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.LabelFor(model => model.ShortName, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.ShortName) ? "active" : "" })
+                        @Html.ValidationMessageFor(model => model.ShortName, "", new { @class = "text-danger" })
+                    }
+                    else
+                    {
+                        <div class="textReadOnly md-form">
+                            <label for="DatasetShortNameReadonly" class="active">Short Name (Readonly)</label>
+                            <input id="DatasetShortNameReadonly" placeholder="@Model.ShortName" disabled class="disabled form-control" />
+                            @Html.HiddenFor(model => model.ShortName)
+                        </div>
+                    }
+                </div>
+
                 @************************************************************************************************************************************
         SAID ASSET
         *************************************************************************************************************************************@
@@ -276,9 +298,6 @@
                 </div>*@
 
 
-        </div>
-        <div class="md-form">
-            <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
         </div>
         <div class="md-form">
             <div>

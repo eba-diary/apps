@@ -18,6 +18,7 @@ namespace Sentry.data.Web
                 DatasetId = model.DatasetId,
                 DatasetCategoryIds = model.DatasetCategoryIds,
                 DatasetName = model.DatasetName,
+                ShortName = model.ShortName,
                 DatasetDesc = model.DatasetDesc,
                 DatasetInformation = model.DatasetInformation,
                 PrimaryContactId = model.PrimaryContactId,
@@ -60,6 +61,7 @@ namespace Sentry.data.Web
             {
                 Id = dto.DatasetId,
                 Name = dto.DatasetName,
+                ShortName = dto.ShortName,
                 Category = dto.CategoryName,
                 Description = dto.DatasetDesc,
                 IsSecure = dto.IsSecured,

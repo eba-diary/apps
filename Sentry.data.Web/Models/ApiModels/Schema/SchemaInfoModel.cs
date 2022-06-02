@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core;
+using System;
 using System.Collections.Generic;
 
 namespace Sentry.data.Web.Models.ApiModels.Schema
@@ -41,13 +42,13 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         {
             List<string> results = new List<string>();
 
-            if (string.Equals(Format, "csv", StringComparison.OrdinalIgnoreCase) && Delimiter != ",")
-{
+            if (string.Equals(Format, GlobalConstants.ExtensionNames.CSV, StringComparison.OrdinalIgnoreCase) && Delimiter != ",")
+            {
                 results.Add("File Extension CSV and it's delimiter do not match");
             }
 
-            if (string.Equals(Format, "delimited", StringComparison.OrdinalIgnoreCase) && string.IsNullOrWhiteSpace(Delimiter))
-{
+            if (string.Equals(Format, GlobalConstants.ExtensionNames.DELIMITED, StringComparison.OrdinalIgnoreCase) && string.IsNullOrWhiteSpace(Delimiter))
+            {
                 results.Add("File Extension Delimited is missing it's delimiter");
             }
 
