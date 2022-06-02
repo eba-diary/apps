@@ -69,9 +69,6 @@ namespace Sentry.data.Core.DTO.Schema.Fields
         public override string SourceFormat { get; set; }
         public override int OrdinalPosition { get; set; }
 
-        private int length;
-        public override int Length { get { return GlobalConstants.Datatypes.Defaults.LENGTH_DEFAULT;} set { length = value; } }     //DEFAULT LENGTH BECAUSE ITS NOT APPLICABLE
-
         public override BaseField ToEntity(BaseField parentField, SchemaRevision parentRevision)
         {
             BaseField newEntityField = new DecimalField()
@@ -130,6 +127,11 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             }
 
             return results;
+        }
+
+        public override void Clean(string extension)
+        {
+            DefaultNonFixedWidthLength(extension);
         }
 
         private void SetPrecisionScale(IDictionary<string, object> extensionData)

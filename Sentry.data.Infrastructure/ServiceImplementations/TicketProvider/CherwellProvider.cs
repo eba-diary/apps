@@ -90,7 +90,7 @@ namespace Sentry.data.Infrastructure
             }
             else if (ticketStatus == GlobalConstants.CherwellChangeStatusNames.CLOSED)
             {
-                ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.WIDHTDRAWN;
+                ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.WITHDRAWN;
             }
             else { return null; }
 
@@ -491,7 +491,7 @@ namespace Sentry.data.Infrastructure
                 sb.Append($"Please remove the following permissions to {model.SecurableObjectName} within Data.sentry.com. <br>");
             }
             sb.Append($"<br>");
-            if (string.IsNullOrEmpty(model.SaidKeyCode))
+            if (!string.IsNullOrEmpty(model.SaidKeyCode))
             {
                 sb.Append($"Said Asset: {model.SaidKeyCode} <br>");
                 sb.Append($"<br>");

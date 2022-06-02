@@ -20,7 +20,7 @@ namespace Sentry.data.Core
         UserSecurity GetUserSecurityForDataSource(int id);
         Task<AccessRequest> GetDataSourceAccessRequest(int dataSourceId);
 
-        string RequestAccessToDataSource(AccessRequest request);
+        Task<string> RequestAccessToDataSource(AccessRequest request);
 
 
         /// <summary>
