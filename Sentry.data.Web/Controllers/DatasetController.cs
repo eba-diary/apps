@@ -586,29 +586,33 @@ namespace Sentry.data.Web.Controllers
         }
 
         public JsonResult GetDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
-       {            
-            UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
+        {            
+            //UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
 
-            bool CLA3048_StandardizeOnUTCTime = _featureFlags.CLA3048_StandardizeOnUTCTime.GetValue();
+            //bool CLA3048_StandardizeOnUTCTime = _featureFlags.CLA3048_StandardizeOnUTCTime.GetValue();
 
-            IEnumerable<DatasetFileGridModel> datasetFiles = _datasetContext.GetDatasetFilesForDatasetFileConfig(Id, x => !x.IsBundled).
-                Select(x => new DatasetFileGridModel(x, _associateInfoProvider, CLA3048_StandardizeOnUTCTime)
-                {
-                    HasDataAccess = us.CanViewData,
-                    HasDataFileEdit = us.CanEditDataset,
-                    HasFullViewDataset = us.CanViewFullDataset
-                });
+            //Func<DatasetFile, DatasetFileGridModel> mapToModel = x => new DatasetFileGridModel(x, _associateInfoProvider, CLA3048_StandardizeOnUTCTime)
+            //{
+            //    HasDataAccess = us.CanViewData,
+            //    HasDataFileEdit = us.CanEditDataset,
+            //    HasFullViewDataset = us.CanViewFullDataset
+            //};
 
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            //Stopwatch sw = new Stopwatch();
+            //sw.Start();
 
-            DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(datasetFiles.AsQueryable(), dtRequest);
-            DataTablesResponse dataTablesResponse = dtqa.GetDataTablesResponse();
+            //MappingDataTablesQueryableAdapter<DatasetFile, DatasetFileGridModel> dtqa = new MappingDataTablesQueryableAdapter<DatasetFile, DatasetFileGridModel>(_datasetService.GetDatasetFileTableQueryable(Id), 
+            //                                                                                                                                                     dtRequest, 
+            //                                                                                                                                                     RangeDelimiterConstants.YADCF, 
+            //                                                                                                                                                     mapToModel);
+            //DataTablesResponse dataTablesResponse = dtqa.GetDataTablesResponse();
 
-            sw.Stop();
-            Logger.Info($"GetDatasetFileInfoForGrid - Id: {Id} - Time to get data tables response: {sw.ElapsedMilliseconds}");
+            //sw.Stop();
+            //Logger.Info($"GetDatasetFileInfoForGrid - Id: {Id} - Time to get data tables response: {sw.ElapsedMilliseconds}");
 
-            return Json(dataTablesResponse, JsonRequestBehavior.AllowGet);
+            //return Json(dataTablesResponse, JsonRequestBehavior.AllowGet);
+
+            return Json("");
         }
 
         public JsonResult GetBundledFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)

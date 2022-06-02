@@ -584,5 +584,52 @@ namespace Sentry.data.Core.Tests
 
             datasetContext.VerifyAll();
         }
+
+        [TestMethod]
+        public void GetDatasetFileTableQueryable_1_ActiveNonBundled()
+        {
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+
+            datasetContext.SetupGet(x => x.DatasetFileStatusActive).Returns(new List<DatasetFile>() {
+                new DatasetFile()
+                {
+                    DatasetFileId = 1,
+                    IsBundled = false,
+                    DatasetFileConfig = new DatasetFileConfig() { ConfigId = 1 },
+                },
+                new DatasetFile()
+                {
+                    DatasetFileId = 2,
+                    IsBundled = true,
+                    DatasetFileConfig = new DatasetFileConfig() { ConfigId = 1 },
+                },
+                new DatasetFile()
+                {
+                    DatasetFileId = 4,
+                    IsBundled = false,
+                    DatasetFileConfig = new DatasetFileConfig() { ConfigId = 1 },
+                    ParentDatasetFileId = 32
+                },
+                new DatasetFile()
+                {
+                    DatasetFileId = 5,
+                    IsBundled = false,
+                    DatasetFileConfig = new DatasetFileConfig() { ConfigId = 2 }
+                }
+            }.AsQueryable());
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, null, null);
+
+            List<DatasetFile> datasetFiles = datasetService.GetDatasetFileTableQueryable(1).ToList();
+
+            Assert.AreEqual(1, datasetFiles.Count);
+
+            DatasetFile datasetFile = datasetFiles.First();
+            Assert.AreEqual(1, datasetFile.DatasetFileId);
+            Assert.AreEqual(false, datasetFile.IsBundled);
+            Assert.AreEqual(1, datasetFile.DatasetFileConfig.ConfigId);
+
+            datasetContext.VerifyAll();
+        }
     }
 }

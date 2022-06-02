@@ -1,6 +1,7 @@
 ﻿using Sentry.Core;
 using Sentry.data.Core.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
@@ -28,5 +29,6 @@ namespace Sentry.data.Core
         DatasetPermissionsDto GetDatasetPermissions(int datasetId);
         string SetDatasetFavorite(int datasetId, string associateId);
         SecurityTicket GetLatestInheritanceTicket(int datasetId);
+        IQueryable<DatasetFile> GetDatasetFileTableQueryable(int configId);
     }
 }

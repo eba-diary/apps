@@ -584,6 +584,13 @@ namespace Sentry.data.Core
             }
         }
 
+        public IQueryable<DatasetFile> GetDatasetFileTableQueryable(int configId)
+        {
+            return _datasetContext.DatasetFileStatusActive.Where(x => x.DatasetFileConfig.ConfigId == configId && 
+                                                                      x.ParentDatasetFileId == null &&
+                                                                      !x.IsBundled);
+        }
+
         #region "private functions"
         private void MarkForDelete(Dataset ds, IApplicationUser user)
         {
@@ -719,8 +726,6 @@ namespace Sentry.data.Core
             dto.NamedEnvironmentType = ds.NamedEnvironmentType;
         }
 
-
-
         private void MapToDetailDto(Dataset ds, DatasetDetailDto dto)
         {
             MapToDto(ds, dto);
@@ -773,7 +778,6 @@ namespace Sentry.data.Core
 
             return JsonConvert.SerializeObject(lambdaEvent);
         }
-
         #endregion
 
     }
