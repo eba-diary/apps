@@ -1292,8 +1292,11 @@ data.Dataset = {
             Id = $('#datasetConfigList').val();
         }
 
-        data.Dataset.DatasetFileTableInit(Id);
-        data.Dataset.DatasetBundingFileTableInit(Id);
+        //Don't init dataset file data table until the file tab is selected when tab feature is on
+        if (!datasetDetailModel.DisplayTabSections) {
+            data.Dataset.DatasetFileTableInit(Id);
+            data.Dataset.DatasetBundingFileTableInit(Id);
+        }
 
         //Hook up handlers for tabbed sections
 
@@ -1719,7 +1722,7 @@ data.Dataset = {
             width: "100%",
             serverSide: true,
             processing: true,
-            searching: false,
+            searching: true,
             paging: true,
             destroy: true,
             rowId: 'Id',
@@ -1733,9 +1736,9 @@ data.Dataset = {
                 [10, 25, 50, 100, 200, "All"]
             ],
             columns: [
-                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
-                { data: "ActionLinks", className: "downloadFile", width: "100px", orderable: false },
-                { data: "Name", className: "Name" },
+                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px", searchable: false },
+                { data: "ActionLinks", className: "downloadFile", width: "100px", orderable: false, searchable: false },
+                { data: "FileName", className: "Name" },
                 { data: "UploadUserName", className: "UploadUserName" },
                 { data: "CreateDtm", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "ModifiedDtm", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
@@ -1748,22 +1751,40 @@ data.Dataset = {
             stateSave: true
         });
 
-        if ($("#datasetFilesTable_filter").length > 0) {
-            yadcf.init(data.Dataset.DatasetFilesTable, [
-                { column_number: 2, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 1000 },
-                { column_number: 3, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 1000 },
-               // { column_number: 4, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },  SEE CLA-4004
-               // { column_number: 5, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },
-                { column_number: 6, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 1000 },
-            ],
-                {
-                    filters_tr_index: 1
-                }
-            );
-        }
+        //date filters are off, already CLA-4004 created for it
+        //something with datepicker_type not working as expected
+        //may need to render additional bundles to get date pickers to function
 
-        $(".dataTables_filter").parent().addClass("text-right");
-        $(".dataTables_filter").parent().css("right", "3px");
+        yadcf.init(data.Dataset.DatasetFilesTable, [
+                {
+                    column_number: 2,
+                    filter_type: 'text',
+                    style_class: 'form-control',
+                    filter_reset_button_text: false,
+                    filter_delay: 500
+                },
+                //{
+                //    column_number: 4,
+                //    filter_type: 'range_date',
+                //    datepicker_type: null,
+                //    filter_reset_button_text: false,
+                //    filter_delay: 500
+                //}, SEE CLA - 4004
+                //{
+                //    column_number: 5,
+                //    filter_type: 'range_date',
+                //    datepicker_type: null,
+                //    filter_reset_button_text: false,
+                //    filter_delay: 500
+                //},
+            ],
+            {
+                filters_tr_index: 1
+            }
+        );
+
+        //searching property needs to be set to true in order for yadcf filters to bind properly to columns, but we don't want the global search available
+        $("#datasetFilesTable_filter").remove();
 
         var table = $('#datasetFilesTable').DataTable();
 

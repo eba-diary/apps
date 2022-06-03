@@ -15,7 +15,7 @@ namespace Sentry.data.Web
         public DatasetFileGridModel(DatasetFile f, IAssociateInfoProvider associateInfoService, bool CLA3048_StandardizeOnUTCTime)
         {
             this.Id = f.DatasetFileId;
-            this.Name = f.FileName;
+            this.FileName = f.FileName;
             this.FlowExecutionGuid = f.FlowExecutionGuid;
             this.RunInstanceGuid = f.RunInstanceGuid;
 
@@ -34,7 +34,7 @@ namespace Sentry.data.Web
             this.Information = f.Information;
         }
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string FileName { get; set; }
         public string FlowExecutionGuid { get; set; }
         public string RunInstanceGuid { get; set; }
         public string UploadUserName { get; set; }
@@ -50,7 +50,7 @@ namespace Sentry.data.Web
                     href += "<a href = \"#\" onclick=\"data.Dataset.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><em class='fas fa-cloud-download-alt text-primary'></em></a>";
                 }
 
-                if (HasFullViewDataset && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name)))
+                if (HasFullViewDataset && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(FileName)))
                 {
                     href += "<a href = \"#\" onclick=\"data.Dataset.FileNameModal(" + Id + ")\" title=\"Push to SAS\">" +
                         "<img src=\"../../Images/sas_logo_min.png\" style=\" height: 15px; margin-bottom: 4px; margin-left: 5px;\"/>" +

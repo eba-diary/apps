@@ -8,7 +8,6 @@ using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using Sentry.data.Infrastructure;
-using Sentry.data.Infrastructure.FeatureFlags;
 using Sentry.data.Web.Helpers;
 using Sentry.DataTables.Mvc;
 using Sentry.DataTables.QueryableAdapter;
@@ -585,37 +584,35 @@ namespace Sentry.data.Web.Controllers
             return Redirect(Request.UrlReferrer.PathAndQuery);
         }
 
-        public JsonResult GetDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
-        {            
-            //UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
+        public JsonResult GetDatasetFileInfoForGrid(int Id, DataTablesRequest dtRequest)
+        {
+            UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
 
-            //bool CLA3048_StandardizeOnUTCTime = _featureFlags.CLA3048_StandardizeOnUTCTime.GetValue();
+            bool CLA3048_StandardizeOnUTCTime = _featureFlags.CLA3048_StandardizeOnUTCTime.GetValue();
 
-            //Func<DatasetFile, DatasetFileGridModel> mapToModel = x => new DatasetFileGridModel(x, _associateInfoProvider, CLA3048_StandardizeOnUTCTime)
-            //{
-            //    HasDataAccess = us.CanViewData,
-            //    HasDataFileEdit = us.CanEditDataset,
-            //    HasFullViewDataset = us.CanViewFullDataset
-            //};
+            Func<DatasetFile, DatasetFileGridModel> mapToModel = x => new DatasetFileGridModel(x, _associateInfoProvider, CLA3048_StandardizeOnUTCTime)
+            {
+                HasDataAccess = us.CanViewData,
+                HasDataFileEdit = us.CanEditDataset,
+                HasFullViewDataset = us.CanViewFullDataset
+            };
 
-            //Stopwatch sw = new Stopwatch();
-            //sw.Start();
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
 
-            //MappingDataTablesQueryableAdapter<DatasetFile, DatasetFileGridModel> dtqa = new MappingDataTablesQueryableAdapter<DatasetFile, DatasetFileGridModel>(_datasetService.GetDatasetFileTableQueryable(Id), 
-            //                                                                                                                                                     dtRequest, 
-            //                                                                                                                                                     RangeDelimiterConstants.YADCF, 
-            //                                                                                                                                                     mapToModel);
-            //DataTablesResponse dataTablesResponse = dtqa.GetDataTablesResponse();
+            MappingDataTablesQueryableAdapter<DatasetFile, DatasetFileGridModel> dtqa = new MappingDataTablesQueryableAdapter<DatasetFile, DatasetFileGridModel>(_datasetService.GetDatasetFileTableQueryable(Id),
+                                                                                                                                                                 dtRequest,
+                                                                                                                                                                 RangeDelimiterConstants.YADCF,
+                                                                                                                                                                 mapToModel);
+            DataTablesResponse dataTablesResponse = dtqa.GetDataTablesResponse();
 
-            //sw.Stop();
-            //Logger.Info($"GetDatasetFileInfoForGrid - Id: {Id} - Time to get data tables response: {sw.ElapsedMilliseconds}");
+            sw.Stop();
+            Logger.Info($"GetDatasetFileInfoForGrid - Id: {Id} - Time to get data tables response: {sw.ElapsedMilliseconds}");
 
-            //return Json(dataTablesResponse, JsonRequestBehavior.AllowGet);
-
-            return Json("");
+            return Json(dataTablesResponse, JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult GetBundledFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        public JsonResult GetBundledFileInfoForGrid(int Id, DataTablesRequest dtRequest)
         {
             //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
@@ -641,7 +638,7 @@ namespace Sentry.data.Web.Controllers
 
         }
 
-        public JsonResult GetVersionsOfDatasetFileForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        public JsonResult GetVersionsOfDatasetFileForGrid(int Id, DataTablesRequest dtRequest)
         {
             DatasetFile df = _datasetContext.DatasetFileStatusActive.Where(x => x.DatasetFileId == Id).Fetch(x => x.DatasetFileConfig).FirstOrDefault();
 
@@ -667,7 +664,7 @@ namespace Sentry.data.Web.Controllers
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
 
-        //public JsonResult GetAllDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        //public JsonResult GetAllDatasetFileInfoForGrid(int Id, DataTablesRequest dtRequest)
         //{
         //    IEnumerable<DatasetFileGridModel> files = _datasetContext.DatasetFile.Where(x => x.ParentDatasetFileId == null).Fetch(x => x.DatasetFileConfig).
         //        Select((f) => new DatasetFileGridModel(f, _associateInfoProvider, _featureFlags));
@@ -698,7 +695,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
-        public JsonResult GetDatasetFileConfigInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        public JsonResult GetDatasetFileConfigInfoForGrid(int Id, DataTablesRequest dtRequest)
         {
             IEnumerable<DatasetFileConfigsModel> files = null;
             if (Id > 0)
