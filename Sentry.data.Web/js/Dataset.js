@@ -2294,7 +2294,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     manageInheritanceInit() {
-        $("#SelectedApprover").materialSelect();
+        $("#Inheritance_SelectedApprover").materialSelect();
         $("#inheritanceSwitch label").click(function () {
             $("#inheritanceModal").modal('show');
         });
@@ -2347,7 +2347,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     validateInheritanceModal() {
-        return ($("#BusinessReason").val() != '' && $("#SelectedApprover").val != '')
+        return ($("#Inheritance_BusinessReason").val() != '' && $("#Inheritance_SelectedApprover").val != '')
     },
 
     removePermissionModalInit() {
@@ -2363,26 +2363,41 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         $("#removePermissionModal").on('hide.bs.modal', function () {
             data.Dataset.removePermissionModalOnClose();
         });
-        $(".removePermissionApprover").materialSelect();
         $("#removePermissionModalSubmit").click(function () {
-            $("#removePermissionModal").modal('hide');
-
+            if (true) {
+                $.ajax({
+                    type: 'POST',
+                    data: $("#RemovePermissionRequestForm").serialize(),
+                    url: '/Dataset/SubmitRemovePermissionRequest',
+                    success: function (data) {
+                        //handle result data
+                        $("#removePermissionModal").modal('hide');
+                    }
+                });
+            }
+            else {
+                $("#inheritanceValidationMessage").removeClass("d-none");
+            }
         });
     },
 
     removePermissionModalOnClose() {
-        $("#Identity").val("");
-        $("#Scope").val("");
-        $("#Permission").val("");
+        $("#RemovePermission_Identity").val("");
+        $("#RemovePermission_Scope").val("");
+        $("#RemovePermission_Permission").val("");
+        $("#RemovePermission_BusinessReason").val("");
+        $("#RemovePermission_SelectedApprover").materialSelect({ destroy: true });
+
         $("#identityLabel").removeClass("active");
         $("#scopeLabel").removeClass("active");
         $("#permissionLabel").removeClass("active");
     },
 
     removePermissionModalOnOpen(scope, identity, permission) {
-        $("#Identity").val(identity);
-        $("#Scope").val(scope);
-        $("#Permission").val(permission);
+        $("#RemovePermission_Identity").val(identity);
+        $("#RemovePermission_Scope").val(scope);
+        $("#RemovePermission_Permission").val(permission);
+        $("#RemovePermission_SelectedApprover").materialSelect();
         $("#identityLabel").addClass("active");
         $("#scopeLabel").addClass("active");
         $("#permissionLabel").addClass("active");
@@ -2395,7 +2410,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     validateRemovePermissionModal() {
-        return ($("#BusinessReason").val() != '' && $("#SelectedApprover").val != '')
+        return ($("#RemovePermission_BusinessReason").val() != '' && $("#RemovePermission_SelectedApprover").val != '')
     },
 
     showDataPreviewError() {

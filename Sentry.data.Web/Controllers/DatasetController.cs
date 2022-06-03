@@ -723,11 +723,29 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult SubmitInheritanceRequest(RequestPermissionInheritanceModel model)
+        public ActionResult SubmitInheritanceRequest([Bind(Prefix = "Inheritance")] RequestPermissionInheritanceModel model)
         {
             AccessRequest ar = model.ToCore();
             string ticketId = _datasetService.RequestAccessToDataset(ar);
 
+            if (string.IsNullOrEmpty(ticketId))
+            {
+                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
+            }
+            else
+            {
+                return PartialView("_Success", new SuccessModel("Dataset permission inheritance change was successfully requested.", "Change Id: " + ticketId, true));
+            }
+        }
+        
+        [HttpPost]
+        public ActionResult SubmitRemovePermissionRequest([Bind(Prefix = "RemovePermission")]RemovePermissionModel model)
+        {
+            //figure out which permission ticket it was
+            //make removal ticket 
+            //AccessRequest ar = model.ToCore();
+            //string ticketId = _datasetService.RequestAccessToDataset(ar);
+            string ticketId = model.ToString();
             if (string.IsNullOrEmpty(ticketId))
             {
                 return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));

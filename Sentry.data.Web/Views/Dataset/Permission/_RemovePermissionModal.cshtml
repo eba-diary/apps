@@ -3,7 +3,7 @@
     ViewData.TemplateInfo.HtmlFieldPrefix = "RemovePermission";
 }
 
-@using (Html.BeginForm("SubmitremovePermissionRequest", "Dataset", FormMethod.Post, new { @id = "removePermissionRequestForm" }))
+@using (Html.BeginForm("SubmitRemovePermissionRequest", "Dataset", FormMethod.Post, new { @id = "RemovePermissionRequestForm" }))
 {
     <div class="modal fade" id="removePermissionModal" tabindex="-1" role="dialog" aria-labelledby="removePermissionModalTitle"
          aria-hidden="true">
@@ -23,15 +23,15 @@
                     @Html.HiddenFor(model => model.SecurableObjectId)
                     @Html.HiddenFor(model => model.SaidKeyCode)
                     <div class="md-form pt-0 mt-0">
-                        <input type="text" id="Identity" class="form-control disabled">
+                        @Html.TextBoxFor(model => model.Identity, new { @readonly = "readonly", @class = "form-control" })
                         <label for="Identity" class="" id="identityLabel">Identity (Readonly)</label>
                     </div>
                     <div class="md-form">
-                        <input type="text" id="Scope" class="form-control disabled">
+                        @Html.TextBoxFor(model => model.Scope, new { @readonly = "readonly", @class = "form-control" })
                         <label for="Scope" class="" id="scopeLabel">Scope (Readonly)</label>
                     </div>
                     <div class="md-form">
-                        <input type="text" id="Permission" class="form-control disabled">
+                        @Html.TextBoxFor(model => model.Permission, new { @readonly = "readonly", @class = "form-control" })
                         <label for="Permission" class="" id="permissionLabel">Permission (Readonly)</label>
                     </div>
                     <div class="md-form">
@@ -40,7 +40,7 @@
                     </div>
                     <div class="md-form">
                         @Html.LabelFor((model) => model.SelectedApprover, new { @class = "mdb-main-label" })
-                        @Html.DropDownListFor((model) => model.SelectedApprover, Model.AllApprovers, new { @class = "mdb-select removePermissionApprover" })
+                        @Html.DropDownListFor((model) => model.SelectedApprover, Model.AllApprovers, new { @class = "mdb-select" })
                     </div>
                     <div id="RemovePermissionScopeContainer">
                         <div class="alert alert-danger" role="alert">

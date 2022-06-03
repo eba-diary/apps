@@ -31,5 +31,10 @@ namespace Sentry.data.Web
 
         public List<string> DatasetNamesForAsset { get; set; }
         
+        public string Scope { get; set; }
+        
+        public string Identity { get; set; }
+
+        public string Permission { get; set; }
     }
 }
