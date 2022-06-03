@@ -1181,6 +1181,7 @@
     <Content Include="Views\Search\SavedSearches.cshtml" />
     <Content Include="Views\Search\FilterSearch.cshtml" />
     <Content Include="Views\Dataset\Permission\_RequestInheritanceModal.cshtml" />
+    <Content Include="Views\Dataset\Details\_TabUnauthorized.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
