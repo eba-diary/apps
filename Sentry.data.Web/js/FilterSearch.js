@@ -144,6 +144,7 @@
             $('#save-search').addClass('disabled');
             $('#cancel-save-search').addClass('display-none');
             $('.filter-search-save-search-modal-text').addClass('display-none');
+            $('#filter-search-save-close').addClass('display-none');
             $('.filter-search-save-search-modal-spinner').removeClass('display-none');
             
             var request = data.FilterSearch.buildSearchRequest();
@@ -381,6 +382,7 @@
         $('#save-search').removeClass('disabled');
         $('#cancel-save-search').removeClass('display-none');
         $('.filter-search-save-search-modal-text').removeClass('display-none');
+        $('#filter-search-save-close').removeClass('display-none');
         $('.filter-search-save-search-modal-spinner').addClass('display-none');
     },
 

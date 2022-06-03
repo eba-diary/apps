@@ -1294,7 +1294,7 @@ data.Dataset = {
 
         //Don't init dataset file data table until the file tab is selected when tab feature is on
         if (!datasetDetailModel.DisplayTabSections) {
-            data.Dataset.DatasetFileTableInit(Id);
+            data.Dataset.DatasetFileTableInit(Id, datasetDetailModel);
             data.Dataset.DatasetBundingFileTableInit(Id);
         }
 
@@ -1413,7 +1413,7 @@ data.Dataset = {
                         $('#tabDataFiles').html(view);
                         if (self.vm.ShowDataFileTable()) {
                             var configId = $('#datasetConfigList').val();
-                            data.Dataset.DatasetFileTableInit(configId);
+                            data.Dataset.DatasetFileTableInit(configId, datasetDetailModel);
                             data.Dataset.DatasetBundingFileTableInit(configId);
                         }
                         $("#tab-spinner").hide();
@@ -1461,13 +1461,68 @@ data.Dataset = {
             }
         });
 
+        $(document).on("change", "#data-file-delete-all-checkbox", function (e) {
+            e.preventDefault();
+            $('.data-file-delete-checkbox').prop('checked', this.checked);
+            data.Dataset.toggleDeleteButton();            
+        });
+
+        $(document).on("change", ".data-file-delete-checkbox", this.toggleDeleteButton);
+
+        $(document).on("click", "#data-file-delete-open-modal", function (e) {
+            $("#data-file-delete-count").text($(".data-file-delete-checkbox:checked").length);
+        });
+
+        $(document).on("click", "#data-file-delete", function (e) {
+            e.preventDefault();            
+
+            $("#data-file-delete-close").hide();
+            $("#data-file-delete-cancel").hide();
+            $("#data-file-delete").hide();
+            $(".data-file-delete-spinner").removeClass("d-none");
+
+            //get all ids to delete
+            var ids = [];
+
+            $('.data-file-delete-checkbox:checkbox:checked').each(function () {
+                ids.push($(this).data("id"));
+            });
+
+            //delete
+            $.ajax({
+                type: "DELETE",
+                url: '../../api/v2/datafile/dataset/' + 1 + '/schema/' + 1 + '?' + $.param({ 'userFileIdList': ids }),
+                success: function () {
+                    $("#datasetFilesTable").DataTable().ajax.reload();
+                },
+                error: function () {
+                    data.Dataset.makeToast("error", "Something went wrong deleting file(s). Please try again or reach out to DSCSupport@sentry.com.");
+                },
+                complete: function () {
+                    $("#data-file-delete-modal").modal("hide");
+                    $("#data-file-delete-close").show();
+                    $("#data-file-delete-cancel").show();
+                    $("#data-file-delete").show();
+                    $(".data-file-delete-spinner").addClass("d-none");
+                }
+            });            
+        });
+
         var url = new URL(window.location.href);
         var tab = url.searchParams.get('tab');
         if (tab == undefined) {
             tab = 'SchemaAbout';
         }
         $("#detailTab" + tab).trigger('click');
+    },
 
+    toggleDeleteButton: function () {
+        if ($('.data-file-delete-checkbox:checkbox:checked').length > 0) {
+            $("#data-file-delete-open-modal").removeClass("display-none");
+        }
+        else {
+            $("#data-file-delete-open-modal").addClass("display-none");
+        }
     },
 
     CancelLink: function (id) {
@@ -1715,7 +1770,7 @@ data.Dataset = {
         });
     },
 
-    DatasetFileTableInit: function (Id) {
+    DatasetFileTableInit: function (Id, datasetDetailModel) {
 
         data.Dataset.DatasetFilesTable = $("#datasetFilesTable").DataTable({
             orderCellsTop: true,
@@ -1742,13 +1797,32 @@ data.Dataset = {
                 { data: "UploadUserName", className: "UploadUserName" },
                 { data: "CreateDtm", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "ModifiedDtm", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
-                { data: "ConfigFileName", className: "ConfigFileName" }
+                { data: "ConfigFileName", className: "ConfigFileName" },
+                { data: null, name: "deleteFile", className: "deleteFile text-center", render: (d) => data.Dataset.renderDeleteFileOption(d, datasetDetailModel.CategoryColor), searchable: false, orderable: false }
             ],
             language: {
-                processing: ""
+                processing: '<div class="progress md-progress sentry-dark-blue data-file-table-loading"><div class="indeterminate"></div></div>'
             },
             order: [5, 'desc'],
-            stateSave: true
+            stateSave: true,
+            initComplete: function () {
+                var table = $("#datasetFilesTable").DataTable();
+                table.column(".deleteFile").visible(datasetDetailModel.DisplayDatasetFileDelete);
+
+                //use the global search location to add delete button even though we are going to remove global search from the dom
+                if (datasetDetailModel.DisplayDatasetFileDelete) {
+                    $("#datasetFilesTable_filter").parent().parent().css("align-items", "end");
+                    $("#datasetFilesTable_filter").parent().append('<button type="button" id="data-file-delete-open-modal" data-toggle="modal" data-target="#data-file-delete-modal" class="btn btn-danger waves-effect waves-light display-none"><i class="far fa-trash-alt"></i>Delete</button>');
+                }
+
+                //searching property needs to be set to true (adds the global search input) in order for yadcf filters for columns to properly model bind
+                //But we don't want the global search available
+                $("#datasetFilesTable_filter").remove();
+            },
+            drawCallback: function () {
+                $('#data-file-delete-all-checkbox').prop('checked', false);
+                data.Dataset.toggleDeleteButton();
+            }
         });
 
         //date filters are off, already CLA-4004 created for it
@@ -1783,8 +1857,6 @@ data.Dataset = {
             }
         );
 
-        //searching property needs to be set to true in order for yadcf filters to bind properly to columns, but we don't want the global search available
-        $("#datasetFilesTable_filter").remove();
 
         var table = $('#datasetFilesTable').DataTable();
 
@@ -1883,6 +1955,24 @@ data.Dataset = {
                 $('#bundle_selected').attr("disabled", false);
             }
         });
+    },
+
+    renderDeleteFileOption: function (d, color) {
+        if (d.ObjectStatus === 1) { //is active
+            var checkboxId = 'data-file-delete-' + d.Id;
+
+            return '<fieldset class="form-group mb-0 text-left data-file-delete-fieldset">' +
+                '<input type="checkbox" id="' + checkboxId + '" data-id="' + d.Id + '" class="form-check-input data-file-delete-checkbox" >' +
+                '<label for="' + checkboxId + '" class="form-check-label p-0"></label>' +
+            '</fieldset >';
+        }
+        else {
+            return '<i class="far fa-clock text-center dsc-' + color +'-text" title="Pending delete"></i>';
+        }
+    },
+
+    deleteFiles: function () {
+        
     },
 
     formatDatasetFileDetails: function (d) {

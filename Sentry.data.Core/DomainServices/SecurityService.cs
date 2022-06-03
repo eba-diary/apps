@@ -213,6 +213,9 @@ namespace Sentry.data.Core
             {
                 BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, parentSecurity, securable);
             }
+
+            us.CanDeleteDatasetFile = us.CanEditDataset && us.CanManageSchema && _dataFeatures.CLA4049_ALLOW_S3_FILES_DELETE.GetValue();
+
             return us;
         }
 

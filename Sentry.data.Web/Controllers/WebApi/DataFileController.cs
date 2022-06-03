@@ -17,10 +17,12 @@ namespace Sentry.data.Web.WebApi.Controllers
     public class DataFileController : BaseWebApiController
     {
         private readonly IDatasetFileService _datafileService;
+        private readonly IDataFeatures _dataFeatures;
 
-        public DataFileController(IDatasetFileService dataFileService)
+        public DataFileController(IDatasetFileService dataFileService, IDataFeatures dataFeatures)
         {
             _datafileService = dataFileService;
+            _dataFeatures = dataFeatures;
         }
 
 
@@ -104,5 +106,60 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             return ApiTryCatch(nameof(DataFileController), nameof(UpdateDataFile), $"datasetid:{dataFileModel.DatasetId} schemaId{dataFileModel.SchemaId} datasetfileId:{dataFileModel.DatasetFileId}", UpdateDataFileFunction);
         }
+
+
+        [HttpDelete]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("dataset/{datasetId}/schema/{schemaId}")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK)]
+        public async Task<IHttpActionResult> DeleteDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] string[] userFileNameList=null, [FromUri] string[] userFileIdList=null)
+        {
+            //FEATURE FLAG CHECK:  REMOVE LATER
+            if (!_dataFeatures.CLA4049_ALLOW_S3_FILES_DELETE.GetValue())
+            {
+                return Content(System.Net.HttpStatusCode.Unauthorized, "Feature not available to this user.");
+            }
+            
+            //STEP 1:  DETERMINE WHAT WAS PASSED IN
+            bool userFileNameListPassed = (userFileNameList != null && userFileNameList.Length > 0) ? true : false;
+            bool userIdListPassed = (userFileIdList != null && userFileIdList.Length > 0) ? true : false;
+
+            //STEP 2:  VALIDATIONS TO ENSURE THEY DON'T PASS BOTH datasetFileIdList AND datasetFileIdList
+            if (userFileNameListPassed && userIdListPassed)    
+            {
+                return Content(System.Net.HttpStatusCode.NotAcceptable, "Cannot pass " + nameof(userFileNameList) + " AND " + nameof(userFileIdList) + " at the same time.  Please include only " + nameof(userFileNameList) + " OR " + nameof(userFileIdList));
+            }
+
+
+            //STEP 3:  TURN USER LIST INTO DBLIST
+            List<DatasetFile> dbList = new List<DatasetFile>();
+            if (userFileNameListPassed)
+            {
+                dbList = _datafileService.GetDatasetFileList(userFileNameList);
+
+                //VALIDATE FILE COUNT
+                if (dbList.Count > userFileNameList.Length)
+                {
+                    return Content(System.Net.HttpStatusCode.NotAcceptable, "No Files were deleted. " + nameof(userFileNameList) + " contained a file that would delete more than one file.  Please only pass filenames that would delete a single file.");
+                }
+            }
+            else
+            {
+                //VALIDATE NON INTEGERS
+                int[] idListINT = System.Array.ConvertAll(userFileIdList, w => int.TryParse(w, out var x) ? x : -1);
+                List<int> invalidIds = idListINT.Where(w => w == -1).ToList();
+                if (invalidIds.Count > 0)
+                {
+                    return Content(System.Net.HttpStatusCode.NotAcceptable, nameof(userFileIdList) + " contains non integers.  Please pass all integers.");
+                }
+
+                dbList = _datafileService.GetDatasetFileList(idListINT);
+            }
+
+
+
+            return Ok("Thanks for using DSC!");
+        }
+
     }
 }
