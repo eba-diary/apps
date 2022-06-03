@@ -1,4 +1,5 @@
 ﻿using NJsonSchema;
+using Sentry.Core;
 using System.Collections.Generic;
 
 namespace Sentry.data.Core.DTO.Schema.Fields
@@ -13,7 +14,6 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
         public override string FieldType => GlobalConstants.Datatypes.STRUCT;
         public override bool Nullable { get; set; }
-        public override int Length { get; set; }
 
 
         //Properties that are not utilized by this type and are defaulted
@@ -32,11 +32,29 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             return changed;
         }
 
+        public override ValidationResults Validate(string extension)
+        {
+            ValidationResults results = base.Validate(extension);
+
+            //Struct has children
+            if (!HasChildren)
+            {
+                results.Add(OrdinalPosition.ToString(), $"({Name}) STRUCTs are required to have children");
+            }
+
+            return results;
+        }
+
         public override BaseField ToEntity(BaseField parentField, SchemaRevision parentRevision)
         {
             BaseField newEntityField = new StructField();
             base.ToEntity(newEntityField, parentField, parentRevision);
             return newEntityField;
+        }
+
+        public override void Clean(string extension)
+        {
+            //Nothing to clean
         }
     }
 }

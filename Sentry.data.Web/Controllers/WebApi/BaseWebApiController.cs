@@ -63,12 +63,12 @@ namespace Sentry.data.Web.WebApi.Controllers
             catch (DatasetUnauthorizedAccessException)
             {
                 Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedaccess dataset - {errorMetadata}");
-                return Content(System.Net.HttpStatusCode.Forbidden, "Unauthroized Access to Dataset");
+                return Content(System.Net.HttpStatusCode.Forbidden, "Unauthorized Access to Dataset");
             }
             catch (SchemaUnauthorizedAccessException)
             {
                 Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedexception schema - {errorMetadata}");
-                return Content(System.Net.HttpStatusCode.Forbidden, "Unauthroized Access to Schema");
+                return Content(System.Net.HttpStatusCode.Forbidden, "Unauthorized Access to Schema");
             }
             catch (SchemaConversionException ex)
             {

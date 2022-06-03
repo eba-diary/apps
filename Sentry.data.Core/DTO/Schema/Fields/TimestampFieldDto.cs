@@ -1,4 +1,5 @@
 ﻿using NJsonSchema;
+using Sentry.Core;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -42,9 +43,6 @@ namespace Sentry.data.Core.DTO.Schema.Fields
         public override string SourceFormat { get; set; }
         public override int OrdinalPosition { get; set; }
 
-        private int length;
-        public override int Length { get { return GlobalConstants.Datatypes.Defaults.LENGTH_DEFAULT; } set { length = value; } }        //DEFAULT LENGTH BECAUSE ITS NOT APPLICABLE
-
         public override bool CompareToEntity(BaseField field)
         {
             bool changed = false;
@@ -59,6 +57,26 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             return changed;
         }
 
+        public override ValidationResults Validate(string extension)
+        {
+            ValidationResults results = base.Validate(extension);
+            
+            if (extension == GlobalConstants.ExtensionNames.FIXEDWIDTH)
+            {
+                if (SourceFormat != null && Length < SourceFormat.Length)
+                {
+                    results.Add(OrdinalPosition.ToString(), $"({Name}) Length ({Length}) needs to be equal or greater than specified format for FIXEDWIDTH schema");
+                }
+
+                if (SourceFormat == null && Length < GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT.Length)
+                {
+                    results.Add(OrdinalPosition.ToString(), $"({Name}) Length ({Length}) needs to be equal or greater than default format length ({GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT.Length}) for FIXEDWIDTH schema");
+                }
+            }            
+
+            return results;
+        }
+
         public override BaseField ToEntity(BaseField parentField, SchemaRevision parentRevision)
         {
             BaseField newEntityField = new TimestampField()
@@ -71,6 +89,11 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
             base.ToEntity(newEntityField, parentField, parentRevision);
             return newEntityField;
+        }
+
+        public override void Clean(string extension)
+        {
+            DefaultNonFixedWidthLength(extension);
         }
     }
 }

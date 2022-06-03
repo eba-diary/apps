@@ -474,7 +474,7 @@ namespace Sentry.data.Core
             return ar;
         }
 
-        public string RequestAccessToDataSource(AccessRequest request)
+        public async Task<string> RequestAccessToDataSource(AccessRequest request)
         {
 
             DataSource ds = _datasetContext.GetById<DataSource>(request.SecurableObjectId);
@@ -501,7 +501,7 @@ namespace Sentry.data.Core
 
                 request.BusinessReason = sb.ToString();
 
-                return _securityService.RequestPermission(request);
+                return await _securityService.RequestPermission(request);
             }
 
             return string.Empty;

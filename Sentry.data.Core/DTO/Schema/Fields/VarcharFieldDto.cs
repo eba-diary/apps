@@ -24,21 +24,21 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             Length = field.FieldLength;
             OrdinalPosition = field.OrdinalPosition;
         }
-
+        
         public VarcharFieldDto(SchemaRow row) : base(row)
         {
             ValidationResults results = new ValidationResults();
-            if (String.IsNullOrWhiteSpace(row.Length))
+            if (string.IsNullOrWhiteSpace(row.Length))
             {
                 Length = GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT;
             }
-            else if (!Int32.TryParse(row.Length, out int x))
+            else if (int.TryParse(row.Length, out int x))
             {
-                results.Add(OrdinalPosition.ToString(), $"({Name}) VARCHAR Length must be non-negative integer value");
+                Length = x;
             }
             else
             {
-                Length = Int32.Parse(row.Length);
+                results.Add(OrdinalPosition.ToString(), $"({Name}) VARCHAR Length must be non-negative integer value");
             }
 
             if (!results.IsValid())
@@ -48,10 +48,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
         }
 
         public override string FieldType => GlobalConstants.Datatypes.VARCHAR;
-        public override bool Nullable { get; set; }
-        public override int Length { get; set; }
-
-        
+        public override bool Nullable { get; set; }        
         //Properties that are not utilized by this type and are defaulted
         public override int Precision { get; set; }
         public override int Scale { get; set; }
@@ -68,6 +65,19 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             return changed;
         }
 
+        public override ValidationResults Validate(string extension)
+        {
+            ValidationResults results = base.Validate(extension);
+
+            //Varchar Length
+            if (Length < 1 || Length > 16000000) //true max is 16777216
+            {
+                results.Add(OrdinalPosition.ToString(), $"({Name}) VARCHAR length ({Length}) is required to be between 1 and 16000000");
+            }
+
+            return results;
+        }
+
         public override BaseField ToEntity(BaseField parentField, SchemaRevision parentRevision)
         {
             BaseField newEntityField = new VarcharField()
@@ -77,6 +87,11 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             };
             base.ToEntity(newEntityField, parentField, parentRevision);
             return newEntityField;
+        }
+
+        public override void Clean(string extension)
+        {
+            //Nothing to clean
         }
     }
 }

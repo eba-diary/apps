@@ -14,9 +14,13 @@
         {
             public const string S3KEY_IS_BLANK = "keyIsBlank";
             public const string NAME_IS_BLANK = "nameIsBlank";
+            public const string NAME_IS_IDEMPOTENT = "nameIsIdempotent";
             public const string SAID_ASSET_REQUIRED = "saidAssetRequired";
+            public const string SAID_ASSET_IDEMPOTENT = "saidAssetIdempotent";
             public const string NAMED_ENVIRONMENT_INVALID = "namedEnvironmentInvalid";
+            public const string NAMED_ENVIRONMENT_IDEMPOTENT = "namedEnvironmentIdempotent";
             public const string NAMED_ENVIRONMENT_TYPE_INVALID = "namedEnvironmentTypeInvalid";
+            public const string NAMED_ENVIRONMENT_TYPE_IDEMPOTENT = "namedEnvironmentTypeIdempotent";
         }
 
 
@@ -163,7 +167,7 @@
             public const string PENDING = "Pending";
             public const string COMPLETED = "Completed";
             public const string DENIED = "Denied";
-            public const string WIDHTDRAWN = "Withdrawn";
+            public const string WITHDRAWN = "Withdrawn";
             //hpsm
             public const string APPROVED = "approved";
             public const string CLOSED = "closed";
@@ -211,6 +215,12 @@
             public const string DALE_VIEW = "DaleView";
             public const string DALE_SENSITIVE_EDIT = "DaleSensEdit";
             public const string DALE_OWNER_VERIFIED_EDIT = "DaleOwnerVerifiedEdit";
+        }
+
+        public static class IdentityType
+        {
+            public const string AD = "AD";
+            public const string AWS_IAM = "AWS_IAM";
         }
 
         public static class ConvertedFileStoragePrefix
@@ -439,6 +449,17 @@
         {
             public const string SAID = "SAID";
             public const string SERVER = "SERVER";
+        }
+
+        public static class ExtensionNames
+        {
+            public const string FIXEDWIDTH = "FIXEDWIDTH";
+            public const string XML = "XML";
+            public const string JSON = "JSON";
+            public const string DELIMITED = "DELIMITED";
+            public const string ANY = "ANY";
+            public const string CSV = "CSV";
+            public const string TXT = "TXT";
         }
     }
 }

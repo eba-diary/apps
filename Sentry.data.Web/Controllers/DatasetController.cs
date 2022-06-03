@@ -406,10 +406,10 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult SubmitAccessRequest(DatasetAccessRequestModel model)
+        public async Task<ActionResult> SubmitAccessRequest(DatasetAccessRequestModel model)
         {
             AccessRequest ar = model.ToCore();
-            string ticketId = _datasetService.RequestAccessToDataset(ar);
+            string ticketId = await _datasetService.RequestAccessToDataset(ar);
             
             if (string.IsNullOrEmpty(ticketId))
             {
@@ -726,10 +726,10 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult SubmitInheritanceRequest(RequestPermissionInheritanceModel model)
+        public async Task<ActionResult> SubmitInheritanceRequest(RequestPermissionInheritanceModel model)
         {
             AccessRequest ar = model.ToCore();
-            string ticketId = _datasetService.RequestAccessToDataset(ar);
+            string ticketId = await _datasetService.RequestAccessToDataset(ar);
 
             if (string.IsNullOrEmpty(ticketId))
             {
@@ -1405,6 +1405,11 @@ namespace Sentry.data.Web.Controllers
                     case Dataset.ValidationErrors.datasetNameDuplicate:
                     case GlobalConstants.ValidationErrors.NAME_IS_BLANK:
                         ModelState.AddModelError(nameof(DatasetModel.DatasetName), vr.Description);
+                        break;
+                    case Dataset.ValidationErrors.datasetShortNameRequired:
+                    case Dataset.ValidationErrors.datasetShortNameInvalid:
+                    case Dataset.ValidationErrors.datasetShortNameDuplicate:
+                        ModelState.AddModelError(nameof(DatasetModel.ShortName), vr.Description);
                         break;
                     case Dataset.ValidationErrors.datasetDescriptionRequired:
                         ModelState.AddModelError(nameof(DatasetModel.DatasetDesc), vr.Description);

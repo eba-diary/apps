@@ -69,9 +69,6 @@ namespace Sentry.data.Core.DTO.Schema.Fields
         public override string SourceFormat { get; set; }
         public override int OrdinalPosition { get; set; }
 
-        private int length;
-        public override int Length { get { return GlobalConstants.Datatypes.Defaults.LENGTH_DEFAULT;} set { length = value; } }     //DEFAULT LENGTH BECAUSE ITS NOT APPLICABLE
-
         public override BaseField ToEntity(BaseField parentField, SchemaRevision parentRevision)
         {
             BaseField newEntityField = new DecimalField()
@@ -100,6 +97,41 @@ namespace Sentry.data.Core.DTO.Schema.Fields
                 changed = true;
             }
             return changed;
+        }
+
+        public override ValidationResults Validate(string extension)
+        {
+            ValidationResults results = base.Validate(extension);
+
+            //Decimal Precision
+            if (Precision < 1 || Precision > 38)
+            {
+                results.Add(OrdinalPosition.ToString(), $"({Name}) Precision ({Precision}) is required to be between 1 and 38");
+            }
+
+            //Decimal Scale
+            if (Scale < 0 || Scale > 38)
+            {
+                results.Add(OrdinalPosition.ToString(), $"({Name}) Scale ({Scale}) is required to be between 0 and 38");
+            }
+
+            //Decimal Scale and Precision dependency
+            if (Scale > Precision)
+            {
+                results.Add(OrdinalPosition.ToString(), $"({Name}) Scale ({Scale}) needs to be less than or equal to Precision ({Precision})");
+            }
+
+            if (extension == GlobalConstants.ExtensionNames.FIXEDWIDTH && Length != 0 && Length < Precision)
+            {
+                results.Add(OrdinalPosition.ToString(), $"({Name}) Length ({Length}) needs to be equal or greater than specified precision ({Precision}) for FIXEDWIDTH schema");
+            }
+
+            return results;
+        }
+
+        public override void Clean(string extension)
+        {
+            DefaultNonFixedWidthLength(extension);
         }
 
         private void SetPrecisionScale(IDictionary<string, object> extensionData)

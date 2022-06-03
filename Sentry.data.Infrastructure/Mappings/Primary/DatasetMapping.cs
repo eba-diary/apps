@@ -23,6 +23,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             //this.Property((x) => x.Category, (m) => m.Column("Category_CDE"));
             this.Property((x) => x.DatasetName, (m) => m.Column("Dataset_NME"));
+            this.Property((x) => x.ShortName, (m) => m.Column("Short_NME"));
             this.Property((x) => x.DatasetDesc, (m) => m.Column("Dataset_DSC"));
             this.Property((x) => x.CreationUserName, (m) => m.Column("FileCreator_NME"));
             this.Property((x) => x.UploadUserName, (m) => m.Column("UploadedBy_NME"));

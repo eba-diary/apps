@@ -4,7 +4,7 @@ using System.Linq;
 using Sentry.Core;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.Common.Logging;
-
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -313,7 +313,7 @@ namespace Sentry.data.Core
             return _domainContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.BUSINESSAREA).ToList();
         }
 
-        public string RequestAccess(AccessRequest request)
+        public async Task<string> RequestAccess(AccessRequest request)
         {
             BusinessArea ba = _domainContext.BusinessAreas.FirstOrDefault(x=> x.Id == request.SecurableObjectId);
 
@@ -333,7 +333,7 @@ namespace Sentry.data.Core
                 request.Permissions = _domainContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
                                                                                                                 x.SecurableObject == GlobalConstants.SecurableEntityName.BUSINESSAREA).ToList();
                 request.IsAddingPermission = true;
-                return _securityService.RequestPermission(request);
+                return await _securityService.RequestPermission(request);
             }
 
             return string.Empty;

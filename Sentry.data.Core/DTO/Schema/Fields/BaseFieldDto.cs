@@ -1,12 +1,15 @@
 ﻿using NJsonSchema;
+using Sentry.Core;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Sentry.data.Core
 {
     public abstract class BaseFieldDto
     {
-        public BaseFieldDto(BaseField field)
+        #region Constructors
+        protected BaseFieldDto(BaseField field)
         {
             FieldId = field.FieldId;
             FieldGuid = field.FieldGuid;
@@ -21,7 +24,7 @@ namespace Sentry.data.Core
             DotNamePath = field.DotNamePath;
         }
 
-        public BaseFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, int position, bool array)
+        protected BaseFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, int position, bool array)
         {
             FieldId = 0;
             FieldGuid = Guid.Empty;
@@ -34,7 +37,7 @@ namespace Sentry.data.Core
             OrdinalPosition = position;
         }
 
-        public BaseFieldDto(SchemaRow row)
+        protected BaseFieldDto(SchemaRow row)
         {
             FieldId = row.DataObjectField_ID;
             FieldGuid = row.FieldGuid;
@@ -45,11 +48,13 @@ namespace Sentry.data.Core
             Description = row.Description;
             ChildFields = new List<BaseFieldDto>();
             OrdinalPosition = row.Position;
-            Length = (Int32.TryParse(row.Length, out int x) ? x : 0);
+            Length = int.TryParse(row.Length, out int x) ? x : GlobalConstants.Datatypes.Defaults.LENGTH_DEFAULT;
             DeleteInd = row.DeleteInd;
             DotNamePath = row.DotNamePath;
         }
+        #endregion
 
+        #region Properties
         public int FieldId { get; set; }
         public Guid FieldGuid { get; set; }
         public string Name { get; set; }
@@ -61,17 +66,56 @@ namespace Sentry.data.Core
         public bool IsArray { get; set; }
         public bool HasChildren { get; set; }
         public string DotNamePath { get; set; }
+        public int Length { get; set; }
+        #endregion
 
-
+        #region Abstract
         public abstract string FieldType { get; }
         public abstract int Precision { get; set; }
         public abstract int Scale { get; set; }
         public abstract string SourceFormat { get; set; }
         public abstract bool Nullable { get; set; }
         public abstract int OrdinalPosition { get; set; }
-        public abstract int Length { get; set; }
+
         public abstract BaseField ToEntity(BaseField parentField, SchemaRevision parentRevision);
         public abstract bool CompareToEntity(BaseField field);
+        public abstract void Clean(string extension);
+        #endregion
+
+        #region Methods
+        public virtual ValidationResults Validate(string extension)
+        {
+            ValidationResults results = new ValidationResults();
+
+            //Field name cannot be blank
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                results.Add(OrdinalPosition.ToString(), $"Field name cannot be empty string");
+            }
+            else
+            {
+                //Field name must start with letter or underscore
+                string startsWith = "^[A-Za-z_]";
+                if (!Regex.IsMatch(Name, startsWith))
+                {
+                    results.Add(OrdinalPosition.ToString(), $"Field name ({Name}) must start with a letter or underscore");
+                }
+
+                //Field name can only contain letters, underscores, digits, and dollar signs
+                string body = "^[A-Za-z0-9$_]+$";
+                if (!Regex.IsMatch(Name, body))
+                {
+                    results.Add(OrdinalPosition.ToString(), $"Field name ({Name}) can only contain letters, underscores, digits (0-9), and dollar signs (\"$\")");
+                }
+            }
+
+            if (extension == GlobalConstants.ExtensionNames.FIXEDWIDTH && Length == 0)
+            {
+                results.Add(OrdinalPosition.ToString(), $"({Name}) Length ({Length}) needs to be greater than zero for FIXEDWIDTH schema");
+            }
+
+            return results;
+        }
 
         protected void ToEntity(BaseField field, BaseField parentField, SchemaRevision parentRevision)
         {
@@ -95,5 +139,14 @@ namespace Sentry.data.Core
                 field.FieldGuid = FieldGuid;
             }
         }
+
+        protected void DefaultNonFixedWidthLength(string extension)
+        {
+            if (extension != GlobalConstants.ExtensionNames.FIXEDWIDTH)
+            {
+                Length = GlobalConstants.Datatypes.Defaults.LENGTH_DEFAULT;
+            }
+        }
+        #endregion
     }
 }

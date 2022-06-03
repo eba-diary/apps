@@ -390,7 +390,7 @@ namespace Sentry.data.Core
             dfc.FileTypeId = dto.FileTypeId;
             dfc.ParentDataset = _datasetContext.GetById<Dataset>(dto.DatasetId);
             dfc.DatasetScopeType = _datasetContext.DatasetScopeTypes.Where(w => w.Name == "Point-in-Time").FirstOrDefault();
-            dfc.FileExtension = _datasetContext.FileExtensions.Where(w => w.Name == "ANY").FirstOrDefault();
+            dfc.FileExtension = _datasetContext.FileExtensions.Where(w => w.Name == GlobalConstants.ExtensionNames.ANY).FirstOrDefault();
         }
 
         private void CreateDataset(BusinessIntelligenceDto dto)

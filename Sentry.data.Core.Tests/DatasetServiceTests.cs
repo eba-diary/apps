@@ -17,19 +17,19 @@ namespace Sentry.data.Core.Tests
         /// - Test that the DatasetService.Validate() method correctly identifies a duplicate Dataset name
         /// and responds with the correct validation result.
         /// </summary>
-        
+
         [TestCategory("Core DatasetService")]
         [TestMethod]
         public async Task Validate_DuplicateName_NoNamedEnvironments()
         {
             // Arrange
             var context = new Mock<IDatasetContext>();
-            var dataFlows = new[] { new Dataset() {
+            var datasets = new[] { new Dataset() {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
                 DatasetCategories = new List<Category> { new Category() { Id=1 } }
             } };
-            context.Setup(f => f.Datasets).Returns(dataFlows.AsQueryable());
+            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
 
             var quartermasterService = new Mock<IQuartermasterService>();
             var validationResults = new ValidationResults();
@@ -49,6 +49,196 @@ namespace Sentry.data.Core.Tests
             // Assert
             Assert.IsTrue(result.ValidationResults.GetAll().Count > 0);
             Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetNameDuplicate));
+            Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetShortNameRequired));
+        }
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public async Task Validate_ShortName_Regex()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+            var datasetService = new DatasetService(context.Object, null, null, null, null, null, quartermasterService.Object, null, null);
+            var dataset = new DatasetDto()
+            {
+                DatasetName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategoryIds = new List<int> { 1 },
+                ShortName = "Spec!@lCh@rsL*ngN@me$"
+            };
+
+            // Act
+            var result = await datasetService.Validate(dataset);
+
+            // Assert
+            Assert.IsTrue(result.ValidationResults.GetAll().Count > 1); //should have at least two errors - short name invalid regex, and from short name being > 12 chars
+            Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetShortNameInvalid));
+        }
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public async Task Validate_ShortName_Duplicate()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var datasets = new[] { new Dataset() {
+                DatasetId = 17,
+                DatasetName = "Foo",
+                ShortName = "Andrew",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategories = new List<Category> { new Category() { Id=1 } }
+            } };
+            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+            var datasetService = new DatasetService(context.Object, null, null, null, null, null, quartermasterService.Object, null, null);
+            var dataset = new DatasetDto()
+            {
+                DatasetId = 0,
+                DatasetName = "FooBar",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategoryIds = new List<int> { 1 },
+                ShortName = "Andrew"
+            };
+
+            // Act
+            var result = await datasetService.Validate(dataset);
+
+            // Assert
+            Assert.IsTrue(result.ValidationResults.GetAll().Count > 0);
+            Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetShortNameDuplicate));
+        }
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public async Task Validate_Success()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var datasets = new[] { new Dataset() {
+                DatasetId = 1000,
+                DatasetName = "FooBar",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategories = new List<Category> { new Category() { Id=1 } },
+                ShortName = "Andrew",
+                PrimaryContactId = "067664",
+                Asset = new Asset() {SaidKeyCode="ABCD"},
+                OriginationCode = ((int)DatasetOriginationCode.Internal).ToString()
+            } };
+            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+            var datasetService = new DatasetService(context.Object, null, null, null, null, null, quartermasterService.Object, null, null);
+            var dataset = new DatasetDto()
+            {
+                DatasetId = 1000,
+                DatasetName = "FooBar",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategoryIds = new List<int> { 1 },
+                ShortName = "Andrew",
+                PrimaryContactId = "067664",
+                SAIDAssetKeyCode = "ABCD",
+                OriginationId = (int)DatasetOriginationCode.Internal
+            };
+
+            // Act
+            var result = await datasetService.Validate(dataset);
+
+            // Assert
+            Assert.IsTrue(result.ValidationResults.GetAll().Count == 0);
+        }
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public void UpdateAndSaveDataset_DatasetName_Idempotent()
+        {
+            //Arrange
+            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetDto a) => a.DatasetName = "NewName");
+
+            //Act/Assert
+            Assert.ThrowsException<ValidationException>(() => datasetService.UpdateAndSaveDataset(newDataset));
+        }
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public void UpdateAndSaveDataset_ShortName_Idempotent()
+        {
+            //Arrange
+            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetDto a) => a.ShortName = "NewName");
+
+            //Act/Assert
+            Assert.ThrowsException<ValidationException>(() => datasetService.UpdateAndSaveDataset(newDataset));
+        }
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public void UpdateAndSaveDataset_SAIDKeyCode_Idempotent()
+        {
+            //Arrange
+            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetDto a) => a.SAIDAssetKeyCode = "NEWN");
+
+            //Act/Assert
+            Assert.ThrowsException<ValidationException>(() => datasetService.UpdateAndSaveDataset(newDataset));
+        }
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public void UpdateAndSaveDataset_NamedEnvironment_Idempotent()
+        {
+            //Arrange
+            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetDto a) => a.NamedEnvironment = "PROD");
+
+            //Act/Assert
+            Assert.ThrowsException<ValidationException>(() => datasetService.UpdateAndSaveDataset(newDataset));
+        }
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public void UpdateAndSaveDataset_NamedEnvironmentType_Idempotent()
+        {
+            //Arrange
+            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetDto a) => a.NamedEnvironmentType = NamedEnvironmentType.Prod);
+
+            //Act/Assert
+            Assert.ThrowsException<ValidationException>(() => datasetService.UpdateAndSaveDataset(newDataset));
+        }
+
+        private static void Setup_UpdateAndSaveDataset(out DatasetDto newDataset, out DatasetService datasetService, Action<DatasetDto> datasetDtoUpdateAction)
+        {
+            var context = new Mock<IDatasetContext>();
+            var dataset = new Dataset()
+            {
+                DatasetId = 1,
+                DatasetName = "Foo",
+                ShortName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                Asset = new Asset() { SaidKeyCode = "ABCD" },
+                NamedEnvironment = "TEST",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd
+            };
+            newDataset = new DatasetDto()
+            {
+                DatasetId = 1,
+                DatasetName = "Foo",
+                ShortName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                SAIDAssetKeyCode = "ABCD",
+                NamedEnvironment = "TEST",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd
+            };
+            //run the requested update
+            datasetDtoUpdateAction.Invoke(newDataset);
+
+            context.Setup(f => f.GetById<Dataset>(It.IsAny<int>())).Returns(dataset);
+            datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null, null);
         }
 
         [TestCategory("Core DatasetService")]
@@ -74,7 +264,7 @@ namespace Sentry.data.Core.Tests
             Mock<IConfigService> configService = mr.Create<IConfigService>();
             configService.Setup(s => s.Delete(ds.DatasetFileConfigs[0].ConfigId, user.Object, true)).Returns(true);
 
-            var datasetService = new DatasetService(context.Object, securityService.Object, userService.Object, configService.Object, 
+            var datasetService = new DatasetService(context.Object, securityService.Object, userService.Object, configService.Object,
                                                     null, null, null, null, null);
 
             //Act
@@ -260,7 +450,7 @@ namespace Sentry.data.Core.Tests
             var existing = new Asset() { AssetId = 1, SaidKeyCode = "ABCD" };
             var assets = new[] { existing };
             context.Setup(c => c.Assets).Returns(assets.AsQueryable());
-            
+
             var user = new Mock<IApplicationUser>();
             user.Setup(u => u.AssociateId).Returns("000000");
             var userService = new Mock<IUserService>();
@@ -341,7 +531,7 @@ namespace Sentry.data.Core.Tests
             string result = datasetService.SetDatasetFavorite(1, "000000");
 
             datasetContext.VerifyAll();
-            
+
             Assert.AreEqual("Successfully added favorite.", result);
         }
 
@@ -376,7 +566,7 @@ namespace Sentry.data.Core.Tests
             string result = datasetService.SetDatasetFavorite(1, "000000");
 
             datasetContext.VerifyAll();
-            
+
             Assert.AreEqual("Successfully removed favorite.", result);
         }
 

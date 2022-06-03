@@ -26,3 +26,7 @@
     CONSTRAINT [FK_DatasetFile_DatasetFileConfigs] FOREIGN KEY ([DatasetFileConfig_ID]) REFERENCES [DatasetFileConfigs]([Config_ID]),
     CONSTRAINT [FK_DatasetFile_ObjectStatus] FOREIGN KEY (ObjectStatus) REFERENCES ObjectStatus(ObjectStatus_Id)
 )
+
+GO
+
+CREATE INDEX [IX_DatasetFile_FlowExecutionGuid] ON [dbo].[DatasetFile] ([FlowExecutionGuid])

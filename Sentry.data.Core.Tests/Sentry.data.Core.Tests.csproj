@@ -160,6 +160,8 @@
     <Compile Include="HelperTests\NestHelperTests.cs" />
     <Compile Include="FilterCategoryOptionNormalizerTests.cs" />
     <Compile Include="FilterSearchExtensionsTests.cs" />
+    <Compile Include="FieldDtoTests.cs" />
+    <Compile Include="SecurityTicketTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using Rhino.Mocks;
+using Sentry.data.Core.Interfaces.InfrastructureEventing;
 using Sentry.FeatureFlags;
 using Sentry.FeatureFlags.Mock;
 using StructureMap;
@@ -31,6 +32,8 @@ namespace Sentry.data.Core.Tests
             registry.For<IDatasetContext>().Use(() => MockRepository.GenerateStub<IDatasetContext>());
             registry.For<IBaseTicketProvider>().Use(() => MockRepository.GenerateStub<ICherwellProvider>());
             registry.For<IDataFeatures>().Use(new MockDataFeatures());
+            registry.For<IInevService>().Use(() => MockRepository.GenerateStub<IInevService>());
+
             //set the container
             _container = new StructureMap.Container(registry);
 
@@ -83,7 +86,6 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA3550_DATA_INVENTORY_NEW_COLUMNS => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3541_Dataset_Details_Tabs => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3605_AllowSchemaParquetUpdate => throw new NotImplementedException();
-            public IFeatureFlag<string> CLA3707_DataInventorySource => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3553_SchemaSearch => throw new NotImplementedException();
 
@@ -92,7 +94,7 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA3819_EgressEdgeMigration => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3882_DSC_NOTIFICATION_SUBCATEGORY => throw new NotImplementedException();
 
-            public IFeatureFlag<bool> CLA3718_Authorization => throw new NotImplementedException();
+            public IFeatureFlag<bool> CLA3718_Authorization { get; } = new MockBooleanFeatureFlag(true);
         }
     }
 }
