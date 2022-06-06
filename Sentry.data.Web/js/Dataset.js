@@ -1404,7 +1404,9 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             if ($('#tabDataFiles').is(':empty')) {
-                $("#tab-spinner").show();
+                //Taking out tab spinner because datatables 'processing' is configured
+                //Always making sure spinner hides in case page is reloaded while on 'Files' tab
+                $("#tab-spinner").hide();
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataFiles',
@@ -1416,7 +1418,6 @@ data.Dataset = {
                             data.Dataset.DatasetFileTableInit(configId, datasetDetailModel);
                             data.Dataset.DatasetBundingFileTableInit(configId);
                         }
-                        $("#tab-spinner").hide();
                     }
                 });
             }
