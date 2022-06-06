@@ -140,11 +140,7 @@ div.dataTables_wrapper div.dataTables_filter input {
 }
 
 .data-file-delete-all-filter {
-    vertical-align: baseline !important;
-}
-
-.data-file-delete-fieldset {
-    width: 18px;
+    vertical-align: middle !important;
 }
 
 #data-file-delete-open-modal {

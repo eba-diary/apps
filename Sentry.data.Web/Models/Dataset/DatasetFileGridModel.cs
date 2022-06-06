@@ -25,7 +25,7 @@ namespace Sentry.data.Web
             this.UploadUserName = int.TryParse(f.UploadUserName, out _) ? associateInfoService.GetAssociateInfo(f.UploadUserName).FullName : f.UploadUserName;
 
             this.ModifiedDtm = CLA3048_StandardizeOnUTCTime ? DateTime.SpecifyKind(f.ModifiedDTM, DateTimeKind.Utc) : f.ModifiedDTM;
-            this.CreateDtm = DateTime.SpecifyKind(f.CreatedDTM, DateTimeKind.Utc);
+            this.CreatedDtm = DateTime.SpecifyKind(f.CreatedDTM, DateTimeKind.Utc);
             this.S3Key = f.FileLocation;
             this.ConfigFileName = f.DatasetFileConfig.Name;
             this.ConfigFileDesc = f.DatasetFileConfig.Description;
@@ -41,7 +41,7 @@ namespace Sentry.data.Web
         public string RunInstanceGuid { get; set; }
         public string UploadUserName { get; set; }
         public DateTime ModifiedDtm { get; set; }
-        public DateTime CreateDtm { get; set; }
+        public DateTime CreatedDtm { get; set; }
         public string ActionLinks
         {
             get

@@ -1791,11 +1791,11 @@ data.Dataset = {
                 [10, 25, 50, 100, 200, "All"]
             ],
             columns: [
-                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px", searchable: false },
-                { data: "ActionLinks", className: "downloadFile", width: "100px", orderable: false, searchable: false },
+                { data: null, className: "details-control", orderable: false, defaultContent: "", searchable: false },
+                { data: "ActionLinks", className: "downloadFile", orderable: false, searchable: false },
                 { data: "FileName", className: "Name" },
                 { data: "UploadUserName", className: "UploadUserName" },
-                { data: "CreateDtm", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
+                { data: "CreatedDtm", type: "date", className: "createddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "ModifiedDtm", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "ConfigFileName", className: "ConfigFileName" },
                 { data: null, name: "deleteFile", className: "deleteFile text-center", render: (d) => data.Dataset.renderDeleteFileOption(d, datasetDetailModel.CategoryColor), searchable: false, orderable: false }
@@ -1804,7 +1804,7 @@ data.Dataset = {
                 processing: '<div class="progress md-progress sentry-dark-blue data-file-table-loading"><div class="indeterminate"></div></div>'
             },
             order: [5, 'desc'],
-            stateSave: true,
+            //stateSave: true,
             initComplete: function () {
                 var table = $("#datasetFilesTable").DataTable();
                 table.column(".deleteFile").visible(datasetDetailModel.DisplayDatasetFileDelete);
@@ -1825,10 +1825,6 @@ data.Dataset = {
             }
         });
 
-        //date filters are off, already CLA-4004 created for it
-        //something with datepicker_type not working as expected
-        //may need to render additional bundles to get date pickers to function
-
         yadcf.init(data.Dataset.DatasetFilesTable, [
                 {
                     column_number: 2,
@@ -1837,26 +1833,39 @@ data.Dataset = {
                     filter_reset_button_text: false,
                     filter_delay: 500
                 },
-                //{
-                //    column_number: 4,
-                //    filter_type: 'range_date',
-                //    datepicker_type: null,
-                //    filter_reset_button_text: false,
-                //    filter_delay: 500
-                //}, SEE CLA - 4004
-                //{
-                //    column_number: 5,
-                //    filter_type: 'range_date',
-                //    datepicker_type: null,
-                //    filter_reset_button_text: false,
-                //    filter_delay: 500
-                //},
+                {
+                    column_number: 4,
+                    filter_type: 'range_date',
+                    datepicker_type: null,
+                    filter_reset_button_text: false,
+                    filter_delay: 500
+                },
+                {
+                    column_number: 5,
+                    filter_type: 'range_date',
+                    datepicker_type: null,
+                    filter_reset_button_text: false,
+                    filter_delay: 500
+                },
             ],
             {
                 filters_tr_index: 1
             }
         );
 
+        $(".yadcf-filter-range-date", data.Dataset.DatasetFilesTable.settings()[0].nTHead).pickadate({
+            format: 'mm/dd/yyyy',
+            formatSubmit: 'mm/dd/yyyy',
+            onSet: function (context) {
+                if (context.clear !== undefined) {
+                    context.select = "";
+                }
+
+                if (context.select !== undefined && context.select !== null) {
+                    yadcf.dateSelect(new Date(context.select), this.$node);
+                }
+            }
+        });
 
         var table = $('#datasetFilesTable').DataTable();
 
@@ -1961,7 +1970,7 @@ data.Dataset = {
         if (d.ObjectStatus === 1) { //is active
             var checkboxId = 'data-file-delete-' + d.Id;
 
-            return '<fieldset class="form-group mb-0 text-left data-file-delete-fieldset">' +
+            return '<fieldset class="form-group mb-0 text-left">' +
                 '<input type="checkbox" id="' + checkboxId + '" data-id="' + d.Id + '" class="form-check-input data-file-delete-checkbox" >' +
                 '<label for="' + checkboxId + '" class="form-check-label p-0"></label>' +
             '</fieldset >';

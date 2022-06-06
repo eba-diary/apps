@@ -9,7 +9,6 @@ using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
-using Sentry.DataTables.Mvc;
 using Sentry.DataTables.QueryableAdapter;
 using Sentry.DataTables.Shared;
 using System;
