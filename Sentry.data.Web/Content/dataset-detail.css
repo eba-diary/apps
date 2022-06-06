@@ -143,11 +143,6 @@ div.dataTables_wrapper div.dataTables_filter input {
     vertical-align: middle !important;
 }
 
-#data-file-delete-open-modal {
-    float: right;
-    margin: 0 0 0.5rem 1rem;
-}
-
 .data-file-table-loading {
     margin: 0.5rem 1rem;
     width: auto;
@@ -156,4 +151,10 @@ div.dataTables_wrapper div.dataTables_filter input {
 .data-file-delete-spinner {
     margin-right: 2rem;
     margin-bottom: 1rem;
+}
+
+.data-file-button {
+    float: right;
+    margin: 0 0 0.5rem 1rem;
+    padding: 0.75rem 1.5rem !important;
 }

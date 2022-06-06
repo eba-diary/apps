@@ -959,7 +959,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult UploadDatafile(int id, int configId)
+        public ActionResult UploadDataFile(int id, int configId)
         {//JsonResult
             if (Request.Files.Count > 0 && id != 0)
             {
@@ -1082,8 +1082,6 @@ namespace Sentry.data.Web.Controllers
             {
                 cd = new CreateDataFileModel(_datasetService.GetDatesetDetailDto(datasetId));
             }
-
-            ViewBag.CurrentConfigId = configId;
 
             return PartialView("_UploadDataFile", cd);
         }

@@ -7,17 +7,11 @@
 <div class="form-horizontal">
 
     <div class="alert-warning alert">
-        Dataset Security is very important to this site and Sentry as a whole.
-        It is imperative that you know what you are uploading to this site.
-        <br />
-        <br />
-        Data.Sentry.com uploads data to the cloud so no sensitive data should be uploaded through our site.
-        <br />
-        <br />
-        To find out what data is sensitive and what classification your data is <a target="_blank" href="http://sharepoint.sentry.com/Security/Security%20Architecture/Security%20Policies/Published/Policy-Data%20Classification%20and%20Handling.pdf">click here.</a>
         <button type="button" class="close" data-dismiss="alert">×</button>
+        The file being uploaded should not contain sensitive data.
+        <br />
+        For more information on sensitive data <a target="_blank" href="http://sharepoint.sentry.com/Security/Security%20Architecture/SitePages/Home.aspx">click here.</a>
     </div>
-
 
     <br />
 
@@ -26,8 +20,7 @@
     <div class="form-group">
         @Html.Label("Schema", new { @class = "col-md-2 control-label" })
         <div class="col-lg-8 edit-dataset-row" >
-            <select class="form-control"
-                    id="configList" name="filterSelector">
+            <select class="form-control" id="configList" name="filterSelector">
                 @foreach (var a in Model.DatasetFileConfigNames)
                 {
                     if (int.Parse(a.Key) == ViewBag.CurrentConfigId)
@@ -50,8 +43,7 @@
     </div>
 </div>
 
-
 <div class="modal-footer">
-    <button type="button" class="btn btn-primary" id="btnUploadFile" data-id="0" style="display:none">Upload Data File</button>
     <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+    <button type="button" class="btn btn-primary d-none" id="btnUploadFile"><i class="fas fa-cloud-upload-alt"></i>Upload</button>
 </div>

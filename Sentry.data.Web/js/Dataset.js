@@ -1005,9 +1005,9 @@ data.Dataset = {
             data.Dataset.FileNameModal($(this).data("id"));
         });
 
-        $("[id^='UploadModal']").click(function (e) {
+        $(document).on('click', '#UploadModal', function (e) {
             e.preventDefault();
-            data.Dataset.UploadFileModal($(this).data("id"));
+            data.Dataset.UploadFileModal(datasetDetailModel.DatasetId);
         });
 
         $("[id^='RequestAccessButton']").off('click').on('click', function (e) {
@@ -1404,20 +1404,18 @@ data.Dataset = {
             window.history.pushState({}, '', url);
 
             if ($('#tabDataFiles').is(':empty')) {
-                //Taking out tab spinner because datatables 'processing' is configured
-                //Always making sure spinner hides in case page is reloaded while on 'Files' tab
-                $("#tab-spinner").hide();
+                $("#tab-spinner").show();
                 $.ajax({
                     type: "POST",
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataFiles',
                     data: datasetDetailModel,
                     success: function (view) {
+                        $("#tab-spinner").hide();
                         $('#tabDataFiles').html(view);
-                        if (self.vm.ShowDataFileTable()) {
-                            var configId = $('#datasetConfigList').val();
-                            data.Dataset.DatasetFileTableInit(configId, datasetDetailModel);
-                            data.Dataset.DatasetBundingFileTableInit(configId);
-                        }
+
+                        var configId = $('#datasetConfigList').val();
+                        data.Dataset.DatasetFileTableInit(configId, datasetDetailModel);
+                        data.Dataset.DatasetBundingFileTableInit(configId);
                     }
                 });
             }
@@ -1655,18 +1653,17 @@ data.Dataset = {
             });
     },
 
-    UploadFileModal: function (id) {
+    UploadFileModal: function (datasetId) {
         /// <summary>
         /// Load Modal for Uploading new Datafile
         /// </summary>
         var modal = Sentry.ShowModalWithSpinner("Upload Data File");
-        //var createDatafileUrl = "/Dataset/GetDatasetUploadPartialView/?datasetId=" + encodeURI(id);
         var selectedConfig = $('#datasetConfigList').find(":selected").val();
-        var createDatafileUrl = "/Dataset/Upload/" + encodeURI(id) + "/Config/" + encodeURI(selectedConfig);
+        var createDatafileUrl = "/Dataset/Upload/" + encodeURI(datasetId) + "/Config/" + encodeURI(selectedConfig);
 
         $.get(createDatafileUrl, function (e) {
             modal.ReplaceModalBody(e);
-            data.Dataset.UploadModalInit(id);
+            data.Dataset.UploadModalInit(datasetId);
         });
     },
 
@@ -1679,16 +1676,6 @@ data.Dataset = {
     },
 
     UploadModalInit: function (id) {
-        var configs;
-        var idFromSelectList = $('#datasetConfigList').find(":selected").val();
-        var dID;
-
-        if (idFromSelectList === undefined) {
-            dId = id;
-        } else {
-            dId = idFromSelectList;
-        }
-
         $('#btnUploadFile').prop("disabled", true);
 
         $("[id^='btnUploadFile']").off('click').on('click', function () {
@@ -1741,11 +1728,12 @@ data.Dataset = {
 
                 $('.btn-cancel')[0].addEventListener('click', function () { xhr.abort(); }, false);
                 $('.bootbox-close-button').hide();
-                var url = '/Dataset/UploadDatafile/?id=' + encodeURI(datasetID) + "&configId=" + encodeURI(configID);
+                var url = '/Dataset/UploadDataFile?id=' + encodeURI(datasetID) + "&configId=" + encodeURI(configID);
                 xhr.open('post', url, true);
                 xhr.setRequestHeader('__RequestVerificationToken', token);
                 xhr.send(fileData);
-            } else {
+            }
+            else {
                 alert("FormData is not supported");
             }
         });
@@ -1802,18 +1790,25 @@ data.Dataset = {
                 { data: null, name: "deleteFile", className: "deleteFile text-center", render: (d) => data.Dataset.renderDeleteFileOption(d, datasetDetailModel.CategoryColor), searchable: false, orderable: false }
             ],
             language: {
-                processing: '<div class="progress md-progress sentry-dark-blue data-file-table-loading"><div class="indeterminate"></div></div>'
+                processing: '<div class="progress md-progress sentry-dark-blue data-file-table-loading"><div class="indeterminate"></div></div>',
+                emptyTable: 'No Data Files Available'
             },
             order: [5, 'desc'],
-            //stateSave: true,
+            stateSave: true,
             initComplete: function () {
                 var table = $("#datasetFilesTable").DataTable();
                 table.column(".deleteFile").visible(datasetDetailModel.DisplayDatasetFileDelete);
 
+                var parent = $("#datasetFilesTable_filter").parent();
+                parent.parent().css("align-items", "end");
+
+                if (datasetDetailModel.Security.CanUploadToDataset) {
+                    parent.append('<button type="button" id="UploadModal" data-id="' + datasetDetailModel.DatasetId + '" class="btn btn-primary waves-effect waves-light data-file-button"><i class="fas fa-cloud-upload-alt"></i>Upload</button>');
+                }
+
                 //use the global search location to add delete button even though we are going to remove global search from the dom
                 if (datasetDetailModel.DisplayDatasetFileDelete) {
-                    $("#datasetFilesTable_filter").parent().parent().css("align-items", "end");
-                    $("#datasetFilesTable_filter").parent().append('<button type="button" id="data-file-delete-open-modal" data-toggle="modal" data-target="#data-file-delete-modal" class="btn btn-danger waves-effect waves-light display-none"><i class="far fa-trash-alt"></i>Delete</button>');
+                    parent.append('<button type="button" id="data-file-delete-open-modal" data-toggle="modal" data-target="#data-file-delete-modal" class="btn btn-danger waves-effect waves-light data-file-button display-none"><i class="far fa-trash-alt"></i>Delete</button>');
                 }
 
                 //searching property needs to be set to true (adds the global search input) in order for yadcf filters for columns to properly model bind
