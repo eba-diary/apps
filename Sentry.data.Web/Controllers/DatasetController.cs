@@ -959,6 +959,20 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
+        public ActionResult UploadDataFileToS3(UploadDataFileModel uploadModel)
+        {
+            //validation 
+            if (false)
+            {
+                return Json("Success");
+            }
+
+            //check file extension matches
+            //check file size under certain amount
+            return Json(new { Validation = "Message Here" });
+        }
+
+        [HttpPost]
         public ActionResult UploadDataFile(int id, int configId)
         {//JsonResult
             if (Request.Files.Count > 0 && id != 0)
@@ -1076,14 +1090,14 @@ namespace Sentry.data.Web.Controllers
                 throw new UnauthorizedAccessException();
             }
 
-            CreateDataFileModel cd = new CreateDataFileModel();
-            //If a value was passed, load appropriate information
-            if (datasetId != 0)
+            UploadDataFileModel uploadModel = new UploadDataFileModel()
             {
-                cd = new CreateDataFileModel(_datasetService.GetDatesetDetailDto(datasetId));
-            }
+                DatasetId = datasetId,
+                ConfigId = configId,
+                SchemaName = _configService.GetDatasetFileConfigDto(configId).Schema.Name
+            };
 
-            return PartialView("_UploadDataFile", cd);
+            return PartialView("_UploadDataFile", uploadModel);
         }
 
         #endregion

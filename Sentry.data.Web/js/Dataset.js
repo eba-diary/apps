@@ -786,7 +786,7 @@ data.Dataset = {
 
         $("[id^='UploadDatafile']").click(function (e) {
             e.preventDefault();
-            data.Dataset.UploadFileModal(0);
+            data.Dataset.OpenUploadFileModal(0);
         });
 
         $('.tile').click(function (e) {
@@ -1007,7 +1007,7 @@ data.Dataset = {
 
         $(document).on('click', '#UploadModal', function (e) {
             e.preventDefault();
-            data.Dataset.UploadFileModal(datasetDetailModel.DatasetId);
+            data.Dataset.OpenUploadFileModal(datasetDetailModel.DatasetId);
         });
 
         $("[id^='RequestAccessButton']").off('click').on('click', function (e) {
@@ -1653,20 +1653,6 @@ data.Dataset = {
             });
     },
 
-    UploadFileModal: function (datasetId) {
-        /// <summary>
-        /// Load Modal for Uploading new Datafile
-        /// </summary>
-        var modal = Sentry.ShowModalWithSpinner("Upload Data File");
-        var selectedConfig = $('#datasetConfigList').find(":selected").val();
-        var createDatafileUrl = "/Dataset/Upload/" + encodeURI(datasetId) + "/Config/" + encodeURI(selectedConfig);
-
-        $.get(createDatafileUrl, function (e) {
-            modal.ReplaceModalBody(e);
-            data.Dataset.UploadModalInit(datasetId);
-        });
-    },
-
     EditDataFileInformation: function (id) {
         var modal = Sentry.ShowModalWithSpinner("Edit Data File");
 
@@ -1675,88 +1661,124 @@ data.Dataset = {
         });
     },
 
-    UploadModalInit: function (id) {
-        $('#btnUploadFile').prop("disabled", true);
+    OpenUploadFileModal: function (datasetId) {
+        var modal = Sentry.ShowModalWithSpinner("Upload Data File");
+        var selectedConfig = $('#datasetConfigList').find(":selected").val();
 
-        $("[id^='btnUploadFile']").off('click').on('click', function () {
-            $('#btnUploadFile').closest('.bootbox').hide();
-            $('.modal-backdrop').remove();
+        $.get("/Dataset/Upload/" + encodeURI(datasetId) + "/Config/" + encodeURI(selectedConfig), function (html) {
+            modal.ReplaceModalBody(html);
+            data.Dataset.InitUploadModal();
+        });
+    },
 
-            var modal = Sentry.ShowModalWithSpinner("Upload Results", {
-                Confirm: {
-                    label: 'Confirm',
-                    className: 'btn-success'
-                },
-                Cancel:
-                {
-                    label: 'Cancel',
-                    className: 'btn-cancel'
+    InitUploadModal: function () {
+
+        $(document).on("change", "#data-file-to-upload", function (e) {
+            if ($(".file-path").val()) {
+                $("#submit-upload-file").prop("disabled", false);
+            }
+            else {
+                $("#submit-upload-file").prop("disabled", true);
+            }
+        });
+
+        $(document).on("submit", "#upload-data-file-form", function (e) {
+
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            var form = e.target;
+            var xhr = new XMLHttpRequest();
+
+            xhr.open(form.method, form.action);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    //if Validation, set the value of #upload-invalid-message to value of Validation in responseText
                 }
-            });
+            };
 
-            // This approach is from the following site:
-            // http://www.c-sharpcorner.com/UploadFile/manas1/upload-files-through-jquery-ajax-in-Asp-Net-mvc/
-            if (window.FormData !== undefined) {
-                var fileUpload = $("#DatasetFileUpload").get(0);
-                var files = fileUpload.files;
-
-                //Create FormData object
-                var fileData = new FormData();
-
-                fileData.append(files[0].name, files[0]);
-                var datasetID = $('#DatasetId').val();
-                var configID = $("#configList").val();
-
-                var token = $('input[name="__RequestVerificationToken"]').val();
-
-                var xhr = new XMLHttpRequest();
-
-                (xhr.upload || xhr).addEventListener('progress', function (e) {
-                    var done = e.position || e.loaded;
-                    var total = e.totalSize || e.total;
-
-                    $('#percentTotal').text(Math.round(done / total * 100) + '%');
-                    $('#progressKB').text('(' + Math.round(done / 1024) + ' KB / ' + Math.round(total / 1024) + ' KB)');
-                    $('#progressBar').width(Math.round(done / total * 100) + '%');
-
-                    $('.btn-success').prop("disabled", true);
-                });
-                xhr.addEventListener('load', function (e) {
-                    $('.modal-footer button').prop("disabled", false);
-                    modal.ReplaceModalBody(e.currentTarget.response.replace(/"/g, ''));
-                });
-
-                $('.btn-cancel')[0].addEventListener('click', function () { xhr.abort(); }, false);
-                $('.bootbox-close-button').hide();
-                var url = '/Dataset/UploadDataFile?id=' + encodeURI(datasetID) + "&configId=" + encodeURI(configID);
-                xhr.open('post', url, true);
-                xhr.setRequestHeader('__RequestVerificationToken', token);
-                xhr.send(fileData);
-            }
-            else {
-                alert("FormData is not supported");
-            }
+            xhr.send(new FormData(form));
         });
 
-        $("#DatasetFileUpload").change(function () {
+        //$("[id^='btnUploadFile']").off('click').on('click', function () {
+        //    $('#btnUploadFile').closest('.bootbox').hide();
+        //    $('.modal-backdrop').remove();
 
-            var fileUpload = $("#DatasetFileUpload").get(0);
-            var files = fileUpload.files;
-            if (files[0].size / 1000000 > 100) {
-                message = 'The file you are attempting to upload to is too large to upload through the browser.  ' +
-                    'Please use a drop location to upload this file.' +
-                    '<br/><br/>' +
-                    'If you don\'t have access to this drop location please contact <a href="mailto:DSCSupport@sentry.com"> Data.sentry.com Administration </a> for further assistance.'
+        //    var modal = Sentry.ShowModalWithSpinner("Upload Results", {
+        //        Confirm: {
+        //            label: 'Confirm',
+        //            className: 'btn-success'
+        //        },
+        //        Cancel:
+        //        {
+        //            label: 'Cancel',
+        //            className: 'btn-cancel'
+        //        }
+        //    });
 
-                largeFileModel = Sentry.ShowModalCustom("File Too Large", message, Sentry.ModalButtonsOK())
-                //largeFileModel = Sentry.ShowModalAlert(message);
-                largeFileModel.show();
-            }
-            else {
-                $("#btnUploadFile").prop("disabled", false);
-                $('#btnUploadFile').show();
-            }
-        });
+        //    // This approach is from the following site:
+        //    // http://www.c-sharpcorner.com/UploadFile/manas1/upload-files-through-jquery-ajax-in-Asp-Net-mvc/
+        //    if (window.FormData !== undefined) {
+        //        var fileUpload = $("#DatasetFileUpload").get(0);
+        //        var files = fileUpload.files;
+
+        //        //Create FormData object
+        //        var fileData = new FormData();
+
+        //        fileData.append(files[0].name, files[0]);
+        //        var datasetID = $('#DatasetId').val();
+        //        var configID = $("#configList").val();
+
+        //        var token = $('input[name="__RequestVerificationToken"]').val();
+
+        //        var xhr = new XMLHttpRequest();
+
+        //        (xhr.upload || xhr).addEventListener('progress', function (e) {
+        //            var done = e.position || e.loaded;
+        //            var total = e.totalSize || e.total;
+
+        //            $('#percentTotal').text(Math.round(done / total * 100) + '%');
+        //            $('#progressKB').text('(' + Math.round(done / 1024) + ' KB / ' + Math.round(total / 1024) + ' KB)');
+        //            $('#progressBar').width(Math.round(done / total * 100) + '%');
+
+        //            $('.btn-success').prop("disabled", true);
+        //        });
+        //        xhr.addEventListener('load', function (e) {
+        //            $('.modal-footer button').prop("disabled", false);
+        //            modal.ReplaceModalBody(e.currentTarget.response.replace(/"/g, ''));
+        //        });
+
+        //        $('.btn-cancel')[0].addEventListener('click', function () { xhr.abort(); }, false);
+        //        $('.bootbox-close-button').hide();
+        //        var url = '/Dataset/UploadDataFile?id=' + encodeURI(datasetID) + "&configId=" + encodeURI(configID);
+        //        xhr.open('post', url, true);
+        //        xhr.setRequestHeader('__RequestVerificationToken', token);
+        //        xhr.send(fileData);
+        //    }
+        //    else {
+        //        alert("FormData is not supported");
+        //    }
+        //});
+
+        //$("#DatasetFileUpload").change(function () {
+
+        //    var fileUpload = $("#DatasetFileUpload").get(0);
+        //    var files = fileUpload.files;
+        //    if (files[0].size / 1000000 > 100) {
+        //        message = 'The file you are attempting to upload to is too large to upload through the browser.  ' +
+        //            'Please use a drop location to upload this file.' +
+        //            '<br/><br/>' +
+        //            'If you don\'t have access to this drop location please contact <a href="mailto:DSCSupport@sentry.com"> Data.sentry.com Administration </a> for further assistance.'
+
+        //        largeFileModel = Sentry.ShowModalCustom("File Too Large", message, Sentry.ModalButtonsOK())
+        //        //largeFileModel = Sentry.ShowModalAlert(message);
+        //        largeFileModel.show();
+        //    }
+        //    else {
+        //        $("#btnUploadFile").prop("disabled", false);
+        //        $('#btnUploadFile').show();
+        //    }
+        //});
     },
 
     DatasetFileTableInit: function (Id, datasetDetailModel) {

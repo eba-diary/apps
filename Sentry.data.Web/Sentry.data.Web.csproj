@@ -569,7 +569,7 @@
     <Compile Include="Models\DataProcessing\SchemaMapModel.cs" />
     <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
     <Compile Include="Models\Dataset\ColumnModel.cs" />
-    <Compile Include="Models\Dataset\CreateDataFileModel.cs" />
+    <Compile Include="Models\Dataset\UpdateDataFileModel.cs" />
     <Compile Include="Models\Config\CreateJobModel.cs" />
     <Compile Include="Models\Config\DatasetFileConfigsModel.cs" />
     <Compile Include="Models\Dataset\DatasetDetailModel.cs" />

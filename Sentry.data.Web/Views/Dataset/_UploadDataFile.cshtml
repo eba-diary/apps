@@ -1,49 +1,36 @@
-﻿@model Sentry.data.Web.CreateDataFileModel
+﻿@model Sentry.data.Web.UploadDataFileModel
 @{
     ViewBag.Title = "Upload Datafile";
 }
 
-@Html.AntiForgeryToken()
-<div class="form-horizontal">
-
-    <div class="alert-warning alert">
-        <button type="button" class="close" data-dismiss="alert">×</button>
-        The file being uploaded should not contain sensitive data.
-        <br />
-        For more information on sensitive data <a target="_blank" href="http://sharepoint.sentry.com/Security/Security%20Architecture/SitePages/Home.aspx">click here.</a>
-    </div>
-
+<div class="alert-warning alert">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    The file being uploaded should not contain sensitive data.
     <br />
+    For more information on sensitive data <a target="_blank" href="http://sharepoint.sentry.com/Security/Security%20Architecture/SitePages/Home.aspx">click here.</a>
+</div>
 
-    @Html.HiddenFor(model => model.DatasetId)
+@using (Html.BeginForm("UploadDataFileToS3", "Dataset", FormMethod.Post, new { id = "upload-data-file-form", @class = "md-form needs-validation" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.DatasetId)
+    @Html.HiddenFor(x => x.ConfigId)
+    @Html.HiddenFor(x => x.SchemaName)
 
-    <div class="form-group">
-        @Html.Label("Schema", new { @class = "col-md-2 control-label" })
-        <div class="col-lg-8 edit-dataset-row" >
-            <select class="form-control" id="configList" name="filterSelector">
-                @foreach (var a in Model.DatasetFileConfigNames)
-                {
-                    if (int.Parse(a.Key) == ViewBag.CurrentConfigId)
-                    {
-                        <option value="@a.Key" selected="selected">@a.Value</option>
-                    }
-                    else
-                    {
-                        <option value="@a.Key">@a.Value</option>
-                    }
-                }
-            </select>
+    <div class="file-field mb-5">
+        <div class="btn btn-primary btn-sm waves-effect waves-light">
+            <span>Choose file</span>
+            @Html.TextBoxFor(x => x.DataFile, new { id = "data-file-to-upload", type = "file" })
+        </div>
+
+        <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Select file to upload to @Model.SchemaName" disabled>
+            <div class="invalid-feedback" id="upload-invalid-message"></div>
         </div>
     </div>
 
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input type="file" class="edit-dataset-row file-load" id="DatasetFileUpload" />
-        </div>
+    <div>
+        <button type="submit" class="btn btn-primary data-file-button" id="submit-upload-file" ><i class="fas fa-cloud-upload-alt"></i>Upload</button>
+        <button type="button" class="btn btn-warning data-file-button" data-dismiss="modal">Cancel</button>
     </div>
-</div>
-
-<div class="modal-footer">
-    <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
-    <button type="button" class="btn btn-primary d-none" id="btnUploadFile"><i class="fas fa-cloud-upload-alt"></i>Upload</button>
-</div>
+}
