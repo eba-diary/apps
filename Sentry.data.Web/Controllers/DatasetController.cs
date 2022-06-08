@@ -396,16 +396,24 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> AccessRequest(int datasetId)
         {
-            DatasetAccessRequestModel model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
+            DatasetAccessRequestModel model;
+
+            if (_featureFlags.CLA3718_Authorization.GetValue())
+            {
+                model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
+                model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
+                return PartialView("Permission/RequestAccessCLA3723", model);
+            }
+            model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
             model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
             return PartialView("DatasetAccessRequest", model);
         }
 
         [HttpPost]
-        public ActionResult SubmitAccessRequest(DatasetAccessRequestModel model)
+        public async Task<ActionResult> SubmitAccessRequest(DatasetAccessRequestModel model)
         {
             AccessRequest ar = model.ToCore();
-            string ticketId = _datasetService.RequestAccessToDataset(ar);
+            string ticketId = await _datasetService.RequestAccessToDataset(ar);
             
             if (string.IsNullOrEmpty(ticketId))
             {
@@ -726,7 +734,7 @@ namespace Sentry.data.Web.Controllers
         public ActionResult SubmitInheritanceRequest([Bind(Prefix = "Inheritance")] RequestPermissionInheritanceModel model)
         {
             AccessRequest ar = model.ToCore();
-            string ticketId = _datasetService.RequestAccessToDataset(ar);
+            string ticketId = await _datasetService.RequestAccessToDataset(ar);
 
             if (string.IsNullOrEmpty(ticketId))
             {

@@ -1,7 +1,10 @@
-﻿using Sentry.data.Core.GlobalEnums;
+﻿using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Interfaces.InfrastructureEventing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
@@ -13,15 +16,17 @@ namespace Sentry.data.Core
         //BaseTicketProvider implementation is determined within Bootstrapper and could be either ICherwellProvider or IHPSMProvider
         private readonly IBaseTicketProvider _baseTicketProvider;
         private readonly IDataFeatures _dataFeatures;
+        private readonly IInevService _inevService;
 
-        public SecurityService(IDatasetContext datasetContext, IBaseTicketProvider baseTicketProvider, IDataFeatures dataFeatures)
+        public SecurityService(IDatasetContext datasetContext, IBaseTicketProvider baseTicketProvider, IDataFeatures dataFeatures, IInevService inevService)
         {
             _datasetContext = datasetContext;
             _baseTicketProvider = baseTicketProvider;
             _dataFeatures = dataFeatures;
+            _inevService = inevService;
         }
 
-        public string RequestPermission(AccessRequest model)
+        public async Task<string> RequestPermission(AccessRequest model)
         {
             string ticketId = _baseTicketProvider.CreateChangeTicket(model);
             if (!string.IsNullOrWhiteSpace(ticketId))
@@ -40,6 +45,7 @@ namespace Sentry.data.Core
                     IsRemovingPermission = !model.IsAddingPermission,
                     ParentSecurity = security,
                     Permissions = new List<SecurityPermission>(),
+                    AwsArn = model.AwsArn
                 };
 
                 foreach (Permission perm in model.Permissions)
@@ -54,6 +60,9 @@ namespace Sentry.data.Core
                 }
 
                 security.Tickets.Add(ticket);
+
+                await PublishDatasetPermissionsUpdatedInfrastructureEvent(ticket);
+
                 _datasetContext.SaveChanges();
 
                 return ticketId;
@@ -218,7 +227,7 @@ namespace Sentry.data.Core
         public SecurityTicket GetSecurableInheritanceTicket(ISecurable securable)
         {
             SecurityTicket inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.Permissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) && t.TicketStatus.Equals(HpsmTicketStatus.PENDING));
-            if(inheritanceTicket != null && inheritanceTicket.TicketId != null)
+            if (inheritanceTicket != null && inheritanceTicket.TicketId != null)
             {
                 return inheritanceTicket;
             }
@@ -272,23 +281,27 @@ namespace Sentry.data.Core
                 results.AddRange(
                     tickets
                     .Where(t => !t.Permissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS))
-                    .SelectMany(t => t.Permissions.Select(p => new SecurablePermission 
-                    { 
-                        Scope = SecurablePermissionScope.Self, 
-                        ScopeSecurity = securable.Security, 
-                        Identity = t.AdGroupName ?? t.GrantPermissionToUserId, 
-                        SecurityPermission = p 
+                    .SelectMany(t => t.Permissions.Select(p => new SecurablePermission
+                    {
+                        Scope = SecurablePermissionScope.Self,
+                        ScopeSecurity = securable.Security,
+                        Identity = t.Identity,
+                        IdentityType = t.IdentityType,
+                        SecurityPermission = p,
+                        TicketId = t.TicketId
                     }))
                 );
 
                 //add in the parent permissions
                 results.AddRange(
-                    parentSecurity.Select(s => new SecurablePermission() 
-                    { 
-                        Scope = SecurablePermissionScope.Inherited, 
-                        ScopeSecurity = s.ScopeSecurity, 
-                        Identity = s.Identity, 
-                        SecurityPermission = s.SecurityPermission 
+                    parentSecurity.Select(s => new SecurablePermission()
+                    {
+                        Scope = SecurablePermissionScope.Inherited,
+                        ScopeSecurity = s.ScopeSecurity,
+                        Identity = s.Identity,
+                        IdentityType = s.IdentityType,
+                        SecurityPermission = s.SecurityPermission,
+                        TicketId = s.TicketId
                     })
                 );
             }
@@ -407,7 +420,10 @@ namespace Sentry.data.Core
             }
         }
 
-        public void ApproveTicket(SecurityTicket ticket, string approveId)
+        /// <summary>
+        /// A ticket in Cherwell has been approved
+        /// </summary>
+        public async Task ApproveTicket(SecurityTicket ticket, string approveId)
         {
             ticket.ApprovedById = approveId;
             ticket.ApprovedDate = DateTime.Now;
@@ -418,8 +434,32 @@ namespace Sentry.data.Core
                 x.IsEnabled = true;
                 x.EnabledDate = DateTime.Now;
             });
+
+            await PublishDatasetPermissionsUpdatedInfrastructureEvent(ticket);
+
         }
 
+        private async Task PublishDatasetPermissionsUpdatedInfrastructureEvent(SecurityTicket ticket)
+        {
+            //If the SecurityTicket just approved includes dataset permissions
+            if (_dataFeatures.CLA3718_Authorization.GetValue() &&
+                ticket.Permissions.Any(p => p.Permission.SecurableObject == SecurableEntityName.DATASET))
+            {
+                //lookup the dataset this ticket is for
+                var dataset = _datasetContext.Datasets.Where(d => d.Security.Tickets.Contains(ticket)).FirstOrDefault();
+                if (dataset == null)
+                {
+                    throw new DatasetNotFoundException($"Could not find a dataset with SecurityTicket ID '{ticket.TicketId}' attached.");
+                }
+                //publish an Infrastructure Event that dataset permissions have changed
+                await _inevService.PublishDatasetPermissionsUpdated(dataset, ticket, GetSecurablePermissions(dataset));
+            }
+        }
+
+
+        /// <summary>
+        /// A ticket in Cherwell has been denied
+        /// </summary>
         public void CloseTicket(SecurityTicket ticket, string RejectorId, string rejectedReason, string status)
         {
             ticket.RejectedById = RejectorId;

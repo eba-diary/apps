@@ -90,7 +90,7 @@ namespace Sentry.data.Infrastructure
             }
             else if (ticketStatus == GlobalConstants.CherwellChangeStatusNames.CLOSED)
             {
-                ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.WIDHTDRAWN;
+                ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.WITHDRAWN;
             }
             else { return null; }
 
@@ -469,44 +469,13 @@ namespace Sentry.data.Infrastructure
         #region Extensions
         private void ToChangeTemplateResponse(AccessRequest model, TemplateResponse response)
         {
-            string requestDescription = String.Empty;
-            if (model.AdGroupName != null)
-            {
-                requestDescription = $"AD Group {model.AdGroupName}";
-            }
-            else
-            {
-                requestDescription = $"user {model.PermissionForUserName}";
-            }
 
-            SetFieldValue(response.Fields, "Title", $"Access Request for {requestDescription}");
 
-            StringBuilder sb = new StringBuilder();
-            if (model.IsAddingPermission)
-            {
-                sb.Append($"Please grant the {requestDescription} the following permissions to {model.SecurableObjectName} within Data.sentry.com. <br>");
-            }
-            else
-            {
-                sb.Append($"Please remove the following permissions to {model.SecurableObjectName} within Data.sentry.com. <br>");
-            }
-            sb.Append($"<br>");
-            if (string.IsNullOrEmpty(model.SaidKeyCode))
-            {
-                sb.Append($"Said Asset: {model.SaidKeyCode} <br>");
-                sb.Append($"<br>");
-            }
-            sb.Append($"<ul>");
-            foreach (Permission item in model.Permissions)
-            {
-                sb.Append($"<li>{item.PermissionName} - {item.PermissionDescription} </li>");
-            }
-            sb.Append($"</ul>");
-            sb.Append($"<br>");
-            sb.Append($"Business Reason: {model.BusinessReason} <br>");
-            sb.Append($"Requestor: {model.RequestorsId} - {model.RequestorsName}");
+            SetFieldValue(response.Fields, "Title", BuildTitleByTemplate(model));
 
-            SetFieldValue(response.Fields, "Description", sb.ToString());
+
+
+            SetFieldValue(response.Fields, "Description", BuildBodyByTemplate(model).ToString());
             SetFieldValue(response.Fields, "ProposedStartDate", DateTime.Now.ToString("MM/dd/yyyy hh:mm tt"));
             SetFieldValue(response.Fields, "ScheduledEndDate", DateTime.Now.Add(TimeSpan.FromDays(14)).ToString("MM/dd/yyyy hh:mm tt"));
 
@@ -540,6 +509,71 @@ namespace Sentry.data.Infrastructure
                 }
             }
         }
+
+        private StringBuilder BuildBodyByTemplate(AccessRequest model)
+        {
+            StringBuilder sb = new StringBuilder();
+            switch (model.Type)
+            {
+                case AccessRequestType.AwsArn:
+                    sb.Append($"Please grant the AWS ARN {model.AwsArn} the following permissions to {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)} data. <br>");
+
+                    foreach (Permission item in model.Permissions)
+                    {
+                        sb.Append($"<li>{item.PermissionName} - {item.PermissionDescription} </li>");
+                    }
+
+                    sb.Append($"</ul>");
+                    sb.Append($"<br>");
+                    break;
+                default:
+                    if (model.IsAddingPermission)
+                    {
+                        sb.Append($"Please grant the {(model.AdGroupName ?? model.PermissionForUserName)} the following permissions to {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)} within Data.sentry.com. <br>");
+                    }
+                    else
+                    {
+                        sb.Append($"Please remove the following permissions to {model.SecurableObjectName} within Data.sentry.com. <br>");
+                    }
+                    sb.Append($"<br>");
+                    if (!string.IsNullOrEmpty(model.SaidKeyCode))
+                    {
+                        sb.Append($"Said Asset: {model.SaidKeyCode} <br>");
+                        sb.Append($"<br>");
+                    }
+                    sb.Append($"<ul>");
+                    foreach (Permission item in model.Permissions)
+                    {
+                        sb.Append($"<li>{item.PermissionName} - {item.PermissionDescription} </li>");
+                    }
+                    sb.Append($"</ul>");
+                    sb.Append($"<br>");
+
+                    break;
+            }
+            sb.Append($"Business Reason: {model.BusinessReason} <br>");
+            sb.Append($"Requestor: {model.RequestorsId} - {model.RequestorsName}");
+            return sb;
+        }
+
+        private string BuildTitleByTemplate(AccessRequest model)
+        {
+            switch (model.Type)
+            {
+                case AccessRequestType.AwsArn:
+                    return $"Access Request for AWS ARN {model.AwsArn}";
+                default:
+                    if (model.AdGroupName != null)
+                    {
+                        return $"Access Request for AD Group {model.AdGroupName}";
+                    }
+                    else
+                    {
+                        return $"Access Request for user {model.PermissionForUserName}";
+                    }
+            }
+        }
+
 
         private void AddApproverToTemplate(string ticketBusObRecId, TemplateResponse templateResponse, AccessRequest model)
         {

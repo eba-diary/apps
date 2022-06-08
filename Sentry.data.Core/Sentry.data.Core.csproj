@@ -117,6 +117,7 @@
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.5.0.0\lib\net45\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Text.Json, Version=5.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -234,6 +235,8 @@
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
     <Compile Include="Entities\Search\SavedSearch.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
+    <Compile Include="GlobalEnums\AccessRequestType.cs" />
+    <Compile Include="GlobalEnums\AccessScope.cs" />
     <Compile Include="GlobalEnums\IntervalType.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryNews.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryReleaseNotes.cs" />
@@ -351,7 +354,9 @@
     <Compile Include="Interfaces\IDataInventoryService.cs" />
     <Compile Include="Interfaces\IDataFeatures.cs" />
     <Compile Include="Interfaces\IHttpClientProvider.cs" />
+    <Compile Include="Interfaces\InfrastructureEventing\IInevRestClient.cs" />
     <Compile Include="Interfaces\IInstanceGenerator.cs" />
+    <Compile Include="Interfaces\InfrastructureEventing\IInevService.cs" />
     <Compile Include="Interfaces\IPollyPolicy.cs" />
     <Compile Include="Interfaces\IQuartermasterRestClient.cs" />
     <Compile Include="Interfaces\IQuartermasterService.cs" />

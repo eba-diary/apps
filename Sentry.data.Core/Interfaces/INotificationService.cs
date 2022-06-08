@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -16,7 +17,7 @@ namespace Sentry.data.Core
         List<BusinessArea> GetBusinessAreasForUserSecurity();
         List<BusinessArea> GetBusinessAreasForAccessRequest();
         List<Permission> GetPermissionsForAccessRequest();
-        string RequestAccess(AccessRequest request);
+        Task<string> RequestAccess(AccessRequest request);
         List<KeyValuePair<string, string>> GetApproversByBusinessArea(int businessAreaId);
 
         List<BusinessAreaSubscription> GetAllUserSubscriptionsFromDatabase(EventTypeGroup group);

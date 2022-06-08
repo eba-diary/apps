@@ -11,7 +11,7 @@ namespace Sentry.data.Infrastructure
 {
     public class TicketMonitorService : ITicketMonitorService
     {
-        public void CheckTicketStatus()
+        public async Task CheckTicketStatus()
         {
             using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
             {
@@ -34,7 +34,7 @@ namespace Sentry.data.Infrastructure
                                 {
                                     st.ApprovedById = ticket.RequestedById;
                                 }
-                                _SecurityService.ApproveTicket(ticket, st.ApprovedById);
+                                await _SecurityService.ApproveTicket(ticket, st.ApprovedById);
                                 _baseTicketProvider.CloseTicket(ticket.TicketId);
                                 break;
                             case GlobalConstants.HpsmTicketStatus.DENIED: //or Denied?  find out those statuses.
@@ -42,7 +42,7 @@ namespace Sentry.data.Infrastructure
                                 _baseTicketProvider.CloseTicket(ticket.TicketId, true);
                                 _SecurityService.CloseTicket(ticket, st.RejectedById, st.RejectedReason, st.TicketStatus);
                                 break;
-                            case GlobalConstants.HpsmTicketStatus.WIDHTDRAWN:
+                            case GlobalConstants.HpsmTicketStatus.WITHDRAWN:
 
                                 _SecurityService.CloseTicket(ticket, st.RejectedById, st.RejectedReason, st.TicketStatus); //Check if the ticket was closed without approval.
                                 break;

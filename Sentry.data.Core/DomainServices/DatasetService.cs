@@ -213,7 +213,8 @@ namespace Sentry.data.Core
             {
                 ApproverList = new List<KeyValuePair<string, string>>(),
                 SecurableObjectId = ds.DatasetId,
-                SecurableObjectName = ds.DatasetName
+                SecurableObjectName = ds.DatasetName,
+                SaidKeyCode = ds.Asset.SaidKeyCode
             };
 
             Expression<Func<Permission, bool>> featureFlagPermissionRestrictions;
@@ -242,15 +243,16 @@ namespace Sentry.data.Core
             return ar;
         }
 
-        public string RequestAccessToDataset(AccessRequest request)
+        public async Task<string> RequestAccessToDataset(AccessRequest request)
         {
 
             Dataset ds = _datasetContext.GetById<Dataset>(request.SecurableObjectId);
             if (ds != null)
             {
                 IApplicationUser user = _userService.GetCurrentUser();
-                request.SecurableObjectName = ds.DatasetName;
+                request.SecurableObjectName = request.SecurableObjectName == null ? ds.DatasetName : request.SecurableObjectName;
                 request.SecurityId = ds.Security.SecurityId;
+                request.SaidKeyCode = ds.Asset.SaidKeyCode;
                 request.RequestorsId = user.AssociateId;
                 request.RequestorsName = user.DisplayName;
                 request.IsProd = bool.Parse(Configuration.Config.GetHostSetting("RequireApprovalHPSMTickets"));
@@ -258,10 +260,27 @@ namespace Sentry.data.Core
                 request.ApproverId = request.SelectedApprover;
                 request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
                                                                                                                 x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
-                return _securityService.RequestPermission(request);
+                request = BuildPermissionsForRequestType(request);
+                return await _securityService.RequestPermission(request);
             }
 
             return string.Empty;
+        }
+
+        public AccessRequest BuildPermissionsForRequestType(AccessRequest request)
+        {
+            switch (request.Type)
+            {
+                case AccessRequestType.AwsArn:
+                    request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS && x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).First());
+                    break;
+                case AccessRequestType.Producer:
+                    request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA && x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).First());
+                    break;
+                default:
+                    break;
+            }
+            return request;
         }
 
         public int CreateAndSaveNewDataset(DatasetDto dto)
@@ -539,7 +558,8 @@ namespace Sentry.data.Core
                 {
                     results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, "Short Name must be 12 characters or less");
                 }
-                if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName && d.DatasetType == GlobalConstants.DataEntityCodes.DATASET))
+                if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName && 
+                    d.DatasetType == GlobalConstants.DataEntityCodes.DATASET && dto.DatasetId != d.DatasetId))
                 {
                     results.Add(Dataset.ValidationErrors.datasetShortNameDuplicate, "That Short Name is already in use by another Dataset");
                 }

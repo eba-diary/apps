@@ -17,7 +17,7 @@ namespace Sentry.data.Core
         UserSecurity GetUserSecurityForDataset(int datasetId);
         UserSecurity GetUserSecurityForConfig(int configId);
         Task<AccessRequest> GetAccessRequestAsync(int datasetId);
-        string RequestAccessToDataset(AccessRequest request);
+        Task<string> RequestAccessToDataset(AccessRequest request);
         List<Dataset> GetDatasetsForQueryTool();
         List<Dataset> GetDatasetMarkedDeleted();
         List<DatasetSummaryMetadataDTO> GetDatasetSummaryMetadataDTO();
