@@ -529,7 +529,7 @@ namespace Sentry.data.Infrastructure
                 default:
                     if (model.IsAddingPermission)
                     {
-                        sb.Append($"Please grant the {(model.AdGroupName ?? model.PermissionForUserName)} the following permissions to {model.SecurableObjectName} within Data.sentry.com. <br>");
+                        sb.Append($"Please grant the {(model.AdGroupName ?? model.PermissionForUserName)} the following permissions to {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)} within Data.sentry.com. <br>");
                     }
                     else
                     {
