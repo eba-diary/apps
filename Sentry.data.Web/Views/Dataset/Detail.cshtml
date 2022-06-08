@@ -358,7 +358,14 @@ else
                 }
             </div>
             <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
-                <div id="tabDataFiles"></div>
+                @if (Model.Security.CanPreviewDataset)
+                {
+                    <div id="tabDataFiles"></div>
+                }
+                else
+                {
+                    @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
+                }
             </div>
             @if (Model.DisplaySchemaSearch)
             {
