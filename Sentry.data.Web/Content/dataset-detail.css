@@ -156,5 +156,8 @@ div.dataTables_wrapper div.dataTables_filter input {
 .data-file-button {
     float: right;
     margin: 0 0 0.5rem 1rem;
-    padding: 0.75rem 1.5rem !important;
+}
+
+#upload-invalid-message {
+    font-size: 1rem;
 }

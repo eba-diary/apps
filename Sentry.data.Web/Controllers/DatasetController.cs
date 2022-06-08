@@ -11,6 +11,7 @@ using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
 using Sentry.DataTables.QueryableAdapter;
 using Sentry.DataTables.Shared;
+using StructureMap.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -667,16 +668,6 @@ namespace Sentry.data.Web.Controllers
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
 
-        //public JsonResult GetAllDatasetFileInfoForGrid(int Id, DataTablesRequest dtRequest)
-        //{
-        //    IEnumerable<DatasetFileGridModel> files = _datasetContext.DatasetFile.Where(x => x.ParentDatasetFileId == null).Fetch(x => x.DatasetFileConfig).
-        //        Select((f) => new DatasetFileGridModel(f, _associateInfoProvider, _featureFlags));
-
-        //    DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
-        //    return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
-
-        //}
-
         [HttpGet]
         public JsonResult GetDatasetFileConfigInfo(int Id)
         {
@@ -958,18 +949,37 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("Dataset/Upload/{datasetId}/Config/{configId}")]
+        public ActionResult Upload(int datasetId, int configId)
+        {
+            DatasetFileConfigDto dto = _configService.GetDatasetFileConfigDto(configId);
+
+            UploadDataFileModel uploadModel = new UploadDataFileModel()
+            {
+                DatasetId = datasetId,
+                ConfigId = configId,
+                SchemaName = dto.Schema.Name
+            };
+
+            return PartialView(@"Details\_UploadDataFileForm", uploadModel);
+        }
+
         [HttpPost]
         public ActionResult UploadDataFileToS3(UploadDataFileModel uploadModel)
         {
-            //validation 
-            if (false)
+            using (StreamReader reader = new StreamReader(uploadModel.DataFile.InputStream))
             {
-                return Json("Success");
+                using (StreamWriter writer = new StreamWriter(@"C:\082116\DSC\TestFile.txt"))
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        writer.WriteLine(reader.ReadLine());
+                    }
+                }
             }
-
-            //check file extension matches
-            //check file size under certain amount
-            return Json(new { Validation = "Message Here" });
+            
+            return Json("Success");
         }
 
         [HttpPost]
@@ -1079,27 +1089,6 @@ namespace Sentry.data.Web.Controllers
                 }
             }
         }
-
-        [HttpGet]
-        [Route("Dataset/Upload/{datasetId}/Config/{configId}")]
-        public ActionResult Upload(int datasetId, int configId = 0)
-        {
-            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
-            if (!us.CanUploadToDataset)
-            {
-                throw new UnauthorizedAccessException();
-            }
-
-            UploadDataFileModel uploadModel = new UploadDataFileModel()
-            {
-                DatasetId = datasetId,
-                ConfigId = configId,
-                SchemaName = _configService.GetDatasetFileConfigDto(configId).Schema.Name
-            };
-
-            return PartialView("_UploadDataFile", uploadModel);
-        }
-
         #endregion
 
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]

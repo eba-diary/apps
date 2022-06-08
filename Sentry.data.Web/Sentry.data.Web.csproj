@@ -1182,6 +1182,8 @@
     <Content Include="Views\Search\FilterSearch.cshtml" />
     <Content Include="Views\Dataset\Permission\_RequestInheritanceModal.cshtml" />
     <Content Include="Views\Dataset\Details\_TabUnauthorized.cshtml" />
+    <Content Include="Views\Dataset\Details\_DeleteDataFiles.cshtml" />
+    <Content Include="Views\Dataset\Details\_UploadDataFile.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
@@ -1841,7 +1843,7 @@
     <Content Include="Views\Home\_Feed.cshtml" />
     <Content Include="Views\Dataset\_HomeDataset.cshtml" />
     <Content Include="Views\Dataset\_ListDatasetFile.cshtml" />
-    <Content Include="Views\Dataset\_UploadDataFile.cshtml" />
+    <Content Include="Views\Dataset\Details\_UploadDataFileForm.cshtml" />
     <Content Include="Views\Dataset\_DatasetFileVersions.cshtml" />
     <Content Include="Views\Config\Manage.cshtml" />
     <Content Include="Views\Config\_EditConfigFile.cshtml" />

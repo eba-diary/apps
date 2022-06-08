@@ -45,37 +45,10 @@
 
 @if (Model.DisplayDatasetFileDelete)
 {
-    <div class="modal fade" id="data-file-delete-modal" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="data-file-delete-modal" aria-hidden="true" style="display: none;">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Delete Files</h5>
-                    <button type="button" id="data-file-delete-close" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
+    Html.RenderPartial("Details/_DeleteDataFiles");
+}
 
-                <div class="modal-body">
-                    Are you sure you want to delete <span id="data-file-delete-count" class="font-weight-bold"></span> file(s)?
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" id="data-file-delete-cancel" class="btn btn-default waves-effect waves-light" data-dismiss="modal">Cancel</button>
-                    <button type="button" id="data-file-delete" class="btn btn-danger waves-effect waves-light"><i class="far fa-trash-alt"></i>Delete</button>
-
-                    <div class="preloader-wrapper small active data-file-delete-spinner d-none">
-                        <div class="spinner-layer spinner-blue-only">
-                            <div class="circle-clipper left">
-                                <div class="circle"></div>
-                            </div><div class="gap-patch">
-                                <div class="circle"></div>
-                            </div><div class="circle-clipper right">
-                                <div class="circle"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+@if (Model.Security.CanUploadToDataset)
+{
+    Html.RenderPartial("Details/_UploadDataFile");
 }

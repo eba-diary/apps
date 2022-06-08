@@ -786,7 +786,7 @@ data.Dataset = {
 
         $("[id^='UploadDatafile']").click(function (e) {
             e.preventDefault();
-            data.Dataset.OpenUploadFileModal(0);
+            data.Dataset.LoadUploadFileModal(0);
         });
 
         $('.tile').click(function (e) {
@@ -1005,9 +1005,9 @@ data.Dataset = {
             data.Dataset.FileNameModal($(this).data("id"));
         });
 
-        $(document).on('click', '#UploadModal', function (e) {
+        $(document).on('click', '#data-file-upload-open-modal', function (e) {
             e.preventDefault();
-            data.Dataset.OpenUploadFileModal(datasetDetailModel.DatasetId);
+            data.Dataset.LoadUploadFileModal(datasetDetailModel.DatasetId);
         });
 
         $("[id^='RequestAccessButton']").off('click').on('click', function (e) {
@@ -1251,17 +1251,18 @@ data.Dataset = {
         //*****************************************************************************************************
         $('#datasetConfigList').on('select2:select', function (e) {
             $("#tab-spinner").show();
+            var configId = $('#datasetConfigList').val();
+            
             var url = new URL(window.location.href);
-            url.searchParams.set('configID', $('#datasetConfigList').val());
+            url.searchParams.set('configID', configId);
             window.history.pushState({}, '', url);
 
-            Id = $('#datasetConfigList').val();
             self.vm.NoColumnsReturned(false);
             $('#schemaHR').show();
             self.vm.SchemaRows.removeAll();
 
             if ($("#datasetFilesTable_filter").length > 0) {
-                var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + $('#datasetConfigList').val();
+                var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + configId;
                 $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
             }
 
@@ -1275,13 +1276,7 @@ data.Dataset = {
             $("#schemaSearchInput").val("")
 
             $("#tab-spinner").hide();
-
         });
-        Id = $('#datasetConfigList').val();
-        //on initial load, try pulling the Id from the URL first. 
-
-        Id = $('#datasetConfigList').val();
-        //on initial load, try pulling the Id from the URL first.
 
         $('#dataLastUpdatedSpinner').show();
         //data.Dataset.UpdateMetadata();
@@ -1661,24 +1656,29 @@ data.Dataset = {
         });
     },
 
-    OpenUploadFileModal: function (datasetId) {
-        var modal = Sentry.ShowModalWithSpinner("Upload Data File");
+    LoadUploadFileModal: function (datasetId) {
         var selectedConfig = $('#datasetConfigList').find(":selected").val();
-
-        $.get("/Dataset/Upload/" + encodeURI(datasetId) + "/Config/" + encodeURI(selectedConfig), function (html) {
-            modal.ReplaceModalBody(html);
-            data.Dataset.InitUploadModal();
-        });
+        $("#upload-data-file-form-wrapper").load("/Dataset/Upload/" + encodeURI(datasetId) + "/Config/" + encodeURI(selectedConfig), data.Dataset.InitUploadModal);
     },
 
     InitUploadModal: function () {
+        $("#upload-data-file-form-wrapper").removeClass('text-center');
 
         $(document).on("change", "#data-file-to-upload", function (e) {
-            if ($(".file-path").val()) {
-                $("#submit-upload-file").prop("disabled", false);
+            $(".file-path-wrapper").removeClass("is-invalid");
+
+            if (!$(".file-path").val()) {
+                //no file selected
+                $("#submit-upload-file").prop("disabled", true);
+            }
+            else if ((this.files[0].size / 1024 / 1024) > 2048) {
+                //file size > 2GB
+                $("#submit-upload-file").prop("disabled", true);
+                $("#upload-invalid-message").text('File exceeds size limit of 2GB');
+                $(".file-path-wrapper").addClass("is-invalid");
             }
             else {
-                $("#submit-upload-file").prop("disabled", true);
+                $("#submit-upload-file").prop("disabled", false);
             }
         });
 
@@ -1687,13 +1687,36 @@ data.Dataset = {
             e.preventDefault();
             e.stopImmediatePropagation();
 
+            $("#upload-progress").removeClass("d-none");
+
             var form = e.target;
             var xhr = new XMLHttpRequest();
 
             xhr.open(form.method, form.action);
+            
+            xhr.upload.onprogress = function (e) {
+                //var divide = e.loaded / e.total;
+                //var hundred = divide * 100;
+                //var rounded = Math.round(hundred);
+                //console.log(divide);
+                //console.log(hundred);
+                //console.log(rounded);
+                //$('#upload-progress-bar').width(rounded + '%');
+            };
+                        
+            xhr.onprogress = function (e) {
+                //var divide = e.loaded / e.total;
+                //var hundred = divide * 100;
+                //var rounded = Math.round(hundred);
+                //console.log(divide);
+                //console.log(hundred);
+                //console.log(rounded);
+            };
+            
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     //if Validation, set the value of #upload-invalid-message to value of Validation in responseText
+                    //var responseJson = JSON.parse(xhr.responseText);
                 }
             };
 
@@ -1825,7 +1848,7 @@ data.Dataset = {
                 parent.parent().css("align-items", "end");
 
                 if (datasetDetailModel.Security.CanUploadToDataset) {
-                    parent.append('<button type="button" id="UploadModal" data-id="' + datasetDetailModel.DatasetId + '" class="btn btn-primary waves-effect waves-light data-file-button"><i class="fas fa-cloud-upload-alt"></i>Upload</button>');
+                    parent.append('<button type="button" id="data-file-upload-open-modal" data-toggle="modal" data-target="#data-file-upload-modal" class="btn btn-primary waves-effect waves-light data-file-button"><i class="fas fa-cloud-upload-alt"></i>Upload</button>');
                 }
 
                 //use the global search location to add delete button even though we are going to remove global search from the dom
