@@ -2402,13 +2402,13 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         });
         $("#SelectedApprover").materialSelect();
         $("#RequestAccessSubmit").click(function () {
-            $("#RequestAccessLoading").removeClass('d-none');
-            $("#RequestAccessBody").addClass('d-none');
             if (data.Dataset.validateRequestAccessModal()) {
+                $("#RequestAccessLoading").removeClass('d-none');
+                $("#RequestAccessBody").addClass('d-none');
                 $.ajax({
                     type: 'POST',
                     data: $("#AccessRequestForm").serialize(),
-                    url: '/Dataset/SubmitAccessRequestCLA3723',
+                    url: '/Dataset/SubmitAccessRequest',
                     success: function (data) {
                         $("#RequestAccessLoading").addClass('d-none');
                         $("#RequestAccessBody").removeClass('d-none');
@@ -2423,7 +2423,12 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     validateRequestAccessModal() {
-        return true;
+        var valid;
+        valid = $("#BusinessReason").val() != '' && $("#SelectedApprover").val != ''
+        if ($("#Type").val() == "1") {
+            valid = valid && data.Dataset.requestAccessValidateAwsArnIam();
+        }
+        return valid;
     },
 
     onAccessToSelection(event) {
@@ -2474,7 +2479,6 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     setupFormAwsIam() {
         $("#AwsArnForm").removeClass("d-none");
-        $("#SecurableObjectName").text("AWS IAM Role ARN");
         $("#Type").val("1")
         data.Dataset.requestAccessShowSaveChanges();
     },
@@ -2501,6 +2505,10 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         $("#RequestAccessSubmit").addClass("d-none");
     },
 
+    requestAccessValidateAwsArnIam() {
+        var pattern = /^arn:aws:iam::\d{12}:role\/+./;
+        return pattern.test($("#AwsArn").val());
+    },
 
     showDataPreviewError() {
         $("#DataPreviewNoRows").html("<p> No rows returned </p>");

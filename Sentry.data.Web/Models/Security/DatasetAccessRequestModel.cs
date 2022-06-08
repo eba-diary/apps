@@ -12,7 +12,5 @@ namespace Sentry.data.Web
         public string AdGroupName { get; set; }
 
         public List<SelectListItem> AllAdGroups { get; set; }
-        [DisplayName("Amazon Resource Name")]
-        public string AwsArn { get; set; }
     }
 }

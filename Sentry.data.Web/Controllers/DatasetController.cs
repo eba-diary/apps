@@ -425,23 +425,6 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<ActionResult> SubmitAccessRequestCLA3723(DatasetAccessRequestModel model)
-        {
-            AccessRequest ar = model.ToCore();
-            //assign permissions for request type
-            string ticketId = await _datasetService.RequestAccessToDataset(ar);
-
-            if (string.IsNullOrEmpty(ticketId))
-            {
-                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
-            }
-            else
-            {
-                return PartialView("_Success", new SuccessModel("Dataset access was successfully requested.", "Change Id: " + ticketId, true));
-            }
-        }
-
         [HttpGet]
         public ActionResult CheckAdGroup(string adGroup)
         {

@@ -515,7 +515,7 @@ namespace Sentry.data.Infrastructure
             StringBuilder sb = new StringBuilder();
             switch (model.Type)
             {
-                case AccessRequestType.AwsARN:
+                case AccessRequestType.AwsArn:
                     sb.Append($"Please grant the AWS ARN {model.AwsArn} the following permissions to {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)} data. <br>");
 
                     foreach (Permission item in model.Permissions)
@@ -560,7 +560,7 @@ namespace Sentry.data.Infrastructure
         {
             switch (model.Type)
             {
-                case AccessRequestType.AwsARN:
+                case AccessRequestType.AwsArn:
                     return $"Access Request for AWS ARN {model.AwsArn}";
                 default:
                     if (model.AdGroupName != null)

@@ -255,10 +255,27 @@ namespace Sentry.data.Core
                 request.ApproverId = request.SelectedApprover;
                 request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
                                                                                                                 x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
+                request = BuildPermissionsForRequestType(request);
                 return await _securityService.RequestPermission(request);
             }
 
             return string.Empty;
+        }
+
+        public AccessRequest BuildPermissionsForRequestType(AccessRequest request)
+        {
+            switch (request.Type)
+            {
+                case AccessRequestType.AwsArn:
+                    request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS && x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).First());
+                    break;
+                case AccessRequestType.Producer:
+                    request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA && x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).First());
+                    break;
+                default:
+                    break;
+            }
+            return request;
         }
 
         public int CreateAndSaveNewDataset(DatasetDto dto)

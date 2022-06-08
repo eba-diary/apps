@@ -39,7 +39,7 @@ namespace Sentry.data.Web
         public string SaidKeyCode { get; set; }
         public bool IsAddingPermission { get; set; }
         public AccessRequestType Type { get; set; }
-        [DisplayName("Amazon Resource Name")]
+        [DisplayName("AWS IAM Role ARN")]
         public string AwsArn { get; set; }
         public AccessScope Scope { get; set; }
     }
