@@ -2410,12 +2410,9 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                     data: $("#AccessRequestForm").serialize(),
                     url: '/Dataset/SubmitAccessRequestCLA3723',
                     success: function (data) {
-                        //handle result data
-                        console.log(data);
                         $("#RequestAccessLoading").addClass('d-none');
                         $("#RequestAccessBody").removeClass('d-none');
-
-
+                        $("#RequestAccessBody").html(data);
                     }
                 });
             }
