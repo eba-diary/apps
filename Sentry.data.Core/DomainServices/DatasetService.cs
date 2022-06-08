@@ -245,7 +245,7 @@ namespace Sentry.data.Core
             if (ds != null)
             {
                 IApplicationUser user = _userService.GetCurrentUser();
-                request.SecurableObjectName = ds.DatasetName;
+                request.SecurableObjectName = request.SecurableObjectName == null ? ds.DatasetName : request.SecurableObjectName;
                 request.SecurityId = ds.Security.SecurityId;
                 request.SaidKeyCode = ds.Asset.SaidKeyCode;
                 request.RequestorsId = user.AssociateId;

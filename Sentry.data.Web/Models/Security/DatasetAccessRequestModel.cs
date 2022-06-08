@@ -8,11 +8,11 @@ namespace Sentry.data.Web
     public class DatasetAccessRequestModel : AccessRequestModel
     {
 
-        [Required]
         [DisplayName("AD Group")]
         public string AdGroupName { get; set; }
 
         public List<SelectListItem> AllAdGroups { get; set; }
-
+        [DisplayName("Amazon Resource Name")]
+        public string AwsArn { get; set; }
     }
 }

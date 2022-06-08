@@ -1,40 +1,64 @@
-﻿@model Sentry.data.Web.AccessRequestModel
+﻿@model Sentry.data.Web.DatasetAccessRequestModel
 
-@using (Html.BeginForm("SubmitAccessRequest", "Dataset", FormMethod.Post, new { @id = "AccessRequestForm" }))
+@using (Html.BeginForm("SubmitAccessRequestCLA3723", "Dataset", FormMethod.Post, new { @id = "AccessRequestForm" }))
 {
-
-    <ol class="breadcrumb p-0" id="RequestAccessBreadcrumb">
-    </ol>
-    <div id="RequestAccessToSection" class="requestAccessStage">
-        <button id="RequestAccessToDatasetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" value="@Model.SecurableObjectId">Request Access to <i id="RequestAccessDatasetName" class="font-style-normal">@Model.DatasetName Dataset</i></button>
-        <button id="RequestAccessToAssetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" value="@Model.SaidKeyCode">Request Access to all @Model.SaidKeyCode Datasets</button>
+    <div id="RequestAccessLoading" class="d-none">
+        <div class="preloader-wrapper big active">
+            <div class="spinner-layer spinner-blue-only">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div>
+                <div class="gap-patch">
+                    <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="RequestAccessTypeSection" class="d-none requestAccessStage">
-        <button id="RequestAccessTypeConsumeBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Consumer/Query Access</button>
-        <button id="RequestAccessTypeManageBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Producer/Admin Access</button>
-    </div>
-    <div id="RequestAccessConsumerTypeSection" class="d-none requestAccessStage">
-        <h6 class="pt-1">To Query in Snowflake UI, DSC, Tableau, or Superset:</h6>
-        <button id="RequestAccessConsumeMyAccessBtn" type="button" onclick="window.open('https://myaccess.sentry.com/identityiq/accessRequest/accessRequest.jsf#/accessRequest/selectUser?quickLink=Request%20Access','_blank')" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Use MyAccess to Request <em id="RequestAccessEntitlement" class="font-style-normal"></em></button>
+    <div id="RequestAccessBody">
+        <ol class="breadcrumb p-0" id="RequestAccessBreadcrumb">
+        </ol>
+        <div id="RequestAccessToSection" class="requestAccessStage">
+            <button id="RequestAccessToDatasetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" value="@Model.SecurableObjectId">Request Access to <i id="RequestAccessDatasetName" class="font-style-normal">@Model.DatasetName Dataset</i></button>
+            <button id="RequestAccessToAssetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" value="@Model.SaidKeyCode">Request Access to all @Model.SaidKeyCode Datasets</button>
+        </div>
+        <div id="RequestAccessTypeSection" class="d-none requestAccessStage">
+            <button id="RequestAccessTypeConsumeBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Consumer/Query Access</button>
+            <button id="RequestAccessTypeManageBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Producer/Admin Access</button>
+        </div>
+        <div id="RequestAccessConsumerTypeSection" class="d-none requestAccessStage">
+            <h6 class="pt-1">To Query in Snowflake UI, DSC, Tableau, or Superset:</h6>
+            <button id="RequestAccessConsumeMyAccessBtn" type="button" onclick="window.open('https://myaccess.sentry.com/identityiq/accessRequest/accessRequest.jsf#/accessRequest/selectUser?quickLink=Request%20Access','_blank')" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Use MyAccess to Request <em id="RequestAccessEntitlement" class="font-style-normal"></em></button>
+            <!-- Hidden Pending Okta Integration results
         <h6 class="pt-1">To Request Access for Snowflake Accounts:</h6>
         <button id="RequestAccessConsumeSnowflakeBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Snowflake Account Access</button>
-        <h6 class="pt-1">To Query from SageMaker or other AWS services:</h6>
-        <button id="RequestAccessConsumeAwsBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request AWS IAM Access</button>
+        -->
+            <h6 class="pt-1">To Query from SageMaker or other AWS services:</h6>
+            <button id="RequestAccessConsumeAwsBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request AWS IAM Access</button>
+        </div>
+        <div id="RequestAccessFormSection" class="d-none requestAccessStage">
+            <div class="alert alert-danger d-none" id="AccessRequestValidationMessage" role="alert">
+                All fields are required
+            </div>
+            @Html.HiddenFor(m => m.Type)
+            @Html.HiddenFor(m => m.Scope)
+            @Html.HiddenFor(m => m.SecurableObjectId)
+            <div class="md-form d-none" id="AwsArnForm">
+                @Html.LabelFor(model => model.AwsArn, new { @class = "" })
+                @Html.TextBoxFor(model => model.AwsArn, new { @class = "form-control" })
+            </div>
+            <div class="md-form">
+                @Html.LabelFor(model => model.BusinessReason, new { @class = "disabled" })
+                @Html.TextAreaFor(model => model.BusinessReason, new { @class = "md-textarea w-100" })
+            </div>
+            <div class="md-form">
+                @Html.LabelFor((model) => model.SelectedApprover, new { @class = "mdb-main-label" })
+                @Html.DropDownListFor((model) => model.SelectedApprover, Model.AllApprovers, new { @class = "mdb-select" })
+            </div>
+        </div>
+        <button type="button" class="btn btn-primary d-none float-right" id="RequestAccessSubmit">Save changes</button>
+        <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
     </div>
-    <div id="RequestAccessFormSection" class="d-none requestAccessStage">
-        <div class="md-form d-none" id="AccessGranteeForm">
-            <input type="text" id="AccessGrantee" class="form-control">
-            <label for="AccessGrantee" class="" id="AccessGranteeLabel"></label>
-        </div>
-        <div class="md-form">
-            @Html.LabelFor(model => model.BusinessReason, new { @class = "disabled" })
-            @Html.TextAreaFor(model => model.BusinessReason, new { @class = "md-textarea w-100" })
-        </div>
-        <div class="md-form">
-            @Html.LabelFor((model) => model.SelectedApprover, new { @class = "mdb-main-label" })
-            @Html.DropDownListFor((model) => model.SelectedApprover, Model.AllApprovers, new { @class = "mdb-select" })
-        </div>
-    </div>
-    <button type="button" class="btn btn-primary d-none float-right" id="RequestAccessSubmit">Save changes</button>
-    <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
 }

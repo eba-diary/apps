@@ -2352,12 +2352,14 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         //1. Pick Access Level (Dataset or Asset)
         $("#RequestAccessToDatasetBtn").click(function (e) {
             var datasetName = $("#RequestAccessDatasetName").text();
+            $("#Scope").val('0')
             data.Dataset.editActiveRequestAccessBreadcrumb(datasetName);
             $("#RequestAccessEntitlement").text(data.Dataset.requestAccessGenerateEntitlement(datasetName));
             data.Dataset.onAccessToSelection(e);
             //set access target down the line
         });
         $("#RequestAccessToAssetBtn").click(function (e) {
+            $("#Scope").val('1')
             data.Dataset.editActiveRequestAccessBreadcrumb(event.target.value);
             $("#RequestAccessEntitlement").text(data.Dataset.requestAccessGenerateEntitlement());
             data.Dataset.onAccessToSelection(e);
@@ -2399,6 +2401,32 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             //set access type down the line
         });
         $("#SelectedApprover").materialSelect();
+        $("#RequestAccessSubmit").click(function () {
+            $("#RequestAccessLoading").removeClass('d-none');
+            $("#RequestAccessBody").addClass('d-none');
+            if (data.Dataset.validateRequestAccessModal()) {
+                $.ajax({
+                    type: 'POST',
+                    data: $("#AccessRequestForm").serialize(),
+                    url: '/Dataset/SubmitAccessRequestCLA3723',
+                    success: function (data) {
+                        //handle result data
+                        console.log(data);
+                        $("#RequestAccessLoading").addClass('d-none');
+                        $("#RequestAccessBody").removeClass('d-none');
+
+
+                    }
+                });
+            }
+            else {
+                $("#AccessRequestValidationMessage").removeClass("d-none");
+            }
+        });
+    },
+
+    validateRequestAccessModal() {
+        return true;
     },
 
     onAccessToSelection(event) {
@@ -2448,21 +2476,23 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     setupFormAwsIam() {
-        $("#AccessGranteeForm").removeClass("d-none");
-        $("#AccessGranteeLabel").text("AWS IAM Role ARN");
+        $("#AwsArnForm").removeClass("d-none");
+        $("#SecurableObjectName").text("AWS IAM Role ARN");
+        $("#Type").val("1")
         data.Dataset.requestAccessShowSaveChanges();
     },
 
     setupFormSnowflakeAccount() {
-        $("#AccessGranteeForm").removeClass("d-none");
-        $("#AccessGranteeLabel").text("Snowflake Account Name");
-        data.Dataset.requestAccessShowSaveChanges();
+        //$("#AccessGranteeForm").removeClass("d-none");
+        //$("#SecurableObjectName").text("Snowflake Account Name");
+        //data.Dataset.requestAccessShowSaveChanges();
     },
 
     setupFormManageAccess() {
-        if (!$("#AccessGranteeForm").hasClass("d-none")) {
-            $("#AccessGranteeForm").addClass("d-none");
+        if (!$("#AwsArnForm").hasClass("d-none")) {
+            $("#AwsArnForm").addClass("d-none");
         }
+        $("#Type").val("2")
         data.Dataset.requestAccessShowSaveChanges();
     },
 

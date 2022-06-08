@@ -18,7 +18,10 @@ namespace Sentry.data.Web
                 BusinessReason = model.BusinessReason,
                 SelectedPermissionCodes = model.SelectedPermissions != null ? model.SelectedPermissions.Split(',').ToList() : new List<string>(),
                 SelectedApprover = model.SelectedApprover,
-                IsAddingPermission = true
+                IsAddingPermission = true,
+                Type = model.Type,
+                AwsArn = model.AwsArn,
+                Scope = model.Scope
             };
         }
 
