@@ -8,6 +8,7 @@ namespace Sentry.data.Core
 {
     public abstract class BaseFieldDto
     {
+        #region Constructors
         protected BaseFieldDto(BaseField field)
         {
             FieldId = field.FieldId;
@@ -47,11 +48,13 @@ namespace Sentry.data.Core
             Description = row.Description;
             ChildFields = new List<BaseFieldDto>();
             OrdinalPosition = row.Position;
-            Length = (int.TryParse(row.Length, out int x) ? x : 0);
+            Length = int.TryParse(row.Length, out int x) ? x : GlobalConstants.Datatypes.Defaults.LENGTH_DEFAULT;
             DeleteInd = row.DeleteInd;
             DotNamePath = row.DotNamePath;
         }
+        #endregion
 
+        #region Properties
         public int FieldId { get; set; }
         public Guid FieldGuid { get; set; }
         public string Name { get; set; }
@@ -63,18 +66,23 @@ namespace Sentry.data.Core
         public bool IsArray { get; set; }
         public bool HasChildren { get; set; }
         public string DotNamePath { get; set; }
+        public int Length { get; set; }
+        #endregion
 
-
+        #region Abstract
         public abstract string FieldType { get; }
         public abstract int Precision { get; set; }
         public abstract int Scale { get; set; }
         public abstract string SourceFormat { get; set; }
         public abstract bool Nullable { get; set; }
         public abstract int OrdinalPosition { get; set; }
-        public abstract int Length { get; set; }
+
         public abstract BaseField ToEntity(BaseField parentField, SchemaRevision parentRevision);
         public abstract bool CompareToEntity(BaseField field);
+        public abstract void Clean(string extension);
+        #endregion
 
+        #region Methods
         public virtual ValidationResults Validate(string extension)
         {
             ValidationResults results = new ValidationResults();
@@ -131,5 +139,14 @@ namespace Sentry.data.Core
                 field.FieldGuid = FieldGuid;
             }
         }
+
+        protected void DefaultNonFixedWidthLength(string extension)
+        {
+            if (extension != GlobalConstants.ExtensionNames.FIXEDWIDTH)
+            {
+                Length = GlobalConstants.Datatypes.Defaults.LENGTH_DEFAULT;
+            }
+        }
+        #endregion
     }
 }

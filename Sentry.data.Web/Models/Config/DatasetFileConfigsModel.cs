@@ -160,5 +160,6 @@ namespace Sentry.data.Web
         public string SnowflakeDatabase { get; set; }
         public string SnowflakeSchema { get; set; }
         public string SnowflakeTable { get; set; }
+        public string DatasetScopeReadonly { get; set; }
     }
 }
