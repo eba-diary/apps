@@ -99,12 +99,23 @@ namespace Sentry.data.Core
             return GetNamedEnvironmentsInternalAsync();
         }
 
-        public void RequestAssistance(RequestAssistanceInfo info)
+        private void RequestAssistance(RequestAssistanceInfo info)
         {
-            _quartermasterClient.RequestAssistanceAsync(info);
+            info.MessageInfo = new RequestAssistanceMessageInfo();
+            info.MessageInfo.Tickets = new List<string>();
+
+            var obj = _quartermasterClient.RequestAssistanceAsync(info);
         }
 
-        public JiraTicketInfo BuildJiraTicket(string project, IList<string> components, IList<string> labels, string description, string summary, string issueType, IList<JiraCustomField> customFields)
+        private void RequestAssistance(JiraTicketInfo ticket)
+        {
+            RequestAssistanceInfo request = new RequestAssistanceInfo();
+            request.Tickets = new List<JiraTicketInfo>();
+            request.Tickets.Add(ticket);
+            RequestAssistance(request);
+        }
+
+        public void BuildJiraTicketAndRequest(string project, IList<string> components, IList<string> labels, string description, string summary, string issueType, IList<JiraCustomField> customFields)
         {
             JiraTicketInfo ticket = new JiraTicketInfo();
             ticket.Project = project;
@@ -114,7 +125,7 @@ namespace Sentry.data.Core
             ticket.Summary = summary;
             ticket.IssueType = issueType;
             ticket.CustomFields = customFields;
-            return ticket;
+            RequestAssistance(ticket);
         }
 
     }
