@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Rhino.Mocks;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using static Sentry.data.Core.GlobalConstants;
 
@@ -824,7 +825,7 @@ namespace Sentry.data.Core.Tests
 
         #region CanCreateDataflow
         /// <summary>
-        /// Can Preview Dataset.  no user available.
+        /// Can create dataflow, user is Admin.
         /// </summary>
         [TestMethod]
         public void Security_CanCreateDataflow_NullSecurable_Admin()
@@ -843,7 +844,7 @@ namespace Sentry.data.Core.Tests
         }
 
         /// <summary>
-        /// Can Preview Dataset.  no user available.
+        /// Non Admin, with no permissions, cannot create dataflow
         /// </summary>
         [TestMethod]
         public void Security_CanCreateDataflow_NullSecurable_NonAdmin_NoPermissions()
@@ -861,7 +862,7 @@ namespace Sentry.data.Core.Tests
         }
 
         /// <summary>
-        /// Can Preview Dataset.  no user available.
+        /// Non Admin, with Modify permissions, can create dataflow
         /// </summary>
         [TestMethod]
         public void Security_CanCreateDataflow_NullSecurable_NonAdmin_With_Modify_Permissions()
@@ -877,6 +878,161 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsTrue(us.CanCreateDataFlow);
+        }
+        #endregion
+
+        #region CanEditDataflow
+        /// <summary>
+        /// Admin User, can edit dataflow
+        /// </summary>
+        [TestMethod]
+        public void Security_CanModifyDataflow_NullSecurable_Admin()
+        {
+            //ARRAGE
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+
+            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(null, user);
+
+            //ASSERT
+            Assert.IsFalse(us.CanModifyDataflow);
+        }
+
+        /// <summary>
+        /// Admin User, can edit dataflow
+        /// </summary>
+        [TestMethod]
+        public void Security_CanModifyDataflow_NullSecurable_User()
+        {
+            //ARRAGE
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+
+            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            user.Stub(x => x.IsAdmin).Return(false).Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(null, user);
+
+            //ASSERT
+            Assert.IsFalse(us.CanModifyDataflow);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void Security_CanModifyDataflow_Securable_Admin()
+        {
+            //ARRAGE
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Loose);
+            Security security = BuildBaseSecurity(securableEntityName: SecurableEntityName.DATAFLOW);
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(false);
+            securable.Setup(x => x.Security).Returns(security);
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(true);
+
+            var ss = _container.GetInstance<ISecurityService>();
+
+            //ACT
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
+
+            //ASSERT
+            Assert.IsTrue(us.CanModifyDataflow);           
+        }
+        
+        /// <summary>
+        /// User with no permissions cannot modify dataflow
+        /// </summary>
+        [TestMethod]
+        public void Security_CanModifyDataflow_Securable_User_With_No_Permissions()
+        {
+            //ARRAGE
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Loose);
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(false);
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(false);
+
+            var ss = _container.GetInstance<ISecurityService>();
+
+            //ACT
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
+
+            //ASSERT
+            Assert.IsFalse(us.CanModifyDataflow);
+        }
+
+        /// <summary>
+        /// User with no permissions cannot modify dataflow
+        /// </summary>
+        [TestMethod]
+        public void Security_CanModifyDataflow_Securable_User_With_Permission()
+        {
+            //ARRAGE
+            Security security = BuildBaseSecurity(securableEntityName:SecurableEntityName.DATAFLOW);
+            SecurityTicket ticket1 = BuildBaseTicket(security, "MyServiceAccountGroup");
+            SecurityPermission dataflowPermission = BuildBasePermission(ticket1, CanManageDataflow(), true);
+            ticket1.Permissions.Add(dataflowPermission);
+            security.Tickets.Add(ticket1);
+
+
+            //mock out securable and attach security object establihsed above
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Loose);
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(false);
+            securable.Setup(x => x.Security).Returns(security);
+
+
+
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(false);
+            user.Setup(x => x.IsInGroup(ticket1.AdGroupName)).Returns(true);
+
+            var ss = _container.GetInstance<ISecurityService>();
+
+            //ACT
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
+
+            //ASSERT
+            Assert.IsTrue(us.CanModifyDataflow);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void Security_CanModifyDataflow_NonSecurable_NonAdmin()
+        {
+            //ARRAGE
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Loose);
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(false);
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(false);
+
+            var ss = _container.GetInstance<ISecurityService>();
+
+            //ACT
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
+
+            //ASSERT
+            Assert.IsFalse(us.CanModifyDataflow);
         }
         #endregion
 
@@ -953,6 +1109,48 @@ namespace Sentry.data.Core.Tests
         #endregion
 
         #region "BuildOutUserSecurityForSecuredEntity"
+        ///// <summary>
+        ///// Tests that the "Owner" of a dataflow can manage it, 
+        ///// even that permission hasn't been explicitely granted
+        ///// </summary>
+        //[TestMethod]
+        //public void BuildOutUserSecurityForSecuredEntity_CanModifyDataflow_Owner()
+        //{
+        //    // Arrange
+        //    var IsAdmin = false;
+        //    var IsOwner = true;
+        //    var userPermissions = new List<string>();
+        //    var us = new UserSecurity();
+        //    var df = new DataFlow();
+
+        //    // Act
+        //    SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, df);
+
+        //    // Assert
+        //    Assert.IsTrue(us.CanModifyDataflow);
+        //}
+
+        ///// <summary>
+        ///// Tests that an Admin can manage dataflow, 
+        ///// even that permission hasn't been explicitely granted
+        ///// </summary>
+        //[TestMethod]
+        //public void BuildOutUserSecurityForSecuredEntity_CanModifyDataflow_Admin()
+        //{
+        //    // Arrange
+        //    var IsAdmin = true;
+        //    var IsOwner = false;
+        //    var userPermissions = (new[] { PermissionCodes.CAN_PREVIEW_DATASET, PermissionCodes.CAN_VIEW_FULL_DATASET }).ToList();
+        //    var us = new UserSecurity();
+        //    var df = new DataFlow();
+
+        //    // Act
+        //    SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, df);
+
+        //    // Assert
+        //    Assert.IsTrue(us.CanModifyDataflow);
+        //}
+
         /// <summary>
         /// Tests that the "Owner" of a dataset can manage its schema, 
         /// even that permission hasn't been explicitely granted
@@ -1268,6 +1466,63 @@ namespace Sentry.data.Core.Tests
             // Assert
             Assert.IsTrue(us.CanViewData);
         }
+
+        /// <summary>
+        /// Tests that an owner of an unsecured dataflow can edit dataflow without permission request
+        /// </summary>
+        [TestMethod]
+        public void BuildOutUserSecurityForUnsecuredEntity_CanModifyDataflow_Owner()
+        {
+            // Arrange
+            var IsAdmin = false;
+            var IsOwner = true;
+            var userPermissions = new List<string>();
+            var us = new UserSecurity();
+
+            // Act
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null);
+
+            // Assert
+            Assert.IsTrue(us.CanModifyDataflow);
+        }
+
+        /// <summary>
+        /// Tests that an Admin can edit an unsecured dataflow without permission request
+        /// </summary>
+        [TestMethod]
+        public void BuildOutUserSecurityForUnsecuredEntity_CanModifyDataflow_Admin()
+        {
+            // Arrange
+            var IsAdmin = true;
+            var IsOwner = false;
+            var userPermissions = new List<string>();
+            var us = new UserSecurity();
+
+            // Act
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null);
+
+            // Assert
+            Assert.IsTrue(us.CanModifyDataflow);
+        }
+
+        /// <summary>
+        /// Tests that a user cannot edit an unsecured dataflow without permission request
+        /// </summary>
+        [TestMethod]
+        public void BuildOutUserSecurityForUnsecuredEntity_CanModifyDataflow_user()
+        {
+            // Arrange
+            var IsAdmin = false;
+            var IsOwner = false;
+            var userPermissions = new List<string>();
+            var us = new UserSecurity();
+
+            // Act
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null);
+
+            // Assert
+            Assert.IsFalse(us.CanModifyDataflow);
+        }
         #endregion
 
         #region "BuildOutUserSecurityFromObsidian"
@@ -1443,7 +1698,9 @@ namespace Sentry.data.Core.Tests
         #endregion
 
         #region "Private helpers"
-        private Security BuildBaseSecurity(string CreateById = null)
+        
+
+        private Security BuildBaseSecurity(string CreateById = null, string securableEntityName = SecurableEntityName.DATASET)
         {
             return new Security()
             {
@@ -1451,7 +1708,7 @@ namespace Sentry.data.Core.Tests
                 CreatedDate = DateTime.Now,
                 EnabledDate = DateTime.Now,
                 CreatedById = CreateById,
-                SecurableEntityName = GlobalConstants.SecurableEntityName.DATASET,
+                SecurableEntityName = securableEntityName,
                 Tickets = new List<SecurityTicket>()
             };
         }
@@ -1535,6 +1792,17 @@ namespace Sentry.data.Core.Tests
                 PermissionDescription = "Can Manage Schema Description",
                 PermissionName = "Can Manage Schema Name",
                 SecurableObject = GlobalConstants.SecurableEntityName.DATASET
+            };
+        }
+
+        private Permission CanManageDataflow()
+        {
+            return new Permission()
+            {
+                PermissionCode = GlobalConstants.PermissionCodes.CAN_MANAGE_DATAFLOW,
+                PermissionDescription = "Can Manage DataFlow Description",
+                PermissionName = "Can Manage Dataflow Name",
+                SecurableObject = GlobalConstants.SecurableEntityName.DATAFLOW
             };
         }
 
