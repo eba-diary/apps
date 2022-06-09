@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System.Web;
+﻿using System.Web;
 
 namespace Sentry.data.Web
 {
@@ -8,7 +7,6 @@ namespace Sentry.data.Web
         public int DatasetId { get; set; }
         public int ConfigId { get; set; }
         public string SchemaName { get; set; }
-        public string FileExtension { get; set; }
         public HttpPostedFileBase DataFile { get; set; }
     }
 }

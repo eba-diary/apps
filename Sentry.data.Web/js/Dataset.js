@@ -1671,10 +1671,10 @@ data.Dataset = {
                 //no file selected
                 $("#submit-upload-file").prop("disabled", true);
             }
-            else if ((this.files[0].size / 1024 / 1024) > 2048) {
-                //file size > 2GB
+            else if ((this.files[0].size / 1024 / 1024) > 100) {
+                //file size > 100MB
                 $("#submit-upload-file").prop("disabled", true);
-                $("#upload-invalid-message").text('File exceeds size limit of 2GB');
+                $("#upload-invalid-message").text('File exceeds size limit of 100MB');
                 $(".file-path-wrapper").addClass("is-invalid");
             }
             else {
@@ -1688,6 +1688,8 @@ data.Dataset = {
             e.stopImmediatePropagation();
 
             $("#upload-progress").removeClass("d-none");
+            $("#data-file-upload-close").addClass("d-none");
+            $("#upload-modal-buttons").addClass("d-none");
 
             var form = e.target;
             var xhr = new XMLHttpRequest();
@@ -1695,29 +1697,40 @@ data.Dataset = {
             xhr.open(form.method, form.action);
             
             xhr.upload.onprogress = function (e) {
-                //var divide = e.loaded / e.total;
-                //var hundred = divide * 100;
-                //var rounded = Math.round(hundred);
-                //console.log(divide);
-                //console.log(hundred);
-                //console.log(rounded);
-                //$('#upload-progress-bar').width(rounded + '%');
+                $('#upload-progress-bar').width(Math.round(e.loaded / e.total * 100) + '%');
             };
-                        
+
+            xhr.upload.error = function () {
+                $("#upload-invalid-message").text('Error uploading the selected file');
+                $(".file-path-wrapper").addClass("is-invalid");
+
+                $("#data-file-upload-close").removeClass("d-none");
+                $("#upload-modal-buttons").removeClass("d-none");
+                $("#upload-progress").addClass("d-none");
+            };
+
+            xhr.upload.onload = function () {
+                $("#upload-progress-1").addClass("d-none");
+                $("#upload-progress-2").removeClass("d-none");
+            };
+
             xhr.onprogress = function (e) {
-                //var divide = e.loaded / e.total;
-                //var hundred = divide * 100;
-                //var rounded = Math.round(hundred);
-                //console.log(divide);
-                //console.log(hundred);
-                //console.log(rounded);
+                console.log(e);
             };
-            
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    //if Validation, set the value of #upload-invalid-message to value of Validation in responseText
-                    //var responseJson = JSON.parse(xhr.responseText);
+
+            xhr.onreadystatechange = function (e) {
+                console.log(e);
+            };
+
+            xhr.onloadend = function () {
+                if (xhr.status == 200) {
+                    data.Dataset.makeToast("success", "File has been successfully uploaded to S3. It may take a few moments before the file is visible in the Files tab.");
                 }
+                else {
+                    data.Dataset.makeToast("error", "There was an issue uploading the file. Please try again or reach out to DSCSupport@sentry.com.");
+                }
+
+                $("#data-file-upload-modal").modal("hide");
             };
 
             xhr.send(new FormData(form));
