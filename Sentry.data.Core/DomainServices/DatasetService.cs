@@ -245,7 +245,9 @@ namespace Sentry.data.Core
             if (ds != null)
             {
                 IApplicationUser user = _userService.GetCurrentUser();
-                request.SecurableObjectName = request.SecurableObjectName == null ? ds.DatasetName : request.SecurableObjectName;
+                
+                request.SecurableObjectName = request.Scope == AccessScope.Asset ? ds.Asset.SaidKeyCode : request.SecurableObjectName;
+                request.SecurableObjectId = request.Scope == AccessScope.Asset ? ds.Asset.AssetId : request.SecurableObjectId;
                 request.SecurityId = ds.Security.SecurityId;
                 request.SaidKeyCode = ds.Asset.SaidKeyCode;
                 request.RequestorsId = user.AssociateId;
@@ -268,9 +270,6 @@ namespace Sentry.data.Core
             {
                 case AccessRequestType.AwsArn:
                     request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS && x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).First());
-                    break;
-                case AccessRequestType.Producer:
-                    request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA && x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).First());
                     break;
                 default:
                     break;

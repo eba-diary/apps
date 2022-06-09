@@ -1,5 +1,9 @@
 ﻿@model Sentry.data.Web.DatasetAccessRequestModel
 
+@{
+    ViewData.TemplateInfo.HtmlFieldPrefix = "RequestAccess";
+}
+
 @using (Html.BeginForm("SubmitAccessRequestCLA3723", "Dataset", FormMethod.Post, new { @id = "AccessRequestForm" }))
 {
     <div id="RequestAccessLoading" class="d-none text-center">
@@ -30,7 +34,7 @@
         </div>
         <div id="RequestAccessConsumerTypeSection" class="d-none requestAccessStage">
             <h6 class="pt-1">To Query in Snowflake UI, DSC, Tableau, or Superset:</h6>
-            <button id="RequestAccessConsumeMyAccessBtn" type="button" onclick="window.open('https://myaccess.sentry.com/identityiq/accessRequest/accessRequest.jsf#/accessRequest/selectUser?quickLink=Request%20Access','_blank')" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Use MyAccess to Request <em id="RequestAccessEntitlement" class="font-style-normal"></em></button>
+            <button id="RequestAccessConsumeMyAccessBtn" type="button" onclick="window.open('https://myaccess.sentry.com/identityiq/accessRequest/accessRequest.jsf#/accessRequest/selectUser?quickLink=Request%20Access','_blank')" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Use MyAccess to Request <em id="RequestAccessConsumeEntitlement" class="font-style-normal"></em></button>
             <!-- Hidden Pending Okta Integration results
         <h6 class="pt-1">To Request Access for Snowflake Accounts:</h6>
         <button id="RequestAccessConsumeSnowflakeBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Snowflake Account Access</button>
@@ -38,9 +42,16 @@
             <h6 class="pt-1">To Query from SageMaker or other AWS services:</h6>
             <button id="RequestAccessConsumeAwsBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request AWS IAM Access</button>
         </div>
+        <div id="RequestAccessManageTypeSection" class="d-none requestAccessStage">
+            <h6 class="pt-1">To Request Manage Access:</h6>
+            <button id="RequestAccessManageMyAccessBtn" type="button" onclick="window.open('https://myaccess.sentry.com/identityiq/accessRequest/accessRequest.jsf#/accessRequest/selectUser?quickLink=Request%20Access','_blank')" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Use MyAccess to Request <em id="RequestAccessManageEntitlement" class="font-style-normal"></em></button>
+        </div>
         <div id="RequestAccessFormSection" class="d-none requestAccessStage">
             <div class="alert alert-danger d-none" id="AccessRequestValidationMessage" role="alert">
-                All fields are required
+                All fields are required.
+            </div>
+            <div class="alert alert-danger d-none" id="AccessRequestAwsArnValidationMessage" role="alert">
+                AWS ARN must be properly formatted.
             </div>
             @Html.HiddenFor(m => m.Type)
             @Html.HiddenFor(m => m.Scope)
