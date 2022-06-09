@@ -2361,7 +2361,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         });
         $("#RequestAccessToAssetBtn").click(function (e) {
             $("#RequestAccess_Scope").val('1')
-            data.Dataset.editActiveRequestAccessBreadcrumb(event.target.value);
+            data.Dataset.editActiveRequestAccessBreadcrumb(e.target.value);
             $("#RequestAccessConsumeEntitlement").text("Placeholder Entitlement");
             data.Dataset.onAccessToSelection(e);
         });
@@ -2386,7 +2386,6 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             data.Dataset.addRequestAccessBreadcrumb("Create Request", "#RequestAccessFormSection");
             $("#RequestAccessConsumerTypeSection").addClass("d-none");
             $("#RequestAccessFormSection").removeClass("d-none");
-            data.Dataset.setupFormSnowflakeAccount();
         });
         $("#RequestAccessConsumeAwsBtn").click(function (e) {
             data.Dataset.editActiveRequestAccessBreadcrumb("AWS IAM");
@@ -2470,11 +2469,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         data.Dataset.requestAccessShowSaveChanges();
     },
 
-    setupFormSnowflakeAccount() {
-        //$("#AccessGranteeForm").removeClass("d-none");
-        //$("#SecurableObjectName").text("Snowflake Account Name");
-        //data.Dataset.requestAccessShowSaveChanges();
-    },
+
 
     requestAccessShowSaveChanges() {
         $("#RequestAccessSubmit").removeClass("d-none");

@@ -25,7 +25,7 @@
         <ol class="breadcrumb p-0" id="RequestAccessBreadcrumb">
         </ol>
         <div id="RequestAccessToSection" class="requestAccessStage">
-            <button id="RequestAccessToDatasetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" value="@Model.SecurableObjectId">Request Access to <i id="RequestAccessDatasetName" class="font-style-normal">@Model.DatasetName Dataset</i></button>
+            <button id="RequestAccessToDatasetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" value="@Model.SecurableObjectId">Request Access to <em id="RequestAccessDatasetName" class="font-style-normal">@Model.DatasetName Dataset</em></button>
             <button id="RequestAccessToAssetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" value="@Model.SaidKeyCode">Request Access to all @Model.SaidKeyCode Datasets</button>
         </div>
         <div id="RequestAccessTypeSection" class="d-none requestAccessStage">
@@ -35,10 +35,6 @@
         <div id="RequestAccessConsumerTypeSection" class="d-none requestAccessStage">
             <h6 class="pt-1">To Query in Snowflake UI, DSC, Tableau, or Superset:</h6>
             <button id="RequestAccessConsumeMyAccessBtn" type="button" onclick="window.open('https://myaccess.sentry.com/identityiq/accessRequest/accessRequest.jsf#/accessRequest/selectUser?quickLink=Request%20Access','_blank')" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Use MyAccess to Request <em id="RequestAccessConsumeEntitlement" class="font-style-normal"></em></button>
-            <!-- Hidden Pending Okta Integration results
-        <h6 class="pt-1">To Request Access for Snowflake Accounts:</h6>
-        <button id="RequestAccessConsumeSnowflakeBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Snowflake Account Access</button>
-        -->
             <h6 class="pt-1">To Query from SageMaker or other AWS services:</h6>
             <button id="RequestAccessConsumeAwsBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request AWS IAM Access</button>
         </div>
