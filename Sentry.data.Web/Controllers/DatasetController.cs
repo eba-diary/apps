@@ -425,6 +425,23 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<ActionResult> SubmitAccessRequestCLA3723([Bind(Prefix = "RequestAccess")] DatasetAccessRequestModel model)
+        {
+            model.IsAddingPermission = true;
+            AccessRequest ar = model.ToCore();
+            string ticketId = await _datasetService.RequestAccessToDataset(ar);
+
+            if (string.IsNullOrEmpty(ticketId))
+            {
+                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
+            }
+            else
+            {
+                return PartialView("_Success", new SuccessModel("Dataset access was successfully requested.", "Change Id: " + ticketId, true));
+            }
+        }
+
         [HttpGet]
         public ActionResult CheckAdGroup(string adGroup)
         {
@@ -731,7 +748,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult SubmitInheritanceRequest([Bind(Prefix = "Inheritance")] RequestPermissionInheritanceModel model)
+        public async Task<ActionResult> SubmitInheritanceRequest([Bind(Prefix = "Inheritance")] RequestPermissionInheritanceModel model)
         {
             AccessRequest ar = model.ToCore();
             string ticketId = await _datasetService.RequestAccessToDataset(ar);

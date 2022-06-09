@@ -2293,7 +2293,6 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         data.Dataset.removePermissionModalInit();
     },
 
-    manageInheritanceInit() {
         $("#Inheritance_SelectedApprover").materialSelect();
         $("#inheritanceSwitch label").click(function () {
             $("#inheritanceModal").modal('show');
@@ -2326,6 +2325,10 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                 $("#inheritanceValidationMessage").removeClass("d-none");
             }
         });
+        $("#RequestAccessButton").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.AccessRequest.InitForDataset($(this).data("id"));
+        });
     },
 
     permissionInheritanceSwitchInit(result) {
@@ -2334,7 +2337,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             case "ACTIVE":
                 $('#inheritanceSwitchInput').prop('checked', true);
                 $("#addRemoveInheritanceMessage").text("Request Remove Inheritance");
-                $("#IsAddingPermission").val(false);
+                $("#Inheritance_IsAddingPermission").val(false);
                 break;
             case "PENDING":
                 $("#inheritanceSwitch").html('<p>Inheritance change pending. See ticket ' + result.TicketId + '.</p>');
@@ -2342,11 +2345,12 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             default: //we treat default the same as "DISABLED"
                 $("#addRemoveInheritanceMessage").text("Request Add Inheritance");
                 $('#inheritanceSwitchInput').prop('checked', false);
-                $("#IsAddingPermission").val(true);
+                $("#Inheritance_IsAddingPermission").val(true);
         }
     },
 
     validateInheritanceModal() {
+        return ($("#Inheritance_BusinessReason").val() != '' && $("#Inheritance_SelectedApprover").val != '')
         return ($("#Inheritance_BusinessReason").val() != '' && $("#Inheritance_SelectedApprover").val != '')
     },
 
@@ -2415,22 +2419,18 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     initRequestAccessWorkflow() {
         data.Dataset.addRequestAccessBreadcrumb("Access To", "#RequestAccessToSection")
-        //Current flow
-        //1. Pick Access Level (Dataset or Asset)
         $("#RequestAccessToDatasetBtn").click(function (e) {
             var datasetName = $("#RequestAccessDatasetName").text();
-            $("#Scope").val('0')
+            $("#RequestAccess_Scope").val('0')
             data.Dataset.editActiveRequestAccessBreadcrumb(datasetName);
-            $("#RequestAccessEntitlement").text(data.Dataset.requestAccessGenerateEntitlement(datasetName));
+            $("#RequestAccessConsumeEntitlement").text("Placeholder Entitlement");
             data.Dataset.onAccessToSelection(e);
-            //set access target down the line
         });
         $("#RequestAccessToAssetBtn").click(function (e) {
-            $("#Scope").val('1')
-            data.Dataset.editActiveRequestAccessBreadcrumb(event.target.value);
-            $("#RequestAccessEntitlement").text(data.Dataset.requestAccessGenerateEntitlement());
+            $("#RequestAccess_Scope").val('1')
+            data.Dataset.editActiveRequestAccessBreadcrumb(e.target.value);
+            $("#RequestAccessConsumeEntitlement").text("Placeholder Entitlement");
             data.Dataset.onAccessToSelection(e);
-            //set access target down the line
         });
         $("#RequestAccessTypeConsumeBtn").click(function (e) {
             data.Dataset.editActiveRequestAccessBreadcrumb("Consume");
@@ -2438,16 +2438,14 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             data.Dataset.addRequestAccessBreadcrumb("Consume Type", "#RequestAccessConsumerTypeSection");
             $("#RequestAccessTypeSection").addClass("d-none");
             $("#RequestAccessConsumerTypeSection").removeClass("d-none");
-            //set access type down the line
         });
         $("#RequestAccessTypeManageBtn").click(function (e) {
             data.Dataset.editActiveRequestAccessBreadcrumb("Manage");
             data.Dataset.requestAccessCleanActiveBreadcrumb();
-            data.Dataset.addRequestAccessBreadcrumb("Create Request", "#RequestAccessFormSection");
+            data.Dataset.addRequestAccessBreadcrumb("Manage Request", "#RequestAccessManageTypeSection");
+            $("#RequestAccessManageEntitlement").text("Placeholder Entitlement");
             $("#RequestAccessTypeSection").addClass("d-none");
-            $("#RequestAccessFormSection").removeClass("d-none");
-            data.Dataset.setupFormManageAccess();
-            //set access type down the line
+            $("#RequestAccessManageTypeSection").removeClass("d-none");
         });
         $("#RequestAccessConsumeSnowflakeBtn").click(function (e) {
             data.Dataset.editActiveRequestAccessBreadcrumb("Snowflake Account");
@@ -2455,8 +2453,6 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             data.Dataset.addRequestAccessBreadcrumb("Create Request", "#RequestAccessFormSection");
             $("#RequestAccessConsumerTypeSection").addClass("d-none");
             $("#RequestAccessFormSection").removeClass("d-none");
-            data.Dataset.setupFormSnowflakeAccount();
-            //set access type down the line
         });
         $("#RequestAccessConsumeAwsBtn").click(function (e) {
             data.Dataset.editActiveRequestAccessBreadcrumb("AWS IAM");
@@ -2465,9 +2461,8 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             $("#RequestAccessConsumerTypeSection").addClass("d-none");
             $("#RequestAccessFormSection").removeClass("d-none");
             data.Dataset.setupFormAwsIam();
-            //set access type down the line
         });
-        $("#SelectedApprover").materialSelect();
+        $("#RequestAccess_SelectedApprover").materialSelect();
         $("#RequestAccessSubmit").click(function () {
             if (data.Dataset.validateRequestAccessModal()) {
                 $("#RequestAccessLoading").removeClass('d-none');
@@ -2475,7 +2470,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                 $.ajax({
                     type: 'POST',
                     data: $("#AccessRequestForm").serialize(),
-                    url: '/Dataset/SubmitAccessRequest',
+                    url: '/Dataset/SubmitAccessRequestCLA3723',
                     success: function (data) {
                         $("#RequestAccessLoading").addClass('d-none');
                         $("#RequestAccessBody").removeClass('d-none');
@@ -2491,8 +2486,8 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     validateRequestAccessModal() {
         var valid;
-        valid = $("#BusinessReason").val() != '' && $("#SelectedApprover").val != ''
-        if ($("#Type").val() == "1") {
+        valid = $("#RequestAccess_BusinessReason").val() != '' && $("#RequestAccess_SelectedApprover").val != ''
+        if ($("#RequestAccess_Type").val() == "1") {
             valid = valid && data.Dataset.requestAccessValidateAwsArnIam();
         }
         return valid;
@@ -2503,15 +2498,6 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         data.Dataset.addRequestAccessBreadcrumb("Access Type", "#RequestAccessTypeSection");
         $("#RequestAccessToSection").addClass("d-none");
         $("#RequestAccessTypeSection").removeClass("d-none");
-    },
-
-    //if datasetName is passed generates for datasetname. If datasetName is null, generates for SAID asset. 
-    requestAccessGenerateEntitlement(datasetName) {
-        var prefix = "DS_" + $("#RequestAccessToAssetBtn").val() + "_";
-        if (datasetName == null || datasetName == undefined) {
-            return prefix + "Default_Consumer";
-        }
-        return prefix + datasetName.replace(/ /g, "") + "_Consumer";
     },
 
     buildBreadcrumbReturnToStepHandler(element) {
@@ -2546,23 +2532,11 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     setupFormAwsIam() {
         $("#AwsArnForm").removeClass("d-none");
-        $("#Type").val("1")
+        $("#RequestAccess_Type").val("1")
         data.Dataset.requestAccessShowSaveChanges();
     },
 
-    setupFormSnowflakeAccount() {
-        //$("#AccessGranteeForm").removeClass("d-none");
-        //$("#SecurableObjectName").text("Snowflake Account Name");
-        //data.Dataset.requestAccessShowSaveChanges();
-    },
 
-    setupFormManageAccess() {
-        if (!$("#AwsArnForm").hasClass("d-none")) {
-            $("#AwsArnForm").addClass("d-none");
-        }
-        $("#Type").val("2")
-        data.Dataset.requestAccessShowSaveChanges();
-    },
 
     requestAccessShowSaveChanges() {
         $("#RequestAccessSubmit").removeClass("d-none");
@@ -2574,7 +2548,15 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     requestAccessValidateAwsArnIam() {
         var pattern = /^arn:aws:iam::\d{12}:role\/+./;
-        return pattern.test($("#AwsArn").val());
+        var valid = pattern.test($("#RequestAccess_AwsArn").val());
+        if (valid) {
+            $("#AccessRequestAwsArnValidationMessage").addClass("d-none");
+            return true;
+        }
+        else {
+            $("#AccessRequestAwsArnValidationMessage").removeClass("d-none");
+            return false;
+        }
     },
 
     showDataPreviewError() {
