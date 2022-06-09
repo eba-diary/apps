@@ -2291,8 +2291,13 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     managePermissionsInit() {
         data.Dataset.manageInheritanceInit();
         data.Dataset.removePermissionModalInit();
+        $("#RequestAccessButton").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.AccessRequest.InitForDataset($(this).data("id"));
+        });
     },
 
+    manageInheritanceInit() {
         $("#Inheritance_SelectedApprover").materialSelect();
         $("#inheritanceSwitch label").click(function () {
             $("#inheritanceModal").modal('show');
@@ -2325,10 +2330,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                 $("#inheritanceValidationMessage").removeClass("d-none");
             }
         });
-        $("#RequestAccessButton").off('click').on('click', function (e) {
-            e.preventDefault();
-            data.AccessRequest.InitForDataset($(this).data("id"));
-        });
+
     },
 
     permissionInheritanceSwitchInit(result) {
@@ -2351,7 +2353,6 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     validateInheritanceModal() {
         return ($("#Inheritance_BusinessReason").val() != '' && $("#Inheritance_SelectedApprover").val != '')
-        return ($("#Inheritance_BusinessReason").val() != '' && $("#Inheritance_SelectedApprover").val != '')
     },
 
     removePermissionModalInit() {
@@ -2360,27 +2361,29 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             var scope = $(cells[0]).text();
             var identity = $(cells[1]).text();
             var permission = $(cells[2]).text();
-            var status = $(cells[3]).text();
-            data.Dataset.removePermissionModalOnOpen(scope, identity, permission);
+            var ticketId = cells.parent().attr("id");
+            data.Dataset.removePermissionModalOnOpen(scope, identity, permission, ticketId);
             $("#removePermissionModal").modal('show');
         });
         $("#removePermissionModal").on('hide.bs.modal', function () {
             data.Dataset.removePermissionModalOnClose();
         });
         $("#removePermissionModalSubmit").click(function () {
-            if (true) {
+            if (data.Dataset.validateRemovePermissionModal()) {
                 $.ajax({
                     type: 'POST',
                     data: $("#RemovePermissionRequestForm").serialize(),
                     url: '/Dataset/SubmitRemovePermissionRequest',
                     success: function (data) {
-                        //handle result data
-                        $("#removePermissionModal").modal('hide');
+                        $("#RemovePermissionModalForm").addClass("d-none");
+                        $("#RemovePermissionModalButtons").addClass("d-none");
+                        $("#RemovePermissionRequestResult").html(data);
+                        $("#RemovePermissionRequestResult").removeClass("d-none");
                     }
                 });
             }
             else {
-                $("#inheritanceValidationMessage").removeClass("d-none");
+                $("#removePermissionValidationMessage").removeClass("d-none");
             }
         });
     },
@@ -2390,21 +2393,31 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         $("#RemovePermission_Scope").val("");
         $("#RemovePermission_Permission").val("");
         $("#RemovePermission_BusinessReason").val("");
+        $("#RemovePermission_TicketId").val("");
+
         $("#RemovePermission_SelectedApprover").materialSelect({ destroy: true });
 
         $("#identityLabel").removeClass("active");
         $("#scopeLabel").removeClass("active");
         $("#permissionLabel").removeClass("active");
+        $("#RemovePermissionRequestResult").html("");
+        $("#RemovePermissionRequestResult").addClass("d-none");
+        $("#removePermissionValidationMessage").addClass("d-none");
     },
 
-    removePermissionModalOnOpen(scope, identity, permission) {
+    removePermissionModalOnOpen(scope, identity, permission, ticketId) {
         $("#RemovePermission_Identity").val(identity);
         $("#RemovePermission_Scope").val(scope);
         $("#RemovePermission_Permission").val(permission);
+        $("#RemovePermission_TicketId").val(ticketId);
         $("#RemovePermission_SelectedApprover").materialSelect();
         $("#identityLabel").addClass("active");
         $("#scopeLabel").addClass("active");
         $("#permissionLabel").addClass("active");
+        $("#RemovePermissionModalForm").removeClass("d-none");
+        $("#RemovePermissionModalButtons").removeClass("d-none");
+
+
         if (scope == $("#ManagePermissionDatasetName").text()) {
             $("#RemovePermissionScopeContainer").addClass("d-none");
         }

@@ -16,21 +16,6 @@ namespace Sentry.data.Web
             DatasetId = permissions.DatasetId;
             DatasetName = permissions.DatasetName;
             DatasetSaidKeyCode = permissions.DatasetSaidKeyCode;
-            
-            ManagePermissionModel mockAws = new ManagePermissionModel();
-            mockAws.Identity = "Sample Identity";
-            mockAws.PermissionDescription = "Consumer/Query";
-            mockAws.PermissionStatus = "Active";
-            mockAws.Scope = "DATA";
-            AwsIamPermissions.Add(mockAws);
-
-            ManagePermissionModel mockAws2 = new ManagePermissionModel();
-            mockAws2.Identity = "Sample Identity";
-            mockAws2.PermissionDescription = "Manage/Producer";
-            mockAws2.PermissionStatus = "Active";
-            mockAws2.Scope = "SES Geographic";
-
-            AwsIamPermissions.Add(mockAws2);
 
             foreach (var permission in permissions.Permissions)
             {

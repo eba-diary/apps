@@ -764,13 +764,12 @@ namespace Sentry.data.Web.Controllers
         }
         
         [HttpPost]
-        public ActionResult SubmitRemovePermissionRequest([Bind(Prefix = "RemovePermission")]RemovePermissionModel model)
+        public async Task<ActionResult> SubmitRemovePermissionRequest([Bind(Prefix = "RemovePermission")]RemovePermissionModel model)
         {
-            //figure out which permission ticket it was
-            //make removal ticket 
-            //AccessRequest ar = model.ToCore();
-            //string ticketId = _datasetService.RequestAccessToDataset(ar);
-            string ticketId = model.ToString();
+            AccessRequest ar = model.ToCore();
+            
+            string ticketId = await _datasetService.RequestAccessRemoval(ar);
+
             if (string.IsNullOrEmpty(ticketId))
             {
                 return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
