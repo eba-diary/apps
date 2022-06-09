@@ -45,6 +45,7 @@ namespace Sentry.data.Core
                     IsRemovingPermission = !model.IsAddingPermission,
                     ParentSecurity = security,
                     Permissions = new List<SecurityPermission>(),
+                    AwsArn = model.AwsArn
                 };
 
                 foreach (Permission perm in model.Permissions)

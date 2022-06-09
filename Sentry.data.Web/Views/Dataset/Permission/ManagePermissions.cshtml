@@ -10,12 +10,19 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-12 pl-0">
+        <div class="col-11 pl-0">
             <!-- Dataset Name and Request Access-->
             <h2 class="pt-2 mb-1" value="@Model.DatasetId" id="DatasetHeader">
                 @Model.DatasetName - Manage Permissions
             </h2>
-            
+        </div>
+        <div class="col-1 pr-0">
+            <div class="text-right">
+                <a class="btn px-3"
+                   id="RequestAccessButton" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Request Additional Access">
+                    <em class="fas fa-user-plus dsc-icon-button mr-0 sentry-dark-blue-text align-middle" id=""></em>
+                </a>
+            </div>
         </div>
     </div>
 
