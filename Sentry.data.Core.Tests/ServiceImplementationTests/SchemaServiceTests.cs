@@ -2298,13 +2298,13 @@ namespace Sentry.data.Core.Tests
             FileSchemaDto dto = new FileSchemaDto()
             {
                 Name = "Name-NewValue",
-                SnowflakeStage = "SnowflakeStage-NewValue",
+                ConsumptionDetails = new List<SchemaConsumptionDto>() { new SchemaConsumptionSnowflakeDto() { SchemaConsumptionId = 1, SnowflakeStage = "SnowflakeStage-NewValue" } },
                 FileExtensionId = 1
             };
 
             FileSchema schema = new FileSchema()
             {
-                SnowflakeStage = "SnowflakeStage-OriginalValue",
+                ConsumptionDetails = new List<SchemaConsumption>() { new SchemaConsumptionSnowflake() { SchemaConsumptionId = 1, SnowflakeStage = "SnowflakeStage-OriginalValue" } },
                 Extension = new FileExtension() { Id = 2 }
             };
 
@@ -2327,7 +2327,7 @@ namespace Sentry.data.Core.Tests
             //ACT
             schemaService.UpdateSchema(dto, schema);
 
-            var snowstage = dto.SnowflakeStage == schema.SnowflakeStage;
+            var snowstage = dto.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>().First().SnowflakeStage == schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().First().SnowflakeStage;
 
             //ASSERT
             Assert.AreEqual(snowstage, AllowUpdateFlag);
@@ -2681,10 +2681,6 @@ namespace Sentry.data.Core.Tests
                 SchemaId = 88,
                 StorageCode = "1000002",
                 UpdatedBy = "072984",
-                SnowflakeDatabase = "",
-                SnowflakeTable = "",
-                SnowflakeSchema = "",
-                SnowflakeStatus = "Available",
                 CLA1396_NewEtlColumns = false,
                 CLA1580_StructureHive = false,
                 Revisions = new List<SchemaRevision>()

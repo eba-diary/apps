@@ -1,4 +1,6 @@
-﻿namespace Sentry.data.Core
+﻿using System.Collections.Generic;
+
+namespace Sentry.data.Core
 {
     public class FileSchemaDto : SchemaDto
     {
@@ -16,14 +18,9 @@
         public string StorageCode { get; set; }
         public string StorageLocation { get; set; }
         public string RawQueryStorage { get; set; }
-        public string SnowflakeDatabase { get; set; }
-        public string SnowflakeTable { get; set; }
-        public string SnowflakeSchema { get; set; }
-        public string SnowflakeStatus { get; set; }
         public string SchemaRootPath { get; set; }
         public string ParquetStorageBucket { get; set; }
         public string ParquetStoragePrefix { get; set; }
-        public string SnowflakeStage { get; set; }
-        public string SnowflakeWarehouse { get; set; }
+        public IList<SchemaConsumptionDto> ConsumptionDetails { get; set; }
     }
 }

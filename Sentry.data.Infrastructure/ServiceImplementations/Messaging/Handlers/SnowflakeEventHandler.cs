@@ -4,6 +4,7 @@ using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.Messaging.Common;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
@@ -52,7 +53,7 @@ namespace Sentry.data.Infrastructure
                         Logger.Info($"snowflakeeventhandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(snowRequestedEvent)}");
 
                         de = _dsContext.GetById<FileSchema>(snowRequestedEvent.SchemaID);
-                        de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Requested.ToString();
+                        de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Requested.ToString());
                         _dsContext.SaveChanges();
                         Logger.Info($"snowflakeeventhandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
@@ -65,13 +66,13 @@ namespace Sentry.data.Infrastructure
                         {
                             case "CREATED":
                             case "EXISTED":
-                                de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Available.ToString();
+                                de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Available.ToString());
                                 break;
                             case "FAILED":
-                                de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.RequestFailed.ToString();
+                                de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.RequestFailed.ToString());
                                 break;
                             default:
-                                de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Pending.ToString();
+                                de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Pending.ToString());
                                 break;
                         }
 
@@ -82,7 +83,7 @@ namespace Sentry.data.Infrastructure
                         SnowTableDeleteModel snowDeleteEvent = JsonConvert.DeserializeObject<SnowTableDeleteModel>(msg);
                         Logger.Info($"snowflakeeventhandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(snowDeleteEvent)}");
                         de = _dsContext.GetById<FileSchema>(snowDeleteEvent.SchemaID);
-                        de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteRequested.ToString();
+                        de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteRequested.ToString());
                         _dsContext.SaveChanges();
                         Logger.Info($"snowflakeeventhandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
@@ -95,13 +96,13 @@ namespace Sentry.data.Infrastructure
                         {
                             case "DELETED":
                             case "SKIPPED":
-                                de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Deleted.ToString();
+                                de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Deleted.ToString());
                                 break;
                             case "FAILED":
-                                de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteFailed.ToString();
+                                de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteFailed.ToString());
                                 break;
                             default:
-                                de.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Pending.ToString();
+                                de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Pending.ToString());
                                 break;
                         }
 

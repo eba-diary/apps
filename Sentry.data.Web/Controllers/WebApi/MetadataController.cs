@@ -149,6 +149,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [ApiVersionEnd(Sentry.data.Web.WebAPI.Version.v20220609)]
         [Route("dataset/{datasetId}/schema")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaInfoModel>))]
         [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
@@ -156,31 +157,72 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> GetSchemaByDataset(int datasetId)
         {
+            return await GetSchemaByDataset_Internal(datasetId, l => l.ToSchemaModel());
+        }
+
+        /// <summary>
+        /// Get list of schema for dataset
+        /// </summary>
+        /// <param name="datasetId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
+        [Route("dataset/{datasetId}/schema")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<Models.ApiModels.Schema20220609.SchemaInfoModel>))]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Forbidden, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
+        public async Task<IHttpActionResult> GetSchemaByDataset20220609(int datasetId)
+        {
+            return await GetSchemaByDataset_Internal(datasetId, l => l.ToSchemaModel20220609());
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1172:Unused method parameters should be removed", Justification = "False positive")]
+        private async Task<IHttpActionResult> GetSchemaByDataset_Internal<T>(int datasetId, Func<List<DatasetFileConfigDto>,List<T>> func) where T : SchemaInfoModelBase
+        {
             IHttpActionResult GetSchemaByDatasetFunction()
             {
-                List<DatasetFileConfigDto> dtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetId);
-                List<SchemaInfoModel> modelList = dtoList.ToSchemaModel();
+                var dtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetId);
+                var modelList = func.Invoke(dtoList);
                 return Ok(modelList);
             }
 
             return ApiTryCatch(nameof(MetadataController), nameof(GetSchemaByDataset), $"datasetid:{datasetId}", GetSchemaByDatasetFunction);
         }
 
-
         /// <summary>
         /// Get schema metadata
         /// </summary>
-        /// <param name="datasetId"></param>
-        /// <param name="schemaId"></param>
-        /// <returns></returns>
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [ApiVersionEnd(Sentry.data.Web.WebAPI.Version.v20220609)]
         [Route("dataset/{datasetId}/schema/{schemaId}")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaInfoModel))]
         [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
         [SwaggerResponse(System.Net.HttpStatusCode.Forbidden, null, null)]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> GetSchema(int datasetId, int schemaId)
+        {
+            return await GetSchema_Internal(datasetId, schemaId, d => d.ToSchemaModel());
+        }
+
+        /// <summary>
+        /// Get schema metadata
+        /// </summary>
+        [HttpGet]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
+        [Route("dataset/{datasetId}/schema/{schemaId}")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(Models.ApiModels.Schema20220609.SchemaInfoModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Forbidden, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
+        public async Task<IHttpActionResult> GetSchema20220609(int datasetId, int schemaId)
+        {
+            return await GetSchema_Internal(datasetId, schemaId, d => d.ToSchemaModel20220609());
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1172:Unused method parameters should be removed", Justification = "False positive")]
+        private async Task<IHttpActionResult> GetSchema_Internal<T>(int datasetId, int schemaId, Func<DatasetFileConfigDto,T> func) where T:SchemaInfoModelBase
         {
             IHttpActionResult GetSchemaFunction()
             {
@@ -189,7 +231,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 {
                     return Content(System.Net.HttpStatusCode.NotFound, "Schema not found");
                 }
-                SchemaInfoModel model = dto.ToSchemaModel();
+                T model = func.Invoke(dto);
                 return Ok(model);
             }
 
@@ -548,12 +590,9 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <summary>
         /// Update schema metadata
         /// </summary>
-        /// <param name="datasetId"></param>
-        /// <param name="schemaId"></param>
-        /// <param name="schemaModel"></param>
-        /// <returns></returns>
         [HttpPut]
         [ApiVersionBegin(WebAPI.Version.v2)]
+        [ApiVersionEnd(WebAPI.Version.v20220609)]
         [Route("dataset/{datasetId}/schema/{schemaId}")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(bool))]
         [SwaggerResponse(System.Net.HttpStatusCode.NotFound)]
@@ -561,7 +600,30 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
         [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
-        public async Task<IHttpActionResult> UpdateSchema(int datasetId, int schemaId, SchemaInfoModel schemaModel)
+        public IHttpActionResult UpdateSchema(int datasetId, int schemaId, SchemaInfoModel schemaModel)
+        {
+            return UpdateSchema_Internal(datasetId, schemaId, schemaModel);
+        }
+
+        /// <summary>
+        /// Update schema metadata
+        /// </summary>
+        [HttpPut]
+        [ApiVersionBegin(WebAPI.Version.v20220609)]
+        [Route("dataset/{datasetId}/schema/{schemaId}")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(bool))]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound)]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        public IHttpActionResult UpdateSchema(int datasetId, int schemaId, Models.ApiModels.Schema20220609.SchemaInfoModel schemaModel)
+        {
+            return UpdateSchema_Internal(datasetId, schemaId, schemaModel);
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1172:Unused method parameters should be removed", Justification = "False Positive")]
+        private IHttpActionResult UpdateSchema_Internal<T>(int datasetId, int schemaId, T schemaModel) where T : SchemaInfoModelBase
         {
             IHttpActionResult Updater()
             {
@@ -818,10 +880,15 @@ namespace Sentry.data.Web.WebApi.Controllers
                 {
                     m.HiveViews.Add($"vw_{config.Schema.HiveTable}_cur");
                 }
-                m.SnowflakeViews.Add($"{config.Schema.SnowflakeDatabase}.{config.Schema.SnowflakeSchema}.vw_{config.Schema.SnowflakeTable}");
+
+                m.SnowflakeViews.AddRange(
+                    config.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().Select(
+                        s => $"{s.SnowflakeDatabase}.{s.SnowflakeSchema}.vw_{s.SnowflakeTable}"));
                 if (config.Schema.CreateCurrentView)
                 {
-                    m.SnowflakeViews.Add($"{config.Schema.SnowflakeDatabase}.{config.Schema.SnowflakeSchema}.vw_{config.Schema.SnowflakeTable}_cur");
+                    m.SnowflakeViews.AddRange(
+                        config.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().Select(
+                            s => $"{s.SnowflakeDatabase}.{s.SnowflakeSchema}.vw_{s.SnowflakeTable}_cur"));
                 }
 
                 return Ok(m);
