@@ -2,7 +2,7 @@
 {
     public class PageParameters
     {
-        public PageParameters(int? pageNumber, int? pageSize, bool? SortDesc)
+        public PageParameters(int? pageNumber, int? pageSize, bool SortDesc = false) // SortDesc has a default value of false
         {
             _pageNumber = pageNumber.GetValueOrDefault() <= 0 ? 1 : pageNumber.Value;
             if (pageSize.GetValueOrDefault() <= 0)
@@ -17,8 +17,7 @@
             {
                 _pageSize = pageSize ?? defaultPageSize;
             }
-
-            _sortDesc = defaultSortDesc;
+            _sortDesc = SortDesc; 
             
         }
         const int maxPageSize = 10000;
@@ -26,7 +25,6 @@
         private readonly int _pageSize;
         private readonly int _pageNumber;
 
-        const bool defaultSortDesc = false;
         private readonly bool _sortDesc;
 
         public int PageNumber
@@ -44,7 +42,8 @@
             }
         }
 
-        public bool SortDesc
+        // getter method for SortDesc
+        public bool SortDesc 
         {
             get
             {

@@ -33,10 +33,24 @@ namespace Sentry.data.Core
                 throw new DatasetUnauthorizedAccessException();
             }
 
-            PagedList<DatasetFile> files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFileStatusActive
+            PagedList<DatasetFile> files;
+            // case when ordering by descending
+            if (pageParameters.SortDesc)
+            {
+                files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFileStatusActive
+                                                .Where(x => x.Schema == config.Schema)
+                                                .OrderByDescending(o => o.DatasetFileId),
+                                                pageParameters.PageNumber, pageParameters.PageSize);
+            }
+            // case when ordering should be ascending
+            else
+            {
+                files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFileStatusActive
                                                 .Where(x => x.Schema == config.Schema)
                                                 .OrderBy(o => o.DatasetFileId),
-                                                pageParameters.PageNumber, (pageParameters.SortDesc ? 1 : 0));            
+                                                pageParameters.PageNumber, pageParameters.PageSize);
+            }
+                
 
             return new PagedList<DatasetFileDto>(files.ToDto().ToList(), files.TotalCount, files.CurrentPage, files.PageSize);
         }

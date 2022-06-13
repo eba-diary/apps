@@ -45,6 +45,57 @@ namespace Sentry.data.Core.Tests
 
         }
 
+       
+        [TestMethod]
+        public void DatasetFileService_GetAllDatasetFileBySchema_PageParameters_Ordering_Is_Descending()
+        {
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            FileSchema schema = MockClasses.MockFileSchema();
+            dfc.Schema = schema;
+
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.AssociateId).Returns("123456");
+
+
+            var userSecurity = new UserSecurity();
+            userSecurity.CanViewFullDataset = true;
+            var securityService = new Mock<ISecurityService>();
+            securityService.Setup(r => r.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(userSecurity);
+
+            var userService = new Mock<IUserService>();
+            userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
+
+            PageParameters pageParams = new PageParameters(1, 5, true); // descending
+
+            var context = new Mock<IDatasetContext>();
+            var datasetFileArray = new List<DatasetFile>();
+            //Add multiple files to array
+            for (int i = 1; (i - 1) < 10; i++)
+            {
+                DatasetFile file = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+                file.DatasetFileId = i;
+                file.Schema = schema;
+                datasetFileArray.Add(file);
+            }
+            context.Setup(f => f.DatasetFileStatusActive).Returns(datasetFileArray.AsQueryable());
+
+            IQueryable<DatasetFileConfig> configQueryable = new List<DatasetFileConfig>() { dfc }.AsQueryable();
+            context.Setup(f => f.DatasetFileConfigs).Returns(configQueryable);
+
+            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object);
+
+            // Act
+            PagedList<DatasetFileDto> dtoList = datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams);
+
+            // Assert
+            List<int> excludedIdList = Enumerable.Range(1, 5).ToList();
+            List<int> includedIdList = Enumerable.Range(6, 5).ToList();
+
+            Assert.AreEqual(false, dtoList.All(w => excludedIdList.Contains(w.DatasetFileId)));
+            Assert.AreEqual(true, dtoList.All(w => includedIdList.Contains(w.DatasetFileId)));
+        }
+
         [TestMethod]
         public void DatasetFileService_GetAllDaatsetFileBySchema_PageParameters_Ordering_Is_Ascending()
         {
@@ -65,7 +116,7 @@ namespace Sentry.data.Core.Tests
             var userService = new Mock<IUserService>();
             userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
 
-            PageParameters pageParams = new PageParameters(1, 5);
+            PageParameters pageParams = new PageParameters(1, 5, false); // ascending
 
             var context = new Mock<IDatasetContext>();
             var datasetFileArray = new List<DatasetFile>();
@@ -94,6 +145,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(false, dtoList.All(w => excludedIdList.Contains(w.DatasetFileId)));
             Assert.AreEqual(true, dtoList.All(w => includedIdList.Contains(w.DatasetFileId)));
         }
+        
+        
+        
 
         [TestMethod]
         public void DatasetFileService_GetAllDatsetFileBySchema_DatasetUnauthorisedAccessException()
