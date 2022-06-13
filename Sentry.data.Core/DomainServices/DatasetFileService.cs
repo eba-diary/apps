@@ -36,7 +36,7 @@ namespace Sentry.data.Core
             PagedList<DatasetFile> files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFileStatusActive
                                                 .Where(x => x.Schema == config.Schema)
                                                 .OrderBy(o => o.DatasetFileId),
-                                                pageParameters.PageNumber, pageParameters.PageSize);            
+                                                pageParameters.PageNumber, (pageParameters.SortDesc ? 1 : 0));            
 
             return new PagedList<DatasetFileDto>(files.ToDto().ToList(), files.TotalCount, files.CurrentPage, files.PageSize);
         }

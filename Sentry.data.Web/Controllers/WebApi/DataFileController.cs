@@ -32,12 +32,13 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <param name="schemaId"></param>
         /// <param name="pageNumber">Default is 1</param>
         /// <param name="pageSize">Default is 1000, Max is 10000</param>
+        /// <param name="SortDesc">Default is false</param>
         /// <returns></returns>
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}/")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(PagedResponse<DatasetFileModel>))]
-        public async Task<IHttpActionResult> GetDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] int? pageNumber = 1, [FromUri] int? pageSize = 1000)
+        public async Task<IHttpActionResult> GetDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] int? pageNumber = 1, [FromUri] int? pageSize = 1000, [FromUri] bool? SortDesc=false)
         {
             IHttpActionResult GetSchemaDatasetFilesFunction()
             {
@@ -47,7 +48,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     If this need expands, there is additional refactoring 
                        that can be done to allow each type to have its own metadata.
                  ******************************************************/
-                PageParameters pagingParams = new PageParameters(pageNumber, pageSize);
+                PageParameters pagingParams = new PageParameters(pageNumber, pageSize, SortDesc);
 
                 PagedList<DatasetFileDto> dtoList = _datafileService.GetAllDatasetFileDtoBySchema(schemaId, pagingParams);
 

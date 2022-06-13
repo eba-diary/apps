@@ -201,7 +201,7 @@ namespace Sentry.data.Core.Tests
         public void PageParameters_PageNumber_Non_Null_Value_Is_Not_Defaulted()
         {
             // Arrage
-            PageParameters pageParams = new PageParameters(123, null);
+            PageParameters pageParams = new PageParameters(123, null,true);
 
             // Assert
             Assert.AreEqual(123, pageParams.PageNumber);
@@ -212,7 +212,7 @@ namespace Sentry.data.Core.Tests
         public void PageParameters_PageNumber_Null_Value_Is_Defaulted()
         {
             // Arrage
-            PageParameters pageParams = new PageParameters(null, null);
+            PageParameters pageParams = new PageParameters(null, null, true);
 
             // Assert
             Assert.AreEqual(1, pageParams.PageNumber);
@@ -223,7 +223,7 @@ namespace Sentry.data.Core.Tests
         public void PageParameters_PageNumber_Zero_Value_Is_Defaulted()
         {
             // Arrage
-            PageParameters pageParams = new PageParameters(0, null);
+            PageParameters pageParams = new PageParameters(0, null, true);
 
             // Assert
             Assert.AreEqual(1, pageParams.PageNumber);
@@ -234,7 +234,7 @@ namespace Sentry.data.Core.Tests
         public void PageParameters_PageNumber_Negative_Value_Is_Defaulted()
         {
             // Arrage
-            PageParameters pageParams = new PageParameters(-1, null);
+            PageParameters pageParams = new PageParameters(-1, null, true);
 
             // Assert
             Assert.AreEqual(1, pageParams.PageNumber);
@@ -245,7 +245,7 @@ namespace Sentry.data.Core.Tests
         public void PageParameters_PageSize_Value_Greater_Than_Max_Size_Is_Defaulted_To_MaxPageSize()
         {
             // Arrage
-            PageParameters pageParams = new PageParameters(null, 10001);
+            PageParameters pageParams = new PageParameters(null, 10001, true);
 
             // Assert
             Assert.AreEqual(10000, pageParams.PageSize);
@@ -256,7 +256,7 @@ namespace Sentry.data.Core.Tests
         public void PageParameters_PageSize_Non_Null_Value_Is_Not_Defaulted()
         {
             // Arrage
-            PageParameters pageParams = new PageParameters(null, 543);
+            PageParameters pageParams = new PageParameters(null, 543, true);
 
             // Assert
             Assert.AreEqual(543, pageParams.PageSize);
@@ -267,7 +267,7 @@ namespace Sentry.data.Core.Tests
         public void PageParameters_PageSize_Null_Value_Is_Defaulted()
         {
             // Arrage
-            PageParameters pageParams = new PageParameters(null, null);
+            PageParameters pageParams = new PageParameters(null, null, true);
 
             // Assert
             Assert.AreEqual(10, pageParams.PageSize);
@@ -278,7 +278,7 @@ namespace Sentry.data.Core.Tests
         public void PageParameters_PageSize_Zero_Value_Is_Defaulted()
         {
             // Arrage
-            PageParameters pageParams = new PageParameters(null, 0);
+            PageParameters pageParams = new PageParameters(null, 0, true);
 
             // Assert
             Assert.AreEqual(10, pageParams.PageSize);
@@ -289,10 +289,35 @@ namespace Sentry.data.Core.Tests
         public void PageParameters_PageSize_Negative_Value_Is_Defaulted()
         {
             // Arrage
-            PageParameters pageParams = new PageParameters(null, -1);
+            PageParameters pageParams = new PageParameters(null, -1, true);
 
             // Assert
             Assert.AreEqual(10, pageParams.PageSize);
         }
+
+        [TestCategory("PageParameters")]
+        [TestMethod]
+        public void PageParameters_SortDesc_False() 
+        {
+            // Arrange
+            PageParameters pageParam = new PageParameters(null, 543, false);
+
+            // Assert
+            Assert.AreEqual(false, pageParam.SortDesc);
+
+        }
+
+        [TestCategory("PageParameters")]
+        [TestMethod]
+        public void PageParameters_SortDesc_True()
+        {
+            // Arrange
+            PageParameters pageParam = new PageParameters(null, null, true);
+
+            // Assert
+            Assert.AreEqual(true, pageParam.SortDesc);
+
+        }
+
     }
 }
