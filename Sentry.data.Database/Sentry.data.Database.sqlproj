@@ -312,6 +312,7 @@
     <Build Include="Tables\SavedSearch.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_01\CLA3920_Auto_Subscribe.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_04\CLA-4140-HISTORY-FIX-DatasetFile-OriginalFileName.sql" />
+    <Build Include="Tables\ApplicationConfigurationProperties.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
