@@ -208,7 +208,9 @@ data.Config = {
         data.Config.DatasetScopeTypeInit($("#DatasetScopeTypeID"));
 
         $("#FileType").materialSelect();
-        $("#DatasetScopeTypeID").materialSelect();
+        if (!$("#DatasetScopeTypeReadonly").length) {
+            $("#DatasetScopeTypeID").materialSelect();
+        }
         $("#FileExtensionID").materialSelect();
     },
 

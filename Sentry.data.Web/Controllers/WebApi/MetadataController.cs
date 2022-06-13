@@ -339,7 +339,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     }
 
                     Logger.Debug($"{nameof(MetadataController)} schema dsc validations starting...");
-                    _schemaService.Validate(schemaId, schemarows_v2);
+                    _schemaService.ValidateCleanedFields(schemaId, schemarows_v2);
                     Logger.Debug($"{nameof(MetadataController)} schema dsc validations ended");
                 }
                 catch (SchemaConversionException)

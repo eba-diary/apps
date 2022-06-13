@@ -1084,15 +1084,14 @@ namespace Sentry.data.Core
             }
         }
 
-        public void Validate(int schemaId, List<BaseFieldDto> fieldDtoList)
+        public void ValidateCleanedFields(int schemaId, List<BaseFieldDto> fieldDtoList)
         {
             MethodBase mBase = System.Reflection.MethodBase.GetCurrentMethod();
             Logger.Debug($"schemaservice start method <{mBase.Name.ToLower()}>");
 
             FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
-            ValidationResults errors = new ValidationResults();
 
-            errors.MergeInResults(Validate(schema, fieldDtoList));
+            ValidationResults errors = ValidateCleanedFields(schema.Extension.Name, fieldDtoList);
 
             if (!errors.IsValid())
             {
@@ -1100,6 +1099,28 @@ namespace Sentry.data.Core
             }
 
             Logger.Debug($"schemaservice end method <{mBase.Name.ToLower()}>");
+        }
+
+        private ValidationResults ValidateCleanedFields(string extensionName, List<BaseFieldDto> fieldDtoList)
+        {
+            //STEP 1:  Look for clones (duplicates) and add to results
+            ValidationResults results = CloneWars(fieldDtoList);
+
+            //STEP 2:  go through all fields and look for validation errors
+            foreach (BaseFieldDto fieldDto in fieldDtoList)
+            {
+                fieldDto.Clean(extensionName);
+                ValidationResults fieldValidationResults = fieldDto.Validate(extensionName);
+                results.MergeInResults(fieldValidationResults);
+
+                //recursively call validate again to validate all child fields of parent
+                if (fieldDto.ChildFields.Any())
+                {
+                    results.MergeInResults(ValidateCleanedFields(extensionName, fieldDto.ChildFields));
+                }
+            }
+
+            return results;
         }
 
         //look at fieldDtoList and returns a list of duplicates at that level only
@@ -1126,27 +1147,6 @@ namespace Sentry.data.Core
                 cloneDetails.ToList().ForEach(x => results.Add(x.OrdinalPosition.ToString(), $"({x.Name}) cannot be duplicated. "));
             }
 
-            return results;
-        }
-
-        private ValidationResults Validate(FileSchema scm, List<BaseFieldDto> fieldDtoList)
-        {
-            //STEP 1:  Look for clones (duplicates) and add to results
-            ValidationResults results = CloneWars(fieldDtoList);
-
-            //STEP 2:  go through all fields and look for validation errors
-            foreach (BaseFieldDto fieldDto in fieldDtoList)
-            {
-                ValidationResults fieldValidationResults = fieldDto.Validate(scm.Extension.Name);
-                results.MergeInResults(fieldValidationResults);
-
-                //recursively call validate again to validate all child fields of parent
-                if (fieldDto.ChildFields.Any())
-                {
-                    results.MergeInResults(Validate(scm, fieldDto.ChildFields));
-                }
-            }
-            
             return results;
         }
     }

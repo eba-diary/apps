@@ -154,5 +154,6 @@ namespace Sentry.data.Web
         public ObjectStatusEnum ObjectStatus { get; set; }
         public string ParquetStorageBucket { get; set; }
         public string ParquetStoragePrefix { get; set; }
+        public string DatasetScopeReadonly { get; set; }
     }
 }
