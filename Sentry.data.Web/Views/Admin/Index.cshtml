@@ -1,7 +1,37 @@
 ﻿
-@{
-    ViewBag.Title = "Admin";
-}
+@model Dictionary<string, string>
+    @{
+        ViewBag.Title = "Admin";
+        ViewBag.Fluid = true;
+    }
 
-<h2>Admin</h2>
 
+<div class="row">
+    <div style="height:100vh" class="card form-wrapper col-lg-2 side-nav-wrapper">
+        <div class="card-body">
+            <h3 class="card-title">Admin Page</h3>
+
+            @foreach (var key in Model.Keys)
+            {
+                 <a href="#" data-url='@Url.Action("GetAdminTest", "Admin", new { viewId = key })' class="load-partial-view"><h5>@Model[key]</h5></a>
+
+            }
+        </div>
+    </div>
+    <div class="col-lg-10">
+        <center id="partial-view-test"></center>
+    </div>
+</div>
+
+
+@Scripts.Render("~/bundles/jquery")
+
+<script>
+    console.log("test");
+
+    $(".load-partial-view").click(function (event) {
+        event.preventDefault();
+        var url = $(this).data("url");
+        $("#partial-view-test").load(url);
+    });
+</script>

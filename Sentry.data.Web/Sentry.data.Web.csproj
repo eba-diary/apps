@@ -1198,6 +1198,10 @@
     <Content Include="Views\Dataset\Details\_TabUnauthorized.cshtml" />
     <Content Include="Views\Dataset\Permission\RequestAccessCLA3723.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Shared\_DataFileReprocessing.cshtml" />
+    <Content Include="Views\Shared\_AdminTest2.cshtml" />
+    <Content Include="Views\Shared\_AdminTest4.cshtml" />
+    <Content Include="Views\Shared\_AdminTest3.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
