@@ -446,6 +446,7 @@
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
     <Compile Include="WebProxy\Win32Api.cs" />
+    <Content Include="Content\admin.css" />
     <Content Include="Content\all.css" />
     <Content Include="Content\all.min.css" />
     <Content Include="Content\bootstrap-grid.css" />

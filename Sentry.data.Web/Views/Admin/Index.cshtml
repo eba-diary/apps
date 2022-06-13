@@ -7,13 +7,13 @@
 
 
 <div class="row">
-    <div style="height:100vh" class="card form-wrapper col-lg-2 side-nav-wrapper">
+    <div class="card form-wrapper col-lg-2 side-nav-wrapper">
         <div class="card-body">
-            <h3 class="card-title">Admin Page</h3>
+            <h2 class="card-title">Admin Page</h2>
 
             @foreach (var key in Model.Keys)
             {
-                 <a href="#" data-url='@Url.Action("GetAdminTest", "Admin", new { viewId = key })' class="load-partial-view"><h5>@Model[key]</h5></a>
+                 <a href="#" data-url='@Url.Action("GetAdminTest", "Admin", new { viewId = key })' class="load-partial-view"><h4>@Model[key]</h4></a>
 
             }
         </div>
