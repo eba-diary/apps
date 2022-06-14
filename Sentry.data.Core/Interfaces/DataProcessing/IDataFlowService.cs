@@ -4,6 +4,7 @@ using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
@@ -18,9 +19,9 @@ namespace Sentry.data.Core
         /// <returns></returns>
         /// <exception cref="Sentry.data.Core.Exceptions.DataFlowNotFound"></exception>
         DataFlowDetailDto GetDataFlowDetailDto(int id);
+        List<DataFlowDetailDto> GetDataFlowDetailDto(Expression<Func<DataFlow, bool>> expression);
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
         int CreateandSaveDataFlow(DataFlowDto dto);
-
         IQueryable<DataSourceType> GetDataSourceTypes();
         IQueryable<DataSource> GetDataSources();
         string GetDataFlowNameForFileSchema(FileSchema scm);

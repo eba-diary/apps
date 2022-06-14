@@ -71,6 +71,20 @@ namespace Sentry.data.Web
             return new DFModel(dto) { };
         }
 
+        public static void MapToModel(DataFlowDetailDto dto, Models.ApiModels.Dataflow.DataFlowDetailModel model)
+        { 
+        }
+
+        public static void MapToDetailModelList(List<DataFlowDetailDto> detailDto, List<Models.ApiModels.Dataflow.DataFlowDetailModel> detailModelList)
+        {
+            foreach (DataFlowDetailDto dto in detailDto)
+            {
+                Models.ApiModels.Dataflow.DataFlowDetailModel detail = new Models.ApiModels.Dataflow.DataFlowDetailModel();
+                MapToModel(dto, detail);
+                detailModelList.Add(detail);
+            }
+        }
+
         public static Core.DataFlowDto ToDto(this DataFlowModel model)
         {
             Core.DataFlowDto dto = new Core.DataFlowDto

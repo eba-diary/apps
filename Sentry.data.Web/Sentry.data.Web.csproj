@@ -427,6 +427,8 @@
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
+    <Compile Include="Models\ApiModels\DataFlow\DataFlowModel.cs" />
+    <Compile Include="Models\ApiModels\DataFlow\DataFlowDetailModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileModel.cs" />
     <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
