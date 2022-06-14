@@ -20,34 +20,37 @@ namespace Sentry.data.Core
 
         public PagedList<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
         {
-            DatasetFileConfig config = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+            DatasetFileConfig config = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId); // gets the specific schema
             
-            if (config == null)
+            if (config == null) // the case where the schema was not found
             {
                 throw new SchemaNotFoundException();
             }
 
+            // security measures taken to make sure that the user has the permission to see the schema/dataset data
             UserSecurity us = _securityService.GetUserSecurity(config.ParentDataset, _userService.GetCurrentUser());
             if (!us.CanViewFullDataset)
             {
-                throw new DatasetUnauthorizedAccessException();
+                throw new DatasetUnauthorizedAccessException(); // if the user does not have permission then this exception is thrown
             }
 
+            // initializes the files
             PagedList<DatasetFile> files;
-            // case when ordering by descending
-            if (pageParameters.SortDesc)
+
+            // checks if SortDesc is true, so the files will be in descending order
+            if (pageParameters.SortDesc) // Order by descendinf is true
             {
                 files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFileStatusActive
                                                 .Where(x => x.Schema == config.Schema)
-                                                .OrderByDescending(o => o.DatasetFileId),
+                                                .OrderByDescending(o => o.DatasetFileId),   // we are ordering by the DatasetFileId and passing the two parameters below it into the ToPagedList method
                                                 pageParameters.PageNumber, pageParameters.PageSize);
+                                                
             }
-            // case when ordering should be ascending
-            else
+            else  // SortDesc is false, so these files will be in ascending order
             {
                 files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFileStatusActive
                                                 .Where(x => x.Schema == config.Schema)
-                                                .OrderBy(o => o.DatasetFileId),
+                                                .OrderBy(o => o.DatasetFileId), // method making it ascending order --> this was not changed
                                                 pageParameters.PageNumber, pageParameters.PageSize);
             }
                 

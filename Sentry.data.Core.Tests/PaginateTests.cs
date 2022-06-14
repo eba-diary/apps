@@ -295,6 +295,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(10, pageParams.PageSize);
         }
 
+        /*
+         * Tests to see if the SortDesc attribute of PageParameters is working properly when being set to false
+         */
         [TestCategory("PageParameters")]
         [TestMethod]
         public void PageParameters_SortDesc_False() 
@@ -307,6 +310,9 @@ namespace Sentry.data.Core.Tests
 
         }
 
+        /*
+         * Tests to see if the SortDesc attribute of PageParameters is working properly when being set to true
+         */
         [TestCategory("PageParameters")]
         [TestMethod]
         public void PageParameters_SortDesc_True()

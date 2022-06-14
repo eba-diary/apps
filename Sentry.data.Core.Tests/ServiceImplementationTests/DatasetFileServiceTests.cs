@@ -45,7 +45,9 @@ namespace Sentry.data.Core.Tests
 
         }
 
-       
+        /*
+         * Test method 1 seeing if files are in descending order 
+         */
         [TestMethod]
         public void DatasetFileService_GetAllDatasetFileBySchema_PageParameters_Ordering_Is_Descending()
         {
@@ -54,8 +56,8 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = MockClasses.MockFileSchema();
             dfc.Schema = schema;
 
-            var user1 = new Mock<IApplicationUser>();
-            user1.Setup(f => f.AssociateId).Returns("123456");
+            var user1 = new Mock<IApplicationUser>();  // creates a user
+            user1.Setup(f => f.AssociateId).Returns("123456");  // sets up a user with a specified associative id
 
 
             var userSecurity = new UserSecurity();
@@ -66,7 +68,8 @@ namespace Sentry.data.Core.Tests
             var userService = new Mock<IUserService>();
             userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
 
-            PageParameters pageParams = new PageParameters(1, 5, true); // descending
+            // creation of the PageParameters object
+            PageParameters pageParams = new PageParameters(1, 5, true); // descending case
 
             var context = new Mock<IDatasetContext>();
             var datasetFileArray = new List<DatasetFile>();
@@ -96,6 +99,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(true, dtoList.All(w => includedIdList.Contains(w.DatasetFileId)));
         }
 
+        /*
+         * Test method 1 to see if files are in ascending order
+         */
         [TestMethod]
         public void DatasetFileService_GetAllDaatsetFileBySchema_PageParameters_Ordering_Is_Ascending()
         {
@@ -116,7 +122,7 @@ namespace Sentry.data.Core.Tests
             var userService = new Mock<IUserService>();
             userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
 
-            PageParameters pageParams = new PageParameters(1, 5, false); // ascending
+            PageParameters pageParams = new PageParameters(1, 5, false); // ascending case
 
             var context = new Mock<IDatasetContext>();
             var datasetFileArray = new List<DatasetFile>();
@@ -139,15 +145,15 @@ namespace Sentry.data.Core.Tests
             PagedList<DatasetFileDto> dtoList = datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams);
 
             // Assert
-            List<int> excludedIdList = Enumerable.Range(6, 5).ToList();
+            List<int> excludedIdList = Enumerable.Range(5, 9).ToList();
             List<int> includedIdList = Enumerable.Range(1, 5).ToList();
 
             Assert.AreEqual(false, dtoList.All(w => excludedIdList.Contains(w.DatasetFileId)));
             Assert.AreEqual(true, dtoList.All(w => includedIdList.Contains(w.DatasetFileId)));
         }
-        
-        
-        
+
+
+
 
         [TestMethod]
         public void DatasetFileService_GetAllDatsetFileBySchema_DatasetUnauthorisedAccessException()

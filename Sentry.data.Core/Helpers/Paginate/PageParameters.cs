@@ -25,8 +25,12 @@
         private readonly int _pageSize;
         private readonly int _pageNumber;
 
-        private readonly bool _sortDesc;
+        // private instance variable for sorting by descending or ascending
+        private readonly bool _sortDesc; 
 
+        /*
+         * Attribute that gets the pageNumber of the PageParameter object
+         */
         public int PageNumber
         {
             get
@@ -34,6 +38,10 @@
                 return _pageNumber;
             }
         }
+
+        /*
+         * Number of records you want to take
+         */
         public int PageSize
         {
             get
@@ -42,7 +50,9 @@
             }
         }
 
-        // getter method for SortDesc
+        /*
+         * Determines whether to get the data is ascending or descending order
+         */
         public bool SortDesc 
         {
             get
