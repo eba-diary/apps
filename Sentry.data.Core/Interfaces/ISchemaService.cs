@@ -108,7 +108,7 @@ namespace Sentry.data.Core
         /// <param name="fieldDtoList"></param>
         /// <param name="schemaId"></param>
         /// <exception cref="ValidationException">Thrown when metadata does not adhere to validations</exception>
-        void Validate(int schemaId, List<BaseFieldDto> fieldDtoList);
+        void ValidateCleanedFields(int schemaId, List<BaseFieldDto> fieldDtoList);
         IDictionary<int, string> GetSchemaList();
     }
 }

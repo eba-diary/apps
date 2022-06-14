@@ -14,6 +14,7 @@ using Sentry.data.Infrastructure.PollyPolicies;
 using Sentry.Messaging.Common;
 using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using static Sentry.data.Core.GlobalConstants;
 
@@ -157,6 +158,14 @@ namespace Sentry.data.Infrastructure
             registry.For<Sentry.data.Core.Interfaces.QuartermasterRestClient.IClient>().Singleton().Use<QuartermasterRestClient.Client>().
                 Ctor<HttpClient>().Is(qClient).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("QuartermasterServiceBaseUrl"));
+
+            //register Inev client
+            var inevClient = new HttpClient(new HttpClientHandler() {
+                Credentials = new NetworkCredential(Configuration.Config.GetHostSetting("ServiceAccountID"),
+                                                    Configuration.Config.GetHostSetting("ServiceAccountPassword"))});
+            registry.For<Sentry.data.Core.Interfaces.InfrastructureEventing.IClient>().Singleton().Use<InfrastructureEventing.Client>().
+                Ctor<HttpClient>().Is(inevClient).
+                SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("InfrastructureEventingServiceBaseUrl"));
 
             //establish Polly Policy registry
             PolicyRegistry pollyRegistry = new PolicyRegistry();

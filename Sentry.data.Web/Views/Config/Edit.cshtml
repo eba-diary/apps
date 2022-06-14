@@ -60,12 +60,13 @@
         }
         else
         {
-            <div class="md-form pb-0">
-                @Html.HiddenFor(model => model.DatasetScopeTypeID)
-                @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "mdb-main-label" })
-                @Html.DropDownListFor(model => model.DatasetScopeTypeID,
-                    new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new { @disabled = "disabled", @readonly = "readonly", @class = "mdb-select" })
+        <div class="md-form pb-0">
+            @Html.HiddenFor(model => model.DatasetScopeTypeID)
+            <div class="textReadOnly md-form">
+                <label for="DatasetScopeTypeReadonly" class="active">Data Scope Type (Readonly)</label>
+                <input id="DatasetScopeTypeReadonly" placeholder="@Model.DatasetScopeReadonly" disabled class="disabled form-control" />
             </div>
+        </div>
         }
 
         <div class="form-group DatasetScopeTypeDescription">

@@ -167,7 +167,7 @@
             public const string PENDING = "Pending";
             public const string COMPLETED = "Completed";
             public const string DENIED = "Denied";
-            public const string WIDHTDRAWN = "Withdrawn";
+            public const string WITHDRAWN = "Withdrawn";
             //hpsm
             public const string APPROVED = "approved";
             public const string CLOSED = "closed";
@@ -215,6 +215,12 @@
             public const string DALE_VIEW = "DaleView";
             public const string DALE_SENSITIVE_EDIT = "DaleSensEdit";
             public const string DALE_OWNER_VERIFIED_EDIT = "DaleOwnerVerifiedEdit";
+        }
+
+        public static class IdentityType
+        {
+            public const string AD = "AD";
+            public const string AWS_IAM = "AWS_IAM";
         }
 
         public static class ConvertedFileStoragePrefix
