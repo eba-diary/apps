@@ -1,7 +1,112 @@
 ﻿
+@model Sentry.data.Web.Models.AdminPage.DataReprocessingModel
 @{
     ViewBag.Title = "_AdminTest";
 }
+<h1>Reprocess Data Files</h1>
+<!-- Data Set Dropdown Menu-->
+<h3>Data Sets</h3>
+<select class="mbd-select" id="dataSetDropdown" style="width:800px; height:30px;" >
+    @for (var x = 0; x < Model.datasets.Count; x++)
+    {
+        <option id="option" value=@Model.datasetIds[x]> @Model.datasets[x]</option>
+    }
 
-<h2>Test 1</h2>
+</select>
+<!-- Schema Dropdown Menu-->
+<h3>Schema</h3>
+<select class="mbd-select" , id="SchemaDropdown" style="width:800px; height:30px;">
+    @for (var x = 0; x < Model.schemas.Count; x++)
+    {
+        <option id="option" value="schema"> @Model.schemas[x]</option>
+    }
+
+</select>
+
+<!-- Flow Steps Dropdown Menu-->
+<h3>Flow Steps</h3>
+<select class="mbd-select" , id="flowStepsDropdown" style="width:800px; height:30px;">
+    @for (var x = 0; x < Model.flowSteps.Count; x++)
+    {
+        <option id="option" value="flowSteps"> @Model.flowSteps[x]</option>
+    }
+</select>
+
+<br />
+<br />
+<br />
+<!--Row Dropdown Menu for Table-->
+<div align="left">
+    Showing
+    <select class="mbd-select select" , id="numEntriesDropdown" style="height: 20px;">
+        <option value="five"> 5 </option>
+        <option value="ten"> 10 </option>
+        <option value="twenty-five"> 25 </option>
+        <option value="fifty"> 50 </option>
+    </select>
+    rows
+</div>
+<!--Table-->
+<table id="results" class="table table-striped table-bordered table-hover">
+    <thead>
+        <tr>
+            <th> Details</th>
+            <th> Actions</th>
+            <th> Name</th>
+            <th> Upload User Name</th>
+            <th> Initial Upload Date</th>
+            <th> Modified Date</th>
+            <th> Schema</th>
+        </tr>
+    </thead>
+    <!--Body to be populated based on selected parameters-->
+    <tbody>
+        <tr>
+            <td>This</td>
+            <td>Is</td>
+            <td>An</td>
+            <td>Example</td>
+            <td>Data</td>
+            <td>Entry</td>
+            <td> (1)</td>
+        </tr>
+        <tr>
+            <td>This</td>
+            <td>Is</td>
+            <td>Also</td>
+            <td>An</td>
+            <td>Example</td>
+            <td>Entry</td>
+            <td>(2)</td>
+        </tr>
+    </tbody>
+</table>
+<!--Page Navigation for table. Not sure how to use this yet but at least it's here'-->
+<nav>
+    <ul class="pagination">
+        <li class="page-item disabled">
+            <a class="page-link previous waves-effect" href="#" aria-label="Previous">Previous</a>
+        </li>
+        <li class="page-item active"><a class="page-link waves-effect" href="#">1</a></li>
+        <li class="page-item"><a class="page-link waves-effect" href="#">2</a></li>
+        <li class="page-item"><a class="page-link waves-effect" href="#">3</a></li>
+        <li class="page-item"><a class="page-link waves-effect" href="#">4</a></li>
+        <li class="page-item"><a class="page-link waves-effect" href="#">5</a></li>
+        <li class="page-item">
+            <a class="page-link next waves-effect" href="#" aria-label="Next">Next</a>
+        </li>
+    </ul>
+</nav>
+<!--Reprocess button-->
+<button type="button" class="btn btn-primary waves-effect waves-light" id="reprocessButton">Reprocess Selected</button>
+<!--No events are handled yet!!! Learn how to do this!!!-->
+<script>
+    $(function () {
+        $('flowSteps' || 'schema' || 'dataSet').materialSelect();
+    });
+    $('id=option').click(function (event) {
+        $(this).addClass("selected")
+    });
+
+</script>
 

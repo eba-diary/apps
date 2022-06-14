@@ -1,25 +1,25 @@
-﻿using System;
+﻿using Sentry.data.Core;
+using Sentry.data.Web.Models.AdminPage;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using System.Threading;
-using System.Data;
-using Sentry.data.Core;
-using Sentry.DataTables.QueryableAdapter;
-using Sentry.DataTables.Mvc;
-using Sentry.DataTables.Shared;
-using DoddleReport.Web;
-using DoddleReport;
-using Sentry.Core;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Web.Controllers
 {
     /*[AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]*/
     public class AdminController : BaseController
     {
+        DataReprocessingModel dataReprocessingModel;
+        private readonly IDatasetService _datasetService;
+        public AdminController(IDatasetService datasetService)
+        {
+            _datasetService = datasetService;
+        }
+
+
+
+     
         // GET: Admin
+
         public ActionResult Index()
         {
             Dictionary<string, string> myDict =
@@ -40,6 +40,10 @@ namespace Sentry.data.Web.Controllers
             {
                 case "1":
                     viewPath = "_DataFileReprocessing";
+                    dataReprocessingModel = new DataReprocessingModel();
+                    List<DatasetDto> dtoList = _datasetService.GetAllDatasetDto();
+                    dataReprocessingModel.populateDatasets(dtoList);
+                    dataReprocessingModel.populateDatasetIds(dtoList);
                     break;
                 case "2":
                     viewPath = "_AdminTest2";
@@ -52,7 +56,7 @@ namespace Sentry.data.Web.Controllers
                     break;
             }
 
-            return PartialView(viewPath);
+            return PartialView(viewPath, dataReprocessingModel);
         }
     }
 }
