@@ -34,26 +34,9 @@ namespace Sentry.data.Core
                 throw new DatasetUnauthorizedAccessException(); // if the user does not have permission then this exception is thrown
             }
 
-            // initializes the files
-            PagedList<DatasetFile> files;
-
-            // checks if SortDesc is true, so the files will be in descending order
-            if (pageParameters.SortDesc) // Order by descendinf is true
-            {
-                files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFileStatusActive
-                                                .Where(x => x.Schema == config.Schema)
-                                                .OrderByDescending(o => o.DatasetFileId),   // we are ordering by the DatasetFileId and passing the two parameters below it into the ToPagedList method
-                                                pageParameters.PageNumber, pageParameters.PageSize);
-                                                
-            }
-            else  // SortDesc is false, so these files will be in ascending order
-            {
-                files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFileStatusActive
-                                                .Where(x => x.Schema == config.Schema)
-                                                .OrderBy(o => o.DatasetFileId), // method making it ascending order --> this was not changed
-                                                pageParameters.PageNumber, pageParameters.PageSize);
-            }
-                
+            IQueryable<DatasetFile> datasetFileQueryable = _datasetContext.DatasetFileStatusActive.Where(x => x.Schema == config.Schema);
+            datasetFileQueryable = pageParameters.SortDesc ? datasetFileQueryable.OrderByDescending(o => o.DatasetFileId) : datasetFileQueryable.OrderBy(o => o.DatasetFileId); // ordering datasetfiles by ascending or descending
+            PagedList<DatasetFile> files = PagedList<DatasetFile>.ToPagedList(datasetFileQueryable, pageParameters.PageNumber, pageParameters.PageSize); // passing pageNumber and pageSize to the ToPagedList method
 
             return new PagedList<DatasetFileDto>(files.ToDto().ToList(), files.TotalCount, files.CurrentPage, files.PageSize);
         }

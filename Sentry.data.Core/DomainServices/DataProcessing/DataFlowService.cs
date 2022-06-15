@@ -571,6 +571,7 @@ namespace Sentry.data.Core
             return steps;
         }
 
+      
         public string GetSchemaStorageCodeForDataFlow(int Id)
         {
             DataFlowStep schemaLoadStep = GetDataFlowStepForDataFlowByActionType(Id, DataActionType.SchemaLoad);
@@ -617,6 +618,33 @@ namespace Sentry.data.Core
             Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(GetProducerFlowsToBeDeletedBySchemaId).ToLower()} Method End");
             return producerFlowIdList;
         }
+
+
+        /*
+         * User is required to pass Dataflowstep id to being processing from
+         * User can pass either a list of dataset file id's or indicate they would like all files reprocessed
+         * Perform parameter validations
+         * Successful status code means we have successfully kicked off reprocessing, not that it has finished
+         */
+        public String ValidateProcessing(int dataFlowStepId, List<int> datasetFileIds = null, bool processAll = false)
+        {
+            
+            // if the user indicates that they want all files reprocessed
+            if (processAll)
+            {
+                
+            }
+            else // the user wants to reprocess only the specified datasetfile ids in the list
+            {
+                foreach (int datasetId in datasetFileIds)
+                {
+                    
+                }
+            }
+
+            return "default";
+        }
+
 
         public List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId)
         {
