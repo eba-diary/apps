@@ -6,13 +6,12 @@
 <h1>Reprocess Data Files</h1>
 <!-- Data Set Dropdown Menu-->
 <h3>Data Sets</h3>
-<select class="mbd-select" id="dataSetDropdown" style="width:800px; height:30px;" >
-    @for (var x = 0; x < Model.datasets.Count; x++)
-    {
-        <option id="option" value=@Model.datasetIds[x]> @Model.datasets[x]</option>
-    }
+@Html.DropDownListFor(m => m.allDatasets,
+                      new SelectList(Model.allDatasets, "Value", "Text"),
+                      "Please select Dataset",
+                      new { @style = "width:800px; height: 30px;" })
 
-</select>
+
 <!-- Schema Dropdown Menu-->
 <h3>Schema</h3>
 <select class="mbd-select" , id="SchemaDropdown" style="width:800px; height:30px;">

@@ -42,8 +42,14 @@ namespace Sentry.data.Web.Controllers
                     viewPath = "_DataFileReprocessing";
                     dataReprocessingModel = new DataReprocessingModel();
                     List<DatasetDto> dtoList = _datasetService.GetAllDatasetDto();
-                    dataReprocessingModel.populateDatasets(dtoList);
-                    dataReprocessingModel.populateDatasetIds(dtoList);
+                    dataReprocessingModel.allDatasets = new List<SelectListItem>();
+                    foreach(DatasetDto d in dtoList)
+                    {
+                        SelectListItem item = new SelectListItem();
+                        item.Text = d.DatasetName;
+                        item.Value = d.DatasetId.ToString();
+                        dataReprocessingModel.allDatasets.Add(item);
+                    }
                     break;
                 case "2":
                     viewPath = "_AdminTest2";
