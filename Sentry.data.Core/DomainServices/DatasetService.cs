@@ -294,6 +294,9 @@ namespace Sentry.data.Core
                 case AccessRequestType.AwsArn:
                     request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS).First());
                     break;
+                case AccessRequestType.RemovePermission:
+                    request.Permissions.Add((Permission)_datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) && x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET));
+                    break;
                 default:
                     break;
             }

@@ -28,6 +28,13 @@ namespace Sentry.data.Web
                     case PermissionCodes.S3_ACCESS:
                         permissionCollection = AwsIamPermissions;
                         break;
+                    case PermissionCodes.CAN_MANAGE_SCHEMA:
+                    case PermissionCodes.CAN_PREVIEW_DATASET:
+                    case PermissionCodes.CAN_VIEW_FULL_DATASET:
+                    case PermissionCodes.CAN_QUERY_DATASET:
+                    case PermissionCodes.CAN_UPLOAD_TO_DATASET:
+                        permissionCollection = DscLegacyPermissions;
+                        break;
                     default:
                         permissionCollection = DscPermissions;
                         break;
@@ -43,6 +50,7 @@ namespace Sentry.data.Web
         public string DatasetName { get; set; }
         public string DatasetSaidKeyCode { get; set; }
         public IList<ManagePermissionModel> DscPermissions { get; set; } = new List<ManagePermissionModel>();
+        public IList<ManagePermissionModel> DscLegacyPermissions { get; set; } = new List<ManagePermissionModel>();
         public IList<ManagePermissionModel> AwsIamPermissions { get; set; } = new List<ManagePermissionModel>();
         public IList<ManagePermissionModel> SnowflakePermissions { get; set; } = new List<ManagePermissionModel>();
         public IList<ManagePermissionModel> AdPermissions { get; set; } = new List<ManagePermissionModel>();

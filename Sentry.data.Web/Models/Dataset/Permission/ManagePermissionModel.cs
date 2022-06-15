@@ -15,6 +15,7 @@ namespace Sentry.data.Web
             PermissionDescription = securablePermission.SecurityPermission.Permission.PermissionDescription;
             PermissionStatus = securablePermission.SecurityPermission.IsEnabled ? "Active" : "Pending";
             TicketId = securablePermission.TicketId;
+            Code = securablePermission.SecurityPermission.Permission.PermissionCode;
         }
 
         public ManagePermissionModel() { }
@@ -24,5 +25,6 @@ namespace Sentry.data.Web
         public string PermissionDescription { get; set; }
         public string PermissionStatus { get; set; }
         public string TicketId { get; set; }
+        public string Code { get; set; }
     }
 }

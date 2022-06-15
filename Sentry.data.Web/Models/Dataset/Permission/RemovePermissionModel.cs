@@ -36,5 +36,6 @@ namespace Sentry.data.Web
         public string Identity { get; set; }
 
         public string Permission { get; set; }
+        public string Code { get; set; }
     }
 }

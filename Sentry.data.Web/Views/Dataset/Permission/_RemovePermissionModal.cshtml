@@ -26,6 +26,7 @@
                     @Html.HiddenFor(model => model.SecurableObjectId)
                     @Html.HiddenFor(model => model.SaidKeyCode)
                     @Html.HiddenFor(model => model.TicketId)
+                    @Html.HiddenFor(model => model.Code)
                     <div class="md-form pt-0 mt-0">
                         @Html.TextBoxFor(model => model.Identity, new { @readonly = "readonly", @class = "form-control" })
                         <label for="Identity" class="" id="identityLabel">Identity (Readonly)</label>
