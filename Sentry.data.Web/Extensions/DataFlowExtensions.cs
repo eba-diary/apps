@@ -56,7 +56,6 @@ namespace Sentry.data.Web
             }
         }
 
-
         public static List<DFModel> ToModelList(this List<Core.DataFlowDto> dtoList)
         {
             List<DFModel> modelList = new List<DFModel>();
@@ -66,21 +65,43 @@ namespace Sentry.data.Web
             }
             return modelList;
         }
+
         public static DFModel ToDFModel(this Core.DataFlowDto dto)
         {
             return new DFModel(dto) { };
         }
 
-        public static void MapToModel(DataFlowDetailDto dto, Models.ApiModels.Dataflow.DataFlowDetailModel model)
+        public static void MapToModel(this DataFlowDetailDto dto, Models.ApiModels.Dataflow.DataFlowDetailModel model)
         { 
+            model.Id = dto.Id;
+            model.FlowGuid = dto.FlowGuid;
+            model.SaidKeyCode = dto.SaidKeyCode;
+            model.DatasetId = dto.DatasetId;
+            model.SchemaId = dto.SchemaId;
+            model.Name = dto.Name;
+            model.CreateDTM = dto.CreateDTM;
+            model.CreatedBy = dto.CreatedBy;
+            model.DFQuestionnaire = dto.DFQuestionnaire;
+            model.IngestionType = dto.IngestionType;
+            model.IsCompressed = dto.IsCompressed;
+            model.IsPreProcessingRequired = dto.IsPreProcessingRequired;
+            model.PreProcessingOption = dto.PreProcessingOption;
+            model.FlowStorageCode = dto.FlowStorageCode;
+            model.MappedSchema = dto.MappedSchema;
+            model.AssociatedJobs = dto.AssociatedJobs;
+            model.ObjectStatus = dto.ObjectStatus;
+            model.DeleteIssuer = dto.DeleteIssuer;
+            model.DeleteIssueDTM = dto.DeleteIssueDTM;
+            model.NamedEnvironment = dto.NamedEnvironment;
+            model.NamedEnvironmentType = dto.NamedEnvironmentType;
         }
 
-        public static void MapToDetailModelList(List<DataFlowDetailDto> detailDto, List<Models.ApiModels.Dataflow.DataFlowDetailModel> detailModelList)
+        public static void MapToDetailModelList(this List<DataFlowDetailDto> detailDto, List<Models.ApiModels.Dataflow.DataFlowDetailModel> detailModelList)
         {
             foreach (DataFlowDetailDto dto in detailDto)
             {
                 Models.ApiModels.Dataflow.DataFlowDetailModel detail = new Models.ApiModels.Dataflow.DataFlowDetailModel();
-                MapToModel(dto, detail);
+                dto.MapToModel(detail);
                 detailModelList.Add(detail);
             }
         }

@@ -95,7 +95,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             if (counter == 0 || counter > 1)
             {
-                return BadRequest(); // returns BadRequest result in the case of excessive or invalid parms
+                return BadRequest(); // returns BadRequest result in the case of excessive or invalid params
             } else
             {
                 foreach (var item in parameters)
@@ -109,7 +109,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             Expression<Func<DataFlow, bool>> expression = null;
 
-            switch (itemCheck.Key)
+            switch (itemCheck.Key) // Switch based on the param that was sent through
             {
                 case "datasetId":
                     expression = w => w.DatasetId == (int)itemCheck.Value;
@@ -122,10 +122,13 @@ namespace Sentry.data.Web.WebApi.Controllers
                     break;
             }
 
+            // Retrieves a list of DataFlowDetailDto(s) via the expression sent through
             List<DataFlowDetailDto> dtoList = _dataFlowService.GetDataFlowDetailDto(expression);
+
+
             List<Models.ApiModels.Dataflow.DataFlowDetailModel> modelList = new List<Models.ApiModels.Dataflow.DataFlowDetailModel> ();
 
-            DataFlowExtensions.MapToDetailModelList(dtoList, modelList);
+            dtoList.MapToDetailModelList(modelList); // Map the DataFlowDetailDto to the DataFlowDetailModel via the MapToDetailModelList extension method.
 
             return Ok();
         }
