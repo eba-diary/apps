@@ -23,8 +23,9 @@ namespace Sentry.data.Core
         List<DatasetFile> GetDatasetFileList(int datasetId, int schemaId, string[] fileNameList);
         List<DatasetFile> GetDatasetFileList(int datasetId, int schemaId, int[] datasetFileIdList);
 
-        void UpdateMetadata(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status);
-        void DeleteS3(int datasetId, int schemaId, List<DatasetFile> dbList);
+        void Delete(int datasetId, int schemaId, List<DatasetFile> dbList);
+        void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status);
+        
         UserSecurity GetUserSecurityForDatasetFile(int datasetId);
     }
 }

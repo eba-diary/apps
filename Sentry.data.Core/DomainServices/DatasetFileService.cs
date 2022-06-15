@@ -81,10 +81,10 @@ namespace Sentry.data.Core
 
         }
 
-        
+
         public List<DatasetFile> GetDatasetFileList(int datasetId, int schemaId, string[] fileNameList)
         {
-            List<DatasetFile> dbList = _datasetContext.DatasetFile.Where(w =>   w.Dataset.DatasetId == datasetId 
+            List<DatasetFile> dbList = _datasetContext.DatasetFileStatusAll.Where(w =>   w.Dataset.DatasetId == datasetId 
                                                                             &&  w.Schema.SchemaId == schemaId 
                                                                             &&  fileNameList.Contains(w.OriginalFileName)).ToList();
             return dbList;
@@ -92,14 +92,21 @@ namespace Sentry.data.Core
 
         public List<DatasetFile> GetDatasetFileList(int datasetId, int schemaId, int[] datasetFileIdList)
         {
-            List<DatasetFile> dbList = _datasetContext.DatasetFile.Where(w =>   w.Dataset.DatasetId == datasetId
+            List<DatasetFile> dbList = _datasetContext.DatasetFileStatusAll.Where(w =>   w.Dataset.DatasetId == datasetId
                                                                             &&  w.Schema.SchemaId == schemaId
                                                                             &&  datasetFileIdList.Contains(w.DatasetFileId)).ToList();
             return dbList;
         }
 
 
-        public void UpdateMetadata(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status)
+        public void Delete(int datasetId, int schemaId, List<DatasetFile> dbList)
+        {
+            UpdateObjectStatus(dbList, Core.GlobalEnums.ObjectStatusEnum.Pending_Delete);
+            DeleteS3(datasetId, schemaId, dbList);
+
+        }
+
+        public void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status)
         {
             try
             {
@@ -115,7 +122,7 @@ namespace Sentry.data.Core
             }
         }
 
-        public void DeleteS3(int datasetId, int schemaId, List<DatasetFile> dbList)
+        private void DeleteS3(int datasetId, int schemaId, List<DatasetFile> dbList)
         {
             try
             {
