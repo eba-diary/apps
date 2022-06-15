@@ -121,13 +121,13 @@ namespace Sentry.data.Web.WebApi.Controllers
                 || !us.CanEditDataset 
                 || !us.CanManageSchema)
             {
-                return Content(System.Net.HttpStatusCode.BadRequest, "Feature not available to this user.");
+                return Content(System.Net.HttpStatusCode.Forbidden, "Feature not available to this user.");
             }
             
             //STEP 1:   VALIDATIONS:  datasetId/schemaId
             if(datasetId < 1 || schemaId < 1)
             {
-                return Content(System.Net.HttpStatusCode.Forbidden, nameof(datasetId) + " AND " + nameof(schemaId) + " must be greater than 0");
+                return Content(System.Net.HttpStatusCode.BadRequest, nameof(datasetId) + " AND " + nameof(schemaId) + " must be greater than 0");
             }
 
 
