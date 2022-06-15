@@ -32,7 +32,6 @@ namespace Sentry.data.Web.Controllers
 
             return View(myDict);
         }
-        
         public ActionResult GetAdminTest(string viewId)
         {
             string viewPath = "";

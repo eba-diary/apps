@@ -15,10 +15,6 @@
 <!-- Schema Dropdown Menu-->
 <h3>Schema</h3>
 <select class="mbd-select" , id="SchemaDropdown" style="width:800px; height:30px;">
-    @for (var x = 0; x < Model.schemas.Count; x++)
-    {
-        <option id="option" value="schema"> @Model.schemas[x]</option>
-    }
 
 </select>
 
@@ -99,13 +95,33 @@
 <!--Reprocess button-->
 <button type="button" class="btn btn-primary waves-effect waves-light" id="reprocessButton">Reprocess Selected</button>
 <!--No events are handled yet!!! Learn how to do this!!!-->
-<script>
-    $(function () {
-        $('flowSteps' || 'schema' || 'dataSet').materialSelect();
-    });
-    $('id=option').click(function (event) {
-        $(this).addClass("selected")
-    });
 
+<script>
+    //function getUrl(){
+    //    $("#allDatasets").change(function (event) {
+    //        var val = $("#allDatasets").find(":selected").val();
+    //        var url = window.location.href;
+    //        url = url.substring(0, url.length - 5);
+    //        url = url + "api/v2/metadata/dataset/" + val + "/schema";
+    //        console.log(url);
+    //        return url;
+    //    });
+    //}
+
+    //$("#allDatasets").change(function (event) {
+    //    $.ajax({
+    //        type: "GET",
+    //        url: getUrl(),
+    //        data: "{}",
+    //        success: function (data) {
+    //            var s = '<option value>Please Select Schema</option>';
+    //            for (var i = 0; i < data.length; i++) {
+    //                s += '<option value="' + data[i].SchemaId + '">' + data[i].SchemaEntity_NME + '</option>';
+    //            }
+    //            $("#SchemaDropdown").html(s);
+    //        }
+    //    });
+    //});
+    data.Admin.Init();
 </script>
 

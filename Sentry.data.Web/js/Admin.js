@@ -26,6 +26,26 @@ data.Admin = {
         $("[id^='Complete_']").on("click", function () {
             data.Admin.CompleteAuction($(this).data("id"));
         });
+    },
+    Init: function () {
+        $("#allDatasets").change(function (event) {
+            var val = $("#allDatasets").find(":selected").val();
+            var url = window.location.href;
+            url = url.substring(0, url.length - 5);
+            url = url + "api/v2/metadata/dataset/" + val + "/schema";
+            console.log(url);
+            $.ajax({
+                type: "GET",
+                url: url,
+                data: "{}",
+                success: function (data) {
+                    var s = '<option value>Please Select Schema</option>';
+                    for (var i = 0; i < data.length; i++) {
+                        s += '<option value="' + data[i].SchemaId + '">' + data[i].Name + '</option>';
+                    }
+                    $("#SchemaDropdown").html(s);
+                }
+            });
+        });
     }
-
 }

@@ -12,6 +12,7 @@ namespace Sentry.data.Web.Models.AdminPage
         public DataReprocessingModel()
         {
             allDatasets = null;
+           
             //available schema depend on dataset selection, will be added to existing list when a schema is selected. Complete population method when test data available
             schemas = populateSchemas("PlaceHolder");
             //available flowSteps depend on schema selection, will be added to existing list when a schema is selected. Complete population method when test data available
