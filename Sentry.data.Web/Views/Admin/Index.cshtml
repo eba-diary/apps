@@ -1,9 +1,9 @@
 ﻿
 @model Dictionary<string, string>
-    @{
-        ViewBag.Title = "Admin";
-        ViewBag.Fluid = true;
-    }
+@{
+    ViewBag.Title = "Admin";
+    ViewBag.Fluid = true;
+}
 
 
 <div class="row">
@@ -13,7 +13,7 @@
 
             @foreach (var key in Model.Keys)
             {
-                 <a href="#" data-url='@Url.Action("GetAdminTest", "Admin", new { viewId = key })' class="load-partial-view"><h4>@Model[key]</h4></a>
+                <a href="#" data-url='@Url.Action("GetAdminTest", "Admin", new { viewId = key })' class="load-partial-view"><h4>@Model[key]</h4></a>
 
             }
         </div>
@@ -23,15 +23,10 @@
     </div>
 </div>
 
-
-@Scripts.Render("~/bundles/jquery")
-
-<script>
-    console.log("test");
-
-    $(".load-partial-view").click(function (event) {
-        event.preventDefault();
-        var url = $(this).data("url");
-        $("#partial-view-test").load(url);
-    });
-</script>
+@section Scripts {
+    <script>
+        $(function () {
+            data.Admin.AdminPageInit();
+        });
+    </script>
+}
