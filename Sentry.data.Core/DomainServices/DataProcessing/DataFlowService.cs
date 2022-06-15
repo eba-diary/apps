@@ -546,6 +546,46 @@ namespace Sentry.data.Core
 
             return step;
         }
+        
+        /*
+         *  User is required to pass Dataflowstep id to being processing from
+         *  User can pass either  a list of dataset file ids or indicate they would like all files processed
+         *  Perform parameter validations
+         *  Successful status code means we have successfully kicked of reprocessing, not that it has finished
+         */
+        public String ReprocessEndpoints(int stepId, List<int> datasetFileIds = null, bool processAll = false)
+        {
+            if (stepId == 0)
+            {
+                throw new ArgumentNullException("stepId", "DataFlowStep is required");
+            }
+
+            if(processAll == false && datasetFileIds.Count == null)
+            {
+                throw new ArgumentException("One of these fields is required");
+            }
+
+            // finding the dataflowstep with the associated stepId
+            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
+            
+            // gets the schema id from the dataflow object
+            int schemaId = step.DataFlow.SchemaId;
+
+            // the case where the user wants all files processed
+            if (processAll == true)
+            {
+
+            }
+            else  // the case where a list of dataset file ids was provided by the user
+            {
+                
+            }
+
+            
+
+
+            return "WORKED";
+        }
 
         public List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId)
         {
