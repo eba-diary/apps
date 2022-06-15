@@ -15,9 +15,6 @@ namespace Sentry.data.Web.Controllers
             _datasetService = datasetService;
         }
 
-
-
-     
         // GET: Admin
 
         public ActionResult Index()
