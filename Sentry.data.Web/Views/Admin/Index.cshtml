@@ -1,0 +1,32 @@
+﻿
+@model Dictionary<string, string>
+@{
+    ViewBag.Title = "Admin";
+    ViewBag.Fluid = true;
+}
+
+
+<div class="row">
+    <div class="card form-wrapper col-lg-2 side-nav-wrapper">
+        <div class="card-body">
+            <h2 class="card-title">Admin Page</h2>
+
+            @foreach (var key in Model.Keys)
+            {
+                <a href="#" data-url='@Url.Action("GetAdminTest", "Admin", new { viewId = key })' class="load-partial-view"><h4>@Model[key]</h4></a>
+
+            }
+        </div>
+    </div>
+    <div class="col-lg-10">
+        <div id="partial-view-test"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            data.Admin.AdminPageInit();
+        });
+    </script>
+}

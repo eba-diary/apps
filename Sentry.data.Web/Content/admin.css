@@ -1,0 +1,10 @@
+﻿.side-nav-wrapper 
+{
+    border: 4px solid #00A3E0;
+    padding-left: 0px;
+    padding-right:0px;
+}
+
+#partial-view-test {
+    text-align:center;
+}
