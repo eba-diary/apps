@@ -602,7 +602,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public IHttpActionResult UpdateSchema(int datasetId, int schemaId, SchemaInfoModel schemaModel)
         {
-            return UpdateSchema_Internal(datasetId, schemaId, schemaModel);
+            return UpdateSchema_Internal(datasetId, schemaId, schemaModel, s => s.ToDto(datasetId, (x) => _schemaService.GetFileExtensionIdByName(x)));
         }
 
         /// <summary>
@@ -619,11 +619,11 @@ namespace Sentry.data.Web.WebApi.Controllers
         [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public IHttpActionResult UpdateSchema(int datasetId, int schemaId, Models.ApiModels.Schema20220609.SchemaInfoModel schemaModel)
         {
-            return UpdateSchema_Internal(datasetId, schemaId, schemaModel);
+            return UpdateSchema_Internal(datasetId, schemaId, schemaModel, s => s.ToDto(datasetId, (x) => _schemaService.GetFileExtensionIdByName(x)));
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1172:Unused method parameters should be removed", Justification = "False Positive")]
-        private IHttpActionResult UpdateSchema_Internal<T>(int datasetId, int schemaId, T schemaModel) where T : SchemaInfoModelBase
+        private IHttpActionResult UpdateSchema_Internal<T>(int datasetId, int schemaId, T schemaModel, Func<T, FileSchemaDto> func) where T : SchemaInfoModelBase
         {
             IHttpActionResult Updater()
             {
@@ -638,7 +638,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     return Content(System.Net.HttpStatusCode.BadRequest, $"Invalid schema request: {string.Join(" | ", validationResults)}");
                 }
 
-                return Ok(_schemaService.UpdateAndSaveSchema(schemaModel.ToDto(datasetId, (x) => _schemaService.GetFileExtensionIdByName(x))));
+                return Ok(_schemaService.UpdateAndSaveSchema(func.Invoke(schemaModel)));
             }
 
             return ApiTryCatch(nameof(MetadataController), nameof(UpdateSchema), $"datasetid:{datasetId} schemaId{schemaId}", Updater);

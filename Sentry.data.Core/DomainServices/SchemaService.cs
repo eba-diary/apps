@@ -405,7 +405,17 @@ namespace Sentry.data.Core
                 {
                     foreach (var consumptionDetailDto in dto.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>())
                     {
-                        var consumptionDetail = schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().First(cd => cd.SchemaConsumptionId == consumptionDetailDto.SchemaConsumptionId);
+                        SchemaConsumptionSnowflake consumptionDetail;
+                        if (consumptionDetailDto.SchemaConsumptionId == 0)
+                        {
+                            //this is logic to account for the fact that we're still supporting the v2 API that doesn't provide a SchemaConsumptionId
+                            consumptionDetail = schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().First(cd => cd.SnowflakeType == consumptionDetailDto.SnowflakeType);
+                        }
+                        else
+                        {
+                            //this is how the logic should work for the v20220609 API
+                            consumptionDetail = schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().First(cd => cd.SchemaConsumptionId == consumptionDetailDto.SchemaConsumptionId);
+                        }
                         changes.Add(TryUpdate(() => consumptionDetail.SnowflakeStage, () => consumptionDetailDto.SnowflakeStage, (x) => consumptionDetail.SnowflakeStage = x));
                     }
                 }

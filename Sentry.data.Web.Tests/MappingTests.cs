@@ -36,7 +36,8 @@ namespace Sentry.data.Web.Tests
                 ObjectStatus = "ACTIVE",
                 SchemaRootPath = new string[] { "start", "middle", "end" },
                 ParquetStorageBucket = "PSB",
-                ParquetStoragePrefix = "PSP"
+                ParquetStoragePrefix = "PSP",
+                SnowflakeStage = "DLST_PARQUET"
             };
 
             FileSchemaDto dto = mdl.ToDto(1, (x) => 1);
@@ -70,6 +71,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("start,middle,end", dto.SchemaRootPath);
             Assert.AreEqual("PSB", dto.ParquetStorageBucket);
             Assert.AreEqual("PSP", dto.ParquetStoragePrefix);
+            Assert.AreEqual("DLST_PARQUET", dto.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>().First().SnowflakeStage);
         }
 
         [TestMethod]

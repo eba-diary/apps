@@ -1,13 +1,21 @@
-﻿using System;
+﻿using JsonSubTypes;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
 namespace Sentry.data.Web.Models.ApiModels.Schema20220609
 {
+    [JsonConverter(typeof(JsonSubtypes), nameof(SchemaConsumptionType))]
+    [JsonSubtypes.KnownSubType(typeof(SchemaConsumptionSnowflakeModel), nameof(SchemaConsumptionTypeEnum.Snowflake))]
     public abstract class SchemaConsumptionModel
     {
         public int SchemaConsumptionId { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public abstract SchemaConsumptionTypeEnum SchemaConsumptionType { get; }
 
         /// <summary>
         /// Method to accept a visitor to this class hierarchy

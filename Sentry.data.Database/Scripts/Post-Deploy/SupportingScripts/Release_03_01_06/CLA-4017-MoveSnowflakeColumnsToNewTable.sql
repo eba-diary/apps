@@ -7,8 +7,8 @@ BEGIN TRY
     PRINT 'Running script "' + @ScriptVersion + '"...'
     -- BEGIN POST-DEPLOY SCRIPT --
 
-    INSERT INTO SchemaConsumption (Schema_Id, SchemaConsumption_TYP)
-    SELECT Schema_Id, 'Snowflake'
+    INSERT INTO SchemaConsumption (Schema_Id)
+    SELECT Schema_Id
     FROM [Schema]
 
     INSERT INTO SchemaConsumptionSnowflake ([SchemaConsumptionSnowflake_Id],

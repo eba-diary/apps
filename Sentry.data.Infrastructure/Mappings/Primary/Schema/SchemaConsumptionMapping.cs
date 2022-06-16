@@ -20,8 +20,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("SchemaConsumption_Id");
                 m.Generator(Generators.Identity);
             });
-
-            Discriminator(x => x.Column("SchemaConsumption_TYP"));
         }
     }
 }

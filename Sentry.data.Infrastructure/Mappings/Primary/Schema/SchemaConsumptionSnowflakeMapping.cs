@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
 {
-    internal class SchemaConsumptionSnowflakeMapping: JoinedSubclassMapping<SchemaConsumptionSnowflake>
+    public class SchemaConsumptionSnowflakeMapping: JoinedSubclassMapping<SchemaConsumptionSnowflake>
     {
 
         public SchemaConsumptionSnowflakeMapping()
@@ -34,7 +34,10 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property(x => x.SnowflakeStage);
             Property(x => x.SnowflakeWarehouse); 
             Property(x => x.SnowflakeType,
-                 attr => attr.Type<EnumStringType<SnowflakeConsumptionType>>());
+                     attr => {
+                     attr.Column("Snowflake_TYP");
+                     attr.Type<EnumStringType<SnowflakeConsumptionType>>();
+                     });
         }
     }
 }

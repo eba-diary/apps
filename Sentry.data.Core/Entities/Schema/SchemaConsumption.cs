@@ -11,7 +11,7 @@ namespace Sentry.data.Core
     /// </summary>
     public abstract class SchemaConsumption
     {
-        public int SchemaConsumptionId { get; set; }
+        public virtual int SchemaConsumptionId { get; set; }
 
         /// <summary>
         /// Method to accept a visitor to this class hierarchy

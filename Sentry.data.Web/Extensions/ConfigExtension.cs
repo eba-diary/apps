@@ -215,41 +215,38 @@ namespace Sentry.data.Web
             return model;
         }
 
-        private static SchemaInfoModelBase PopulateSchemaModelBase(this SchemaInfoModelBase model, Core.DatasetFileConfigDto dto)
+        private static void PopulateSchemaModelBase(this SchemaInfoModelBase model, Core.DatasetFileConfigDto dto)
         {
             Core.FileSchemaDto schemaDto = dto.Schema;
-            return new SchemaInfoModel()
+            model.ConfigId = dto.ConfigId;
+            model.Name = schemaDto.Name;
+            model.SchemaId = schemaDto.SchemaId;
+            model.SchemaEntity_NME = schemaDto.SchemaEntity_NME;
+            model.Description = schemaDto.Description;
+            model.StorageCode = schemaDto.StorageCode;
+            model.Format = schemaDto.FileExtensionName;
+            model.CurrentView = schemaDto.CreateCurrentView;
+            model.Delimiter = schemaDto.Delimiter;
+            model.HasHeader = schemaDto.HasHeader;
+            model.IsTrackableSchema = dto.IsTrackableSchema;
+            model.HiveTable = schemaDto.HiveTable;
+            model.HiveDatabase = schemaDto.HiveDatabase;
+            model.HiveTableStatus = schemaDto.HiveStatus;
+            model.HiveLocation = schemaDto.HiveLocation;
+            model.Options = new List<string>()
             {
-                ConfigId = dto.ConfigId,
-                Name = schemaDto.Name,
-                SchemaId = schemaDto.SchemaId,
-                SchemaEntity_NME = schemaDto.SchemaEntity_NME,
-                Description = schemaDto.Description,
-                StorageCode = schemaDto.StorageCode,
-                Format = schemaDto.FileExtensionName,
-                CurrentView = schemaDto.CreateCurrentView,
-                Delimiter = schemaDto.Delimiter,
-                HasHeader = schemaDto.HasHeader,
-                IsTrackableSchema = dto.IsTrackableSchema,
-                HiveTable = schemaDto.HiveTable,
-                HiveDatabase = schemaDto.HiveDatabase,
-                HiveTableStatus = schemaDto.HiveStatus,
-                HiveLocation = schemaDto.HiveLocation,
-                Options = new List<string>()
-                {
-                    "CLA1396_NewEtlColumns|" + schemaDto.CLA1396_NewEtlColumns.ToString(),
-                    "CLA1580_StructureHive|" + schemaDto.CLA1580_StructureHive.ToString(),
-                    "CLA2472_EMRSend|" + schemaDto.CLA2472_EMRSend.ToString(),
-                    "CLA1286_KafkaFlag|" + schemaDto.CLA1286_KafkaFlag.ToString(),
-                    "CLA3014_LoadDataToSnowflake|" + schemaDto.CLA3014_LoadDataToSnowflake.ToString()
-                },
-                DeleteInd = schemaDto.DeleteInd,
-                ObjectStatus = schemaDto.ObjectStatus.GetDescription().ToUpper(),
-                SchemaRootPath = schemaDto.SchemaRootPath?.Split(','),
-                HasDataFlow = dto.HasDataFlow,
-                ParquetStorageBucket = schemaDto.ParquetStorageBucket,
-                ParquetStoragePrefix = schemaDto.ParquetStoragePrefix,
+                "CLA1396_NewEtlColumns|" + schemaDto.CLA1396_NewEtlColumns.ToString(),
+                "CLA1580_StructureHive|" + schemaDto.CLA1580_StructureHive.ToString(),
+                "CLA2472_EMRSend|" + schemaDto.CLA2472_EMRSend.ToString(),
+                "CLA1286_KafkaFlag|" + schemaDto.CLA1286_KafkaFlag.ToString(),
+                "CLA3014_LoadDataToSnowflake|" + schemaDto.CLA3014_LoadDataToSnowflake.ToString()
             };
+            model.DeleteInd = schemaDto.DeleteInd;
+            model.ObjectStatus = schemaDto.ObjectStatus.GetDescription().ToUpper();
+            model.SchemaRootPath = schemaDto.SchemaRootPath?.Split(',');
+            model.HasDataFlow = dto.HasDataFlow;
+            model.ParquetStorageBucket = schemaDto.ParquetStorageBucket;
+            model.ParquetStoragePrefix = schemaDto.ParquetStoragePrefix;            
         }
 
         public static List<SchemaInfoModel> ToSchemaModel(this List<Core.DatasetFileConfigDto> dtoList)
@@ -264,7 +261,22 @@ namespace Sentry.data.Web
 
         public static FileSchemaDto ToDto(this SchemaInfoModel mdl, int datasetId, Func<string, int> extIdLookup)
         {
-            return ((SchemaInfoModelBase)mdl).ToDto(datasetId, extIdLookup);
+            var dto = ((SchemaInfoModelBase)mdl).ToDto(datasetId, extIdLookup);
+            //the old SchemaInfoModel doesn't hold the SchemaConsumptionId - so we just put the data we have into a SchemaConsumptionSnowflakeDto as-is -
+            //it will be up to the SchemaService implementation to translate this to the correct SchemaConsumption record
+            dto.ConsumptionDetails = new List<SchemaConsumptionDto>() {
+                    new SchemaConsumptionSnowflakeDto()
+                    {
+                        SnowflakeDatabase = mdl.SnowflakeDatabase,
+                        SnowflakeSchema = mdl.SnowflakeSchema,
+                        SnowflakeTable = mdl.SnowflakeTable,
+                        SnowflakeStatus = mdl.SnowflakeStatus,
+                        SnowflakeStage = mdl.SnowflakeStage,
+                        SnowflakeWarehouse = mdl.SnowflakeWarehouse,
+                        SnowflakeType = SnowflakeConsumptionType.CategorySchemaParquet //assume that the legacy SchemaInfoModel is referring to the legacy Snowflake type
+                    }
+                };
+            return dto;
         }
 
         public static FileSchemaDto ToDto(this Models.ApiModels.Schema20220609.SchemaInfoModel mdl, int datasetId, Func<string, int> extIdLookup)
@@ -274,7 +286,7 @@ namespace Sentry.data.Web
             return dto;
         }
 
-        public static FileSchemaDto ToDto(this SchemaInfoModelBase mdl, int datasetId, Func<string, int> extIdLookup)
+        private static FileSchemaDto ToDto(this SchemaInfoModelBase mdl, int datasetId, Func<string, int> extIdLookup)
         {
             return new FileSchemaDto()
             {
