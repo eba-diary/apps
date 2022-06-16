@@ -546,6 +546,49 @@ namespace Sentry.data.Core
 
             return step;
         }
+        
+        /*
+         *  @param - User is required to pass Dataflowstep id to being processing from
+         *  @return - DataFlowdto object of the stepId
+         */
+        public DataFlowDto GetDataFlowByStepId(int stepId)
+        {
+            if (stepId == 0)
+            {
+                throw new ArgumentNullException("stepId", "DataFlowStep is required");
+            }
+
+            // finding the dataflowstep with the associated stepId
+            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
+            
+            // retrieve the dataflow object from dataflowstep
+            DataFlow df = step.DataFlow;
+
+            DataFlowDto dataFlowDto = new DataFlowDto();
+            MapToDto(df, dataFlowDto);
+
+            return dataFlowDto;
+        }
+
+        /*
+         *  User can pass either  a list of dataset file ids
+         *  Perform parameter validation
+         *  Successful status code means we have successfully kicked off reprocessing, not that it has finished 
+         */
+        public bool validateDatafileIds(List<int> datasetFileIds)
+        {
+            List<DataFlow> validatedIds = new List<DataFlow>();
+            foreach (int datasetFileId in datasetFileIds)
+            {
+                DataFlow tempDataflow = _datasetContext.DataFlow.Where(w => w.DatasetId == datasetFileId).FirstOrDefault();
+                validatedIds.Add(tempDataflow);
+            }
+
+            bool indicator = datasetFileIds.Count == validatedIds.Count ? true : false;
+            
+            return indicator; // indicator acts like a status code, true --> worked, false --> didn't work
+        }
+
 
         public List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId)
         {
