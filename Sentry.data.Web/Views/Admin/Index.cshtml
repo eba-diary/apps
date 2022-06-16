@@ -24,6 +24,9 @@
 </div>
 
 @section Scripts {
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/dataTables")
+    @Styles.Render("~/bundles/css/dataTables")
     <script>
         $(function () {
             data.Admin.AdminPageInit();

@@ -22,12 +22,13 @@ data.Admin = {
 
     // Complete.vbhtml
 
-    CompleteInit: function() {
+    CompleteInit: function () {
         $("[id^='Complete_']").on("click", function () {
             data.Admin.CompleteAuction($(this).data("id"));
         });
     },
-    Init: function () {
+
+    ReprocessInit: function () {
         //on selection of a dataset, load available schema
         $("#allDatasets").change(function (event) {
             var val = $("#allDatasets").find(":selected").val();
@@ -55,20 +56,28 @@ data.Admin = {
             var url = window.location.href;
             url = url.substring(0, url.length - 5);
             url = url + "api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000";
+
             console.log(url);
+
             $("#results").DataTable({
+                destroy: true,
                 ajax: {
                     url: url,
-                    dataSrc: "record",
+                    dataSrc: "Records",
                 },
+                columns: [
+                    { data: "DatasetFileId" },
+                    { data: "FileName" },
+                    { data: "UploadUserName" },
+                    { data: "CreateDTM" },
+                    { data: "ModifiedDTM" },
+                    { data: "FileLocation" },
+                ],
             });
 
         });
-    
-    }
-}
-    },
 
+    },
     // Loads Admin jobs pages
 
     AdminPageInit: function () {
@@ -79,3 +88,4 @@ data.Admin = {
         });
     }
 }
+
