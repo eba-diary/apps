@@ -28,6 +28,7 @@ data.Admin = {
         });
     },
     Init: function () {
+        //on selection of a dataset, load available schema
         $("#allDatasets").change(function (event) {
             var val = $("#allDatasets").find(":selected").val();
             var url = window.location.href;
@@ -47,5 +48,22 @@ data.Admin = {
                 }
             });
         });
+        //on selection of a schema, fills in data table
+        $("#SchemaDropdown").change(function (event) {
+            var schemaId = $("#SchemaDropdown").find(":selected").val();
+            var datasetId = $("#allDatasets").find(":selected").val();
+            var url = window.location.href;
+            url = url.substring(0, url.length - 5);
+            url = url + "api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000";
+            console.log(url);
+            $("#results").DataTable({
+                ajax: {
+                    url: url,
+                    dataSrc: "record",
+                },
+            });
+
+        });
+    
     }
 }
