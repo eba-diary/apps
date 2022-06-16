@@ -46,6 +46,7 @@ namespace Sentry.data.Web.Controllers
         private readonly NamedEnvironmentBuilder _namedEnvironmentBuilder;
         private readonly IElasticContext _elasticContext;
         private readonly Lazy<IDataApplicationService> _dataApplicationService;
+        private readonly IDatasetFileService _datasetFileService;
 
         public DatasetController(
             IDatasetContext dsCtxt,
@@ -62,7 +63,8 @@ namespace Sentry.data.Web.Controllers
             IJobService jobService,
             NamedEnvironmentBuilder namedEnvironmentBuilder,
             IElasticContext elasticContext,
-            Lazy<IDataApplicationService> dataApplicationService)
+            Lazy<IDataApplicationService> dataApplicationService,
+            IDatasetFileService datasetFileService)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
@@ -79,6 +81,7 @@ namespace Sentry.data.Web.Controllers
             _namedEnvironmentBuilder = namedEnvironmentBuilder;
             _elasticContext = elasticContext;
             _dataApplicationService = dataApplicationService;
+            _datasetFileService = datasetFileService;
         }
 
         private IDataApplicationService DataApplicationService
@@ -955,31 +958,46 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetFileConfigDto dto = _configService.GetDatasetFileConfigDto(configId);
 
-            UploadDataFileModel uploadModel = new UploadDataFileModel()
+            UploadDatasetFileModel uploadModel = new UploadDatasetFileModel()
             {
                 DatasetId = datasetId,
                 ConfigId = configId,
                 SchemaName = dto.Schema.Name
             };
 
-            return PartialView(@"Details\_UploadDataFileForm", uploadModel);
+            return PartialView(@"Details\_UploadDatasetFileForm", uploadModel);
         }
 
         [HttpPost]
-        public ActionResult UploadDataFileToS3(UploadDataFileModel uploadModel)
+        public JsonResult UploadDatasetFileToS3(UploadDatasetFileModel uploadModel)
         {
-            using (StreamReader reader = new StreamReader(uploadModel.DataFile.InputStream))
+            UserSecurity userSecurity = _datasetService.GetUserSecurityForConfig(uploadModel.ConfigId);
+            if (userSecurity.CanUploadToDataset)
             {
-                using (StreamWriter writer = new StreamWriter(@"C:\082116\DSC\TestFile.txt"))
+                if (uploadModel.DatasetFile != null)
                 {
-                    while (!reader.EndOfStream)
+                    try
                     {
-                        writer.WriteLine(reader.ReadLine());
+                        UploadDatasetFileDto dto = uploadModel.ToDto();
+                        _datasetFileService.UploadDatasetFileToS3(dto);
                     }
+                    catch (Exception e)
+                    {
+                        Logger.Error("Error uploading file to S3", e);
+                        throw;
+                    }
+                    
+                    return Json(new { Success = true });
+                }
+                else
+                {
+                    return Json(new { Success = false, Message = "No file was available for upload" });
                 }
             }
-            
-            return Json("Success");
+            else
+            {
+                return Json(new { Success = false, Message = "Unauthorized to upload a file to this dataset" });
+            }
         }
 
         [HttpPost]

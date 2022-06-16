@@ -1714,17 +1714,15 @@ data.Dataset = {
                 $("#upload-progress-2").removeClass("d-none");
             };
 
-            xhr.onprogress = function (e) {
-                console.log(e);
-            };
-
-            xhr.onreadystatechange = function (e) {
-                console.log(e);
-            };
-
             xhr.onloadend = function () {
                 if (xhr.status == 200) {
-                    data.Dataset.makeToast("success", "File has been successfully uploaded to S3. It may take a few moments before the file is visible in the Files tab.");
+                    var responseJson = JSON.parse(xhr.response);
+                    if (responseJson.Success) {
+                        data.Dataset.makeToast("success", "File has been successfully uploaded to S3. It may take a few moments before the file is visible in the Files tab.");
+                    }
+                    else {
+                        data.Dataset.makeToast("error", responseJson.Message);
+                    }
                 }
                 else {
                     data.Dataset.makeToast("error", "There was an issue uploading the file. Please try again or reach out to DSCSupport@sentry.com.");

@@ -1,9 +1,9 @@
-﻿@model Sentry.data.Web.UploadDataFileModel
+﻿@model Sentry.data.Web.UploadDatasetFileModel
 @{
     ViewBag.Title = "Upload Datafile";
 }
 
-@using (Html.BeginForm("UploadDataFileToS3", "Dataset", FormMethod.Post, new { id = "upload-data-file-form", @class = "md-form needs-validation" }))
+@using (Html.BeginForm("UploadDatasetFileToS3", "Dataset", FormMethod.Post, new { id = "upload-data-file-form", @class = "md-form needs-validation" }))
 {
     @Html.AntiForgeryToken()
     @Html.HiddenFor(x => x.DatasetId)
@@ -13,7 +13,7 @@
     <div class="file-field mb-5">
         <div class="btn btn-primary btn-sm waves-effect waves-light">
             <span>Choose file</span>
-            @Html.TextBoxFor(x => x.DataFile, new { id = "data-file-to-upload", type = "file" })
+            @Html.TextBoxFor(x => x.DatasetFile, new { id = "data-file-to-upload", type = "file" })
         </div>
 
         <div class="file-path-wrapper">

@@ -75,5 +75,16 @@ namespace Sentry.data.Web
 
             return dto;
         }
+
+        public static UploadDatasetFileDto ToDto(this UploadDatasetFileModel model)
+        {
+            return new UploadDatasetFileDto()
+            {
+                DatasetId = model.DatasetId,
+                ConfigId = model.ConfigId,
+                FileName = model.DatasetFile.FileName,
+                FileInputStream = model.DatasetFile.InputStream
+            };
+        }
     }
 }

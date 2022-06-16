@@ -1,4 +1,6 @@
-﻿using Sentry.data.Core.Exceptions;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Helpers.Paginate;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +12,15 @@ namespace Sentry.data.Core
         private readonly IDatasetContext _datasetContext;
         private readonly ISecurityService _securityService;
         private readonly IUserService _userService;
+        private readonly IS3ServiceProvider _s3ServiceProvider;
 
         public DatasetFileService(IDatasetContext datasetContext, ISecurityService securityService,
-                                    IUserService userService)
+                                    IUserService userService, IS3ServiceProvider s3ServiceProvider)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
             _userService = userService;
+            _s3ServiceProvider = s3ServiceProvider;
         }
 
         public PagedList<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
@@ -94,6 +98,28 @@ namespace Sentry.data.Core
             //UPDATE ObjectStatus
         }
 
+        public void UploadDatasetFileToS3(UploadDatasetFileDto uploadDatasetFileDto)
+        {
+            DatasetFileConfig datasetFileConfig = _datasetContext.GetById<DatasetFileConfig>(uploadDatasetFileDto.ConfigId);
+
+            if (datasetFileConfig != null)
+            {
+                DataFlow dataFlow = _datasetContext.DataFlow.FirstOrDefault(x => x.DatasetId == uploadDatasetFileDto.DatasetId && x.SchemaId == datasetFileConfig.Schema.SchemaId);
+                DataFlowStep dropStep = dataFlow?.Steps.FirstOrDefault(x => x.DataAction_Type_Id == DataActionType.ProducerS3Drop);
+                if (dropStep != null)
+                {
+                    _s3ServiceProvider.UploadDataFile(uploadDatasetFileDto.FileInputStream, dropStep.TriggerBucket, dropStep.TriggerKey + uploadDatasetFileDto.FileName);
+                }
+                else
+                {
+                    Logger.Info($"Data Flow for dataset: {uploadDatasetFileDto.DatasetId} and schema: {datasetFileConfig.Schema.SchemaId} not found while attempting to upload file to S3");
+                }
+            }
+            else
+            {
+                Logger.Info($"Dataset File Config with Id: {uploadDatasetFileDto.ConfigId} not found while attempting to upload file to S3");
+            }
+        }
 
         #region PrivateMethods
         internal void UpdateDataFile(DatasetFileDto dto, DatasetFile dataFile)

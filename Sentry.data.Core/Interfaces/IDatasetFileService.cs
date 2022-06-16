@@ -22,5 +22,6 @@ namespace Sentry.data.Core
 
         List<DatasetFile> GetDatasetFileList(string[] fileNameList);
         List<DatasetFile> GetDatasetFileList(int[] datasetFileIdList);
+        void UploadDatasetFileToS3(UploadDatasetFileDto uploadDatasetFileDto);
     }
 }

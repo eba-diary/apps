@@ -45,10 +45,10 @@
 
 @if (Model.DisplayDatasetFileDelete)
 {
-    Html.RenderPartial("Details/_DeleteDataFiles");
+    Html.RenderPartial("Details/_DeleteDatasetFiles");
 }
 
 @if (Model.Security.CanUploadToDataset)
 {
-    Html.RenderPartial("Details/_UploadDataFile");
+    Html.RenderPartial("Details/_UploadDatasetFile");
 }
