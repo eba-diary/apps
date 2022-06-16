@@ -19,23 +19,14 @@
         </div>
     </div>
     <div class="col-lg-10">
-        <center id="partial-view-test"></center>
+        <div id="partial-view-test"></div>
     </div>
 </div>
 
 @section Scripts {
-    
-@Scripts.Render("~/bundles/jquery")
-@Scripts.Render("~/bundles/dataTables")
-@Styles.Render("~/bundles/css/dataTables")
-
-<script>
-    console.log("test");
-
-    $(".load-partial-view").click(function (event) {
-        event.preventDefault();
-        var url = $(this).data("url");
-        $("#partial-view-test").load(url);
-    });
-</script>
-    }
+    <script>
+        $(function () {
+            data.Admin.AdminPageInit();
+        });
+    </script>
+}
