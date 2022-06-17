@@ -1,5 +1,9 @@
 ﻿@model Sentry.data.Web.RequestPermissionInheritanceModel
 
+@{
+    ViewData.TemplateInfo.HtmlFieldPrefix = "Inheritance";
+}
+
 @using (Html.BeginForm("SubmitInheritanceRequest", "Dataset", FormMethod.Post, new { @id = "InheritanceRequestForm" }))
 {
     <div class="modal fade" id="inheritanceModal" tabindex="-1" role="dialog" aria-labelledby="inheritanceModalTitle"
@@ -22,7 +26,7 @@
                     @Html.HiddenFor(model => model.SecurableObjectId)
                     @Html.HiddenFor(model => model.SaidKeyCode)
                     <div class="md-form">
-                        @Html.TextBoxFor(model => model.DatasetName, new { @disabled = "disabled", @class = "form-control disabled" })
+                        @Html.TextBoxFor(model => model.DatasetName, new { @disabled = "disabled", @class = "form-control", @readonly = "readonly" })
                         <label for="SecurableObjectName" class="active">Dataset</label>
                     </div>
                     <div class="md-form">

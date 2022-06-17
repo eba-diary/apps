@@ -14,7 +14,6 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
         public override string FieldType => GlobalConstants.Datatypes.STRUCT;
         public override bool Nullable { get; set; }
-        public override int Length { get; set; }
 
 
         //Properties that are not utilized by this type and are defaulted
@@ -51,6 +50,11 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             BaseField newEntityField = new StructField();
             base.ToEntity(newEntityField, parentField, parentRevision);
             return newEntityField;
+        }
+
+        public override void Clean(string extension)
+        {
+            //Nothing to clean
         }
     }
 }

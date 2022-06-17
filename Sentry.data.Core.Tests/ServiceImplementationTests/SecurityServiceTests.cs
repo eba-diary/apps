@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Rhino.Mocks;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Interfaces.InfrastructureEventing;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core.Tests
@@ -1423,13 +1426,13 @@ namespace Sentry.data.Core.Tests
             var parentSecurable = new Mock<ISecurable>();
             parentSecurable.Setup(s => s.Security).Returns(security);
             securable.Setup(s => s.Parent).Returns(parentSecurable.Object);
-            var securityService = new SecurityService(null, null, null);
+            var securityService = new SecurityService(null, null, null, null);
 
             // Act
             var actual = securityService.GetSecurablePermissions(securable.Object);
 
             // Assert
-            Assert.AreEqual(2,actual.Count());
+            Assert.AreEqual(2, actual.Count());
         }
 
         [TestMethod]
@@ -1442,13 +1445,97 @@ namespace Sentry.data.Core.Tests
             var parentSecurable = new Mock<ISecurable>();
             parentSecurable.Setup(s => s.Security).Returns(security);
             securable.Setup(s => s.Parent).Returns(parentSecurable.Object);
-            var securityService = new SecurityService(null, null, null);
+            var securityService = new SecurityService(null, null, null, null);
 
             // Act
             var actual = securityService.GetSecurablePermissions(securable.Object);
 
             // Assert
             Assert.AreEqual(4, actual.Count()); //2 from parent and 2 from itself
+        }
+
+        #endregion
+
+        #region ApproveTicket
+
+        /// <summary>
+        /// Tests that when a security ticket is approved, and none of the associated permissions
+        /// are for a dataset, no Infrastructure Event is published.
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        public async Task ApproveTicket_NoDatasetPermissions()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var inevService = new Mock<IInevService>();
+            var ticket = new SecurityTicket()
+            {
+                Permissions = new List<SecurityPermission>() {
+                    new SecurityPermission() {
+                        Permission = new Permission() { SecurableObject = SecurableEntityName.DATA_ASSET } } }
+            };
+            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object);
+
+            //Act
+            await service.ApproveTicket(ticket, "");
+
+            //Assert
+            inevService.VerifyNoOtherCalls();
+        }
+
+        /// <summary>
+        /// Tests that when a security ticket is approved, and the dataset associated with the security ticket
+        /// can't be found, no Infrastructure Event is published.
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        public async Task ApproveTicket_DatasetPermissions_NoDataset()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var inevService = new Mock<IInevService>();
+            var ticket = new SecurityTicket()
+            {
+                Permissions = new List<SecurityPermission>() {
+                    new SecurityPermission() {
+                        Permission = new Permission() { SecurableObject = SecurableEntityName.DATASET } } }
+            };
+            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object);
+
+            //Act
+            await Assert.ThrowsExceptionAsync<DatasetNotFoundException>(() => service.ApproveTicket(ticket, ""));
+
+            //Assert
+            inevService.VerifyNoOtherCalls();
+        }
+
+        /// <summary>
+        /// Tests that when a security ticket is approved, if there are dataset permissions associated with the
+        /// security ticket, and the dataset can be found, then the Infrastructure Event is published
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        public async Task ApproveTicket_DatasetPermissions_WithDataset()
+        {
+            //Arrange
+            var ticket = new SecurityTicket()
+            {
+                Permissions = new List<SecurityPermission>() {
+                    new SecurityPermission() {
+                        Permission = new Permission() { SecurableObject = SecurableEntityName.DATASET } } }
+            };
+            var dataset = new Dataset() { Security = new Security() { Tickets = new List<SecurityTicket>() { ticket } } };
+            var context = new Mock<IDatasetContext>();
+            context.Setup(s => s.Datasets).Returns((new List<Dataset>() { dataset }).AsQueryable());
+            var inevService = new Mock<IInevService>();
+            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object);
+
+            //Act
+            await service.ApproveTicket(ticket, "");
+
+            //Assert
+            inevService.Verify(i => i.PublishDatasetPermissionsUpdated(dataset, ticket, It.IsAny<IList<SecurablePermission>>()));
         }
 
         #endregion

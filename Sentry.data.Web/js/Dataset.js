@@ -2373,7 +2373,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     managePermissionsInit() {
 
-        $("#SelectedApprover").materialSelect();
+        $("#Inheritance_SelectedApprover").materialSelect();
         $("#inheritanceSwitch label").click(function () {
             $("#inheritanceModal").modal('show');
         });
@@ -2405,6 +2405,10 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                 $("#inheritanceValidationMessage").removeClass("d-none");
             }
         });
+        $("#RequestAccessButton").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.AccessRequest.InitForDataset($(this).data("id"));
+        });
     },
 
     permissionInheritanceSwitchInit(result) {
@@ -2413,7 +2417,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             case "ACTIVE":
                 $('#inheritanceSwitchInput').prop('checked', true);
                 $("#addRemoveInheritanceMessage").text("Request Remove Inheritance");
-                $("#IsAddingPermission").val(false);
+                $("#Inheritance_IsAddingPermission").val(false);
                 break;
             case "PENDING":
                 $("#inheritanceSwitch").html('<p>Inheritance change pending. See ticket ' + result.TicketId + '.</p>');
@@ -2421,12 +2425,154 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             default: //we treat default the same as "DISABLED"
                 $("#addRemoveInheritanceMessage").text("Request Add Inheritance");
                 $('#inheritanceSwitchInput').prop('checked', false);
-                $("#IsAddingPermission").val(true);
+                $("#Inheritance_IsAddingPermission").val(true);
         }
     },
 
     validateInheritanceModal() {
-        return ($("#BusinessReason").val() != '' && $("#SelectedApprover").val != '')
+        return ($("#Inheritance_BusinessReason").val() != '' && $("#Inheritance_SelectedApprover").val != '')
+    },
+
+    initRequestAccessWorkflow() {
+        data.Dataset.addRequestAccessBreadcrumb("Access To", "#RequestAccessToSection")
+        $("#RequestAccessToDatasetBtn").click(function (e) {
+            var datasetName = $("#RequestAccessDatasetName").text();
+            $("#RequestAccess_Scope").val('0')
+            data.Dataset.editActiveRequestAccessBreadcrumb(datasetName);
+            $("#RequestAccessConsumeEntitlement").text("Placeholder Entitlement");
+            data.Dataset.onAccessToSelection(e);
+        });
+        $("#RequestAccessToAssetBtn").click(function (e) {
+            $("#RequestAccess_Scope").val('1')
+            data.Dataset.editActiveRequestAccessBreadcrumb(e.target.value);
+            $("#RequestAccessConsumeEntitlement").text("Placeholder Entitlement");
+            data.Dataset.onAccessToSelection(e);
+        });
+        $("#RequestAccessTypeConsumeBtn").click(function (e) {
+            data.Dataset.editActiveRequestAccessBreadcrumb("Consume");
+            data.Dataset.requestAccessCleanActiveBreadcrumb();
+            data.Dataset.addRequestAccessBreadcrumb("Consume Type", "#RequestAccessConsumerTypeSection");
+            $("#RequestAccessTypeSection").addClass("d-none");
+            $("#RequestAccessConsumerTypeSection").removeClass("d-none");
+        });
+        $("#RequestAccessTypeManageBtn").click(function (e) {
+            data.Dataset.editActiveRequestAccessBreadcrumb("Manage");
+            data.Dataset.requestAccessCleanActiveBreadcrumb();
+            data.Dataset.addRequestAccessBreadcrumb("Manage Request", "#RequestAccessManageTypeSection");
+            $("#RequestAccessManageEntitlement").text("Placeholder Entitlement");
+            $("#RequestAccessTypeSection").addClass("d-none");
+            $("#RequestAccessManageTypeSection").removeClass("d-none");
+        });
+        $("#RequestAccessConsumeSnowflakeBtn").click(function (e) {
+            data.Dataset.editActiveRequestAccessBreadcrumb("Snowflake Account");
+            data.Dataset.requestAccessCleanActiveBreadcrumb();
+            data.Dataset.addRequestAccessBreadcrumb("Create Request", "#RequestAccessFormSection");
+            $("#RequestAccessConsumerTypeSection").addClass("d-none");
+            $("#RequestAccessFormSection").removeClass("d-none");
+        });
+        $("#RequestAccessConsumeAwsBtn").click(function (e) {
+            data.Dataset.editActiveRequestAccessBreadcrumb("AWS IAM");
+            data.Dataset.requestAccessCleanActiveBreadcrumb();
+            data.Dataset.addRequestAccessBreadcrumb("Create Request", "#RequestAccessFormSection");
+            $("#RequestAccessConsumerTypeSection").addClass("d-none");
+            $("#RequestAccessFormSection").removeClass("d-none");
+            data.Dataset.setupFormAwsIam();
+        });
+        $("#RequestAccess_SelectedApprover").materialSelect();
+        $("#RequestAccessSubmit").click(function () {
+            if (data.Dataset.validateRequestAccessModal()) {
+                $("#RequestAccessLoading").removeClass('d-none');
+                $("#RequestAccessBody").addClass('d-none');
+                $.ajax({
+                    type: 'POST',
+                    data: $("#AccessRequestForm").serialize(),
+                    url: '/Dataset/SubmitAccessRequestCLA3723',
+                    success: function (data) {
+                        $("#RequestAccessLoading").addClass('d-none');
+                        $("#RequestAccessBody").removeClass('d-none');
+                        $("#RequestAccessBody").html(data);
+                    }
+                });
+            }
+            else {
+                $("#AccessRequestValidationMessage").removeClass("d-none");
+            }
+        });
+    },
+
+    validateRequestAccessModal() {
+        var valid;
+        valid = $("#RequestAccess_BusinessReason").val() != '' && $("#RequestAccess_SelectedApprover").val != ''
+        if ($("#RequestAccess_Type").val() == "1") {
+            valid = valid && data.Dataset.requestAccessValidateAwsArnIam();
+        }
+        return valid;
+    },
+
+    onAccessToSelection(event) {
+        data.Dataset.requestAccessCleanActiveBreadcrumb();
+        data.Dataset.addRequestAccessBreadcrumb("Access Type", "#RequestAccessTypeSection");
+        $("#RequestAccessToSection").addClass("d-none");
+        $("#RequestAccessTypeSection").removeClass("d-none");
+    },
+
+    buildBreadcrumbReturnToStepHandler(element) {
+        element.click(function () {
+            var jumpBackTo = element.attr("value");
+            $('#AccessRequestForm div.requestAccessStage:not(.d-none)').addClass('d-none');
+            $(jumpBackTo).removeClass('d-none');
+            element.nextAll().remove();
+            element.addClass('active');
+            if (jumpBackTo != "#RequestAccessFormSection") {
+                data.Dataset.requestAccessHideSaveChanges();
+            }
+        });
+    },
+
+    requestAccessCleanActiveBreadcrumb() {
+        $("#RequestAccessBreadcrumb li").removeClass("active");
+    },
+
+    addRequestAccessBreadcrumb(breadCrumbText, createdFrom) {
+        $("#RequestAccessBreadcrumb").append('<li class="breadcrumb-item active" value="' + createdFrom + '"><a href="#">' + breadCrumbText + '</a></li>');
+        data.Dataset.buildBreadcrumbReturnToStepHandler(data.Dataset.requestAccessGetActiveBreadcrumb());
+    },
+
+    editActiveRequestAccessBreadcrumb(breadCrumbText) {
+        $("#RequestAccessBreadcrumb li.active a").text(breadCrumbText);
+    },
+
+    requestAccessGetActiveBreadcrumb() {
+        return $("#RequestAccessBreadcrumb li.active");
+    },
+
+    setupFormAwsIam() {
+        $("#AwsArnForm").removeClass("d-none");
+        $("#RequestAccess_Type").val("1")
+        data.Dataset.requestAccessShowSaveChanges();
+    },
+
+
+
+    requestAccessShowSaveChanges() {
+        $("#RequestAccessSubmit").removeClass("d-none");
+    },
+
+    requestAccessHideSaveChanges() {
+        $("#RequestAccessSubmit").addClass("d-none");
+    },
+
+    requestAccessValidateAwsArnIam() {
+        var pattern = /^arn:aws:iam::\d{12}:role\/+./;
+        var valid = pattern.test($("#RequestAccess_AwsArn").val());
+        if (valid) {
+            $("#AccessRequestAwsArnValidationMessage").addClass("d-none");
+            return true;
+        }
+        else {
+            $("#AccessRequestAwsArnValidationMessage").removeClass("d-none");
+            return false;
+        }
     },
 
     showDataPreviewError() {

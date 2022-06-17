@@ -43,9 +43,6 @@ namespace Sentry.data.Core.DTO.Schema.Fields
         public override string SourceFormat { get; set; }
         public override int OrdinalPosition { get; set; }
 
-        private int length;
-        public override int Length { get { return GlobalConstants.Datatypes.Defaults.LENGTH_DEFAULT; } set { length = value; } }        //DEFAULT LENGTH BECAUSE ITS NOT APPLICABLE
-
         public override bool CompareToEntity(BaseField field)
         {
             bool changed = false;
@@ -92,6 +89,11 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
             base.ToEntity(newEntityField, parentField, parentRevision);
             return newEntityField;
+        }
+
+        public override void Clean(string extension)
+        {
+            DefaultNonFixedWidthLength(extension);
         }
     }
 }

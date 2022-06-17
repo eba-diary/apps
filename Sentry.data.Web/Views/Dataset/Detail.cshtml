@@ -50,66 +50,62 @@
                 </div>
 
                 <div class="col-5 pr-0">
-                    @if (Model.Security.CanPreviewDataset)
-                    {
-                        <div class="text-right">
+                    <div class="text-right">
+                        <a class="btn px-3"
+                           id="RequestAccessButton" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Request Additional Dataset Access">
+                            <em class="fas fa-user-plus dsc-icon-button @textColor mr-0 align-middle" id=""></em>
+                        </a>
 
-                            <a class="btn px-3"
-                               id="RequestAccessButton" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Request Additional Dataset Access">
-                                <em class="fas fa-user-plus dsc-icon-button @textColor mr-0 align-middle" id=""></em>
-                            </a>
-
-                            <a class="btn px-3"
-                               id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
-                                @if (Model.IsFavorite)
-                                {
-                                    <em class="fas fa-star dsc-icon-button @textColor mr-0 align-middle" id="favoriteIcon"></em>
-                                }
-                                else
-                                {
-                                    <em class="far fa-star dsc-icon-button @textColor mr-0 align-middle" id="favoriteIcon"></em>
-                                }
-                            </a>
-
-                            @if (Model.Security.CanEditDataset)
+                        <a class="btn px-3"
+                           id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
+                            @if (Model.IsFavorite)
                             {
-                                <a class="btn px-3"
-                                   id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                                    <em class="far fa-edit dsc-icon-button align-self-center @textColor mr-0 align-middle"></em>
-                                </a>
-
+                                <em class="fas fa-star dsc-icon-button @textColor mr-0 align-middle" id="favoriteIcon"></em>
                             }
-                            <div class="btn-group dropdown" data-toggle="tooltip" data-placement="top" title="Additional Actions">
+                            else
+                            {
+                                <em class="far fa-star dsc-icon-button @textColor mr-0 align-middle" id="favoriteIcon"></em>
+                            }
+                        </a>
 
-                                <a class="btn px-3"
-                                   data-toggle="dropdown">
-                                    <em class="fas fa-bars dsc-icon-button @textColor mr-0 align-middle"></em>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-start">
-                                    @if (Model.ShowManagePermissionsLink)
+                        @if (Model.Security.CanEditDataset)
+                        {
+                            <a class="btn px-3"
+                               id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
+                                <em class="far fa-edit dsc-icon-button align-self-center @textColor mr-0 align-middle"></em>
+                            </a>
+
+                        }
+                        <div class="btn-group dropdown" data-toggle="tooltip" data-placement="top" title="Additional Actions">
+
+                            <a class="btn px-3"
+                               data-toggle="dropdown">
+                                <em class="fas fa-bars dsc-icon-button @textColor mr-0 align-middle"></em>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-start">
+                                @if (Model.ShowManagePermissionsLink)
+                                {
+                                    @Html.ActionLink("Manage Permissions", nameof(Sentry.data.Web.Controllers.DatasetController.ManagePermissions), new { datasetId = Model.DatasetId }, new { @class = "dropdown-item" })
+                                }
+                                @if (Model.Security.CanManageSchema)
+                                {
+                                    <a class="dropdown-item" href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>
+                                    <a class="dropdown-item" id="btnSyncConsumptionLayers" data-id="@Model.DatasetId">Sync All Consumption Layers</a>
+                                    if (Model.Security.CanEditDataset)
                                     {
-                                        @Html.ActionLink("Manage Permissions", nameof(Sentry.data.Web.Controllers.DatasetController.ManagePermissions), new { datasetId=Model.DatasetId }, new { @class = "dropdown-item" })
+                                        <a class="dropdown-item" id="btnDeleteDataset" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured">Delete Dataset</a>
                                     }
-                                    @if (Model.Security.CanManageSchema)
-                                    {
-                                        <a class="dropdown-item" href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>
-                                        <a class="dropdown-item" id="btnSyncConsumptionLayers" data-id="@Model.DatasetId">Sync All Consumption Layers</a>
-                                        if (Model.Security.CanEditDataset)
-                                        {
-                                            <a class="dropdown-item" id="btnDeleteDataset" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured">Delete Dataset</a>
-                                        }
-                                    }
-                                    <a class="dropdown-item" href="@Model.MailtoLink">Share Dataset</a>
-                                    @if (Model.Security.CanViewFullDataset)
-                                    {
-                                        <a id="SubscribeModal" class="dropdown-item" data-id="@Model.DatasetId">
-                                            Subscribe
-                                        </a>
-                                    }
-                                </div>
+                                }
+                                <a class="dropdown-item" href="@Model.MailtoLink">Share Dataset</a>
+                                @if (Model.Security.CanViewFullDataset)
+                                {
+                                    <a id="SubscribeModal" class="dropdown-item" data-id="@Model.DatasetId">
+                                        Subscribe
+                                    </a>
+                                }
                             </div>
                         </div>
-                    }
+                    </div>
                 </div>
             </div>
         </div>
@@ -334,6 +330,10 @@ else
                 {
                     <div id="tabSchemaAbout"></div>
                 }
+                else
+                {
+                    @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
+                }
             </div>
 
             <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
@@ -341,15 +341,31 @@ else
                 {
                     <div id="tabSchemaColumns"></div>
                 }
+                else
+                {
+                    @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
+                }
             </div>
-            @if (Model.HasDataAccess)
-            {
-                <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
+
+            <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
+                @if (Model.HasDataAccess)
+                {
                     <div id="tabDataPreview"></div>
-                </div>
-            }
+                }
+                else
+                {
+                    @Html.Partial("Details/_TabUnauthorized", "Full Dataset");
+                }
+            </div>
             <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
-                <div id="tabDataFiles"></div>
+                @if (Model.Security.CanPreviewDataset)
+                {
+                    <div id="tabDataFiles"></div>
+                }
+                else
+                {
+                    @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
+                }
             </div>
             @if (Model.DisplaySchemaSearch)
             {
