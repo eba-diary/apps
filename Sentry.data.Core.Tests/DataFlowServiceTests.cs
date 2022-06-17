@@ -1159,24 +1159,41 @@ namespace Sentry.data.Core.Tests
             user.Setup(s => s.DisplayName).Returns("displayName");
             user.Setup(s => s.AssociateId).Returns("123456");
 
+            // Setup Dataflow steps for DataFlow objects
+            DataFlowStep step = new DataFlowStep()
+            {
+                Action = new ProducerS3DropAction(),
+                DataFlow = new DataFlow()
+                {
+                    Id = 1
+                }
+            };
 
-            Mock<DataFlowStep> dfs = new Mock<DataFlowStep>();
-            dfs.Object.Action = new Mock<BaseAction>().Object;
-           
+            DataFlowStep step2 = new DataFlowStep()
+            {
+                Action = new ProducerS3DropAction(),
+                DataFlow = new DataFlow()
+                {
+                    Id = 1
+                }
+            };
+
+            // Mock 2 DataFlow objects - both sharing a DatasetId, but with different object statuses
             DataFlow df = MockClasses.MockDataFlow();
             df.ObjectStatus = ObjectStatusEnum.Deleted;
             df.DatasetId = 2;
             df.SchemaId = 1;
-            df.Steps = new[] { dfs.Object };
+            df.Steps = new[] { step };
 
             DataFlow df2 = MockClasses.MockDataFlow();
             df2.ObjectStatus = ObjectStatusEnum.Active;
             df2.DatasetId = 2;
             df2.SchemaId = 2;
-            df2.Steps = new[] { dfs.Object };
+            df2.Steps = new[] { step2 };
 
             var dataflows = new[] { df, df2 };
 
+            // Create mock retrieve jobs
             RetrieverJob job = MockClasses.GetMockRetrieverJob(
                                         MockClasses.MockDataFileConfig(
                                                 MockClasses.MockDataset()), new FtpSource());
@@ -1188,25 +1205,32 @@ namespace Sentry.data.Core.Tests
             job2.DataFlow = df2;
             List<RetrieverJob> jobList = new List<RetrieverJob>() { job, job2 };
 
+            // Mock dataset context and setup return values
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
-            /*context.Setup(s => s.GetById<DataFlow>(It.IsAny<int>())).Returns(df);*/
             context.Setup(s => s.DataFlow).Returns(dataflows.AsQueryable);
             context.Setup(s => s.RetrieverJob).Returns(jobList.AsQueryable());
 
+
+            // Mock job service and setup return values
             Mock<IJobService> jobService = mr.Create<IJobService>();
             jobService.Setup(s => s.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
 
+            // Mock data features and setup return values
             Mock<IDataFeatures> _datafeatures = new Mock<IDataFeatures>();
             _datafeatures.Setup(_ => _.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
 
+            // Setup DataFlowService
             var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, _datafeatures.Object, null);
 
+            // Create Linq expression for test
             Expression<Func<DataFlow, bool>> expression = w => w.DatasetId == 2;
 
             // Act
             List<DataFlowDetailDto> testFlow = dataFlowService.GetDataFlowDetailDto(expression);
 
             // Assert
+            // Ensuring that the DataFlow with the deleted object status is filtered out and only returns the 
+            // DataFlowDetailDto object mapped from the active object status DataFlow
             Assert.AreEqual(1, testFlow.Count);
         }
     }
