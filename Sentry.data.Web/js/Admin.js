@@ -27,57 +27,70 @@ data.Admin = {
             data.Admin.CompleteAuction($(this).data("id"));
         });
     },
-
-    ReprocessInit: function () {
-        //on selection of a dataset, load available schema
-        $("#allDatasets").change(function (event) {
-            var val = $("#allDatasets").find(":selected").val();
-            var url = window.location.href;
-            url = url.substring(0, url.length - 5);
-            url = url + "api/v2/metadata/dataset/" + val + "/schema";
-            console.log(url);
-            $.ajax({
-                type: "GET",
-                url: url,
-                data: "{}",
-                success: function (data) {
-                    var s = '<option value>Please Select Schema</option>';
-                    for (var i = 0; i < data.length; i++) {
-                        s += '<option value="' + data[i].SchemaId + '">' + data[i].Name + '</option>';
-                    }
-                    $("#SchemaDropdown").html(s);
+    //creates url for api call to get schema associated with selected dataset
+    GetSchemaUrl: function (datasetId) {
+        var url = window.location.href;
+        url = url.substring(0, url.length - 5);
+        url = url + "api/v2/metadata/dataset/" + datasetId + "/schema";
+        console.log(url);
+        return url;
+    },
+    //creates schema dropdown for selected dataset
+    GetSchemaDropdown: function (url) {
+        $.ajax({
+            type: "GET",
+            url: url,
+            data: "{}",
+            success: function (data) {
+                var s = '<option value>Please Select Schema</option>';
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i].SchemaId + '">' + data[i].Name + '</option>';
                 }
-            });
+                $("#SchemaDropdown").html(s);
+            }
+        }); 
+    },
+    //creates url for API call to get data files
+    GetFileUrl: function (datasetId, schemaId) {
+        var url = window.location.href;
+        url = url.substring(0, url.length - 5);
+        url = url + "api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000";
+        console.log(url);
+        return url;
+    },
+    //generates table with datafiles from selected dataset and schema
+    PopulateTable: function (url) {
+        $("#results").DataTable({
+            destroy: true,
+            ajax: {
+                url: url,
+                dataSrc: "Records",
+            },
+            columns: [
+                { data: "DatasetFileId" },
+                { data: "FileName" },
+                { data: "UploadUserName" },
+                { data: "CreateDTM" },
+                { data: "ModifiedDTM" },
+                { data: "FileLocation" },
+            ],
         });
-        //on selection of a schema, fills in data table
+    },
+    //loads reprocessing page with relevant functions
+    ReprocessInit: function () {
+        $("#allDatasets").change(function (event) {
+            var datasetId = $("#allDatasets").find(":selected").val();
+            var url = data.Admin.GetSchemaUrl(datasetId);
+            data.Admin.GetSchemaDropdown(url);
+        });
         $("#SchemaDropdown").change(function (event) {
             var schemaId = $("#SchemaDropdown").find(":selected").val();
             var datasetId = $("#allDatasets").find(":selected").val();
-            var url = window.location.href;
-            url = url.substring(0, url.length - 5);
-            url = url + "api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000";
-
-            console.log(url);
-
-            $("#results").DataTable({
-                destroy: true,
-                ajax: {
-                    url: url,
-                    dataSrc: "Records",
-                },
-                columns: [
-                    { data: "DatasetFileId" },
-                    { data: "FileName" },
-                    { data: "UploadUserName" },
-                    { data: "CreateDTM" },
-                    { data: "ModifiedDTM" },
-                    { data: "FileLocation" },
-                ],
-            });
-
+            var url = data.Admin.GetFileUrl(datasetId, schemaId);
+            data.Admin.PopulateTable(url);
         });
-
     },
+  
     // Loads Admin jobs pages
 
     AdminPageInit: function () {

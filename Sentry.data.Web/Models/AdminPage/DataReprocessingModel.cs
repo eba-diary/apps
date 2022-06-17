@@ -11,10 +11,12 @@ namespace Sentry.data.Web.Models.AdminPage
     {
         public DataReprocessingModel()
         {
+            selectedFiles = null;
             allDatasets = null;
             //available flowSteps depend on schema selection, will be added to existing list when a schema is selected. Complete population method when test data available
             flowSteps = populateFlowSteps("PlaceHolder");
         }
+        public List<String> selectedFiles { get; set; }
         public List<SelectListItem> allDatasets { get; set; }
         public List<String> flowSteps { get; set; }
         public List<String> populateFlowSteps(String schema)
