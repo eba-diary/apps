@@ -106,16 +106,23 @@ namespace Sentry.data.Web.WebApi.Controllers
             return ApiTryCatch(nameof(DataFileController), nameof(UpdateDataFile), $"datasetid:{dataFileModel.DatasetId} schemaId{dataFileModel.SchemaId} datasetfileId:{dataFileModel.DatasetFileId}", UpdateDataFileFunction);
         }
 
-
-        [HttpDelete]
+        /// <summary>
+        /// Directions:  Please pass either deleteFilesModel.UserFileIdList OR deleteFilesModel.UserFileNameList.  Both cannot be passed at same time.
+        /// Warning:  Even though this is a POST, this will delete passed in list.
+        /// </summary>
+        /// <param name="datasetId"></param>
+        /// <param name="schemaId"></param>
+        /// <param name="deleteFilesModel"></param>
+        /// <returns></returns>
+        [HttpPost]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        [Route("dataset/{datasetId}/schema/{schemaId}")]
+        [Route("dataset/{datasetId}/schema/{schemaId}/Delete")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK)]
         [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
         [SwaggerResponse(System.Net.HttpStatusCode.BadRequest)]
-        public IHttpActionResult DeleteDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] string[] userFileNameList=null, [FromUri] int[] userFileIdList=null)
+        public IHttpActionResult DeleteDataFiles(int datasetId, int schemaId, [FromBody] DeleteFilesModel deleteFilesModel)
         {
-
+           
             //SECURITY CHECK
             UserSecurity us = _datafileService.GetUserSecurityForDatasetFile(datasetId);
             if (!_dataFeatures.CLA4049_ALLOW_S3_FILES_DELETE.GetValue()
@@ -124,37 +131,48 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 return Content(System.Net.HttpStatusCode.Forbidden, "Feature not available to this user.");
             }
-            
-            //STEP 1:   VALIDATIONS:  datasetId/schemaId
+
+            //VALIDATIONS:  datasetId/schemaId
             if(datasetId < 1 || schemaId < 1)
             {
                 return Content(System.Net.HttpStatusCode.BadRequest, nameof(datasetId) + " AND " + nameof(schemaId) + " must be greater than 0");
             }
 
+            //VALIDATIONS:  deleteFilesModel
+            if (deleteFilesModel == null)
+            {
+                return Content(System.Net.HttpStatusCode.BadRequest, nameof(deleteFilesModel) + " format is wrong, please see definition for format.");
+            }
 
-            //STEP 2:  VALIDATIONS:    DETERMINE WHAT WAS PASSED IN
-            bool userFileNameListPassed = (userFileNameList != null && userFileNameList.Length > 0) ? true : false;
-            bool userIdListPassed = (userFileIdList != null && userFileIdList.Length > 0) ? true : false;
+            //VALIDATIONS:
+            if((deleteFilesModel.UserFileNameList == null && deleteFilesModel.UserFileIdList == null))
+            {
+                return Content(System.Net.HttpStatusCode.BadRequest, "Must pass either " + nameof(deleteFilesModel.UserFileNameList) + " OR " + nameof(deleteFilesModel.UserFileIdList) );
+            }
+
+            //VALIDATIONS:    DETERMINE WHAT WAS PASSED IN
+            bool userFileNameListPassed = (deleteFilesModel.UserFileNameList != null && deleteFilesModel.UserFileNameList.Length > 0) ? true : false;
+            bool userIdListPassed = (deleteFilesModel.UserFileIdList != null && deleteFilesModel.UserFileIdList.Length > 0) ? true : false;
             if (userFileNameListPassed && userIdListPassed)    
             {
-                return Content(System.Net.HttpStatusCode.BadRequest, "Cannot pass " + nameof(userFileNameList) + " AND " + nameof(userFileIdList) + " at the same time.  Please include only " + nameof(userFileNameList) + " OR " + nameof(userFileIdList));
+                return Content(System.Net.HttpStatusCode.BadRequest, "Cannot pass " + nameof(deleteFilesModel.UserFileNameList) + " AND " + nameof(deleteFilesModel.UserFileIdList) + " at the same time.  Please include only " + nameof(deleteFilesModel.UserFileNameList) + " OR " + nameof(deleteFilesModel.UserFileIdList));
             }
 
 
-            //STEP 3:  TURN USER LIST INTO DBLIST
+            //TURN USER LIST INTO DBLIST
             List<DatasetFile> dbList;
             if (userFileNameListPassed)
             {
-                dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, userFileNameList);
+                dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, deleteFilesModel.UserFileNameList);
             }
             else
             {
                 //VALIDATE LESS THAN 1
-                if (userFileIdList.Any(w => w < 1 ) )
+                if (deleteFilesModel.UserFileIdList.Any(w => w < 1 ) )
                 {
-                    return Content(System.Net.HttpStatusCode.BadRequest, nameof(userFileIdList) + " contains an item less than one.  Please pass items greater than zero.");
+                    return Content(System.Net.HttpStatusCode.BadRequest, nameof(deleteFilesModel.UserFileIdList) + " contains an item less than one.  Please pass items greater than zero.");
                 }
-                dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, userFileIdList);
+                dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, deleteFilesModel.UserFileIdList);
             }
 
 
@@ -164,7 +182,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 return Content(System.Net.HttpStatusCode.BadRequest, "Nothing found to delete.");
             }
 
-            //STEP 4:  CALL SERVICE TO DELETE METADATA AND DPP TO DELETE
+            //FINAL STEP :  CALL SERVICE TO DELETE METADATA AND DPP TO DELETE
             _datafileService.Delete(datasetId, schemaId, dbList);
 
             return Ok("Delete Successful.  Thanks for using DSC!");
