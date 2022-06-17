@@ -1491,10 +1491,18 @@ data.Dataset = {
             //$('#datasetConfigList')
             var schemaId = encodeURI();
 
+            var deleteRequest = {
+                deleteFilesModel: {
+                    UserFileIdList: ids
+                }
+            };
+
             //delete
             $.ajax({
-                type: "DELETE",
+                type: "POST",
                 url: '../../api/v2/datafile/dataset/' + datasetId + '/schema/' + 1 + '?' + $.param({ 'userFileIdList': ids }),
+                data: JSON.stringify(deleteRequest),
+                contentType: "application/json",
                 success: function () {
                     $("#datasetFilesTable").DataTable().ajax.reload();
                 },
