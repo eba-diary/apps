@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
-    public class ContuentConnectorProvider : IKafkaConnectorProvider
+    public class ConfluentConnectorProvider : IKafkaConnectorProvider
     {
         private readonly IAsyncPolicy _asyncProviderPolicy;
         private readonly IHttpClientProvider _httpClient;
 
-        public ContuentConnectorProvider(IHttpClientProvider httpClientProvider, IPolicyRegistry<string> policyRegistry)
+        public ConfluentConnectorProvider(IHttpClientProvider httpClientProvider, IPolicyRegistry<string> policyRegistry)
         {
             _httpClient = httpClientProvider;
             _asyncProviderPolicy = policyRegistry.Get<IAsyncPolicy>(PollyPolicyKeys.ApacheLivyProviderAsyncPolicy);

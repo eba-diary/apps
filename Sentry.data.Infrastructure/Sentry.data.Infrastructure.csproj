@@ -342,7 +342,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="ServiceImplementations\ContuentConnectorProvider.cs" />
+    <Compile Include="ServiceImplementations\ConfluentConnectorProvider.cs" />
     <Compile Include="ServiceImplementations\ApacheLivyProvider.cs" />
     <Compile Include="ServiceImplementations\AWSLambdaProvider.cs" />
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
