@@ -1,11 +1,15 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Newtonsoft.Json.Linq;
+using Rhino.Mocks;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Sentry.data.Web.Tests
 {
@@ -228,7 +232,7 @@ namespace Sentry.data.Web.Tests
                     }
                 }
             };
-            
+
             FilterSearchDto dto = model.ToDto();
 
             Assert.AreEqual("SearchName", dto.SearchName);
@@ -467,6 +471,53 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(1, model.SavedSearchId);
             Assert.AreEqual("SearchName", model.SavedSearchName);
             Assert.IsTrue(model.IsFavorite);
+        }
+
+        [TestMethod]
+        public void MapToModel_DataFlowDetailDto_DatFlowDetailModel()
+        {
+            // Arrange
+            DataFlowDetailDto dto = MockClasses.MockDataFlowDetailDto();
+
+            Models.ApiModels.Dataflow.DataFlowDetailModel model = new Models.ApiModels.Dataflow.DataFlowDetailModel();
+
+            // Act
+            dto.MapToModel(model);
+
+            // Assert
+            Assert.AreEqual(dto.Id, model.Id);
+            Assert.AreEqual(dto.FlowGuid, model.FlowGuid);
+            Assert.AreEqual(dto.SaidKeyCode, model.SaidKeyCode);
+            Assert.AreEqual(dto.SchemaId, model.SchemaId);
+            Assert.AreEqual(dto.Name, model.Name);
+            Assert.AreEqual(dto.CreateDTM, model.CreateDTM);
+            Assert.AreEqual(dto.CreatedBy, model.CreatedBy);
+            Assert.AreEqual(dto.DFQuestionnaire, model.DFQuestionnaire);
+            Assert.AreEqual(dto.IngestionType, model.IngestionType);
+            Assert.AreEqual(dto.IsCompressed, model.IsCompressed);
+            Assert.AreEqual(dto.IsPreProcessingRequired, model.IsPreProcessingRequired);
+            Assert.AreEqual(dto.FlowStorageCode, model.FlowStorageCode);
+            Assert.AreEqual(dto.MappedSchema, model.MappedSchema);
+            Assert.AreEqual(dto.AssociatedJobs, model.AssociatedJobs);
+            Assert.AreEqual(dto.ObjectStatus, model.ObjectStatus);
+            Assert.AreEqual(dto.DeleteIssuer, model.DeleteIssuer);
+            Assert.AreEqual(dto.DeleteIssueDTM, model.DeleteIssueDTM);
+            Assert.AreEqual(dto.NamedEnvironment, model.NamedEnvironment);
+            Assert.AreEqual(dto.NamedEnvironmentType, model.NamedEnvironmentType);
+        }
+
+        [TestMethod]
+        public void MapToDetailModelList_DataFlowDetailDto_DataFlowDetailModel()
+        {
+            // Arrange
+            List<DataFlowDetailDto> detailDto = MockClasses.MockDataFlowDetailDtos(2);
+            List<Models.ApiModels.Dataflow.DataFlowDetailModel> modelList = new List<Models.ApiModels.Dataflow.DataFlowDetailModel>();
+
+            // Act
+            detailDto.MapToDetailModelList(modelList);
+
+            // Assert
+            Assert.AreEqual(detailDto.Count, modelList.Count);
         }
     }
 }

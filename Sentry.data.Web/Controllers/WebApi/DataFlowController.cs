@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
@@ -71,11 +72,12 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <param name="storagecode"></param>
         /// <returns></returns>
         [ApiVersionBegin(WebAPI.Version.v2)]
-        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        /*[WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]*/
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.OK)]
-        [HttpPost]
-        public IHttpActionResult RetrieveDataFlowMetadata([FromUri] int? datasetId, [FromUri] int? schemaId, [FromUri] string storagecode)
+        [Route("getdataflowmetadata")]
+        [HttpGet]
+        public IHttpActionResult GetDataFlowMetadata([FromUri] int? datasetId = null, [FromUri] int? schemaId = null, [FromUri] string storagecode = null)
         {
             // Dictionary to manage and check method params
             IDictionary<string, object> parameters = new Dictionary<string, object>();
@@ -93,10 +95,14 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             KeyValuePair<string, object> itemCheck = new KeyValuePair<string, object>();
 
-            if (counter == 0 || counter > 1)
+            if (counter == 0)
             {
-                return BadRequest(); // returns BadRequest result in the case of excessive or invalid params
-            } else
+                return BadRequest("Ensure that one parameter is passed in"); // returns BadRequest result in the case of excessive or invalid params
+            } else if(counter > 1)
+            {
+                return BadRequest("Only one parameter may be passed in"); // returns BadRequest result in the case of excessive or invalid params
+            } 
+            else
             {
                 foreach (var item in parameters)
                 {
@@ -125,12 +131,11 @@ namespace Sentry.data.Web.WebApi.Controllers
             // Retrieves a list of DataFlowDetailDto(s) via the expression sent through
             List<DataFlowDetailDto> dtoList = _dataFlowService.GetDataFlowDetailDto(expression);
 
-
-            List<Models.ApiModels.Dataflow.DataFlowDetailModel> modelList = new List<Models.ApiModels.Dataflow.DataFlowDetailModel> ();
+            List<Models.ApiModels.Dataflow.DataFlowDetailModel> modelList = new List<Models.ApiModels.Dataflow.DataFlowDetailModel>();
 
             dtoList.MapToDetailModelList(modelList); // Map the DataFlowDetailDto to the DataFlowDetailModel via the MapToDetailModelList extension method.
 
-            return Ok();
+            return Ok(dtoList);
         }
 
         

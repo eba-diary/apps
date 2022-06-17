@@ -74,7 +74,6 @@ namespace Sentry.data.Core
         {
             List<DataFlow> dfList = null;
 
-
             dfList = _datasetContext.DataFlow.Where(expression)
                 .Where(x => x.ObjectStatus == ObjectStatusEnum.Active)
                 .OrderByDescending(x => x.Id).ToList();

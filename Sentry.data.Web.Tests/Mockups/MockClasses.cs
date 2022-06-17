@@ -136,6 +136,68 @@ namespace Sentry.data.Web.Tests
             return feList;
         }
 
+        public static List<DataFlowDetailDto> MockDataFlowDetailDtos(int listSize)
+        {
+            List<DataFlowDetailDto> dtos = new List<DataFlowDetailDto>();
+            for (int i = 1; i<=listSize; i++)
+            {
+                dtos.Add(new DataFlowDetailDto()
+                {
+                    Id = i,
+                    FlowGuid = Guid.NewGuid(),
+                    SaidKeyCode = "SaidKeyCode",
+                    DatasetId = 1,
+                    SchemaId = 1,
+                    Name = "Name",
+                    CreateDTM = DateTime.Now,
+                    CreatedBy = "CreatedBy",
+                    DFQuestionnaire = "DFQuestionnaire",
+                    IngestionType = 1,
+                    IsCompressed = true,
+                    IsPreProcessingRequired = true,
+                    FlowStorageCode = "FlowStorageCode",
+                    MappedSchema = new List<int> { 1, 2 },
+                    AssociatedJobs = new List<int> { 1, 2 },
+                    ObjectStatus = ObjectStatusEnum.Active,
+                    DeleteIssuer = "DeleteIssuer",
+                    DeleteIssueDTM = DateTime.Now,
+                    NamedEnvironment = "NamedEnvironment",
+                    NamedEnvironmentType = NamedEnvironmentType.Prod
+                });
+            }
+
+            return dtos;
+        }
+
+        public static DataFlowDetailDto MockDataFlowDetailDto()
+        {
+            DataFlowDetailDto dto = new DataFlowDetailDto()
+            {
+                Id = 1,
+                FlowGuid = Guid.NewGuid(),
+                SaidKeyCode = "SaidKeyCode",
+                DatasetId = 1,
+                SchemaId = 1,
+                Name = "Name",
+                CreateDTM = DateTime.Now,
+                CreatedBy = "CreatedBy",
+                DFQuestionnaire = "DFQuestionnaire",
+                IngestionType = 1,
+                IsCompressed = true,
+                IsPreProcessingRequired = true,
+                FlowStorageCode = "FlowStorageCode",
+                MappedSchema = new List<int> { 1, 2 },
+                AssociatedJobs = new List<int> { 1, 2 },
+                ObjectStatus = ObjectStatusEnum.Active,
+                DeleteIssuer = "DeleteIssuer",
+                DeleteIssueDTM = DateTime.Now,
+                NamedEnvironment = "NamedEnvironment",
+                NamedEnvironmentType = NamedEnvironmentType.Prod
+            };
+
+            return dto;
+        }
+
         public static List<DataSource> MockDataSources()
         {
             List<DataSource> dataSources = new List<DataSource>();
