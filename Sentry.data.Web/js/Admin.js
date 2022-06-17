@@ -82,15 +82,15 @@ data.Admin = {
             ],
         });
     },
-    //generates list of fileIds from selected checkboxes
+
     GetFilesToReprocess: function () {
         var fileIds = [];
         $('.form-check-input:checkbox:checked').each(function () {
             fileIds.push($(this).attr("fileid"));
         });
         console.log(fileIds);
-    //make fileid into a data-fileid attribute so that it can be accessed by the .data() function for consistency
-
+        //need to change fileid attribute into a data-fileid for consistency, can be called by .data() function in jquery then
+    },
     //loads reprocessing page with relevant functions
     ReprocessInit: function () {
         $("#allDatasets").change(function (event) {
