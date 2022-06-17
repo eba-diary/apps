@@ -99,11 +99,10 @@ namespace Sentry.data.Core
         }
 
 
-        public void Delete(int datasetId, int schemaId, List<DatasetFile> dbList)
+        public void Delete(int datasetId, int schemaId,List<DatasetFile> dbList)
         {
+            DeleteS3(datasetId,schemaId,dbList);
             UpdateObjectStatus(dbList, Core.GlobalEnums.ObjectStatusEnum.Pending_Delete);
-            DeleteS3(datasetId, schemaId, dbList);
-
         }
 
         public void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status)
@@ -116,6 +115,7 @@ namespace Sentry.data.Core
             }
             catch (System.Exception ex)
             {
+                //log list of Ids by exception
                 string msg = "Error marking DatasetFile rows as Deleted";
                 Logger.Error(msg, ex);
                 throw;
@@ -124,11 +124,11 @@ namespace Sentry.data.Core
 
         private void DeleteS3(int datasetId, int schemaId, List<DatasetFile> dbList)
         {
+            //CONVERT LIST TO GENERIC ARRAY IN PREP FOR PublishDSCEvent and ERROR HANDLING
+            string[] idList = dbList.Select(s => s.DatasetFileId.ToString()).ToArray();
+
             try
             {
-                //CONVERT LIST TO GENERIC ARRAY IN PREP FOR PublishDSCEvent
-                string[] idList = dbList.Select(s => s.DatasetFileId.ToString()).ToArray();
-
                 //CHUNK INTO 10 id's PER MESSAGE
                 string[] buffer;
                 for (int i = 0; i < idList.Length; i += 10)
@@ -137,26 +137,34 @@ namespace Sentry.data.Core
                     buffer = new string[chunk];
                     Array.Copy(idList, i, buffer, 0, chunk );
 
-                    S3DeleteFilesModel model = new S3DeleteFilesModel()
-                    {
-                        DatasetID = datasetId,
-                        SchemaID = schemaId,
-                        RequestGUID = DateTime.Now.ToString("yyyyMMddHHmmssfff"),
-                        DatasetFileIdList = buffer
-                    };
-
+                    S3DeleteFilesModel model = CreateS3DeleteFilesModel(datasetId,schemaId,buffer);
+                    
                     //PUBLISH DSC DELETE EVENT
                     _messagePublisher.PublishDSCEvent(schemaId.ToString(), JsonConvert.SerializeObject(model));
                 }
             }
             catch (System.Exception ex)
             {
-                string msg = "Error trying to call _messagePublisher.PublishDSCEvent";
-                Logger.Error(msg, ex);
+                string errorMsg = "Error trying to call _messagePublisher.PublishDSCEvent: " + 
+                            JsonConvert.SerializeObject(CreateS3DeleteFilesModel(datasetId, schemaId, idList));
+                
+                Logger.Error(errorMsg, ex);
                 throw;
             }
         }
 
+        private S3DeleteFilesModel CreateS3DeleteFilesModel(int datasetId, int schemaId, string[] datasetFileIdList)
+        {
+            S3DeleteFilesModel model = new S3DeleteFilesModel()
+            {
+                DatasetID = datasetId,
+                SchemaID = schemaId,
+                RequestGUID = DateTime.Now.ToString("yyyyMMddHHmmssfff"),
+                DatasetFileIdList = datasetFileIdList
+            };
+
+            return model;
+        }
 
 
         public UserSecurity GetUserSecurityForDatasetFile(int datasetId)

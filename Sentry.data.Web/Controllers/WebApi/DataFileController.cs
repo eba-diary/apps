@@ -111,8 +111,9 @@ namespace Sentry.data.Web.WebApi.Controllers
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
         [SwaggerResponse(System.Net.HttpStatusCode.BadRequest)]
-        public IHttpActionResult DeleteDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] string[] userFileNameList=null, [FromUri] string[] userFileIdList=null)
+        public IHttpActionResult DeleteDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] string[] userFileNameList=null, [FromUri] int[] userFileIdList=null)
         {
 
             //SECURITY CHECK
@@ -148,14 +149,12 @@ namespace Sentry.data.Web.WebApi.Controllers
             }
             else
             {
-                //VALIDATE NON INTEGERS
-                int[] idListINT = System.Array.ConvertAll(userFileIdList, w => int.TryParse(w, out var x) ? x : -1);
-                List<int> invalidIds = idListINT.Where(w => w == -1).ToList();
-                if (invalidIds.Count > 0)
+                //VALIDATE LESS THAN 1
+                if (userFileIdList.Any(w => w < 1 ) )
                 {
-                    return Content(System.Net.HttpStatusCode.BadRequest, nameof(userFileIdList) + " contains non integers.  Please pass all integers.");
+                    return Content(System.Net.HttpStatusCode.BadRequest, nameof(userFileIdList) + " contains an item less than one.  Please pass items greater than zero.");
                 }
-                dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, idListINT);
+                dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, userFileIdList);
             }
 
 
@@ -166,12 +165,9 @@ namespace Sentry.data.Web.WebApi.Controllers
             }
 
             //STEP 4:  CALL SERVICE TO DELETE METADATA AND DPP TO DELETE
-            _datafileService.Delete(datasetId,schemaId,dbList);
+            _datafileService.Delete(datasetId, schemaId, dbList);
 
             return Ok("Delete Successful.  Thanks for using DSC!");
         }
-
-
-
     }
 }
