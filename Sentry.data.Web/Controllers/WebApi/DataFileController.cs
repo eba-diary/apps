@@ -118,9 +118,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             //SECURITY CHECK
             UserSecurity us = _datafileService.GetUserSecurityForDatasetFile(datasetId);
-            if (!_dataFeatures.CLA4049_ALLOW_S3_FILES_DELETE.GetValue()
-                || !us.CanEditDataset 
-                || !us.CanManageSchema)
+            if (!us.CanDeleteDatasetFile)
             {
                 return Content(System.Net.HttpStatusCode.Forbidden, "Feature not available to this user.");
             }
