@@ -139,6 +139,14 @@ div.dataTables_wrapper div.dataTables_filter input {
     padding-top: 0.1rem;
 }
 
+#inheritanceSwitch {
+    padding-top: 0.1rem;
+}
+
+.requestAccessButton {
+    margin-bottom: 0.5rem !important;
+}
+
 .data-file-delete-all-filter {
     vertical-align: middle !important;
 }
