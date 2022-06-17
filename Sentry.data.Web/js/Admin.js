@@ -73,9 +73,24 @@ data.Admin = {
                 { data: "CreateDTM" },
                 { data: "ModifiedDTM" },
                 { data: "FileLocation" },
+                {
+                    data: null,
+                    render: (d) => function (data, type, row) {
+                        return '<input type="checkbox" id= checkbox' + d.DatasetFileId + ' class="form-check-input" fileId = ' + d.DatasetFileId + '><label for=checkbox' + d.DatasetFileId + ' class="form-check-label"></label>';
+                    }
+                },
             ],
         });
     },
+    //generates list of fileIds from selected checkboxes
+    GetFilesToReprocess: function () {
+        var fileIds = [];
+        $('.form-check-input:checkbox:checked').each(function () {
+            fileIds.push($(this).attr("fileid"));
+        });
+        console.log(fileIds);
+    //make fileid into a data-fileid attribute so that it can be accessed by the .data() function for consistency
+
     //loads reprocessing page with relevant functions
     ReprocessInit: function () {
         $("#allDatasets").change(function (event) {
@@ -88,6 +103,9 @@ data.Admin = {
             var datasetId = $("#allDatasets").find(":selected").val();
             var url = data.Admin.GetFileUrl(datasetId, schemaId);
             data.Admin.PopulateTable(url);
+        });
+        $("#reprocessButton").click(function (event) {
+            data.Admin.GetFilesToReprocess();
         });
     },
   
