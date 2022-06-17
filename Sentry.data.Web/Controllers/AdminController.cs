@@ -13,12 +13,21 @@ using DoddleReport.Web;
 using DoddleReport;
 using Sentry.Core;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Web.Http;
 
 namespace Sentry.data.Web.Controllers
 {
     /*[AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]*/
     public class AdminController : BaseController
     {
+        private IKafkaConnectorProvider _connectorProvider;
+
+        public AdminController(IKafkaConnectorProvider connectorProvider)
+        {
+            _connectorProvider = connectorProvider;
+        }
+
         // GET: Admin
         public ActionResult Index()
         {
