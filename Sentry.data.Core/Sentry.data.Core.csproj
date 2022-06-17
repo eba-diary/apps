@@ -342,6 +342,7 @@
     <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\Entities\IFavorable.cs" />
+    <Compile Include="Interfaces\IKafkaConnectorProvider.cs" />
     <Compile Include="Interfaces\IApacheLivyProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IXMLAction.cs" />
     <Compile Include="Interfaces\IDataApplicationService.cs" />
