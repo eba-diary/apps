@@ -6,8 +6,7 @@ namespace Sentry.data.Core
 {
     public class ConfluentConnectorDTO
     {
-        public string Name { get; set; }
-        public ConnectorState State { get; set; }
-        public List<ConfluentConnectorTaskDTO> Task { get; set; }
+        public ConnectorStateEnum state { get; set; }
+        public string worker_id { get; set; }
     }
 }

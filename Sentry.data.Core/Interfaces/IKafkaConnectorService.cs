@@ -9,6 +9,6 @@ namespace Sentry.data.Core
 {
     public interface IKafkaConnectorService
     {
-        ConfluentConnectorDTO GetConnectorDto(string resource);
+        ConfluentConnectorRootDTO GetConnectorDto(HttpResponseMessage resource);
     }
 }

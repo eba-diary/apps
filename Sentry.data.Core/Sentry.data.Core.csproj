@@ -155,9 +155,10 @@
     <Compile Include="DTO\DataInventory\DataInventoryUpdateDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventorySensitiveSearchDto.cs" />
     <Compile Include="DTO\DataProcessing\CompressionJobDto.cs" />
+    <Compile Include="DTO\DataProcessing\ConfluentConnectorDTO.cs" />
     <Compile Include="DTO\DataProcessing\ConfluentConnectorTasksDTO.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDetailDto.cs" />
-    <Compile Include="DTO\DataProcessing\ConfluentConnectorDTO.cs" />
+    <Compile Include="DTO\DataProcessing\ConfluentConnectorRootDTO.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowStepDto.cs" />
     <Compile Include="DTO\DataProcessing\NamedEnvironmentDto.cs" />
@@ -243,7 +244,7 @@
     <Compile Include="GlobalEnums\IntervalType.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryNews.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryReleaseNotes.cs" />
-    <Compile Include="GlobalEnums\ConnectorState.cs" />
+    <Compile Include="GlobalEnums\ConnectorStateEnum.cs" />
     <Compile Include="Helpers\CustomAttributeHelper.cs" />
     <Compile Include="Helpers\FilterCategoryOptionNormalizer.cs" />
     <Compile Include="Helpers\NestExtensions.cs" />

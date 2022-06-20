@@ -8,6 +8,7 @@ using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,7 +16,7 @@ namespace Sentry.data.Core
 {
     public class ConfluentConnectorService : IKafkaConnectorService
     {
-        public ConfluentConnectorDTO GetConnectorDto(string resources)
+        public ConfluentConnectorRootDTO GetConnectorDto(HttpResponseMessage resources)
         {
             throw new NotImplementedException();
         }

@@ -13,8 +13,9 @@ using DoddleReport.Web;
 using DoddleReport;
 using Sentry.Core;
 using System.Threading.Tasks;
-using System.Net.Http;
 using System.Web.Http;
+using System.Net.Http;
+using Newtonsoft.Json;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -29,10 +30,15 @@ namespace Sentry.data.Web.Controllers
         }
 
         // GET: Admin
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             Dictionary<string, string> myDict =
             new Dictionary<string, string>();
+
+            HttpResponseMessage response = await _connectorProvider.GetRequestAsync("/connectors/SRPL_TEST_QUOTES_CONNECT_EAST_2_1/status").ConfigureAwait(false);
+            var test = response.Content.ReadAsStringAsync().Result;
+            ConfluentConnectorRootDTO testObject = JsonConvert.DeserializeObject<ConfluentConnectorRootDTO>(test);
+
 
             myDict.Add("1", "Reprocess Data Files");
             myDict.Add("2", "File Processing Logs");
