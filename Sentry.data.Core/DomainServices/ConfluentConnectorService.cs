@@ -16,9 +16,17 @@ namespace Sentry.data.Core
 {
     public class ConfluentConnectorService : IKafkaConnectorService
     {
+        public ConfluentConnectorService()
+        {
+
+        }
+
         public ConfluentConnectorRootDTO GetConnectorDto(HttpResponseMessage resources)
         {
-            throw new NotImplementedException();
+            string JsonString = resources.Content.ReadAsStringAsync().Result;
+            ConfluentConnectorRootDTO connectorRootDTO = JsonConvert.DeserializeObject<ConfluentConnectorRootDTO>(JsonString);
+
+            return connectorRootDTO;
         }
     }
 }

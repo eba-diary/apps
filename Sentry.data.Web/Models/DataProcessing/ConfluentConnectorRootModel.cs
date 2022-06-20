@@ -3,13 +3,13 @@ using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 
-namespace Sentry.data.Core
+namespace Sentry.data.Web
 {
-    public class ConfluentConnectorRootDTO
+    public class ConfluentConnectorRootModel
     {
         public string name { get; set; }
-        public ConfluentConnectorDTO connector { get; set; }
-        public List<ConfluentConnectorTaskDTO> tasks { get; set; }
+        public ConfluentConnectorModel connector { get; set; }
+        public List<ConfluentConnectorTaskModel> tasks { get; set; }
         public string type { get; set; }
     }
 }

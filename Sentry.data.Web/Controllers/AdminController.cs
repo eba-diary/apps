@@ -23,10 +23,12 @@ namespace Sentry.data.Web.Controllers
     public class AdminController : BaseController
     {
         private IKafkaConnectorProvider _connectorProvider;
+        private IKafkaConnectorService _connectorService;
 
-        public AdminController(IKafkaConnectorProvider connectorProvider)
+        public AdminController(IKafkaConnectorProvider connectorProvider, IKafkaConnectorService connectorService)
         {
             _connectorProvider = connectorProvider;
+            _connectorService = connectorService;
         }
 
         // GET: Admin
@@ -36,8 +38,12 @@ namespace Sentry.data.Web.Controllers
             new Dictionary<string, string>();
 
             HttpResponseMessage response = await _connectorProvider.GetRequestAsync("/connectors/SRPL_TEST_QUOTES_CONNECT_EAST_2_1/status").ConfigureAwait(false);
-            var test = response.Content.ReadAsStringAsync().Result;
-            ConfluentConnectorRootDTO testObject = JsonConvert.DeserializeObject<ConfluentConnectorRootDTO>(test);
+
+            ConfluentConnectorRootDTO connectorRootDTO = _connectorService.GetConnectorDto(response);
+
+            ConfluentConnectorRootModel confluentConnectorRootModel = new ConfluentConnectorRootModel();
+
+            confluentConnectorRootModel = connectorRootDTO.MaptoRootModel(confluentConnectorRootModel);
 
 
             myDict.Add("1", "Reprocess Data Files");

@@ -189,6 +189,8 @@ namespace Sentry.data.Infrastructure
                 Ctor<IHttpClientProvider>().Is(apacheHttpClientProvider)
                 .SetProperty((c) => c.BaseUrl = Configuration.Config.GetHostSetting("ApacheLivy"));
 
+            registry.For<IKafkaConnectorService>().Singleton().Use<ConfluentConnectorService>();
+
             //establish httpclient specific to ConfluentConnectorProvider
             var confluentConnectorClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
             confluentConnectorClient.DefaultRequestHeaders.Accept.Clear();
