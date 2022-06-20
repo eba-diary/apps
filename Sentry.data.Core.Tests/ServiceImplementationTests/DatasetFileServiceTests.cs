@@ -548,6 +548,55 @@ namespace Sentry.data.Core.Tests
 
         }
 
+        [TestMethod]
+        public void DatasetFileService_ValidateDeleteDataFilesParams()
+        {
+            var datasetFileService = new DatasetFileService(null, null, null, null);
+
+            //VALIDATE PASS BOTH UserFileIdList and UserFileNameList
+            DeleteFilesParamDto dto = new DeleteFilesParamDto();
+            dto.UserFileIdList = new int[] { 1, 2 };
+            dto.UserFileNameList = new string[] { "stan" };
+            string error = datasetFileService.ValidateDeleteDataFilesParams(1, 1, dto);
+            Assert.IsNotNull(error);
+
+            //VALIDATE bad datasetId
+            dto.UserFileIdList = new int[] { 1, 2 };
+            dto.UserFileNameList = new string[] { "stan" };
+            error = datasetFileService.ValidateDeleteDataFilesParams(0, 1, dto);
+            Assert.IsNotNull(error);
+
+            //VALIDATE bad schemaId
+            dto.UserFileIdList = new int[] { 1, 2 };
+            dto.UserFileNameList = new string[] { "stan" };
+            error = datasetFileService.ValidateDeleteDataFilesParams(1, 0, dto);
+            Assert.IsNotNull(error);
+
+
+            //VALIDATE dto has nothing
+            error = datasetFileService.ValidateDeleteDataFilesParams(1, 1, null);
+            Assert.IsNotNull(error);
+
+            //VALIDATE dto has something
+            dto.UserFileIdList = null;
+            dto.UserFileNameList = null;
+            error = datasetFileService.ValidateDeleteDataFilesParams(1, 1, dto);
+            Assert.IsNotNull(error);
+
+            //VALIDATE good outcome
+            dto.UserFileIdList = new int[] { 1, 2 }; 
+            dto.UserFileNameList = null;
+            error = datasetFileService.ValidateDeleteDataFilesParams(1, 1, dto);
+            Assert.IsNull(error);
+
+
+            //VALIDATE good outcome
+            dto.UserFileIdList = null;
+            dto.UserFileNameList = new string[] { "stan" };
+            error = datasetFileService.ValidateDeleteDataFilesParams(1, 1, dto);
+            Assert.IsNull(error);
+        }
+
 
         [TestMethod]
         public void DatasetFileService_UpdateObjectStatus()

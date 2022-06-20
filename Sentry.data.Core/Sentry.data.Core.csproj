@@ -162,6 +162,7 @@
     <Compile Include="DTO\DataProcessing\SchemaMapDto.cs" />
     <Compile Include="DTO\Dataset\DatasetPermissionsDto.cs" />
     <Compile Include="DTO\Dataset\DatasetSummaryMetadataDTO.cs" />
+    <Compile Include="DTO\DeleteFiles\DeleteFilesParamDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
     <Compile Include="DTO\Schema\DatasetFileDto.cs" />
