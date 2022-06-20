@@ -76,19 +76,20 @@ data.Admin = {
                 {
                     data: null,
                     render: (d) => function (data, type, row) {
-                        return '<input type="checkbox" id= checkbox' + d.DatasetFileId + ' class="form-check-input" fileId = ' + d.DatasetFileId + '><label for=checkbox' + d.DatasetFileId + ' class="form-check-label"></label>';
+                        return '<input type="checkbox" id= checkbox' + d.DatasetFileId + ' class="form-check-input select-all-target" data-fileId = ' + d.DatasetFileId + '><label for=checkbox' + d.DatasetFileId + ' class="form-check-label"></label>';
                     }
                 },
             ],
+            searchable: true,
         });
     },
 
     GetFilesToReprocess: function () {
         var fileIds = [];
-        $('.form-check-input:checkbox:checked').each(function () {
-            fileIds.push($(this).attr("fileid"));
+        $('.select-all-target:checkbox:checked').each(function () {
+            fileIds.push($(this).data('fileid'));
         });
-        console.log(fileIds);
+        return fileIds;
         //need to change fileid attribute into a data-fileid for consistency, can be called by .data() function in jquery then
     },
     //loads reprocessing page with relevant functions
@@ -105,7 +106,22 @@ data.Admin = {
             data.Admin.PopulateTable(url);
         });
         $("#reprocessButton").click(function (event) {
-            data.Admin.GetFilesToReprocess();
+            var files = data.Admin.GetFilesToReprocess();
+            if (files.length > 100) {
+                alert("Selected files exceed reprocessing limit of 100 files.");
+            }
+            else if (files.length == 0) {
+                alert("You must select files before reprocessing!");
+            }
+            else {
+                console.log(files);
+            }
+        });
+        $("#selectAll").click(function (event) {
+            var selectAllCheckbox = $(this);
+            $(".select-all-target").each(function(){
+                $(this).prop("checked", selectAllCheckbox.is(":checked"));
+            });
         });
     },
   
