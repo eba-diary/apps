@@ -122,6 +122,38 @@ namespace Sentry.data.Core
             }
         }
 
+
+        public string ValidateDeleteDataFilesParams(int datasetId, int schemaId, DeleteFilesParamDto dto)
+        {
+            //VALIDATIONS:  datasetId/schemaId
+            if (datasetId < 1 || schemaId < 1)
+            {
+                return nameof(datasetId) + " AND " + nameof(schemaId) + " must be greater than 0";
+            }
+
+            //VALIDATIONS:  deleteFilesModel
+            if (dto == null)
+            {
+                return " DeleteFilesParam format is wrong, please see definition for format.";
+            }
+
+            //VALIDATIONS: BOTH PASSED
+            if ((dto.UserFileNameList == null && dto.UserFileIdList == null))
+            {
+                return "Must pass either " + nameof(dto.UserFileNameList) + " OR " + nameof(dto.UserFileIdList);
+            }
+
+            //VALIDATIONS:    DETERMINE WHAT WAS PASSED IN
+            bool userFileNameListPassed = (dto.UserFileNameList != null && dto.UserFileNameList.Length > 0);
+            bool userIdListPassed = (dto.UserFileIdList != null && dto.UserFileIdList.Length > 0);
+            if (userFileNameListPassed && userIdListPassed)
+            {
+                return "Cannot pass " + nameof(dto.UserFileNameList) + " AND " + nameof(dto.UserFileIdList) + " at the same time.  Please include only " + nameof(dto.UserFileNameList) + " OR " + nameof(dto.UserFileIdList);
+            }
+
+            return null;
+        }
+
         private void DeleteS3(int datasetId, int schemaId, List<DatasetFile> dbList)
         {
             //CONVERT LIST TO GENERIC ARRAY IN PREP FOR PublishDSCEvent and ERROR HANDLING
