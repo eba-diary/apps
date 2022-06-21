@@ -43,8 +43,8 @@ data.Admin = {
             data: "{}",
             success: function (data) {
                 var s = '<option value>Please Select Schema</option>';
-                for (var i = 0; i < data.length; i++) {
-                    s += '<option value="' + data[i].SchemaId + '">' + data[i].Name + '</option>';
+                for (var d of data) {
+                    s += '<option value="' + d.SchemaId + '">' + d.Name + '</option>';
                 }
                 $("#SchemaDropdown").html(s);
             }
