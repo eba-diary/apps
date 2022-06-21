@@ -47,6 +47,7 @@ data.Admin = {
                     s += '<option value="' + d.SchemaId + '">' + d.Name + '</option>';
                 }
                 $("#schemaDropdown").html(s);
+                $("#schemaDropdown").materialSelect('destroy');
             }
         }); 
     },
@@ -113,19 +114,27 @@ data.Admin = {
             else if (files.length == 0) {
                 alert("You must select files before reprocessing!");
             }
-            else if ($("#flowStepsDropdown").find(":selected").val() == "") {
-                alert("You must select a flow step before reprocessing!");
-            }
             else {
-                console.log(files);
+                alert("Selected files (ID's: "+ files + ") submitted for reprocessing!")
             }
         });
+        $("#flowStepsDropdown").change(function (event) {
+            if ($("#flowStepsDropdown").find(":selected").val() != "-1") {
+                $("#reprocessButton").prop("disabled", false);
+            }
+            else {
+                $("#reprocessButton").prop("disabled", true);
+            }
+        });
+        /*
+         * Uncomment this block and and replace column header in _DataFileReprocessing.cshtml to activate select all functionality
         $("#selectAll").click(function (event) {
             var selectAllCheckbox = $(this);
             $(".select-all-target").each(function(){
                 $(this).prop("checked", selectAllCheckbox.is(":checked"));
             });
         });
+        */
     },
   
     // Loads Admin jobs pages

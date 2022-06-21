@@ -9,19 +9,19 @@
 @Html.DropDownListFor(m => m.allDatasets,
                       new SelectList(Model.allDatasets, "Value", "Text"),
                       "Please select Dataset",
-                      new { @style = "width:400px; height: 30px;" })
+                      new { @style = "width:400px; height: 30px; display: none" })
 
 
 <!-- Schema Dropdown Menu-->
 <h3>Schema</h3>
-<select class="mbd-select" , id="schemaDropdown" style="width:400px; height:30px;">
+<select class="mbd-select" , id="schemaDropdown" style="width:400px; height:30px; display: none">
     <!--populated asyncronously via ajax-->
 </select>
 
 <!-- Flow Steps Dropdown Menu-->
 <h3>Flow Steps</h3>
-<select class="mbd-select" , id="flowStepsDropdown" style="width:400px; height:30px;">
-    <option value="">Select a flowstep</option>
+<select class="mbd-select" , id="flowStepsDropdown" style="width:400px; height:30px; display: none">
+    <option value="-1">Select a flowstep</option>
     <option value="1">Example flowstep</option>
 </select>
 
@@ -39,14 +39,20 @@
             <th>Initial Upload Date</th>
             <th>Modified Date</th>
             <th>File Location</th>
-            <th><input type="checkbox" id="selectAll" class="form-check-input"><label for="selectAll" class="form-check-label">Select Files</label> </th>
+            <!-- Replace last th with below and uncomment #selectAll event handler in admin.js to activate select all functionality-->
+            <!--<input type="checkbox" id="selectAll" class="form-check-input"><label for="selectAll" class="form-check-label">Select Files</label>-->
+            <th> Select Files </th>
         </tr>
     </thead>
 </table>
 <!--Reprocess button-->
-<button type="button" class="btn btn-primary waves-effect waves-light" id="reprocessButton">Reprocess Selected</button>
+<button type="button" class="btn btn-primary waves-effect waves-light" id="reprocessButton" disabled>Reprocess Selected</button>
 
 <script>
+    $(function () {
+        $("#allDatasets").materialSelect("destroy");
+        $("#flowStepsDropdown").materialSelect("destroy");
+    });
     data.Admin.ReprocessInit();
 </script>
 
