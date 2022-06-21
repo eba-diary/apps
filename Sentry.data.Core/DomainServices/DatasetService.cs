@@ -55,7 +55,7 @@ namespace Sentry.data.Core
             return dto;
         }
 
-        public DatasetDetailDto GetDatesetDetailDto(int id)
+        public DatasetDetailDto GetDatasetDetailDto(int id)
         {
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
 
@@ -736,8 +736,6 @@ namespace Sentry.data.Core
             dto.NamedEnvironmentType = ds.NamedEnvironmentType;
         }
 
-
-
         private void MapToDetailDto(Dataset ds, DatasetDetailDto dto)
         {
             MapToDto(ds, dto);
@@ -745,11 +743,11 @@ namespace Sentry.data.Core
             IApplicationUser user = _userService.GetCurrentUser();
 
             dto.Downloads = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.DOWNLOAD && x.Dataset == ds.DatasetId).Count();
-            dto.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, dto.DatasetId);
-            dto.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, dto.DatasetId).Count;
+            dto.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(user.AssociateId, dto.DatasetId);
+            dto.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(user.AssociateId, dto.DatasetId).Count;
             dto.Views = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
             dto.IsFavorite = ds.Favorities.Any(w => w.UserId == user.AssociateId);
-            dto.DatasetFileConfigNames = ds.DatasetFileConfigs.Where(w => w.DeleteInd == false).ToDictionary(x => x.ConfigId.ToString(), y => y.Name);
+            dto.DatasetFileConfigSchemas = ds.DatasetFileConfigs.Where(w => !w.DeleteInd).Select(x => x.ToDatasetFileConfigSchemaDto()).ToList();
             dto.DatasetScopeTypeNames = ds.DatasetScopeType.ToDictionary(x => x.Name, y => y.Description);
             dto.DatasetFileCount = ds.DatasetFiles.Count();
             dto.OriginationCode = ds.OriginationCode;

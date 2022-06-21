@@ -180,11 +180,10 @@
                 <div>
                     <div class="row">
                         <div class="col-lg-12" style="margin-left: 20px">
-                            <select class="form-control" style="margin:1em !important;"
-                                    id="datasetConfigList" name="filterSelector">
-                                @foreach (var schema in Model.DatasetFileConfigNames)
+                            <select class="form-control" style="margin:1em !important;" id="datasetConfigList" name="filterSelector">
+                                @foreach (var schema in Model.DatasetFileConfigSchemas)
                                 {
-                                    <option value="@schema.Key">@schema.Value</option>
+                                    <option value="@schema.ConfigId" data-id="@schema.SchemaId">@schema.SchemaName</option>
                                 }
                             </select>
                         </div>

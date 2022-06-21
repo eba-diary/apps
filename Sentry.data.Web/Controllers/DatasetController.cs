@@ -311,18 +311,20 @@ namespace Sentry.data.Web.Controllers
         [Route("Dataset/Detail/{id}/")]
         public ActionResult Detail(int id)
         {
-            DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
+            DatasetDetailDto dto = _datasetService.GetDatasetDetailDto(id);
             if (dto != null)
             {
-                DatasetDetailModel model = new DatasetDetailModel(dto);
-                model.DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue();
-                model.DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue();
-                model.DisplaySchemaSearch = _featureFlags.CLA3553_SchemaSearch.GetValue();
-                model.DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue();
-                model.ShowManagePermissionsLink = _featureFlags.CLA3718_Authorization.GetValue();
-
                 UserSecurity userSecurity = _datasetService.GetUserSecurityForDataset(id);
-                model.DisplayDatasetFileDelete = userSecurity.CanDeleteDatasetFile;
+                
+                DatasetDetailModel model = new DatasetDetailModel(dto)
+                {
+                    DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue(),
+                    DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue(),
+                    DisplaySchemaSearch = _featureFlags.CLA3553_SchemaSearch.GetValue(),
+                    DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue(),
+                    ShowManagePermissionsLink = _featureFlags.CLA3718_Authorization.GetValue(),
+                    DisplayDatasetFileDelete = userSecurity.CanDeleteDatasetFile
+                };
                 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Detail Page", dto.DatasetId);
 
@@ -528,7 +530,7 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult DatasetConfiguration(int id)
         {
-            DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
+            DatasetDetailDto dto = _datasetService.GetDatasetDetailDto(id);
             DatasetDetailModel model = new DatasetDetailModel(dto);
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Configuration Page", dto.DatasetId);
@@ -1103,7 +1105,7 @@ namespace Sentry.data.Web.Controllers
             //If a value was passed, load appropriate information
             if (datasetId != 0)
             {
-                cd = new CreateDataFileModel(_datasetService.GetDatesetDetailDto(datasetId));
+                cd = new CreateDataFileModel(_datasetService.GetDatasetDetailDto(datasetId));
             }
 
             ViewBag.CurrentConfigId = configId;

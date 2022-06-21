@@ -1486,22 +1486,13 @@ data.Dataset = {
             });
 
             var datasetId = encodeURI(datasetDetailModel.DatasetId);
-
-            //Need to get the schema id after adding it to the dataset detail model in some way
-            //$('#datasetConfigList')
-            var schemaId = encodeURI();
-
-            var deleteRequest = {
-                deleteFilesModel: {
-                    UserFileIdList: ids
-                }
-            };
+            var schemaId = encodeURI($('#datasetConfigList option:selected').data("id"));
 
             //delete
             $.ajax({
                 type: "POST",
-                url: '../../api/v2/datafile/dataset/' + datasetId + '/schema/' + 1 + '?' + $.param({ 'userFileIdList': ids }),
-                data: JSON.stringify(deleteRequest),
+                url: '../../api/v2/datafile/dataset/' + datasetId + '/schema/' + schemaId + '/Delete',
+                data: JSON.stringify({ UserFileIdList: ids }),
                 contentType: "application/json",
                 success: function () {
                     $("#datasetFilesTable").DataTable().ajax.reload();
