@@ -552,7 +552,7 @@ namespace Sentry.data.Core
          *  @param - User is required to pass Dataflowstep id to being processing from
          *  @return - DataFlowdto object of the stepId
          */
-        public DataFlowDto getDataFlowDtoByStepId(int stepId)
+        public DataFlowDto GetDataFlowDtoByStepId(int stepId)
         {
             if (stepId == 0) // making sure stepId is a valid value
             {
@@ -576,7 +576,7 @@ namespace Sentry.data.Core
          *  @param - int datasetFileId
          *  @return - int schemaId
          */
-        public int getSchemaIdFromDatafileId(int datasetFileId)
+        public int GetSchemaIdFromDatafileId(int datasetFileId)
         {
             if(datasetFileId == 0)
             {
@@ -601,13 +601,13 @@ namespace Sentry.data.Core
             bool indicator = true;
 
             // creates a dataFlowDto object from the stepId
-            DataFlowDto currentDataFlowDto = getDataFlowDtoByStepId(stepId);
+            DataFlowDto currentDataFlowDto = GetDataFlowDtoByStepId(stepId);
 
             // traversing through the list of datasetFileIds
             foreach (int datasetFileId in datasetFileIds)
             {
                 // compares the schemaIds from the DataFlowDto and the datasetFileId seeing if they are not equal
-                if(!(currentDataFlowDto.SchemaId == getSchemaIdFromDatafileId(datasetFileId)))
+                if(!(currentDataFlowDto.SchemaId == GetSchemaIdFromDatafileId(datasetFileId)))
                 {
                     // in the case that the schemaId are not equal to one another --> return false
                     indicator = false;

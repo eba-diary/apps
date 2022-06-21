@@ -802,7 +802,7 @@ namespace Sentry.data.Core.Tests
             var dataflowservice = new DataFlowService(context.Object, null, null, null, null, null, datafeature.Object, null); // creating the dataflowservice object
 
             // Act
-            var result = dataflowservice.getDataFlowDtoByStepId(stepId).Id;// this creates a nullReferenceException  -> gets the step Id from the currrent dataflowservice object
+            var result = dataflowservice.GetDataFlowDtoByStepId(stepId).Id;// this creates a nullReferenceException  -> gets the step Id from the currrent dataflowservice object
             
 
             // Assert
@@ -837,7 +837,7 @@ namespace Sentry.data.Core.Tests
             var dataflowservice = new DataFlowService(context.Object, null, null, null, null, null, null, null);
             
             // Act
-            int testSchema = dataflowservice.getSchemaIdFromDatafileId(datafileId);
+            int testSchema = dataflowservice.GetSchemaIdFromDatafileId(datafileId);
             
             // Assert
             Assert.AreEqual(schemaId, testSchema);
