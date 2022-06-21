@@ -590,6 +590,81 @@ namespace Sentry.data.Core
         }
 
 
+        /*
+         *  Helper method for getting a dataFlotDto object from a DataflowStepid
+         *  @param - User is required to pass Dataflowstep id to being processing from
+         *  @return - DataFlowdto object of the stepId
+         */
+        public DataFlowDto GetDataFlowDtoByStepId(int stepId)
+        {
+            if (stepId == 0) // making sure stepId is a valid value
+            {
+                throw new ArgumentNullException("stepId", "DataFlowStep is required");
+            }
+            
+            // finding the dataflowstep with the associated stepId and retrieving the dataflow object from dataflowstep
+            DataFlow df = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault().DataFlow;
+            
+            // creating a new blank DataFlowDto object
+            DataFlowDto dataFlowDto = new DataFlowDto();
+
+            // creating a DataFlowDto from the DataFlow
+            MapToDto(df, dataFlowDto);
+            
+            return dataFlowDto;
+        }
+
+        /*
+         *  Helper method for getting a datasetFileId into a schema id
+         *  @param - int datasetFileId
+         *  @return - int schemaId
+         */
+        public int GetSchemaIdFromDatafileId(int datasetFileId)
+        {
+            if(datasetFileId == 0)
+            {
+                throw new ArgumentNullException("datasetFileId", "DatasetFileId is required attribute");
+            }
+
+            // finds the DatasetFile object that is associated with the datasetFileId passed into the method and getting schema id 
+            int schemaId = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault().Schema.SchemaId;
+
+            return schemaId; // returns the schema id of the associated datasetFileId
+        }
+        
+
+        
+
+        /*
+         * Validating that all datasetFileIds correspond to the stepId
+         * @return true->passed validation, false->failed validation   determines whether reprocessing should be performed or not
+         */
+        public bool ValidateStepIdAndDatasetFileIds(int stepId, List<int> datasetFileIds)
+        {
+            bool indicator = true;
+
+            // creates a dataFlowDto object from the stepId
+            DataFlowDto currentDataFlowDto = GetDataFlowDtoByStepId(stepId);
+
+            // traversing through the list of datasetFileIds
+            foreach (int datasetFileId in datasetFileIds)
+            {
+                // compares the schemaIds from the DataFlowDto and the datasetFileId seeing if they are not equal
+                if(!(currentDataFlowDto.SchemaId == GetSchemaIdFromDatafileId(datasetFileId)))
+                {
+                    // in the case that the schemaId are not equal to one another --> return false
+                    indicator = false;
+                    break;
+                }
+            }
+            // if both schemaIds are equal for all datasetFileIds then this method will return true, false otherwise
+            return indicator;
+        }
+
+        
+
+
+
         public List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId)
         {
             if (stepId == 0)
