@@ -28,7 +28,6 @@ namespace Sentry.data.Core
         public virtual bool IsSecuredAtUserLevel { get; set; }
         public virtual string GrantPermissionToUserId { get; set; }
         public virtual string AwsArn { get; set; }
-        [ScriptIgnore]
         public virtual Security ParentSecurity { get; set; }
 
         public virtual IList<SecurityPermission> Permissions { get; set; }
