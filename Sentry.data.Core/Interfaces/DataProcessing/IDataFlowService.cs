@@ -19,8 +19,6 @@ namespace Sentry.data.Core
         /// <returns></returns>
         /// <exception cref="Sentry.data.Core.Exceptions.DataFlowNotFound"></exception>
         DataFlowDetailDto GetDataFlowDetailDto(int id);
-
-        List<DataFlowDetailDto> GetDataFlowDetailDto(Expression<Func<DataFlow, bool>> expression);
         List<DataFlowDetailDto> GetDataFlowDetailDtoByDatasetId(int datasetId);
         List<DataFlowDetailDto> GetDataFlowDetailDtoBySchemaId(int schemaId);
         List<DataFlowDetailDto> GetDataFlowDetailDtoByStorageCode(string storageCode);
