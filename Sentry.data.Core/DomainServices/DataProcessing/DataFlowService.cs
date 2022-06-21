@@ -552,19 +552,16 @@ namespace Sentry.data.Core
          *  @param - User is required to pass Dataflowstep id to being processing from
          *  @return - DataFlowdto object of the stepId
          */
-        public DataFlowDto GetDataFlowByStepId(int stepId)
+        public DataFlowDto getDataFlowDtoByStepId(int stepId)
         {
             if (stepId == 0) // making sure stepId is a valid value
             {
                 throw new ArgumentNullException("stepId", "DataFlowStep is required");
             }
-
-            // finding the dataflowstep with the associated stepId
-            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
-
-            // retrieve the dataflow object from dataflowstep
-            DataFlow df = step.DataFlow;
-
+            
+            // finding the dataflowstep with the associated stepId and retrieving the dataflow object from dataflowstep
+            DataFlow df = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault().DataFlow;
+            
             // creating a new blank DataFlowDto object
             DataFlowDto dataFlowDto = new DataFlowDto();
 
@@ -586,61 +583,42 @@ namespace Sentry.data.Core
                 throw new ArgumentNullException("datasetFileId", "DatasetFileId is required attribute");
             }
 
-            // finds the DatasetFile object that is associated with the datasetFileId passed into the method
-            DatasetFile dsf = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
+            // finds the DatasetFile object that is associated with the datasetFileId passed into the method and getting schema id 
+            int schemaId = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault().Schema.SchemaId;
 
-            return dsf.Schema.SchemaId; // returns the schema id of the associated datasetFileId
+            return schemaId; // returns the schema id of the associated datasetFileId
         }
         
 
-        /*
-         * Validates dataflowStepId with associated schema
-         */
-        public bool dataflowStepIdToSchemaValidation(int stepId)
-        {
-            // indicator used to see if the stepId passes validation
-            bool indicator = true; 
-
-            // calling the helper method that returns the DataFlowDto object
-            DataFlowDto dto = GetDataFlowByStepId(stepId);
-
-            try
-            {
-                // this method will determine whether validation worked or not
-                CreateandSaveDataFlow(dto);
-            } 
-            catch (SchemaInUseException e) // exception is thrown and caught here if selected schema is alreadly connected with a different dataflow
-            {
-                indicator = false;
-            }
-
-            return indicator;
-            
-        }
+        
 
         /*
-         * Validates the list of datasetFileIds with associated schema
+         * Validating that all datasetFileIds correspond to the stepId
+         * @return true->passed validation, false->failed validation   determines whether reprocessing should be performed or not
          */
-        public bool DatasetFileIdsToSchemaValidation(List<int> datasetFileIds)
+        public bool ValidateStepIdAndDatasetFileIds(int stepId, List<int> datasetFileIds)
         {
-            // indicator used to see if datasetFileIds pass validation
             bool indicator = true;
 
-            // traversing through every datasetFileId
-            foreach(int datasetFileId in datasetFileIds)
+            // creates a dataFlowDto object from the stepId
+            DataFlowDto currentDataFlowDto = getDataFlowDtoByStepId(stepId);
+
+            // traversing through the list of datasetFileIds
+            foreach (int datasetFileId in datasetFileIds)
             {
-                // gets the schema of the associated datasetFileId
-                int schema = getSchemaIdFromDatafileId(datasetFileId);
-
-
-                if (DataFlowExistsForFileSchema(schema)) // the case where a dataflow already exists for the associated schema
+                // compares the schemaIds from the DataFlowDto and the datasetFileId seeing if they are not equal
+                if(!(currentDataFlowDto.SchemaId == getSchemaIdFromDatafileId(datasetFileId)))
                 {
-                    indicator = false; // validation failed for the indicated schema 
+                    // in the case that the schemaId are not equal to one another --> return false
+                    indicator = false;
                     break;
                 }
             }
-            return indicator ? true : false; // returning the indicator true->passed validation   false->failed validation
+            // if both schemaIds are equal for all datasetFileIds then this method will return true, false otherwise
+            return indicator;
         }
+
+        
 
 
 
