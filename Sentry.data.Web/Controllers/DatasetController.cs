@@ -776,7 +776,7 @@ namespace Sentry.data.Web.Controllers
             }
             else
             {
-                return PartialView("_Success", new SuccessModel("Dataset permission inheritance change was successfully requested.", "Change Id: " + ticketId, true));
+                return PartialView("_Success", new SuccessModel("Dataset permission removal was successfully requested.", "Change Id: " + ticketId, true));
             }
         }
 
@@ -784,12 +784,12 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public ActionResult GetLatestInheritanceTicket(int datasetId)
         {
-            var ticket = _datasetService.GetLatestInheritanceTicket(datasetId);
+            SecurityTicket ticket = _datasetService.GetLatestInheritanceTicket(datasetId);
             if(ticket == null)
             {
                 ticket = new SecurityTicket();
             }
-            return Json(ticket, JsonRequestBehavior.AllowGet);
+            return Json(ticket.ToSimple(), JsonRequestBehavior.AllowGet);
         }
         #endregion
 

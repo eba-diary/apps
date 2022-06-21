@@ -38,7 +38,7 @@
         </div>
     </div>
 
-    @foreach (var pair in new Dictionary<string, IList<ManagePermissionModel>> { { "DSC Permissions", Model.DscPermissions }, { "Snowflake Permissions", Model.SnowflakePermissions }, { "S3 Permissions", Model.AwsIamPermissions }, { "DSC Legacy Permissions", Model.DscLegacyPermissions } })
+    @foreach (var pair in new Dictionary<string, IList<ManagePermissionModel>> { { "DSC Permissions", Model.DscPermissions }, { "Snowflake Permissions", Model.SnowflakePermissions }, { "S3 Permissions", Model.AwsIamPermissions } })
     {
         <div class="row">
             <h6 class="pt-3">@pair.Key</h6>
@@ -65,7 +65,7 @@
                                 <td class="permissionDescription">@permission.PermissionDescription</td>
                                 <td class="permissionStatus"><span title="Change #@permission.TicketId">@permission.PermissionStatus</span></td>
                                 <td class="permissionCode d-none">@permission.Code </td>
-                                <td>@if (pair.Key.Equals("S3 Permissions") || pair.Key.Equals("DSC Legacy Permissions")) { <em class="far fa-trash-alt removePermissionIcon"></em> }</td>
+                                <td>@if (!permission.IsSystemGenerated) { <em class="far fa-trash-alt removePermissionIcon"></em> }</td>
                             </tr>
                         }
                     }

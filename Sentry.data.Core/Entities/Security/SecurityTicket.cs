@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web.Script.Serialization;
 using Sentry.Core;
+using Sentry.data.Core.Entities.Security;
 
 namespace Sentry.data.Core
 {
@@ -26,12 +28,14 @@ namespace Sentry.data.Core
         public virtual bool IsSecuredAtUserLevel { get; set; }
         public virtual string GrantPermissionToUserId { get; set; }
         public virtual string AwsArn { get; set; }
-
+        [ScriptIgnore]
         public virtual Security ParentSecurity { get; set; }
 
         public virtual IList<SecurityPermission> Permissions { get; set; }
 
         public virtual string SaidKeyCode { get; set; }
+
+        public virtual bool IsSystemGenerated { get; set; }
 
         /// <summary>
         /// Retrieves the Identity (user/group/role) that this SecurityTicket applies to
@@ -113,6 +117,10 @@ namespace Sentry.data.Core
             }
 
             return vr; 
+        }
+        public virtual SecurityTicketSimple ToSimple()
+        {
+            return new SecurityTicketSimple(this);
         }
     }
 }

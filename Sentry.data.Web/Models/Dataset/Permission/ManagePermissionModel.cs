@@ -16,6 +16,7 @@ namespace Sentry.data.Web
             PermissionStatus = securablePermission.SecurityPermission.IsEnabled ? "Active" : "Pending";
             TicketId = securablePermission.TicketId;
             Code = securablePermission.SecurityPermission.Permission.PermissionCode;
+            IsSystemGenerated = securablePermission.IsSystemGenerated;
         }
 
         public ManagePermissionModel() { }
@@ -26,5 +27,6 @@ namespace Sentry.data.Web
         public string PermissionStatus { get; set; }
         public string TicketId { get; set; }
         public string Code { get; set; }
+        public bool IsSystemGenerated { get; set; }
     }
 }

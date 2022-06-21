@@ -511,11 +511,6 @@ data.Dataset = {
 
 
     UpdateMetadata: function () {
-
-        if (!isNaN(getUrlParameter('configID'))) {
-            $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
-        }
-
         if ($('#datasetConfigList').val() === undefined) { return; }
 
         var metadataURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val();
@@ -993,6 +988,10 @@ data.Dataset = {
 
     DetailInit: function (datasetDetailModel) {
 
+        if (!isNaN(getUrlParameter('configID'))) {
+            $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
+        }
+
         this.delroyInit();
 
         $("[id^='EditDataset_']").off('click').on('click', function (e) {
@@ -1277,23 +1276,6 @@ data.Dataset = {
             $("#tab-spinner").hide();
 
         });
-        Id = $('#datasetConfigList').val();
-        //on initial load, try pulling the Id from the URL first. 
-
-        Id = $('#datasetConfigList').val();
-        //on initial load, try pulling the Id from the URL first.
-
-        $('#dataLastUpdatedSpinner').show();
-        //data.Dataset.UpdateMetadata();
-        var url = new URL(window.location.href);
-
-        Id = url.searchParams.get('configID')
-        if (Id == undefined) {
-            Id = $('#datasetConfigList').val();
-        }
-
-        data.Dataset.DatasetFileTableInit(Id);
-        data.Dataset.DatasetBundingFileTableInit(Id);
 
         //Hook up handlers for tabbed sections
 
@@ -2302,17 +2284,10 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         $("#inheritanceSwitch label").click(function () {
             $("#inheritanceModal").modal('show');
         });
-        data.Dataset.permissionInheritanceSwitchInit();
+        data.Dataset.updateInheritanceStatus();
         //Event to refresh inheritance switch on modal close
         $("#inheritanceModal").on('hide.bs.modal', function () {
-            $.ajax({
-                type: "GET",
-                url: '/Dataset/Detail/' + $("#DatasetHeader").attr("value") + '/Permissions/GetLatestInheritanceTicket',
-                success: function (result) {
-                    $("#inheritanceSwitch").attr("value", result.TicketStatus);
-                    data.Dataset.permissionInheritanceSwitchInit(result);
-                }
-            });
+            data.Dataset.updateInheritanceStatus();
         });
         $("#inheritanceModalSubmit").click(function () {
             if (data.Dataset.validateInheritanceModal()) {
@@ -2333,15 +2308,26 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     },
 
+    updateInheritanceStatus() {
+        $.ajax({
+            type: "GET",
+            url: '/Dataset/Detail/' + $("#DatasetHeader").attr("value") + '/Permissions/GetLatestInheritanceTicket',
+            success: function (result) {
+                $("#inheritanceSwitch").attr("value", result.TicketStatus);
+                data.Dataset.permissionInheritanceSwitchInit(result);
+            }
+        });
+    },
+
     permissionInheritanceSwitchInit(result) {
         var inheritance = $("#inheritanceSwitch").attr("value");
         switch (inheritance) {
-            case "ACTIVE":
+            case "Active":
                 $('#inheritanceSwitchInput').prop('checked', true);
                 $("#addRemoveInheritanceMessage").text("Request Remove Inheritance");
                 $("#Inheritance_IsAddingPermission").val(false);
                 break;
-            case "PENDING":
+            case "Pending":
                 $("#inheritanceSwitch").html('<p>Inheritance change pending. See ticket ' + result.TicketId + '.</p>');
                 break
             default: //we treat default the same as "DISABLED"
