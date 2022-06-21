@@ -26,6 +26,15 @@ data.Admin = {
         $("[id^='Complete_']").on("click", function () {
             data.Admin.CompleteAuction($(this).data("id"));
         });
-    }
+    },
 
+    // Loads Admin jobs pages
+
+    AdminPageInit: function () {
+        $(".load-partial-view").click(function (event) {
+            event.preventDefault();
+            var url = $(this).data("url");
+            $("#partial-view-test").load(url);
+        });
+    }
 }
