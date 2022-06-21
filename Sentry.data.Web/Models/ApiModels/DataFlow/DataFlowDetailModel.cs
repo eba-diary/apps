@@ -6,6 +6,6 @@ namespace Sentry.data.Web.Models.ApiModels.Dataflow
 
     public class DataFlowDetailModel : DataFlowModel
     {
-        public List<DataFlowStepDto> steps { get; set; }
+        public List<DataFlowStepModel> steps { get; set; }
     }
 }

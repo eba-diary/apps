@@ -72,10 +72,10 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <param name="storagecode"></param>
         /// <returns></returns>
         [ApiVersionBegin(WebAPI.Version.v2)]
-        /*[WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]*/
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.OK)]
-        [Route("getdataflowmetadata")]
+        [Route("")]
         [HttpGet]
         public IHttpActionResult GetDataFlowMetadata([FromUri] int? datasetId = null, [FromUri] int? schemaId = null, [FromUri] string storagecode = null)
         {
@@ -113,27 +113,25 @@ namespace Sentry.data.Web.WebApi.Controllers
                 }
             }
 
-            Expression<Func<DataFlow, bool>> expression = null;
+            List<DataFlowDetailDto> dtoList = new List<DataFlowDetailDto>();
 
             switch (itemCheck.Key) // Switch based on the param that was sent through
             {
                 case "datasetId":
-                    expression = w => w.DatasetId == (int)itemCheck.Value;
+                    dtoList = _dataFlowService.GetDataFlowDetailDtoByDatasetId((int)itemCheck.Value);
                     break;
                 case "schemaId":
-                    expression = w => w.SchemaId == (int)itemCheck.Value;
+                    dtoList = _dataFlowService.GetDataFlowDetailDtoBySchemaId((int)itemCheck.Value);
                     break;
                 case "storagecode":
-                    expression = w => w.FlowStorageCode == (string)itemCheck.Value;
+                    dtoList = _dataFlowService.GetDataFlowDetailDtoByStorageCode((string)itemCheck.Value);
                     break;
             }
 
-            // Retrieves a list of DataFlowDetailDto(s) via the expression sent through
-            List<DataFlowDetailDto> dtoList = _dataFlowService.GetDataFlowDetailDto(expression);
-
+            // Retrieves a list of DataFlowDetailDto(s) via the expression sent 
             List<Models.ApiModels.Dataflow.DataFlowDetailModel> modelList = new List<Models.ApiModels.Dataflow.DataFlowDetailModel>();
 
-            dtoList.MapToDetailModelList(modelList); // Map the DataFlowDetailDto to the DataFlowDetailModel via the MapToDetailModelList extension method.
+            modelList = dtoList.MapToDetailModelList(); // Map the DataFlowDetailDto to the DataFlowDetailModel via the MapToDetailModelList extension method.
 
             return Ok(dtoList);
         }

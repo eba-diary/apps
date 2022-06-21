@@ -70,7 +70,7 @@ namespace Sentry.data.Core
             return dto;
         }
 
-        public List<DataFlowDetailDto> GetDataFlowDetailDto(Expression<Func<DataFlow, bool>> expression)
+        private List<DataFlowDetailDto> GetDataFlowDetailDto(Expression<Func<DataFlow, bool>> expression)
         {
             List<DataFlow> dfList = null;
 
@@ -80,6 +80,24 @@ namespace Sentry.data.Core
 
             List<DataFlowDetailDto> dtoList = new List<DataFlowDetailDto>();
             MapToDetailDtoList(dfList, dtoList);
+            return dtoList;
+        }
+
+        public List<DataFlowDetailDto> GetDataFlowDetailDtoByDatasetId(int datasetId)
+        {
+            List<DataFlowDetailDto> dtoList = GetDataFlowDetailDto(w => w.DatasetId == datasetId);
+            return dtoList;
+        }
+
+        public List<DataFlowDetailDto> GetDataFlowDetailDtoBySchemaId(int schemaId)
+        {
+            List<DataFlowDetailDto> dtoList = GetDataFlowDetailDto(w => w.SchemaId == schemaId);
+            return dtoList;
+        }
+
+        public List<DataFlowDetailDto> GetDataFlowDetailDtoByStorageCode(string storageCode)
+        {
+            List<DataFlowDetailDto> dtoList = GetDataFlowDetailDto(w => w.FlowStorageCode == storageCode);
             return dtoList;
         }
 

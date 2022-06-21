@@ -482,7 +482,7 @@ namespace Sentry.data.Web.Tests
             Models.ApiModels.Dataflow.DataFlowDetailModel model = new Models.ApiModels.Dataflow.DataFlowDetailModel();
 
             // Act
-            dto.MapToModel(model);
+            model = dto.MapToModel();
 
             // Assert
             Assert.AreEqual(dto.Id, model.Id);
@@ -514,7 +514,7 @@ namespace Sentry.data.Web.Tests
             List<Models.ApiModels.Dataflow.DataFlowDetailModel> modelList = new List<Models.ApiModels.Dataflow.DataFlowDetailModel>();
 
             // Act
-            detailDto.MapToDetailModelList(modelList);
+            modelList = detailDto.MapToDetailModelList();
 
             // Assert
             Assert.AreEqual(detailDto.Count, modelList.Count);

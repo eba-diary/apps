@@ -71,8 +71,10 @@ namespace Sentry.data.Web
             return new DFModel(dto) { };
         }
 
-        public static void MapToModel(this DataFlowDetailDto dto, Models.ApiModels.Dataflow.DataFlowDetailModel model)
-        { 
+        public static Models.ApiModels.Dataflow.DataFlowDetailModel MapToModel(this DataFlowDetailDto dto)
+        {
+            Models.ApiModels.Dataflow.DataFlowDetailModel model = new Models.ApiModels.Dataflow.DataFlowDetailModel();
+
             model.Id = dto.Id;
             model.FlowGuid = dto.FlowGuid;
             model.SaidKeyCode = dto.SaidKeyCode;
@@ -94,16 +96,22 @@ namespace Sentry.data.Web
             model.DeleteIssueDTM = dto.DeleteIssueDTM;
             model.NamedEnvironment = dto.NamedEnvironment;
             model.NamedEnvironmentType = dto.NamedEnvironmentType;
+
+            return model;
         }
 
-        public static void MapToDetailModelList(this List<DataFlowDetailDto> detailDto, List<Models.ApiModels.Dataflow.DataFlowDetailModel> detailModelList)
+        public static List<Models.ApiModels.Dataflow.DataFlowDetailModel> MapToDetailModelList(this List<DataFlowDetailDto> detailDto)
         {
+            List<Models.ApiModels.Dataflow.DataFlowDetailModel> detailModelList = new List<Models.ApiModels.Dataflow.DataFlowDetailModel>();
+
             foreach (DataFlowDetailDto dto in detailDto)
             {
                 Models.ApiModels.Dataflow.DataFlowDetailModel detail = new Models.ApiModels.Dataflow.DataFlowDetailModel();
-                dto.MapToModel(detail);
+                detail = dto.MapToModel();
                 detailModelList.Add(detail);
             }
+
+            return detailModelList;
         }
 
         public static Core.DataFlowDto ToDto(this DataFlowModel model)
