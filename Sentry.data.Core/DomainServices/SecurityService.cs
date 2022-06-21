@@ -467,7 +467,7 @@ namespace Sentry.data.Core
         public void BuildS3RequestAssistance(SecurityTicket ticket)
         {
             var dataset = _datasetContext.Datasets.Where(d => d.Security.Tickets.Contains(ticket)).FirstOrDefault();
-            string project = "CLA";
+            string project = Sentry.Configuration.Config.GetHostSetting("S3_JiraTicketProject");
             string summary = "S3 Access " + (ticket.IsAddingPermission ? "Request" : "Removal");
             StringBuilder sb = new StringBuilder();
             string issueType = "Request";
