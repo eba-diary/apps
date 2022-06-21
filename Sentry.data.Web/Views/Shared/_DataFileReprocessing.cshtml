@@ -14,17 +14,15 @@
 
 <!-- Schema Dropdown Menu-->
 <h3>Schema</h3>
-<select class="mbd-select" , id="SchemaDropdown" style="width:400px; height:30px;">
+<select class="mbd-select" , id="schemaDropdown" style="width:400px; height:30px;">
     <!--populated asyncronously via ajax-->
 </select>
 
 <!-- Flow Steps Dropdown Menu-->
 <h3>Flow Steps</h3>
 <select class="mbd-select" , id="flowStepsDropdown" style="width:400px; height:30px;">
-    @for (var x = 0; x < Model.flowSteps.Count; x++)
-    {
-        <option id="option" value="flowSteps"> @Model.flowSteps[x]</option>
-    }
+    <option value="">Select a flowstep</option>
+    <option value="1">Example flowstep</option>
 </select>
 
 <br />

@@ -46,7 +46,7 @@ data.Admin = {
                 for (var d of data) {
                     s += '<option value="' + d.SchemaId + '">' + d.Name + '</option>';
                 }
-                $("#SchemaDropdown").html(s);
+                $("#schemaDropdown").html(s);
             }
         }); 
     },
@@ -99,8 +99,8 @@ data.Admin = {
             var url = data.Admin.GetSchemaUrl(datasetId);
             data.Admin.GetSchemaDropdown(url);
         });
-        $("#SchemaDropdown").change(function (event) {
-            var schemaId = $("#SchemaDropdown").find(":selected").val();
+        $("#schemaDropdown").change(function (event) {
+            var schemaId = $("#schemaDropdown").find(":selected").val();
             var datasetId = $("#allDatasets").find(":selected").val();
             var url = data.Admin.GetFileUrl(datasetId, schemaId);
             data.Admin.PopulateTable(url);
@@ -112,6 +112,9 @@ data.Admin = {
             }
             else if (files.length == 0) {
                 alert("You must select files before reprocessing!");
+            }
+            else if ($("#flowStepsDropdown").find(":selected").val() == "") {
+                alert("You must select a flow step before reprocessing!");
             }
             else {
                 console.log(files);
