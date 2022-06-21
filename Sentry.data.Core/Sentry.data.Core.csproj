@@ -233,6 +233,7 @@
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\SparkConverterModel.cs" />
     <Compile Include="Entities\Schema\Elastic\ElasticSchemaField.cs" />
+    <Compile Include="Entities\Schema\SnowflakeConsumptionType.cs" />
     <Compile Include="Entities\Security\SecurablePermission.cs" />
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
     <Compile Include="Entities\Search\SavedSearch.cs" />
