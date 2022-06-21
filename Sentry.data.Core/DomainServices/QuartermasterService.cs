@@ -110,8 +110,7 @@ namespace Sentry.data.Core
         private void RequestAssistance(JiraTicketInfo ticket)
         {
             RequestAssistanceInfo request = new RequestAssistanceInfo();
-            request.Tickets = new List<JiraTicketInfo>();
-            request.Tickets.Add(ticket);
+            request.Tickets = new List<JiraTicketInfo>() { ticket };
             RequestAssistance(request);
         }
 

@@ -468,21 +468,33 @@ namespace Sentry.data.Core
         {
             var dataset = _datasetContext.Datasets.Where(d => d.Security.Tickets.Contains(ticket)).FirstOrDefault();
             string project = "CLA";
-            string summary = "S3 Access Request";
+            string summary = "S3 Access " + (ticket.IsAddingPermission ? "Request" : "Removal");
             StringBuilder sb = new StringBuilder();
             string issueType = "Request";
 
+            //Build Description
             string account = Sentry.Configuration.Config.GetHostSetting("AwsAccountId");
             string name = "sentry-dtlk-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-" + dataset.ShortName + "-ae2";
-            string sourceBucket = "sentry-dtlk-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-ae2";
-            string principal = ticket.AwsArn;
-            string action = "s3.*";
-            string resourceSchemas;
-            string actionBucket = "S3:ListBucket";
-            string resource = "arn:aws:s3:us-east-2:" + account + ":accesspoint/" + name;
-            sb.Append(account);
-            sb.Append(name);
-            _quartermasterService.BuildJiraTicketAndRequest(project, new List<string>(), new List<string>(), sb.ToString(), summary, issueType, new List<JiraCustomField>());
+
+            sb.AppendLine("Account: " + account);
+            sb.AppendLine("Name: " + name);
+            sb.AppendLine("Source Bucket: " + "sentry-dtlk-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-ae2");
+            sb.AppendLine("Principal AWS ARN: " + ticket.AwsArn);
+            sb.AppendLine("Action: s3.*");
+            sb.AppendLine("Action Bucket: S3:ListBucket");
+            sb.AppendLine("Resource: " + "arn:aws:s3:us-east-2:" + account + ":accesspoint/" + name);
+            foreach (DatasetFileConfig dsfc in dataset.DatasetFileConfigs)
+            {
+                sb.AppendLine("Schema: " + dsfc.Schema.Name);
+                sb.AppendLine("\t\tBucket: " + dsfc.Schema.ParquetStorageBucket);
+                sb.AppendLine("\t\tPrefix: " + dsfc.Schema.ParquetStoragePrefix);
+            }
+            List<JiraCustomField> customFields = new List<JiraCustomField>();
+            JiraCustomField acceptanceCriteria = new JiraCustomField();
+            acceptanceCriteria.Name = "Acceptance Criteria";
+            acceptanceCriteria.Value = sb.ToString();
+            customFields.Add(acceptanceCriteria);
+            _quartermasterService.BuildJiraTicketAndRequest(project, new List<string>(), new List<string>(), "", summary, issueType, customFields);
         }
 
         /// <summary>
