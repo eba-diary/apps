@@ -133,7 +133,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             modelList = dtoList.MapToDetailModelList(); // Map the DataFlowDetailDto to the DataFlowDetailModel via the MapToDetailModelList extension method.
 
-            return Ok(dtoList);
+            return Ok(modelList);
         }
 
         
