@@ -1,5 +1,6 @@
 ﻿using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.FeatureFlags;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
 using System;
 using System.Collections.Generic;

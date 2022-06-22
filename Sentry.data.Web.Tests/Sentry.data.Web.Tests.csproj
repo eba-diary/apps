@@ -186,6 +186,7 @@
     </Compile>
     <Compile Include="RetrieverTests.cs" />
     <Compile Include="MappingTests.cs" />
+    <Compile Include="DatasetExtensionsTests.cs" />
     <Compile Include="UtilitiesUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>

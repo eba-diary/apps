@@ -1261,10 +1261,12 @@ data.Dataset = {
             $('#schemaHR').show();
             self.vm.SchemaRows.removeAll();
 
-            if ($("#datasetFilesTable_filter").length > 0) {
-                var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + configId;
-                $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
-            }
+            //if ($("#datasetFilesTable_filter").length > 0) {
+            //    var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + configId;
+            //    $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
+            //}
+
+            $('#datasetFilesTable').DataTable().ajax.url(data.Dataset.getDatasetFileTableUrl()).load();
 
             if (!$("#DataPreviewNoRows").hasClass("d-none"))
             { 
@@ -1289,8 +1291,8 @@ data.Dataset = {
 
         //Don't init dataset file data table until the file tab is selected when tab feature is on
         if (!datasetDetailModel.DisplayTabSections) {
-            data.Dataset.DatasetFileTableInit(Id, datasetDetailModel);
-            data.Dataset.DatasetBundingFileTableInit(Id);
+            data.Dataset.DatasetFileTableInit(datasetDetailModel);
+            //data.Dataset.DatasetBundingFileTableInit(Id);
         }
 
         //Hook up handlers for tabbed sections
@@ -1408,9 +1410,8 @@ data.Dataset = {
                         $("#tab-spinner").hide();
                         $('#tabDataFiles').html(view);
 
-                        var configId = $('#datasetConfigList').val();
-                        data.Dataset.DatasetFileTableInit(configId, datasetDetailModel);
-                        data.Dataset.DatasetBundingFileTableInit(configId);
+                        data.Dataset.DatasetFileTableInit(datasetDetailModel);
+                        //data.Dataset.DatasetBundingFileTableInit(configId);
                     }
                 });
             }
@@ -1482,10 +1483,15 @@ data.Dataset = {
                 ids.push($(this).data("id"));
             });
 
+            var datasetId = encodeURI(datasetDetailModel.DatasetId);
+            var schemaId = encodeURI($('#datasetConfigList option:selected').data("id"));
+
             //delete
             $.ajax({
-                type: "DELETE",
-                url: '../../api/v2/datafile/dataset/' + 1 + '/schema/' + 1 + '?' + $.param({ 'userFileIdList': ids }),
+                type: "POST",
+                url: '../../api/v2/datafile/dataset/' + datasetId + '/schema/' + schemaId + '/Delete',
+                data: JSON.stringify({ UserFileIdList: ids }),
+                contentType: "application/json",
                 success: function () {
                     $("#datasetFilesTable").DataTable().ajax.reload();
                 },
@@ -1815,7 +1821,7 @@ data.Dataset = {
         //});
     },
 
-    DatasetFileTableInit: function (Id, datasetDetailModel) {
+    DatasetFileTableInit: function (datasetDetailModel) {
 
         data.Dataset.DatasetFilesTable = $("#datasetFilesTable").DataTable({
             orderCellsTop: true,
@@ -1827,8 +1833,8 @@ data.Dataset = {
             destroy: true,
             rowId: 'Id',
             ajax: {
-                url: "/Dataset/GetDatasetFileInfoForGrid/?Id=" + Id,
-                type: "POST"
+                type: "POST",
+                url: data.Dataset.getDatasetFileTableUrl()
             },
             iDisplayLength: 10,
             aLengthMenu: [
@@ -2018,6 +2024,10 @@ data.Dataset = {
         });
     },
 
+    getDatasetFileTableUrl: function () {
+        return "/Dataset/GetDatasetFileInfoForGrid/?Id=" + encodeURIComponent($('#datasetConfigList').val());
+    },
+
     renderDeleteFileOption: function (d, color) {
         if (d.ObjectStatus === 1) { //is active
             var checkboxId = 'data-file-delete-' + d.Id;
@@ -2091,7 +2101,7 @@ data.Dataset = {
                 [10, 25, 50, 100, 200, "All"]
             ],
             ajax: {
-                url: "/Dataset/GetBundledFileInfoForGrid/?Id=" + Id,
+                url: "/Dataset/GetBundledFileInfoForGrid/?Id=" + encodeURI($('#datasetConfigList').val()),
                 type: "POST"
             },
             columns: [

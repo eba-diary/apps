@@ -162,6 +162,7 @@
     <Compile Include="FilterSearchExtensionsTests.cs" />
     <Compile Include="FieldDtoTests.cs" />
     <Compile Include="SecurityTicketTests.cs" />
+    <Compile Include="DatasetFileConfigExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

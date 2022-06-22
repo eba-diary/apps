@@ -7,7 +7,7 @@ namespace Sentry.data.Core
     public class DatasetDetailDto : DatasetDto
     {
         public int Downloads { get; set; }
-        public Dictionary<string,string> DatasetFileConfigNames { get; set; }
+        public List<DatasetFileConfigSchemaDto> DatasetFileConfigSchemas { get; set; }
         public Dictionary<string,string> DatasetScopeTypeNames { get; set; }
         public int DatasetFileCount { get; set; }
         public string OriginationCode { get; set; }

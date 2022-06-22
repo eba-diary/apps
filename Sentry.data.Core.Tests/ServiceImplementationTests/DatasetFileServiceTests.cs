@@ -51,6 +51,7 @@ namespace Sentry.data.Core.Tests
             Dataset ds = MockClasses.MockDataset();
             DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
             FileSchema schema = MockClasses.MockFileSchema();
+
             dfc.Schema = schema;
 
             var user1 = new Mock<IApplicationUser>();
@@ -64,6 +65,9 @@ namespace Sentry.data.Core.Tests
 
             var userService = new Mock<IUserService>();
             userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
+
+            var messagePublisher = new Mock<IMessagePublisher>();
+
 
             PageParameters pageParams = new PageParameters(1, 5);
 
@@ -82,7 +86,7 @@ namespace Sentry.data.Core.Tests
             IQueryable<DatasetFileConfig> configQueryable = new List<DatasetFileConfig>() { dfc }.AsQueryable();
             context.Setup(f => f.DatasetFileConfigs).Returns(configQueryable);
 
-            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, null);
+            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, messagePublisher.Object, null);
 
             // Act
             PagedList<DatasetFileDto> dtoList = datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams);
@@ -133,8 +137,10 @@ namespace Sentry.data.Core.Tests
 
             PageParameters pageParams = new PageParameters(1, 5);
 
+            var messagePublisher = new Mock<IMessagePublisher>();
+
             //Initialize Service
-            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, null);
+            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, messagePublisher.Object, null);
 
             // Assert
             Assert.ThrowsException<DatasetUnauthorizedAccessException>(() => datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams));
@@ -174,8 +180,11 @@ namespace Sentry.data.Core.Tests
 
             PageParameters pageParams = new PageParameters(1, 5);
 
+            var messagePublisher = new Mock<IMessagePublisher>();
+
+
             //Initialize Service
-            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, null);
+            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, messagePublisher.Object, null);
 
             // Act
             var result = datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams);
@@ -221,8 +230,11 @@ namespace Sentry.data.Core.Tests
 
             PageParameters pageParams = new PageParameters(1, 5);
 
+            var messagePublisher = new Mock<IMessagePublisher>();
+
+
             //Initialize Service
-            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, null);
+            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object,messagePublisher.Object, null);
 
             // Act
             var result = datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams);
@@ -242,7 +254,9 @@ namespace Sentry.data.Core.Tests
             user1.Setup(f => f.IsAdmin).Returns(false);
             userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
 
-            var datasetFileService = new DatasetFileService(null, null, userService.Object, null);
+            var messagePublisher = new Mock<IMessagePublisher>();
+
+            var datasetFileService = new DatasetFileService(null, null, userService.Object, messagePublisher.Object, null);
 
             //Assert
             Assert.ThrowsException<DataFileUnauthorizedException>(() => datasetFileService.UpdateAndSave(null));
@@ -261,7 +275,9 @@ namespace Sentry.data.Core.Tests
 
             var datasetFileDto = MockClasses.MockDatasetFileDto();
 
-            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object, null);
+            var messagePublisher = new Mock<IMessagePublisher>();
+
+            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object, messagePublisher.Object, null);
 
             // Assert
             Assert.ThrowsException<DataFileNotFoundException>(() => datasetFileService.UpdateAndSave(datasetFileDto));
@@ -286,7 +302,9 @@ namespace Sentry.data.Core.Tests
             var context = new Mock<IDatasetContext>();
             context.Setup(d => d.GetById<DatasetFile>(3000)).Returns(dataFile);
 
-            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object, null);
+            var messagePublisher = new Mock<IMessagePublisher>();
+
+            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object,messagePublisher.Object, null);
 
             // Assert
             Assert.ThrowsException<DatasetNotFoundException>(() => datasetFileService.UpdateAndSave(datasetFileDto));
@@ -310,7 +328,9 @@ namespace Sentry.data.Core.Tests
             var context = new Mock<IDatasetContext>();
             context.Setup(d => d.GetById<DatasetFile>(3000)).Returns(dataFile);
 
-            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object, null);
+            var messagePublisher = new Mock<IMessagePublisher>();
+
+            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object,messagePublisher.Object, null);
 
             // Assert
             Assert.ThrowsException<SchemaNotFoundException>(() => datasetFileService.UpdateAndSave(datasetFileDto));
@@ -335,7 +355,9 @@ namespace Sentry.data.Core.Tests
             var context = new Mock<IDatasetContext>();
             context.Setup(d => d.GetById<DatasetFile>(3000)).Returns(dataFile);
 
-            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object, null);
+            var messagePublisher = new Mock<IMessagePublisher>();
+
+            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object,messagePublisher.Object, null);
 
             // Assert
             Assert.ThrowsException<SchemaNotFoundException>(() => datasetFileService.UpdateAndSave(datasetFileDto));
@@ -360,7 +382,9 @@ namespace Sentry.data.Core.Tests
             var context = new Mock<IDatasetContext>();
             context.Setup(d => d.GetById<DatasetFile>(3000)).Returns(dataFile);
 
-            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object, null);
+            var messagePublisher = new Mock<IMessagePublisher>();
+
+            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object, messagePublisher.Object, null);
 
             // Assert
             Assert.ThrowsException<SchemaRevisionNotFoundException>(() => datasetFileService.UpdateAndSave(datasetFileDto));
@@ -390,7 +414,9 @@ namespace Sentry.data.Core.Tests
             context.Setup(d => d.GetById<DatasetFile>(3000)).Returns(dataFile);
             context.Setup(x => x.SaveChanges(true)).Verifiable();
 
-            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object, null);
+            var messagePublisher = new Mock<IMessagePublisher>();
+
+            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object, messagePublisher.Object, null);
 
             //Act
             datasetFileService.UpdateAndSave(datasetFileDto);
@@ -418,7 +444,9 @@ namespace Sentry.data.Core.Tests
             var context = new Mock<IDatasetContext>();
             context.Setup(d => d.GetById<DatasetFile>(3000)).Returns(dataFile);
 
-            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object, null);
+            var messagePublisher = new Mock<IMessagePublisher>();
+
+            var datasetFileService = new DatasetFileService(context.Object, null, userService.Object,messagePublisher.Object, null);
 
             // Assert
             Assert.ThrowsException<SchemaRevisionNotFoundException>(() => datasetFileService.UpdateAndSave(datasetFileDto));
@@ -449,7 +477,9 @@ namespace Sentry.data.Core.Tests
             datasetFile_Original_Values.CreatedDTM = dtm;
             datasetFile_Original_Values.ModifiedDTM = dtm;
 
-            DatasetFileService datasetFileService = new DatasetFileService(null, null, null, null);
+            var messagePublisher = new Mock<IMessagePublisher>();
+
+            DatasetFileService datasetFileService = new DatasetFileService(null, null, null, messagePublisher.Object, null);
 
             // Act
             datasetFileService.UpdateDataFile(datasetFileDto, datasetFile_To_Update);
@@ -477,6 +507,192 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(datasetFileDto.FileKey,         datasetFile_To_Update.FileKey);
             Assert.AreEqual(datasetFileDto.FileBucket,      datasetFile_To_Update.FileBucket);
             Assert.AreEqual(datasetFileDto.VersionId,       datasetFile_To_Update.VersionId);
+        }
+
+
+        [TestMethod]
+        public void DatasetFileService_Delete()
+        {
+            var userService = new Mock<IUserService>();
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.IsAdmin).Returns(true);
+            userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
+
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFile dataFileClancy = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            DatasetFile dataFileYoder = MockClasses.MockDatasetFileYoder(ds, dfc, user1.Object);
+            Schema schema = MockClasses.MockFileSchema();
+
+
+            var context = new Mock<IDatasetContext>();
+            var messagePublisher = new Mock<IMessagePublisher>();
+            var datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object, null);
+
+
+            List<DatasetFile> dbList = new List<DatasetFile>();
+            dbList.Add(dataFileClancy);
+
+            //ENSURE ONLY CLANCY IS MARKED PENDING_DELETED
+            datasetFileService.Delete(ds.DatasetId, schema.SchemaId, dbList);
+            Assert.AreEqual(Core.GlobalEnums.ObjectStatusEnum.Pending_Delete, dataFileClancy.ObjectStatus);
+            Assert.AreEqual(Core.GlobalEnums.ObjectStatusEnum.Active, dataFileYoder.ObjectStatus);
+
+            //ENSURE NOW YODER IS MARKED PENDING_DELETED
+            dbList.Add(dataFileYoder);
+            datasetFileService.Delete(ds.DatasetId, schema.SchemaId, dbList);
+            Assert.AreEqual(Core.GlobalEnums.ObjectStatusEnum.Pending_Delete, dataFileYoder.ObjectStatus);
+
+
+        }
+
+        [TestMethod]
+        public void DatasetFileService_ValidateDeleteDataFilesParams()
+        {
+            var datasetFileService = new DatasetFileService(null, null, null, null, null);
+
+            //VALIDATE PASS BOTH UserFileIdList and UserFileNameList
+            DeleteFilesParamDto dto = new DeleteFilesParamDto();
+            dto.UserFileIdList = new int[] { 1, 2 };
+            dto.UserFileNameList = new string[] { "stan" };
+            string error = datasetFileService.ValidateDeleteDataFilesParams(1, 1, dto);
+            Assert.IsNotNull(error);
+
+            //VALIDATE bad datasetId
+            dto.UserFileIdList = new int[] { 1, 2 };
+            dto.UserFileNameList = new string[] { "stan" };
+            error = datasetFileService.ValidateDeleteDataFilesParams(0, 1, dto);
+            Assert.IsNotNull(error);
+
+            //VALIDATE bad schemaId
+            dto.UserFileIdList = new int[] { 1, 2 };
+            dto.UserFileNameList = new string[] { "stan" };
+            error = datasetFileService.ValidateDeleteDataFilesParams(1, 0, dto);
+            Assert.IsNotNull(error);
+
+
+            //VALIDATE dto has nothing
+            error = datasetFileService.ValidateDeleteDataFilesParams(1, 1, null);
+            Assert.IsNotNull(error);
+
+            //VALIDATE dto has something
+            dto.UserFileIdList = null;
+            dto.UserFileNameList = null;
+            error = datasetFileService.ValidateDeleteDataFilesParams(1, 1, dto);
+            Assert.IsNotNull(error);
+
+            //VALIDATE good outcome
+            dto.UserFileIdList = new int[] { 1, 2 }; 
+            dto.UserFileNameList = null;
+            error = datasetFileService.ValidateDeleteDataFilesParams(1, 1, dto);
+            Assert.IsNull(error);
+
+
+            //VALIDATE good outcome
+            dto.UserFileIdList = null;
+            dto.UserFileNameList = new string[] { "stan" };
+            error = datasetFileService.ValidateDeleteDataFilesParams(1, 1, dto);
+            Assert.IsNull(error);
+        }
+
+
+        [TestMethod]
+        public void DatasetFileService_UpdateObjectStatus()
+        {
+            var userService = new Mock<IUserService>();
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.IsAdmin).Returns(true);
+            userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
+
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFile dataFileClancy = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            DatasetFile dataFileYoder = MockClasses.MockDatasetFileYoder(ds, dfc, user1.Object);
+
+
+            var context = new Mock<IDatasetContext>();
+            var messagePublisher = new Mock<IMessagePublisher>();
+            var datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object, null);
+
+
+            List<DatasetFile> dbList = new List<DatasetFile>();
+            dbList.Add(dataFileClancy);
+
+            //ENSURE MARKING PENDING DELETE WORKS
+            datasetFileService.UpdateObjectStatus(dbList, Core.GlobalEnums.ObjectStatusEnum.Pending_Delete);
+            Assert.AreEqual(Core.GlobalEnums.ObjectStatusEnum.Pending_Delete, dataFileClancy.ObjectStatus);
+            Assert.AreEqual(Core.GlobalEnums.ObjectStatusEnum.Active, dataFileYoder.ObjectStatus);
+
+            //ENSURE MARKING DELETE WORKS
+            datasetFileService.UpdateObjectStatus(dbList, Core.GlobalEnums.ObjectStatusEnum.Deleted);
+            Assert.AreEqual(Core.GlobalEnums.ObjectStatusEnum.Deleted, dataFileClancy.ObjectStatus);
+            Assert.AreEqual(Core.GlobalEnums.ObjectStatusEnum.Active, dataFileYoder.ObjectStatus);
+        }
+
+
+
+
+        [TestMethod]
+        public void DatasetFileService_GetDatasetFileList_IntArray()
+        {
+            var userService = new Mock<IUserService>();
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.IsAdmin).Returns(true);
+            userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
+
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFile dataFileClancy = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            DatasetFile dataFileYoder = MockClasses.MockDatasetFileYoder(ds, dfc, user1.Object);
+            Schema schema = MockClasses.MockFileSchema();
+
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            
+            //Always need to mock up the property we are using OR in other cases the function
+            context.SetupGet(d => d.DatasetFileStatusAll).Returns(new List<DatasetFile>() { dataFileClancy, dataFileYoder }.AsQueryable);
+            var datasetFileService = new DatasetFileService(context.Object, null, null, null, null);
+
+
+            //ENSURE returning dbList has correct id found
+            int[] datasetFileIdList = new int[] { 3000};
+            List<DatasetFile> dbList = datasetFileService.GetDatasetFileList(ds.DatasetId, schema.SchemaId, datasetFileIdList);
+            Assert.AreEqual(3000, dbList[0].DatasetFileId);
+
+            //ENSURE returning dbList has ONLY 1 item
+            Assert.AreEqual(1, dbList.Count);
+        }
+
+        public void DatasetFileService_GetDatasetFileList_StringArray()
+        {
+            var userService = new Mock<IUserService>();
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.IsAdmin).Returns(true);
+            userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
+
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFile dataFileClancy = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            DatasetFile dataFileYoder = MockClasses.MockDatasetFileYoder(ds, dfc, user1.Object);
+            Schema schema = MockClasses.MockFileSchema();
+
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+
+            //Always need to mock up the property we are using OR in other cases the function
+            context.SetupGet(d => d.DatasetFileStatusAll).Returns(new List<DatasetFile>() { dataFileClancy, dataFileYoder }.AsQueryable);
+            var datasetFileService = new DatasetFileService(context.Object, null, null, null, null);
+
+
+            //ENSURE returning dbList has correct id found
+            string[] fileNameList = new string[] { "clancy" };
+            List<DatasetFile> dbList = datasetFileService.GetDatasetFileList(ds.DatasetId, schema.SchemaId, fileNameList);
+            Assert.AreEqual(3000, dbList[0].DatasetFileId);
+
+            //ENSURE returning dbList has ONLY 1 item
+            Assert.AreEqual(1, dbList.Count);
         }
     }
 }
