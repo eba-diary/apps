@@ -128,10 +128,8 @@ namespace Sentry.data.Web.WebApi.Controllers
                     break;
             }
 
-            // Retrieves a list of DataFlowDetailDto(s) via the expression sent 
-            List<Models.ApiModels.Dataflow.DataFlowDetailModel> modelList = new List<Models.ApiModels.Dataflow.DataFlowDetailModel>();
-
-            modelList = dtoList.MapToDetailModelList(); // Map the DataFlowDetailDto to the DataFlowDetailModel via the MapToDetailModelList extension method.
+            // Map the DataFlowDetailDto to the DataFlowDetailModel via the MapToDetailModelList extension method.
+            List<Models.ApiModels.Dataflow.DataFlowDetailModel> modelList = dtoList.MapToDetailModelList(); 
 
             return Ok(modelList);
         }

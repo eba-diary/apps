@@ -106,8 +106,7 @@ namespace Sentry.data.Web
 
             foreach (DataFlowDetailDto dto in detailDto)
             {
-                Models.ApiModels.Dataflow.DataFlowDetailModel detail = new Models.ApiModels.Dataflow.DataFlowDetailModel();
-                detail = dto.MapToModel();
+                Models.ApiModels.Dataflow.DataFlowDetailModel detail = dto.MapToModel();
                 detailModelList.Add(detail);
             }
 
