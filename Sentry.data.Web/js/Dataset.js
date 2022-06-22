@@ -1857,26 +1857,7 @@ data.Dataset = {
             },
             order: [5, 'desc'],
             stateSave: true,
-            initComplete: function () {
-                var table = $("#datasetFilesTable").DataTable();
-                table.column(".deleteFile").visible(datasetDetailModel.DisplayDatasetFileDelete);
-
-                var parent = $("#datasetFilesTable_filter").parent();
-                parent.parent().css("align-items", "end");
-
-                if (datasetDetailModel.DisplayDatasetFileUpload) {
-                    parent.append('<button type="button" id="data-file-upload-open-modal" data-toggle="modal" data-target="#data-file-upload-modal" class="btn btn-primary waves-effect waves-light data-file-button"><i class="fas fa-cloud-upload-alt"></i>Upload</button>');
-                }
-
-                //use the global search location to add delete button even though we are going to remove global search from the dom
-                if (datasetDetailModel.DisplayDatasetFileDelete) {
-                    parent.append('<button type="button" id="data-file-delete-open-modal" data-toggle="modal" data-target="#data-file-delete-modal" class="btn btn-danger waves-effect waves-light data-file-button display-none"><i class="far fa-trash-alt"></i>Delete</button>');
-                }
-
-                //searching property needs to be set to true (adds the global search input) in order for yadcf filters for columns to properly model bind
-                //But we don't want the global search available
-                $("#datasetFilesTable_filter").remove();
-            },
+            initComplete: () => data.Dataset.datasetFilesTableInitComplete(datasetDetailModel),
             drawCallback: function () {
                 $('#data-file-delete-all-checkbox').prop('checked', false);
                 data.Dataset.toggleDeleteButton();
@@ -1925,11 +1906,35 @@ data.Dataset = {
             }
         });
 
-        var table = $('#datasetFilesTable').DataTable();
+        data.Dataset.datasetFilesTableInitEvents();
+    },
+
+    datasetFilesTableInitComplete: function (datasetDetailModel) {
+        var datasetFileTable = $("#datasetFilesTable").DataTable();
+        datasetFileTable.column(".deleteFile").visible(datasetDetailModel.DisplayDatasetFileDelete);
+
+        var parent = $("#datasetFilesTable_filter").parent();
+        parent.parent().css("align-items", "end");
+
+        if (datasetDetailModel.DisplayDatasetFileUpload) {
+            parent.append('<button type="button" id="data-file-upload-open-modal" data-toggle="modal" data-target="#data-file-upload-modal" class="btn btn-primary waves-effect waves-light data-file-button"><i class="fas fa-cloud-upload-alt"></i>Upload</button>');
+        }
+
+        //use the global search location to add delete button even though we are going to remove global search from the dom
+        if (datasetDetailModel.DisplayDatasetFileDelete) {
+            parent.append('<button type="button" id="data-file-delete-open-modal" data-toggle="modal" data-target="#data-file-delete-modal" class="btn btn-danger waves-effect waves-light data-file-button display-none"><i class="far fa-trash-alt"></i>Delete</button>');
+        }
+
+        //searching property needs to be set to true (adds the global search input) in order for yadcf filters for columns to properly model bind
+        //But we don't want the global search available
+        $("#datasetFilesTable_filter").remove();
+    },
+
+    datasetFilesTableInitEvents: function () {
 
         $('#datasetFilesTable tbody').on('click', 'td.details-control', function () {
             var tr = $(this).closest('tr');
-            var row = table.row(tr);
+            var row = $('#datasetFilesTable').DataTable().row(tr);
 
             if (row.child.isShown()) {
                 // This row is already open - close it
@@ -2040,10 +2045,6 @@ data.Dataset = {
         else {
             return '<i class="far fa-clock text-center dsc-' + color +'-text" title="Pending delete"></i>';
         }
-    },
-
-    deleteFiles: function () {
-        
     },
 
     formatDatasetFileDetails: function (d) {
