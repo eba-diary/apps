@@ -1,10 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Sentry.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -737,6 +739,8 @@ namespace Sentry.data.Core.Tests
             DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, null, null, null, null, null);
 
             DatasetDetailDto dto = datasetService.GetDatasetDetailDto(1);
+
+            mockRepository.VerifyAll();
 
             Assert.AreEqual(userSecurity, dto.Security);
             Assert.AreEqual("000000", dto.PrimaryContactId);

@@ -1,9 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Helpers.Paginate;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Sentry.data.Core.Tests
@@ -693,6 +695,59 @@ namespace Sentry.data.Core.Tests
 
             //ENSURE returning dbList has ONLY 1 item
             Assert.AreEqual(1, dbList.Count);
+        }
+
+        [TestMethod]
+        public void UploadDatasetFileToS3_UploadDatasetFileDto_Success()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            DatasetFileConfig datasetFileConfig = new DatasetFileConfig()
+            {
+                ConfigId = 1,
+                Schema = new FileSchema()
+                {
+                    SchemaId = 2
+                }
+            };
+
+            DataFlow dataFlow = new DataFlow()
+            {
+                DatasetId = 3,
+                SchemaId = 2,
+                Steps = new List<DataFlowStep>()
+                {
+                    new DataFlowStep()
+                    {
+                        DataAction_Type_Id = DataActionType.ProducerS3Drop,
+                        TriggerBucket = "TriggerBucket",
+                        TriggerKey = "TriggerKey/",
+                    }
+                }
+            };
+
+            Mock<Stream> stream = mockRepository.Create<Stream>();
+
+            Mock<IDatasetContext> datasetContext = mockRepository.Create<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.Setup(x => x.GetById<DatasetFileConfig>(1)).Returns(datasetFileConfig);
+            datasetContext.SetupGet(x => x.DataFlow).Returns(new List<DataFlow>() { dataFlow }.AsQueryable());
+
+            Mock<IS3ServiceProvider> s3ServiceProvider = mockRepository.Create<IS3ServiceProvider>();
+            s3ServiceProvider.Setup(x => x.UploadDataFile(stream.Object, "TriggerBucket", "TriggerKey/FileName.json")).Returns("");
+
+            DatasetFileService datasetFileService = new DatasetFileService(datasetContext.Object, null, null, null, s3ServiceProvider.Object);
+
+            UploadDatasetFileDto dto = new UploadDatasetFileDto()
+            {
+                DatasetId = 3,
+                ConfigId = 1,
+                FileName = "FileName.json",
+                FileInputStream = stream.Object
+            };
+
+            datasetFileService.UploadDatasetFileToS3(dto);
+
+            mockRepository.VerifyAll();
         }
     }
 }
