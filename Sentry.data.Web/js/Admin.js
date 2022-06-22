@@ -97,6 +97,7 @@ data.Admin = {
       //need to see new api url structure before continuing
         return url;
     },
+    //creates dropdown menu for flowsteps based on selected dataset and schema
     GetFlowStepDropdown: function (url) {
         $ajax({
             type: "GET",
@@ -147,7 +148,7 @@ data.Admin = {
         });
         //submit selected file list
         $("#reprocessButton").click(function (event) {
-            alert("Selected files (ID's: "+ filesToReprocess + ") submitted for reprocessing!")
+            alert("Selected files (ID's: " + filesToReprocess + ") submitted for reprocessing at flowstep " + $("#flowStepsDropdown").find(":selected").val());
         });
         //input validation for reprocess button
         $("#flowStepsDropdown").change(function (event) {
