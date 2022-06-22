@@ -198,6 +198,9 @@
     <Compile Include="Entities\DataProcessing\Actions\UncompressGzipAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressZip.cs" />
     <Compile Include="Entities\DataProcessing\Actions\XMLAction.cs" />
+    <Compile Include="Entities\DataProcessing\ConfluentConnectorInfo.cs" />
+    <Compile Include="Entities\DataProcessing\ConfluentConnectorStatus.cs" />
+    <Compile Include="Entities\DataProcessing\ConfluentConnectorRoot.cs" />
     <Compile Include="Entities\DataProcessing\EventMetric.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ActionTypeAttribute.cs" />
     <Compile Include="Entities\DataProcessing\Actions\BaseAction.cs" />

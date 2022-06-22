@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sentry.data.Core.Entities.DataProcessing;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -13,8 +14,6 @@ using DoddleReport.Web;
 using DoddleReport;
 using Sentry.Core;
 using System.Threading.Tasks;
-using System.Web.Http;
-using System.Net.Http;
 using Newtonsoft.Json;
 
 namespace Sentry.data.Web.Controllers
@@ -22,13 +21,17 @@ namespace Sentry.data.Web.Controllers
     /*[AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]*/
     public class AdminController : BaseController
     {
-        private IKafkaConnectorProvider _connectorProvider;
         private IKafkaConnectorService _connectorService;
 
-        public AdminController(IKafkaConnectorProvider connectorProvider, IKafkaConnectorService connectorService)
+        public AdminController(IKafkaConnectorService connectorService)
         {
-            _connectorProvider = connectorProvider;
             _connectorService = connectorService;
+        }
+
+        [Route("Connectors")]
+        public async Task<ActionResult> Connectors()
+        {
+            return View();
         }
 
         // GET: Admin
@@ -37,14 +40,7 @@ namespace Sentry.data.Web.Controllers
             Dictionary<string, string> myDict =
             new Dictionary<string, string>();
 
-            HttpResponseMessage response = await _connectorProvider.GetRequestAsync("/connectors/SRPL_TEST_QUOTES_CONNECT_EAST_2_1/status").ConfigureAwait(false);
-
-            ConfluentConnectorRootDTO connectorRootDTO = _connectorService.GetConnectorDto(response);
-
-            ConfluentConnectorRootModel confluentConnectorRootModel = new ConfluentConnectorRootModel();
-
-            confluentConnectorRootModel = connectorRootDTO.MaptoRootModel(confluentConnectorRootModel);
-
+            Task<List<ConfluetConnectorRoot>> test = _connectorService.GetConnectorList();
 
             myDict.Add("1", "Reprocess Data Files");
             myDict.Add("2", "File Processing Logs");

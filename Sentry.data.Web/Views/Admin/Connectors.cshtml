@@ -1,0 +1,11 @@
+﻿
+@model ConnectorViewModel
+@{
+    ViewBag.Title = "Admin";
+    ViewBag.Fluid = true;
+}
+
+
+<div class="form-control">
+    @Html.DropDownListFor(s => s.SelectedConfluentConnectorRootModel, new SelectList(Model.confluentConnectorRootModels.Select(s => s.name)), "-select one-", new { @class = "dropdown-item", @name = "Connector-Name" })
+</div> 

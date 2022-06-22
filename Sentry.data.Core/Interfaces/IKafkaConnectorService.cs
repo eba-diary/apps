@@ -1,4 +1,5 @@
 ﻿
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using System;
@@ -10,6 +11,7 @@ namespace Sentry.data.Core
 {
     public interface IKafkaConnectorService
     {
-        ConfluentConnectorRootDTO GetConnectorDto(HttpResponseMessage resource);
+        Task<ConfluentConnectorRootDTO> GetConnectorDto(string resource);
+        Task<List<ConfluetConnectorRoot>> GetConnectorList();
     }
 }

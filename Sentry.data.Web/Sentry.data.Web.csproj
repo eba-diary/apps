@@ -434,6 +434,7 @@
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
     <Compile Include="Models\DataProcessing\ConfluentConnectorModel.cs" />
     <Compile Include="Models\DataProcessing\ConfluentConnectorRootModel.cs" />
+    <Compile Include="Models\DataProcessing\ConnectorViewModel.cs" />
     <Compile Include="Models\DataProcessing\ConfluentConnectorTaskModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
@@ -1207,6 +1208,7 @@
     <Content Include="Views\Shared\_AdminTest2.cshtml" />
     <Content Include="Views\Shared\_AdminTest4.cshtml" />
     <Content Include="Views\Shared\_AdminTest3.cshtml" />
+    <Content Include="Views\Admin\Connectors.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
