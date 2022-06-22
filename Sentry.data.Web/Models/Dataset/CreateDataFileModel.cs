@@ -14,7 +14,7 @@ namespace Sentry.data.Web
         public CreateDataFileModel(DatasetDetailDto dto) : base(dto)
         {
             this.dsID = dto.DatasetId;
-            this.DatasetFileConfigNames = dto.DatasetFileConfigNames;
+            this.DatasetFileConfigNames = dto.DatasetFileConfigSchemas.ToDictionary(x => x.ConfigId.ToString(), y => y.SchemaName);
         }
 
         [DisplayName("Dataset")]

@@ -1,18 +1,18 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Sentry.data.Core;
 
 namespace Sentry.data.Web
 {
     public class DatasetDetailModel : DatasetModel
     {
-
         public DatasetDetailModel(DatasetDetailDto dto) : base(dto)
         {
             Downloads = dto.Downloads;
             DatasetFileCount = dto.DatasetFileCount;
-            DatasetFileConfigNames = dto.DatasetFileConfigNames;
+            DatasetFileConfigSchemas = dto.DatasetFileConfigSchemas?.Select(x => x.ToModel()).ToList();
             DatasetScopeTypeNames = dto.DatasetScopeTypeNames;
             OriginationCode = dto.OriginationCode;
             DataClassificationDescription = dto.DataClassificationDescription;
@@ -26,7 +26,7 @@ namespace Sentry.data.Web
         public int GroupAccessCount { get; set; }
         public string OriginationCode { get; set; }
         public int DatasetFileCount { get; set; }
-        public Dictionary<string, string> DatasetFileConfigNames { get; set; }
+        public List<DatasetFileConfigSchemaModel> DatasetFileConfigSchemas { get; set; }
         public Dictionary<string, string> DatasetScopeTypeNames { get; set; }
         public string DataClassificationDescription { get; set; }
         public List<Tuple<string, List<AssociatedDataFlowModel>>> DataFlows { get; set; }

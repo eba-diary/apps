@@ -1,5 +1,6 @@
 ﻿using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.FeatureFlags;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
 using System;
 using System.Collections.Generic;
@@ -45,6 +46,7 @@ namespace Sentry.data.Core
                     IsRemovingPermission = !model.IsAddingPermission,
                     ParentSecurity = security,
                     Permissions = new List<SecurityPermission>(),
+                    AwsArn = model.AwsArn
                 };
 
                 foreach (Permission perm in model.Permissions)

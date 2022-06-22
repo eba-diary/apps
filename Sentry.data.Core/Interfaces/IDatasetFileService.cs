@@ -20,7 +20,14 @@ namespace Sentry.data.Core
         /// <param name="dto"></param>
         void UpdateAndSave(DatasetFileDto dto);
 
-        List<DatasetFile> GetDatasetFileList(string[] fileNameList);
-        List<DatasetFile> GetDatasetFileList(int[] datasetFileIdList);
+        List<DatasetFile> GetDatasetFileList(int datasetId, int schemaId, string[] fileNameList);
+        List<DatasetFile> GetDatasetFileList(int datasetId, int schemaId, int[] datasetFileIdList);
+
+        void Delete(int datasetId, int schemaId,List<DatasetFile> dbList);
+        void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status);
+        
+        UserSecurity GetUserSecurityForDatasetFile(int datasetId);
+
+        string ValidateDeleteDataFilesParams(int datasetId, int schemaId, DeleteFilesParamDto dto);
     }
 }

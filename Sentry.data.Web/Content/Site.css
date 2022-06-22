@@ -3044,3 +3044,7 @@ table.dsc-blue-table th {
 .dataset-disable-stuff {
     pointer-events: none;
 }
+
+.font-style-normal {
+    font-style: normal !important;
+}

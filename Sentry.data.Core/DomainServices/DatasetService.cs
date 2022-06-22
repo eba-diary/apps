@@ -55,7 +55,7 @@ namespace Sentry.data.Core
             return dto;
         }
 
-        public DatasetDetailDto GetDatesetDetailDto(int id)
+        public DatasetDetailDto GetDatasetDetailDto(int id)
         {
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
 
@@ -208,7 +208,8 @@ namespace Sentry.data.Core
             {
                 ApproverList = new List<KeyValuePair<string, string>>(),
                 SecurableObjectId = ds.DatasetId,
-                SecurableObjectName = ds.DatasetName
+                SecurableObjectName = ds.DatasetName,
+                SaidKeyCode = ds.Asset.SaidKeyCode
             };
 
             Expression<Func<Permission, bool>> featureFlagPermissionRestrictions;
@@ -244,7 +245,9 @@ namespace Sentry.data.Core
             if (ds != null)
             {
                 IApplicationUser user = _userService.GetCurrentUser();
-                request.SecurableObjectName = ds.DatasetName;
+                
+                request.SecurableObjectName = request.Scope == AccessScope.Asset ? ds.Asset.SaidKeyCode : request.SecurableObjectName;
+                request.SecurableObjectId = request.Scope == AccessScope.Asset ? ds.Asset.AssetId : request.SecurableObjectId;
                 request.SecurityId = ds.Security.SecurityId;
                 request.SaidKeyCode = ds.Asset.SaidKeyCode;
                 request.RequestorsId = user.AssociateId;
@@ -254,10 +257,24 @@ namespace Sentry.data.Core
                 request.ApproverId = request.SelectedApprover;
                 request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
                                                                                                                 x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
+                request = BuildPermissionsForRequestType(request);
                 return await _securityService.RequestPermission(request);
             }
 
             return string.Empty;
+        }
+
+        public AccessRequest BuildPermissionsForRequestType(AccessRequest request)
+        {
+            switch (request.Type)
+            {
+                case AccessRequestType.AwsArn:
+                    request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS && x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).First());
+                    break;
+                default:
+                    break;
+            }
+            return request;
         }
 
         public int CreateAndSaveNewDataset(DatasetDto dto)
@@ -733,11 +750,11 @@ namespace Sentry.data.Core
             IApplicationUser user = _userService.GetCurrentUser();
 
             dto.Downloads = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.DOWNLOAD && x.Dataset == ds.DatasetId).Count();
-            dto.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, dto.DatasetId);
-            dto.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, dto.DatasetId).Count;
+            dto.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(user.AssociateId, dto.DatasetId);
+            dto.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(user.AssociateId, dto.DatasetId).Count;
             dto.Views = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
             dto.IsFavorite = ds.Favorities.Any(w => w.UserId == user.AssociateId);
-            dto.DatasetFileConfigNames = ds.DatasetFileConfigs.Where(w => w.DeleteInd == false).ToDictionary(x => x.ConfigId.ToString(), y => y.Name);
+            dto.DatasetFileConfigSchemas = ds.DatasetFileConfigs.Where(w => !w.DeleteInd).Select(x => x.ToDatasetFileConfigSchemaDto()).ToList();
             dto.DatasetScopeTypeNames = ds.DatasetScopeType.ToDictionary(x => x.Name, y => y.Description);
             dto.DatasetFileCount = ds.DatasetFiles.Count();
             dto.OriginationCode = ds.OriginationCode;

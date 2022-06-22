@@ -412,12 +412,15 @@
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
+    <Compile Include="Extensions\DeleteFilesExtension.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileModel.cs" />
+    <Compile Include="Models\ApiModels\DatasetFile\DeleteFilesParamModel.cs" />
     <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
+    <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
     <Compile Include="Models\Dataset\Permission\RequestPermissionInheritanceModel.cs" />
@@ -1182,6 +1185,7 @@
     <Content Include="Views\Search\FilterSearch.cshtml" />
     <Content Include="Views\Dataset\Permission\_RequestInheritanceModal.cshtml" />
     <Content Include="Views\Dataset\Details\_TabUnauthorized.cshtml" />
+    <Content Include="Views\Dataset\Permission\RequestAccessCLA3723.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />

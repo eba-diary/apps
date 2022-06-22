@@ -74,7 +74,6 @@ namespace Sentry.data.Core
         IQueryable<SchemaMap> SchemaMap { get; }
         IQueryable<ClaimIQAction> ClaimIQAction { get; }
         IQueryable<SavedSearch> SavedSearches { get; }
-        IQueryable<DatasetFile> DatasetFile { get; }
         /** Datasets **/
 
         Dataset GetById(int id);

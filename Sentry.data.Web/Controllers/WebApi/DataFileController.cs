@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 using Sentry.data.Core.Helpers.Paginate;
+using Sentry.data.Web.Models.ApiModels;
 using Sentry.data.Web.Models.ApiModels.DatasetFile;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
-using Sentry.data.Web.Models.ApiModels;
 
 namespace Sentry.data.Web.WebApi.Controllers
 {
@@ -107,59 +106,64 @@ namespace Sentry.data.Web.WebApi.Controllers
             return ApiTryCatch(nameof(DataFileController), nameof(UpdateDataFile), $"datasetid:{dataFileModel.DatasetId} schemaId{dataFileModel.SchemaId} datasetfileId:{dataFileModel.DatasetFileId}", UpdateDataFileFunction);
         }
 
-
-        [HttpDelete]
+        /// <summary>
+        /// Directions:  Please pass either deleteFilesModel.UserFileIdList OR deleteFilesModel.UserFileNameList.  Both cannot be passed at same time.
+        /// Warning:  Even though this is a POST, this will delete passed in list.
+        /// </summary>
+        /// <param name="datasetId"></param>
+        /// <param name="schemaId"></param>
+        /// <param name="deleteFilesParamModel"></param>
+        /// <returns></returns>
+        [HttpPost]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        [Route("dataset/{datasetId}/schema/{schemaId}")]
+        [Route("dataset/{datasetId}/schema/{schemaId}/Delete")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK)]
-        public async Task<IHttpActionResult> DeleteDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] string[] userFileNameList=null, [FromUri] string[] userFileIdList=null)
+        [SwaggerResponse(System.Net.HttpStatusCode.Forbidden)]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest)]
+        public IHttpActionResult DeleteDataFiles(int datasetId, int schemaId, [FromBody] DeleteFilesParamModel deleteFilesParamModel)
         {
-            //FEATURE FLAG CHECK:  REMOVE LATER
-            if (!_dataFeatures.CLA4049_ALLOW_S3_FILES_DELETE.GetValue())
+            //SECURITY CHECK
+            UserSecurity us = _datafileService.GetUserSecurityForDatasetFile(datasetId);
+            if (!us.CanDeleteDatasetFile)
             {
-                return Content(System.Net.HttpStatusCode.Unauthorized, "Feature not available to this user.");
-            }
-            
-            //STEP 1:  DETERMINE WHAT WAS PASSED IN
-            bool userFileNameListPassed = (userFileNameList != null && userFileNameList.Length > 0) ? true : false;
-            bool userIdListPassed = (userFileIdList != null && userFileIdList.Length > 0) ? true : false;
-
-            //STEP 2:  VALIDATIONS TO ENSURE THEY DON'T PASS BOTH datasetFileIdList AND datasetFileIdList
-            if (userFileNameListPassed && userIdListPassed)    
-            {
-                return Content(System.Net.HttpStatusCode.NotAcceptable, "Cannot pass " + nameof(userFileNameList) + " AND " + nameof(userFileIdList) + " at the same time.  Please include only " + nameof(userFileNameList) + " OR " + nameof(userFileIdList));
+                return Content(System.Net.HttpStatusCode.Forbidden, "Feature not available to this user.");
             }
 
-
-            //STEP 3:  TURN USER LIST INTO DBLIST
-            List<DatasetFile> dbList = new List<DatasetFile>();
-            if (userFileNameListPassed)
+            string simpleError = _datafileService.ValidateDeleteDataFilesParams(datasetId, schemaId, deleteFilesParamModel.ToDto());
+            if (simpleError != null)
             {
-                dbList = _datafileService.GetDatasetFileList(userFileNameList);
+                return Content(System.Net.HttpStatusCode.BadRequest, simpleError);
+            }
 
-                //VALIDATE FILE COUNT
-                if (dbList.Count > userFileNameList.Length)
+            //TURN USER LIST INTO DBLIST
+            List<DatasetFile> dbList;
+
+            //IF userFileNameList PASSED
+            if (deleteFilesParamModel.UserFileNameList != null && deleteFilesParamModel.UserFileNameList.Length > 0)
+            {
+                dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, deleteFilesParamModel.UserFileNameList);
+            }
+            else  //userIdList PASSED
+            {
+                //VALIDATE LESS THAN 1
+                if (deleteFilesParamModel.UserFileIdList.Any(w => w < 1 ) )
                 {
-                    return Content(System.Net.HttpStatusCode.NotAcceptable, "No Files were deleted. " + nameof(userFileNameList) + " contained a file that would delete more than one file.  Please only pass filenames that would delete a single file.");
+                    return Content(System.Net.HttpStatusCode.BadRequest, nameof(deleteFilesParamModel.UserFileIdList) + " contains an item less than one.  Please pass items greater than zero.");
                 }
+                dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, deleteFilesParamModel.UserFileIdList);
             }
-            else
+
+
+            //VALIDATE: ANYTHING TO DELETE
+            if(dbList != null && dbList.Count == 0)
             {
-                //VALIDATE NON INTEGERS
-                int[] idListINT = System.Array.ConvertAll(userFileIdList, w => int.TryParse(w, out var x) ? x : -1);
-                List<int> invalidIds = idListINT.Where(w => w == -1).ToList();
-                if (invalidIds.Count > 0)
-                {
-                    return Content(System.Net.HttpStatusCode.NotAcceptable, nameof(userFileIdList) + " contains non integers.  Please pass all integers.");
-                }
-
-                dbList = _datafileService.GetDatasetFileList(idListINT);
+                return Content(System.Net.HttpStatusCode.BadRequest, "Nothing found to delete.");
             }
 
+            //FINAL STEP :  CALL SERVICE TO DELETE METADATA AND DPP TO DELETE
+            _datafileService.Delete(datasetId, schemaId, dbList);
 
-
-            return Ok("Thanks for using DSC!");
+            return Ok("Delete Successful.  Thanks for using DSC!");
         }
-
     }
 }

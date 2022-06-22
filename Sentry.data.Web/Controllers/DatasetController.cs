@@ -311,18 +311,20 @@ namespace Sentry.data.Web.Controllers
         [Route("Dataset/Detail/{id}/")]
         public ActionResult Detail(int id)
         {
-            DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
+            DatasetDetailDto dto = _datasetService.GetDatasetDetailDto(id);
             if (dto != null)
             {
-                DatasetDetailModel model = new DatasetDetailModel(dto);
-                model.DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue();
-                model.DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue();
-                model.DisplaySchemaSearch = _featureFlags.CLA3553_SchemaSearch.GetValue();
-                model.DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue();
-                model.ShowManagePermissionsLink = _featureFlags.CLA3718_Authorization.GetValue();
-
                 UserSecurity userSecurity = _datasetService.GetUserSecurityForDataset(id);
-                model.DisplayDatasetFileDelete = userSecurity.CanDeleteDatasetFile;
+                
+                DatasetDetailModel model = new DatasetDetailModel(dto)
+                {
+                    DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue(),
+                    DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue(),
+                    DisplaySchemaSearch = _featureFlags.CLA3553_SchemaSearch.GetValue(),
+                    DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue(),
+                    ShowManagePermissionsLink = _featureFlags.CLA3718_Authorization.GetValue(),
+                    DisplayDatasetFileDelete = userSecurity.CanDeleteDatasetFile
+                };
                 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Detail Page", dto.DatasetId);
 
@@ -400,7 +402,15 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> AccessRequest(int datasetId)
         {
-            DatasetAccessRequestModel model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
+            DatasetAccessRequestModel model;
+
+            if (_featureFlags.CLA3718_Authorization.GetValue())
+            {
+                model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
+                model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
+                return PartialView("Permission/RequestAccessCLA3723", model);
+            }
+            model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
             model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
             return PartialView("DatasetAccessRequest", model);
         }
@@ -411,6 +421,23 @@ namespace Sentry.data.Web.Controllers
             AccessRequest ar = model.ToCore();
             string ticketId = await _datasetService.RequestAccessToDataset(ar);
             
+            if (string.IsNullOrEmpty(ticketId))
+            {
+                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
+            }
+            else
+            {
+                return PartialView("_Success", new SuccessModel("Dataset access was successfully requested.", "Change Id: " + ticketId, true));
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> SubmitAccessRequestCLA3723([Bind(Prefix = "RequestAccess")] DatasetAccessRequestModel model)
+        {
+            model.IsAddingPermission = true;
+            AccessRequest ar = model.ToCore();
+            string ticketId = await _datasetService.RequestAccessToDataset(ar);
+
             if (string.IsNullOrEmpty(ticketId))
             {
                 return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
@@ -503,7 +530,7 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult DatasetConfiguration(int id)
         {
-            DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
+            DatasetDetailDto dto = _datasetService.GetDatasetDetailDto(id);
             DatasetDetailModel model = new DatasetDetailModel(dto);
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Configuration Page", dto.DatasetId);
@@ -728,7 +755,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> SubmitInheritanceRequest(RequestPermissionInheritanceModel model)
+        public async Task<ActionResult> SubmitInheritanceRequest([Bind(Prefix = "Inheritance")] RequestPermissionInheritanceModel model)
         {
             AccessRequest ar = model.ToCore();
             string ticketId = await _datasetService.RequestAccessToDataset(ar);
@@ -1080,7 +1107,7 @@ namespace Sentry.data.Web.Controllers
             //If a value was passed, load appropriate information
             if (datasetId != 0)
             {
-                cd = new CreateDataFileModel(_datasetService.GetDatesetDetailDto(datasetId));
+                cd = new CreateDataFileModel(_datasetService.GetDatasetDetailDto(datasetId));
             }
 
             ViewBag.CurrentConfigId = configId;

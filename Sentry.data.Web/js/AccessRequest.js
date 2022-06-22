@@ -2,9 +2,10 @@
 
 
     InitForDataset: function (datasetId) {
-
+        //try and axe the old modal
+        $("#RequestAccessModal").remove();
         var modal = Sentry.ShowModalWithSpinner("Request Dataset Access");
-
+        $(modal).attr("id","RequestAccessModal");
         $("select").materialSelect();
 
         var createRequestUrl = "/Dataset/AccessRequest/?datasetId=" + encodeURI(datasetId);
@@ -74,6 +75,7 @@
                     $("#AccessRequesrErrorBox").html(errors).show();
                 }
             });
+            data.Dataset.initRequestAccessWorkflow();
         });
        
     },
