@@ -63,8 +63,8 @@ namespace Sentry.data.Infrastructure
                 IInevRestClient _containerInevClient = Container.GetInstance<IInevRestClient>();
                 
                 List<Message> messages = _containerInevClient.ConsumeGroupUsingGETAsync("INEV-DataLake-Test", INEV_GROUP_DSC_CONSUMER, 25).Result.Messages.ToList();
-                //messages = messages.Concat(_containerInevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_APPROVED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
-                //messages = messages.Concat(_containerInevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_ADDED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
+                messages = messages.Concat(_containerInevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_APPROVED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
+                messages = messages.Concat(_containerInevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_ADDED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
 
                 Console.WriteLine("Found " + messages.Count + " Events to Consume");
 
