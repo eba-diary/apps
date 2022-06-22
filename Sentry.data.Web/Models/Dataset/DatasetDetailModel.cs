@@ -35,6 +35,7 @@ namespace Sentry.data.Web
         public bool DisplaySchemaSearch { get; set; }
         public bool DisplayDataflowEdit { get; set; }
         public bool DisplayDatasetFileDelete { get; set; }
+        public bool DisplayDatasetFileUpload { get; set; }
         public bool HasDataAccess { get; set; }
         public bool ShowManagePermissionsLink { get; set; }
     }

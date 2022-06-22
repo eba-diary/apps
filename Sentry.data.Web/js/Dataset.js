@@ -1864,7 +1864,7 @@ data.Dataset = {
                 var parent = $("#datasetFilesTable_filter").parent();
                 parent.parent().css("align-items", "end");
 
-                if (datasetDetailModel.Security.CanUploadToDataset) {
+                if (datasetDetailModel.DisplayDatasetFileUpload) {
                     parent.append('<button type="button" id="data-file-upload-open-modal" data-toggle="modal" data-target="#data-file-upload-modal" class="btn btn-primary waves-effect waves-light data-file-button"><i class="fas fa-cloud-upload-alt"></i>Upload</button>');
                 }
 

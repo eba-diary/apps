@@ -327,7 +327,8 @@ namespace Sentry.data.Web.Controllers
                     DisplaySchemaSearch = _featureFlags.CLA3553_SchemaSearch.GetValue(),
                     DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue(),
                     ShowManagePermissionsLink = _featureFlags.CLA3718_Authorization.GetValue(),
-                    DisplayDatasetFileDelete = userSecurity.CanDeleteDatasetFile
+                    DisplayDatasetFileDelete = userSecurity.CanDeleteDatasetFile,
+                    DisplayDatasetFileUpload = userSecurity.CanUploadToDataset && _featureFlags.CLA4152_UploadFileFromUI.GetValue()
                 };
                 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Detail Page", dto.DatasetId);
@@ -999,7 +1000,7 @@ namespace Sentry.data.Web.Controllers
         public JsonResult UploadDatasetFileToS3(UploadDatasetFileModel uploadModel)
         {
             UserSecurity userSecurity = _datasetService.GetUserSecurityForConfig(uploadModel.ConfigId);
-            if (userSecurity.CanUploadToDataset)
+            if (userSecurity.CanUploadToDataset && _featureFlags.CLA4152_UploadFileFromUI.GetValue())
             {
                 if (uploadModel.DatasetFile != null)
                 {

@@ -48,7 +48,7 @@
     Html.RenderPartial("Details/_DeleteDatasetFiles");
 }
 
-@if (Model.Security.CanUploadToDataset)
+@if (Model.DisplayDatasetFileUpload)
 {
     Html.RenderPartial("Details/_UploadDatasetFile");
 }
