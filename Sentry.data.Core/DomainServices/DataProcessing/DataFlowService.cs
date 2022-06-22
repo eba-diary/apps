@@ -575,7 +575,7 @@ namespace Sentry.data.Core
          *  Perform parameter validation
          *  Successful status code means we have successfully kicked off reprocessing, not that it has finished 
          */
-        public bool validateDatafileIds(List<int> datasetFileIds)
+        public bool ValidateDatasetFileIds(List<int> datasetFileIds)
         {
             List<DataFlow> validatedIds = new List<DataFlow>();
             foreach (int datasetFileId in datasetFileIds)
@@ -619,7 +619,7 @@ namespace Sentry.data.Core
          *  @param - int datasetFileId
          *  @return - int schemaId
          */
-        public int GetSchemaIdFromDatafileId(int datasetFileId)
+        public int GetSchemaIdFromDatasetFileId(int datasetFileId)
         {
             if(datasetFileId == 0)
             {
@@ -650,7 +650,7 @@ namespace Sentry.data.Core
             foreach (int datasetFileId in datasetFileIds)
             {
                 // compares the schemaIds from the DataFlowDto and the datasetFileId seeing if they are not equal
-                if(!(currentDataFlowDto.SchemaId == GetSchemaIdFromDatafileId(datasetFileId)))
+                if(!(currentDataFlowDto.SchemaId == GetSchemaIdFromDatasetFileId(datasetFileId)))
                 {
                     // in the case that the schemaId are not equal to one another --> return false
                     indicator = false;

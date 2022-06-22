@@ -21,7 +21,7 @@ namespace Sentry.data.Core
         public PagedList<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
         {
             DatasetFileConfig config = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId); // gets the specific schema
-            
+
             if (config == null) // the case where the schema was not found
             {
                 throw new SchemaNotFoundException();

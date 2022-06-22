@@ -837,7 +837,7 @@ namespace Sentry.data.Core.Tests
             var dataflowservice = new DataFlowService(context.Object, null, null, null, null, null, null, null);
             
             // Act
-            int testSchema = dataflowservice.GetSchemaIdFromDatafileId(datafileId);
+            int testSchema = dataflowservice.GetSchemaIdFromDatasetFileId(datafileId);
             
             // Assert
             Assert.AreEqual(schemaId, testSchema);
