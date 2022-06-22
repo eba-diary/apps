@@ -172,7 +172,7 @@ namespace Sentry.data.Core
                     S3DeleteFilesModel model = CreateS3DeleteFilesModel(datasetId,schemaId,buffer);
                     
                     //PUBLISH DSC DELETE EVENT
-                    //_messagePublisher.PublishDSCEvent(schemaId.ToString(), JsonConvert.SerializeObject(model));
+                    _messagePublisher.PublishDSCEvent(schemaId.ToString(), JsonConvert.SerializeObject(model));
                 }
             }
             catch (System.Exception ex)
