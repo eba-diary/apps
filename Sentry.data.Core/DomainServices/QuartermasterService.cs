@@ -98,5 +98,34 @@ namespace Sentry.data.Core
             }
             return GetNamedEnvironmentsInternalAsync();
         }
+
+        private void RequestAssistance(RequestAssistanceInfo info)
+        {
+            info.MessageInfo = new RequestAssistanceMessageInfo();
+            info.MessageInfo.Tickets = new List<string>();
+
+            var obj = _quartermasterClient.RequestAssistanceAsync(info);
+        }
+
+        private void RequestAssistance(JiraTicketInfo ticket)
+        {
+            RequestAssistanceInfo request = new RequestAssistanceInfo();
+            request.Tickets = new List<JiraTicketInfo>() { ticket };
+            RequestAssistance(request);
+        }
+
+        public void BuildJiraTicketAndRequest(string project, IList<string> components, IList<string> labels, string description, string summary, string issueType, IList<JiraCustomField> customFields)
+        {
+            JiraTicketInfo ticket = new JiraTicketInfo();
+            ticket.Project = project;
+            ticket.Components = components;
+            ticket.Labels = labels;
+            ticket.Description = description;
+            ticket.Summary = summary;
+            ticket.IssueType = issueType;
+            ticket.CustomFields = customFields;
+            RequestAssistance(ticket);
+        }
+
     }
 }
