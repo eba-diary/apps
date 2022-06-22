@@ -3,9 +3,7 @@
  ******************************************************************************************/
 
 data.Admin = {
-
     // Approve.vbhtml
-
     ApproveInit: function () {
         $("[id^='Approve_']").on("click", function () {
             data.Admin.ApproveAsset($(this).data("id"));
@@ -27,7 +25,7 @@ data.Admin = {
             data.Admin.CompleteAuction($(this).data("id"));
         });
     },
-    //creates url for api call to get schema associated with selected dataset
+    //creates url for ajax call to get schema associated with selected dataset
     GetSchemaUrl: function (datasetId) {
         var url = window.location.href;
         url = url.substring(0, url.length - 5);
@@ -49,9 +47,17 @@ data.Admin = {
                 $("#schemaDropdown").html(s);
                 $("#schemaDropdown").materialSelect('destroy');
             }
-        }); 
+        });
     },
-    //creates url for API call to get data files
+    //adds specified fileId to selectedFiles global var
+    AddToSelectedFiles: function (fileList, idToAdd) {
+        fileList.push(idToAdd)
+    },
+    //removes specified fileId from selectedFiles global var
+    RemoveFromSelectedFiles: function (fileList, idToRemove) {
+        fileList.splice(fileList.indexOf(idToRemove), 1);
+    },
+    //creates url for Ajax call to get data files
     GetFileUrl: function (datasetId, schemaId) {
         var url = window.location.href;
         url = url.substring(0, url.length - 5);
@@ -77,23 +83,37 @@ data.Admin = {
                 {
                     data: null,
                     render: (d) => function (data, type, row) {
-                        return '<input type="checkbox" id= checkbox' + d.DatasetFileId + ' class="form-check-input select-all-target" data-fileId = ' + d.DatasetFileId + '><label for=checkbox' + d.DatasetFileId + ' class="form-check-label"></label>';
+                        return '<center><input type="checkbox" id= checkbox' + d.DatasetFileId + ' class="form-check-input select-all-target" data-fileId = ' + d.DatasetFileId + '><label for=checkbox' + d.DatasetFileId + ' class="form-check-label"></label><center>';
                     }
                 },
             ],
             searchable: true,
         });
     },
-
-    GetFilesToReprocess: function () {
-        var fileIds = [];
-        $('.select-all-target:checkbox:checked').each(function () {
-            fileIds.push($(this).data('fileid'));
-        });
-        return fileIds;
-        //need to change fileid attribute into a data-fileid for consistency, can be called by .data() function in jquery then
+    //creates url for Ajax call to get flowsteps associated with selected schema
+    GetFlowStepUrl: function (datasetId, schemaId) {
+        var url = window.location.href;
+        url = url.substring(0, url.length - 5);
+      //need to see new api url structure before continuing
+        return url;
     },
-    //loads reprocessing page with relevant functions
+    GetFlowStepDropdown: function (url) {
+        $ajax({
+            type: "GET",
+            url: url,
+            data: "{}",
+            success: function (data) {
+                var s = '<option value>Please Select Flow Step<option>';
+                for (var d of data) {
+                    //need to know what the API returns to finish this
+                    s += '<option value="???"></option>';
+                }
+                $("#flowStepsDropdown").html(s);
+                $("#flowStepsDropdown").materialSelect('destroy');
+            },
+        });
+    },
+    //loads reprocessing page with event handlers
     ReprocessInit: function () {
         $("#allDatasets").change(function (event) {
             var datasetId = $("#allDatasets").find(":selected").val();
@@ -104,22 +124,34 @@ data.Admin = {
             var schemaId = $("#schemaDropdown").find(":selected").val();
             var datasetId = $("#allDatasets").find(":selected").val();
             var url = data.Admin.GetFileUrl(datasetId, schemaId);
-            data.Admin.PopulateTable(url);
+            data.Admin.PopulateTable(url);       
+           // url = data.Admin.GetFlowStepUrl(datasetId, schemaId);
+           // data.Admin.getFlowStepDropdown(url);
         });
-        $("#reprocessButton").click(function (event) {
-            var files = data.Admin.GetFilesToReprocess();
-            if (files.length > 100) {
-                alert("Selected files exceed reprocessing limit of 100 files.");
-            }
-            else if (files.length == 0) {
-                alert("You must select files before reprocessing!");
+        //add or remove from selected files list based on checkbox selection and input validation for reprocess
+        $("#results").change(".select-all-target", function () {
+            if ($(".select-all-target").is(":checked")) {
+                data.Admin.AddToSelectedFiles(filesToReprocess, $(".select-all-target").data("fileid"));
             }
             else {
-                alert("Selected files (ID's: "+ files + ") submitted for reprocessing!")
+                data.Admin.RemoveFromSelectedFiles(filesToReprocess, $(".select-all-target").data("fileid"));
             }
+            console.log(filesToReprocess);
+            if ($("#flowStepsDropdown").find(":selected").val() != "-1" && filesToReprocess.length > 0 && filesToReprocess.length <= 100) {
+                $("#reprocessButton").prop("disabled", false);
+            }
+            else {
+                $("#reprocessButton").prop("disabled", true);
+            }
+
         });
+        //submit selected file list
+        $("#reprocessButton").click(function (event) {
+            alert("Selected files (ID's: "+ filesToReprocess + ") submitted for reprocessing!")
+        });
+        //input validation for reprocess button
         $("#flowStepsDropdown").change(function (event) {
-            if ($("#flowStepsDropdown").find(":selected").val() != "-1") {
+            if ($("#flowStepsDropdown").find(":selected").val() != "-1" && filesToReprocess.length > 0 && filesToReprocess.length <= 100) {
                 $("#reprocessButton").prop("disabled", false);
             }
             else {
@@ -127,7 +159,7 @@ data.Admin = {
             }
         });
         /*
-         * Uncomment this block and and replace column header in _DataFileReprocessing.cshtml to activate select all functionality
+         * Uncomment this block and and replace final column header in _DataFileReprocessing.cshtml to activate select all functionality
         $("#selectAll").click(function (event) {
             var selectAllCheckbox = $(this);
             $(".select-all-target").each(function(){

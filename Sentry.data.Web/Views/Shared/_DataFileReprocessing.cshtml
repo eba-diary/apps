@@ -49,10 +49,14 @@
 <button type="button" class="btn btn-primary waves-effect waves-light" id="reprocessButton" disabled>Reprocess Selected</button>
 
 <script>
+    var filesToReprocess = [];
+    
     $(function () {
         $("#allDatasets").materialSelect("destroy");
         $("#flowStepsDropdown").materialSelect("destroy");
     });
     data.Admin.ReprocessInit();
+
+    
 </script>
 
