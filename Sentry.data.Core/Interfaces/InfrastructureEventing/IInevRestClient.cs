@@ -18,7 +18,7 @@ namespace Sentry.data.Core.Interfaces.InfrastructureEventing
     using System = global::System;
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v11.0.0.0))")]
-    public partial interface IClient
+    public partial interface IInevRestClient
     {
         /// <summary>
         /// Shuts down all consumers for a consumer group.

@@ -5,6 +5,7 @@ using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
 using Sentry.data.Infrastructure.Exceptions;
 using Sentry.data.Infrastructure.InfrastructureEvents;
+using StructureMap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,8 +20,13 @@ namespace Sentry.data.Infrastructure
     public class InevService : IInevService
     {
         private readonly IRestClient _restClient;
+        private readonly IInevRestClient _inevRestClient;
 
         public const string INEV_TOPIC = "INEV-DataLake";
+        public const string INEV_TOPIC_DBA_PORTAL_COMPLETE = "INEV-DBAPortalRequestComplete";
+        public const string INEV_TOPIC_DBA_PORTAL_APPROVED = "INEV-DBAPortalRequestApproved";
+        public const string INEV_TOPIC_DBA_PORTAL_ADDED = "INEV-DBAPortalTicketAdded";
+        public const string INEV_GROUP_DSC_CONSUMER = "DATA-DSC-EVENT-CONSUMER";
         public const string INEV_MESSAGE_SOURCE = "DSC";
         public const string INEV_SAID_KEY = "DATA";
         public const string INEV_EVENTTYPE_PERMSUPDATED = "DatasetPermissionsUpdated";
@@ -28,9 +34,10 @@ namespace Sentry.data.Infrastructure
         /// <summary>
         /// Public constructor
         /// </summary>
-        public InevService(IRestClient restClient)
+        public InevService(IRestClient restClient, IInevRestClient inevRestClient)
         {
             _restClient = restClient;
+            _inevRestClient = inevRestClient;
         }
 
         /// <summary>
@@ -43,6 +50,36 @@ namespace Sentry.data.Infrastructure
         {
             var details = BuildDatasetPermissionsUpdatedDto(dataset, ticket, securablePermissions);
             await PublishInfrastructureEvent(INEV_EVENTTYPE_PERMSUPDATED, details.ToDictionary(), dataset.DatasetId.ToString());
+        }
+
+        public async Task CheckDbaPortalEvents()
+        {
+            using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
+            {
+                Console.WriteLine("Checking Inev Consume ");
+
+                IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
+                ISecurityService _SecurityService = Container.GetInstance<ISecurityService>();
+                IInevRestClient _containerInevClient = Container.GetInstance<IInevRestClient>();
+                
+                List<Message> messages = _containerInevClient.ConsumeGroupUsingGETAsync("INEV-test", "DATA-SES-TEST", 1).Result.Messages.ToList();
+                //messages = messages.Concat(_containerInevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_APPROVED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
+                //messages = messages.Concat(_containerInevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_ADDED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
+                foreach(Message message in messages)
+                {
+                    SecurityTicket sourceTicket;
+                    message.Details.TryGetValue("sourceRequestId", out string messageTicketId);
+                    message.Details.TryGetValue("cherwellTicketId", out string cherwellTicketId);
+                    Guid toCompare = new Guid(messageTicketId);
+                    if (!String.IsNullOrEmpty(messageTicketId))
+                    {
+                        sourceTicket = _datasetContext.SecurityTicket.Where(t => t.SecurityTicketId.Equals(toCompare)).FirstOrDefault();
+                        sourceTicket.TicketId = cherwellTicketId;
+                        _datasetContext.Merge<SecurityTicket>(sourceTicket);
+                    }
+                }
+                _datasetContext.SaveChanges();
+            }
         }
 
         /// <summary>

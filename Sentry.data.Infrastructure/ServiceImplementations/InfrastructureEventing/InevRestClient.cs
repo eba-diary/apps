@@ -4,7 +4,10 @@
 // </auto-generated>
 //----------------------
 
+using Sentry.Configuration;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
+using System;
+using System.Text;
 
 #pragma warning disable 108 // Disable "CS0108 '{derivedDto}.ToJson()' hides inherited member '{dtoBase}.ToJson()'. Use the new keyword if hiding was intended."
 #pragma warning disable 114 // Disable "CS0114 '{derivedDto}.RaisePropertyChanged(String)' hides inherited member 'dtoBase.RaisePropertyChanged(String)'. To make the current member override that implementation, add the override keyword. Otherwise add the new keyword."
@@ -20,15 +23,18 @@ namespace Sentry.data.Infrastructure.InfrastructureEventing
     using System = global::System;
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v11.0.0.0))")]
-    public partial class Client : IClient
+    public partial class InevRestClient : IInevRestClient
     {
         private string _baseUrl = "inevdev.sentry.com/";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public Client(System.Net.Http.HttpClient httpClient)
+        public InevRestClient(System.Net.Http.HttpClient httpClient)
         {
             _httpClient = httpClient;
+            string user = Config.GetHostSetting("ServiceAccountID").Replace("SHOESD01\\", "");
+            var credentials = Encoding.ASCII.GetBytes($"{user}:{Config.GetHostSetting("ServiceAccountPassword")}");
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(credentials));
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
 
@@ -525,6 +531,7 @@ namespace Sentry.data.Infrastructure.InfrastructureEventing
             urlBuilder_.Replace("{records}", System.Uri.EscapeDataString(ConvertToString(records, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
+            
             var disposeClient_ = false;
             try
             {
@@ -532,7 +539,6 @@ namespace Sentry.data.Infrastructure.InfrastructureEventing
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("*/*"));
-
                     PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
