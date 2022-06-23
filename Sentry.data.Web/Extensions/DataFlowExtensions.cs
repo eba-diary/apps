@@ -66,6 +66,16 @@ namespace Sentry.data.Web
             return modelList;
         }
 
+        public static List<Models.ApiModels.Dataflow.DataFlowStepModel> ToModelList(this List<Core.DataFlowStepDto> dtoList)
+        {
+            List<Models.ApiModels.Dataflow.DataFlowStepModel> modelList = new List<Models.ApiModels.Dataflow.DataFlowStepModel>();
+            foreach (Core.DataFlowStepDto dto in dtoList)
+            {
+                modelList.Add(dto.ToAPIModel());
+            }
+            return modelList;
+        }
+
         public static DFModel ToDFModel(this Core.DataFlowDto dto)
         {
             return new DFModel(dto) { };
@@ -74,6 +84,8 @@ namespace Sentry.data.Web
         public static Models.ApiModels.Dataflow.DataFlowDetailModel MapToModel(this DataFlowDetailDto dto)
         {
             Models.ApiModels.Dataflow.DataFlowDetailModel model = new Models.ApiModels.Dataflow.DataFlowDetailModel();
+
+            model.steps = dto.steps.ToModelList();
 
             model.Id = dto.Id;
             model.FlowGuid = dto.FlowGuid;
@@ -89,7 +101,6 @@ namespace Sentry.data.Web
             model.IsPreProcessingRequired = dto.IsPreProcessingRequired;
             model.PreProcessingOption = dto.PreProcessingOption;
             model.FlowStorageCode = dto.FlowStorageCode;
-            model.MappedSchema = dto.MappedSchema;
             model.AssociatedJobs = dto.AssociatedJobs;
             model.ObjectStatus = dto.ObjectStatus;
             model.DeleteIssuer = dto.DeleteIssuer;
@@ -233,7 +244,7 @@ namespace Sentry.data.Web
                 JobModel jobModel = new JobModel()
                 {
                     CreateCurrentFile = dto.RetrieverJob.CreateCurrentFile,
-                    FtpPattern = dto.RetrieverJob.FtpPattern?? FtpPattern.NoPattern,
+                    FtpPattern = dto.RetrieverJob.FtpPattern ?? FtpPattern.NoPattern,
                     HttpRequestBody = dto.RetrieverJob.HttpRequestBody,
                     IsRegexSearch = true,
                     OverwriteDataFile = false,
@@ -247,6 +258,22 @@ namespace Sentry.data.Web
         public static DataFlowStepModel ToModel(this Core.DataFlowStepDto dto)
         {
             DataFlowStepModel model = new DataFlowStepModel()
+            {
+                Id = dto.Id,
+                ActionId = dto.ActionId,
+                ActionName = dto.ActionName,
+                ActionDescription = dto.ActionDescription,
+                ExecutionOrder = dto.ExeuctionOrder,
+                TriggetKey = dto.TriggerKey,
+                TargetPrefix = dto.TargetPrefix,
+                RootAwsUrl = $"https://{AwsRegion.ToLower()}.amazonaws.com/{dto.TriggerBucket}/"
+            };
+            return model;
+        }
+
+        public static Models.ApiModels.Dataflow.DataFlowStepModel ToAPIModel(this Core.DataFlowStepDto dto)
+        {
+            Models.ApiModels.Dataflow.DataFlowStepModel model = new Models.ApiModels.Dataflow.DataFlowStepModel()
             {
                 Id = dto.Id,
                 ActionId = dto.ActionId,

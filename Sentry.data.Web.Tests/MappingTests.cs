@@ -497,7 +497,6 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(dto.IsCompressed, model.IsCompressed);
             Assert.AreEqual(dto.IsPreProcessingRequired, model.IsPreProcessingRequired);
             Assert.AreEqual(dto.FlowStorageCode, model.FlowStorageCode);
-            Assert.AreEqual(dto.MappedSchema, model.MappedSchema);
             Assert.AreEqual(dto.AssociatedJobs, model.AssociatedJobs);
             Assert.AreEqual(dto.ObjectStatus, model.ObjectStatus);
             Assert.AreEqual(dto.DeleteIssuer, model.DeleteIssuer);

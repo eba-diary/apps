@@ -20,7 +20,6 @@ namespace Sentry.data.Web.Models.ApiModels.Dataflow
         public bool IsPreProcessingRequired { get; set; }
         public int? PreProcessingOption { get; set; }
         public string FlowStorageCode { get; set; }
-        public List<int> MappedSchema { get; set; }
         /// <summary>
         /// Associated RetrieverJobs which pull data from external sources
         /// </summary>
