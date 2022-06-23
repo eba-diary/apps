@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Sentry.data.Core.Entities.DataProcessing
 {
-    public class DataFlow : IValidatable
+    public class DataFlow : IValidatable, ISecurable
     {
         public DataFlow()
         {
@@ -44,6 +44,16 @@ namespace Sentry.data.Core.Entities.DataProcessing
 
         public virtual string NamedEnvironment { get; set; }
         public virtual NamedEnvironmentType NamedEnvironmentType { get; set; }
+
+        #region ISecurableImplementation
+        public virtual bool IsSecured { get; set; } = true;
+        public virtual Security Security { get; set; }
+        public virtual string PrimaryContactId { get; set; }
+
+        public virtual bool AdminDataPermissionsAreExplicit { get; set; }
+
+        public virtual ISecurable Parent { get; set; }
+        #endregion
 
         public virtual ValidationResults ValidateForDelete()
         {

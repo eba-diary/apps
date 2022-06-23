@@ -339,7 +339,7 @@ namespace Sentry.data.Core
             us.CanUseDataSource = true;
             us.CanViewData = true;
             us.CanManageSchema = (userPermissions.Count > 0) ? userPermissions.Contains(PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin : (IsOwner || IsAdmin);
-            us.CanModifyDataflow = userPermissions.Contains(PermissionCodes.CAN_MANAGE_DATAFLOW) || IsOwner || IsAdmin;
+            us.CanModifyDataflow = false; /* Dataflows should always be marked as secure */
             MergeParentSecurity(us, parentSecurity);
         }
 

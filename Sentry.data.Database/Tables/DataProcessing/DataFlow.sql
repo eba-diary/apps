@@ -21,7 +21,10 @@
     [IsPreProcessingRequired] BIT NULL, 
     [PreProcessingOption] INT NULL, 
     [DatasetId] INT NULL, 
-    [SchemaId] INT NULL, 
+    [SchemaId] INT NULL,
+    [PrimaryContact_ID] VARCHAR(8) NULL,
+    [IsSecured_IND] BIT NULL, 
+    [Security_ID] UNIQUEIDENTIFIER NULL, 
     CONSTRAINT [PK_DataFlow] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC

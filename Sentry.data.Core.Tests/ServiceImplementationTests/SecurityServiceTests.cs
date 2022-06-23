@@ -934,7 +934,7 @@ namespace Sentry.data.Core.Tests
             Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Loose);
             Security security = BuildBaseSecurity(securableEntityName: SecurableEntityName.DATAFLOW);
             Mock<ISecurable> securable = mr.Create<ISecurable>();
-            securable.Setup(x => x.IsSecured).Returns(false);
+            securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
 
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
@@ -991,7 +991,7 @@ namespace Sentry.data.Core.Tests
             //mock out securable and attach security object establihsed above
             Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Loose);
             Mock<ISecurable> securable = mr.Create<ISecurable>();
-            securable.Setup(x => x.IsSecured).Returns(false);
+            securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
 
 
