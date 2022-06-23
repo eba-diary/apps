@@ -25,6 +25,7 @@ data.Admin = {
             data.Admin.CompleteAuction($(this).data("id"));
         });
     },
+
     //creates url for ajax call to get schema associated with selected dataset
     GetSchemaUrl: function (datasetId) {
         var url = window.location.href;
@@ -33,6 +34,7 @@ data.Admin = {
         console.log(url);
         return url;
     },
+
     //creates schema dropdown for selected dataset
     GetSchemaDropdown: function (url) {
         $.ajax({
@@ -49,14 +51,17 @@ data.Admin = {
             }
         });
     },
+
     //adds specified fileId to selectedFiles global var
     AddToSelectedFiles: function (fileList, idToAdd) {
         fileList.push(idToAdd)
     },
+
     //removes specified fileId from selectedFiles global var
     RemoveFromSelectedFiles: function (fileList, idToRemove) {
         fileList.splice(fileList.indexOf(idToRemove), 1);
     },
+
     //creates url for Ajax call to get data files
     GetFileUrl: function (datasetId, schemaId) {
         var url = window.location.href;
@@ -65,6 +70,7 @@ data.Admin = {
         console.log(url);
         return url;
     },
+
     //generates table with datafiles from selected dataset and schema
     PopulateTable: function (url) {
         $("#results").DataTable({
@@ -90,6 +96,7 @@ data.Admin = {
             searchable: true,
         });
     },
+
     //creates url for Ajax call to get flowsteps associated with selected schema
     GetFlowStepUrl: function (datasetId, schemaId) {
         var url = window.location.href;
@@ -97,6 +104,7 @@ data.Admin = {
       //need to see new api url structure before continuing
         return url;
     },
+
     //creates dropdown menu for flowsteps based on selected dataset and schema
     GetFlowStepDropdown: function (url) {
         $ajax({
@@ -114,6 +122,7 @@ data.Admin = {
             },
         });
     },
+
     //loads reprocessing page with event handlers
     ReprocessInit: function () {
         $("#allDatasets").change(function (event) {
@@ -168,17 +177,28 @@ data.Admin = {
                 $("#reprocessButton").prop("disabled", true);
             }
         });
+        
+         // Uncomment this block and and replace final column header in _DataFileReprocessing.cshtml to activate select all functionality.
         /*
-         * Uncomment this block and and replace final column header in _DataFileReprocessing.cshtml to activate select all functionality
         $("#selectAll").click(function (event) {
             var selectAllCheckbox = $(this);
-            $(".select-all-target").each(function(){
-                $(this).prop("checked", selectAllCheckbox.is(":checked"));
-                data.Admin.addToSelectedFiles(filesToReprocess. $(this).data("fileid"));
-            });
+            if (selectAllCheckbox.is(":checked")) {
+                $(".select-all-target").each(function () {
+                    $(this).prop("checked", selectAllCheckbox.is(":checked"));
+                    data.Admin.AddToSelectedFiles(filesToReprocess, $(this).data("fileid"));
+                });
+            }
+            else {
+                $(".select-all-target").each(function () {
+                    $(this).prop("checked", selectAllCheckbox.is(":checked"));
+                    data.Admin.RemoveFromSelectedFiles(filesToReprocess, $(this).data("fileid"));
+                });
+            }
+
             console.log(filesToReprocess);
         });
         */
+        
     },
   
     // Loads Admin jobs pages
