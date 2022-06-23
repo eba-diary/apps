@@ -11,7 +11,7 @@ namespace Sentry.data.Web.Models.AdminPage
     {
         public DataReprocessingModel()
         {
-            //All of these are required based on design documents, but the only one used right now is allDatasets
+            //All of these are required based on design documents, but the only one used right now is allDatasets, which is assigned values in the controller
             selectedFiles = null;
             allDatasets = null;
             schema = null;

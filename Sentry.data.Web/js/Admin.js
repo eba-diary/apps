@@ -44,7 +44,7 @@ data.Admin = {
             success: function (data) {
                 var s = '<option value id="defaultSchemaSelection">Please Select Schema</option>';
                 for (var d of data) {
-                    s += '<option value"' + d.SchemaId + '">' + d.Name + '</option>';
+                    s += '<option value="' + d.SchemaId + '">' + d.Name + '</option>';
                 }
                 $("#schemaDropdown").html(s);
                 //proof of concept, alternate method of input validation for dropdown menues rather than current if(selected val!=-1) 
