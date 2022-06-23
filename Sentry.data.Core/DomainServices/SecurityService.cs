@@ -209,14 +209,12 @@ namespace Sentry.data.Core
             //if it is not secure, it should be wide open except for upload and notifications
             if (securable == null || securable.Security == null || !securable.IsSecured)
             {
-                BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, parentSecurity);
+                BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, parentSecurity, _dataFeatures);
             }
             else
             {
-                BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, parentSecurity, securable);
+                BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, parentSecurity, securable, _dataFeatures);
             }
-
-            us.CanDeleteDatasetFile = us.CanEditDataset && us.CanManageSchema && _dataFeatures.CLA4049_ALLOW_S3_FILES_DELETE.GetValue();
 
             return us;
         }
@@ -345,7 +343,7 @@ namespace Sentry.data.Core
         /// <param name="userPermissions">The list of permissions we've gathered for this user</param>
         /// <param name="us">The user security object to populate</param>
         /// <param name="parentSecurity">The user's security to this entity's parent</param>
-        internal static void BuildOutUserSecurityForUnsecuredEntity(bool IsAdmin, bool IsOwner, List<string> userPermissions, UserSecurity us, UserSecurity parentSecurity)
+        internal static void BuildOutUserSecurityForUnsecuredEntity(bool IsAdmin, bool IsOwner, List<string> userPermissions, UserSecurity us, UserSecurity parentSecurity, IDataFeatures features)
         {
             //if it is not secure, it should be wide open except for upload and notifications. call everything out for visibility.
             us.CanPreviewDataset = true;
@@ -357,6 +355,8 @@ namespace Sentry.data.Core
             us.CanViewData = true;
             us.CanManageSchema = (userPermissions.Count > 0) ? userPermissions.Contains(PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin : (IsOwner || IsAdmin);
             MergeParentSecurity(us, parentSecurity);
+
+            us.CanDeleteDatasetFile = CanDeleteDatasetFile(us, features);
         }
 
         /// <summary>
@@ -371,7 +371,7 @@ namespace Sentry.data.Core
         /// <param name="parentSecurity">The user's security to this entity's parent</param>
         /// <param name="securable">The securable entity itself</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S1541:Methods and properties should not be too complex", Justification = "Breaking this method up more actually makes it more difficult to understand")]
-        internal static void BuildOutUserSecurityForSecuredEntity(bool IsAdmin, bool IsOwner, List<string> userPermissions, UserSecurity us, UserSecurity parentSecurity, ISecurable securable)
+        internal static void BuildOutUserSecurityForSecuredEntity(bool IsAdmin, bool IsOwner, List<string> userPermissions, UserSecurity us, UserSecurity parentSecurity, ISecurable securable, IDataFeatures features)
         {
             //from the list of permissions, build out the security object.
             us.CanPreviewDataset = userPermissions.Contains(PermissionCodes.CAN_PREVIEW_DATASET) || IsOwner || (IsAdmin);
@@ -383,6 +383,8 @@ namespace Sentry.data.Core
             us.CanManageSchema = userPermissions.Contains(PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin;
             us.CanViewData = userPermissions.Contains(PermissionCodes.CAN_VIEW_FULL_DATASET) || IsOwner || (!securable.AdminDataPermissionsAreExplicit && IsAdmin);
             MergeParentSecurity(us, parentSecurity);
+
+            us.CanDeleteDatasetFile = CanDeleteDatasetFile(us, features);
         }
 
         /// <summary>
@@ -404,6 +406,11 @@ namespace Sentry.data.Core
                 us.CanUseDataSource = us.CanUseDataSource || parentSecurity.CanUseDataSource;
                 us.CanManageSchema = us.CanManageSchema || parentSecurity.CanManageSchema;
             }
+        }
+
+        private static bool CanDeleteDatasetFile(UserSecurity us, IDataFeatures features)
+        {
+            return us.CanEditDataset && us.CanManageSchema && features.CLA4049_ALLOW_S3_FILES_DELETE.GetValue();
         }
 
         /// <summary>

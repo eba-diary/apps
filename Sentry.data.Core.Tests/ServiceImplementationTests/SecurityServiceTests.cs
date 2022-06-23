@@ -982,7 +982,7 @@ namespace Sentry.data.Core.Tests
             var ds = new Dataset() { DataClassification = DataClassificationType.InternalUseOnly };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanManageSchema);
@@ -1007,7 +1007,7 @@ namespace Sentry.data.Core.Tests
             };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanViewFullDataset);
@@ -1027,7 +1027,7 @@ namespace Sentry.data.Core.Tests
             var ds = new Dataset() { DataClassification = DataClassificationType.InternalUseOnly };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanModifyNotifications);
@@ -1052,7 +1052,7 @@ namespace Sentry.data.Core.Tests
             ds.DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanPreviewDataset);
@@ -1078,7 +1078,7 @@ namespace Sentry.data.Core.Tests
             ds.DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsFalse(us.CanViewData);
@@ -1104,7 +1104,7 @@ namespace Sentry.data.Core.Tests
             ds.DatasetCategories = new List<Category>() { new Category() { Name = "Claim" } };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanViewData);
@@ -1129,7 +1129,7 @@ namespace Sentry.data.Core.Tests
             ds.DatasetCategories = new List<Category>() { new Category() { Name = "Claim" } };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanViewData);
@@ -1154,7 +1154,7 @@ namespace Sentry.data.Core.Tests
             ds.DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsFalse(us.CanViewData);
@@ -1179,7 +1179,7 @@ namespace Sentry.data.Core.Tests
             ds.DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanViewData);
@@ -1201,7 +1201,7 @@ namespace Sentry.data.Core.Tests
             var us = new UserSecurity();
 
             // Act
-            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null);
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, new MockDataFeatures());
 
             // Assert
             Assert.IsFalse(us.CanUploadToDataset);
@@ -1220,7 +1220,7 @@ namespace Sentry.data.Core.Tests
             var us = new UserSecurity();
 
             // Act
-            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null);
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanManageSchema);
@@ -1239,7 +1239,7 @@ namespace Sentry.data.Core.Tests
             var us = new UserSecurity();
 
             // Act
-            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null);
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanManageSchema);
@@ -1258,7 +1258,7 @@ namespace Sentry.data.Core.Tests
             var us = new UserSecurity();
 
             // Act
-            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null);
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanViewData);
@@ -1277,7 +1277,7 @@ namespace Sentry.data.Core.Tests
             var us = new UserSecurity();
 
             // Act
-            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null);
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanViewData);
