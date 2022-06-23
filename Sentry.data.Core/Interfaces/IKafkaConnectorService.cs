@@ -11,7 +11,6 @@ namespace Sentry.data.Core
 {
     public interface IKafkaConnectorService
     {
-        Task<ConfluentConnectorRootDTO> GetConnectorDto(string resource);
-        Task<List<ConfluetConnectorRoot>> GetConnectorList();
+        Task<List<ConnectorRootDto>> GetS3ConnectorsDTO();
     }
 }

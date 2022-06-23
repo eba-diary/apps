@@ -40,7 +40,7 @@ namespace Sentry.data.Web.Controllers
             Dictionary<string, string> myDict =
             new Dictionary<string, string>();
 
-            Task<List<ConfluetConnectorRoot>> test = _connectorService.GetConnectorList();
+            List<ConnectorRootDto> connectorRootDtos = await _connectorService.GetS3ConnectorsDTO();
 
             myDict.Add("1", "Reprocess Data Files");
             myDict.Add("2", "File Processing Logs");

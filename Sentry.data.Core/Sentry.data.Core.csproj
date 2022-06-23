@@ -131,7 +131,7 @@
     <Compile Include="Attributes\FilterSearchField.cs" />
     <Compile Include="Attributes\GlobalSearchField.cs" />
     <Compile Include="DomainServices\BusinessAreaService.cs" />
-    <Compile Include="DomainServices\ConfluentConnectorService.cs" />
+    <Compile Include="DomainServices\ConnectorService.cs" />
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DataInventoryService.cs" />
     <Compile Include="DomainServices\DataApplicationService.cs" />
@@ -155,10 +155,11 @@
     <Compile Include="DTO\DataInventory\DataInventoryUpdateDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventorySensitiveSearchDto.cs" />
     <Compile Include="DTO\DataProcessing\CompressionJobDto.cs" />
-    <Compile Include="DTO\DataProcessing\ConfluentConnectorDTO.cs" />
-    <Compile Include="DTO\DataProcessing\ConfluentConnectorTasksDTO.cs" />
+    <Compile Include="DTO\DataProcessing\ConnectorInfoDto.cs" />
+    <Compile Include="DTO\DataProcessing\ConnectorTaskDto.cs" />
+    <Compile Include="DTO\DataProcessing\ConnectorStatusDto.cs" />
+    <Compile Include="DTO\DataProcessing\ConnectorRootDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDetailDto.cs" />
-    <Compile Include="DTO\DataProcessing\ConfluentConnectorRootDTO.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowStepDto.cs" />
     <Compile Include="DTO\DataProcessing\NamedEnvironmentDto.cs" />
@@ -198,7 +199,10 @@
     <Compile Include="Entities\DataProcessing\Actions\UncompressGzipAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressZip.cs" />
     <Compile Include="Entities\DataProcessing\Actions\XMLAction.cs" />
+    <Compile Include="Entities\DataProcessing\ConfluentConnectorInfoConfig.cs" />
     <Compile Include="Entities\DataProcessing\ConfluentConnectorInfo.cs" />
+    <Compile Include="Entities\DataProcessing\ConfluentConnectorStatusTask.cs" />
+    <Compile Include="Entities\DataProcessing\ConfluentConnectorStatusConnector.cs" />
     <Compile Include="Entities\DataProcessing\ConfluentConnectorStatus.cs" />
     <Compile Include="Entities\DataProcessing\ConfluentConnectorRoot.cs" />
     <Compile Include="Entities\DataProcessing\EventMetric.cs" />

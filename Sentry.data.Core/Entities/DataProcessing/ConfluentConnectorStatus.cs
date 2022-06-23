@@ -6,7 +6,7 @@ using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 
-namespace Sentry.data.Core.Entities.DataProcessing
+namespace Sentry.data.Core
 {
     public class ConfluentConnectorStatus
     {
@@ -14,18 +14,5 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public ConfluentConnectorStatusConnector connector { get; set; }
         public List<ConfluentConnectorStatusTask> tasks { get; set; }
         public string type { get; set; }
-    }
-
-    public class ConfluentConnectorStatusConnector
-    {
-        public string state { get; set; }
-        public string worker_id { get; set; }
-    }
-
-    public class ConfluentConnectorStatusTask
-    {
-        public int id { get; set; }
-        public string state { get; set; }
-        public string worker_id { get; set; }
     }
 }

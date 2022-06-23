@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Sentry.data.Core.Entities.DataProcessing
 {
-    public class ConfluetConnectorRoot
+    public class ConfluentConnectorRoot
     {
         public string ConnectorName { get; set; }
 
