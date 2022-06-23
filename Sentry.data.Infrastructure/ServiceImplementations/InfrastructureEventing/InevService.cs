@@ -66,6 +66,7 @@ namespace Sentry.data.Infrastructure
                             Database = s.SnowflakeDatabase,
                             Schema = s.SnowflakeSchema,
                             Account = Configuration.Config.GetHostSetting("SnowAccount"),
+                            SnowflakeType = SnowflakeConsumptionType.CategorySchemaParquet
                         }).ToList());
             }
 

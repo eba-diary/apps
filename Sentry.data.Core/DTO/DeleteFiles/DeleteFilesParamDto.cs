@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public enum SnowflakeConsumptionType
+    public class DeleteFilesParamDto
     {
-        CategorySchemaParquet,
-        DatasetSchemaParquet
+        public string[] UserFileNameList { get; set; }
+        public int[] UserFileIdList { get; set; }
+
     }
 }

@@ -162,6 +162,7 @@
     <Compile Include="DTO\DataProcessing\SchemaMapDto.cs" />
     <Compile Include="DTO\Dataset\DatasetPermissionsDto.cs" />
     <Compile Include="DTO\Dataset\DatasetSummaryMetadataDTO.cs" />
+    <Compile Include="DTO\DeleteFiles\DeleteFilesParamDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
     <Compile Include="DTO\Schema\DatasetFileDto.cs" />
@@ -230,6 +231,7 @@
     <Compile Include="Entities\MessageFormats\DataFlowStepEvent.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\RawFileAddModel.cs" />
+    <Compile Include="Entities\MessageFormats\S3DeleteFilesModel.cs" />
     <Compile Include="Entities\MessageFormats\S3Event.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableCreateModel.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
