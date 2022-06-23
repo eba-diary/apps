@@ -176,6 +176,10 @@
     <Compile Include="DTO\Schema\Fields\TimestampFieldDto.cs" />
     <Compile Include="DTO\Schema\Fields\VarcharFieldDto.cs" />
     <Compile Include="DTO\Schema\FileSchemaDto.cs" />
+    <Compile Include="DTO\Schema\ISchemaConsumptionDtoVisitor.cs" />
+    <Compile Include="DTO\Schema\SchemaConsumptionDto.cs" />
+    <Compile Include="DTO\Schema\SchemaConsumptionDtoTransformer.cs" />
+    <Compile Include="DTO\Schema\SchemaConsumptionSnowflakeDto.cs" />
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionJsonStructureDto.cs" />
@@ -233,6 +237,9 @@
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\SparkConverterModel.cs" />
     <Compile Include="Entities\Schema\Elastic\ElasticSchemaField.cs" />
+    <Compile Include="Entities\Schema\SchemaConsumption.cs" />
+    <Compile Include="Entities\Schema\SchemaConsumptionSnowflake.cs" />
+    <Compile Include="Entities\Schema\ISchemaConsumptionVisitor.cs" />
     <Compile Include="Entities\Schema\SnowflakeConsumptionType.cs" />
     <Compile Include="Entities\Security\SecurablePermission.cs" />
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />

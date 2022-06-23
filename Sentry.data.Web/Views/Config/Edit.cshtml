@@ -22,11 +22,6 @@
         @Html.HiddenFor(model => model.SchemaId)
         @Html.HiddenFor(model => model.ParquetStorageBucket)
         @Html.HiddenFor(model => model.ParquetStoragePrefix)
-        @Html.HiddenFor(model => model.SnowflakeStage)
-        @Html.HiddenFor(model => model.SnowflakeWarehouse)
-        @Html.HiddenFor(model => model.SnowflakeDatabase)
-        @Html.HiddenFor(model => model.SnowflakeSchema)
-        @Html.HiddenFor(model => model.SnowflakeTable)
 
         <div class="md-form">
             @Html.EditorFor(m => m.ConfigFileName, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })

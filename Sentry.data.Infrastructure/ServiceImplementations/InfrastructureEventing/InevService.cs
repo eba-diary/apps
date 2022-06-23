@@ -58,15 +58,16 @@ namespace Sentry.data.Infrastructure
             var snowflake = new List<DatasetPermissionsUpdatedDto.SnowflakeDto>();
             if (dataset.DatasetFileConfigs.Any())
             {
-                var schema = dataset.DatasetFileConfigs.First().Schema;
-                snowflake.Add(new DatasetPermissionsUpdatedDto.SnowflakeDto()
-                {
-                    Warehouse = schema.SnowflakeWarehouse,
-                    Database = schema.SnowflakeDatabase,
-                    Schema = schema.SnowflakeSchema,
-                    Account = Configuration.Config.GetHostSetting("SnowAccount"),
-                    SnowflakeType = SnowflakeConsumptionType.CategorySchemaParquet
-                });
+                snowflake.AddRange(
+                    dataset.DatasetFileConfigs.First().Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().Select(s =>
+                        new DatasetPermissionsUpdatedDto.SnowflakeDto()
+                        {
+                            Warehouse = s.SnowflakeWarehouse,
+                            Database = s.SnowflakeDatabase,
+                            Schema = s.SnowflakeSchema,
+                            Account = Configuration.Config.GetHostSetting("SnowAccount"),
+                            SnowflakeType = SnowflakeConsumptionType.CategorySchemaParquet
+                        }).ToList());
             }
 
             //get the dataset's full list of permissions

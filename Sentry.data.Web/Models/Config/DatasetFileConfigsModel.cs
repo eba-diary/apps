@@ -54,7 +54,6 @@ namespace Sentry.data.Web
             this.SchemaRootPath = dto.SchemaRootPath;
             this.ParquetStorageBucket = dto.ParquetStorageBucket;
             this.ParquetStoragePrefix = dto.ParquetStoragePrefix;
-            this.SnowflakeStage = dto.SnowflakeStage;
             //this.CLA24 = (dto.Schema != null) ? dto.Schema.CLA1580_StructureHive : false;
         }
 
@@ -155,11 +154,6 @@ namespace Sentry.data.Web
         public ObjectStatusEnum ObjectStatus { get; set; }
         public string ParquetStorageBucket { get; set; }
         public string ParquetStoragePrefix { get; set; }
-        public string SnowflakeStage { get; set; }
-        public string SnowflakeWarehouse { get; set; }
-        public string SnowflakeDatabase { get; set; }
-        public string SnowflakeSchema { get; set; }
-        public string SnowflakeTable { get; set; }
         public string DatasetScopeReadonly { get; set; }
     }
 }
