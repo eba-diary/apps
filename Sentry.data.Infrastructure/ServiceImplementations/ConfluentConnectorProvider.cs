@@ -167,11 +167,11 @@ namespace Sentry.data.Infrastructure
             connectorInfoDto.S3ProxyUser = confluentConnectorInfo.confluentConnectorInfoConfig.S3ProxyUser;
             connectorInfoDto.S3SseaName = confluentConnectorInfo.confluentConnectorInfoConfig.S3SseaName;
             connectorInfoDto.FileDelim = confluentConnectorInfo.confluentConnectorInfoConfig.FileDelim;
-            connectorInfoDto.TransformsInsertMetadataOffsetField = confluentConnectorInfo.confluentConnectorInfoConfig.TransformsInsertMetadataOffsetField; ;
+            connectorInfoDto.TransformsInsertMetadataOffsetField = confluentConnectorInfo.confluentConnectorInfoConfig.TransformsInsertMetadataOffsetField; 
             connectorInfoDto.topics = confluentConnectorInfo.confluentConnectorInfoConfig.topics;
             connectorInfoDto.PartitionerClass = confluentConnectorInfo.confluentConnectorInfoConfig.PartitionerClass;
             connectorInfoDto.ValueConverterSchemasEnable = confluentConnectorInfo.confluentConnectorInfoConfig.ValueConverterSchemasEnable;
-            connectorInfoDto.TransformsInsertMetadataTimestampField = confluentConnectorInfo.confluentConnectorInfoConfig.TransformsInsertMetadataTimestampField; ; ;
+            connectorInfoDto.TransformsInsertMetadataTimestampField = confluentConnectorInfo.confluentConnectorInfoConfig.TransformsInsertMetadataTimestampField; 
             connectorInfoDto.StorageClass = confluentConnectorInfo.confluentConnectorInfoConfig.StorageClass;
             connectorInfoDto.RotateScheduleIntervalMs = confluentConnectorInfo.confluentConnectorInfoConfig.RotateScheduleIntervalMs;
             connectorInfoDto.PathFormat = confluentConnectorInfo.confluentConnectorInfoConfig.PathFormat;

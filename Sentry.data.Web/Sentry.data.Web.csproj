@@ -424,6 +424,7 @@
     <Compile Include="Controllers\FilterSearchController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
+    <Compile Include="Extensions\ConnectorExtensions.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
@@ -431,6 +432,10 @@
     <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
+    <Compile Include="Models\DataProcessing\ConnectorInfoModel.cs" />
+    <Compile Include="Models\DataProcessing\ConnectorRootModel.cs" />
+    <Compile Include="Models\DataProcessing\ConnectorStatusModel.cs" />
+    <Compile Include="Models\DataProcessing\ConnectorTaskModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
     <Compile Include="Models\Dataset\Permission\RequestPermissionInheritanceModel.cs" />

@@ -8,15 +8,15 @@ namespace Sentry.data.Core.GlobalEnums
     { 
         [Description("UNASSIGNED")]
         [EnumMember(Value = "UNASSIGNED")]
-        Unassigned = 1,
+        UNASSIGNED = 1,
         [Description("RUNNING")]
         [EnumMember(Value = "RUNNING")]
-        Running = 2,
+        RUNNING = 2,
         [Description("PAUSED")]
         [EnumMember(Value = "PAUSED")]
-        Paused = 3,
+        PAUSED = 3,
         [Description("FAILED")]
         [EnumMember(Value = "FAILED")]
-        Failed = 4
+        FAILED = 4
     }
 }

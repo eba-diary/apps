@@ -1,11 +1,74 @@
 ﻿
-@model ConnectorViewModel
+@model List<ConnectorRootModel>
 @{
     ViewBag.Title = "Admin";
     ViewBag.Fluid = true;
+    string selected_connector_name = "";
+    string connectorRoot = null;
 }
 
+<div class="container">
+    <table id="regular_table" class="col-8-lg table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>State</th>
+                <th></th>
+            </tr>
+        </thead>
 
-<div class="form-control">
-    @Html.DropDownListFor(s => s.SelectedConfluentConnectorRootModel, new SelectList(Model.confluentConnectorRootModels.Select(s => s.name)), "-select one-", new { @class = "dropdown-item", @name = "Connector-Name" })
-</div> 
+        @foreach (var rootModel in Model)
+        {
+            <tbody>
+            <td>@rootModel.ConnectorName</td>
+
+            @switch (rootModel.ConnectorStatus.State)
+            {
+                case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.RUNNING:
+                    <td style="color:green"> @rootModel.ConnectorStatus.State </td>
+                    break;
+                case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.FAILED:
+                    <td style="color:red"> @rootModel.ConnectorStatus.State </td>
+                    break;
+                case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.PAUSED:
+                    <td style="color:blue"> @rootModel.ConnectorStatus.State </td>
+                    break;
+                case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.UNASSIGNED:
+                    <td> @rootModel.ConnectorStatus.State </td>
+                    break;
+            }
+
+            <td>
+                <button type="button" class="btn btn-primary waves-effect waves-light"
+                        data-toggle="modal"
+                        data-target="#configModal">
+                    View Config Data
+                </button>
+            </td>
+            
+            <div class="modal fade" id="configModal" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p id="connector-class">Connector Class: @rootModel.ConnectorInfo.ConnectorClass</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            </tbody>
+        }
+
+    </table>
+
+    
+</div>

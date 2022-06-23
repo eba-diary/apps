@@ -31,7 +31,11 @@ namespace Sentry.data.Web.Controllers
         [Route("Connectors")]
         public async Task<ActionResult> Connectors()
         {
-            return View();
+            List<ConnectorRootDto> connectorRootDtos = await _connectorService.GetS3ConnectorsDTO();
+
+            List<ConnectorRootModel> connectorRootModels = connectorRootDtos.MapToModelList();
+
+            return View(connectorRootModels);
         }
 
         // GET: Admin
@@ -40,7 +44,7 @@ namespace Sentry.data.Web.Controllers
             Dictionary<string, string> myDict =
             new Dictionary<string, string>();
 
-            List<ConnectorRootDto> connectorRootDtos = await _connectorService.GetS3ConnectorsDTO();
+           
 
             myDict.Add("1", "Reprocess Data Files");
             myDict.Add("2", "File Processing Logs");
