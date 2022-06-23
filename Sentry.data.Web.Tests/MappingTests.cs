@@ -537,5 +537,90 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("SearchName", model.SavedSearchName);
             Assert.IsTrue(model.IsFavorite);
         }
+
+        /// <summary>
+        /// Tests that when the ConsumptionDetails list contains both the old and new
+        /// Snowflake info, <see cref="ConfigExtension.ToSchemaModel(DatasetFileConfigDto)"/>
+        /// will only return the old.
+        /// </summary>
+        [TestMethod]
+        public void ToSchemaModel_OldCategorySchemaParquet()
+        {
+            // Arrange
+            DatasetFileConfigDto dto = GetDatasetFileConfigDto();
+
+            //Act
+            var model = dto.ToSchemaModel();
+
+            //Assert
+            Assert.AreEqual(dto.ConfigId, model.ConfigId);
+            Assert.AreEqual("old", model.SnowflakeTable);
+        }
+
+        /// <summary>
+        /// Tests that when the ConsumptionDetails list contains ONLY the new
+        /// Snowflake info, <see cref="ConfigExtension.ToSchemaModel(DatasetFileConfigDto)"/>
+        /// will only return the new
+        /// </summary>
+        [TestMethod]
+        public void ToSchemaModel_NewDatasetSchemaParquet()
+        {
+            // Arrange
+            DatasetFileConfigDto dto = GetDatasetFileConfigDto();
+            dto.Schema.ConsumptionDetails.RemoveAt(0); //remove the old item
+
+            //Act
+            var model = dto.ToSchemaModel();
+
+            //Assert
+            Assert.AreEqual(dto.ConfigId, model.ConfigId);
+            Assert.AreEqual("new", model.SnowflakeTable);
+        }
+
+        /// <summary>
+        /// Tests that when the ConsumptionDetails list contains both the old and new
+        /// Snowflake info, <see cref="ConfigExtension.ToSchemaModel20220609(DatasetFileConfigDto)"/>
+        /// will return a list with both in it.
+        /// </summary>
+        [TestMethod]
+        public void ToSchemaModel20220609_OldCategorySchemaParquet()
+        {
+            // Arrange
+            DatasetFileConfigDto dto = GetDatasetFileConfigDto();
+
+            //Act
+            var model = dto.ToSchemaModel20220609();
+
+            //Assert
+            Assert.AreEqual(dto.ConfigId, model.ConfigId);
+            //assert that there is one of each type in the ConsumptionDetails list
+            model.ConsumptionDetails.OfType<Models.ApiModels.Schema20220609.SchemaConsumptionSnowflakeModel>().First(c => c.SnowflakeType == SnowflakeConsumptionType.CategorySchemaParquet);
+            model.ConsumptionDetails.OfType<Models.ApiModels.Schema20220609.SchemaConsumptionSnowflakeModel>().First(c => c.SnowflakeType == SnowflakeConsumptionType.DatasetSchemaParquet);
+        }
+
+        private static DatasetFileConfigDto GetDatasetFileConfigDto()
+        {
+            return new DatasetFileConfigDto()
+            {
+                ConfigId = 1,
+                Name = "Test",
+                Schema = new FileSchemaDto()
+                {
+                    ConsumptionDetails = new List<SchemaConsumptionDto>()
+                    {
+                        new SchemaConsumptionSnowflakeDto()
+                        {
+                            SnowflakeType = SnowflakeConsumptionType.CategorySchemaParquet,
+                            SnowflakeTable = "old"
+                        },
+                        new SchemaConsumptionSnowflakeDto()
+                        {
+                            SnowflakeType = SnowflakeConsumptionType.DatasetSchemaParquet,
+                            SnowflakeTable = "new"
+                        }
+                    }
+                }
+            };
+        }
     }
 }
