@@ -136,12 +136,15 @@ data.Admin = {
             }
         });
         //add or remove from selected files list based on checkbox selection and input validation for reprocess
-        $("#results").change(".select-all-target", function () {
-            if ($(".select-all-target").is(":checked")) {
-                data.Admin.AddToSelectedFiles(filesToReprocess, $(".select-all-target").data("fileid"));
+        $("#results").on("click",".select-all-target", function () {
+            var checkbox = $(this);
+
+            
+            if (checkbox.is(":checked")) {
+                data.Admin.AddToSelectedFiles(filesToReprocess, checkbox.data("fileid"));
             }
             else {
-                data.Admin.RemoveFromSelectedFiles(filesToReprocess, $(".select-all-target").data("fileid"));
+                data.Admin.RemoveFromSelectedFiles(filesToReprocess, checkbox.data("fileid"));
             }
             console.log(filesToReprocess);
             if ($("#flowStepsDropdown").find(":selected").val() != "-1" && filesToReprocess.length > 0 && filesToReprocess.length <= 100) {
@@ -171,7 +174,9 @@ data.Admin = {
             var selectAllCheckbox = $(this);
             $(".select-all-target").each(function(){
                 $(this).prop("checked", selectAllCheckbox.is(":checked"));
+                data.Admin.addToSelectedFiles(filesToReprocess. $(this).data("fileid"));
             });
+            console.log(filesToReprocess);
         });
         */
     },
