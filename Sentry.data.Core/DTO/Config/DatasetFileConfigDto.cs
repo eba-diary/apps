@@ -39,11 +39,6 @@ namespace Sentry.data.Core
         public bool HasDataFlow { get; set; }
         public string ParquetStorageBucket { get; set; }
         public string ParquetStoragePrefix { get; set; }
-        public string SnowflakeStage { get; set; }
-        public string SnowflakeWarehouse { get; set; }
-        public string SnowflakeTable { get; set; }
-        public string SnowflakeDatabase { get; set; }
-        public string SnowflakeSchema { get; set; }
-
+        public IList<SchemaConsumptionDto> ConsumptionDetails { get; set; }
     }
 }

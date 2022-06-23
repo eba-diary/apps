@@ -187,6 +187,7 @@
     </Compile>
     <Compile Include="RetrieverTests.cs" />
     <Compile Include="MappingTests.cs" />
+    <Compile Include="SchemaConsumptionModelTransformerTests.cs" />
     <Compile Include="Extensions\DatasetExtensionsTests.cs" />
     <Compile Include="UtilitiesUnitTests.cs" />
   </ItemGroup>
