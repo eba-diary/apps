@@ -125,7 +125,8 @@ data.Admin = {
             var schemaId = $("#schemaDropdown").find(":selected").val();
             var datasetId = $("#allDatasets").find(":selected").val();
             var url = data.Admin.GetFileUrl(datasetId, schemaId);
-            data.Admin.PopulateTable(url);       
+            data.Admin.PopulateTable(url);
+            filesToReprocess = [];
            // url = data.Admin.GetFlowStepUrl(datasetId, schemaId);
            // data.Admin.getFlowStepDropdown(url);
         });
