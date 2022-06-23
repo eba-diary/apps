@@ -118,17 +118,22 @@ data.Admin = {
     ReprocessInit: function () {
         $("#allDatasets").change(function (event) {
             var datasetId = $("#allDatasets").find(":selected").val();
-            var url = data.Admin.GetSchemaUrl(datasetId);
-            data.Admin.GetSchemaDropdown(url);
+            if (datasetId != "") {
+                var url = data.Admin.GetSchemaUrl(datasetId);
+                data.Admin.GetSchemaDropdown(url);
+            }
+
         });
         $("#schemaDropdown").change(function (event) {
             var schemaId = $("#schemaDropdown").find(":selected").val();
             var datasetId = $("#allDatasets").find(":selected").val();
-            var url = data.Admin.GetFileUrl(datasetId, schemaId);
-            data.Admin.PopulateTable(url);
-            filesToReprocess = [];
-           // url = data.Admin.GetFlowStepUrl(datasetId, schemaId);
-           // data.Admin.getFlowStepDropdown(url);
+            if (schemaId != "" && datasetId != "") {
+                var url = data.Admin.GetFileUrl(datasetId, schemaId);
+                data.Admin.PopulateTable(url);
+                filesToReprocess = [];
+                // url = data.Admin.GetFlowStepUrl(datasetId, schemaId);
+                 // data.Admin.getFlowStepDropdown(url);
+            }
         });
         //add or remove from selected files list based on checkbox selection and input validation for reprocess
         $("#results").change(".select-all-target", function () {
