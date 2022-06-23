@@ -42,11 +42,13 @@ data.Admin = {
             url: url,
             data: "{}",
             success: function (data) {
-                var s = '<option value>Please Select Schema</option>';
+                var s = '<option value id="defaultSchemaSelection">Please Select Schema</option>';
                 for (var d of data) {
-                    s += '<option value="' + d.SchemaId + '">' + d.Name + '</option>';
+                    s += '<option value"' + d.SchemaId + '">' + d.Name + '</option>';
                 }
                 $("#schemaDropdown").html(s);
+                //proof of concept, alternate method of input validation for dropdown menues rather than current if(selected val!=-1) 
+                $("#defaultSchemaSelection").prop("disabled", true);
                 $("#schemaDropdown").materialSelect('destroy');
             }
         });
@@ -97,7 +99,7 @@ data.Admin = {
         });
     },
 
-    //creates url for Ajax call to get flowsteps associated with selected schema
+    //creates url for Ajax call to get flowsteps associated with selected schema ***unfinished and unimplemented***
     GetFlowStepUrl: function (datasetId, schemaId) {
         var url = window.location.href;
         url = url.substring(0, url.length - 5);
@@ -105,7 +107,7 @@ data.Admin = {
         return url;
     },
 
-    //creates dropdown menu for flowsteps based on selected dataset and schema
+    //creates dropdown menu for flowsteps based on selected dataset and schema ***unfinished and unimplemented***
     GetFlowStepDropdown: function (url) {
         $ajax({
             type: "GET",
