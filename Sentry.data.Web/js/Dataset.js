@@ -1261,11 +1261,6 @@ data.Dataset = {
             $('#schemaHR').show();
             self.vm.SchemaRows.removeAll();
 
-            //if ($("#datasetFilesTable_filter").length > 0) {
-            //    var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + configId;
-            //    $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
-            //}
-
             $('#datasetFilesTable').DataTable().ajax.url(data.Dataset.getDatasetFileTableUrl()).load();
 
             if (!$("#DataPreviewNoRows").hasClass("d-none"))
@@ -1292,7 +1287,6 @@ data.Dataset = {
         //Don't init dataset file data table until the file tab is selected when tab feature is on
         if (!datasetDetailModel.DisplayTabSections) {
             data.Dataset.DatasetFileTableInit(datasetDetailModel);
-            //data.Dataset.DatasetBundingFileTableInit(Id);
         }
 
         //Hook up handlers for tabbed sections
@@ -1411,7 +1405,6 @@ data.Dataset = {
                         $('#tabDataFiles').html(view);
 
                         data.Dataset.DatasetFileTableInit(datasetDetailModel);
-                        //data.Dataset.DatasetBundingFileTableInit(configId);
                     }
                 });
             }
@@ -1702,8 +1695,8 @@ data.Dataset = {
 
             xhr.open(form.method, form.action);
             
-            xhr.upload.onprogress = function (e) {
-                $('#upload-progress-bar').width(Math.round(e.loaded / e.total * 100) + '%');
+            xhr.upload.onprogress = function (progress) {
+                $('#upload-progress-bar').width(Math.round(progress.loaded / progress.total * 100) + '%');
             };
 
             xhr.upload.error = function () {
@@ -1739,86 +1732,6 @@ data.Dataset = {
 
             xhr.send(new FormData(form));
         });
-
-        //$("[id^='btnUploadFile']").off('click').on('click', function () {
-        //    $('#btnUploadFile').closest('.bootbox').hide();
-        //    $('.modal-backdrop').remove();
-
-        //    var modal = Sentry.ShowModalWithSpinner("Upload Results", {
-        //        Confirm: {
-        //            label: 'Confirm',
-        //            className: 'btn-success'
-        //        },
-        //        Cancel:
-        //        {
-        //            label: 'Cancel',
-        //            className: 'btn-cancel'
-        //        }
-        //    });
-
-        //    // This approach is from the following site:
-        //    // http://www.c-sharpcorner.com/UploadFile/manas1/upload-files-through-jquery-ajax-in-Asp-Net-mvc/
-        //    if (window.FormData !== undefined) {
-        //        var fileUpload = $("#DatasetFileUpload").get(0);
-        //        var files = fileUpload.files;
-
-        //        //Create FormData object
-        //        var fileData = new FormData();
-
-        //        fileData.append(files[0].name, files[0]);
-        //        var datasetID = $('#DatasetId').val();
-        //        var configID = $("#configList").val();
-
-        //        var token = $('input[name="__RequestVerificationToken"]').val();
-
-        //        var xhr = new XMLHttpRequest();
-
-        //        (xhr.upload || xhr).addEventListener('progress', function (e) {
-        //            var done = e.position || e.loaded;
-        //            var total = e.totalSize || e.total;
-
-        //            $('#percentTotal').text(Math.round(done / total * 100) + '%');
-        //            $('#progressKB').text('(' + Math.round(done / 1024) + ' KB / ' + Math.round(total / 1024) + ' KB)');
-        //            $('#progressBar').width(Math.round(done / total * 100) + '%');
-
-        //            $('.btn-success').prop("disabled", true);
-        //        });
-        //        xhr.addEventListener('load', function (e) {
-        //            $('.modal-footer button').prop("disabled", false);
-        //            modal.ReplaceModalBody(e.currentTarget.response.replace(/"/g, ''));
-        //        });
-
-        //        $('.btn-cancel')[0].addEventListener('click', function () { xhr.abort(); }, false);
-        //        $('.bootbox-close-button').hide();
-        //        var url = '/Dataset/UploadDataFile?id=' + encodeURI(datasetID) + "&configId=" + encodeURI(configID);
-        //        xhr.open('post', url, true);
-        //        xhr.setRequestHeader('__RequestVerificationToken', token);
-        //        xhr.send(fileData);
-        //    }
-        //    else {
-        //        alert("FormData is not supported");
-        //    }
-        //});
-
-        //$("#DatasetFileUpload").change(function () {
-
-        //    var fileUpload = $("#DatasetFileUpload").get(0);
-        //    var files = fileUpload.files;
-        //    if (files[0].size / 1000000 > 100) {
-        //        message = 'The file you are attempting to upload to is too large to upload through the browser.  ' +
-        //            'Please use a drop location to upload this file.' +
-        //            '<br/><br/>' +
-        //            'If you don\'t have access to this drop location please contact <a href="mailto:DSCSupport@sentry.com"> Data.sentry.com Administration </a> for further assistance.'
-
-        //        largeFileModel = Sentry.ShowModalCustom("File Too Large", message, Sentry.ModalButtonsOK())
-        //        //largeFileModel = Sentry.ShowModalAlert(message);
-        //        largeFileModel.show();
-        //    }
-        //    else {
-        //        $("#btnUploadFile").prop("disabled", false);
-        //        $('#btnUploadFile').show();
-        //    }
-        //});
     },
 
     DatasetFileTableInit: function (datasetDetailModel) {
