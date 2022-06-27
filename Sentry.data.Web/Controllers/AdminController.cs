@@ -42,7 +42,7 @@ namespace Sentry.data.Web.Controllers
                     viewPath = "_DataFileReprocessing";
                     break;
                 case "2":
-                    viewPath = "_AdminTest2";
+                    viewPath = "_ProcessingLogs";
                     break;
                 case "3":
                     viewPath = "_AdminTest3";
