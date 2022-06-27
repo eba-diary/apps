@@ -3,28 +3,36 @@
 @{
     ViewBag.Title = "_AdminTest";
 }
-<h1>Reprocess Data Files</h1>
-<!-- Data Set Dropdown Menu-->
-<h3>Datasets</h3>
-@Html.DropDownListFor(m => m.AllDatasets,
-                      new SelectList(Model.AllDatasets, "Value", "Text"),
-                      "Please select Dataset",
-                      new { @class = "admin-reprocess-dropdown",
-                            @style = "display: none"            })
+<div style="display:inline-block">
+    <h1>Reprocess Data Files</h1>
+    <!-- Data Set Dropdown Menu-->
+    <h3>Datasets</h3>
+    @Html.DropDownListFor(m => m.AllDatasets,
+                          new SelectList(Model.AllDatasets, "Value", "Text"),
+                          "Please select Dataset",
+                          new
+                          {
+                              @class = "admin-reprocess-dropdown",
+                                @style = "display: none"
+                          })
 
-
+</div>
 <!-- Schema Dropdown Menu-->
-<h3>Schema</h3>
-<select class="mbd-select admin-reprocess-dropdown" id="schemaDropdown" style="display: none">
-    <!--populated asyncronously via ajax-->
-</select>
-
+<div style="display: inline-block">
+    <h3>Schema</h3>
+    <select class="mbd-select admin-reprocess-dropdown" id="schemaDropdown" style="display: none">
+        <option value="-1">Please Select a Schema</option>
+        <!--populated asyncronously via ajax-->
+    </select>
+</div>
 <!-- Flow Steps Dropdown Menu-->
-<h3>Flow Steps</h3>
-<select class="mbd-select admin-reprocess-dropdown" id="flowStepsDropdown", style="display:none">
-    <option value="-1">Select a flowstep</option>
-    <option value="1">Example flowstep</option>
-</select>
+<div style="display: inline-block">
+    <h3>Flow Steps</h3>
+    <select class="mbd-select admin-reprocess-dropdown" id="flowStepsDropdown" , style="display:none">
+        <option value="-1">Select a Flowstep</option>
+        <option value="1">Example flowstep</option>
+    </select>
+</div>
 
 <br />
 <br />

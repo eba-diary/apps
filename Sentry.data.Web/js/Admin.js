@@ -39,7 +39,7 @@ data.Admin = {
             type: "GET",
             url: url,
             success: function (data) {
-                var s = '<option value id="defaultSchemaSelection">Please Select Schema</option>';
+                var s = '<option value="-1">Please Select a Schema</option>';
                 for (var d of data) {
                     s += '<option value="' + d.SchemaId + '">' + d.Name + '</option>';
                 }
@@ -120,6 +120,7 @@ data.Admin = {
     //loads reprocessing page with event handlers
     ReprocessInit: function () {
         $("#AllDatasets").materialSelect("destroy");
+        $("#schemaDropdown").materialSelect("destroy")
         $("#flowStepsDropdown").materialSelect("destroy");
         $("#AllDatasets").change(function (event) {
             var datasetId = $("#AllDatasets").find(":selected").val();
