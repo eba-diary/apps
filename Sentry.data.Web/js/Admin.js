@@ -146,6 +146,11 @@ data.Admin = {
         });
         //submit selected file list
         $("#reprocessButton").click(function (event) {
+            var filesToReprocess = [];
+            $(".select-all-target:checkbox:checked").each(function () {
+                var checkbox = $(this);
+                filesToReprocess.push(checkbox.data("fileid"));
+            });
             alert("Selected files (ID's: " + filesToReprocess + ") submitted for reprocessing at flowstep " + $("#flowStepsDropdown").find(":selected").val());
         });
         //activate or deactivate button
