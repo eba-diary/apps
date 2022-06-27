@@ -162,8 +162,9 @@ namespace Sentry.data.Infrastructure
             //register Inev client
             var inevClient = new HttpClient(new HttpClientHandler()
             {
-                Credentials = new NetworkCredential(Configuration.Config.GetHostSetting("ServiceAccountID"),
-                                                    Configuration.Config.GetHostSetting("ServiceAccountPassword"))
+                Credentials = new NetworkCredential(
+                    Configuration.Config.GetHostSetting("ServiceAccountID"),
+                    Configuration.Config.GetHostSetting("ServiceAccountPassword"))
             });
             registry.For<Sentry.data.Core.Interfaces.InfrastructureEventing.IClient>().Singleton().Use<InfrastructureEventing.Client>().
                 Ctor<HttpClient>().Is(inevClient).
