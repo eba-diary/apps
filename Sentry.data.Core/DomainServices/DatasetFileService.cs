@@ -82,48 +82,28 @@ namespace Sentry.data.Core
         }
 
 
-        public List<DatasetFile> GetDatasetFileList(int datasetId, int schemaId, string[] fileNameList)
-        {
-            List<DatasetFile> dbList = _datasetContext.DatasetFileStatusAll.Where(w =>   w.Dataset.DatasetId == datasetId 
-                                                                            &&  w.Schema.SchemaId == schemaId 
-                                                                            &&  fileNameList.Contains(w.OriginalFileName)).ToList();
-            return dbList;
-        }
+       
 
-        public List<DatasetFile> GetDatasetFileList(int datasetId, int schemaId, int[] datasetFileIdList)
+        public string Delete(int datasetId, int schemaId, DeleteFilesParamDto dto)
         {
-            List<DatasetFile> dbList = _datasetContext.DatasetFileStatusAll.Where(w =>   w.Dataset.DatasetId == datasetId
-                                                                            &&  w.Schema.SchemaId == schemaId
-                                                                            &&  datasetFileIdList.Contains(w.DatasetFileId)).ToList();
-            return dbList;
-        }
-
-
-        public void Delete(int datasetId, int schemaId,List<DatasetFile> dbList)
-        {
-            DeleteS3(datasetId,schemaId,dbList);
-            UpdateObjectStatus(dbList, Core.GlobalEnums.ObjectStatusEnum.Pending_Delete);
-        }
-
-        public void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status)
-        {
-            try
+            string error = ValidateDeleteDataFilesParams(datasetId, schemaId, dto);
+            if(error != null)
             {
-                //UPDATE OBJECTSTATUS
-                dbList.ForEach(f => f.ObjectStatus = status);
-                _datasetContext.SaveChanges();
+                return error;
             }
-            catch (System.Exception ex)
+
+            List<DatasetFile> dbList = GetDatasetFileList(datasetId, schemaId, dto);
+            if (dbList != null && dbList.Count == 0)    //VALIDATE: ANYTHING TO DELETE
             {
-                //log list of Ids by exception
-                string msg = "Error marking DatasetFile rows as Deleted";
-                Logger.Error(msg, ex);
-                throw;
+                return "Nothing found to delete.";
             }
+
+            DeleteByDatasetFileList(datasetId, schemaId, dbList);
+            return error;
         }
 
 
-        public string ValidateDeleteDataFilesParams(int datasetId, int schemaId, DeleteFilesParamDto dto)
+        private string ValidateDeleteDataFilesParams(int datasetId, int schemaId, DeleteFilesParamDto dto)
         {
             //VALIDATIONS:  datasetId/schemaId
             if (datasetId < 1 || schemaId < 1)
@@ -131,19 +111,13 @@ namespace Sentry.data.Core
                 return nameof(datasetId) + " AND " + nameof(schemaId) + " must be greater than 0";
             }
 
-            //VALIDATIONS:  deleteFilesModel
+            //VALIDATIONS:  deleteFilesModel NOT NULL
             if (dto == null)
             {
                 return " DeleteFilesParam format is wrong, please see definition for format.";
             }
 
-            //VALIDATIONS: BOTH PASSED
-            if ((dto.UserFileNameList == null && dto.UserFileIdList == null))
-            {
-                return "Must pass either " + nameof(dto.UserFileNameList) + " OR " + nameof(dto.UserFileIdList);
-            }
-
-            //VALIDATIONS:    DETERMINE WHAT WAS PASSED IN
+            //VALIDATIONS:    CANNOT PASS BOTH LISTS
             bool userFileNameListPassed = (dto.UserFileNameList != null && dto.UserFileNameList.Length > 0);
             bool userIdListPassed = (dto.UserFileIdList != null && dto.UserFileIdList.Length > 0);
             if (userFileNameListPassed && userIdListPassed)
@@ -151,9 +125,59 @@ namespace Sentry.data.Core
                 return "Cannot pass " + nameof(dto.UserFileNameList) + " AND " + nameof(dto.UserFileIdList) + " at the same time.  Please include only " + nameof(dto.UserFileNameList) + " OR " + nameof(dto.UserFileIdList);
             }
 
+            //VALIDATIONS: MUST PASS ATLEAST ONE LIST
+            if ((dto.UserFileNameList == null && dto.UserFileIdList == null))
+            {
+                return "Must pass either " + nameof(dto.UserFileNameList) + " OR " + nameof(dto.UserFileIdList);
+            }
+
             return null;
         }
 
+        private List<DatasetFile> GetDatasetFileList(int datasetId, int schemaId, DeleteFilesParamDto dto)
+        {
+            List<DatasetFile> dbList = new List<DatasetFile>();
+            const int maxChunk = 2000;      //NOTE:  CHUNK SIZE SET HERE, LINQ TURNS "Contains" below into SQL SERVER PARAMS for each element in buffer, limit is 2100 params in SQL SERVER.  The loops here keep us under that threshold
+            
+            if(dto.UserFileNameList != null)
+            {
+                string[] buffer;
+                for (int i = 0; i < dto.UserFileNameList.Length; i += maxChunk)
+                {
+                    int chunk = (dto.UserFileNameList.Length - i < maxChunk) ? dto.UserFileNameList.Length - i : maxChunk;          //ENSURE LAST CHUNK ONLY HAS WHAT REMAINS
+                    buffer = new string[chunk];                                                                                     //CREATE BUFFER BASED ON CHUNK SIZE
+                    Array.Copy(dto.UserFileNameList, i, buffer, 0, chunk);                                                          //COPY FROM list INTO buffer
+                    dbList.AddRange(_datasetContext.DatasetFileStatusAll.Where(w => w.Dataset.DatasetId == datasetId                //USE LINQ to grab anything from DB that matches whats in buffer
+                                                                           && w.Schema.SchemaId == schemaId
+                                                                           && buffer.Contains(w.OriginalFileName)
+                                                                           ).ToList());
+                }
+            }
+            else
+            {
+                int[] buffer;
+                for (int i = 0; i < dto.UserFileIdList.Length; i += maxChunk)
+                {
+                    int chunk = (dto.UserFileIdList.Length - i < maxChunk) ? dto.UserFileIdList.Length - i : maxChunk;          //ENSURE LAST CHUNK ONLY HAS WHAT REMAINS
+                    buffer = new int[chunk];
+                    Array.Copy(dto.UserFileIdList, i, buffer, 0, chunk);
+                    dbList.AddRange(_datasetContext.DatasetFileStatusAll.Where(w => w.Dataset.DatasetId == datasetId
+                                                                           && w.Schema.SchemaId == schemaId
+                                                                           && buffer.Contains(w.DatasetFileId)
+                                                                           ).ToList());
+                }
+            }
+
+            return dbList;
+        }
+
+        private void DeleteByDatasetFileList(int datasetId, int schemaId,List<DatasetFile> dbList)
+        {
+            DeleteS3(datasetId,schemaId,dbList);
+            UpdateObjectStatus(dbList, Core.GlobalEnums.ObjectStatusEnum.Pending_Delete);
+        }
+
+       
         private void DeleteS3(int datasetId, int schemaId, List<DatasetFile> dbList)
         {
             //CONVERT LIST TO GENERIC ARRAY IN PREP FOR PublishDSCEvent and ERROR HANDLING
@@ -181,6 +205,24 @@ namespace Sentry.data.Core
                             JsonConvert.SerializeObject(CreateS3DeleteFilesModel(datasetId, schemaId, idList));
                 
                 Logger.Error(errorMsg, ex);
+                throw;
+            }
+        }
+
+
+        public void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status)
+        {
+            try
+            {
+                //UPDATE OBJECTSTATUS
+                dbList.ForEach(f => f.ObjectStatus = status);
+                _datasetContext.SaveChanges();
+            }
+            catch (System.Exception ex)
+            {
+                //log list of Ids by exception
+                string msg = "Error marking DatasetFile rows as Deleted";
+                Logger.Error(msg, ex);
                 throw;
             }
         }
