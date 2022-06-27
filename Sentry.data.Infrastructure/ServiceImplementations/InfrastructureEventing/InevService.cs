@@ -20,7 +20,7 @@ namespace Sentry.data.Infrastructure
     public class InevService : IInevService
     {
         private readonly IRestClient _restClient;
-        private readonly IInevRestClient _inevRestClient;
+        private readonly IClient _inevRestClient;
 
         public const string INEV_TOPIC = "INEV-DataLake";
         public const string INEV_TOPIC_DBA_PORTAL_COMPLETE = "INEV-DBAPortalRequestComplete";
@@ -34,7 +34,7 @@ namespace Sentry.data.Infrastructure
         /// <summary>
         /// Public constructor
         /// </summary>
-        public InevService(IRestClient restClient, IInevRestClient inevRestClient)
+        public InevService(IRestClient restClient, IClient inevRestClient)
         {
             _restClient = restClient;
             _inevRestClient = inevRestClient;
@@ -60,7 +60,7 @@ namespace Sentry.data.Infrastructure
 
                 IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
                 ISecurityService _SecurityService = Container.GetInstance<ISecurityService>();
-                IInevRestClient _containerInevClient = Container.GetInstance<IInevRestClient>();
+                IClient _containerInevClient = Container.GetInstance<IClient>();
                 
                 List<Message> messages = _containerInevClient.ConsumeGroupUsingGETAsync("INEV-DataLake-Test", INEV_GROUP_DSC_CONSUMER, 25).Result.Messages.ToList();
                 messages = messages.Concat(_containerInevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_APPROVED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();

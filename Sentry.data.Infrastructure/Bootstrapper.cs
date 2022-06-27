@@ -165,7 +165,7 @@ namespace Sentry.data.Infrastructure
                 Credentials = new NetworkCredential(Configuration.Config.GetHostSetting("ServiceAccountID"),
                                                     Configuration.Config.GetHostSetting("ServiceAccountPassword"))
             });
-            registry.For<Sentry.data.Core.Interfaces.InfrastructureEventing.IInevRestClient>().Singleton().Use<InfrastructureEventing.InevRestClient>().
+            registry.For<Sentry.data.Core.Interfaces.InfrastructureEventing.IClient>().Singleton().Use<InfrastructureEventing.Client>().
                 Ctor<HttpClient>().Is(inevClient).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("InfrastructureEventingServiceBaseUrl"));
 
