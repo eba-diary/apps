@@ -28,9 +28,7 @@ data.Admin = {
 
     //creates url for ajax call to get schema associated with selected dataset
     GetSchemaUrl: function (datasetId) {
-        var url = window.location.href;
-        url = url.substring(0, url.length - 5);
-        url = url + "api/v2/metadata/dataset/" + datasetId + "/schema";
+        var url = "../../api/v2/metadata/dataset/" + datasetId + "/schema";
         console.log(url);
         return url;
     },
@@ -40,7 +38,6 @@ data.Admin = {
         $.ajax({
             type: "GET",
             url: url,
-            data: "{}",
             success: function (data) {
                 var s = '<option value id="defaultSchemaSelection">Please Select Schema</option>';
                 for (var d of data) {
@@ -54,21 +51,9 @@ data.Admin = {
         });
     },
 
-    //adds specified fileId to selectedFiles global var
-    AddToSelectedFiles: function (fileList, idToAdd) {
-        fileList.push(idToAdd)
-    },
-
-    //removes specified fileId from selectedFiles global var
-    RemoveFromSelectedFiles: function (fileList, idToRemove) {
-        fileList.splice(fileList.indexOf(idToRemove), 1);
-    },
-
     //creates url for Ajax call to get data files
     GetFileUrl: function (datasetId, schemaId) {
-        var url = window.location.href;
-        url = url.substring(0, url.length - 5);
-        url = url + "api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000";
+        var url = "../../api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000";
         console.log(url);
         return url;
     },
@@ -101,8 +86,8 @@ data.Admin = {
 
     //creates url for Ajax call to get flowsteps associated with selected schema ***unfinished and unimplemented***
     GetFlowStepUrl: function (datasetId, schemaId) {
-        var url = window.location.href;
-        url = url.substring(0, url.length - 5);
+        var url = "../../apiv2/" + datasetId + schemaId;
+        console.log(url);
       //need to see new api url structure before continuing
         return url;
     },
@@ -112,7 +97,6 @@ data.Admin = {
         $ajax({
             type: "GET",
             url: url,
-            data: "{}",
             success: function (data) {
                 var s = '<option value>Please Select Flow Step<option>';
                 for (var d of data) {
@@ -124,7 +108,15 @@ data.Admin = {
             },
         });
     },
-
+    //activate or deactivate reprocess button based on input list of checked boxes
+    ActivateDeactivateReprocessButton: function (checkedBoxes) {
+        if (checkedBoxes.length > 0 && checkedBoxes.length <= 100 && $("#flowStepsDropdown").find(":selected").val() != "-1") {
+            $("#reprocessButton").prop("disabled", false);
+        }
+        else {
+            $("#reprocessButton").prop("disabled", true);
+        }
+    },
     //loads reprocessing page with event handlers
     ReprocessInit: function () {
         $("#AllDatasets").materialSelect("destroy");
@@ -143,43 +135,23 @@ data.Admin = {
             if (schemaId != "" && datasetId != "") {
                 var url = data.Admin.GetFileUrl(datasetId, schemaId);
                 data.Admin.PopulateTable(url);
-                filesToReprocess = [];
                 // url = data.Admin.GetFlowStepUrl(datasetId, schemaId);
                  // data.Admin.getFlowStepDropdown(url);
             }
         });
-        //add or remove from selected files list based on checkbox selection and input validation for reprocess
-        $("#results").on("click",".select-all-target", function () {
-            var checkbox = $(this);
-
-            
-            if (checkbox.is(":checked")) {
-                data.Admin.AddToSelectedFiles(filesToReprocess, checkbox.data("fileid"));
-            }
-            else {
-                data.Admin.RemoveFromSelectedFiles(filesToReprocess, checkbox.data("fileid"));
-            }
-            console.log(filesToReprocess);
-            if ($("#flowStepsDropdown").find(":selected").val() != "-1" && filesToReprocess.length > 0 && filesToReprocess.length <= 100) {
-                $("#reprocessButton").prop("disabled", false);
-            }
-            else {
-                $("#reprocessButton").prop("disabled", true);
-            }
-
+        //activate or deactivate button
+        $("#results").on("click", ".select-all-target", function () {
+            var checkedBoxes = $(".select-all-target:checkbox:checked");
+            data.Admin.ActivateDeactivateReprocessButton(checkedBoxes);
         });
         //submit selected file list
         $("#reprocessButton").click(function (event) {
             alert("Selected files (ID's: " + filesToReprocess + ") submitted for reprocessing at flowstep " + $("#flowStepsDropdown").find(":selected").val());
         });
-        //input validation for reprocess button
+        //activate or deactivate button
         $("#flowStepsDropdown").change(function (event) {
-            if ($("#flowStepsDropdown").find(":selected").val() != "-1" && filesToReprocess.length > 0 && filesToReprocess.length <= 100) {
-                $("#reprocessButton").prop("disabled", false);
-            }
-            else {
-                $("#reprocessButton").prop("disabled", true);
-            }
+            var checkedBoxes = $(".select-all-target:checkbox:checked");
+            data.Admin.ActivateDeactivateReprocessButton(checkedBoxes);
         });
         
          // Uncomment this block and and replace final column header in _DataFileReprocessing.cshtml to activate select all functionality.
