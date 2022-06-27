@@ -602,6 +602,11 @@ namespace Sentry.data.Core
                 throw new ArgumentNullException("stepId", "DataFlowStep is required");
             }
             
+            if(_datasetContext.DataFlowStep.Where(w => w.Id == stepId) == null)
+            {
+                throw new NullReferenceException("Step id not found");
+            }
+
             // finding the dataflowstep with the associated stepId and retrieving the dataflow object from dataflowstep
             DataFlow df = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault().DataFlow;
             
@@ -629,6 +634,7 @@ namespace Sentry.data.Core
             // finds the DatasetFile object that is associated with the datasetFileId passed into the method and getting schema id 
             int schemaId = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault().Schema.SchemaId;
 
+
             return schemaId; // returns the schema id of the associated datasetFileId
         }
         
@@ -645,17 +651,20 @@ namespace Sentry.data.Core
 
             // creates a dataFlowDto object from the stepId
             DataFlowDto currentDataFlowDto = GetDataFlowDtoByStepId(stepId);
+            
 
             // traversing through the list of datasetFileIds
             foreach (int datasetFileId in datasetFileIds)
             {
                 // compares the schemaIds from the DataFlowDto and the datasetFileId seeing if they are not equal
-                if(!(currentDataFlowDto.SchemaId == GetSchemaIdFromDatasetFileId(datasetFileId)))
+                if (!(currentDataFlowDto.SchemaId == GetSchemaIdFromDatasetFileId(datasetFileId)))
                 {
                     // in the case that the schemaId are not equal to one another --> return false
                     indicator = false;
                     break;
                 }
+               
+                
             }
             // if both schemaIds are equal for all datasetFileIds then this method will return true, false otherwise
             return indicator;
@@ -737,31 +746,6 @@ namespace Sentry.data.Core
             return producerFlowIdList;
         }
 
-
-        /*
-         * User is required to pass Dataflowstep id to being processing from
-         * User can pass either a list of dataset file id's or indicate they would like all files reprocessed
-         * Perform parameter validations
-         * Successful status code means we have successfully kicked off reprocessing, not that it has finished
-         */
-        public String ValidateProcessing(int dataFlowStepId, List<int> datasetFileIds = null, bool processAll = false)
-        {
-            
-            // if the user indicates that they want all files reprocessed
-            if (processAll)
-            {
-                
-            }
-            else // the user wants to reprocess only the specified datasetfile ids in the list
-            {
-                foreach (int datasetId in datasetFileIds)
-                {
-                    
-                }
-            }
-
-            return "default";
-        }
 
 
         public List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId)

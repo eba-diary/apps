@@ -75,6 +75,16 @@ namespace Sentry.data.Core
 
         }
 
+        public void ImplementReprocessingLogic(DatasetFileDto dto)
+        {
+            DatasetFile datasetFile = _datasetContext.GetById<DatasetFile>(dto.DatasetFileId);
+            if(datasetFile == null)
+            {
+                throw new DataFileNotFoundException("Could not find the datasetFile with the indicated datasetFileId");
+            }
+
+        }
+
         #region PrivateMethods
         internal void UpdateDataFile(DatasetFileDto dto, DatasetFile dataFile)
         {
