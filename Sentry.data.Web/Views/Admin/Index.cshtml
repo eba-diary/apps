@@ -13,7 +13,7 @@
 
             @foreach (var key in Model.Keys)
             {
-                <a href="#" data-url='@Url.Action("GetAdminTest", "Admin", new { viewId = key })' class="load-partial-view"><h4>@Model[key]</h4></a>
+                <a href="#" data-url='@Url.Action("GetAdminAction", "Admin", new { viewId = key })' class="load-partial-view"><h4>@Model[key]</h4></a>
 
             }
         </div>
@@ -24,6 +24,8 @@
 </div>
 
 @section Scripts {
+    @Scripts.Render("~/bundles/dataTables")
+    @Styles.Render("~/bundles/css/dataTables")
     <script>
         $(function () {
             data.Admin.AdminPageInit();
