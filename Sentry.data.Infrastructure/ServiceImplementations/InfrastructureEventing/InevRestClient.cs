@@ -32,9 +32,6 @@ namespace Sentry.data.Infrastructure.InfrastructureEventing
         public InevRestClient(System.Net.Http.HttpClient httpClient)
         {
             _httpClient = httpClient;
-            string user = Config.GetHostSetting("ServiceAccountID");
-            var credentials = Encoding.ASCII.GetBytes($"{user}:{Config.GetHostSetting("ServiceAccountPassword")}");
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(credentials));
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
 
