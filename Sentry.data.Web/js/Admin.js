@@ -127,8 +127,10 @@ data.Admin = {
 
     //loads reprocessing page with event handlers
     ReprocessInit: function () {
-        $("#allDatasets").change(function (event) {
-            var datasetId = $("#allDatasets").find(":selected").val();
+        $("#AllDatasets").materialSelect("destroy");
+        $("#flowStepsDropdown").materialSelect("destroy");
+        $("#AllDatasets").change(function (event) {
+            var datasetId = $("#AllDatasets").find(":selected").val();
             if (datasetId != "") {
                 var url = data.Admin.GetSchemaUrl(datasetId);
                 data.Admin.GetSchemaDropdown(url);
@@ -137,7 +139,7 @@ data.Admin = {
         });
         $("#schemaDropdown").change(function (event) {
             var schemaId = $("#schemaDropdown").find(":selected").val();
-            var datasetId = $("#allDatasets").find(":selected").val();
+            var datasetId = $("#AllDatasets").find(":selected").val();
             if (schemaId != "" && datasetId != "") {
                 var url = data.Admin.GetFileUrl(datasetId, schemaId);
                 data.Admin.PopulateTable(url);

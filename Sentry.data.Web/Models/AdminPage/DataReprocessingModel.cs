@@ -9,18 +9,10 @@ namespace Sentry.data.Web.Models.AdminPage
 {
     public class DataReprocessingModel
     {
-        public DataReprocessingModel()
-        {
-            //All of these are required based on design documents, but the only one used right now is allDatasets, which is assigned values in the controller
-            selectedFiles = null;
-            allDatasets = null;
-            schema = null;
-            flowSteps = null;
-        }
-        public List<String> selectedFiles { get; set; }
-        public List<SelectListItem> allDatasets { get; set; }
-        public List<String> schema { get; set; }
-        public List<String> flowSteps { get; set; }
+        public List<string> SelectedFiles { get; set; }
+        public List<SelectListItem> AllDatasets { get; set; }
+        public List<string> Schema { get; set; }
+        public List<string> FlowSteps { get; set; }
 
 
 

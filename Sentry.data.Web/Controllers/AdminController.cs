@@ -29,24 +29,23 @@ namespace Sentry.data.Web.Controllers
 
             return View(myDict);
         }
-        public ActionResult GetAdminTest(string viewId)
+        public ActionResult GetAdminAction(string viewId)
         {
             string viewPath = "";
             switch (viewId)
             {
                 case "1":
-                    viewPath = "_DataFileReprocessing";
-                    dataReprocessingModel = new DataReprocessingModel();
+                    DataReprocessingModel dataReprocessingModel = new DataReprocessingModel();
                     List<DatasetDto> dtoList = _datasetService.GetAllDatasetDto();
-                    dataReprocessingModel.allDatasets = new List<SelectListItem>();
+                    dataReprocessingModel.AllDatasets = new List<SelectListItem>();
                     foreach(DatasetDto d in dtoList)
                     {
                         SelectListItem item = new SelectListItem();
                         item.Text = d.DatasetName;
                         item.Value = d.DatasetId.ToString();
-                        dataReprocessingModel.allDatasets.Add(item);
+                        dataReprocessingModel.AllDatasets.Add(item);
                     }
-                    break;
+                    return PartialView("_DataFileReprocessing", dataReprocessingModel);
                 case "2":
                     viewPath = "_AdminTest2";
                     break;
@@ -58,7 +57,7 @@ namespace Sentry.data.Web.Controllers
                     break;
             }
 
-            return PartialView(viewPath, dataReprocessingModel);
+            return PartialView(viewPath);
         }
     }
 }

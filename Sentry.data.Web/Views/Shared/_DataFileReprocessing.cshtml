@@ -5,22 +5,23 @@
 }
 <h1>Reprocess Data Files</h1>
 <!-- Data Set Dropdown Menu-->
-<h3>Data Sets</h3>
-@Html.DropDownListFor(m => m.allDatasets,
-                      new SelectList(Model.allDatasets, "Value", "Text"),
+<h3>Datasets</h3>
+@Html.DropDownListFor(m => m.AllDatasets,
+                      new SelectList(Model.AllDatasets, "Value", "Text"),
                       "Please select Dataset",
-                      new { @style = "width:400px; height: 30px; display: none" })
+                      new { @class = "admin-reprocess-dropdown",
+                            @style = "display: none"            })
 
 
 <!-- Schema Dropdown Menu-->
 <h3>Schema</h3>
-<select class="mbd-select" , id="schemaDropdown" style="width:400px; height:30px; display: none">
+<select class="mbd-select admin-reprocess-dropdown" id="schemaDropdown" style="display: none">
     <!--populated asyncronously via ajax-->
 </select>
 
 <!-- Flow Steps Dropdown Menu-->
 <h3>Flow Steps</h3>
-<select class="mbd-select" , id="flowStepsDropdown" style="width:400px; height:30px; display: none">
+<select class="mbd-select admin-reprocess-dropdown" id="flowStepsDropdown", style="display:none">
     <option value="-1">Select a flowstep</option>
     <option value="1">Example flowstep</option>
 </select>
@@ -52,10 +53,9 @@
     var filesToReprocess = [];
     
     $(function () {
-        $("#allDatasets").materialSelect("destroy");
-        $("#flowStepsDropdown").materialSelect("destroy");
+        data.Admin.ReprocessInit();
     });
-    data.Admin.ReprocessInit();
+
 
     
 </script>

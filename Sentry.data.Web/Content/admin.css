@@ -5,3 +5,8 @@
     padding-right:0px;
     height: 100vh;
 }
+.admin-reprocess-dropdown
+{
+    width: 400px;
+    height: 30px;
+}
