@@ -1143,7 +1143,7 @@ namespace Sentry.data.Core.Tests
             var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null);
 
             // Act
-            List<DataFlowDetailDto> testFlow = dataFlowService.GetDataFlowDetailDto((w => w.DatasetId == 1));
+            List<DataFlowDetailDto> testFlow = dataFlowService.GetDataFlowDetailDtoByDatasetId(1);
             
             // Assert
             Assert.AreEqual(0,testFlow.Count);
@@ -1226,7 +1226,7 @@ namespace Sentry.data.Core.Tests
             Expression<Func<DataFlow, bool>> expression = w => w.DatasetId == 2;
 
             // Act
-            List<DataFlowDetailDto> testFlow = dataFlowService.GetDataFlowDetailDto(expression);
+            List<DataFlowDetailDto> testFlow = dataFlowService.GetDataFlowDetailDtoByDatasetId(2);
 
             // Assert
             // Ensuring that the DataFlow with the deleted object status is filtered out and only returns the 
