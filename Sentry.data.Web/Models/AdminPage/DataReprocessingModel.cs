@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using Sentry.data.Core;
 
-namespace Sentry.data.Web.Models.AdminPage
+namespace Sentry.data.Web
 {
     public class DataReprocessingModel
     {

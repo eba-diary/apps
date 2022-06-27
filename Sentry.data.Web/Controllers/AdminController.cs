@@ -1,5 +1,4 @@
 ﻿using Sentry.data.Core;
-using Sentry.data.Web.Models.AdminPage;
 using System.Collections.Generic;
 using System.Web.Mvc;
 
@@ -8,7 +7,6 @@ namespace Sentry.data.Web.Controllers
     /*[AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]*/
     public class AdminController : BaseController
     {
-        DataReprocessingModel dataReprocessingModel;
         private readonly IDatasetService _datasetService;
         public AdminController(IDatasetService datasetService)
         {
