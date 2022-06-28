@@ -433,6 +433,7 @@
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorInfoModel.cs" />
+    <Compile Include="Models\DataProcessing\ConnectorViewModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorRootModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorStatusModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorTaskModel.cs" />
@@ -1209,6 +1210,7 @@
     <Content Include="Views\Shared\_AdminTest4.cshtml" />
     <Content Include="Views\Shared\_AdminTest3.cshtml" />
     <Content Include="Views\Admin\Connectors.cshtml" />
+    <Content Include="Views\Shared\_ConnectorConfig.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
