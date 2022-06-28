@@ -282,7 +282,7 @@ namespace Sentry.data.Core
                 //exclude the "Inherit Parent" permission
                 results.AddRange(
                     tickets
-                    .Where(t => !t.Permissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS))
+                    .Where(t => !t.Permissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) && t.IsAddingPermission)
                     .SelectMany(t => t.Permissions.Select(p => new SecurablePermission
                     {
                         Scope = SecurablePermissionScope.Self,
@@ -290,7 +290,8 @@ namespace Sentry.data.Core
                         Identity = t.Identity,
                         IdentityType = t.IdentityType,
                         SecurityPermission = p,
-                        TicketId = t.TicketId
+                        TicketId = t.TicketId,
+                        IsSystemGenerated = t.IsSystemGenerated
                     }))
                 );
 

@@ -42,5 +42,6 @@ namespace Sentry.data.Web
         [DisplayName("AWS IAM Role ARN")]
         public string AwsArn { get; set; }
         public AccessScope Scope { get; set; }
+        public string TicketId { get; set; }
     }
 }

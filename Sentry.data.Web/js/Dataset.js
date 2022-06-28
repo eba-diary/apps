@@ -511,11 +511,6 @@ data.Dataset = {
 
 
     UpdateMetadata: function () {
-
-        if (!isNaN(getUrlParameter('configID'))) {
-            $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
-        }
-
         if ($('#datasetConfigList').val() === undefined) { return; }
 
         var metadataURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val();
@@ -993,6 +988,10 @@ data.Dataset = {
 
     DetailInit: function (datasetDetailModel) {
 
+        if (!isNaN(getUrlParameter('configID'))) {
+            $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
+        }
+
         this.delroyInit();
 
         $("[id^='EditDataset_']").off('click').on('click', function (e) {
@@ -1274,15 +1273,6 @@ data.Dataset = {
 
             $("#tab-spinner").hide();
         });
-
-        $('#dataLastUpdatedSpinner').show();
-        //data.Dataset.UpdateMetadata();
-        var url = new URL(window.location.href);
-
-        Id = url.searchParams.get('configID')
-        if (Id == undefined) {
-            Id = $('#datasetConfigList').val();
-        }
 
         //Don't init dataset file data table until the file tab is selected when tab feature is on
         if (!datasetDetailModel.DisplayTabSections) {
@@ -2383,22 +2373,23 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     managePermissionsInit() {
+        data.Dataset.manageInheritanceInit();
+        data.Dataset.removePermissionModalInit();
+        $("#RequestAccessButton").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.AccessRequest.InitForDataset($(this).data("id"));
+        });
+    },
 
+    manageInheritanceInit() {
         $("#Inheritance_SelectedApprover").materialSelect();
         $("#inheritanceSwitch label").click(function () {
             $("#inheritanceModal").modal('show');
         });
-        data.Dataset.permissionInheritanceSwitchInit();
+        data.Dataset.updateInheritanceStatus();
         //Event to refresh inheritance switch on modal close
         $("#inheritanceModal").on('hide.bs.modal', function () {
-            $.ajax({
-                type: "GET",
-                url: '/Dataset/Detail/' + $("#DatasetHeader").attr("value") + '/Permissions/GetLatestInheritanceTicket',
-                success: function (result) {
-                    $("#inheritanceSwitch").attr("value", result.TicketStatus);
-                    data.Dataset.permissionInheritanceSwitchInit(result);
-                }
-            });
+            data.Dataset.updateInheritanceStatus();
         });
         $("#inheritanceModalSubmit").click(function () {
             if (data.Dataset.validateInheritanceModal()) {
@@ -2416,21 +2407,29 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                 $("#inheritanceValidationMessage").removeClass("d-none");
             }
         });
-        $("#RequestAccessButton").off('click').on('click', function (e) {
-            e.preventDefault();
-            data.AccessRequest.InitForDataset($(this).data("id"));
+
+    },
+
+    updateInheritanceStatus() {
+        $.ajax({
+            type: "GET",
+            url: '/Dataset/Detail/' + $("#DatasetHeader").attr("value") + '/Permissions/GetLatestInheritanceTicket',
+            success: function (result) {
+                $("#inheritanceSwitch").attr("value", result.TicketStatus);
+                data.Dataset.permissionInheritanceSwitchInit(result);
+            }
         });
     },
 
     permissionInheritanceSwitchInit(result) {
         var inheritance = $("#inheritanceSwitch").attr("value");
         switch (inheritance) {
-            case "ACTIVE":
+            case "Active":
                 $('#inheritanceSwitchInput').prop('checked', true);
                 $("#addRemoveInheritanceMessage").text("Request Remove Inheritance");
                 $("#Inheritance_IsAddingPermission").val(false);
                 break;
-            case "PENDING":
+            case "Pending":
                 $("#inheritanceSwitch").html('<p>Inheritance change pending. See ticket ' + result.TicketId + '.</p>');
                 break
             default: //we treat default the same as "DISABLED"
@@ -2442,6 +2441,84 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     validateInheritanceModal() {
         return ($("#Inheritance_BusinessReason").val() != '' && $("#Inheritance_SelectedApprover").val != '')
+    },
+
+    removePermissionModalInit() {
+        $(".removePermissionIcon").click(function (e) {
+            var cells = $(e.target).parent().parent().children();
+            var scope = $(cells[0]).text();
+            var identity = $(cells[1]).text();
+            var permission = $(cells[2]).text();
+            var code = $(cells[4]).text();
+            var ticketId = cells.parent().attr("id");
+            data.Dataset.removePermissionModalOnOpen(scope, identity, permission, code, ticketId);
+            $("#removePermissionModal").modal('show');
+        });
+        $("#removePermissionModal").on('hide.bs.modal', function () {
+            data.Dataset.removePermissionModalOnClose();
+        });
+        $("#removePermissionModalSubmit").click(function () {
+            if (data.Dataset.validateRemovePermissionModal()) {
+                $.ajax({
+                    type: 'POST',
+                    data: $("#RemovePermissionRequestForm").serialize(),
+                    url: '/Dataset/SubmitRemovePermissionRequest',
+                    success: function (data) {
+                        $("#RemovePermissionModalForm").addClass("d-none");
+                        $("#RemovePermissionModalButtons").addClass("d-none");
+                        $("#RemovePermissionRequestResult").html(data);
+                        $("#RemovePermissionRequestResult").removeClass("d-none");
+                    }
+                });
+            }
+            else {
+                $("#removePermissionValidationMessage").removeClass("d-none");
+            }
+        });
+    },
+
+    removePermissionModalOnClose() {
+        $("#RemovePermission_Identity").val("");
+        $("#RemovePermission_Scope").val("");
+        $("#RemovePermission_Permission").val("");
+        $("#RemovePermission_BusinessReason").val("");
+        $("#RemovePermission_TicketId").val("");
+        $("#RemovePermission_Code").val("");
+
+        $("#RemovePermission_SelectedApprover").materialSelect({ destroy: true });
+
+        $("#identityLabel").removeClass("active");
+        $("#scopeLabel").removeClass("active");
+        $("#permissionLabel").removeClass("active");
+        $("#RemovePermissionRequestResult").html("");
+        $("#RemovePermissionRequestResult").addClass("d-none");
+        $("#removePermissionValidationMessage").addClass("d-none");
+    },
+
+    removePermissionModalOnOpen(scope, identity, permission, code, ticketId) {
+        $("#RemovePermission_Identity").val(identity);
+        $("#RemovePermission_Scope").val(scope);
+        $("#RemovePermission_Permission").val(permission);
+        $("#RemovePermission_TicketId").val(ticketId);
+        $("#RemovePermission_Code").val(code);
+        $("#RemovePermission_SelectedApprover").materialSelect();
+        $("#identityLabel").addClass("active");
+        $("#scopeLabel").addClass("active");
+        $("#permissionLabel").addClass("active");
+        $("#RemovePermissionModalForm").removeClass("d-none");
+        $("#RemovePermissionModalButtons").removeClass("d-none");
+
+
+        if (scope == $("#ManagePermissionDatasetName").text()) {
+            $("#RemovePermissionScopeContainer").addClass("d-none");
+        }
+        else {
+            $("#RemovePermissionScopeContainer").removeClass("d-none");
+        }
+    },
+
+    validateRemovePermissionModal() {
+        return ($("#RemovePermission_BusinessReason").val() != '' && $("#RemovePermission_SelectedApprover").val != '')
     },
 
     initRequestAccessWorkflow() {

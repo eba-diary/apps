@@ -746,6 +746,7 @@ namespace Sentry.data.Web.Controllers
         {
             var perms = _datasetService.GetDatasetPermissions(datasetId);
             var model = new ManagePermissionsModel(perms);
+            model.RemovePermissionRequest.DatasetNamesForAsset = _datasetService.GetDatasetNamesForAsset(perms.DatasetSaidKeyCode);
             return View("Permission/ManagePermissions", model);
         }
 
@@ -764,17 +765,34 @@ namespace Sentry.data.Web.Controllers
                 return PartialView("_Success", new SuccessModel("Dataset permission inheritance change was successfully requested.", "Change Id: " + ticketId, true));
             }
         }
+        
+        [HttpPost]
+        public async Task<ActionResult> SubmitRemovePermissionRequest([Bind(Prefix = "RemovePermission")]RemovePermissionModel model)
+        {
+            AccessRequest ar = model.ToCore();
+            
+            string ticketId = await _datasetService.RequestAccessRemoval(ar);
+
+            if (string.IsNullOrEmpty(ticketId))
+            {
+                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
+            }
+            else
+            {
+                return PartialView("_Success", new SuccessModel("Dataset permission removal was successfully requested.", "Change Id: " + ticketId, true));
+            }
+        }
 
         [Route("Dataset/Detail/{datasetId}/Permissions/GetLatestInheritanceTicket")]
         [HttpGet]
         public ActionResult GetLatestInheritanceTicket(int datasetId)
         {
-            var ticket = _datasetService.GetLatestInheritanceTicket(datasetId);
+            SecurityTicket ticket = _datasetService.GetLatestInheritanceTicket(datasetId);
             if(ticket == null)
             {
                 ticket = new SecurityTicket();
             }
-            return Json(ticket, JsonRequestBehavior.AllowGet);
+            return Json(ticket.ToSimple(), JsonRequestBehavior.AllowGet);
         }
         #endregion
 
