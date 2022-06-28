@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Hangfire;
 using Sentry.data.Core.GlobalEnums;
+using System.Linq.Expressions;
 
 namespace Sentry.data.Core
 {
@@ -67,6 +68,37 @@ namespace Sentry.data.Core
             DataFlowDetailDto dto = new DataFlowDetailDto();
             MapToDetailDto(df, dto);
             return dto;
+        }
+
+        private List<DataFlowDetailDto> GetDataFlowDetailDto(Expression<Func<DataFlow, bool>> expression)
+        {
+            List<DataFlow> dfList = null;
+
+            dfList = _datasetContext.DataFlow.Where(expression)
+                .Where(x => x.ObjectStatus == ObjectStatusEnum.Active)
+                .OrderByDescending(x => x.Id).ToList();
+
+            List<DataFlowDetailDto> dtoList = new List<DataFlowDetailDto>();
+            MapToDetailDtoList(dfList, dtoList);
+            return dtoList;
+        }
+
+        public List<DataFlowDetailDto> GetDataFlowDetailDtoByDatasetId(int datasetId)
+        {
+            List<DataFlowDetailDto> dtoList = GetDataFlowDetailDto(w => w.DatasetId == datasetId);
+            return dtoList;
+        }
+
+        public List<DataFlowDetailDto> GetDataFlowDetailDtoBySchemaId(int schemaId)
+        {
+            List<DataFlowDetailDto> dtoList = GetDataFlowDetailDto(w => w.SchemaId == schemaId);
+            return dtoList;
+        }
+
+        public List<DataFlowDetailDto> GetDataFlowDetailDtoByStorageCode(string storageCode)
+        {
+            List<DataFlowDetailDto> dtoList = GetDataFlowDetailDto(w => w.FlowStorageCode == storageCode);
+            return dtoList;
         }
 
         public List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key)
@@ -1136,6 +1168,16 @@ namespace Sentry.data.Core
 
             dto.SchemaName = map.MappedSchema.Name;
             dto.DatasetName = map.Dataset.DatasetName;
+        }
+
+        private void MapToDetailDtoList(List<DataFlow> flows, List<DataFlowDetailDto> dtoList)
+        {
+            foreach (DataFlow flow in flows)
+            {
+                DataFlowDetailDto detailDto = new DataFlowDetailDto();
+                MapToDetailDto(flow, detailDto);
+                dtoList.Add(detailDto);
+            }
         }
 
         private void MapToDto(DataFlowStep step, DataFlowStepDto dto)
