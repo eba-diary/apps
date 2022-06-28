@@ -71,7 +71,7 @@ data.Admin = {
                     s+= '<option value="' + d.DatasetFileId + '">' + d.FileName + '</option>'
                 }
                 $("#fileDropdown").html(s);
-                $("defaultFileSelection").prop("disabled", true);
+                $("#defaultFileSelection").prop("disabled", true);
                 $("#fileDropdown").materialSelect("destroy");
             }
         })
@@ -212,6 +212,12 @@ data.Admin = {
                 var url = data.Admin.GetSchemaUrl(datasetId);
                 data.Admin.GetSchemaDropdown(url);
             }
+            if ($("#DatasetsList").find(":selected").val() != "" && $("#schemaDropdown").find(":selected").val() != "-1") {
+                $("#submitButton").prop("disabled", false);
+            }
+            else {
+                $("#submitButton").prop("disabled", true);
+            }
 
         });
         $("#schemaDropdown").change(function (event) {
@@ -221,7 +227,22 @@ data.Admin = {
                 var url = data.Admin.GetFileUrl(datasetId, schemaId);
                 data.Admin.GetFileDropdown(url);
             }
+            if ($("#DatasetsList").find(":selected").val != "" && $("#schemaDropdown").find(":selected").val != "-1") {
+                $("#submitButton").prop("disabled", false);
+            }
+            else {
+                $("#submitButton").prop("disabled", true);
+            }
         });
+        $("#submitButton").click(function (event) {
+            
+            if ($("#fileDropdown").find(":selected").val() != "-1") {
+                alert("Show the accordion with the searched file!")
+            }
+            else {
+                alert("Show the accordion with all files for the given dataset and schema!")
+            }
+        })
     },
     // Loads Admin jobs pages
 
