@@ -42,7 +42,7 @@ namespace Sentry.data.Core
 
             if (results.GetAll().Count == 0)
             {
-                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted11.False).ConfigureAwait(false)).ToList();
+                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted10.False).ConfigureAwait(false)).ToList();
                 if (namedEnvironmentList.Any())
                 {
                     if (!namedEnvironmentList.Any(e => e.Name == namedEnvironment))
@@ -77,7 +77,7 @@ namespace Sentry.data.Core
             async Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsInternalAsync()
             {
                 //call Quartermaster to get list of named environments for this asset
-                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted11.False).ConfigureAwait(false)).ToList();
+                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted10.False).ConfigureAwait(false)).ToList();
                 namedEnvironmentList = namedEnvironmentList.OrderBy(n => n.Name).ToList();
 
                 //grab a config setting to see if we need to filter the named environments by a certain named environment type
