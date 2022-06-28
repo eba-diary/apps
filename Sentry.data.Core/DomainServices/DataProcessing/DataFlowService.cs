@@ -602,9 +602,10 @@ namespace Sentry.data.Core
                 throw new ArgumentNullException("stepId", "DataFlowStep is required");
             }
             
-            if(_datasetContext.DataFlowStep.Where(w => w.Id == stepId) == null)
+            // the case where the stepId is not found
+            if(_datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault() == null)
             {
-                throw new NullReferenceException("Step id not found");
+                throw new NullReferenceException("stepId not found");
             }
 
             // finding the dataflowstep with the associated stepId and retrieving the dataflow object from dataflowstep
@@ -631,6 +632,12 @@ namespace Sentry.data.Core
                 throw new ArgumentNullException("datasetFileId", "DatasetFileId is required attribute");
             }
 
+            // the case when the datasetFileId is not found
+            if(_datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault() == null)
+            {
+                throw new NullReferenceException("DatasetFileId was not found");
+            }
+
             // finds the DatasetFile object that is associated with the datasetFileId passed into the method and getting schema id 
             int schemaId = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault().Schema.SchemaId;
 
@@ -650,22 +657,42 @@ namespace Sentry.data.Core
             bool indicator = true;
 
             // creates a dataFlowDto object from the stepId
-            DataFlowDto currentDataFlowDto = GetDataFlowDtoByStepId(stepId);
-            
+            DataFlowDto currentDataFlowDto = new DataFlowDto();
 
-            // traversing through the list of datasetFileIds
-            foreach (int datasetFileId in datasetFileIds)
+            try
             {
-                // compares the schemaIds from the DataFlowDto and the datasetFileId seeing if they are not equal
-                if (!(currentDataFlowDto.SchemaId == GetSchemaIdFromDatasetFileId(datasetFileId)))
-                {
-                    // in the case that the schemaId are not equal to one another --> return false
-                    indicator = false;
-                    break;
-                }
-               
-                
+                currentDataFlowDto = GetDataFlowDtoByStepId(stepId);
+            } catch (NullReferenceException ex)
+            {
+                 return false;
             }
+            
+            try
+            {
+                // traversing through the list of datasetFileIds
+                foreach (int datasetFileId in datasetFileIds)
+                {
+                    // compares the schemaIds from the DataFlowDto and the datasetFileId seeing if they are not equal
+                    if (!(currentDataFlowDto.SchemaId == GetSchemaIdFromDatasetFileId(datasetFileId)))
+                    {
+                        // in the case that the schemaId are not equal to one another --> return false
+                        indicator = false;
+                        break;
+                    }
+
+
+                }
+            } catch (NullReferenceException ex)
+            {
+                indicator = false;// throw new NullReferenceException("datasetFileId cannot be found");
+            }
+            catch (Exception ex)
+            {
+                indicator = false;// throw new Exception("datasetFileId cannot be found");
+            }
+            
+            
+            
             // if both schemaIds are equal for all datasetFileIds then this method will return true, false otherwise
             return indicator;
         }

@@ -136,11 +136,14 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 
                 // validating the dataflowstepid and the datasetfileids for reprocessing
-                if(!_flowService.ValidateStepIdAndDatasetFileIds(reprocessEndpointHelper.dataflowstepId, reprocessEndpointHelper.datasetFileIds)) 
+                if (!_flowService.ValidateStepIdAndDatasetFileIds(reprocessEndpointHelper.dataflowstepId, reprocessEndpointHelper.datasetFileIds))
                 {
-                    return Content(System.Net.HttpStatusCode.BadRequest, "$Invalid Request with dataflowstepId: {dataflowstepId} and datasetFileIds: {datasetFileIds}"); // there was an error
+                    string error_message = string.Format("Invalid Request with dataflowstepId: {0} and datasetFileIds: {1}", reprocessEndpointHelper.dataflowstepId, string.Join(",", reprocessEndpointHelper.datasetFileIds));
+                    return Content(System.Net.HttpStatusCode.BadRequest, error_message); // there was an error
                 }
                 return Content(System.Net.HttpStatusCode.OK, "Kicking off reprocessing"); // On to reprocessing
+                
+                
             }
             
             return ApiTryCatch(nameof(DataFileController), nameof(CheckingForReprocessing), $"dataflowstepid:{reprocessEndpointHelper.dataflowstepId} datasetFileIds:{reprocessEndpointHelper.datasetFileIds}", CheckingForReprocessingFunction);
