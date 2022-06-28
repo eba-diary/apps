@@ -908,20 +908,21 @@ namespace Sentry.data.Core
                                         : GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DSC, Config.GetDefaultEnvironmentName()),
                 ParquetStoragePrefix = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
                                         ? GenerateParquetStoragePrefix(parentDataset.Asset.SaidKeyCode, parentDataset.NamedEnvironment, storageCode)
-                                        : GenerateParquetStoragePrefix(Configuration.Config.GetHostSetting("S3DataPrefix"), null, storageCode),
-                ConsumptionDetails = new List<SchemaConsumption>()
-                {
-                    new SchemaConsumptionSnowflake() 
-                    {
-                        SnowflakeDatabase = GenerateSnowflakeDatabaseName(isHumanResources),
-                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources),
-                        SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
-                        SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
-                        SnowflakeStage = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) ? GlobalConstants.SnowflakeStageNames.PARQUET_STAGE : GlobalConstants.SnowflakeStageNames.DATASET_STAGE,
-                        SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME
-                    }
-                }
+                                        : GenerateParquetStoragePrefix(Configuration.Config.GetHostSetting("S3DataPrefix"), null, storageCode)
 
+            };
+            schema.ConsumptionDetails = new List<SchemaConsumption>()
+            {
+                new SchemaConsumptionSnowflake()
+                {
+                    Schema = schema,
+                    SnowflakeDatabase = GenerateSnowflakeDatabaseName(isHumanResources),
+                    SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources),
+                    SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
+                    SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
+                    SnowflakeStage = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) ? GlobalConstants.SnowflakeStageNames.PARQUET_STAGE : GlobalConstants.SnowflakeStageNames.DATASET_STAGE,
+                    SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME
+                }
             };
             _datasetContext.Add(schema);
 
