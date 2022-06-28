@@ -311,7 +311,7 @@
             self.Name.subscribe(        function () { self.UpdateRow() });
             self.FieldGuid.subscribe(   function () { self.UpdateRow() });
             self.Description.subscribe( function () { self.UpdateRow() });
-            self.DataType.subscribe(    function () { self.UpdateRow() });
+            self.DataType.subscribe(    function () { self.UpdateDataType() });
             self.ArrayType.subscribe(   function () { self.UpdateRow() });
             self.Precision.subscribe(   function () { self.UpdatePrecision() });
             self.Scale.subscribe(       function () { self.UpdateRow() });
@@ -326,8 +326,14 @@
                 self.UpdateRow();
             }
 
+            self.UpdateDataType = function () {
+                if (self.DataType() === 'DECIMAL' && parent.IsFixedWidth()) {
+                    self.Length(self.Precision());
+                }
+                self.UpdateRow();
+            }
+
             self.UpdateRow = function () {
-                console.log('update row')
                 var a = JSON.stringify(ko.toJS(self), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd', 'IsArray', 'FieldGuid', 'Length']);
 
                 var url_parts = window.location.href.replace(/\/\s*$/, '').split('/');
