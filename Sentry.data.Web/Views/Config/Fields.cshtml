@@ -321,16 +321,20 @@
 
             self.UpdatePrecision = function () {
                 if (parent.IsFixedWidth()) {
-                    self.Length(self.Precision());
+                    self.SetLengthToPrecision();
                 }
                 self.UpdateRow();
             }
 
             self.UpdateDataType = function () {
                 if (self.DataType() === 'DECIMAL' && parent.IsFixedWidth()) {
-                    self.Length(self.Precision());
+                    self.SetLengthToPrecision();
                 }
                 self.UpdateRow();
+            }
+
+            self.SetLengthToPrecision = function () {
+                self.Length(self.Precision());
             }
 
             self.UpdateRow = function () {
