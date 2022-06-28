@@ -19,7 +19,7 @@ namespace Sentry.data.Core.Tests
             // Arrange
             var quartermasterClient = new Mock<IClient>();
             var namedEnvironmentList = new List<NamedEnvironment>();
-            quartermasterClient.Setup(f => f.NamedEnvironmentsGet2Async(It.IsAny<string>(), It.IsAny<ShowDeleted11>()).Result).Returns(namedEnvironmentList);
+            quartermasterClient.Setup(f => f.NamedEnvironmentsGet2Async(It.IsAny<string>(), It.IsAny<ShowDeleted10>()).Result).Returns(namedEnvironmentList);
             var quartermasterService = new QuartermasterService(quartermasterClient.Object);
 
             // Act
@@ -40,7 +40,7 @@ namespace Sentry.data.Core.Tests
             // Arrange
             var quartermasterClient = new Mock<IClient>();
             var namedEnvironmentList = new[] { new NamedEnvironment() { Name = "TEST", Environmenttype = "NonProd" } };
-            quartermasterClient.Setup(f => f.NamedEnvironmentsGet2Async(It.IsAny<string>(), It.IsAny<ShowDeleted11>()).Result).Returns(namedEnvironmentList);
+            quartermasterClient.Setup(f => f.NamedEnvironmentsGet2Async(It.IsAny<string>(), It.IsAny<ShowDeleted10>()).Result).Returns(namedEnvironmentList);
             var quartermasterService = new QuartermasterService(quartermasterClient.Object);
 
             // Act
@@ -61,7 +61,7 @@ namespace Sentry.data.Core.Tests
             // Arrange
             var quartermasterClient = new Mock<IClient>();
             var namedEnvironmentList = new[] { new NamedEnvironment() { Name = "TEST", Environmenttype = "NonProd" } };
-            quartermasterClient.Setup(f => f.NamedEnvironmentsGet2Async(It.IsAny<string>(), It.IsAny<ShowDeleted11>()).Result).Returns(namedEnvironmentList);
+            quartermasterClient.Setup(f => f.NamedEnvironmentsGet2Async(It.IsAny<string>(), It.IsAny<ShowDeleted10>()).Result).Returns(namedEnvironmentList);
             var quartermasterService = new QuartermasterService(quartermasterClient.Object);
 
             // Act
