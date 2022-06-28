@@ -20,6 +20,8 @@ namespace Sentry.data.Infrastructure
     public class InevService : IInevService
     {
         private readonly IRestClient _restClient;
+        private readonly IClient _inevClient;
+        private readonly IDatasetContext _datasetContext;
 
         public const string INEV_TOPIC = "INEV-DataLake";
         public const string INEV_TOPIC_DBA_PORTAL_COMPLETE = "INEV-DBAPortalRequestComplete";
@@ -33,9 +35,11 @@ namespace Sentry.data.Infrastructure
         /// <summary>
         /// Public constructor
         /// </summary>
-        public InevService(IRestClient restClient)
+        public InevService(IRestClient restClient, IClient inevClient, IDatasetContext datasetContext)
         {
             _restClient = restClient;
+            _inevClient = inevClient;
+            _datasetContext = datasetContext;
         }
 
         /// <summary>
@@ -52,36 +56,30 @@ namespace Sentry.data.Infrastructure
 
         public async Task CheckDbaPortalEvents()
         {
-            using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
+            Console.WriteLine("Checking for Infrastructure Events to Consume: ");
+
+            List<Message> messages = _inevClient.ConsumeGroupUsingGETAsync("INEV-DataLake-Test", INEV_GROUP_DSC_CONSUMER, 25).Result.Messages.ToList();
+            messages = messages.Concat(_inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_APPROVED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
+            messages = messages.Concat(_inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_ADDED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
+
+            Console.WriteLine("Found " + messages.Count + " Events to Consume");
+
+            foreach (Message message in messages)
             {
-                Console.WriteLine("Checking for Infrastructure Events to Consume: ");
+                Console.WriteLine("Consuming " + message.EventType + " event from " + message.MessageSource);
 
-                IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
-                IClient _containerInevClient = Container.GetInstance<IClient>();
-                
-                List<Message> messages = _containerInevClient.ConsumeGroupUsingGETAsync("INEV-DataLake-Test", INEV_GROUP_DSC_CONSUMER, 25).Result.Messages.ToList();
-                messages = messages.Concat(_containerInevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_APPROVED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
-                messages = messages.Concat(_containerInevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_ADDED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
-
-                Console.WriteLine("Found " + messages.Count + " Events to Consume");
-
-                foreach(Message message in messages)
+                SecurityTicket sourceTicket;
+                message.Details.TryGetValue("sourceRequestId", out string messageTicketId);
+                message.Details.TryGetValue("cherwellTicketId", out string cherwellTicketId);
+                Guid toCompare = new Guid(messageTicketId);
+                if (!String.IsNullOrEmpty(messageTicketId))
                 {
-                    Console.WriteLine("Consuming " + message.EventType + " event from " + message.MessageSource);
-                    
-                    SecurityTicket sourceTicket;
-                    message.Details.TryGetValue("sourceRequestId", out string messageTicketId);
-                    message.Details.TryGetValue("cherwellTicketId", out string cherwellTicketId);
-                    Guid toCompare = new Guid(messageTicketId);
-                    if (!String.IsNullOrEmpty(messageTicketId))
-                    {
-                        sourceTicket = _datasetContext.SecurityTicket.Where(t => t.SecurityTicketId.Equals(toCompare)).FirstOrDefault();
-                        sourceTicket.TicketId = cherwellTicketId;
-                        _datasetContext.Merge<SecurityTicket>(sourceTicket);
-                    }
+                    sourceTicket = _datasetContext.SecurityTicket.Where(t => t.SecurityTicketId.Equals(toCompare)).FirstOrDefault();
+                    sourceTicket.TicketId = cherwellTicketId;
+                    _datasetContext.Merge<SecurityTicket>(sourceTicket);
                 }
-                _datasetContext.SaveChanges();
             }
+            _datasetContext.SaveChanges();
         }
 
         /// <summary>
