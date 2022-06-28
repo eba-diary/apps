@@ -20,6 +20,13 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("SchemaConsumption_Id");
                 m.Generator(Generators.Identity);
             });
+
+            ManyToOne(x => x.Schema, m =>
+            {
+                m.Column("Schema_Id");
+                m.ForeignKey("FK_SchemaConsumption_Schema");
+                m.Class(typeof(FileSchema));
+            });
         }
     }
 }

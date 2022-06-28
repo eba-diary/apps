@@ -2,9 +2,11 @@
 using Sentry.data.Core.GlobalEnums;
 using Sentry.FeatureFlags;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
+using Sentry.data.Core.Interfaces.QuartermasterRestClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
 
@@ -18,13 +20,15 @@ namespace Sentry.data.Core
         private readonly IBaseTicketProvider _baseTicketProvider;
         private readonly IDataFeatures _dataFeatures;
         private readonly IInevService _inevService;
+        private readonly IQuartermasterService _quartermasterService;
 
-        public SecurityService(IDatasetContext datasetContext, IBaseTicketProvider baseTicketProvider, IDataFeatures dataFeatures, IInevService inevService)
+        public SecurityService(IDatasetContext datasetContext, IBaseTicketProvider baseTicketProvider, IDataFeatures dataFeatures, IInevService inevService, IQuartermasterService quartermasterService)
         {
             _datasetContext = datasetContext;
             _baseTicketProvider = baseTicketProvider;
             _dataFeatures = dataFeatures;
             _inevService = inevService;
+            _quartermasterService = quartermasterService;
         }
 
         public async Task<string> RequestPermission(AccessRequest model)
@@ -447,6 +451,11 @@ namespace Sentry.data.Core
                 x.EnabledDate = DateTime.Now;
             });
 
+            if(ticket.Permissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS))
+            {
+                BuildS3RequestAssistance(ticket);
+            }
+
             await PublishDatasetPermissionsUpdatedInfrastructureEvent(ticket);
 
         }
@@ -468,6 +477,38 @@ namespace Sentry.data.Core
             }
         }
 
+        public void BuildS3RequestAssistance(SecurityTicket ticket)
+        {
+            var dataset = _datasetContext.Datasets.Where(d => d.Security.Tickets.Contains(ticket)).FirstOrDefault();
+            string project = Sentry.Configuration.Config.GetHostSetting("S3_JiraTicketProject");
+            string summary = "S3 Access " + (ticket.IsAddingPermission ? "Request" : "Removal");
+            StringBuilder sb = new StringBuilder();
+            string issueType = "Request";
+
+            //Build Description
+            string account = Sentry.Configuration.Config.GetHostSetting("AwsAccountId");
+            string name = "sentry-dtlk-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-" + dataset.ShortName + "-ae2";
+
+            sb.AppendLine("Account: " + account);
+            sb.AppendLine("Name: " + name);
+            sb.AppendLine("Source Bucket: " + "sentry-dtlk-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-ae2");
+            sb.AppendLine("Principal AWS ARN: " + ticket.AwsArn);
+            sb.AppendLine("Action: s3.*");
+            sb.AppendLine("Action Bucket: S3:ListBucket");
+            sb.AppendLine("Resource: " + "arn:aws:s3:us-east-2:" + account + ":accesspoint/" + name);
+            foreach (DatasetFileConfig dsfc in dataset.DatasetFileConfigs)
+            {
+                sb.AppendLine("Schema: " + dsfc.Schema.Name);
+                sb.AppendLine("\t\tBucket: " + dsfc.Schema.ParquetStorageBucket);
+                sb.AppendLine("\t\tPrefix: " + dsfc.Schema.ParquetStoragePrefix);
+            }
+            List<JiraCustomField> customFields = new List<JiraCustomField>();
+            JiraCustomField acceptanceCriteria = new JiraCustomField();
+            acceptanceCriteria.Name = "Acceptance Criteria";
+            acceptanceCriteria.Value = sb.ToString();
+            customFields.Add(acceptanceCriteria);
+            _quartermasterService.BuildJiraTicketAndRequest(project, new List<string>(), new List<string>(), "", summary, issueType, customFields);
+        }
 
         /// <summary>
         /// A ticket in Cherwell has been denied

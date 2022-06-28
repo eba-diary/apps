@@ -42,7 +42,7 @@ namespace Sentry.data.Core
 
             if (results.GetAll().Count == 0)
             {
-                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted11.False).ConfigureAwait(false)).ToList();
+                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted10.False).ConfigureAwait(false)).ToList();
                 if (namedEnvironmentList.Any())
                 {
                     if (!namedEnvironmentList.Any(e => e.Name == namedEnvironment))
@@ -77,7 +77,7 @@ namespace Sentry.data.Core
             async Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsInternalAsync()
             {
                 //call Quartermaster to get list of named environments for this asset
-                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted11.False).ConfigureAwait(false)).ToList();
+                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted10.False).ConfigureAwait(false)).ToList();
                 namedEnvironmentList = namedEnvironmentList.OrderBy(n => n.Name).ToList();
 
                 //grab a config setting to see if we need to filter the named environments by a certain named environment type
@@ -98,5 +98,34 @@ namespace Sentry.data.Core
             }
             return GetNamedEnvironmentsInternalAsync();
         }
+
+        private void RequestAssistance(RequestAssistanceInfo info)
+        {
+            info.MessageInfo = new RequestAssistanceMessageInfo();
+            info.MessageInfo.Tickets = new List<string>();
+
+            var obj = _quartermasterClient.RequestAssistanceAsync(info);
+        }
+
+        private void RequestAssistance(JiraTicketInfo ticket)
+        {
+            RequestAssistanceInfo request = new RequestAssistanceInfo();
+            request.Tickets = new List<JiraTicketInfo>() { ticket };
+            RequestAssistance(request);
+        }
+
+        public void BuildJiraTicketAndRequest(string project, IList<string> components, IList<string> labels, string description, string summary, string issueType, IList<JiraCustomField> customFields)
+        {
+            JiraTicketInfo ticket = new JiraTicketInfo();
+            ticket.Project = project;
+            ticket.Components = components;
+            ticket.Labels = labels;
+            ticket.Description = description;
+            ticket.Summary = summary;
+            ticket.IssueType = issueType;
+            ticket.CustomFields = customFields;
+            RequestAssistance(ticket);
+        }
+
     }
 }

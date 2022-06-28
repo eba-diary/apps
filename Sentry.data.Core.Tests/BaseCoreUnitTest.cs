@@ -33,6 +33,7 @@ namespace Sentry.data.Core.Tests
             registry.For<IBaseTicketProvider>().Use(() => MockRepository.GenerateStub<ICherwellProvider>());
             registry.For<IDataFeatures>().Use(new MockDataFeatures());
             registry.For<IInevService>().Use(() => MockRepository.GenerateStub<IInevService>());
+            registry.For<IQuartermasterService>().Use(() => MockRepository.GenerateStub<IQuartermasterService>());
 
             //set the container
             _container = new StructureMap.Container(registry);

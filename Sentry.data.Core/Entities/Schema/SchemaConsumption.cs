@@ -13,6 +13,8 @@ namespace Sentry.data.Core
     {
         public virtual int SchemaConsumptionId { get; set; }
 
+        public virtual FileSchema Schema { get; set; }
+
         /// <summary>
         /// Method to accept a visitor to this class hierarchy
         /// </summary>
