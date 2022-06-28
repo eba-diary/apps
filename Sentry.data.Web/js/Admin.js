@@ -39,7 +39,7 @@ data.Admin = {
             type: "GET",
             url: url,
             success: function (data) {
-                var s = '<option value="-1">Please Select a Schema</option>';
+                var s = '<option value="-1"id="defaultSchemaSelection">Please Select a Schema</option>';
                 for (var d of data) {
                     s += '<option value="' + d.SchemaId + '">' + d.Name + '</option>';
                 }
@@ -58,6 +58,24 @@ data.Admin = {
         return url;
     },
 
+    GetFileDropdown: function (url) {
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "Json",
+            dataSrc: "Records",
+            success: function (data) {
+                console.log(data);
+                var s = '<option value="-1"id="defaultFileSelection"> (Optional) Select a File</option>';
+                for (var d of data.Records) {
+                    s+= '<option value="' + d.DatasetFileId + '">' + d.FileName + '</option>'
+                }
+                $("#fileDropdown").html(s);
+                $("defaultFileSelection").prop("disabled", true);
+                $("#fileDropdown").materialSelect("destroy");
+            }
+        })
+    },
     //generates table with datafiles from selected dataset and schema
     PopulateTable: function (url) {
         $("#results").DataTable({
@@ -118,6 +136,7 @@ data.Admin = {
         }
     },
     //loads reprocessing page with event handlers
+
     ReprocessInit: function () {
         $("#AllDatasets").materialSelect("destroy");
         $("#schemaDropdown").materialSelect("destroy")
@@ -186,6 +205,7 @@ data.Admin = {
     LogsInit: function () {
         $("#DatasetsList").materialSelect();
         $("#schemaDropdown").materialSelect();
+        $("#fileDropdown").materialSelect();
         $("#DatasetsList").change(function (event) {
             var datasetId = $("#DatasetsList").find(":selected").val();
             if (datasetId != "") {
@@ -193,6 +213,14 @@ data.Admin = {
                 data.Admin.GetSchemaDropdown(url);
             }
 
+        });
+        $("#schemaDropdown").change(function (event) {
+            var schemaId = $("#schemaDropdown").find(":selected").val();
+            var datasetId = $("#DatasetsList").find(":selected").val();
+            if (schemaId != -1 && datasetId != "") {
+                var url = data.Admin.GetFileUrl(datasetId, schemaId);
+                data.Admin.GetFileDropdown(url);
+            }
         });
     },
     // Loads Admin jobs pages

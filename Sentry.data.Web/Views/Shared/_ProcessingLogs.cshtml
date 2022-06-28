@@ -5,7 +5,7 @@
 }
 
 <h1>File Processing Logs</h1>
-<div style="display:inline-block">
+<div class="d-inline-block">
     <!-- Data Set Dropdown Menu-->
     <h3>Datasets</h3>
     @Html.DropDownListFor(m => m.DatasetsList,
@@ -14,19 +14,23 @@
                           new
                           {
                               @class = "admin-logs-dropdown",
-                                @style = "display: none"
+                              @style = "display: none",
+                              @searchable = "Search Available Datasets"
                           })
 </div>
 <!-- Schema Dropdown Menu-->
-<div style="display: inline-block">
+<div class="d-inline-block">
     <h3>Schema</h3>
-    <select class="mbd-select admin-logs-dropdown" id="schemaDropdown" style="display:none">
+    <select class="mbd-select admin-logs-dropdown" id="schemaDropdown" style="display:none" searchable ="Search Available Schema">
         <option value="-1">Please Select a Schema</option>
         <!--populated asyncronously via ajax-->
     </select>
 </div>
-<div style="display:inline-block">
-   
+<div class="d-inline-block">
+    <h3>Data Files</h3>
+    <select class="mbd-select admin-logs-dropdown" id="fileDropdown" style="display:none" searchable ="Search Available Files">
+        <option value="-1">(Optional) Select a File</option>
+    </select>
 </div>
 
 <script>
