@@ -1222,9 +1222,6 @@ namespace Sentry.data.Core.Tests
             // Setup DataFlowService
             var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, _datafeatures.Object, null);
 
-            // Create Linq expression for test
-            Expression<Func<DataFlow, bool>> expression = w => w.DatasetId == 2;
-
             // Act
             List<DataFlowDetailDto> testFlow = dataFlowService.GetDataFlowDetailDtoByDatasetId(2);
 

@@ -479,10 +479,10 @@ namespace Sentry.data.Web.Tests
             // Arrange
             DataFlowDetailDto dto = MockClasses.MockDataFlowDetailDto();
 
-            Models.ApiModels.Dataflow.DataFlowDetailModel model = new Models.ApiModels.Dataflow.DataFlowDetailModel();
+            dto.steps = new Mock<List<DataFlowStepDto>>().Object;
 
             // Act
-            model = dto.MapToModel();
+            Models.ApiModels.Dataflow.DataFlowDetailModel model = dto.MapToModel();
 
             // Assert
             Assert.AreEqual(dto.Id, model.Id);
@@ -509,14 +509,17 @@ namespace Sentry.data.Web.Tests
         public void MapToDetailModelList_DataFlowDetailDto_DataFlowDetailModel()
         {
             // Arrange
-            List<DataFlowDetailDto> detailDto = MockClasses.MockDataFlowDetailDtos(2);
+            List<DataFlowDetailDto> detailDtos = MockClasses.MockDataFlowDetailDtos(2);
+
+            detailDtos.ForEach(x => x.steps = new Mock<List<DataFlowStepDto>>().Object);
+
             List<Models.ApiModels.Dataflow.DataFlowDetailModel> modelList = new List<Models.ApiModels.Dataflow.DataFlowDetailModel>();
 
             // Act
-            modelList = detailDto.MapToDetailModelList();
+            modelList = detailDtos.MapToDetailModelList();
 
             // Assert
-            Assert.AreEqual(detailDto.Count, modelList.Count);
+            Assert.AreEqual(detailDtos.Count, modelList.Count);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
@@ -134,6 +135,32 @@ namespace Sentry.data.Web.Tests
             feList.Add(fe);
 
             return feList;
+        }
+
+        public static List<DataFlowStepDto> MockDataFlowSteoDtos(int listSize)
+        {
+            List<DataFlowStepDto> steps = new List<DataFlowStepDto>();
+            for (int i = 1; i <= listSize; i++)
+            {
+                steps.Add(new DataFlowStepDto()
+                {
+                    Id = i,
+                    DataFlowId = i,
+                    DataFlowName = "DataFlowName" + i,
+                    DataActionType = DataActionType.None,
+                    DataActionTypeId = i,
+                    DataActionName = "DataActionName" + i,
+                    ActionId = i,
+                    ActionName = "ActionName" + i,
+                    ActionDescription = "ActionDescription",
+                    ExeuctionOrder = i,
+                    TriggerKey = "TriggerKey" + i,
+                    TriggerBucket = "TriggerBucket",
+                    TargetPrefix = "TargetPrefix"
+                });
+            }
+
+            return steps;
         }
 
         public static List<DataFlowDetailDto> MockDataFlowDetailDtos(int listSize)
