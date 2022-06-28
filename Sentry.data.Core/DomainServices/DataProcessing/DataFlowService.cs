@@ -601,15 +601,17 @@ namespace Sentry.data.Core
             {
                 throw new ArgumentNullException("stepId", "DataFlowStep is required");
             }
-            
-            // the case where the stepId is not found
-            if(_datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault() == null)
+
+            DataFlowStep dataFlowStep = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
+
+            // the case when the stepId cannot be found
+            if(dataFlowStep == null)
             {
                 throw new DataFlowStepNotFound("stepId not found");
             }
 
             // finding the dataflowstep with the associated stepId and retrieving the dataflow object from dataflowstep
-            DataFlow df = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault().DataFlow;
+            DataFlow df = dataFlowStep.DataFlow;
             
             // creating a new blank DataFlowDto object
             DataFlowDto dataFlowDto = new DataFlowDto();
@@ -631,15 +633,17 @@ namespace Sentry.data.Core
             {
                 throw new ArgumentNullException("datasetFileId", "DatasetFileId is required attribute");
             }
+            
+            DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
 
             // the case when the datasetFileId is not found
-            if(_datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault() == null)
+            if(datasetFile == null)
             {
                 throw new DataFileNotFoundException("DatasetFileId was not found");
             }
 
             // finds the DatasetFile object that is associated with the datasetFileId passed into the method and getting schema id 
-            int schemaId = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault().Schema.SchemaId;
+            int schemaId = datasetFile.Schema.SchemaId;
 
 
             return schemaId; // returns the schema id of the associated datasetFileId

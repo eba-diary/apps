@@ -929,6 +929,161 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(true, indicator); // status code worked
         }
 
+        /*
+         * Unit test to see if exception is thrown when stepId cannot be found
+         */
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public void StepIdNotFound()
+        {
+            // Arrange
+            List<int> datasetFileIds = new List<int> { 3, 3, 3 };
+            int stepId = 8;
+
+            // creating 3 datasetfiles with the same associated schema/schemaid
+            FileSchema schema = new FileSchema()
+            {
+                SchemaId = 3,
+            };
+
+            DatasetFile dsf1 = new DatasetFile()
+            {
+                Schema = schema,
+                DatasetFileId = 1
+            };
+            DatasetFile dsf2 = new DatasetFile()
+            {
+                Schema = schema,
+                DatasetFileId = 2
+            };
+            DatasetFile dsf3 = new DatasetFile()
+            {
+                Schema = schema,
+                DatasetFileId = 3
+            };
+
+            var datasetfiles = new[] { dsf1, dsf2, dsf3 };
+
+            var context = new Mock<IDatasetContext>();
+            var datafeature = new Mock<IDataFeatures>();
+
+            DataFlow df = MockClasses.MockDataFlow();
+            df.ObjectStatus = ObjectStatusEnum.Active;
+            df.Id = 1;
+            df.DatasetId = 1;
+            df.SchemaId = 1;
+
+           
+
+            DataFlowStep step1 = new DataFlowStep()
+            {
+                Id = 1,
+                Action = new ProducerS3DropAction(),
+                DataFlow = df
+            };
+
+            
+
+            df.Steps = new[] { step1 };
+
+            // created two dataflow mock classes and two associated dataflowsteps
+
+            var dataflows = new[] { df };
+            var dataflowsteps = new[] { step1 };
+
+            context.SetupGet(f => f.DataFlow).Returns(dataflows.AsQueryable);
+            context.SetupGet(f => f.DataFlowStep).Returns(dataflowsteps.AsQueryable);
+            context.SetupGet(f => f.DatasetFileStatusActive).Returns(datasetfiles.AsQueryable);
+            datafeature.Setup(f => f.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
+
+            var dataflowservice = new DataFlowService(context.Object, null, null, null, null, null, datafeature.Object, null);
+
+            // Act
+
+            Assert.ThrowsException<DataFlowStepNotFound>(() => dataflowservice.GetDataFlowDtoByStepId(stepId));
+
+         
+        }
+
+        /*
+         * Unit test to see if exception is thrown when stepId cannot be found
+         */
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public void DatasetFileIdsNotFound()
+        {
+            // Arrange
+            List<int> datasetFileIds = new List<int> { 3, 3, 3 };
+            int stepId = 8;
+
+            // creating 3 datasetfiles with the same associated schema/schemaid
+            FileSchema schema = new FileSchema()
+            {
+                SchemaId = 3,
+            };
+
+            DatasetFile dsf1 = new DatasetFile()
+            {
+                Schema = schema,
+                DatasetFileId = 1
+            };
+            DatasetFile dsf2 = new DatasetFile()
+            {
+                Schema = schema,
+                DatasetFileId = 2
+            };
+            DatasetFile dsf3 = new DatasetFile()
+            {
+                Schema = schema,
+                DatasetFileId = 3
+            };
+
+            var datasetfiles = new[] { dsf1, dsf2, dsf3 };
+
+            var context = new Mock<IDatasetContext>();
+            var datafeature = new Mock<IDataFeatures>();
+
+            DataFlow df = MockClasses.MockDataFlow();
+            df.ObjectStatus = ObjectStatusEnum.Active;
+            df.Id = 1;
+            df.DatasetId = 1;
+            df.SchemaId = 1;
+
+
+
+            DataFlowStep step1 = new DataFlowStep()
+            {
+                Id = 1,
+                Action = new ProducerS3DropAction(),
+                DataFlow = df
+            };
+
+
+
+            df.Steps = new[] { step1 };
+
+            // created two dataflow mock classes and two associated dataflowsteps
+
+            var dataflows = new[] { df };
+            var dataflowsteps = new[] { step1 };
+
+            context.SetupGet(f => f.DataFlow).Returns(dataflows.AsQueryable);
+            context.SetupGet(f => f.DataFlowStep).Returns(dataflowsteps.AsQueryable);
+            context.SetupGet(f => f.DatasetFileStatusActive).Returns(datasetfiles.AsQueryable);
+            datafeature.Setup(f => f.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
+
+            var dataflowservice = new DataFlowService(context.Object, null, null, null, null, null, datafeature.Object, null);
+
+            int testDatasetFileId = 12;
+
+            // Act
+            
+            Assert.ThrowsException<DataFileNotFoundException>(() => dataflowservice.GetSchemaIdFromDatasetFileId(testDatasetFileId));
+
+
+        }
+
+
         [TestCategory("Core DataFlowService")]
         [TestMethod]
         public void DataFlowService_UpgradeDataFlow_Invalid_DataFlow_Id()
@@ -1293,7 +1448,7 @@ namespace Sentry.data.Core.Tests
             jobService.Verify(v => v.Delete(It.IsAny<List<int>>(), user.Object, false), Times.Once);
         }
 
-
+        
         
 
         
