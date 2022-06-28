@@ -1,7 +1,37 @@
 ﻿
+@model ProcessingLogsModel
 @{
     ViewBag.Title = "_AdminTest";
 }
 
-<h2>Test 2</h2>
+<h1>File Processing Logs</h1>
+<div style="display:inline-block">
+    <!-- Data Set Dropdown Menu-->
+    <h3>Datasets</h3>
+    @Html.DropDownListFor(m => m.DatasetsList,
+                          new SelectList(Model.DatasetsList, "Value", "Text"),
+                          "Please select Dataset",
+                          new
+                          {
+                              @class = "admin-logs-dropdown",
+                                @style = "display: none"
+                          })
+</div>
+<!-- Schema Dropdown Menu-->
+<div style="display: inline-block">
+    <h3>Schema</h3>
+    <select class="mbd-select admin-logs-dropdown" id="schemaDropdown" style="display:none">
+        <option value="-1">Please Select a Schema</option>
+        <!--populated asyncronously via ajax-->
+    </select>
+</div>
+<div style="display:inline-block">
+   
+</div>
+
+<script>
+    $(function () {
+        data.Admin.LogsInit();
+    });
+</script>
 

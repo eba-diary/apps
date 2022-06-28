@@ -182,7 +182,19 @@ data.Admin = {
         */
         
     },
-  
+
+    LogsInit: function () {
+        $("#DatasetsList").materialSelect();
+        $("#schemaDropdown").materialSelect();
+        $("#DatasetsList").change(function (event) {
+            var datasetId = $("#DatasetsList").find(":selected").val();
+            if (datasetId != "") {
+                var url = data.Admin.GetSchemaUrl(datasetId);
+                data.Admin.GetSchemaDropdown(url);
+            }
+
+        });
+    },
     // Loads Admin jobs pages
 
     AdminPageInit: function () {
