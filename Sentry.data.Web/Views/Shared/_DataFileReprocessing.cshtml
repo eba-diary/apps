@@ -3,7 +3,7 @@
 @{
     ViewBag.Title = "_AdminTest";
 }
-<div style="display:inline-block">
+<div class="d-inline-block">
     <h1>Reprocess Data Files</h1>
     <!-- Data Set Dropdown Menu-->
     <h3>Datasets</h3>
@@ -13,12 +13,13 @@
                           new
                           {
                               @class = "admin-reprocess-dropdown",
-                                @style = "display: none"
+                              @style = "display: none",
+                              @searchable = "Search Available Datasets"
                           })
 
 </div>
 <!-- Schema Dropdown Menu-->
-<div style="display: inline-block">
+<div class="d-inline-block">
     <h3>Schema</h3>
     <select class="mbd-select admin-reprocess-dropdown" id="schemaDropdown" style="display: none">
         <option value="-1">Please Select a Schema</option>
@@ -26,7 +27,7 @@
     </select>
 </div>
 <!-- Flow Steps Dropdown Menu-->
-<div style="display: inline-block">
+<div class="d-inline-block">
     <h3>Flow Steps</h3>
     <select class="mbd-select admin-reprocess-dropdown" id="flowStepsDropdown" , style="display:none">
         <option value="-1">Select a Flowstep</option>
