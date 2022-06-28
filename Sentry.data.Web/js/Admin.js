@@ -237,10 +237,10 @@ data.Admin = {
         $("#submitButton").click(function (event) {
             
             if ($("#fileDropdown").find(":selected").val() != "-1") {
-                alert("Show the accordion with the searched file!")
+                alert("Partial View of the accordion with the searched file!")
             }
             else {
-                alert("Show the accordion with all files for the given dataset and schema!")
+                alert("Partial View of the accordion with all files for the given dataset and schema!")
             }
         })
     },
