@@ -143,7 +143,6 @@ namespace Sentry.data.Core
         public UserSecurity GetUserSecurityForDataset(int datasetId)
         {
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault();
-
             return _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
         }
 

@@ -1415,7 +1415,7 @@ namespace Sentry.data.Core.Tests
             var parentSecurable = new Mock<ISecurable>();
             parentSecurable.Setup(s => s.Security).Returns(security);
             securable.Setup(s => s.Parent).Returns(parentSecurable.Object);
-            var securityService = new SecurityService(null, null, null, null);
+            var securityService = new SecurityService(null, null, null, null, null);
 
             // Act
             var actual = securityService.GetSecurablePermissions(securable.Object);
@@ -1434,7 +1434,7 @@ namespace Sentry.data.Core.Tests
             var parentSecurable = new Mock<ISecurable>();
             parentSecurable.Setup(s => s.Security).Returns(security);
             securable.Setup(s => s.Parent).Returns(parentSecurable.Object);
-            var securityService = new SecurityService(null, null, null, null);
+            var securityService = new SecurityService(null, null, null, null, null);
 
             // Act
             var actual = securityService.GetSecurablePermissions(securable.Object);
@@ -1464,7 +1464,7 @@ namespace Sentry.data.Core.Tests
                     new SecurityPermission() {
                         Permission = new Permission() { SecurableObject = SecurableEntityName.DATA_ASSET } } }
             };
-            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object);
+            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null);
 
             //Act
             await service.ApproveTicket(ticket, "");
@@ -1490,7 +1490,7 @@ namespace Sentry.data.Core.Tests
                     new SecurityPermission() {
                         Permission = new Permission() { SecurableObject = SecurableEntityName.DATASET } } }
             };
-            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object);
+            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null);
 
             //Act
             await Assert.ThrowsExceptionAsync<DatasetNotFoundException>(() => service.ApproveTicket(ticket, ""));
@@ -1518,7 +1518,7 @@ namespace Sentry.data.Core.Tests
             var context = new Mock<IDatasetContext>();
             context.Setup(s => s.Datasets).Returns((new List<Dataset>() { dataset }).AsQueryable());
             var inevService = new Mock<IInevService>();
-            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object);
+            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null);
 
             //Act
             await service.ApproveTicket(ticket, "");
