@@ -131,39 +131,11 @@ namespace Sentry.data.Web.WebApi.Controllers
                 return Content(System.Net.HttpStatusCode.Forbidden, "Feature not available to this user.");
             }
 
-            string simpleError = _datafileService.ValidateDeleteDataFilesParams(datasetId, schemaId, deleteFilesParamModel.ToDto());
-            if (simpleError != null)
+            string error = _datafileService.Delete(datasetId, schemaId, deleteFilesParamModel.ToDto()); 
+            if (error != null)
             {
-                return Content(System.Net.HttpStatusCode.BadRequest, simpleError);
+                return Content(System.Net.HttpStatusCode.BadRequest, error);
             }
-
-            //TURN USER LIST INTO DBLIST
-            List<DatasetFile> dbList;
-
-            //IF userFileNameList PASSED
-            if (deleteFilesParamModel.UserFileNameList != null && deleteFilesParamModel.UserFileNameList.Length > 0)
-            {
-                dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, deleteFilesParamModel.UserFileNameList);
-            }
-            else  //userIdList PASSED
-            {
-                //VALIDATE LESS THAN 1
-                if (deleteFilesParamModel.UserFileIdList.Any(w => w < 1 ) )
-                {
-                    return Content(System.Net.HttpStatusCode.BadRequest, nameof(deleteFilesParamModel.UserFileIdList) + " contains an item less than one.  Please pass items greater than zero.");
-                }
-                dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, deleteFilesParamModel.UserFileIdList);
-            }
-
-
-            //VALIDATE: ANYTHING TO DELETE
-            if(dbList != null && dbList.Count == 0)
-            {
-                return Content(System.Net.HttpStatusCode.BadRequest, "Nothing found to delete.");
-            }
-
-            //FINAL STEP :  CALL SERVICE TO DELETE METADATA AND DPP TO DELETE
-            _datafileService.Delete(datasetId, schemaId, dbList);
 
             return Ok("Delete Successful.  Thanks for using DSC!");
         }
