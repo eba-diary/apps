@@ -605,7 +605,7 @@ namespace Sentry.data.Core
             // the case where the stepId is not found
             if(_datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault() == null)
             {
-                throw new NullReferenceException("stepId not found");
+                throw new DataFlowStepNotFound("stepId not found");
             }
 
             // finding the dataflowstep with the associated stepId and retrieving the dataflow object from dataflowstep
@@ -635,7 +635,7 @@ namespace Sentry.data.Core
             // the case when the datasetFileId is not found
             if(_datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault() == null)
             {
-                throw new NullReferenceException("DatasetFileId was not found");
+                throw new DataFileNotFoundException("DatasetFileId was not found");
             }
 
             // finds the DatasetFile object that is associated with the datasetFileId passed into the method and getting schema id 
@@ -645,7 +645,7 @@ namespace Sentry.data.Core
             return schemaId; // returns the schema id of the associated datasetFileId
         }
         
-
+        
         
 
         /*
@@ -662,7 +662,7 @@ namespace Sentry.data.Core
             try
             {
                 currentDataFlowDto = GetDataFlowDtoByStepId(stepId);
-            } catch (NullReferenceException ex)
+            } catch (DataFlowStepNotFound ex)
             {
                  return false;
             }
@@ -682,13 +682,9 @@ namespace Sentry.data.Core
 
 
                 }
-            } catch (NullReferenceException ex)
+            } catch (DataFileNotFoundException ex)
             {
-                indicator = false;// throw new NullReferenceException("datasetFileId cannot be found");
-            }
-            catch (Exception ex)
-            {
-                indicator = false;// throw new Exception("datasetFileId cannot be found");
+                indicator = false;
             }
             
             

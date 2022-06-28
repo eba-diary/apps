@@ -134,7 +134,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         {
             IHttpActionResult CheckingForReprocessingFunction()
             {
-                
+
                 // validating the dataflowstepid and the datasetfileids for reprocessing
                 if (!_flowService.ValidateStepIdAndDatasetFileIds(reprocessEndpointHelper.dataflowstepId, reprocessEndpointHelper.datasetFileIds))
                 {
@@ -142,7 +142,6 @@ namespace Sentry.data.Web.WebApi.Controllers
                     return Content(System.Net.HttpStatusCode.BadRequest, error_message); // there was an error
                 }
                 return Content(System.Net.HttpStatusCode.OK, "Kicking off reprocessing"); // On to reprocessing
-                
                 
             }
             
