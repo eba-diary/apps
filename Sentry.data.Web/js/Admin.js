@@ -109,7 +109,8 @@ data.Admin = {
         });
     },
     //activate or deactivate reprocess button based on input list of checked boxes
-    ActivateDeactivateReprocessButton: function (checkedBoxes) {
+    ActivateDeactivateReprocessButton: function () {
+        var checkedBoxes = $(".select-all-target:checkbox:checked");
         if (checkedBoxes.length > 0 && checkedBoxes.length <= 100 && $("#flowStepsDropdown").find(":selected").val() != "-1") {
             $("#reprocessButton").prop("disabled", false);
         }
@@ -142,8 +143,8 @@ data.Admin = {
         });
         //activate or deactivate button
         $("#results").on("click", ".select-all-target", function () {
-            var checkedBoxes = $(".select-all-target:checkbox:checked");
-            data.Admin.ActivateDeactivateReprocessButton(checkedBoxes);
+
+            data.Admin.ActivateDeactivateReprocessButton();
         });
         //submit selected file list
         $("#reprocessButton").click(function (event) {
@@ -156,8 +157,7 @@ data.Admin = {
         });
         //activate or deactivate button
         $("#flowStepsDropdown").change(function (event) {
-            var checkedBoxes = $(".select-all-target:checkbox:checked");
-            data.Admin.ActivateDeactivateReprocessButton(checkedBoxes);
+            data.Admin.ActivateDeactivateReprocessButton();
         });
         
          // Uncomment this block and and replace final column header in _DataFileReprocessing.cshtml to activate select all functionality.
