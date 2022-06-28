@@ -135,6 +135,11 @@ namespace Sentry.data.Core
             return datasetList;
         }
 
+        public List<string> GetDatasetNamesForAsset(string asset)
+        {
+            return _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(asset)).Select(ds => ds.DatasetName).ToList();
+        }
+
         public UserSecurity GetUserSecurityForDataset(int datasetId)
         {
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault();
@@ -263,12 +268,33 @@ namespace Sentry.data.Core
             return string.Empty;
         }
 
+        public async Task<string> RequestAccessRemoval(AccessRequest request)
+        {
+            IApplicationUser user = _userService.GetCurrentUser();
+            request.RequestorsId = user.AssociateId;
+            var security = _datasetContext.Security.Where(s => s.Tickets.Any(t => t.TicketId == request.TicketId)).FirstOrDefault();
+            if(security != null)
+            {
+                request.SecurityId = security.SecurityId;
+            }
+            request.RequestorsName = user.DisplayName;
+            request.IsProd = bool.Parse(Configuration.Config.GetHostSetting("RequireApprovalHPSMTickets"));
+            request.RequestedDate = DateTime.Now;
+            request.ApproverId = request.SelectedApprover;
+            request.Permissions = new List<Permission>();
+            request = BuildPermissionsForRequestType(request);
+            return await _securityService.RequestPermission(request);
+        }
+
         public AccessRequest BuildPermissionsForRequestType(AccessRequest request)
         {
             switch (request.Type)
             {
                 case AccessRequestType.AwsArn:
-                    request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS && x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).First());
+                    request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS).First());
+                    break;
+                case AccessRequestType.RemovePermission:
+                    request.Permissions.Add(_datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) && x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).FirstOrDefault());
                     break;
                 default:
                     break;

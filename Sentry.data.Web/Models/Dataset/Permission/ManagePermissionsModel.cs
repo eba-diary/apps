@@ -16,6 +16,7 @@ namespace Sentry.data.Web
             DatasetId = permissions.DatasetId;
             DatasetName = permissions.DatasetName;
             DatasetSaidKeyCode = permissions.DatasetSaidKeyCode;
+
             foreach (var permission in permissions.Permissions)
             {
                 IList<ManagePermissionModel> permissionCollection;
@@ -34,6 +35,7 @@ namespace Sentry.data.Web
                 permissionCollection.Add(new ManagePermissionModel(permission, DatasetName, DatasetSaidKeyCode));
             }
             InheritanceRequest = new RequestPermissionInheritanceModel(permissions);
+            RemovePermissionRequest = new RemovePermissionModel(permissions);
             InheritanceTicket = new SecurityTicket();//permissions.InheritanceTicket;
         }
 
@@ -45,6 +47,7 @@ namespace Sentry.data.Web
         public IList<ManagePermissionModel> SnowflakePermissions { get; set; } = new List<ManagePermissionModel>();
         public IList<ManagePermissionModel> AdPermissions { get; set; } = new List<ManagePermissionModel>();
         public RequestPermissionInheritanceModel InheritanceRequest { get; set; }
+        public RemovePermissionModel RemovePermissionRequest { get; set; }
         public SecurityTicket InheritanceTicket { get; set; }
 
     }

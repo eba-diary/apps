@@ -35,6 +35,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA3861_RefactorGetUserSecurity { get; }
         public IFeatureFlag<bool> CLA3882_DSC_NOTIFICATION_SUBCATEGORY { get; }
         public IFeatureFlag<bool> CLA3718_Authorization { get; }
+        public IFeatureFlag<bool> CLA4049_ALLOW_S3_FILES_DELETE { get; }
 
 
         public DataFeatures(UserService userService)
@@ -58,6 +59,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA3882_DSC_NOTIFICATION_SUBCATEGORY = new BooleanFeatureFlagAmbientContext("CLA3882_DSC_NOTIFICATION_SUBCATEGORY", false, LdClient, () => LdUser);
             CLA3861_RefactorGetUserSecurity = new BooleanFeatureFlagAmbientContext("CLA3861_RefactorGetUserSecurity", false, LdClient, () => LdUser);
             CLA3718_Authorization = new BooleanFeatureFlagAmbientContext("CLA3718_Authorization", false, LdClient, () => LdUser);
+            CLA4049_ALLOW_S3_FILES_DELETE = new BooleanFeatureFlagAmbientContext("CLA4049_ALLOW_S3_FILES_DELETE", false, LdClient, () => LdUser);
         }
 
         /// <summary>

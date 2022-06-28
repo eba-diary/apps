@@ -119,6 +119,7 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Text.Json, Version=5.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -162,6 +163,7 @@
     <Compile Include="DTO\DataProcessing\SchemaMapDto.cs" />
     <Compile Include="DTO\Dataset\DatasetPermissionsDto.cs" />
     <Compile Include="DTO\Dataset\DatasetSummaryMetadataDTO.cs" />
+    <Compile Include="DTO\DeleteFiles\DeleteFilesParamDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
     <Compile Include="DTO\Schema\DatasetFileDto.cs" />
@@ -175,6 +177,10 @@
     <Compile Include="DTO\Schema\Fields\TimestampFieldDto.cs" />
     <Compile Include="DTO\Schema\Fields\VarcharFieldDto.cs" />
     <Compile Include="DTO\Schema\FileSchemaDto.cs" />
+    <Compile Include="DTO\Schema\ISchemaConsumptionDtoVisitor.cs" />
+    <Compile Include="DTO\Schema\SchemaConsumptionDto.cs" />
+    <Compile Include="DTO\Schema\SchemaConsumptionDtoTransformer.cs" />
+    <Compile Include="DTO\Schema\SchemaConsumptionSnowflakeDto.cs" />
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionJsonStructureDto.cs" />
@@ -226,14 +232,20 @@
     <Compile Include="Entities\MessageFormats\DataFlowStepEvent.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\RawFileAddModel.cs" />
+    <Compile Include="Entities\MessageFormats\S3DeleteFilesModel.cs" />
     <Compile Include="Entities\MessageFormats\S3Event.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableCreateModel.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\SparkConverterModel.cs" />
     <Compile Include="Entities\Schema\Elastic\ElasticSchemaField.cs" />
+    <Compile Include="Entities\Schema\SchemaConsumption.cs" />
+    <Compile Include="Entities\Schema\SchemaConsumptionSnowflake.cs" />
+    <Compile Include="Entities\Schema\ISchemaConsumptionVisitor.cs" />
+    <Compile Include="Entities\Schema\SnowflakeConsumptionType.cs" />
     <Compile Include="Entities\Security\SecurablePermission.cs" />
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
     <Compile Include="Entities\Search\SavedSearch.cs" />
+    <Compile Include="Entities\Security\SecurityTicketSimple.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="GlobalEnums\AccessRequestType.cs" />
     <Compile Include="GlobalEnums\AccessScope.cs" />
