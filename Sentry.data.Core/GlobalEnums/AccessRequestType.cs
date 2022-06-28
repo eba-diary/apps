@@ -6,6 +6,8 @@ namespace Sentry.data.Core
     {
         Default = 0,
         [Description("AWS Consume")]
-        AwsArn = 1
+        AwsArn = 1,
+        [Description("Remove Permission")]
+        RemovePermission
     }
 }

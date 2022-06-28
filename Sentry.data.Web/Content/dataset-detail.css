@@ -146,3 +146,9 @@ div.dataTables_wrapper div.dataTables_filter input {
 .requestAccessButton {
     margin-bottom: 0.5rem !important;
 }
+}
+
+#RemovePermissionScopeContainer {
+    max-height: 500px;
+    overflow: auto;
+}

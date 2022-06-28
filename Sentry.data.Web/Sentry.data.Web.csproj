@@ -443,6 +443,7 @@
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
+    <Compile Include="Models\Dataset\Permission\RemovePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\RequestPermissionInheritanceModel.cs" />
     <Compile Include="Models\Search\FilterCategoryModel.cs" />
     <Compile Include="Models\Search\FilterCategoryOptionModel.cs" />
@@ -1206,6 +1207,7 @@
     <Content Include="Views\Dataset\Permission\_RequestInheritanceModal.cshtml" />
     <Content Include="Views\Dataset\Details\_TabUnauthorized.cshtml" />
     <Content Include="Views\Dataset\Permission\RequestAccessCLA3723.cshtml" />
+    <Content Include="Views\Dataset\Permission\_RemovePermissionModal.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
