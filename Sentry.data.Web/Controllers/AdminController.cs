@@ -45,17 +45,17 @@ namespace Sentry.data.Web.Controllers
                     }
                     return PartialView("_DataFileReprocessing", dataReprocessingModel);
                 case "2":
-                    DataFlowMetricsModel processingLogsModel = new DataFlowMetricsModel();
+                    DataFlowMetricsModel flowMetricsModel = new DataFlowMetricsModel();
                     List<DatasetDto> dtoList2 = _datasetService.GetAllDatasetDto();
-                    processingLogsModel.DatasetsList = new List<SelectListItem>();
+                    flowMetricsModel.DatasetsList = new List<SelectListItem>();
                     foreach (DatasetDto d in dtoList2)
                     {
                         SelectListItem item = new SelectListItem();
                         item.Text = d.DatasetName;
                         item.Value = d.DatasetId.ToString();
-                        processingLogsModel.DatasetsList.Add(item);
+                        flowMetricsModel.DatasetsList.Add(item);
                     }
-                    return PartialView("_ProcessingLogs", processingLogsModel);
+                    return PartialView("_DataFlowMetrics", flowMetricsModel);
                 case "3":
                     viewPath = "_AdminTest3";
                     break;

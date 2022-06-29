@@ -131,6 +131,7 @@ namespace Sentry.data.Infrastructure
 
             ConnectionSettings settings = new ConnectionSettings(new Uri(Configuration.Config.GetHostSetting("ElasticUrl")));
             settings.DefaultMappingFor<ElasticSchemaField>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexSchemaSearch")));
+            settings.DefaultMappingFor<DataFlowMetricEntity>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexFlowMetricSearch")));
             settings.BasicAuthentication(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"));
             settings.DefaultMappingFor<DataInventory>(x => x.IndexName(ElasticAliases.DATA_INVENTORY)); //using index alias
             settings.ThrowExceptions();
