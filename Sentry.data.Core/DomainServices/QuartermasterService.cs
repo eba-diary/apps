@@ -101,12 +101,19 @@ namespace Sentry.data.Core
 
         private void RequestAssistance(RequestAssistanceInfo info)
         {
-            info.MessageInfo = new RequestAssistanceMessageInfo
+            try
             {
-                Tickets = new List<string>()
-            };
+                info.MessageInfo = new RequestAssistanceMessageInfo
+                {
+                    Tickets = new List<string>()
+                };
 
-            _quartermasterClient.RequestAssistanceAsync(info);
+                _quartermasterClient.RequestAssistanceAsync(info);
+            }
+            catch(Exception e)
+            {
+                Sentry.Common.Logging.Logger.Fatal("Error creating Jira Ticket.", e);
+            }
         }
 
         private void RequestAssistance(JiraTicketInfo ticket)

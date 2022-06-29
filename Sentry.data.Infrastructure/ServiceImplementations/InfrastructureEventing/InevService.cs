@@ -56,30 +56,38 @@ namespace Sentry.data.Infrastructure
 
         public async Task CheckDbaPortalEvents()
         {
-            Console.WriteLine("Checking for Infrastructure Events to Consume: ");
-
-            List<Message> messages = _inevClient.ConsumeGroupUsingGETAsync("INEV-DataLake-Test", INEV_GROUP_DSC_CONSUMER, 25).Result.Messages.ToList();
-            messages = messages.Concat(_inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_APPROVED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
-            messages = messages.Concat(_inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_ADDED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
-
-            Console.WriteLine("Found " + messages.Count + " Events to Consume");
-
-            foreach (Message message in messages)
+            try
             {
-                Console.WriteLine("Consuming " + message.EventType + " event from " + message.MessageSource);
+                Console.WriteLine("Checking for Infrastructure Events to Consume: ");
 
-                SecurityTicket sourceTicket;
-                message.Details.TryGetValue("sourceRequestId", out string messageTicketId);
-                message.Details.TryGetValue("cherwellTicketId", out string cherwellTicketId);
-                Guid toCompare = new Guid(messageTicketId);
-                if (!String.IsNullOrEmpty(messageTicketId))
+                List<Message> messages = _inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_COMPLETE, INEV_GROUP_DSC_CONSUMER, 25).Result.Messages.ToList();
+                messages = messages.Concat(_inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_APPROVED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
+                messages = messages.Concat(_inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_ADDED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
+
+                Console.WriteLine("Found " + messages.Count + " Events to Consume");
+
+                foreach (Message message in messages)
                 {
-                    sourceTicket = _datasetContext.SecurityTicket.Where(t => t.SecurityTicketId.Equals(toCompare)).FirstOrDefault();
-                    sourceTicket.TicketId = cherwellTicketId;
-                    _datasetContext.Merge<SecurityTicket>(sourceTicket);
+                    Console.WriteLine("Consuming " + message.EventType + " event from " + message.MessageSource);
+                    Sentry.Common.Logging.Logger.Info("Consuming " + message.EventType + " event from " + message.MessageSource);
+
+                    SecurityTicket sourceTicket;
+                    message.Details.TryGetValue("sourceRequestId", out string messageTicketId);
+                    message.Details.TryGetValue("cherwellTicketId", out string cherwellTicketId);
+                    Guid toCompare = new Guid(messageTicketId);
+                    if (!String.IsNullOrEmpty(messageTicketId))
+                    {
+                        sourceTicket = _datasetContext.SecurityTicket.Where(t => t.SecurityTicketId.Equals(toCompare)).FirstOrDefault();
+                        sourceTicket.TicketId = cherwellTicketId;
+                        _datasetContext.Merge<SecurityTicket>(sourceTicket);
+                    }
                 }
+                _datasetContext.SaveChanges();
             }
-            _datasetContext.SaveChanges();
+            catch (Exception e)
+            {
+                Sentry.Common.Logging.Logger.Fatal("Error while trying to consume events.", e);
+            }
         }
 
         /// <summary>
