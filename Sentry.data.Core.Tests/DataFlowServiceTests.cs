@@ -753,7 +753,7 @@ namespace Sentry.data.Core.Tests
          */
         [TestCategory("Core DataFlowService")]
         [TestMethod]
-        public void testGetDataFlowDtoByStepId()
+        public void GetDataFlowSToByStepId_Return_StepId_Successful()
         {
             // Arrange
             int stepId = 2;
@@ -815,7 +815,7 @@ namespace Sentry.data.Core.Tests
          */
         [TestCategory("Core DataFlowService")]
         [TestMethod]
-        public void testGetSchemaIdFromDatafileId()
+        public void GetSchemaIdFromDatasetFileId_Return_Successful()
         {
             // Arrange
             int datafileId = 3;
@@ -849,7 +849,7 @@ namespace Sentry.data.Core.Tests
          */
         [TestCategory("Core DataFlowService")]
         [TestMethod]
-        public void testValidateStepIdAndDatasetFileIds()
+        public void ValidateStepIdsAndDatasetFileIds_Return_Successful()
         {
             // Arrange
             List<int> datasetFileIds = new List<int> { 3, 3, 3};
@@ -935,7 +935,7 @@ namespace Sentry.data.Core.Tests
          */
         [TestCategory("Core DataFlowService")]
         [TestMethod]
-        public void StepIdNotFound()
+        public void StepIdNotFound_ExceptionThrown_DataFlowStepNotFound()
         {
             // Arrange
             List<int> datasetFileIds = new List<int> { 3, 3, 3 };
@@ -1000,10 +1000,7 @@ namespace Sentry.data.Core.Tests
             var dataflowservice = new DataFlowService(context.Object, null, null, null, null, null, datafeature.Object, null);
 
             // Act
-
             Assert.ThrowsException<DataFlowStepNotFound>(() => dataflowservice.GetDataFlowDtoByStepId(stepId));
-
-         
         }
 
         /*
@@ -1011,11 +1008,10 @@ namespace Sentry.data.Core.Tests
          */
         [TestCategory("Core DataFlowService")]
         [TestMethod]
-        public void DatasetFileIdsNotFound()
+        public void DatasetFileIdsNotFound_ExceptionThrown_DataFileNotFoundException()
         {
             // Arrange
             List<int> datasetFileIds = new List<int> { 3, 3, 3 };
-            int stepId = 8;
 
             // creating 3 datasetfiles with the same associated schema/schemaid
             FileSchema schema = new FileSchema()
@@ -1078,10 +1074,7 @@ namespace Sentry.data.Core.Tests
             int testDatasetFileId = 12;
 
             // Act
-            
             Assert.ThrowsException<DataFileNotFoundException>(() => dataflowservice.GetSchemaIdFromDatasetFileId(testDatasetFileId));
-
-
         }
 
 
