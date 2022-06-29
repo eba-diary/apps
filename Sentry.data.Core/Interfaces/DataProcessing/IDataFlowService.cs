@@ -117,8 +117,6 @@ namespace Sentry.data.Core
 
         bool ValidateStepIdAndDatasetFileIds(int stepId, List<int> datasetFileIds);
 
-        bool ValidateDatasetFileIds(List<int> datasetFileIds);
-
         DataFlowDto GetDataFlowDtoByStepId(int stepId);
 
         int GetSchemaIdFromDatasetFileId(int datasetFileId);

@@ -113,8 +113,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <summary>
         /// Validates Reprocessing
         /// </summary>
-        /// <param name="dataflowstepId"></param>
-        /// <param name="datasetFileIds"></param>
+        /// <param name="datasetFileReprocessModel"></param>
         /// <returns></returns>
         /// 
         
@@ -122,22 +121,22 @@ namespace Sentry.data.Web.WebApi.Controllers
         [ApiVersionBegin(WebAPI.Version.v2)]
         [Route("DataFile/Reprocess")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK)]
-        public async Task<IHttpActionResult> ReprocessDataFiles([FromBody] DatasetFileReprocessModel reprocessEndpointHelper)
+        public async Task<IHttpActionResult> ReprocessDataFiles([FromBody] DatasetFileReprocessModel datasetFileReprocessModel)
         {
-            IHttpActionResult CheckingForReprocessingFunction()
+            IHttpActionResult ReprocessDataFilesFunction()
             {
 
                 // validating the dataflowstepid and the datasetfileids for reprocessing
-                if (!_flowService.ValidateStepIdAndDatasetFileIds(reprocessEndpointHelper.DataFlowStepId, reprocessEndpointHelper.DatasetFileIds))
+                if (!_flowService.ValidateStepIdAndDatasetFileIds(datasetFileReprocessModel.DataFlowStepId, datasetFileReprocessModel.DatasetFileIds))
                 {
-                    string error_message = string.Format("Invalid Request with dataflowstepId: {0} and datasetFileIds: {1}", reprocessEndpointHelper.DataFlowStepId, string.Join(",", reprocessEndpointHelper.DatasetFileIds));
+                    string error_message = string.Format("Invalid Request with dataflowstepId: {0} and datasetFileIds: {1}", datasetFileReprocessModel.DataFlowStepId, string.Join(",", datasetFileReprocessModel.DatasetFileIds));
                     return Content(System.Net.HttpStatusCode.BadRequest, error_message); // there was an error
                 }
                 return Content(System.Net.HttpStatusCode.OK, "Kicking off reprocessing"); // On to reprocessing
                 
             }
             
-            return ApiTryCatch(nameof(DataFileController), nameof(ReprocessDataFiles), $"dataflowstepid:{reprocessEndpointHelper.DataFlowStepId} datasetFileIds:{reprocessEndpointHelper.DatasetFileIds}", CheckingForReprocessingFunction);
+            return ApiTryCatch(nameof(DataFileController), nameof(ReprocessDataFiles), $"dataflowstepid:{datasetFileReprocessModel.DataFlowStepId} datasetFileIds:{datasetFileReprocessModel.DatasetFileIds}", ReprocessDataFilesFunction);
 
         }
 
