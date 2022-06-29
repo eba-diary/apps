@@ -1820,12 +1820,12 @@ data.Dataset = {
         parent.parent().css("align-items", "end");
 
         if (datasetDetailModel.DisplayDatasetFileUpload) {
-            parent.append('<button type="button" id="data-file-upload-open-modal" data-toggle="modal" data-target="#data-file-upload-modal" class="btn btn-primary waves-effect waves-light data-file-button"><i class="fas fa-cloud-upload-alt"></i>Upload</button>');
+            parent.append('<button type="button" id="data-file-upload-open-modal" data-toggle="modal" data-target="#data-file-upload-modal" class="btn btn-primary waves-effect waves-light data-file-button"><em class="fas fa-cloud-upload-alt button-icon"></em>Upload</button>');
         }
 
         //use the global search location to add delete button even though we are going to remove global search from the dom
         if (datasetDetailModel.DisplayDatasetFileDelete) {
-            parent.append('<button type="button" id="data-file-delete-open-modal" data-toggle="modal" data-target="#data-file-delete-modal" class="btn btn-danger waves-effect waves-light data-file-button display-none"><i class="far fa-trash-alt"></i>Delete</button>');
+            parent.append('<button type="button" id="data-file-delete-open-modal" data-toggle="modal" data-target="#data-file-delete-modal" class="btn btn-danger waves-effect waves-light data-file-button display-none"><em class="far fa-trash-alt button-icon"></em>Delete</button>');
         }
 
         //searching property needs to be set to true (adds the global search input) in order for yadcf filters for columns to properly model bind
