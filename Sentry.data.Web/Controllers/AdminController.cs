@@ -45,7 +45,7 @@ namespace Sentry.data.Web.Controllers
                     }
                     return PartialView("_DataFileReprocessing", dataReprocessingModel);
                 case "2":
-                    ProcessingLogsModel processingLogsModel = new ProcessingLogsModel();
+                    DataFlowMetricsModel processingLogsModel = new DataFlowMetricsModel();
                     List<DatasetDto> dtoList2 = _datasetService.GetAllDatasetDto();
                     processingLogsModel.DatasetsList = new List<SelectListItem>();
                     foreach (DatasetDto d in dtoList2)

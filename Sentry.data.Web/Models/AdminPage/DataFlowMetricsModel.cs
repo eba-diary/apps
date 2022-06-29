@@ -7,7 +7,7 @@ using Sentry.data.Core;
 
 namespace Sentry.data.Web
 {
-    public class ProcessingLogsModel
+    public class DataFlowMetricsModel
     {
         public List<SelectListItem> DatasetsList { get; set; }
     }

@@ -427,7 +427,7 @@
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
-    <Compile Include="Models\AdminPage\ProcessingLogsModel.cs" />
+    <Compile Include="Models\AdminPage\DataFlowMetricsModel.cs" />
     <Compile Include="Models\AdminPage\DataReprocessingModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileModel.cs" />
     <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
