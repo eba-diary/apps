@@ -346,6 +346,8 @@
     <Compile Include="Interfaces\IApacheLivyProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IXMLAction.cs" />
     <Compile Include="Interfaces\IDataApplicationService.cs" />
+    <Compile Include="Interfaces\IDataFlowMetricProvider.cs" />
+    <Compile Include="Interfaces\IDataFlowMetricService.cs" />
     <Compile Include="Interfaces\IDatasetFileService.cs" />
     <Compile Include="Interfaces\IEntityService.cs" />
     <Compile Include="Interfaces\IElasticContext.cs" />
