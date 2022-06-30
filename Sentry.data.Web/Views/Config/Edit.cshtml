@@ -22,11 +22,6 @@
         @Html.HiddenFor(model => model.SchemaId)
         @Html.HiddenFor(model => model.ParquetStorageBucket)
         @Html.HiddenFor(model => model.ParquetStoragePrefix)
-        @Html.HiddenFor(model => model.SnowflakeStage)
-        @Html.HiddenFor(model => model.SnowflakeWarehouse)
-        @Html.HiddenFor(model => model.SnowflakeDatabase)
-        @Html.HiddenFor(model => model.SnowflakeSchema)
-        @Html.HiddenFor(model => model.SnowflakeTable)
 
         <div class="md-form">
             @Html.EditorFor(m => m.ConfigFileName, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
@@ -84,9 +79,10 @@
             {
                 @Html.HiddenFor(model => model.FileExtensionID)
 
-                @Html.LabelFor((model) => model.FileExtensionID, new { @class = "mdb-main-label" })
-                @Html.DropDownListFor(model => model.FileExtensionID,
-                    new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @disabled = "disabled", @readonly = "readonly", @class = "mdb-select" })
+                <div class="textReadOnly md-form">
+                    <label for="FileExtensionReadonly" class="active">File Extension (Readonly)</label>
+                    <input id="FileExtensionReadonly" placeholder="@Model.FileExtensionReadonly" disabled class="disabled form-control" />
+                </div>
             }
         </div>
         <div class="schemaRootPathPanel md-form">

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Sentry.data.Core
 {
@@ -45,6 +46,16 @@ namespace Sentry.data.Core
                 CreateCurrentView = dsDto.CreateCurrentView,
                 ObjectStatus = dsDto.ObjectStatus,
                 SchemaRootPath = dsDto.SchemaRootPath
+            };
+        }
+
+        public static DatasetFileConfigSchemaDto ToDatasetFileConfigSchemaDto(this DatasetFileConfig datasetFileConfig)
+        {
+            return new DatasetFileConfigSchemaDto()
+            {
+                ConfigId = datasetFileConfig.ConfigId,
+                SchemaId = datasetFileConfig.Schema.SchemaId,
+                SchemaName = datasetFileConfig.Name
             };
         }
     }

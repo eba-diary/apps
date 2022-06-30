@@ -19,5 +19,7 @@ namespace Sentry.data.Core
         /// </summary>
         IList<SecurablePermission> GetSecurablePermissions(ISecurable securable);
         SecurityTicket GetSecurableInheritanceTicket(ISecurable securable);
+        void BuildS3RequestAssistance(SecurityTicket ticket);
+
     }
 }
