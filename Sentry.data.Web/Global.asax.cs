@@ -35,6 +35,7 @@ namespace Sentry.data.Web
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             MiniProfilerConfig.RegisterMiniProfilerSettings();
+            ModelBinders.Binders.Add(typeof(DataTables.Shared.DataTablesRequest), new DataTables.Mvc.DataTablesBinder());
 
             //Application Initialization
             Bootstrapper.Init();

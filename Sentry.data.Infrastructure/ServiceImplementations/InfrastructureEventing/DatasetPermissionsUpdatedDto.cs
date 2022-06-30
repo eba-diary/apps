@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Sentry.data.Core;
+using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Sentry.data.Infrastructure.InfrastructureEvents
 {
@@ -67,6 +69,10 @@ namespace Sentry.data.Infrastructure.InfrastructureEvents
             /// The Snowflake Schema - for example, CLAIM or ZZZDataset
             /// </summary>
             public string Schema { get; set; }
+            /// <summary>
+            /// What type of Snowflake instance this is
+            /// </summary>
+            public SnowflakeConsumptionType SnowflakeType { get; set; }
         }
 
         public class PermissionDto
@@ -92,7 +98,7 @@ namespace Sentry.data.Infrastructure.InfrastructureEvents
 
         public Dictionary<string, string> ToDictionary()
         {
-            var serializerOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            var serializerOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, Converters = { new JsonStringEnumConverter() } };
             return new Dictionary<string, string>
             {
                 { nameof(RequestId).ToLowerFirstChar(), RequestId },

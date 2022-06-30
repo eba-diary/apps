@@ -270,8 +270,12 @@ namespace Sentry.data.Infrastructure
         /// <returns></returns>
         public string UploadDataFile(Stream inputstream, string targetKey)
         {
-            string fileVersionId = PutObject(inputstream, targetKey);
+            return UploadDataFile(inputstream, RootBucket, targetKey);
+        }
 
+        public string UploadDataFile(Stream inputStream, string targetBucket, string targetKey)
+        {
+            string fileVersionId = PutObject(inputStream, targetBucket, targetKey);
             return fileVersionId;
         }
 
@@ -619,34 +623,32 @@ namespace Sentry.data.Infrastructure
         #endregion
 
         #region PutObject
-
-        private string PutObject(Stream filestream, string targetKey)
+        private string PutObject(Stream filestream, string targetBucket, string targetKey)
         {
-            string fileVersionId = null;
+            string fileVersionId;
             try
             {
                 PutObjectRequest poReq = new PutObjectRequest();
                 poReq.InputStream = filestream;
-                poReq.BucketName = RootBucket;
+                poReq.BucketName = targetBucket;
                 poReq.Key = targetKey;
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 poReq.AutoCloseStream = true;
                 poReq.CannedACL = GetCannedAcl();
 
-                Sentry.Common.Logging.Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
+                Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
 
                 PutObjectResponse poRsp = S3Client.PutObject(poReq);
 
-                Sentry.Common.Logging.Logger.Debug($"Completed PutObject Request: Key: {targetKey}, Version_ID:{poRsp.VersionId}, ETag:{poRsp.ETag}, Lenght(bytes):{poRsp.ContentLength}");
+                Logger.Debug($"Completed PutObject Request: Key: {targetKey}, Version_ID:{poRsp.VersionId}, ETag:{poRsp.ETag}, Lenght(bytes):{poRsp.ContentLength}");
 
                 fileVersionId = poRsp.VersionId;
             }
             catch (AmazonS3Exception amazonS3Exception)
             {
-                if (amazonS3Exception.ErrorCode != null &&
-                    (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId")
-                    ||
-                    amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
+                Logger.Error("Error uploading object to S3", amazonS3Exception);
+                
+                if (amazonS3Exception.ErrorCode != null && (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId") || amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
                 {
                     throw new Exception("Error attempting to upload dataset to S3: Check the provided AWS Credentials.");
                 }
@@ -655,6 +657,7 @@ namespace Sentry.data.Infrastructure
                     throw new Exception("Error attempting to upload dataset to S3: " + amazonS3Exception.Message);
                 }
             }
+            
             return fileVersionId;
         }
 
@@ -1252,6 +1255,6 @@ namespace Sentry.data.Infrastructure
             return keyVersionList;
         }
         #endregion
-        
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Sentry.Core;
 using Sentry.data.Core.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
@@ -11,7 +12,7 @@ namespace Sentry.data.Core
         int CreateAndSaveNewDataset(DatasetDto dto);
         DatasetDto GetDatasetDto(int id);
         List<DatasetDto> GetAllDatasetDto();
-        DatasetDetailDto GetDatesetDetailDto(int id);
+        DatasetDetailDto GetDatasetDetailDto(int id);
         IDictionary<int, string> GetDatasetList();
         void UpdateAndSaveDataset(DatasetDto dto);
         UserSecurity GetUserSecurityForDataset(int datasetId);
@@ -28,5 +29,9 @@ namespace Sentry.data.Core
         DatasetPermissionsDto GetDatasetPermissions(int datasetId);
         string SetDatasetFavorite(int datasetId, string associateId);
         SecurityTicket GetLatestInheritanceTicket(int datasetId);
+        List<string> GetDatasetNamesForAsset(string asset);
+        Task<string> RequestAccessRemoval(AccessRequest request);
+
+        IQueryable<DatasetFile> GetDatasetFileTableQueryable(int configId);
     }
 }

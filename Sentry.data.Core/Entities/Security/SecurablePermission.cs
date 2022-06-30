@@ -17,5 +17,6 @@ namespace Sentry.data.Core
         public string IdentityType { get; set; }
         public SecurityPermission SecurityPermission { get; set; }
         public string TicketId { get; set; }
+        public bool IsSystemGenerated { get; set; }
     }
 }

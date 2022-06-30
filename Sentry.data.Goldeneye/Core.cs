@@ -290,6 +290,8 @@ namespace Sentry.data.Goldeneye
 
             //Schedule the Ticket Monitor to run based on cron within configuration file.
             RecurringJob.AddOrUpdate<TicketMonitorService>("HPSMTicketMonitor", x => x.CheckTicketStatus(), Config.GetHostSetting("HpsmTicketMonitorTimeInterval"), TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            //Recurring job to consume infrastructure events
+            RecurringJob.AddOrUpdate<InevService>("DBA_Inev_Consumer", x => x.CheckDbaPortalEvents(), Config.GetHostSetting("InevDBAConsumerMonitorTimeInterval"), TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
             
             //Schedule WallEService every day at midnight
             RecurringJob.AddOrUpdate("WallEService", () => WallEService.Run(), "00 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
