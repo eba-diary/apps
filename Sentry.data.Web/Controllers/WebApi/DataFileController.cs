@@ -12,15 +12,18 @@ using Sentry.data.Web.Models.ApiModels;
 
 namespace Sentry.data.Web.WebApi.Controllers
 {
+
     [RoutePrefix(WebConstants.Routes.VERSION_DATAFILE)]
     [WebApiAuthorizeUseApp]
     public class DataFileController : BaseWebApiController
     {
         private readonly IDatasetFileService _datafileService;
+        private readonly IDataFlowService _flowService;
 
-        public DataFileController(IDatasetFileService dataFileService)
+        public DataFileController(IDatasetFileService dataFileService, IDataFlowService dataFlowService)
         {
             _datafileService = dataFileService;
+            _flowService = dataFlowService;
         }
 
 
@@ -32,12 +35,13 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <param name="schemaId"></param>
         /// <param name="pageNumber">Default is 1</param>
         /// <param name="pageSize">Default is 1000, Max is 10000</param>
+        /// <param name="sortDesc">Default is false</param> this parameter is also necessary for the object
         /// <returns></returns>
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}/")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(PagedResponse<DatasetFileModel>))]
-        public async Task<IHttpActionResult> GetDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] int? pageNumber = 1, [FromUri] int? pageSize = 1000)
+        public async Task<IHttpActionResult> GetDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] int? pageNumber = 1, [FromUri] int? pageSize = 1000, [FromUri] bool sortDesc = false)
         {
             IHttpActionResult GetSchemaDatasetFilesFunction()
             {
@@ -47,7 +51,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     If this need expands, there is additional refactoring 
                        that can be done to allow each type to have its own metadata.
                  ******************************************************/
-                PageParameters pagingParams = new PageParameters(pageNumber, pageSize);
+                PageParameters pagingParams = new PageParameters(pageNumber, pageSize, sortDesc);  // creating the PageParameters object  --> adding the sortDesc parameter to the object declaration
 
                 PagedList<DatasetFileDto> dtoList = _datafileService.GetAllDatasetFileDtoBySchema(schemaId, pagingParams);
 
@@ -104,5 +108,37 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             return ApiTryCatch(nameof(DataFileController), nameof(UpdateDataFile), $"datasetid:{dataFileModel.DatasetId} schemaId{dataFileModel.SchemaId} datasetfileId:{dataFileModel.DatasetFileId}", UpdateDataFileFunction);
         }
+
+
+        /// <summary>
+        /// Validates Reprocessing
+        /// </summary>
+        /// <param name="datasetFileReprocessModel"></param>
+        /// <returns></returns>
+        /// 
+        
+        [HttpPost]
+        [ApiVersionBegin(WebAPI.Version.v2)]
+        [Route("DataFile/Reprocess")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK)]
+        public async Task<IHttpActionResult> ReprocessDataFiles([FromBody] DatasetFileReprocessModel datasetFileReprocessModel)
+        {
+            IHttpActionResult ReprocessDataFilesFunction()
+            {
+
+                // validating the dataflowstepid and the datasetfileids for reprocessing
+                if (!_flowService.ValidateStepIdAndDatasetFileIds(datasetFileReprocessModel.DataFlowStepId, datasetFileReprocessModel.DatasetFileIds))
+                {
+                    string error_message = string.Format("Invalid Request with dataflowstepId: {0} and datasetFileIds: {1}", datasetFileReprocessModel.DataFlowStepId, string.Join(",", datasetFileReprocessModel.DatasetFileIds));
+                    return Content(System.Net.HttpStatusCode.BadRequest, error_message); // there was an error
+                }
+                return Content(System.Net.HttpStatusCode.OK, "Kicking off reprocessing"); // On to reprocessing
+                
+            }
+            
+            return ApiTryCatch(nameof(DataFileController), nameof(ReprocessDataFiles), $"dataflowstepid:{datasetFileReprocessModel.DataFlowStepId} datasetFileIds:{datasetFileReprocessModel.DatasetFileIds}", ReprocessDataFilesFunction);
+
+        }
+
     }
 }
