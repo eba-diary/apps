@@ -13,6 +13,7 @@ using System;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Infrastructure.Tests
 { 
@@ -82,7 +83,7 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public async Task ConfluentConnectorProvider_GetS3Connectors_ReturnListOf23DTOS()
+        public async Task ConfluentConnectorProvider_GetS3Connectors_S3ConnectorClassFilterAndConnectorStateSetter()
         {
             //Arrange
             /*Setup Polly Policy*/
@@ -92,12 +93,12 @@ namespace Sentry.data.Infrastructure.Tests
 
             /*Setup provider*/
             HttpResponseMessage httpResponse1 = new HttpResponseMessage(HttpStatusCode.OK);
-            JObject connectorJObjects = GetData("ConfluentConnectors.json");
+            JObject connectorJObjects = GetData("ConfluentConnectors_2.json");
             string connectorStr = connectorJObjects.ToString();
             httpResponse1.Content = new StringContent(connectorStr);
 
             HttpResponseMessage httpResponse2 = new HttpResponseMessage(HttpStatusCode.OK);
-            JObject connectorNameJObjects = GetData("ConfluentConnectors_Names.json");
+            JObject connectorNameJObjects = GetData("ConfluentConnectors_Names_2.json");
             string connectorNamesStr = connectorNameJObjects["connectorNames"].ToString();
             httpResponse2.Content = new StringContent(connectorNamesStr);
 
@@ -117,7 +118,10 @@ namespace Sentry.data.Infrastructure.Tests
             List<ConnectorRootDto> rootDtos = await providerA.GetS3Connectors();
             
             //Assert
-            Assert.AreEqual(23, rootDtos.Count);
+            Assert.AreEqual(3, rootDtos.Count);
+            Assert.AreEqual(ConnectorStateEnum.RUNNING, rootDtos[0].ConnectorStatus.State);
+            Assert.AreEqual(ConnectorStateEnum.DEGRADED, rootDtos[1].ConnectorStatus.State);
+            Assert.AreEqual(ConnectorStateEnum.FAILED, rootDtos[2].ConnectorStatus.State);
         }
 
         protected JObject GetData(string fileName)

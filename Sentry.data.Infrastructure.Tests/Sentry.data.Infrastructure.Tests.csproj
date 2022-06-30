@@ -159,10 +159,6 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ExpectedJSON\ConfluentConnectors_Names.json" />
-    <None Include="ExpectedJSON\ConfluentConnector_Config.json" />
-    <None Include="ExpectedJSON\ConfluentConnector_Status.json" />
-    <None Include="ExpectedJSON\ConfluentConnectors.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
