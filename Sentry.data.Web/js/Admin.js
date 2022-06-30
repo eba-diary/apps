@@ -46,7 +46,7 @@ data.Admin = {
                 $("#schemaDropdown").html(s);
                 // proof of concept, alternate method of input validation for dropdown menues rather than current if(selected val!=-1) 
                 $("#defaultSchemaSelection").prop("disabled", true);
-                $("#schemaDropdown").materialSelect('destroy');
+                $("#schemaDropdown").materialSelect();
             }
         });
     },
@@ -103,7 +103,7 @@ data.Admin = {
                     s += '<option value="' + d.Id + '">' + d.ActionName + '</option>';
                 }
                 $("#flowStepsDropdown").html(s);
-                $("#flowStepsDropdown").materialSelect('destroy');
+                $("#flowStepsDropdown").materialSelect();
             },
         });
     },
@@ -119,9 +119,9 @@ data.Admin = {
     },
     // loads reprocessing page with event handlers
     ReprocessInit: function () {
-        $("#AllDatasets").materialSelect("destroy");
-        $("#schemaDropdown").materialSelect("destroy")
-        $("#flowStepsDropdown").materialSelect("destroy");
+        $("#AllDatasets").materialSelect();
+        $("#schemaDropdown").materialSelect()
+        $("#flowStepsDropdown").materialSelect();
         $("#AllDatasets").change(function (event) {
             var datasetId = $("#AllDatasets").find(":selected").val();
             if (datasetId != "") {
