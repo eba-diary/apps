@@ -578,6 +578,142 @@ namespace Sentry.data.Core
 
             return step;
         }
+        
+        /*
+         *  @param - User is required to pass Dataflowstep id to being processing from
+         *  @return - DataFlowdto object of the stepId
+         */
+        public DataFlowDto GetDataFlowByStepId(int stepId)
+        {
+            if (stepId == 0)
+            {
+                throw new ArgumentNullException("stepId", "DataFlowStep is required");
+            }
+
+            // finding the dataflowstep with the associated stepId
+            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
+            
+            // retrieve the dataflow object from dataflowstep
+            DataFlow df = step.DataFlow;
+
+            DataFlowDto dataFlowDto = new DataFlowDto();
+            MapToDto(df, dataFlowDto);
+
+            return dataFlowDto;
+        }
+
+
+
+        /*
+         *  Helper method for getting a dataFlotDto object from a DataflowStepid
+         *  @param - User is required to pass Dataflowstep id to being processing from
+         *  @return - DataFlowdto object of the stepId
+         */
+        public DataFlowDto GetDataFlowDtoByStepId(int stepId)
+        {
+            if (stepId == 0) // making sure stepId is a valid value
+            {
+                throw new ArgumentNullException("stepId", "DataFlowStep is required");
+            }
+
+            DataFlowStep dataFlowStep = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
+
+            // the case when the stepId cannot be found
+            if(dataFlowStep == null)
+            {
+                throw new DataFlowStepNotFound("stepId not found");
+            }
+
+            // finding the dataflowstep with the associated stepId and retrieving the dataflow object from dataflowstep
+            DataFlow df = dataFlowStep.DataFlow;
+            
+            // creating a new blank DataFlowDto object
+            DataFlowDto dataFlowDto = new DataFlowDto();
+
+            // creating a DataFlowDto from the DataFlow
+            MapToDto(df, dataFlowDto);
+            
+            return dataFlowDto;
+        }
+
+        /*
+         *  Helper method for getting a datasetFileId into a schema id
+         *  @param - int datasetFileId
+         *  @return - int schemaId
+         */
+        public int GetSchemaIdFromDatasetFileId(int datasetFileId)
+        {
+            if(datasetFileId == 0)
+            {
+                throw new ArgumentNullException("datasetFileId", "DatasetFileId is required attribute");
+            }
+            
+            DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
+
+            // the case when the datasetFileId is not found
+            if(datasetFile == null)
+            {
+                throw new DataFileNotFoundException("DatasetFileId was not found");
+            }
+
+            // finds the DatasetFile object that is associated with the datasetFileId passed into the method and getting schema id 
+            int schemaId = datasetFile.Schema.SchemaId;
+
+
+            return schemaId; // returns the schema id of the associated datasetFileId
+        }
+        
+        
+        
+
+        /*
+         * Validating that all datasetFileIds correspond to the stepId
+         * @return true->passed validation, false->failed validation   determines whether reprocessing should be performed or not
+         */
+        public bool ValidateStepIdAndDatasetFileIds(int stepId, List<int> datasetFileIds)
+        {
+            bool indicator = true;
+
+            // creates a dataFlowDto object from the stepId
+            DataFlowDto currentDataFlowDto = new DataFlowDto();
+
+            try
+            {
+                currentDataFlowDto = GetDataFlowDtoByStepId(stepId);
+            } catch (DataFlowStepNotFound ex)
+            {
+                 return false;
+            }
+            
+            try
+            {
+                // traversing through the list of datasetFileIds
+                foreach (int datasetFileId in datasetFileIds)
+                {
+                    // compares the schemaIds from the DataFlowDto and the datasetFileId seeing if they are not equal
+                    if (!(currentDataFlowDto.SchemaId == GetSchemaIdFromDatasetFileId(datasetFileId)))
+                    {
+                        // in the case that the schemaId are not equal to one another --> return false
+                        indicator = false;
+                        break;
+                    }
+
+
+                }
+            } catch (DataFileNotFoundException ex)
+            {
+                indicator = false;
+            }
+            
+            
+            
+            // if both schemaIds are equal for all datasetFileIds then this method will return true, false otherwise
+            return indicator;
+        }
+
+        
+
+
 
         public List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId)
         {
@@ -603,6 +739,7 @@ namespace Sentry.data.Core
             return steps;
         }
 
+      
         public string GetSchemaStorageCodeForDataFlow(int Id)
         {
             DataFlowStep schemaLoadStep = GetDataFlowStepForDataFlowByActionType(Id, DataActionType.SchemaLoad);
@@ -649,6 +786,8 @@ namespace Sentry.data.Core
             Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(GetProducerFlowsToBeDeletedBySchemaId).ToLower()} Method End");
             return producerFlowIdList;
         }
+
+
 
         public List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId)
         {

@@ -20,23 +20,23 @@ namespace Sentry.data.Core
 
         public PagedList<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
         {
-            DatasetFileConfig config = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId);
-            
-            if (config == null)
+            DatasetFileConfig config = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId); // gets the specific schema
+
+            if (config == null) // the case where the schema was not found
             {
                 throw new SchemaNotFoundException();
             }
 
+            // security measures taken to make sure that the user has the permission to see the schema/dataset data
             UserSecurity us = _securityService.GetUserSecurity(config.ParentDataset, _userService.GetCurrentUser());
             if (!us.CanViewFullDataset)
             {
-                throw new DatasetUnauthorizedAccessException();
+                throw new DatasetUnauthorizedAccessException(); // if the user does not have permission then this exception is thrown
             }
 
-            PagedList<DatasetFile> files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFileStatusActive
-                                                .Where(x => x.Schema == config.Schema)
-                                                .OrderBy(o => o.DatasetFileId),
-                                                pageParameters.PageNumber, pageParameters.PageSize);            
+            IQueryable<DatasetFile> datasetFileQueryable = _datasetContext.DatasetFileStatusActive.Where(x => x.Schema == config.Schema);
+            datasetFileQueryable = pageParameters.SortDesc ? datasetFileQueryable.OrderByDescending(o => o.DatasetFileId) : datasetFileQueryable.OrderBy(o => o.DatasetFileId); // ordering datasetfiles by ascending or descending
+            PagedList<DatasetFile> files = PagedList<DatasetFile>.ToPagedList(datasetFileQueryable, pageParameters.PageNumber, pageParameters.PageSize); // passing pageNumber and pageSize to the ToPagedList method
 
             return new PagedList<DatasetFileDto>(files.ToDto().ToList(), files.TotalCount, files.CurrentPage, files.PageSize);
         }
@@ -75,6 +75,7 @@ namespace Sentry.data.Core
 
         }
 
+        
         #region PrivateMethods
         internal void UpdateDataFile(DatasetFileDto dto, DatasetFile dataFile)
         {
