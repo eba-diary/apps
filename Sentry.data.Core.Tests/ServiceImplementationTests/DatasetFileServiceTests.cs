@@ -88,7 +88,7 @@ namespace Sentry.data.Core.Tests
             IQueryable<DatasetFileConfig> configQueryable = new List<DatasetFileConfig>() { dfc }.AsQueryable();
             context.Setup(f => f.DatasetFileConfigs).Returns(configQueryable);
 
-            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object);
+            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, null, null);
 
             // Act
             PagedList<DatasetFileDto> dtoList = datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams);
