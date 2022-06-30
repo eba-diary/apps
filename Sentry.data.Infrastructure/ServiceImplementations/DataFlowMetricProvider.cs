@@ -16,9 +16,5 @@ namespace Sentry.data.Infrastructure
         {
             _elasticContext = elasticContext;
         }
-        public List<DataFlowMetricEntity> GetSearchResults(FilterSearchDto dto)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

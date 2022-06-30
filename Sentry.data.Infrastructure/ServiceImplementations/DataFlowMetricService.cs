@@ -14,9 +14,6 @@ namespace Sentry.data.Infrastructure
         {
             _dataFlowMetricService = dataFlowMetricService;
         }
-        public DataInventorySearchResultDto GetSearchResults(FilterSearchDto dto)
-        {
-            throw new NotImplementedException();
-        }
+
     }
 }
