@@ -12,6 +12,149 @@ namespace Sentry.data.Web.Tests
     [TestClass]
     public class MappingTests
     {
+        public List<ConnectorRootDto> MockConnectorRootDtoList()
+        {
+            List<ConnectorRootDto> connectorRootDtoList = new List<ConnectorRootDto>();
+
+            for(int i=0; i<2; i++) 
+            {
+                ConnectorInfoDto cid = new ConnectorInfoDto()
+                {
+                    Name = $"connector_info_{i}",
+                    Type = "Type",
+                    ConnectorClass = "ConnectorClass",
+                    S3Region = "S3Region",
+                    FlushSize = "FlushSize",
+                    TasksMax = "TasksMax",
+                    timezone = "timezone",
+                    transforms = "transforms",
+                    locale = "locale",
+                    S3PathStyleAccessEnabled = "S3PathStyleAccessEnabled",
+                    FormatClass = "FormatClass",
+                    S3AclCanned = "S3AclCanned",
+                    TransformsInsertMetadataPartitionField = "TransformsInsertMetadataPartitionField",
+                    ValueConverter = "ValueConverter",
+                    S3ProxyPassword = "S3ProxyPassword",
+                    KeyConverter = "KeyConverter",
+                    S3BucketName = "S3BucketName",
+                    PartitionDurationMs = "PartitionDurationMs",
+                    S3ProxyUser = "S3ProxyUser",
+                    S3SseaName = "S3SseaName",
+                    FileDelim = "FileDelim",
+                    TransformsInsertMetadataOffsetField = "TransformsInsertMetadataOffsetField",
+                    topics = "topics",
+                    TransformsInsertMetadataTimestampField = "TransformsInsertMetadataTimestampField",
+                    PartitionerClass = "PartitionerClass",
+                    ValueConverterSchemasEnable = "ValueConverterSchemasEnable",
+                    StorageClass = "StorageClass",
+                    RotateScheduleIntervalMs = "RotateScheduleIntervalMs",
+                    PathFormat = "PathFormat",
+                    TimestampExtractor = "TimestampExtractor",
+                    S3ProxyUrl = "S3ProxyUrl",
+                    TransformsInsertMetadataType = "TransformsInsertMetadataType"
+                };
+
+                List<ConnectorTaskDto> taskDtoList = new List<ConnectorTaskDto>();
+
+                for (int t = 0; t < 2; t++)
+                {
+                    taskDtoList.Add(new ConnectorTaskDto()
+                    {
+                        Id = t,
+                        State = ConnectorStateEnum.RUNNING,
+                        Worker_Id = $"Worked_Id_{t}_{i}"
+                    });
+                }
+
+                ConnectorStatusDto csd = new ConnectorStatusDto()
+                {
+                    Name = $"connector_status_{i}",
+                    State = ConnectorStateEnum.RUNNING,
+                    WorkerId = "WorkerId",
+                    Type = "Type",
+                    ConnectorTasks = taskDtoList,
+                };
+
+                ConnectorRootDto crd = new ConnectorRootDto()
+                {
+                    ConnectorName = $"connector_root_{i}",
+                    ConnectorInfo = cid,
+                    ConnectorStatus = csd
+                };
+
+                connectorRootDtoList.Add(crd);
+            }
+
+            return connectorRootDtoList;
+        }
+
+        [TestMethod]
+        public void ToModel_ConnectorInfoDto_ReturnConnectorInfoModel() 
+        {
+            //Arrange
+            List<ConnectorRootDto> crd = MockConnectorRootDtoList();
+
+            //Act
+            List<ConnectorRootModel> crm = crd.MapToModelList();
+
+            //Assert
+            for(int i=0; i < crm.Count; i++)
+            {
+                ConnectorRootModel currentCrm = crm[i];
+                ConnectorInfoModel currentCim = crm[i].ConnectorInfo;
+                ConnectorStatusModel currentCsm = crm[i].ConnectorStatus;
+
+                Assert.AreEqual($"connector_root_{i}", currentCrm.ConnectorName);
+
+                Assert.AreEqual($"connector_info_{i}", currentCim.Name);
+                Assert.AreEqual("Type", currentCim.Type);
+                Assert.AreEqual("ConnectorClass", currentCim.ConnectorClass);
+                Assert.AreEqual("S3Region", currentCim.S3Region);
+                Assert.AreEqual("FlushSize", currentCim.FlushSize);
+                Assert.AreEqual("TasksMax", currentCim.TasksMax);
+                Assert.AreEqual("timezone", currentCim.timezone);
+                Assert.AreEqual("transforms", currentCim.transforms);
+                Assert.AreEqual("locale", currentCim.locale);
+                Assert.AreEqual("S3PathStyleAccessEnabled", currentCim.S3PathStyleAccessEnabled);
+                Assert.AreEqual("FormatClass", currentCim.FormatClass);
+                Assert.AreEqual("S3AclCanned", currentCim.S3AclCanned);
+                Assert.AreEqual("TransformsInsertMetadataPartitionField", currentCim.TransformsInsertMetadataPartitionField);
+                Assert.AreEqual("ValueConverter", currentCim.ValueConverter);
+                Assert.AreEqual("S3ProxyPassword", currentCim.S3ProxyPassword);
+                Assert.AreEqual("KeyConverter", currentCim.KeyConverter);
+                Assert.AreEqual("S3BucketName", currentCim.S3BucketName);
+                Assert.AreEqual("PartitionDurationMs", currentCim.PartitionDurationMs);
+                Assert.AreEqual("S3ProxyUser", currentCim.S3ProxyUser);
+                Assert.AreEqual("S3SseaName", currentCim.S3SseaName);
+                Assert.AreEqual("FileDelim", currentCim.FileDelim);
+                Assert.AreEqual("TransformsInsertMetadataOffsetField", currentCim.TransformsInsertMetadataOffsetField);
+                Assert.AreEqual("topics", currentCim.topics);
+                Assert.AreEqual("PartitionerClass", currentCim.PartitionerClass);
+                Assert.AreEqual("ValueConverterSchemasEnable", currentCim.ValueConverterSchemasEnable);
+                Assert.AreEqual("TransformsInsertMetadataTimestampField", currentCim.TransformsInsertMetadataTimestampField);
+                Assert.AreEqual("StorageClass", currentCim.StorageClass);
+                Assert.AreEqual("RotateScheduleIntervalMs", currentCim.RotateScheduleIntervalMs);
+                Assert.AreEqual("PathFormat", currentCim.PathFormat);
+                Assert.AreEqual("TimestampExtractor", currentCim.TimestampExtractor);
+                Assert.AreEqual("S3ProxyUrl", currentCim.S3ProxyUrl);
+                Assert.AreEqual("TransformsInsertMetadataType", currentCim.TransformsInsertMetadataType);
+
+                Assert.AreEqual($"connector_status_{i}", currentCsm.Name);
+                Assert.AreEqual(ConnectorStateEnum.RUNNING, currentCsm.State);
+                Assert.AreEqual("WorkerId", currentCsm.WorkerId);
+                Assert.AreEqual("Type", currentCsm.Type);
+                
+                for(int t=0; t<currentCsm.ConnectorTasks.Count; t++)
+                {
+                    ConnectorTaskModel currentCtm = currentCsm.ConnectorTasks[t];
+
+                    Assert.AreEqual(t, currentCtm.Id);
+                    Assert.AreEqual(ConnectorStateEnum.RUNNING, currentCtm.State);
+                    Assert.AreEqual($"Worked_Id_{t}_{i}", currentCtm.Worker_Id);
+                }
+            }
+        }
+
         [TestMethod]
         public void ToDto_SchemaInfoModel_ReturnFileSchemaDto()
         {

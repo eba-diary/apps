@@ -10,6 +10,15 @@ namespace Sentry.data.Web
 {
     public static class ConnectorExtensions
     {
+        public static List<ConnectorRootModel> MapToModelList(this List<ConnectorRootDto> connectorRootDtos)
+        {
+            List<ConnectorRootModel> connectorRootModels = new List<ConnectorRootModel>();
+
+            connectorRootDtos.ForEach(crd => connectorRootModels.Add(MapToModel(crd)));
+
+            return connectorRootModels;
+        }
+
         private static ConnectorRootModel MapToModel(this ConnectorRootDto rootDto)
         {
             ConnectorRootModel rootModel = new ConnectorRootModel();
@@ -21,16 +30,7 @@ namespace Sentry.data.Web
             return rootModel;
         }
 
-        public static List<ConnectorRootModel> MapToModelList(this List<ConnectorRootDto> connectorRootDtos)
-        {
-            List<ConnectorRootModel> connectorRootModels = new List<ConnectorRootModel>();
-
-            connectorRootDtos.ForEach(crd => connectorRootModels.Add(MapToModel(crd)));
-
-            return connectorRootModels;
-        }
-
-        public static List<ConnectorTaskModel> MapToTaskList(this List<ConnectorTaskDto> connectorTaskDtos)
+        private static List<ConnectorTaskModel> MapToTaskList(this List<ConnectorTaskDto> connectorTaskDtos)
         {
             List<ConnectorTaskModel> connectorTaskModels = new List<ConnectorTaskModel>();
 
@@ -59,6 +59,7 @@ namespace Sentry.data.Web
             infoModel.ValueConverter = infoDto.ValueConverter;
             infoModel.S3ProxyPassword = infoDto.S3ProxyPassword;
             infoModel.KeyConverter = infoDto.KeyConverter;
+            infoModel.TransformsInsertMetadataTimestampField = infoDto.TransformsInsertMetadataTimestampField;
             infoModel.S3BucketName = infoDto.S3BucketName;
             infoModel.PartitionDurationMs = infoDto.PartitionDurationMs;
             infoModel.S3ProxyUser = infoDto.S3ProxyUser;
