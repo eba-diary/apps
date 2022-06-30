@@ -138,6 +138,7 @@ namespace Sentry.data.Infrastructure
 
             registry.For<IDataInventorySearchProvider>().Add<ElasticDataInventorySearchProvider>().Ctor<IDbExecuter>().Is(new DataInventorySqlExecuter());
             registry.For<IDataInventoryService>().Use<DataInventoryService>();
+            registry.For<IKafkaConnectorService>().Singleton().Use<ConnectorService>();
 
             // Choose the parameterless constructor.
             registry.For<IBackgroundJobClient>().Singleton().Use<BackgroundJobClient>().SelectConstructor(() => new BackgroundJobClient());
@@ -193,7 +194,7 @@ namespace Sentry.data.Infrastructure
                 Ctor<IHttpClientProvider>().Is(apacheHttpClientProvider)
                 .SetProperty((c) => c.BaseUrl = Configuration.Config.GetHostSetting("ApacheLivy"));
 
-            registry.For<IKafkaConnectorService>().Singleton().Use<ConnectorService>();
+            
 
             //establish httpclient specific to ConfluentConnectorProvider
             var confluentConnectorClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });

@@ -10,9 +10,7 @@ namespace Sentry.data.Web
     public class ConnectorRootModel
     {
         public string ConnectorName { get; set; }
-
         public ConnectorStatusModel ConnectorStatus { get; set; }
-
         public ConnectorInfoModel ConnectorInfo { get; set; }
     }
 }
