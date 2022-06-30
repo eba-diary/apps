@@ -84,7 +84,6 @@ data.Admin = {
         });
     },
 
-    // creates url for Ajax call to get flowsteps associated with selected schema ***unfinished and unimplemented***
     GetFlowStepUrl: function (schemaId) {
         var url = "../../api/v2/dataflow?schemaId=" + schemaId;
         console.log(url);
@@ -98,7 +97,7 @@ data.Admin = {
             type: "GET",
             url: url,
             success: function (data) {
-                var s = '<option value="-1">Please Select Flow Step</option>';
+                var s = '<option value="-1">Please Select a Flow Step</option>';
                 for (var d of data[0].steps) {
                     s += '<option value="' + d.Id + '">' + d.ActionName + '</option>';
                 }
@@ -137,7 +136,6 @@ data.Admin = {
                 var url = data.Admin.GetFileUrl(datasetId, schemaId);
                 data.Admin.PopulateTable(url);
                 url = data.Admin.GetFlowStepUrl(schemaId);
-                console.log(url);
                 data.Admin.GetFlowStepDropdown(url);
             }
         });
