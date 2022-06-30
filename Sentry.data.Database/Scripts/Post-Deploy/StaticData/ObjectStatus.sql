@@ -6,7 +6,8 @@
 									(1, 'Active', 'Fully functional'),
 									(2, 'Pending Delete', 'Not editiable, no activity will occur for object, disabled in UI'),
 									(3, 'Deleted', 'Not visible in UI, all jobs and dataflows are disabled'),
-									(4, 'Disabled', 'Temporarily disabled, no activity will occur for object, disabled in UI')
+									(4, 'Disabled', 'Temporarily disabled, no activity will occur for object, disabled in UI'),
+									(5, 'Pending Delete Failure', 'Pending delete failure awaiting resolution, not editiable, no activity will occur for object, disabled in UI')
 								)
 								AS Source ([ObjectStatus_Id], [ObjectStatus_CDE], [ObjectStatus_DSC]) 
 

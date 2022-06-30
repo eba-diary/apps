@@ -23,7 +23,9 @@ namespace Sentry.data.Core
         string Delete(int datasetId, int schemaId, DeleteFilesParamDto dto);
 
         void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status);
-        
+        void UpdateObjectStatus(int datasetFileId, GlobalEnums.ObjectStatusEnum status);
+
+
         UserSecurity GetUserSecurityForDatasetFile(int datasetId);        
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Sentry.data.Core
 {
-    public class S3DeleteFilesModel : BaseEventMessage
+    public class DeleteFilesModel : BaseEventMessage
     {
-        public S3DeleteFilesModel()
+        public DeleteFilesModel()
         {
             EventType = "FILE_DELETE_REQUEST";
         }

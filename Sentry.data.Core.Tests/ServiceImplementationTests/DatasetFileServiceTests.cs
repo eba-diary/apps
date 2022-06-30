@@ -586,5 +586,46 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(Core.GlobalEnums.ObjectStatusEnum.Active, dataFileB.ObjectStatus);
         }
 
+        [TestMethod]
+        public void DatasetFileService_UpdateObjectStatus_SingleFile()
+        {
+            var userService = new Mock<IUserService>();
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.IsAdmin).Returns(true);
+            userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
+
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFile dataFileA = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            DatasetFile dataFileB = MockClasses.MockDatasetFileB(ds, dfc, user1.Object);
+            DatasetFile dataFileC = MockClasses.MockDatasetFileC(ds, dfc, user1.Object);
+
+
+            var context = new Mock<IDatasetContext>();
+            context.SetupGet(d => d.DatasetFileStatusAll).Returns(new List<DatasetFile>() { dataFileA, dataFileB,dataFileC }.AsQueryable);
+
+            var messagePublisher = new Mock<IMessagePublisher>();
+            var datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object);
+
+
+            //ENSURE MARKING Deleted WORKS
+            datasetFileService.UpdateObjectStatus(3000, Core.GlobalEnums.ObjectStatusEnum.Deleted);
+            Assert.AreEqual(Core.GlobalEnums.ObjectStatusEnum.Deleted, dataFileA.ObjectStatus);
+            Assert.AreEqual(Core.GlobalEnums.ObjectStatusEnum.Active, dataFileB.ObjectStatus);
+
+
+            //ENSURE MARKING Pending_Delete_Failure WORKS
+            datasetFileService.UpdateObjectStatus(4000, Core.GlobalEnums.ObjectStatusEnum.Pending_Delete_Failure);
+            Assert.AreEqual(Core.GlobalEnums.ObjectStatusEnum.Deleted, dataFileA.ObjectStatus);
+            Assert.AreEqual(Core.GlobalEnums.ObjectStatusEnum.Pending_Delete_Failure, dataFileB.ObjectStatus);
+
+            //ENSURE DatasetFile Not found WORKS
+            datasetFileService.UpdateObjectStatus(7000, Core.GlobalEnums.ObjectStatusEnum.Deleted);
+            Assert.AreEqual(Core.GlobalEnums.ObjectStatusEnum.Deleted, dataFileA.ObjectStatus);
+            Assert.AreEqual(Core.GlobalEnums.ObjectStatusEnum.Pending_Delete_Failure, dataFileB.ObjectStatus);
+            Assert.AreEqual(Core.GlobalEnums.ObjectStatusEnum.Active, dataFileC.ObjectStatus);
+
+        }
+
     }
 }

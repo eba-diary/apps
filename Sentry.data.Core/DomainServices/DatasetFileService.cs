@@ -193,7 +193,7 @@ namespace Sentry.data.Core
                     buffer = new string[chunk];
                     Array.Copy(idList, i, buffer, 0, chunk );
 
-                    S3DeleteFilesModel model = CreateS3DeleteFilesModel(datasetId,schemaId,buffer);
+                    DeleteFilesModel model = CreateDeleteFilesModel(datasetId,schemaId,buffer);
                     
                     //PUBLISH DSC DELETE EVENT
                     _messagePublisher.PublishDSCEvent(schemaId.ToString(), JsonConvert.SerializeObject(model));
@@ -202,7 +202,7 @@ namespace Sentry.data.Core
             catch (System.Exception ex)
             {
                 string errorMsg = "Error trying to call _messagePublisher.PublishDSCEvent: " + 
-                            JsonConvert.SerializeObject(CreateS3DeleteFilesModel(datasetId, schemaId, idList));
+                            JsonConvert.SerializeObject(CreateDeleteFilesModel(datasetId, schemaId, idList));
                 
                 Logger.Error(errorMsg, ex);
                 throw;
@@ -220,16 +220,39 @@ namespace Sentry.data.Core
             }
             catch (System.Exception ex)
             {
-                //log list of Ids by exception
                 string msg = "Error marking DatasetFile rows as Deleted";
                 Logger.Error(msg, ex);
                 throw;
             }
         }
 
-        private S3DeleteFilesModel CreateS3DeleteFilesModel(int datasetId, int schemaId, string[] datasetFileIdList)
+        public void UpdateObjectStatus(int datasetFileId, GlobalEnums.ObjectStatusEnum status)
         {
-            S3DeleteFilesModel model = new S3DeleteFilesModel()
+            try
+            {
+                DatasetFile datasetFile = _datasetContext.DatasetFileStatusAll.FirstOrDefault(w => w.DatasetFileId == datasetFileId);
+                if (datasetFile != null)
+                {
+                    datasetFile.ObjectStatus = status;
+                    _datasetContext.SaveChanges();
+                }
+
+                
+            }
+            catch (System.Exception ex)
+            {
+                string msg = "Error marking DatasetFile row as " + status.GetDescription();
+                Logger.Error(msg, ex);
+                throw;
+            }
+        }
+
+
+
+
+        private DeleteFilesModel CreateDeleteFilesModel(int datasetId, int schemaId, string[] datasetFileIdList)
+        {
+            DeleteFilesModel model = new DeleteFilesModel()
             {
                 DatasetID = datasetId,
                 SchemaID = schemaId,
