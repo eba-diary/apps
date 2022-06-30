@@ -93,12 +93,12 @@ namespace Sentry.data.Infrastructure.Tests
 
             /*Setup provider*/
             HttpResponseMessage httpResponse1 = new HttpResponseMessage(HttpStatusCode.OK);
-            JObject connectorJObjects = GetData("ConfluentConnectors_2.json");
+            JObject connectorJObjects = GetData("ConfluentConnectors.json");
             string connectorStr = connectorJObjects.ToString();
             httpResponse1.Content = new StringContent(connectorStr);
 
             HttpResponseMessage httpResponse2 = new HttpResponseMessage(HttpStatusCode.OK);
-            JObject connectorNameJObjects = GetData("ConfluentConnectors_Names_2.json");
+            JObject connectorNameJObjects = GetData("ConfluentConnectors_Names.json");
             string connectorNamesStr = connectorNameJObjects["connectorNames"].ToString();
             httpResponse2.Content = new StringContent(connectorNamesStr);
 
