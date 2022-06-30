@@ -1267,7 +1267,7 @@ namespace Sentry.data.Core
             dto.SchemaRootPath = dfc.Schema?.SchemaRootPath;
             dto.ParquetStorageBucket = dfc.Schema?.ParquetStorageBucket;
             dto.ParquetStoragePrefix = dfc.Schema?.ParquetStoragePrefix;
-            dto.SnowflakeStage = dfc.Schema?.SnowflakeStage;
+            dto.ConsumptionDetails = dfc.Schema?.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList();
         }
 
         public Tuple<List<RetrieverJob>, List<DataFlowStepDto>> GetDataFlowDropLocationJobs(DatasetFileConfig config)

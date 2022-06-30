@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Sentry.data.Web.Models.ApiModels.Schema
 {
-    public class SchemaInfoModel
+    public abstract class SchemaInfoModelBase
     {
         public int ConfigId { get; set; }
         public int SchemaId { get; set; }
@@ -26,17 +26,11 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public string HiveLocation { get; set; }
         public List<string> Options { get; set; }
         public bool DeleteInd { get; set; }
-        public string SnowflakeDatabase { get; set; }
-        public string SnowflakeSchema { get; set; }
-        public string SnowflakeTable { get; set; }
-        public string SnowflakeStatus { get; set; }
         public string ObjectStatus { get; set; }
         public string[] SchemaRootPath { get; set; }
         public bool HasDataFlow { get; set; }
         public string ParquetStorageBucket { get; set; }
         public string ParquetStoragePrefix { get; set; }
-        public string SnowflakeStage { get; set; }
-        public string SnowflakeWarehouse { get; set; }
 
         public List<string> Validate()
         {
@@ -76,5 +70,15 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
 
             return results;
         }
+    }
+
+    public class SchemaInfoModel : SchemaInfoModelBase
+    {
+        public string SnowflakeDatabase { get; set; }
+        public string SnowflakeSchema { get; set; }
+        public string SnowflakeTable { get; set; }
+        public string SnowflakeStatus { get; set; }
+        public string SnowflakeStage { get; set; }
+        public string SnowflakeWarehouse { get; set; }
     }
 }
