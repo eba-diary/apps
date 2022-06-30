@@ -529,6 +529,7 @@ namespace Sentry.data.Web.Controllers
             return View("CreateDataSource", dsm);
         }
 
+        [Route("Config/HeaderEntryRow")]
         public ActionResult HeaderEntryRow()
         {
             return PartialView("_Headers");
@@ -687,6 +688,8 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
+        [Route("Config/AuthenticationByType/")]
+
         public JsonResult AuthenticationByType(string sourceType)
         {
             return Json(AuthenticationTypesByType(sourceType, null), JsonRequestBehavior.AllowGet);
@@ -724,6 +727,7 @@ namespace Sentry.data.Web.Controllers
             return Json(temp, JsonRequestBehavior.AllowGet);
         }
 
+        [Route("Config/AuthTypeDescription/")]
         public JsonResult AuthTypeDescription(int AuthID)
         {
             var temp = _datasetContext.AuthTypes.Where(x => x.AuthID == AuthID).Select(x => x.Description).FirstOrDefault();
