@@ -181,19 +181,19 @@ namespace Sentry.data.Core
         private void DeleteS3(int datasetId, int schemaId, List<DatasetFile> dbList)
         {
             //CONVERT LIST TO GENERIC ARRAY IN PREP FOR PublishDSCEvent and ERROR HANDLING
-            string[] idList = dbList.Select(s => s.DatasetFileId.ToString()).ToArray();
+            int[] idList = dbList.Select(s => s.DatasetFileId).ToArray();
 
             try
             {
                 //CHUNK INTO 10 id's PER MESSAGE
-                string[] buffer;
+                int[] buffer;
                 for (int i = 0; i < idList.Length; i += 10)
                 {
                     int chunk = (idList.Length - i < 10) ? idList.Length - i : 10;          //ENSURE LAST CHUNK ONLY HAS WHAT REMAINS
-                    buffer = new string[chunk];
+                    buffer = new int[chunk];
                     Array.Copy(idList, i, buffer, 0, chunk );
 
-                    DeleteFilesModel model = CreateDeleteFilesModel(datasetId,schemaId,buffer);
+                    DeleteFilesRequestModel model = CreateDeleteFilesRequestModel(datasetId,schemaId,buffer);
                     
                     //PUBLISH DSC DELETE EVENT
                     _messagePublisher.PublishDSCEvent(schemaId.ToString(), JsonConvert.SerializeObject(model));
@@ -202,7 +202,7 @@ namespace Sentry.data.Core
             catch (System.Exception ex)
             {
                 string errorMsg = "Error trying to call _messagePublisher.PublishDSCEvent: " + 
-                            JsonConvert.SerializeObject(CreateDeleteFilesModel(datasetId, schemaId, idList));
+                            JsonConvert.SerializeObject(CreateDeleteFilesRequestModel(datasetId, schemaId, idList));
                 
                 Logger.Error(errorMsg, ex);
                 throw;
@@ -236,8 +236,6 @@ namespace Sentry.data.Core
                     datasetFile.ObjectStatus = status;
                     _datasetContext.SaveChanges();
                 }
-
-                
             }
             catch (System.Exception ex)
             {
@@ -250,13 +248,13 @@ namespace Sentry.data.Core
 
 
 
-        private DeleteFilesModel CreateDeleteFilesModel(int datasetId, int schemaId, string[] datasetFileIdList)
+        private DeleteFilesRequestModel CreateDeleteFilesRequestModel(int datasetId, int schemaId, int[] datasetFileIdList)
         {
-            DeleteFilesModel model = new DeleteFilesModel()
+            DeleteFilesRequestModel model = new DeleteFilesRequestModel()
             {
                 DatasetID = datasetId,
                 SchemaID = schemaId,
-                RequestGUID = DateTime.Now.ToString("yyyyMMddHHmmssfff"),
+                RequestGUID = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff"),
                 DatasetFileIdList = datasetFileIdList
             };
 

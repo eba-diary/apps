@@ -2,9 +2,9 @@
 
 namespace Sentry.data.Core
 {
-    public class DeleteFilesModel : BaseEventMessage
+    public class DeleteFilesRequestModel : BaseEventMessage
     {
-        public DeleteFilesModel()
+        public DeleteFilesRequestModel()
         {
             EventType = "FILE_DELETE_REQUEST";
         }
@@ -12,7 +12,7 @@ namespace Sentry.data.Core
 
         public string RequestGUID { get; set; }
 
-        public string[] DatasetFileIdList { get; set; }
+        public int[] DatasetFileIdList { get; set; }
         
     }
 }
