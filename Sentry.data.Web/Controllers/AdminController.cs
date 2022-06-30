@@ -15,6 +15,7 @@ using DoddleReport;
 using Sentry.Core;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -41,11 +42,19 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetConnector(ConnectorInfoModel connectorInfo)
+        public async Task<JObject> GetConnectorConfig(string ConnectorId)
         {
-            ConnectorInfoModel connector = connectorInfo;
+            return await _connectorService.GetS3ConnectorConfigJSON(ConnectorId);
+        }
 
-            return PartialView("_ConnectorConfig",connector);
+        [HttpPost]
+        public async Task<ActionResult> GetConnectorStatus(string ConnectorId)
+        {
+            JObject JConnectorStatus = await _connectorService.GetS3ConnectorStatusJSON(ConnectorId);
+
+            string json = JsonConvert.SerializeObject(JConnectorStatus, Formatting.Indented);
+
+            return Content(json, "application/json");
         }
 
         // GET: Admin

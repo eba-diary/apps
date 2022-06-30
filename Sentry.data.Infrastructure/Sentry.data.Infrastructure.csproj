@@ -333,6 +333,7 @@
     <Compile Include="Mappings\Primary\RTSourceTypesMapping.cs" />
     <Compile Include="Mappings\Primary\RTAPIEndpointsMapping.cs" />
     <Compile Include="Mappings\Subscriptions\StatusTypeMapping.cs" />
+    <Compile Include="PollyPolicies\ConfluentConnectorProviderPolicy.cs" />
     <Compile Include="PollyPolicies\ApacheLivyProviderPolicy.cs" />
     <Compile Include="PollyPolicies\GenericHttpProviderPolicy.cs" />
     <Compile Include="PollyPolicies\FtpProviderPolicy.cs" />

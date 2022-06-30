@@ -9,8 +9,8 @@ namespace Sentry.data.Core
 {
     public class ConnectorTaskDto
     {
-        public int Id { get; set; } 
-        public string State { get; set; }   
+        public int Id { get; set; }
+        public ConnectorStateEnum State { get; set; }   
         public string Worker_Id { get; set; }
     }
 }

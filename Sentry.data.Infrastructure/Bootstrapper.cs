@@ -174,6 +174,7 @@ namespace Sentry.data.Infrastructure
 
             //register polly policies
             registry.For<IPollyPolicy>().Singleton().Add<ApacheLivyProviderPolicy>();
+            registry.For<IPollyPolicy>().Singleton().Add<ConfluentConnectorProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<GoogleApiProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<GenericHttpProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<FtpProviderPolicy>();

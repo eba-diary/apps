@@ -17,6 +17,9 @@ namespace Sentry.data.Core.GlobalEnums
         PAUSED = 3,
         [Description("FAILED")]
         [EnumMember(Value = "FAILED")]
-        FAILED = 4
+        FAILED = 4,
+        [Description("DEGRADED")]
+        [EnumMember(Value = "DEGRADED")]
+        DEGRADED = 5
     }
 }

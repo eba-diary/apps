@@ -10,7 +10,7 @@ namespace Sentry.data.Web
     public class ConnectorTaskModel
     {
         public int Id { get; set; } 
-        public string State { get; set; }   
+        public ConnectorStateEnum State { get; set; }   
         public string Worker_Id { get; set; }
     }
 }

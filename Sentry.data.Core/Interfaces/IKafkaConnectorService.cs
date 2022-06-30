@@ -1,4 +1,5 @@
 ﻿
+using Newtonsoft.Json.Linq;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
@@ -12,5 +13,7 @@ namespace Sentry.data.Core
     public interface IKafkaConnectorService
     {
         Task<List<ConnectorRootDto>> GetS3ConnectorsDTO();
+        Task<JObject> GetS3ConnectorStatusJSON(string connectorName);
+        Task<JObject> GetS3ConnectorConfigJSON(string connectorName);
     }
 }

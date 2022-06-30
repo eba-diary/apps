@@ -83,7 +83,7 @@ namespace Sentry.data.Web
             ConnectorStatusModel statusModel = new ConnectorStatusModel();
 
             statusModel.Name = statusDto.Name;
-            statusModel.State = (ConnectorStateEnum) Enum.Parse(typeof(ConnectorStateEnum), statusDto.State);
+            statusModel.State = statusDto.State;
             statusModel.WorkerId = statusDto.WorkerId;
             statusModel.Type = statusDto.Type;
             statusModel.ConnectorTasks = statusDto.ConnectorTasks.MapToTaskList();

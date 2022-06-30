@@ -11,7 +11,7 @@ namespace Sentry.data.Core
     {
         public string Name { get; set; }
 
-        public string State { get; set; }
+        public ConnectorStateEnum State { get; set; }
 
         public string WorkerId { get; set; }
 

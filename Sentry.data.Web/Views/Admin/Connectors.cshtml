@@ -5,85 +5,92 @@
     ViewBag.Fluid = true;
 }
 
+<br />
 <div class="container">
-    <table id="regular_table" class="col-8-lg table table-striped table-bordered table-hover">
+    <table id="connector_table" class="col-8-lg table table-striped table-bordered table-hover">
         <thead>
             <tr>
                 <th>Name</th>
                 <th>State</th>
                 <th></th>
+                <th></th>
             </tr>
         </thead>
 
-        @foreach (ConnectorRootModel rootModel in Model.Connectors)
-        {
-            <tbody>
-            @Html.HiddenFor(x => rootModel.ConnectorInfo.ConnectorClass, new { id = rootModel.ConnectorName + "_connectorClass"})
-            @Html.HiddenFor(x => rootModel.ConnectorInfo.ValueConverter, new { id = rootModel.ConnectorName + "_valueConverter"})
-            @Html.HiddenFor(x => rootModel.ConnectorInfo.PathFormat, new { id = rootModel.ConnectorName + "_pathFormat"})
-            @Html.HiddenFor(x => rootModel.ConnectorInfo.Type, new { id = rootModel.ConnectorName + "_type"})
-
-            <td>@rootModel.ConnectorName</td>
-
-            @switch (rootModel.ConnectorStatus.State)
+        <tbody>
+            @foreach (ConnectorRootModel rootModel in Model.Connectors)
             {
-                case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.RUNNING:
-                    <td class="text-success"> @rootModel.ConnectorStatus.State </td>
-                    break;
-                case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.FAILED:
-                    <td class="text-danger"> @rootModel.ConnectorStatus.State </td>
-                    break;
-                case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.PAUSED:
-                    <td class="text-primary"> @rootModel.ConnectorStatus.State </td>
-                    break;
-                case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.UNASSIGNED:
-                    <td> @rootModel.ConnectorStatus.State </td>
-                    break;
+                <tr>
+                    <td>@rootModel.ConnectorName</td>
+
+                    @switch (rootModel.ConnectorStatus.State)
+                    {
+                        case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.RUNNING:
+                            <td class="text-success"> @rootModel.ConnectorStatus.State </td>
+                            break;
+                        case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.FAILED:
+                            <td class="text-danger"> @rootModel.ConnectorStatus.State </td>
+                            break;
+                        case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.PAUSED:
+                            <td class="text-primary"> @rootModel.ConnectorStatus.State </td>
+                            break;
+                        case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.DEGRADED:
+                            <td class="text-warning"> @rootModel.ConnectorStatus.State </td>
+                            break;
+                        case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.UNASSIGNED:
+                            <td> @rootModel.ConnectorStatus.State </td>
+                            break;
+                    }
+
+                    <td>
+                        <a href="#" type="button" class="modalViewBtn"
+                                data-name="@rootModel.ConnectorName"
+                                data-type="config"
+                                data-controller="GetConnectorConfig"
+                                data-toggle="modal" data-target="#modalViewDetails">
+                            View Config Data
+                        </a>
+                    </td>
+                    <td>
+                        <a href="#" type="button" class="modalViewBtn"
+                                data-name="@rootModel.ConnectorName"
+                                data-type="status"
+                                data-controller="GetConnectorStatus"
+                                data-toggle="modal" data-target="#modalViewDetails">
+                            View Status Data
+                        </a>
+                    </td>
+                </tr>
             }
-
-            <td>
-                <button type="button" class="btn btnConfig btn-primary waves-effect waves-light"
-                        id="configBtn"
-                        data-target="@rootModel.ConnectorName"
-                        data-toggle="tooltip" data-placement="top" title="" data-original-title="Click to get a more detailed view of this connector">
-                    View Config Data
-                </button>
-            </td>
-
-            </tbody>
-        }
-
+        </tbody>
     </table>
+
+    <div class="modal fade" id="modalViewDetails" tabindex="-1" aria-labelledby="modalViewDetailsLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalViewLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default waves-effect waves-light w-100" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
+    @Scripts.Render("~/bundles/dataTables")
+    @Styles.Render("~/bundles/css/dataTables")
+
     <script type="text/javascript">
-        $(".btnConfig").click(function () {
-            var selectedConnector = $(this).data("target");
-
-            var ConnectorInfoModel = {
-                ConnectorClass: $("#" + selectedConnector + "_connectorClass").attr("value"),
-                ValueConverter: $("#" + selectedConnector + "_valueConverter").attr("value"),
-                PathFormat: $("#" + selectedConnector + "_pathFormat").attr("value"),
-                Type: $("#" + selectedConnector + "_type").attr("value")
-            };
-
-            var modal = Sentry.ShowModalWithSpinner(selectedConnector + " Config Info");
-
-            $.ajax({
-            type: "POST",
-            url: "Admin/GetConnector",
-            dataType: "html",
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify(ConnectorInfoModel),
-            success: function (data) {
-                modal.ReplaceModalBody(data);
-            },
-            failure: function (errMsg) {
-                alert(errMsg);
-            }
-        });
-
-        });
+        data.Admin.SetupConnectorFilterTableInit();
+        data.Admin.RetrieveModalDataInit();
     </script>
 }
+
