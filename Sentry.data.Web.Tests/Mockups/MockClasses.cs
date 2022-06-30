@@ -402,23 +402,80 @@ namespace Sentry.data.Web.Tests
             };
         }
 
-        //public static List<Schema> MockSchemas(DatasetFileConfig dfc = null)
-        //{
-        //    Schema schema = new Schema()
-        //    {
-        //        Schema_NME = "Mock Schema",
-        //        Schema_ID = 11000,
-        //        Schema_DSC = "Mock Schema",
-        //        Created_DTM = DateTime.Now,
-        //        DatasetFileConfig = dfc
-        //    };
+        public static List<ConnectorRootDto> MockConnectorRootDtoList()
+        {
+            List<ConnectorRootDto> connectorRootDtoList = new List<ConnectorRootDto>();
 
-        //    var schemas = new List<Schema>();
+            for (int i = 0; i < 2; i++)
+            {
+                ConnectorInfoDto cid = new ConnectorInfoDto()
+                {
+                    Name = $"connector_info_{i}",
+                    Type = "Type",
+                    ConnectorClass = "ConnectorClass",
+                    S3Region = "S3Region",
+                    FlushSize = "FlushSize",
+                    TasksMax = "TasksMax",
+                    timezone = "timezone",
+                    transforms = "transforms",
+                    locale = "locale",
+                    S3PathStyleAccessEnabled = "S3PathStyleAccessEnabled",
+                    FormatClass = "FormatClass",
+                    S3AclCanned = "S3AclCanned",
+                    TransformsInsertMetadataPartitionField = "TransformsInsertMetadataPartitionField",
+                    ValueConverter = "ValueConverter",
+                    S3ProxyPassword = "S3ProxyPassword",
+                    KeyConverter = "KeyConverter",
+                    S3BucketName = "S3BucketName",
+                    PartitionDurationMs = "PartitionDurationMs",
+                    S3ProxyUser = "S3ProxyUser",
+                    S3SseaName = "S3SseaName",
+                    FileDelim = "FileDelim",
+                    TransformsInsertMetadataOffsetField = "TransformsInsertMetadataOffsetField",
+                    topics = "topics",
+                    TransformsInsertMetadataTimestampField = "TransformsInsertMetadataTimestampField",
+                    PartitionerClass = "PartitionerClass",
+                    ValueConverterSchemasEnable = "ValueConverterSchemasEnable",
+                    StorageClass = "StorageClass",
+                    RotateScheduleIntervalMs = "RotateScheduleIntervalMs",
+                    PathFormat = "PathFormat",
+                    TimestampExtractor = "TimestampExtractor",
+                    S3ProxyUrl = "S3ProxyUrl",
+                    TransformsInsertMetadataType = "TransformsInsertMetadataType"
+                };
 
-        //    schemas.Add(schema);
+                List<ConnectorTaskDto> taskDtoList = new List<ConnectorTaskDto>();
 
-        //    return schemas;
-           
-        //}
+                for (int t = 0; t < 2; t++)
+                {
+                    taskDtoList.Add(new ConnectorTaskDto()
+                    {
+                        Id = t,
+                        State = ConnectorStateEnum.RUNNING,
+                        Worker_Id = $"Worked_Id_{t}_{i}"
+                    });
+                }
+
+                ConnectorStatusDto csd = new ConnectorStatusDto()
+                {
+                    Name = $"connector_status_{i}",
+                    State = ConnectorStateEnum.RUNNING,
+                    WorkerId = "WorkerId",
+                    Type = "Type",
+                    ConnectorTasks = taskDtoList,
+                };
+
+                ConnectorRootDto crd = new ConnectorRootDto()
+                {
+                    ConnectorName = $"connector_root_{i}",
+                    ConnectorInfo = cid,
+                    ConnectorStatus = csd
+                };
+
+                connectorRootDtoList.Add(crd);
+            }
+
+            return connectorRootDtoList;
+        }
     }
 }
