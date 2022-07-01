@@ -31,5 +31,6 @@ namespace Sentry.data.Core
         public AccessRequestType Type { get; set; }
         public string AwsArn { get; set; }
         public AccessScope Scope { get; set; }
+        public string TicketId { get; set; }
     }
 }

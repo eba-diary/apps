@@ -885,6 +885,7 @@ namespace Sentry.data.Core.Tests
                 security.Tickets.Add(
                     new SecurityTicket()
                     {
+                        IsAddingPermission = true,
                         Permissions = new List<SecurityPermission>()
                         {
                             new SecurityPermission()

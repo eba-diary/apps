@@ -4,7 +4,10 @@
 // </auto-generated>
 //----------------------
 
+using Sentry.Configuration;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
+using System;
+using System.Text;
 
 #pragma warning disable 108 // Disable "CS0108 '{derivedDto}.ToJson()' hides inherited member '{dtoBase}.ToJson()'. Use the new keyword if hiding was intended."
 #pragma warning disable 114 // Disable "CS0114 '{derivedDto}.RaisePropertyChanged(String)' hides inherited member 'dtoBase.RaisePropertyChanged(String)'. To make the current member override that implementation, add the override keyword. Otherwise add the new keyword."
@@ -525,6 +528,7 @@ namespace Sentry.data.Infrastructure.InfrastructureEventing
             urlBuilder_.Replace("{records}", System.Uri.EscapeDataString(ConvertToString(records, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
+            
             var disposeClient_ = false;
             try
             {
@@ -532,7 +536,6 @@ namespace Sentry.data.Infrastructure.InfrastructureEventing
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("*/*"));
-
                     PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();

@@ -228,6 +228,7 @@ namespace Sentry.data.Web.Controllers
                 dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
                 dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, dfcm.FileExtensionID);
                 dfcm.DatasetScopeReadonly = dfcm.AllDatasetScopeTypes.Where(s => s.Value == dfcm.DatasetScopeTypeID.ToString()).Select(n => n.Text).FirstOrDefault();
+                dfcm.FileExtensionReadonly = dfcm.ExtensionList.Where(s => s.Value == dfcm.FileExtensionID.ToString()).Select(n => n.Text).FirstOrDefault();
 
                 //ViewBag.ModifyType = "Edit";
 
@@ -528,6 +529,7 @@ namespace Sentry.data.Web.Controllers
             return View("CreateDataSource", dsm);
         }
 
+        [Route("Config/HeaderEntryRow")]
         public ActionResult HeaderEntryRow()
         {
             return PartialView("_Headers");
@@ -686,6 +688,8 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
+        [Route("Config/AuthenticationByType/")]
+
         public JsonResult AuthenticationByType(string sourceType)
         {
             return Json(AuthenticationTypesByType(sourceType, null), JsonRequestBehavior.AllowGet);
@@ -723,6 +727,7 @@ namespace Sentry.data.Web.Controllers
             return Json(temp, JsonRequestBehavior.AllowGet);
         }
 
+        [Route("Config/AuthTypeDescription/")]
         public JsonResult AuthTypeDescription(int AuthID)
         {
             var temp = _datasetContext.AuthTypes.Where(x => x.AuthID == AuthID).Select(x => x.Description).FirstOrDefault();

@@ -211,6 +211,24 @@ namespace Sentry.data.Core
                     throw new NotImplementedException();
             }
 
+            if (auth != null && auth.Is<OAuthAuthentication>())
+            {
+                if (String.IsNullOrWhiteSpace(dto.ClientId))
+                {
+                    errors.Add("OAuth requires a Client ID.");
+                }
+                
+                if (String.IsNullOrWhiteSpace(dto.ClientPrivateId))
+                {
+                    errors.Add("OAuth requires a Client Private ID.");
+                }
+
+                if (String.IsNullOrWhiteSpace(dto.TokenUrl))
+                {
+                    errors.Add("OAuth requires a Token URL.");
+                }
+            }
+
             if (String.IsNullOrWhiteSpace(dto.PrimaryContactId))
             {
                 errors.Add("Contact is requried.");

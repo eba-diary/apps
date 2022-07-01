@@ -27,7 +27,7 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA3819_EgressEdgeMigration { get; }
         IFeatureFlag<bool> CLA3882_DSC_NOTIFICATION_SUBCATEGORY { get; }
         IFeatureFlag<bool> CLA3718_Authorization { get; }
-
         IFeatureFlag<bool> CLA4049_ALLOW_S3_FILES_DELETE { get; }
+        IFeatureFlag<bool> CLA4152_UploadFileFromUI { get; }
     }
 }
