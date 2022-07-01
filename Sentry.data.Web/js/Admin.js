@@ -212,7 +212,7 @@ data.Admin = {
         
     },
     //loads dataflow metric page events
-    LogsInit: function () {
+    DataFlowMetricsInit: function () {
         $("#DatasetsList").materialSelect();
         $("#schemaDropdown").materialSelect();
         $("#fileDropdown").materialSelect();
