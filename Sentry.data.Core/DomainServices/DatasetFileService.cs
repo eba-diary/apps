@@ -261,15 +261,15 @@ namespace Sentry.data.Core
             }
         }
 
-        public void UpdateObjectStatus(int datasetFileId, GlobalEnums.ObjectStatusEnum status)
+        
+        public void UpdateObjectStatus(int[] idList, GlobalEnums.ObjectStatusEnum status)
         {
             try
             {
-                DatasetFile datasetFile = _datasetContext.DatasetFileStatusAll.FirstOrDefault(w => w.DatasetFileId == datasetFileId);
-                if (datasetFile != null)
+                if(idList != null)
                 {
-                    datasetFile.ObjectStatus = status;
-                    _datasetContext.SaveChanges();
+                    List<DatasetFile> dbList = _datasetContext.DatasetFileStatusAll.Where(w => idList.Contains(w.DatasetFileId)).ToList();
+                    UpdateObjectStatus(dbList, status);
                 }
             }
             catch (System.Exception ex)
@@ -279,7 +279,6 @@ namespace Sentry.data.Core
                 throw;
             }
         }
-
 
 
 

@@ -3,6 +3,7 @@ using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.Messaging.Common;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
@@ -97,35 +98,35 @@ namespace Sentry.data.Infrastructure
 
         private void ProcessEachFile(DeleteFilesResponseModel responseModel)
         {
-            //LOOP THROUGH EACH FILE AND UPDATE STATUS
-            foreach (DeleteFilesResponseSingleStatusModel response in responseModel.DeleteProcessStatusPerID)
+            //GROUP INTO MULTIPLE GROUPS
+            if (responseModel != null && responseModel.DeleteProcessStatusPerID != null)
             {
-                if(response.DatasetFileIdDeleteStatus != null)
-                {
-                    Core.GlobalEnums.ObjectStatusEnum status = Core.GlobalEnums.ObjectStatusEnum.Deleted;
+                int[] successList = responseModel.DeleteProcessStatusPerID.Where(w => (w.DatasetFileIdDeleteStatus)?.ToUpper() == GlobalConstants.DeleteFileResponseStatus.SUCCESS).Select(s => s.DatasetFileId).ToArray();
+                int[] failureList = responseModel.DeleteProcessStatusPerID.Where(w => (w.DatasetFileIdDeleteStatus)?.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE).Select(s => s.DatasetFileId).ToArray();
+                int[] errorList = responseModel.DeleteProcessStatusPerID.Where(w => (w.DatasetFileIdDeleteStatus)?.ToUpper()       != GlobalConstants.DeleteFileResponseStatus.SUCCESS
+                                                                                    && (w.DatasetFileIdDeleteStatus)?.ToUpper()    != GlobalConstants.DeleteFileResponseStatus.FAILURE)
+                                                                        .Select(s => s.DatasetFileId).ToArray();
 
-                    if (response.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.SUCCESS)
-                    {
-                        //FILE DELETED SUCCESSFULLY
-                        _datafileService.UpdateObjectStatus(response.DatasetFileId, status);
-                        Logger.Info($"filedeleteeventhandler processed {response.DatasetFileId} as {status.GetDescription()}");
-                    }
-                    else if (response.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE)
-                    {
-                        //FILE DELETED FAILURE
-                        status = Core.GlobalEnums.ObjectStatusEnum.Pending_Delete_Failure;
-                        _datafileService.UpdateObjectStatus(response.DatasetFileId, status);
-                        Logger.Info($"filedeleteeventhandler processed {response.DatasetFileId} as {status.GetDescription()}");
-                    }
-                    else
-                    {
-                        Logger.Info($"filedeleteeventhandler unable to process {response.DatasetFileId} because it does not understand {response.DatasetFileIdDeleteStatus}");
-                    }
-                }
-                else
+                if(successList!= null && successList.Count() > 0)
                 {
-                    Logger.Info($"filedeleteeventhandler unable to locate {nameof(response.DatasetFileIdDeleteStatus)} in message");
+                    _datafileService.UpdateObjectStatus(successList, Core.GlobalEnums.ObjectStatusEnum.Deleted);
+                    Logger.Info($"filedeleteeventhandler will attempt to mark {successList.ToString()} as {Core.GlobalEnums.ObjectStatusEnum.Deleted.GetDescription()}");
                 }
+
+                if (failureList != null && failureList.Count() > 0)
+                {
+                    _datafileService.UpdateObjectStatus(failureList, Core.GlobalEnums.ObjectStatusEnum.Pending_Delete_Failure);
+                    Logger.Info($"filedeleteeventhandler will attempt to mark {failureList.ToString()} as {Core.GlobalEnums.ObjectStatusEnum.Pending_Delete_Failure.GetDescription()}");
+                }
+
+                if (errorList != null && errorList.Count() > 0)
+                {
+                    Logger.Info($"filedeleteeventhandler unable to process {errorList.ToString()} due to unknown status");
+                }
+            }
+            else
+            {
+                Logger.Info($"filedeleteeventhandler unable to locate {nameof(responseModel.DeleteProcessStatusPerID)} in message");
             }
         }
 
