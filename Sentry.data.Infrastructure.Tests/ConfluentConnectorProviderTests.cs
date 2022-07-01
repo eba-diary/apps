@@ -45,7 +45,7 @@ namespace Sentry.data.Infrastructure.Tests
             ConfluentConnectorProvider providerA = new ConfluentConnectorProvider(StubIHttpClientProvider.Object, policyRegistry);
 
             //Act
-            JObject connectorJObject = await providerA.GetS3ConnectorStatus(CONNECTOR_NAME);
+            JObject connectorJObject = await providerA.GetS3ConnectorStatusAsync(CONNECTOR_NAME);
 
             //Assert
             Assert.AreEqual(CONNECTOR_NAME, connectorJObject["name"]);
@@ -76,7 +76,7 @@ namespace Sentry.data.Infrastructure.Tests
             ConfluentConnectorProvider providerA = new ConfluentConnectorProvider(StubIHttpClientProvider.Object, policyRegistry);
 
             //Act
-            JObject connectorJObject = await providerA.GetS3ConnectorConfig(CONNECTOR_NAME);
+            JObject connectorJObject = await providerA.GetS3ConnectorConfigAsync(CONNECTOR_NAME);
 
             //Assert
             Assert.AreEqual(CONNECTOR_NAME, connectorJObject["name"]);
@@ -115,13 +115,13 @@ namespace Sentry.data.Infrastructure.Tests
 
             //Act
             /*The call for S3 Connectors should only bring back connectors with a connector.class value of io.confluent.connect.s3.S3SinkConnector */
-            List<ConnectorRootDto> rootDtos = await providerA.GetS3Connectors();
+            List<ConnectorDto> rootDtos = await providerA.GetS3ConnectorsAsync();
             
             //Assert
             Assert.AreEqual(3, rootDtos.Count);
-            Assert.AreEqual(ConnectorStateEnum.RUNNING, rootDtos[0].ConnectorStatus.State);
-            Assert.AreEqual(ConnectorStateEnum.DEGRADED, rootDtos[1].ConnectorStatus.State);
-            Assert.AreEqual(ConnectorStateEnum.FAILED, rootDtos[2].ConnectorStatus.State);
+            Assert.AreEqual(ConnectorStateEnum.RUNNING, rootDtos[0].ConnectorState);
+            Assert.AreEqual(ConnectorStateEnum.DEGRADED, rootDtos[1].ConnectorState);
+            Assert.AreEqual(ConnectorStateEnum.FAILED, rootDtos[2].ConnectorState);
         }
 
         protected JObject GetData(string fileName)

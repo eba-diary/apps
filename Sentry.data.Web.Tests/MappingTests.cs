@@ -17,73 +17,36 @@ namespace Sentry.data.Web.Tests
     public class MappingTests
     {
         [TestMethod]
-        public void ToModel_ConnectorInfoDto_ReturnConnectorInfoModel() 
+        public void ToModel_ConnectorInfoDto_ReturnConnectorModel() 
         {
             //Arrange
-            List<ConnectorRootDto> crd = MockClasses.MockConnectorRootDtoList();
+            List<ConnectorDto> cdList = new List<ConnectorDto>();
 
             //Act
-            List<ConnectorRootModel> crm = crd.MapToModelList();
-
-            //Assert
-            for(int i=0; i < crm.Count; i++)
+            cdList.Add(new ConnectorDto()
             {
-                ConnectorRootModel currentCrm = crm[i];
-                ConnectorInfoModel currentCim = crm[i].ConnectorInfo;
-                ConnectorStatusModel currentCsm = crm[i].ConnectorStatus;
+                ConnectorName = "test_connector1",
+                ConnectorState = ConnectorStateEnum.RUNNING
+            });
 
-                Assert.AreEqual($"connector_root_{i}", currentCrm.ConnectorName);
+            cdList.Add(new ConnectorDto()
+            {
+                ConnectorName = "test_connector2",
+                ConnectorState = ConnectorStateEnum.FAILED
+            });
 
-                Assert.AreEqual($"connector_info_{i}", currentCim.Name);
-                Assert.AreEqual("Type", currentCim.Type);
-                Assert.AreEqual("ConnectorClass", currentCim.ConnectorClass);
-                Assert.AreEqual("S3Region", currentCim.S3Region);
-                Assert.AreEqual("FlushSize", currentCim.FlushSize);
-                Assert.AreEqual("TasksMax", currentCim.TasksMax);
-                Assert.AreEqual("timezone", currentCim.timezone);
-                Assert.AreEqual("transforms", currentCim.transforms);
-                Assert.AreEqual("locale", currentCim.locale);
-                Assert.AreEqual("S3PathStyleAccessEnabled", currentCim.S3PathStyleAccessEnabled);
-                Assert.AreEqual("FormatClass", currentCim.FormatClass);
-                Assert.AreEqual("S3AclCanned", currentCim.S3AclCanned);
-                Assert.AreEqual("TransformsInsertMetadataPartitionField", currentCim.TransformsInsertMetadataPartitionField);
-                Assert.AreEqual("ValueConverter", currentCim.ValueConverter);
-                Assert.AreEqual("S3ProxyPassword", currentCim.S3ProxyPassword);
-                Assert.AreEqual("KeyConverter", currentCim.KeyConverter);
-                Assert.AreEqual("S3BucketName", currentCim.S3BucketName);
-                Assert.AreEqual("PartitionDurationMs", currentCim.PartitionDurationMs);
-                Assert.AreEqual("S3ProxyUser", currentCim.S3ProxyUser);
-                Assert.AreEqual("S3SseaName", currentCim.S3SseaName);
-                Assert.AreEqual("FileDelim", currentCim.FileDelim);
-                Assert.AreEqual("TransformsInsertMetadataOffsetField", currentCim.TransformsInsertMetadataOffsetField);
-                Assert.AreEqual("topics", currentCim.topics);
-                Assert.AreEqual("PartitionerClass", currentCim.PartitionerClass);
-                Assert.AreEqual("ValueConverterSchemasEnable", currentCim.ValueConverterSchemasEnable);
-                Assert.AreEqual("TransformsInsertMetadataTimestampField", currentCim.TransformsInsertMetadataTimestampField);
-                Assert.AreEqual("StorageClass", currentCim.StorageClass);
-                Assert.AreEqual("RotateScheduleIntervalMs", currentCim.RotateScheduleIntervalMs);
-                Assert.AreEqual("PathFormat", currentCim.PathFormat);
-                Assert.AreEqual("TimestampExtractor", currentCim.TimestampExtractor);
-                Assert.AreEqual("S3ProxyUrl", currentCim.S3ProxyUrl);
-                Assert.AreEqual("TransformsInsertMetadataType", currentCim.TransformsInsertMetadataType);
-
-                Assert.AreEqual($"connector_status_{i}", currentCsm.Name);
-                Assert.AreEqual(ConnectorStateEnum.RUNNING, currentCsm.State);
-                Assert.AreEqual("WorkerId", currentCsm.WorkerId);
-                Assert.AreEqual("Type", currentCsm.Type);
-                
-                for(int t=0; t<currentCsm.ConnectorTasks.Count; t++)
-                {
-                    ConnectorTaskModel currentCtm = currentCsm.ConnectorTasks[t];
-
-                    Assert.AreEqual(t, currentCtm.Id);
-                    Assert.AreEqual(ConnectorStateEnum.RUNNING, currentCtm.State);
-                    Assert.AreEqual($"Worked_Id_{t}_{i}", currentCtm.Worker_Id);
-                }
+            List<ConnectorModel> cmList = cdList.MapToModelList();
+            
+            //Assert
+            for(int i=0; i< cmList.Count;i++)
+            {
+                Assert.AreEqual(cmList[i].ConnectorName, cdList[i].ConnectorName);
+                Assert.AreEqual(cmList[i].ConnectorState, cdList[i].ConnectorState);
             }
+
         }
 
-        [TestMethod]
+    [TestMethod]
         public void ToDto_SchemaInfoModel_ReturnFileSchemaDto()
         {
             SchemaInfoModel mdl = new SchemaInfoModel()

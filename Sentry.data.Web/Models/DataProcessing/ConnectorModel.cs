@@ -5,14 +5,11 @@ using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 
-namespace Sentry.data.Core
+namespace Sentry.data.Web
 {
-    public class ConnectorRootDto
+    public class ConnectorModel
     {
         public string ConnectorName { get; set; }
-
-        public ConnectorStatusDto ConnectorStatus { get; set; }
-
-        public ConnectorInfoDto ConnectorInfo { get; set; }
+        public ConnectorStateEnum ConnectorState { get; set; }
     }
 }

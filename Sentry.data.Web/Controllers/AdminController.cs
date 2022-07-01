@@ -1,5 +1,8 @@
-﻿using Sentry.data.Core;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Sentry.data.Core;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
@@ -8,10 +11,12 @@ namespace Sentry.data.Web.Controllers
     public class AdminController : BaseController
     {
         private IKafkaConnectorService _connectorService;
+        private readonly IDatasetService _datasetService;
 
-        public AdminController(IKafkaConnectorService connectorService)
+        public AdminController(IKafkaConnectorService connectorService, IDatasetService datasetService)
         {
             _connectorService = connectorService;
+            _datasetService = datasetService;
         }
 
         [Route("Connectors")]
@@ -19,9 +24,9 @@ namespace Sentry.data.Web.Controllers
         {
             ConnectorViewModel viewModel = new ConnectorViewModel();
 
-            List<ConnectorRootDto> connectorRootDtos = await _connectorService.GetS3ConnectorsDTO();
+            List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
 
-            viewModel.Connectors = connectorRootDtos.MapToModelList();
+            viewModel.Connectors = connectorDtos.MapToModelList();
 
             return View(viewModel);
         }
@@ -29,27 +34,18 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public async Task<JObject> GetConnectorConfig(string ConnectorId)
         {
-            return await _connectorService.GetS3ConnectorConfigJSON(ConnectorId);
+            return await _connectorService.GetS3ConnectorConfigJSONAsync(ConnectorId);
         }
 
         [HttpPost]
         public async Task<ActionResult> GetConnectorStatus(string ConnectorId)
         {
-            JObject JConnectorStatus = await _connectorService.GetS3ConnectorStatusJSON(ConnectorId);
+            JObject JConnectorStatus = await _connectorService.GetS3ConnectorStatusJSONAsync(ConnectorId);
 
             string json = JsonConvert.SerializeObject(JConnectorStatus, Formatting.Indented);
 
             return Content(json, "application/json");
         }
-
-        private readonly IDatasetService _datasetService;
-        public AdminController(IDatasetService datasetService)
-        {
-            _datasetService = datasetService;
-        }
-
-        // GET: Admin
-        public async Task<ActionResult> Index()
 
         public ActionResult Index()
         {

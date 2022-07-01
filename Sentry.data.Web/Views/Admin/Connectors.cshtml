@@ -18,27 +18,27 @@
         </thead>
 
         <tbody>
-            @foreach (ConnectorRootModel rootModel in Model.Connectors)
+            @foreach (ConnectorModel rootModel in Model.Connectors)
             {
                 <tr>
                     <td>@rootModel.ConnectorName</td>
 
-                    @switch (rootModel.ConnectorStatus.State)
+                    @switch (rootModel.ConnectorState)
                     {
                         case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.RUNNING:
-                            <td class="text-success"> @rootModel.ConnectorStatus.State </td>
+                            <td class="text-success"> @rootModel.ConnectorState </td>
                             break;
                         case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.FAILED:
-                            <td class="text-danger"> @rootModel.ConnectorStatus.State </td>
+                            <td class="text-danger"> @rootModel.ConnectorState </td>
                             break;
                         case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.PAUSED:
-                            <td class="text-primary"> @rootModel.ConnectorStatus.State </td>
+                            <td class="text-primary"> @rootModel.ConnectorState </td>
                             break;
                         case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.DEGRADED:
-                            <td class="text-warning"> @rootModel.ConnectorStatus.State </td>
+                            <td class="text-warning"> @rootModel.ConnectorState </td>
                             break;
                         case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.UNASSIGNED:
-                            <td> @rootModel.ConnectorStatus.State </td>
+                            <td> @rootModel.ConnectorState </td>
                             break;
                     }
 

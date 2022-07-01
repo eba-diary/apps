@@ -28,11 +28,11 @@ namespace Sentry.data.Core
         /// Goes to Kafka Connector provider, retrieves a list of S3 ConnectorRootDto's and sorts them by Connector name.
         /// </summary>
         /// <returns>List of ConnectorRootDto's</returns>
-        public async Task<List<ConnectorRootDto>> GetS3ConnectorsDTO()
+        public async Task<List<ConnectorDto>> GetS3ConnectorsDTOAsync()
         {
-            List<ConnectorRootDto> unsortedList = await _connectorProvider.GetS3Connectors();
+            List<ConnectorDto> unsortedList = await _connectorProvider.GetS3ConnectorsAsync();
 
-            List<ConnectorRootDto> sortedList = unsortedList.OrderBy(x=>x.ConnectorName).ToList();
+            List<ConnectorDto> sortedList = unsortedList.OrderBy(x=>x.ConnectorName).ToList();
 
             return sortedList;
         }
@@ -42,9 +42,9 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="connectorName">Name of S3 connector to be returned</param>
         /// <returns>Specified JSON connector status object</returns>
-        public async Task<JObject> GetS3ConnectorStatusJSON(string connectorName) 
+        public async Task<JObject> GetS3ConnectorStatusJSONAsync(string connectorName) 
         { 
-            return await _connectorProvider.GetS3ConnectorStatus(connectorName);
+            return await _connectorProvider.GetS3ConnectorStatusAsync(connectorName);
         }
 
         /// <summary>
@@ -52,9 +52,9 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="connectorName">Name of S3 connector to be returned</param>
         /// <returns>Specified JSON Connector Config object</returns>
-        public async Task<JObject> GetS3ConnectorConfigJSON(string connectorName)
+        public async Task<JObject> GetS3ConnectorConfigJSONAsync(string connectorName)
         {
-            return await _connectorProvider.GetS3ConnectorConfig(connectorName);
+            return await _connectorProvider.GetS3ConnectorConfigAsync(connectorName);
         }
     }
 }

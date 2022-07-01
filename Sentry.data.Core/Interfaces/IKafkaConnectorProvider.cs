@@ -9,8 +9,8 @@ namespace Sentry.data.Core
 {
     public interface IKafkaConnectorProvider
     {
-        Task<List<ConnectorRootDto>> GetS3Connectors();
-        Task<JObject> GetS3ConnectorStatus(string connectorName);
-        Task<JObject> GetS3ConnectorConfig(string connectorName);
+        Task<List<ConnectorDto>> GetS3ConnectorsAsync();
+        Task<JObject> GetS3ConnectorStatusAsync(string connectorName);
+        Task<JObject> GetS3ConnectorConfigAsync(string connectorName);
     }
 }

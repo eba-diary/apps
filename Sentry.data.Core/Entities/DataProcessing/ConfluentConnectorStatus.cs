@@ -10,9 +10,9 @@ namespace Sentry.data.Core
 {
     public class ConfluentConnectorStatus
     {
-        public string name { get; set; }
-        public ConfluentConnectorStatusConnector connector { get; set; }
-        public List<ConfluentConnectorStatusTask> tasks { get; set; }
-        public string type { get; set; }
+        public string Name { get; set; }
+        public ConfluentConnectorStatusConnector Connector { get; set; }
+        public List<ConfluentConnectorStatusTask> Tasks { get; set; }
+        public string Type { get; set; }
     }
 }

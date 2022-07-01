@@ -9,6 +9,6 @@ namespace Sentry.data.Web
 {
     public class ConnectorViewModel
     {
-        public List<ConnectorRootModel> Connectors { get; set; }
+        public List<ConnectorModel> Connectors { get; set; }
     }
 }

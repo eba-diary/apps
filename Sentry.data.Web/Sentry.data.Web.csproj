@@ -17,7 +17,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44321</IISExpressSSLPort>
+    <IISExpressSSLPort>44371</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -436,11 +436,8 @@
     <Compile Include="Models\ApiModels\Schema20220609\SchemaConsumptionSnowflakeModel.cs" />
     <Compile Include="Models\ApiModels\Schema20220609\SchemaInfoModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
-    <Compile Include="Models\DataProcessing\ConnectorInfoModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorViewModel.cs" />
-    <Compile Include="Models\DataProcessing\ConnectorRootModel.cs" />
-    <Compile Include="Models\DataProcessing\ConnectorStatusModel.cs" />
-    <Compile Include="Models\DataProcessing\ConnectorTaskModel.cs" />
+    <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
