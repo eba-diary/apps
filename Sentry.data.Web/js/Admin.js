@@ -26,32 +26,33 @@ data.Admin = {
         });
     },
 
-    //creates url for ajax call to get schema associated with selected dataset
+    // creates url for ajax call to get schema associated with selected dataset
     GetSchemaUrl: function (datasetId) {
         var url = "../../api/v2/metadata/dataset/" + datasetId + "/schema";
         console.log(url);
         return url;
     },
 
-    //creates schema dropdown for selected dataset
+    // creates schema dropdown for selected dataset
     GetSchemaDropdown: function (url) {
         $.ajax({
             type: "GET",
             url: url,
             success: function (data) {
-                var s = '<option value="-1"id="defaultSchemaSelection">Please Select a Schema</option>';
+                $("#schemaDropdown").materialSelect({ destroy: true });
+                var s = '<option value="-1">Please Select a Schema</option>';
                 for (var d of data) {
                     s += '<option value="' + d.SchemaId + '">' + d.Name + '</option>';
                 }
                 $("#schemaDropdown").html(s);
-                //proof of concept, alternate method of input validation for dropdown menues rather than current if(selected val!=-1) 
+                // proof of concept, alternate method of input validation for dropdown menues rather than current if(selected val!=-1) 
                 $("#defaultSchemaSelection").prop("disabled", true);
-                $("#schemaDropdown").materialSelect('destroy');
+                $("#schemaDropdown").materialSelect();
             }
         });
     },
 
-    //creates url for Ajax call to get data files
+    // creates url for Ajax call to get data files
     GetFileUrl: function (datasetId, schemaId) {
         var url = "../../api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000";
         console.log(url);
@@ -102,31 +103,30 @@ data.Admin = {
         });
     },
 
-    //creates url for Ajax call to get flowsteps associated with selected schema ***unfinished and unimplemented***
-    GetFlowStepUrl: function (datasetId, schemaId) {
-        var url = "../../apiv2/" + datasetId + schemaId;
+    GetFlowStepUrl: function (schemaId) {
+        var url = "../../api/v2/dataflow?schemaId=" + schemaId;
         console.log(url);
-      //need to see new api url structure before continuing
+      // need to see new api url structure before continuing
         return url;
     },
-
-    //creates dropdown menu for flowsteps based on selected dataset and schema ***unfinished and unimplemented***
+     
+    // creates dropdown menu for flowsteps based on selected dataset and schema ***unfinished and unimplemented***
     GetFlowStepDropdown: function (url) {
-        $ajax({
+        $.ajax({
             type: "GET",
             url: url,
             success: function (data) {
-                var s = '<option value>Please Select Flow Step<option>';
-                for (var d of data) {
-                    //need to know what the API returns to finish this
-                    s += '<option value="???"></option>';
+                $("#flowStepsDropdown").materialSelect({ destroy: true });
+                var s = '<option value="-1">Please Select a Flow Step</option>';
+                for (var d of data[0].steps) {
+                    s += '<option value="' + d.Id + '">' + d.ActionName + '</option>';
                 }
                 $("#flowStepsDropdown").html(s);
-                $("#flowStepsDropdown").materialSelect('destroy');
+                $("#flowStepsDropdown").materialSelect();
             },
         });
     },
-    //activate or deactivate reprocess button based on input list of checked boxes
+    // activate or deactivate reprocess button based on input list of checked boxes
     ActivateDeactivateReprocessButton: function () {
         var checkedBoxes = $(".select-all-target:checkbox:checked");
         if (checkedBoxes.length > 0 && checkedBoxes.length <= 100 && $("#flowStepsDropdown").find(":selected").val() != "-1") {
@@ -136,12 +136,11 @@ data.Admin = {
             $("#reprocessButton").prop("disabled", true);
         }
     },
-    //loads reprocessing page with event handlers
-
+    // loads reprocessing page with event handlers
     ReprocessInit: function () {
-        $("#AllDatasets").materialSelect("destroy");
-        $("#schemaDropdown").materialSelect("destroy")
-        $("#flowStepsDropdown").materialSelect("destroy");
+        $("#AllDatasets").materialSelect();
+        $("#schemaDropdown").materialSelect()
+        $("#flowStepsDropdown").materialSelect();
         $("#AllDatasets").change(function (event) {
             var datasetId = $("#AllDatasets").find(":selected").val();
             if (datasetId != "") {
@@ -156,25 +155,38 @@ data.Admin = {
             if (schemaId != "" && datasetId != "") {
                 var url = data.Admin.GetFileUrl(datasetId, schemaId);
                 data.Admin.PopulateTable(url);
-                // url = data.Admin.GetFlowStepUrl(datasetId, schemaId);
-                 // data.Admin.getFlowStepDropdown(url);
+                url = data.Admin.GetFlowStepUrl(schemaId);
+                data.Admin.GetFlowStepDropdown(url);
             }
         });
-        //activate or deactivate button
+        // activate or deactivate button
         $("#results").on("click", ".select-all-target", function () {
 
             data.Admin.ActivateDeactivateReprocessButton();
         });
-        //submit selected file list
+        // submit selected file list
         $("#reprocessButton").click(function (event) {
             var filesToReprocess = [];
             $(".select-all-target:checkbox:checked").each(function () {
                 var checkbox = $(this);
                 filesToReprocess.push(checkbox.data("fileid"));
             });
-            alert("Selected files (ID's: " + filesToReprocess + ") submitted for reprocessing at flowstep " + $("#flowStepsDropdown").find(":selected").val());
+            var flowStep = $("#flowStepsDropdown").find(":selected").val();
+            $.ajax({
+                type: "POST",
+                url: "../../api/v2/datafile/DataFile/Reprocess",
+                contentType: "application/json",
+                data: JSON.stringify({ DataFlowStepId: flowStep, DatasetFileIds: filesToReprocess }),
+                success: function () {
+                    data.Dataset.makeToast("success", "File Id(s) " + filesToReprocess + " posted for reprocessing at flow step " + flowStep + ".")
+                },
+                error: function () {
+                    data.Dataset.makeToast("error", "Selected file(s) could not be posted for reprocessing. Please try again.")
+                }
+                
+            })
         });
-        //activate or deactivate button
+        // activate or deactivate button
         $("#flowStepsDropdown").change(function (event) {
             data.Admin.ActivateDeactivateReprocessButton();
         });
@@ -186,13 +198,11 @@ data.Admin = {
             if (selectAllCheckbox.is(":checked")) {
                 $(".select-all-target").each(function () {
                     $(this).prop("checked", selectAllCheckbox.is(":checked"));
-                    data.Admin.AddToSelectedFiles(filesToReprocess, $(this).data("fileid"));
                 });
             }
             else {
                 $(".select-all-target").each(function () {
                     $(this).prop("checked", selectAllCheckbox.is(":checked"));
-                    data.Admin.RemoveFromSelectedFiles(filesToReprocess, $(this).data("fileid"));
                 });
             }
 
