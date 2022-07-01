@@ -33,8 +33,8 @@ namespace Sentry.data.Web.Controllers
             switch (viewId)
             {
                 case "1":
-                    DataReprocessingModel dataReprocessingModel = new DataReprocessingModel();
                     List<DatasetDto> dtoList = _datasetService.GetAllDatasetDto();
+                    DataReprocessingModel dataReprocessingModel = new DataReprocessingModel();
                     dataReprocessingModel.AllDatasets = new List<SelectListItem>();
                     foreach(DatasetDto d in dtoList)
                     {

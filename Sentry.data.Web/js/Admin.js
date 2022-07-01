@@ -39,6 +39,7 @@ data.Admin = {
             type: "GET",
             url: url,
             success: function (data) {
+                $("#schemaDropdown").materialSelect({ destroy: true });
                 var s = '<option value="-1">Please Select a Schema</option>';
                 for (var d of data) {
                     s += '<option value="' + d.SchemaId + '">' + d.Name + '</option>';
@@ -97,6 +98,7 @@ data.Admin = {
             type: "GET",
             url: url,
             success: function (data) {
+                $("#flowStepsDropdown").materialSelect({ destroy: true });
                 var s = '<option value="-1">Please Select a Flow Step</option>';
                 for (var d of data[0].steps) {
                     s += '<option value="' + d.Id + '">' + d.ActionName + '</option>';
@@ -151,7 +153,17 @@ data.Admin = {
                 var checkbox = $(this);
                 filesToReprocess.push(checkbox.data("fileid"));
             });
-            alert("Selected files (ID's: " + filesToReprocess + ") submitted for reprocessing at flowstep " + $("#flowStepsDropdown").find(":selected").val());
+            var flowStep = $("#flowStepsDropdown").find(":selected").val();
+            var DatasetFileReprocessModel = '{"DataFlowStepId": ' + flowStep + ', "DatasetFileIds":' + filesToReprocess + '}';
+            $.ajax({
+                type: "POST",
+                url: "../../api/v2/datafile/DataFile/Reprocess",
+                contentType: "application/json",
+                data: DatasetFileReprocessModel,
+                success: function () { alert("That worked!") },
+                error: function () {alert("That didn't work!") }
+                
+            })
         });
         // activate or deactivate button
         $("#flowStepsDropdown").change(function (event) {
