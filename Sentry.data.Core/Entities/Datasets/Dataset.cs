@@ -69,13 +69,11 @@ namespace Sentry.data.Core
         }
         public virtual IList<Favorite> Favorities { get; set; }
 
-        public virtual List<DatasetScopeType> DatasetScopeType
+        public virtual List<DatasetScopeType> DatasetScopeType()
         {
-            get
-            {
-                return DatasetFileConfigs.Select(x => x.DatasetScopeType).GroupBy(x => x.Name).Select(x => x.First()).ToList();
-            }
+            return DatasetFileConfigs.Select(x => x.DatasetScopeType).GroupBy(x => x.Name).Select(x => x.First()).ToList();
         }
+
         public virtual IList<Image> Images { get; set; }
         public virtual string NamedEnvironment { get; set; }
         public virtual NamedEnvironmentType NamedEnvironmentType { get; set; }
@@ -122,25 +120,9 @@ namespace Sentry.data.Core
             {
                 vr.Add(ValidationErrors.datasetCategoryRequired, "The Dataset Category is required");
             }
-            if (Asset == null)
-            {
-                vr.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "The SAID Asset is required");
-            }
             if (string.IsNullOrWhiteSpace(DatasetName))
             {
                 vr.Add(GlobalConstants.ValidationErrors.NAME_IS_BLANK, "The Dataset Name is required");
-            }
-            if (string.IsNullOrWhiteSpace(ShortName))
-            {
-                vr.Add(ValidationErrors.datasetShortNameRequired, "Short Name is required");
-            }
-            if (ShortName != null && new Regex(@"[^0-9a-zA-Z]").Match(ShortName).Success)
-            {
-                vr.Add(ValidationErrors.datasetShortNameInvalid, "Short Name can only contain alphanumeric characters");
-            }
-            if (ShortName != null && ShortName.Length > 12)
-            {
-                vr.Add(ValidationErrors.datasetShortNameInvalid, "Short Name must be 12 characters or less");
             }
             if (string.IsNullOrWhiteSpace(CreationUserName))
             {
@@ -159,7 +141,28 @@ namespace Sentry.data.Core
                 vr.Add(ValidationErrors.datasetDescriptionRequired, "The Dataset description is required");
             }
 
-            //Report specific checks
+            // Validations that only apply to Datasets
+            if (DatasetType == GlobalConstants.DataEntityCodes.DATASET)
+            {
+                if (Asset == null)
+                {
+                    vr.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "The SAID Asset is required");
+                }
+                if (string.IsNullOrWhiteSpace(ShortName))
+                {
+                    vr.Add(ValidationErrors.datasetShortNameRequired, "Short Name is required");
+                }
+                if (ShortName != null && new Regex(@"[^0-9a-zA-Z]").Match(ShortName).Success)
+                {
+                    vr.Add(ValidationErrors.datasetShortNameInvalid, "Short Name can only contain alphanumeric characters");
+                }
+                if (ShortName != null && ShortName.Length > 12)
+                {
+                    vr.Add(ValidationErrors.datasetShortNameInvalid, "Short Name must be 12 characters or less");
+                }
+            }
+
+            // Validations that only apply to Reports
             if (DatasetType == GlobalConstants.DataEntityCodes.REPORT && string.IsNullOrWhiteSpace(Metadata.ReportMetadata.Location))
             {
                 vr.Add(ValidationErrors.datasetLocationRequired, "Report Location is required");
