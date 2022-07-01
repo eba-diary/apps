@@ -24,8 +24,5 @@ namespace Sentry.data.Core
 
         void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status);
         void UpdateObjectStatus(int datasetFileId, GlobalEnums.ObjectStatusEnum status);
-
-
-        UserSecurity GetUserSecurityForDatasetFile(int datasetId);        
     }
 }
