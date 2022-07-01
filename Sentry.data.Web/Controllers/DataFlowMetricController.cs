@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using Sentry.data.Infrastructure;
 using Sentry.data.Core;
+using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -27,6 +28,10 @@ namespace Sentry.data.Web.Controllers
                 dataFlowAccordionModel.FlowEventGroups.Add(dto.FlowEvents);
             }
             return dataFlowAccordionModel;
+        }
+        public ActionResult GetDataFlowMetricAccordionView()
+        {
+            return PartialView("_DataFlowMetricAccordion");
         }
     }
 }

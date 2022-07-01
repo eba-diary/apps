@@ -1,5 +1,4 @@
-﻿
-@model DataFlowMetricsModel
+﻿@model DataFlowMetricsModel
 @{
     ViewBag.Title = "_AdminTest";
 }
@@ -21,18 +20,22 @@
 <!-- Schema Dropdown Menu-->
 <div class="d-inline-block">
     <h3>Schema</h3>
-    <select class="mbd-select admin-logs-dropdown" id="schemaDropdown" style="display:none" searchable ="Search Available Schema">
+    <select class="mbd-select admin-logs-dropdown" id="schemaDropdown" style="display:none" searchable="Search Available Schema">
         <option value="-1">Please Select a Schema</option>
         <!--populated asyncronously via ajax-->
     </select>
 </div>
 <div class="d-inline-block">
     <h3>Data Files</h3>
-    <select class="mbd-select admin-logs-dropdown" id="fileDropdown" style="display:none" searchable ="Search Available Files">
+    <select class="mbd-select admin-logs-dropdown" id="fileDropdown" style="display:none" searchable="Search Available Files">
         <option value="-1">(Optional) Select a File</option>
     </select>
 </div>
-<button type="button" class="btn btn-primary waves-effect waves-light d-inline-block" id="submitButton" disabled>Submit</button>
+<button type="button" class="btn btn-primary waves-effect waves-light d-inline-block" id="submitButton" disabled data-url="@Url.Action("GetDataFlowMetricAccordionView", "DataFlowMetric")">Submit</button>
+<!--Partial View Area for the Accordion-->
+<div id="accordion-view-area">
+
+</div>
 
 <script>
     $(function () {

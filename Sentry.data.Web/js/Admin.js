@@ -211,7 +211,7 @@ data.Admin = {
         */
         
     },
-
+    //loads dataflow metric page events
     LogsInit: function () {
         $("#DatasetsList").materialSelect();
         $("#schemaDropdown").materialSelect();
@@ -246,12 +246,8 @@ data.Admin = {
         });
         $("#submitButton").click(function (event) {
             
-            if ($("#fileDropdown").find(":selected").val() != "-1") {
-                alert("Partial View of the accordion with the searched file!")
-            }
-            else {
-                alert("Partial View of the accordion with all files for the given dataset and schema!")
-            }
+            var url = $(this).data("url");
+            $("#accordion-view-area").load(url);
         })
     },
     // Loads Admin jobs pages
