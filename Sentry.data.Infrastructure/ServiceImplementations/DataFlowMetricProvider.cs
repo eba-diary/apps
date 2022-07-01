@@ -19,7 +19,8 @@ namespace Sentry.data.Infrastructure
 
         public List<DataFlowMetricEntity> GetDataFlowMetricEntities(FilterSearchDto dto)
         {
-            throw new NotImplementedException();
+            ElasticResult<DataFlowMetricEntity> elasticResult = _elasticContext.SearchAsync<DataFlowMetricEntity>(x=>x.MatchAll()).Result;
+            return elasticResult.Documents.ToList();
         }
     }
 }

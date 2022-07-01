@@ -9,11 +9,69 @@ namespace Sentry.data.Infrastructure
 {
     public class DataFlowMetricService: IDataFlowMetricService
     {
-        private readonly IDataFlowMetricService _dataFlowMetricService;
-        public DataFlowMetricService(IDataFlowMetricService dataFlowMetricService)
+        private readonly IDataFlowMetricProvider _dataFlowMetricProvider;
+        public DataFlowMetricService(IDataFlowMetricProvider dataFlowMetricProvider)
         {
-            _dataFlowMetricService = dataFlowMetricService;
+            _dataFlowMetricProvider = dataFlowMetricProvider;
         }
-
+        public List<DataFlowMetricDto> GetMetricList(List<DataFlowMetricEntity> entityList)
+        {
+            List<DataFlowMetricDto> dataFlowMetricDtos = new List<DataFlowMetricDto>();
+            foreach(DataFlowMetricEntity entity in entityList)
+            {
+                DataFlowMetricDto dto = entity.ToDto();
+                dataFlowMetricDtos.Add(dto);
+            }
+            return dataFlowMetricDtos;
+        }
+        public List<DataFileFlowMetricsDto> GetFileMetricGroups(List<DataFlowMetricDto> dtoList)
+        {
+            List<DataFileFlowMetricsDto> fileGroups = new List<DataFileFlowMetricsDto>();
+            foreach(DataFlowMetricDto dto in dtoList)
+            {
+                if (fileGroups.Count == 0)
+                {
+                    DataFileFlowMetricsDto fileGroup = new DataFileFlowMetricsDto();
+                    fileGroup.FileName = dto.FileName;
+                    fileGroup.FirstEventTime = dto.MetricGeneratedDateTime;
+                    fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
+                    fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
+                    fileGroup.FlowEvents.Add(dto);
+                    fileGroups.Add(fileGroup);
+                }
+                else
+                {
+                    bool present = false;
+                    foreach(DataFileFlowMetricsDto fileGroup in fileGroups)
+                    {
+                        if (dto.FileName == fileGroup.FileName)
+                        {
+                            present = true;
+                            if(fileGroup.FirstEventTime > dto.MetricGeneratedDateTime)
+                            {
+                                fileGroup.FirstEventTime = dto.MetricGeneratedDateTime;
+                            }
+                            if(fileGroup.LastEventTime < dto.MetricGeneratedDateTime)
+                            {
+                                fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
+                            }
+                            fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
+                            fileGroup.FlowEvents.Add(dto);
+                        }
+                    }
+                    if (present == false)
+                    {
+                        DataFileFlowMetricsDto fileGroup = new DataFileFlowMetricsDto();
+                        fileGroup.FileName = dto.FileName;
+                        fileGroup.FirstEventTime = dto.MetricGeneratedDateTime;
+                        fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
+                        fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
+                        fileGroup.FlowEvents.Add(dto);
+                        fileGroups.Add(fileGroup);
+                    }
+                }
+            }
+            return fileGroups;
+        }
     }
 }

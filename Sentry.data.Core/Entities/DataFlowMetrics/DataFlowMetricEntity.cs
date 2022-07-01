@@ -14,7 +14,7 @@ namespace Sentry.data.Core
         public int SchemaId { get; set; }
 
         [PropertyName("messagevalue")]
-        public string EvenContents { get; set; }
+        public string EventContents { get; set; }
 
         [PropertyName("maxexecutuionorder")]
         public int TotalFlowSteps { get; set; }
@@ -77,7 +77,7 @@ namespace Sentry.data.Core
         public int RunInstanceGuid { get; set; }
 
         [PropertyName("filename")]
-        public string Filename { get; set; }
+        public string FileName { get; set; }
 
         [PropertyName("saidkeycode")]
         public string SaidKeyCode { get; set; }
@@ -95,5 +95,40 @@ namespace Sentry.data.Core
         public string StatusCode { get; set; }
 
         #endregion
+        public DataFlowMetricDto ToDto()
+        {
+            return new DataFlowMetricDto()
+            {
+                QueryMadeDateTime = QueryMadeDateTime,
+                SchemaId = SchemaId,
+                EventContents = EventContents,
+                TotalFlowteps = TotalFlowSteps,
+                FileModifiedDateTime = FileModifiedDateTime,
+                OriginalFileName = OriginalFileName,
+                DatasetId = DatasetId,
+                CurrentFlowStep = CurrentFlowStep,
+                DataActionId = DataActionId,
+                DataFlowId = DataFlowId,
+                Partition = Partition,
+                DataActionTypeId = DataActionTypeId,
+                MessageKey = MessageKey,
+                Duration = Duration,
+                Offset = Offset,
+                DataFlowName = DataFlowName,
+                DataFlowStepId = DataFlowStepId,
+                FlowExecutionGuid = FlowExecutionGuid,
+                FileSize = FileSize,
+                EventMetricId = EventMetricId,
+                StorageCode = StorageCode,
+                FileCreatedDateTime = FileCreatedDateTime,
+                RunInstanceGuid = RunInstanceGuid,
+                FileName = FileName,
+                SaidKeyCode = SaidKeyCode,
+                MetricGeneratedDateTime = MetricGeneratedDateTime,
+                DatesetFileId = DatesetFileId,
+                ProcessStartDateTime = ProcessStartDateTime,
+                StatusCode = StatusCode,
+            };
+        }
     }
 }
