@@ -154,14 +154,17 @@ data.Admin = {
                 filesToReprocess.push(checkbox.data("fileid"));
             });
             var flowStep = $("#flowStepsDropdown").find(":selected").val();
-            var DatasetFileReprocessModel = '{"DataFlowStepId": ' + flowStep + ', "DatasetFileIds":' + filesToReprocess + '}';
             $.ajax({
                 type: "POST",
                 url: "../../api/v2/datafile/DataFile/Reprocess",
                 contentType: "application/json",
-                data: DatasetFileReprocessModel,
-                success: function () { alert("That worked!") },
-                error: function () {alert("That didn't work!") }
+                data: JSON.stringify({ DataFlowStepId: flowStep, DatasetFileIds: filesToReprocess }),
+                success: function () {
+                    data.Dataset.makeToast("success", "File Id(s) " + filesToReprocess + " posted for reprocessing at flow step " + flowStep + ".")
+                },
+                error: function () {
+                    data.Dataset.makeToast("error", "Selected file(s) could not be posted for reprocessing. Please try again.")
+                }
                 
             })
         });
