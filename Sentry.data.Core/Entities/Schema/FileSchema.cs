@@ -1,4 +1,6 @@
-﻿namespace Sentry.data.Core
+﻿using System.Collections.Generic;
+
+namespace Sentry.data.Core
 {
     public class FileSchema : Schema
     {
@@ -17,16 +19,11 @@
         public virtual string HiveLocation { get; set; }
         public virtual string HiveTableStatus { get; set; }
         public virtual string StorageCode { get; set; }
-        public virtual string SnowflakeTable { get; set; }
-        public virtual string SnowflakeDatabase { get; set; }
-        public virtual string SnowflakeSchema { get; set; }
-        public virtual string SnowflakeStatus { get; set; }
         public virtual string SchemaRootPath { get; set; }
         public virtual string ParquetStorageBucket { get; set; }
         public virtual string ParquetStoragePrefix { get; set; }
-        public virtual string SnowflakeStage { get; set; }
-        public virtual string SnowflakeWarehouse { get; set; }
 
+        public virtual IList<SchemaConsumption> ConsumptionDetails { get; set; }
         
     }
 }

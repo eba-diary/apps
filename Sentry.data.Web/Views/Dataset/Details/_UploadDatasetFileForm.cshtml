@@ -1,0 +1,40 @@
+﻿@model Sentry.data.Web.UploadDatasetFileModel
+@{
+    ViewBag.Title = "Upload Datafile";
+}
+
+@using (Html.BeginForm("UploadDatasetFileToS3", "Dataset", FormMethod.Post, new { id = "upload-data-file-form", @class = "md-form needs-validation" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.DatasetId)
+    @Html.HiddenFor(x => x.ConfigId)
+    @Html.HiddenFor(x => x.SchemaName)
+
+    <div class="file-field mb-5">
+        <div class="btn btn-primary btn-sm waves-effect waves-light">
+            <span>Choose file</span>
+            @Html.TextBoxFor(x => x.DatasetFile, new { id = "data-file-to-upload", type = "file" })
+        </div>
+
+        <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Select file to upload to @Model.SchemaName" disabled required>
+        </div>
+
+        <div class="invalid-feedback ml-2" id="upload-invalid-message"></div>
+    </div>
+
+    <div id="upload-progress" class="mb-5 ml-3 mr-3 d-none">
+        <div class="progress md-progress" id="upload-progress-1">
+            <div class="progress-bar bg-primary" id="upload-progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+
+        <div class="progress md-progress sentry-dark-blue d-none" id="upload-progress-2">
+            <div class="indeterminate"></div>
+        </div>
+    </div>
+
+    <div id="upload-modal-buttons">
+        <button type="submit" class="btn btn-primary data-file-button" id="submit-upload-file" disabled><em class="fas fa-cloud-upload-alt button-icon"></em>Upload</button>
+        <button type="button" class="btn btn-warning data-file-button" data-dismiss="modal">Cancel</button>
+    </div>
+}

@@ -65,15 +65,20 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 Property(x => x.HiveLocation, m => m.Column("HiveLocation"));
                 Property(x => x.StorageCode, m => m.Column("StorageCode"));
                 Property(x => x.HiveTableStatus, m => m.Column("HiveStatus"));
-                Property(x => x.SnowflakeTable, m => m.Column("SnowflakeTable"));
-                Property(x => x.SnowflakeDatabase, m => m.Column("SnowflakeDatabase"));
-                Property(x => x.SnowflakeSchema, m => m.Column("SnowflakeSchema"));
-                Property(x => x.SnowflakeStatus, m => m.Column("SnowflakeStatus"));
                 Property(x => x.SchemaRootPath, m => m.Column("SchemaRootPath"));
                 Property(x => x.ParquetStorageBucket);
                 Property(x => x.ParquetStoragePrefix);
-                Property(x => x.SnowflakeStage);
-                Property(x => x.SnowflakeWarehouse);
+                Bag((x) => x.ConsumptionDetails, (m) =>
+                {
+                    m.Inverse(true);
+                    m.Table("SchemaConsumption");
+                    m.Cascade(Cascade.All);
+                    m.Key((k) =>
+                    {
+                        k.Column("Schema_Id");
+                        k.ForeignKey("FK_SchemaConsumption_Schema");
+                    });
+                }, map => map.OneToMany(a => a.Class(typeof(SchemaConsumption))));
             }
         }
     }

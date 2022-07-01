@@ -1,9 +1,12 @@
 ﻿using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.FeatureFlags;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
+using Sentry.data.Core.Interfaces.QuartermasterRestClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
 
@@ -17,13 +20,15 @@ namespace Sentry.data.Core
         private readonly IBaseTicketProvider _baseTicketProvider;
         private readonly IDataFeatures _dataFeatures;
         private readonly IInevService _inevService;
+        private readonly IQuartermasterService _quartermasterService;
 
-        public SecurityService(IDatasetContext datasetContext, IBaseTicketProvider baseTicketProvider, IDataFeatures dataFeatures, IInevService inevService)
+        public SecurityService(IDatasetContext datasetContext, IBaseTicketProvider baseTicketProvider, IDataFeatures dataFeatures, IInevService inevService, IQuartermasterService quartermasterService)
         {
             _datasetContext = datasetContext;
             _baseTicketProvider = baseTicketProvider;
             _dataFeatures = dataFeatures;
             _inevService = inevService;
+            _quartermasterService = quartermasterService;
         }
 
         public async Task<string> RequestPermission(AccessRequest model)
@@ -208,12 +213,13 @@ namespace Sentry.data.Core
             //if it is not secure, it should be wide open except for upload and notifications
             if (securable == null || securable.Security == null || !securable.IsSecured)
             {
-                BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, parentSecurity);
+                BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, parentSecurity, _dataFeatures);
             }
             else
             {
-                BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, parentSecurity, securable);
+                BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, parentSecurity, securable, _dataFeatures);
             }
+
             return us;
         }
 
@@ -280,7 +286,7 @@ namespace Sentry.data.Core
                 //exclude the "Inherit Parent" permission
                 results.AddRange(
                     tickets
-                    .Where(t => !t.Permissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS))
+                    .Where(t => !t.Permissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) && t.IsAddingPermission)
                     .SelectMany(t => t.Permissions.Select(p => new SecurablePermission
                     {
                         Scope = SecurablePermissionScope.Self,
@@ -288,7 +294,8 @@ namespace Sentry.data.Core
                         Identity = t.Identity,
                         IdentityType = t.IdentityType,
                         SecurityPermission = p,
-                        TicketId = t.TicketId
+                        TicketId = t.TicketId,
+                        IsSystemGenerated = t.IsSystemGenerated
                     }))
                 );
 
@@ -341,7 +348,7 @@ namespace Sentry.data.Core
         /// <param name="userPermissions">The list of permissions we've gathered for this user</param>
         /// <param name="us">The user security object to populate</param>
         /// <param name="parentSecurity">The user's security to this entity's parent</param>
-        internal static void BuildOutUserSecurityForUnsecuredEntity(bool IsAdmin, bool IsOwner, List<string> userPermissions, UserSecurity us, UserSecurity parentSecurity)
+        internal static void BuildOutUserSecurityForUnsecuredEntity(bool IsAdmin, bool IsOwner, List<string> userPermissions, UserSecurity us, UserSecurity parentSecurity, IDataFeatures features)
         {
             //if it is not secure, it should be wide open except for upload and notifications. call everything out for visibility.
             us.CanPreviewDataset = true;
@@ -353,6 +360,8 @@ namespace Sentry.data.Core
             us.CanViewData = true;
             us.CanManageSchema = (userPermissions.Count > 0) ? userPermissions.Contains(PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin : (IsOwner || IsAdmin);
             MergeParentSecurity(us, parentSecurity);
+
+            us.CanDeleteDatasetFile = CanDeleteDatasetFile(us, features);
         }
 
         /// <summary>
@@ -367,7 +376,7 @@ namespace Sentry.data.Core
         /// <param name="parentSecurity">The user's security to this entity's parent</param>
         /// <param name="securable">The securable entity itself</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S1541:Methods and properties should not be too complex", Justification = "Breaking this method up more actually makes it more difficult to understand")]
-        internal static void BuildOutUserSecurityForSecuredEntity(bool IsAdmin, bool IsOwner, List<string> userPermissions, UserSecurity us, UserSecurity parentSecurity, ISecurable securable)
+        internal static void BuildOutUserSecurityForSecuredEntity(bool IsAdmin, bool IsOwner, List<string> userPermissions, UserSecurity us, UserSecurity parentSecurity, ISecurable securable, IDataFeatures features)
         {
             //from the list of permissions, build out the security object.
             us.CanPreviewDataset = userPermissions.Contains(PermissionCodes.CAN_PREVIEW_DATASET) || IsOwner || (IsAdmin);
@@ -379,6 +388,8 @@ namespace Sentry.data.Core
             us.CanManageSchema = userPermissions.Contains(PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin;
             us.CanViewData = userPermissions.Contains(PermissionCodes.CAN_VIEW_FULL_DATASET) || IsOwner || (!securable.AdminDataPermissionsAreExplicit && IsAdmin);
             MergeParentSecurity(us, parentSecurity);
+
+            us.CanDeleteDatasetFile = CanDeleteDatasetFile(us, features);
         }
 
         /// <summary>
@@ -400,6 +411,11 @@ namespace Sentry.data.Core
                 us.CanUseDataSource = us.CanUseDataSource || parentSecurity.CanUseDataSource;
                 us.CanManageSchema = us.CanManageSchema || parentSecurity.CanManageSchema;
             }
+        }
+
+        private static bool CanDeleteDatasetFile(UserSecurity us, IDataFeatures features)
+        {
+            return us.CanEditDataset && us.CanManageSchema && features.CLA4049_ALLOW_S3_FILES_DELETE.GetValue();
         }
 
         /// <summary>
@@ -435,6 +451,11 @@ namespace Sentry.data.Core
                 x.EnabledDate = DateTime.Now;
             });
 
+            if(ticket.Permissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS))
+            {
+                BuildS3RequestAssistance(ticket);
+            }
+
             await PublishDatasetPermissionsUpdatedInfrastructureEvent(ticket);
 
         }
@@ -456,6 +477,38 @@ namespace Sentry.data.Core
             }
         }
 
+        public void BuildS3RequestAssistance(SecurityTicket ticket)
+        {
+            var dataset = _datasetContext.Datasets.Where(d => d.Security.Tickets.Contains(ticket)).FirstOrDefault();
+            string project = Sentry.Configuration.Config.GetHostSetting("S3_JiraTicketProject");
+            string summary = "S3 Access " + (ticket.IsAddingPermission ? "Request" : "Removal");
+            StringBuilder sb = new StringBuilder();
+            string issueType = "Request";
+
+            //Build Description
+            string account = Sentry.Configuration.Config.GetHostSetting("AwsAccountId");
+            string name = "sentry-dtlk-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-" + dataset.ShortName + "-ae2";
+
+            sb.AppendLine("Account: " + account);
+            sb.AppendLine("Name: " + name);
+            sb.AppendLine("Source Bucket: " + "sentry-dtlk-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-ae2");
+            sb.AppendLine("Principal AWS ARN: " + ticket.AwsArn);
+            sb.AppendLine("Action: s3.*");
+            sb.AppendLine("Action Bucket: S3:ListBucket");
+            sb.AppendLine("Resource: " + "arn:aws:s3:us-east-2:" + account + ":accesspoint/" + name);
+            foreach (DatasetFileConfig dsfc in dataset.DatasetFileConfigs)
+            {
+                sb.AppendLine("Schema: " + dsfc.Schema.Name);
+                sb.AppendLine("\t\tBucket: " + dsfc.Schema.ParquetStorageBucket);
+                sb.AppendLine("\t\tPrefix: " + dsfc.Schema.ParquetStoragePrefix);
+            }
+            List<JiraCustomField> customFields = new List<JiraCustomField>();
+            JiraCustomField acceptanceCriteria = new JiraCustomField();
+            acceptanceCriteria.Name = "Acceptance Criteria";
+            acceptanceCriteria.Value = sb.ToString();
+            customFields.Add(acceptanceCriteria);
+            _quartermasterService.BuildJiraTicketAndRequest(project, new List<string>(), new List<string>(), "", summary, issueType, customFields);
+        }
 
         /// <summary>
         /// A ticket in Cherwell has been denied

@@ -161,9 +161,12 @@ namespace Sentry.data.Infrastructure
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("QuartermasterServiceBaseUrl"));
 
             //register Inev client
-            var inevClient = new HttpClient(new HttpClientHandler() {
-                Credentials = new NetworkCredential(Configuration.Config.GetHostSetting("ServiceAccountID"),
-                                                    Configuration.Config.GetHostSetting("ServiceAccountPassword"))});
+            var inevClient = new HttpClient(new HttpClientHandler()
+            {
+                Credentials = new NetworkCredential(
+                    Configuration.Config.GetHostSetting("ServiceAccountID"),
+                    Configuration.Config.GetHostSetting("ServiceAccountPassword"))
+            });
             registry.For<Sentry.data.Core.Interfaces.InfrastructureEventing.IClient>().Singleton().Use<InfrastructureEventing.Client>().
                 Ctor<HttpClient>().Is(inevClient).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("InfrastructureEventingServiceBaseUrl"));
