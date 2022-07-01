@@ -1,21 +1,6 @@
-﻿using System;
+﻿using Sentry.data.Core;
 using System.Collections.Generic;
-using Sentry.data.Core.Entities.DataProcessing;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using System.Threading;
-using System.Data;
-using Sentry.data.Core;
-using Sentry.DataTables.QueryableAdapter;
-using Sentry.DataTables.Mvc;
-using Sentry.DataTables.Shared;
-using DoddleReport.Web;
-using DoddleReport;
-using Sentry.Core;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -57,8 +42,16 @@ namespace Sentry.data.Web.Controllers
             return Content(json, "application/json");
         }
 
+        private readonly IDatasetService _datasetService;
+        public AdminController(IDatasetService datasetService)
+        {
+            _datasetService = datasetService;
+        }
+
         // GET: Admin
         public async Task<ActionResult> Index()
+
+        public ActionResult Index()
         {
             Dictionary<string, string> myDict =
             new Dictionary<string, string>();
@@ -70,15 +63,23 @@ namespace Sentry.data.Web.Controllers
 
             return View(myDict);
         }
-        
-        public ActionResult GetAdminTest(string viewId)
+        public ActionResult GetAdminAction(string viewId)
         {
             string viewPath = "";
             switch (viewId)
             {
                 case "1":
-                    viewPath = "_DataFileReprocessing";
-                    break;
+                    List<DatasetDto> dtoList = _datasetService.GetAllDatasetDto();
+                    DataReprocessingModel dataReprocessingModel = new DataReprocessingModel();
+                    dataReprocessingModel.AllDatasets = new List<SelectListItem>();
+                    foreach(DatasetDto d in dtoList)
+                    {
+                        SelectListItem item = new SelectListItem();
+                        item.Text = d.DatasetName;
+                        item.Value = d.DatasetId.ToString();
+                        dataReprocessingModel.AllDatasets.Add(item);
+                    }
+                    return PartialView("_DataFileReprocessing", dataReprocessingModel);
                 case "2":
                     viewPath = "_AdminTest2";
                     break;
