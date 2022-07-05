@@ -14,6 +14,10 @@ namespace Sentry.data.Infrastructure
         {
             _dataFlowMetricProvider = dataFlowMetricProvider;
         }
+        public List<DataFlowMetricEntity> GetDataFlowMetricEntities(DataFlowMetricSearchDto dto)
+        {
+            return _dataFlowMetricProvider.GetDataFlowMetricEntities(dto);
+        }
         public List<DataFlowMetricDto> GetMetricList(List<DataFlowMetricEntity> entityList)
         {
             List<DataFlowMetricDto> dataFlowMetricDtos = new List<DataFlowMetricDto>();

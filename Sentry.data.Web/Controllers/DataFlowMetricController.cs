@@ -11,10 +11,12 @@ namespace Sentry.data.Web.Controllers
     public class DataFlowMetricController : BaseController
     {
         private readonly DataFlowMetricService _dataFlowMetricService;
+        public DataFlowMetricSearchDto searchDto;
 
         public DataFlowMetricController(DataFlowMetricService dataFlowMetricService)
         {
             _dataFlowMetricService = dataFlowMetricService;
+            searchDto = new DataFlowMetricSearchDto();
         }
         public DataFlowMetricAccordionModel GetDataFlowMetricAccordionModel(List<DataFileFlowMetricsDto> dtoList)
         {
@@ -31,6 +33,13 @@ namespace Sentry.data.Web.Controllers
         }
         public ActionResult GetDataFlowMetricAccordionView()
         {
+            /*
+            List<DataFlowMetricEntity> entityList = _dataFlowMetricService.GetDataFlowMetricEntities(searchDto);
+            List<DataFlowMetricDto> metricDtoList = _dataFlowMetricService.GetMetricList(entityList);
+            List<DataFileFlowMetricsDto> fileGroups = _dataFlowMetricService.GetFileMetricGroups(metricDtoList);
+            DataFlowMetricAccordionModel dataFlowAccordionModel = GetDataFlowMetricAccordionModel(fileGroups);
+            */
+            //uncomment above and add dataFLowAccordionModel to below return statement, in current test environment, this throws expected error
             return PartialView("_DataFlowMetricAccordion");
         }
     }
