@@ -16,7 +16,6 @@ namespace Sentry.data.Web.Controllers
         public DataFlowMetricController(DataFlowMetricService dataFlowMetricService)
         {
             _dataFlowMetricService = dataFlowMetricService;
-            searchDto = new DataFlowMetricSearchDto();
         }
         public DataFlowMetricAccordionModel GetDataFlowMetricAccordionModel(List<DataFileFlowMetricsDto> dtoList)
         {
@@ -31,6 +30,14 @@ namespace Sentry.data.Web.Controllers
             }
             return dataFlowAccordionModel;
         }
+        [HttpPost]
+        public void GetSearchDto(DataFlowMetricSearchDto searchDtoData)
+        {
+            searchDto = new DataFlowMetricSearchDto();
+            searchDto.DatasetToSearch = searchDtoData.DatasetToSearch;
+            searchDto.SchemaToSearch = searchDtoData.SchemaToSearch;
+            searchDto.FileToSearch = searchDtoData.FileToSearch;
+        }
         public ActionResult GetDataFlowMetricAccordionView()
         {
             /*
@@ -39,7 +46,7 @@ namespace Sentry.data.Web.Controllers
             List<DataFileFlowMetricsDto> fileGroups = _dataFlowMetricService.GetFileMetricGroups(metricDtoList);
             DataFlowMetricAccordionModel dataFlowAccordionModel = GetDataFlowMetricAccordionModel(fileGroups);
             */
-            //uncomment above and add dataFLowAccordionModel to below return statement, in current test environment, this throws expected error
+            //uncomment above and add dataFlowAccordionModel to below return statement, in current test environment, this throws expected error
             return PartialView("_DataFlowMetricAccordion");
         }
     }

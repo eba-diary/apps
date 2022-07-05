@@ -23,7 +23,7 @@ namespace Sentry.data.Infrastructure
             List<QueryContainer> must = new List<QueryContainer>();
             must.AddMatch<DataFlowMetricEntity>(x => x.DatasetId, dto.DatasetToSearch);
             must.AddMatch<DataFlowMetricEntity>(x => x.SchemaId, dto.SchemaToSearch);
-            if(dto.FileToSearch != null)
+            if(dto.FileToSearch != "-1")
             {
                 must.AddMatch<DataFlowMetricEntity>(x => x.DatesetFileId, dto.FileToSearch);
             }

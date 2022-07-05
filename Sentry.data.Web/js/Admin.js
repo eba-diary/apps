@@ -245,7 +245,20 @@ data.Admin = {
             }
         });
         $("#submitButton").click(function (event) {
-            
+            var dto = new Object();
+            dto.FileToSearch = $("#fileDropdown").find(":selected").val();
+            dto.DatasetToSearch = $("#DatasetsList").find(":selected").val();
+            dto.SchemaToSearch = $("#schemaDropdown").find(":selected").val();
+            $.ajax({
+                type: "POST",
+                url: "/DataFlowMetric/GetSearchDto",
+                data: JSON.stringify(dto),
+                contentType: "application/json",
+                dataType: "json",
+                success: function () {
+                    alert("That worked!")
+                }
+            })
             var url = $(this).data("url");
             $("#accordion-view-area").load(url);
         })
