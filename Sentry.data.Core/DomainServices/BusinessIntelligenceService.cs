@@ -374,23 +374,20 @@ namespace Sentry.data.Core
             };
         }
 
-        //private void UpdateDatasetFileConfig(BusinessIntelligenceDto dto, Dataset ds)
-        //{
-        //    MapDatasetFileConig(dto, ds);
-        //}
-        private void CreateDatasetFileConfig(BusinessIntelligenceDto dto, DatasetFileConfig dfc)
+        private DatasetFileConfig CreateDatasetFileConfig(BusinessIntelligenceDto dto)
         {
-            MapDatasetFileConig(dto, dfc);
-        }
-
-        private void MapDatasetFileConig(BusinessIntelligenceDto dto, DatasetFileConfig dfc)
-        {
-            dfc.Name = dto.DatasetName;
-            dfc.Description = dto.DatasetDesc;
-            dfc.FileTypeId = dto.FileTypeId;
-            dfc.ParentDataset = _datasetContext.GetById<Dataset>(dto.DatasetId);
-            dfc.DatasetScopeType = _datasetContext.DatasetScopeTypes.Where(w => w.Name == "Point-in-Time").FirstOrDefault();
-            dfc.FileExtension = _datasetContext.FileExtensions.Where(w => w.Name == GlobalConstants.ExtensionNames.ANY).FirstOrDefault();
+            return new DatasetFileConfig()
+            {
+                Name = dto.DatasetName,
+                Description = dto.DatasetDesc,
+                FileTypeId = dto.FileTypeId,
+                ParentDataset = _datasetContext.GetById<Dataset>(dto.DatasetId),
+                DatasetScopeType = _datasetContext.DatasetScopeTypes.Where(w => w.Name == "Point-in-Time").FirstOrDefault(),
+                FileExtension = _datasetContext.FileExtensions.Where(w => w.Name == GlobalConstants.ExtensionNames.ANY).FirstOrDefault(),
+                ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
+                DeleteIssuer = null,
+                DeleteIssueDTM = DateTime.MaxValue
+            };
         }
 
         private void CreateDataset(BusinessIntelligenceDto dto)
@@ -399,8 +396,7 @@ namespace Sentry.data.Core
             _datasetContext.Add(ds);
             dto.DatasetId = ds.DatasetId;
 
-            DatasetFileConfig config = new DatasetFileConfig();
-            CreateDatasetFileConfig(dto, config);
+            var config = CreateDatasetFileConfig(dto);
             _datasetContext.Add(config);
             ds.DatasetFileConfigs = new List<DatasetFileConfig>() { config };
 
