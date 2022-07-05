@@ -78,20 +78,18 @@ namespace Sentry.data.Infrastructure
         {
             List<ConfluentConnectorRoot> confluentConnectorRootList = new List<ConfluentConnectorRoot>();
 
-            const string CONNECTOR_CLASS = "io.confluent.connect.s3.S3SinkConnector";
-
             //Iterates over list of jObjects
             foreach (JToken currentToken in jConnectorObjects.Children())
             {
                 JToken connectorToken = currentToken.Children().First();
 
                 //Checks if the current connector class is set to io.confluent.connect.s3.S3SinkConnector
-                if ((string)connectorToken.SelectToken("info.config.['connector.class']") == CONNECTOR_CLASS)
+                if ((string)connectorToken.SelectToken("info.config.['connector.class']") == "io.confluent.connect.s3.S3SinkConnector")
                 {
                     //Get the status json string from current jToken
                     string statusToken = connectorToken.SelectToken("status").ToString();
 
-                    //Create and set 
+                    //Create and set the ConfluentConnectorRoot object
                     ConfluentConnectorRoot confluentConnectorRoot = new ConfluentConnectorRoot()
                     {
                         ConnectorName = currentToken.First.Path,
