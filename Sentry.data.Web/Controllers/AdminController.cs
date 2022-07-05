@@ -10,7 +10,7 @@ namespace Sentry.data.Web.Controllers
     /*[AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]*/
     public class AdminController : BaseController
     {
-        private IKafkaConnectorService _connectorService;
+        private readonly IKafkaConnectorService _connectorService;
         private readonly IDatasetService _datasetService;
 
         public AdminController(IKafkaConnectorService connectorService, IDatasetService datasetService)

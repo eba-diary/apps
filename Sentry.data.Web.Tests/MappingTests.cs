@@ -43,7 +43,6 @@ namespace Sentry.data.Web.Tests
                 Assert.AreEqual(cmList[i].ConnectorName, cdList[i].ConnectorName);
                 Assert.AreEqual(cmList[i].ConnectorState, cdList[i].ConnectorState);
             }
-
         }
 
     [TestMethod]

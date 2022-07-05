@@ -33,31 +33,31 @@ namespace Sentry.data.Infrastructure
         /// <returns>List of ConnectorDto's</returns>
         public async Task<List<ConnectorDto>> GetS3ConnectorsAsync()
         {
-            JObject JConnectorObjects = await requestConfluentJsonAsync("/connectors?expand=status&expand=info");
+            JObject JConnectorObjects = await RequestConfluentJsonAsync("/connectors?expand=status&expand=info");
 
-            List<ConnectorDto> connectorDtos = await mapJsonToDtosAsync(JConnectorObjects);
+            List<ConnectorDto> connectorDtos = MapJsonToDtos(JConnectorObjects);
 
             return connectorDtos;
         }
 
         /// <summary>
-        /// Requests Connector Status JSON object from Confluent API
+        /// Requests Connector status JSON object from Confluent API
         /// </summary>
         /// <param name="connectorName">Name of Connector to retrieve</param>
-        /// <returns>Connector Status JSON object</returns>
+        /// <returns>Connector status JSON object</returns>
         public async Task<JObject> GetS3ConnectorStatusAsync(string connectorName)
         {
-            return await requestConfluentJsonAsync($"/connectors/{connectorName}/status");
+            return await RequestConfluentJsonAsync($"/connectors/{connectorName}/status");
         }
 
         /// <summary>
-        /// Requests Connector Config JSON object from Confluent API
+        /// Requests Connector config JSON object from Confluent API
         /// </summary>
         /// <param name="connectorName">Name of Connector to retrieve</param>
-        /// <returns>Connector Config JSON object</returns>
+        /// <returns>Connector config JSON object</returns>
         public async Task<JObject> GetS3ConnectorConfigAsync(string connectorName)
         {
-            return await requestConfluentJsonAsync($"/connectors/{connectorName}/config");
+            return await RequestConfluentJsonAsync($"/connectors/{connectorName}/config");
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Sentry.data.Infrastructure
         /// </summary>
         /// <param name="resource">Specified request</param>
         /// <returns>JSON object returned from passes in request</returns>
-        private async Task<JObject> requestConfluentJsonAsync(string resource)
+        private async Task<JObject> RequestConfluentJsonAsync(string resource)
         {
             HttpResponseMessage response = await GetRequestAsync(resource).ConfigureAwait(false);
 
@@ -74,67 +74,35 @@ namespace Sentry.data.Infrastructure
             return JObject.Parse(connectorOjbectsList);
         }
 
-        private async Task<List<ConnectorDto>> mapJsonToDtosAsync(JObject jConnectorObjects)
+        private List<ConnectorDto> MapJsonToDtos(JObject jConnectorObjects)
         {
-            List<ConfluentConnectorRoot> confluetConnectorRoots = new List<ConfluentConnectorRoot>();
+            List<ConfluentConnectorRoot> confluentConnectorRootList = new List<ConfluentConnectorRoot>();
 
-            List<string> confluentConnectorNameList = await getConnectorNameListAsync();
+            const string CONNECTOR_CLASS = "io.confluent.connect.s3.S3SinkConnector";
 
-            //Iterates over entire list of confluent connector names returned from API
-            confluentConnectorNameList.ForEach(delegate (string connectorName)
+            //Iterates over list of jObjects
+            foreach (JToken currentToken in jConnectorObjects.Children())
             {
-                //Parses passed in JSON object and returns JToken of specified connector  
-                JToken jToken = jConnectorObjects.Property(connectorName).Children().First();
+                JToken connectorToken = currentToken.Children().First();
 
-                // Get connector info data and set it the ConfluentConnecterRoot.ConflueConnetorInfo field
-                string infoToken = jToken.SelectToken("info").ToString();
-
-                // Checks if the connector class is of type io.confluent.connect.s3.S3SinkConnector, if not, the connector will be skipped and not added to the list
-                if (infoToken.Contains("io.confluent.connect.s3.S3SinkConnector"))
+                //Checks if the current connector class is set to io.confluent.connect.s3.S3SinkConnector
+                if ((string)connectorToken.SelectToken("info.config.['connector.class']") == CONNECTOR_CLASS)
                 {
+                    //Get the status json string from current jToken
+                    string statusToken = connectorToken.SelectToken("status").ToString();
+
+                    //Create and set 
                     ConfluentConnectorRoot confluentConnectorRoot = new ConfluentConnectorRoot()
                     {
-                        ConnectorName = connectorName
+                        ConnectorName = currentToken.First.Path,
+                        ConfluentConnectorStatus = JsonConvert.DeserializeObject<ConfluentConnectorStatus>(statusToken)
                     };
 
-                    ConfluentConnectorInfo connectorInfo = JsonConvert.DeserializeObject<ConfluentConnectorInfo>(infoToken);
+                    confluentConnectorRootList.Add(confluentConnectorRoot);
+                }
+            };
 
-                    confluentConnectorRoot.ConfluentConnectorInfo = connectorInfo;
-
-                    // Get connector status data and set it the ConfluentConnecterRoot.ConflueConnetorStatus field
-                    string statusToken = jToken.SelectToken("status").ToString();
-
-                    ConfluentConnectorStatus connectorStatus = JsonConvert.DeserializeObject<ConfluentConnectorStatus>(statusToken);
-
-                    confluentConnectorRoot.ConfluetConnectorStatus = connectorStatus;
-
-                    confluetConnectorRoots.Add(confluentConnectorRoot);
-                }   
-            });
-
-            return MapToList(confluetConnectorRoots);
-        }
-
-        /// <summary>
-        /// Request list of all Connector names from Confluent API
-        /// </summary>
-        /// <returns>String List of Connector Names</returns>
-        private async Task<List<string>> getConnectorNameListAsync()
-        {
-            List<string> connectorNameList = new List<string>();
-
-            HttpResponseMessage response = await GetRequestAsync("/connectors").ConfigureAwait(false);
-
-            string jsonString = response.Content.ReadAsStringAsync().Result;
-
-            var jArray = JArray.Parse(jsonString);
-
-            foreach (var j in jArray)
-            {
-                connectorNameList.Add(j.ToString());
-            }
-
-            return connectorNameList;
+            return MapToList(confluentConnectorRootList);
         }
 
         private List<ConnectorDto> MapToList(List<ConfluentConnectorRoot> confluentConnectorRoots)
@@ -155,13 +123,13 @@ namespace Sentry.data.Infrastructure
             int connectorRunningTaskCount = 0;
 
             //Counts the amount of running Connector Tasks
-            foreach (ConfluentConnectorStatusTask task in confluentConnectorRoot.ConfluetConnectorStatus.Tasks)
+            foreach (ConfluentConnectorStatusTask task in confluentConnectorRoot.ConfluentConnectorStatus.Tasks)
             {
                 if (task.state == ConnectorStateEnum.RUNNING.ToString()) connectorRunningTaskCount++;
             }
 
             //Checks if all Connector Tasks are running
-            if (connectorRunningTaskCount == confluentConnectorRoot.ConfluetConnectorStatus.Tasks.Count)
+            if (connectorRunningTaskCount == confluentConnectorRoot.ConfluentConnectorStatus.Tasks.Count)
             {
                 connectorDto.ConnectorState = ConnectorStateEnum.RUNNING;
             }
@@ -171,7 +139,7 @@ namespace Sentry.data.Infrastructure
                 connectorDto.ConnectorState = ConnectorStateEnum.FAILED;
             }
             //Checks if a portion of the Connector Tasks have failed
-            else if (connectorRunningTaskCount > 0 || connectorRunningTaskCount < confluentConnectorRoot.ConfluetConnectorStatus.Tasks.Count)
+            else if (connectorRunningTaskCount > 0 || connectorRunningTaskCount < confluentConnectorRoot.ConfluentConnectorStatus.Tasks.Count)
             {
                 connectorDto.ConnectorState = ConnectorStateEnum.DEGRADED;
             }

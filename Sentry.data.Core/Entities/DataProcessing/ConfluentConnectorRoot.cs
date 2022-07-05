@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.GlobalEnums;
@@ -10,9 +11,6 @@ namespace Sentry.data.Core.Entities.DataProcessing
     public class ConfluentConnectorRoot
     {
         public string ConnectorName { get; set; }
-
-        public ConfluentConnectorStatus ConfluetConnectorStatus { get; set; }
-
-        public ConfluentConnectorInfo ConfluentConnectorInfo { get; set; }
+        public ConfluentConnectorStatus ConfluentConnectorStatus { get; set; }
     }
 }

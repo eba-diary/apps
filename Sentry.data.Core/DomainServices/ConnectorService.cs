@@ -25,9 +25,9 @@ namespace Sentry.data.Core
         }
 
         /// <summary>
-        /// Goes to Kafka Connector provider, retrieves a list of S3 ConnectorRootDto's and sorts them by Connector name.
+        /// Goes to the Kafka Connector provider, retrieves a list of S3 ConnectorDto's and sorts them by Connector name.
         /// </summary>
-        /// <returns>List of ConnectorRootDto's</returns>
+        /// <returns>List of ConnectorDto's</returns>
         public async Task<List<ConnectorDto>> GetS3ConnectorsDTOAsync()
         {
             List<ConnectorDto> unsortedList = await _connectorProvider.GetS3ConnectorsAsync();
@@ -38,20 +38,20 @@ namespace Sentry.data.Core
         }
 
         /// <summary>
-        /// Requests S3 Connector by it's name and retrieves S3 Cconnector Status JSON object
+        /// Requests S3 Connector by it's name and retrieves a status JSON object
         /// </summary>
-        /// <param name="connectorName">Name of S3 connector to be returned</param>
-        /// <returns>Specified JSON connector status object</returns>
+        /// <param name="connectorName">Name of S3 Connector to be returned</param>
+        /// <returns>Specified JSON Connector status object</returns>
         public async Task<JObject> GetS3ConnectorStatusJSONAsync(string connectorName) 
         { 
             return await _connectorProvider.GetS3ConnectorStatusAsync(connectorName);
         }
 
         /// <summary>
-        /// Requests S3 Connector by it's name and retrieves S3 Cconnector Config JSON object
+        /// Requests S3 Connector by it's name and retrieves a config JSON object
         /// </summary>
-        /// <param name="connectorName">Name of S3 connector to be returned</param>
-        /// <returns>Specified JSON Connector Config object</returns>
+        /// <param name="connectorName">Name of S3 Connector to be returned</param>
+        /// <returns>Specified JSON Connector config object</returns>
         public async Task<JObject> GetS3ConnectorConfigJSONAsync(string connectorName)
         {
             return await _connectorProvider.GetS3ConnectorConfigAsync(connectorName);
