@@ -2,4 +2,24 @@
 @{
     ViewBag.Title = "_AdminTest";
 }
-<h2>Pretend I'm an Accordion!</h2>
+
+<div class="accordion" id="dataFlowMetricAccordion">
+    <div class="card">
+        <div id="headingOne">
+                <button class="btn btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne">
+                    <h4 class="d-inline-block" style=" padding-left: 25px; padding-top: 0px; padding-bottom: 0px">zzz_ExampleFileName.csv</h4>
+                    <h4 class="d-inline-block" style=" padding-left: 100px; padding-top: 0px; padding-bottom: 0px">Monday, June 15, 2009 1:45:30 PM</h4>
+                    <h4 class="d-inline-block" style=" padding-left: 100px; padding-top: 0px; padding-bottom: 0px">Monday, June 15, 2009 1:45:30 PM</h4>
+                    <h4 class="d-inline-block" style=" padding-left: 100px; padding-top: 0px; padding-bottom: 0px">00:00:00</h4>
+                    <i class="d-inline-block bi-check-circle-fill show" style=" padding-left: 25px;"></i>
+                </button>
+        </div>
+        <div id="collapseOne" class="collapse" data-parent="#dataFlowMetricAccordion">
+            <div>
+                <h5 style="padding-left: 25px; padding-top: 10px; padding-bottom: 10px">  <a href="#"> Event 1</a></h5>
+                <h5 style="padding-left: 25px; padding-top: 10px; padding-bottom: 10px">  <a href="#"> Event 2</a></h5>
+                <h5 style="padding-left: 25px; padding-top: 10px; padding-bottom: 10px">  <a href="#"> Event 3</a></h5>
+            </div>
+        </div>
+    </div>
+</div>

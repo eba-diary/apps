@@ -36,7 +36,7 @@ namespace Sentry.data.Infrastructure
                 Query = boolQuery
             };
 
-            ElasticResult<DataFlowMetricEntity> elasticResult = _elasticContext.SearchAsync<DataFlowMetricEntity>(request).Result;
+            ElasticResult<DataFlowMetricEntity> elasticResult = _elasticContext.SearchAsync(request).Result;
             return elasticResult.Documents.ToList();
         }
     }

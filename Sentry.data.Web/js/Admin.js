@@ -40,7 +40,7 @@ data.Admin = {
             url: url,
             success: function (data) {
                 $("#schemaDropdown").materialSelect({ destroy: true });
-                var s = '<option value="-1">Please Select a Schema</option>';
+                var s = '<option value="-1"  id = "defaultSchemaSelection">Please Select a Schema</option>';
                 for (var d of data) {
                     s += '<option value="' + d.SchemaId + '">' + d.Name + '</option>';
                 }
